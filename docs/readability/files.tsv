@@ -64,17 +64,17 @@ include/EDITOR/fullMap.h	58	6	1	read	8d6b1d48cca513d44f22889844464ac49a2ec52809c
 include/EDITOR/mapcell.h	149	1	1	read	c2aa8f2d2c3dae60671da97867fb09fd971afdd2915f6dedc645f63a282b6e11	B12: full tileset/bitfield/old-record layouts and HasFlag inline; R14
 include/Ints.h	539	53	68	read	6fd249695ef01cdc160942d87e37d0bc9af2958788205727702a2ed611acf87a	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
 include/SOURCE/ADVMGR.h	149	0	1	read	7b9777229ae53954e735bd38d318f1392596f3e187b1279251d6f151c13af7c7	B14: complete remote/sound/command/draw/options domains and global declarations; no bodies
-include/SOURCE/ADVMGR_TYPES.h	23	0	1	unread	6a06b6a52b2e2d0463956f6831813a88f15f2e37f5cfa97e92068613cb05c931	-
+include/SOURCE/ADVMGR_TYPES.h	23	0	1	read	6a06b6a52b2e2d0463956f6831813a88f15f2e37f5cfa97e92068613cb05c931	B25: complete packed adventure save/player-exit/raw-byte remote payload union and size contract; no bodies
 include/SOURCE/ARMY.h	166	0	1	read	882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658	B13: complete animation/sample/spell/frame domains and packed SMonFrameInfo; no bodies
 include/SOURCE/CMBTMGR.h	18	0	1	read	9e2fc82b267ab2b69708140660f3ae6998f60f1ddfb2b4c14dbce6aaa2f9f43e	B14: complete combat tower origin/ValidHex/options API; no bodies
 include/SOURCE/COMMAND.h	44	0	1	read	a852441f65690400de7c81809b11723e54e194f1f80ec79c4215b22ce04fea8c	B22: complete combat action domain, packed 25-byte remote packet and handler declarations; no bodies; H53
 include/SOURCE/CONFIG_TYPES.h	130	0	1	read	6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f	B10: complete packed graphics/config records and enum/storage contracts; H15; no bodies
 include/SOURCE/CURSOR.h	110	0	1	read	8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916	B22: complete cursor/movement/change domains, packed 11-byte SMapChange union and SendMapChange declaration; no bodies
-include/SOURCE/Campaign.h	78	0	1	unread	8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc	-
+include/SOURCE/Campaign.h	78	0	1	read	8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc	B25: complete campaign message/award domains and declarations; no bodies; implementation unread
 include/SOURCE/Castle.h	22	0	1	unread	f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510	-
 include/SOURCE/EVENTS.h	331	0	3	read	aa48042c559abec23312bf2709282ddcdbb1fcc4113360570182f8e556860cc0	B23: complete event/object/resource domains and packed map-extra event/hero/town layouts, macros and declarations; no bodies; EVENTS implementation unread
 include/SOURCE/EVENTS_TYPES.h	43	0	1	unread	33ad4e93fb77eeed235a8f5b40cf6a24eaa21e70143ba7321ae2dc71d6780210	-
-include/SOURCE/ExpCampaign.h	153	0	1	unread	96f9d7cdb3e1bb99fe3bb93377ab8389c1531b9f0ddfbff680fee339863fbe24	-
+include/SOURCE/ExpCampaign.h	153	0	1	read	96f9d7cdb3e1bb99fe3bb93377ab8389c1531b9f0ddfbff680fee339863fbe24	B25: complete expansion campaign IDs/maps/awards and packed state/interface; no bodies; implementation unread
 include/SOURCE/FINDPATH.h	16	0	1	read	7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665	B14: complete terrain cost declaration; no bodies
 include/SOURCE/GAME.h	170	0	1	read	709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185	B13: complete calendar/serialization/player/random/weekly domains and free APIs; no bodies
 include/SOURCE/HERO.h	17	0	1	read	40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6	B13: complete hero UI declarations; no bodies
@@ -108,7 +108,7 @@ include/SOURCE/combatTypes.h	119	8	8	read	4cd3766ce7192a3952a2a8b8ea30a7949509f7
 include/SOURCE/comwin.h	62	0	1	unread	951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512	-
 include/SOURCE/dimPalette.h	14	0	1	read	bbebfa76143453b5a65687189a368b5e436756e073c5d2504703d46c4dabc945	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/SOURCE/dpnetwin.h	103	0	1	unread	ed4e337cf85139cf1ea816c6668120be372acf6c045a536d1fed768ede2d87b1	-
-include/SOURCE/fileRequester.h	122	0	1	unread	77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b	-
+include/SOURCE/fileRequester.h	122	0	1	read	77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b	B25: complete filename/extension domains, packed requester/window layout and interface; no bodies; implementation unread
 include/SOURCE/game.h	356	5	1	read	fcaa4554262de8c324295e02c4f11a1b2f37453dafcc3710adda23bc68961924	B13: complete game/boat/mine/campaign/save/runtime layouts and API; five existing owner accessors
 include/SOURCE/hero.h	239	1	1	read	b18f61633fc21a8d1127f7d074458ea3521c06026c79aa5542922ccce878b986	B13: complete packed runtime/serialized hero/flag/skill domains; IsEmbarked inline; H22/R15
 include/SOURCE/hexcell.h	45	0	1	read	bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5	B12: complete packed occupant/corpse/path/clipping layout and declarations; no bodies
@@ -178,7 +178,7 @@ src/BASE/listbox.cpp	538	8	0	read	08c4e9385dd8785a2d5e4ec8272b17fe91e1264ae7f9b3
 src/BASE/miscwin.cpp	89	2	0	read	14d866b4c87c49c46eb75011803c8cfbc14b146d711c408f930f1fc65a6bff0e	B04: 2 bodies; VESA fixed-pitch blit, enlargement/net-box exclusion and scaled invalidation; H10/R06
 src/BASE/soundmgr.cpp	537	22	1	read	3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750474a04b4d8231b0d26ca	B06: 22 bodies; both backend selection/failure/dispatch, full fade state machine; H07/H14; R08
 src/EDITOR/mapcell.cpp	264	11	0	read	11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f	B12: 11 bodies; allocation/extra chains/old-format read/write and both tile branches; R14
-src/SOURCE/ADVMGR.cpp	10885	95	8	unread	07da270722ada59c233a8fbf9567d07e2753ba0362924e4eb125f2203b93cc7c	-
+src/SOURCE/ADVMGR.cpp	10885	95	8	read	07da270722ada59c233a8fbf9567d07e2753ba0362924e4eb125f2203b93cc7c	B25: all 95 bodies, constants/macros/data; full lifecycle/input/draw/radar/UI/context/travel/sound/route/network/puzzle/options/visions paths; H01/H06/H07/H14/H20-H22/H24-H26/H29-H33/H41/H44/H59-H63/R26
 src/SOURCE/AI.cpp	1090	19	21	read	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
 src/SOURCE/ARMY.cpp	3674	47	18	read	5653eee7093d2efcf72493adcd5e376eed1507dd54326d707a2ff55e6e297bf6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMYGRP.cpp	282	14	0	read	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	B12: 14 bodies including strict SwapValues; full morale/slots/damage and conditional swaps; H20/R14

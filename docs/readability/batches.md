@@ -381,3 +381,32 @@ preserves network/input/direction, army-filter, reward/lifetime and random/timin
 contracts. The three local pickup-sound tails are not promoted from a searched
 EVENTS occurrence; it uses another random stream and its full body is unread.
 No game source, headers, configuration or behavior were changed.
+
+## B25 — complete adventure manager and remaining UI/packet declarations
+
+Read all 10,885 lines and 95 definitions of ADVMGR.cpp, including every constant,
+macro, unannotated helper, overload and trailing data declaration. Reconciled
+the full index after reading. Covered initialization/cleanup, command/input/
+selection/hover, the complete 1,039-line DrawCell and every draw/radar path,
+quick/bottom views, context/scrolling, travel spells, environmental sounds,
+routes, network control, puzzle, panels/options, visions and trigger queries.
+No partial long function was credited before its full body and file were read.
+
+Also read all of ADVMGR_TYPES.h (23 lines), ExpCampaign.h (153),
+fileRequester.h (122) and Campaign.h (78), with zero function bodies. Their
+packed packet/save/player-exit overlay, campaign IDs/awards/state and file
+requester/window interface establish declarations, not implementation coverage
+for the still-unread campaign, file requester, game and general remote TUs.
+The other adventure/cursor/map/game/hero/window owners were previously read.
+
+H01/H06/H07/H14/H20-H22/H24-H26/H29-H33/H41/H44 gain concrete consumers or
+explicit source-shape exclusions. Targeted comparison against the already-read
+CURSOR, COMMAND and WINDOW bodies confirms H59-H63: the two-call adventure
+redraw, fixed viewport icon calls, flipped hero-shadow remap, explicitly owned
+widget-pointer disposal, and scouting-plus-telescope radius. Existing
+RedrawAdvScreen and RemoveAndDeleteWidget(id) have materially broader/different
+contracts, not interchangeable implementations of the small repeated idioms.
+R26 records algorithm, lifetime, numeric, state and protocol distinctions;
+GetHeroSlot/owner-array access favors existing game accessors, while cursor
+snapshot and adjacent-config-field speed selection remain local/pending leads.
+No executable source, header, configuration or behavior was changed.

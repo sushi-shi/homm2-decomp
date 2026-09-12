@@ -56,6 +56,11 @@ following text/value write and each broadcast explicit. Its resource-animation
 setup writes the text pointer before selecting an id; scattered stores and
 subsequent id-only broadcasts are not contiguous instances of the macro.
 
+B25 adds QuickInfo, TownQuickView and TownGate's initial list message in ADVMGR.
+Locator updates and options panels often reuse a previously established type or
+write id before command. DisableButtons/EnableButtons put data before id; these
+are not additional exact three-store prefixes.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -179,6 +184,10 @@ file-static state assignments in place; the scaling wrapper has no raw lookup.
 B16 adds the raw effect-frame lookup in `army::PowEffect`; `army::SpellEffect`
 already uses the API. Keep current frame and icon selection in the caller.
 
+B25 adds UpdBottomViewHero's raw byte-address lookup; HeroQuickView and
+TownQuickView already call GetIconEntry. Icon choice, frame, centering arithmetic
+and final coordinate narrowing remain explicit.
+
 ## H07 — sequential clamp to a scroll range
 
 Disposition: shared small idiom; macro versus inline remains an evidence question.
@@ -218,6 +227,12 @@ B19 adds lower-then-upper scalar clamps in `AddBolt` / `DoLuck` (upper compariso
 have reversed operands) and an upper-then-lower branch-distance clamp in
 `ChainLightning`. `DrawBolt` also updates matching float coordinates on a clamp;
 it is not the same scalar-only idiom.
+
+B25 adds the per-axis lower/upper map-origin clamps in ScreenScroll.
+ProcessSelect/ProcessHover interleave X and Y bounds differently; do not regroup
+their stores into two scalar clamps. SummonBoat's fizzle rectangle instead
+applies lower coordinate bounds then shrinks width/height at the far edges;
+it is not the same scalar lower/upper clamp.
 
 ## H08 — list row and scrollbar drag arithmetic
 
@@ -427,6 +442,9 @@ the indirection and its matching cost.
 
 B15 confirms the exact mask/priority/active sequence at the end of
 `combatManager::Open`; combat resource setup and name copying stay outside it.
+
+B25 confirms the same final three stores in advManager::Open. Restoring the
+saved sound volume and copying the manager name are outside this protocol.
 
 ## R08 — unified audio lifecycle or backend-dispatch macros
 
@@ -655,6 +673,10 @@ the mask; faction-specific shrine and fortification guards remain caller-owned.
 B17 adds the knight/rainbow background and moat tests in `DrawBackground` /
 `DrawFrame`. Preserve castle and faction short-circuit conditions outside it.
 
+B24-B25 add command turret checks and adventure UpdateTownLocators,
+UpdBottomViewKingdom and TownQuickView castle checks. Counting towns, known-town
+bits, faction-specific frames and mage-guild information levels remain separate.
+
 ## R14 — data-owner algorithms and deceptively similar state resets
 
 The map owner already has `Cell`, `GetCell`, `Row`, `Column`, `Extra` and
@@ -708,6 +730,10 @@ The count/type reset at the start of `UpdateArmyGroup` instead matches the
 existing `Dismiss` type-then-count order; it is a possible existing-method reuse,
 not a new reset macro. Preserve initialization and store sequencing if measured.
 
+B21/B25 add tactical AI's group-slot queries and adventure bottom-view /
+HeroQuickView / TownQuickView counting and skipping. They still test the type
+sentinel alone, not positive quantity or combat army::IsAlive.
+
 ## H22 — reuse the existing embarked-state accessor
 
 Disposition: existing small inline worth wider use, not a new flag framework.
@@ -726,6 +752,10 @@ may still change `/Ob1` expansion shape and must be measured later.
 B23 adds MoveHero's movement/event/adjacent-monster guards and both hero checks
 in ValidMoveWithEvent. Preserve the nested lookup of the destination hero and
 do not replace the separate boat-object or occupied-boat-id tests.
+
+B25 adds DrawCell's hero-versus-boat cursor selection, SetHeroContext and the
+DimensionDoor/TownGate guards. Teleport/demobilize writes to the event flags are
+mutations, not occurrences of this read-only accessor.
 
 ## H23 — compact an owner's signed-id array without changing its count
 
@@ -804,6 +834,10 @@ B23 adds MoveHero's current/destination terrain queries for walking samples,
 water handling and music. Keep those individual cell resolutions and query
 times: callbacks and the actual move separate some uses.
 
+B25 adds adventure hover/search, cursor context, travel-spell and environmental
+sound consumers. The full GetCell body confirms its (0,0) fallback; raw full-map
+and map-extra accesses do not acquire that behavior by sharing a terrain name.
+
 ## H25 — non-shadow, non-dummy object-sprite test
 
 Disposition: promising semantic predicate; final naming needs wider map review.
@@ -828,6 +862,13 @@ neighbor cells. Its `CURSOR_OBJECT_PASSABLE_FLAG` is also 0x80, another name for
 the same stored bit. These sites do not call IsShadow; do not introduce a new
 tileset/frame-based shadow test. North/south direction, overlay and trigger
 conditions remain outside the proposed three-field query.
+
+B25's FindAdjacentMonster uses the ordered negation (index equals 0xFF OR dummy
+tileset OR flag 0x80 set), only for a monster above the origin. Each short-circuit
+arm currently calls GetCell again. Passing one resolved pointer to an inline
+would change the lookup count; retain this as a source-shape variant requiring
+measurement, not an automatic replacement. Digging and boat-placement checks
+also inspect other fields and are not this predicate.
 
 ## H26 — adventure-map coordinate bounds
 
@@ -856,6 +897,12 @@ B23 adds ValidMoveWithEvent's x-lower/x-upper/y-lower/y-upper rejection using
 These are runtime dimensions, not an assumed fixed 144-square map. ValidMove
 instead tests the translated map origin against -7 and dimension-minus-8;
 its later center coordinates are not interchangeable helper inputs.
+
+B25 fully confirms GetCell and adds InsertSound's both-lowers-before-both-uppers
+form, plus QuickInfo/SummonBoat's axis-grouped variants. FindAdjacentMonster's
+strict interior fast path excludes the edge cells; MapExtraPosAndAdjacentsSet
+reads its center before checking neighboring bounds. Neither is a universal
+bounded-map iterator, and no helper should move the center access under a guard.
 
 ## H27 — reuse the existing search-node accessor
 
@@ -963,6 +1010,9 @@ Do not clamp `m_spellPoints`, infer spellbook possession, or reinterpret capacit
 as the current balance. Above-normal spell points are explicitly allowed by the
 hero UI. No additional minimum/maximum or rounding rule belongs in this helper.
 
+B25 adds HeroQuickView's normal-capacity display with the same Stats call and
+integer factor. Its information-visibility conditions stay outside the helper.
+
 ## H30 — shorter calls for a text-only NormalDialog
 
 Disposition: strong fixed-argument readability candidate; owner body review pending.
@@ -983,6 +1033,11 @@ still require their full planned review before finalizing defaults.
 
 B19 adds `ViewSpells` and mirror-creation failure. The NORMAL_DIALOG sentinel
 names denote the same -1/zero tail; their long message formatting stays outside.
+
+B24-B25 add command help/result dialogs and adventure search, travel, panels,
+system-options and visions dialogs. Raw mode 1 remains an explicit argument;
+OPTION_DIALOG_NONE and NORMAL_DIALOG_NO_RESOURCE both denote the same -1 tail.
+Resource/artifact-bearing calls, including movement-event dialogs, are excluded.
 
 ## H31 — check an already-stored allocation with the existing error handler
 
@@ -1008,6 +1063,10 @@ when `gbInMemError` is set; otherwise it logs, formats a message and calls
 B19 adds palette allocation checks in `Armageddon` and `DoBolt`; nearby bolt,
 flight, ripple and vaporize allocations without checks remain unchanged.
 
+B24-B25 add stored window/widget allocations in command and adventure UI,
+including Open, bottom/quick views and adventure/options panels. Unchecked
+TownPortalWin, border/fizzle buffers and text buffers are not newly checked.
+
 ## H32 — preserve the dialog result and request handler completion
 
 Disposition: strong small statement protocol shared by two reviewed handlers.
@@ -1029,6 +1088,11 @@ have the relevant widget-message context; retain it and the original button id.
 B24 adds WinCombatHandler's ordinary exit and timeout exit. The latter first
 sets the message type, then performs the same three stores, then clears the
 timeout; neither extra operation belongs inside the shared completion macro.
+
+B25 adds TownPortalHandler, APanelHandler, CPanelHandler and SystemOptionsHandler.
+The latter's SYSTEM_OPTION_FIRST alias is also 10. DimensionDoorHandler only
+writes the final id/command pair and deliberately does not copy a global result;
+it is not an instance. Confirmation/cancel interpretation remains caller-owned.
 
 ## R17 — combat setup, reset and presentation are not one generic algorithm
 
@@ -1081,6 +1145,9 @@ replacing that list with the four-type predicate would be wrong.
 B24 adds DoVictory's exact earth/air/fire/water exclusions and AddArmy's exact
 positive four-type tail. Skeleton exclusion, light-palette flag, mirror flag,
 quantity and slot-reuse policy remain caller-owned.
+
+B25 adds DoVisions' earth/air/fire/water exclusions in that same order. Ghost,
+hideous-mask, CanJoin and relative-strength checks do not belong in the helper.
 
 ## H34 — clamp the accumulated combat extents
 
@@ -1310,6 +1377,11 @@ rank below the stronger fixed-bound and short-call candidates if so.
 B18 adds FlyTo's saved-extent accumulation. B19's bolt accumulation instead
 orders X-max/X-min/Y-max/Y-min before and after drawing; do not normalize it.
 
+B25's ComboDraw grows X-min/X-max/Y-min/Y-max, then separately converts cells
+to pixel bounds and clips them. It is another ordered variant, not automatic
+reuse of combat globals. Adventure UpdateScreen uses max-minus-min extents
+without +1; it must not inherit H35's inclusive-region conversion.
+
 ## H42 — default optional combat sprite drawing arguments
 
 Disposition: strong default-argument candidate on an already-reviewed API.
@@ -1413,6 +1485,12 @@ distance substitution, wider overflow policy, pre-conversion to float/double,
 or extra absolute-value operation. This is not H39's approximate cell metric.
 Movement step rounding, minimum counts and division by frame count stay outside;
 they differ among flight, missiles and blast segments.
+
+B25's IsCrystalBallInEffect uses the same integer-square/double-sqrt/i32-truncate
+boundary in map-cell units, but repeats coordinate subtraction instead of using
+existing delta locals. A broader name such as IntegerVectorLength would need
+that domain and source-shape distinction reviewed. Comparing squared distances
+directly would lose the current truncation before the inclusive radius test.
 
 ## H45 — replace the one cached combat-effect icon
 
@@ -1930,3 +2008,245 @@ or removed. Hero death/idle arrays and army frame state are different owners.
 InCombatArea is already a named local-use boundary and does not justify a new
 all-screen/hex predicate. Settings updates and AddArmy's fizzle sequence keep
 their specific redraw, visibility, resource and preference-write order.
+
+## H59 — redraw the current adventure view and request its update
+
+Disposition: credible small owner method / two-call macro; not a full UI refresh.
+
+ProcessMapChange in CURSOR and Main, ProcessSelect, ProcessSearch,
+HeroQuickView, TownQuickView, CheckCastSpell and ScreenScroll in ADVMGR repeat
+`CompleteDraw(0); UpdateScreen(0, 0);` contiguously. A proposed
+`advManager::DrawAndUpdateView()` would name only that ordered pair. Owner:
+SOURCE/advManager.h. Both complete implementations and the one-argument
+CompleteDraw overload are read: the overload uses the current map origin,
+forceDraw=0 and updateBottomView=1.
+
+Preserve each call, their arguments and repeated receiver/global reads. Do not
+add an outer bShowIt guard: drawing and updating each have their own sound,
+timer and visibility behavior. UpdateScreen with force=0 can decline a display
+update, so the name must not promise a forced blit. Caller radar updates,
+mobilization, route changes and hover processing remain outside. Four-argument
+CompleteDraw calls are related variants, not this exact source prefix.
+RedrawAdvScreen also rebuilds backdrop/border, locators and UI and is not an
+existing substitute. Prefer a narrow method only if measured inline expansion
+and its name justify hiding two already meaningful calls; no RAII refresh guard.
+
+## H60 — adventure-viewport icon call with explicit clipping mode
+
+Disposition: strong fixed-argument statement/expression macro candidate.
+
+DrawCursor / DrawCursorShadow in CURSOR and DrawCell / PuzzleDraw in ADVMGR
+repeatedly call `IconToBitmap(icon, gpWindowManager->m_screen, x, y, frame,
+clip, 0, 0, 480, 480, 0)`. CURSOR_CLIP_SIZE, DRAW_CLIP_WIDTH/HEIGHT and
+PuzzleDraw's SCREEN_HEIGHT denote that same 480-square adventure viewport.
+A proposed `DRAW_ADVENTURE_ICON(icon, x, y, frame, clip)` at SOURCE/ADVMGR.h
+could expose the viewport contract while removing six mechanical arguments.
+This is an adventure-layer convenience, not a new BASE decoder abstraction.
+
+Keep the normal and FlipIconToBitmap forms separately named; both occur across
+these TUs and have the same fixed rectangle but different rendering semantics.
+Pass each varying operand once with its existing argument conversion and
+evaluation behavior. Frame masking, animation, color choice and mirrored X
+offsets stay explicit. Keep clip mode explicit even when the same fixed extents
+are ignored in no-clip mode. DrawCursor's non-flipped boat flag instead supplies
+zero extents and is not an exact instance. Color/palette, monochrome, scaled and
+sheared APIs are excluded. Default arguments on the BASE function cannot encode
+this caller-specific screen/rectangle contract without affecting other domains.
+
+## H61 — flipped land-hero shadow-frame remapping
+
+Disposition: credible small ordered remap, with a separate final frame offset.
+
+DrawCell in ADVMGR and DrawCursorShadow in CURSOR apply the same five independent
+ifs to an already-resolved i32 frame: 51→56, 50→57, 49→58, 47→55, 46→55, in that
+order. A proposed `REMAP_FLIPPED_HERO_SHADOW_FRAME(frame)` or small reference
+inline belongs at the shared adventure cursor/frame interface in SOURCE/CURSOR.h.
+The two private constant domains have been compared by value; they are not
+different animation rules.
+
+Keep the initial frame assignment, mask and cursor frame-count addition in the
+caller. Retain conditional-only writes to the existing local, repeated tests
+and order; do not replace them with a lookup table, switch or a newly narrowed
+frame argument without byte evidence. Both subsequently pass
+`frame + (frame >= 9 && frame < 36 ? 50 : 0)` to the normal icon renderer.
+That shared expression can be named separately, but storing its result back
+into the local would add a mutation absent from the source. The boat shadow
+uses offset 36 and no five-frame remap. Non-flipped shadows and flag frames
+are not instances. The name explains an otherwise opaque sprite-sheet rule;
+the entire shadow draw workflow remains caller-owned.
+
+## H62 — detach and delete one explicitly owned widget pointer
+
+Disposition: plausible small lifetime helper with a deliberately narrow contract.
+
+advManager::ClearBottomView in ADVMGR and combatManager::ClearWinLoseBottom in
+COMMAND repeat `if (pointer != NULL) { window->RemoveWidget(pointer); delete
+pointer; }` for each of two widget arrays. A proposed
+`REMOVE_AND_DELETE_WIDGET_POINTER(window, pointer)` belongs beside heroWindow's
+widget operations. The existing RemoveWidget calls Close and unlinks the widget
+but does not delete it. Keep that existing call rather than duplicating its list
+algorithm, including its current edge-case behavior.
+
+The helper must not clear the array slot: both callers null both pointers only
+after both detach/delete sequences. Keep those stores, loop bounds, adventure's
+early empty-view guard and its subsequent global resets outside. Macro operands
+must be stable and side-effect-free; an inline that captures the pointer once
+changes the repeated lvalue-read behavior across RemoveWidget/Close and needs
+explicit alias/codegen review. Preserve pointer static type and deletion form.
+heroWindow::RemoveAndDeleteWidget(id) is not equivalent: it searches for matching
+IDs and deletes only under WINDOW_FLAG_OWNS_WIDGETS, whereas these callers delete
+their explicit nonnull pointers unconditionally. No generic owner-container or
+cleanup-on-scope-exit framework follows from this shared pair.
+
+## H63 — hero scouting visibility radius including a telescope
+
+Disposition: credible small hero query shared by movement and teleportation.
+
+MoveHero in CURSOR and TeleportTo in ADVMGR pass
+`giVisRange[IDX(hero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])] +
+(hero->HasArtifact(ARTIFACT_TELESCOPE) != 0)` to game::SetVisibility.
+CURSOR_VISIBILITY_ARTIFACT aliases ARTIFACT_TELESCOPE. A proposed
+`hero::ScoutingVisibilityRadius()` belongs at SOURCE/hero.h with the existing
+artifact/skill queries; declaration placement must respect X_GLOBAL's table
+dependency. No existing equivalent method was found in the fully read owner.
+
+The table and skill slot are signed i8 storage; preserve their promotion and
+signed indexing, the one HasArtifact call and its explicit Boolean conversion,
+and the final integer sum. No minimum, clamp, duplicate-artifact count, alternate
+table or embarked modifier is added. Coordinates and player are not part of
+the helper: MoveHero uses direction-adjusted map origin, while TeleportTo uses
+the manager's current origin even when its no-show path leaves that origin
+unchanged. Their visibility timing, movement and blackout workflows differ.
+Further game/AI consumers remain to be fully read before final interface ranking.
+
+## R26 — adventure manager workflows and superficially shared formulas
+
+The complete 95-definition ADVMGR review retains the following boundaries; no
+observed oddity was corrected as part of this source-reading audit.
+
+Open/Close resource groups have different cache, disposal-level, null-check,
+entering-town and music conditions. The visibility buffer is allocated with
+new[] but currently scalar-deleted; this is not silently repaired. Sample-set
+selection's bridge/retail conditional forms differ for negative inputs. Sound
+volume and player/watch-player substitutions retain their exact restore order;
+draw suppression is not a universal save/restore guard. The final registration
+triple is H14, not an abstraction of the whole manager lifecycle.
+
+DoAdvCommand and Main retain route seeding/reversal, mobility, network/input
+dispatch and mouse-hide-count draining order. Reseed's actual body only clears
+giSeedingValid despite accepting two arguments. ProcessSelect performs some
+map-extra reads before GetCell's bounds fallback; radar dragging coalesces two
+events under its own protocol. Hover cursor modes depend on action-bit versus
+base object type and days-left offsets; not every branch updates selectedCell.
+The fixed six-player reveal calls, cheat guards and unusual next-town count
+conditions are not normalized by an iteration or selection macro.
+
+CompleteDraw retains PollSound before its show guard, layered whole-view passes,
+direction-dependent overlay order, border/cursor/bottom-view ordering and
+gbAllBlack's temporary origin stores. DrawCell uses shared file-static state,
+GetCell before border selection, watch-player visibility, packed terrain flags,
+and distinct base/extra object and overlay rules. Object chains stop at the first
+invalid object index, overlay chains at the first invalid overlay index; neither
+is a skip-invalid generic iterator. Garden, monster, mine, boat and flag frame
+rules differ. H60/H61 name only fixed call arguments and a verified remap.
+
+ComboDraw's 18×18 state is cleared with 256 bytes, not its entire array; retain
+the existing partial clear and neighbor indices, including suspicious negative
+ones. Its marking traversal and forward overlay passes differ from CompleteDraw.
+Extent growth, cell-to-pixel conversion, clipping, empty-rectangle behavior and
+UpdateScreen's max-minus-min widths are separate contracts. UpdateScreen also
+owns sound polling, timer deadlines, scroll offsets and animation-counter changes.
+Save/DrawAdventureBorder use a specific 640-pitch top/sides/bottom copy layout;
+they are not a general bitmap rectangle copier or ownership guard.
+
+Radar's 108-map raster uses integer 4/3 with remainders, its frame uses 1.33f,
+and selection uses 1.3333f; do not share a supposedly exact scale formula.
+UpdateRadar initializes its color once: an other-owner hero can retain the
+previous cell's color. Its neighboring castle query has distinct guards and
+uses the raw map accessor. Bounds, partial redraw spans, float conversions and
+current-player versus watch-player visibility must remain explicit.
+
+QuickInfo's visited-site flags vary between hero masks, player masks and packed
+metadata bits. Expansion/dwelling object-versus-overlay selection priorities also
+differ; a universal trigger lookup or HasVisited is not justified. Its tent/key
+text uses signed-byte toupper, not the combat CP1251 helper. GetArmySizeName's
+thresholds, grammar variants and shared diagnostic buffer remain a named owner
+algorithm, not a generic number formatter. Resource text with sprintf(source
+as format) is not H05's strcpy allocation/copy contract.
+
+Bottom-view widgets retain exact add/update order and buffer capacities. NewTurn
+assigns two allocations to the same text slot; enemy-turn logic compares the
+player just stored. DoHeroKnob/DoTownKnob differ in their double spans but share
+other seemingly odd constants; division occurs before the count guard and the
+page is narrowed before the subsequent local limit adjustment. No cleanup helper
+repairs those behaviors. HeroQuickView may repeat IsCrystalBallInEffect after
+window creation, whereas TownQuickView has different knowledge/debug/guild
+levels and radar/window ordering. Their post-dialog local-message checks retain
+the type left by widget setup. H62 does not unify their window/resource lifetimes.
+
+SetHeroContext/SetTownContext use last-match list searches and different route,
+mobilize, music and hover sequencing. Existing game::GetHero/GetTown and
+GetPlayerHero/GetPlayerTown already name unchecked owner-array access;
+GetHeroSlot's duplicate local expression is an existing-API reuse lead, not a
+reason to add another index macro or bounds policy. Cursor snapshots and its
+adjacent-config-field walking-speed expression remain local CURSOR leads; no
+second matching TU instance has yet been fully reviewed.
+
+Travel spells retain their own charge/cancel rules: mobility is deducted before
+travel UI; DimensionDoor can consume the spell after an accepted invalid terrain
+choice, TownGate charges only on success, and SummonBoat failure still reaches
+CastSpell's spell-use tail. TeleportTo sends the map change before cell mutation,
+clears/restores old occupancy under distinct flag rules and does not restore
+bShowIt. Its shown/no-show origins differ (H63). TownGate's nearest selection can
+choose an occupied town rather than another free one. SummonBoat chooses the
+first qualifying boat, not the nearest; trigger/metadata and packed coordinate
+stores retain order. No common movement transaction or travel-spell wrapper.
+
+ShowRoute tests destination X, seeds with its own limit, subtracts movement costs
+in stages and encodes u16 frame/reachability flags. HideRoute updates button and
+destination state before its visibility guard. SeedTo's related modes already
+have an owner method; none of these is a generic path iterator. Scrolling sets
+the deadline before clamping and demobilizes only if the origin changes.
+FindAdjacentMonster returns the first X-major match with a stricter interior
+fast path; its above-origin object test is the H25 negated/call-count variant.
+MapExtraPosAndAdjacentsSet tests the center before bounds and revisits it in the
+subsequent 3×3 scan.
+
+Environment sound scans process center then ordered perimeter edges in two
+layers. Existing sounds update distance only when smaller; replacement chooses
+the first strict farthest slot, stops it, stores metadata, lazily loads and
+starts playback, then XORs the active mask. TrimLoopingSounds retains ascending
+cached slots up to a memory-adjusted quota; this is not LRU or dispose-all.
+Backend, mute and stop-versus-volume-update behavior differ from other sound
+workflows. The environment-volume, floating-coordinate, remote-payload and
+route-visibility macros have existing local contracts; only the correctly
+ordered MAP_EXTRA_AT/MAP_EXTRA_AT_WFIRST expansions merit their existing names.
+
+CheckHandleNet accepts reliable and unreliable modes with a typed payload union,
+has receive-save failure/shutdown and synthetic player-exit paths, and returns
+raw packets for combat/unknown cases. Wait forwarding and executive close
+messages are not H32 widget completion. ComputeAdvNetControl's dead-player loop
+does not advance its index; the following active-player scan tracks a different
+choice. These behaviors are retained, not repaired with a common player loop.
+SaveGame has its own human/dead filtering, filename suffixes, disable/dialog/
+save/enable ordering and result replacement.
+
+ViewPuzzle keeps its exact piece permutation, coordinate perturbation, tan-map
+pixel pass and fizzle-source release choice. PuzzleDraw toggles gbDrawingPuzzle
+to true then false, not back to a saved value. Adventure/control/system panels
+keep context restoration and confirmation interpretation explicit (DIALOG_OK
+cancels the reset here). System option toggles differ: 1-x, Boolean zero test,
+modulo cycles and blackout transitions are not interchangeable. The always-true
+local music-presence helpers reflect this build's removed readiness checks;
+no new generic backend predicate follows. Preference writes, cursor-sample
+reloads, interface redraw and remobilization retain their order.
+
+GetMobilityFrame and GetManaFrame share a final threshold ladder locally, but
+their initial scaling, negative handling and minimum-visible rule differ.
+DoVisions scans through GetCell's fallback without clipping the candidate loop,
+uses first strictly nearest Manhattan distance and computes a double ratio
+stored as float. Diplomacy fee uses the full count even for a partial join,
+and one partial-join message formats count rather than joinNum. H33 does not
+absorb these rules. Crystal-ball range truncates sqrt before comparing radius
+(H44 variant). StopOnTrigger already names its masked-base-table lookup and
+expansion metadata exception; no universal object/trigger classification helper.
