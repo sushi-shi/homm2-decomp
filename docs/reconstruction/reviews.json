@@ -1,6 +1,198 @@
 {
-  "src/SOURCE/ADVMGR.cpp:advManager::Open(i32 id)#1": {
-    "body_sha256": "7efab233e33c17c502d94c2660eb43ede0bd62fb8fcff41984e804a9aed21931",
+  "include/SOURCE/advManager.h:advManager::GetCommandTargetX(void)#1": {
+    "body_sha256": "cfef48e61f2b4befc09497fd23499ac771d04a134c772f59026030188e9834c0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline accessor reads the command-target X member; no casts, aggregate overlay, arithmetic, or buffer access."
+  },
+  "include/SOURCE/advManager.h:advManager::GetCommandTargetY(void)#1": {
+    "body_sha256": "7c6d35393751c879957239acefacb9566444795d7cebad62ddf5857f12b28fa1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline accessor reads the command-target Y member; no casts, aggregate overlay, arithmetic, or buffer access."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::advManager(void)#1": {
+    "body_sha256": "588d57710c88767a55f415a2a14574dbc0e5c79e707f22b9c579b5fac52ef17c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "All initialization loops fit64 object,8 hero,6 flag,28 looping-sample and9 cursor-sample owners; four animation-phase indices are explicit. Duplicate NULL assignments are observed retail statements, not unobserved stack padding. No artificial local aggregate."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DoAdvCommand(void)#1": {
+    "body_sha256": "880bf61d87bf462285b0c3421c56ec8a67a86e1ec7d52526f656d073040cf72d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "G27 continue_route/movement_done joins need structured-source matrices. Real event record and MoveHero result scalars; map-direction cast decodes path byte. B18/B43 pathLength+1 domain, current hero/town, hovered cell and terrain indices depend on gameplay state. SelectedHero is checked in move/view arms but not occupied-town arm."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckSetEvilInterface(i32 redraw,i32 player)#1": {
+    "body_sha256": "871cf4345c37bccd7c9b39f1595325a40b0717f2e52eee4efc88f29cce75f8dc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual widget replacement message and savedShowIt restoration scalar. Translation loop0..36 fits37x2 names; gbUseEvilInterface must remain0/1 to select columns. B43 player=-1 substitution still requires valid watch-player index; no fabricated owner recovery."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::Main(struct tag_message & message)#1": {
+    "body_sha256": "5b7e20c67625ff870ffda6552c8be2ae3c89a8ed690f13abcc61f3e06140d09b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G28 cheat-digit and game-command joins need matrices. R03 c mixes resource/town loop index, cheat digit and game command; S30 mx/my and assigned curHero are unread. U01 actual widget/mouse/keyboard/executive event transitions. Keyboard directions are explicitly0..7, but B43 MoveHero destination guard occurs later; townCount>=0 permits townIds[0] when count0. Fixed coordinate message fits gText500."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::Reseed(i32,i32)#1": {
+    "body_sha256": "eca227bb97091c9c8041bf38198837a86548383a8069ee8504ed30f54a829c4d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Only invalidates the shared seeding-valid flag; unused formal parameters preserve the method interface and are not fabricated argument-slot reads."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ProcessSelect(struct tag_message * message,class mapCell ** eventCell)#1": {
+    "body_sha256": "403f4c95eb3447e03827fecc22ea53c34f58a60c2c7425bfe95b009bbbd10299",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "U01 two real event snapshots retain mouse fields during radar dragging; floating casts implement scaled coordinate truncation. R04 objectTypeState mixes hero/town IDs and map-object kind. B43 locator page+slot/logical count and hover cell are used before complete local validation; scroll division relies on bounded counts. Radar coordinate clamps are explicit."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ProcessDeSelect(struct tag_message * message,i32 * result,class mapCell ** eventCell)#1": {
+    "body_sha256": "56e0079abe1509483865e9cec8d1c4a7d110ba2d65e748a5adde9dc454003fce",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C21 pointer bits are reinterpreted as i32 for HeroView's b32 noDismiss; downstream SetupHeroView tests nonzero. Natural !=NULL candidate remains unmeasured: generator sees following unannotated GetHeroSlot in the same marker span. B43 selected hero lookup uses overview action enum rather than action extra and needs retail/caller proof. U01 event payload and fade snapshot are genuine."
+  },
+  "src/SOURCE/ADVMGR.cpp:GetHeroSlot(i32 i)#1": {
+    "body_sha256": "406167259f5cdc97a041bc3efeba24297945e180b3c30619b7b4085c6bed9931",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Direct indexed address into the hero-record owner, not member-to-owner recovery. B43 ProcessSearch passes currentHero without excluding -1; invalid input can form a before-array pointer. Extent contract must be resolved, not padded over."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ProcessSearch(i32 x,i32 y)#1": {
+    "body_sha256": "20de65967c75be0f1e1ed8a013d05ddc5166ff64f9ee104eae4848f893480dfc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G29 search_end shared AI hint-reset exit; S30 unread evt aggregate and gaveArtifact result remain. B43 currentHero can be -1 from unguarded keyboard search, map/terrain/artifact/player-count domains need caller proof. Real sample handle and artifact grant output are preserved; gText concatenation depends on artifact name extent."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ProcessHover(i32 mouseX,i32 mouseY)#1": {
+    "body_sha256": "52d9d941fac26aee5459741481b828ed270a5c5861e42cb04875a3ca6b1cd64f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G30 castle/default hover join needs structural proof. Mouse cells clamp0..14 and command map coordinates are checked before direct lookup here. B43 metadata hero/town, terrain index and positive hero mobility divisor still depend on valid state; later ProcessSelect may use coordinates after this early return. No artificial local aggregation."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdateScreen(i32,i32 forceUpdate)#1": {
+    "body_sha256": "b868fb67277ee9dcf6a20b6351e9657b5e3bb0f920beccb45dde0740008c620b",
     "patterns": {
       "casts": "absent",
       "unions": "absent",
@@ -13,7 +205,87 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close uses scalar delete. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
+    "note": "Fixed viewport16..463 fits640x480 screen. B07/B43 alternate update rectangle and scroll offsets depend on ComboDraw/ScreenScroll producers. Animation-phase indices0..3 and modulo18 fit their arrays; timing/update state has a single real role."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CompleteDraw(i32 originX,i32 originY,i32 forceDraw,i32 updateBottomView)#1": {
+    "body_sha256": "9bd327138e86f63146fb6c964fc3743961c4a01341aff6fdcb794d5a40e0d6a2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual15x15 layered rendering loops, forward/reverse draw order and saved-origin restoration state. No casts, goto or fake stack arrays. B07/B43 caller origins and DrawCell clipping/early pointer formation remain relevant; edge cells are intentionally passed to the renderer."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CompleteDraw(i32 update)#1": {
+    "body_sha256": "b014c5a66c0fdf2e5f3c6efba05f43df72985637560716d7cf5b41720873d545",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Delegates to the four-argument draw with current map origin and update flag; no independent buffer access or debt pattern. Underlying rendering/origin contracts remain B07/B43."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::GetCloudLookup(i32 x,i32 y)#1": {
+    "body_sha256": "cff2fd52accf3c800f5fe922cd6e0d81ee3d96e6329d1e606f815bdf4f5c21df",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "cloudMask accumulates only eight bits and fits giCloudType[256]. Given valid x/y, edge masks suppress every out-of-map neighbor before reading mapExtra. DrawCell checks coordinates before this call; remaining ComboDraw callers still need full-body review (B43). Flat map addressing uses its real heap owner."
+  },
+  "src/SOURCE/HERO.cpp:HeroView(i32 heroId,b32 noDismiss,b32 fadeAlreadyOut)#1": {
+    "body_sha256": "282910f2ad71da07887d9cbf5a90c16e227f5e4359b3411d84ccbb2eba095d89",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual hero window allocation/lifecycle and hero-cell lookup; noDismiss is copied to the real gbNoDismiss flag. C21 caller passes pointer bits; downstream nonzero usage inspected but not silently normalized. B43 heroId and hero coordinates need valid gameplay context. No local byte buffer or fake aggregate."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::Open(i32 id)#1": {
+    "body_sha256": "7efab233e33c17c502d94c2660eb43ede0bd62fb8fcff41984e804a9aed21931",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close now uses array delete with exact native/retail proof. U08 locator integer arrays only clear bottom-view widget storage; shared owner recovery remains. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::Close(void)#1": {
     "body_sha256": "a95596804138250bfd7790115a355d9604f6c92da2076254e6c4493524c873f8",
@@ -477,7 +749,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "B42: a 104-byte drain buffer is passed with nominal capacity100 to dpnet_rcv, which ignores capacity and copies the queued packet length. No arbitrary extra-four-byte deletion: establish retail frame and maximum queued receive first. API shutdown ownership/lifecycle is also a caller contract."
+    "note": "B42: full237-byte retail/target proof confirms EBP-104 drain destination and nominal capacity100. dpnet_rcv ignores capacity; ordinary receive limit256 permits copying beyond104-byte caller object/frame boundary. Not a reconstruction-only extra-four-byte deletion or grounds for silent behavioral fix. API shutdown lifecycle also remains a caller contract."
   },
   "src/SOURCE/dpnetwin.cpp:dpSendMessage(i32 destination,NetworkPacketType type,u16 size,void * data)#1": {
     "body_sha256": "18b6d0b186a02b1e252af2d34f48e5b2cab0cadeda39f0dc5b2a58263fb17c79",

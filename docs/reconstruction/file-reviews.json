@@ -1,4 +1,16 @@
 {
+  "include/SOURCE/ADVMGR.h": {
+    "sha256": "7b9777229ae53954e735bd38d318f1392596f3e187b1279251d6f151c13af7c7",
+    "note": "Full149-line header read: sound/command/draw domains, network command lengths and all cross-TU globals/prototypes. No hidden function or macro body; real AI coordinate/resource arrays retain documented dimensions."
+  },
+  "include/SOURCE/ADVMGR_TYPES.h": {
+    "sha256": "6a06b6a52b2e2d0463956f6831813a88f15f2e37f5cfa97e92068613cb05c931",
+    "note": "Full23-line header read. U09 AdventureRemotePayload overlays sixteen raw bytes, save fields and SPlayerExit; tag-dependent wire meanings are credible but unused views/extents require remaining CheckHandleNet consumers. Not granted a safe bound by SIZE alone."
+  },
+  "include/SOURCE/advManager.h": {
+    "sha256": "fc8aede10196333113009e10721bb7aca6e9fa27b322f933b718b9ca12d3b147",
+    "note": "Full441-line header/two inline accessors read and reconciled. U08 bottom-view arrays overlay misleading locator integer arrays and typed widget subviews; S30 named padding/reserved fields need actual owner recovery. Real packed0x37e manager, pointer arrays, cursor/frame/sound dimensions and all declarations inspected. Other bodies remain individually pending."
+  },
   "src/SOURCE/dpnetwin.cpp": {
     "sha256": "7ccab6fd6609c02e62dbb0394c65dce517752cde1cc9a426dcd2fed85933a7ae",
     "note": "Full671-line TU,16 definitions and all storage/macros read. C18 SDK outputs applied; B20 same genuine-retail queue overread as Winsock, C07 false startup carrier, B42 session/player/drain/API contracts, S27 unread locals/global/enum remain. No goto or manual varargs body."

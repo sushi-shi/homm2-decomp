@@ -214,8 +214,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   walk-speed array, with all preference/UI consumers updated and
   [whole-build byte/relocation equivalence](O04.md).
 - B42: DirectPlay session enumeration can exceed its ten-element list;
-  packet lengths/player mappings, shutdown drain capacity, and retained
-  provider GUID lifetime/mutable name contracts need proof. B20 now includes
+  [retail shutdown-drain capacity hazard is confirmed](B42.md). Packet
+  lengths/player mappings and retained provider GUID lifetime/mutable name
+  contracts need proof. B20 now includes
   independently verified DirectPlay overread evidence. C07 also applies to
   its startup-typed carrier reinterpreted as a guest-info record.
 - S27/S28/S29: DirectPlay unused locals/state, cursor unread flag/counter
@@ -230,6 +231,17 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   map, with [complete native and retail equivalence](B44.md).
 - C20: system-options scalar boolean conversions/materialization require
   native comparison; event widget payload unions themselves remain meaningful.
+- U08/U09: bottom-view widget storage has integer locator aliases and typed
+  overlay/padding views; adventure remote payload has a raw-byte/save/exit
+  union. Remaining consumers must establish the correct shared owners.
+- G27-G30: adventure command movement, keyboard cheat/confirmation, search
+  completion and default-hover joins await structured matrices. R03/R04 cover
+  unrelated dispatcher scalar roles; S30 covers unused adventure locals and
+  class padding views.
+- C21: overview passes occupied-town pointer bits as HeroView's boolean flag.
+  The explicit truth-value candidate is not yet measured: the source generator
+  rejects the following unannotated helper in the same RVA marker span.
+  B43 also includes zero-town selection and unguarded no-hero search callers.
 
 ## Build setup observations
 
