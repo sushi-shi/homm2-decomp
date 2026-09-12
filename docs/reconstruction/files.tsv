@@ -178,7 +178,7 @@ src/BASE/listbox.cpp	5658e2bfcbee761992965d964f149b901b2e9a1eb1ac7d937c01d41890a
 src/BASE/miscwin.cpp	14d866b4c87c49c46eb75011803c8cfbc14b146d711c408f930f1fc65a6bff0e	2	2	reviewed	Both functions, RECT/PAINTSTRUCT owners and constants; B07 caller rectangle bounds.
 src/BASE/soundmgr.cpp	3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750474a04b4d8231b0d26ca	22	22	reviewed	All22 methods, format constants, SDK aggregate globals and volume/backend state; D01 withdrawn: original address claims restored after rejecting the reconstructed control. B10 track bounds,S03 previousTrack,S04 unread fade scalar.
 src/EDITOR/mapcell.cpp	11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f	11	11	reviewed	Full264-line TU and11bodies read. B18 dimensions/counts/link domains; B35 zero-index first-growth sentinel/lifecycle issue. S17 two unused scalar declarations. Old-format prefix copies are bounded by real20/15-byte records; pointer reload after realloc is intentional.
-src/SOURCE/ADVMGR.cpp	cc3845cd1618caf2dd783d593362277fae7849a56c433216c5c9a14188386f58	95	10	pending	Not yet reviewed.
+src/SOURCE/ADVMGR.cpp	4ee2667f99a4b29d86dab5ff3c6f63abdd80485170b4257c9f897551d50eba15	95	10	pending	Not yet reviewed.
 src/SOURCE/AI.cpp	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	19	0	pending	Not yet reviewed.
 src/SOURCE/ARMY.cpp	9a6ba2a5fef4957eeb3a1832844e33efbadace73f83a2b413c43ea6a83c6784b	47	2	pending	Not yet reviewed.
 src/SOURCE/ARMYGRP.cpp	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	14	14	reviewed	Full282-line TU/14physical bodies including strict-only swap helper read. U06 duplicate army aliases; S18 unread morale local; B36 creature/slot domains. Real raceUsed7 fits all retail race ids0..6.

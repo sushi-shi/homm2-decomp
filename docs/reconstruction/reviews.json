@@ -16,7 +16,7 @@
     "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close uses scalar delete. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::Close(void)#1": {
-    "body_sha256": "5065c88f04ce9cff861d28af13b1a3f4cd47ec1821214263de111076b9753c2b",
+    "body_sha256": "a95596804138250bfd7790115a355d9604f6c92da2076254e6c4493524c873f8",
     "patterns": {
       "casts": "absent",
       "unions": "absent",
@@ -27,9 +27,9 @@
       "varargs": "absent",
       "reuse": "absent",
       "stack": "absent",
-      "bounds": "open"
+      "bounds": "applied"
     },
-    "note": "B44: visibility map allocated with new u16[] in Open is released by scalar delete here; requires exact retail allocator-call proof before changing. Other icon/sample loops match owner counts; reused index retains one collection-traversal role."
+    "note": "B44 applied: delete[] now matches Open's u16-array owner. Complete two-arm matrix and independent proof retain every byte/ordered target for952-byte Close, all95 TU functions and allocated sections. Icon/sample loops match owner counts; reused index retains one collection-traversal role."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet)#1": {
     "body_sha256": "0b648935baf444aa72c312490d06ec8098936d4ffa45aa15f6710074f26edf83",

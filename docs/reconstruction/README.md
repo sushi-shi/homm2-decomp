@@ -226,8 +226,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B43: cursor/map-change direction, hero/player, map coordinate, frame and
   received-record domains remain. Normal preference values fit the actual
   eleven-entry volume and five-entry speed text tables; malformed stored
-  values remain unvalidated. B44 records visibility-map array allocation
-  followed by scalar deletion, pending retail allocator-call proof.
+  values remain unvalidated. B44 now uses array deletion for the visibility
+  map, with [complete native and retail equivalence](B44.md).
 - C20: system-options scalar boolean conversions/materialization require
   native comparison; event widget payload unions themselves remain meaningful.
 
