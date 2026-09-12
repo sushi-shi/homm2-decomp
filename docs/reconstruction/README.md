@@ -328,6 +328,24 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   boolean conversions and literal constness. S39 records the spell-message
   assignment overwritten by its following clear; B59 tracks spell-view text
   lengths and live widget/spell-index domains.
+- C38/C39: [army-view name storage is now text](C38-C41-S41-S44.md), and five variadic numeric
+  arguments use normal promotions. B60 covers the complete198-byte detail
+  chain in550 bytes. S40 records unread army-dialog locals.
+- C40-C43: sprite sentinels, logo upcasts, event-flag conversions and new-turn
+  lowercase text ownership are reviewed individually. C41's logo upcast is
+  removed; other candidates still require their own matrices.
+- S41/S44: dwelling-roll and rumour-order scratch now match ten entries and
+  six players. Other random-army/setup storage remains open. S42/S43 cover
+  unused turn-update and transfer/compression locals. R09 tracks indices
+  reused across distinct player/hero/town roles.
+- G49-G54: random-monster bounds, transfer cleanup, score clamping, map-size
+  setup, diff completion and rumour fallback joins need structural tests.
+- B61/B64/B65: turn-state, town/hero setup, rumour/event and compression
+  domains remain function-specific contracts. U14/C44 tracks typed save-packet
+  ownership and erased byte-buffer interfaces; no fabricated padding is added.
+- B62/B63: [retail confirms](B62-B63.md) the receiver's100-byte acknowledgement fill with
+  a200-byte transmission, and diff completion using the old-file remainder.
+  These defects are separate from byte-preserving reconstruction fixes.
 
 ## Build setup observations
 

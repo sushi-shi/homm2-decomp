@@ -698,5 +698,9 @@
   "include/SOURCE/GAME.h": {
     "sha256": "709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185",
     "note": "Full170-line declarations/constants header read through EOF; no physical function bodies. Packed50-byte EventExtra has one-byte message head and runtime fields, requiring actual variable-tail allocation contracts rather than sizeof as message extent (B55). Real six-byte RandomHeroArmyRange record and domain/serialization constants retained; no manual varargs or fabricated stack aggregate."
+  },
+  "src/SOURCE/GAME.cpp": {
+    "sha256": "c29bbdfcb0e6d66f7cb8ccde6383f884409c35c8b0a6d98c7ecf57e072ce3c87",
+    "note": "Full8051-line TU read through final DATA definition; every helper/body, private enum, float factor, both temporary serialization identifier macro groups and undef pairs reconciled. All functions have ten manual pattern verdicts. C35/C38/C39/C41/S41/S44 source changes have complete matrices and102-function/all-allocated-section native equivalence. No probe declarations or fake padding retained. Full reading is not whole-retail exactness or resolution of open findings."
   }
 }

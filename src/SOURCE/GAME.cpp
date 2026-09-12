@@ -222,7 +222,7 @@ H2_ENUM_BEGIN(GameMapSetupConstant)
     GAME_SCREEN_WIDTH                     = 640,
     GAME_SCREEN_HEIGHT                    = 480,
     ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
-    DEFAULT_DWELLING_ROLL_CAPACITY        = 12,
+    DEFAULT_DWELLING_ROLL_CAPACITY        = 10,
     DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
     TOWN_UPGRADE_BUILDING_FIRST           = IDX(BUILDING_SLOT_UPGRADE_FIRST),
     TOWN_UPGRADE_BUILDING_LAST            = IDX(BUILDING_SLOT_SPECIAL_THIRTY),
@@ -516,7 +516,7 @@ H2_ENUM_END(GameCompressionTestConstant)
 
 H2_ENUM_BEGIN(GameRumourConstant)
     RUMOUR_SCRATCH_CAPACITY        = 100,
-    RUMOUR_CATEGORY_ORDER_CAPACITY = 8
+    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT
 H2_ENUM_END(GameRumourConstant)
 
 DATA(0x0052499c) b32 gbGameOver = false;
@@ -3621,7 +3621,7 @@ void game::ViewArmy(
     i16 H2_UNUSED(numWidget5);
     i32 morale;
     i32 luck4;
-    u8 armyName0[VIEW_ARMY_NAME_SIZE];
+    char armyName0[VIEW_ARMY_NAME_SIZE];
     icon* monsterIcon5;
     tag_message message;
     i16 H2_UNUSED(frame);
@@ -3715,11 +3715,11 @@ void game::ViewArmy(
     m_viewArmyWindow->AddWidget(monsterWidget9, -1);
     gpResourceManager->Dispose(monsterIcon5);
 
-    strcpy(reinterpret_cast<char*>(armyName0), gArmyNames[IDX(monsterType)]);
+    strcpy(armyName0, gArmyNames[IDX(monsterType)]);
     armyName0[0] = ToUpperCp1251(armyName0[0]);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
-    message.payload.widget.data.text = reinterpret_cast<char*>(armyName0);
+    message.payload.widget.data.text = armyName0;
     m_viewArmyWindow->BroadcastMessage(message);
 
     details0 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE));
@@ -3739,7 +3739,7 @@ void game::ViewArmy(
         gText,
         "%s%d",
         cArmyDetail[ARMY_DETAIL_ATTACK],
-        static_cast<i32>(monster->attack)
+        monster->attack
     );
     strcat(details0, gText);
     if (theHero)
@@ -3756,7 +3756,7 @@ void game::ViewArmy(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DEFENSE],
-        static_cast<i32>(monster->defense)
+        monster->defense
     );
     strcat(details0, gText);
     if (theHero)
@@ -3783,18 +3783,18 @@ void game::ViewArmy(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DAMAGE],
-        static_cast<i32>(monster->damageMin)
+        monster->damageMin
     );
     strcat(details0, gText);
     if (monster->damageMin != monster->damageMax) {
-        sprintf(gText, "-%d", static_cast<i32>(monster->damageMax));
+        sprintf(gText, "-%d", monster->damageMax);
         strcat(details0, gText);
     }
     sprintf(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_HIT_POINTS],
-        static_cast<u32>(monster->hitPoints)
+        monster->hitPoints
     );
     strcat(details0, gText);
     if (gpCombatManager->m_active == 1) {
@@ -5827,7 +5827,7 @@ void game::ShowHeroesLogo(void) {
             HEROES_LOGO_WIDTH,
             HEROES_LOGO_HEIGHT
         );
-        gpResourceManager->Dispose(static_cast<resource*>(theIcon));
+        gpResourceManager->Dispose(theIcon);
     }
 }
 
