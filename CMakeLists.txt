@@ -288,6 +288,18 @@ target_link_libraries(homm2 PRIVATE
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  # Optional real-asset integration test; see docs/combat-redraw-test.md.
+  # Keep it out of normal builds/CTest, which need no installed game data.
+  add_executable(homm2_combat_redraw_test EXCLUDE_FROM_ALL
+    tools/combat_redraw_test.cpp ${HOMM2_GAME_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/EXECUTABLE/Run.cpp)
+  target_include_directories(homm2_combat_redraw_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_combat_redraw_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  target_link_libraries(homm2_combat_redraw_test PRIVATE
+    homm2_platform homm2_compression ${HOMM2_FFMPEG_LIBRARIES})
+
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
@@ -308,6 +320,28 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME combat_cursor COMMAND homm2_combat_cursor_test)
+  add_executable(homm2_combat_sprite_test
+    tools/combat_sprite_test.cpp
+    src/BASE/ICON.cpp
+    src/BASE/Icon2b.cpp src/BASE/Iconf2b.cpp
+    src/BASE/icon2bc.cpp src/BASE/iconf2bc.cpp
+    src/BASE/icon2by.cpp src/BASE/iconf2by.cpp
+    src/BASE/Iconm2b.cpp src/BASE/Iconmf2b.cpp
+    src/BASE/Icond2b.cpp src/BASE/Icondf2b.cpp)
+  target_include_directories(homm2_combat_sprite_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME combat_sprite COMMAND homm2_combat_sprite_test)
+  add_executable(homm2_font_clip_test
+    tools/font_clip_test.cpp
+    src/BASE/FONT.cpp
+    src/BASE/Utf8.cpp
+    src/BASE/Icon2b.cpp
+    src/BASE/icon2bc.cpp)
+  target_include_directories(homm2_font_clip_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_font_clip_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  add_test(NAME font_clip COMMAND homm2_font_clip_test)
   add_executable(homm2_binary_io_test tools/binary_io_test.cpp)
   target_include_directories(homm2_binary_io_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

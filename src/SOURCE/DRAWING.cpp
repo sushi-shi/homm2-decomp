@@ -715,15 +715,6 @@ void combatManager::DrawBackground(void) {
         COMBAT_BACKGROUND_COPY_HEIGHT
     );
     UpdateGrid(1, 0);
-    m_backgroundBuffer->CopyToCareful(
-        gpWindowManager->m_screen,
-        0,
-        0,
-        0,
-        0,
-        COMBAT_SCREEN_WIDTH,
-        COMBAT_AREA_HEIGHT
-    );
     m_backgroundDrawn = true;
 }
 
@@ -978,30 +969,33 @@ void combatManager::DrawFrame(
     }
 
     if (drawBackground != 0) {
-        if (m_backgroundDrawn != 0) {
-            if (computeExtent != 0 || redrawExtent != 0 || gbLimitToExtent != 0) {
-                m_backgroundBuffer->CopyTo(
-                    gpWindowManager->m_screen,
-                    giMinExtentX,
-                    giMinExtentY,
-                    giMinExtentX,
-                    giMinExtentY,
-                    giMaxExtentX - giMinExtentX + 1,
-                    giMaxExtentY - giMinExtentY + 1
-                );
-            } else {
-                m_backgroundBuffer->CopyTo(
-                    gpWindowManager->m_screen,
-                    0,
-                    0,
-                    0,
-                    0,
-                    COMBAT_SCREEN_WIDTH,
-                    COMBAT_AREA_HEIGHT
-                );
-            }
-        } else {
+        // Walking temporarily caches other armies in the background buffer.
+        // Rebuild that cache without clearing the whole working screen: this
+        // frame only redraws sprites inside its damage rectangle. Otherwise
+        // later enlarged/cursor blits expose bare background just beyond it.
+        if (m_backgroundDrawn == 0)
             DrawBackground();
+
+        if (computeExtent != 0 || redrawExtent != 0 || gbLimitToExtent != 0) {
+            m_backgroundBuffer->CopyTo(
+                gpWindowManager->m_screen,
+                giMinExtentX,
+                giMinExtentY,
+                giMinExtentX,
+                giMinExtentY,
+                giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1
+            );
+        } else {
+            m_backgroundBuffer->CopyTo(
+                gpWindowManager->m_screen,
+                0,
+                0,
+                0,
+                0,
+                COMBAT_SCREEN_WIDTH,
+                COMBAT_AREA_HEIGHT
+            );
         }
     }
 

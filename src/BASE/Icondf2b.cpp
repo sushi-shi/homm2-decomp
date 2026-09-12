@@ -74,8 +74,8 @@ void FlipDimIconToBitmap(
                     *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
                     s_dst++;
                 }
-            } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 >= clipX
-                       && s_x <= s_clipR) {
+            } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 <= s_clipR
+                       && s_x >= clipX) {
                 if (s_x <= s_clipR) {
                     if (s_x - s_run + 1 >= clipX) {
                         s_spanCount = s_run;
@@ -86,7 +86,7 @@ void FlipDimIconToBitmap(
                     }
                 } else {
                     if (s_x - s_run + 1 >= clipX) {
-                        s_spanCount = s_clipR - (s_x - s_run) + 1;
+                        s_spanCount = s_clipR - (s_x - s_run);
                         s_dst = s_row + s_x - s_run + 1;
                     } else {
                         s_spanCount = clipW;

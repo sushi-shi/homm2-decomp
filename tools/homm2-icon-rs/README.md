@@ -102,6 +102,13 @@ ColorBlit::new().mirrored(true).quirks(Quirks::retail())
 makes mirrored solid, shadow and mask runs that straddle a clip edge vanish
 entirely instead of clamping, matching the shipped game.
 
+The portable C++ renderer on `master` corrects this clipping defect. Its parity
+tests use `Quirks::corrected()`; the opt-in retail quirk remains available for
+comparison with the original executable. The native `combat_sprite` test also
+checks that repeated partial battle redraws match a full render, including
+recoloured and row-distorted sprites whose shadows must stay inside the restored
+rectangle.
+
 ## Validated against shipped assets
 
 `examples/survey.rs` decodes every icon in a real archive and checks the model

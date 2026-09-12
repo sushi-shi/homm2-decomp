@@ -340,10 +340,26 @@ void font::DrawBoundedString(
     i32 w,
     i32 h,
     FontDrawMode mode,
-    FontAlignment align
+    FontAlignment align,
+    const SLimitData* clip
 ) {
     if (str == NULL)
         return;
+
+    // The layout box determines alignment and wrapping. An optional damage
+    // rectangle limits painting without moving or reflowing the text.
+    i32 clipX = x;
+    i32 clipY = y;
+    i32 clipW = w;
+    i32 clipH = h;
+    if (clip != nullptr) {
+        clipX = std::max(x, clip->left);
+        clipY = std::max(y, clip->top);
+        clipW = std::min(x + w - 1, clip->right) - clipX + 1;
+        clipH = std::min(y + h - 1, clip->bottom) - clipY + 1;
+        if (clipW <= 0 || clipH <= 0)
+            return;
+    }
 
     const i32 len = static_cast<i32>(strlen(str));
     i32 xPosition = 0;
@@ -378,7 +394,9 @@ void font::DrawBoundedString(
                 xPosition = 0;
                 break;
         }
-        DrawStringExecute(line.data(), xPosition + x, yPosition + y, mode, x, y, w, h);
+        DrawStringExecute(
+            line.data(), xPosition + x, yPosition + y, mode, clipX, clipY, clipW, clipH
+        );
         yPosition += m_height;
         lw = 0;
     }
