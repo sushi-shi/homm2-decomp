@@ -617,3 +617,48 @@ password vocabulary including duplicates, alignment/cost tables and expansion
 state globals. X_GLOBAL.h and ExpCampaign.h were already fully read. R35 records
 why table declarations and repeated localized text are not new code helpers.
 This batch adds five read files and no function definitions; source is unchanged.
+
+## B37 — complete file requester and map-header reader
+
+Read all 1,247 lines and sixteen definitions of REQUEST.cpp, including the full
+two-pass enumeration, mode/filter branches, lifecycle, 490-line Main, scrollbar
+drag/update and filename return paths, unreachable legacy filter and trailing
+data/vtable. Reconciled the complete index. fileRequester.h and REQUEST.h were
+already read; reread the requester owner without granting duplicate credit.
+
+H01/H07/H14/H30/H31 gain callers or variants; H69/H70/H75 gain explicit
+boundaries. R36 records count-only side effects, enumeration/sorting and
+extension state, unchecked header reads, active-state dimming, cancellation,
+input whitelist, drag arithmetic and completion differences. This batch adds
+sixteen definitions and one file; no executable changes or behavior repairs.
+
+## B38 — complete new-game and scenario-information implementation
+
+Read all 2,319 lines and sixteen definitions of Newgame.cpp, including all
+constants/data, local and remote setup, player/window initialization, full
+540-line handler, chat editing/caret/drawing, scenario display and loss/victory/
+side text. Reconciled the complete index; all associated owner headers were
+already fully read. No partial KB/chat occurrence reading is credited here.
+
+H77 records the deferred-dim-then-disable protocol shared with ADVMGR, distinct
+from H75's reverse order. H01/H20/H30/H31/H32/H68/H69 gain callers or exclusions.
+R37 preserves full-record versus packet-prefix extents, local/remote result and
+allocation differences, setup buffer arrangement, widget ordering, tentative
+chat-display state and local-only UI/text families. This batch adds sixteen
+definitions and one file. Across B37-B38, 32 definitions and two files are newly
+fully read; executable source, headers, configuration and behavior are unchanged.
+
+## B39 — complete setup menus and shared handler tail
+
+Read all 1,184 lines and 23 definitions of SETUP.cpp, including campaign/baud/
+COM/hot-seat/network/modem/multiplayer setup, the full menu-driven SetupGame,
+load requester, all thirteen handler bodies, constants and modem-config global.
+Reconciled the full index. SETUP.h and all referenced owner headers were already
+fully read; campaign implementations remain unread despite their call sites.
+
+H78 names the exact select-or-alternate-select command predicate against fully
+read adventure/general/new-game handlers, without adding event-type guards or
+changing outer branches. H01/H17/H30/H31/H32 gain callers; H75/H77 gain dim-only
+exclusions. R38 retains configuration side effects, DLL/OS and no-CD checks,
+menu overrides, load/requester lifetime and the existing BaseSetupHandler tail.
+This batch adds 23 definitions and one file, with no executable changes.

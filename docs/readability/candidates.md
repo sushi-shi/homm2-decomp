@@ -3040,7 +3040,8 @@ data ordering. They are protocol-level occurrences, not claims of identical
 macro text. Preserve those variants and any intermediate message changes when
 testing extraction; do not silently canonicalize stores around mutable dispatch.
 ADVMGR::ControlPanel dims before disabling, so is excluded from this ordered
-helper. HERO::SetupHeroView dims both navigation controls before disabling
+helper; B38 records its separately shared reverse protocol as H77.
+HERO::SetupHeroView dims both navigation controls before disabling
 either, a different two-control phase order. RECRUIT::Open broadcasts through
 the window manager with value 0x4008, which includes update work; it is also
 not this deferred-draw operation. These exclusions make a blanket DisableWidget
@@ -3341,3 +3342,317 @@ alignment table and shrine's seven-resource cost row already have named owners.
 Repeated localized literals, typed global state and initializer lists are not
 additional cross-TU helper proposals. No string, table or packed-layout change
 is part of this audit.
+
+## H77 — defer a widget's dimmed drawing, then disable it
+
+Disposition: credible small statement protocol, distinct from H75's order.
+
+ADVMGR::ControlPanel repeats this pair for restart/new-game controls; Newgame's
+game::NewGame remote-receive branch repeats it for map options, OK and cancel.
+Each instance writes id, command SET_FLAGS, data 0x1000, broadcasts, then writes
+command CLEAR_FLAGS, data 2 and broadcasts again, reusing the id. The first
+message type is set outside the per-control sequence. New-game ENABLE/DISABLE
+aliases and its ACTIVE_FRAME/INACTIVE_FRAME names denote these exact values,
+not icon frames. Both complete callers and the widget flag handler are read.
+
+Possible name: DimThenDisableWidgetForNextDraw at heroWindow.h/widget's existing
+boundary. Reuse the existing message and stable receiver/id; preserve both
+broadcasts, all five field stores, order and the final command/data state.
+The special exact 0x1000 argument defers drawing, as described in H75. Do not
+replace it with ordinary dim bit 8, combine calls, move type initialization,
+clear the union, or replace either protocol with the other. A small statement
+macro is historically plausible, but neither extraction nor an inline has
+retail-byte evidence yet. This is an order-specific alternative to test, not
+an instruction to add two near-duplicate public APIs automatically.
+
+REQUEST::SetOK is not an unconditional instance: its first command depends on
+enabled, its dim argument is 8 when m_active == 1 and 0x1000 otherwise, and the
+second command also depends on enabled. Its normal active-state draw behavior
+must remain expressible. HERO's two-control dim phase before either disable
+and RECRUIT's window-manager/update-flag variant remain excluded as in H75.
+
+## B37-B38 — extensions to established candidates
+
+- H01 gains REQUEST::Open's maximum-length message, SetOK's initial conditional
+  command triple and Main's filename GET_TEXT prefix; Newgame's initial map-name
+  update, shadow disable, map-choice cancel disable/enable and ShowScenInfo's
+  first text message. Existing header reuse and scattered formatting stay outside.
+- H07 gains REQUEST::DoKnob's upper-then-lower top-index clamp, after comparison
+  against oldTop. The gutter click compares top + rows - 1 against count before
+  assigning count - rows, an arithmetic-shape variant, not an identical macro.
+- H14 gains REQUEST::Open's manager fields; H20 gains both Newgame victory/loss
+  town castle-mask tests. H69 gains GetSideDesc's existing CyrillicToUpper call,
+  not new inline code; the requester's whitelist is not case folding.
+- H30 gains requester help, filename and multiplayer checks, and new-game help,
+  remote-cancel and swap-rejection dialogs. H31 gains checked requester arrays,
+  window/knob, new-game chooser/main windows and dynamic icon/text widgets.
+  Newgame's fixed chat/label buffers and remote-receive window are unchecked;
+  those are not opportunities to insert allocation tests through the helper.
+- H32 gains NewGameHandler's ordinary OK/cancel release branches. Their remote
+  sends/shutdown precede the three stores; gbNewGameDialogOver and the forward
+  return follow them and stay caller-owned. Remote START instead overwrites the
+  result with OK and inserts a message-type store; it is not an exact instance.
+  Requester completion is an executive close event and is excluded.
+- H68 gains Newgame's map-header/player-info/setup/chat/start/cancel sends.
+  Preserve each reliable argument and each caller's existing failure handling:
+  some check and shut down, whereas start/map-choice paths do not. No packet
+  extent, local-buffer arrangement or retry behavior belongs in short-call syntax.
+- H70's GetMapHeader occurrence is a pointer/sizeof(*header) variant, not the
+  literal &value spelling. The read remains unchecked and its 420-byte extent
+  must not be replaced with Newgame's 116-byte network prefix. H75 explicitly
+  excludes SetOK and the H77 order. CleanUpNewGameWindow already uses the named
+  RemoveAndDeleteWidget(id) API, not H62's explicit-pointer/nulling protocol.
+
+## R36 — file-request enumeration, filtering and input contracts
+
+GetMapHeader formats gcMapPath plus filename into shared gText, opens binary,
+reads sizeof(*header) without checking the byte count, closes and reports 1
+whenever open succeeded. It leaves the header untouched on open failure; it
+does not validate or initialize it. CheckSumIsDemoOK, ShowThisMap and
+ShowThisMapGame return 1; the latter retains unreachable legacy filtering after
+that return. Do not reactivate it through a shared map-acceptance predicate.
+
+InitializeFiles performs two independent enumerations. MAP_GAME checks human
+limits, optional width, then ShowThisMapGame; MAP checks width then ShowThisMap.
+Header-read success and file attributes are not tested. The count-only path
+already changes m_fileCount. Name/extension arrays have count + 1 entries but
+only count are cleared, while headers allocate count entries. The second pass
+can observe a changed directory; returned m_fileCount remains the first-pass
+count, not the insertion count. Case-insensitive insertion orders equal names
+after earlier equals. It shifts names/extensions, then reads headers in sorted
+order using gcMapPath, not the requester's directory. A missing dot leaves the
+local extension buffer unchanged/uninitialized. Preserve these contracts;
+a vector, one-pass iterator or normalized path helper would change more than
+the duplicated operations. No general enumeration helper is promoted.
+
+Construction changes global scrollbar geometry by requester mode, probes the
+current size filter and may fall back to ALL. MapExistsForFilter restores the
+filter but not the count mutated by its count-only enumeration. Main's mouse
+filter path probes before checking/displaying or saving the selected filename;
+a failed probe can leave zero count beside the old arrays. F6 cycles the filter
+even outside map mode. SetupFiles disposes arrays then resets selection/count/
+top/result and enumerates; these are not interchangeable state guards.
+
+Close returns if inactive, otherwise restores menu state and obtains/copies
+the filename even on cancel before cleaning arrays, removing/deleting the
+window and marking inactive. Open draws/updates before AddWindow and calls
+SetOK before marking active. Its initial enable depends on selection, then
+empty-file state, then the new-game default-name override. SetOK's active-state
+dependent dim behavior is not either unconditional H75/H77 protocol. Name
+selection scans retain the last match. Pointer nulling in array cleanup does
+not imply that the deleted window is nulled too.
+
+Filename GET_TEXT clears only nine bytes of a 352-byte local buffer before
+copying. The fixed original-length loop writes NUL for each disallowed byte,
+effectively truncating at the first one rather than compacting. The whitelist
+includes ASCII and CP1251 letters, digits, spaces and explicit punctuation,
+including dots. It then trims trailing spaces in the first terminated prefix;
+empty/leading-control results keep the prior filename. No Unicode conversion,
+case fold, new buffer guard or general filename sanitizer is proposed. Invalid
+non-save GetFilename returns static empty text; a no-selection filename gets
+the default extension appended to its own stored value, including on repeated
+calls. Selected load/map uses the saved extension; other modes use the default.
+
+The scrollbar has three different formulas. Gutter clicks use an integer step
+from float travel * 100 divided by count - (rows - 1), with a minimum positions
+value of one; DoKnob computes its float/double denominator before its count
+guard. Drag offset uses MouseY minus knob Y without window Y, compares the new
+top before clamping, updates rows then restores knob Y and draws. Its loop
+processes Windows messages and GetEvent without move coalescing. Display uses
+count - rows instead of count - rows + 1. No division or range repair belongs
+inside H07/H08. Release clears selected state before Update(1).
+
+Click handling tests equality with the old selected index before checking
+whether the index is past file count. Help ranges and ordinary selection
+ranges have different inclusive endpoints. Load acceptance excludes GMC/GXC
+from digit-based human-count checks; extension[3] is read without a new length
+guard, and fewer/more-human checks have different debug/confirmation behavior.
+Update may index mapHeaders[selected] even when count is zero; its width icons
+default to XL for unrecognized widths. It shows/hides row controls before icon,
+text and selection updates, and enables the filename entry before selectively
+disabling it for map/load. A generic chooser or list-rendering wrapper would
+hide these differences from the other fully read list/overview/trade owners.
+
+## R37 — new-game setup, remote exchange, chat and scenario display
+
+GetMap selects the requester pattern by expansion and remote-old-player state,
+deletes the requester before using the saved result, and restores gMapName on
+cancel. ProcessNewMap clears initialization and narrows human count before
+returning for a null window. InitNewGame's cached/same-human path resets only
+certain races; full initialization copies/reads a header, collects enabled
+colors, and assigns forced humans/computers before flexible positions. Unused
+color entries are not cleared. Field reset order differs inside/outside the
+player count, with normal difficulty and selected=-1 set separately. A blanket
+player/reset record macro would erase those distinctions.
+
+NewGame's outer expansion chooser can return before allocating chat state.
+It then allocates three 101-byte and two 105-byte text buffers without checks,
+clears them and acquires the chat icon. Remote join waits for reliable header
+and player-info messages in either order, without validating sender: clear the
+full 420-byte map header, copy only 116 bytes; copy 204 bytes of player info,
+then update names. Only after both arrive does it allocate an unchecked window,
+initialize it, apply H77 to three controls and run the dialog. Its successful
+result does not execute the local NewMap path. Local setup separately chooses
+default maps/human-count fallbacks and can return to map selection repeatedly.
+The variable wrongExpansionType is true for the matching extension. Host sends
+the 116-byte header prefix then 204 bytes of player records. Common cleanup
+frees buffers/disposes the icon without nulling every global or window pointer.
+
+NewGameHandler accepts reliable or unreliable messages when idle. SETUP first
+compares the map name, then copies 65 bytes into setupPlayerColor onward; MAP
+HEADER clears a local full record before copying the 116-byte prefix. CHAT
+formats a nonnegative sender's name/text, but a negative sender leaves prior
+gText content before truncation and shifting the three chat lines. No new
+length/sender validation is implied. Remote START assigns the result twice,
+retypes the event and returns without the ordinary release path's dialog-over
+store. SETUP synchronization copies a 60-byte map name into mapNamePacket and
+65 bytes into the separate setupData local, then transmits 125 bytes starting
+at mapNamePacket. This source/layout contract is not evidence for replacing
+those locals with an invented packed packet. H68 only shortens policy arguments.
+
+Widget handling has distinct release/press/right-help paths. Some difficulty,
+handicap and player-selection attempts request sync/redraw even if state does
+not change. Single-player swapping searches for a human then sets loop index
+999; multiplayer uses a selected-slot state and permits swaps according to
+type/network-id conditions, not a generic swap predicate for every caller.
+Race cycling is gated by the header's random race and explicitly traverses
+random/knight/necromancer. Map choice disables cancel, calls GetMap, reenables
+cancel and optionally sends the map prefix; redraw occurs before setup sync.
+Preserve each send's differing return-value/shutdown handling.
+
+InitNewGameWindow and ShowScenInfo share local player-column arithmetic and
+some allocations, but are not a cross-TU widget factory. The scenario view
+omits creation of the select overlay while still broadcasting its id; it uses
+different Y offsets and no remote/single-player icon shift. Label buffers of
+two bytes are unchecked although their new text widgets are checked. Setup
+updates separately select difficulty, chat, names, selection/color, handicap,
+race and rating. It unconditionally reenables the last handicap id before
+selecting a race-cycle id, potentially undoing its computer-disable broadcast.
+Scenario display omits that step and reuses the earlier player-lock predicate
+for race frames instead of recomputing race lock. Preserve table-text-as-format
+sprintf calls and message state; do not silently canonicalize the two screens.
+
+ProcessNGKeyPress handles scan-code delete/arrows/escape before AsciiConvert;
+Enter returns before drawing. Escape clears core text without resetting the
+cursor. Insertion accepts keypad digits, excludes braces for ordinary bytes,
+uses gText as scratch and tentatively changes core/cursor/display to measure
+width. An overlong line restores core/cursor but leaves the tentative display
+until later rebuilding. Delete/backspace also use scratch copies, not a new
+overlapping-copy abstraction. NGKPSetupDisplayString uses a u16 cursor, toggles
+flash only for signed tick > timer, writes spacer or underscore and copies the
+tail. Draw checks dialog-over and multiplayer/hot-seat state, then optionally
+updates the screen; it does not rebuild display. Compared with the already-read
+textEntryWidget these are not one shared editor. KB's chat implementation is
+still pending full reading; this resemblance earns no KB read credit.
+
+Scenario map-size text defaults to small for unknown widths, unlike requester's
+XL icon fallback. Loss/victory text resolves specific town/hero/artifact data;
+time text uses its own month/week/day arithmetic and unsupported conditions
+leave prior text intact. Victory punctuation/normal-victory suffix depends on
+condition. GetSideDesc chooses the last local-player match, walks inclusive
+side ranges, uppercases the first byte through the existing CyrillicToUpper,
+and formats distinct ally/enemy prefixes with count-sensitive separators.
+The two local formatting loops do not yet justify a cross-TU join/list helper.
+
+## H78 — select-or-alternate-select widget command predicate
+
+Disposition: credible small enum-domain predicate, not an event dispatcher.
+
+SETUP's help handlers repeatedly test command == WIDGET_COMMAND_SELECT (12)
+|| command == WIDGET_COMMAND_ALTERNATE_SELECT (14). The same ordered pair is
+read in ADVMGR's APanelHandler/CPanelHandler, VIEW's ViewGeneralHandler and
+NewGameHandler (through NEW_GAME_EVENT_PRESS/ALTERNATE_PRESS aliases).
+Possible name: IsWidgetSelectionCommand, owned by BASE/message.h beside the
+BaseWidgetCommand domain. This names a shared two-value input classification;
+it does not include SET_FLAGS despite some campaign names using "SELECT" for
+that different command. No additional select/deselect/hover values are implied.
+
+A small inline returning the Boolean equality pair, with the existing command
+type, is period-plausible. An expression macro must parenthesize and require a
+stable operand because the second comparison can evaluate it again. Preserve
+SELECT-first short-circuit order and existing argument/storage conversions;
+do not use a numeric interval, bit trick or lookup table. Inline evaluation
+count/code generation remains a matching question, not an established island.
+
+Keep message-type and right-button tests, help-index initialization, id mapping,
+NormalDialog and branch structure outside. SETUP's help wrappers read widget
+payload fields without first testing message.type, unlike ADVMGR/VIEW/Newgame.
+In particular, combining nested right-button/command tests and retaining the
+old else would incorrectly route right-button releases into ordinary handling.
+H78 replaces only the two-command expression at its original evaluation point;
+it is not a universal IsHelpEvent predicate. R01's whole-handler exclusion stands.
+
+## B39 — extensions to established candidates
+
+SETUP adds H01 prefixes in SetupNetworkGame, SetupModemGame and
+SetupMultiPlayerGame. SetupGame/SetupNetworkGame2 put data before id and are
+not exact triples. H17 gains SetupNetworkGame2's two-value LogInt call (the
+other five values are LOG_UNUSED_VALUE); short LogStr calls already omit their
+optional length. H30 gains hot-seat naming confirmation, old-player expansion
+warning and all help dialogs; H31 gains checked setup windows and PickLoadGame's
+requester. No new whole-dialog lifetime macro is required for those checks.
+
+BaseSetupHandler gains H32's exact result/id/command stores even when reached
+through a menu override. Its later override of result to cancel remains outside;
+PollSound, CheckShingleUpdate and forwarding are not part of H32. SETUP's
+no-CD/OS/DLL dimming sends only the SET_FLAGS/0x1000 broadcast, without a following
+disable. These are neither H75 nor H77 and must not acquire an extra command.
+
+## R38 — setup dialogs, configuration, menu overrides and local help wrappers
+
+SetupCampaignGame plays the two movies then returns 1 unconditionally.
+Baud/COM/hot-seat/network selection switches return failure on cancel, but an
+unrecognized result can retain old state and still succeed. SetupComPort stores
+the COM choice before calling SetupBaud, so cancellation does not roll it back;
+modem setup resets the initialization string to ATZ, ignores GetDataEntry's
+result, copies the entered string and writes preferences. Hot-seat setup clears
+all six player-name slots before optionally asking for names. A configuration
+transaction or shared reset macro would change these visible state effects.
+
+SetupNetworkGame2 clears OSVERSIONINFO, sets its size and logs GetVersionEx's
+result before deciding whether to dim the modem option on NT. It separately
+loads DPLAYX.DLL to test availability and does not FreeLibrary afterward. Both
+restrictions use deferred dimming only, as does the no-CD host restriction;
+none automatically removes enabled flags. Choice four selects direct-connect
+protocol but its help handler maps only choices one through three plus cancel.
+Protocol selection precedes the separate host/guest dialog; cancellation does
+not undo it. Do not introduce new eligibility checks or generic capability guards.
+
+SetupModemGame chooses among four window resources from direct-connect and
+configured-COM state. Host may configure a port and asks for a phone number
+only for nondirect modem; guest has a different configuration branch. The
+configuration choice sets gbDoModemConfig, consumed/reset by the outer loop
+before calling SetupComPort. SetupMultiPlayerGame clears gbDirectConnect after
+the dialog, even on cancel, and shares the modem path with explicit goto/state
+assignments. Log calls and early returns remain at their existing points.
+
+SetupGame resets expansion/campaign/network/human/setup flags in fixed order.
+An existing menu command bypasses dialogs, maps selected restart/load modes,
+runs RemoteMain where applicable, clears giMenuCommand and returns success;
+remote guests set wait-for-receive without checking RemoteMain's return. Both
+new/load campaign branches use x_loadcm.bin with ExpLoadCampaignHandler, not
+ExpNewCampaignHandler. Their consequences differ: set base-campaign state,
+play movies for new base campaign, or choose/initialize expansion campaign.
+The menu-result switch is explicitly narrowed to i16. Every done path clears
+gbInSetupDialog. A generalized setup flow must not merge these mode decisions.
+
+PickLoadGame immediately succeeds while waiting for a remote receive. Otherwise
+campaign masks take precedence, then remote-old-player restriction, then the
+standard/expansion chooser. It passes the wildcard mask as both pattern and
+default extension to a checked requester. On OK it calls LoadGame with the
+saved gLastFilename before deleting the requester and returns 1 without using
+LoadGame's result; Newgame::GetMap deletes its requester before processing the
+selection. The two requester lifetimes are not one interchangeable helper.
+
+SetupCampaignGameHandler already delegates directly to BaseSetupHandler.
+Other help wrappers share H78 and H30, but retain individual switch domains
+and cancel-help indices; COM/baud/modem select a different help table for direct
+connect. ExpNewCampaignHandler and ExpLoadCampaignHandler are identical local
+bodies using the same table, not a new cross-TU helper by themselves. SetupGame's
+ordinary-command arm contains an empty switch and remains explicit. All wrappers
+delegate after optional help; help does not automatically consume the message.
+BaseSetupHandler polls sound first, accepts deselection for ids 1..1000 or
+cancel, and also completes on any pending menu command, copying the incoming
+id before the later cancel override. Only the noncompletion path updates the
+shingle. This existing common tail is the right boundary; no generalized menu
+handler or changed event-type guard is proposed.
