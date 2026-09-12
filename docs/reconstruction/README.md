@@ -307,10 +307,27 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   append chains, command-line help, ranking/congratulations and memory-error text.
   Other text owners and caller-domain contracts remain individually open.
 - U12/U13: game's duplicate castle/town-owner and daily-event/known-town views
-  need all-consumer reconciliation. S34 covers52-byte reserved-file scratch;
+  need all-consumer reconciliation. S34 [retains52-byte reserved-file scratch
+  after complete native layout matrices](S34-C35.md);
   S35 covers unknown game-layout regions, not proven deletable padding.
   C34 covers bounded narrowing casts in SetupOrigData; B55 tracks game getter,
   saved-player and initialization-domain contracts.
+- G47: ultimate-artifact hint retry exit needs a structured-source matrix.
+  C34 also covers bounded byte stores in hint/boat setup; C35 covers the
+  puzzle interpolator's [applied constant-conversion cleanup](S34-C35.md).
+  S36 tracks unread selection locals.
+  B56 tracks standard-filename mutation, capacity, aliasing and loop-limit contracts.
+- B57: save/load uses cross-member serialized prefixes, duplicated two-byte count
+  headers and unchecked file-supplied lengths. S37 tracks save/load/map scratch
+  arrays larger than their observed accesses; no padding is silently removed.
+- G48/R07: new-map award joins and player/town counters reused as artifact
+  coordinates need structural recovery. R08 tracks event random-roll/layer-index
+  and town/mine-ID reuse; S38 tracks event layer-index arrays written but not read.
+- B58: map-event allocation, terrain, layer-chain and town/mine-edge contracts
+  remain open. C36 covers map-coordinate byte owners; C37 covers spell-widget
+  boolean conversions and literal constness. S39 records the spell-message
+  assignment overwritten by its following clear; B59 tracks spell-view text
+  lengths and live widget/spell-index domains.
 
 ## Build setup observations
 

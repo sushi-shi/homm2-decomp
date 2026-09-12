@@ -694,5 +694,9 @@
   "include/SOURCE/game.h": {
     "sha256": "f094b31d7d1997a7aa3d66d672a9af081879ba086c00dd67e9e363930dcfe035",
     "note": "Full header through EOF and all five inline bodies read. Packed0x660f game,7-byte mine/8-byte boat, fixed player/hero/town/event owners inspected. C25/C32 signed b8 cheat-flag owner verified across98 native units and all named consumers, serialized width unchanged. U12 duplicate castle/town-owner names and U13 daily-event/known-town byte views require all-consumer review. S35 unknown campaign/setup/runtime gaps are not proven deletable padding; B55 getters and event/name capacities keep caller contracts. No fake stack aggregate or manual varargs."
+  },
+  "include/SOURCE/GAME.h": {
+    "sha256": "709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185",
+    "note": "Full170-line declarations/constants header read through EOF; no physical function bodies. Packed50-byte EventExtra has one-byte message head and runtime fields, requiring actual variable-tail allocation contracts rather than sizeof as message extent (B55). Real six-byte RandomHeroArmyRange record and domain/serialization constants retained; no manual varargs or fabricated stack aggregate."
   }
 }

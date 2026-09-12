@@ -923,7 +923,7 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     float fraction = GetNumObelisks(player) / static_cast<double>(m_obeliskCount);
     float interp =
         (fraction * fraction + fraction)
-        / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
+        / IDX(PUZZLE_INTERPOLATION_TERM_COUNT)
         ;
     pieceCount = static_cast<i32>(pieceCount + unvisitedObelisks * interp);
 
