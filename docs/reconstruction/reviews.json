@@ -372,7 +372,7 @@
     "patterns": {
       "casts": "applied",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -381,7 +381,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 literalconst_cast removed after complete two-arm matrix,44-function native equivalence and all1699 retail bytes/sites/targets proof. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. B50 genuine strings bound scratch at77 and combined text at128 including NUL. Exactly one stat increment; offers exclude expert, so current0..2 indexes next-tier text intentionally. B49 valid faction/skill/count/name termination and newLevel arithmetic remain; negative corrupted skill levels are not excluded."
+    "note": "G40 ordinary nextAttempt join retained: complete goto/break matrix shows break removes retail trampoline and10 bytes (1689 vs1699,66 vs67 blocks); restored all44 native functions and full retail targets pass. S32 levelsGained and terminal tryCount decrement unread. C27 literalconst_cast removed with full proof. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. B50 genuine strings bound scratch at77 and combined text at128 including NUL. Exactly one stat increment; offers exclude expert, so current0..2 indexes next-tier text intentionally. B49 valid faction/skill/count/name termination and newLevel arithmetic remain; negative corrupted skill levels are not excluded."
   },
   "src/SOURCE/HERO.cpp:hero::NumArtifacts(void)#1": {
     "body_sha256": "272dd39fb46e103ace01836331b1d97024af2e789007a83a350371eb0c06b83f",

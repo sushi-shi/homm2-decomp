@@ -276,8 +276,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   All98 units remain native-identical; four affected bodies have retail proof.
 - C27: the level-up sample literal now passes directly to the const-correct
   sample API, with [complete native and retail proof](C27.md).
-- G40-G42: hero level-up choice, secondary-skill status text and secondary-skill
-  dialog joins need structured matrices. R06 records the army type/count swap
+- G40: retain the [level-up skill-search goto](G40.md); the measured break arm
+  loses the retail trampoline and ten bytes. G41/G42 secondary-skill status
+  and dialog joins still need structured matrices. R06 records the army type/count swap
   sharing a scalar temporary; S31/S32 cover serialized unknown regions and
   unread hero UI/level-up/split/upgrade locals.
 - B49: hero/player initialization and spell/skill/experience/selection domains
