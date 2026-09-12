@@ -3,7 +3,9 @@
 Usage: PYTHONPATH=scripts python3 docs/reconstruction/check-function.py BASE/RESMGR 0xb89b0
 Private C-string identities are proven by their exact content at each retail
 operand destination, not by VC6's unstable $SG counter. No other unknown owner
-is accepted; this is deliberately narrower than a general relocation verifier.
+is accepted except labels strictly inside this same function, whose target is
+proved by the function RVA plus the COFF-relative label offset. This is
+deliberately narrower than a general relocation verifier.
 """
 import argparse
 import csv
@@ -53,6 +55,12 @@ for reloc in obj.relocations:
     else:
         raise ValueError(('unsupported relocation', reloc.typ))
     expected = owners.get(owner.name)
+    if (expected is None and owner.section == symbol.section
+            and symbol.value <= owner.value < end):
+        # A local switch table/label has a provable position relative to this
+        # function. Never apply this to another function, EH section or data
+        # owner: their retail placement is not implied by this function RVA.
+        expected = rva + owner.value - symbol.value
     valid = expected is not None and ((expected + addend) & 0xffffffff) == actual
     if expected is None and reloc.typ == 6 and owner.name.startswith('$SG') and owner.section > 0:
         data = obj.section_bytes(obj.symbol_section(owner))[owner.value:]
