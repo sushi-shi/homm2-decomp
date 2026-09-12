@@ -50,6 +50,12 @@ B17 adds `combatManager::CombatMessage(text, ...)`: its COMBAT_MESSAGE aliases
 denote the same WIDGET / SET_TEXT values and exact three-store prefix. The second
 line's id/text-only broadcast intentionally reuses that header.
 
+B24 adds complete type/command/id prefixes in the combat reward, victory/loss
+and surrender panels, and WinCombatHandler's final animation update. Keep the
+following text/value write and each broadcast explicit. Its resource-animation
+setup writes the text pointer before selecting an id; scattered stores and
+subsequent id-only broadcasts are not contiguous instances of the macro.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -717,6 +723,10 @@ do not silently change that existing API. Formation, visited-site and boat-id
 tests are different state queries. Replacing source expressions by this inline
 may still change `/Ob1` expansion shape and must be measured later.
 
+B23 adds MoveHero's movement/event/adjacent-monster guards and both hero checks
+in ValidMoveWithEvent. Preserve the nested lookup of the destination hero and
+do not replace the separate boat-object or occupied-boat-id tests.
+
 ## H23 — compact an owner's signed-id array without changing its count
 
 Disposition: plausible narrow statement helper; retain only if naming saves effort.
@@ -790,6 +800,10 @@ B15 adds `combatManager::SetupCombat`'s battlefield terrain lookup. The source
 can assign a null battlefield cell before that lookup; this audit does not add
 an early guard or silently change the caller's current preconditions.
 
+B23 adds MoveHero's current/destination terrain queries for walking samples,
+water handling and music. Keep those individual cell resolutions and query
+times: callbacks and the actual move separate some uses.
+
 ## H25 — non-shadow, non-dummy object-sprite test
 
 Disposition: promising semantic predicate; final naming needs wider map review.
@@ -808,6 +822,12 @@ caller-owned. Keep that surrounding short-circuit order, the sprite/tileset/flag
 test order, and no extra coordinate lookup. A macro repeats its cell expression,
 so it needs a stable local; an inline changes expansion evidence. Do not merge
 overlay existence, map-extra visibility, or occupied-hero tests into it.
+
+B23 adds ValidMove's exact index/tileset/flag conjunctions on destination and
+neighbor cells. Its `CURSOR_OBJECT_PASSABLE_FLAG` is also 0x80, another name for
+the same stored bit. These sites do not call IsShadow; do not introduce a new
+tileset/frame-based shadow test. North/south direction, overlay and trigger
+conditions remain outside the proposed three-field query.
 
 ## H26 — adventure-map coordinate bounds
 
@@ -830,6 +850,12 @@ widget-local geometry or combat's existing `ValidHex`.
 B15 adds the exact x-lower/x-upper/y-lower/y-upper form in
 `combatManager::MoreTreesNear`. Its radius-zero repeated center samples and
 tree-versus-mountain classification are outside the bounds predicate.
+
+B23 adds ValidMoveWithEvent's x-lower/x-upper/y-lower/y-upper rejection using
+`> MAP_WIDTH - 1` / `> MAP_HEIGHT - 1`, like PushPoint's upper-bound spelling.
+These are runtime dimensions, not an assumed fixed 144-square map. ValidMove
+instead tests the translated map origin against -7 and dimension-minus-8;
+its later center coordinates are not interchangeable helper inputs.
 
 ## H27 — reuse the existing search-node accessor
 
@@ -876,6 +902,12 @@ do not silently substitute the physical-current-army pair at those sites.
 
 B21 adds all AI mask/target/strength/approach consumers, including reversed
 `index[array]` notation. Preserve that operand ordering when judging exact expansion.
+
+B24 adds the command loop, direction selection, rounds, actions, cycling,
+rewards and mini-view callers. RightClick resolves side from its hex argument
+but index from `m_selectedHex`; SetupSmallView uses controlling side with the
+current army index. Preserve these actual pairs rather than substituting a
+current-army or occupant lookup that silently changes them.
 
 B15 adds direct owner-array accesses in `LoadArmies`, `UpdateArmyGroup`,
 `CheckApplyGoodMorale`, `CheckApplyBadMorale`, `KeepAttack` and
@@ -994,6 +1026,10 @@ initialize the message type, clear other payload slots, set result to 10 or
 replace the handler result with an executive close event. Both callers already
 have the relevant widget-message context; retain it and the original button id.
 
+B24 adds WinCombatHandler's ordinary exit and timeout exit. The latter first
+sets the message type, then performs the same three stores, then clears the
+timeout; neither extra operation belongs inside the shared completion macro.
+
 ## R17 — combat setup, reset and presentation are not one generic algorithm
 
 `CombineGroups` has two passes with existing `IsMember` / `Add` / `Dismiss`
@@ -1041,6 +1077,10 @@ Keep summoned, mirror, undead and giant/titan conditions outside this helper.
 record it as a variant, not an automatic exact expansion. `ModifyFrameInfo`
 intentionally includes only three elementals because fire supplies the baseline;
 replacing that list with the four-type predicate would be wrong.
+
+B24 adds DoVictory's exact earth/air/fire/water exclusions and AddArmy's exact
+positive four-type tail. Skeleton exclusion, light-palette flag, mirror flag,
+quantity and slot-reuse policy remain caller-owned.
 
 ## H34 — clamp the accumulated combat extents
 
@@ -1091,6 +1131,10 @@ SaveFizzleSource/FizzleForward and direct BlitBitmapToScreen calls also convert
 inclusive bounds, but have different APIs and side effects; they are not instances
 of the same UpdateScreenRegion call macro.
 
+B24's AddArmy has those fizzle-API variants. Full-screen updates in the command
+key handler and DoVictory pass 639/479 directly, not endpoint-plus-one sizes;
+preserve those arguments instead of normalizing them through this helper.
+
 ## H36 — speed-scaled combat animation deadline
 
 Disposition: plausible narrow expression macro; float evaluation is the contract.
@@ -1118,6 +1162,11 @@ factor on the vampire path. B19 adds direct expression instances in Fireball,
 ElementalStorm, Armageddon, ChainLightning, MirrorImage, DoBlast, Resurrect and
 Earthquake. MeteorShower uses a double 112.5 multiplier and reversed operands;
 DoBolt also reverses operands. Preserve timer 0 versus timer 1 and local deadlines.
+
+B24 adds Main's sound-poll deadline and CycleCombatScreen's final deadline,
+using float 75/150 factors in the exact expression order. WinCombatHandler,
+victory fades and idle-animation jitter have different timer arithmetic and
+random-call contracts; they are not instances.
 
 ## H37 — select a projectile frame from angle midpoints
 
@@ -1341,6 +1390,12 @@ repair its null-pointer assumption while introducing a helper. Mirror searching
 continues its current inner loop on an invalid candidate; do not turn that into
 a break or change target-search order.
 
+B24's ValidHexToStandOn is NOT an instance: -2 succeeds immediately, only -1
+is explicitly rejected, and its right-edge test uses `MAP_WIDTH - 1`, not the
+combat row length minus one. GetCommand and RightClick have special hero/tower
+hexes and partial column checks. Do not add range checks or repair these domains
+by applying the interior-hex predicate.
+
 ## H44 — integer-result Euclidean length of an existing delta
 
 Disposition: plausible small math helper with explicit integer/float boundaries.
@@ -1468,6 +1523,10 @@ B21 adds the exact positive triple in GetOutOfItMask and GetBestArmy, and
 zero-test conjunctions in shooter/flyer/walker masks. Those masks do not all
 check positive quantity and are not interchangeable with the existing IsAlive.
 
+B24's CycleCombatScreen tests the zero-duration conjunction in
+paralyze/blind/petrified order, another explicit ordering variant. Its ability
+flag, animation-sequence and deadline guards are not part of this predicate.
+
 ## H51 — shorter calls to the existing combat text-message API
 
 Disposition: useful default-argument hypothesis; retain the history choice explicitly.
@@ -1485,6 +1544,9 @@ not only display style. Do not reinterpret false values as defaults, add clearin
 or move text formatting. The separate CombatMessageCommand overload must retain
 its resolution; review all call types before changing defaults. This is lower
 priority if omission makes a caller's history/update intent harder to see.
+
+B24 adds the four mouse-hover help calls with `(text, 1, 0, 0)`. DoVictory's
+empty message uses `(text, 1, 1, 0)` and must retain that history choice.
 
 ## H52 — use the existing affected-army array indexing
 
@@ -1616,6 +1678,10 @@ those are not contiguous two-store instances. ACTION_MOVE can designate an
 occupied attack target as well as empty movement, so the helper must not validate
 or reinterpret the target.
 
+B24 adds DoCommand's MOVE/FLY/SHOOT group, with a separate following
+`giNextActionExtra = -1`. Its ATTACK arm writes the grid first and selects
+action/extra later; that arm is not an exact two-store instance.
+
 ## H54 — begin a named army animation, favoring existing Wince
 
 Disposition: useful existing-API reuse plus a small generalization hypothesis.
@@ -1633,7 +1699,12 @@ evaluation; keep pending animation, offsets, flags, sound, counters and drawing
 outside. Sites that select a sequence but deliberately keep/advance the frame
 are not instances. No generic animation state machine is proposed.
 
-## H55 — named lich and vampire base/upgrade pairs
+B24 adds the army sequence/frame pairs in ResetCyclingCreatures and
+CycleCombatScreen. Keep last-animation tick/jitter and standing-animation
+selection outside. The separate hero animation state/frame arrays have a
+different owner and are not calls to an army method.
+
+## H55 — named lich, vampire and troll base/upgrade pairs
 
 Disposition: additional credible two-type creature predicates, not upgrade inference.
 
@@ -1650,6 +1721,11 @@ damage, flight delays and first/last-leg precedence remain separate. Vampire-lor
 healing is a single-type test and must not be widened to the pair.
 Other repeated single-TU creature pairs are leads for later consumers, not yet
 additional confirmed shared families.
+
+B24 promotes the troll/war-troll pair: ResetRound's hit-point-loss reset and
+army::LoadResources' projectile-resource selection compare those two types in
+that order. `IsTrollCreature(type)` can name membership without combining the
+unrelated regeneration and resource effects.
 
 ## R23 — tactical AI masks, ranking and movement remain domain-specific
 
@@ -1684,3 +1760,173 @@ before float conversion. Group clearing uses type-then-count, like Dismiss, but
 projection, quantity estimation, base-artifact scoring and retreat probability
 are not a reusable reset/value macro. The later PHILAI implementation review is
 still needed before suggesting reuse of any broader battle-value algorithm.
+
+## B23/B24 — extensions to established short-call candidates
+
+ProcessMapChange and SendMapChange add H17's trailing-default logging calls;
+the hero-position diagnostic also formats gText then LogStr, an H19 instance.
+Its long non-default movement log is not shortened by removing meaningful fields.
+ViewBallista adds H20's left/right turret building-mask checks. The ordinary
+text-only command/help/retreat/error/ballista dialogs add H30; the cursor death
+notification and event-resource dialogs carry actual resource/time arguments
+and must keep them. Command panel/window allocations add H31's stored-pointer
+MemError checks. Unchecked text buffers are not grounds to add new checks or
+replace their fixed capacity with H05's strlen-plus-one allocation.
+
+## H56 — combat-cell occupant identity
+
+Disposition: strong small predicate shared by command, movement and flight code.
+
+SetCombatDirections and CheckSetMouseDirection in COMMAND, MoveAttack in ARMY,
+and CanFit in FLY compare a cell's occupant side then occupant index with a
+specified pair. A proposed `hexcell::HasOccupant(side, index)` names exactly
+that short-circuit conjunction at the already-read packed owner in hexcell.h.
+It must compare the stored signed-byte fields using the existing promotions,
+without narrowing the requested index before comparison.
+
+Keep hex resolution and ValidHex checks outside; this is not a checked lookup.
+The query does not require a nonempty side, positive quantity, unblocked cell
+or living army. CanFit separately permits an empty cell before the identity
+test. No corpse-list search or occupant-frame comparison is implied. A macro
+needs stable cell/side/index expressions; an inline must be measured because
+argument evaluation can move ahead of the original side short-circuit.
+
+## H57 — clear only an army's selected target identity
+
+Disposition: credible two-store army protocol, with reversed-order exclusions.
+
+The constructor, Init and MoveAttack in ARMY, SetupGridForArmy in DRAWING, and
+SetCombatDirections / GetCommand in COMMAND set target side to COMBAT_SIDE_NONE
+then target index to -1. A proposed `army::ClearTarget()` or narrow statement
+macro in army.h names only these two ordered stores. It is distinct from H40's
+combat-cell occupancy reset and H53's global next-action selection.
+
+Do not clear attack direction, move-target hex or previous-target hex; their
+separate stores and retained values remain visible. Save/restore in drawing and
+direction setup surrounds calls and cannot be absorbed into a generic guard.
+WalkTo(i32) in ARMY and SeedCombatPosition in FINDPATH write index before side;
+those are reversed-order variants, not automatic substitutions. No destructor,
+callback, hidden return or new validation belongs in this helper.
+
+## H58 — the castle-gate exception to a blocked combat cell
+
+Disposition: useful shared semantic predicate; positive/negative source variants.
+
+The front and rear tests in PATH's army::ValidMove permit a blocked cell when
+castle combat is active, the candidate is one of the two gate hexes, and the
+drawbridge is not raised OR the current controlling side is the defender with
+no live or dead occupant in the approach hex. COMMAND's ValidHexToStandOn,
+GetCommand and RightClick spell the exact negation of this gate exception.
+The owner declares COMBAT_CASTLE_GATE_OPEN as an alias of
+COMBAT_DRAWBRIDGE_RAISED (4); the misleading alias is not a different state.
+
+A proposed `CanPassCastleGate(hex)` at the combat-manager boundary could name
+just that exception, preserving castle/hex/state/side/live/dead test order and
+the existing global-manager accesses. Blocked-state and candidate-occupancy
+queries remain outside: COMMAND reads some candidate fields through `this`
+while gate state comes from gpCombatManager. Do not assume the receivers alias
+when designing the helper or add an implied movement/flying rule.
+
+Positive and negated forms still require independent byte/CFG evidence before
+replacement. Keep the two gate constants, current controlling side, strict
+dead-count equality and original hex-domain guards. TestRaiseDoor additionally
+examines occupancy/corpses in the gate hex and uses a different drawbridge state;
+it is not a reuse site for this predicate.
+
+## R24 — adventure cursor, movement and map-change protocols remain explicit
+
+DrawCursor and DrawCursorShadow locally save the same five cursor fields, but
+frame advancement, boat wakes/flags, mirroring, clipping and snapshot timing
+differ. Boat flags use no-clip/zero extents while hero flags use clipped extents;
+shadow drawing has its own frame remapping. The walking-speed selector through
+adjacent config fields is a local lead pending the full adventure-manager pass,
+not yet a promoted cross-TU helper. Preserve timer precision, negative half-turn
+tie behavior, repeated draws and independent sound guards.
+
+MoveHero computes terrain costs before the mobility guard and sends the map
+change before several event/path checks. Forced movement still later deducts
+mobility. Embark/disembark, hero interaction and castle branches have different
+stop/redraw/event paths; midpoint versus final map-origin/hero-coordinate changes
+and deferred northwest X movement are not normalized. Existing global blit and
+dialog-menu flags are explicitly set, not restored by a newly introduced guard.
+Adjacent-monster callbacks can change the moving hero's owner and invalidate
+the pending event cell. Keep these phases visible rather than introducing a
+whole movement transaction macro.
+
+Event resource presentation selects the last two nonzero entries, can replace
+one with an artifact, and encodes negative displayed amounts differently from
+the raw resource addition and floor at zero. Interactive and computer handling
+have different event guards. No general resource-award/dialog macro is yet
+justified; EVENTS implementation remains unread.
+
+ProcessMapChange advances the sequence before dispatch and changes player
+context only for the six-player range. Position mismatch and dead-hero checks
+have distinct outcomes; recruit stores preserve trigger/metadata widths and
+order. The repeated CompleteDraw/UpdateScreen tail is a local lead until other
+adventure TUs are read, not a universal redraw helper.
+
+Incoming map changes distinguish stale, exact-next and future sequences, scan
+for duplicates before free slots, and force-unwind one oldest entry on a full
+queue before retrying. Batch input is copied and visited from highest array
+index down to zero; queue drain has separate forced and exact-next phases. Zeroing all fields,
+sorting once, introducing a priority queue or breaking after one exact entry
+would obscure/change that protocol. Purge clears only type tags. SendMapChange
+guards control then remote state, zeroes its packed record, increments the
+sequence, shifts overlapping recent history with memmove and transmits all four
+records. This is not COMMAND's four-integer action packet or a generic reliable
+transport wrapper; REMOTE implementation remains unread.
+
+## R25 — combat commands, reward dialogs and idle cycling retain their contracts
+
+Main polls sound/cycling, performs castle attacks and win checking, receives
+remote commands, then considers local control, berserk and player input. A
+received action jumps past local-only handling. Grid-selection input draining,
+mouse-move coalescing and reset-event synthesis are not a generic event loop.
+gbHumanPlayer and gbThisNetHumanPlayer mean different things; the actual network
+control conditions, duplicate previous-command store and sentinel guards are
+not replaced with a newly inferred IsHuman/HasControl rule.
+
+Direction setup clears and later restores target identity, builds facing-aware
+front/rear cells, then expands six/eight directions into 24 cursor sectors.
+The zero-valid fallback, pending-value propagation and next-before-previous
+priority remain explicit. Mouse slope thresholds use asymmetric strict tests
+and load-bearing float divisor parentheses; do not reuse projectile angle
+selection or repair division by zero. ValidHexToStandOn's -2 success and
+MAP_WIDTH-based edge check remain as written (see H43).
+
+Round reset, victory qualification, casualties and surrender use different
+army counts/filters. ResetRound visits 20 slots and tests quantity; casualties
+compare initial and current quantities; surrender calls IsAlive; AddArmy searches
+21 slots and reuses only selected excluded dead stacks. DoVictory can restore
+one creature after subtracting temporary resurrection, counts necromancy stacks
+separately from defeated bodies, and applies multiple truncating conversions.
+Do not introduce a universal living-army iterator, generic stack allocator or
+shared arithmetic formula. Captains, hero experience, artifact capacity/order,
+spell learning and temporary-stat application have separate control paths.
+
+WinCombatHandler preserves the current event payload in timeout completion,
+cycles across multiple resources with distinct last/reset frames, and mutates
+the incoming message for broadcasts. Reward panels differ in AddWidget order
+and which window receiver they draw. Fixed text buffers, format-string versus
+%s copying, get/dispose of monster icons and signed quantity formatting remain
+visible. Three local pickup-sound tails use SRandom; a searched EVENTS occurrence
+uses Random and its complete body is still unread. This is not yet a shared
+sound helper. Victory/loss dialog cleanup differs: only the loss path nulls the
+window pointer. Do not add cleanup or change callback/resource lifetime here.
+
+ProcessNextAction transmits before executing and has multiple win exits; the
+early pre-switch win branch retains the initialized consume result. Action
+reset, morale, cycle-timer reset, next-army selection and round reset do not
+occur on every path. Keep the spell/move/attack/retreat/surrender/wait/defend
+differences and the four-integer wire order. Castle attack loops have fixed
+catapult versus three-tower order, not one generic repeat-action operation.
+
+ResetCyclingCreatures marks cycling troops but then resets every non-excluded
+troop when any was marked. ResetCycleTimers samples now separately from hero
+ticks and uses an inclusive random range only above its delay threshold.
+CycleCombatScreen has another spell-test order, weighted animation selection,
+random frame-repeat and double-valued jitter; no random/timer calls are cached
+or removed. Hero death/idle arrays and army frame state are different owners.
+InCombatArea is already a named local-use boundary and does not justify a new
+all-screen/hex predicate. Settings updates and AddArmy's fizzle sequence keep
+their specific redraw, visibility, resource and preference-write order.

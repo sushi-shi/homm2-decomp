@@ -72,7 +72,7 @@ include/SOURCE/CONFIG_TYPES.h	130	0	1	read	6e7d153b19fdfcca7482bc695055903705181
 include/SOURCE/CURSOR.h	110	0	1	read	8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916	B22: complete cursor/movement/change domains, packed 11-byte SMapChange union and SendMapChange declaration; no bodies
 include/SOURCE/Campaign.h	78	0	1	unread	8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc	-
 include/SOURCE/Castle.h	22	0	1	unread	f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510	-
-include/SOURCE/EVENTS.h	331	0	3	unread	aa48042c559abec23312bf2709282ddcdbb1fcc4113360570182f8e556860cc0	-
+include/SOURCE/EVENTS.h	331	0	3	read	aa48042c559abec23312bf2709282ddcdbb1fcc4113360570182f8e556860cc0	B23: complete event/object/resource domains and packed map-extra event/hero/town layouts, macros and declarations; no bodies; EVENTS implementation unread
 include/SOURCE/EVENTS_TYPES.h	43	0	1	unread	33ad4e93fb77eeed235a8f5b40cf6a24eaa21e70143ba7321ae2dc71d6780210	-
 include/SOURCE/ExpCampaign.h	153	0	1	unread	96f9d7cdb3e1bb99fe3bb93377ab8389c1531b9f0ddfbff680fee339863fbe24	-
 include/SOURCE/FINDPATH.h	16	0	1	read	7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665	B14: complete terrain cost declaration; no bodies
@@ -88,7 +88,7 @@ include/SOURCE/Overview.h	42	0	1	unread	905d7828d5ecc61e7f20193918f42a66cb1e2bac
 include/SOURCE/PATH.h	9	0	1	read	c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2	B14: complete combat adjacency/opposite-direction declarations; no bodies
 include/SOURCE/PHILAI.h	115	0	2	read	dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
 include/SOURCE/RECRUIT.h	20	0	1	unread	0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e	-
-include/SOURCE/REMOTE.h	117	0	1	unread	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	-
+include/SOURCE/REMOTE.h	117	0	1	read	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	B23: complete packed packet/message records, transport/buffer/retry domains and all remote declarations; no bodies; REMOTE implementation unread
 include/SOURCE/REMOTE_TYPES.h	68	0	1	read	a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70	B22: complete network/remote/protocol domains and packed 34-byte player-info record; no bodies; implementations still unread
 include/SOURCE/REQUEST.h	83	0	1	unread	00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8	-
 include/SOURCE/SETUP.h	26	0	1	unread	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b	-
@@ -183,8 +183,8 @@ src/SOURCE/AI.cpp	1090	19	21	read	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc
 src/SOURCE/ARMY.cpp	3674	47	18	read	5653eee7093d2efcf72493adcd5e376eed1507dd54326d707a2ff55e6e297bf6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMYGRP.cpp	282	14	0	read	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	B12: 14 bodies including strict SwapValues; full morale/slots/damage and conditional swaps; H20/R14
 src/SOURCE/CMBTMGR.cpp	2443	38	8	read	c6830fbba94e6a8da5c7564e4b9775d6485a668f54b63b851ff1d03ec7a26ab7	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
-src/SOURCE/COMMAND.cpp	3263	36	14	unread	0415faf2879b028df320eb313adafefad2ecf24fcafa211feb986427312f670b	-
-src/SOURCE/CURSOR.cpp	1583	18	1	unread	9640b4070918a09eb3b6b964b4a1c3b7bb6b9da952b77f43e76586b393573251	-
+src/SOURCE/COMMAND.cpp	3263	36	14	read	0415faf2879b028df320eb313adafefad2ecf24fcafa211feb986427312f670b	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/CURSOR.cpp	1583	18	1	read	9640b4070918a09eb3b6b964b4a1c3b7bb6b9da952b77f43e76586b393573251	B23: all eighteen bodies; full cursor/shadow/movement/event/validation/origin and ordered map-change queue/transmit paths; H17/H19/H22/H24-H26/R24
 src/SOURCE/Campaign.cpp	1129	7	0	unread	9bace5d261c51e3cc6930bae7485969b4e001408c5f44626f824221c932242c3	-
 src/SOURCE/Castle.cpp	850	3	0	unread	9b224b9cf52512e737df8b570eee82e4d9c0f68d4cd2207987d9643d0deb88fb	-
 src/SOURCE/DRAWING.cpp	1830	13	0	read	7937a64778bf5e55c878cb1f2c3eac6cd943b4adca8a69b60136e403aac1d23c	B17: all 13 bodies incl both CombatMessage overloads and complete DrawFrame/DrawSmallView; full message/grid/background/hero/wall/moat/mini-view ordering; H01/H20/H28/H34-H36/H41/H42/R19

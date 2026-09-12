@@ -346,3 +346,38 @@ domains, packed SMapChange movement/wire overlay, CombatRemotePacket reserved
 fields and typed command payload, network modes/protocols and player-info layout.
 These declarations support already-read combat action consumers and the next
 CURSOR/COMMAND/remote implementation passes. Those implementing TUs remain unread.
+
+## B23 — complete adventure cursor and map-change handling
+
+Read all 1,583 lines and eighteen definitions of CURSOR.cpp, plus all of
+EVENTS.h (331 lines) and REMOTE.h (117); both headers have zero function bodies.
+Reconciled all cursor/movement, validation, map-origin and map-change queue
+bodies, including the full 427-line MoveHero and every event/resource branch.
+Reviewed packet/event layouts and transport declarations; this does not mark
+EVENTS, REMOTE or the other adventure-manager implementation TUs read.
+
+H17/H19/H22/H24-H26 gain concrete instances or bounds/naming variants. The
+MoveHero map-extra expression also matches the existing MAP_EXTRA_AT operand
+order, not the width-first variant; no new helper is needed for that spelling.
+R24 records animation/sound, movement/event, resource presentation and ordered
+map-change queue distinctions. Cursor snapshots, walking-speed selection and
+redraw tails remain local/pending leads until the remaining adventure callers
+are fully read. Runtime map dimensions were retained, not assumed to be 144.
+
+## B24 — complete combat command and result handling
+
+Read all 3,263 lines and 36 definitions of COMMAND.cpp, including constants,
+macros and trailing data. Reconciled Main, all direction/command/input methods,
+round/win handling, full reward/victory/loss/surrender UI, network control/action
+dispatch, idle cycling, grid settings, army addition and ballista view. The
+COMMAND, combat, army, window/message, resource and sound declarations/owners
+were already fully reviewed; the general REMOTE implementation remains unread.
+
+H01/H17/H20/H28/H30-H33/H36/H51/H53-H55 gain command consumers. H35/H43/H50 gain
+explicit API/domain/test-order exclusions. H56/H57 isolate occupant identity
+and army-target clearing across already-read TUs; H58 names the shared castle
+gate exception while distinguishing positive and negated source forms. R25
+preserves network/input/direction, army-filter, reward/lifetime and random/timing
+contracts. The three local pickup-sound tails are not promoted from a searched
+EVENTS occurrence; it uses another random stream and its full body is unread.
+No game source, headers, configuration or behavior were changed.

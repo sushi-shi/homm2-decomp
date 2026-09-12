@@ -144,9 +144,9 @@ include/SOURCE/CONFIG_TYPES.h	2	2	HOMM2_SOURCE_CONFIG_TYPES_H	read	a95c8136dd77e
 include/SOURCE/CURSOR.h	2	2	HOMM2_CURSOR_H	read	b1e44a3464bcb4256e273752c4574360b4539f5d3b6e52f34ad340d440352462	B22: complete cursor/movement/change domains, packed 11-byte SMapChange union and SendMapChange declaration; no bodies
 include/SOURCE/Campaign.h	2	2	HOMM2_CAMPAIGN_H	unread	52ba851438f5a9e7aa2a4934255b6f9f51a04a40bcea3ef90b8a1b494e59b6a1	-
 include/SOURCE/Castle.h	2	2	HOMM2_CASTLE_H	unread	7fa63445d5328b47e61e40dbf38fc4ec91623e74accc04586e72da4d6d0f720e	-
-include/SOURCE/EVENTS.h	2	2	HOMM2_EVENTS_H	unread	ffde25456c08c09d5fd2410c8b079c11d86ed4009109b81c94a2291ac40278bc	-
-include/SOURCE/EVENTS.h	303	303	MONSTER_STRENGTH_JOIN	unread	561b7f912cba364af27df831a6893d9c629537d2ec334799707c451372029a99	-
-include/SOURCE/EVENTS.h	304	304	MONSTER_STRENGTH_FLEE	unread	7ea5c116318816a02f3af9a09e9afa9274398d26c68fb77a77c6437430307fdd	-
+include/SOURCE/EVENTS.h	2	2	HOMM2_EVENTS_H	read	ffde25456c08c09d5fd2410c8b079c11d86ed4009109b81c94a2291ac40278bc	B23: complete event/object/resource domains and packed map-extra event/hero/town layouts, macros and declarations; no bodies; EVENTS implementation unread
+include/SOURCE/EVENTS.h	303	303	MONSTER_STRENGTH_JOIN	read	561b7f912cba364af27df831a6893d9c629537d2ec334799707c451372029a99	B23: complete event/object/resource domains and packed map-extra event/hero/town layouts, macros and declarations; no bodies; EVENTS implementation unread
+include/SOURCE/EVENTS.h	304	304	MONSTER_STRENGTH_FLEE	read	7ea5c116318816a02f3af9a09e9afa9274398d26c68fb77a77c6437430307fdd	B23: complete event/object/resource domains and packed map-extra event/hero/town layouts, macros and declarations; no bodies; EVENTS implementation unread
 include/SOURCE/EVENTS_TYPES.h	2	2	HOMM2_EVENTS_TYPES_H	unread	9726cc4de5a78342047c49e907896fa73b50e63a3b93e12caca93207afd42ce4	-
 include/SOURCE/ExpCampaign.h	2	2	HOMM2_SOURCE_EXPCAMPAIGN_H	unread	a1f3f8ad0841d0be7d3a4b2674eccfc7c9bd719c0c0807900d3f4f0d481b3ee0	-
 include/SOURCE/FINDPATH.h	2	2	HOMM2_FINDPATH_H	read	557e7f75dfb1ed84ab925e57b0c003a691226fa7ca8e5bae931272b7a46d24a3	B14: complete terrain cost declaration; no bodies
@@ -175,7 +175,7 @@ include/SOURCE/PATH.h	2	2	HOMM2_PATH_H	read	03de6bdbb6ade8f9c77e46845b18498bbd50
 include/SOURCE/PHILAI.h	2	2	HOMM2_PHILAI_TU_H	read	7caa3be65b8e6a2cd324f61a075bdce189b41e967214300d666c0505446e207c	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
 include/SOURCE/PHILAI.h	59	59	AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER	read	582ff4a893310ba556b8f3cee94a7e7c1aeb5cf466c400d8d0eeb071382982b0	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
 include/SOURCE/RECRUIT.h	2	2	HOMM2_RECRUIT_H	unread	07365e3fe60611f1b0900cc4bcb512f4b86b7a49012cf6d374166d465ebd4be8	-
-include/SOURCE/REMOTE.h	2	2	HOMM2_REMOTE_H	unread	e13000ce34cfa9ed6b70d65d4523eb658b4decd909bc4f4b8b5daf8b493fb5d4	-
+include/SOURCE/REMOTE.h	2	2	HOMM2_REMOTE_H	read	e13000ce34cfa9ed6b70d65d4523eb658b4decd909bc4f4b8b5daf8b493fb5d4	B23: complete packed packet/message records, transport/buffer/retry domains and all remote declarations; no bodies; REMOTE implementation unread
 include/SOURCE/REMOTE_TYPES.h	2	2	HOMM2_REMOTE_TYPES_H	read	4b7397ca4043ecd774fcdc144f3c5e153f09806cd557248111e301b10f9c7787	B22: complete network/remote/protocol domains and packed 34-byte player-info record; no bodies; implementations still unread
 include/SOURCE/REQUEST.h	2	2	HOMM2_REQUEST_H	unread	e28f1389b3857121e654145e7b559c03d5c71382bb6cbd9b24470906d4407011	-
 include/SOURCE/SETUP.h	2	2	HOMM2_SETUP_H	unread	59bcb0b1263be6c28d9c3fd2855aedf06ecf3783c5514534801a970fb50f64bb	-
@@ -366,21 +366,21 @@ src/SOURCE/CMBTMGR.cpp	38	38	COMBAT_MISSILE_DEGREES_PER_RADIAN	read	ed25a508d27d
 src/SOURCE/CMBTMGR.cpp	39	39	COMBAT_MISSILE_PI	read	13ac34d4cc38cb02955e3939748a9b29a0d8268d421d88197f1aae8cc1f0a029	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
 src/SOURCE/CMBTMGR.cpp	40	40	COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR	read	b8c5d6354c5faedde8b9bf696f3d6fc1540c5d7f060b16f3107a47bee12ad1cb	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
 src/SOURCE/CMBTMGR.cpp	41	41	COMBAT_CREATURE_VANISH_DURATION	read	04a09e552de7fbfaa9979e67586826990dd7a1f8d9b0ac775bd39fc677b54879	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
-src/SOURCE/COMMAND.cpp	29	29	COMBAT_NECROMANCY_LEVEL_FACTOR	unread	925916b8084da957ddf5f8dc1aff147b1778e6c4a23e1ef8b97081f353d33b61	-
-src/SOURCE/COMMAND.cpp	30	30	COMBAT_SURRENDER_QUILL_FACTOR	unread	6497cefb82767d929cf8204c25913d443dc4e99d352e464c17cd3d3a4702034d	-
-src/SOURCE/COMMAND.cpp	31	31	COMBAT_SURRENDER_BASE_FACTOR	unread	ab427162c98e8cf6bfeda00cdc979a51ce698959b2263f3df986027a01653631	-
-src/SOURCE/COMMAND.cpp	32	33	COMBAT_SURRENDER_DIPLOMACY_FACTOR	unread	5dfe1aee3e856556152502f3e80452551fcafb82a1946129fcc0704b218e3a6b	-
-src/SOURCE/COMMAND.cpp	34	34	COMBAT_IDLE_ROLL_DIVISOR	unread	424a24c3cc7d348d6aa686b93371bf6a301d14b1ff6de0d40d6730c9bceaebc6	-
-src/SOURCE/COMMAND.cpp	35	35	COMBAT_STAND_DELAY_BASE_FACTOR	unread	a63d9d9faf73baaf6619938970a41adf7ddddedc0d4444b04d8cff0762539016	-
-src/SOURCE/COMMAND.cpp	36	36	COMBAT_STAND_DELAY_RANDOM_FACTOR	unread	e42cf65f8934d39cf95e6fb8d71b1a7f7d72d7c8f6aaf1303605c04b054b0e76	-
-src/SOURCE/COMMAND.cpp	37	37	COMBAT_CYCLE_TIMER_FACTOR	unread	df62db085223c1618b8f22e48453ef017858768da01bac823ecc1d49820db242	-
-src/SOURCE/COMMAND.cpp	38	38	COMBAT_SOUND_POLL_DELAY	unread	c3d7e5d98139efd5ce3effc6d5809b9c8c8737e70b51c09bd34de4d2c3722852	-
-src/SOURCE/COMMAND.cpp	39	39	COMBAT_DIRECTION_SLOPE_STEEPEST	unread	a635b7f1d12c95f10d4a18458a321c0b7e3ed2d801e62c3feac52b8ce2de4128	-
-src/SOURCE/COMMAND.cpp	40	40	COMBAT_DIRECTION_SLOPE_STEEP	unread	a076e33cf4a8d8cc570457d9e046528ddadda2a6e3ef20886b34b033cfa34340	-
-src/SOURCE/COMMAND.cpp	41	41	COMBAT_DIRECTION_SLOPE_DIAGONAL	unread	d91647a51575844baf2ed7e27dd6aff25c8f3c7d0b0d8742f04fb83164f14edb	-
-src/SOURCE/COMMAND.cpp	42	42	COMBAT_DIRECTION_SLOPE_SHALLOW	unread	1810a464960a4b4603caca2f22c338f9ecdb246573c0243039127ef77666dfdc	-
-src/SOURCE/COMMAND.cpp	43	43	COMBAT_DIRECTION_SLOPE_SHALLOWEST	unread	f4d2d0f62d4c9c5246933494879bcab4682395b9fd258713aa8402b05910ae4f	-
-src/SOURCE/CURSOR.cpp	54	54	SLOW_TURN_DELAY_SCALE	unread	cd3f627757f535e25f226c5d6bcb75b66d6fb949980e0b1b4460aca5754e251a	-
+src/SOURCE/COMMAND.cpp	29	29	COMBAT_NECROMANCY_LEVEL_FACTOR	read	925916b8084da957ddf5f8dc1aff147b1778e6c4a23e1ef8b97081f353d33b61	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	30	30	COMBAT_SURRENDER_QUILL_FACTOR	read	6497cefb82767d929cf8204c25913d443dc4e99d352e464c17cd3d3a4702034d	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	31	31	COMBAT_SURRENDER_BASE_FACTOR	read	ab427162c98e8cf6bfeda00cdc979a51ce698959b2263f3df986027a01653631	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	32	33	COMBAT_SURRENDER_DIPLOMACY_FACTOR	read	5dfe1aee3e856556152502f3e80452551fcafb82a1946129fcc0704b218e3a6b	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	34	34	COMBAT_IDLE_ROLL_DIVISOR	read	424a24c3cc7d348d6aa686b93371bf6a301d14b1ff6de0d40d6730c9bceaebc6	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	35	35	COMBAT_STAND_DELAY_BASE_FACTOR	read	a63d9d9faf73baaf6619938970a41adf7ddddedc0d4444b04d8cff0762539016	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	36	36	COMBAT_STAND_DELAY_RANDOM_FACTOR	read	e42cf65f8934d39cf95e6fb8d71b1a7f7d72d7c8f6aaf1303605c04b054b0e76	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	37	37	COMBAT_CYCLE_TIMER_FACTOR	read	df62db085223c1618b8f22e48453ef017858768da01bac823ecc1d49820db242	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	38	38	COMBAT_SOUND_POLL_DELAY	read	c3d7e5d98139efd5ce3effc6d5809b9c8c8737e70b51c09bd34de4d2c3722852	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	39	39	COMBAT_DIRECTION_SLOPE_STEEPEST	read	a635b7f1d12c95f10d4a18458a321c0b7e3ed2d801e62c3feac52b8ce2de4128	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	40	40	COMBAT_DIRECTION_SLOPE_STEEP	read	a076e33cf4a8d8cc570457d9e046528ddadda2a6e3ef20886b34b033cfa34340	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	41	41	COMBAT_DIRECTION_SLOPE_DIAGONAL	read	d91647a51575844baf2ed7e27dd6aff25c8f3c7d0b0d8742f04fb83164f14edb	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	42	42	COMBAT_DIRECTION_SLOPE_SHALLOW	read	1810a464960a4b4603caca2f22c338f9ecdb246573c0243039127ef77666dfdc	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/COMMAND.cpp	43	43	COMBAT_DIRECTION_SLOPE_SHALLOWEST	read	f4d2d0f62d4c9c5246933494879bcab4682395b9fd258713aa8402b05910ae4f	B24: all 36 bodies; full command/direction/input/round/win/reward/network/action/cycling/add-army/ballista paths; H01/H17/H20/H28/H30-H33/H35/H36/H43/H50/H51/H53-H58/R25
+src/SOURCE/CURSOR.cpp	54	54	SLOW_TURN_DELAY_SCALE	read	cd3f627757f535e25f226c5d6bcb75b66d6fb949980e0b1b4460aca5754e251a	B23: all eighteen bodies; full cursor/shadow/movement/event/validation/origin and ordered map-change queue/transmit paths; H17/H19/H22/H24-H26/R24
 src/SOURCE/EVENTS.cpp	42	43	GENERIC_SITE_SIREN_ARMY_REMAINDER	unread	14e117387fdfa81db98c5f6e1644bc768873f5f66b1e0b4e3313e951f97f08d7	-
 src/SOURCE/EVENTS.cpp	44	44	MONSTER_NECROMANCY_FRACTION	unread	0561de0e8b59bcac83a33dc3ce381084af2700dcca19fb40b7c486cd4064dbf5	-
 src/SOURCE/EVENTS.cpp	45	45	MONSTER_AI_JOIN_COST_FRACTION	unread	2c2d03ae43458948c74e771dd2c73e4087f90220c7e84efbfcd97b44da5dbff6	-
