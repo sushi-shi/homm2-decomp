@@ -2787,7 +2787,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     b32 mixedUndead4;
     i32 alignment_e;
     ArmyGroupAlignmentResult homogeneous5;
-    i32 modifierStart;
+    u32 modifierStart;
     char description7[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 slot8;
 
@@ -2899,7 +2899,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
     }
-    if (modifierStart == static_cast<i32>(strlen(gText))) {
+    if (modifierStart == strlen(gText)) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_NONE)]);
     }
 
@@ -2911,7 +2911,7 @@ VA(0x0046b6ab, 0x33e)
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
     char description4[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 H2_UNUSED(luckValue);
-    i32 modifierStart;
+    u32 modifierStart;
 
     if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
         sprintf(description4, cLuckInfo[IDX(LUCK_INFO_GOOD)]);
@@ -2955,7 +2955,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
-    if (modifierStart == static_cast<i32>(strlen(gText)))
+    if (modifierStart == strlen(gText))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
 
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -3593,7 +3593,7 @@ void SmackFade(u8* src, u8* dst) {
             dst + a * MISC_PALETTE_COMPONENT_BYTES,
             MISC_PALETTE_COMPONENT_BYTES
         );
-        g[f] = (u8)a;
+        g[f] = a;
     }
     FadeTo(src, l, HIGH_SCORE_FADE_STEPS);
     i = gpWindowManager->m_screen->m_pixels;
@@ -3633,7 +3633,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         sprintf(ratingText, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
     }
     ratingText[0] = CyrillicToUpper(ratingText[0]);
-    if (static_cast<i8>(gpGame->m_cheated))
+    if (gpGame->m_cheated)
         sprintf(ratingText, "\xd7\xe8\xf2\xe5\xf0!!!");
 
     if (highScoreType == HIGH_SCORE_STANDARD) {

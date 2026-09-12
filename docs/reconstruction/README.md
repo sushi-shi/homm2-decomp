@@ -266,8 +266,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   town/hero context setters reuse locator-position locals as terrain IDs.
 - G35-G39: summon-boat completion, sound disposal, adjacent-monster output,
   control-panel confirmation and visions tails await structured-source matrices.
-- C25: loaded-game cheat-byte cast preserves truth for every byte value but
-  requires native comparison before removal. U09's byte view forwards variable
+- C25/C32: [recovered the signed-byte cheat flag](C25-C32.md), removing both
+  compensating casts with complete98-unit native equivalence. U09's byte view forwards variable
   network payloads, so its16-byte view does not prove those consumer extents.
 - B48: [network-control selection has a retail-confirmed non-advancing loop
   and possible negative index](B48.md). The genuine behavior is retained.
@@ -297,11 +297,20 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   seven-byte packet. Dead-player exit differs: its remaining field is initialized
   by the receiving handler before transmission.
 - C28/C33: [applied six resource-cast removals and a numeric payload correction](C28-C33.md),
-  with complete native KB equivalence. C29-C32 scalar index/length conversions,
-  C-style palette conversion and cheat-byte truth cast await measured cleanup.
+  with complete native KB equivalence. C30/C31 [apply unsigned text lengths and
+  a direct palette-index assignment](C30-C31.md), removing three more casts.
+  C29 scalar index conversions remain for measurement.
   U11 records startup's 212/256-byte union;
   S33 covers KB unused locals and reserved scratch space. G43-G46 track startup,
   morale, menu and player-exit joins.
+- B52: [selected KB formatter bounds](B52.md) account for complete morale/luck
+  append chains, command-line help, ranking/congratulations and memory-error text.
+  Other text owners and caller-domain contracts remain individually open.
+- U12/U13: game's duplicate castle/town-owner and daily-event/known-town views
+  need all-consumer reconciliation. S34 covers52-byte reserved-file scratch;
+  S35 covers unknown game-layout regions, not proven deletable padding.
+  C34 covers bounded narrowing casts in SetupOrigData; B55 tracks game getter,
+  saved-player and initialization-domain contracts.
 
 ## Build setup observations
 

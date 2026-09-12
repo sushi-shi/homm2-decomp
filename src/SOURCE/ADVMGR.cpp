@@ -9332,7 +9332,7 @@ void advManager::LoadRemote(void) {
     SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
     gSoundBackendsReady = 1;
 
-    if (static_cast<i8>(gpGame->m_cheated)) {
+    if (gpGame->m_cheated) {
         DATA(0x00523ffc) static b32 cheatWarned = false;
         if (!cheatWarned) {
             cheatWarned = true;

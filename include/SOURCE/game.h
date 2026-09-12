@@ -140,7 +140,7 @@ public:
     H2_ENUM_STORAGE(ArtifactType, i8) m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
-    u8 m_cheated;
+    b8 m_cheated;
     char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
     char m_rumour[GAME_RUMOUR_TEXT_SIZE];
     u16 m_rumourEventCount;

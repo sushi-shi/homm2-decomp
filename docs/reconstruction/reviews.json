@@ -1008,9 +1008,9 @@
     "note": "S30 gameState unread. Real selected-town/first-hero/first-town alternatives; positive counts protect first-slot access but IDs/player domains remain B43. GetCell clamps map origin lookup while terrain image and music table indices still require valid metadata. Separate typed locals are meaningful, not a fabricated aggregate."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::LoadRemote(void)#1": {
-    "body_sha256": "358466385163ef9a353657eda36198f585ffd9c94563573aa444a59fcad6aa3c",
+    "body_sha256": "ed76def0a963912c2f9a2ded9f3630105bc4d9af008e142e60f916bfff3d2bfb",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -1021,7 +1021,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C25 static_cast<i8>(u8 m_cheated) is used only for truth; all256 byte values preserve zero/nonzero, but native removal still needs measured source alternatives. Actual persistent once-warning statics and saved-game/turn flow. Fixed warnings fit gText768; B43 loaded player state/rmtRCName contract remains."
+    "note": "C25 applied direct truth test of recovered signed b8 game::m_cheated; complete98-unit native equivalence preserves writers/serializers and both consumers. Standalone retail checker agrees on all530 ordinary bytes/DIR32 but cannot resolve four pre-existing local-static identities, so no standalone closure claim. Actual once-warning statics and saved-game/turn flow. Fixed warnings fit gText768; B43 loaded player state/rmtRCName contract remains."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNet(void)#1": {
     "body_sha256": "ff8dd9eec482bde7db9140ca9d601235e8e46bdaf551da2e0eea2da780141236",
@@ -15581,7 +15581,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Lookahead guards cover i+1/i+2/i+3. Address/name loops copy at most20 bytes then append NUL, requiring21-byte owners; TCP count accepts2..6. B52 command-line termination,14-help-line concatenation and fixed/path text capacities need actual owner/data proof. Four human slots initialized intentionally here, not six. No casts, unions, gotos, fake locals or manual varargs."
+    "note": "Lookahead guards cover i+1/i+2/i+3. Address/name loops copy at most20 bytes then append NUL, requiring21-byte owners; TCP count accepts2..6. B52 complete14-line help is226 bytes including NUL within768, independently pinned. Command-line termination and remaining fixed/path capacities retain their caller contracts. Four human slots initialized intentionally here, not six. No casts, unions, gotos, fake locals or manual varargs."
   },
   "src/SOURCE/KB.cpp:InitMenuHandler(struct tag_message & msg)#1": {
     "body_sha256": "fa0a666c74d83c179b2c6369825aed8cd456fd9808ad47ed26bde82b857f88a9",
@@ -15872,9 +15872,9 @@
     "note": "S33 unread j. Fixed ten-timer initialization and four net-box lines/colors stay within declared owners; map filename literal fits its owner. Real menu handles and global state resets, no casts, unions, gotos or manual varargs."
   },
   "src/SOURCE/KB.cpp:game::ShowMoraleInfo(hero * h,i32 dialogType)#1": {
-    "body_sha256": "abffb8f6251da89bb7d74a53262721a68f639be82899927db44f31a4212b8a3c",
+    "body_sha256": "f13951f8d53ed1ac9204805c1d9fe15a09b26c82b43a9eab83046baa30179317",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "open",
       "address": "absent",
@@ -15885,12 +15885,12 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "G44 all-undead goto joins final dialog. Real description200 and gText768; B52 maximum combined modifier append chain and table format markers require actual data. C30 strlen-result cast reflects signed length local, a candidate unsigned length role. Creature/faction domain B51; five-slot creature scan bounded. No fake aggregate or owner recovery."
+    "note": "C30 applied u32 strlen-length local and direct comparison, whole KB native and whole-function retail proofs pass. G44 all-undead goto joins final dialog. B52 pinned-table upper bounds including NUL: scratch108/200, complete540/768; full modifier chain and exclusive tiers accounted for, conservative not reachable maximum. Creature/faction/owner domain B51 remains; five-slot creature scan bounded. No fake aggregate or owner recovery."
   },
   "src/SOURCE/KB.cpp:game::ShowLuckInfo(hero * h,i32 dialogType)#1": {
-    "body_sha256": "b7c651749089f693803600f138da72a90d1cce7090f8bc11c72e2b0be229902e",
+    "body_sha256": "daa61ca0c42fa7619d19f7ab79070f3aea4b5d2ec0e4fe63235feabf591c6865",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -15901,7 +15901,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "S33 unread luckValue; C30 signed strlen-result comparison could use real unsigned length local. B52 description200 and cumulative gText768 modifier text need real table maxima and mutually exclusive skill handling. No goto, union, artificial arithmetic or manual varargs."
+    "note": "C30 applied u32 length local/direct strlen comparison with full native/retail proof. S33 unread luckValue remains. B52 pinned-table upper bounds including NUL scratch156/200 and complete437/768, accounting for independent flags and exclusive skill tiers. Valid hero/town ownership still B51. No goto, union, artificial arithmetic or manual varargs."
   },
   "src/SOURCE/KB.cpp:ClearMapExtra(void)#1": {
     "body_sha256": "ad7cf28ae803208710250d58fec9ebf9e7e0539482c360b39384b1b1253c024d",
@@ -16032,9 +16032,9 @@
     "note": "Two independent real500-byte error buffers; err captures errno before helper calls. B52 strerror result plus filename/format capacities require input/table bounds. LogInt passes explicit eight values, no manual varargs walk, cast, goto or fake aggregate."
   },
   "src/SOURCE/KB.cpp:SmackFade(u8 * src,u8 * dst)#1": {
-    "body_sha256": "fef597ea8a146452f22a020f4b0cd399166645be78de841478f891906e6852d6",
+    "body_sha256": "bf32fbc58e38f9a6d6607a736a3b5146ff6292fbbf720eea3b58da8ed27a6c0e",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -16045,12 +16045,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Two real heap owners768 palette bytes and256 lookup bytes; allocation and signed-palette API casts meaningful. C31 C-style u8 assignment should use typed conversion. With768-byte palettes, intensity differences<=255 and sentinel999 guarantee a chosen color10..35 before copy, not -1. Source indices10..245, mapping bytes0..255 and640x480 pixel walk bounded by their required owners. B51 palette/screen extent and allocation contracts remain; no fake stack or unrelated-role reuse."
+    "note": "C31 removed C-style palette-index cast after complete three-arm native/retail proof. Difference<=255<sentinel999 ensures a chosen color10..35 before assignment; direct byte storage is value-preserving. Real heap owners768 palette bytes/256 lookup bytes and required allocation/signed-palette API casts retained. Source indices10..245, mapping byte0..255 and640x480 pixel walk require B51 palette/screen/allocation contracts; no fake stack or unrelated-role reuse."
   },
   "src/SOURCE/KB.cpp:ShowCongrats(HighScoreType highScoreType)#1": {
-    "body_sha256": "8050b323e0f2a1d3f43cd8453fc950d39e8efa5e613dd51b213ebe4efb08472f",
+    "body_sha256": "d5039ab59167830999c49c16c99c3b769ca00a38f89e2e0e8d980d92fbd9c72f",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -16061,7 +16061,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "S33 unused scalar, real768-byte saved palette and32-byte ratingText. C32 cheat byte is only truth-tested after i8 cast; same all-byte equivalence issue as C25. Required allocation/palette boundary casts retained. B52 real creature-name-as-format and500-byte allocated congrats output need pinned data; score arithmetic/domain and palette lifecycle B51."
+    "note": "C32 removed compensating cheat-byte cast by recovering signed b8 game::m_cheated; all98 native units unchanged and full946-byte retail proof passes. Direct removal under former u8 owner was measured/rejected, not silently accepted. S33 unused scalar remains. B52 pinned names max19, ranking20/32 and congratulation bounds123/63 within500 including NUL. Real768-byte palette and required heap/palette casts retained; score domain and palette/manager lifetime B51 remain."
   },
   "src/SOURCE/KB.cpp:CongratsWait(void)#1": {
     "body_sha256": "11762d5bb32fe3e3d82065b2de21b483d4423d304afa5034ad9e2ae8689e58fb",
@@ -16107,9 +16107,9 @@
       "varargs": "absent",
       "reuse": "absent",
       "stack": "absent",
-      "bounds": "open"
+      "bounds": "retain"
     },
-    "note": "Reentrancy guard and fixed message/request6400 are formatted through cOutOfMemory into gText768. B52 pinned template conversions/capacity need proof. No local buffer, cast, union, goto or artificial argument access."
+    "note": "Fixed request6400 and pinned message/template produce119 bytes including NUL within gText768; B52 numeric bound and full75-byte retail bytes/sites/targets pass. Reentrancy guard retained. No local buffer, cast, union, goto or artificial argument access."
   },
   "src/SOURCE/KB.cpp:GetTownName(i32 i)#1": {
     "body_sha256": "1de9c270543695017ec37546c0ce1aced2508585c118991f86fae9bef80a3f7b",
@@ -16526,5 +16526,133 @@
       "bounds": "absent"
     },
     "note": "Cycles the real three-value spell-display enum; no pointers, buffers, conversions, goto or scratch ownership. Valid enum input supplies arithmetic domain."
+  },
+  "include/SOURCE/game.h:game::GetHero(i32 id)#1": {
+    "body_sha256": "ee89e4b771b9e1034e00c8f2d8f67f39f395638f36a19f3683330f7994867b70",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Returns the actual hero-array element address, not enclosing-owner recovery. B55 caller id must designate a live member of54 records; no casts, union, goto, scratch aggregate or manual varargs."
+  },
+  "include/SOURCE/game.h:game::GetTown(i32 id)#1": {
+    "body_sha256": "81fa841f76e09f48fdad5e41dac3f14c04393f9e6f24dd2c349c607c622abdac",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Returns actual town-array element address. B55 caller id must be within72 records; ordinary array indexing is not artificial address arithmetic or a fabricated object."
+  },
+  "include/SOURCE/game.h:game::GetPlayerHero(i32 player,i32 index)#1": {
+    "body_sha256": "7429ad3a24aa94b95470dbe86a3e927fc1117eed4f1e6c33eb1ab5143c20afd3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B55 three coupled domains: player0..5, hero-list index0..7, and stored signed hero id0..53; stored -1 is not guarded here. Direct typed arrays, no cast, union, goto, varargs or fake local."
+  },
+  "include/SOURCE/game.h:game::GetPlayerTown(i32 player,i32 index)#1": {
+    "body_sha256": "435e584962fa7f2658ee309d984a17c7b971648ec0097652593e3bd4637afa01",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B55 player0..5, list index0..71, and stored town id0..71 must all be valid; no local sentinel guard. Actual typed nested array lookup, not owner recovery or manual arithmetic."
+  },
+  "include/SOURCE/game.h:game::GetPlayerColor(i32 player)#1": {
+    "body_sha256": "5907b6491d1f4eeec5abbc1b75c53831b86c5376fc7b65194ccebc5e4fcd88b7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Promotes actual signed-byte color to i32 without explicit cast. B55 player-array index needs caller validation; no scratch, union, goto or artificial pointer operation."
+  },
+  "src/SOURCE/GAME.cpp:playerData::Write(i32 file)#1": {
+    "body_sha256": "9ad963e030f7658ee519e5d673a103098d0b1e66e8529689a0828e491c5114f9",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S34 real reserved-file scratch declared52, clears48 and writes42 bytes; no uninitialized transmitted scratch, but unused capacity needs native removal matrix. Writes real typed fields/arrays, one-byte signed cheat flag, seven-resource/income arrays, duplicated barrier byte, and six-byte barrier record. Complete571-byte retail proof confirms widths/sites/targets. B55 unchecked write results and valid file/owner contract remain; no casts, unions, goto, manual varargs or owner tricks."
+  },
+  "src/SOURCE/GAME.cpp:playerData::Read(i32 file)#1": {
+    "body_sha256": "f4fcc036f1075744915957b003986adce26dfd5820122adb6605903a127b39d1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S34 actual52-byte scratch receives42 reserved file bytes and is otherwise unread; not a fabricated combined stack record. Raw one-byte cheat flag and typed player fields/arrays preserve packed representation; barrier byte is read twice. Complete556-byte retail proof passes. B55 short/error reads and unvalidated loaded counts/IDs remain; no cast, union, goto or manual argument access."
+  },
+  "src/SOURCE/GAME.cpp:game::SetupOrigData(void)#1": {
+    "body_sha256": "44d3fbe64658af26dd2f2c0ab29d8f1a8c09c471e603f0611afe780269e49ca8",
+    "patterns": {
+      "casts": "open",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full140-line initializer reviewed; complete2513-byte retail proof passes. Fixed6 players/54 heroes/72 towns and other named-array loops fit owners; initial active-player count4 is distinct. Hero faction i/9 is0..5, town faction0..7 intentionally includes neutral/random. C34 seven bounded narrow assignment/bit-mask casts need matrices; two real faction conversions retained. U12/U13 owner aliases need global reconciliation. B55 default hero names into13 bytes and at-least-one-local-human watch-loop termination need contracts. Real i/j scan roles, no goto, fake stack aggregate, varargs or enclosing-owner arithmetic."
   }
 }

@@ -16,8 +16,8 @@
     "note": "Full2131-line TU, all41 physical definitions, prolog enums/macro and trailing globals read. Actual12-entry XP table and all UI IDs reconciled. G40-G42 skill joins, R06 type/count temporary, S32 unused locals and B49/B50 record/domain/text contracts tracked per function. U10 header change has whole native proof; C27 literal const_cast removal has44-function native and complete scoped retail proof. No fake stack owner or manual argument-slot access found."
   },
   "src/SOURCE/ADVMGR.cpp": {
-    "sha256": "39137e1b441e663ecb34500b39488aab633d6c3f4b39f021598c5a6fe6137d4f",
-    "note": "Full10885-line TU read across ordered batches: prolog enums/macros/static owners, every physical body and trailing globals/vtable reconciled. O04/B44/U08 owner/type changes verified; G27-G39 joins, R03-R05 roles, C20-C25 conversions, S29/S30 unused state, U09 wire owner and B43/B45-B48 contracts retain per-function dispositions. Genuine-retail radar/grid/count-label/control evidence recorded separately; source anomalies not silently repaired. Real18x18 redraw grid,48-piece order,0x7400 border owner and other fixed arrays inspected."
+    "sha256": "567db52196de4f39f85c78b5a290b059e19bb38c07d44fe7f91fbd7c13b22546",
+    "note": "Full10885-line TU read across ordered batches: prolog enums/macros/static owners, every physical body and trailing globals/vtable reconciled. O04/B44/U08 owner/type changes verified; G27-G39 joins, R03-R05 roles, C20-C25 conversions, S29/S30 unused state, U09 wire owner and B43/B45-B48 contracts retain per-function dispositions. Genuine-retail radar/grid/count-label/control evidence recorded separately; source anomalies not silently repaired. Real18x18 redraw grid,48-piece order,0x7400 border owner and other fixed arrays inspected. C25 LoadRemote cast removed after signed cheat-owner recovery and complete98-unit native verification; all other source remains the reviewed body/file content."
   },
   "include/SOURCE/ADVMGR.h": {
     "sha256": "7b9777229ae53954e735bd38d318f1392596f3e187b1279251d6f151c13af7c7",
@@ -690,5 +690,9 @@
   "include/SOURCE/X_GLOBAL.h": {
     "sha256": "63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d",
     "note": "Full header and its one inline read. Real packed14-byte obstacle and17-byte elevation records; elevation table25 vs debug command range200 is B51. Global declarations and stated table extents inspected; remaining caller-domain obligations stay in the function ledger. Actual GLOBAL_TEXT_BUFFER_SIZE is768, correcting prior conservative500 wording. Globals, aliases, enum domains and source-owned arrays are not fake local aggregates."
+  },
+  "include/SOURCE/game.h": {
+    "sha256": "f094b31d7d1997a7aa3d66d672a9af081879ba086c00dd67e9e363930dcfe035",
+    "note": "Full header through EOF and all five inline bodies read. Packed0x660f game,7-byte mine/8-byte boat, fixed player/hero/town/event owners inspected. C25/C32 signed b8 cheat-flag owner verified across98 native units and all named consumers, serialized width unchanged. U12 duplicate castle/town-owner names and U13 daily-event/known-town byte views require all-consumer review. S35 unknown campaign/setup/runtime gaps are not proven deletable padding; B55 getters and event/name capacities keep caller contracts. No fake stack aggregate or manual varargs."
   }
 }
