@@ -1,0 +1,458 @@
+{
+  "src/BASE/Iconf2b.cpp": {
+    "sha256": "e4ee63ea92cd19e6af2258c074cb0a2a3665a4e85cc6c8eab8c90e015c3e7bc7",
+    "note": "Full199-line TU/one decoder plus all18 static owners read. C12/G15/B28 retained for palette, shared-fill and clipping/stream pointer review."
+  },
+  "src/BASE/Icond2b.cpp": {
+    "sha256": "3eb19050fd436c66180e49d574194e00c41905824dd77c326d04deedd78ef979",
+    "note": "Full103-line TU/one decoder and12 static owners read. O03 real palette-level indexing applied; caller levels0/2 and full native/scoped-retail proof verified. B28 row/asset domains remain."
+  },
+  "src/BASE/Icondf2b.cpp": {
+    "sha256": "bdde924a3637728bf2ff3aef442a3dc99790f11c55251180f25ffde0b96aeeeb",
+    "note": "Full110-line TU/one decoder and13 static owners read. O03 palette-level indexing applied with full native/scoped-retail proof. B28 row, full-run clipping and stream/frame domains open."
+  },
+  "src/BASE/Iconm2b.cpp": {
+    "sha256": "6d89a4722c83f4d7b82e132c26a470ac8e26838da2b393e0039791fe409739b1",
+    "note": "Full87-line TU/one mono decoder and9 static owners read. Genuine serialized prefix/high-bit casts and related decoder state retained; B28 row/clipping/stream domains open."
+  },
+  "src/BASE/Iconmf2b.cpp": {
+    "sha256": "6b9f9b8de7153ddcf11baff992682fa8c2827da95becaf39820882649d6c9cca",
+    "note": "Full89-line TU/one flipped mono decoder and10 static owners read. B28 preclip row formation, full-run clipping predicate and asset bounds open; no artificial stack aggregate."
+  },
+  "include/BASE/Iconf2b.h": {
+    "sha256": "d7a65cdbdc7283dcb6c49a5e4f34dfb34c92d58292ec96a33d42ddeff8dd33f3",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Icond2b.h": {
+    "sha256": "559908059c151b4a2a4de3fea6c1787ee7a92acf53fe0499f8f1b5b71b740f10",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Icondf2b.h": {
+    "sha256": "b5448cd496bb2cf823d11e9e2f0be855b837f545ced92e110142ada0c606c56f",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Iconm2b.h": {
+    "sha256": "6b877a2d5abdb407d0b7d7e35fd434baea30ea130e970203ef667490a899b307",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Iconmf2b.h": {
+    "sha256": "46132f9b1de5dd9bc7a790664bff7d8db2b79a54567c914fdeb7d4050b0ed5ef",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/IconMonoRle.h": {
+    "sha256": "ce7ae90eccf355b1634497de9337b3f9443d5196c77f8f6a460f9739be1eb3ae",
+    "note": "Full11-line header/four command constants read: newline0, skip flag0x80, end count0 and low7-bit run count; no inline body or executable macro."
+  },
+  "src/SOURCE/VIEW.cpp": {
+    "sha256": "0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436",
+    "note": "Full418 lines/all three functions, enums and side global read. S15 unused local constants and B26 hero/army/text domains remain open; genuine tagged messages retained. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "include/SOURCE/VIEW.h": {
+    "sha256": "8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d",
+    "note": "Full14-line header/prototypes/side declaration; no body, layout or executable macro."
+  },
+  "src/SOURCE/HEXCELL.cpp": {
+    "sha256": "af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720",
+    "note": "Full138 lines/eight definitions read. Real corpse arrays and clipping member array; B27 lifecycle bounds needs remaining producer review. No casts/gotos/artificial addresses."
+  },
+  "include/SOURCE/hexcell.h": {
+    "sha256": "bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5",
+    "note": "Full45-line packed98-byte class reviewed: three14-byte corpse arrays are real, with append capacity checks in ProcessDeath, plus real two-record limits. No inline bodies or union."
+  },
+  "include/SOURCE/combatTypes.h": {
+    "sha256": "4cd3766ce7192a3952a2a8b8ea30a7949509f787ea9148508a3cd083babb9d0d",
+    "note": "Full119 lines/all8 inline functions and7 alternate macros reviewed. Typed enum adapters model valid binary side/facing/result domains. NO sentinel equivalence claim is made between strict enums and legacy arithmetic macros."
+  },
+  "src/BASE/Icon2b.cpp": {
+    "sha256": "e790e3b76d481df35a558f81206e2d9162ea9f92b2e7e3f4c3ed22c65e35b0c9",
+    "note": "Full170 lines/one RLE decoder and16 file-static owners reviewed. C12/G15/B28 open; serialized entry prefix and real related decode state retained. No stack aggregates or varargs."
+  },
+  "include/BASE/Icon2b.h": {
+    "sha256": "ce7c737bfd2b9ab81e7de5ebbf8c98534c367f507a334f0fc2ddf5a144ab3a60",
+    "note": "Full25-line parameter/prototype owner header; no bodies or executable macros."
+  },
+  "include/BASE/IconRle.h": {
+    "sha256": "d3d3675349926a628d129f08da025033609a82aa48d2e1409e1d81433f0ff22d",
+    "note": "Full24-line command-bit constants and cursor helper read. Native byte helper uses valid previous-byte access under stream contract; B28 global decoder bounds open."
+  },
+  "src/SOURCE/Viewwrld.cpp": {
+    "sha256": "ecb2ec755bafbfd383fbdc4bd90c9d0cff503ff824bbdf13c00a092aefbb22bf",
+    "note": "Full867 lines/all five functions/three-scale offset data and storage read. S14 array extents corrected with strict native proof; D01 withdrawn: original address claims restored after rejecting the reconstructed control. B24 retail wrong-axis clamp retained; B25 map/resource input domains open. All macros are constants or included known accessors."
+  },
+  "include/SOURCE/Viewwrld.h": {
+    "sha256": "7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139",
+    "note": "Full17-line header: three explicit4/6/12 scales and handler prototype; no function body, aggregate or executable macro."
+  },
+  "src/SOURCE/wingraph.cpp": {
+    "sha256": "3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9",
+    "note": "Full1158-line TU/32 functions plus all storage/macros reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Genuine API records retained; C04/C11, S13 and B23 are open native/caller investigations."
+  },
+  "src/SOURCE/x_arena.cpp": {
+    "sha256": "198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a",
+    "note": "Full257-line TU/three functions, arena constants and globals reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C10/S12 open; real3-slot choice arrays and tagged messages are not artificial aggregates."
+  },
+  "include/SOURCE/wingraph.h": {
+    "sha256": "0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f",
+    "note": "Full header, palette404/image42c layouts and graphics API/prototypes read. Both prefix records genuinely provide256 entries to variable-length Win32 interfaces. No function bodies; framebuffer/API owner typing C04/C11 remains."
+  },
+  "include/SOURCE/x_arena.h": {
+    "sha256": "af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02",
+    "note": "Full17-line declarations/externs reviewed; no body or pointer macro. Real three-choice array is defined and bounded in source."
+  },
+  "src/SOURCE/SMACKMGR.cpp": {
+    "sha256": "a1eb2af13ac68e181d71fda6de78f61da3742d2e8bec5a82bb437c26c00c88c6",
+    "note": "All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed."
+  },
+  "include/SOURCE/SMACKMGR.h": {
+    "sha256": "21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20",
+    "note": "Full header layouts/prototypes/externs read: tag_rect8, options45 with four nine-byte names, SDK SmackSum84. SmackMilesDigitalDriver50-byte partial owner with76 reserved bytes has no source use or instance; investigate removal separately, not counted as a live stack aggregate."
+  },
+  "include/SOURCE/REMOTE_TYPES.h": {
+    "sha256": "a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70",
+    "note": "Full packet/message/protocol domains and packed34-byte SNetPlayerInfo reviewed. Four-byte system ID,21-byte name and6-byte reserved extension are genuine network storage; reserved[0] used to identify old players in wsEvaluateMessage. No function definitions or executable pointer macros."
+  },
+  "src/BASE/bmap2.cpp": {
+    "sha256": "7da81092966cc9d02777eff0d5d3798924cff60507e3088e25de7dc34978ced8",
+    "note": "Full TU, four definitions and nine scratch owners read. O03 corrects palette subarray indexing and removes obsolete stride enum; seven native functions/all allocated sections remain identical. B07/O03 rectangle/final-row pointer bounds still need caller proof; no unions or stack aggregates."
+  },
+  "include/BASE/bmap2.h": {
+    "sha256": "195e2118d3d44d97efdba40edf5e0f471b554fbf06267d57bcd8ee2a407289f9",
+    "note": "Full four helper prototypes; no bodies, layout definitions or executable macros."
+  },
+  "include/SOURCE/dimPalette.h": {
+    "sha256": "bbebfa76143453b5a65687189a368b5e436756e073c5d2504703d46c4dabc945",
+    "note": "Full three-set/four-level/256-color array declaration. O03 must respect actual subarrays, not index a higher level through uDimPal[0][0]. No function definitions."
+  },
+  "src/SOURCE/tradpost.cpp": {
+    "sha256": "b0b69f9a7db5333ace20349089c95f9d74aaa66f12df9b34bf953ad131daac01",
+    "note": "All462 lines/six definitions, four private enum domains and data owners reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. S09 unused message aggregate; B21 invalid resource sentinel reaching ratio lookup. CP1251/name bounds verified from seven source literals."
+  },
+  "include/SOURCE/tradpost.h": {
+    "sha256": "34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484",
+    "note": "Full geometry/resource/widget constants and prototypes/externs; no functions or storage-view macros. Resource count seven and offer indices reconciled with handlers."
+  },
+  "src/SOURCE/Wsnetwin.cpp": {
+    "sha256": "6b7c68d77cfdf3b9f95b3c22b776400868011fe8d65c6d0b1816649ceff8ea69",
+    "note": "All572 lines/ten definitions and static/socket data claims reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. B20 payload overread proved directly in retail; other bounds and C07/G12/G13/S10 remain explicit."
+  },
+  "include/SOURCE/Wsnetwin.h": {
+    "sha256": "daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b50606f4bf40",
+    "note": "Full constants, packed26-byte startup packet, transport prototypes and SDK object externs reviewed. Packet uses six addresses and two byte fields; C07 signed read versus u8 owner ambiguity recorded. No function definitions."
+  },
+  "src/SOURCE/SEARCH.cpp": {
+    "sha256": "db79c87d9297de0e5e0f3e5f75a8e16e0b74f7ca76abee2c366b45557dc6761a",
+    "note": "Full original and reconstructed TU read, both physical definitions reconciled. O02 separates 29 scratch objects, removes padding arrays and preserves the original addresses (verified retail agrees with the old field map). All five emitted functions pass native before/after proof; both game functions match complete retail bytes/sites/targets. U02-U04/G09/B18 remain open."
+  },
+  "src/SOURCE/FINDPATH.cpp": {
+    "sha256": "97adb74b82448236772fe96fb9c82fc224fabeb4be314a35f1f78e306fe87c52",
+    "note": "Read all 593 lines and twelve physical definitions, local enum/constants and static-data declarations. Queue/grid allocations and packed node views reviewed; U02/U03, G10/G11, B18/B19 and S08 need further evidence/experiments."
+  },
+  "include/SOURCE/searchArray.h": {
+    "sha256": "ad483f65ac7f0acc70696aa75651bb381b8494aa04b5f38756c2edf3870a981a",
+    "note": "Full layout and four inline helpers reviewed. U02: padded path/aiPath overlays preserve pointer first four bytes; prospective pointer union plus real direction[256] needs all caller builds. U03/U04: counter and target-coordinate aliases look redundant; genuine nine-byte node auxiliary views retained. Total class0x2518 preserved pending proof."
+  },
+  "include/SOURCE/FINDPATH.h": {
+    "sha256": "7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665",
+    "note": "Full owner header reviewed; one typed terrain-cost prototype, no definitions, aggregates or executable macros."
+  },
+  "src/BASE/Misc.cpp": {
+    "sha256": "0cea1d4c617a67daef0cb845c95c9fb80fe91f16b9fd9c1dc4c760272346a434",
+    "note": "Read all 2182 lines, including private constants/DATA declarations and both conditional FindToken bodies. Forty-eight definitions reconciled; G07/G08, C05, B13-B17 and S05-S07 remain explicit candidates. Genuine packed file records and tagged message views retained."
+  },
+  "include/BASE/Misc.h": {
+    "sha256": "a618108289ba29c8ffa978403b886cff3e9831d95bc877070900df025e41ea0e",
+    "note": "Full declarations/macros and strict-enum LogInt inline reviewed. MemEntry[74], conditional IconEntry[13], PCXHeader[128] are real layouts; H2_ALLOC returns byte-array allocation as void*, H2_FREE and H2_ASSERT are actual allocation/assertion boundaries, not manual varargs."
+  },
+  "include/BASE/MiscEnums.h": {
+    "sha256": "10e7ed0cddf99af74b8555ea9246947443bd33b24d4da28a0ac226d6ec6e456f",
+    "note": "Read all named numeric/string/fade/drive/logging constants; no function definitions or hidden pointer/aggregate macros. Extents used in Misc body review, including file[352], text[500], format[200] and data-entry[100]."
+  },
+  "include/BASE/MiscGraphicsConstants.h": {
+    "sha256": "ea4121af939b85b16b40d320ae5738e8df82b25f07585e7b00b583b538bdfd2f",
+    "note": "Read all graphics/fade/status geometry constants; no function bodies, union definitions or executable pointer macros. Palette 768, screen 640x480 and status y460/h20 checked against callers."
+  },
+  "include/SOURCE/CONFIG_TYPES.h": {
+    "sha256": "6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f",
+    "note": "Full packed exeGfxConfig/configStruct and enum domains reviewed; 413-byte persisted prefix versus 416-byte claimed allocation. B13: terminal name[24] at+188 is smaller than registry read31/write30; retail confirms start and request, so owner extent remains unresolved, not automatically enlarged."
+  },
+  "src/BASE/BASEMGR.cpp": {
+    "sha256": "32679850d68b15eb2e4d52448e034b6ffffdf71c7f08182dbb9a216107dc18ef",
+    "note": "R01: one constructor and vtable marker; bounded literal name and direct owner links."
+  },
+  "src/BASE/RESOURCE.cpp": {
+    "sha256": "76c8461449fdc8073f58466ae93fe4429d154bb60af3f00e67280ef7505457c5",
+    "note": "R01: all three resource constructors/destructor bodies; common polymorphic ownership, no debt candidate."
+  },
+  "src/BASE/RESMGR.cpp": {
+    "sha256": "5855b4660731fad8f1ed01363693846bbd5c6f4152c27efd36c62612ae0a095b",
+    "note": "R01: all 31 bodies, two ten-slot position arrays and enums; C01 read interfaces, S01 single-used count-array element. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/WIDGET.cpp": {
+    "sha256": "05b5c3a6558559d17b1c9b2e475c0a223a7f3cc512b15534245beb603d654842",
+    "note": "R01: all seven bodies; U01 event views, narrowed flag decoding, no goto or synthetic local aggregate."
+  },
+  "src/BASE/TEXTWDGT.cpp": {
+    "sha256": "3c9f505cdb9f2a520a1224a8c0c235750ea4f6847f5edb5d7eae5b4f403f785a",
+    "note": "R01: all eight bodies and SET_WIDGET_MESSAGE macro; C01 signed-byte read views, U01 payload protocol, text ownership/length assumptions."
+  },
+  "src/BASE/BUTTON.cpp": {
+    "sha256": "c70f15c341a7ffbe813c57071bc4b2b25c98666b55494fa48d7cd1200fd4fa2e",
+    "note": "R01: all nine bodies, message macro and saved-modifier storage; C01 name-reader cast, G01 common-tail goto, U01 payload preservation."
+  },
+  "src/BASE/ICONWDGT.cpp": {
+    "sha256": "50df62dfb738bda1ea6cbd79d9dc532df30100754aa43fe08709a6268c73aff4",
+    "note": "R01: all seven bodies; C01 name-reader cast, U01 tagged payload retyping and width conversions."
+  },
+  "include/BASE/baseManager.h": {
+    "sha256": "1eab30ccd89463a3f9f654257dd3dcfa8d730e2f8d716dab353c3d0361e94baa",
+    "note": "R01: complete packed 0x36 owner, 30-byte name, message-mask domains and one Activate inline body."
+  },
+  "include/BASE/resource.h": {
+    "sha256": "4abe8b725aa764c1b65ae5337664d0341fdf59864a1ec435756b2fafc26de4f5",
+    "note": "R01: complete category/refcount domains and common resource class with virtual destruction."
+  },
+  "include/BASE/resourceManager.h": {
+    "sha256": "c29a656655ebb9d385658b7be43ddb86f8d5986c529f11e8e301d02c1d64c0ff",
+    "note": "R01: two aggregate slots, typed cache APIs, 1000-byte filename and read interfaces; C01 targets Read13/ReadBlock parameter types."
+  },
+  "include/BASE/widget.h": {
+    "sha256": "734055c1622691e5c519195e6359fb9a3922624ae7ddd43ce868ad5b9719acc6",
+    "note": "R01: complete 0x20 owner with typed window/list links and narrow enum storage; no function bodies."
+  },
+  "include/BASE/textWidget.h": {
+    "sha256": "5cc4ec66e3315739d76c89d0c90c05f1394f86c8d8f6b65138687c66a6c11454",
+    "note": "R01: complete 0x2b text/font owner and narrow alignment/draw storage; no function bodies."
+  },
+  "include/BASE/button.h": {
+    "sha256": "1d0ce609d2ba19b02430854d5ad185f268bf15d98757d6ce2d7b3319124afa37",
+    "note": "R01: complete 0x30 icon/button layout, narrow selection domain and saved-modifier declaration; no bodies."
+  },
+  "include/BASE/iconWidget.h": {
+    "sha256": "676e06cc42cdb205e07b90e4485419d686be95fb70b685b8b3b2f3984573a2c6",
+    "note": "R01: complete 0x2d owner with typed icon pointer and signed-byte orientation storage; no bodies."
+  },
+  "include/BASE/message.h": {
+    "sha256": "26336389fe4806de61933691de2d73aaeb1dc4684ec1ed6e5996490e59c3e860",
+    "note": "U01: all four union definitions reviewed. Top-level event tag, keyboard low-byte view, widget text/value and parameter/modifier views represent payload protocol. Unknown fields preserve the 24-byte payload; no local stack union invented."
+  },
+  "include/BASE/widgetKind.h": {
+    "sha256": "6e08cf446d6a74e76f4679751de59802bab547086de80e5dc555c908d6e08323",
+    "note": "R01: complete narrow widget-kind domain; constants only, no function bodies."
+  },
+  "src/BASE/BITMAP.cpp": {
+    "sha256": "dfe814bf6cc20d482be2c98f131c91f364ded927d570e84045ce331586be88da",
+    "note": "All bitmap constructors/destructor and copy/draw/clip wrappers; C01 raw header read and pixel allocation casts; rectangles remain real bitmap extents."
+  },
+  "src/BASE/Blur.cpp": {
+    "sha256": "38f8dc3e1e01189699fac8e7ea35cf9f4f6e8a6d30ee4dd2add0ed0a65cdf6fd",
+    "note": "Full blur passes and constants; C01 raw byte read; real 768-byte palette and scanline addressing."
+  },
+  "src/BASE/BORDER.cpp": {
+    "sha256": "403dd4c0e70785895574d0e6446022e4decb1d1f423d57291b265172cf988666",
+    "note": "All border constructors/read/draw/destructor; C01 name read and tagged widget dispatch."
+  },
+  "src/BASE/SAMPLE.cpp": {
+    "sha256": "498e621c5190f3839a1f61083b0c56b7c919519421815a0b55f1b7cf8c32d1b3",
+    "note": "Complete sample owner lifecycle; C01 raw read, real header/payload allocation and driver handles."
+  },
+  "src/BASE/PALETTE.cpp": {
+    "sha256": "a133bc0974b95e481031e435184be0710798ceb49fa33e453db521e2ba67e29b",
+    "note": "Complete palette lifecycle, 768-byte RGB owner and real allocation boundary."
+  },
+  "src/BASE/TILESET.cpp": {
+    "sha256": "9d9584c27ddb77c3b734b786fdc1aff57dec64e1950f7b0f9fbfc9e73fe84957",
+    "note": "Complete tileset lifecycle, serialized payload and C01 block read."
+  },
+  "src/BASE/ICON.cpp": {
+    "sha256": "1bb707b5a2b80244ec2501d3bf5fe4f1940c58d734b3c74cf67c03ad7c6368eb",
+    "note": "Full icon lifecycle and entry/bitmap decoder wrappers; serialized IconEntry prefix+blob remains meaningful."
+  },
+  "src/BASE/FONT.cpp": {
+    "sha256": "3eaec0228fafe88396d9e9ecf6888d07c1986df8321d92d122b659b26d210c5f",
+    "note": "Complete font TU; C01 reads, G02 next-character joins, S02 unused locals and B01 line-extraction bounds candidates."
+  },
+  "src/BASE/listbox.cpp": {
+    "sha256": "5658e2bfcbee761992965d964f149b901b2e9a1eb1ac7d937c01d41890ababc6",
+    "note": "Full list-box TU and message macro; C01 text names and raw read, item/list bounds and U01 event transformations."
+  },
+  "src/BASE/droplist.cpp": {
+    "sha256": "e69d01c5c983fb11b5ae8b6061a307469fc5a3de43ca28701670420c5a12e16b",
+    "note": "Full drop-list TU and message macro; C01 text names/read and U01 payload transitions; allocation/cursor roles reconciled."
+  },
+  "src/BASE/Textntry.cpp": {
+    "sha256": "39bdf8d3f9e17d851055843aa1afd21e6238a27b5406db1f720b18c23e1983d5",
+    "note": "Full text-entry TU, source constants and all body variants; C01 name reads, B02 1000-byte scratch/cursor limits, U01 message payload."
+  },
+  "include/BASE/tileset.h": {
+    "sha256": "cf04107eb476ff6e2236f174a8149e83d3bcb988342298617baafa3b69a55948",
+    "note": "Complete serialized tileset resource owner, no inline bodies or union."
+  },
+  "include/BASE/palette.h": {
+    "sha256": "3d4a3cc89afc30f03031743c24fffa7bb311becc2c6f4855aa1ede8ee56d98d7",
+    "note": "Complete palette resource owner and768-byte payload contract; palette signedness retained pending caller review."
+  },
+  "include/BASE/sample.h": {
+    "sha256": "0a15d616bf66e82d517f40f9a13baa569368333c3fc5755452f45e517a642586",
+    "note": "Complete sample resource owner, typed sampleData pointer and lifecycle; no inline bodies."
+  },
+  "include/BASE/sampleData.h": {
+    "sha256": "e7344b129f8a0bfe9926240ea216c254a46b2efa2438d46a6c0545b0bf3b156e",
+    "note": "Complete sample header fields and payload layout, SIZE evidence and data extent."
+  },
+  "include/BASE/MIDIWrap.h": {
+    "sha256": "c0cf943f538a4385511ff50b0991a1ccc2070dab0a6153a5544c58ec93d7dd20",
+    "note": "Complete typed MIDI wrapper storage and declarations; no inline bodies."
+  },
+  "include/BASE/border.h": {
+    "sha256": "5103ec9851c71e0185e436e449cc53b84555b4426d55cccadd0568aae157f505",
+    "note": "Complete border widget owner and resource/render declarations; no inline bodies."
+  },
+  "include/BASE/bitmap.h": {
+    "sha256": "02da19395546e378f2c7a55eb53b605d226dc92029aa362f3ff3a57856f44cb3",
+    "note": "Complete packed bitmap owner/dimensions/pixel pointer and copy APIs; no inline bodies."
+  },
+  "include/BASE/icon.h": {
+    "sha256": "b3c7de6c7c58d6448630790fc5f84e783899cd287b0b23ed04702cf59fb65e71",
+    "note": "Complete icon resource owner, entry access and bitmap operation APIs; serialized buffer owner retained."
+  },
+  "include/BASE/IconEntry.h": {
+    "sha256": "d097f1c68aab1090c4bc3b0d9aa844cd5d608e2da367efbdc3a2ef00aa68472f",
+    "note": "Complete packed13-byte frame record; blob offset/prefix reinterpretations describe serialized format."
+  },
+  "include/BASE/Blur.h": {
+    "sha256": "9f02898f81a837e6803d3ead70f5941fabeba60d3f80b6040fb42243c95e2863",
+    "note": "Complete blur helper declarations and bitmap owner references."
+  },
+  "include/BASE/listBoxWidget.h": {
+    "sha256": "566915a460dbb5c61e68022b4c26cd96cfda668f242c772c771a5a861456b5da",
+    "note": "Complete list-box layout, typed text/item owners, counts and enums; no hidden inline body."
+  },
+  "include/BASE/textEntryWidget.h": {
+    "sha256": "459e275aea85a3c324699da4771308483cef7d6a05dd56e953e22d2b7f232720",
+    "note": "Complete text-entry widget layout and text owner/cursor fields; B02 scratch capacity audited in implementation."
+  },
+  "include/BASE/dropListWidget.h": {
+    "sha256": "1b8eb0cdac10302fd7d88184583df41591f6771bdd082b08bcb374fd6c763f3a",
+    "note": "Complete drop-list layout, typed resource/text owners and saved widget state."
+  },
+  "include/BASE/font.h": {
+    "sha256": "a3d3f9ae7f519fbb6f3b3c7c6e5e158b47395dc5619e48aef980dbb71291bf61",
+    "note": "Complete font owner and256-character metric/offset domains; string API output capacity remains caller contract B01."
+  },
+  "src/BASE/MOUSEMGR.cpp": {
+    "sha256": "32af17cb76a3fb41714fe9f8d62fd0ab07dd1cf42cbd46bb56a15bbb5c884077",
+    "note": "All17 functions and96 cursor dimensions/hotspots/handles; max66x43 fits saved66x64. C02 pixel owners, G03/G04 joins. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/DIMMER.cpp": {
+    "sha256": "3c1d3913f68139f13037a4311226dc90930383e28c95c5cb9ee973cd73a4a74a",
+    "note": "All six functions and vtable; derived owner adds no fields or macro-hidden debt."
+  },
+  "src/BASE/Ripple.cpp": {
+    "sha256": "d3b1a07204c1db98896cfe5db134e476c645752500c6eb47a3958f3c9e1b258d",
+    "note": "Complete DoRipple/profile constants; real640-byte previous-column array and51-byte profile. B05 caller source-pointer bound."
+  },
+  "src/BASE/WINDOW.cpp": {
+    "sha256": "470241cd94088280bf3f770ad024bdf2360120b3e6ad78726cbac3f3df9549b2",
+    "note": "All15 constructors/methods, record-tag enum and geometry constants; B06 resource name bound, U01 real DRAW message."
+  },
+  "src/BASE/EXEC.cpp": {
+    "sha256": "283b7943ab658836555d12a197ee281c3bf1d8c1e753dae2915a37fcce0ee990",
+    "note": "All10 methods and gExecutiveText macro/concatenated initializer; C03 typed text-owner candidate, B03 manager-array and B04 log format bounds."
+  },
+  "src/BASE/miscwin.cpp": {
+    "sha256": "14d866b4c87c49c46eb75011803c8cfbc14b146d711c408f930f1fc65a6bff0e",
+    "note": "Both functions, RECT/PAINTSTRUCT owners and constants; B07 caller rectangle bounds."
+  },
+  "src/BASE/INPUTMGR.cpp": {
+    "sha256": "1567deef750c9ba1cfbd2939ec9bb65073836db6bea7e26722b171de17873c8f",
+    "note": "All18 functions including two inline helpers, EncodeScanCode macro,128-byte CP1251 map, U01 event rings, G06 coordinate join, B09 scan index. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/WINMGR.cpp": {
+    "sha256": "b99f4ae56fe2208ad41fd1ae17a0745e597123d36ba60839435bbc3130bdefee",
+    "note": "All22 definitions including FadeSavedUpdate and empty table stubs; DATA macro override reviewed,96-byte palette covers rotation accesses; G05,C04-C06,B08. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "include/BASE/mouseManager.h": {
+    "sha256": "ced722d60d2253b37f9d4601539f6f3ea8826795b08604f8ae3544db95bee402",
+    "note": "Complete packed0x8a manager,96 cursor slots,3 type offsets and saved66x64 bitmap constants; C02 void* buffer globals."
+  },
+  "include/BASE/dimmerWidget.h": {
+    "sha256": "ad38b443d5f1b7569d272ac4b06a9dcfed296b11f05dd7908f788071972ba849",
+    "note": "Complete0x20 fieldless derived widget and virtual declarations."
+  },
+  "include/BASE/Ripple.h": {
+    "sha256": "0430f46c11b75b02bd0165a0b2cca6c25683175b0e8766feb45e6f0dd9e9c526",
+    "note": "Complete bitmap-pointer ripple declaration; B05 caller strength remains unbounded in signature."
+  },
+  "include/BASE/heroWindow.h": {
+    "sha256": "6c07e5d463fb134951ac52f42737be2487eda3499e3e7b2955a4c49b355c9990",
+    "note": "Complete window owner links/name[20]/background fields and flag domains; B06 resource name contract."
+  },
+  "include/BASE/executive.h": {
+    "sha256": "30f4ae7614c533c323428327233fd37be3cf9a9a1fe5ce75ce0d58da558c0dae",
+    "note": "Complete0x10 manager-list executive owner and methods."
+  },
+  "include/BASE/EXEC_TYPES.h": {
+    "sha256": "6dc2b87ee2f064cbe61463780dad2ae31f234c0977f0095de8c126c3c610fa5f",
+    "note": "All18 text-slot fields total0x25c; C03 char buffer overlay macro in EXEC.cpp may be real initialized aggregate."
+  },
+  "include/BASE/miscwin.h": {
+    "sha256": "170685792af3e1f291e28ccbbd8b863f78e0c83e8c4dc4442522a4b518324686",
+    "note": "Complete blitter/SVGA declarations and SDK PAINTSTRUCT forward declaration."
+  },
+  "include/BASE/inputManager.h": {
+    "sha256": "e764ea765e3cf449d8d3475fd7842b8acc51ead42233a9815eb8612925e0b3bf",
+    "note": "Complete packed0x86a input owner:64 event messages,128 i16 scan cells and modifier/key domains."
+  },
+  "include/BASE/INPUTMGR.h": {
+    "sha256": "088cfd450f7e8143e2d3b83644bab30b8ef0b6e079f4d5880e5e8b04ac3c1cc6",
+    "note": "Complete Windows keyboard/mouse dispatch and cursor-change declarations."
+  },
+  "include/BASE/heroWindowManager.h": {
+    "sha256": "5e6cfde404b01ee82e9a95dab785ea6277f81ac9a57a4f340b1ae6219c61ed06",
+    "note": "Complete0x62 manager owner, fade domain, typed dialog callback and signed palette interfaces."
+  },
+  "include/BASE/WINMGR.h": {
+    "sha256": "07afad47fcc3583da119db7093aee81ef0193c9058346fd5d8e0d558e071611c",
+    "note": "Complete cycle mode enum,96-byte scratch extent and table helper declarations."
+  },
+  "src/BASE/soundmgr.cpp": {
+    "sha256": "3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750474a04b4d8231b0d26ca",
+    "note": "All22 methods, format constants, SDK aggregate globals and volume/backend state; D01 withdrawn: original address claims restored after rejecting the reconstructed control. B10 track bounds,S03 previousTrack,S04 unread fade scalar."
+  },
+  "src/BASE/MusicFlags.cpp": {
+    "sha256": "92cd3d0abe52bc3533dadcd23babff16b01514f147be89bcbe6293557e4cb125",
+    "note": "All3 byte-flag queries and feature flag; scalar temporary has real predicate role."
+  },
+  "src/BASE/Midi.cpp": {
+    "sha256": "6fc8dadf5d6368a71cc9020610eb920838d9e884f8d6251326dca57474930e83",
+    "note": "All6 MIDI helpers,60-track arrays and filename format; B10 pre-check indexing requires caller-domain proof. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/AudiereEffects.cpp": {
+    "sha256": "66050a61dac3b326c25705b7d704df52e28304179d2aad2093f59baa36dd1d2b",
+    "note": "All13 functions and0x1c global descriptor: buffer plus frame/channel/rate/format/list/depth. Every member is used; typed linked nodes and reference lifetimes retained."
+  },
+  "src/BASE/AudiereMusic.cpp": {
+    "sha256": "736b9ab782b1c3998cefdb9802b9341715da92c5c8b010e9b7fff1b98c5ebb4f",
+    "note": "All7 functions,8 static-member lifecycle claims and2 locale helpers; B10/B11 track/path bounds. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Real static smart-pointer owners and12-volume lookup."
+  },
+  "src/BASE/MilesSound.cpp": {
+    "sha256": "245f18bb510ab44e9a4406e749c760d69ae6bc4d8cb4a1685e53e47234c131ed",
+    "note": "All12 functions including inline format helper; O01 real72-byte state replaces out-of-object memset, all11 retail bodies exact with resolved relocations. B12 channel-allocation question retained."
+  },
+  "include/BASE/soundManager.h": {
+    "sha256": "5882906f4461821515ff1722aaf84bd2b8d24911dcc3ea5d6f8dcef5d809911d",
+    "note": "Complete0x52 manager, backend enum and all5 inline bodies; typed Miles/Audiere owners and60-track extern contracts."
+  },
+  "include/BASE/soundBackends.h": {
+    "sha256": "30299251f62b790dc2db13557d3acafa3e1c0b66dbd4782d0ed1b4390980ec82",
+    "note": "Complete sample node inline constructor, music static-member owners and backend APIs; O01 adds real72-byte MilesSampleState,16 handles plus ready/count."
+  },
+  "include/BASE/MusicFlags.h": {
+    "sha256": "acc8fe949ff9f44c480b2d69587865bdf2ec1907bd79a61266f36dea0463bbff",
+    "note": "Complete byte-flag declarations and three helper signatures; no inline body."
+  },
+  "include/BASE/Midi.h": {
+    "sha256": "c306dcba4410ebffcc50bf517bfeb27cb205ade68036bc14e05b79892ca43964",
+    "note": "Complete typed MIDI API; track/fade state passed as real references."
+  }
+}
