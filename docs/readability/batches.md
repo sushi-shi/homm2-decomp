@@ -693,3 +693,24 @@ return contract, not EVENTS read credit. R40 retains partial resets, hero-search
 fallbacks, graph/completion, display/text and table differences. This batch adds
 36 definitions and one file. Across B40-B41, 43 definitions and two files are
 newly fully read; source, headers, configuration and behavior are unchanged.
+
+## B42 — complete adventure events, rewards and network combat bridge
+
+Read all 9,078 lines and 43 definitions of EVENTS.cpp, including the complete
+human/AI event switches, object erasure, base/expansion site and recruitment
+handlers, artifact/resource/experience operations, three undead encounters,
+monster-army assembly, both monster-interaction paths, normal/automatic/network
+combat, send/receive fragments, both string comparisons and private lowercase
+inline. All constants, eight macros and trailing data were covered. Reconciled
+the complete function index; no credit comes from the earlier isolated
+GiveExperience read. All referenced owner headers were already read, with the
+playerData and relevant event declarations rechecked here.
+
+H82 resolves the artifact-extra default lead at its actual EVENTS owner.
+H83/H84 isolate event-resource flooring and last-two-reward bookkeeping against
+the fully read CURSOR/GAME consumers. H01/H22/H29/H30/H31/H33/H59/H68/H69 gain
+instances or exclusions; H81's cached-level distinction is confirmed. R41/R42
+retain human/AI rule and ordering differences, local-only helper leads, packed
+recruitment/army behavior and network/presentation contracts. This batch adds
+43 definitions and one fully read file. No executable source, header,
+configuration or behavior changed.

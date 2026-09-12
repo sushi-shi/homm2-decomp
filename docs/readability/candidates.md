@@ -2570,9 +2570,12 @@ replacement. The lowercase helper returns char while DoNewTurn stages u8.
 Do not substitute a locale-dependent CRT function or MAKEFILEID's ASCII-only
 folding. GenerateStandardFileName additionally filters characters, truncates
 the basename, temporarily mutates the source dot and preserves the extension;
-its whole loop is not a case-fold helper. EVENTS' searched lowercase occurrences
-remain pending its complete read. Gain: one explicit localized-byte contract
-instead of duplicated alphabet rules, favoring an API that already exists.
+its whole loop is not a case-fold helper. B42's complete EVENTS read confirms
+its private ToLowerCp1251 has the same mapping, including the special Yo byte;
+resource pickup and artifact-purchase text supply further consumers. Preserve
+the surrounding strcpy versus format-as-string sprintf differences. Gain:
+one explicit localized-byte contract instead of duplicated alphabet rules,
+favoring an API that already exists.
 
 ## H70 — read or write the exact storage size of one file value
 
@@ -3724,11 +3727,12 @@ changes and first-versus-special-hero selection. The base campaign's separate
 Archibald army replacement has another exact add/check pair beneath its own
 setup-state scope. Do not absorb that larger bonus workflow.
 
-Targeted complete inspection of advManager::GiveExperience in still-unread
-EVENTS confirms it is not a substitute: it queries the old level, writes
-m_level before adding experience, queries the new level, optionally checks
+Targeted complete inspection of advManager::GiveExperience, subsequently
+confirmed by B42's full EVENTS read, establishes it is not a substitute: it
+queries the old level, writes m_level before adding experience, queries the
+new level, optionally checks
 levels and returns the difference. A stale cached level makes that a different
-contract. No EVENTS file/read credit is granted by this targeted inspection.
+contract. The earlier targeted inspection alone granted no EVENTS read credit.
 GetExperience/GetLevel are already separate conversions, not this operation;
 GAME's absolute experience assignments followed by CheckLevel are excluded.
 The new inline/macro and all expanded callers still need retail comparison.
@@ -3751,9 +3755,10 @@ setup reuses type across loops/formatting and supplies no new exact H01 triple.
 The already-reviewed GetHero/GetPlayerHero accessors remain the preferred
 vocabulary for exact owner-array access (R26), with no implicit bounds guard.
 Campaign's existing OppositeCampaignSide call needs no second helper. Repeated
-GiveArtifact(hero, artifact, false, -1) calls are a short-call lead for the
-remaining KB owner review, not yet an approved default-argument proposal;
-expansion scroll bonuses deliberately pass a spell id instead of -1.
+GiveArtifact(hero, artifact, false, -1) calls were a short-call lead. B42 resolves
+the actual owner as EVENTS.cpp/EVENTS.h (not KB) and records H82 after reading
+the complete implementation; expansion scroll bonuses deliberately pass a
+spell id instead of -1.
 
 ## R39 — base campaign graph, switching, presentation and bonus contracts
 
@@ -3887,4 +3892,285 @@ All track/difficulty/choice tables were read, including {-1,-1} unused points,
 negative resource bonuses, invalid first choices with zero-resource companions,
 and unused map slots. Base and expansion coordinate widths and record extents
 differ. Repeated initializer shapes alone do not merit new code helpers. The
-remaining EVENTS/KB implementations are not credited through calls or snippets.
+then-remaining EVENTS/KB implementations were not credited through calls or
+snippets.
+
+## H82 — default artifact extra data on the existing grant API
+
+Disposition: credible declaration default; retain the explicit end-game policy.
+
+GiveArtifact in EVENTS.cpp:5239 is declared in SOURCE/EVENTS.h:327. Ordinary
+artifact grants in game::InitCampaignMap (Campaign.cpp), ExpCampaign::InitMap,
+CURSOR's MoveHero and ADVMGR's DoAdvCommand pass -1 as the last argument. EVENTS' human
+and AI rewards do likewise. A default `i8 artifactExtra = -1` on that existing
+declaration would permit GiveArtifact(hero, artifact, checkEndGame), without
+adding another callable wrapper or macro. The third argument remains required:
+campaign bonuses deliberately pass false, ordinary pickups true, and HERO's
+CheckAnduranPieces forwards showDialog into this end-game-policy position.
+
+The complete body finds the first ARTIFACT_NONE slot or returns -1 without
+further work. It stores artifact then extra, applies stats, checks the Anduran
+pieces, optionally checks end game, and returns the original slot. Preserve
+all of that, including the recursive grant performed by CheckAnduranPieces;
+the returned slot need not still contain the original artifact afterwards.
+Do not rename the boolean as a universal show-dialog flag, add a capacity
+guard, or fold the caller's later dialog/erase/check-level operations into it.
+Scroll grants in X_CAMPGN and EVENTS explicitly pass narrowed spell/metadata
+bytes; EVENTS' special golden-bow path also supplies metadata and is not a
+default-argument instance. HERO's IDX(ARTIFACT_NONE) extra is the same -1 value.
+
+Gain: remove a meaningless repeated sentinel while leaving the meaningful
+grant policy visible. Keep the four-parameter ABI, all supplied-argument
+evaluation and i8 conversion; later implementation still requires byte and
+ordered-relocation checks. The searched PHILAI caller remains subject to its
+complete TU read, not needed to establish the already-read cross-TU instances.
+
+## H83 — add one event resource and floor the stored balance at zero
+
+Disposition: credible small player-owned inline, distinct from GiveResource.
+
+CURSOR.cpp:882/904 (MoveHero's computer/human map events), GAME.cpp:7805
+(CheckForTimeEvent), and EVENTS.cpp:511/7594 (human/AI sphinx rewards) repeat
+the same operation: add the original signed i32 event amount to one current
+player resource, then test that stored balance and replace it with zero only
+if negative. A proposed playerData::ApplyEventResource(i32 resourceIndex,
+i32 amount), owned by SOURCE/playerData.h, names this event-specific rule.
+The complete owner has an i32 resource array and no existing equivalent method.
+
+Keep the signed add before the comparison, the same resource lvalue and no
+upper cap, overflow repair, affordability test or return value. The callers'
+0..6 traversal, current-player selection and event applicability remain outside;
+do not change the recipient to the visiting hero's owner. The current global
+player/index expressions are stable across this call-free fragment, but a
+macro accepting arbitrary repeated lvalues or an inline caching a different
+receiver needs its own evaluation/aliasing review. No new aggregate, resource
+loop, grant transaction or serialized field is required.
+
+CURSOR and GAME independently cap the amount shown in the dialog BEFORE adding
+the original record amount. Sphinx displays the raw record amount instead.
+Those calculations, later record rereads, reward selection, artifact grants
+and active-state changes remain caller-owned. GiveResource instead validates
+the resource id, does not floor a negative balance and may check end game for
+human gold, so it is not interchangeable. The AI artifact-pickup loop that only
+clears already-negative balances is also not this add/floor operation. Gain:
+one explicit name for a repeated rule without merging different reward flows.
+Source equivalence does not establish safe inline code generation.
+
+## H84 — remember the two most recently selected event-dialog rewards
+
+Disposition: small shared bookkeeping candidate; lower priority than H82/H83.
+
+MoveHero in CURSOR.cpp:908/920, CheckForTimeEvent in GAME.cpp:7809 and the
+sphinx branch of DoEvent in EVENTS.cpp:515/528 share a four-store-at-most idiom.
+If primary type is not -1, copy primary type then amount into the secondary
+pair; then store the new primary type followed by amount. A fixed-arity
+REMEMBER_EVENT_REWARD macro or C++98 free inline at SOURCE/EVENTS.h could name
+this "last two selected rewards" policy. It takes the four existing i32 state
+lvalues and the new type/amount; no replacement record/layout is needed.
+
+Keep the sentinel test and store order, and leave secondary untouched when
+primary is absent. Require distinct stable state lvalues and new values that
+do not alias them; an eager value-argument inline must not move reads across
+observable writes. The current instances use local state and separate event
+records or local amounts. Do not add a nonzero test inside: resource callers
+already decide whether an entry qualifies, while artifact callers use capacity
+and artifact-presence guards and record the artifact AFTER GiveArtifact.
+The resulting order is newest in primary, previous in secondary, not the first
+two resources and not a sort by importance or amount.
+
+Initialization, H83's balance changes, separate human display-amount caps,
+negative-resource dialog encoding, dialog calls and event activation remain
+outside. AI sphinx code initializes unused display locals but never appends a
+reward, so it is not a consumer. The six-argument interface is a readability
+tradeoff to assess in final ranking; do not use this as justification for a
+generic reward builder. Macro/inline expansion and all callers remain untested
+against retail bytes.
+
+## B42 — extensions to established candidates
+
+H01/H31 gain DoEvent's oracle message and checked oracle/recruit/swap windows;
+H30 gains numerous actual text-only NormalDialog calls, not icon-bearing
+dialogs or EventWindow substitutions. H29 gains human/AI spring and well
+capacity calculations and GiveTakeArtifactStat's post-removal knowledge cap;
+the spring's doubling stays outside. H22 gains embarked-state tests, not the
+boat/coast state-change protocol. H59 gains observation, Magellan and magi-eye
+visibility draw/update pairs; four-argument CompleteDraw and intervening work
+are not its exact pair. H69 now includes the fully read private lowercase body.
+
+H33 gains the four-elemental exclusion inside PlayerMonsterInteract and
+ComputerMonsterInteract. Ghost, army-strength, capacity and hideous-mask tests
+stay separate and in their respective order. EraseObj's sprite test uses the
+layerBit1 field, not H25's shadow-only flag; its lower-only coordinate tests
+are not H26's full bounds check. CombatMonsterEvent's two whole-array memsets
+and DoWhirlpool's count-first/type-only tail are not H71's per-slot dismissal.
+Existing GetHero/GetTown, AddSpell, UpgradeCreatures, IsCursedItem and enum-flag
+machinery remain the vocabulary for their exact contracts, not new wrappers.
+
+H68 gains five fragment/acknowledgement sends whose final arguments are
+COMBAT_REMOTE_FRAGMENT_TYPE (=1) and REMOTE_MESSAGE_DEFAULT. Reliable remains
+the explicit preceding argument; per-call shutdown handling stays outside.
+H81's exclusion is confirmed throughout: GiveExperience resets cached level,
+and many event callers intentionally make another CheckLevel call later,
+sometimes with flag/metadata writes or dialogs between them. No deduplication
+of level checks or automatic replacement with H81 is proposed.
+
+## R41 — adventure event rules, local similarities and reward contracts
+
+All 43 definitions and all constants/data in EVENTS were read, including the
+3,832-line DoEvent, complete AI switch and unannotated lowercase helper.
+Four numeric macros name floating rules/efficiency; the four packet-view
+macros are covered in R42. The AI siren fraction already has a same-valued
+shared PHILAI macro; merging numeric spellings alone is not a new operation.
+
+DoEvent resolves the current hero, masks the trigger, initializes sound/fizzle/
+erase state and dispatches the full object domain. Its common tail refreshes
+radar/hero/town/bottom views, erases then fizzles or draws, updates the screen,
+switches terrain music, waits for the sample and finally checks end game.
+DoAIEvent clears a reached destination Y then X, decrements remaining mobility
+before dispatch, and normally erases, restores current-player globals, checks
+the still-owned hero's level and checks end game. Friendly AI hero interaction
+returns before that tail. Do not merge the human/AI dispatchers or introduce
+an automatic context/cleanup guard.
+
+Reward order varies by site. Sea chests grant an artifact before their gold;
+campfires grant gold then the other resource. Full artifact capacity may
+convert a chest to gold, discard a wagon reward, or simply skip a survivor's
+grant while still erasing it. Equality with 14 and >= 14 are not interchangeable
+guards. Human pickup may show a dialog before granting, while skeleton artifact
+pickup grants before its dialog. Daemon artifact handling can consume a random
+artifact selection as a probe and then select again inside GiveRandomArtifact;
+do not cache that first result. Random-artifact fallback grants gold itself.
+GiveArtifact does not perform every caller's capacity/display/erase workflow.
+
+Sphinx reads its extra record after sound dispatch, tests every supplied answer
+without early exit, applies all seven resource changes, records the last two
+rewards, grants an artifact if eligible and marks inactive after presentation.
+Incorrect answers lose the hero; declining does not consume the event. Its AI
+counterpart uses a random success test. H83/H84 isolate only exact common
+fragments, not these rules. StrEqNoCase uses signed-char promotion into CRT
+toupper and a preincremented limit that accepts after nine compared bytes;
+RiddleStringsEqual truncates/trims the expected prefix, truncates the answer
+to that prefix's length and uses strcmpi. Neither is H69's byte case mapper or
+a request for a new Unicode/string-comparison policy.
+
+Spring metadata is consumed before the capacity test even if no refill occurs;
+the well sets its hero flag only on an actual refill. Witch-hut human handling
+checks existing skill then capacity, while AI relies on GiveSS and has no same
+local capacity test. Human tree-of-knowledge handling checks levels even after
+declining/revisiting; AI's paid branches use strict greater-than affordability
+and perform both GiveExperience(check=true) and another CheckLevel. Its amount
+is the difference between two level thresholds, not next threshold minus live
+experience. Shrine wisdom/book rules differ from the pyramid's expert-wisdom
+condition. AI pyramid evaluation does not reproduce those human gates.
+
+Visit flags, stat increments and dialogs have different ordering. Xanadu's
+four increases are attack, defense, knowledge, then spell power, not enum order.
+Stables repeat the mobility/remaining-mobility addition pair, also used by
+oasis and watering hole; current occurrence search finds this only in EVENTS,
+so it is a local hero-method lead, not a cross-TU candidate. The identical
+human/AI jail placement tail and abandoned-mine conversion sequence are also
+local-only. Hill-fort/foundry upgrade groups differ in order and preconditions.
+Sirens keep 70% through the existing double expression and i16 store, accumulate
+experience from lost troops, then flag the visit even when no experience was
+earned. Human cursed-item removal applies stat removal; AI only clears the
+artifact slot, requires 1500 gold and charges 750. Do not normalize those paths.
+
+Human guarded dwellings fight and recruit in separate phases. Dragon-city
+victory checks campaign end game before level/metadata/recruitment work; AI
+refuses still-guarded dwellings. AI mine guardians use a separate philAI combat
+API, and mine-spell selection tests strictly more mana than cost, excludes the
+loop's water-guardian endpoint and clamps spell power before narrowing count.
+Human ordinary-mine victory clears only guardian type; abandoned mines perform
+five ordered ConvertObject calls and change resource/guardian/owner state.
+Artifact purchases preserve resource decoding, skill and guard branches, and
+gold-before-resource charges even if both address gold. AI clamps negative
+balances at pickup; human affordability and confirmation remain separate.
+
+Teleports use row-major count/select passes with exact action-trigger and
+sprite tests, Manhattan distance thresholds and a random draw only for multiple
+exits. Human and AI second-pass predicates differ, as do TeleportTo's mode
+arguments. DoWhirlpool runs before exit selection and can consume troops even
+when no exit exists; it only affects humans, draws its trigger first, chooses
+the first strictly lowest positive-count stack by fight value and halves it
+with last-stack protection. Its unguarded selected-slot assumptions and lack
+of a creature-type check are not H76 or a generic army-selection policy.
+
+EraseObj handles an ordinary left companion and four wide-object companion
+slots using different frame rules, lower-only coordinate checks, and exact
+extra-chain termination. It clears sprite/index/animation, promotes the first
+extra only when usable while copying layer bits, then determines shadow-only
+status through a separate scan. Trigger/metadata/overlay changes and map notification, environment
+refresh and adjacent-monster setup remain explicit. Similar sprite-clear
+triples are confined to this TU; extra traversal must not become a general
+iterator that skips currently terminating empty entries.
+
+EventSound's wagon/lean-to pickup assignment falls through to the experience
+sound assignment. Some music cases leave the sample pointer untouched; named
+samples and ambient-track switches are different operations. EventWindow uses
+sprintf with either the chosen event-table text or supplied text AS FORMAT,
+then calls NormalDialog with a zero third value. All its callers currently lie
+in EVENTS; optional defaults are a local short-call opportunity only. It is
+not interchangeable with H30. Skeleton/Zombie/Ghost reward functions have local
+table-like repetition but different support armies, random-artifact timing and
+intermediate gText formatting. No cross-TU encounter-table framework is proposed.
+
+CombatMonsterEvent preserves seed/draw order, centered upgrade eligibility,
+primary/support stack counts, empty-type marking and subsequent placement
+permutation. Tertiary quantities use the secondary count's remainder in the
+current expression; groupCount advances using the previous stack count even
+when secondary stacks are absent. A generic stack distributor must not silently
+repair either. Recruitment sites narrow packed metadata to signed i16 BEFORE
+shifting, preserve no-default creature mapping and pack remaining counts after
+the existing dialog or AI purchase. The scaled seven-resource cost subtraction
+has a searched PHILAI counterpart; defer judgment until that TU is fully read.
+
+GiveTakeArtifactStat applies four deltas in stat order and caps mana after the
+knowledge adjustment on removal, including a zero knowledge delta. It does not
+own slot/extra clearing. TransferArtifacts skips books, can consume an empty
+destination slot's iteration destroying an ultimate artifact, applies destination
+stats before storing a transferable artifact/extra, then removes source stats
+and clears source artifact/extra. Its final Anduran check is destination-only.
+Human alchemist and HERO Anduran removal do not clear extra data the same way.
+No generic remove/transfer macro may absorb these differing state effects.
+
+PlayerMonsterInteract processes campaign alliances before ordinary strength,
+mask, diplomacy and fleeing rules. The ordinary human price uses the entire
+stack even for partial joins. ComputerMonsterInteract applies its 0.75 price,
+uses separate purchase evaluation and has no early return after some handled
+join branches, so subsequent flee/fight work remains reachable. AI fleeing
+grants experience and possible skeletons; human fleeing only chooses pursuit.
+Do not unify those protocols or add an early return based on the handled flag.
+
+## R42 — combat presentation, network fragments and loss processing
+
+DoCombat and AutoResolveCombat share a local loss-processing tail, not a new
+cross-TU workflow. Debug autoresolution returns before normal random-seed and
+gbInCombat setup. Normal combat saves/restores current player and display state,
+selects network control, may poll for a remote result, handles memory-disposal
+levels and resets cursor state. Autoresolution runs nonvisual Main with a
+MESSAGE_NONE event and its own mouse-update flags. Both check hero levels
+before optional artifact transfer/deallocation, but only the normal path
+unwinds hide-count through repeated ShowColorPointer calls. SetupCombat receives
+x/y again despite separate setup-coordinate parameters. No RAII state guard,
+new seed initialization or common shutdown loop is implied.
+
+SendHeroTownData sends a 155-byte combat header and separate 200/50-byte hero
+fragments, with one-byte tags, fixed body offsets and fatal send-failure checks.
+ReceiveHeroTownData independently allocates both armies and optional town/heroes,
+acknowledges the header and polls until four presence-dependent fragment flags
+are satisfied. Its gold restoration uses owner > 0, not >= 0. Fragment dispatch
+is four independent tests, packet validation is type/command only, and a
+qualifying packet resets timeout even for an unrecognized fragment. Preserve
+those conditions, signed/narrow fields, partial-copy extents and timer/prompt
+behavior; do not introduce packet validation or ownership repairs in a helper.
+
+DoNetCombat dereferences the received first hero, optionally sends back for an
+AI first side, frees armies/town/heroes in its existing order and resets only
+retreat state. Normal DoCombat's receive branch copies each present received
+object into existing storage and frees it before the next object. Allocations
+here are unchecked, so H31 must not add checks. The four existing EVENTS packet-
+view macros distinguish the raw message envelope, combat payload, hero payload
+and raw outgoing fragment buffer. They do not establish a universal shared
+packet-cast helper. Whole-record copies, first/second fragment slices and
+transport-header offsets remain distinct contracts; H68 only shortens explicit
+default policy arguments.
