@@ -166,9 +166,9 @@ include/SOURCE/KB_TYPES.h	638	638	MAP_PASSIVE_TRIGGER	read	d07facef9050201c3b74b
 include/SOURCE/KB_TYPES.h	639	639	MAP_TRIGGER_OBJECT	read	a344fcccd2e92f369b266e9a951071e32fd2e6b9c5cf8d6610c723145fa1ba73	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
 include/SOURCE/KB_TYPES.h	640	640	MAP_TRIGGER_IS_ACTION	read	7a4a57e84fa127bc514539e0445c05f521f6fc7bad38bc2723533e0fd9e3336f	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
 include/SOURCE/KB_TYPES.h	641	642	MAP_TRIGGER_WITH_OBJECT	read	794462bf4005d615e64633b7e0b06ced9346fef470dd1fb61119718cd513fb5d	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
-include/SOURCE/Modem.h	2	2	HOMM2_MODEM_H	unread	554df069eb4d72116a1ef1fc23c6b5a97eec633d0f9c8e83eb27ce29a2083fe4	-
+include/SOURCE/Modem.h	2	2	HOMM2_MODEM_H	read	554df069eb4d72116a1ef1fc23c6b5a97eec633d0f9c8e83eb27ce29a2083fe4	B26: complete modem framing/state/queue/interface declarations and TruncateModemResponse inline body; implementation covered in B28
 include/SOURCE/NOOPT.h	2	2	HOMM2_NOOPT_H	read	ccf4726e12330e655e0f202bae673a494c579e9955850de30b2584daee69198c	B10: complete pointer/value delay API declarations; R10; no bodies
-include/SOURCE/Netbios.h	2	2	HOMM2_NETBIOS_H	unread	c8997d3b68615d210c65082d7584be7823d5c70d6d558813570fa01ab63c30e6	-
+include/SOURCE/Netbios.h	2	2	HOMM2_NETBIOS_H	read	c8997d3b68615d210c65082d7584be7823d5c70d6d558813570fa01ab63c30e6	B26: complete setup/wait states, narrow storage and interface declarations; no bodies; implementation covered in B28
 include/SOURCE/Newgame.h	2	2	HOMM2_NEWGAME_H	unread	a691d41d2570833e3b31f0dd6d9518a360a26611cc85a0ed795e5c772f9c9991	-
 include/SOURCE/Overview.h	2	2	HOMM2_OVERVIEW_H	unread	aefbe29c4e8c2c0ab56f42a349c3711fafa2e3d5186ef1158febfbdcb74e3e43	-
 include/SOURCE/PATH.h	2	2	HOMM2_PATH_H	read	03de6bdbb6ade8f9c77e46845b18498bbd50b30336d116e8f3adf0bb6ed3c77c	B14: complete combat adjacency/opposite-direction declarations; no bodies
@@ -185,7 +185,7 @@ include/SOURCE/SPELLS.h	179	179	SPELL_GOLEM_DAMAGE_MULTIPLIER	read	93ca29f35f1b1
 include/SOURCE/TOWNMGR.h	2	2	HOMM2_TOWNMGR_H	unread	4febdbb6cebdae43c812cc7c182641daba047dadcfc2fdeeeeb01236fbc47882	-
 include/SOURCE/VIEW.h	2	2	HOMM2_VIEW_H	unread	1bcfeacd87974ac80b4086e0b789392dbf9842e9dfe60f1ab6f6f83616b0c70d	-
 include/SOURCE/Viewwrld.h	2	2	HOMM2_VIEWWRLD_H	unread	fc1709f290c702a423a3b46dea7eac66bb72b605c05cddeceda6efb834be17fd	-
-include/SOURCE/Wsnetwin.h	2	2	HOMM2_WSNETWIN_H	unread	c1141f2d44d15c3c15760ab9336591d4b55d01ab62ef910da54b5eb78618e73f	-
+include/SOURCE/Wsnetwin.h	2	2	HOMM2_WSNETWIN_H	read	c1141f2d44d15c3c15760ab9336591d4b55d01ab62ef910da54b5eb78618e73f	B26: complete Winsock transport constants, packed startup, globals and interface; no bodies; H64/H65
 include/SOURCE/X_GLOBAL.h	2	2	HOMM2_X_GLOBAL_H	read	51f0502d53e9952e0114fb220a548203f9cb37a95da8c48c612861c756663a9c	B10: complete globals/table dimensions and NextSpellEffectDisplayType inline; H15/R12
 include/SOURCE/advManager.h	2	2	HOMM2_SOURCE_ADVMANAGER_H	read	abb269bafd7328a28b2c30c001651e1cc8a4d5e069b1ad71efdc225eda3a66c8	B14: complete 441-line adventure owner, unions, cursor/map/remote/event/sound API; two target accessors
 include/SOURCE/army.h	2	2	HOMM2_SOURCE_ARMY_H	read	0850daf6a9e077761a8357f2b819c5983c17bbcfef69545efb671a7dc4eebfdf	B13: complete combat-army layout/lifetime/path/spell API and IsAlive inline; H21 distinguishes group presence
@@ -200,17 +200,17 @@ include/SOURCE/combatTypes.h	55	55	CombatSideForResult	read	a7b94059536ac237c27b
 include/SOURCE/combatTypes.h	78	78	OppositeArmyFacing	read	e2fa716e1ac6af3a2ffd391cc6ccd6936f71c94629fd3c6e4217b7e7cf9613aa	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
 include/SOURCE/combatTypes.h	79	79	ArmyFacingForSide	read	7f6d57739fc117ce67044f6b2471254e7d1e3631c2fe386f7ddc5ea52f083618	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
 include/SOURCE/combatTypes.h	80	80	ArmyFacingRearHexOffset	read	f4328734189895e8bc1dfdba4d2d8fd58b61982310476fbf62286e8b0ad8f56b	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
-include/SOURCE/comwin.h	2	2	HOMM2_COMWIN_H	unread	7f1e9d196b0019f39d75fb47de72f298849ec84d7a66f735802a60982504c0d5	-
+include/SOURCE/comwin.h	2	2	HOMM2_COMWIN_H	read	7f1e9d196b0019f39d75fb47de72f298849ec84d7a66f735802a60982504c0d5	B26: complete serial baud/port domains, shared node/anchor payload union, saved driver state and interface; no bodies; H66/H67
 include/SOURCE/dimPalette.h	2	2	HOMM2_SOURCE_DIMPALETTE_H	read	e422cb98242070fb2605dfb0bdce8181f660020359cc0ee85980cdda78540bc1	B05: complete decoder/encoding/palette contract declarations; no bodies
-include/SOURCE/dpnetwin.h	2	2	HOMM2_DPNETWIN_H	unread	7fce4c626e462c431f24758f99b10e6cd5d6560c7ad80dcbae4a66809ace8687	-
+include/SOURCE/dpnetwin.h	2	2	HOMM2_DPNETWIN_H	read	7fce4c626e462c431f24758f99b10e6cd5d6560c7ad80dcbae4a66809ace8687	B26: complete DirectPlay transport constants, packed startup, states/interfaces and shared receive storage; no bodies; H64/H65
 include/SOURCE/fileRequester.h	2	2	HOMM2_SOURCE_FILEREQUESTER_H	read	dd1536400a60ac43df7b6873f40ec57265530c8381215960b57dc17954ab689f	B25: complete filename/extension domains, packed requester/window layout and interface; no bodies; implementation unread
 include/SOURCE/game.h	2	2	HOMM2_SOURCE_GAME_H	read	9ec8edd8fbc580e39e0feed6208ef9ef30d11f925baf03b90a98b2b8061a4a23	B13: complete game/boat/mine/campaign/save/runtime layouts and API; five existing owner accessors
 include/SOURCE/hero.h	2	2	HOMM2_SOURCE_HERO_H	read	e5045e769918d42bddec802db0f068bfd3b7bf5e67e34f607347d4a52c38b0d2	B13: complete packed runtime/serialized hero/flag/skill domains; IsEmbarked inline; H22/R15
 include/SOURCE/hexcell.h	2	2	HOMM2_SOURCE_HEXCELL_H	read	2cebc8a22b633133c7b29aaeb5d99f739efbaa5c649f25b3db96f9206647fe4c	B12: complete packed occupant/corpse/path/clipping layout and declarations; no bodies
 include/SOURCE/highScoreManager.h	2	2	HOMM2_SOURCE_HIGHSCOREMANAGER_H	unread	2e7c96d83917bdf1da6272660a3ec1b5c7e423b98b42e7ada8484ae0724f5e34	-
 include/SOURCE/kbwin.h	2	2	HOMM2_KBWIN_H	read	aa2547e812f662b3a86b6a256f9ff1148b3e1f52d96a548f9ef514cb051de6b2	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
-include/SOURCE/netwin.h	2	2	HOMM2_NETWIN_H	unread	0eafab4a7dfbb199a721b79e2f7f7c399f45076ef6264d47d909f524b1997949	-
-include/SOURCE/netwin_private.h	2	2	HOMM2_NETWIN_PRIVATE_H	unread	0e9ffbea2eebb74b79420e253b1bfedc24f538d44ec69db92b63c313186d1f60	-
+include/SOURCE/netwin.h	2	2	HOMM2_NETWIN_H	read	0eafab4a7dfbb199a721b79e2f7f7c399f45076ef6264d47d909f524b1997949	B26: complete NetBIOS command/result/session domains, packed NCB and payload/event layouts, calling conventions and interfaces; no bodies
+include/SOURCE/netwin_private.h	2	2	HOMM2_NETWIN_PRIVATE_H	read	0e9ffbea2eebb74b79420e253b1bfedc24f538d44ec69db92b63c313186d1f60	B26: complete private NetBIOS callback/session/name declarations and external Netbios ABI; no bodies
 include/SOURCE/philAI.h	2	2	HOMM2_SOURCE_PHILAI_H	read	d138d4e105b517ef543c6b89bbb402862daa844e2e80fa9f46ca6e6827af16e2	B21: complete philAI interface including FightValueOfStack and battle/interaction APIs; no bodies; implementation still unread
 include/SOURCE/playerData.h	2	2	HOMM2_SOURCE_PLAYERDATA_H	read	261d92851be5d7aec9b1c249dccafcb19b05130f745a29daa60cedf1d31fde9c	B13: complete player/AI layout, signed id lists and eight accessors; H23; implementation in GAME still unread
 include/SOURCE/recruitUnit.h	2	2	HOMM2_SOURCE_RECRUITUNIT_H	unread	e768ce998ef02d410e6f7e96feff3b44a177efbc7f46756eec66f9d314630e79	-
@@ -676,9 +676,9 @@ src/SOURCE/PHILAI.cpp	318	319	AI_GOLD_TURN_VALUE_SCALE	unread	753e354aac075939a0
 src/SOURCE/PHILAI.cpp	320	321	AI_OBELISK_VISITOR_COUNT_FLOAT	unread	3b6fafebce3f9114305b9c6861d5ca7ded9f82c41c4543a8b587f85ddb2127bb	-
 src/SOURCE/PHILAI.cpp	322	323	AI_FUTURE_MINIMUM_VALUE	unread	691aaf860aff5c97043d8c0c8b0233f155010f234d0a675d7989e54545fccfc2	-
 src/SOURCE/PHILAI.cpp	324	325	AI_TOWN_FLYING_CREATURE_FACTOR	unread	aa28b0bc75e601596c3e8428a50953ca8e2cf5f84fe441828a0223e71bfe6f38	-
-src/SOURCE/REMOTE.cpp	42	42	REMOTE_PACKET	unread	03c26936587743bea6c38334b7647ea61e1b835355ac3ae674ff0a56df043ae5	-
-src/SOURCE/REMOTE.cpp	43	43	REMOTE_MESSAGE	unread	60f47c81a82b2bb044d21138f3c2adf3564e537d8f97c52fa5d7cd97cf20d5d8	-
-src/SOURCE/REMOTE.cpp	44	44	REMOTE_PLAYER_INFO	unread	f873e9a6420cc6a7d59d16d9d779375e7184cfc375fc01dae058f5e8fb9f8607	-
+src/SOURCE/REMOTE.cpp	42	42	REMOTE_PACKET	read	03c26936587743bea6c38334b7647ea61e1b835355ac3ae674ff0a56df043ae5	B26: all thirteen bodies; full cleanup/setup/CRC/packet/backend/retry/queue/heartbeat/timeout/request-reply paths and data/macros; H30/H68/R27
+src/SOURCE/REMOTE.cpp	43	43	REMOTE_MESSAGE	read	60f47c81a82b2bb044d21138f3c2adf3564e537d8f97c52fa5d7cd97cf20d5d8	B26: all thirteen bodies; full cleanup/setup/CRC/packet/backend/retry/queue/heartbeat/timeout/request-reply paths and data/macros; H30/H68/R27
+src/SOURCE/REMOTE.cpp	44	44	REMOTE_PLAYER_INFO	read	f873e9a6420cc6a7d59d16d9d779375e7184cfc375fc01dae058f5e8fb9f8607	B26: all thirteen bodies; full cleanup/setup/CRC/packet/backend/retry/queue/heartbeat/timeout/request-reply paths and data/macros; H30/H68/R27
 src/SOURCE/SMACKMGR.cpp	695	697	LOG_SUMMARY_VALUE	unread	1af08c0d545e9ec61116d9a9a4c3b349af0887aea9e2ae13d2159269ca5c8396	-
 src/SOURCE/SPELLAI.cpp	8	8	COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER	read	f2a0e2df20c79c104ba95c6d5949afe02e6c5b0839c29044d3b794be8ee46483	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
 src/SOURCE/SPELLAI.cpp	9	9	COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER	read	a46d56f8aef732f58529d2e584c2bd3f8a8d7be7e5ed0e6413482efb2d353820	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
@@ -727,19 +727,19 @@ src/SOURCE/SPELLS.cpp	54	54	BOLT_CHILD_ANGLE_OFFSET	read	4d2585e5f576bf0fd2d6c4d
 src/SOURCE/SPELLS.cpp	55	55	BOLT_CHILD_MIN_ANGLE_OFFSET	read	0ad8d33c338ffca74ef5f5f9cac8875ef5fecd70324ca9db5fde8caa2464ffd1	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
 src/SOURCE/SPELLS.cpp	159	159	RIPPLE_WAVE_CENTER	read	e13da6008d9e7902e7fbd1da3b4c867c6bfe19d5755ca6e9d357d69956297d33	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
 src/SOURCE/SPELLS.cpp	160	160	RIPPLE_WAVE_RANGE	read	fc5333fa8652ed966ab79b2d249d6b58a63dfd1b60fe1461dad9570c3aec7508	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
-src/SOURCE/dpnetwin.cpp	17	17	RETAIL_FILE	unread	9ee97c0dfa0d213e6000aa83c2bcf74a21e63848da49b36c7739ca25c9a7b0b8	-
-src/SOURCE/netwin.cpp	2	2	NCB_INCLUDED	unread	720511c27596a4a5a294b0020d7fba3a7a9868428ba6232367df124caef868df	-
-src/SOURCE/netwin.cpp	13	13	RETAIL_FILE	unread	bf2d42c0be14448fe138c8fd665cfa3b508bef4325f1faf3faa5b8283f3a287e	-
-src/SOURCE/netwin.cpp	50	50	gNbFreeQueue	unread	78d283697ab16bf4d245118d6b42226a57e0b16cbb6c998ea65ea9fcac823b04	-
-src/SOURCE/netwin.cpp	51	51	gNbSessLsn	unread	bb90edeb50fa6b2affee86ab5ce5a076fa2bcb8d34ef507b56761181e1b9df23	-
-src/SOURCE/netwin.cpp	52	52	gNbRcvData	unread	1e17f464762089f5d085736b54b7aa72e06d085db3b64c93f4650eede021dc87	-
-src/SOURCE/netwin.cpp	53	53	gNbNameBuf	unread	a33f035b11810925499eb0730e91d6aea241f060f5ee7dfa012a647f0f0e6bb9	-
-src/SOURCE/netwin.cpp	54	54	gNbSessBuf	unread	e6eb4497cc3dd3a4eebd0fb60b0cc81b2cc239990e2e0b770b78608b606a0527	-
-src/SOURCE/netwin.cpp	55	55	gNbSessNcb	unread	69afb72a7f70208844956fd86c330b0f25b0914ee6d51ee2b58acb1dca0f8f25	-
-src/SOURCE/netwin.cpp	56	56	gNbCtlNcb	unread	b4f1bf8dbc5df887d337acae72e80307c4ec36c493d0a80978356e7d5fecfe5a	-
-src/SOURCE/netwin.cpp	57	57	gNbRcvQueue	unread	5d565f3d062b4f78c3f7da95c491549b4c61d3f318c384940d3e6eef4d4aa89d	-
-src/SOURCE/netwin.cpp	58	58	gNbSndQueue	unread	0ebae9037d729924cf4d7d9e9df67b3e023fa37ae57b9d8408b66126efe5e8a1	-
-src/SOURCE/netwin.cpp	59	59	gNbRcvLock	unread	94a5555fef3e4fe7f8af749f36fd1455d8be07c341864a9f5d0b26d6dec1174e	-
-src/SOURCE/netwin.cpp	60	60	gNbEvents	unread	f00eeab2aa2a611eff709b9ba16e8d2ea26f01a65699ba5d538c7b360bd17d34	-
-src/SOURCE/netwin.cpp	61	61	gNbSndLock	unread	c22165db3e681b8e4129922c5872f4b445fd6922b2315250a4a2e35f1d1bc769	-
+src/SOURCE/dpnetwin.cpp	17	17	RETAIL_FILE	read	9ee97c0dfa0d213e6000aa83c2bcf74a21e63848da49b36c7739ca25c9a7b0b8	B27: all sixteen bodies incl status/session stubs; full initialization/enumeration/send/receive/guest/wait/error/teardown paths and data; H01/H17/H19/H30/H64/H65/R27
+src/SOURCE/netwin.cpp	2	2	NCB_INCLUDED	read	720511c27596a4a5a294b0020d7fba3a7a9868428ba6232367df124caef868df	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	13	13	RETAIL_FILE	read	bf2d42c0be14448fe138c8fd665cfa3b508bef4325f1faf3faa5b8283f3a287e	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	50	50	gNbFreeQueue	read	78d283697ab16bf4d245118d6b42226a57e0b16cbb6c998ea65ea9fcac823b04	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	51	51	gNbSessLsn	read	bb90edeb50fa6b2affee86ab5ce5a076fa2bcb8d34ef507b56761181e1b9df23	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	52	52	gNbRcvData	read	1e17f464762089f5d085736b54b7aa72e06d085db3b64c93f4650eede021dc87	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	53	53	gNbNameBuf	read	a33f035b11810925499eb0730e91d6aea241f060f5ee7dfa012a647f0f0e6bb9	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	54	54	gNbSessBuf	read	e6eb4497cc3dd3a4eebd0fb60b0cc81b2cc239990e2e0b770b78608b606a0527	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	55	55	gNbSessNcb	read	69afb72a7f70208844956fd86c330b0f25b0914ee6d51ee2b58acb1dca0f8f25	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	56	56	gNbCtlNcb	read	b4f1bf8dbc5df887d337acae72e80307c4ec36c493d0a80978356e7d5fecfe5a	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	57	57	gNbRcvQueue	read	5d565f3d062b4f78c3f7da95c491549b4c61d3f318c384940d3e6eef4d4aa89d	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	58	58	gNbSndQueue	read	0ebae9037d729924cf4d7d9e9df67b3e023fa37ae57b9d8408b66126efe5e8a1	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	59	59	gNbRcvLock	read	94a5555fef3e4fe7f8af749f36fd1455d8be07c341864a9f5d0b26d6dec1174e	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	60	60	gNbEvents	read	f00eeab2aa2a611eff709b9ba16e8d2ea26f01a65699ba5d538c7b360bd17d34	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
+src/SOURCE/netwin.cpp	61	61	gNbSndLock	read	c22165db3e681b8e4129922c5872f4b445fd6922b2315250a4a2e35f1d1bc769	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
 src/SOURCE/wingraph.cpp	14	14	RETAIL_FILE	read	24613e0de90ed68deb8a974e97b655881be88b74b9a9f4b85ad44a59d75335bf	B11: all 32 bodies; full DD/WinG surface/palette/paint/error/switch/lifetime; H13/H15/H18; R13

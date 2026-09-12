@@ -61,6 +61,10 @@ Locator updates and options panels often reuse a previously established type or
 write id before command. DisableButtons/EnableButtons put data before id; these
 are not additional exact three-store prefixes.
 
+B27 adds dpWaitForExtraGuests and wsWaitForExtraGuests, plus Winsock's accepted-
+guest status message. Text-buffer choice, broadcast receiver and following
+DrawWindow call remain explicit; those are not part of the header macro.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -504,6 +508,9 @@ menu changes) and `wingraph.cpp` (clipper setup, display initialization/switchin
 The save/restore locals around window changes intentionally preserve selected
 fields while callbacks run; H15 does not replace them with a whole-record copy.
 
+B27 adds wsnet_init's current-executable fullscreen test. Its dialog and
+SetFullScreenStatus(false) call are separate behavior, not part of the accessor.
+
 ## H16 — inclusive rectangle disjointness
 
 Disposition: credible small geometry predicate, separate from clipping and hit tests.
@@ -593,6 +600,11 @@ logging's existing level check inside the callee. Do not add a variadic macro or
 replace the function with a stream/logging framework. Other arities remain leads
 until their game/network caller bodies are read.
 
+B27 adds service-provider/session enumeration and guest/startup logging in
+DirectPlay/Winsock, with one or two values followed by the established sentinel
+tail. REMOTE's failed-send log deliberately includes two numeric zero slots;
+do not drop them as though they were LOG_UNUSED_VALUE.
+
 ## H18 — palette component from six-bit intensity to output byte
 
 Disposition: small cross-TU expression macro; input signedness must stay explicit.
@@ -626,6 +638,11 @@ both calls and the caller's later use of the buffer. No modern variadic-macro
 requirement, new `vsprintf` call, stream machinery, implicit truncation or hidden
 shutdown is justified. H17 remains preferable for existing `LogInt` callers;
 these sites have distinct free-form formats, not the fixed integer-label format.
+
+B27 adds dpEvaluateMessage's unknown-message diagnostic and DPSD's formatted
+error followed by LogStr(gText). Winsock/DecodePacket also use other local or
+transport-owned buffers; they are not instances of the fixed-gText protocol.
+DPSD's subsequent ShutDown remains outside the helper.
 
 ## R13 — Windows display/error initialization and painting
 
@@ -1038,6 +1055,11 @@ B24-B25 add command help/result dialogs and adventure search, travel, panels,
 system-options and visions dialogs. Raw mode 1 remains an explicit argument;
 OPTION_DIALOG_NONE and NORMAL_DIALOG_NO_RESOURCE both denote the same -1 tail.
 Resource/artifact-bearing calls, including movement-event dialogs, are excluded.
+
+B26-B28 add remote retry/timeout dialogs, DirectPlay/Winsock/NetBIOS setup and
+modem command/response waits. These share the exact trailing slots, not one
+dialog behavior: keep mode, giWaitType, gbFunctionComplete checks, retry choices
+and shutdown calls explicit. An informational dialog is not a network wait.
 
 ## H31 — check an already-stored allocation with the existing error handler
 
@@ -2250,3 +2272,262 @@ and one partial-join message formats count rather than joinNum. H33 does not
 absorb these rules. Crystal-ball range truncates sqrt before comparing radius
 (H44 variant). StopOnTrigger already names its masked-base-table lookup and
 expansion metadata exception; no universal object/trigger classification helper.
+
+## H64 — shared DirectPlay/Winsock receive-buffer primitives
+
+Disposition: strong shared-owner findings; separate small operations, not a
+general-purpose ring-buffer or transport framework.
+
+The fully read DPNETWIN and WSNETWIN implementations use the same globals,
+declared in SOURCE/dpnetwin.h: ppDPRcvBuffer, piDPRcvBufferSize and their i32
+head/tail indices. Both capacities are 200. Narrow free inlines/macros at that
+existing shared storage boundary could name the following exact operations:
+
+- Initialization: allocate pointer storage, allocate size storage, zero pointer
+  storage, zero size storage, in that order. Neither site resets head/tail here
+  or checks these allocations; do not add either action inside a helper.
+- Enqueue in dpEvaluateMessage/wsEvaluateMessage: allocate size-minus-1 bytes at
+  head, copy that many bytes from rcvBufIn+1, store the original size, advance
+  head with `(head + 1) % 200`. Size is u32l here. There is no full-queue test,
+  overwrite disposal, source-length validation or new null check.
+- Copy/dequeue in dpnet_rcv/wsnet_rcv: return zero on head==tail, read the stored
+  size into u32, copy exactly that size, free the slot, advance tail modulo 200,
+  and return an i16-narrowed size. The slot and size are not cleared. Each
+  backend's ProcessMessages call must remain before this operation.
+- Array disposal in dpnet_term/wsnet_term: conditional H2_FREE of pointer
+  storage, unconditional null store, then the same pair for size storage.
+  This does not free queued payloads or reset indices. DirectPlay drains queued
+  packets before this phase; Winsock does not. Keep that lifetime difference.
+
+Possible names include QueueTransportPacket and CopyNextTransportPacket, with
+separately named storage initialization/disposal if worth the indirection. Do
+not move the existing DATA owners or introduce a new packed/container layout
+merely to share them. Preserve all repeated index/global reads and caller-local
+size conversions; inline expansion still needs byte/relocation evidence.
+In particular, the enqueue's stored size includes the byte omitted from its
+allocation/copy, and dequeue later copies that stored size. A helper must not
+silently correct this observed discrepancy or acquire a false safety contract.
+REMOTE's ordered 128-slot message queue and NetBIOS/serial node queues are
+different owners and algorithms, not additional instances.
+
+## H65 — allocate a one-byte-tagged transport message
+
+Disposition: credible narrow construction prefix; lifetime and send remain explicit.
+
+dpSendMessage and wsSendMessage allocate H2_ALLOC(size+1) into a u8 pointer,
+write `static_cast<u8>(type)` at byte zero, then copy size bytes to pointer+1
+only if size!=0. A proposed ALLOC_TRANSPORT_MESSAGE(destination, type, size,
+data) belongs at the NetworkPacketType/transport boundary in SOURCE/REMOTE_TYPES.h
+or the shared transport interface, not at the six-byte remote packet layer.
+
+Keep size's u16 input promotion before +1, its conversion at the allocation/copy
+calls, the zero-size copy guard, unchecked allocation and caller pointer storage.
+Macro arguments must be stable and side-effect-free; a pointer-returning inline
+is an alternative only after testing its changed local/return code shape.
+Do not absorb backend calls, broadcast expansion, retries, error handling or
+H2_FREE: Winsock error returns currently bypass that final free, while DirectPlay
+has its own DPSD path. Neither whole send routine is shared by this prefix.
+The outer one-byte tag, RemotePacketHeader and RemoteMessage are three distinct
+wire layers; no universal packet initializer or serialization template follows.
+
+## H66 — free all nodes from an existing tag_Anchor queue
+
+Disposition: credible small queue-owner operation, not generic object destruction.
+
+com_term in COMWIN and nb_term in NETWIN repeat
+`while ((node = pop_node(anchor)) != NULL) H2_FREE(node);` across two and three
+queues respectively. A small `free_node_queue(anchor)` beside add_node/pop_node/
+init_anchor in SOURCE/comwin.h would name a real operation on that same node
+representation. The complete owner bodies are read; no alternate destructor or
+payload callback is involved.
+
+Preserve repeated pop-until-null and one H2_FREE per returned node, including
+the final null result if a macro uses the caller's node lvalue. Do not replace
+it with direct next-pointer traversal or memset the anchor. pop_node currently
+updates head and possibly tail without repairing the new head's prev link or
+clearing the detached node's links; sharing must retain that behavior.
+NetBIOS lock acquisition/release, serial's valid-handle guard, port shutdown and
+queue order stay outside. No implicit lock or shutdown belongs in the helper.
+The existing init_anchor only writes head then tail to null; it does not drain
+allocated nodes and is not an alternative cleanup operation.
+
+## H67 — pop the first available node from two ordered queues
+
+Disposition: plausible small owner helper; lower priority than H64/H66.
+
+comm_wrt_task in COMWIN pops priorityQueue and, only on a null result, normalQueue.
+nb_thr_ctl in NETWIN has the exact same three-statement shape for gNbFreeQueue
+then gNbSndQueue. A proposed `pop_first_node(first, second)` at SOURCE/comwin.h
+would name this ordered choice while reusing the existing pop_node primitive.
+
+Preserve one first pop, the null test and conditional second pop; do not pop
+both eagerly, merge the queues or infer a priority from either queue's name.
+Keep the caller's result assignment and subsequent empty-queue behavior; serial
+returns, whereas NetBIOS clears its loop flag. NetBIOS holds its send lock around
+both pops, while serial has no such lock. A macro's repeated arguments need
+stable operands, and an inline's local/call boundary must be measured. If the
+three explicit statements prove clearer than another name, retain only as a
+low-priority source-reading finding.
+
+## H68 — default optional remote-send policy arguments
+
+Disposition: credible shorter call to an existing API; wider caller audit pending.
+
+RemoteMain/TransmitAndWait in REMOTE, SendMapChange in CURSOR and
+combatManager::ProcessNextAction in COMMAND pass the final pair
+`1, REMOTE_MESSAGE_DEFAULT` to TransmitRemoteData. Default arguments on the
+existing SOURCE/REMOTE.h declaration, or a fixed-arity five-argument macro,
+could leave data, destination, length, command and reliable explicit.
+
+The complete TransmitRemoteData body confirms that the final two slots mean
+allowRetryDialog and default message-type selection. They do not mean reliable
+delivery: SendMapChange deliberately passes reliable=0 even though its next
+constant is named CURSOR_REMOTE_RELIABLE. Default message type chooses reliable
+or unreliable from the preceding argument; an explicit non-default type is
+another policy and must remain expressible. Preserve narrowing to the existing
+i8/enum parameters, argument evaluation, ID allocation, retries and return
+handling. No extra transmit call, early guard, packet conversion or hidden
+shutdown is added. Prefer declaration defaults over a second callable wrapper
+if matching evidence permits; owner/body reading does not establish byte safety.
+
+## R27 — remote reliability and DirectPlay/Winsock transport differences
+
+REMOTE's complete thirteen definitions and both complete transport TUs establish
+three packet layers with different lengths, signedness and checks. EncodePacket
+narrows its payload size to char but copies the original length. DecodePacket
+reads the global packet, ignores its second argument, converts payload size to
+u8 and leaves the CRC field zeroed after verification. Neither adds a received-
+buffer-length check. calc_crc_long is the existing feedback-bit/shift/add/sum
+algorithm, not a standard CRC library substitution; calc_crc truncates its result.
+
+RemoteCleanup has remote/main/cleanup guards, protocol-specific unload calls and
+repeated flag stores; it does not dispose the receive-queue allocations. RemoteMain
+zeros player info after first formatting names, clears only 30 bytes of the i32
+recent-ID array, sets backend flags in branch-specific ways, and initializes
+remote-on before or after backend startup depending on the path. Name input,
+preference writes, cursor-color restoration and the two-player setup handshake
+remain explicit. A common reset or backend-lifetime guard must not normalize them.
+
+SendRemoteData's NetBIOS error exits its apparent retry loop, while DirectPlay/
+Winsock return values are not folded into the same success rule. ReceiveRemoteData
+retains each backend's signed/narrow return conversion before DecodePacket.
+TransmitRemoteData increments the global ID, constructs fields in order and
+can poll reentrantly while comparing confirmations against the current iIDCtr,
+not a saved msg.id. Keep the inclusive retry limit, per-confirmation delay,
+optional retry dialog and tries=-1 restart. H68 only shortens fixed call slots.
+
+GetRemoteData selects the first strictly lowest arrival order, copies the full
+256-byte message into shared rcvBufOut, then optionally frees/nulls its slot.
+PollRemote services a backend before its setup guard, sends partially populated
+heartbeat/confirmation buffers with distinct lengths, and recognizes only
+heartbeat packets for heartbeat time updates. Confirmation or heartbeat receipt
+ends that poll; reliable data is acknowledged before duplicate-ID checks, but a
+full queue rejects data before acknowledging it. Recent-ID rotation and first
+free-slot allocation are not CURSOR's ordered map-change queue or H64's ring.
+
+Timeout paths distinguish host, first guest and later guests. Host completion
+clears bInTimeoutFail, while the guest path sets it true after restoring the
+sound-poll guard. Synthetic exits do not initialize every SPlayerExit field;
+ADVMGR's save-message exit has different flags and store order. No zero-initialized
+universal player-exit macro or save/restore guard is justified. TransmitAndWait
+consumes unrelated messages, writes the output pointer only on its matching
+response path, and can return success while leaving it untouched when remote
+handling is disabled. Preserve these contracts rather than introducing a generic
+request/reply framework.
+
+DirectPlay and Winsock really share H64's storage, but their startup structures
+carry player IDs versus network addresses. DirectPlay declares char count/position;
+Winsock declares u8 fields but reads them through char pointers and offsetof.
+Do not normalize those promotions. Duplicate guest handling occurs before the
+open-game guard in DirectPlay and inside it in Winsock; Winsock additionally
+compares a player-record pointer with the incoming pointer, not record contents.
+Neither gets a new player/session-capacity guard from a shared helper.
+
+DirectPlay enumerates providers/sessions, stores provider GUID pointers, uppercases
+the provided name, and uses its own create/join/accept/startup states. Winsock
+changes fullscreen state, resolves/binds a nonblocking socket, validates entered
+addresses and has separate automatic-host guest-count behavior. Their wait UIs
+share H01/H30 prefixes, not a whole connection state machine. Failed/unknown
+message behavior, system-sender filtering and host-accept handling differ.
+
+UpdateNormalDialog is an existing near match to the status-text updates, but a
+targeted complete body read shows two separately ranged DrawWindow calls after
+its text broadcast. The network callers use a single DrawWindow() call. Favor
+H01 for their shared message prefix; do not substitute this broader existing
+routine or invent a second universal text-update helper. The full KB TU remains
+unread despite this targeted callee check.
+
+Winsock's broadcast send retries without incrementing attemptCount; its error
+returns bypass packet disposal. Its receive loop can pass a non-WOULDBLOCK
+WSAGetLastError value onward as a length. DirectPlay has distinct accepted-error
+codes, receive-result handling and system-message filtering. DPSD sets its
+reentrancy flag before the DP_OK early return and does not clear it there;
+its error-text switch, three beeps, log and shutdown are not a generic OS-error
+macro. H65 shares only message construction and must not repair these paths.
+DirectPlay teardown drains the shared receive ring before array disposal;
+Winsock does not. CleanupDPVars already names a specific shared reset, not a
+reason to merge socket, COM-object and DLL lifetimes.
+
+## R28 — NetBIOS and serial protocols, queues and local-only helpers
+
+Read every definition in Netbios, netwin, Modem and comwin, including all private
+callbacks, status stubs, variadic dispatch and data/macro owners. Netbios host
+and guest setup differ in status increments, name collision retries, receive
+arming and failure behavior. Their narrow enum/byte result conversions and the
+registered/active/error masks already have names; a universal wait-state or
+network-status predicate would lose those distinctions.
+
+NETWIN's aliases identify existing static storage and NCB_INCLUDED controls an
+SDK declaration boundary; neither is a new common-code macro. Its paired
+nb_call/nb_listen NCB setup, callback-to-session scans, cancel prefixes and
+inactive-session result lists are local-only leads. Do not hide adapter/name/
+callback/event/command-complete differences in a generic NCB initializer.
+nb_init partially clears its event storage, initializes seven sessions, and
+uses its second argument for the narrowed max-session slot. nb_sess retains
+per-operation varargs, early returns, move-before-detach order and the final
+pending-to-success conversion. nb_format_name copies up to fifteen input bytes,
+pads the remainder with spaces and leaves the sixteenth zero; it is not ordinary
+strncpy or a string-copy helper.
+
+nb_term closes and nulls event handles before setting event zero. nb_thr_ctl
+processes specific receive events, then pops the first queue under a lock and
+can retry sending indefinitely after inactive-session errors. Other callbacks
+retry, rearm or cancel under different conditions and do not all set the same
+adapter/post-routine fields. Allocation-failure guards in nb_recv_complete are
+not MemError checks; nb_snd has a different unchecked allocation. No generic
+async-operation wrapper, RAII lock, added failure return or timeout is introduced.
+
+COMWIN's existing add_node/pop_node/init_anchor already own the actual link
+protocol (H66/H67). NetBIOS nodes allocate length+11 and store a session byte
+before payload; serial nodes allocate length+10 and begin payload at that byte.
+Their union layouts and copy offsets are not one serialized packet contract.
+NetBIOS receive compares node length to a signed parameter before a u16 fallback;
+serial receive limits an unsigned request by the driver's count, writes a DWORD
+through two i16 slots and returns the first slot. Preserve each truncation and
+return convention rather than creating a common receive wrapper.
+
+com_init resets all handle slots before searching for one, preserves driver
+configuration/timeouts and uses its own baud enum/default conversion. com_term
+drains queues only under a valid-handle guard; NetBIOS teardown holds its own
+locks. Zero-length com_snd means a timed break, not an empty data packet.
+comm_wrt_task's port pointer does not advance; its empty-queue return and partial
+WriteFile loop remain unchanged. ShutdownComError snapshots GetLastError before
+its error-name switch and appends localized suggestions; it is not DPSD's
+reentrant error protocol or a shared string-format macro.
+
+ModemSetup retains its queue-field reset order, baud-clock calculation, fixed
+com_init baud choice, two reset attempts and separate direct/dial/wait paths.
+GUIModemCommandExec and ModemCommand use different timing/return protocols;
+GUIModemResponseExec reads one byte per callback, filters control characters,
+terminates/truncates the buffer through the existing TruncateModemResponse
+inline and matches a prefix. write_buffer checks the old queue position but
+delegates the actual send; no queue-index update is invented.
+
+Connect and WaitForDirectConnect share a local ID handshake, but blocking
+continue/poll/drain and callback-state transitions differ. Tick-derived ID
+formatting, six-byte copies without a new terminator, duplicate-ID cleanup and
+second-boundary comparison remain explicit. ReadPacket's escape/partial-frame
+state and WriteModemPacket's escape duplication, 256-byte limit and ForcePollSound
+backpressure form a streaming framing protocol, not RemotePacketHeader or an
+icon-RLE helper. No new negative-length/overflow repair, timeout or generic
+buffer reader is introduced. These local leads do not inflate the cross-TU list.

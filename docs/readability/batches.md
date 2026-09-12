@@ -410,3 +410,57 @@ R26 records algorithm, lifetime, numeric, state and protocol distinctions;
 GetHeroSlot/owner-array access favors existing game accessors, while cursor
 snapshot and adjacent-config-field speed selection remain local/pending leads.
 No executable source, header, configuration or behavior was changed.
+
+## B26 — remote reliability and complete transport declarations
+
+Read all 891 lines and thirteen definitions of REMOTE.cpp: cleanup/setup,
+driver selection, both CRC routines, packet encoding/decoding, backend send/
+receive dispatch, retry/confirmation, ordered receive queue, complete heartbeat/
+timeout polling and request/reply waiting. Reconciled all fields, macros, data
+and indexed bodies. Existing REMOTE.h/REMOTE_TYPES.h were checked against their
+implementations; earlier adventure/cursor/combat consumers were already read.
+
+Read the complete transport declarations: netwin.h (136 lines), Modem.h (91),
+Netbios.h (32), dpnetwin.h (103), Wsnetwin.h (56), comwin.h (62) and
+netwin_private.h (22). Modem.h contains one inline TruncateModemResponse;
+the other six headers have zero bodies. Covered packed startup/NCB records,
+receive/storage sizes, node payload union, session/connection domains, queue/
+port layouts and private callback/calling-convention declarations. No vendor
+Windows, DirectPlay or Winsock SDK source is counted as game-code coverage.
+
+H30 gains remote dialogs; H68 compares the complete send implementation against
+its CURSOR/COMMAND call tails. R27 records packet layers, retry, timeout and
+queue distinctions. Header reads alone do not imply transport-body coverage;
+the following batches account for those implementations separately.
+
+## B27 — complete DirectPlay and Winsock implementations
+
+Read all of dpnetwin.cpp (671 lines, sixteen definitions) and Wsnetwin.cpp
+(572 lines, ten definitions), including stub status/session bodies and data.
+Covered initialization/teardown, provider/session enumeration, send/broadcast,
+receive/evaluation, guest acceptance/startup, all wait states and complete DPSD.
+Reconciled both indexes and the shared storage declared in the B26 headers.
+
+H01/H15/H17/H19/H30 gain concrete consumers. H64 records actual shared receive-
+buffer primitives, H65 the one-byte-tagged allocation/copy prefix. R27 retains
+backend-specific errors, signed fields, guest checks, retry behavior and resource
+lifetimes. Targeted full UpdateNormalDialog body inspection rules out replacing
+the single-draw network status updates with its two ranged draws; KB.cpp stays
+unread. A shared buffer-size discrepancy was documented, not silently corrected.
+
+## B28 — complete NetBIOS and serial/modem implementations
+
+Read all of Netbios.cpp (247 lines, five definitions), netwin.cpp (660, nineteen),
+Modem.cpp (419, fifteen) and comwin.cpp (356, eleven). Reconciled every public,
+private/static, callback, stub and variadic body, plus all macros and data.
+Covered host/guest setup, NCB command/status/cancel/retry, locks/events, node
+queues, serial driver configuration/read/write, modem command/response waits,
+both handshake paths and streaming escape framing. All owner headers are B26.
+
+H30 gains setup/wait consumers. H66/H67 name narrow clear-queue and ordered-pop
+operations shared by the already-common tag_Anchor/tag_Node owner. Existing
+add_node/pop_node/init_anchor and TruncateModemResponse remain the semantic
+owners; no replacement container or framing framework is proposed. R28 records
+different payload offsets, narrowing, teardown/locking, local duplicate
+algorithms and the exact failure/return behavior. Across B26-B28, 90 definitions
+and fourteen files are newly fully read. No game code or behavior was changed.
