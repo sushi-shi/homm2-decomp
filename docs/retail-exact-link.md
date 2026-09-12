@@ -38,10 +38,12 @@ historical COFF member shapes participate in exact final-image layout.
 
 Object matching and final-image matching answer different questions:
 
-- `homm2 build` compares 98 reconstructed translation units. The current
-  closure is 1,727/1,727 exact functions, complete ordered relocations, and
-  291,995/291,995 exact data bytes.
-- `homm2 link` compares PE section geometry and payloads, the complete file,
+- `homm2 build` compares 98 reconstructed translation units. The retained
+  historical result is 1,727/1,727 normalized-object exact functions and
+  291,995/291,995 data bytes. The September 2026 audit found that its CLI hard
+  gates were disabled; complete ordered-relocation verification cannot be
+  inferred from that score. See [the revalidation audit](match-provenance-audit.md).
+- `homm2 link --transform` compares PE section geometry and payloads, the complete file,
   imports, resources, initialized storage, and reviewed function placement.
 - Objdiff uses `functionRelocDiffs=all`. The local Gruntz-derived patch also
   compares symbol-relative COFF relocation addends hidden by ordinary masked

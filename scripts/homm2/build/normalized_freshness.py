@@ -1,7 +1,7 @@
 """Provenance stamps for disposable comparison objects.
 
 Each normalization stage writes ``<output>.stamp.json`` recording the exact
-content identity of every input it consumed. A consumer of a normalized
+content identity of its output and every input it consumed. A consumer of a normalized
 comparison object verifies the whole recorded chain before trusting it, so a
 focused raw rebuild can never be silently compared through a stale normalized
 copy. A missing stamp is reported as unverifiable rather than silently
@@ -19,15 +19,15 @@ import os
 from pathlib import Path
 
 STAMP_SUFFIX = ".stamp.json"
-STAMP_SCHEMA = 1
+STAMP_SCHEMA = 2
 
-_HASH_CACHE: dict[str, tuple[tuple[int, int], str]] = {}
+_HASH_CACHE: dict[str, tuple[tuple[int, ...], str]] = {}
 
 
 def _sha256(path: Path) -> str:
     key = str(path)
     stat = path.stat()
-    identity = (stat.st_mtime_ns, stat.st_size)
+    identity = (stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino, stat.st_dev)
     cached = _HASH_CACHE.get(key)
     if cached and cached[0] == identity:
         return cached[1]
@@ -57,10 +57,12 @@ def write_stamp(output: Path, inputs: dict[str, Path]) -> Path:
     path = stamp_path(output)
     payload = {
         "schema": STAMP_SCHEMA,
+        "output_sha256": _sha256(Path(output)),
         "inputs": {
             role: {
                 "path": _portable_reference(Path(input_path), path.parent),
                 "sha256": _sha256(Path(input_path)),
+                "requires_stamp": stamp_path(Path(input_path)).is_file(),
             }
             for role, input_path in sorted(inputs.items())
         },
@@ -78,10 +80,10 @@ def freshness_problems(output: Path, _seen: set | None = None) -> list[str]:
     that were derived from the old bytes.
     """
     output = Path(output)
-    seen = _seen if _seen is not None else set()
+    seen = set(_seen or ())
     key = str(output.resolve())
     if key in seen:
-        return []
+        return ["%s has a cyclic provenance chain; run `homm2 build`" % output]
     seen.add(key)
     problems = []
     stamp = stamp_path(output)
@@ -93,10 +95,22 @@ def freshness_problems(output: Path, _seen: set | None = None) -> list[str]:
     except (json.JSONDecodeError, OSError) as exc:
         problems.append("%s stamp is unreadable (%s); run `homm2 build`" % (output, exc))
         return problems
-    if payload.get("schema") != STAMP_SCHEMA:
+    if not isinstance(payload, dict) or payload.get("schema") != STAMP_SCHEMA:
         problems.append("%s stamp has unknown schema; run `homm2 build`" % output)
         return problems
-    for role, record in sorted(payload.get("inputs", {}).items()):
+    if not output.is_file() or _sha256(output) != payload.get("output_sha256"):
+        problems.append("%s output changed or is missing; run `homm2 build`" % output)
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, dict) or not inputs:
+        problems.append("%s has no valid provenance inputs; run `homm2 build`" % output)
+        return problems
+    for role, record in sorted(inputs.items()):
+        if (not isinstance(record, dict) or not isinstance(record.get("path"), str) or
+                not record["path"] or not isinstance(record.get("sha256"), str) or
+                not isinstance(record.get("requires_stamp"), bool)):
+            problems.append("%s input %s has invalid provenance; run `homm2 build`" %
+                            (output, role))
+            continue
         input_path = Path(record.get("path", ""))
         if not input_path.is_absolute():
             input_path = (stamp.parent / input_path).resolve()
@@ -108,6 +122,6 @@ def freshness_problems(output: Path, _seen: set | None = None) -> list[str]:
                 "%s is stale: %s input changed (%s); run `homm2 build`" %
                 (output, role, input_path))
             continue
-        if stamp_path(input_path).is_file():
+        if record["requires_stamp"] or stamp_path(input_path).is_file():
             problems.extend(freshness_problems(input_path, seen))
     return problems

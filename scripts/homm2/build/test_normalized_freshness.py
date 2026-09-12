@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import unittest
 from pathlib import Path
@@ -48,6 +49,54 @@ class StampRoundTripTest(unittest.TestCase):
 
         self.assertEqual(len(problems), 1)
         self.assertIn("no provenance stamp", problems[0])
+
+    def test_modified_output_is_rejected(self):
+        raw, normalized = self._tree()
+        write_stamp(normalized, {"input": raw})
+        normalized.write_bytes(b"retail bytes copied over candidate")
+        self.assertTrue(freshness_problems(normalized))
+
+    def test_same_size_output_change_with_preserved_mtime_is_rejected(self):
+        raw, normalized = self._tree()
+        write_stamp(normalized, {"input": raw})
+        before = normalized.stat()
+        normalized.write_bytes(b"normalized-object-v2")
+        os.utime(normalized, ns=(before.st_atime_ns, before.st_mtime_ns))
+        self.assertTrue(freshness_problems(normalized))
+
+    def test_empty_or_malformed_provenance_is_rejected(self):
+        raw, normalized = self._tree()
+        for inputs in ({}, [], {"input": None}, {"input": {}}):
+            with self.subTest(inputs=inputs):
+                write_stamp(normalized, {"input": raw})
+                record = json.loads(stamp_path(normalized).read_text())
+                record["inputs"] = inputs
+                stamp_path(normalized).write_text(json.dumps(record))
+                self.assertTrue(freshness_problems(normalized))
+
+    def test_missing_intermediate_stamp_is_rejected(self):
+        raw, normalized = self._tree()
+        intermediate = self.root / "objdiff/paired/UNIT.obj"
+        intermediate.parent.mkdir(parents=True)
+        intermediate.write_bytes(b"paired")
+        write_stamp(intermediate, {"input": raw})
+        write_stamp(normalized, {"input": intermediate})
+        stamp_path(intermediate).unlink()
+        self.assertTrue(freshness_problems(normalized))
+
+    def test_cyclic_provenance_is_rejected(self):
+        raw, normalized = self._tree()
+        write_stamp(raw, {"input": normalized})
+        write_stamp(normalized, {"input": raw})
+        self.assertTrue(any("cyclic" in problem for problem in freshness_problems(normalized)))
+
+    def test_old_schema_requires_rebuild(self):
+        raw, normalized = self._tree()
+        write_stamp(normalized, {"input": raw})
+        record = json.loads(stamp_path(normalized).read_text())
+        record["schema"] = 1
+        stamp_path(normalized).write_text(json.dumps(record))
+        self.assertTrue(any("unknown schema" in problem for problem in freshness_problems(normalized)))
 
     def test_two_stage_chain_catches_base_change_through_paired_copy(self):
         raw, _normalized = self._tree()

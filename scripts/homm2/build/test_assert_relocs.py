@@ -1,10 +1,13 @@
+import json
 import struct
 import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
+
+from homm2.build import assert_relocs
 
 from homm2.build.assert_relocs import (
     _BODY_CACHE,
@@ -41,6 +44,40 @@ from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_
 
 GCONFIG_SYMBOL = "?gConfig@@3UconfigStruct@@A"
 GMONSTER_DATABASE_SYMBOL = "?gMonsterDatabase@@3PAUtag_monsterInfo@@A"
+
+
+class RelocationGateIntegrationTest(unittest.TestCase):
+    def run_gate(self, *, base=None, target=None, objects_exist=True, unit="SOURCE/UNIT"):
+        report = {"units": [{"name": unit, "functions": [
+            {"name": "function", "fuzzy_match_percent": 100.0},
+        ]}]}
+        with patch.object(assert_relocs, "load_symbols", return_value=(
+            {"first": 0x1000, "second": 0x2000}, {}, {}
+        )), patch.object(assert_relocs, "load_owner_ranges", return_value=[]), patch(
+            "builtins.open", mock_open(read_data=json.dumps(report))
+        ), patch.object(assert_relocs.os.path, "exists", return_value=objects_exist), patch.object(
+            assert_relocs, "parse_obj", side_effect=[base or {}, target or {}]
+        ), patch("builtins.print"):
+            return assert_relocs.review_fields(resolved_addresses=True)
+
+    def test_exact_function_with_swapped_targets_fails_despite_equal_multiset(self):
+        self.assertEqual(self.run_gate(
+            base={"function": [(1, "REL32", "first", 0), (6, "REL32", "second", 0)]},
+            target={"function": [(1, "REL32", "second", 0), (6, "REL32", "first", 0)]},
+        ), 1)
+
+    def test_exact_function_with_matching_targets_passes(self):
+        functions = {"function": [(1, "REL32", "first", 0)]}
+        self.assertEqual(self.run_gate(base=functions, target=functions), 0)
+
+    def test_missing_objects_cannot_pass(self):
+        self.assertEqual(self.run_gate(objects_exist=False), 1)
+
+    def test_missing_function_cannot_pass(self):
+        self.assertEqual(self.run_gate(base={"function": []}), 1)
+
+    def test_target_only_runtime_is_not_a_source_object(self):
+        self.assertEqual(self.run_gate(objects_exist=False, unit="(libcmt)"), 0)
 
 
 class DataIdentityTranspositionTest(unittest.TestCase):

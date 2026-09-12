@@ -6,10 +6,12 @@ from homm2.init import main
 
 class InitTest(unittest.TestCase):
     def test_redelinks_before_configuring_editor_tooling(self):
-        with (mock.patch("homm2.init.redelink", return_value=0) as redelink,
+        with (mock.patch("homm2.init.toolchain.main", return_value=0) as toolchain,
+              mock.patch("homm2.init.redelink", return_value=0) as redelink,
               mock.patch("homm2.init.run", return_value=0) as run):
             self.assertEqual(main([]), 0)
         redelink.assert_called_once_with([])
+        toolchain.assert_called_once_with([])
         run.assert_called_once_with("python3", "-m", "homm2.init.clangd")
 
 

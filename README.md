@@ -7,10 +7,12 @@ stripped — no debug stream, no relocations — so every symbol is a claim made
 source's own markers and every relocation site comes from a reviewed manifest.
 Retail bytes are authoritative.
 
-The reconstruction is **complete**: every function and every data byte matches
-retail, and the pinned `LINK.EXE` reproduces the retail executable byte-for-byte
-from compiled objects (see the link modes below for exactly what that claim rests
-on). This repository contains **no** game content; supply a legally obtained
+The checked-in results record a completed normalized-object comparison and a
+historical retail-exact link. They are not a fresh verification of this checkout:
+the September 2026 audit found disabled hard gates and incomplete comparison
+provenance checks. Those checks are repaired; full revalidation requires the
+original executable. See [the audit and remaining evidence gaps](docs/match-provenance-audit.md).
+This repository contains **no** game content; supply a legally obtained
 `HMM2PL.exe` in `build/orig/` before initializing.
 
 ## Trust and provenance
@@ -20,6 +22,11 @@ exact function is still independently checkable against retail bytes and ordered
 relocations, so accepting it does not require trusting the model's prose or
 intent. The cross-platform port is a semantic rewrite, not a byte-matching
 result, and therefore still requires ordinary code review and play-testing.
+
+The generated score block below is a retained historical result, not a new audit
+run. Its old “byte-identical now” description overstates normalized-object
+scoring; the generator now labels that distinction explicitly. Only a fresh
+`homm2 link --transform` run can re-establish the whole-file equality claim.
 
 ## Repository branches
 

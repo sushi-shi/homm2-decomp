@@ -3,18 +3,6 @@ import os, subprocess, sys
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
 
-# Every audit is off while the reconstruction is unmarked. They were written for a
-# COMPLETE inventory, and here the inventory starts empty and grows one proven
-# address at a time, so the same checks report the whole image as broken and say
-# nothing: audit_text_coverage calls all 951,827 bytes of .text unexplained, and
-# every assert_* keyed on a symbol model has no model to read.
-#
-# They come back on as the campaign earns them, and several could return early: the
-# source-only ones (assert_decls, assert_defs_declared, assert_globals_defined,
-# assert_no_fake_labels, assert_fixed_width_ints) check the tree against itself and
-# do not depend on the target at all.
-AUDITS = False
-
 def sh(*cmd):
     return subprocess.run([str(c) for c in cmd], cwd=REPO).returncode
 
@@ -59,8 +47,7 @@ def main(argv=None):
         print("usage: homm2 data-topology census", file=sys.stderr)
         return 1
     if cmd == "build":
-        if AUDITS:
-            if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
+        if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
         # Relocation field validation consumes the objdiff report. Generate it
@@ -69,21 +56,21 @@ def main(argv=None):
         report = load_report()
         if report is None:
             return 1
-        if AUDITS:
-            # Fast and warning-only: half-built TUs may intentionally need a later redelink.
-            sh("python3", "-m", "homm2.build.symbol_model_drift")
-            if sh("python3", "-m", "homm2.build.annotated_functions", "--check",
-                  "--objects", "build/objdiff/base"): return 1
-            # HARD gates: every declaration comes from a header (no drift), and every emitted
-            # function symbol exists in the retained-public/recovered-private inventory.
-            if sh("python3", "-m", "homm2.build.assert_decls"): return 1
-            if sh("python3", "-m", "homm2.build.assert_no_fake_labels"): return 1
-            if sh("python3", "-m", "homm2.build.assert_globals_data"): return 1
-            if sh("python3", "-m", "homm2.build.assert_defs_declared"): return 1
-            if sh("python3", "-m", "homm2.build.assert_globals_defined"): return 1
-            if sh("python3", "-m", "homm2.build.assert_vtables"): return 1
-            if sh("python3", "-m", "homm2.build.assert_relocs", "--fields"): return 1
-            if sh("python3", "-m", "homm2.build.assert_fixed_width_ints"): return 1
+        # Fast and warning-only: half-built TUs may intentionally need a later redelink.
+        sh("python3", "-m", "homm2.build.symbol_model_drift")
+        if sh("python3", "-m", "homm2.build.annotated_functions", "--check",
+              "--objects", "build/objdiff/base"): return 1
+        # These are unconditional gates, not an optional campaign switch. A score
+        # is not evidence that declarations, data owners, or relocations are sound.
+        for audit in ("assert_decls", "assert_no_fake_labels", "assert_globals_data",
+                      "assert_defs_declared", "assert_globals_defined", "assert_vtables"):
+            if sh("python3", "-m", "homm2.build." + audit): return 1
+        # Unordered target identities plus ordered resolved sites/owner offsets.
+        # Ordinary source functions use raw objects; compiler-generated identities
+        # retain the audit's explicit normalized-name fallback.
+        if sh("python3", "-m", "homm2.build.assert_relocs"): return 1
+        if sh("python3", "-m", "homm2.build.assert_relocs", "--resolved"): return 1
+        if sh("python3", "-m", "homm2.build.assert_fixed_width_ints"): return 1
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":
@@ -101,10 +88,7 @@ def main(argv=None):
         if sh("ninja", *targets): return 1
         return sh("python3", "-m", "homm2.build.exact_link.plain", *rest)
     if cmd == "relocs":
-        # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
-        # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks
-        # each near-exact fn's reloc targets against retail. Off by default because it also surfaces
-        # incomplete-function relocation shape. `homm2 relocs 0x<rva>` reviews one.
+        # Also run by `build`; this entry point permits focused diagnosis.
         return sh("python3", "-m", "homm2.build.assert_relocs", *rest)
     if cmd == "status":
         from homm2.match.status import main as st; return st(rest)
