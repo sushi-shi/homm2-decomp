@@ -279,3 +279,70 @@ combat sprite API rather than a replacement renderer. R19 preserves the distinct
 visibility/recursion/extent flags, byte/text contracts and layer/timing behavior.
 The full-file review supersedes B16's targeted-only DRAWING status; KB remains
 unread apart from its separately documented targeted bodies.
+
+## B18 — complete flying movement
+
+Read all 476 lines of `FLY.cpp`; reconciled four definitions, including both
+FlyTo overloads. Covered wide-creature fitting and both side attempts, complete
+ordered attack-position search, facing-dependent endpoint shifts, occupied-hex
+stores, every flight leg/frame/sound path, timer arithmetic and landing cleanup.
+All relevant model/path/drawing declarations were already read.
+
+H28/H34-H36/H41 gain flight instances or explicit variants; H43/H44 isolate
+interior-hex bounds and integer-result Euclidean length. R20 keeps placement,
+movement/sound timing and null-pointer/domain assumptions separate. A flight
+occupant reset writes index/side/frame, not H40's side/index-only protocol.
+
+## B19 — complete combat spell implementation
+
+Read all 3,918 lines and 37 definitions of `SPELLS.cpp`, including its constants,
+macro variants and trailing data. Covered the entire spell-selection UI and
+recursive teleport callback, target and corpse selection, 576-line CastSpell,
+every area/individual/mass effect, bolt construction/branching, palette/shake/
+ripple drawing, mirror/summon/resurrection and delayed earthquake state changes.
+The SPELLS header and complete army/combat/resource owners were already read.
+
+H07/H28/H30/H31/H34-H36/H38/H40/H42 gain concrete spell consumers and exceptions.
+H43/H44 gain validation/length instances, H45 names the existing effect-cache
+replacement protocol, H46/H47 cover duration-artifact and golem checks, and
+H51/H52 cover shorter message calls and existing affected-slot indexing. R21
+distinguishes genuine repeated idioms from incompatible cast, damage, resource,
+animation and corpse-stack algorithms. No source behavior was corrected.
+
+## B20 — complete combat spell AI
+
+Read all 1,479 lines of `SPELLAI.cpp`; reconciled eleven definitions, including
+the full 582-line DetermineEffectOfSpell and 353-line EffectSpellDamage. Reviewed
+spell eligibility/scoring/ties, all target modes, duration/cancel modifiers,
+creature creation and influence scoring, hex iteration, cure/resurrection value,
+damage-area traversal and both final score paths. Static Buka score values and
+global tables were included; no other executable version's signs were imported.
+
+H28/H46/H47/H52 gain AI consumers; H48-H50 name narrowly defined dragon and
+spell-state predicates across the already-read combat TUs. R22 records where
+the evaluator and runtime intentionally cannot share a full formula or iterator.
+All three B18-B20 files are now fully read; no snippet-only coverage is credited.
+
+## B21 — complete combat tactical AI
+
+Read all 1,090 lines and nineteen definitions of `AI.cpp`, plus the complete
+`PHILAI.h` / `philAI.h` declarations. Reviewed retreat eligibility and value
+construction, the entire prioritized tactical decision tree, lich splash scoring,
+all seven army-mask builders, best/worst/closest/strength methods and both
+front/target approach paths. The implementing PHILAI TU remains unread; reading
+its interface establishes call contracts, not full stack-value algorithm coverage.
+
+H21/H28/H39/H49/H50 gain AI instances or explicit variants; H53 isolates a
+two-store next-action protocol. H54 records animation-start/Wince reuse discovered
+while comparing the complete preceding combat family; H55 records two additional
+cross-TU base/upgrade creature predicates. R23 retains mask, scoring, path and
+retreat distinctions rather than hiding the large decision tree in macros.
+
+## B22 — command and adventure-cursor packet declarations
+
+Read `CURSOR.h` (110 lines), `COMMAND.h` (44) and `REMOTE_TYPES.h` (68) in full;
+zero function bodies in three files. Reviewed cursor/boat/map-change/action
+domains, packed SMapChange movement/wire overlay, CombatRemotePacket reserved
+fields and typed command payload, network modes/protocols and player-info layout.
+These declarations support already-read combat action consumers and the next
+CURSOR/COMMAND/remote implementation passes. Those implementing TUs remain unread.

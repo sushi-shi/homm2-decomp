@@ -208,6 +208,11 @@ B15-B16 add the upper-then-lower [-20, 20] attack/defense difference clamp in
 variant, not automatic reuse of the lower-first spelling. The surrounding
 damage arithmetic has different floating-point, rounding and quantity stages.
 
+B19 adds lower-then-upper scalar clamps in `AddBolt` / `DoLuck` (upper comparisons
+have reversed operands) and an upper-then-lower branch-distance clamp in
+`ChainLightning`. `DrawBolt` also updates matching float coordinates on a clamp;
+it is not the same scalar-only idiom.
+
 ## H08 — list row and scrollbar drag arithmetic
 
 Disposition: plausible expression helpers, lower confidence than H01-H03.
@@ -865,6 +870,13 @@ B16-B17 confirm repeated current, target and mini-view owner lookups in ARMY and
 DRAWING. A possible current-army spelling must use `m_currentArmySide`, not
 `m_currentSide`: physical and controlling sides are not interchangeable.
 
+B18-B20 add flight targets, spell/corpse/mirror/effect targets and AI lookups.
+Some spell routines explicitly combine `m_currentSide` with `m_currentArmyIndex`;
+do not silently substitute the physical-current-army pair at those sites.
+
+B21 adds all AI mask/target/strength/approach consumers, including reversed
+`index[array]` notation. Preserve that operand ordering when judging exact expansion.
+
 B15 adds direct owner-array accesses in `LoadArmies`, `UpdateArmyGroup`,
 `CheckApplyGoodMorale`, `CheckApplyBadMorale`, `KeepAttack` and
 `ExperienceValueOfStack`. `GetNextArmy` also uses pointer-plus-index spellings;
@@ -937,6 +949,9 @@ button-result interpretation or dismissal side effects. The declaration and
 these callers are read; the large NormalDialog body and wider consumer set
 still require their full planned review before finalizing defaults.
 
+B19 adds `ViewSpells` and mirror-creation failure. The NORMAL_DIALOG sentinel
+names denote the same -1/zero tail; their long message formatting stays outside.
+
 ## H31 — check an already-stored allocation with the existing error handler
 
 Disposition: plausible narrow statement macro; usefulness versus indirection to rank.
@@ -957,6 +972,9 @@ failure path. Allocation sites with no current check are not added instances.
 A targeted complete read of `MemError` confirms that reentry immediately returns
 when `gbInMemError` is set; otherwise it logs, formats a message and calls
 `ShutDown`. A nonreturning assumption is therefore particularly inappropriate.
+
+B19 adds palette allocation checks in `Armageddon` and `DoBolt`; nearby bolt,
+flight, ripple and vaporize allocations without checks remain unchanged.
 
 ## H32 — preserve the dialog result and request handler completion
 
@@ -1043,6 +1061,10 @@ B17 adds `combatManager::DrawFrame`'s exact four-store sequence after expanding
 all four bounds by one pixel. Keep that expansion and extent-only early exit
 outside the clamp. Grid-copy clipping has different limits and local destinations.
 
+B18 adds the exact four statements in `army::FlyTo`. B19's `DoBlast` uses the
+same bounds/order but reverses the operands of its upper-bound comparisons;
+`DoBolt` also uses local destinations. Keep both as explicit variants.
+
 ## H35 — update an inclusive screen region
 
 Disposition: strong short-call macro, distinct from whole-combat redraw.
@@ -1063,6 +1085,11 @@ checks visibility/window state, updates the entire 640-by-443 area and writes
 B17 adds `UpdateMouseGrid`, the extent branch of `DrawFrame`, and stale-view
 erasure in `DrawSmallView`. Their surrounding save/restore/blit-flag protocols
 remain separate; the mini-view's final size-based update is not an instance.
+
+B18-B19 add `FlyTo`, mirror sliding, blast segments and earthquake impacts.
+SaveFizzleSource/FizzleForward and direct BlitBitmapToScreen calls also convert
+inclusive bounds, but have different APIs and side effects; they are not instances
+of the same UpdateScreenRegion call macro.
 
 ## H36 — speed-scaled combat animation deadline
 
@@ -1085,6 +1112,12 @@ wait/pump abstraction or wraparound-policy change is proposed.
 B17 confirms the reversed-multiplication variant in both DrawFrame deadline
 sites. Preserve the difference between `updateScreen == 1` and general truthiness
 and the distinct timer behavior of extent-only and whole-area branches.
+
+B18's flight deadlines divide after scaling, with an additional double `1.3`
+factor on the vampire path. B19 adds direct expression instances in Fireball,
+ElementalStorm, Armageddon, ChainLightning, MirrorImage, DoBlast, Resurrect and
+Earthquake. MeteorShower uses a double 112.5 multiplier and reversed operands;
+DoBolt also reverses operands. Preserve timer 0 versus timer 1 and local deadlines.
 
 ## H37 — select a projectile frame from angle midpoints
 
@@ -1121,6 +1154,11 @@ case-conversion API. The ordinary army damage message lowercases a copied
 singular name in `gTargetName`; that conditional is not the same raw-table helper.
 CP1251 casing, formatting, sound and text-buffer mutation remain outside it.
 
+B19 adds the cold-ray, magic-arrow and lightning damage messages in CastSpell.
+`SpellMessage` and `ShowSpellCastFailure` use `quantity == 1`, not <= 1, so are
+not exact instances. Resurrect has separate plural/singular format branches;
+do not collapse their different format strings into this table lookup.
+
 ## H39 — approximate distance between combat cell pixel centers
 
 Disposition: useful small forwarding helper, owner placement needs dependency care.
@@ -1138,6 +1176,9 @@ indices and coordinate-read order; do not add validation, change signed arithmet
 reorder operands, or absorb targeting/tie-breaking. Calling versus inlining must
 be measured before retaining a source change.
 
+B21 adds `GetClosestArmy`. Its subsequent distance weighting minus total hit
+points is a separate ranking expression, not part of the shared metric.
+
 ## H40 — clear the live occupant identity of a combat hex
 
 Disposition: credible two-store owner method/macro, not a full cell reset.
@@ -1153,6 +1194,11 @@ constructor uses a different index value and `Walk` clears index before side;
 neither is an exact instance. Repeated pointer/index evaluation in a macro needs
 stable operands; a method's single `this` evaluation and call expansion require
 matching evidence. Adding an all-purpose reset would erase these distinctions.
+
+B19 adds the teleport source clear stores in CastSpell; COMBAT_HEX_EMPTY aliases
+-1 and occupant-frame reads still follow those stores. B18's flight clear is
+index/side/frame instead, and its landing writes the manager's current identity;
+neither is this two-store helper.
 
 ## R18 — army animation, damage and spell protocols remain explicit
 
@@ -1212,6 +1258,9 @@ interleave growth and clipping in a different axis order. Those are variants.
 An eight-argument macro may be less readable than the four visible statements;
 rank below the stronger fixed-bound and short-call candidates if so.
 
+B18 adds FlyTo's saved-extent accumulation. B19's bolt accumulation instead
+orders X-max/X-min/Y-max/Y-min before and after drawing; do not normalize it.
+
 ## H42 — default optional combat sprite drawing arguments
 
 Disposition: strong default-argument candidate on an already-reviewed API.
@@ -1231,6 +1280,10 @@ palette translation and vertical modification are not stripped; the full creatur
 draw uses all three. Do not infer orientation from side/facing, replace the call
 with DrawToBuffer, or add drawing flags and screen updates. Even defaults still
 need the normal matching verification before retention in canonical source.
+
+B19 adds MeteorShower, ElementalStorm and DoBlast. MeteorShower passes a null
+limits pointer: retain it and its existing extent-flag assumptions, rather than
+adding a new limits object or treating the shorter call as always safe to compute.
 
 ## R19 — combat rendering is ordered stateful work, not a scene framework
 
@@ -1267,3 +1320,367 @@ icons are local leads, not a universal stat-panel macro. Spell scanning trusts t
 stored count and searches influences without a new bound; layout tables and
 two separate GetIconEntry calls remain intact. Quantity-format selection is not
 H38's creature-name table selection.
+
+## H43 — an in-range combat hex outside the edge columns
+
+Disposition: credible narrow predicate, distinct from ValidHex and passability.
+
+`army::CanFit`, `combatManager::UpdateMouseGrid` and `MirrorImage` test both
+0 <= hex < 117 and column != 0/12 in a 13-column grid. A proposed
+`IsInteriorCombatHex(hex)` belongs beside ValidHex in CMBTMGR. CanFit already
+calls ValidHex for the range portion; the other sites spell it out. A shared
+Boolean contract does not establish that replacing that existing call with an
+inline/macro, or adding a call elsewhere, is byte-neutral.
+
+Keep occupancy, blocked state and fitting-side attempts outside it. HasValidSpellTarget
+and area targeting skip border columns under an already-established range; they
+are partial/guarded instances, not grounds to add extra checks everywhere.
+In CanFit, an interior check controls pointer assignment but the next condition
+checks only ValidHex before dereferencing; do not broaden that later check or
+repair its null-pointer assumption while introducing a helper. Mirror searching
+continues its current inner loop on an invalid candidate; do not turn that into
+a break or change target-search order.
+
+## H44 — integer-result Euclidean length of an existing delta
+
+Disposition: plausible small math helper with explicit integer/float boundaries.
+
+`army::SpecialAttack` / `FlyTo`, `combatManager::ShootMissile`, and spell bolt /
+chain / blast code compute
+`static_cast<i32>(sqrt(static_cast<double>(dx * dx + dy * dy)))`.
+A proposed `PixelVectorLength(dx, dy)` would name that repeated distance operation
+at the common combat geometry interface. Inputs are already-computed integer
+deltas; callers that take abs do so outside the helper.
+
+Preserve integer multiplication and addition before conversion to double, the
+existing sqrt call, and final truncating integer conversion. No hypot, squared
+distance substitution, wider overflow policy, pre-conversion to float/double,
+or extra absolute-value operation. This is not H39's approximate cell metric.
+Movement step rounding, minimum counts and division by frame count stay outside;
+they differ among flight, missiles and blast segments.
+
+## H45 — replace the one cached combat-effect icon
+
+Disposition: credible short state protocol across ARMY and SPELLS.
+
+`army::SpellEffect` and `combatManager::ShowMassSpell` compare the requested effect
+with `gCurLoadedSpellEffect`, then Dispose the old icon, assign GetIcon(fileId)
+to `gCurLoadedSpellIcon`, and finally assign the effect id. A proposed
+`SELECT_COMBAT_EFFECT_ICON(effect, fileId)` can name that exact conditional
+three-operation protocol. Owner: the existing combat-effect globals/interface,
+not a new general resource cache.
+
+Both callers compute MAKEFILEID before this conditional; keep that computation
+and its timing outside the macro. Preserve disposal-before-acquisition, stored
+pointer-before-id, operand evaluation and the no-change path. SpellEffect's
+visibility guard also stays outside. PowEffect uses the filename overload and
+extra valid-effect/draw guards: record it as a variant, not an excuse to move
+hashing or unify all effect preparation. No animation state/frame initialization,
+reference-count policy or resource error behavior is added.
+
+## H46 — duration bonuses from the hourglass and wizard hat
+
+Disposition: plausible narrow statement helper shared with the spell evaluator.
+
+MirrorImage and the trailing local-power calculation in SummonElemental, plus
+DetermineEffectOfSpell, start from the current side's `m_spellPower`, then add
+2 for ARTIFACT_ENCHANTED_HOURGLASS and 10 for ARTIFACT_WIZARD_HAT. A proposed
+`ADD_DURATION_ARTIFACT_BONUSES(power, hero)` would name just those two ordered
+HasArtifact/conditional-add pairs. Owner: the hero/spell interface. Keep the
+initial power load and the caller's subsequent storage/usage explicit.
+
+Require stable operands and preserve destination width, sequential additions,
+artifact call order and the caller's nonnull assumption. Do not silently add
+a null guard or recompute the hero's primary power stat. CastSpell tests each
+artifact before that spell's duration attribute; moving a common duration test
+ahead of the artifact calls would change evaluation. That is a separate variant.
+SummonElemental's final result is unused, but the existing calls are not removed
+or repurposed to alter the already-created quantity.
+
+## H47 — iron-or-steel golem classification
+
+Disposition: strong small creature predicate; optional damage wrapper is narrower.
+
+CastSpell, Fireball, ElementalStorm, Armageddon and ChainLightning in SPELLS,
+and EffectSpellDamage in SPELLAI, repeatedly test iron then steel golem.
+`IsGolemCreature(type)` beside the creature domain would name that exact pair.
+Do not substitute the broader notion of spell immunity or resistance.
+
+Several sites then assign `static_cast<i32l>(damage * 0.5)`; a conditional damage
+macro is another possible spelling if it improves readability. Preserve the
+double multiplier, final conversion and each destination type; ChainLightning
+uses i32. Do not replace it with a shift or integer division. More importantly,
+do not extend the reduction to new spells: the AI reduces meteor damage here,
+while the runtime MeteorShower body does not. Artifact and elemental adjustments
+also have different ordering and remain outside the predicate.
+
+## H48 — the four dragon-slayer creature types
+
+Disposition: strong small predicate shared by runtime damage and spell scoring.
+
+`army::DamageEnemy` and `combatManager::RawEffectSpellInfluence` compare green,
+red, black and bone dragon, in that order, for dragon-slayer logic. A proposed
+`IsDragonCreature(type)` belongs beside the creature domain in KB_TYPES and
+retains those four short-circuit comparisons. Stable inputs and a measured
+macro/inline choice are required as with H33/H47.
+
+Do not use it for spell immunity: SpellCastWorkChance includes the three living
+dragon types but not bone dragon. The evaluator's target-array side and loop-count
+side currently differ; a type predicate must not correct that relationship or
+change its integer ratio. Classification names do not authorize damage/scoring fixes.
+
+## H49 — berserk-or-hypnotize spell state
+
+Disposition: credible two-field army predicate, not a new controlling-side rule.
+
+`army::SpecialAttack`, `DoAttack`, and the final suppression test in
+`combatManager::RawEffectSpellInfluence` read berserk influence then hypnotize
+influence as a Boolean OR. Keep that order in a proposed army-owned
+`HasBerserkOrHypnotize()` or comparably precise period-plausible name.
+Keep retaliation guards, cancellation and drawing outside the predicate.
+
+DetermineEffectOfSpell tests hypnotize before berserk, a reversed-order variant;
+KeepAttack's five-state priority test has this two-state tail after H50's three.
+Do not collapse all five into a generic CanAct or IsEnemy predicate: berserk and
+hypnotize do not share the same action/ownership semantics. Nonzero duration is
+the test, not a bit flag, and cancellation does not belong in a query helper.
+
+B21 adds GetTraitorMask's exact positive pair and the pair at the end of
+GetBestArmy's five-state test. Shooter/flyer/walker masks use zero-test conjunctions
+in the same field order; keep them as negated variants with their other filters.
+
+## H50 — blind, paralyzed or petrified spell state
+
+Disposition: credible three-field army predicate with ordering variants.
+
+DetermineEffectOfSpell and the prefix of KeepAttack's priority test read blind,
+paralyze and petrified influence, in that order. A small army-owned predicate
+such as `HasIncapacitatingSpell()` can name precisely these three duration tests.
+It must not include death, quantity, morale, berserk or hypnotize.
+
+NextArmy tests paralyze/petrified/blind, and DoAttack's second-attack guard has
+their three negations in that order. These are logical variants, not exact macro
+expansions. CancelSpellType's paralyze/hypnotize/petrified condition is a different
+set altogether. Keep surrounding guards, ranking and branch evaluation unchanged;
+do not replace full action eligibility with this partial predicate.
+
+B21 adds the exact positive triple in GetOutOfItMask and GetBestArmy, and
+zero-test conjunctions in shooter/flyer/walker masks. Those masks do not all
+check positive quantity and are not interchangeable with the existing IsAlive.
+
+## H51 — shorter calls to the existing combat text-message API
+
+Disposition: useful default-argument hypothesis; retain the history choice explicitly.
+
+ARMY attack/luck code, CMBTMGR morale/keep messages, DRAWING's command-message
+overload, and SPELLS UI/cast paths repeatedly call the text overload of
+`CombatMessage(text, updateScreen, retainPrevious, clear)` with updateScreen 1
+and clear 0. Defaults at the existing combatManager declaration can shorten
+ordinary status calls `(text, 1, 0, 0)` while retaining explicit arguments for
+history messages `(text, 1, 1, 0)` and clear/reset paths. The full owner body is
+read in B17; no forwarding function is required just to supply constants.
+
+Keep retainPrevious meaningful: it controls history, timeout and no-show logging,
+not only display style. Do not reinterpret false values as defaults, add clearing,
+or move text formatting. The separate CombatMessageCommand overload must retain
+its resolution; review all call types before changing defaults. This is lower
+priority if omission makes a caller's history/update intent harder to see.
+
+## H52 — use the existing affected-army array indexing
+
+Disposition: prefer the already-present two-dimensional spelling; no new macro needed.
+
+Fireball/MeteorShower and ClearEffects use flattened
+`*(gArmyEffected[0] + IDX(side) * COMBAT_ARMY_SLOT_COUNT + index)` expressions.
+ARMY splash damage, ChainLightning and EffectSpellDamage already use
+`gArmyEffected[IDX(side)][index]`. The reviewed declaration has exactly two
+20-element rows, matching the flattened stride. Owner: X_GLOBAL's existing array.
+
+The direct spelling expresses the same selected slot without inventing a lookup
+framework. Preserve lvalue mutation, element type, evaluation order and caller
+bounds. Do not return a normalized bool for a writable slot, change the stride
+to the army-storage capacity of 21, or alter ClearEffects' side/slot iteration.
+In runtime area effects SpellCastWorks is evaluated before duplicate suppression,
+whereas the AI checks the slot before its chance query; indexing cleanup must
+not move those calls or random draws.
+
+## R20 — flying fit, path and animation differences
+
+CanFit initializes its optional result before validation and has different edge
+checks in its first versus opposite-side attempt. A later ValidHex-only test can
+dereference a pointer that was assigned under a stronger check; this audit does
+not insert a repair. ValidFlight tries current-position attacks before landing
+search, uses last matching attack direction in one wide-creature loop, and keeps
+its exact ANY_TARGET and 1 - mode handling. No universal nearest/free-hex helper.
+
+FlyTo temporarily shifts both origin and destination when reversing a wide army,
+clears index/side/frame before animation and installs the manager's current army
+identity on landing. Facing restoration does not rewrite all those stores.
+Its initial CopyTo height is ARMY_COMBAT_MAX_Y, not inclusive height; preserve
+the actual argument. Frame-count overwrites and the stepCount == 0 branch remain,
+even after the earlier minimum-one assignment.
+
+Vampire first/last-leg sound selection has precedence, a fixed unscaled delay and
+a double duration factor. Frame-position movement and final leg snapping differ
+from missile stepping. The rounded `(length + (speed >> 1)) / speed` expression
+is a small arithmetic lead shared with army projectiles, but flight adds positive
+speed and minimum-one rules that must stay outside any future rounding helper.
+
+## R21 — spell execution is not the same as a universal effect pipeline
+
+Spell UI target lists, CastSpell's target-pointer exclusions, and AI target modes
+are not identical spell sets (including CastSpell's mass-slow omission). Preserve
+each switch, fallthrough and default. HandleCastSpell's two-store completion
+does not save/set a dialog result like H32; teleport recursively synthesizes a
+hover event from screen coordinates and retains its global selection state.
+
+Runtime damage, chance and artifact order differs among direct, area, chain and
+mass spells. Area effects can consume repeated random checks for the same wide
+army before marking/checking the affected slot; chance queries in AI do not.
+Keep explicit SpellCastWorks versus SpellCastWorkChance, SpellType versus influence
+versus visual-effect domains, and each use of SPELL_NONE when applying damage.
+The current artifact routine is already a shared owner; do not duplicate or
+extend it while naming golem/elemental predicates.
+
+Visual/no-show guards do not enclose every later operation. Armageddon restores
+through palette pointers outside its guarded allocation block and invokes the
+last target pointer without an any-affected guard; ShowSpellMessage's unhandled
+creature branch can leave its local message unset. Neither is repaired here.
+Preserve byte palette narrowing, local/shared buffers, callback-sensitive update
+flags and cursor hide/show order. Shake tables and screen-copy row loops are
+local duplication with different scaling and casts, not a shared animation API.
+
+Bolt drawing deliberately makes a discarded Random draw, mixes Euclidean and
+Manhattan distances, preserves sin/cos and atan2 operand order, and writes signed
+palette indices. Branching iterates only the old bolt count, uses lastBranchX as
+a sentinel and has multiple different random streams/rounding stages. Several
+call-site angle-looking values occupy DoBolt's unused parameter slot; do not
+move them to forceAngle. Zero-distance/denominator and unsigned sentinel behavior
+is not replaced with a generic geometry policy.
+
+Ripple/vaporize modify shared row arrays and force quantity display false/true;
+they do not restore arbitrary old state. Mass effects animate before applying
+influences and have different death cleanup under no-show. Summoning chooses the
+last free slot in a rotated scan without checking blocked state; mirror searching
+is an ordered multi-part search, not the same slot allocator.
+
+Resurrection walks corpse entries after the match, repeatedly writes live identity,
+shifts side/index without an equivalent frame shift and decrements each processed
+cell count. Do not substitute a general remove/copy/reset helper. Earthquake
+unblocks cells while constructing prospective states, draws random delays for
+all impact slots and commits wall states at a later animation frame. A shared
+"destroy structure" helper would hide these timing and state-domain differences.
+
+## R22 — combat spell evaluation retains its own formulas and traversal
+
+DoSpellAI preserves repeated mana-cost calls, restricted spell membership and
+strict first-best ties. DetermineEffectOfSpell has separate global/area/army/
+summed target modes; its area scan stops at 0x2b, not the full hex range. Existing
+NextPos/FirstArmy/FirstResurrectable already name the AI traversal protocol;
+their inverted found/done return values and edge skips are not a generic iterator.
+
+Duration modifiers have an upper cap but no new lower cap; state can carry across
+iterations without an occupied target. Cure passes a hex value to a parameter
+used as an army index in the existing evaluator. EffectSpellCreateCreature uses
+creature type id times fightValue while its computed spellPower is unused.
+Do not reinterpret either as an invitation to reuse a normal stack-value helper.
+
+RawEffectSpellInfluence preserves Buka's positive disabling-spell coefficients,
+integer division before float conversion for some ratios, and target-side array
+access despite opposite-side loop counts. Cure accumulation can overwrite a
+previous negative score for a mirror and clears the positive accumulator in
+cure mode; its output signs and per-conversion rounding stay explicit.
+
+Damage estimation builds its area step by step with a different upper hex bound
+and golem/elemental order from runtime. It scales chance before reductions,
+uses a mirror lethal-damage surrogate and weights partial damage differently
+from killed-unit value. Preserve integer multiplication/division without algebraic
+cancellation, subsequent score narrowing and decisive/castle score branches.
+No shared damage formula, area-list builder or generic buff/debuff scoring macro
+is justified merely because spell names and some constants overlap.
+
+## H53 — set the next combat move target
+
+Disposition: credible two-store statement protocol shared by AI and army behavior.
+
+DoCompAI, DoLichShot, AttemptAttack, AttemptAdjacentAttack and the approach
+methods, plus GoBerserk in ARMY, write `giNextAction = ACTION_MOVE` followed by
+`giNextActionGridIndex = hex`. A proposed `SET_NEXT_COMBAT_MOVE(hex)` belongs
+at the COMMAND/X_GLOBAL action interface. Keep exactly that store order and
+evaluate the target expression once, after setting the action.
+
+Do not write action-extra or second-grid fields, assign the army's target side/
+index, call ValidPath, or hide a return/goto. Some callers set ACTION_MOVE before
+an intervening ValidAttack call or only reuse a previously selected grid index;
+those are not contiguous two-store instances. ACTION_MOVE can designate an
+occupied attack target as well as empty movement, so the helper must not validate
+or reinterpret the target.
+
+## H54 — begin a named army animation, favoring existing Wince
+
+Disposition: useful existing-API reuse plus a small generalization hypothesis.
+
+The complete `army::Wince` body sets `m_animationSequence = ARMY_ANIMATION_WINCE`
+then `m_animationFrame = 0`. ShowMassSpell repeats that exact pair; compare reuse
+of Wince before introducing another name. It is currently out of line, so a new
+call is not assumed byte-neutral.
+
+ARMY, FLY and SPELLS also repeat sequence-then-zero-frame pairs for STAND, DEATH
+and WINCE_RETURN. A small `StartAnimation(sequence)` member or statement macro
+at army.h could name those exact two stores if the expansion and readability
+benefit hold. Preserve the original sequence storage type and stable argument
+evaluation; keep pending animation, offsets, flags, sound, counters and drawing
+outside. Sites that select a sequence but deliberately keep/advance the frame
+are not instances. No generic animation state machine is proposed.
+
+## H55 — named lich and vampire base/upgrade pairs
+
+Disposition: additional credible two-type creature predicates, not upgrade inference.
+
+DoCompAI and army::SpecialAttack test lich then power lich for their specific
+shot behavior. army::LoadResources, DoAttack and FlyTo test vampire then vampire
+lord for extra samples, retaliation exemption or flight presentation. Small `IsLichCreature(type)` and
+`IsVampireCreature(type)` predicates beside the creature domain would name those
+exact pairs across TUs. Retain stable inputs, comparison order and the caller's
+surrounding conditions.
+
+Do not replace these with IsUndead, infer contiguous id ranges, or assume every
+base/upgrade pair shares every ability. The helper only names membership; splash
+damage, flight delays and first/last-leg precedence remain separate. Vampire-lord
+healing is a single-type test and must not be widened to the pair.
+Other repeated single-TU creature pairs are leads for later consumers, not yet
+additional confirmed shared families.
+
+## R23 — tactical AI masks, ranking and movement remain domain-specific
+
+The existing mask builders already name meaningful army sets. Their common loop
+is local and their filters differ: some omit quantity checks, mirror classification
+does not exclude disabled spells, and ability flags are not the IsAlive contract.
+Keep the shifted unsigned mask bit, signed mask input and loop bounds rather
+than replacing them with a generic filter/container or a living-army iterator.
+
+BestArmy halves strength for five spell states and uses a strict greater-than
+test starting at zero; WorstArmy does not use the same adjustment and has a
+different sentinel. ClosestArmy is distance-weighted hit-point ranking, not simply
+nearest geometry. Existing Strength calls are useful abstractions; don't replace
+type-id or differently typed/raw products elsewhere without checking the exact
+contract and evaluation. Remaining-hit-point capping in GetModLichDamage is local
+so far, not proof of a shared total-health helper.
+
+DoCompAI's priority calls, repeated fly branches, dead constant branch and
+post-selection adjacent-enemy rewrite remain explicit. Lich scoring uses its own
+local marked array, not the global affected-spell buffer; shooter and flyer bonuses
+can both apply. Target/side guards and unused calculations are not removed.
+
+Front-approach and enemy-approach temporarily increase speed but differ in target
+assignment, path modes, fallback calls and whether the last path element is walked.
+Restore the narrowed speed at the same point, retain moat stopping and preserve
+FindCombatPath calls even when a local result is unused. Do not unify both into
+a generic walk-until-range function.
+
+AICheckRetreat copies a hero before rewriting a five-slot army projection, performs
+explicit double/float and signed/unsigned conversions, and has integer divisions
+before float conversion. Group clearing uses type-then-count, like Dismiss, but
+projection, quantity estimation, base-artifact scoring and retreat probability
+are not a reusable reset/value macro. The later PHILAI implementation review is
+still needed before suggesting reuse of any broader battle-value algorithm.

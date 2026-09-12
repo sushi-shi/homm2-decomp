@@ -67,9 +67,9 @@ include/SOURCE/ADVMGR.h	149	0	1	read	7b9777229ae53954e735bd38d318f1392596f3e187b
 include/SOURCE/ADVMGR_TYPES.h	23	0	1	unread	6a06b6a52b2e2d0463956f6831813a88f15f2e37f5cfa97e92068613cb05c931	-
 include/SOURCE/ARMY.h	166	0	1	read	882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658	B13: complete animation/sample/spell/frame domains and packed SMonFrameInfo; no bodies
 include/SOURCE/CMBTMGR.h	18	0	1	read	9e2fc82b267ab2b69708140660f3ae6998f60f1ddfb2b4c14dbce6aaa2f9f43e	B14: complete combat tower origin/ValidHex/options API; no bodies
-include/SOURCE/COMMAND.h	44	0	1	unread	a852441f65690400de7c81809b11723e54e194f1f80ec79c4215b22ce04fea8c	-
+include/SOURCE/COMMAND.h	44	0	1	read	a852441f65690400de7c81809b11723e54e194f1f80ec79c4215b22ce04fea8c	B22: complete combat action domain, packed 25-byte remote packet and handler declarations; no bodies; H53
 include/SOURCE/CONFIG_TYPES.h	130	0	1	read	6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f	B10: complete packed graphics/config records and enum/storage contracts; H15; no bodies
-include/SOURCE/CURSOR.h	110	0	1	unread	8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916	-
+include/SOURCE/CURSOR.h	110	0	1	read	8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916	B22: complete cursor/movement/change domains, packed 11-byte SMapChange union and SendMapChange declaration; no bodies
 include/SOURCE/Campaign.h	78	0	1	unread	8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc	-
 include/SOURCE/Castle.h	22	0	1	unread	f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510	-
 include/SOURCE/EVENTS.h	331	0	3	unread	aa48042c559abec23312bf2709282ddcdbb1fcc4113360570182f8e556860cc0	-
@@ -86,10 +86,10 @@ include/SOURCE/Netbios.h	32	0	1	unread	2c468edde0d18b58224064925a9ad5ee338fd5a3b
 include/SOURCE/Newgame.h	50	0	1	unread	b67f046c7caa54d7411991e09d9d1c5aa0fd6d5a6a699e37508ac53fed5890c6	-
 include/SOURCE/Overview.h	42	0	1	unread	905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe	-
 include/SOURCE/PATH.h	9	0	1	read	c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2	B14: complete combat adjacency/opposite-direction declarations; no bodies
-include/SOURCE/PHILAI.h	115	0	2	unread	dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18	-
+include/SOURCE/PHILAI.h	115	0	2	read	dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
 include/SOURCE/RECRUIT.h	20	0	1	unread	0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e	-
 include/SOURCE/REMOTE.h	117	0	1	unread	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	-
-include/SOURCE/REMOTE_TYPES.h	68	0	1	unread	a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70	-
+include/SOURCE/REMOTE_TYPES.h	68	0	1	read	a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70	B22: complete network/remote/protocol domains and packed 34-byte player-info record; no bodies; implementations still unread
 include/SOURCE/REQUEST.h	83	0	1	unread	00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8	-
 include/SOURCE/SETUP.h	26	0	1	unread	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b	-
 include/SOURCE/SMACKMGR.h	71	0	1	unread	21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20	-
@@ -116,7 +116,7 @@ include/SOURCE/highScoreManager.h	64	0	1	unread	05f6eef027b0c761877a950c49ca0263
 include/SOURCE/kbwin.h	86	0	1	read	d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	136	0	1	unread	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27	-
 include/SOURCE/netwin_private.h	22	0	1	unread	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	-
-include/SOURCE/philAI.h	138	0	1	unread	3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c	-
+include/SOURCE/philAI.h	138	0	1	read	3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c	B21: complete philAI interface including FightValueOfStack and battle/interaction APIs; no bodies; implementation still unread
 include/SOURCE/playerData.h	109	8	1	read	95fbf9b9517844c3a72b20f0f6fd44ddee9a406e094737359abc43a4ff0c0449	B13: complete player/AI layout, signed id lists and eight accessors; H23; implementation in GAME still unread
 include/SOURCE/recruitUnit.h	51	0	1	unread	6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0	-
 include/SOURCE/searchArray.h	174	4	1	read	ad483f65ac7f0acc70696aa75651bb381b8494aa04b5f38756c2edf3870a981a	B14: complete queue/searchCell/searchNode/path union layouts and four existing accessors; H27/R16
@@ -179,7 +179,7 @@ src/BASE/miscwin.cpp	89	2	0	read	14d866b4c87c49c46eb75011803c8cfbc14b146d711c408
 src/BASE/soundmgr.cpp	537	22	1	read	3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750474a04b4d8231b0d26ca	B06: 22 bodies; both backend selection/failure/dispatch, full fade state machine; H07/H14; R08
 src/EDITOR/mapcell.cpp	264	11	0	read	11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f	B12: 11 bodies; allocation/extra chains/old-format read/write and both tile branches; R14
 src/SOURCE/ADVMGR.cpp	10885	95	8	unread	07da270722ada59c233a8fbf9567d07e2753ba0362924e4eb125f2203b93cc7c	-
-src/SOURCE/AI.cpp	1090	19	21	unread	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	-
+src/SOURCE/AI.cpp	1090	19	21	read	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
 src/SOURCE/ARMY.cpp	3674	47	18	read	5653eee7093d2efcf72493adcd5e376eed1507dd54326d707a2ff55e6e297bf6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMYGRP.cpp	282	14	0	read	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	B12: 14 bodies including strict SwapValues; full morale/slots/damage and conditional swaps; H20/R14
 src/SOURCE/CMBTMGR.cpp	2443	38	8	read	c6830fbba94e6a8da5c7564e4b9775d6485a668f54b63b851ff1d03ec7a26ab7	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
@@ -190,7 +190,7 @@ src/SOURCE/Castle.cpp	850	3	0	unread	9b224b9cf52512e737df8b570eee82e4d9c0f68d4cd
 src/SOURCE/DRAWING.cpp	1830	13	0	read	7937a64778bf5e55c878cb1f2c3eac6cd943b4adca8a69b60136e403aac1d23c	B17: all 13 bodies incl both CombatMessage overloads and complete DrawFrame/DrawSmallView; full message/grid/background/hero/wall/moat/mini-view ordering; H01/H20/H28/H34-H36/H41/H42/R19
 src/SOURCE/EVENTS.cpp	9078	43	8	unread	6f4b6007b9a64974ff4791c131495be3bb06d6b7c2d7b16a5512801ca40ca1a5	-
 src/SOURCE/FINDPATH.cpp	593	12	0	read	97adb74b82448236772fe96fb9c82fc224fabeb4be314a35f1f78e306fe87c52	B14: 12 bodies; storage, both priority queues, terrain/directions, combat path and moat lifetime; H24-H28/R16
-src/SOURCE/FLY.cpp	476	4	1	unread	119bad9ab6fdf5f1a43490feb68d0e1ce25e9acf134e39679c6cddcd28656fbf	-
+src/SOURCE/FLY.cpp	476	4	1	read	119bad9ab6fdf5f1a43490feb68d0e1ce25e9acf134e39679c6cddcd28656fbf	B18: all four bodies incl FlyTo overload; full fit/search/facing/occupancy/sound/animation/timer paths; H28/H34-H36/H41/H43/H44/R20
 src/SOURCE/GAME.cpp	8051	103	56	unread	e78a08b9b2fdc8ed202f8d5485c6aec6ff07630136ce9cb5257cc649bce616fb	-
 src/SOURCE/HERO.cpp	2131	41	1	read	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9	B13: all 41 bodies; full hero stats/spells/skills/level/deallocation and UI handlers/setup/splits; H01/H21-H23/R15
 src/SOURCE/HEXCELL.cpp	138	8	0	read	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	B12: 8 bodies; current/dead occupants, facing-dependent draws, tower parity and empty hooks; R14
@@ -209,8 +209,8 @@ src/SOURCE/REQUEST.cpp	1247	16	0	unread	98e7c3eaf83bdcf2243c626472133899853a5dd9
 src/SOURCE/SEARCH.cpp	393	2	0	read	377a8a734f66a97d602f4a134060e81ec90f16bfd32941403eb76ae9de1f0868	B14: both complete bodies and static SeedPositionState; adventure path/reseed/target/monster scans; H24-H27/R16
 src/SOURCE/SETUP.cpp	1184	23	0	unread	7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b0e962	-
 src/SOURCE/SMACKMGR.cpp	851	8	1	unread	a1eb2af13ac68e181d71fda6de78f61da3742d2e8bec5a82bb437c26c00c88c6	-
-src/SOURCE/SPELLAI.cpp	1479	11	19	unread	40c0bdeadb581158ae48cee719cec4c7c3d6e5090cf9efa371e9ba941bc7d0a5	-
-src/SOURCE/SPELLS.cpp	3918	37	28	unread	b339f7e92d3169ddcb1f10cffbd9b24a8ee69fc453a70c02403bb4e3dc94a85b	-
+src/SOURCE/SPELLAI.cpp	1479	11	19	read	40c0bdeadb581158ae48cee719cec4c7c3d6e5090cf9efa371e9ba941bc7d0a5	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLS.cpp	3918	37	28	read	b339f7e92d3169ddcb1f10cffbd9b24a8ee69fc453a70c02403bb4e3dc94a85b	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
 src/SOURCE/STRIP.cpp	255	8	0	unread	84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f	-
 src/SOURCE/SWAPMGR.cpp	1023	13	0	unread	ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473	-
 src/SOURCE/TOWN.cpp	218	9	0	read	02549ee9cb7ea6a2360bbb612b089138609f9ce240f1e2f498211a233e87934c	B12: 9 bodies; spell/building/garrison/view/conversion/player-list lifetime; H20/R14

@@ -139,9 +139,9 @@ include/SOURCE/ADVMGR.h	2	2	HOMM2_ADVMGR_H	read	c8bcf6dd92435680a2795a200457aa4c
 include/SOURCE/ADVMGR_TYPES.h	2	2	HOMM2_ADVMGR_TYPES_H	unread	0e37271748d344bc04cca630c0f06e22491ffd88f46733507641e0d7d08014c7	-
 include/SOURCE/ARMY.h	2	2	HOMM2_ARMY_H	read	0cb3b00e351425a8d681154977bed6dca2f988fc368bcca06c71876c7de75c6b	B13: complete animation/sample/spell/frame domains and packed SMonFrameInfo; no bodies
 include/SOURCE/CMBTMGR.h	2	2	HOMM2_CMBTMGR_H	read	a935f14ae9c2bbc081461c77ae80601a5dcc2d4c7612b2c57b5c4ea68ab337ef	B14: complete combat tower origin/ValidHex/options API; no bodies
-include/SOURCE/COMMAND.h	2	2	HOMM2_COMMAND_H	unread	fe8e1c82998153844804dd6d63ef9c163272cca34d8d930e84002c6739cb3d37	-
+include/SOURCE/COMMAND.h	2	2	HOMM2_COMMAND_H	read	fe8e1c82998153844804dd6d63ef9c163272cca34d8d930e84002c6739cb3d37	B22: complete combat action domain, packed 25-byte remote packet and handler declarations; no bodies; H53
 include/SOURCE/CONFIG_TYPES.h	2	2	HOMM2_SOURCE_CONFIG_TYPES_H	read	a95c8136dd77e79f93b44639a22f60bd2541c9ee1c266d10a70e58c33e7731f0	B10: complete packed graphics/config records and enum/storage contracts; H15; no bodies
-include/SOURCE/CURSOR.h	2	2	HOMM2_CURSOR_H	unread	b1e44a3464bcb4256e273752c4574360b4539f5d3b6e52f34ad340d440352462	-
+include/SOURCE/CURSOR.h	2	2	HOMM2_CURSOR_H	read	b1e44a3464bcb4256e273752c4574360b4539f5d3b6e52f34ad340d440352462	B22: complete cursor/movement/change domains, packed 11-byte SMapChange union and SendMapChange declaration; no bodies
 include/SOURCE/Campaign.h	2	2	HOMM2_CAMPAIGN_H	unread	52ba851438f5a9e7aa2a4934255b6f9f51a04a40bcea3ef90b8a1b494e59b6a1	-
 include/SOURCE/Castle.h	2	2	HOMM2_CASTLE_H	unread	7fa63445d5328b47e61e40dbf38fc4ec91623e74accc04586e72da4d6d0f720e	-
 include/SOURCE/EVENTS.h	2	2	HOMM2_EVENTS_H	unread	ffde25456c08c09d5fd2410c8b079c11d86ed4009109b81c94a2291ac40278bc	-
@@ -172,11 +172,11 @@ include/SOURCE/Netbios.h	2	2	HOMM2_NETBIOS_H	unread	c8997d3b68615d210c65082d7584
 include/SOURCE/Newgame.h	2	2	HOMM2_NEWGAME_H	unread	a691d41d2570833e3b31f0dd6d9518a360a26611cc85a0ed795e5c772f9c9991	-
 include/SOURCE/Overview.h	2	2	HOMM2_OVERVIEW_H	unread	aefbe29c4e8c2c0ab56f42a349c3711fafa2e3d5186ef1158febfbdcb74e3e43	-
 include/SOURCE/PATH.h	2	2	HOMM2_PATH_H	read	03de6bdbb6ade8f9c77e46845b18498bbd50b30336d116e8f3adf0bb6ed3c77c	B14: complete combat adjacency/opposite-direction declarations; no bodies
-include/SOURCE/PHILAI.h	2	2	HOMM2_PHILAI_TU_H	unread	7caa3be65b8e6a2cd324f61a075bdce189b41e967214300d666c0505446e207c	-
-include/SOURCE/PHILAI.h	59	59	AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER	unread	582ff4a893310ba556b8f3cee94a7e7c1aeb5cf466c400d8d0eeb071382982b0	-
+include/SOURCE/PHILAI.h	2	2	HOMM2_PHILAI_TU_H	read	7caa3be65b8e6a2cd324f61a075bdce189b41e967214300d666c0505446e207c	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
+include/SOURCE/PHILAI.h	59	59	AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER	read	582ff4a893310ba556b8f3cee94a7e7c1aeb5cf466c400d8d0eeb071382982b0	B21: complete purchase/battle/site domains and AI globals/declarations; no bodies; implementation still unread
 include/SOURCE/RECRUIT.h	2	2	HOMM2_RECRUIT_H	unread	07365e3fe60611f1b0900cc4bcb512f4b86b7a49012cf6d374166d465ebd4be8	-
 include/SOURCE/REMOTE.h	2	2	HOMM2_REMOTE_H	unread	e13000ce34cfa9ed6b70d65d4523eb658b4decd909bc4f4b8b5daf8b493fb5d4	-
-include/SOURCE/REMOTE_TYPES.h	2	2	HOMM2_REMOTE_TYPES_H	unread	4b7397ca4043ecd774fcdc144f3c5e153f09806cd557248111e301b10f9c7787	-
+include/SOURCE/REMOTE_TYPES.h	2	2	HOMM2_REMOTE_TYPES_H	read	4b7397ca4043ecd774fcdc144f3c5e153f09806cd557248111e301b10f9c7787	B22: complete network/remote/protocol domains and packed 34-byte player-info record; no bodies; implementations still unread
 include/SOURCE/REQUEST.h	2	2	HOMM2_REQUEST_H	unread	e28f1389b3857121e654145e7b559c03d5c71382bb6cbd9b24470906d4407011	-
 include/SOURCE/SETUP.h	2	2	HOMM2_SETUP_H	unread	59bcb0b1263be6c28d9c3fd2855aedf06ecf3783c5514534801a970fb50f64bb	-
 include/SOURCE/SMACKMGR.h	2	2	HOMM2_SMACKMGR_H	unread	0dd136bea987eb580affaea86f6c302e4ac82b0ae741029dfee2f2e4bff91d0a	-
@@ -211,7 +211,7 @@ include/SOURCE/highScoreManager.h	2	2	HOMM2_SOURCE_HIGHSCOREMANAGER_H	unread	2e7
 include/SOURCE/kbwin.h	2	2	HOMM2_KBWIN_H	read	aa2547e812f662b3a86b6a256f9ff1148b3e1f52d96a548f9ef514cb051de6b2	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	2	2	HOMM2_NETWIN_H	unread	0eafab4a7dfbb199a721b79e2f7f7c399f45076ef6264d47d909f524b1997949	-
 include/SOURCE/netwin_private.h	2	2	HOMM2_NETWIN_PRIVATE_H	unread	0e9ffbea2eebb74b79420e253b1bfedc24f538d44ec69db92b63c313186d1f60	-
-include/SOURCE/philAI.h	2	2	HOMM2_SOURCE_PHILAI_H	unread	d138d4e105b517ef543c6b89bbb402862daa844e2e80fa9f46ca6e6827af16e2	-
+include/SOURCE/philAI.h	2	2	HOMM2_SOURCE_PHILAI_H	read	d138d4e105b517ef543c6b89bbb402862daa844e2e80fa9f46ca6e6827af16e2	B21: complete philAI interface including FightValueOfStack and battle/interaction APIs; no bodies; implementation still unread
 include/SOURCE/playerData.h	2	2	HOMM2_SOURCE_PLAYERDATA_H	read	261d92851be5d7aec9b1c249dccafcb19b05130f745a29daa60cedf1d31fde9c	B13: complete player/AI layout, signed id lists and eight accessors; H23; implementation in GAME still unread
 include/SOURCE/recruitUnit.h	2	2	HOMM2_SOURCE_RECRUITUNIT_H	unread	e768ce998ef02d410e6f7e96feff3b44a177efbc7f46756eec66f9d314630e79	-
 include/SOURCE/searchArray.h	2	2	HOMM2_SOURCE_SEARCHARRAY_H	read	4335505ea737a50fdd6c0db023b46ea1cf5a16eccd02f427eecde9cc420e0e90	B14: complete queue/searchCell/searchNode/path union layouts and four existing accessors; H27/R16
@@ -319,27 +319,27 @@ src/SOURCE/ADVMGR.cpp	970	971	ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE	unread	d5e6
 src/SOURCE/ADVMGR.cpp	972	973	ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE	unread	ea54b2f586b54573b2593d72446b9cde8d49ae120f291bee84875da0e0b60be9	-
 src/SOURCE/ADVMGR.cpp	974	974	ADVMGR_REMOTE_PAYLOAD	unread	a69a6874877abd647f98cc2674acdafab1ff3007ff4aa0051f2cd272e8da1fc5	-
 src/SOURCE/ADVMGR.cpp	978	978	ADVMGR_VISIBILITY_AT	unread	a06e51ea4f4332ff8fabc4fce09b7ce79fc26b59596117912aa36b11c8313b92	-
-src/SOURCE/AI.cpp	18	18	COMBAT_AI_QUANTITY_ESTIMATE	unread	747fbdcb6d2e1f814e933b3a1d6afe0b995aafdc7bb0b4964478c23c002f366e	-
-src/SOURCE/AI.cpp	19	19	COMBAT_AI_TOWN_STRENGTH_MODIFIER	unread	1aeda0c75cd8f033294c6386d412e4ec1c1f45366cd980cb1d82578562b6d007	-
-src/SOURCE/AI.cpp	20	20	COMBAT_AI_BASE_RETREAT_CHANCE	unread	0fe150ec0054bdc2851077bac40d8e6da183157805643bd8e21386a03c4b6244	-
-src/SOURCE/AI.cpp	21	21	COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE	unread	164edf29d71768abd2bd5f8aa5f21f234075c5b54305bab58164202b0ed960bb	-
-src/SOURCE/AI.cpp	22	22	COMBAT_AI_MAX_RETREAT_CHANCE	unread	c6a5132d29183fe78bb3b4a6f81cf4f580b511416fa108b76b5ab074f30af8ef	-
-src/SOURCE/AI.cpp	23	23	COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS	unread	4688064f837507ff65cb505c68b5bd380fd6df3024438cc5fe725ca50aae4d9b	-
-src/SOURCE/AI.cpp	24	25	COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS	unread	45dde838b1f4962e110b415920ad67df25b9bdd386a785c79ace25de58716c90	-
-src/SOURCE/AI.cpp	26	27	COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS	unread	07fe86fa6a870c74eda6f7dac17c73d7507bcbeba2fa35bf1010e556176698c7	-
-src/SOURCE/AI.cpp	28	29	COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY	unread	b1750754c9ed6e25fc947fcb6cf7b1d828f11092a09fa8ac0a6e2c1fedd2d03f	-
-src/SOURCE/AI.cpp	30	30	COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY	unread	701abbe11efd7bffb72020d09e4509de3b863a6829df2d2269467b0c286ac311	-
-src/SOURCE/AI.cpp	31	31	COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY	unread	56b0ed983d347cf009179662b16247af9a8d0eb2ef99bcfa44dc39c2761a1bff	-
-src/SOURCE/AI.cpp	32	33	COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY	unread	1a4cd77e245d8024f657b97649efeb259941c74e4b69ee1b99261b25d93a6666	-
-src/SOURCE/AI.cpp	34	34	COMBAT_AI_DIFFICULTY_RETREAT_STEP	unread	8dfec30d903e318acdac03887db623ba2cfa6b9c4c2f6bcfead77f8042574d29	-
-src/SOURCE/AI.cpp	35	35	COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE	unread	bb75e53706d29e64df07d0c2e4ddfdb2a7bcac94ddcc468fb9fb87eb66a58076	-
-src/SOURCE/AI.cpp	36	36	COMBAT_AI_MAX_EXPERIENCE_BONUS	unread	c0a949257577d84b13bec22df135601bad6a95693039b63095e00e5a3111e40b	-
-src/SOURCE/AI.cpp	37	37	COMBAT_AI_ATTACKER_RETREAT_PENALTY	unread	323b3bd3433be17f1d8fdfc96a05b2a0507cdcfcc87f8dcae0a26dbcedc29082	-
-src/SOURCE/AI.cpp	38	38	COMBAT_AI_TOWER_LEVEL_SCALE	unread	5d1acc4112a81b97d7cc51205c956dd4a855d95f12a4da059b37d6f9e40cad2c	-
-src/SOURCE/AI.cpp	39	39	COMBAT_AI_TOWER_BASE_SCALE	unread	c7078f78d2e1c8d6a3686bdbc7b6dc1d02734396dca45ae298148b3507955c22	-
-src/SOURCE/AI.cpp	40	40	COMBAT_AI_LICH_PRIORITY_MULTIPLIER	unread	1973c44098d5b7ce5f36d9e4ce52ccbff06136f9b7889d148ee70a59d0c43989	-
-src/SOURCE/AI.cpp	41	41	COMBAT_AI_LICH_HIT_POINT_SCALE	unread	d909fe5a3e6bf50d8ad7296c4ad9f716d260b063df49a209623979d21f0bf362	-
-src/SOURCE/AI.cpp	42	43	COMBAT_AI_MIN_LICH_DAMAGE_SCORE	unread	5d9528f1ba8b558a407a69b1385c0becd6e0375c01bdc02e723d6e95a1a5790c	-
+src/SOURCE/AI.cpp	18	18	COMBAT_AI_QUANTITY_ESTIMATE	read	747fbdcb6d2e1f814e933b3a1d6afe0b995aafdc7bb0b4964478c23c002f366e	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	19	19	COMBAT_AI_TOWN_STRENGTH_MODIFIER	read	1aeda0c75cd8f033294c6386d412e4ec1c1f45366cd980cb1d82578562b6d007	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	20	20	COMBAT_AI_BASE_RETREAT_CHANCE	read	0fe150ec0054bdc2851077bac40d8e6da183157805643bd8e21386a03c4b6244	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	21	21	COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE	read	164edf29d71768abd2bd5f8aa5f21f234075c5b54305bab58164202b0ed960bb	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	22	22	COMBAT_AI_MAX_RETREAT_CHANCE	read	c6a5132d29183fe78bb3b4a6f81cf4f580b511416fa108b76b5ab074f30af8ef	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	23	23	COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS	read	4688064f837507ff65cb505c68b5bd380fd6df3024438cc5fe725ca50aae4d9b	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	24	25	COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS	read	45dde838b1f4962e110b415920ad67df25b9bdd386a785c79ace25de58716c90	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	26	27	COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS	read	07fe86fa6a870c74eda6f7dac17c73d7507bcbeba2fa35bf1010e556176698c7	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	28	29	COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY	read	b1750754c9ed6e25fc947fcb6cf7b1d828f11092a09fa8ac0a6e2c1fedd2d03f	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	30	30	COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY	read	701abbe11efd7bffb72020d09e4509de3b863a6829df2d2269467b0c286ac311	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	31	31	COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY	read	56b0ed983d347cf009179662b16247af9a8d0eb2ef99bcfa44dc39c2761a1bff	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	32	33	COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY	read	1a4cd77e245d8024f657b97649efeb259941c74e4b69ee1b99261b25d93a6666	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	34	34	COMBAT_AI_DIFFICULTY_RETREAT_STEP	read	8dfec30d903e318acdac03887db623ba2cfa6b9c4c2f6bcfead77f8042574d29	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	35	35	COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE	read	bb75e53706d29e64df07d0c2e4ddfdb2a7bcac94ddcc468fb9fb87eb66a58076	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	36	36	COMBAT_AI_MAX_EXPERIENCE_BONUS	read	c0a949257577d84b13bec22df135601bad6a95693039b63095e00e5a3111e40b	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	37	37	COMBAT_AI_ATTACKER_RETREAT_PENALTY	read	323b3bd3433be17f1d8fdfc96a05b2a0507cdcfcc87f8dcae0a26dbcedc29082	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	38	38	COMBAT_AI_TOWER_LEVEL_SCALE	read	5d1acc4112a81b97d7cc51205c956dd4a855d95f12a4da059b37d6f9e40cad2c	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	39	39	COMBAT_AI_TOWER_BASE_SCALE	read	c7078f78d2e1c8d6a3686bdbc7b6dc1d02734396dca45ae298148b3507955c22	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	40	40	COMBAT_AI_LICH_PRIORITY_MULTIPLIER	read	1973c44098d5b7ce5f36d9e4ce52ccbff06136f9b7889d148ee70a59d0c43989	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	41	41	COMBAT_AI_LICH_HIT_POINT_SCALE	read	d909fe5a3e6bf50d8ad7296c4ad9f716d260b063df49a209623979d21f0bf362	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
+src/SOURCE/AI.cpp	42	43	COMBAT_AI_MIN_LICH_DAMAGE_SCORE	read	5d9528f1ba8b558a407a69b1385c0becd6e0375c01bdc02e723d6e95a1a5790c	B21: all nineteen bodies; full retreat/strategy/lich scoring/masks/target ranking/approach paths; H21/H28/H39/H49/H50/H53/H55/R23
 src/SOURCE/ARMY.cpp	29	29	ARMY_HASTE_WALK_DURATION_SCALE	read	0e550bc559637beaf4af1596352cb4730ec383f40218f5f06be6d15ac1edb1ab	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMY.cpp	30	30	ARMY_SLOW_WALK_DURATION_SCALE	read	96b362b825abe5072e9cc3702911426542ce49e093cc44b0b234d818a9f2f0c6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMY.cpp	31	32	ARMY_PROJECTILE_PI	read	9a394ce960b5c9357361b7535afbccf197df49aff2f09eea10622dce9eac2175	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
@@ -389,7 +389,7 @@ src/SOURCE/EVENTS.cpp	339	339	EVENTS_REMOTE_MESSAGE	unread	44ac28ed0efb36ce37bd6
 src/SOURCE/EVENTS.cpp	340	341	EVENTS_REMOTE_COMBAT	unread	922098ecb63284796b23b157d78a552b14e4cb75a572c9da3c4d80ba35e8258a	-
 src/SOURCE/EVENTS.cpp	342	343	EVENTS_REMOTE_HERO	unread	1dc7a0583eff431b2433895034d1e68ad93804741265adb444892253273e76e1	-
 src/SOURCE/EVENTS.cpp	344	344	EVENTS_HERO_BUFFER	unread	87dc0b121b1fd739c1b218eb6f33057c5f0ebea2c26258030f131b29209cf643	-
-src/SOURCE/FLY.cpp	16	17	ARMY_VAMPIRE_FLIGHT_DURATION_SCALE	unread	87502ee71299dfbc754f9853d90eefe50f0a0efa1d6fce577eee237c49d8918f	-
+src/SOURCE/FLY.cpp	16	17	ARMY_VAMPIRE_FLIGHT_DURATION_SCALE	read	87502ee71299dfbc754f9853d90eefe50f0a0efa1d6fce577eee237c49d8918f	B18: all four bodies incl FlyTo overload; full fit/search/facing/occupancy/sound/animation/timer paths; H28/H34-H36/H41/H43/H44/R20
 src/SOURCE/GAME.cpp	49	49	GAME_SCORE_EXTRA_LARGE_DAY_SCALE	unread	c386dd4f6b42f91ad573df51166dfc9d4ed0ddc1803cfb641cd6960d8f085d5f	-
 src/SOURCE/GAME.cpp	50	51	GAME_SCORE_LARGE_DAY_SCALE	unread	b83d5518f49e7a55f70cab9872cc8f7efb0fe1800029f54525b15b3e3c17f212	-
 src/SOURCE/GAME.cpp	52	52	GAME_SCORE_MEDIUM_DAY_SCALE	unread	bf2389261ce013cf0bc2face4da6e68804e17bd4f9a198938bd3dd4df4de0ac2	-
@@ -680,53 +680,53 @@ src/SOURCE/REMOTE.cpp	42	42	REMOTE_PACKET	unread	03c26936587743bea6c38334b7647ea
 src/SOURCE/REMOTE.cpp	43	43	REMOTE_MESSAGE	unread	60f47c81a82b2bb044d21138f3c2adf3564e537d8f97c52fa5d7cd97cf20d5d8	-
 src/SOURCE/REMOTE.cpp	44	44	REMOTE_PLAYER_INFO	unread	f873e9a6420cc6a7d59d16d9d779375e7184cfc375fc01dae058f5e8fb9f8607	-
 src/SOURCE/SMACKMGR.cpp	695	697	LOG_SUMMARY_VALUE	unread	1af08c0d545e9ec61116d9a9a4c3b349af0887aea9e2ae13d2159269ca5c8396	-
-src/SOURCE/SPELLAI.cpp	8	8	COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER	unread	f2a0e2df20c79c104ba95c6d5949afe02e6c5b0839c29044d3b794be8ee46483	-
-src/SOURCE/SPELLAI.cpp	9	9	COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER	unread	a46d56f8aef732f58529d2e584c2bd3f8a8d7be7e5ed0e6413482efb2d353820	-
-src/SOURCE/SPELLAI.cpp	23	23	COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER	unread	878146bfab8080830dcf618666064c9abaf678bdb818d60c456a2e8ceabe9004	-
-src/SOURCE/SPELLAI.cpp	24	24	COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE	unread	8ab842dfb1d4ca45cace4a91acee78f6d1aa199c20fcd62d5d85fc6f8530b2b2	-
-src/SOURCE/SPELLAI.cpp	25	25	COMBAT_SPELL_AI_MIRROR_POWER_ONE_MODIFIER	unread	8562fc6d6b93aa1936f7a219b979f967184f77e106d9712e3f3ab114e0696774	-
-src/SOURCE/SPELLAI.cpp	26	26	COMBAT_SPELL_AI_MIRROR_POWER_TWO_MODIFIER	unread	6be45225707a354d228597a9f73bdf42f6b54ac57e4e8b85e6c403dc017ad5af	-
-src/SOURCE/SPELLAI.cpp	27	27	COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER	unread	de8bb8bba2a3a31954eda95cc3f0ba699b307244199e2d38c0009ca58e4ffe16	-
-src/SOURCE/SPELLAI.cpp	28	28	COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER	unread	5f6ca02b65e44f8f0abb89d6abf8d22f3b5170bde8e512dfed0ea8c744add750	-
-src/SOURCE/SPELLAI.cpp	29	29	COMBAT_SPELL_AI_TURN_CAP	unread	9fc5826d985739d78bc15816a744536e1350ec81fd81b508e7057810bacc9163	-
-src/SOURCE/SPELLAI.cpp	30	30	COMBAT_SPELL_AI_TURN_DIVISOR	unread	3e82cdff6a8605166c6831f8dac4c5c7e95aecad45e403ac8537b0029750b1eb	-
-src/SOURCE/SPELLAI.cpp	31	31	COMBAT_SPELL_AI_ZERO_EFFECT	unread	e331603dbd48c69b1f8f25c325ab16e49f11a8ed5987079b23fed34fe112e1c4	-
-src/SOURCE/SPELLAI.cpp	32	32	COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER	unread	23917a77d5e9ca4207572c1f654c735c76c657c0b09e983941576d8c87ab7aba	-
-src/SOURCE/SPELLAI.cpp	33	33	COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER	unread	e282cab81eca4974ab0a5a90f5d894f3fe2bb7a4b193d1a111bf80342e5f26df	-
-src/SOURCE/SPELLAI.cpp	34	34	COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS	unread	c6ab40db69e17cfb9eafefa3c9055a8bda9c52d94b44131c78d8955fe413d87d	-
-src/SOURCE/SPELLAI.cpp	35	35	COMBAT_SPELL_AI_CURE_VALUE_MODIFIER	unread	abb1d8de03efcd991c2b3dbf1f0e9b7b4a7ffe3de0e861d6839376165744c481	-
-src/SOURCE/SPELLAI.cpp	36	36	COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER	unread	c70f6e9b7590dd534f5e08c826c0a14a17437c0de17dbaff23142e47e10efcfa	-
-src/SOURCE/SPELLAI.cpp	37	37	COMBAT_SPELL_AI_PARTIAL_DAMAGE_MODIFIER	unread	90e3e99f3d17440945a13ec3f97f2ab25d34310d9546c01385ab736a31fb8ed0	-
-src/SOURCE/SPELLAI.cpp	38	38	COMBAT_SPELL_AI_DISRUPTING_RAY_MODIFIER	unread	68804cd6a3c3ff2577cc2b751e3cf7409f1b83a6fd49de1469c963be2ee7969b	-
-src/SOURCE/SPELLAI.cpp	39	39	COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER	unread	53e4ecceefa6e9fd4eec40341939c56d76e7e5264b96f7c929fe7fefd1ab7d6f	-
-src/SOURCE/SPELLS.cpp	30	30	RIPPLE_MODE_ZERO_AMPLITUDE_BASE	unread	b5413754321524d7cbd617792f4fc4ab1477b3f110e0ddad1ed17bd91d4b634f	-
-src/SOURCE/SPELLS.cpp	31	31	RIPPLE_MODE_ZERO_AMPLITUDE_STEP	unread	e2512a6eb0e1189af780bc52a0def19250a064fab5c9445b9321ff4c73e409b5	-
-src/SOURCE/SPELLS.cpp	32	32	RIPPLE_OTHER_AMPLITUDE_BASE	unread	9d2065ab34b829aef765fa320f1aeda2c80cfd0a7169f4130ec8a09df17a764d	-
-src/SOURCE/SPELLS.cpp	33	33	RIPPLE_OTHER_AMPLITUDE_STEP	unread	6130084315a381806a693b0f6b333b5bd89b732a7bd5e0daa9d102548456c762	-
-src/SOURCE/SPELLS.cpp	34	34	SPELL_VANISH_END_DELAY	unread	2614b0142888a6036a1f5cfba2887b17785ef708e86342599251995a8ce81ce0	-
-src/SOURCE/SPELLS.cpp	35	35	CHAIN_LIGHTNING_FRAME_DELAY	unread	afc48f9f41251a440e0421ca64e3d5e2c67d62b20a81ddf3f2d0df4f51690dee	-
-src/SOURCE/SPELLS.cpp	36	36	MIRROR_SLIDE_FRAME_DELAY	unread	491a98a2c3e13aa1cc46247d13c8c80b72578fb10eb55077f784149889c47908	-
-src/SOURCE/SPELLS.cpp	37	37	BLAST_FRAME_DELAY	unread	abf1ae4d41e17558ee6502765eca8a5ded65babf527af944875d86a0148ab77b	-
-src/SOURCE/SPELLS.cpp	38	38	SPELL_COLD_RAY_DELAY	unread	66cf1b7a583496f573931d25aad6b63972c545d217410d3ecc0ad73d3ff705be	-
-src/SOURCE/SPELLS.cpp	39	39	SPELL_MAGIC_ARROW_DELAY	unread	610bff3a35892d89250e37cb41354c480035e4f415c14d1bc1b585f2633ddca0	-
-src/SOURCE/SPELLS.cpp	40	40	SPELL_AREA_ANIMATION_DELAY	unread	899be32ee87b08647d293ff44feb1f14c75793ee84e4ca268f605a7a125dfae3	-
-src/SOURCE/SPELLS.cpp	41	41	SPELL_METEOR_ANIMATION_DELAY	unread	7cc764e4913044475640c5c8e93760b130214119e6913da90fe57029842ca0ba	-
-src/SOURCE/SPELLS.cpp	42	42	SPELL_ARMAGEDDON_PALETTE_DELAY	unread	3a621853fa2cb3f758a995a7a703ff208dc83834b543539ef9742f9e630cf995	-
-src/SOURCE/SPELLS.cpp	43	43	SPELL_ARMAGEDDON_SHAKE_DELAY	unread	b261faf063f5cb5b0f8473bb9fe9856e1dcdee461efc4defac37d80f9e8af5f0	-
-src/SOURCE/SPELLS.cpp	44	44	SPELL_ARMAGEDDON_SHAKE_SCALE	unread	59f5df505dbd724b4b85b14475f12c6882fa55c3c127d0714363b28f8165e90a	-
-src/SOURCE/SPELLS.cpp	45	45	SPELL_ARTIFACT_DAMAGE_BONUS	unread	fd9438d24681d9980ca72abfbbdf60c21e2affad21e9eaa5f05f5e96818a177f	-
-src/SOURCE/SPELLS.cpp	46	46	SPELL_ARTIFACT_DAMAGE_REDUCTION	unread	e8664999bbe584e4b634eed9d979b8c9d29723de18e2d2d1f57125780bccdf6e	-
-src/SOURCE/SPELLS.cpp	47	47	BOLT_INITIAL_ANGLE_BIAS	unread	f16700e99db0cad4822f1b9cd5ddb25bfcd6b8cb1fba309eca2817965732dcbf	-
-src/SOURCE/SPELLS.cpp	48	48	BOLT_INITIAL_ANGLE_DIVISOR	unread	c67a7d627ac9b404d0589a8c67f29f9b375e1fb5934000bbd8230fab19d5cf2f	-
-src/SOURCE/SPELLS.cpp	49	49	BOLT_RANDOM_ANGLE_BIAS	unread	33d895e6d4b1c5edb3dd4eda80d12772fe6b576fc1b2c2edc204044a9d58a0e7	-
-src/SOURCE/SPELLS.cpp	50	50	BOLT_RANDOM_ANGLE_DIVISOR	unread	bc34f5001d21f626f74fabbfd47e318c5b33d79d106cdd3407ff499bad3e2075	-
-src/SOURCE/SPELLS.cpp	51	51	BOLT_ANGLE_DISTANCE_FACTOR	unread	41cdfe5bb7b634e5148a24315a327ea50b8e4be21b2c8dc14a6b2a4927f5133e	-
-src/SOURCE/SPELLS.cpp	52	52	BOLT_BRANCH_COOLDOWN_FACTOR	unread	50d6268f4ee99203b57f8220c2fdb891e380a3bf8225d24901ab6192b714cadb	-
-src/SOURCE/SPELLS.cpp	53	53	BOLT_CHILD_ANGLE_SCALE	unread	5cb36b2a808879bf7367b741cb657584ac715c1ceeeb9edb79bd2499cf1e0ffe	-
-src/SOURCE/SPELLS.cpp	54	54	BOLT_CHILD_ANGLE_OFFSET	unread	4d2585e5f576bf0fd2d6c4df5771d8cc11e5eeba363dc9a322b2a8a40b83d5db	-
-src/SOURCE/SPELLS.cpp	55	55	BOLT_CHILD_MIN_ANGLE_OFFSET	unread	0ad8d33c338ffca74ef5f5f9cac8875ef5fecd70324ca9db5fde8caa2464ffd1	-
-src/SOURCE/SPELLS.cpp	159	159	RIPPLE_WAVE_CENTER	unread	e13da6008d9e7902e7fbd1da3b4c867c6bfe19d5755ca6e9d357d69956297d33	-
-src/SOURCE/SPELLS.cpp	160	160	RIPPLE_WAVE_RANGE	unread	fc5333fa8652ed966ab79b2d249d6b58a63dfd1b60fe1461dad9570c3aec7508	-
+src/SOURCE/SPELLAI.cpp	8	8	COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER	read	f2a0e2df20c79c104ba95c6d5949afe02e6c5b0839c29044d3b794be8ee46483	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	9	9	COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER	read	a46d56f8aef732f58529d2e584c2bd3f8a8d7be7e5ed0e6413482efb2d353820	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	23	23	COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER	read	878146bfab8080830dcf618666064c9abaf678bdb818d60c456a2e8ceabe9004	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	24	24	COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE	read	8ab842dfb1d4ca45cace4a91acee78f6d1aa199c20fcd62d5d85fc6f8530b2b2	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	25	25	COMBAT_SPELL_AI_MIRROR_POWER_ONE_MODIFIER	read	8562fc6d6b93aa1936f7a219b979f967184f77e106d9712e3f3ab114e0696774	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	26	26	COMBAT_SPELL_AI_MIRROR_POWER_TWO_MODIFIER	read	6be45225707a354d228597a9f73bdf42f6b54ac57e4e8b85e6c403dc017ad5af	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	27	27	COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER	read	de8bb8bba2a3a31954eda95cc3f0ba699b307244199e2d38c0009ca58e4ffe16	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	28	28	COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER	read	5f6ca02b65e44f8f0abb89d6abf8d22f3b5170bde8e512dfed0ea8c744add750	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	29	29	COMBAT_SPELL_AI_TURN_CAP	read	9fc5826d985739d78bc15816a744536e1350ec81fd81b508e7057810bacc9163	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	30	30	COMBAT_SPELL_AI_TURN_DIVISOR	read	3e82cdff6a8605166c6831f8dac4c5c7e95aecad45e403ac8537b0029750b1eb	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	31	31	COMBAT_SPELL_AI_ZERO_EFFECT	read	e331603dbd48c69b1f8f25c325ab16e49f11a8ed5987079b23fed34fe112e1c4	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	32	32	COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER	read	23917a77d5e9ca4207572c1f654c735c76c657c0b09e983941576d8c87ab7aba	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	33	33	COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER	read	e282cab81eca4974ab0a5a90f5d894f3fe2bb7a4b193d1a111bf80342e5f26df	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	34	34	COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS	read	c6ab40db69e17cfb9eafefa3c9055a8bda9c52d94b44131c78d8955fe413d87d	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	35	35	COMBAT_SPELL_AI_CURE_VALUE_MODIFIER	read	abb1d8de03efcd991c2b3dbf1f0e9b7b4a7ffe3de0e861d6839376165744c481	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	36	36	COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER	read	c70f6e9b7590dd534f5e08c826c0a14a17437c0de17dbaff23142e47e10efcfa	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	37	37	COMBAT_SPELL_AI_PARTIAL_DAMAGE_MODIFIER	read	90e3e99f3d17440945a13ec3f97f2ab25d34310d9546c01385ab736a31fb8ed0	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	38	38	COMBAT_SPELL_AI_DISRUPTING_RAY_MODIFIER	read	68804cd6a3c3ff2577cc2b751e3cf7409f1b83a6fd49de1469c963be2ee7969b	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLAI.cpp	39	39	COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER	read	53e4ecceefa6e9fd4eec40341939c56d76e7e5264b96f7c929fe7fefd1ab7d6f	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
+src/SOURCE/SPELLS.cpp	30	30	RIPPLE_MODE_ZERO_AMPLITUDE_BASE	read	b5413754321524d7cbd617792f4fc4ab1477b3f110e0ddad1ed17bd91d4b634f	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	31	31	RIPPLE_MODE_ZERO_AMPLITUDE_STEP	read	e2512a6eb0e1189af780bc52a0def19250a064fab5c9445b9321ff4c73e409b5	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	32	32	RIPPLE_OTHER_AMPLITUDE_BASE	read	9d2065ab34b829aef765fa320f1aeda2c80cfd0a7169f4130ec8a09df17a764d	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	33	33	RIPPLE_OTHER_AMPLITUDE_STEP	read	6130084315a381806a693b0f6b333b5bd89b732a7bd5e0daa9d102548456c762	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	34	34	SPELL_VANISH_END_DELAY	read	2614b0142888a6036a1f5cfba2887b17785ef708e86342599251995a8ce81ce0	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	35	35	CHAIN_LIGHTNING_FRAME_DELAY	read	afc48f9f41251a440e0421ca64e3d5e2c67d62b20a81ddf3f2d0df4f51690dee	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	36	36	MIRROR_SLIDE_FRAME_DELAY	read	491a98a2c3e13aa1cc46247d13c8c80b72578fb10eb55077f784149889c47908	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	37	37	BLAST_FRAME_DELAY	read	abf1ae4d41e17558ee6502765eca8a5ded65babf527af944875d86a0148ab77b	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	38	38	SPELL_COLD_RAY_DELAY	read	66cf1b7a583496f573931d25aad6b63972c545d217410d3ecc0ad73d3ff705be	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	39	39	SPELL_MAGIC_ARROW_DELAY	read	610bff3a35892d89250e37cb41354c480035e4f415c14d1bc1b585f2633ddca0	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	40	40	SPELL_AREA_ANIMATION_DELAY	read	899be32ee87b08647d293ff44feb1f14c75793ee84e4ca268f605a7a125dfae3	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	41	41	SPELL_METEOR_ANIMATION_DELAY	read	7cc764e4913044475640c5c8e93760b130214119e6913da90fe57029842ca0ba	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	42	42	SPELL_ARMAGEDDON_PALETTE_DELAY	read	3a621853fa2cb3f758a995a7a703ff208dc83834b543539ef9742f9e630cf995	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	43	43	SPELL_ARMAGEDDON_SHAKE_DELAY	read	b261faf063f5cb5b0f8473bb9fe9856e1dcdee461efc4defac37d80f9e8af5f0	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	44	44	SPELL_ARMAGEDDON_SHAKE_SCALE	read	59f5df505dbd724b4b85b14475f12c6882fa55c3c127d0714363b28f8165e90a	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	45	45	SPELL_ARTIFACT_DAMAGE_BONUS	read	fd9438d24681d9980ca72abfbbdf60c21e2affad21e9eaa5f05f5e96818a177f	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	46	46	SPELL_ARTIFACT_DAMAGE_REDUCTION	read	e8664999bbe584e4b634eed9d979b8c9d29723de18e2d2d1f57125780bccdf6e	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	47	47	BOLT_INITIAL_ANGLE_BIAS	read	f16700e99db0cad4822f1b9cd5ddb25bfcd6b8cb1fba309eca2817965732dcbf	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	48	48	BOLT_INITIAL_ANGLE_DIVISOR	read	c67a7d627ac9b404d0589a8c67f29f9b375e1fb5934000bbd8230fab19d5cf2f	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	49	49	BOLT_RANDOM_ANGLE_BIAS	read	33d895e6d4b1c5edb3dd4eda80d12772fe6b576fc1b2c2edc204044a9d58a0e7	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	50	50	BOLT_RANDOM_ANGLE_DIVISOR	read	bc34f5001d21f626f74fabbfd47e318c5b33d79d106cdd3407ff499bad3e2075	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	51	51	BOLT_ANGLE_DISTANCE_FACTOR	read	41cdfe5bb7b634e5148a24315a327ea50b8e4be21b2c8dc14a6b2a4927f5133e	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	52	52	BOLT_BRANCH_COOLDOWN_FACTOR	read	50d6268f4ee99203b57f8220c2fdb891e380a3bf8225d24901ab6192b714cadb	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	53	53	BOLT_CHILD_ANGLE_SCALE	read	5cb36b2a808879bf7367b741cb657584ac715c1ceeeb9edb79bd2499cf1e0ffe	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	54	54	BOLT_CHILD_ANGLE_OFFSET	read	4d2585e5f576bf0fd2d6c4df5771d8cc11e5eeba363dc9a322b2a8a40b83d5db	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	55	55	BOLT_CHILD_MIN_ANGLE_OFFSET	read	0ad8d33c338ffca74ef5f5f9cac8875ef5fecd70324ca9db5fde8caa2464ffd1	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	159	159	RIPPLE_WAVE_CENTER	read	e13da6008d9e7902e7fbd1da3b4c867c6bfe19d5755ca6e9d357d69956297d33	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
+src/SOURCE/SPELLS.cpp	160	160	RIPPLE_WAVE_RANGE	read	fc5333fa8652ed966ab79b2d249d6b58a63dfd1b60fe1461dad9570c3aec7508	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
 src/SOURCE/dpnetwin.cpp	17	17	RETAIL_FILE	unread	9ee97c0dfa0d213e6000aa83c2bcf74a21e63848da49b36c7739ca25c9a7b0b8	-
 src/SOURCE/netwin.cpp	2	2	NCB_INCLUDED	unread	720511c27596a4a5a294b0020d7fba3a7a9868428ba6232367df124caef868df	-
 src/SOURCE/netwin.cpp	13	13	RETAIL_FILE	unread	bf2d42c0be14448fe138c8fd665cfa3b508bef4325f1faf3faa5b8283f3a287e	-
