@@ -14,6 +14,9 @@
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <BASE/INPUTMGR.h>
+#include <BASE/MonochromeCursor.h>
+
+#include <array>
 
 #define MOUSE_CURSOR_MASK_SHIFT 3
 #define MOUSE_MANAGER_SOURCE_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\MOUSEMGR.CPP"
@@ -34,6 +37,39 @@ static i32 gOldMouseLeft = 0;
 static i32 gOldMouseTop = 0;
 static i32 gOldMouseRight = 0;
 static i32 gOldMouseBottom = 0;
+static std::array<platform::MonochromeCursor, MOUSE_CURSOR_COUNT> gMonochromeCursors;
+static std::array<bool, MOUSE_CURSOR_COUNT> gMonochromeCursorLoaded {};
+
+// Rendering adapter only: role/frame selection is shared by both cursor modes
+// in mouseManager::SetPointer. Do not duplicate adventure/combat action logic here.
+static void SelectMonochromeCursor(MouseCursorType type, i32 frame, i32 index) {
+    auto& cursor = gMonochromeCursors[index];
+    if (!gMonochromeCursorLoaded[index]) {
+        char filename[RESOURCE_NAME_CAPACITY];
+        const char* pattern = type == MOUSE_CURSOR_ADVENTURE
+            ? MOUSE_MANAGER_ADVENTURE_BITMAP
+            : type == MOUSE_CURSOR_SPELL ? MOUSE_MANAGER_SPELL_BITMAP : MOUSE_MANAGER_COMBAT_BITMAP;
+        utf8::Format(filename, pattern, frame + (type == MOUSE_CURSOR_SPELL ? 0 : 1));
+        const u32l id = gpResourceManager->MakeId(filename, 1);
+        std::array<u8, mouse_cursor::ResourceBytes> bytes {};
+        if (gpResourceManager->GetFileSize(id) != bytes.size()) {
+            ShutDown("Invalid monochrome cursor resource size");
+            return;
+        }
+        gpResourceManager->PointToFile(id);
+        gpResourceManager->ReadBlock(bytes.data(), static_cast<u32l>(bytes.size()));
+        const platform::Point hotspot = type == MOUSE_CURSOR_SPELL
+            ? platform::Point{MOUSE_SPELL_CURSOR_HOTSPOT, MOUSE_SPELL_CURSOR_HOTSPOT}
+            : platform::Point{iHotSpot[index][MOUSE_CURSOR_HORIZONTAL], iHotSpot[index][MOUSE_CURSOR_VERTICAL]};
+        if (!mouse_cursor::Decode(bytes, hotspot, cursor)) {
+            ShutDown("Invalid monochrome cursor bitmap");
+            return;
+        }
+        gMonochromeCursorLoaded[index] = true;
+    }
+    platform::Video().SetMonochromeCursor(cursor);
+}
+
 b32 gbInSetPointer = false;
 b32 bInNewMouseUpdate = false;
 
@@ -116,7 +152,9 @@ void mouseManager::Close(void) {
     if (m_savedUnderlying != NULL)
         delete m_savedUnderlying;
     m_savedUnderlying = NULL;
+    platform::Video().ResetCursor();
     platform::Video().ShowCursor(true);
+    gMonochromeCursorLoaded.fill(false);
     if (m_cursorIcon != NULL)
         gpResourceManager->Dispose(m_cursorIcon);
     m_cursorIcon = NULL;
@@ -130,6 +168,8 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
     MouseCursorType type;
     if (m_forcePointerUpdate != 0)
         return;
+    if (frame == MOUSE_KEEP_CURRENT_FRAME)
+        frame = m_cursorFrame;
     {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
@@ -143,7 +183,9 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
         } else {
             type = cursorType;
         }
-        if (type != m_cursorType && (m_cursorType = type, gbColorMice != 0)) {
+        const bool typeChanged = type != m_cursorType;
+        m_cursorType = type;
+        if (typeChanged && gbColorMice != 0) {
             b32 saved82 = m_cursorReady;
             m_cursorReady = false;
             if (m_cursorIcon != NULL)
@@ -166,9 +208,11 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
                 );
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
             H2_ASSERT(frame != MOUSE_KEEP_CURRENT_FRAME);
-            m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
             m_cursorReady = saved82;
         }
+        // Adventure/combat/spell can share a frame number but not an image.
+        if (typeChanged)
+            m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
         SetPointer(frame);
         gpResourceManager->RestorePosition();
         gbPutzingWithMouseCtr--;
@@ -202,7 +246,7 @@ void mouseManager::SetPointer(i32 frame) {
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
-        platform::Video().ShowCursor(true);
+        SelectMonochromeCursor(m_cursorType, frame, m_cursorSizeIndex);
     }
     gpResourceManager->RestorePosition();
     gbPutzingWithMouseCtr--;

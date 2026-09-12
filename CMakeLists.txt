@@ -300,6 +300,16 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_libraries(homm2_combat_redraw_test PRIVATE
     homm2_platform homm2_compression ${HOMM2_FFMPEG_LIBRARIES})
 
+  add_executable(homm2_monochrome_cursor_assets_test EXCLUDE_FROM_ALL
+    tools/monochrome_cursor_assets_test.cpp ${HOMM2_GAME_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/EXECUTABLE/Run.cpp)
+  target_include_directories(homm2_monochrome_cursor_assets_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_monochrome_cursor_assets_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  target_link_libraries(homm2_monochrome_cursor_assets_test PRIVATE
+    homm2_platform homm2_compression ${HOMM2_FFMPEG_LIBRARIES})
+
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
@@ -320,6 +330,24 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME combat_cursor COMMAND homm2_combat_cursor_test)
+  add_executable(homm2_monochrome_cursor_test tools/monochrome_cursor_test.cpp)
+  target_include_directories(homm2_monochrome_cursor_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME monochrome_cursor COMMAND homm2_monochrome_cursor_test)
+  add_executable(homm2_mouse_cursor_selection_test
+    tools/mouse_cursor_selection_test.cpp src/BASE/MOUSEMGR.cpp src/BASE/Utf8.cpp)
+  target_include_directories(homm2_mouse_cursor_selection_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_definitions(homm2_mouse_cursor_selection_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  add_test(NAME mouse_cursor_selection COMMAND homm2_mouse_cursor_selection_test)
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(homm2_monochrome_cursor_backend_test tools/monochrome_cursor_backend_test.cpp)
+    target_include_directories(homm2_monochrome_cursor_backend_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_link_libraries(homm2_monochrome_cursor_backend_test PRIVATE homm2_platform)
+    target_link_options(homm2_monochrome_cursor_backend_test PRIVATE
+      -Wl,--wrap=SDL_CreateCursor -Wl,--wrap=SDL_SetCursor
+      -Wl,--wrap=SDL_GetDefaultCursor -Wl,--wrap=SDL_DestroyCursor)
+    add_test(NAME monochrome_cursor_backend COMMAND homm2_monochrome_cursor_backend_test)
+  endif()
   add_executable(homm2_combat_sprite_test
     tools/combat_sprite_test.cpp
     src/BASE/ICON.cpp

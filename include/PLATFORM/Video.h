@@ -2,6 +2,7 @@
 #define HOMM2_PLATFORM_VIDEO_H
 
 #include "Types.h"
+#include "MonochromeCursor.h"
 
 namespace platform {
 
@@ -32,6 +33,10 @@ public:
     virtual void Present() = 0;
 
     virtual void ShowCursor(bool visible) = 0;
+    // Selection does not change visibility. Cursor resources belong to the
+    // video backend and are released by Close(). Reset restores the OS default.
+    virtual bool SetMonochromeCursor(const MonochromeCursor& cursor) = 0;
+    virtual void ResetCursor() = 0;
 };
 
 }
