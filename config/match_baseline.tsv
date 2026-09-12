@@ -1032,7 +1032,7 @@ SOURCE/Modem	?ReadPacket@@YIDXZ	100.0000	360143b2309f
 SOURCE/Modem	?Wait@@YIJXZ	100.0000	41970fed62ba
 SOURCE/Modem	?WaitForDirectConnect@@YIHXZ	100.0000	8e7e4b0b06d5
 SOURCE/Modem	?WriteModemPacket@@YIXPADH@Z	100.0000	cddc047a7a90
-SOURCE/Modem	?read_byte@@YIHXZ	100.0000	deda0f823c8d
+SOURCE/Modem	?read_byte@@YIHXZ	100.0000	d010f29764c7
 SOURCE/Modem	?write_buffer@@YIHPADH@Z	100.0000	54e0284f413d
 SOURCE/Modem	?write_byte@@YIXH@Z	100.0000	e12ea69c6527
 SOURCE/NOOPT	?DelayMilli@@YIXJ@Z	100.0000	3af2b71a6a99
@@ -1394,7 +1394,7 @@ SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	100.0000	f9f7ba309545
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	100.0000	5029d88be61f
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	7fe2d921f763
 SOURCE/comwin	?com_init@@YIFEHH@Z	100.0000	c2d4f246cbe5
-SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	dc964b5b85ab
+SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	8e760b9311ad
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	d3dfb2830a60
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	31c37bd25a99
 SOURCE/comwin	?com_stat@@YIEFG@Z	100.0000	ddc07b36e77d
