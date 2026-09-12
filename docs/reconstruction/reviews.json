@@ -269,7 +269,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real scroll branch inserts gSpellNames[extra] into gArtifactDesc[artifact] format. B49 artifact/spell-extra indices and B50 template/inserted-name500-byte bound need retail data; ordinary artifact branch forwards description. No manual varargs slot walk or artificial stack owner."
+    "note": "Real scroll branch inserts gSpellNames[extra] into gArtifactDesc[artifact] format. B50 pinned retail table/string proof bounds output at104 bytes including NUL within500; ordinary artifact branch forwards description without formatting. B49 artifact/spell-extra indices remain caller contracts. Full139-byte body/sites/targets pass. No manual varargs slot walk or artificial stack owner."
   },
   "src/SOURCE/HERO.cpp:hero::Dismiss(void)#1": {
     "body_sha256": "324b6331d8231e009622e1a7bcb4ba18da1910ae24080d486894bec427ef98db",
@@ -381,7 +381,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 literalconst_cast removed after complete two-arm matrix,44-function native equivalence and all1699 retail bytes/sites/targets proof. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. Choice scan cycles0..13 and5000 bound; valid faction/skill/count, newLevel arithmetic and B50 retail template/text concatenation bounds remain. One-choice/choice text indexes current level directly while display useslevel-1 elsewhere; maxskill-level input must be checked."
+    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 literalconst_cast removed after complete two-arm matrix,44-function native equivalence and all1699 retail bytes/sites/targets proof. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. B50 genuine strings bound scratch at77 and combined text at128 including NUL. Exactly one stat increment; offers exclude expert, so current0..2 indexes next-tier text intentionally. B49 valid faction/skill/count/name termination and newLevel arithmetic remain; negative corrupted skill levels are not excluded."
   },
   "src/SOURCE/HERO.cpp:hero::NumArtifacts(void)#1": {
     "body_sha256": "272dd39fb46e103ace01836331b1d97024af2e789007a83a350371eb0c06b83f",
@@ -413,7 +413,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "G41 secondary_skill_text joins three8-control ranges. Explicit UI IDs bound5 army/14 artifact slots; selected source slot and GetNthSS result can still be invalid (B49). Actual widget union, B50 table formats combine creature/artifact/hero/class/skill names into500 bytes. No fake local aggregate."
+    "note": "G41 secondary_skill_text joins three8-control ranges. Explicit UI IDs bound5 army/14 artifact slots; selected source slot and GetNthSS result can still be invalid (B49). Actual widget union. B50 all25 genuine templates and source-name maxima bound output at70 including NUL within500, conditional on valid indices/name termination; full1858-byte body/sites/targets pass. No fake local aggregate."
   },
   "src/SOURCE/HERO.cpp:HeroHandler(struct tag_message & message)#1": {
     "body_sha256": "7ad990fe6d330a51da339a2ce9e2a1c315ab85dcb2060b4bbf5e91ad9955bb67",
@@ -429,7 +429,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G42 secondary_skill_dialog joins; R06 tmp stores creature enum then troop count during paired swaps and could use typed temporaries. S32 dummy/newMsg/j unread. Actual widget/hover/keyboard transitions. Cycling heroCount>=2 protects modulo; ID membership/source-slot/skill order remain B49. B50 long mana/XP format bounds; explicit casts bridge typed flags, creature/count swap and dialog command domains."
+    "note": "G42 secondary_skill_dialog joins; R06 tmp stores creature enum then troop count during paired swaps and could use typed temporaries. S32 dummy/newMsg/j unread. Actual widget/hover/keyboard transitions. Cycling heroCount>=2 protects modulo; ID membership/source-slot/skill order remain B49. B50 actual mana/XP templates need at most263/80 bytes including NUL within500 with a terminated12-byte name and arbitraryi32 decimal arguments; full2490-byte body/sites/targets pass. Explicit casts bridge typed flags, creature/count swap and dialog command domains."
   },
   "src/SOURCE/HERO.cpp:RedrawHeroScreen(void)#1": {
     "body_sha256": "ef1353fed10ce51c1c48947f37b2b634dd908c6f5bdf1807c5865084a6eb5cdb",
@@ -461,7 +461,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "Actual two widget messages and separate morale/luck/display temporaries; shared magnitude is same display-role reuse. Fixed5 army/4 stat/3 modifier/8 skill/14 artifact loops bounded. B49 selected hero/faction/skill order and level-1 indices require state contract; statusMsg id=-1 routes to no-payload default status arm. B50 name/title/skill text bounds; no fake aggregate."
+    "note": "Actual two widget messages and separate morale/luck/display temporaries; shared magnitude is same display-role reuse. Fixed5 army/4 stat/3 modifier/8 skill/14 artifact loops bounded. B49 selected hero/faction/skill order and level-1 indices require state contract; statusMsg id=-1 routes to no-payload default status arm. B50 actual title<=28, icon<=20, fraction<=24 and skillbonus<=22 bytes including NUL within500; full2310-byte body/sites/targets pass. Name termination remains a contract; no fake aggregate."
   },
   "src/SOURCE/HERO.cpp:DoHeroSplit(i32 destinationSlot,i32 sourceSlot)#1": {
     "body_sha256": "3543d75a86c3dec503a919790471a139227c13b908a71381f559df2a2c4c7f03",
@@ -637,7 +637,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "B49 skill and stored level1..3 needed for level-1 text/description indices. B50 bonus branch formats two level names and three integer values into500 bytes; ordinary description is itself used as format. Real const string pointer/scalar bonus, no cast or stack buffer."
+    "note": "B49 skill and stored level1..3 needed for level-1 text/description indices. B50 real bonus template needs<=169 bytes including NUL even with arbitraryi32 decimal arguments; all42 genuine ordinary descriptions have no conversion markers and need<=181 within500. Full221-byte body/sites/targets pass. Real const string pointer/scalar bonus, no cast or stack buffer."
   },
   "src/SOURCE/HERO.cpp:hero::CheckAnduranPieces(b32 showDialog)#1": {
     "body_sha256": "61b637b5b1184430ede43c0578d27d87c2b6dbb8f04172fcba073c4bab03f7ff",

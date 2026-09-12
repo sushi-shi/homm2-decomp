@@ -280,9 +280,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   dialog joins need structured matrices. R06 records the army type/count swap
   sharing a scalar temporary; S31/S32 cover serialized unknown regions and
   unread hero UI/level-up/split/upgrade locals.
-- B49/B50: hero/player initialization, spell/skill/experience/selection domains
-  and hero-dialog text capacities require explicit caller/data bounds. Actual
-  serialized record regions are not disposable stack padding.
+- B49: hero/player initialization and spell/skill/experience/selection domains
+  require caller contracts. Actual serialized record regions are not disposable
+  stack padding.
+- B50: [hero formatter bounds](B50.md) fit the real 200/500-byte buffers for
+  valid indices and a terminated hero name; complete level-up text is at most
+  128 bytes. The next-tier index is intentional, not an off-by-one defect.
 
 ## Build setup observations
 
