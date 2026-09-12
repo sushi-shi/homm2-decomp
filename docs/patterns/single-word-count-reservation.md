@@ -21,3 +21,26 @@ in the TU agree. [S01](../reconstruction/S01.md) preserves the four-arm
 matrix and reproduction commands. This proves scalar sufficiency, not the
 original spelling. Do not infer array extent from an aligned slot gap alone,
 and do not generalize this to wider reads or pointer escapes.
+
+## Packet checksum outputs
+
+The same result is independently measured for the two-word `crc` / `crc2`
+arrays in `EncodePacket` and `DecodePacket`. `calc_crc` writes exactly one
+`u16`. Scalar outputs preserve the complete125/269-byte functions:
+
+```
+retail                                 scalar candidate
+0048d8ec 66 c7 45 fc 00 00 mov word [ebp-4],0   +02d same bytes
+0048d91d 8d 4d fc lea ecx,[ebp-4]              +05e same bytes
+0048d920 e8 77 ff ff ff call calc_crc          +061 e8 00 00 00 00 ; REL32 calc_crc
+0048d925 66 8b 4d fc mov cx,[ebp-4]            +066 same bytes
+0048d9d1 8d 4d f4 lea ecx,[ebp-0c]             +095 same bytes
+0048d9d4 e8 c3 fe ff ff call calc_crc          +098 e8 00 00 00 00 ; REL32 calc_crc
+0048d9e2 8b 55 f4 mov edx,[ebp-0c]             +0a6 same bytes
+0048d9e5 81 e2 ff ff 00 00 and edx,0ffffh      +0a9 same bytes
+```
+
+The last wide load is masked to the scalar's16-bit domain. It does not prove
+that the source declared a second checksum. [S25](../reconstruction/S25.md)
+records the complete4-arm matrix, all16 native functions/sections equal and
+independent retail bytes/sites/ordered-target proof for both changed functions.
