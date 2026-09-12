@@ -15645,7 +15645,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "Real400-byte intermediate buf and gText768. B52 unbounded table formats plus second sprintf(gText,buf) require both capacity and percent-marker proof; mode prefix inserts building name and buffer. Dwelling branch writes directly to gText. B51 faction/building/dwelling indices remain. No returned stack pointer, fake aggregate, casts or manual varargs."
+    "note": "Real400-byte intermediate buf and gText768. B66 pinned-retail exhaustive171 valid faction/building entries: titled result<=187 including NUL, every source/derived string percent-free; full377-byte independent retail proof passes. B51 faction/building/dwelling indices remain, unsupported creature entries excluded explicitly. No returned stack pointer, fake aggregate, casts or manual varargs."
   },
   "src/SOURCE/KB.cpp:GetBuildingName(FactionType race,BuildingSlotType building)#1": {
     "body_sha256": "09fbe5b777044569fd46e485f77c4b0966ddb95cb6cba41858188181a602c6c6",
@@ -15661,7 +15661,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Returns existing shrine/well/special/neutral/dwelling string owner, with no copy or cast. B51 faction/building table indices need caller domain; building<dwelling-first is not a negative-value guard."
+    "note": "Returns existing shrine/well/special/neutral/dwelling string owner, with no copy or cast. B51 faction/building table indices need caller domain; building<dwelling-first is not a negative-value guard. B66 all pinned names are percent-free; independent whole105-byte retail proof passes. This does not validate negative or unsupported building indices."
   },
   "src/SOURCE/KB.cpp:GetBuildingCost(FactionType race,BuildingSlotType building,i32 * const dest,i32 mageLevel)#1": {
     "body_sha256": "1477b31d5c9d1947ed2b66480344478b0eb3cde764d6911332d7742ed31eded3",
@@ -18249,11 +18249,11 @@
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "absent",
+      "reuse": "open",
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Whole body read for S44: writes stats/order once per player<count, no fixed8 access. C34 bounded player i8; B61 count<=6/list/army IDs and category domain. Known cases assign stats, unknown category can leave it uninitialized. Fixed town72/artifact14 scans fit; no union/goto/fake aggregate/manual varargs/owner arithmetic."
+    "note": "Whole body read for S44: writes stats/order once per player<count, no fixed8 access. C34 bounded player i8; B61 count<=6/list/army IDs and category domain. Known cases assign stats, unknown category can leave it uninitialized. Fixed town72/artifact14 scans fit; no union/goto/fake aggregate/manual varargs/owner arithmetic. R10 correction from complete reread: townIndex_c is also hero-list position and heroIndex_n is also artifact-slot and town-list position; these roles need separate-local review."
   },
   "src/SOURCE/TOWNMGR.cpp:SortStats(i32l * const stats,i8 * const order)#1": {
     "body_sha256": "dc6013ab17130553c6275200d3fdf3b8516e20900d1939dbca20e82b27426117",
@@ -18270,5 +18270,693 @@
       "bounds": "open"
     },
     "note": "Whole sort read for S44: indices0..count-1 only, six buffers cover valid count. C34 temporaryOrder contains i8 then casts back, lossless candidate. Separate stat/order temps are related swap roles; no unrelated reuse/goto/union/fake stack/manual varargs/arbitrary pointer."
+  },
+  "src/SOURCE/TOWNMGR.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
+    "body_sha256": "ef31a709743e4bf00b21d2b6ed2ef268b8175261972cbb6c60cdeac1c736c0f7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unsigned input preserves the high CP1251 ranges; returned char preserves one byte and length. Actual ASCII/Cyrillic/yo mapping, no explicit casts, arrays, unions, gotos, pointer arithmetic, reused roles or unused scratch."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townObject::townObject(FactionType townType,BuildingSlotType buildingId,char * iconBaseName)#1": {
+    "body_sha256": "8905828d228a4c9ee5a87d45ee278b8e7300392396460cae2ef9c08cc7f3c26a",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C46 bounded building-ID to i16 widget-ID conversion; S48 unread tempY scalar. B66 prefix+object+.icn upper bound13/16 including NUL for known tables. B67 faction0..5/building0..31 and live icon/border required; NONE check occurs after sBuildingInfo indexing and cannot validate a negative input. Real coordinate locals and same-role id_h copy, no union/goto/fake address/manual varargs."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townObject::~townObject()#1": {
+    "body_sha256": "f08f854356468635f3653b05cf2e66cfc24c6be3d199264a78d45e35b2082345",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Deletes optional border then releases typed icon; no redundant cast, union, goto, fake storage, manual varargs or unrelated reuse. Resource ownership/lifetime is the destructor contract."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townObject::Draw(i32 advanceAnimation)#1": {
+    "body_sha256": "60e3c177706b4d9c4c7564091b135b6da259dd7053ef6b80bf2f4eb48b47ad94",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Every faction/overlay gate and animation path read. B67 live town/icon, buildState1..5, nonnegative frame count and sufficient icon frames required; frame arithmetic is a real animation index. No cast, union, goto, owner recovery, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::townManager(void)#1": {
+    "body_sha256": "a7c621d1a6dce1355c5437c9eaca3d3668417d55e3c59b4a5c394c1d57949400",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Initializes selected persistent fields; Open supplies the remaining operational state. No buffer accesses, casts, unions, goto, artificial storage, manual varargs or unrelated local reuse. Partial object initialization is not fabricated padding."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetupExtraStuff(void)#1": {
+    "body_sha256": "854b0145b9cfee7a2a1a0b4a462f2016a7dd1b398997c37806411a2103c851dc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual persistent building flags select faction overlays and boat graphic; gpAdvManager accessor handles coordinates but terrain/resource/lifecycle remain B67. No casts, union, goto, local scratch, manual varargs, unrelated reuse or owner trick."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::Open(i32 id)#1": {
+    "body_sha256": "5f55ab733720e7ab3ae5c46c84eba46e66dfe4e7b115b7ad2642558d49c0c87a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Initializes all town-view pointer/selection state before SetupTown; fixed townManager name12/30 with NUL fits inherited owner. B67 m_town already set, faction/theme/resource/window and timer contracts required. No cast, union, goto, fake scratch, manual varargs or unrelated variable roles."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::ChangeTown(void)#1": {
+    "body_sha256": "958ad528515066c6aedf4b9a4ebf67728d2a777bfb3aaa979c5a1b0cd6c5b807",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U01 message sets widget type/id-1; SetCommandAndText NONE branch does not read uninitialized command/parameter. Actual town/music lifecycle B67, no cast/goto/fake aggregate/manual varargs/owner arithmetic; message is a real protocol object."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetupTown(void)#1": {
+    "body_sha256": "4e95cd4e90b759584357ab1de3fe4fef01864f1a3b5b5a36a6c073de7e19bb80",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C46 two i8 crest constants feed i32 strip constructor. U01 text/numeric widget arms are meaningful. S48 crestFrame computed including GetHero but never consumed. B66 known resource filenames fit; GetTownName returns13-byte field but sprintf(gText,name) still needs termination/no-percent contract B67. gTownObjectOrder6x32 contains NONE sentinels; count<=32, same-faction reuse requires previous matching object population. Hero/player IDs, strip/resource lifetime and screen extents remain. No goto/fake address/manual varargs."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::UnloadTown(void)#1": {
+    "body_sha256": "bee9753bd8aed32ed8419b085e4210d881df6f582b3cb4583480de2808eecc93",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Typed deletion/disposal, real object-array traversal; B67 initialized count<=32, live window and attached border ownership required. No cast, union, goto, fake scratch, manual varargs, unrelated reuse or owner recovery."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::Close(void)#1": {
+    "body_sha256": "0b00d4e00cad6d74c81490e3aefc986f715bd605f225896d59d281612547fc0e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unload then remove/delete window, stop music/fade and clear persistent flags. Normal initialized-manager lifetime contract; no cast/union/goto/scratch/manual varargs/unrelated local roles or artificial addresses."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetArmyCommand(i32 qualifier)#1": {
+    "body_sha256": "40ea3e6b5ef1b14c0c9c539a1974579c71c7adfc3a56dc56a754a4840842dd94",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "A01 replaces &m_swapStrip[0] comparison with actual pointer; complete2/2 exact884-byte matrix and independent ordered-retail proof. B66 every status arm<=70/80 including NUL. B67 live strips/armies, selected slots0..4 and valid creature IDs required. No casts, unions, goto, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetCommandAndText(struct tag_message & message)#1": {
+    "body_sha256": "800c4af281aa2bfa961e993c1fcedd84d8f4a84d2ee610c437299e470bc1204b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real numeric-widget-to-TownManagerWidgetId cast. U01 consumes widget/hover shared id and parameter slots; all switch arms read. B66 all80-byte status writes bounded (date41, exchange70); B67 strip/army lifetime, valid faction/creature/dwelling domains remain. Five-slot control cases bound local indices. Unknown ID leaves existing status, no new write. No goto, fake scratch/manual varargs/owner recovery or unrelated role."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::ShowText(char *)#1": {
+    "body_sha256": "1b2895794cc6201d8c2764b12c313e1520d779a6abb29453ef94dc6f17f3ddb2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real ignored text ABI input: body always sends member m_statusText via U01 text arm. No copy into local buffer; B67 previously initialized terminated status/window required. No casts, goto, fake aggregate, manual varargs, reuse or artificial pointer."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::Main(tag_message & message)#1": {
+    "body_sha256": "545345f607a25149b8f71ac247fd50f782f1345abd43a700b52aec5899ad4c0e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire629-line nested dispatch read. G55 eight quick-view jumps share building-information tail. Real widget/building enum conversions and U01 mouse/hover/keyboard/widget/executive reuse. S48 unread status, townHero result (GetHero call retained), failed-boat result. B66 building text<=187/400 and fixed format strings proved; B67 debug shift domain, town/hero/creature IDs, resources/dialogs, and quick-view hero-strip army nonnull are contracts. SetupTown can create hero strip with null army; UI must prevent those selections, not locally guarded. Trade count capped before efficiency access. No manual varargs, fabricated offsets/owner or fake aggregate."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::DoCommand(TownManagerArmyCommand command)#1": {
+    "body_sha256": "7bed1a20b8bd5a8c0518f931fc795da48f08c415ec6734470d122815c609b9e0",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "R10 oldValue first stores creature count then creature type; typed swap locals candidate C46 would remove enum reconstruction. Five-slot search checks termination before reassigning pending index. B67 live strips/army/hero, initial slots0..4 and representable troop sums required. No union/goto/fake stack/owner arithmetic/manual varargs."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::RedrawTownScreen(void)#1": {
+    "body_sha256": "01e094e0a8dc9c48ab56abe3829b5d61a86879fbe180f45b85974a4f5f222e39",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U01 status-text arm; no buffer copy. B67 initialized strips/bank/window and terminated m_statusText, fixed640x480 update. No cast/goto/fake aggregate/manual varargs/owner recovery/unrelated role reuse."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SplitArmy(void)#1": {
+    "body_sha256": "7ab6c06fbdbebc0c99aeaf9894399d611cf966e12f747981972ec75e1bf60d6e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S48 two unread i16 control locals; U01 real text dialog message. B67 valid selected slots/counts, positive split maximum, dialog-generated amount and i16 updates required. Fixed format plus creature/hero-or-garrison names fits gText768 under known name tables; no manual varargs/goto/cast/fake pointer or unrelated variable role."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::ShiftQualChange(void)#1": {
+    "body_sha256": "87f433f683fbf752bcd7ad52c1a974a098518ad0150497e875b04d59b7c4e2de",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Single live input-manager ForceMouseMove call. No ten-pattern instance beyond ordinary pointer lifetime; no local scratch or indexing."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::ResetStrips(void)#1": {
+    "body_sha256": "df4787f06cdd717ddf78bf218081147e0912eeacfeda32e5aeda52e30ff2cf38",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Optional selection owners guarded, both persistent display strips required; typed pointers reset to null and slots-1. No cast/union/goto/fake storage/manual varargs/unrelated reuse/artificial pointer."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::Toggle(BuildingSlotType building)#1": {
+    "body_sha256": "e070681cd9e2bc049ca1eeecd9f599bafb0c9c1076ac0ac47cfb74f99645bcdb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B67 real building-bit domain0..31 and initialized object count<=32. Iterates typed objects and toggles visible flag; no cast/union/goto/fake address/manual varargs/unused stack/unrelated roles."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::DrawTown(i32 updateScreen,i32 drawFlags)#1": {
+    "body_sha256": "0398c75ef297019ab2807c5459e0eb410280e2e7f173f35aca3d96358a5a825d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual background/object/icon iteration and640x256 viewport blit; B67 count<=32/live resources/frame extents required. No cast, union, goto, fake stack, manual arguments or unrelated reuse."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::BuyBuild(BuildingSlotType building,i32 cannotBuy,i32 quickView)#1": {
+    "body_sha256": "7ff6f85b6d221025ff2e1c2dc7d502a231e4db9b126e98efebbb1b669629f3c4",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S45 resourceTypes and costs8->7 applied by complete4/4 independent extent matrix; every loop uses7 and compact positive-cost prefix, two rows<=4 each. C46 bounded byte/resource and real i16 price/coordinate conversions; allocation-to-char is actual heap boundary. U01 widget text/numeric arms meaningful. R10 costCount evolves packed-count to row cursor; S48 seven unread i16 UI locals remain. B66 full prerequisites<=172/400, icon13/16, any i16 amount7/10. textWidget constructor takes ownership and destructor frees description/amount text. B67 valid building/faction/cost/resource/line-height domains and successful allocations remain. All36 TOWNMGR native functions/sections/relocs identical;3692 ordinary retail bytes agree but four EH operands/DIR32 unresolved, no whole-retail closure. No goto/fake owner/manual varargs."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::BuildObj(BuildingSlotType building)#1": {
+    "body_sha256": "4428da6110488721905afddff727ae57311f6a9a2a798549a995dd331507f09e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real SLimitData output aggregate for extent query, not invented stack padding. B67 building0..31, buildState cap, object count and successful object lookup required: objectIndex=-1 is used if lookup fails. Borders dereferenced without null guard under SetupTown construction contract. Global extent mode/output and icon frames must be valid. No casts/unions/goto/manual varargs/unrelated local role or owner arithmetic."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetupMage(heroWindow * window)#1": {
+    "body_sha256": "9e636b5f085cb9705c55d43547fbdeb958a875ff1ec1e4be840d86448e8fee39",
+    "patterns": {
+      "casts": "retain",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C45 complete2/2 boolean-cast matrix: remove i16 conversion gives886 vs889bytes, deletes retail0f bf c8 movsx ecx,ax at+123; retained independent whole889-byte proof passes. U01 widget arms real; U15 town spell/count overlapping owner remains. S48 nine unread i16 UI locals plus unusedLocal; unusedGuildFrame IS consumed and not dead. B67 level0..4, slot0..3 fixed; valid spell/count/faction and icon/name bounds required. No goto/manual varargs/fake owner/unrelated role."
+  },
+  "src/SOURCE/TOWNMGR.cpp:MageGuildHandler(tag_message & message)#1": {
+    "body_sha256": "fcedbacee6959754131b05a90874ce2bcafc1c588b05911f2e678d764c8fcb96",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "A01 commuted level[array+1] now real m_spellCounts[level+1]; complete2/2 exact340-byte matrix and independent ordered-retail proof. Three control ranges map to levels0..4/slots0..3; count guard before spell use. U01 real message/U15 overlapping count owner. S48 three unread i16 control locals. B67 valid stored spell IDs/counts and live manager remain. No cast/goto/manual varargs/fake stack/owner recovery or unrelated reuse."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::RecruitHero(i32 availableHeroIndex,i32 cannotRecruit)#1": {
+    "body_sha256": "ec25110671dd640d76f9fd08e59fa2efa3921ba0e9c390be314203cc62c9f3e3",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C46 player char/i8 and new-hero byte casts, true randomized FactionType conversion. U01 dialog payload; S48 eight unread i16 UI constants. B67 availableHeroIndex0..1, valid hero IDs, heroCount<8 before append, free town/map cell, resource and terminated13-byte hero name required. Owner temporarily set for preview then reset/retained by result, not scratch padding. Index_j always artifact scan; no goto/fake owner/manual varargs/unrelated role."
+  },
+  "src/SOURCE/TOWNMGR.cpp:TavernHandler(tag_message & message)#1": {
+    "body_sha256": "a1ebd88beb3ae016fe05853678b7a2d83cad2b97ae79f83263c32741a8baf766",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C46 KBTickCount-to-i32 timer conversion needs SDK width/signedness proof. U01 input becomes frame update; S48 unused delay/frame constants. B67 live tavern window, no overflow in persistent frame counter/tick arithmetic,20-frame modulus+2 range required. No goto, buffer copy, fake aggregate, manual varargs or owner recovery."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::DoTavern(void)#1": {
+    "body_sha256": "512e0f0d0f71de41eb45e6ec1c473d8845980f01e4447e59451a8d1b72946573",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "U01 text arm and S48 unread unusedValue. Fixed CP1251 intro plus terminated301-byte rumour fits gText768; prior rumour producer B65 still needs bounds. B67 live window/dialog. No casts/goto/fake aggregate/manual varargs/owner recovery/unrelated roles."
+  },
+  "src/SOURCE/TOWNMGR.cpp:SplitArmyHandler(tag_message & message)#1": {
+    "body_sha256": "c4dbbba9efb0c59194580634ea8e4d2de05597885ce52f6255bddeb4e5a4bb96",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G56 three update_amount joins share formatter/broadcast tail. U01 GET_TEXT/SET_TEXT and select result arms; S48 three unread i16 controls plus unusedAction. B67 atoi input termination/representability and positive splitMaximum required: zero max can produce-1 after upper clamp. Integer output<=12/768; no cast, fake owner/aggregate, manual varargs or unrelated role."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetupWell(heroWindow * window)#1": {
+    "body_sha256": "2962059a47fe12bd634b50d02066fa9b9d7ac96a4939d4a10e5f21ff3a7f7bf0",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S46 dwelling type scratch8->6; complete2/2 matrix, all36 native functions/sections and whole1607-byte retail proof pass. C46 two bounded dwelling byte stores; high-CP1251 unsigned text comparisons must remain unsigned. U01 widget payloads, real monsterInfo record copy. S48 seven unread i16 UI constants remain. B66 fragments27/40, complete optional-chain99/768, icon13/16. B67 supported faction/dwelling/creature/speed and valid garrison/resource state required; fixed six loops and derived0..11 dwelling indices fit. No goto/manual varargs/fake pointer/unrelated local roles."
+  },
+  "src/SOURCE/TOWNMGR.cpp:townManager::SetupThievesGuild(heroWindow * window,i32 informationLevel)#1": {
+    "body_sha256": "eb9907aeaf5a0450d88f9045eb2d7658ab3c58b9094d6facbec16a70c4aab517",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S47 category order8->6 matches stats and all GetCategoryStats/SortStats/rank indices for valid playerCount<=6; complete2/2 matrix and all36 native functions/sections identical. C46 real allocation/coordinate/enum narrowing boundaries, U01 messages. G57 four nextRank jumps; R10 heroPosition reused for primary stat and town/hero list indices; S48 fourteen unread i16 constants, unusedThievesValue and statText200 for<=13-byte decimal line. B66 four stat lines<=49/768. B67 consistent live/dead counts and initialized stats/order, player/faction/personality/hero/creature IDs/lifetimes required; dead-player while scan has no separate cap.3555 ordinary retail bytes agree but four EH operands/DIR32 unresolved, no whole closure. No manual varargs or fake owner."
+  },
+  "src/SOURCE/TOWN.cpp:town::town(void)#1": {
+    "body_sha256": "0a0f3bd6eee170f246222325d35eca639f038156de32e107dd07d314f5ba8fc3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Initializes real town identity/basic flags and no occupant; other fields are populated by setup/load. No cast, union accesses, goto, index, artificial scratch, manual varargs or unrelated local roles."
+  },
+  "src/SOURCE/TOWN.cpp:town::HasGarrison(void)#1": {
+    "body_sha256": "ec2ad79356ffa0d38058c3b70cf7a2b017ce424c9339f9788903b823a970df30",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fixed five army type slots, compares NONE and returns first occupied type without reading quantity. No casts, union, goto, owner trick, local scratch/manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/TOWN.cpp:town::GiveSpells(hero * targetHero)#1": {
+    "body_sha256": "51882c2a07a104706e69d0d6108557ce861effa45a17ba0bcf04cffe11f7a90c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U15 real spell/count owner currently overlaps last spell byte with unused count0. B67 wisdom0..3 gives at most five levels, counts<=4 and valid spells/pupil/occupant required. Book/guild guards precede traversal. No casts, goto, artificial addresses, manual varargs, unused aggregate or unrelated local roles."
+  },
+  "src/SOURCE/TOWN.cpp:town::XformToCastle(void)#1": {
+    "body_sha256": "6c2259ea78b827f0be8bfa05513b0b800b89e3d4ee5f2161d207e7b39b2d830d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S48 unread objectType. Two real rectangle conversions for object/overlay tilesets; ConvertObject clips accesses but map/extra-chain contracts B58 remain. No casts, unions, goto, fake pointer/aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/TOWN.cpp:town::View(i32 noFade)#1": {
+    "body_sha256": "aa781849c8616301de16b9fda856cf607435a0b62aa70de89dbe0e81dfff1820",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real manager lifecycle, SetTown(this) and optional fade; B67 live managers/valid occupant and memory-threshold arithmetic required. No casts, union, goto, fake scratch, owner recovery/manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/TOWN.cpp:town::Deallocate(void)#1": {
+    "body_sha256": "3122b167ec9aa3eacc5ec7d61dfc76ff1d70c05f2e327c84e49be86ed66466fb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B67 owner0..5, nonempty town list<=72 and this ID present required. pos starts-1; absent ID makes compaction use negative index, empty list writes townIds[-1]. Real member array, not owner recovery or deliberate before-object base. No casts, unions, goto, fake scratch, manual varargs or unrelated roles; list index i remains compaction/search cursor."
+  },
+  "src/SOURCE/TOWN.cpp:town::BuildBuilding(BuildingSlotType building)#1": {
+    "body_sha256": "d22f1b84af8c0ec8289dad4bb803577cebc1df8123ec768478518361bca689a8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U15 actual one-based count accesses and20-spell owner; B67 buildState before guild increment<5, counts<=4, valid building/faction/creature/town ID required. Dwelling/garrison derived ranges0..11 guarded by building ranges; upgrades copy earlier real slots. No casts/goto/fake scratch/manual varargs/owner recovery/unrelated reuse."
+  },
+  "src/SOURCE/TOWN.cpp:town::CanBuildDock(void)#1": {
+    "body_sha256": "4cddd8a95853142ca7d0ce9497b8b5e13bfc74eff772749d5ff9deae744e25f8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Compares boatX against unsigned255 sentinel; no array/pointer access, casts/unions/gotos/stack/manual varargs/reuse or artificial address."
+  },
+  "src/SOURCE/TOWN.cpp:town::CalcNumLevelArchers(i32 * numArchers,i32 * mageGuildLevel)#1": {
+    "body_sha256": "0ac865cb5989dfc9da51700bcc5da51f767809429bf11a56eb46a77f6cf11a96",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Two named building-enum loops count existing bits, real scalar outputs required. No indexing buffer, casts, union, goto, fake stack/manual varargs/owner trick. Reuses building only for the same domain of building enumeration."
+  },
+  "include/SOURCE/town.h:town::OccupyingHero(void)#1": {
+    "body_sha256": "f4fbfd3ff350ea2c5cba93b8a5ca77fcead4caa8092506a5b5bf1ab7fedbfd69",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns real signed occupant-ID field; no ten-pattern instance, aggregate scratch or pointer manipulation."
+  },
+  "include/SOURCE/townManager.h:townManager::SetTown(class town * townData)#1": {
+    "body_sha256": "776ebed4780cbc37af7d1ea6b4361447bd25155b015debe84b7d5dd078419338",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Assigns supplied typed town pointer to its actual owner field; no ten-pattern instance, cast or fabricated offset."
   }
 }

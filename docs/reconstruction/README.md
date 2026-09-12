@@ -346,6 +346,16 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B62/B63: [retail confirms](B62-B63.md) the receiver's100-byte acknowledgement fill with
   a200-byte transmission, and diff completion using the old-file remainder.
   These defects are separate from byte-preserving reconstruction fixes.
+- A01/S45–S47: [town-manager pointer expressions and four array extents](A01-C45-S45-S47.md)
+  are simplified with complete native equivalence. C45 retains its measured
+  16-bit boolean conversion; removing it loses three retail bytes.
+- B66: [town text bounds](B66.md) prove all80-byte status writes, well-detail
+  append chains, resource filenames and complete building descriptions for
+  valid table indices. This resolves the selected B52 building-format question.
+- B67/U15: [town state and spell-owner contracts](B67-U15.md) remain separate
+  from text capacity. U15's count overlay needs all-consumer layout recovery.
+  C46/R10/S48/G55–G57 track the remaining conversions, reused roles, unused
+  locals and town-dialog joins, with per-function evidence in the ledger.
 
 ## Build setup observations
 

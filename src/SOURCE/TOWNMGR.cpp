@@ -182,7 +182,6 @@ namespace {
     H2_ENUM_END(TownSplitConstant)
 
     H2_ENUM_BEGIN(BuildDialogConstant)
-        BUILD_RESOURCE_STORAGE_COUNT = TOWN_RESOURCE_COUNT + 1,
         BUILD_ROW_RESOURCE_CAPACITY = 4,
         BUILD_DESCRIPTION_WIDTH = 240,
         BUILD_WINDOW_BASE_Y = 151,
@@ -232,7 +231,7 @@ namespace {
     H2_ENUM_END(RecruitDialogConstant)
 
     H2_ENUM_BEGIN(WellConstant)
-        WELL_DWELLING_TYPE_STORAGE_COUNT = 8,
+        WELL_DWELLING_TYPE_STORAGE_COUNT = TOWN_WELL_DWELLING_COUNT,
         WELL_DETAIL_TEXT_CAPACITY = 40,
         WELL_ALTERNATE_UPGRADE_INDEX = TOWN_WELL_DWELLING_COUNT * 2 - 1
     H2_ENUM_END(WellConstant)
@@ -1005,7 +1004,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
 
     m_command = ARMY_COMMAND_NONE;
     cantMoveLastArmy = false;
-    if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
+    if (m_swapStrip->m_army->GetNumArmies() == 1 && m_swapStrip == m_heroStrip
         && m_pendingStrip != m_swapStrip)
         cantMoveLastArmy = true;
 
@@ -2115,7 +2114,7 @@ i32 townManager::BuyBuild(
     i32 resourcesInRow_l;
     i32 rowY_o;
     i32 windowY_m;
-    i8 resourceTypes_o[BUILD_RESOURCE_STORAGE_COUNT];
+    i8 resourceTypes_o[TOWN_RESOURCE_COUNT];
     i32 costCount_o;
     i16 H2_UNUSED(dialogResult_b);
     i32 index_h;
@@ -2136,7 +2135,7 @@ i32 townManager::BuyBuild(
     i32 dwelling_k;
     i16 H2_UNUSED(dialogHeight_f);
     i32 entryWidth_o;
-    i16 costs_e[BUILD_RESOURCE_STORAGE_COUNT];
+    i16 costs_e[TOWN_RESOURCE_COUNT];
     widget* descriptionWidget_g;
 
     mageLevel_k = 0;
@@ -2700,7 +2699,7 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
                 if (spellSlot_b != -1) {
                     level_d = spellSlot_b / TOWN_MAGE_SPELLS_PER_LEVEL;
                     slot_j = spellSlot_b % TOWN_MAGE_SPELLS_PER_LEVEL;
-                    if (slot_j >= level_d[gpTownManager->m_town->m_spellCounts + 1])
+                    if (slot_j >= gpTownManager->m_town->m_spellCounts[level_d + 1])
                         return MESSAGE_DISPATCH_CONSUME;
                     spell_j = gpTownManager->m_town->m_spells[level_d][slot_j];
                     NormalDialog(
@@ -3161,7 +3160,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i16 H2_UNUSED(unusedIconHeight_a) = THIEVES_RANK_ICON_HEIGHT;
     i16 H2_UNUSED(unusedPlayerWidth_n) = 72;
     TownThievesGuildCategory category_l;
-    i8 categoryOrder_a[TOWN_THIEVES_ORDER_BUFFER_SIZE];
+    i8 categoryOrder_a[TOWN_THIEVES_PLAYER_COUNT];
     i32 rank_a;
     i32 tiedCount_j;
     i32 rankX_e;
