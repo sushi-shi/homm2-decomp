@@ -199,5 +199,13 @@
   "include/SOURCE/RECRUIT.h": {"sha256":"0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e","note":"B31: complete recruitment window/quick-view declarations; no bodies"},
   "include/SOURCE/recruitUnit.h": {"sha256":"6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0","note":"B31: complete packed recruitment-manager fields, source domain and interface; no bodies; R30"},
   "include/SOURCE/strip.h": {"sha256":"b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083","note":"B31: complete packed strip icon/cache/slot/border owner and drawing interface; no bodies; R30"},
-  "include/SOURCE/tradpost.h": {"sha256":"34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484","note":"B31: complete trade ratio/efficiency globals, UI geometry domains and interface; no bodies; R30"}
+  "include/SOURCE/tradpost.h": {"sha256":"34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484","note":"B31: complete trade ratio/efficiency globals, UI geometry domains and interface; no bodies; R30"},
+  "src/SOURCE/SWAPMGR.cpp": {"sha256":"ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473","note":"B32: all thirteen bodies incl both constructors; full lifecycle/selector/input/artifact-stat and extra exchange/army view/merge/swap/split/display phases; H14/H21/H30/H31/H71/H74/R31"},
+  "include/SOURCE/swapManager.h": {"sha256":"141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf","note":"B32: complete packed exchange-manager layout, side/item domains and interface; no bodies; R31"},
+  "src/SOURCE/VIEW.cpp": {"sha256":"0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436","note":"B33: all three bodies; complete general/army detail placement/stats/actions/quick view/hover/dispatch and data; H29-H31/H51/H75/R32"},
+  "src/SOURCE/HISCORE.cpp": {"sha256":"a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b","note":"B33: all five bodies; full score-manager lifecycle/input/timing/animation/file-record/display/highlight paths; H14/H31/H70/R32"},
+  "src/SOURCE/x_arena.cpp": {"sha256":"198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a","note":"B33: all three bodies; complete arena choice layout/widget ownership/timeout/help/key/select/replacement paths and data; H01/H30/H31/H62/R32"},
+  "include/SOURCE/VIEW.h": {"sha256":"8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d","note":"B33: complete general-handler and viewed-side declarations; no bodies; R32"},
+  "include/SOURCE/highScoreManager.h": {"sha256":"05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c","note":"B33: complete score display/animation/file/UI constants, packed manager layout and interface; no bodies; R32"},
+  "include/SOURCE/x_arena.h": {"sha256":"af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02","note":"B33: complete arena handler/update interface and choice/widget/window globals; no bodies; R32"}
 }

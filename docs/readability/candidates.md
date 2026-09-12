@@ -2980,3 +2980,164 @@ quantity uses a 187-pixel denominator and maximum-plus-one; do not merge that
 geometry with a generic list thumb. Drag coalesces mouse-move events and still
 does its final display update on release. +/- controls and close forwarding
 remain separate from the clamp and H32 protocols.
+
+## H74 — unconditional adventure-button flag broadcasts
+
+Disposition: credible small owner operation beneath the existing guarded API.
+
+SWAPMGR::Open/Close and ADVMGR::DisableButtons/EnableButtons send the same
+six ordered broadcasts to adventure-window ids 1 through 6. The message is
+initialized type, command, data value 2, then first id; later calls change only
+id. Commands are CLEAR_FLAGS or SET_FLAGS. Natural owner: advManager.h,
+with a proposed SetAdventureButtonFlags operation taking the existing message
+by reference and an explicit command. Reuse the already-named adventure domain,
+not a general window iterator or new lifecycle wrapper.
+
+Preserve all six calls, id order, the single command/data setup, receiver and
+message reuse, and final id 6. Do not clear the union or substitute a new zeroed
+event; SWAPMGR::Open has already used that message for other controls. Do not
+reset command/data between broadcasts or combine them into a ranged draw.
+Receiver/command expressions must be stable. No enable/disable Boolean needs
+to conceal which message is sent. Keep menu, manager activation and redraw
+outside. The readability gain is one owner for the six-button panel contract.
+
+The existing DisableButtons/EnableButtons return unless global gpAdvManager
+is active exactly 1. SWAPMGR's broadcasts are unconditional, including Close's
+ordering after Activate. Replacing them directly with those guarded methods
+would change the contract. Any shared primitive must retain the old guards
+in their callers, not weaken the public API. Helper/inline extraction and the
+six-call shape remain unverified against retail bytes.
+
+## H75 — disable a widget and defer its dimmed drawing
+
+Disposition: credible protocol-level helper; store-order variants need review.
+
+VIEW::ViewGeneral repeats two broadcasts: CLEAR_FLAGS with value 2 to disable
+one control, then SET_FLAGS with the special argument 0x1000 to mark it dimmed.
+TOWNMGR::BuyBuild and ADVMGR::AdvPanel have the same ordered message protocol.
+Possible name: DisableWidgetForNextDraw at the heroWindow.h/widget boundary.
+Pass/reuse the existing message, stable owner and target id; leave its type
+setup, eligibility tests and subsequent dialog/draw work visible.
+
+The fully read widget::Main treats an exact 0x1000 argument specially: it sets
+WIDGET_FLAG_DIMMED and returns without drawing. It is not equivalent to sending
+the ordinary dim flag 8 or flags containing UPDATE. Preserve the two separate
+broadcasts and their order; do not replace them with direct m_flags mutation,
+one combined flag message, an immediate redraw or a different receiver overload.
+The name explains a non-obvious command-argument protocol, not just duplicate
+numbers. Matching evidence is required before any source spelling is retained.
+
+There are distinct store shapes: ViewGeneral reuses the first id on its second
+broadcast, BuyBuild writes command/id/data again, and AdvPanel uses id/command/
+data ordering. They are protocol-level occurrences, not claims of identical
+macro text. Preserve those variants and any intermediate message changes when
+testing extraction; do not silently canonicalize stores around mutable dispatch.
+ADVMGR::ControlPanel dims before disabling, so is excluded from this ordered
+helper. HERO::SetupHeroView dims both navigation controls before disabling
+either, a different two-control phase order. RECRUIT::Open broadcasts through
+the window manager with value 0x4008, which includes update work; it is also
+not this deferred-draw operation. These exclusions make a blanket DisableWidget
+substitution inappropriate.
+
+## B32-B33 — extensions to established candidates
+
+H14 gains exchange/high-score manager registration stores, keeping surrounding
+menu/fade/activation work explicit. H21 gains SWAPMGR's slot-sentinel queries;
+SwapMons' unused count loop additionally requires positive quantity. H71 gains
+SwapMons' merge source reset, type NONE then count zero, after its separate
+last-stack guard. Its ordinary exchange already calls armyGroup::Swap, whose
+type-before-count operation differs from townManager's open-coded order.
+
+H01 gains DoArenaDialog's complete text prefix. Exchange setup, both score
+message paths and ViewGeneral often have formatting or id-before-command stores,
+or reuse type/id/payload state; they are not additional exact H01 triples.
+H29 gains ViewGeneral's Stats(KNOWLEDGE) times ten, retaining its repeated Stats
+call within the complete formatted summary. H30 gains exchange restrictions,
+general help and arena skill help's text-only dialogs. H31 gains checked
+exchange/general/high-score/arena windows and arena widgets. H51 gains
+HandleViewGeneral's hover CombatMessage(text, 1, 0, 0).
+
+H62 gains UpdateArenaIcons' RemoveWidget/delete/null pointer prefix; leave
+replacement construction, attachment and final ranged DrawWindow outside.
+H70 gains highScoreManager::Update's exact `read(fd, &highScore,
+sizeof(highScore))` for the packed 100-byte record, with its return ignored
+and its uninitialized/partial-read behavior unchanged. It is not the searched
+KB score-array byte-count mismatch. None of the new close handlers sets H32's
+function-completion flag. ViewArmy's placement tests are not ordinary inclusive
+H07 clamps: x + 488 > 640 assigns 151, not 152; y + 229 > 460 assigns 230,
+not 231. Preserve the one-pixel discontinuities instead of repairing bounds.
+
+## R31 — hero exchange and split contracts
+
+The default swapManager constructor initializes all pointers/selection fields;
+the two-hero constructor sets only hero pointers. Reset's chained five-field
+assignment is not either constructor. Open uses a fixed mono-icon setting then
+resets it to -1, not its previous value, and Close does not null disposed window/
+selector pointers. DrawSwapWin returns zero after window draw and screen update;
+it is not H59's adventure redraw primitive. The selector's army/artifact grids,
+frame choice and screen-region update remain local geometry.
+
+Main reads the modifier union before checking message type, maps each side's
+skill icon/level controls separately, and handles same-slot views before
+exchange/split. Book prohibition precedes normal artifact interaction, while
+quick view allows the book. Hero view redraws before Reset and later runs the
+outer Update/Draw/Selector tail again. Quick paths skip that tail. Existing
+owner methods name these operations; a macro for the mirrored full left/right
+handlers would hide selection, UI and reset ordering.
+
+SwapArtifacts takes both old artifact stats before writing either artifact,
+swaps i8 extras separately, gives both new stats, then checks Anduran pieces
+on selected and target heroes in order. It calls the stat API even for NONE.
+The spade-of-necromancy refresh tests the captured old ids and updates skill
+levels, not every skill widget. This is not a generic two-field swap, nor an
+interchangeable remove-then-give-artifact operation. Update renders primary
+stats in interleaved left/right order, then separate passes for left icons,
+left counts, right icons, right counts, left artifacts and right artifacts.
+Do not fuse these phases into a per-slot or per-hero loop.
+
+SwapMons retains its unused positive-stack census. Same-type merge rejects
+GetNumArmies() == 1 before count addition; ordinary swapping tests cross-group,
+last-stack and empty target separately. It already uses armyGroup::Swap after
+those guards. SplitMons uses the town manager's shared window/quantity/handler,
+but different coordinates/text and mutation order. Same-type transfer subtracts
+source before adding destination and clears type if the source count becomes
+zero; town SplitArmy adds destination first and has no such type clear. The
+nonmatching target path searches the first empty slot but retains the old target
+if none exists, then assigns its type/count. Preserve those behavior differences,
+shared dangling window pointer, exclusive split bound and result handling.
+
+## R32 — combat detail, score and arena presentation contracts
+
+ViewGeneral first rejects a null hero, then sets two side globals. Captain/name/
+color/stat queries use different player/hero references, and morale uses the
+opposing army group. Preserve the repeated null check and the actual action
+control ids even when labels suggest a different meaning. Quick view still
+deletes its window and redraws combat afterward; normal view additionally
+dispatches the dialog result. HandleViewGeneral stores the selected result,
+then changes id and command to the close value; it does not set a completion
+flag. Hover caching uses one id and the shared viewed-side global. Combat
+ViewArmy keeps facing-dependent placement, unusual edge assignments and the
+existing complete game::ViewArmy argument list; it is not a generic tooltip.
+
+High-score construction consumes ten Random draws. Main animates every display
+slot before its right-button return, uses a strict timer comparison and reads
+KBTickCount again when updating the deadline. Update advances frames only for
+nonempty scores. Missing files initialize only highScore.score, yet cheated is
+still inspected; short reads likewise do not initialize the rest of the record
+or validate size. Do not insert zeroing/early failure through a read helper.
+Player/scenario strings are used as sprintf formats, and redundant empty
+formats remain visible. Campaign and standard columns differ, and highlight
+selection retains its Boolean expression and four broadcasts. No score
+normalization, string repair, generic row renderer or error-lifetime wrapper
+is proposed. Close fades/removes/deletes without clearing the window pointer.
+
+Arena creates checked text widgets from static gStatNames with a kind that
+assumes ownership; that documented mismatch is not an allocation-copy instance.
+Icon changes remove/delete/null/recreate all three icons rather than merely
+changing frames, with reattachment affecting widget order. Timeout first retypes
+the current event, stores its existing union id as dialog result, forwards close
+and clears the deadline. It differs from the explicit accept path and H32.
+Right-click help changes choice but does not refresh selection icons; keyboard
+cycling and left release do. Ambient music may restart before any dispatch.
+The fixed five-row window height and retained text measurement are not a generic
+auto-layout calculation. Preserve widget ownership, globals and event ordering.

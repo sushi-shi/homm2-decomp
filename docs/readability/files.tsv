@@ -95,7 +95,7 @@ include/SOURCE/SETUP.h	26	0	1	unread	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232
 include/SOURCE/SMACKMGR.h	71	0	1	unread	21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20	-
 include/SOURCE/SPELLS.h	184	0	2	read	d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
 include/SOURCE/TOWNMGR.h	167	0	1	read	e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2	B29: complete building record/masks, UI/resource/thieves-guild domains and declarations; no bodies; implementation covered in B30
-include/SOURCE/VIEW.h	13	0	1	unread	8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d	-
+include/SOURCE/VIEW.h	13	0	1	read	8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d	B33: complete general-handler and viewed-side declarations; no bodies; R32
 include/SOURCE/Viewwrld.h	17	0	1	unread	7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139	-
 include/SOURCE/Wsnetwin.h	56	0	1	read	daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b50606f4bf40	B26: complete Winsock transport constants, packed startup, globals and interface; no bodies; H64/H65
 include/SOURCE/X_GLOBAL.h	631	1	1	read	63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d	B10: complete globals/table dimensions and NextSpellEffectDisplayType inline; H15/R12
@@ -112,7 +112,7 @@ include/SOURCE/fileRequester.h	122	0	1	read	77531e764a0450d54d51c6228c22d91a49ae
 include/SOURCE/game.h	356	5	1	read	fcaa4554262de8c324295e02c4f11a1b2f37453dafcc3710adda23bc68961924	B13: complete game/boat/mine/campaign/save/runtime layouts and API; five existing owner accessors
 include/SOURCE/hero.h	239	1	1	read	b18f61633fc21a8d1127f7d074458ea3521c06026c79aa5542922ccce878b986	B13: complete packed runtime/serialized hero/flag/skill domains; IsEmbarked inline; H22/R15
 include/SOURCE/hexcell.h	45	0	1	read	bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5	B12: complete packed occupant/corpse/path/clipping layout and declarations; no bodies
-include/SOURCE/highScoreManager.h	64	0	1	unread	05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c	-
+include/SOURCE/highScoreManager.h	64	0	1	read	05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c	B33: complete score display/animation/file/UI constants, packed manager layout and interface; no bodies; R32
 include/SOURCE/kbwin.h	86	0	1	read	d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	136	0	1	read	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27	B26: complete NetBIOS command/result/session domains, packed NCB and payload/event layouts, calling conventions and interfaces; no bodies
 include/SOURCE/netwin_private.h	22	0	1	read	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	B26: complete private NetBIOS callback/session/name declarations and external Netbios ABI; no bodies
@@ -121,13 +121,13 @@ include/SOURCE/playerData.h	109	8	1	read	95fbf9b9517844c3a72b20f0f6fd44ddee9a406
 include/SOURCE/recruitUnit.h	51	0	1	read	6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0	B31: complete packed recruitment-manager fields, source domain and interface; no bodies; R30
 include/SOURCE/searchArray.h	174	4	1	read	ad483f65ac7f0acc70696aa75651bb381b8494aa04b5f38756c2edf3870a981a	B14: complete queue/searchCell/searchNode/path union layouts and four existing accessors; H27/R16
 include/SOURCE/strip.h	70	0	1	read	b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083	B31: complete packed strip icon/cache/slot/border owner and drawing interface; no bodies; R30
-include/SOURCE/swapManager.h	53	0	1	unread	141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf	-
+include/SOURCE/swapManager.h	53	0	1	read	141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf	B32: complete packed exchange-manager layout, side/item domains and interface; no bodies; R31
 include/SOURCE/town.h	121	1	1	read	152a21d536099dc905cd861822fec1a0c9b8bf097993b95a34d50853786f289b	B12: complete building masks, faction aliases, packed spell/count union; OccupyingHero inline; H20
 include/SOURCE/townManager.h	98	1	1	read	89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc	B29: complete packed town-manager layout/interface and SetTown inline; pointer assignment is not context activation; implementation covered in B30
 include/SOURCE/townObject.h	25	0	1	read	4e0c90cbc973c613dd5b9e0b6a8dbcc4241fb97b77ef9488228c8149e16574fb	B12: complete animation/building/icon/border owner declarations; no bodies
 include/SOURCE/tradpost.h	53	0	1	read	34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484	B31: complete trade ratio/efficiency globals, UI geometry domains and interface; no bodies; R30
 include/SOURCE/wingraph.h	112	0	1	read	0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
-include/SOURCE/x_arena.h	17	0	1	unread	af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02	-
+include/SOURCE/x_arena.h	17	0	1	read	af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02	B33: complete arena handler/update interface and choice/widget/window globals; no bodies; R32
 include/va.h	55	0	23	read	613ae23bdf9a6f3e6d0b74217e62c4bd1008b2661ae0cdc861d253246bcb3278	B10: complete annotation/metadata conditional macros; no function bodies; R12
 src/BASE/AudiereEffects.cpp	203	13	0	read	66050a61dac3b326c25705b7d704df52e28304179d2aad2093f59baa36dd1d2b	B06: 13 bodies incl empty node destructor; full list/iteration/stream lifecycle; R08
 src/BASE/AudiereMusic.cpp	168	7	0	read	736b9ab782b1c3998cefdb9802b9341715da92c5c8b010e9b7fff1b98c5ebb4f	B06: 7 bodies; stream ownership, reset/play/position/fade contracts; H07/R08
@@ -194,7 +194,7 @@ src/SOURCE/FLY.cpp	476	4	1	read	119bad9ab6fdf5f1a43490feb68d0e1ce25e9acf134e3967
 src/SOURCE/GAME.cpp	8051	103	56	read	e78a08b9b2fdc8ed202f8d5485c6aec6ff07630136ce9cb5257cc649bce616fb	B29: all 103 bodies incl four unannotated inlines; complete player/save/load/puzzle/map/setup/calendar/UI/random/visibility/transfer/diff/rumour/event/consistency/test paths and macros/data; H01/H07/H17/H20/H22/H24/H26/H29-H31/H33/H44/H68-H71/R29
 src/SOURCE/HERO.cpp	2131	41	1	read	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9	B13: all 41 bodies; full hero stats/spells/skills/level/deallocation and UI handlers/setup/splits; H01/H21-H23/R15
 src/SOURCE/HEXCELL.cpp	138	8	0	read	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	B12: 8 bodies; current/dead occupants, facing-dependent draws, tower parity and empty hooks; R14
-src/SOURCE/HISCORE.cpp	320	5	0	unread	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	-
+src/SOURCE/HISCORE.cpp	320	5	0	read	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	B33: all five bodies; full score-manager lifecycle/input/timing/animation/file-record/display/highlight paths; H14/H31/H70/R32
 src/SOURCE/KB.cpp	11500	75	6	unread	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	-
 src/SOURCE/Modem.cpp	419	15	0	read	0f54ae68a192f37429c53437d53c213c651574b72e8f921dde1da25c6f412d9f	B28: all fifteen bodies; full setup/command/response/byte/handshake/streaming-frame paths and data; H30/R28
 src/SOURCE/NOOPT.cpp	25	3	0	read	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	B10: 3 delay bodies; pointer reread vs value deadline, message then sound polling; R10
@@ -212,10 +212,10 @@ src/SOURCE/SMACKMGR.cpp	851	8	1	unread	a1eb2af13ac68e181d71fda6de78f61da3742d2e8
 src/SOURCE/SPELLAI.cpp	1479	11	19	read	40c0bdeadb581158ae48cee719cec4c7c3d6e5090cf9efa371e9ba941bc7d0a5	B20: all eleven bodies and score tables; full selection/duration/influence/create/cure/resurrect/damage evaluation; H28/H46-H50/H52/R22
 src/SOURCE/SPELLS.cpp	3918	37	28	read	b339f7e92d3169ddcb1f10cffbd9b24a8ee69fc453a70c02403bb4e3dc94a85b	B19: all 37 bodies and data/macros; full spell UI/target/cast/damage/bolt/palette/ripple/mass/mirror/resurrection/earthquake paths; H07/H28/H30/H31/H34-H36/H38/H40/H42-H47/H51/H52/R21
 src/SOURCE/STRIP.cpp	255	8	0	read	84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f	B31: all eight strip/bank bodies; complete ownership/cache invalidation/replacement/slot draw/frame/bank update paths; H21/H31/R30
-src/SOURCE/SWAPMGR.cpp	1023	13	0	unread	ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473	-
+src/SOURCE/SWAPMGR.cpp	1023	13	0	read	ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473	B32: all thirteen bodies incl both constructors; full lifecycle/selector/input/artifact-stat and extra exchange/army view/merge/swap/split/display phases; H14/H21/H30/H31/H71/H74/R31
 src/SOURCE/TOWN.cpp	218	9	0	read	02549ee9cb7ea6a2360bbb612b089138609f9ce240f1e2f498211a233e87934c	B12: 9 bodies; spell/building/garrison/view/conversion/player-list lifetime; H20/R14
 src/SOURCE/TOWNMGR.cpp	3636	34	0	read	ed4ea7444bee3fd99fdc889b9f6fe85b5ae687a31f1a3c3b0618e10df56b351e	B30: all 34 bodies incl private CP1251 inline; full object/lifecycle/drawing/input/army/build/mage/recruit/tavern/well/thieves/statistics paths and data; H01/H05-H07/H14/H20/H21/H30/H31/H69/H71-H73/R30
-src/SOURCE/VIEW.cpp	418	3	0	unread	0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436	-
+src/SOURCE/VIEW.cpp	418	3	0	read	0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436	B33: all three bodies; complete general/army detail placement/stats/actions/quick view/hover/dispatch and data; H29-H31/H51/H75/R32
 src/SOURCE/Viewwrld.cpp	867	5	0	unread	ecb65df904c39239a8742341302fee5271ae3f2b357525b54a356e9443eb5b4f	-
 src/SOURCE/Wsnetwin.cpp	572	10	0	read	6b7c68d77cfdf3b9f95b3c22b776400868011fe8d65c6d0b1816649ceff8ea69	B27: all ten bodies; full socket/setup/send/broadcast/receive/guest/wait/teardown paths and data; H01/H15/H17/H30/H64/H65/R27
 src/SOURCE/X_CAMPGN.cpp	1373	36	0	unread	785cadb46cc272005050458eaf293ae3a82666051eaab30101fa672e603432e3	-
@@ -226,4 +226,4 @@ src/SOURCE/kbwin.cpp	587	16	0	read	8e359c2475ae2ad626c8128d608cdfbc062e99a11cfa2
 src/SOURCE/netwin.cpp	660	19	14	read	31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1	B28: all nineteen bodies incl private callbacks and variadic dispatch; full NCB/session/queue/lock/event/retry/cancel/name paths and data/macros; H66/H67/R28
 src/SOURCE/tradpost.cpp	462	6	0	read	b0b69f9a7db5333ace20349089c95f9d74aaa66f12df9b34bf953ad131daac01	B31: all six bodies; full trade setup/ratios/two-sided display/drag/input/exchange and globals; H01/H07/H69/R30
 src/SOURCE/wingraph.cpp	1158	32	1	read	3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9	B11: all 32 bodies; full DD/WinG surface/palette/paint/error/switch/lifetime; H13/H15/H18; R13
-src/SOURCE/x_arena.cpp	257	3	0	unread	198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a	-
+src/SOURCE/x_arena.cpp	257	3	0	read	198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a	B33: all three bodies; complete arena choice layout/widget ownership/timeout/help/key/select/replacement paths and data; H01/H30/H31/H62/R32

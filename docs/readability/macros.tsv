@@ -183,7 +183,7 @@ include/SOURCE/SMACKMGR.h	2	2	HOMM2_SMACKMGR_H	unread	0dd136bea987eb580affaea86f
 include/SOURCE/SPELLS.h	2	2	HOMM2_SPELLS_H	read	05e998a05146b5fd7d9840201a03cfa7fc3a83428cd09011f8b77f8433c6d64b	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
 include/SOURCE/SPELLS.h	179	179	SPELL_GOLEM_DAMAGE_MULTIPLIER	read	93ca29f35f1b1ce0e6ead306df5a8e8b8d28accfcf50d74d117f65174a8328df	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
 include/SOURCE/TOWNMGR.h	2	2	HOMM2_TOWNMGR_H	read	4febdbb6cebdae43c812cc7c182641daba047dadcfc2fdeeeeb01236fbc47882	B29: complete building record/masks, UI/resource/thieves-guild domains and declarations; no bodies; implementation covered in B30
-include/SOURCE/VIEW.h	2	2	HOMM2_VIEW_H	unread	1bcfeacd87974ac80b4086e0b789392dbf9842e9dfe60f1ab6f6f83616b0c70d	-
+include/SOURCE/VIEW.h	2	2	HOMM2_VIEW_H	read	1bcfeacd87974ac80b4086e0b789392dbf9842e9dfe60f1ab6f6f83616b0c70d	B33: complete general-handler and viewed-side declarations; no bodies; R32
 include/SOURCE/Viewwrld.h	2	2	HOMM2_VIEWWRLD_H	unread	fc1709f290c702a423a3b46dea7eac66bb72b605c05cddeceda6efb834be17fd	-
 include/SOURCE/Wsnetwin.h	2	2	HOMM2_WSNETWIN_H	read	c1141f2d44d15c3c15760ab9336591d4b55d01ab62ef910da54b5eb78618e73f	B26: complete Winsock transport constants, packed startup, globals and interface; no bodies; H64/H65
 include/SOURCE/X_GLOBAL.h	2	2	HOMM2_X_GLOBAL_H	read	51f0502d53e9952e0114fb220a548203f9cb37a95da8c48c612861c756663a9c	B10: complete globals/table dimensions and NextSpellEffectDisplayType inline; H15/R12
@@ -207,7 +207,7 @@ include/SOURCE/fileRequester.h	2	2	HOMM2_SOURCE_FILEREQUESTER_H	read	dd1536400a6
 include/SOURCE/game.h	2	2	HOMM2_SOURCE_GAME_H	read	9ec8edd8fbc580e39e0feed6208ef9ef30d11f925baf03b90a98b2b8061a4a23	B13: complete game/boat/mine/campaign/save/runtime layouts and API; five existing owner accessors
 include/SOURCE/hero.h	2	2	HOMM2_SOURCE_HERO_H	read	e5045e769918d42bddec802db0f068bfd3b7bf5e67e34f607347d4a52c38b0d2	B13: complete packed runtime/serialized hero/flag/skill domains; IsEmbarked inline; H22/R15
 include/SOURCE/hexcell.h	2	2	HOMM2_SOURCE_HEXCELL_H	read	2cebc8a22b633133c7b29aaeb5d99f739efbaa5c649f25b3db96f9206647fe4c	B12: complete packed occupant/corpse/path/clipping layout and declarations; no bodies
-include/SOURCE/highScoreManager.h	2	2	HOMM2_SOURCE_HIGHSCOREMANAGER_H	unread	2e7c96d83917bdf1da6272660a3ec1b5c7e423b98b42e7ada8484ae0724f5e34	-
+include/SOURCE/highScoreManager.h	2	2	HOMM2_SOURCE_HIGHSCOREMANAGER_H	read	2e7c96d83917bdf1da6272660a3ec1b5c7e423b98b42e7ada8484ae0724f5e34	B33: complete score display/animation/file/UI constants, packed manager layout and interface; no bodies; R32
 include/SOURCE/kbwin.h	2	2	HOMM2_KBWIN_H	read	aa2547e812f662b3a86b6a256f9ff1148b3e1f52d96a548f9ef514cb051de6b2	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	2	2	HOMM2_NETWIN_H	read	0eafab4a7dfbb199a721b79e2f7f7c399f45076ef6264d47d909f524b1997949	B26: complete NetBIOS command/result/session domains, packed NCB and payload/event layouts, calling conventions and interfaces; no bodies
 include/SOURCE/netwin_private.h	2	2	HOMM2_NETWIN_PRIVATE_H	read	0e9ffbea2eebb74b79420e253b1bfedc24f538d44ec69db92b63c313186d1f60	B26: complete private NetBIOS callback/session/name declarations and external Netbios ABI; no bodies
@@ -216,13 +216,13 @@ include/SOURCE/playerData.h	2	2	HOMM2_SOURCE_PLAYERDATA_H	read	261d92851be5d7aec
 include/SOURCE/recruitUnit.h	2	2	HOMM2_SOURCE_RECRUITUNIT_H	read	e768ce998ef02d410e6f7e96feff3b44a177efbc7f46756eec66f9d314630e79	B31: complete packed recruitment-manager fields, source domain and interface; no bodies; R30
 include/SOURCE/searchArray.h	2	2	HOMM2_SOURCE_SEARCHARRAY_H	read	4335505ea737a50fdd6c0db023b46ea1cf5a16eccd02f427eecde9cc420e0e90	B14: complete queue/searchCell/searchNode/path union layouts and four existing accessors; H27/R16
 include/SOURCE/strip.h	2	2	HOMM2_SOURCE_STRIP_H	read	53ff69ac00596b725cc1d57eb399266ffc7f85aa82d29bb7239570e4277d2db3	B31: complete packed strip icon/cache/slot/border owner and drawing interface; no bodies; R30
-include/SOURCE/swapManager.h	2	2	HOMM2_SOURCE_SWAPMANAGER_H	unread	c4ff371b7fdc37f53ef85dacd9635cb82fd7d50ec0a9a1645fc580bc64f3a660	-
+include/SOURCE/swapManager.h	2	2	HOMM2_SOURCE_SWAPMANAGER_H	read	c4ff371b7fdc37f53ef85dacd9635cb82fd7d50ec0a9a1645fc580bc64f3a660	B32: complete packed exchange-manager layout, side/item domains and interface; no bodies; R31
 include/SOURCE/town.h	2	2	HOMM2_SOURCE_TOWN_H	read	eeb5aec97b79c03250f0bca7e7131435af490f2dc2acfd57cf94e45a503b5134	B12: complete building masks, faction aliases, packed spell/count union; OccupyingHero inline; H20
 include/SOURCE/townManager.h	2	2	HOMM2_SOURCE_TOWNMANAGER_H	read	ff784e1edcfda33fe3f4ef341925b9c4af52e9806a61016f01007f2f159ae065	B29: complete packed town-manager layout/interface and SetTown inline; pointer assignment is not context activation; implementation covered in B30
 include/SOURCE/townObject.h	2	2	HOMM2_SOURCE_TOWNOBJECT_H	read	03641e7149e9c02e3b35017115b315d99dc4f7245edc5ace82246fea6d745878	B12: complete animation/building/icon/border owner declarations; no bodies
 include/SOURCE/tradpost.h	2	2	HOMM2_TRADPOST_H	read	2647f6192f2b7851bb5fd48c338a62b66b5fb2bd6f1187157b0d88fcc491da4b	B31: complete trade ratio/efficiency globals, UI geometry domains and interface; no bodies; R30
 include/SOURCE/wingraph.h	2	2	HOMM2_WINGRAPH_H	read	c465b9830860309a51b6c4d4a6daf31c81e7e235e7bb6226d2703260908e71e0	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
-include/SOURCE/x_arena.h	2	2	HOMM2_X_ARENA_H	unread	5f9da015274f322557b715e4ab638486628377357324bdd0f325e34b2db248aa	-
+include/SOURCE/x_arena.h	2	2	HOMM2_X_ARENA_H	read	5f9da015274f322557b715e4ab638486628377357324bdd0f325e34b2db248aa	B33: complete arena handler/update interface and choice/widget/window globals; no bodies; R32
 include/va.h	2	2	HOMM2_VA_H	read	e39adb13f62e0394e95400e867677a46c8443ff377ae5d4cd14c81f26cbf325f	B10: complete annotation/metadata conditional macros; no function bodies; R12
 include/va.h	8	8	VA	read	add40f66f97db717311ae883056ce68c5ab85889093c6d958a7cf04784440cd5	B10: complete annotation/metadata conditional macros; no function bodies; R12
 include/va.h	9	9	VA_COMPGEN	read	75bbb8fa4cab5e444dfc53c0ec573c2558fef79977966106e0d2161fc3678ac9	B10: complete annotation/metadata conditional macros; no function bodies; R12

@@ -533,3 +533,35 @@ view deletion, first-nonzero cost selection, icon disposal, ratio conversion,
 stale trade state and event-loop contracts. This batch adds 22 definitions and
 eight files. Across B30-B31, 59 definitions and eleven files are newly fully read;
 no executable source, header, configuration or behavior changed.
+
+## B32 — complete hero-to-hero exchange manager
+
+Read all 1,023 lines and thirteen definitions of SWAPMGR.cpp, including both
+constructors, the complete 434-line Main, selectors, artifact stat/extra exchange,
+army view/merge/swap/split, six-pass display update, lifecycle and vtable marker.
+Reconciled its complete index. Also read all 53 lines of swapManager.h (zero
+bodies): packed manager fields, side/item domains and interface. Hero, town,
+army, adventure, widget and resource owners were already fully reviewed.
+
+H74 isolates the unconditional six-button broadcast sequence shared with
+ADVMGR, retaining the existing methods' active-state guards outside. H14/H21/
+H30/H31/H71 gain consumers. R31 retains constructor initialization differences,
+artifact stat ordering, army/split distinctions and reused message state.
+This batch adds thirteen definitions and two files, without game-code changes.
+
+## B33 — complete combat detail, high-score and arena screens
+
+Read all of VIEW.cpp (418 lines, three definitions), HISCORE.cpp (320, five)
+and x_arena.cpp (257, three), including complete handlers, all data and trailing
+markers. Reconciled each index. Covered general/army panel placement, actions,
+hover/quick view, high-score file/display/animation and arena choice/timeout/
+widget replacement. Read all of VIEW.h (13 lines), highScoreManager.h (64) and
+x_arena.h (17), zero bodies; other relevant owners were previously read.
+
+H75 records the disable-then-deferred-dim message protocol against fully read
+town/adventure/widget code, with explicit field-order and broadcast variants.
+H01/H14/H29-H31/H51/H62/H70 gain instances or exclusions. R32 records nonstandard
+clamp endpoints, dialog completion, score-record/animation behavior and static
+text ownership. This batch adds eleven definitions and six files. Across
+B32-B33, 24 definitions and eight files are newly fully read; no executable
+source, header, configuration or behavior changed.
