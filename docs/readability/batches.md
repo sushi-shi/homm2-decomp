@@ -1,5 +1,10 @@
 # Deliberate reading notes
 
+These are chronological checkpoints. Statements about unread files in early
+batches describe the state at that batch, not today's checklist; B44 finishes
+the reading pass and B45 records final consolidation. Current status is in
+[progress.md](progress.md), with current recommendations in [findings.md](findings.md).
+
 ## B01 — base widget event protocol
 
 Read in full: `BUTTON.cpp`, `TEXTWDGT.cpp`, `WIDGET.cpp`, `ICONWDGT.cpp` under
@@ -764,3 +769,43 @@ checklist at 1,655 definitions and 228 files. That completes the reading pass,
 NOT the whole task: occurrence validation, consolidation, prioritization and
 the requirement-by-requirement final audit still remain. No executable source,
 header, configuration or behavior changed.
+
+## B45 — whole-corpus consolidation and final candidate ranking
+
+Reviewed the entire H01-H96/R01-R45 ledger against the completed owner/caller
+pass, then wrote a compact ranked index with natural owners, confirmed cross-TU
+witnesses, essential boundaries and consolidation decisions. Existing duplicate
+macros, declaration defaults, existing APIs, narrow new contracts and low-gain
+variants are distinguished; multiple forms within H12/H55/H64 are not presented
+as a single universal helper or counted as independent discoveries.
+
+Final source checks resolve early leads as H97 quick-view dialog mode, H98
+rounded animation steps and H99 changed-hover-id acceptance, all rank C. R46
+records the nonuniform secondary-skill encoding, callback-only hover comparison,
+two-field town cache, local invalidation and existing owner-accessor exclusions.
+Rechecked message/manager field types, dialog modes, animation spacing/speed and
+all relevant call fragments. No extra source-reading credit was created.
+
+The whole-tree abs search extends H96 to five TUs: adventure/events/AI plus
+SPELLS and GAME. Separate-delta approximate metrics and reassociated visibility
+radius formulas are excluded. Rechecked H62 against ADVMGR/COMMAND and the
+arena/overview variants: null stores never belong inside its detach/delete
+helper, and arena's prefix is unguarded. Corrected the earlier extension wording.
+Rechecked the existing identical H01 definitions, H17's strict bridge, H08's
+division/geometry preconditions and relevant natural owner declarations.
+
+Updated stale future-reading references to their actual completed batches while
+preserving the earlier checkpoints' chronology. The final ledger has 99 H
+families and 46 R observations. No executable refactor, propagation, byte-match
+claim or original-source-spelling claim is made. Inventory and mechanical
+validation, scope verification and completion evidence are recorded separately
+in [completion.md](completion.md); tests validate tooling, not human reading.
+
+The final independent raw-macro check found one inventory omission in the
+already fully read `KB_TYPES.h`: the C++ parser skipped the `NextCreatureType`
+macro following its inline alternative. Added a separate CPreProcessor indexing
+pass and three integration regressions, then regenerated and checked all reports.
+All 745 physical macro names/locations/extents now agree with the raw definitions;
+the function inventory stays at 1,655 and no game file changed. This is existing
+R12 domain vocabulary, not a new H candidate. Direct inventory tests pass 20/20;
+the audit suite passes 239/239, with all six Ctags integrations enabled.

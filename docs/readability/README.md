@@ -8,6 +8,13 @@ macros and inline functions that explain code across translation units.
 This is a source-reading audit, not a claim to have recovered original source
 spelling. Similar code alone does not prove a historical macro or inline.
 
+The deliberate pass is complete: **228 files and 1,655 physical function
+definitions read**, including header bodies and assembly. Start with the
+[ranked findings](findings.md), then use the [detailed ledger](candidates.md)
+for the exact contracts, call sites and exclusions. It records 99 finding
+families and 46 local/rejected observations; those are not 99 required new APIs.
+The [completion audit](completion.md) states the evidence and its limits.
+
 ## Inventory and reading contract
 
 - [Every function definition](functions.tsv), including constructors, destructors,
@@ -16,7 +23,8 @@ spelling. Similar code alone does not prove a historical macro or inline.
 - [Existing macros](macros.tsv), including conditional variants and include guards;
   these are classified during the owning-file read, not counted as helper ideas.
 - [Current progress](progress.md) and [review records](reviews.json).
-- [Candidate ledger](candidates.md) and [batch notes](batches.md).
+- [Ranked findings](findings.md), [candidate ledger](candidates.md),
+  [batch notes](batches.md), and [completion evidence](completion.md).
 
 `read` means the complete file, all its function bodies, and relevant declarations
 were deliberately read; its indexed function boundaries were reconciled. Searches,
@@ -27,7 +35,9 @@ SHA-256, so changes reset the file and its functions to `unread` on regeneration
 Reading shared declarations/call sites also remains necessary when judging a helper.
 
 Universal Ctags 6 indexes physical definitions using explicit expansions of the
-project's enum annotation macros. Each source `VA` must have an indexed body.
+project's enum annotation macros. A separate CPreProcessor pass indexes macros,
+including alternatives to inline functions that the C++ parser can skip. Each
+source `VA` must have an indexed body.
 This is a navigation/completeness aid, not a C++ correctness proof. Human reading
 must reconcile unannotated and conditional bodies too. Vendor SDK/library sources,
 build tooling, and hypothetical compiler-generated bodies are outside the game

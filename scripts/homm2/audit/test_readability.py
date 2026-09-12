@@ -96,12 +96,50 @@ CTAGS = os.environ.get("HOMM2_READABILITY_CTAGS") or shutil.which("ctags")
 
 @unittest.skipUnless(CTAGS, "Universal Ctags is not available")
 class CtagsIntegrationTests(unittest.TestCase):
-    def index(self, text):
+    def index_all(self, text):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "fixture.cpp").write_text(text)
             return tag_rows(ctags_rows(root, ["fixture.cpp"], CTAGS),
-                            {"fixture.cpp": text.encode()})[0]
+                            {"fixture.cpp": text.encode()})
+
+    def index(self, text):
+        return self.index_all(text)[0]
+
+    def test_macro_alternative_to_inline_body_is_not_skipped(self):
+        functions, macros = self.index_all("""#ifdef STRICT
+inline Kind NextKind(Kind value) {
+    return static_cast<Kind>(value + 1);
+}
+#else
+#define NextKind(value) (static_cast<Kind>((value) + 1))
+#endif
+""")
+        self.assertEqual([r["name"] for r in functions], ["NextKind"])
+        self.assertEqual([(r["name"], r["line"], r["end"]) for r in macros],
+                         [("NextKind", 6, 6)])
+
+    def test_conditional_macros_keep_each_physical_extent(self):
+        source = ("#if 0\n#define CHOOSE(x) " + chr(92) + "\n"
+                  "    ((x) + 1)\n#else\n#define CHOOSE(x) ((x) + 2)\n#endif\n")
+        functions, macros = self.index_all(source)
+        self.assertEqual(functions, [])
+        self.assertEqual([(r["name"], r["line"], r["end"]) for r in macros],
+                         [("CHOOSE", 2, 3), ("CHOOSE", 5, 5)])
+        self.assertEqual(macros[0]["body_sha256"],
+                         digest("".join(source.splitlines(keepends=True)[1:3]).encode()))
+
+    def test_macro_pass_ignores_comments_and_quoted_text(self):
+        functions, macros = self.index_all('''/*
+#define IN_COMMENT 1
+*/
+// #define IN_LINE_COMMENT 2
+const char* text = "#define IN_STRING 3";
+#define REAL_TEXT "/* not a comment */"
+''')
+        self.assertEqual(functions, [])
+        self.assertEqual([(r["name"], r["line"], r["end"]) for r in macros],
+                         [("REAL_TEXT", 6, 6)])
 
     def test_project_macros_do_not_hide_constructor_or_method(self):
         rows = self.index("""H2_ENUM_BEGIN(Kind)

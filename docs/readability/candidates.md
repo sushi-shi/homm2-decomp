@@ -1,9 +1,10 @@
 # Common-helper candidates
 
 All entries are search findings, not implemented or retail-byte-verified changes.
-The deliberate whole-tree reading pass is complete (B44); the final occurrence,
-consolidation and ranking review is still in progress. Names below are proposals
-unless identified as existing.
+The deliberate whole-tree reading pass is complete (B44). B45 reconciles the
+cross-TU witnesses, resolves earlier leads and ranks the findings in
+[findings.md](findings.md). Names below are proposals unless identified as
+existing. H numbers identify finding families, not mandatory new abstractions.
 
 ## H01 — shared widget-message header macro
 
@@ -85,8 +86,9 @@ screen coordinates. Do not fold screen-to-local conversion into the helper: it
 would change narrowing and possibly overflow behavior. No unsigned subtraction
 "optimization" or Win32 `RECT` conversion. Read-only predicate is period-plausible;
 an inline may add `/Ob1` expansion structure absent from the current body, so macro
-versus method remains a measured matching question. Rectangle-like checks in other
-domains are not yet reviewed and are not automatically instances of this helper.
+versus method remains a measured matching question. The other rectangle domains
+were also read; B34/B43 record their different ordering, widths and owners rather
+than treating them as widget-method instances.
 
 B02 adds `border::Main`, `textEntryWidget::Main`, `listBoxWidget::Main`, and
 `dropListWidget::Main` (right-click). The drop button and open list have different
@@ -96,7 +98,7 @@ from `screenX/screenY`, unlike the entry handler's narrowed `x/y`; preserve that
 
 ## H03 — serialized widget geometry prefix
 
-Disposition: plausible narrow statement macro; more widget readers to review.
+Disposition: plausible narrow statement macro; all eight widget readers reviewed.
 
 `button::Read`, `textWidget::Read`, and `iconWidget::Read` start with four
 `gpResourceManager->ReadWord()` calls assigning `m_x`, `m_y`, `m_width`, `m_height`
@@ -114,18 +116,21 @@ in total. Keep `m_id`/`m_kind` outside the helper, since their positions vary.
 
 ## H04 — resource lookup while retaining a resource-file cursor
 
-Disposition: recurring lifetime pattern, defer abstraction judgment.
+Disposition: credible direct-lookup subset; low priority, not a general lifetime helper.
 
 The three `Read` functions above bracket `GetFont` or `MakeId`/`GetIcon` with
-`SavePosition` / `RestorePosition`. It is plausible shared intent, but not yet a
-single common statement contract. B02 confirms repeated font/icon pairs in both
-list widgets and text entry, and bitmap/icon alternatives in `border::Read`.
+`SavePosition` / `RestorePosition`. This is shared intent, but the whole family
+is not a single common statement contract. B02 confirms repeated font/icon pairs
+in both list widgets and text entry, and bitmap/icon alternatives in `border::Read`.
 The `resourceManager` implementation saves BOTH active aggregate and file offset
 on a global ten-entry stack. A narrow `GET_RESOURCE_PRESERVING_POSITION(destination,
 lookupExpression)` macro is plausible; both expressions would require side-effect
 constraints and exact ordering. Do not introduce RAII, return from inside a macro,
-or move the restore past any subsequent `ReadWord`. Deferred until the other
-resource consumers are read; a generic callback framework is not warranted.
+or move the restore past any subsequent `ReadWord`. Final review restricts the
+three-statement contract to TEXTWDGT/BORDER/Textntry/listbox/droplist's direct
+lookup assignments. BUTTON/ICONWDGT's separate stored MakeId then GetIcon are
+larger variants, not one lookup-expression instance. A generic callback framework
+is not warranted; the explicit save/lookup/restore is already readable.
 
 B07's `mouseManager::SetPointer` overloads also preserve aggregate position, but
 the protected regions include cursor selection, disposal, native mask creation,
@@ -142,7 +147,7 @@ for combining the event state machines.
 
 ## H05 — allocate and copy a terminated string
 
-Disposition: credible small cross-TU statement helper; wider occurrence audit pending.
+Disposition: credible small cross-TU statement helper; full reading pass complete.
 
 `listBoxWidget::Main` and `dropListWidget::Main` both allocate
 `H2_ALLOC(strlen(text) + 1)` into an item slot then `strcpy` into it, for append
@@ -201,7 +206,8 @@ Disposition: shared small idiom; macro versus inline remains an evidence questio
 `listBoxWidget::ProcessMouseMessage`, plus `dropListWidget::ProcessSelectDialog`,
 repeat `if (value < 0) value = 0; if (value > range) value = range;`.
 A period-plausible statement macro `CLAMP_RANGE(value, low, high)` would name the
-operation. Before sharing project-wide, audit other bounds/widths and existing APIs.
+operation. The completed pass records other bounds/widths as distinct ordered
+variants below; it does not recommend a universal clamp replacement.
 
 The order matters: if `range < 0`, the second assignment wins; a nested ternary
 that returns zero at the first comparison is NOT equivalent. Some destinations
@@ -252,8 +258,12 @@ header would be more honest than pretending the classes share an object layout.
 Preserve the `offset > firstHeight` boundary (not `>=`), signed division/truncation,
 and multiplication-before-division. Clamp remains a separate H07 phase. List-box
 and drop-down drawing differ for empty rows and no-scroll thumb positioning;
-those whole routines are not equivalent. Zero travel/range and coordinate origins
-need explicit caller analysis before a safe common contract can be recommended.
+those whole routines are not equivalent. Final checking confirms no divisor-zero
+guard around the drag expression; positive range in popup setup does not prove
+positive travel for every resource geometry. Preserve the original signed local
+coordinates, initialized-or-retained travel and caller guards. The row expression
+likewise uses the existing row height without adding validation. Rank C: these
+are small formulas with many parameters, not checked scroll-position APIs.
 
 ## R02 — resource cache getter/aggregate scan boilerplate
 
@@ -534,8 +544,8 @@ their separate half-open contracts.
 ## R10 — registry, file, random, and fade utilities
 
 The many registry queries/writes in `Misc.cpp` are good local readability targets,
-but not yet cross-TU helpers. Query byte count is an in/out variable reused across
-calls, not reset to four before every DWORD. Initial probing, ignored failures,
+but remain local findings, not cross-TU helpers. Query byte count is an in/out
+variable reused across calls, not reset to four before every DWORD. Initial probing, ignored failures,
 string lengths, and handle-close/default-write paths differ; a table-driven rewrite
 would hide these details. Read/write/seek/open sequences also differ in error
 handling and file mode. In particular, `FileSize` opens `r+b`, so it cannot blindly
@@ -598,8 +608,9 @@ The implementation chooses output length by trailing sentinel values; it is not
 a normal variable-length formatting API. Preserve all seven numeric slots, the
 required first value, the sentinel's actual meaning, argument evaluation, and
 logging's existing level check inside the callee. Do not add a variadic macro or
-replace the function with a stream/logging framework. Other arities remain leads
-until their game/network caller bodies are read.
+replace the function with a stream/logging framework. The complete game/network
+caller pass confirms shorter sentinel tails at other arities; declaration
+defaults cover those without a separate macro per arity (final rank A).
 
 B27 adds service-provider/session enumeration and guest/startup logging in
 DirectPlay/Winsock, with one or two values followed by the established sentinel
@@ -655,8 +666,9 @@ a measured source-shape question, not evidence of original historical spelling.
 ## R13 — Windows display/error initialization and painting
 
 DirectDraw HRESULT checks and `memset` plus descriptor `dwSize` initialization
-are local opportunities in `wingraph.cpp`; defer shared ownership until other
-Windows-facing TUs are read. Error calls pass original file/line facts and can
+remain local opportunities in `wingraph.cpp`; the complete Windows/network pass
+does not establish an interchangeable shared error/descriptor protocol. Error
+calls pass original file/line facts and can
 return through a reentrancy guard, so a new macro must not assume `noreturn` or
 replace these numbers with current source locations.
 
@@ -688,8 +700,10 @@ The special-building masks deliberately share numeric values across factions;
 the helper must not infer a faction, select an upgraded dwelling, or turn an
 any-bit query into an all-bits query. Only Boolean consumers are candidates:
 normalizing the result changes callers that retain a masked numeric value.
-Read later game/castle/AI consumers before finalizing the interface. No new
-call boundary or inline expansion is assumed byte-neutral.
+The game/castle/AI consumer pass is complete: favor existing HAS vocabulary
+where it carries this precise Boolean contract, or one narrow town query, not
+competing interfaces. No new call boundary or inline expansion is assumed
+byte-neutral.
 
 B15 adds `combatManager::SetupCombat`, `InitNonVisualVars`, `LoadIcons`, and
 `SetupAndLoadObstacles`. Castle/moat Boolean assignments explicitly normalize
@@ -802,7 +816,7 @@ must preserve the actual input domain and not claim all malformed states are saf
 Macro arguments must be stable; adding hidden locals or an inline boundary needs
 the usual codegen audit.
 
-## R15 — hero-specific workflows and pending UI leads
+## R15 — hero-specific workflows and resolved UI leads
 
 Hero routines use both ordinary and seeded random streams across their related
 level/skill/army routines. Keep random-call count/order, low-stat threshold tests,
@@ -826,13 +840,11 @@ branch tests before the actual writes. Preserve these phases. `HeroView`'s early
 dismissal return does not clear every global cleared on the normal exit; this
 audit does not repair it or impose RAII cleanup.
 
-Further leads, not yet promoted cross-TU candidates: shorter `NormalDialog`
-arity/defaults, quick-view-to-dialog-mode conversion, maximum spell-point
-calculation, skill icon frame calculation, hover invalidation, and allocation
-followed by `MemError`. Hero provides concrete instances, but the complete
-dialog/game/other UI consumers must still be read before assigning a common
-contract. Morale/luck widget layout similarity is currently local, not grounds
-for a shared screen algorithm.
+The complete consumer pass resolves the early leads: H30 covers NormalDialog
+defaults, H97 quick-view mode, H29 normal spell-point capacity and H31 the
+stored-allocation check. H99 names only changed-hover-id acceptance, not hover
+invalidation. R46 retains the skill-encoding and reset exclusions. Morale/luck
+widget layout similarity is local, not grounds for a shared screen algorithm.
 
 ## H24 — terrain lookup from an already-resolved map cell
 
@@ -960,8 +972,9 @@ Return the existing object, not a copy. Preserve side/index values, sentinel
 guards, reference/address use and evaluation frequency; do not infer a living
 army, filter by quantity, clamp the index, or introduce a checked container.
 Storage has 21 slots per side while several operational loops visit only 20;
-the caller's range is significant. A separate current-army accessor is only a
-lead until the corresponding combat consumers are read. Keep raw-byte evidence
+the caller's range is significant. The complete combat pass below resolves the
+current-army lead: preserve each physical/controlling/mixed pair explicitly,
+rather than adding one ambiguous CurrentArmy accessor. Keep raw-byte evidence
 as the criterion for retaining a new inline boundary.
 
 B16-B17 confirm repeated current, target and mini-view owner lookups in ARMY and
@@ -1014,8 +1027,9 @@ apparently redundant conditions are not repaired by this audit.
 Combat pathfinding preserves moat state and temporarily changes creature speed
 through separate owner routines. Some member reads precede the later null check;
 no cleanup macro may assume it can safely move validation or hoist pointers.
-Front/rear placement and drawbridge exceptions are local semantic predicates
-to compare with later army code, not yet a universal passability API. Existing
+Front/rear placement and drawbridge exceptions were compared with the army and
+command code; only the narrow shared gate exception is H58, not a universal
+passability API. Existing
 `ValidHex` is a 0 <= hex < 117 Boolean predicate (targeted body read), not every
 other constant named MAX/COUNT in combat. Monster `HAS` tests already expose
 flying/wide flag intent; a generic new flag framework is unnecessary.
@@ -1149,8 +1163,8 @@ strict tie behavior, while grid picking has special hero/ballista regions and
 signed remainder geometry. Generic random-choice or rectangle helpers would
 hide those contracts.
 
-Animation leads for comparison with ARMY and rendering TUs: inclusive extent
-updates, speed-scaled timer deadlines, projectile-angle frame selection, and
+The ARMY/rendering comparison resolves the animation leads in H34-H38: inclusive
+extent updates, speed-scaled deadlines, projectile-angle frame selection and
 quantity-dependent creature names. Shared extents have multiple store/clamp
 orders and sometimes 442 versus 479 output limits; never infer a whole drawing
 loop macro. Door raise/lower sequences and global visibility/palette lifetime
@@ -1378,8 +1392,7 @@ an explicit hypnotize cancel. Restoring flying/speed, anti-magic clearing and
 stone/steel-skin precedence remain local, ordered behavior.
 
 Local/reuse leads: `BuildTempWalkSeq`'s two memcpy-and-length updates; private
-CP1251 folding (promoted to H69 after the complete GAME read in B29; wider
-KB/NEWGAME/EVENTS callers still to read); and
+CP1251 folding (H69, with the later complete KB/Newgame/EVENTS reviews); and
 `army::Strength` versus keep targeting's reversed multiply operands and signed
 destination. Keep byte-conversion boundaries and exact multiplication types.
 Three-elemental/upgrade exclusions in frame metadata, empty `WaitSample` /
@@ -1695,8 +1708,8 @@ even after the earlier minimum-one assignment.
 Vampire first/last-leg sound selection has precedence, a fixed unscaled delay and
 a double duration factor. Frame-position movement and final leg snapping differ
 from missile stepping. The rounded `(length + (speed >> 1)) / speed` expression
-is a small arithmetic lead shared with army projectiles, but flight adds positive
-speed and minimum-one rules that must stay outside any future rounding helper.
+is recorded as low-priority H98 after final cross-checking. Flight adds positive
+speed and minimum-one rules that stay outside that expression helper.
 
 ## R21 — spell execution is not the same as a universal effect pipeline
 
@@ -1829,8 +1842,8 @@ Do not replace these with IsUndead, infer contiguous id ranges, or assume every
 base/upgrade pair shares every ability. The helper only names membership; splash
 damage, flight delays and first/last-leg precedence remain separate. Vampire-lord
 healing is a single-type test and must not be widened to the pair.
-Other repeated single-TU creature pairs are leads for later consumers, not yet
-additional confirmed shared families.
+Other repeated single-TU creature pairs are not additional confirmed shared
+families merely because they are base/upgrade neighbors.
 
 B24 promotes the troll/war-troll pair: ResetRound's hit-point-loss reset and
 army::LoadResources' projectile-resource selection compare those two types in
@@ -1868,8 +1881,8 @@ AICheckRetreat copies a hero before rewriting a five-slot army projection, perfo
 explicit double/float and signed/unsigned conversions, and has integer divisions
 before float conversion. Group clearing uses type-then-count, like Dismiss, but
 projection, quantity estimation, base-artifact scoring and retreat probability
-are not a reusable reset/value macro. The later PHILAI implementation review is
-still needed before suggesting reuse of any broader battle-value algorithm.
+are not a reusable reset/value macro. The complete PHILAI review confirms the
+broader battle-value differences in R44/R45; H94 only shortens neutral arguments.
 
 ## B23/B24 — extensions to established short-call candidates
 
@@ -1949,8 +1962,8 @@ DrawCursor and DrawCursorShadow locally save the same five cursor fields, but
 frame advancement, boat wakes/flags, mirroring, clipping and snapshot timing
 differ. Boat flags use no-clip/zero extents while hero flags use clipped extents;
 shadow drawing has its own frame remapping. The walking-speed selector through
-adjacent config fields is a local lead pending the full adventure-manager pass,
-not yet a promoted cross-TU helper. Preserve timer precision, negative half-turn
+adjacent config fields remains local after the full adventure-manager pass
+(R26), not a promoted cross-TU helper. Preserve timer precision, negative half-turn
 tie behavior, repeated draws and independent sound guards.
 
 MoveHero computes terrain costs before the mobility guard and sends the map
@@ -1966,14 +1979,14 @@ whole movement transaction macro.
 Event resource presentation selects the last two nonzero entries, can replace
 one with an artifact, and encodes negative displayed amounts differently from
 the raw resource addition and floor at zero. Interactive and computer handling
-have different event guards. No general resource-award/dialog macro is yet
-justified; EVENTS implementation remains unread.
+have different event guards. The complete EVENTS review isolates only H83/H84;
+no general resource-award/dialog macro is justified (R41).
 
 ProcessMapChange advances the sequence before dispatch and changes player
 context only for the six-player range. Position mismatch and dead-hero checks
 have distinct outcomes; recruit stores preserve trigger/metadata widths and
-order. The repeated CompleteDraw/UpdateScreen tail is a local lead until other
-adventure TUs are read, not a universal redraw helper.
+order. The repeated CompleteDraw/UpdateScreen tail is now H59 after the complete
+adventure pass, not a universal redraw helper.
 
 Incoming map changes distinguish stale, exact-next and future sequences, scan
 for duplicates before free slots, and force-unwind one oldest entry on a full
@@ -1984,7 +1997,7 @@ would obscure/change that protocol. Purge clears only type tags. SendMapChange
 guards control then remote state, zeroes its packed record, increments the
 sequence, shifts overlapping recent history with memmove and transmits all four
 records. This is not COMMAND's four-integer action packet or a generic reliable
-transport wrapper; REMOTE implementation remains unread.
+transport wrapper; the complete REMOTE review confirms its different layer (R27).
 
 ## R25 — combat commands, reward dialogs and idle cycling retain their contracts
 
@@ -2019,9 +2032,9 @@ cycles across multiple resources with distinct last/reset frames, and mutates
 the incoming message for broadcasts. Reward panels differ in AddWidget order
 and which window receiver they draw. Fixed text buffers, format-string versus
 %s copying, get/dispose of monster icons and signed quantity formatting remain
-visible. Three local pickup-sound tails use SRandom; a searched EVENTS occurrence
-uses Random and its complete body is still unread. This is not yet a shared
-sound helper. Victory/loss dialog cleanup differs: only the loss path nulls the
+visible. Three local pickup-sound tails use SRandom; the fully read EVENTS
+counterpart uses Random. This is not a shared sound helper. Victory/loss dialog
+cleanup differs: only the loss path nulls the
 window pointer. Do not add cleanup or change callback/resource lifetime here.
 
 ProcessNextAction transmits before executing and has multiple win exits; the
@@ -2149,7 +2162,8 @@ table or embarked modifier is added. Coordinates and player are not part of
 the helper: MoveHero uses direction-adjusted map origin, while TeleportTo uses
 the manager's current origin even when its no-show path leaves that origin
 unchanged. Their visibility timing, movement and blackout workflows differ.
-Further game/AI consumers remain to be fully read before final interface ranking.
+The full game/AI pass is complete; scouting-only GAME uses remain excluded as
+recorded in R26, and PHILAI's search-horizon formulas are not visibility updates.
 
 ## R26 — adventure manager workflows and superficially shared formulas
 
@@ -2221,8 +2235,8 @@ mobilize, music and hover sequencing. Existing game::GetHero/GetTown and
 GetPlayerHero/GetPlayerTown already name unchecked owner-array access;
 GetHeroSlot's duplicate local expression is an existing-API reuse lead, not a
 reason to add another index macro or bounds policy. Cursor snapshots and its
-adjacent-config-field walking-speed expression remain local CURSOR leads; no
-second matching TU instance has yet been fully reviewed.
+adjacent-config-field walking-speed expression remain local CURSOR findings;
+the completed pass establishes no second matching TU instance.
 
 B29 confirms GAME's GetCastle/GetCastleSlot expressions against the existing
 game::GetTown accessor. Keep the receiver explicit: GetCastle uses gpGame,
@@ -2388,7 +2402,7 @@ low-priority source-reading finding.
 
 ## H68 — default optional remote-send policy arguments
 
-Disposition: credible shorter call to an existing API; wider caller audit pending.
+Disposition: strong shorter call to an existing API; owner and caller pass complete.
 
 RemoteMain/TransmitAndWait in REMOTE, SendMapChange in CURSOR and
 combatManager::ProcessNextAction in COMMAND pass the final pair
@@ -2471,8 +2485,8 @@ UpdateNormalDialog is an existing near match to the status-text updates, but a
 targeted complete body read shows two separately ranged DrawWindow calls after
 its text broadcast. The network callers use a single DrawWindow() call. Favor
 H01 for their shared message prefix; do not substitute this broader existing
-routine or invent a second universal text-update helper. The full KB TU remains
-unread despite this targeted callee check.
+routine or invent a second universal text-update helper. B43 subsequently read
+the full KB TU and confirmed this exclusion (R43).
 
 Winsock's broadcast send retries without incrementing attemptCount; its error
 returns bypass packet disposal. Its receive loop can pass a non-WOULDBLOCK
@@ -2673,7 +2687,8 @@ by game::GetWorldMapData. Its save-transfer local-name macros are scoped spellin
 aliases, not reusable operations. RandomMineType, RandomizePassword and the
 existing object/overlay/owner accessors already name small local operations.
 The town-manager header's SetTown assigns only its pointer; it is not a town
-context/activation workflow. No implementation coverage is inferred for TOWNMGR.
+context/activation workflow. TOWNMGR implementation was read separately in B30;
+the header alone did not establish that coverage.
 
 Player/save/map formats remain explicit. playerData::Write clears 48 scratch
 bytes but serializes 42; cheated is a one-byte slice of the global game field;
@@ -2755,8 +2770,8 @@ the day/week/month update and uses the saved income delta; it is not a second
 application of the gold multiplier. Weekly site thresholds are tested before
 adding growth and are not saturation bounds. Weekly neutral/AI adjustments
 differ from the monthly plague subtraction and halving. PerDay computes
-giCurTurn before rollover; the same day-number expression has searched KB/
-PHILAI counterparts still awaiting full reads, not a promoted shared helper.
+giCurTurn before rollover; H87 records the shared KB/PHILAI day-first expression
+after their complete reads, keeping that original query position.
 Mana restoration preserves existing over-cap mana and clears the well flag.
 GetLuck applies the battle-garb override after its clamp. ExperienceValueOfStack
 tests positive quantity, not H21's type sentinel. GiveArmy's explicit slot,
@@ -2825,7 +2840,7 @@ Important exclusion: targeted full inspection of KB::GetBuildingCost shows
 that it calculates and caps a local `level` but actually indexes
 `gMageBuildingCosts[mageLevel + 1]`, uncapped. Replacing that subscript with
 this helper would change behavior; the unused capped calculation is not proof
-of an interchangeable whole cost API. KB remains unread as a complete TU.
+of an interchangeable whole cost API. B43's complete KB read confirms the exclusion.
 
 ## H73 — completed town building, including final mage-guild level
 
@@ -2960,14 +2975,16 @@ queries initialize only playerCount slots and can leave invalid-category stats
 untouched; dead players are -1. Artifact counts exclude books and count
 duplicates. Strongest-creature ranking uses per-unit value, positive quantity,
 towns before heroes and first-on-tie behavior. Army totals instead call the AI
-stack evaluator with explicit arguments; its implementation is still unread.
+stack evaluator with explicit arguments; B44's complete PHILAI read supports
+only H94's optional-tail shortening here, not a simpler scoring algorithm.
 Pairwise descending SortStats uses strict greater-than but is not generally
 stable, and swaps the i8 order values through an i32 temporary. Allocation,
 scratch formatting and repeated hide operations remain explicit; a variadic
 append-format macro would hide observable intermediate buffers.
 
-Recruitment has three local first-nonzero-nongold cost scans, not yet a shared
-cross-TU operation. Negative costs qualify; gold is assigned before the scan.
+Recruitment has three local first-nonzero-nongold cost scans, not a shared
+cross-TU operation after the complete PHILAI comparison (R44). Negative costs
+qualify; gold is assigned before the scan.
 Open calls Update before calculating maximum and disables only for zero
 availability, not zero affordability. Division guards and a lower maximum
 clamp are absent. Purchase checks room, then ignores Add's result while charging
@@ -3077,7 +3094,8 @@ general help and arena skill help's text-only dialogs. H31 gains checked
 exchange/general/high-score/arena windows and arena widgets. H51 gains
 HandleViewGeneral's hover CombatMessage(text, 1, 0, 0).
 
-H62 gains UpdateArenaIcons' RemoveWidget/delete/null pointer prefix; leave
+H62 has an unguarded RemoveWidget/delete prefix variant in UpdateArenaIcons.
+Its following null store is NOT part of H62, and no new guard is implied; leave
 replacement construction, attachment and final ranged DrawWindow outside.
 H70 gains highScoreManager::Update's exact `read(fd, &highScore,
 sizeof(highScore))` for the packed 100-byte record, with its return ignored
@@ -3197,9 +3215,10 @@ H31 gains checked overview icons/windows/recruit managers, the world-view legend
 window and Smacker's checked expansion background, not overview's unchecked
 text widgets, dynamic pointer arrays, text buffers or unchecked movie opens.
 
-H62 gains overview's text/icon pointer cleanup and its separate title cleanup
-pass. Keep text-before-icon order for each slot, all cleanup before rebuilding,
-and the null guards outside the narrow detach/delete/null prefix. H20 gains
+H62 has detach/delete prefix variants in overview's text/icon cleanup and its
+separate title cleanup pass. Keep each original outer null guard and subsequent
+null store INSIDE that outer guard; H62 itself never nulls. Preserve text-before-
+icon order and all cleanup before rebuilding. H20 gains
 overview castle, captain and dwelling bit tests; twelve displayed dwellings
 retain their explicit reordered slot mapping. H24 gains world-view terrain
 classification from an already-resolved map cell. H30 gains overview statistic
@@ -3342,7 +3361,7 @@ prefix. Neither declaration alone proves a shared packet serializer. REQUEST's
 420-byte map header retains mixed signed races, unsigned dimensions/conditions,
 fixed name/description capacities, reserved fields and trailing event counts.
 SETUP supplies handler declarations only. These owner contracts guide the
-remaining implementation reads; no new inline body or executable macro was
+subsequent implementation reads; no new inline body or executable macro was
 found in these four headers beyond their include guards.
 
 X_GLOBAL.cpp is data-only. Campaign text arrays preserve empty scenario slots,
@@ -3413,7 +3432,7 @@ and RECRUIT's window-manager/update-flag variant remain excluded as in H75.
   literal &value spelling. The read remains unchecked and its 420-byte extent
   must not be replaced with Newgame's 116-byte network prefix. H75 explicitly
   excludes SetOK and the H77 order. CleanUpNewGameWindow already uses the named
-  RemoveAndDeleteWidget(id) API, not H62's explicit-pointer/nulling protocol.
+  RemoveAndDeleteWidget(id) API, not H62's explicit-pointer detach/delete protocol.
 
 ## R36 — file-request enumeration, filtering and input contracts
 
@@ -3554,8 +3573,8 @@ overlapping-copy abstraction. NGKPSetupDisplayString uses a u16 cursor, toggles
 flash only for signed tick > timer, writes spacer or underscore and copies the
 tail. Draw checks dialog-over and multiplayer/hot-seat state, then optionally
 updates the screen; it does not rebuild display. Compared with the already-read
-textEntryWidget these are not one shared editor. KB's chat implementation is
-still pending full reading; this resemblance earns no KB read credit.
+textEntryWidget these are not one shared editor. B43 separately read KB's chat
+implementation and confirmed the distinct editor/lifetime contracts (R43).
 
 Scenario map-size text defaults to small for unknown widths, unlike requester's
 XL icon fallback. Loss/victory text resolves specific town/hero/artifact data;
@@ -3564,7 +3583,7 @@ leave prior text intact. Victory punctuation/normal-victory suffix depends on
 condition. GetSideDesc chooses the last local-player match, walks inclusive
 side ranges, uppercases the first byte through the existing CyrillicToUpper,
 and formats distinct ally/enemy prefixes with count-sensitive separators.
-The two local formatting loops do not yet justify a cross-TU join/list helper.
+The two local formatting loops do not justify a cross-TU join/list helper.
 
 ## H78 — select-or-alternate-select widget command predicate
 
@@ -3931,8 +3950,8 @@ default-argument instance. HERO's IDX(ARTIFACT_NONE) extra is the same -1 value.
 Gain: remove a meaningless repeated sentinel while leaving the meaningful
 grant policy visible. Keep the four-parameter ABI, all supplied-argument
 evaluation and i8 conversion; later implementation still requires byte and
-ordered-relocation checks. The searched PHILAI caller remains subject to its
-complete TU read, not needed to establish the already-read cross-TU instances.
+ordered-relocation checks. B44 confirms the PHILAI magic-book caller with its
+explicit true end-game policy and default -1 extra.
 
 ## H83 — add one event resource and floor the stored balance at zero
 
@@ -3991,7 +4010,7 @@ Initialization, H83's balance changes, separate human display-amount caps,
 negative-resource dialog encoding, dialog calls and event activation remain
 outside. AI sphinx code initializes unused display locals but never appends a
 reward, so it is not a consumer. The six-argument interface is a readability
-tradeoff to assess in final ranking; do not use this as justification for a
+tradeoff ranked C in the final index; do not use this as justification for a
 generic reward builder. Macro/inline expansion and all callers remain untested
 against retail bytes.
 
@@ -4130,8 +4149,8 @@ current expression; groupCount advances using the previous stack count even
 when secondary stacks are absent. A generic stack distributor must not silently
 repair either. Recruitment sites narrow packed metadata to signed i16 BEFORE
 shifting, preserve no-default creature mapping and pack remaining counts after
-the existing dialog or AI purchase. The scaled seven-resource cost subtraction
-has a searched PHILAI counterpart; defer judgment until that TU is fully read.
+the existing dialog or AI purchase. B44's complete PHILAI read qualifies the
+scaled seven-resource cost subtraction as H89 and the narrow count decode as H93.
 
 GiveTakeArtifactStat applies four deltas in stat order and caps mana after the
 knowledge adjustment on removal, including a zero knowledge delta. It does not
@@ -4296,8 +4315,8 @@ does not authorize changing the allocation/deallocation vocabulary.
 H62 is distinct: it detaches an owned widget before deleting it and deliberately
 does NOT null its pointer within the helper. R04/R14 continue to reject generic
 owner/lifetime algorithms. H88 proposes only a literal small sequence; its
-readability benefit and expansion behavior still require final ranking and
-retail/codegen evidence before implementation.
+readability benefit ranks C: the explicit spelling may better expose ownership.
+Expansion still requires retail/codegen evidence before implementation.
 
 ## B43 — extensions to established candidates
 
@@ -4625,8 +4644,8 @@ alliances, diplomacy, CanJoin, ghost/elemental/mask tests and thresholds outside
 
 PHILAI::EvaluateMonsterEvent instead converts both operands to float before
 division; it is not an exact instance. The more generic raw-strength default
-H94 already reduces much of the call noise, so final ranking must assess the
-additional domain name against an extra interface. Neither helper unifies the
+H94 already reduces much of the call noise, so final ranking puts H95 at C,
+to reassess only after the simpler change. Neither helper unifies the
 different monster-interaction and vision rules.
 
 ## H96 — integer Manhattan length of two existing deltas
@@ -4650,9 +4669,14 @@ are different metrics. Keep thresholds, loop bounds and tie-breaking outside.
 In particular, ResetHeroRVs' hero-cache test subtracts the hero's X coordinate
 from BOTH x and y. Passing those existing deltas must preserve that fact, not
 repair it by assuming a conventional point-pair interface. Additional absolute
-values/shifts in mine valuation also remain outside. Broad occurrence validation
-and final ranking must distinguish this literal expression from nearby radius
-tests that use max distance or truncated square roots.
+values/shifts in mine valuation also remain outside. B45's full-tree abs search
+adds TownGate/SummonBoat in ADVMGR (8640/8750), DrawBolt/DoBolt in SPELLS
+(2109/2371/2379), and NewMap in GAME (2058): five confirmed TUs in total.
+SBolt's coordinate fields and the three spell totals are i32. The related
+SetVisibility expression `radius - abs(dy) + radius - abs(dx)` is NOT this
+literal sum; replacing it would reassociate arithmetic. FINDPATH's separately
+stored deltas feed QuickDistance's different metric, and PHILAI's per-axis
+radius tests are also excluded. Rank B with the supplied-delta boundary intact.
 
 ## B44 — extensions to established candidates
 
@@ -4838,3 +4862,99 @@ ALL five first, then clears ALL five pointers and closes the search array.
 Neither H31 nor H88 may add checks, interleave those null stores, or introduce
 scope cleanup. Empty and constant-result routines remain counted/read bodies,
 not invitations to invent missing AI behavior during a readability audit.
+
+## H97 — normal dialog mode from an explicit quick-view flag
+
+Disposition: credible tiny expression/inline, low priority after H30.
+
+hero::ViewStat/ViewArtifact/DoSSLevelDialog in HERO, ViewBallista in COMMAND
+(3237), and Overview::ProcessIconSelect (1483) repeat
+`quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW`. The modes are
+1 and 4 in SOURCE/KB.h. A proposed `NormalDialogModeForQuickView(i32 quickView)`
+at that existing enum/API boundary would preserve zero versus ANY nonzero input,
+one evaluation, and the existing mode type. MageGuildHandler in TOWNMGR (2708)
+has the reversed test/arm spelling and is a source-shape variant.
+
+Keep the flag's derivation from modifiers or caller arguments outside; do not
+test equality to one, reclassify right-button events or move formatting and
+dialog-result handling. H30 still keeps mode explicit: this would be its mode
+expression, not a new default that silently chooses quick view. The current
+ternary already explains the two named modes well, so final rank C favors
+leaving it visible unless call-site comparison shows a real gain.
+
+## H98 — rounded animation step count from distance and spacing
+
+Disposition: credible two-input expression, low priority rather than a general
+rounding library.
+
+army::SpecialAttack at ARMY.cpp:1100 computes
+`(pathDist + (spacing >> 1)) / spacing`; army::FlyTo at FLY.cpp:277 computes
+the same expression using length and m_frameInfo.flightSpeed. Both distances,
+spacing/speed and destination counts are i32. ARMY chooses positive spacing
+31 or 26, while FLY has an explicit speed >0 guard. A proposed
+`AnimationStepCount(distance, spacing)` belongs at the shared combat-animation
+interface in SOURCE/ARMY.h, not inside a whole movement routine.
+
+Preserve signed right shift, integer addition before division and truncation.
+Require stable arguments; a macro repeats spacing. Leave distance calculation,
+the flight speed guard, initial zero and later minimum-one correction outside:
+ARMY has no equivalent minimum-one step. Do not add a zero/negative-spacing
+policy or substitute floating round/ceil. Whole-tree shift-expression checking
+finds other half/midpoint formulas with different contracts, not further exact
+instances. H44's length calculation remains separate. Rank C: the two current
+expressions are small and their adjacent movement rules are intentionally different.
+
+## H99 — accept a changed window-manager hover id
+
+Disposition: credible small stateful owner inline; low priority, not event dispatch.
+
+HandleViewGeneral in VIEW.cpp:332, CombatSpecialHandler in SPELLS.cpp:388 and
+ViewSpecialHandler in GAME.cpp:3554 compare the incoming hover id with
+gpWindowManager->m_lastHoverId, return CONSUME if equal, otherwise store the
+new id before dispatching its help content. HeroHandler at HERO.cpp:1184 has
+the reversed equality operands. The owner field and message hover id are i32.
+A proposed `b32 heroWindowManager::UpdateHoverId(i32 id)` in
+BASE/heroWindowManager.h could return false without a store when equal, otherwise
+store id and return true. Callers would retain the explicit
+`if (!UpdateHoverId(...)) return MESSAGE_DISPATCH_CONSUME;` at the original point.
+
+Share only equality/conditional-store state, not ConvertToHover, message-type
+guards, content selection or a hidden caller return. The exact fragments contain
+no intervening call, their message and manager fields are distinct, and the
+existing owner has no equivalent method. Preserve conversion/evaluation and
+prove the added return/inline shape before retention. The explicit old code is
+short already, so rank C rather than introducing a generic change-detection macro.
+
+ViewSpellsHandler in GAME compares but delegates WITHOUT storing the id; its
+callback may do the store. It is excluded. TOWNMGR::Main checks/stores both id
+and subId, while CastleHandler uses a different manager's widget-id cache; do
+not move either to the global window-manager field. HERO's reset-to--1 plus
+ForceMouseMove sequence is invalidation, not this changed-id acceptance query.
+
+## R46 — final disposition of remaining early leads
+
+The complete consumer review plus final source checks resolve the early small
+leads rather than leaving them as promises of future reading. H97-H99 record
+quick-view conversion, rounded animation steps and hover-id acceptance. Their
+low priority is deliberate; none requires adding an abstraction just to remove
+two or three already-clear lines.
+
+Secondary-skill dialog values are not universally an icon frame. HERO's level-
+up offer encodes `3 * skill + current stored level` before granting the skill,
+whereas DoSSLevelDialog uses `3 * skill + stored level - 1`. EVENTS' witch hut
+passes `3 * metadata` for the basic-level reward. KB divides/modulos this packed
+value for text and chooses a separate skill-background frame; Overview and
+SWAPMGR draw a skill-index icon and display the level separately. The shared
+stride is already named. A new universal SkillIconFrame or direct replacement
+with effective GetSSLevel would hide these offsets and distinct representations.
+The full two-input encoding expression occurs in HERO; the EVENT zero-level
+special case is not additional exact text or a reason to add a new common API.
+
+GetHero/GetTown and GetPlayerHero/GetPlayerTown already own their unchecked array
+access. The private slot aliases recorded in R26/R43/R44 should use that existing
+vocabulary when matching permits, not another numbered family of index macros.
+Likewise existing map accessors, enum-flag operations, AddSpell, creature cost and
+combat strength APIs remain the correct owners only for their exact contracts.
+The corpus does not support shared registry, hover-invalidation, first-nongold-
+cost, creature-name formatting, whole animation or purchase-valuation frameworks
+beyond the narrow findings and explicit variants already recorded.

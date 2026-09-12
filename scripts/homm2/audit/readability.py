@@ -5,6 +5,7 @@ Run with Universal Ctags 6 on PATH:
   python3 -m homm2.audit.readability --check
 
 Ctags indexes physical definitions, including header bodies and inactive branches.
+An independent preprocessor pass covers macros in branches the C++ parser skips.
 Project enum macros are expanded only for indexing; game files are never rewritten.
 Every VA marker must resolve to exactly one definition. Unmarked/header bodies are
 also indexed, but the file-by-file human pass remains the completeness backstop.
@@ -59,13 +60,23 @@ def tracked_files(root: Path) -> list[str]:
 def ctags_rows(root: Path, paths: list[str], executable: str) -> list[dict]:
     command = [executable, "--options=NONE", "--output-format=json", "--sort=no",
                "--fields=+neKSt", "--fields-C++=+{properties}",
-               "--kinds-C++=fpd", "--language-force=C++", "--if0=yes", "-I", IGNORES]
+               "--kinds-C++=fp", "--language-force=C++", "--if0=yes", "-I", IGNORES]
     for definition in DEFINES:
         command.extend(("-D", definition))
     command += ["-o", "-"] + paths
-    result = subprocess.run(command, cwd=root, check=True, capture_output=True, text=True)
-    return [row for line in result.stdout.splitlines()
-            if (row := json.loads(line)).get("_type") == "tag"]
+    # The C++ parser can suppress an #else macro after an inline body even with
+    # --if0=yes (NextCreatureType in KB_TYPES.h). Index physical macro definitions
+    # independently, without the enum expansions used only to expose C++ bodies.
+    macro_command = [executable, "--options=NONE", "--output-format=json", "--sort=no",
+                     "--fields=+neKSt", "--kinds-CPreProcessor=d",
+                     "--language-force=CPreProcessor", "--if0=yes", "-o", "-"] + paths
+    rows = []
+    for invocation in (command, macro_command):
+        result = subprocess.run(invocation, cwd=root, check=True,
+                                capture_output=True, text=True)
+        rows.extend(row for line in result.stdout.splitlines()
+                    if (row := json.loads(line)).get("_type") == "tag")
+    return rows
 
 
 def tag_rows(tags: list[dict], blobs: dict[str, bytes]) -> tuple[list[dict], list[dict]]:
