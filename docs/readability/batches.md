@@ -662,3 +662,34 @@ changing outer branches. H01/H17/H30/H31/H32 gain callers; H75/H77 gain dim-only
 exclusions. R38 retains configuration side effects, DLL/OS and no-CD checks,
 menu overrides, load/requester lifetime and the existing BaseSetupHandler tail.
 This batch adds 23 definitions and one file, with no executable changes.
+
+## B40 — complete base-campaign implementation
+
+Read all 1,129 lines and seven definitions of Campaign.cpp: complete win graph,
+pre-scenario movies, campaign window/track/bonus display, handler/side switching,
+entire-campaign reset and full map/hero/bonus/award/carryover initialization,
+constants, coordinate table and globals. Reconciled its complete index. All
+owner headers were already read; reread Campaign.h without duplicate credit.
+
+H79/H80 gain their base occurrences, paired with B41's complete expansion read;
+H81 also uses the fully read GAME/HERO owners. H30/H31/H32/H71 gain callers and
+H38/H76 gain exclusions. R39 records graph, field-order/indexing, track, theme,
+choice/hero ordering and fixed-prefix-reset differences. This batch adds seven
+definitions and one file, with no executable changes.
+
+## B41 — complete expansion-campaign implementation
+
+Read all 1,373 lines and 36 definitions of X_CAMPGN.cpp, including the constructor
+and empty destructor, all reset/award/query methods, full initialization and
+display, four victory graphs and four replay routines, handler, autosave,
+calendar/name/special-event queries, and every track/choice/difficulty record.
+Reconciled its complete index. ExpCampaign.h and all referenced owner headers
+were already read; reread the packed owner without duplicate credit.
+
+H79 names the shared six-operation restart presentation, H80 the two-message
+bonus-control update and H81 the add-experience/check-level pair. Targeted full
+EVENTS::GiveExperience inspection establishes its extra cached-level update and
+return contract, not EVENTS read credit. R40 retains partial resets, hero-search
+fallbacks, graph/completion, display/text and table differences. This batch adds
+36 definitions and one file. Across B40-B41, 43 definitions and two files are
+newly fully read; source, headers, configuration and behavior are unchanged.

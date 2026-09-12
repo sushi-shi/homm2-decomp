@@ -3656,3 +3656,235 @@ cancel, and also completes on any pending menu command, copying the incoming
 id before the later cancel override. Only the noncompletion path updates the
 shingle. This existing common tail is the right boundary; no generalized menu
 handler or changed event-type guard is proposed.
+
+## H79 — present the adventure map after a confirmed campaign restart
+
+Disposition: credible campaign-owned statement protocol shared by both TUs.
+
+game::ShowCampaignInfo and ExpCampaign::ShowInfo have the same six-operation
+tail after their different InitCampaignMap/InitMap calls: invalidate the
+adventure visibility map, set giBottomViewOverride to BOTTOM_VIEW_NONE, fade
+out with eight steps and gPalette, call SetInitialMapOrigin, call
+RedrawAdvScreen(1, 0), then fade in with eight steps and gPalette.
+Possible name: PresentRestartedCampaignMap, at the SOURCE/Campaign.h shared
+campaign UI boundary. The name captures why this complete ordered sequence
+is needed, rather than making a universal redraw or dialog-lifetime wrapper.
+
+Keep restart confirmation and map initialization outside. Preserve all six
+operations, both fade arguments, repeated global receiver/palette reads, and
+their order. SetInitialMapOrigin also updates input, music and environment;
+RedrawAdvScreen rebuilds the border/locators/radar and has its own bShowIt guard.
+FadeScreen changes update flags and polls sound. Those complete owner bodies
+are read; the sequence is not H59's CompleteDraw/UpdateScreen pair. Do not add
+an outer display guard, cache flags/palette across callbacks, or turn it into
+an RAII fade transaction. A statement macro or period inline is a hypothesis
+to compare, not proof of original spelling or retail-neutral extraction.
+
+## H80 — campaign bonus-control availability and selection display
+
+Disposition: credible small domain-specific message protocol.
+
+CampaignInfoUpdate and ExpCampaign::UpdateInfo finish by updating each of three
+bonus controls with the same two broadcasts. They store id, SET_FRAME, then
+frame 8 when the caller's availability predicate is true or 9 otherwise and
+broadcast. Next they choose SET_FLAGS/CLEAR_FLAGS from the caller's selected
+predicate, store value 4 and broadcast again, retaining id. Natural owner:
+Campaign.h beside the existing bonus-control/frame constants. A proposed
+UPDATE_CAMPAIGN_BONUS_WIDGET can reuse the caller's message and window while
+leaving map/side ownership and the availability/selection expressions explicit.
+
+Availability controls the frame; it does not gate selection state. A selected
+bonus remains selected even when viewing a locked/view-only map. Preserve id/
+command/value store order, both calls and the final command/value state, and
+evaluate availability only at its original point and selection after the first
+broadcast. Passing both as eagerly computed Boolean arguments would move those
+reads; an inline needs evidence that this is harmless, while a statement macro
+can retain the original evaluation points. Require stable message/window/id
+operands. Keep type initialization, loops, text labels and final DrawWindow
+outside. This is not general enable/disable, nor either H75/H77 dim protocol.
+
+## H81 — add hero experience, then check levels without resetting the cache
+
+Disposition: credible narrow owner operation; distinguish the existing event API.
+
+game::InitCampaignMap in Campaign.cpp and ExpCampaign::InitMap each add an experience bonus
+to one hero's m_experience then call that hero's CheckLevel. GAME::NewMap's
+Eliza/Brax bonus arms have the same contiguous pair. A proposed
+hero::AddExperienceAndCheckLevel(i32 amount) names just the add followed by one
+CheckLevel call. Keep the existing signed i32 arithmetic and stable hero
+selection; no saturation, positivity test, extra level query or new return
+value belongs in the helper. A macro alternative must preserve repeated
+receiver evaluation, or restrict it to demonstrably stable expressions.
+
+The full hero::CheckLevel body uses the cached m_level to decide which level
+bonuses to apply, can present dialogs and finishes by storing the calculated
+level. Campaign callers' gbInNewGameSetup save/set/restore suppresses those
+dialogs and must remain outside, as must hero-count guards, portrait/name
+changes and first-versus-special-hero selection. The base campaign's separate
+Archibald army replacement has another exact add/check pair beneath its own
+setup-state scope. Do not absorb that larger bonus workflow.
+
+Targeted complete inspection of advManager::GiveExperience in still-unread
+EVENTS confirms it is not a substitute: it queries the old level, writes
+m_level before adding experience, queries the new level, optionally checks
+levels and returns the difference. A stale cached level makes that a different
+contract. No EVENTS file/read credit is granted by this targeted inspection.
+GetExperience/GetLevel are already separate conversions, not this operation;
+GAME's absolute experience assignments followed by CheckLevel are excluded.
+The new inline/macro and all expanded callers still need retail comparison.
+
+## B40-B41 — extensions to established candidates
+
+H30 gains both campaign restart confirmations and unavailable-map messages;
+H31 gains checked campaign windows, track icons and the expansion title icon.
+H32 gains both handlers' ordinary close and timeout paths. Timeout retyping
+precedes the three-store prefix, and clearing giDialogTimeout follows it;
+neither extra belongs inside H32. Music restart guards remain handler-owned.
+
+H71 gains InitCampaignMap's per-slot type-NONE/count-zero army reset. Its
+strengthening loop tests only signed count >= 1, without a creature-type check,
+so is not H76. H38 does not apply to either bonus label's unconditional plural
+creature name, even for quantity one. Their paired HOVER/HELP switch cases use
+the H78 command domain but are not equality-predicate substitutions. Message
+setup reuses type across loops/formatting and supplies no new exact H01 triple.
+
+The already-reviewed GetHero/GetPlayerHero accessors remain the preferred
+vocabulary for exact owner-array access (R26), with no implicit bounds guard.
+Campaign's existing OppositeCampaignSide call needs no second helper. Repeated
+GiveArtifact(hero, artifact, false, -1) calls are a short-call lead for the
+remaining KB owner review, not yet an approved default-argument proposal;
+expansion scroll bonuses deliberately pass a spell id instead of -1.
+
+## R39 — base campaign graph, switching, presentation and bonus contracts
+
+HandleCampaignWin clears the whole map-enabled array before its scenario/movie/
+award switch. It does not itself mark the completed-scenario array. Roland and
+Archibald have different optional branches, award revocations and endings;
+Archibald sometimes plays two movies. Nonfinal handling chooses the first
+enabled regular map in side/map order, assigns the campaign score to every
+enabled regular map's bonus field and shows the dialog. Final predicates mix
+receiver fields and gpGame fields, and do not generalize to "last map". Unknown
+states do not gain a new fallback/guard. PlayPreScenarioSmacker has its own
+prior-completion and starting-side conditions; victory movies are not a table
+of identical pre-scenario replays. Its tail forces updateFlags to 1 even when
+no movie case matched, rather than restoring a saved value.
+
+ShowCampaignInfo saves the interface theme, selects the current side's theme
+and assigns view globals before building the window. Track mode depends on
+starting/current sides, switching scenario and a completed branch. It filters
+13 possible points, tests existence using current view side, but obtains some
+coordinates from starting side. Coordinates are i16 and shifted by two pixels;
+two switching points can map to the same widget id. No new generic path/track
+iterator may normalize those choices. It deletes campWin without nulling it,
+then restores the theme before restart confirmation. H79 begins only after
+the confirmed map initialization.
+
+CampaignInfoUpdate determines frame availability/completion/lock state before
+adding selected-track offsets that depend on crossing sides and map number.
+Scenario number, name, description and choice-table lookup have related but
+not identical switching-map remaps. Text broadcasts intentionally reuse the
+same message and gText pointer across formatting; awards append a newline per
+award and leave empty text when none are present. Bonus labels have nine
+campaign-specific artifact abbreviations, a shortened earth-elemental spell,
+unconditional plural creature text and faction text used as sprintf format.
+Unknown choice types retain prior text. H80 names only the final two-message
+control update, not this whole rendering procedure.
+
+CampaignHandler resumes terrain music only when adventure is active exactly 1,
+then processes timeout before widget input. Track eligibility uses enabled or
+previously completed state with a debug bypass and switching-side indexing.
+On accepting the switching map it stores the switching scenario, flips side,
+then writes m_campaignMapEnabled[scenario][side] in that actual transposed order;
+the subsequent bonus/choice stores use side/scenario. Do not repair or transpose
+that first store through an accessor. It transfers the opposite side's choice
+and clears all awards. View-only accept falls through to ordinary close without
+changing the selected campaign. Replay redraws the existing campaign window;
+timeout/ordinary exits retain their separate prefix and timeout-clear timing.
+
+InitEntireCampaign clears a 0x147-byte region starting at m_campaignType before
+assigning side/starting-side/scenario, not sizeof(game) or just those fields.
+InitCampaignMap clears a separate 65-byte setup prefix, selects H2C filename
+spelling with reversed E/G and B suffix for side switching, resets score only
+for scenario zero and ignores GetMapHeader's result. It loads origdata, calls
+InitNewGame, applies an alignment choice to a side-dependent player slot, sets
+difficulty by scenario thresholds and creates the map. Expansion setup shares
+some calls but not the score, side, difficulty or intervening alignment logic.
+
+The player-zero hero list is selection-sorted by portrait priority, using strict
+greater-than and swaps, then currentHero becomes the first hero when present.
+This can reorder equal-priority heroes through swaps; do not replace it with a
+stable sort. Bonuses usually target slot zero, but one Roland spell bonus uses
+slot one. Puzzle value narrows to i8; experience uses H81 inside a saved setup
+flag. Crown awards, Corlagon removal, positive-count tripling, Archibald faction-
+specific army replacement, experience and carryover copies occur afterward in
+that order. Some award paths assume a first hero without checking count. Army
+copy stores type then multiplied/narrowed count; it is not one memcpy or generic
+transfer. Victory/loss overrides are scenario-specific and occur last.
+
+The i16 track table includes absent points, and globals retain separate view
+side/map/track/view-only state. No data-table deduplication or shared campaign
+record layout is proposed. H79-H81 are candidate extractions, not repairs to
+the state machine or claims of interchangeable base/expansion workflows.
+
+## R40 — expansion campaign state, graph, awards and display contracts
+
+ExpCampaign's constructor initializes only m_window and its destructor is
+empty. ResetMapChoices/MapsPlayed/Awards/BonusChoices already name full-array
+zeroing. InitNewCampaign sets id/currentMap/mapCount and calls those four resets,
+but does not clear all mapDays/view/runtime fields. HandleVictory instead clears
+only m_mapCount bytes of mapChoices, not the entire eight-entry array. These
+already-named operations should not become a blanket object-reset macro.
+GrantAward/RemoveAward/SetMapWasPlayed are named single-byte stores. HasAward
+returns the stored byte narrowed to i8, while IsThisMapCompleted normalizes it
+to 0/1; they are not the same Boolean accessor or a reason to inline every body.
+
+InitMap reads its selected choice, clears the 65-byte player-setup prefix and
+formats the HXC filename. It resets only mapDays[0] on the first map, then reads
+the header, loads origdata, initializes players, selects table difficulty and
+creates the map. Secondary/primary bonuses can search player-zero heroes for
+Gallavant/Ceallach on specific voyage maps. If no portrait matches, the loop
+leaves the last visited hero selected; do not replace it with a null-returning
+find helper. Other bonuses target slot zero. H81 retains the setup flag scope;
+scroll artifacts narrow the spell id to i8. Award iteration has explicit no-op
+cases, ordered artifact grants, Dainwin deallocation and the guardian-spell
+store, followed by gbRetreatWin. A universal bonus/award executor is not justified.
+
+ShowInfo always uses the evil theme, builds m_mapCount track icons at unshifted
+i32 table coordinates and adds a campaign title icon. It shares the post-restart
+H79 tail, but not base-campaign track filtering, themes or switching globals.
+UpdateInfo's selected-frame stride uses campaign id. Awards display a distinct
+"none" string when no flag is set; base campaign displays empty text. Its
+artifact abbreviations extend the base nine and deliberately label major
+scroll like minor scroll. Selected skill/level pairs use shorter skill-level
+text, and primary/scroll choice types have extra formatting. Scroll suffix is
+omitted for Disrupting Ray and Animate Dead. Do not share the full formatting
+switch by silently importing these expansion-only cases into base campaign.
+
+HandleVictory captures Days and marks the current map played before clearing
+choices and calling one of four campaign graph handlers. Those handlers order
+movies, new choices and award grants/revocations explicitly. Completion can
+mean the final map or the voyage's alternative terminal map; it returns before
+choosing a next map. Otherwise all available maps get the accumulated days and
+the first available index becomes current before ShowInfo. ReplaySmacker uses
+viewMap and earlier played branches, performs no award/choice updates and
+forces window updateFlags to 1 after dispatch. The two four-way switches are
+local dispatch, not a cross-TU graph framework or function-pointer table proposal.
+
+MessageHandler's input switch accepts twelve track ids although arrays have
+eight entries and campaigns use four/eight; preserve the original direct index
+and debug/availability/played short circuit without adding bounds. View-only
+accept exits without selecting a new map. Ordinary/timeout close shares H32,
+not a merged event loop. Autosave marks played before saving, and ignores save
+success. Days adds the stored map total to calendar arithmetic and returns i16;
+neither saturation nor a different one-based calendar conversion is implied.
+Choose plays the selector then returns xLastChoice without a new validity test.
+JosephName/IvanName deliberately use xStableText after the threshold, including
+Ivan's +6 offset. Preserve these actual table references rather than naming an
+assumed adjacent-array layout. The existing golden-bow, ultimate-artifact and
+special-loss predicates already own their campaign/map/coordinate conditions.
+
+All track/difficulty/choice tables were read, including {-1,-1} unused points,
+negative resource bonuses, invalid first choices with zero-resource companions,
+and unused map slots. Base and expansion coordinate widths and record extents
+differ. Repeated initializer shapes alone do not merit new code helpers. The
+remaining EVENTS/KB implementations are not credited through calls or snippets.
