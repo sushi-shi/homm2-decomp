@@ -474,12 +474,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitCampaignMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -977,8 +972,10 @@ void game::InitCampaignMap(void) {
             savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (m_players[0].m_heroCount > 0) {
-                gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += choiceBest1->value;
-                gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(m_players[0].m_heroIds[0]),
+                    choiceBest1->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -1044,8 +1041,10 @@ void game::InitCampaignMap(void) {
                     .Add(CREATURE_VAMPIRE_LORD, NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
-        gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-        gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
+        ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+            *gpGame->GetHero(m_players[0].m_heroIds[0]),
+            CAMPAIGN_EXPERIENCE_BONUS
+        );
         gbInNewGameSetup = savedNewGame;
     }
 

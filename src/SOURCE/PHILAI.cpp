@@ -4851,8 +4851,7 @@ i32 philAI::CombatMonsterEvent(
     float f2;
     i32 jb;
     i32 total;
-    memset(gpMonGroup->m_creatureTypes, -1, sizeof(gpMonGroup->m_creatureTypes));
-    memset(gpMonGroup->m_quantities, 0, sizeof(gpMonGroup->m_quantities));
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     if (*pCount / AI_TOWN_ARMY_SLOTS > 0) {
         for (kn = 0; kn < AI_TOWN_ARMY_SLOTS; kn++) {
             gpMonGroup->m_creatureTypes[kn] = monType;
@@ -6319,12 +6318,7 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
 
     if (gpGame->m_mines[mineIndex].guardianType != CREATURE_NONE) {
         guardianCount9 = gpGame->m_mines[mineIndex].guardianCount;
-        memset(gpMonGroup->m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_SLOT_COUNT);
-        memset(
-            gpMonGroup->m_quantities,
-            0,
-            ARMY_GROUP_SLOT_COUNT * sizeof(gpMonGroup->m_quantities[0])
-        );
+        CLEAR_ARMY_GROUP(*gpMonGroup);
 
         if (guardianCount9 / ARMY_GROUP_SLOT_COUNT > 0) {
             for (stackIndex0 = 0; stackIndex0 < ARMY_GROUP_SLOT_COUNT; stackIndex0++) {
@@ -6399,12 +6393,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
     monsterCount4 = eventData & IDX(MAP_MONSTER_COUNT_MASK);
     willJoin15 = eventData & IDX(MAP_MONSTER_GUARD_FLAG);
     result5 = 0;
-    memset(gpMonGroup->m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_SLOT_COUNT);
-    memset(
-        gpMonGroup->m_quantities,
-        0,
-        ARMY_GROUP_SLOT_COUNT * sizeof(gpMonGroup->m_quantities[0])
-    );
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     if (monsterCount4 / ARMY_GROUP_SLOT_COUNT > 0) {
         for (stackIndex29 = 0; stackIndex29 < ARMY_GROUP_SLOT_COUNT; stackIndex29++) {
             gpMonGroup->m_creatureTypes[stackIndex29] = monsterType;

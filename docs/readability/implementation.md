@@ -290,3 +290,76 @@ pass with the same section/relocation totals. FLY now explicitly includes the
 math-helper owner header. The real-header VC6 executable additionally passes
 2,048 signed tent-mask/color combinations, 2,001 hex/guild-level inputs and
 1,089 signed delta pairs against independent bounded integer expectations.
+
+## Group 7: UI, campaign and resource protocols
+
+| Family | Application or measured retention |
+| --- | --- |
+| H45 | Retain the guarded spell-icon dispose/load/cache update. Its expanded statement-safe block changes the probe from 863 to 869 bytes. Resource ownership and reload conditions remain visible. |
+| H46 | Retain the two ordered artifact tests and additive bonuses. The statement-safe block changes the probe from 3,918 to 3,924 bytes; neither test becomes else-if or one cached artifact query. |
+| H61 | Retain the five ordered independent frame-remap tests and separate final offset. The statement-safe block adds six bytes (9,310 to 9,316). |
+| H71 | Retain the explicit type-then-count stores. Both existing Dismiss and a separate inline were measured without changing the out-of-line ABI: 775 bytes becomes 767 with a new call relocation, or 783 with the inline. The trial inline is removed. |
+| H74 | Four `SET_ADVENTURE_BUTTON_FLAGS` calls preserve message type, command, enabled-bit payload, then each id/broadcast from 1 through 6. Active-manager guards remain only where originally present. Receiver/message expressions remain live across callbacks. |
+| H79 | Both `PRESENT_RESTARTED_CAMPAIGN_MAP` calls preserve invalidation, bottom-view reset, fade-out, origin setup, redraw and fade-in. Different initialization calls and dialog guards remain outside. |
+| H80 | Retain each campaign-bonus widget protocol. Its statement-safe block changes the probe from 2,268 to 2,278 bytes; selection guards and refresh order are not generalized. |
+| H81 | Five `ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL` calls preserve add-before-CheckLevel and both receiver evaluations, including the repeated GetHero calls. Setup suppression, cached levels and reward policy remain explicit. |
+| H83 | Retain event-resource addition followed by floor-to-zero. The trial player method changes 4,347 to 4,290 bytes and 159 relocations to 153, and is removed. Raw resource indices, overflow and event timing are not repaired. |
+| H86 | Retain cheat-flag assignment followed by campaign-conditional assignment. Its statement-safe block adds six bytes (3,587 to 3,593). |
+| H89 | Retain the ascending seven-resource cost loops. The trial player method changes the probe from 645 to 649 bytes and removes a relocation, and is removed. No affordability, saturation or transaction layer is added. |
+| H90 | Five `CLEAR_ARMY_GROUP` calls retain the two array-major clears: type bytes to -1, then signed count storage to zero. Aliased quantity storage has the same address/size. No whole-object memset or per-slot loop is introduced. |
+| H91 | Retain presence-first signed quantity summation. The trial CountCreatures inline changes 977 to 983 bytes, and is removed. Count zero, absent types, and the existing unsigned troop alias are not conflated. |
+
+[Thirteen complete matrices](../matching/ReadabilityProtocols/shared-operations.cpp)
+record 27 arms, including both H71 alternatives. H74 and H90 match the retail
+probes exactly; H79 and H81 retain the baseline bytes/relocation hashes with
+their pre-existing retail residuals. The five statement-safe-block experiments
+measure the actual expanded bodies with `do/while(0)`, not a claim that every
+possible inline or macro spelling has been disproved. None is retained.
+
+The combined build, original-snapshot object comparison and retail field review
+pass again: 98 objects, 1,516 non-debug sections, 42,433 ordered object relocations;
+1,727 retail functions and 38,307 field sites, with zero structural review items.
+
+## Rank-C and exclusion dispositions
+
+The following are final **retain-explicit** decisions for all 29 rank-C families,
+not pending mandatory APIs. Their precise variants remain documented in the
+audit. These are readability/scope decisions, not claims of newly measured
+compiler rejection; only experiments in the measured dossiers have that status.
+
+| Family | Reason to retain the current boundary |
+| --- | --- |
+| H04 | Save/lookup/restore remains visible; stored MakeId and larger protected regions are distinct, and a general position guard would obscure that distinction. |
+| H06 | Keep the existing GetIconEntry API and explicit addressing at their current sites; no second accessor or unmeasured new out-of-line call is added. |
+| H07 | Explicit clamps show lower/upper order and already-narrowed stores; a universal clamp would hide negative-range and interleaved-axis differences. |
+| H08 | Parameter-heavy list-layout helpers would move the same arithmetic behind longer calls; row selection and thumb travel remain separate. |
+| H09 | Origin adjustment and far-edge shrinking remain explicit, including the interleaved Fizzle axes. |
+| H10 | Keep actual base/pitch expressions visible; decoder state and fixed screen pitch do not become bitmap-width assumptions. |
+| H12 | Retain existing cursor/palette APIs and distinct decoder expressions. The cursor helper's load/increment order and the two palette domains are not interchangeable. |
+| H14 | Three named manager-field stores do not justify a name that could imply registration or resource initialization. |
+| H16 | Eight-edge predicates would hide comparison order and saved/raw rectangle choices with little reduction in argument noise. |
+| H18 | The component shift is already short; preserve caller-specific promotion/store types rather than add another palette conversion layer. |
+| H23 | Keep compaction after the last-match search, old-tail sentinel and external count/selection changes visible. |
+| H26 | Map bounds remain local to their actual dimensions, comparison order and access timing; no broad guard is introduced. |
+| H31 | An explicit null test followed by MemError is clearer than another macro, especially because MemError is not assumed nonreturning. Unchecked allocations stay unchecked. |
+| H37 | Keep the small midpoint scan beside its distinct angle/count/animation context; no generic count repair or projectile-loop extraction. |
+| H39 | Existing QuickDistance already names the approximate metric. Coordinate extraction and combat-cell choices remain visible without another forwarding API. |
+| H41 | Eight operands and several store-order variants outweigh the gain from an extent-growth macro. |
+| H51 | Keep CombatMessage history/update arguments explicit; these are meaningful policies, unlike the applied sentinel defaults. |
+| H54 | Retain the existing Wince boundary and explicit sequence/frame pairs; no redundant animation-start API or unmeasured call substitution. |
+| H59 | CompleteDraw and UpdateScreen already describe the two operations well. No combined redraw API is added. |
+| H62 | Keep guarded pointer detach/delete and the later separate null stores visible, rather than conceal the ownership/lifetime distinction. |
+| H67 | Three statements clearly show first-pop then conditional second-pop; no extra priority or locking semantics are implied. |
+| H75 | Disable then defer-dim remains explicit, with its message-state differences and special flag. |
+| H77 | The reverse defer-dim then disable protocol remains separate; symmetry is not a reason for a second public API. |
+| H84 | Six operands would make reward-history bookkeeping harder to follow than the conditional copy and new-primary stores. |
+| H88 | Typed guarded scalar deletion and unconditional nulling stay explicit; no deletion-form repair or generic ownership guard. |
+| H95 | After H94 shortens the stack-value calls, retain the ratio's visible signed product, double division and float store rather than introduce another wrapper. |
+| H97 | The named INFO/QUICK_VIEW ternary remains clear after H30; keep that mode choice visible. |
+| H98 | Retain the short rounded-step expression beside each caller's positive-speed/minimum-one policy. |
+| H99 | Keep hover equality, state update and consume return together in the handler; no stateful query obscures the dispatch boundary. |
+
+All 46 R entries remain exclusions under their original contracts in
+[candidates.md](candidates.md). No helper authorizes a behavior repair, transport
+validation, ownership rewrite, generalized serialization, geometry substitution
+or merged game/UI workflow described by those exclusions.

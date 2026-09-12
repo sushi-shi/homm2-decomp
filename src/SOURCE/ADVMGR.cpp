@@ -9370,21 +9370,7 @@ void advManager::DisableButtons(void) {
         return;
     }
     tag_message msg;
-    msg.type = ADVMGR_BUTTON_MESSAGE;
-    msg.payload.widget.command = ADVMGR_BUTTON_DISABLE;
-    msg.payload.widget.data.value = BUTTON_TARGET;
-    msg.payload.widget.id = BUTTON_SLOT_1;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_2;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_3;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_4;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_5;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_6;
-    m_adventureWindow->BroadcastMessage(msg);
+    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
 }
 
 VA(0x0041339c, 0xc8)
@@ -9393,21 +9379,7 @@ void advManager::EnableButtons(void) {
         return;
     }
     tag_message msg;
-    msg.type = ADVMGR_BUTTON_MESSAGE;
-    msg.payload.widget.command = ADVMGR_BUTTON_ENABLE;
-    msg.payload.widget.data.value = BUTTON_TARGET;
-    msg.payload.widget.id = BUTTON_SLOT_1;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_2;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_3;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_4;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_5;
-    m_adventureWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = BUTTON_SLOT_6;
-    m_adventureWindow->BroadcastMessage(msg);
+    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
 }
 
 VA(0x00413464, 0x142)

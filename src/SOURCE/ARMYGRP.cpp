@@ -25,8 +25,7 @@ void SwapValues(Value& lhs, Value& rhs) {
 
 VA(0x00421710, 0x31)
 armyGroup::armyGroup(void) {
-    memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
-    memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
+    CLEAR_ARMY_GROUP(*this);
 }
 
 VA(0x00421741, 0xd)

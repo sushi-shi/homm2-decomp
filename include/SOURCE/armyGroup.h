@@ -52,6 +52,10 @@ public:
 };
 #pragma pack(pop)
 SIZE(armyGroup, 0xf);
+// Two array-major clears, not a whole-object zero or a slot-major Dismiss loop.
+#define CLEAR_ARMY_GROUP(group)                                                                    \
+    (memset((group).m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof((group).m_creatureTypes)),      \
+     memset((group).m_creatureCounts, 0, sizeof((group).m_creatureCounts)))
 // Type-first query; use the signed quantity view, not the unsigned troop alias.
 #define ARMY_GROUP_HAS_POSITIVE_STACK(group, slot)                                                 \
     ((group).m_creatureTypes[slot] != CREATURE_NONE && (group).m_creatureCounts[slot] > 0)

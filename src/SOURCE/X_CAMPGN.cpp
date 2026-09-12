@@ -397,8 +397,10 @@ void ExpCampaign::InitMap(void) {
             b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
-                gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
-                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(player->m_heroIds[0]),
+                    bonus->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -574,12 +576,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }

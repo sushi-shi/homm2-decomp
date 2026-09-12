@@ -179,21 +179,11 @@ i32 swapManager::Open(i32 id) {
         }
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(
+        message,
+        gpAdvManager->m_adventureWindow,
+        WIDGET_COMMAND_CLEAR_FLAGS
+    );
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -218,21 +208,7 @@ void swapManager::Close(void) {
     gpAdvManager->Activate();
 
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(message, gpAdvManager->m_adventureWindow, WIDGET_COMMAND_SET_FLAGS);
 }
 
 VA(0x004a286f, 0x185)

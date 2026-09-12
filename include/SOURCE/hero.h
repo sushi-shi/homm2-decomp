@@ -230,6 +230,9 @@ public:
 };
 #pragma pack(pop)
 SIZE(hero, 250);
+// Keep the cached level and each receiver evaluation; setup/dialog guards remain outside.
+#define ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(h, amount)                                             \
+    ((h).m_experience += (amount), (h).CheckLevel())
 // Signed skill/table reads, then one Boolean telescope bonus; stable hero operand.
 #define HERO_SCOUTING_VISIBILITY_RADIUS(h)                                                         \
     (giVisRange[IDX((h).m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]                              \

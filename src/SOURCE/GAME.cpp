@@ -1913,16 +1913,20 @@ void game::NewMap(char* filename) {
             }
             if (awardHero < GAME_HERO_COUNT) {
                 if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
-                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[awardHero].CheckLevel();
+                    ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                        m_heroRecs[awardHero],
+                        CAMPAIGN_EXPERIENCE_BONUS
+                    );
                     strcpy(
                         m_heroRecs[awardHero].m_name,
                         "\xd1\xe5\xf1\xf2\xf0\xe0 \xdd\xeb\xe8\xe7\xe0" /* "Сестра Элиза" */
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
-                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[awardHero].CheckLevel();
+                    ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                        m_heroRecs[awardHero],
+                        CAMPAIGN_EXPERIENCE_BONUS
+                    );
                     strcpy(
                         m_heroRecs[awardHero].m_name,
                         "\xc1\xf0\xe0\xf2 \xc1\xf0\xe0\xea\xf1" /* "Брат Бракс" */
