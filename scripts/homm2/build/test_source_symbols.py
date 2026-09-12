@@ -41,6 +41,31 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(render([]), "rva,name,unit,size,kind,provenance\n")
 
 
+class ReviewedDiagnosticTests(unittest.TestCase):
+    def test_only_exact_reviewed_file_and_diagnostic_are_accepted(self):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "config").mkdir()
+            (repo / "config/retail_bool_exceptions.tsv").write_text(
+                "category\tfile\tqualified_name\twrite_kind\tdetail\treason\n"
+                "parse-diagnostic\tsrc/SOURCE/KB.cpp\t\t\tknown language difference\tVC6 control\n")
+            allowed = mock.Mock(spelling="known language difference")
+            allowed.location.file = repo / "src/SOURCE/KB.cpp"
+            other_error = mock.Mock(spelling="unreviewed type error")
+            other_error.location.file = allowed.location.file
+            other_file = mock.Mock(spelling=allowed.spelling)
+            other_file.location.file = repo / "src/SOURCE/OTHER.cpp"
+            self.assertEqual(mod.unreviewed_diagnostics(
+                [allowed, other_error, other_file], repo), [other_error, other_file])
+
+    def test_no_manifest_accepts_no_project_errors(self):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            diagnostic = mock.Mock(spelling="type error")
+            diagnostic.location.file = repo / "src/UNIT.cpp"
+            self.assertEqual(mod.unreviewed_diagnostics([diagnostic], repo), [diagnostic])
+
+
 class CompgenMarkerTests(unittest.TestCase):
     def test_marker_uses_semantic_role_instead_of_volatile_coff_counter(self):
         with TemporaryDirectory() as directory:
