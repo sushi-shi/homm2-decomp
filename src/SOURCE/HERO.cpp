@@ -1512,9 +1512,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     }
 
     if (bExit) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(UI_DIALOG_CLOSE_COMMAND);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

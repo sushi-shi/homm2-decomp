@@ -406,8 +406,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     oldSide = armyPtr->m_targetSide;
     oldIndex = armyPtr->m_targetIndex;
-    armyPtr->m_targetSide = COMBAT_SIDE_NONE;
-    armyPtr->m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*armyPtr);
     gpSearchArray->SeedCombatPosition(armyPtr);
     armyPtr->m_targetSide = oldSide;
     armyPtr->m_targetIndex = oldIndex;
@@ -856,12 +855,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
-    gpWindowManager->UpdateScreenRegion(
-        giMinExtentX,
-        giMinExtentY,
-        giMaxExtentX - giMinExtentX + 1,
-        giMaxExtentY - giMinExtentY + 1
-    );
+    UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
     giMinExtentX = savedMinX;
     giMinExtentY = savedMinY;
     giMaxExtentX = oldMaxX;
@@ -1360,12 +1354,7 @@ void combatManager::DrawFrame(
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
                 giMaxExtentY = COMBAT_MAX_EXTENT_Y;
             gbEnlargeScreenBlit = false;
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             gbEnlargeScreenBlit = true;
         }
     } else if (updateScreen == 1) {
@@ -1458,12 +1447,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             giMaxExtentX = m_smallViewLastX[viewIndex] + m_smallViewWidth[viewIndex] - 1;
             giMaxExtentY = m_smallViewLastY[viewIndex] + m_smallViewHeight[viewIndex] - 1;
             DrawFrame(0, 0, 0, 0, 0, 1, 1);
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             gbLimitToExtent = false;
             m_smallViewLastX[viewIndex] = -1;
         }

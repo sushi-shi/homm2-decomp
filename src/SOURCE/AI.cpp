@@ -343,53 +343,35 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             }
             best = GetBestArmy(sideEnemy, mirrorMask[IDX(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[IDX(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, shooters[IDX(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[IDX(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, flyerMask[IDX(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[IDX(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             if (walkers[IDX(sideEnemy)] != 0) {
                 best =
                     GetClosestArmy(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]);
                 if (best != -1) {
-                    giNextAction = ACTION_MOVE;
-                    giNextActionGridIndex =
-                        (m_armies[IDX(sideEnemy)] + best)
-                            ->m_hex;
+                    SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                     goto finish;
                 }
             }
             best = GetBestArmy(sideEnemy, oddMasks[IDX(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[IDX(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, traitorArray[IDX(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[IDX(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[IDX(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             break;
@@ -482,8 +464,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
                 targetCell = &gpCombatManager->m_hexCells[targetHex];
                 if (ValidHex(targetHex) && targetCell->m_occupantSide == COMBAT_SIDE_NONE
                     && targetCell->m_blocked == 0) {
-                    giNextAction = ACTION_MOVE;
-                    giNextActionGridIndex = targetHex;
+                    SET_NEXT_COMBAT_MOVE(targetHex);
                     goto finish;
                 }
             }
@@ -582,8 +563,7 @@ void combatManager::DoLichShot(class army* lich) {
         if (bestIndex == COMBAT_AI_NO_ARMY || score > bestTotal) {
             bestTotal = score;
             bestIndex = armyIndex;
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = targetHex;
+            SET_NEXT_COMBAT_MOVE(targetHex);
         }
     }
 }
@@ -844,8 +824,7 @@ i32 combatManager::AttemptAttack(
         targetHex = targetArmy[m_armies[IDX(side)]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = targetHex;
+            SET_NEXT_COMBAT_MOVE(targetHex);
             return 1;
         }
         if (HAS(targetArmy[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
@@ -857,8 +836,7 @@ i32 combatManager::AttemptAttack(
                 targetHex++;
             currentArmy->m_moveTargetHex = targetHex;
             if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex = targetHex;
+                SET_NEXT_COMBAT_MOVE(targetHex);
                 return 1;
             }
         }
@@ -905,8 +883,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     else
         enemyArmy = GetBestArmy(OppositeCombatSide(m_currentSide), enemyMask);
     if (enemyArmy != COMBAT_AI_NO_ARMY) {
-        giNextAction = ACTION_MOVE;
-        giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex;
+        SET_NEXT_COMBAT_MOVE(m_armies[IDX(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex);
         return 1;
     } else {
         return 0;

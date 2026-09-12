@@ -609,6 +609,9 @@ extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern H2_CONST char* cOutOfMemory;
 extern H2_CONST char* gArmyNames[IDX(CREATURE_COUNT)];
 extern H2_CONST char* gArmyNamesPlural[IDX(CREATURE_COUNT)];
+// The <= 1 rule deliberately includes zero/negative quantities; only one table is read.
+#define CREATURE_DISPLAY_NAME(type, count)                                                         \
+    ((count) <= 1 ? gArmyNames[IDX(type)] : gArmyNamesPlural[IDX(type)])
 extern H2_CONST char* cMonFilename[IDX(CREATURE_COUNT)];
 extern H2_CONST char* cArmyFrameFileNames[IDX(CREATURE_COUNT)];
 extern H2_CONST char* gArmyShortNames[IDX(CREATURE_COUNT)];

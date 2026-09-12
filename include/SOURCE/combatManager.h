@@ -859,6 +859,11 @@ extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
 extern H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
+// The hex expression is evaluated after the action store. Other action fields remain.
+#define SET_NEXT_COMBAT_MOVE(hex) (giNextAction = ACTION_MOVE, giNextActionGridIndex = (hex))
+// Preserve floating tick addition followed by one final i32 conversion.
+#define COMBAT_DEADLINE(delay)                                                                     \
+    (static_cast<i32>(KBTickCount() + (delay) * gfCombatSpeedMod[gConfig.combatSpeed]))
 extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;

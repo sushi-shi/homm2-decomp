@@ -2842,9 +2842,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
                     case TOWN_DIALOG_CONFIRM:
-                        gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        FINISH_DIALOG_MESSAGE(message);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;

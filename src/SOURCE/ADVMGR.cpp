@@ -8432,9 +8432,7 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
                         choiceMessage.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_CHOICE;
                         townPortalWin->BroadcastMessage(choiceMessage);
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
-                        gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
-                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        FINISH_DIALOG_MESSAGE(message);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
@@ -9892,9 +9890,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     }
 
     if (handled) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -10046,9 +10042,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
     }
 
     if (handled) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -10425,9 +10419,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
         UpdateSystemOptions(0);
     }
     if (accepted) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = static_cast<BaseWidgetCommand>(IDX(SYSTEM_OPTION_FIRST));
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

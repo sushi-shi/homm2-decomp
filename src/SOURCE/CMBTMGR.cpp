@@ -1478,12 +1478,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             &limits9,
             ICON_DRAW_NORMAL
         );
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         previousX7 = static_cast<i32l>(projectileX11);
         previousY4 = static_cast<i32l>(projectileY4);
         projectileX11 += xStep0;
@@ -1556,12 +1551,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 0
             );
         }
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         DelayTil(&glTimers[COMBAT_CATAPULT_TIMER_SLOT]);
 
         if (((frame == COMBAT_CATAPULT_WALL_IMPACT_FRAME && gateIndex11 == -1)
@@ -1718,13 +1708,13 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+            tower == COMBAT_TOWER_GARRISON
+                ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
+                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
             damage5,
             "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
             killed0,
-            killed0 <= 1 ? gArmyNames[IDX(target9->m_monsterType)]
-                         : gArmyNamesPlural[IDX(target9->m_monsterType)],
+            CREATURE_DISPLAY_NAME(target9->m_monsterType, killed0),
             killed0 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
         );
     } else {
@@ -1922,15 +1912,12 @@ void combatManager::MakeCreaturesVanish(void) {
         for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[iSide]; armyIndex++) {
             if (m_removedArmies[iSide][armyIndex]) {
                 removedArmy = &m_armies[iSide][armyIndex];
-                m_hexCells[removedArmy->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[removedArmy->m_hex].m_occupantIndex = -1;
+                CLEAR_HEX_OCCUPANT(m_hexCells[removedArmy->m_hex]);
                 if (HAS(removedArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-                    m_hexCells[removedArmy->m_hex
-                               + ArmyFacingRearHexOffset(removedArmy->m_facing)]
-                            .m_occupantSide = COMBAT_SIDE_NONE;
-                    m_hexCells[removedArmy->m_hex
-                               + ArmyFacingRearHexOffset(removedArmy->m_facing)]
-                            .m_occupantIndex = -1;
+                    CLEAR_HEX_OCCUPANT(
+                        m_hexCells
+                            [removedArmy->m_hex + ArmyFacingRearHexOffset(removedArmy->m_facing)]
+                    );
                 }
             }
         }
@@ -2218,15 +2205,10 @@ void combatManager::ShootMissile(
         }
         missileIcon->DrawToBuffer(posX, posY, angleFrame, reverseMissile);
         if (frame == 0) {
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         } else {
             DelayTil(glTimers);
-            gpWindowManager->UpdateScreenRegion(minimumX, minY, maxX - minimumX + 1, maxY - minY + 1);
+            UPDATE_INCLUSIVE_REGION(minimumX, minY, maxX, maxY);
         }
         glTimers[0] = static_cast<i32>(
             KBTickCount()
@@ -2412,9 +2394,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     if (bRedraw)
         UpdateCombatSystemOptions(0);
     if (bDone) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
-        message.payload.widget.command = BaseWidgetCommand(SYSTEM_OPTION_SPEED_BUTTON);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

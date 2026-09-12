@@ -1031,9 +1031,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     }
 
     if (handled || giMenuCommand != -1) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        FINISH_DIALOG_MESSAGE(message);
         if (giMenuCommand != -1)
             gpWindowManager->m_dialogResult = DIALOG_CANCEL;
         return MESSAGE_DISPATCH_FORWARD;

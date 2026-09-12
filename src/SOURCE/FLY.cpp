@@ -417,12 +417,7 @@ i32 army::FlyTo(i32 destination) {
                               / frameCount0
                     );
                 }
-                gpWindowManager->UpdateScreenRegion(
-                    lastMinX,
-                    oldMinY,
-                    oldMaxX0 - lastMinX + 1,
-                    oldMaxY - oldMinY + 1
-                );
+                UPDATE_INCLUSIVE_REGION(lastMinX, oldMinY, oldMaxX0, oldMaxY);
                 if (m_animationFrame
                     == m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)] - 1) {
                     xPos = fromX + (leg + 1) * xSpeed;

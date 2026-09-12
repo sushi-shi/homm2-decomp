@@ -803,14 +803,11 @@ void combatManager::CastSpell(
                 teleportArmy6->m_index,
                 COMBAT_RIPPLE_DEATH_RIPPLE
             );
-            m_hexCells[teleportArmy6->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-            m_hexCells[teleportArmy6->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
+            CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex]);
             if (m_hexCells[teleportArmy6->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
-                m_hexCells[teleportArmy6->m_hex + 1].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[teleportArmy6->m_hex + 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+                CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex + 1]);
             } else if (m_hexCells[teleportArmy6->m_hex].m_occupantFrame == ARMY_FACING_RIGHT) {
-                m_hexCells[teleportArmy6->m_hex - 1].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[teleportArmy6->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+                CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex - 1]);
             }
             if (gbNoShowCombat == 0)
                 WaitEndSample(&spellSample6);
@@ -915,11 +912,11 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "\xd5\xeb\xe0\xe4\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e",
+                "\xd5\xeb\xe0\xe4\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20"
+                "\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3"
+                "\x20\x25\x73\x2e",
                 static_cast<i32>(damage1),
-                target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                    ? gArmyNames[IDX(target3->m_monsterType)]
-                    : gArmyNamesPlural[IDX(target3->m_monsterType)]
+                CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
             CombatMessage(gText, 1, 1, 0);
             DoBlast(targetHex, spell);
@@ -944,11 +941,11 @@ void combatManager::CastSpell(
                 );
                 sprintf(
                     gText,
-                    "\xc2\xee\xeb\xf8\xe5\xe1\xed\xe0\xff\x20\xf1\xf2\xf0\xe5\xeb\xe0\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e",
+                    "\xc2\xee\xeb\xf8\xe5\xe1\xed\xe0\xff\x20\xf1\xf2\xf0\xe5\xeb\xe0\x20\xed\xe0"
+                    "\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0"
+                    "\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e",
                     static_cast<i32>(damage1),
-                    target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                        ? gArmyNames[IDX(target3->m_monsterType)]
-                        : gArmyNamesPlural[IDX(target3->m_monsterType)]
+                    CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
                 );
                 CombatMessage(gText, 1, 1, 0);
                 missileIcon6 = gpResourceManager->GetIcon("keep.icn");
@@ -988,11 +985,11 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "\xd0\xe0\xe7\xf0\xff\xe4\x20\xec\xee\xeb\xed\xe8\xe8\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e",
+                "\xd0\xe0\xe7\xf0\xff\xe4\x20\xec\xee\xeb\xed\xe8\xe8\x20\xed\xe0\xed\xee\xf1\xe8"
+                "\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff"
+                "\xe4\xf3\x20\x25\x73\x2e",
                 static_cast<i32>(damage1),
-                target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                    ? gArmyNames[IDX(target3->m_monsterType)]
-                    : gArmyNamesPlural[IDX(target3->m_monsterType)]
+                CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
             CombatMessage(gText, 1, 1, 0);
             DoBolt(
@@ -1241,9 +1238,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
         }
 
         for (frame = 0; frame < frameCount7; ++frame) {
-            glTimers[0] = static_cast<i32>(
-                KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
             IconToBitmap(
                 spellIcon4,
                 gpWindowManager->m_screen,
@@ -1469,10 +1464,7 @@ void combatManager::ElementalStorm(void) {
         stormIcon_i = gpResourceManager->GetIcon("storm.icn");
         for (iter = 0; iter < SPELL_STORM_PASS_COUNT; ++iter) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
-                glTimers[0] = static_cast<i32>(
-                    KBTickCount()
-                    + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-                );
+                glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 for (row_b = 0; row_b < SPELL_STORM_ROW_COUNT; ++row_b) {
                     for (c = 0; c < SPELL_STORM_COLUMN_COUNT; ++c) {
@@ -1577,9 +1569,7 @@ void combatManager::Armageddon(void) {
             MemError();
         memcpy(effectPalette->Data(), originalPalette9->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
 
-        glTimers[0] = static_cast<i32>(
-            KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
         effectData28 = effectPalette->Data();
         for (pass1 = 0; pass1 < SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT; ++pass1) {
             for (color9 = 0; color9 < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color9) {
@@ -1595,10 +1585,7 @@ void combatManager::Armageddon(void) {
             }
             DelayTil(&glTimers[0]);
             SetPalette(effectData28, 1);
-            glTimers[0] = static_cast<i32>(
-                KBTickCount()
-                + SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(SPELL_ARMAGEDDON_PALETTE_DELAY);
         }
 
         i32 shakeOffsets15[SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {
@@ -1663,10 +1650,7 @@ void combatManager::Armageddon(void) {
                 offsetX18 =
                     static_cast<i32>(shakeOffsets15[frame8][IDX(COORDINATE_AXIS_X)] * scale1);
                 offsetY9 = static_cast<i32>(shakeOffsets15[frame8][IDX(COORDINATE_AXIS_Y)] * scale1);
-                timer0 = static_cast<i32>(
-                    KBTickCount()
-                    + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-                );
+                timer0 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
                 PollSound();
                 copyWidth =
                     COMBAT_SCREEN_WIDTH
@@ -2498,9 +2482,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetHex = nextTarget10;
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline4);
-        deadline4 = static_cast<i32>(
-            KBTickCount() + CHAIN_LIGHTNING_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        deadline4 = COMBAT_DEADLINE(CHAIN_LIGHTNING_FRAME_DELAY);
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[IDX(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -3115,26 +3097,17 @@ mirror_found:
     m_limitCreatureCount[IDX(m_hexCells[targetHex].m_occupantSide)]
                         [m_hexCells[targetHex].m_occupantIndex]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    deadline1 = static_cast<i32>(
-        KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-    );
+    deadline1 = COMBAT_DEADLINE(MIRROR_SLIDE_FRAME_DELAY);
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image0->m_xOffset =
             xOffset3 * (MIRROR_SLIDE_FRAME_COUNT - frame) / MIRROR_SLIDE_FRAME_COUNT;
         image0->m_yOffset = yOffset6 * (MIRROR_SLIDE_FRAME_COUNT - frame) / MIRROR_SLIDE_FRAME_COUNT;
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(0, 0, 0, 0, 0, 1, 0);
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         gbLimitToExtent = false;
         DelayTil(&deadline1);
-        deadline1 = static_cast<i32>(
-            KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        deadline1 = COMBAT_DEADLINE(MIRROR_SLIDE_FRAME_DELAY);
     }
     image0->m_xOffset = 0;
     image0->m_yOffset = 0;
@@ -3317,15 +3290,8 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
         if (COMBAT_AREA_HEIGHT - 1 < giMaxExtentY)
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_k);
-        deadline_k = static_cast<i32>(
-            KBTickCount() + BLAST_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        deadline_k = COMBAT_DEADLINE(BLAST_FRAME_DELAY);
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
     }
     gbComputeExtent = false;
     gbSaveBiggestExtent = false;
@@ -3600,9 +3566,7 @@ void combatManager::Earthquake(void) {
     );
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
         for (frame8 = 0; frame8 < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame8) {
-            deadline7 = static_cast<i32>(
-                KBTickCount() + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            deadline7 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
             PollSound();
             width0 = COMBAT_SCREEN_WIDTH - abs(shakeOffsets17[frame8][IDX(COORDINATE_AXIS_X)]);
             height9 = COMBAT_AREA_HEIGHT - abs(shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)]) - 1;
@@ -3729,12 +3693,7 @@ void combatManager::Earthquake(void) {
                     );
                 }
             }
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             DelayTil(&glTimers[1]);
             if (index7 == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
                 for (impact = 0; impact < EARTHQUAKE_STRUCTURE_COUNT; ++impact) {

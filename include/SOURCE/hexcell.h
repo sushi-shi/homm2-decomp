@@ -42,4 +42,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(hexcell, 0x62);
+// Only the live identity, in side/index order; frame and corpse data are retained.
+#define CLEAR_HEX_OCCUPANT(cell)                                                                   \
+    ((cell).m_occupantSide = COMBAT_SIDE_NONE, (cell).m_occupantIndex = -1)
 #endif

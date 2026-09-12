@@ -239,3 +239,26 @@ records. Existing local retail normalization residuals remain distinct from the
 passing before/after proof. The real-header VC6 integration check now also passes
 all 256 signed-byte inputs for six creature sets and the selection predicate,
 plus 32,768 sprite tileset/flag/sentinel combinations, alongside the 512 case folds.
+
+## Group 5: ordered UI and combat operations
+
+| Family | Application or measured retention |
+| --- | --- |
+| H32 | Ten `FINISH_DIALOG_MESSAGE` calls save the original widget id, then store the close id and dialog-select command. Handler returns, the timeout's preceding type write/following reset, SETUP's later cancel override and all other payload remain explicit. The town event handler has the same three-store contract. |
+| H34 | Retain the six exact-order four-`if` clamps. The statement-safe `do/while(0)` macro increases Walk from 2,599 to 2,609 bytes. Its definition is removed; no unguarded multi-statement macro or reordered ternaries are substituted. |
+| H35 | Sixteen `UPDATE_INCLUSIVE_REGION` calls name endpoint-to-size conversion at the window-manager boundary, with stable local/global bounds. Other drawing/fizzle APIs, clipping and caller flags are untouched. |
+| H36 | Fifteen `COMBAT_DEADLINE` expressions retain the `i32` conversion after floating tick addition and the original delay-first product. Long-cast, reversed-product, division and double-factor variants remain explicit, as do timer slots and polling. |
+| H38 | Seven `CREATURE_DISPLAY_NAME` calls preserve the lazy table selection and `count <= 1`, including SPELLS' equivalent `PLURAL_QUANTITY_MINIMUM - 1`. Separate-format branches, `== 1` variants and lowercased `gTargetName` remain explicit. |
+| H40 | Eight `CLEAR_HEX_OCCUPANT` calls clear side then index only. Repeated cell expressions, front/rear selection and guards are retained; grid initialization, reversed stores and frame/corpse state remain explicit. |
+| H53 | Thirteen `SET_NEXT_COMBAT_MOVE` calls set action before evaluating/storing the destination. Intervening ValidAttack work, previously selected destinations, action-extra stores and returns remain outside. |
+| H57 | Seven `CLEAR_ARMY_TARGET` calls preserve side/index order. Attack direction, move/previous-target hexes, save/restore and index-first variants remain explicit. |
+
+[Eight complete two-arm matrices](../matching/ReadabilityOrdered/shared-operations.cpp)
+record the exact attempted source and results. H32/H35/H57 match their retail
+probes; the other retained expressions preserve baseline instruction and
+relocation hashes with the existing local retail residuals. H34's added code is
+a measured rejection, not an untested claim that no possible helper could match.
+
+The combined build and original-object control pass: all 98 objects, 1,516
+non-debug sections and 42,433 ordered relocations are unchanged. Retail field
+review passes for 1,727 functions and 38,307 sites with zero structural items.

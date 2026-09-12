@@ -333,9 +333,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     if (gbNoShowCombat == 0) {
         if (glTimers[0] < KBTickCount()) {
             PollSound();
-            glTimers[0] = static_cast<i32>(
-                KBTickCount() + COMBAT_SOUND_POLL_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(COMBAT_SOUND_POLL_DELAY);
         }
         if (glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] < KBTickCount()
             && gbProcessingCombatAction == 0) {
@@ -455,8 +453,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     army* currentArmy_1 = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     CombatSide targetSide_28 = currentArmy_1->m_targetSide;
     i32 targetIndex_9 = currentArmy_1->m_targetIndex;
-    currentArmy_1->m_targetSide = COMBAT_SIDE_NONE;
-    currentArmy_1->m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*currentArmy_1);
     army* targetArmy_13 = &m_armies[IDX(targetSide_28)][targetIndex_9];
 
     i32 direction_28;
@@ -1188,8 +1185,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
             enemySide_27 = m_hexCells[hexIndex].m_occupantSide;
             targetIndex = m_hexCells[hexIndex].m_occupantIndex;
             ourArmy_13 = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-            ourArmy_13->m_targetSide = COMBAT_SIDE_NONE;
-            ourArmy_13->m_targetIndex = -1;
+            CLEAR_ARMY_TARGET(*ourArmy_13);
 
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
@@ -1241,8 +1237,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
                             else {
-                                ourArmy_13->m_targetSide = COMBAT_SIDE_NONE;
-                                ourArmy_13->m_targetIndex = -1;
+                                CLEAR_ARMY_TARGET(*ourArmy_13);
                                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
                             }
                         }
@@ -1349,8 +1344,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_FLY:
         case COMBAT_MESSAGE_COMMAND_SHOOT:
         case COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL:
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = m_selectedHex;
+            SET_NEXT_COMBAT_MOVE(m_selectedHex);
             giNextActionExtra = -1;
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
@@ -1443,9 +1437,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
 
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(WIN_LOSE_CLOSE_COMMAND);
+        FINISH_DIALOG_MESSAGE(message);
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1483,10 +1475,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                                     SPELL_NONE;
                             } else {
                             ExitDialog:
-                                gpWindowManager->m_dialogResult = message.payload.widget.id;
-                                message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
-                                message.payload.widget.command =
-                                    BaseWidgetCommand(WIN_LOSE_CLOSE_COMMAND);
+                                FINISH_DIALOG_MESSAGE(message);
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         }
@@ -2899,9 +2888,7 @@ void combatManager::CycleCombatScreen(void) {
     }
     DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 setCycleTimer:
-    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = static_cast<i32>(
-        KBTickCount() + COMBAT_CYCLE_TIMER_FACTOR * gfCombatSpeedMod[gConfig.combatSpeed]
-    );
+    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = COMBAT_DEADLINE(COMBAT_CYCLE_TIMER_FACTOR);
 }
 
 VA(0x00431f2a, 0x30)
