@@ -8,12 +8,20 @@ macros and inline functions that explain code across translation units.
 This is a source-reading audit, not a claim to have recovered original source
 spelling. Similar code alone does not prove a historical macro or inline.
 
-The deliberate pass is complete: **228 files and 1,655 physical function
-definitions read**, including header bodies and assembly. Start with the
+The deliberate pass completed at `77b87cd47`: **228 files and 1,655 physical
+function definitions read**, including header bodies and assembly. Start with the
 [ranked findings](findings.md), then use the [detailed ledger](candidates.md)
 for the exact contracts, call sites and exclusions. It records 99 finding
 families and 46 local/rejected observations; those are not 99 required new APIs.
 The [completion audit](completion.md) states the evidence and its limits.
+
+The findings have since been [applied and measured](implementation.md): 56
+families have retained applications; every other family has an explicit
+retention decision. The inventory below reflects the applied source, while
+whole-file read credit stays bound to the original hashes. Thus the 96 modified
+files correctly show stale/unread, not an unearned new whole-file review.
+[Implementation delta records](implementation-review.tsv) preserve both hashes
+and the separate caller/contract review evidence.
 
 ## Inventory and reading contract
 

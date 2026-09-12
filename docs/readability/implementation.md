@@ -1,6 +1,6 @@
 # Applying the common-helper audit
 
-Work in progress on `refactor/buka-common-helpers`, based on the completed audit
+Applied on `refactor/buka-common-helpers`, based on the completed audit
 at `77b87cd47` and canonical `decomp-gold-2.1-buka` at `ca2904a91`.
 The requested deliverable is the applied readability changes and a pull request
 against the canonical branch. Generated/portable-source propagation remains a
@@ -20,7 +20,7 @@ Before/after compiler-object comparisons supplement the retail comparison; they
 are not substitutes for it. Test the strict modern declarations too. Update the
 reading inventory for reviewed changes, then publish the branch and open the PR.
 
-Planned groups:
+Original work plan:
 
 1. Existing widget-message macro and seven optional-argument API families.
 2. Existing accessors, affected-army indexing and CP1251 vocabulary.
@@ -31,8 +31,11 @@ Planned groups:
 7. Whole-tree caller/contract review, explicit disposition of every finding,
    combined verification, refreshed inventory and PR handoff.
 
-Completed groups and explicit dispositions follow below. Unlisted families are
-still pending application review, not implicitly implemented.
+All H01-H99 families now have explicit dispositions below: 56 A/B families have
+retained applications (with documented subsets), 14 A/B families remain explicit
+after measured non-equivalent alternatives, and all 29 rank-C families remain
+explicit by design. All 46 R exclusions are preserved. A family disposition is
+not a claim that every variant was bulk-replaced or that a new API was mandatory.
 
 ## Reproducible verification inputs
 
@@ -387,3 +390,45 @@ All 46 R entries remain exclusions under their original contracts in
 [candidates.md](candidates.md). No helper authorizes a behavior repair, transport
 validation, ownership rewrite, generalized serialization, geometry substitution
 or merged game/UI workflow described by those exclusions.
+
+## Final verification and inventory handoff
+
+The combined source state at `610e19c1` passes `homm2 build`, the complete
+original-object control (98 objects, 1,516 non-debug sections, 42,433 ordered
+relocations), and retail field review (1,727 functions, 38,307 sites, zero
+structural items). The build report retains 1,727/1,727 compared functions and
+291,995/291,995 data bytes. The target-local residuals in the measured dossiers
+remain visible; rounded report totals are not substituted for those audits.
+
+The final full tool suite passes **905 tests, no skips**, with Universal Ctags
+6.2.1 on PATH. The real-header VC6 contract executable passes all finite-domain
+and file-I/O cases described above. The explicitly invoked global-data,
+global-definition, vtable and fixed-width-integer gates also pass; all 30
+source-owned vtable identities remain accounted for.
+
+The five baseline limitations listed earlier were rerun, not bypassed:
+declaration, definition-owner, fake-label and annotation diagnostics are exactly
+unchanged from the initialized baseline. Unlimited-error strict Clang again
+reports 1,615 errors, byte-for-byte the same diagnostic lines in the same eight
+SDK headers, with zero game-source/header errors (95/96 TUs still fail). The
+strict build is **not** claimed as passing, and AUDITS remains unchanged.
+
+The reading inventory is regenerated and its `--check` passes. It now indexes
+228 files, 1,652 physical definitions, 1,491 VA-associated bodies and 792 macros.
+The three-body net reduction is reconciled: five private CP1251 folds were
+removed in favor of shared vocabulary, while CyrillicToLower and the transport
+array-disposal inline were added. LogInt's inventory signature changes only
+because its trailing defaults are now explicit.
+
+Historical whole-file reading credit remains bound to the original audit at
+`77b87cd47`; it is **not** silently transferred to changed files. The 96 changed
+files therefore correctly show stale/unread whole-file status (132 unchanged
+files and 264 definitions retain their original credit). Their
+[implementation review records](implementation-review.tsv) bind both audit and
+applied hashes and point to the caller/contract/compiler reviews above. Those
+delta reviews are implementation evidence, not a newly claimed whole-tree read.
+The completed original reading/search remains available in Git at `77b87cd47`.
+
+Generated source and the portable branch have not been modified. The PR targets
+`decomp-gold-2.1-buka`; propagation remains the separate follow-up originally
+specified by the audit.

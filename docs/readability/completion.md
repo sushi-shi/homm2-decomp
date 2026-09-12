@@ -1,13 +1,20 @@
 # Completion audit — Buka common-helper search
 
-Completed 2026-09-12 on `audit/buka-common-helpers`, based on canonical
+Historical snapshot: completed 2026-09-12 at `77b87cd47` on
+`audit/buka-common-helpers`, based on canonical
 `decomp-gold-2.1-buka` at `ca2904a91`. This completes the requested deliberate
 reading/search and its function checklist. It does not implement the candidate
 refactors or propagate them to generated/ported source.
 
+All evidence and counts below refer to that completed audit snapshot, not the
+subsequently modified implementation. See [implementation.md](implementation.md)
+for the applied changes, final verification and current inventory reconciliation.
+The current checklist intentionally invalidates historical read credit for
+changed files; the audit's original all-read inventory is preserved at `77b87cd47`.
+
 ## Requirement-by-requirement evidence
 
-| Requirement | Current evidence | Result |
+| Requirement | Evidence at the audit snapshot | Result |
 | --- | --- | --- |
 | Use canonical Buka first; propagation later | Audit worktree is based on `ca2904a91`. Whole-branch `git diff ca2904a91 -- src include config` is empty. Changes are audit documentation and inventory/test tooling only. | Satisfied; no propagation. |
 | Deliberately read the codebase, not merely search it | B01-B44 in [batches.md](batches.md) document complete file/body/declaration/data reads and function-boundary reconciliation. All 228 [review records](reviews.json) bind to the current whole-file hashes. Final validation rechecked every hash. | 228/228 files read. |
