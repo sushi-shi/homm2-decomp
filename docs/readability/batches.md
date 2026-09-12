@@ -118,5 +118,66 @@ from genuinely shared helpers and rejects generic cursor/bit-mask guards. The
 cursor uses separate saved/clipped and raw origins, current/drawn size indices,
 and several non-interchangeable reentrancy/readiness fields.
 
-Next family: remaining BASE utility and bundled compression owners, before the
-larger game/AI/map/combat translation units.
+## B08 — complete Misc utility owner
+
+Read all 2,182 lines of `Misc.cpp`, plus `Misc.h` and `MiscEnums.h`; reconciled
+49 definitions in three files, including the strict const `FindToken` overload
+and constrained `LogInt` bridge. Covered allocation diagnostics, filename hash,
+binary search, every registry field read/write, defaults/CD discovery, screen
+blitting, logging, palette fades, PCX output, random state and modal data entry.
+
+H01/H07 gain concrete instances and store/axis-order exceptions. H05/H06 now have
+complete owner review. H15 names the current graphics-config slot; H16 names
+inclusive disjointness shared with the previously read mouse TU. R10 keeps local
+registry boilerplate and different file/random/fade contracts separate. Searches
+also located potential short-arity `LogInt` and allocation-error patterns in game
+TUs; those are leads only until those bodies are deliberately read.
+
+## B09 — complete bundled Bzip
+
+Read all 2,061 lines of `Bzip.cpp` and the complete 139-line `Bzip.h`; reconciled
+88 authored definitions, including empty hooks, in two files. Covered CRC state,
+bit I/O, arithmetic coder/model updates, MTF/RLE, word access, cyclic sorting,
+reversible transform, block spotting, stream framing and filesystem wrappers.
+Existing macro bodies were read too; macro expansions are not extra physical
+function definitions.
+
+R11 records protocol ownership and why generic bit/RLE/free/normalize macros
+would be misleading. The MSB-oriented CRC, arithmetic-coded big-endian accessors,
+single-step normalization, returning error stubs, and all-frees-before-null-stores
+are explicit contracts. No compression, temporary-file creation, or deletion was
+executed during this source-only review. This completes all BASE files in scope.
+
+## B10 — shared types and game/Windows declarations
+
+Read in full: `Ints.h`, `va.h`, `SOURCE/CONFIG_TYPES.h`, `SOURCE/KB.h`,
+`SOURCE/X_GLOBAL.h`, `SOURCE/KB_TYPES.h`, `SOURCE/combatTypes.h`,
+`SOURCE/kbwin.h`, `SOURCE/wingraph.h`, `SOURCE/NOOPT.h`, and `src/SOURCE/NOOPT.cpp`.
+Reconciled 93 definitions in eleven files: 53 fundamental storage/conversion
+bodies, 26 KB-type helpers, eight combat-domain helpers, three KB/global inlines,
+and three delay functions. All conditional branches, defaulted bodies and macro
+definitions were considered; extern tables do not create invented bodies.
+
+R12 separates modern strict-build infrastructure from semantic game helpers.
+Existing trigger, side/direction/facing, codepage and map-extra interfaces form
+the vocabulary to compare against game consumers. Header reads are complete, but
+the large implementing game TUs are still unread; no caller coverage is inferred.
+H15's actual config record and global-selection declarations are now checked.
+R10 distinguishes pointer versus value deadlines in the already-named delay APIs.
+
+## B11 — complete Windows event/display implementation
+
+Read all 587 lines of `kbwin.cpp` and 1,158 lines of `wingraph.cpp`; reconciled
+48 definitions in two files against the owner headers read in B10. Covered
+startup, complete window procedure and menu recursion, both message pumps,
+DirectDraw surface/clipper/error/retry/lock paths, WinG bitmap/palette paths,
+display switching and teardown.
+
+H13/H15 gain display and window consumers; H17 confirms short-arity logging,
+H18 isolates palette-component scaling, and H19 records the shared diagnostic
+format-then-log protocol across four TUs. R13 rejects whole display/pump
+unification and records local HRESULT/descriptor-init leads for later network
+owner comparison. Existing odd RECT endpoints, dead/default branches, original
+error line numbers and callback-sensitive saved settings remain explicit.
+
+Next family: game/map data owners and algorithmic consumers.

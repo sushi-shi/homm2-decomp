@@ -33,6 +33,11 @@ do not replace those automatically. The icon release arm's existing subsequent
 test against `MESSAGE_RIGHT_BUTTON_UP` is unreachable after retyping; a helper
 must not silently "fix" this behavior.
 
+B08 adds the initial text message in `GetDataEntry` and the post-copy SET_TEXT
+message in `DataEntryWindowHandler`. The latter's GET_TEXT setup orders id before
+command and is not an exact store-order instance. Multi-widget broadcasts that
+reuse the existing message header should keep their id/payload-only updates.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -122,11 +127,16 @@ Do not include freeing the previous string: allocation and source lifetime order
 must remain caller-owned, especially with aliases. Do not substitute CRT `strdup`
 (different allocator/call) or a modern string class. `textWidget::SetText` and
 text-entry buffers use extra capacity (+5/+6), so they are NOT exact instances.
-The full string-memory owner TU still needs deliberate reading.
+The complete string-memory owner was subsequently reviewed in B08.
 
 B04 adds `font::DrawBoundedString`'s allocated whole-string copy. The buffer
 allocation in `font::LineLength` has no immediately corresponding whole-string
 copy and is not an exact instance.
+
+B08 confirms `H2_ALLOC` currently expands to `new u8[size]` and `H2_FREE` to the
+existing delete expression. `BaseAlloc`/`BaseFree` implement a separate debug
+allocation ledger; do not substitute them for the current macros. No existing
+allocate-and-copy string helper was found in this owner.
 
 ## H06 — icon-frame entry lookup (existing API)
 
@@ -173,6 +183,10 @@ B06 confirms lower-then-upper clamps in `SetAudiereMusicVolume` and
 `soundManager::ConvertVolume`. Their upper limits are fixed nonnegative constants.
 `soundManager::PollSound` instead clamps upper-then-lower after fade arithmetic;
 leave the ordering explicit even where ordinary inputs yield the same result.
+
+B08 adds the X/Y window-position clamps in `ReadPrefsFromRegistry`. The source
+uses video height for the X limit and video width for Y; a helper must retain
+those actual arguments, not quietly correct the apparent axis swap.
 
 ## H08 — list row and scrollbar drag arithmetic
 
@@ -357,6 +371,12 @@ global dimension reads. Do not clamp off-screen positions or add a new zero-size
 policy. `MouseCoords` additionally queries Windows and converts screen to client;
 it cannot replace the message-coordinate expressions wholesale.
 
+B11 adds `DDAppPaint` and `WGAppPaint` source-coordinate calculations. Scaling
+width/height uses the same arithmetic but follows distinct rectangle preparation
+and inclusive-end adjustments; keep those steps outside an expression helper.
+`AppWndProc` forces reported client dimensions to at least one on WM_SIZE, but
+that one path is not a proof that every use can discard division preconditions.
+
 ## H14 — manager registration fields
 
 Disposition: lower-confidence small statement macro or base-method hypothesis.
@@ -408,3 +428,169 @@ position over a larger region than H04's narrow expression. Cursor bitmap masks
 are MSB-first two-plane bytes, unlike BITS' packed LSB-oriented interface; no shared
 bit-set macro should erase that encoding. Cursor save/draw paths use distinct
 raw versus clipped origins and old versus current size indices; R06 applies.
+
+## H15 — current executable's graphics configuration
+
+Disposition: useful cross-TU lvalue expression / reference-accessor hypothesis.
+
+`KeyboardMessageHandler`, `MouseMessageHandler`, `CheckChangeCursor`,
+`BlitBitmapToScreenVesa`, `FadeIn`, `FadeOut`, and `ReadPrefsFromRegistry` repeat
+`gConfig.gfx[IDX(giCurExe)]` across three TUs. A name such as `CURRENT_GFX_CONFIG`
+or `CurrentGraphicsConfig()` would explain that game and editor have independent
+window/fullscreen/cursor preferences. The actual record is `exeGfxConfig` in
+`CONFIG_TYPES.h`; `gConfig` and `giCurExe` are declared in `KB.h`/`X_GLOBAL.h`.
+A small configuration-access boundary should own it, not a generic index macro.
+
+It must remain an lvalue selecting the current slot on each use. Do not cache a
+pointer/reference across callbacks, collapse the game/editor settings, normalize
+the packed record, or turn nonzero integer flags into new bool storage. The
+reference-returning inline and expression macro are alternatives to measure,
+not established byte-equivalent spellings.
+
+B11 adds extensive consumers in `kbwin.cpp` (initialization, move/size, resize,
+menu changes) and `wingraph.cpp` (clipper setup, display initialization/switching).
+The save/restore locals around window changes intentionally preserve selected
+fields while callbacks run; H15 does not replace them with a whole-record copy.
+
+## H16 — inclusive rectangle disjointness
+
+Disposition: credible small geometry predicate, separate from clipping and hit tests.
+
+`mouseManager::NewUpdate` compares current versus old cursor rectangles;
+`BlitBitmapToScreen` compares the destination update rectangle with the saved
+cursor rectangle. Both decide disjointness by four edge comparisons, with edge
+contact still overlapping. A name such as `RECTS_DISJOINT_INCLUSIVE` could make
+the redraw decision clearer without absorbing visibility or dirty-extent updates.
+Proposed owner: the same narrow BASE graphics-geometry boundary considered by H09.
+
+Pass the existing saved/clipped and raw edges exactly; do not reconstruct a new
+rectangle from cursor position and current size. Comparison order differs between
+these bodies and must be measured or parameterized faithfully. Keep `IsVis()`
+outside the predicate and preserve its short circuit. The subsequent test in
+`BlitBitmapToScreen` asks whether the update fully covers the cursor; that is a
+different containment contract, not another disjointness instance. H02/H11 retain
+their separate half-open contracts.
+
+## R10 — registry, file, random, and fade utilities
+
+The many registry queries/writes in `Misc.cpp` are good local readability targets,
+but not yet cross-TU helpers. Query byte count is an in/out variable reused across
+calls, not reset to four before every DWORD. Initial probing, ignored failures,
+string lengths, and handle-close/default-write paths differ; a table-driven rewrite
+would hide these details. Read/write/seek/open sequences also differ in error
+handling and file mode. In particular, `FileSize` opens `r+b`, so it cannot blindly
+replace Bzip's read-only temporary-file measurement.
+
+`Random` and `SRandom` deliberately have different random state and seed mixing;
+both already expose inclusive bounds. `MAKEFILEID` folds ASCII only and updates
+its unsigned hash by specific shifts/additions, whereas `CyrillicToUpper` handles
+CP1251 too. They are not interchangeable case-conversion or rotate operations.
+Fade variants differ in threshold table, saturation, palette state and final-step
+behavior. Existing `DelayTil` rereads a pointer deadline after message pumping;
+`DelayTilMilli` owns a value deadline. Similar loops do not justify merging these
+APIs or moving sound/message calls. R05 still applies.
+
+## R11 — bundled Bzip implementation is its own protocol boundary
+
+The complete Bzip TU already has CRC/bitstream/model/packed-word helpers and local
+macros (`UPDATE_CRC`, `ERROR_IF_*`, `GETFIRST*`, `SWAP`). Their actual consumers are
+within that TU; do not promote them to game-wide utilities just because the names
+sound generic. Arithmetic-coded big-endian words are not resource `ReadWord` data;
+its RLE counts, EOF marker, CRC order, block normalization and global buffers are
+not icon RLE. `NORMALISE` adjusts by at most one block; `STRONG_NORMALISE` loops
+and takes a remainder. A generic modulo/clamp replacement changes the contract.
+
+Keep empty error/cleanup hooks as currently written: they do not establish a
+nonreturning failure path. Repeated free-then-null groups put all null stores
+after all frees, so a per-pointer macro would reorder them. Encode/decode's
+temporary-file protocol, random filename append and stream-owned closes are
+local opportunities, not evidence for a shared game serialization framework.
+
+## R12 — compatibility machinery versus period helpers
+
+`Ints.h`'s enum storage templates, constrained conversions, assignment bridges,
+and generated operators are modern checking infrastructure. They were read and
+counted as physical definitions where appropriate, but are not proposed as
+historical helper discoveries. Likewise, `va.h` annotations are reconstruction
+metadata, not game behavior. Do not factor these into the period macro candidate set.
+
+The game already has small semantic interfaces worth checking at later consumers:
+`MAP_TRIGGER_*`, `OppositeMapDirection`, `OppositeCombatSide`, facing/result
+conversions, `OppositeCampaignSide`, `NextSpellEffectDisplayType`, and
+`CyrillicToUpper`. Their strict/retail branches can differ for invalid domain values;
+use the caller's real domain rather than assuming every numeric lookalike is valid.
+`MAP_EXTRA_AT` and `_WFIRST` explicitly retain different address operand ordering;
+their existing comments prohibit merging them for tidiness. Consumer review and
+new matching evidence remain necessary before any additional replacement.
+
+## H17 — short-arity logging calls
+
+Disposition: strong readability candidate using the existing `LogInt` API.
+
+`AppInit` in `kbwin.cpp`, and memory diagnostic routines in `Misc.cpp`, pass one
+value followed by six `LOG_UNUSED_VALUE` arguments. A fixed-arity macro such as
+`LOG_INT_1(label, value)` could preserve that exact eight-argument call. Default
+arguments for the existing function are an equally period-plausible alternative
+that avoids new callable wrappers; audit the strict enum overload consistently.
+Natural owner: `BASE/Misc.h` next to `LogInt` and the existing sentinel constant.
+
+The implementation chooses output length by trailing sentinel values; it is not
+a normal variable-length formatting API. Preserve all seven numeric slots, the
+required first value, the sentinel's actual meaning, argument evaluation, and
+logging's existing level check inside the callee. Do not add a variadic macro or
+replace the function with a stream/logging framework. Other arities remain leads
+until their game/network caller bodies are read.
+
+## H18 — palette component from six-bit intensity to output byte
+
+Disposition: small cross-TU expression macro; input signedness must stay explicit.
+
+`CreatePCXFile` in `Misc.cpp` and `DDUpdatePalette`/`WGUpdatePalette` in
+`wingraph.cpp` shift each palette component left by two before storing a byte.
+A name such as `PALETTE_COMPONENT_TO_BYTE(component)` would expose this conversion
+at the palette I/O boundary. Proposed owner: existing BASE palette constants/API.
+
+The PCX source is `u8`; display-update sources are `i8`. Preserve their promotions,
+the shift, and the caller's final byte store; do not introduce a common unsigned
+cast, saturation, gamma correction, or a different rounding rule. Only the scalar
+conversion is shared. WinG also writes RGBQUAD channels in interleaved order,
+DirectDraw sets palette flags, and system-palette exclusions are caller-owned.
+
+## H19 — format into the shared diagnostic buffer, then log
+
+Disposition: plausible fixed-arity statement macros; lower priority than H17.
+
+`resourceManager::ReadBlock`, `BaseFree`, `PrintMemoryLeaks`, Bzip model/error
+reporters, and `DDSD` repeat `sprintf(gText, format, ...); LogStr(gText);` across
+four TUs. Small fixed-arity `LOG_FORMAT_1`/`LOG_FORMAT_2`-style macros could name
+that exact two-call protocol. A parenthesized-argument-list macro is another
+possible spelling, but may save too little reading effort. Natural owner:
+`BASE/Misc.h`'s diagnostic interface; do not introduce a competing buffer owner.
+
+The shared `gText` clobber is part of the contract, including when logging is
+disabled. Do not move a debug-level check before formatting: `DDSD`, for example,
+subsequently passes the same text to `ShutDown`. Keep format/argument evaluation,
+both calls and the caller's later use of the buffer. No modern variadic-macro
+requirement, new `vsprintf` call, stream machinery, implicit truncation or hidden
+shutdown is justified. H17 remains preferable for existing `LogInt` callers;
+these sites have distinct free-form formats, not the fixed integer-label format.
+
+## R13 — Windows display/error initialization and painting
+
+DirectDraw HRESULT checks and `memset` plus descriptor `dwSize` initialization
+are local opportunities in `wingraph.cpp`; defer shared ownership until other
+Windows-facing TUs are read. Error calls pass original file/line facts and can
+return through a reentrancy guard, so a new macro must not assume `noreturn` or
+replace these numbers with current source locations.
+
+DirectDraw and WinG painting differ in invalidation rectangles, source clipping,
+alignment, scrolling, surface loss/busy retry, lock lifetime and palette realization.
+Existing backend dispatch functions already express the choice. Likewise,
+palette initialization/update loops have distinct interleaved RGBQUAD stores and
+system-entry flags; H18 is not a whole palette-loop macro. Do not impose standard
+RECT edge conventions on the source's explicit `+1`/`-1` calculations.
+
+`WinMain` recognizes WM_QUIT in its nonblocking pump; `Process1WindowsMessage`
+drains messages, services sound on one interval, and can call blocking GetMessage
+on another. Their superficially shared Translate/Dispatch pair does not justify
+one universal pump. R05 and the pointer/value deadline distinction still apply.

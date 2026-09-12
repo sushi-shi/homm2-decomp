@@ -1,8 +1,8 @@
 path	line	end	name	status	body_sha256	review
 include/BASE/BITS.h	2	2	HOMM2_BITS_H	read	afb9fab55cc5bf725d89a6e6570d9bc0e793caa4bc98a7fb1c2ffb6e1e450a27	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/Blur.h	2	2	HOMM2_BLUR_H	read	b430b3a17dc75c409bac93e1bd4d6bdd2191e10c42d0455f2a40bf0bf5d6eaa4	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
-include/BASE/Bzip.h	2	2	HOMM2_BASE_BZIP_H	unread	a1c4517d9edf57ac21c9816410bb696bf81a2ee9e3ae30a0b5e5b6d5bd867f37	-
-include/BASE/Bzip.h	16	16	MAX_SYMBOLS	unread	ee59278788f28f0ee9b448b2b04086891dd50615d07235641bd3b313dadaee9c	-
+include/BASE/Bzip.h	2	2	HOMM2_BASE_BZIP_H	read	a1c4517d9edf57ac21c9816410bb696bf81a2ee9e3ae30a0b5e5b6d5bd867f37	B09: complete stream/model/word/API declarations and storage aliases; no bodies; R11
+include/BASE/Bzip.h	16	16	MAX_SYMBOLS	read	ee59278788f28f0ee9b448b2b04086891dd50615d07235641bd3b313dadaee9c	B09: complete stream/model/word/API declarations and storage aliases; no bodies; R11
 include/BASE/DebugCheck.h	2	2	HOMM2_DEBUGCHECK_H	read	4a87ec766f5edc3ffd4125426e3423cfc18b01ce00d0a6b7feaac6e92d3b7c74	B07: complete empty DebugCheck inline; no helper extraction needed
 include/BASE/EXEC_TYPES.h	2	2	HOMM2_BASE_EXEC_TYPES_H	read	39b5e135d3b9e2eac80262410f36f1430c4db1f282b577f8307f320100957d7c	B03: complete manager contracts, flags, state and declarations; no bodies
 include/BASE/INPUTMGR.h	2	2	HOMM2_INPUTMGR_H	read	a7cfc2edb71398c54ee18e410033eca895a844e078fb69e766ba29b06c6206ac	B07: complete input/cursor layouts, scan domain and declarations; no bodies
@@ -19,12 +19,12 @@ include/BASE/Iconm2b.h	2	2	HOMM2_ICONM2B_H	read	63c172b8a37f8ccfff8374ea30a3dafa
 include/BASE/Iconmf2b.h	2	2	HOMM2_ICONMF2B_H	read	0b4b923aa6ea96e553208e1e8c2f86c69c0b1a8e45bc4819aabc4cfa24db763e	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/BASE/MIDIWrap.h	2	2	HOMM2_BASE_MIDIWRAP_H	read	7292feb10412ba9399bab685efece0096e474dba55d9b64deb2e907a93c55e6b	B06: complete audio resource/format/sequence/flag declarations; no bodies
 include/BASE/Midi.h	2	2	HOMM2_BASE_MIDI_H	read	baf55c7015ad76e5573af0924d3db597e81a6bd2ce17f1a1ffa2ac98415f2835	B06: complete audio resource/format/sequence/flag declarations; no bodies
-include/BASE/Misc.h	2	2	HOMM2_MISC_H	unread	482518d4ab0a10c69eb4959e8e1684d910373ad4bfe401a1fee5092317b5e913	-
-include/BASE/Misc.h	51	51	HOMM2_BASE_ICONENTRY_NO_SIZE	unread	65650d10e7333d43a78c5090935b6b2668df70794cca8f15bbc53dc26575c303	-
-include/BASE/Misc.h	82	82	H2_ALLOC	unread	4eebded6306a9d59611b5a623c64c7c4174214beb9cf975e0fec2f27af476429	-
-include/BASE/Misc.h	83	83	H2_FREE	unread	8153c6b7ad591c33ba99675aae231e166b320ac4aa4b34b265961a0740f1cd00	-
-include/BASE/Misc.h	84	85	H2_ASSERT	unread	e366186a24f5f161f6f8cba4195b5adec4c778a3fd528575ccdb35491079cfde	-
-include/BASE/MiscEnums.h	2	2	HOMM2_MISC_ENUMS_H	unread	7e1db33c33726ac3f207393ebcd1c3e3d6fb4377f2e8e334c74bef8441d60bdf	-
+include/BASE/Misc.h	2	2	HOMM2_MISC_H	read	482518d4ab0a10c69eb4959e8e1684d910373ad4bfe401a1fee5092317b5e913	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/Misc.h	51	51	HOMM2_BASE_ICONENTRY_NO_SIZE	read	65650d10e7333d43a78c5090935b6b2668df70794cca8f15bbc53dc26575c303	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/Misc.h	82	82	H2_ALLOC	read	4eebded6306a9d59611b5a623c64c7c4174214beb9cf975e0fec2f27af476429	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/Misc.h	83	83	H2_FREE	read	8153c6b7ad591c33ba99675aae231e166b320ac4aa4b34b265961a0740f1cd00	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/Misc.h	84	85	H2_ASSERT	read	e366186a24f5f161f6f8cba4195b5adec4c778a3fd528575ccdb35491079cfde	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/MiscEnums.h	2	2	HOMM2_MISC_ENUMS_H	read	7e1db33c33726ac3f207393ebcd1c3e3d6fb4377f2e8e334c74bef8441d60bdf	B08: complete CD setup result domain; no bodies
 include/BASE/MiscGraphicsConstants.h	2	2	HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H	read	0e388cd58ace005f5cb76bb45f60378269392c476a925a119258416c5b2aa087	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/MusicFlags.h	2	2	HOMM2_BASE_MUSICFLAGS_H	read	f5447db12870e1030695dd0706fe83b2d8e8310142d864537dce906f9ded5da4	B06: complete audio resource/format/sequence/flag declarations; no bodies
 include/BASE/Ripple.h	2	2	HOMM2_RIPPLE_H	read	78d43eb9107e1f6adcf67e2b4dbcb7389eeec782ce8a5cc90fb38e48c517a9e5	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
@@ -67,80 +67,80 @@ include/BASE/widget.h	2	2	HOMM2_BASE_WIDGET_H	read	af1de48736575a95c7bc1e62d8289
 include/BASE/widgetKind.h	2	2	HOMM2_BASE_WIDGET_KIND_H	read	dba4c4f57187ea160116561d44b1fc93a03bac069b7f5359b2251059eda83cb4	B01: full widget kind domain; no function bodies
 include/EDITOR/fullMap.h	2	2	HOMM2_EDITOR_FULLMAP_H	unread	498588c1cf0b2087926d7d1fa7e3d8837f9c2fcbf8aa3c31233ab9dbdb2075b3	-
 include/EDITOR/mapcell.h	2	2	HOMM2_EDITOR_MAPCELL_H	unread	30645a29c30c492f858bb553cf8239320770baa3afeec2edfac48b689a828ff7	-
-include/Ints.h	2	2	HOMM2_INTS_H	unread	289844971d4a830da01d796de396f043e16d69d4ec951db4d68ed5472c67e22a	-
-include/Ints.h	7	7	H2_STRICT_ENUMS	unread	aa3585a4b4c7f4d67b0038dcd4d1e146ffa476b14dec4033ea3b21770152b04e	-
-include/Ints.h	8	8	H2_FINAL	unread	bccebc0025ac1c1e12cbfe56690a50aaf3e760a317bd4cfa3be9b04f40801561	-
-include/Ints.h	9	9	H2_CONST	unread	de783843fb870e338a298cb169f1ba95cb03e43a947a0b3f4041e61cfaef88b5	-
-include/Ints.h	10	10	H2_UNUSED	unread	8b907ee23a52be31ffcfb5a144e180d427eeea3ec4a896684676ac4224affb00	-
-include/Ints.h	11	11	H2_RETAIL_INLINE	unread	88ebf762af763ceea7fab858a16bd69ca286b8ccec85679d7dcbc27ff1f62520	-
-include/Ints.h	12	12	H2_ZERO_INIT	unread	5692088604af361f82cca00f3c477dde5652c70a8805f198324902db4ddfb9f2	-
-include/Ints.h	14	14	H2_STRICT_ENUMS	unread	5362c7776edf6e48f6aad8f4b8ec1dc9044567d6cdf8bb46732b41016c2da7f2	-
-include/Ints.h	15	15	H2_FINAL	unread	6f46c5be007711cd097aca75f2123b0009821d2687d43ac560a890319175e59f	-
-include/Ints.h	16	16	H2_CONST	unread	0d6b806c93eba102b79e5c425e841f264ab48c4cae6f37b472baf0754599c1aa	-
-include/Ints.h	17	17	H2_UNUSED	unread	acda9366b426827e1d839f640a632e2f507d139f5b84cca74cd8f18275c06370	-
-include/Ints.h	18	18	H2_RETAIL_INLINE	unread	6f71cf696589e7a8fa5fdeb116eb3849ec375fb1f12f078bcfb47d749954dd08	-
-include/Ints.h	19	19	H2_ZERO_INIT	unread	dff4b0dae585affaf5e74fd2fe3dd742daa0afd7afaec41caa379a42b606a539	-
-include/Ints.h	34	34	NULL	unread	e9c4c7ecf2529875eba5693306dc97e7abe3461a11c5308807dcfa02d100064d	-
-include/Ints.h	49	49	H2_ENUM_BEGIN	unread	d0ce65a2023ef81e59065f61bff126ac35a955dac75bde1375b1e800606c842d	-
-include/Ints.h	50	52	H2_ENUM_END	unread	1d5ed9e269bd0a4149bf772e6da1ac8e6d8803b0826225e10ce2f830f3014032	-
-include/Ints.h	53	53	H2_ENUM_CLASS_BEGIN	unread	fa508e970d8000c8ba03a300a5f73728d21d176da0aa7c9d0b7b0ec81085abd6	-
-include/Ints.h	54	54	H2_ENUM_CLASS_FORWARD	unread	250fafc1ce38126812b3801ec343743b9255b28cf8d89cf07d74854a1bc7a832	-
-include/Ints.h	55	55	H2_ENUM_CLASS_FORWARD_SPLIT	unread	81240b5a6feb963b4cfef5d0c95d7ea00749b8eef6e850cde718abf4d338d2c2	-
-include/Ints.h	56	59	H2_ENUM_CLASS_END	unread	1b37606437a6d1ca5d7791f4823ae29197c1d8dc6a8cc4c2d8491c8f66dca08b	-
-include/Ints.h	60	60	H2_ENUM_CLASS_BEGIN_T	unread	a2be0bfa98e77fe80d9826267f746a1a8ca659437a0edbfabfe66c54b80b5588	-
-include/Ints.h	61	64	H2_ENUM_CLASS_END_T	unread	07d8adca6cc3d45e5cc6244948f4ff8ea41fdb57477a3cfc2e5f085d62a77b2a	-
-include/Ints.h	66	66	H2_ENUM_CLASS_BEGIN_SPLIT	unread	ea6e9745d67f9b27b37b8b7c737a489da616f4b6524207159a419091aeec38e9	-
-include/Ints.h	67	70	H2_ENUM_CLASS_END_SPLIT	unread	9d7783a8d990bc1b560266844e92f898710966e1c2a3f1c94369a440b04c5af5	-
-include/Ints.h	332	332	H2_ENUM_STORAGE	unread	63d13f1e4be1c9d2336bd64e762211811dd82e984ad30667c86e68cf76894de6	-
-include/Ints.h	333	333	H2_ENUM_STORAGE_STEPPED	unread	e7bcc5a54da483bc8a6ddc3e11436012982958f034188a894c0f31ce6dc9a2ec	-
-include/Ints.h	334	334	H2_OPEN_CODE_STORAGE	unread	5f5a61cc00cc257a63efce9c373764e0c5d8cf4848c50603f4f000a1010759a3	-
-include/Ints.h	335	335	H2_ENUM_BITFIELD	unread	11930db9a5b535b896c12a75a5782cbf694c9d3d1e11d62203e2a7244f55694b	-
-include/Ints.h	336	336	H2_ENUM_PARAM	unread	1bd61f8940fc74d696242c0edfe1c6b543e8361969505898fa95804afcb7c138	-
-include/Ints.h	337	337	H2_ENUM_RETURN	unread	0161123e90888f1d336de5a4de701cadde14ca6d072e432935990d544f04d5b1	-
-include/Ints.h	338	338	H2_OPEN_CODE_PARAM	unread	46f0cf579c3fad2e04cb3419d58e37dd3a0de77071f31c464d06001077b625f6	-
-include/Ints.h	339	369	H2_ENUM_FLAGS	unread	820e6bf449e2e1a37f0b2321bb08a18ff86e50daa25250bf24cde7633e6150d0	-
-include/Ints.h	371	371	H2_ENUM_BEGIN	unread	2eb68347424e403a27220db52bd3e6edf0e425ecad64c705f2a7118820990f08	-
-include/Ints.h	372	375	H2_ENUM_END	unread	648e9a302b12e078fe4ff4a2a92bf3123b1d8eeb0ed6a7d0114637685b393411	-
-include/Ints.h	376	376	H2_ENUM_CLASS_BEGIN	unread	06f2dba529dce577888435af4a7e0170d1feac36995a652a4fb1dd91ccdef0d8	-
-include/Ints.h	377	377	H2_ENUM_CLASS_FORWARD	unread	b37d68c7d833207247a1d0e4381be2c2336855678644392e3a31c54383099301	-
-include/Ints.h	378	378	H2_ENUM_CLASS_FORWARD_SPLIT	unread	ba5adf9e3eb748772c733d00a80bc2dc7957fdfdf3726b64822315aae8a2be8d	-
-include/Ints.h	379	382	H2_ENUM_CLASS_END	unread	f0612bc54fceb469250fbcb61ae33eb67aa7ac057ee4d03cfbd5414ca925804c	-
-include/Ints.h	383	383	H2_ENUM_CLASS_BEGIN_T	unread	35f904caab8bf8c5b2a9d86492523dd366c18ffcfccd3cb9631533b60c207d49	-
-include/Ints.h	384	387	H2_ENUM_CLASS_END_T	unread	354040b2259a95cc9536da3dfeb01d82c65aebef4dbebd65284537ad92dc9453	-
-include/Ints.h	389	389	H2_ENUM_CLASS_BEGIN_SPLIT	unread	f3c0a3549376439c2dc4f506e4cede175d91be8cbdecd024721f2e3624dc2124	-
-include/Ints.h	390	393	H2_ENUM_CLASS_END_SPLIT	unread	c8b2d32ff0e909c0188bae3146452662626d896b9a87de828f07448245885846	-
-include/Ints.h	394	394	H2_ENUM_STORAGE	unread	7280720d5e6b4c779169f9e035bb0606045186ab3ce6534b41ff6973c6b5ab0f	-
-include/Ints.h	395	395	H2_ENUM_STORAGE_STEPPED	unread	48c1931021f52a61f97dca2996740f1a8f2b87d3e736921bd23bf9272bdd8144	-
-include/Ints.h	396	396	H2_OPEN_CODE_STORAGE	unread	c1bf2d953839a41ff198e0a53ac48168af7bd67279788544a0569ba63f409ad5	-
-include/Ints.h	397	397	H2_ENUM_BITFIELD	unread	0ba92a07c9dd7bd773f7fc050bd1075ae1c020bb6dd8288956c39bb3b99e9fa0	-
-include/Ints.h	398	398	H2_ENUM_PARAM	unread	0a4476ac2d98339c95aa6a3ef49351141e6fb50b1131e07b982856b613cf2215	-
-include/Ints.h	399	399	H2_ENUM_RETURN	unread	239a8cc662ca234e150a7fad9b4b2124ed7aca95722c113acd3661d269e5b03e	-
-include/Ints.h	400	400	H2_OPEN_CODE_PARAM	unread	f09d7d8e6c0b8f8d35765793f725b2d15236d1447518cc6b2054d1676c87576f	-
-include/Ints.h	401	401	H2_ENUM_FLAGS	unread	d0df62ae87ea2fb82bf1b043abfe0da0c905da25f413a4275380449e7b57e640	-
-include/Ints.h	408	415	H2_ENUM_ASSIGN_CHAIN_5	unread	9623eee66abb97810726b9150d27e2f6261b50e61fc9a85f75e71e6035a14721	-
-include/Ints.h	417	417	H2_ENUM_ASSIGN_CHAIN_5	unread	5001fa5719df0b10cb23285ebff397ab70d5c0c25787c3a7927d70d9e113e025	-
-include/Ints.h	423	426	H2_ENUM_DECODE_MASKED	unread	bc4dfb83be972b4e39f78a3d7d519bdc3b3dedc878981ee505bb88ea873ee48b	-
-include/Ints.h	428	432	H2_ENUM_DECODE_MASKED	unread	ba63dab6c893e6c9f3171c3698b9664c9a23332eb5d5e3fb5746e316571be09c	-
-include/Ints.h	438	438	H2_ENUM_RAW	unread	ff1505cdddae36d668995329d981504c33f546291b75a8cff7284f7ce9c4173d	-
-include/Ints.h	440	440	H2_ENUM_RAW	unread	f351a4f6061f9c7f0985897915560f77aa651aca9678692ed0f81bcb1d5ce4d6	-
-include/Ints.h	446	446	IDX	unread	00d487a7cb7aa68ca228f2a714b5ffcf116297588f6cac690c8d758442120cf6	-
-include/Ints.h	448	448	IDX	unread	789e668e7c07fd8785dbd51fe06c4d198ca847a1004d7742a214d38445cae382	-
-include/Ints.h	455	455	HAS	unread	76c82f8e7f10f50c1861e6da63ba19146e0e1e0b0721a1dd46cb25b6ff687ccf	-
-include/Ints.h	457	457	HAS	unread	0f00aaa8561614bd263c976675acb143c34a0ee9be9067b7350b80dc06124654	-
-include/Ints.h	464	464	H2_ENUM_CLEAR_FLAG	unread	63713d8db7ee2ac3daa5628735178f517b658d1ecdbc7916c0f290d83481eb72	-
-include/Ints.h	466	466	H2_ENUM_CLEAR_FLAG	unread	ba00986e35d7cf60031fe0144615b4772b9e0a1e1038123108b93a6833092a24	-
-include/Ints.h	472	472	BIT	unread	11a3b2c17114f369f0be653f8b22a20427ff6356c176493e414a80d4e371b497	-
-include/Ints.h	474	474	BIT	unread	4a484777c04552471960415c76636c127cb8afe04933f7d46f75879aacab2447	-
-include/Ints.h	480	523	H2_ENUM_STEPPED	unread	036ddd1077170dde0803bc42a5cd33134b1838429fda54a61e61aa35c95d7d27	-
-include/Ints.h	525	525	H2_ENUM_STEPPED	unread	a7036fec450633dc3a52d8e68b90d2553c311d6770c62447a1214a83f8014ff2	-
-include/Ints.h	531	534	H2_ENUM_INDEX_OFFSET	unread	99515e88fb74c3ff0b0002e74d6edbca9781905ca58e9f163a4b18b9b7b4a407	-
-include/Ints.h	536	536	H2_ENUM_INDEX_OFFSET	unread	7a8e93f1741377da4095a4a2d8f5c749adaa4b69c4237c6dc5b49a1af9551362	-
+include/Ints.h	2	2	HOMM2_INTS_H	read	289844971d4a830da01d796de396f043e16d69d4ec951db4d68ed5472c67e22a	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	7	7	H2_STRICT_ENUMS	read	aa3585a4b4c7f4d67b0038dcd4d1e146ffa476b14dec4033ea3b21770152b04e	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	8	8	H2_FINAL	read	bccebc0025ac1c1e12cbfe56690a50aaf3e760a317bd4cfa3be9b04f40801561	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	9	9	H2_CONST	read	de783843fb870e338a298cb169f1ba95cb03e43a947a0b3f4041e61cfaef88b5	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	10	10	H2_UNUSED	read	8b907ee23a52be31ffcfb5a144e180d427eeea3ec4a896684676ac4224affb00	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	11	11	H2_RETAIL_INLINE	read	88ebf762af763ceea7fab858a16bd69ca286b8ccec85679d7dcbc27ff1f62520	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	12	12	H2_ZERO_INIT	read	5692088604af361f82cca00f3c477dde5652c70a8805f198324902db4ddfb9f2	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	14	14	H2_STRICT_ENUMS	read	5362c7776edf6e48f6aad8f4b8ec1dc9044567d6cdf8bb46732b41016c2da7f2	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	15	15	H2_FINAL	read	6f46c5be007711cd097aca75f2123b0009821d2687d43ac560a890319175e59f	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	16	16	H2_CONST	read	0d6b806c93eba102b79e5c425e841f264ab48c4cae6f37b472baf0754599c1aa	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	17	17	H2_UNUSED	read	acda9366b426827e1d839f640a632e2f507d139f5b84cca74cd8f18275c06370	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	18	18	H2_RETAIL_INLINE	read	6f71cf696589e7a8fa5fdeb116eb3849ec375fb1f12f078bcfb47d749954dd08	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	19	19	H2_ZERO_INIT	read	dff4b0dae585affaf5e74fd2fe3dd742daa0afd7afaec41caa379a42b606a539	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	34	34	NULL	read	e9c4c7ecf2529875eba5693306dc97e7abe3461a11c5308807dcfa02d100064d	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	49	49	H2_ENUM_BEGIN	read	d0ce65a2023ef81e59065f61bff126ac35a955dac75bde1375b1e800606c842d	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	50	52	H2_ENUM_END	read	1d5ed9e269bd0a4149bf772e6da1ac8e6d8803b0826225e10ce2f830f3014032	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	53	53	H2_ENUM_CLASS_BEGIN	read	fa508e970d8000c8ba03a300a5f73728d21d176da0aa7c9d0b7b0ec81085abd6	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	54	54	H2_ENUM_CLASS_FORWARD	read	250fafc1ce38126812b3801ec343743b9255b28cf8d89cf07d74854a1bc7a832	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	55	55	H2_ENUM_CLASS_FORWARD_SPLIT	read	81240b5a6feb963b4cfef5d0c95d7ea00749b8eef6e850cde718abf4d338d2c2	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	56	59	H2_ENUM_CLASS_END	read	1b37606437a6d1ca5d7791f4823ae29197c1d8dc6a8cc4c2d8491c8f66dca08b	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	60	60	H2_ENUM_CLASS_BEGIN_T	read	a2be0bfa98e77fe80d9826267f746a1a8ca659437a0edbfabfe66c54b80b5588	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	61	64	H2_ENUM_CLASS_END_T	read	07d8adca6cc3d45e5cc6244948f4ff8ea41fdb57477a3cfc2e5f085d62a77b2a	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	66	66	H2_ENUM_CLASS_BEGIN_SPLIT	read	ea6e9745d67f9b27b37b8b7c737a489da616f4b6524207159a419091aeec38e9	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	67	70	H2_ENUM_CLASS_END_SPLIT	read	9d7783a8d990bc1b560266844e92f898710966e1c2a3f1c94369a440b04c5af5	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	332	332	H2_ENUM_STORAGE	read	63d13f1e4be1c9d2336bd64e762211811dd82e984ad30667c86e68cf76894de6	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	333	333	H2_ENUM_STORAGE_STEPPED	read	e7bcc5a54da483bc8a6ddc3e11436012982958f034188a894c0f31ce6dc9a2ec	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	334	334	H2_OPEN_CODE_STORAGE	read	5f5a61cc00cc257a63efce9c373764e0c5d8cf4848c50603f4f000a1010759a3	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	335	335	H2_ENUM_BITFIELD	read	11930db9a5b535b896c12a75a5782cbf694c9d3d1e11d62203e2a7244f55694b	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	336	336	H2_ENUM_PARAM	read	1bd61f8940fc74d696242c0edfe1c6b543e8361969505898fa95804afcb7c138	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	337	337	H2_ENUM_RETURN	read	0161123e90888f1d336de5a4de701cadde14ca6d072e432935990d544f04d5b1	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	338	338	H2_OPEN_CODE_PARAM	read	46f0cf579c3fad2e04cb3419d58e37dd3a0de77071f31c464d06001077b625f6	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	339	369	H2_ENUM_FLAGS	read	820e6bf449e2e1a37f0b2321bb08a18ff86e50daa25250bf24cde7633e6150d0	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	371	371	H2_ENUM_BEGIN	read	2eb68347424e403a27220db52bd3e6edf0e425ecad64c705f2a7118820990f08	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	372	375	H2_ENUM_END	read	648e9a302b12e078fe4ff4a2a92bf3123b1d8eeb0ed6a7d0114637685b393411	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	376	376	H2_ENUM_CLASS_BEGIN	read	06f2dba529dce577888435af4a7e0170d1feac36995a652a4fb1dd91ccdef0d8	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	377	377	H2_ENUM_CLASS_FORWARD	read	b37d68c7d833207247a1d0e4381be2c2336855678644392e3a31c54383099301	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	378	378	H2_ENUM_CLASS_FORWARD_SPLIT	read	ba5adf9e3eb748772c733d00a80bc2dc7957fdfdf3726b64822315aae8a2be8d	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	379	382	H2_ENUM_CLASS_END	read	f0612bc54fceb469250fbcb61ae33eb67aa7ac057ee4d03cfbd5414ca925804c	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	383	383	H2_ENUM_CLASS_BEGIN_T	read	35f904caab8bf8c5b2a9d86492523dd366c18ffcfccd3cb9631533b60c207d49	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	384	387	H2_ENUM_CLASS_END_T	read	354040b2259a95cc9536da3dfeb01d82c65aebef4dbebd65284537ad92dc9453	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	389	389	H2_ENUM_CLASS_BEGIN_SPLIT	read	f3c0a3549376439c2dc4f506e4cede175d91be8cbdecd024721f2e3624dc2124	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	390	393	H2_ENUM_CLASS_END_SPLIT	read	c8b2d32ff0e909c0188bae3146452662626d896b9a87de828f07448245885846	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	394	394	H2_ENUM_STORAGE	read	7280720d5e6b4c779169f9e035bb0606045186ab3ce6534b41ff6973c6b5ab0f	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	395	395	H2_ENUM_STORAGE_STEPPED	read	48c1931021f52a61f97dca2996740f1a8f2b87d3e736921bd23bf9272bdd8144	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	396	396	H2_OPEN_CODE_STORAGE	read	c1bf2d953839a41ff198e0a53ac48168af7bd67279788544a0569ba63f409ad5	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	397	397	H2_ENUM_BITFIELD	read	0ba92a07c9dd7bd773f7fc050bd1075ae1c020bb6dd8288956c39bb3b99e9fa0	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	398	398	H2_ENUM_PARAM	read	0a4476ac2d98339c95aa6a3ef49351141e6fb50b1131e07b982856b613cf2215	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	399	399	H2_ENUM_RETURN	read	239a8cc662ca234e150a7fad9b4b2124ed7aca95722c113acd3661d269e5b03e	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	400	400	H2_OPEN_CODE_PARAM	read	f09d7d8e6c0b8f8d35765793f725b2d15236d1447518cc6b2054d1676c87576f	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	401	401	H2_ENUM_FLAGS	read	d0df62ae87ea2fb82bf1b043abfe0da0c905da25f413a4275380449e7b57e640	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	408	415	H2_ENUM_ASSIGN_CHAIN_5	read	9623eee66abb97810726b9150d27e2f6261b50e61fc9a85f75e71e6035a14721	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	417	417	H2_ENUM_ASSIGN_CHAIN_5	read	5001fa5719df0b10cb23285ebff397ab70d5c0c25787c3a7927d70d9e113e025	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	423	426	H2_ENUM_DECODE_MASKED	read	bc4dfb83be972b4e39f78a3d7d519bdc3b3dedc878981ee505bb88ea873ee48b	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	428	432	H2_ENUM_DECODE_MASKED	read	ba63dab6c893e6c9f3171c3698b9664c9a23332eb5d5e3fb5746e316571be09c	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	438	438	H2_ENUM_RAW	read	ff1505cdddae36d668995329d981504c33f546291b75a8cff7284f7ce9c4173d	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	440	440	H2_ENUM_RAW	read	f351a4f6061f9c7f0985897915560f77aa651aca9678692ed0f81bcb1d5ce4d6	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	446	446	IDX	read	00d487a7cb7aa68ca228f2a714b5ffcf116297588f6cac690c8d758442120cf6	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	448	448	IDX	read	789e668e7c07fd8785dbd51fe06c4d198ca847a1004d7742a214d38445cae382	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	455	455	HAS	read	76c82f8e7f10f50c1861e6da63ba19146e0e1e0b0721a1dd46cb25b6ff687ccf	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	457	457	HAS	read	0f00aaa8561614bd263c976675acb143c34a0ee9be9067b7350b80dc06124654	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	464	464	H2_ENUM_CLEAR_FLAG	read	63713d8db7ee2ac3daa5628735178f517b658d1ecdbc7916c0f290d83481eb72	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	466	466	H2_ENUM_CLEAR_FLAG	read	ba00986e35d7cf60031fe0144615b4772b9e0a1e1038123108b93a6833092a24	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	472	472	BIT	read	11a3b2c17114f369f0be653f8b22a20427ff6356c176493e414a80d4e371b497	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	474	474	BIT	read	4a484777c04552471960415c76636c127cb8afe04933f7d46f75879aacab2447	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	480	523	H2_ENUM_STEPPED	read	036ddd1077170dde0803bc42a5cd33134b1838429fda54a61e61aa35c95d7d27	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	525	525	H2_ENUM_STEPPED	read	a7036fec450633dc3a52d8e68b90d2553c311d6770c62447a1214a83f8014ff2	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	531	534	H2_ENUM_INDEX_OFFSET	read	99515e88fb74c3ff0b0002e74d6edbca9781905ca58e9f163a4b18b9b7b4a407	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
+include/Ints.h	536	536	H2_ENUM_INDEX_OFFSET	read	7a8e93f1741377da4095a4a2d8f5c749adaa4b69c4237c6dc5b49a1af9551362	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
 include/SOURCE/ADVMGR.h	2	2	HOMM2_ADVMGR_H	unread	c8bcf6dd92435680a2795a200457aa4cc120b4496d345a155159536e7c27918f	-
 include/SOURCE/ADVMGR_TYPES.h	2	2	HOMM2_ADVMGR_TYPES_H	unread	0e37271748d344bc04cca630c0f06e22491ffd88f46733507641e0d7d08014c7	-
 include/SOURCE/ARMY.h	2	2	HOMM2_ARMY_H	unread	0cb3b00e351425a8d681154977bed6dca2f988fc368bcca06c71876c7de75c6b	-
 include/SOURCE/CMBTMGR.h	2	2	HOMM2_CMBTMGR_H	unread	a935f14ae9c2bbc081461c77ae80601a5dcc2d4c7612b2c57b5c4ea68ab337ef	-
 include/SOURCE/COMMAND.h	2	2	HOMM2_COMMAND_H	unread	fe8e1c82998153844804dd6d63ef9c163272cca34d8d930e84002c6739cb3d37	-
-include/SOURCE/CONFIG_TYPES.h	2	2	HOMM2_SOURCE_CONFIG_TYPES_H	unread	a95c8136dd77e79f93b44639a22f60bd2541c9ee1c266d10a70e58c33e7731f0	-
+include/SOURCE/CONFIG_TYPES.h	2	2	HOMM2_SOURCE_CONFIG_TYPES_H	read	a95c8136dd77e79f93b44639a22f60bd2541c9ee1c266d10a70e58c33e7731f0	B10: complete packed graphics/config records and enum/storage contracts; H15; no bodies
 include/SOURCE/CURSOR.h	2	2	HOMM2_CURSOR_H	unread	b1e44a3464bcb4256e273752c4574360b4539f5d3b6e52f34ad340d440352462	-
 include/SOURCE/Campaign.h	2	2	HOMM2_CAMPAIGN_H	unread	52ba851438f5a9e7aa2a4934255b6f9f51a04a40bcea3ef90b8a1b494e59b6a1	-
 include/SOURCE/Castle.h	2	2	HOMM2_CASTLE_H	unread	7fa63445d5328b47e61e40dbf38fc4ec91623e74accc04586e72da4d6d0f720e	-
@@ -152,22 +152,22 @@ include/SOURCE/ExpCampaign.h	2	2	HOMM2_SOURCE_EXPCAMPAIGN_H	unread	a1f3f8ad0841d
 include/SOURCE/FINDPATH.h	2	2	HOMM2_FINDPATH_H	unread	557e7f75dfb1ed84ab925e57b0c003a691226fa7ca8e5bae931272b7a46d24a3	-
 include/SOURCE/GAME.h	2	2	HOMM2_GAME_H	unread	8cad0c745b398ebeb721ab600bb19f098a3d67abf460976b1c26ecdac6a86ed7	-
 include/SOURCE/HERO.h	2	2	HOMM2_HERO_H	unread	1f687c01121dfc04c3f1d202dc0ac9bd4b2313a0ee4d349fa5e5c6b5f734d63f	-
-include/SOURCE/KB.h	2	2	HOMM2_KB_H	unread	58fff8650227c7c87b4d60574fc7c62c45150661d939da43627519e14d64892c	-
-include/SOURCE/KB.h	713	713	MAP_EXTRA_AT	unread	bb1ab0fc959c0b465d21978551d9dfca34e37c4d1d0985fb561a10e50a866c6e	-
-include/SOURCE/KB.h	714	714	MAP_EXTRA_AT_WFIRST	unread	b8ad08c45bd1f2af8e51cf2aba1332a7a3e86fa8b3675025c4105e50f9288df7	-
-include/SOURCE/KB_TYPES.h	2	2	HOMM2_SOURCE_KB_TYPES_H	unread	9b6eb8e0fb4fc43753351fadf10d910780f85e2b156831e0fa36426a30e90d3d	-
-include/SOURCE/KB_TYPES.h	630	630	MAP_ACTION_TRIGGER	unread	a3b87eb5c127e867c6fa17d2f2d1d054698ea350456d5deea8504d539a07d053	-
-include/SOURCE/KB_TYPES.h	631	631	MAP_PASSIVE_TRIGGER	unread	70d551cbcf89aaa5476bd1ebeabfe0de6293870fb3f10c1f8dc5fb421656fc30	-
-include/SOURCE/KB_TYPES.h	632	632	MAP_TRIGGER_OBJECT	unread	9283ad9ce8738c60014fc0698cbabacad73d9edadd3325370abddf765450dd3b	-
-include/SOURCE/KB_TYPES.h	633	633	MAP_TRIGGER_IS_ACTION	unread	e59b7fb0900e31eabd76a94c010082ddd9b3a7462237d466f3445829d5be2316	-
-include/SOURCE/KB_TYPES.h	634	634	MAP_TRIGGER_WITH_OBJECT	unread	cdcbc202b57c51f77206913b77a1b588d2750cce4ef432a691f4cea6e54391e3	-
-include/SOURCE/KB_TYPES.h	637	637	MAP_ACTION_TRIGGER	unread	1fe24c9499bd41d0ff494e33fb6b691e4e8688509fe24ab5d6ae9cbb5ae4c65a	-
-include/SOURCE/KB_TYPES.h	638	638	MAP_PASSIVE_TRIGGER	unread	d07facef9050201c3b74b5dcc13f6f2618deea976fcaa8063592bcce80664d47	-
-include/SOURCE/KB_TYPES.h	639	639	MAP_TRIGGER_OBJECT	unread	a344fcccd2e92f369b266e9a951071e32fd2e6b9c5cf8d6610c723145fa1ba73	-
-include/SOURCE/KB_TYPES.h	640	640	MAP_TRIGGER_IS_ACTION	unread	7a4a57e84fa127bc514539e0445c05f521f6fc7bad38bc2723533e0fd9e3336f	-
-include/SOURCE/KB_TYPES.h	641	642	MAP_TRIGGER_WITH_OBJECT	unread	794462bf4005d615e64633b7e0b06ced9346fef470dd1fb61119718cd513fb5d	-
+include/SOURCE/KB.h	2	2	HOMM2_KB_H	read	58fff8650227c7c87b4d60574fc7c62c45150661d939da43627519e14d64892c	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; H15/R12
+include/SOURCE/KB.h	713	713	MAP_EXTRA_AT	read	bb1ab0fc959c0b465d21978551d9dfca34e37c4d1d0985fb561a10e50a866c6e	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; H15/R12
+include/SOURCE/KB.h	714	714	MAP_EXTRA_AT_WFIRST	read	b8ad08c45bd1f2af8e51cf2aba1332a7a3e86fa8b3675025c4105e50f9288df7	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; H15/R12
+include/SOURCE/KB_TYPES.h	2	2	HOMM2_SOURCE_KB_TYPES_H	read	9b6eb8e0fb4fc43753351fadf10d910780f85e2b156831e0fa36426a30e90d3d	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	630	630	MAP_ACTION_TRIGGER	read	a3b87eb5c127e867c6fa17d2f2d1d054698ea350456d5deea8504d539a07d053	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	631	631	MAP_PASSIVE_TRIGGER	read	70d551cbcf89aaa5476bd1ebeabfe0de6293870fb3f10c1f8dc5fb421656fc30	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	632	632	MAP_TRIGGER_OBJECT	read	9283ad9ce8738c60014fc0698cbabacad73d9edadd3325370abddf765450dd3b	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	633	633	MAP_TRIGGER_IS_ACTION	read	e59b7fb0900e31eabd76a94c010082ddd9b3a7462237d466f3445829d5be2316	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	634	634	MAP_TRIGGER_WITH_OBJECT	read	cdcbc202b57c51f77206913b77a1b588d2750cce4ef432a691f4cea6e54391e3	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	637	637	MAP_ACTION_TRIGGER	read	1fe24c9499bd41d0ff494e33fb6b691e4e8688509fe24ab5d6ae9cbb5ae4c65a	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	638	638	MAP_PASSIVE_TRIGGER	read	d07facef9050201c3b74b5dcc13f6f2618deea976fcaa8063592bcce80664d47	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	639	639	MAP_TRIGGER_OBJECT	read	a344fcccd2e92f369b266e9a951071e32fd2e6b9c5cf8d6610c723145fa1ba73	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	640	640	MAP_TRIGGER_IS_ACTION	read	7a4a57e84fa127bc514539e0445c05f521f6fc7bad38bc2723533e0fd9e3336f	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
+include/SOURCE/KB_TYPES.h	641	642	MAP_TRIGGER_WITH_OBJECT	read	794462bf4005d615e64633b7e0b06ced9346fef470dd1fb61119718cd513fb5d	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
 include/SOURCE/Modem.h	2	2	HOMM2_MODEM_H	unread	554df069eb4d72116a1ef1fc23c6b5a97eec633d0f9c8e83eb27ce29a2083fe4	-
-include/SOURCE/NOOPT.h	2	2	HOMM2_NOOPT_H	unread	ccf4726e12330e655e0f202bae673a494c579e9955850de30b2584daee69198c	-
+include/SOURCE/NOOPT.h	2	2	HOMM2_NOOPT_H	read	ccf4726e12330e655e0f202bae673a494c579e9955850de30b2584daee69198c	B10: complete pointer/value delay API declarations; R10; no bodies
 include/SOURCE/Netbios.h	2	2	HOMM2_NETBIOS_H	unread	c8997d3b68615d210c65082d7584be7823d5c70d6d558813570fa01ab63c30e6	-
 include/SOURCE/Newgame.h	2	2	HOMM2_NEWGAME_H	unread	a691d41d2570833e3b31f0dd6d9518a360a26611cc85a0ed795e5c772f9c9991	-
 include/SOURCE/Overview.h	2	2	HOMM2_OVERVIEW_H	unread	aefbe29c4e8c2c0ab56f42a349c3711fafa2e3d5186ef1158febfbdcb74e3e43	-
@@ -186,20 +186,20 @@ include/SOURCE/TOWNMGR.h	2	2	HOMM2_TOWNMGR_H	unread	4febdbb6cebdae43c812cc7c1826
 include/SOURCE/VIEW.h	2	2	HOMM2_VIEW_H	unread	1bcfeacd87974ac80b4086e0b789392dbf9842e9dfe60f1ab6f6f83616b0c70d	-
 include/SOURCE/Viewwrld.h	2	2	HOMM2_VIEWWRLD_H	unread	fc1709f290c702a423a3b46dea7eac66bb72b605c05cddeceda6efb834be17fd	-
 include/SOURCE/Wsnetwin.h	2	2	HOMM2_WSNETWIN_H	unread	c1141f2d44d15c3c15760ab9336591d4b55d01ab62ef910da54b5eb78618e73f	-
-include/SOURCE/X_GLOBAL.h	2	2	HOMM2_X_GLOBAL_H	unread	51f0502d53e9952e0114fb220a548203f9cb37a95da8c48c612861c756663a9c	-
+include/SOURCE/X_GLOBAL.h	2	2	HOMM2_X_GLOBAL_H	read	51f0502d53e9952e0114fb220a548203f9cb37a95da8c48c612861c756663a9c	B10: complete globals/table dimensions and NextSpellEffectDisplayType inline; H15/R12
 include/SOURCE/advManager.h	2	2	HOMM2_SOURCE_ADVMANAGER_H	unread	abb269bafd7328a28b2c30c001651e1cc8a4d5e069b1ad71efdc225eda3a66c8	-
 include/SOURCE/army.h	2	2	HOMM2_SOURCE_ARMY_H	unread	0850daf6a9e077761a8357f2b819c5983c17bbcfef69545efb671a7dc4eebfdf	-
 include/SOURCE/armyGroup.h	2	2	HOMM2_SOURCE_ARMYGROUP_H	unread	0f9532aba38904c8ad36b9dc8fce82e7dd45c921e6e60bd44aeac1828f47a88b	-
 include/SOURCE/bankBox.h	2	2	HOMM2_SOURCE_BANKBOX_H	unread	fd1b7bda07a5c265d57cbe3a8efd020bc1b222a0e515b953daa6e5a80c0ef1ec	-
 include/SOURCE/combatManager.h	2	2	HOMM2_SOURCE_COMBATMANAGER_H	unread	23415abce7f60d86243612e1fdca270d7f121619ad28ab64794d8261a2f8591e	-
-include/SOURCE/combatTypes.h	2	2	HOMM2_SOURCE_COMBATTYPES_H	unread	2d746a5abf635071c41a7991f75df09ed92b80bde56b1767618fe4572c0369f5	-
-include/SOURCE/combatTypes.h	30	30	OppositeCombatSide	unread	504522593b7b1dc49a2ae81738dadf06d215053d0077f5ad5c3ea913cc1d831d	-
-include/SOURCE/combatTypes.h	53	53	CombatResultForSide	unread	589a27eca6b4a96bfc6cf65ae4fe74013a377f1ce794fa655087b28cde3b2c54	-
-include/SOURCE/combatTypes.h	54	54	OppositeCombatResult	unread	4fb5768bba09a8190bee1a9f2aa6627147ad2e1a411c0fd5d75bdc4865418a10	-
-include/SOURCE/combatTypes.h	55	55	CombatSideForResult	unread	a7b94059536ac237c27b7cc37098a8c8afd3952dca5b815ac9ced14f08976f4b	-
-include/SOURCE/combatTypes.h	78	78	OppositeArmyFacing	unread	e2fa716e1ac6af3a2ffd391cc6ccd6936f71c94629fd3c6e4217b7e7cf9613aa	-
-include/SOURCE/combatTypes.h	79	79	ArmyFacingForSide	unread	7f6d57739fc117ce67044f6b2471254e7d1e3631c2fe386f7ddc5ea52f083618	-
-include/SOURCE/combatTypes.h	80	80	ArmyFacingRearHexOffset	unread	f4328734189895e8bc1dfdba4d2d8fd58b61982310476fbf62286e8b0ad8f56b	-
+include/SOURCE/combatTypes.h	2	2	HOMM2_SOURCE_COMBATTYPES_H	read	2d746a5abf635071c41a7991f75df09ed92b80bde56b1767618fe4572c0369f5	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	30	30	OppositeCombatSide	read	504522593b7b1dc49a2ae81738dadf06d215053d0077f5ad5c3ea913cc1d831d	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	53	53	CombatResultForSide	read	589a27eca6b4a96bfc6cf65ae4fe74013a377f1ce794fa655087b28cde3b2c54	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	54	54	OppositeCombatResult	read	4fb5768bba09a8190bee1a9f2aa6627147ad2e1a411c0fd5d75bdc4865418a10	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	55	55	CombatSideForResult	read	a7b94059536ac237c27b7cc37098a8c8afd3952dca5b815ac9ced14f08976f4b	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	78	78	OppositeArmyFacing	read	e2fa716e1ac6af3a2ffd391cc6ccd6936f71c94629fd3c6e4217b7e7cf9613aa	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	79	79	ArmyFacingForSide	read	7f6d57739fc117ce67044f6b2471254e7d1e3631c2fe386f7ddc5ea52f083618	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
+include/SOURCE/combatTypes.h	80	80	ArmyFacingRearHexOffset	read	f4328734189895e8bc1dfdba4d2d8fd58b61982310476fbf62286e8b0ad8f56b	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
 include/SOURCE/comwin.h	2	2	HOMM2_COMWIN_H	unread	7f1e9d196b0019f39d75fb47de72f298849ec84d7a66f735802a60982504c0d5	-
 include/SOURCE/dimPalette.h	2	2	HOMM2_SOURCE_DIMPALETTE_H	read	e422cb98242070fb2605dfb0bdce8181f660020359cc0ee85980cdda78540bc1	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/SOURCE/dpnetwin.h	2	2	HOMM2_DPNETWIN_H	unread	7fce4c626e462c431f24758f99b10e6cd5d6560c7ad80dcbae4a66809ace8687	-
@@ -208,7 +208,7 @@ include/SOURCE/game.h	2	2	HOMM2_SOURCE_GAME_H	unread	9ec8edd8fbc580e39e0feed6208
 include/SOURCE/hero.h	2	2	HOMM2_SOURCE_HERO_H	unread	e5045e769918d42bddec802db0f068bfd3b7bf5e67e34f607347d4a52c38b0d2	-
 include/SOURCE/hexcell.h	2	2	HOMM2_SOURCE_HEXCELL_H	unread	2cebc8a22b633133c7b29aaeb5d99f739efbaa5c649f25b3db96f9206647fe4c	-
 include/SOURCE/highScoreManager.h	2	2	HOMM2_SOURCE_HIGHSCOREMANAGER_H	unread	2e7c96d83917bdf1da6272660a3ec1b5c7e423b98b42e7ada8484ae0724f5e34	-
-include/SOURCE/kbwin.h	2	2	HOMM2_KBWIN_H	unread	aa2547e812f662b3a86b6a256f9ff1148b3e1f52d96a548f9ef514cb051de6b2	-
+include/SOURCE/kbwin.h	2	2	HOMM2_KBWIN_H	read	aa2547e812f662b3a86b6a256f9ff1148b3e1f52d96a548f9ef514cb051de6b2	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	2	2	HOMM2_NETWIN_H	unread	0eafab4a7dfbb199a721b79e2f7f7c399f45076ef6264d47d909f524b1997949	-
 include/SOURCE/netwin_private.h	2	2	HOMM2_NETWIN_PRIVATE_H	unread	0e9ffbea2eebb74b79420e253b1bfedc24f538d44ec69db92b63c313186d1f60	-
 include/SOURCE/philAI.h	2	2	HOMM2_SOURCE_PHILAI_H	unread	d138d4e105b517ef543c6b89bbb402862daa844e2e80fa9f46ca6e6827af16e2	-
@@ -221,79 +221,79 @@ include/SOURCE/town.h	2	2	HOMM2_SOURCE_TOWN_H	unread	eeb5aec97b79c03250f0bca7e71
 include/SOURCE/townManager.h	2	2	HOMM2_SOURCE_TOWNMANAGER_H	unread	ff784e1edcfda33fe3f4ef341925b9c4af52e9806a61016f01007f2f159ae065	-
 include/SOURCE/townObject.h	2	2	HOMM2_SOURCE_TOWNOBJECT_H	unread	03641e7149e9c02e3b35017115b315d99dc4f7245edc5ace82246fea6d745878	-
 include/SOURCE/tradpost.h	2	2	HOMM2_TRADPOST_H	unread	2647f6192f2b7851bb5fd48c338a62b66b5fb2bd6f1187157b0d88fcc491da4b	-
-include/SOURCE/wingraph.h	2	2	HOMM2_WINGRAPH_H	unread	c465b9830860309a51b6c4d4a6daf31c81e7e235e7bb6226d2703260908e71e0	-
+include/SOURCE/wingraph.h	2	2	HOMM2_WINGRAPH_H	read	c465b9830860309a51b6c4d4a6daf31c81e7e235e7bb6226d2703260908e71e0	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/x_arena.h	2	2	HOMM2_X_ARENA_H	unread	5f9da015274f322557b715e4ab638486628377357324bdd0f325e34b2db248aa	-
-include/va.h	2	2	HOMM2_VA_H	unread	e39adb13f62e0394e95400e867677a46c8443ff377ae5d4cd14c81f26cbf325f	-
-include/va.h	8	8	VA	unread	add40f66f97db717311ae883056ce68c5ab85889093c6d958a7cf04784440cd5	-
-include/va.h	9	9	VA_COMPGEN	unread	75bbb8fa4cab5e444dfc53c0ec573c2558fef79977966106e0d2161fc3678ac9	-
-include/va.h	15	15	DATA	unread	dd38e3def69eb4e0bff3bdb4b4a40ee4dae8fd88e2851c22f87bd82831616752	-
-include/va.h	16	16	DATA_COMPGEN	unread	02110781a6c46dc8e377edc35aad60a126b1af81f916408e908e04d09ea837c7	-
-include/va.h	17	17	DATA_COMPGEN_GUARD	unread	ed3ba90d1f750452502a7369b395528b7dc53aada249c1371adf2c635487750c	-
-include/va.h	24	25	VTBL	unread	bc46f91bf18f31bbc7adb710bb41d10a1564e4ae09e045c97f6a9588865fbec1	-
-include/va.h	26	27	VTBL2	unread	1c90d9082478f3b4ce02bc6088a035cbf461c5fee7a0f8ed188a28a37e480aa2	-
-include/va.h	28	28	OVERRIDE	unread	73e149847731b586d97ccba44d8677225b046c95ccac41c6c0164b19190d22a8	-
-include/va.h	29	29	SIZE	unread	2c2b4affd158b3784040db9ac6e4efb366702b227509dbcd1efe5867386c8aa2	-
-include/va.h	34	34	NEW_VA	unread	709b367f6ce5921584662c57b937eabf8f970ead60a1eeb160f5aa8f40a59781	-
-include/va.h	35	35	NEW_SIZE	unread	18aec4722b3429560486fdfa063a72aef3dbb4869292122a89f795efa94d04d8	-
-include/va.h	39	39	VA	unread	9a0d17b23477c254880a1a04256310a3eaf158aed555d5b62ee78c5784c96a46	-
-include/va.h	40	40	VA_COMPGEN	unread	75bbb8fa4cab5e444dfc53c0ec573c2558fef79977966106e0d2161fc3678ac9	-
-include/va.h	41	41	DATA	unread	52e207aad98d607e276e9e3d8ad8eafc54cf5860aaa7e96936b1591ec8f2e0f5	-
-include/va.h	42	42	DATA_COMPGEN	unread	02110781a6c46dc8e377edc35aad60a126b1af81f916408e908e04d09ea837c7	-
-include/va.h	43	43	DATA_COMPGEN_GUARD	unread	ed3ba90d1f750452502a7369b395528b7dc53aada249c1371adf2c635487750c	-
-include/va.h	44	44	VTBL	unread	e19536e5a8a2ff358b1499c68c90c311b56deff1cbbbc663f5897ff221c45f23	-
-include/va.h	45	45	VTBL2	unread	fd2ebc5e28f0074bffc85bc3bca91795e5ee8a4aa144826720fe0615170541d5	-
-include/va.h	46	46	OVERRIDE	unread	34b86fccc58fd14380ead98f9d429dbe3eec2bca4addac506055ca58d6f1c223	-
-include/va.h	48	48	SIZE	unread	f6f1af66fbac2532cccf36118efeb58ae8eebb79e3dc9d9e4001f1c2560cc713	-
-include/va.h	50	50	NEW_VA	unread	ab30d12abf77269bf37a5dfe162b1bdfc4a5c74988c252ad2b78bef04a042e56	-
-include/va.h	51	51	NEW_SIZE	unread	18aec4722b3429560486fdfa063a72aef3dbb4869292122a89f795efa94d04d8	-
+include/va.h	2	2	HOMM2_VA_H	read	e39adb13f62e0394e95400e867677a46c8443ff377ae5d4cd14c81f26cbf325f	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	8	8	VA	read	add40f66f97db717311ae883056ce68c5ab85889093c6d958a7cf04784440cd5	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	9	9	VA_COMPGEN	read	75bbb8fa4cab5e444dfc53c0ec573c2558fef79977966106e0d2161fc3678ac9	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	15	15	DATA	read	dd38e3def69eb4e0bff3bdb4b4a40ee4dae8fd88e2851c22f87bd82831616752	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	16	16	DATA_COMPGEN	read	02110781a6c46dc8e377edc35aad60a126b1af81f916408e908e04d09ea837c7	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	17	17	DATA_COMPGEN_GUARD	read	ed3ba90d1f750452502a7369b395528b7dc53aada249c1371adf2c635487750c	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	24	25	VTBL	read	bc46f91bf18f31bbc7adb710bb41d10a1564e4ae09e045c97f6a9588865fbec1	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	26	27	VTBL2	read	1c90d9082478f3b4ce02bc6088a035cbf461c5fee7a0f8ed188a28a37e480aa2	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	28	28	OVERRIDE	read	73e149847731b586d97ccba44d8677225b046c95ccac41c6c0164b19190d22a8	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	29	29	SIZE	read	2c2b4affd158b3784040db9ac6e4efb366702b227509dbcd1efe5867386c8aa2	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	34	34	NEW_VA	read	709b367f6ce5921584662c57b937eabf8f970ead60a1eeb160f5aa8f40a59781	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	35	35	NEW_SIZE	read	18aec4722b3429560486fdfa063a72aef3dbb4869292122a89f795efa94d04d8	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	39	39	VA	read	9a0d17b23477c254880a1a04256310a3eaf158aed555d5b62ee78c5784c96a46	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	40	40	VA_COMPGEN	read	75bbb8fa4cab5e444dfc53c0ec573c2558fef79977966106e0d2161fc3678ac9	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	41	41	DATA	read	52e207aad98d607e276e9e3d8ad8eafc54cf5860aaa7e96936b1591ec8f2e0f5	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	42	42	DATA_COMPGEN	read	02110781a6c46dc8e377edc35aad60a126b1af81f916408e908e04d09ea837c7	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	43	43	DATA_COMPGEN_GUARD	read	ed3ba90d1f750452502a7369b395528b7dc53aada249c1371adf2c635487750c	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	44	44	VTBL	read	e19536e5a8a2ff358b1499c68c90c311b56deff1cbbbc663f5897ff221c45f23	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	45	45	VTBL2	read	fd2ebc5e28f0074bffc85bc3bca91795e5ee8a4aa144826720fe0615170541d5	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	46	46	OVERRIDE	read	34b86fccc58fd14380ead98f9d429dbe3eec2bca4addac506055ca58d6f1c223	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	48	48	SIZE	read	f6f1af66fbac2532cccf36118efeb58ae8eebb79e3dc9d9e4001f1c2560cc713	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	50	50	NEW_VA	read	ab30d12abf77269bf37a5dfe162b1bdfc4a5c74988c252ad2b78bef04a042e56	B10: complete annotation/metadata conditional macros; no function bodies; R12
+include/va.h	51	51	NEW_SIZE	read	18aec4722b3429560486fdfa063a72aef3dbb4869292122a89f795efa94d04d8	B10: complete annotation/metadata conditional macros; no function bodies; R12
 src/BASE/BUTTON.cpp	103	106	SET_WIDGET_MESSAGE	read	f2251e824f97673a602adebd9b51266aa66672f42e7028d387f4df4491d5bdd3	B01: 9 bodies; H01-H04; selection/modifier ordering retained; R01
 src/BASE/Blur.cpp	30	36	BLUR_TAP_SUM	read	d8e9becfdd955d7e485e8b37f2dd788d6fd3ff945d11bbe9dbabf2cb55938c8f	B04: 1 body; tap-sum macro, channel remap, signed narrow then upper/lower clamp; H07/R07
-src/BASE/Bzip.cpp	14	14	True	unread	47c7bd1bb57602f26d9c8402b52164a422a81f4b06fc5002682eef92c6b58adc	-
-src/BASE/Bzip.cpp	15	15	False	unread	643c59cc5fdc6645d474a93be33eb1a1228708bd09c2db43882bff7cab28cf11	-
-src/BASE/Bzip.cpp	16	20	ERROR_IF_EOF	unread	399bac97c6ecd93c854cd4f50351ebddece4bdae9be799cdae7d1fdec103bb40	-
-src/BASE/Bzip.cpp	21	25	ERROR_IF_NOT_ZERO	unread	85d3bc32a4a9269c755c706913d4f0c9cb2b61741d11f75ed43065278053992d	-
-src/BASE/Bzip.cpp	26	30	ERROR_IF_MINUS_ONE	unread	4cd4fee541f243d2d081356460e70054b61f006cc088c8122eb9477a10415d76	-
-src/BASE/Bzip.cpp	32	32	TWO_TO_THE	unread	d41f229117cc2ffb54e4ac6c67e2f9d1a46c1a587329375dee8ed4aea392bd3a	-
-src/BASE/Bzip.cpp	33	33	MAX_BITS_OUTSTANDING	unread	222beeaa71690d0203e96bf2ef0449beb7beae4c7d0419db83167d896b6084bb	-
-src/BASE/Bzip.cpp	34	34	smallB	unread	6592bd028a5b7ffedd69edd2ce1d448135179b49314728c57757108f1a0a057f	-
-src/BASE/Bzip.cpp	35	35	smallF	unread	ee771a2b699e53f1b0916b999adf87d4634cc09e64dd3ae04477fd2eddb6eb9b	-
-src/BASE/Bzip.cpp	47	47	BASIS	unread	3470b8a829d3704673211b9371de8219b5eafd5dc88159691818dd543cc67d69	-
-src/BASE/Bzip.cpp	48	48	MODEL_2_3	unread	96d6204d48f874d032b4d03bc204e017c0b7cf7af1d1b7deb4571833c03545cc	-
-src/BASE/Bzip.cpp	49	49	MODEL_4_7	unread	00cb22f6f21a685a32ce22b390d05d23ea56d0b567c226cb3952cc02fdf70bc6	-
-src/BASE/Bzip.cpp	50	50	MODEL_8_15	unread	3419414590058afece40b50ff4bbda7864487afaef4258e7000a9577fabeb150	-
-src/BASE/Bzip.cpp	51	51	MODEL_16_31	unread	593cc7fbca1713930017dd2d8f399c7ee876094760942f11f5389629cf451f4a	-
-src/BASE/Bzip.cpp	52	52	MODEL_32_63	unread	6bf31d7a50e954365603edcfcf6c3208de882721e7b64afe9d4426d15f9bff73	-
-src/BASE/Bzip.cpp	53	53	MODEL_64_127	unread	2b157fe100f94434eb3237182a5590e207049bb59dda24f23e541bdda41f297d	-
-src/BASE/Bzip.cpp	54	54	MODEL_128_255	unread	f5a285184f79b7a69cb8a0dd49d9e13d769bdcfde6fa5e9cd1e2e77f13941eb5	-
-src/BASE/Bzip.cpp	57	57	VAL_RUNA	unread	32645e3c819c0e8f4915d1f2721ca74567fcae4a1b73055fa95b4d30f7d89250	-
-src/BASE/Bzip.cpp	58	58	VAL_RUNB	unread	b38d649800c41ea410b72fa0028b3a6e97f0de91347f29c9fc74d45eae5e4560	-
-src/BASE/Bzip.cpp	59	59	VAL_ONE	unread	ec44187a60a575762f89775b0df2e6d978556df6975473986ef0a1dc07de481b	-
-src/BASE/Bzip.cpp	60	60	VAL_2_3	unread	7f022b1a60962fc8baae775d41cb36a8687c7ad79266bb0aa560a81f5edfa797	-
-src/BASE/Bzip.cpp	61	61	VAL_4_7	unread	c059794832568be2dd8b65d7cb81cffa61e288343e8a37f15306c365ad0bfbd4	-
-src/BASE/Bzip.cpp	62	62	VAL_8_15	unread	1ebd3a26ed76c3bba55581f03f812d8b784174cca131fa0a60a61670ed7404ae	-
-src/BASE/Bzip.cpp	63	63	VAL_16_31	unread	d4e30362172e86d8b69764d4aa204e46b8eae622c5f36671de0ec4728f168dab	-
-src/BASE/Bzip.cpp	64	64	VAL_32_63	unread	0087ccb3a1db5c63b27a54e00298c0d8bde20a92529e453cfc875b05137cef1a	-
-src/BASE/Bzip.cpp	65	65	VAL_64_127	unread	22b074ab5b68ae620eae8a074b73714ed89d82e2cecb558d312d0e5452e19673	-
-src/BASE/Bzip.cpp	66	66	VAL_128_255	unread	44c0fd16dcd24e4d58ceddc0e175bb8002b5d165792bbfd7a3e5089db2337a88	-
-src/BASE/Bzip.cpp	67	67	VAL_EOB	unread	8f722b545c90ec3fb9a3004613339c4c1537d64bdc55a60b5a325e546a20b2d4	-
-src/BASE/Bzip.cpp	68	68	RUNA	unread	c3fa64bfc4ae37d43bdcaf02a515e5071da09994be6a01fc30fab2595b4360dc	-
-src/BASE/Bzip.cpp	69	69	RUNB	unread	2c217c893a5bf5ee8752eac52a7ee762d4ec181adcddacd502feccbad116f26a	-
-src/BASE/Bzip.cpp	70	70	EOB	unread	53c2a382b8a9e5d3c59a7e16e4ac288857f9abacae8cfb0e9d8969ae944c3ff6	-
-src/BASE/Bzip.cpp	71	71	INVALID	unread	8e900a590fdf4275b20253a232b7fd5fc58ed7e3a3418aa8bc9ca6f63fc95677	-
-src/BASE/Bzip.cpp	73	73	NUM_FULLGT_UNROLLINGS	unread	edffed6a53cab62f01a85b37d69fb5505ea036897170cb2e07943d0305c1ec4f	-
-src/BASE/Bzip.cpp	74	74	MAX_DENORM_OFFSET	unread	6a87590d01367fedb4853c3def89e56fa2bcda0af61e1d7571b50d24e82d69d5	-
-src/BASE/Bzip.cpp	130	130	MY_EOF	unread	9383c7b7108085844629c1f33861d7c961ae6557d69e3ead4020e48cae6e562e	-
-src/BASE/Bzip.cpp	131	134	UPDATE_CRC	unread	c6380b160e5431863659ea25b24fecfe5db04de92040d43022d4de2e892e5bde	-
-src/BASE/Bzip.cpp	136	136	IF_THEN_ELSE	unread	3f8ffd2416a917383641a9e8b05c66385770aeff4a873bf725c19d2051dfaff8	-
-src/BASE/Bzip.cpp	137	137	GETFIRST	unread	9f5f17428bc2cf79012e0ad1ceee4632da1b2e9ce9f51326302f56dea81b516a	-
-src/BASE/Bzip.cpp	138	138	GETREST	unread	98ef2d7f436a045f0f956f402cc61dab2018938e73fadff0a0b03548f933fe20	-
-src/BASE/Bzip.cpp	139	139	SETALL	unread	5c0f415853af720e100d652cb599bb2f7c688b1c646c34a3908f4e74864f78c8	-
-src/BASE/Bzip.cpp	140	140	GETFIRST16	unread	a36e0889d297ccbc0a434732e5f9323141c17a2e8a31031a7b7d9689ce736d63	-
-src/BASE/Bzip.cpp	141	141	GETREST16	unread	a1b14789a3e35af58689965a1b8bd926e842f72b55b2998cfa8396f78f786484	-
-src/BASE/Bzip.cpp	1042	1042	ISORT_BELOW	unread	1e1358c2a69a1952812f8c778083eb4697a7d59891b548e70f6c4ec558f43711	-
-src/BASE/Bzip.cpp	1043	1043	RC	unread	19bb20432ae5597091e68ca5111746158195ff98ae00d41db992a7a92bdcd1b5	-
-src/BASE/Bzip.cpp	1044	1051	SWAP	unread	117ea251b08bc8e35fb5d1ac322cb866bf3b97d49673f3f48ab553cc49ba099d	-
-src/BASE/Bzip.cpp	1376	1376	SPOT_BASIS_STEP	unread	819d5c098db5809e3e61ccbc4e58d6297d2969cf5019f31489e49e8f38dac826	-
+src/BASE/Bzip.cpp	14	14	True	read	47c7bd1bb57602f26d9c8402b52164a422a81f4b06fc5002682eef92c6b58adc	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	15	15	False	read	643c59cc5fdc6645d474a93be33eb1a1228708bd09c2db43882bff7cab28cf11	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	16	20	ERROR_IF_EOF	read	399bac97c6ecd93c854cd4f50351ebddece4bdae9be799cdae7d1fdec103bb40	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	21	25	ERROR_IF_NOT_ZERO	read	85d3bc32a4a9269c755c706913d4f0c9cb2b61741d11f75ed43065278053992d	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	26	30	ERROR_IF_MINUS_ONE	read	4cd4fee541f243d2d081356460e70054b61f006cc088c8122eb9477a10415d76	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	32	32	TWO_TO_THE	read	d41f229117cc2ffb54e4ac6c67e2f9d1a46c1a587329375dee8ed4aea392bd3a	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	33	33	MAX_BITS_OUTSTANDING	read	222beeaa71690d0203e96bf2ef0449beb7beae4c7d0419db83167d896b6084bb	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	34	34	smallB	read	6592bd028a5b7ffedd69edd2ce1d448135179b49314728c57757108f1a0a057f	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	35	35	smallF	read	ee771a2b699e53f1b0916b999adf87d4634cc09e64dd3ae04477fd2eddb6eb9b	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	47	47	BASIS	read	3470b8a829d3704673211b9371de8219b5eafd5dc88159691818dd543cc67d69	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	48	48	MODEL_2_3	read	96d6204d48f874d032b4d03bc204e017c0b7cf7af1d1b7deb4571833c03545cc	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	49	49	MODEL_4_7	read	00cb22f6f21a685a32ce22b390d05d23ea56d0b567c226cb3952cc02fdf70bc6	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	50	50	MODEL_8_15	read	3419414590058afece40b50ff4bbda7864487afaef4258e7000a9577fabeb150	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	51	51	MODEL_16_31	read	593cc7fbca1713930017dd2d8f399c7ee876094760942f11f5389629cf451f4a	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	52	52	MODEL_32_63	read	6bf31d7a50e954365603edcfcf6c3208de882721e7b64afe9d4426d15f9bff73	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	53	53	MODEL_64_127	read	2b157fe100f94434eb3237182a5590e207049bb59dda24f23e541bdda41f297d	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	54	54	MODEL_128_255	read	f5a285184f79b7a69cb8a0dd49d9e13d769bdcfde6fa5e9cd1e2e77f13941eb5	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	57	57	VAL_RUNA	read	32645e3c819c0e8f4915d1f2721ca74567fcae4a1b73055fa95b4d30f7d89250	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	58	58	VAL_RUNB	read	b38d649800c41ea410b72fa0028b3a6e97f0de91347f29c9fc74d45eae5e4560	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	59	59	VAL_ONE	read	ec44187a60a575762f89775b0df2e6d978556df6975473986ef0a1dc07de481b	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	60	60	VAL_2_3	read	7f022b1a60962fc8baae775d41cb36a8687c7ad79266bb0aa560a81f5edfa797	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	61	61	VAL_4_7	read	c059794832568be2dd8b65d7cb81cffa61e288343e8a37f15306c365ad0bfbd4	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	62	62	VAL_8_15	read	1ebd3a26ed76c3bba55581f03f812d8b784174cca131fa0a60a61670ed7404ae	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	63	63	VAL_16_31	read	d4e30362172e86d8b69764d4aa204e46b8eae622c5f36671de0ec4728f168dab	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	64	64	VAL_32_63	read	0087ccb3a1db5c63b27a54e00298c0d8bde20a92529e453cfc875b05137cef1a	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	65	65	VAL_64_127	read	22b074ab5b68ae620eae8a074b73714ed89d82e2cecb558d312d0e5452e19673	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	66	66	VAL_128_255	read	44c0fd16dcd24e4d58ceddc0e175bb8002b5d165792bbfd7a3e5089db2337a88	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	67	67	VAL_EOB	read	8f722b545c90ec3fb9a3004613339c4c1537d64bdc55a60b5a325e546a20b2d4	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	68	68	RUNA	read	c3fa64bfc4ae37d43bdcaf02a515e5071da09994be6a01fc30fab2595b4360dc	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	69	69	RUNB	read	2c217c893a5bf5ee8752eac52a7ee762d4ec181adcddacd502feccbad116f26a	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	70	70	EOB	read	53c2a382b8a9e5d3c59a7e16e4ac288857f9abacae8cfb0e9d8969ae944c3ff6	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	71	71	INVALID	read	8e900a590fdf4275b20253a232b7fd5fc58ed7e3a3418aa8bc9ca6f63fc95677	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	73	73	NUM_FULLGT_UNROLLINGS	read	edffed6a53cab62f01a85b37d69fb5505ea036897170cb2e07943d0305c1ec4f	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	74	74	MAX_DENORM_OFFSET	read	6a87590d01367fedb4853c3def89e56fa2bcda0af61e1d7571b50d24e82d69d5	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	130	130	MY_EOF	read	9383c7b7108085844629c1f33861d7c961ae6557d69e3ead4020e48cae6e562e	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	131	134	UPDATE_CRC	read	c6380b160e5431863659ea25b24fecfe5db04de92040d43022d4de2e892e5bde	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	136	136	IF_THEN_ELSE	read	3f8ffd2416a917383641a9e8b05c66385770aeff4a873bf725c19d2051dfaff8	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	137	137	GETFIRST	read	9f5f17428bc2cf79012e0ad1ceee4632da1b2e9ce9f51326302f56dea81b516a	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	138	138	GETREST	read	98ef2d7f436a045f0f956f402cc61dab2018938e73fadff0a0b03548f933fe20	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	139	139	SETALL	read	5c0f415853af720e100d652cb599bb2f7c688b1c646c34a3908f4e74864f78c8	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	140	140	GETFIRST16	read	a36e0889d297ccbc0a434732e5f9323141c17a2e8a31031a7b7d9689ce736d63	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	141	141	GETREST16	read	a1b14789a3e35af58689965a1b8bd926e842f72b55b2998cfa8396f78f786484	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	1042	1042	ISORT_BELOW	read	1e1358c2a69a1952812f8c778083eb4697a7d59891b548e70f6c4ec558f43711	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	1043	1043	RC	read	19bb20432ae5597091e68ca5111746158195ff98ae00d41db992a7a92bdcd1b5	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	1044	1051	SWAP	read	117ea251b08bc8e35fb5d1ac322cb866bf3b97d49673f3f48ab553cc49ba099d	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
+src/BASE/Bzip.cpp	1376	1376	SPOT_BASIS_STEP	read	819d5c098db5809e3e61ccbc4e58d6297d2969cf5019f31489e49e8f38dac826	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
 src/BASE/EXEC.cpp	43	43	gExecutiveText	read	d2c24d8a135d56b5f593e0dc3b28e836f65cd52939149f35b1346e716fb6ba70	B03: 10 bodies; manager priority/list lifecycle and complete modal/main dispatch; R04/R05
 src/BASE/INPUTMGR.cpp	22	22	EncodeScanCode	read	e539f5b2cb74e8c630a585c5a6b3801322b8b521389ba467025e16dd4f203301	B07: 18 bodies incl two private inlines; full input conversion/ring/table/cursor checks; H13/H14; R09
 src/BASE/MOUSEMGR.cpp	17	17	MOUSE_CURSOR_MASK_SHIFT	read	7f760fb307514ebaec45a9716a77184888f06d5828d6a271257fa24a4c86034e	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
@@ -305,8 +305,8 @@ src/BASE/MOUSEMGR.cpp	22	22	MOUSE_MANAGER_COMBAT_ICON	read	79e44ff5dbc3095ac4f82
 src/BASE/MOUSEMGR.cpp	23	23	MOUSE_MANAGER_ADVENTURE_BITMAP	read	4a9d590d05440300e398098e1a2fe0f452374bd63488e1f308c1fa78142abdcd	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
 src/BASE/MOUSEMGR.cpp	24	24	MOUSE_MANAGER_SPELL_BITMAP	read	880d7eb092868343ca3df7cd8231037e506b60fa8b3358aba979202bc2c66cf1	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
 src/BASE/MOUSEMGR.cpp	25	25	MOUSE_MANAGER_COMBAT_BITMAP	read	fdec402ce10b938d6c34e5258fcfae13408c08bee43778f588f4e4e052cd63b1	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
-src/BASE/Misc.cpp	1	1	HOMM2_MISC_INLINE_ICONENTRY	unread	217bc462a50b69fa2de39785711fe85d9e9255baa8ba657f2b4ebba70a851c0a	-
-src/BASE/Misc.cpp	14	14	MISC_REGISTRY_KEY	unread	89c517f4c7cc6eacaa98ad2847aaebb53c28fa03c88a65c8ed35fce66ddb3853	-
+src/BASE/Misc.cpp	1	1	HOMM2_MISC_INLINE_ICONENTRY	read	217bc462a50b69fa2de39785711fe85d9e9255baa8ba657f2b4ebba70a851c0a	B08: 48 bodies incl strict const overload; full memory/hash/prefs/CD/blit/log/fade/PCX/random/dialog paths; H01/H05/H06/H07/H15/H16; R10
+src/BASE/Misc.cpp	14	14	MISC_REGISTRY_KEY	read	89c517f4c7cc6eacaa98ad2847aaebb53c28fa03c88a65c8ed35fce66ddb3853	B08: 48 bodies incl strict const overload; full memory/hash/prefs/CD/blit/log/fade/PCX/random/dialog paths; H01/H05/H06/H07/H15/H16; R10
 src/BASE/TEXTWDGT.cpp	74	77	SET_WIDGET_MESSAGE	read	f2251e824f97673a602adebd9b51266aa66672f42e7028d387f4df4491d5bdd3	B01: 8 bodies; H01-H04; text ownership and union modifier preservation
 src/BASE/WINMGR.cpp	63	63	DATA	read	dd38e3def69eb4e0bff3bdb4b4a40ee4dae8fd88e2851c22f87bd82831616752	B03: 22 bodies; window dispatch, focus, draw/fade/fizzle/cycles; H09/H10; R04/R05/R07
 src/BASE/WINMGR.cpp	65	65	DATA	read	52e207aad98d607e276e9e3d8ad8eafc54cf5860aaa7e96936b1591ec8f2e0f5	B03: 22 bodies; window dispatch, focus, draw/fade/fizzle/cycles; H09/H10; R04/R05/R07
@@ -742,4 +742,4 @@ src/SOURCE/netwin.cpp	58	58	gNbSndQueue	unread	0ebae9037d729924cf4d7d9e9df67b3e0
 src/SOURCE/netwin.cpp	59	59	gNbRcvLock	unread	94a5555fef3e4fe7f8af749f36fd1455d8be07c341864a9f5d0b26d6dec1174e	-
 src/SOURCE/netwin.cpp	60	60	gNbEvents	unread	f00eeab2aa2a611eff709b9ba16e8d2ea26f01a65699ba5d538c7b360bd17d34	-
 src/SOURCE/netwin.cpp	61	61	gNbSndLock	unread	c22165db3e681b8e4129922c5872f4b445fd6922b2315250a4a2e35f1d1bc769	-
-src/SOURCE/wingraph.cpp	14	14	RETAIL_FILE	unread	24613e0de90ed68deb8a974e97b655881be88b74b9a9f4b85ad44a59d75335bf	-
+src/SOURCE/wingraph.cpp	14	14	RETAIL_FILE	read	24613e0de90ed68deb8a974e97b655881be88b74b9a9f4b85ad44a59d75335bf	B11: all 32 bodies; full DD/WinG surface/palette/paint/error/switch/lifetime; H13/H15/H18; R13

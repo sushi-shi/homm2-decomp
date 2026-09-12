@@ -1,7 +1,7 @@
 path	lines	functions	macros	status	sha256	review
 include/BASE/BITS.h	10	0	1	read	d5adfd9e9d4f670e35f3e7206b62e8b1ef342ace7592ceb5a28989032981f659	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/Blur.h	17	0	1	read	9f02898f81a837e6803d3ead70f5941fabeba60d3f80b6040fb42243c95e2863	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
-include/BASE/Bzip.h	139	0	2	unread	2f75ce0d2dcb04fdbb7577694c8f0778d5d2c311021fd3dd126de7aa36602660	-
+include/BASE/Bzip.h	139	0	2	read	2f75ce0d2dcb04fdbb7577694c8f0778d5d2c311021fd3dd126de7aa36602660	B09: complete stream/model/word/API declarations and storage aliases; no bodies; R11
 include/BASE/DebugCheck.h	7	1	1	read	4000914f7ed51cb00d309b22dcc7777a5fac9ca16bb89261920a525a592f509c	B07: complete empty DebugCheck inline; no helper extraction needed
 include/BASE/EXEC_TYPES.h	43	0	1	read	6dc2b87ee2f064cbe61463780dad2ae31f234c0977f0095de8c126c3c610fa5f	B03: complete manager contracts, flags, state and declarations; no bodies
 include/BASE/INPUTMGR.h	10	0	1	read	088cfd450f7e8143e2d3b83644bab30b8ef0b6e079f4d5880e5e8b04ac3c1cc6	B07: complete input/cursor layouts, scan domain and declarations; no bodies
@@ -18,8 +18,8 @@ include/BASE/Iconm2b.h	23	0	1	read	6b877a2d5abdb407d0b7d7e35fd434baea30ea130e970
 include/BASE/Iconmf2b.h	23	0	1	read	46132f9b1de5dd9bc7a790664bff7d8db2b79a54567c914fdeb7d4050b0ed5ef	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/BASE/MIDIWrap.h	16	0	1	read	c0cf943f538a4385511ff50b0991a1ccc2070dab0a6153a5544c58ec93d7dd20	B06: complete audio resource/format/sequence/flag declarations; no bodies
 include/BASE/Midi.h	16	0	1	read	c306dcba4410ebffcc50bf517bfeb27cb205ade68036bc14e05b79892ca43964	B06: complete audio resource/format/sequence/flag declarations; no bodies
-include/BASE/Misc.h	149	1	5	unread	a618108289ba29c8ffa978403b886cff3e9831d95bc877070900df025e41ea0e	-
-include/BASE/MiscEnums.h	14	0	1	unread	10e7ed0cddf99af74b8555ea9246947443bd33b24d4da28a0ac226d6ec6e456f	-
+include/BASE/Misc.h	149	1	5	read	a618108289ba29c8ffa978403b886cff3e9831d95bc877070900df025e41ea0e	B08: complete utility/layout/allocator contracts and strict LogInt template body; H05/H06; R10
+include/BASE/MiscEnums.h	14	0	1	read	10e7ed0cddf99af74b8555ea9246947443bd33b24d4da28a0ac226d6ec6e456f	B08: complete CD setup result domain; no bodies
 include/BASE/MiscGraphicsConstants.h	11	0	1	read	ea4121af939b85b16b40d320ae5738e8df82b25f07585e7b00b583b538bdfd2f	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/MusicFlags.h	18	0	1	read	acc8fe949ff9f44c480b2d69587865bdf2ec1907bd79a61266f36dea0463bbff	B06: complete audio resource/format/sequence/flag declarations; no bodies
 include/BASE/Ripple.h	10	0	1	read	0430f46c11b75b02bd0165a0b2cca6c25683175b0e8766feb45e6f0dd9e9c526	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
@@ -62,13 +62,13 @@ include/BASE/widget.h	58	0	1	read	734055c1622691e5c519195e6359fb9a3922624ae7ddd4
 include/BASE/widgetKind.h	22	0	1	read	6e08cf446d6a74e76f4679751de59802bab547086de80e5dc555c908d6e08323	B01: full widget kind domain; no function bodies
 include/EDITOR/fullMap.h	58	6	1	unread	8d6b1d48cca513d44f22889844464ac49a2ec52809cff0943664cfa5ed9b452a	-
 include/EDITOR/mapcell.h	149	1	1	unread	c2aa8f2d2c3dae60671da97867fb09fd971afdd2915f6dedc645f63a282b6e11	-
-include/Ints.h	539	53	68	unread	6fd249695ef01cdc160942d87e37d0bc9af2958788205727702a2ed611acf87a	-
+include/Ints.h	539	53	68	read	6fd249695ef01cdc160942d87e37d0bc9af2958788205727702a2ed611acf87a	B10: all 53 physical definitions, defaulted/constrained/conditional bodies and 68 macros read; modern compatibility R12
 include/SOURCE/ADVMGR.h	149	0	1	unread	7b9777229ae53954e735bd38d318f1392596f3e187b1279251d6f151c13af7c7	-
 include/SOURCE/ADVMGR_TYPES.h	23	0	1	unread	6a06b6a52b2e2d0463956f6831813a88f15f2e37f5cfa97e92068613cb05c931	-
 include/SOURCE/ARMY.h	166	0	1	unread	882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658	-
 include/SOURCE/CMBTMGR.h	18	0	1	unread	9e2fc82b267ab2b69708140660f3ae6998f60f1ddfb2b4c14dbce6aaa2f9f43e	-
 include/SOURCE/COMMAND.h	44	0	1	unread	a852441f65690400de7c81809b11723e54e194f1f80ec79c4215b22ce04fea8c	-
-include/SOURCE/CONFIG_TYPES.h	130	0	1	unread	6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f	-
+include/SOURCE/CONFIG_TYPES.h	130	0	1	read	6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f	B10: complete packed graphics/config records and enum/storage contracts; H15; no bodies
 include/SOURCE/CURSOR.h	110	0	1	unread	8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916	-
 include/SOURCE/Campaign.h	78	0	1	unread	8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc	-
 include/SOURCE/Castle.h	22	0	1	unread	f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510	-
@@ -78,10 +78,10 @@ include/SOURCE/ExpCampaign.h	153	0	1	unread	96f9d7cdb3e1bb99fe3bb93377ab8389c153
 include/SOURCE/FINDPATH.h	16	0	1	unread	7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665	-
 include/SOURCE/GAME.h	170	0	1	unread	709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185	-
 include/SOURCE/HERO.h	17	0	1	unread	40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6	-
-include/SOURCE/KB.h	723	2	3	unread	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	-
-include/SOURCE/KB_TYPES.h	969	26	11	unread	3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02	-
+include/SOURCE/KB.h	723	2	3	read	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; H15/R12
+include/SOURCE/KB_TYPES.h	969	26	11	read	3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
 include/SOURCE/Modem.h	91	1	1	unread	1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d	-
-include/SOURCE/NOOPT.h	10	0	1	unread	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	-
+include/SOURCE/NOOPT.h	10	0	1	read	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	B10: complete pointer/value delay API declarations; R10; no bodies
 include/SOURCE/Netbios.h	32	0	1	unread	2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b	-
 include/SOURCE/Newgame.h	50	0	1	unread	b67f046c7caa54d7411991e09d9d1c5aa0fd6d5a6a699e37508ac53fed5890c6	-
 include/SOURCE/Overview.h	42	0	1	unread	905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe	-
@@ -98,13 +98,13 @@ include/SOURCE/TOWNMGR.h	167	0	1	unread	e762e09a5558928796741abbdbf76ff69c100481
 include/SOURCE/VIEW.h	13	0	1	unread	8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d	-
 include/SOURCE/Viewwrld.h	17	0	1	unread	7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139	-
 include/SOURCE/Wsnetwin.h	56	0	1	unread	daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b50606f4bf40	-
-include/SOURCE/X_GLOBAL.h	631	1	1	unread	63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d	-
+include/SOURCE/X_GLOBAL.h	631	1	1	read	63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d	B10: complete globals/table dimensions and NextSpellEffectDisplayType inline; H15/R12
 include/SOURCE/advManager.h	441	2	1	unread	fc8aede10196333113009e10721bb7aca6e9fa27b322f933b718b9ca12d3b147	-
 include/SOURCE/army.h	160	1	1	unread	1835685f63e1be6e7fda6b84f9f21523291070d9a09ddd0cd459072b67f70202	-
 include/SOURCE/armyGroup.h	55	0	1	unread	b31953182adb7d15b142c85bcff5d06951542f612bcfe4d25f989da543fde1e6	-
 include/SOURCE/bankBox.h	22	0	1	unread	348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8	-
 include/SOURCE/combatManager.h	868	0	1	unread	11172778e68a861a77db959957215f5df6c99f7ac613d6c938f0684326ce4304	-
-include/SOURCE/combatTypes.h	119	8	8	unread	4cd3766ce7192a3952a2a8b8ea30a7949509f787ea9148508a3cd083babb9d0d	-
+include/SOURCE/combatTypes.h	119	8	8	read	4cd3766ce7192a3952a2a8b8ea30a7949509f787ea9148508a3cd083babb9d0d	B10: complete side/result/facing/direction contracts and eight strict helper bodies; R12
 include/SOURCE/comwin.h	62	0	1	unread	951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512	-
 include/SOURCE/dimPalette.h	14	0	1	read	bbebfa76143453b5a65687189a368b5e436756e073c5d2504703d46c4dabc945	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/SOURCE/dpnetwin.h	103	0	1	unread	ed4e337cf85139cf1ea816c6668120be372acf6c045a536d1fed768ede2d87b1	-
@@ -113,7 +113,7 @@ include/SOURCE/game.h	356	5	1	unread	fcaa4554262de8c324295e02c4f11a1b2f37453dafc
 include/SOURCE/hero.h	239	1	1	unread	b18f61633fc21a8d1127f7d074458ea3521c06026c79aa5542922ccce878b986	-
 include/SOURCE/hexcell.h	45	0	1	unread	bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5	-
 include/SOURCE/highScoreManager.h	64	0	1	unread	05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c	-
-include/SOURCE/kbwin.h	86	0	1	unread	d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561	-
+include/SOURCE/kbwin.h	86	0	1	read	d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/netwin.h	136	0	1	unread	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27	-
 include/SOURCE/netwin_private.h	22	0	1	unread	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	-
 include/SOURCE/philAI.h	138	0	1	unread	3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c	-
@@ -126,9 +126,9 @@ include/SOURCE/town.h	121	1	1	unread	152a21d536099dc905cd861822fec1a0c9b8bf09799
 include/SOURCE/townManager.h	98	1	1	unread	89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc	-
 include/SOURCE/townObject.h	25	0	1	unread	4e0c90cbc973c613dd5b9e0b6a8dbcc4241fb97b77ef9488228c8149e16574fb	-
 include/SOURCE/tradpost.h	53	0	1	unread	34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484	-
-include/SOURCE/wingraph.h	112	0	1	unread	0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f	-
+include/SOURCE/wingraph.h	112	0	1	read	0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
 include/SOURCE/x_arena.h	17	0	1	unread	af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02	-
-include/va.h	55	0	23	unread	613ae23bdf9a6f3e6d0b74217e62c4bd1008b2661ae0cdc861d253246bcb3278	-
+include/va.h	55	0	23	read	613ae23bdf9a6f3e6d0b74217e62c4bd1008b2661ae0cdc861d253246bcb3278	B10: complete annotation/metadata conditional macros; no function bodies; R12
 src/BASE/AudiereEffects.cpp	203	13	0	read	66050a61dac3b326c25705b7d704df52e28304179d2aad2093f59baa36dd1d2b	B06: 13 bodies incl empty node destructor; full list/iteration/stream lifecycle; R08
 src/BASE/AudiereMusic.cpp	168	7	0	read	736b9ab782b1c3998cefdb9802b9341715da92c5c8b010e9b7fff1b98c5ebb4f	B06: 7 bodies; stream ownership, reset/play/position/fade contracts; H07/R08
 src/BASE/BASEMGR.cpp	17	1	0	read	32679850d68b15eb2e4d52448e034b6ffffdf71c7f08182dbb9a216107dc18ef	B03: 1 body; manager inactive/link initialization
@@ -137,7 +137,7 @@ src/BASE/BITS.asm	73	3	0	read	845c0d23d2ef13de5c06d9306831bb219cadb9feaa38eb5d49
 src/BASE/BORDER.cpp	156	6	0	read	5c0b83d58e3b4649741f3ecbd1a9148761ce0acdd09d1138e6482fc40068b5f9	B02: 6 bodies; H01-H04; bitmap/icon lifetime and optional backdrop draw
 src/BASE/BUTTON.cpp	277	9	1	read	84d1851364959cca552944e87741757cc23c0d18d23ad623f75a59dd56d6b275	B01: 9 bodies; H01-H04; selection/modifier ordering retained; R01
 src/BASE/Blur.cpp	139	1	1	read	ff002ecaca34ee740e4f0fe2e244d25af515f098e8d879a162f8191d8796ab53	B04: 1 body; tap-sum macro, channel remap, signed narrow then upper/lower clamp; H07/R07
-src/BASE/Bzip.cpp	2061	88	46	unread	755f9e00d4091c6e472dfc1366cf919a01086d671a0bdb76cae1bafa233fa6d9	-
+src/BASE/Bzip.cpp	2061	88	46	read	755f9e00d4091c6e472dfc1366cf919a01086d671a0bdb76cae1bafa233fa6d9	B09: all 88 bodies plus local macros; full compression/decompression, CRC, sort, MTF/RLE and file wrappers; R11
 src/BASE/DIMMER.cpp	43	6	0	read	3c1d3913f68139f13037a4311226dc90930383e28c95c5cb9ee973cd73a4a74a	B02: 6 bodies; H03; thin dispatch/draw wrappers need no new abstraction
 src/BASE/EXEC.cpp	271	10	1	read	283b7943ab658836555d12a197ee281c3bf1d8c1e753dae2915a37fcce0ee990	B03: 10 bodies; manager priority/list lifecycle and complete modal/main dispatch; R04/R05
 src/BASE/FONT.cpp	426	12	0	read	f4e3c3a0d3fbb7a0944d55e596a2bbcbff6ccda1ad22e283d8dd3279b09cd5dd	B04: 12 bodies; full line measurement/wrapping/draw and private helpers; H05/H06; R07
@@ -153,7 +153,7 @@ src/BASE/Iconmf2b.cpp	89	1	0	read	6b9f9b8de7153ddcf11baff992682fa8c2827da95becaf
 src/BASE/MOUSEMGR.cpp	646	17	9	read	3b03cba5b77e6affdc8190aec59e6c3920780a990ed0c80436ebebb963385168	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
 src/BASE/Midi.cpp	157	6	0	read	6fc8dadf5d6368a71cc9020610eb920838d9e884f8d6251326dca57474930e83	B06: 6 bodies; all sequence startup/play/stop/shutdown/fade paths; R08
 src/BASE/MilesSound.cpp	206	12	0	read	919e63aa189824b9b6916eb88e35dab4a6fc074aa8724b88ead54061d6dcbef6	B06: 12 bodies incl private MilesSampleFormat; pool/channel/service/volume behavior; R08
-src/BASE/Misc.cpp	2182	48	2	unread	0cea1d4c617a67daef0cb845c95c9fb80fe91f16b9fd9c1dc4c760272346a434	-
+src/BASE/Misc.cpp	2182	48	2	read	0cea1d4c617a67daef0cb845c95c9fb80fe91f16b9fd9c1dc4c760272346a434	B08: 48 bodies incl strict const overload; full memory/hash/prefs/CD/blit/log/fade/PCX/random/dialog paths; H01/H05/H06/H07/H15/H16; R10
 src/BASE/MusicFlags.cpp	24	3	0	read	92cd3d0abe52bc3533dadcd23babff16b01514f147be89bcbe6293557e4cb125	B06: 3 bodies; provisional feature/flag contracts; no invented semantics
 src/BASE/PALETTE.cpp	35	4	0	read	a133bc0974b95e481031e435184be0710798ceb49fa33e453db521e2ba67e29b	B04: 4 bodies; resource load/lifetime and named display dispatch
 src/BASE/RESMGR.cpp	515	31	0	read	90e3bca084190f6899a3564a1e5c1330ff2abcb7335766f1575fc0b6c1c4e682	B02: 31 bodies; H04 position-stack contract; cache/read/aggregate families local-only R02
@@ -197,7 +197,7 @@ src/SOURCE/HEXCELL.cpp	138	8	0	unread	af8e4915ec3fec698e22e584947eca636521f2be02
 src/SOURCE/HISCORE.cpp	320	5	0	unread	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	-
 src/SOURCE/KB.cpp	11500	75	6	unread	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	-
 src/SOURCE/Modem.cpp	419	15	0	unread	0f54ae68a192f37429c53437d53c213c651574b72e8f921dde1da25c6f412d9f	-
-src/SOURCE/NOOPT.cpp	25	3	0	unread	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	-
+src/SOURCE/NOOPT.cpp	25	3	0	read	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	B10: 3 delay bodies; pointer reread vs value deadline, message then sound polling; R10
 src/SOURCE/Netbios.cpp	247	5	0	unread	0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52	-
 src/SOURCE/Newgame.cpp	2319	16	0	unread	0a462978001a3348debdfaa6bbeb2d264aee172236817e930731839906ce6cfe	-
 src/SOURCE/Overview.cpp	1578	7	5	unread	451e8ec6412d9c885a9c4cc9c4cca15d9ea95a1b688d83aacd3f53c5f9fa4e14	-
@@ -222,8 +222,8 @@ src/SOURCE/X_CAMPGN.cpp	1373	36	0	unread	785cadb46cc272005050458eaf293ae3a826660
 src/SOURCE/X_GLOBAL.cpp	665	0	0	unread	776d73bf4ceeb3aa6bb9b214061048192227ff3f7c45c91a5689513b27aabf27	-
 src/SOURCE/comwin.cpp	356	11	0	unread	ce48214d518eac196d6d5508d9e0f42fd401871edfe2f017e83428572adaddd1	-
 src/SOURCE/dpnetwin.cpp	671	16	1	unread	2d2cf7b372bbf431f4facb3e4eb5c4ac2830322ef1ac16649dc754435ba9af10	-
-src/SOURCE/kbwin.cpp	587	16	0	unread	8e359c2475ae2ad626c8128d608cdfbc062e99a11cfa26169b0b56a633672c0d	-
+src/SOURCE/kbwin.cpp	587	16	0	read	8e359c2475ae2ad626c8128d608cdfbc062e99a11cfa26169b0b56a633672c0d	B11: all 16 bodies; startup/full message procedure/pumps/menus/resize/tick; H13/H15/H17; R13
 src/SOURCE/netwin.cpp	660	19	14	unread	31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1	-
 src/SOURCE/tradpost.cpp	462	6	0	unread	b0b69f9a7db5333ace20349089c95f9d74aaa66f12df9b34bf953ad131daac01	-
-src/SOURCE/wingraph.cpp	1158	32	1	unread	3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9	-
+src/SOURCE/wingraph.cpp	1158	32	1	read	3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9	B11: all 32 bodies; full DD/WinG surface/palette/paint/error/switch/lifetime; H13/H15/H18; R13
 src/SOURCE/x_arena.cpp	257	3	0	unread	198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a	-
