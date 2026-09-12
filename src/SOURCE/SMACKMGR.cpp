@@ -678,15 +678,10 @@ i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
 
 VA(0x00495b18, 0x243)
 void PrintSummaryInfo(SmackSum* summary) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "                                              Name - %s",
         SmackOptions[bSmackNum].fileName
     );
-    LogStr(gText);
-#define LOG_SUMMARY_VALUE(format, value)                                                           \
-    sprintf(gText, format, value);                                                                 \
-    LogStr(gText)
     LOG_SUMMARY_VALUE(
         "                                        total time - %8d",
         summary->TotalTime
@@ -747,7 +742,6 @@ void PrintSummaryInfo(SmackSum* summary) {
         "                Highest amount of memory allocated - %8d",
         summary->HighestExtraUsed
     );
-#undef LOG_SUMMARY_VALUE
 }
 
 DATA(0x00533ea4) icon* backImage = NULL;

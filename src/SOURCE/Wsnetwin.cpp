@@ -32,7 +32,7 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 plr;
 
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         sprintf(
             gText,
             /* Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы

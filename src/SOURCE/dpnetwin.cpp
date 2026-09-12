@@ -330,8 +330,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             bStartUpInfoReceived = true;
             break;
         default:
-            sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
-            LogStr(gText);
+            LOG_SUMMARY_VALUE("Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
             break;
     }
 }

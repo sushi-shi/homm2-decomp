@@ -522,7 +522,7 @@ i32 oldmain(void) {
         0,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    gpMouseManager->SetColorMice(gConfig.gfx[IDX(giCurExe)].colorMouseCursor);
+    gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
     LogStr("OM4");
     SetupCDRom();
     LogStr("OM5");
@@ -3910,7 +3910,7 @@ void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
 
-    if (gConfig.gfx[IDX(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     if (hmnuApp == NULL)
         return;

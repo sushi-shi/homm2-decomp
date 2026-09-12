@@ -41,7 +41,7 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
             );
     }
 
-    if (gbEnlargeScreenBlit != 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
+    if (gbEnlargeScreenBlit != 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
         if (iMainWinScreenWidth == VESA_SCREEN_WIDTH
             && iMainWinScreenHeight == VESA_SCREEN_HEIGHT) {
             if (width < VESA_SCREEN_WIDTH)

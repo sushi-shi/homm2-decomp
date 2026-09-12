@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
@@ -48,10 +49,7 @@ textWidget::textWidget(
 VA(0x004c3090, 0x12f)
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     i16 len = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(len));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
@@ -105,8 +103,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_DOWN: {
             i16 relativeX = msg.payload.mouse.x - m_owner->m_posX;
             i16 relativeY = msg.payload.mouse.y - m_owner->m_posY;
-            if (relativeX >= m_x && relativeY >= m_y && relativeX < m_x + m_width
-                && relativeY < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, relativeX, relativeY)) {
                 m_flags |= WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
                     msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);

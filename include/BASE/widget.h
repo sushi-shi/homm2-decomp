@@ -8,6 +8,16 @@
 class heroWindow;
 struct tag_message;
 
+// Inputs are already window-local; repeated operands must be stable expressions.
+#define WIDGET_CONTAINS_LOCAL_POINT(w, x, y)                                                       \
+    ((x) >= (w).m_x && (y) >= (w).m_y && (x) < (w).m_x + (w).m_width                               \
+     && (y) < (w).m_y + (w).m_height)
+
+// Four ordered signed-word stores. Reevaluate the resource pointer per read.
+#define READ_WIDGET_GEOMETRY(w, resources) \
+    ((w).m_x = (resources)->ReadWord(), (w).m_y = (resources)->ReadWord(), \
+     (w).m_width = (resources)->ReadWord(), (w).m_height = (resources)->ReadWord())
+
 H2_ENUM_CLASS_BEGIN_SPLIT(WidgetFlag, i16)
     WIDGET_FLAG_NONE     = 0,
     WIDGET_FLAG_SELECTED = 1,

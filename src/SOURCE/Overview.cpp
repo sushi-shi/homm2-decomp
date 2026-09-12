@@ -363,8 +363,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             b32 capt;
             i32 captainMana;
             {
-                valueText = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1));
-                strcpy(valueText, record->m_name);
+                ALLOC_COPY_STRING(valueText, record->m_name);
 
                 OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                     TOWN_NAME_X,
@@ -1018,10 +1017,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         }
     }
     for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        titleText = static_cast<char*>(
-            H2_ALLOC(strlen(cOverviewText[col + IDX(giOverviewType) * OVERVIEW_TITLE_COUNT]) + 1)
-        );
-        strcpy(titleText, cOverviewText[col + IDX(giOverviewType) * OVERVIEW_TITLE_COUNT]);
+        ALLOC_COPY_STRING(titleText, cOverviewText[col + IDX(giOverviewType) * OVERVIEW_TITLE_COUNT]);
         textWidgetTitle[col] = new textWidget(
             titleX[IDX(giOverviewType)][col],
             OVERVIEW_TITLE_Y,

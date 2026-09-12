@@ -3306,8 +3306,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (strongestHeroPosition_j != -1) {
                     strongestHero_d = gpGame->GetPlayerHero(rank_a, strongestHeroPosition_j);
                     sprintf(gText, "\xc0\xf2.\n\xc7\xe0\xf9.\n\xcc\xe0\xe3.\n\xc7\xed." /* "Ат.\nЗащ.\nМаг.\nЗн." */);
-                    widgetText_c = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
-                    strcpy(widgetText_c, gText);
+                    ALLOC_COPY_STRING(widgetText_c, gText);
                     textControl_p = new textWidget(
                         static_cast<i16>(
                             position_a * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PRIMARY_LABEL_X
@@ -3338,8 +3337,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         );
                         strcat(gText, statText_h);
                     }
-                    widgetText_c = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
-                    strcpy(widgetText_c, gText);
+                    ALLOC_COPY_STRING(widgetText_c, gText);
                     textControl_p = new textWidget(
                         static_cast<i16>(
                             position_a * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PRIMARY_VALUE_X
@@ -3361,8 +3359,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     goto nextRank;
                 {
                     strcpy(gText, cPersonality[IDX(gpGame->m_players[rank_a].m_aiDifficulty)]);
-                    widgetText_c = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
-                    strcpy(widgetText_c, gText);
+                    ALLOC_COPY_STRING(widgetText_c, gText);
                     textControl_p = new textWidget(
                         static_cast<i16>(
                             position_a * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PERSONALITY_X

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
@@ -53,10 +54,7 @@ H2_RETAIL_INLINE border::~border() {
 
 VA(0x004cb250, 0x13c)
 void border::Read(void) {
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = NULL;
@@ -93,7 +91,7 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_DOWN: {
             i16 x = msg.payload.mouse.x - m_owner->m_posX;
             i16 y = msg.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;

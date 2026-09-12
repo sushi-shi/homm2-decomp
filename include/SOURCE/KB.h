@@ -644,6 +644,8 @@ extern H2_CONST char* gBuildingInfoSpecial[];
 extern icon* gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
+// An lvalue selected afresh, including across callbacks that change executables.
+#define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[IDX(giCurExe)])
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
 extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];

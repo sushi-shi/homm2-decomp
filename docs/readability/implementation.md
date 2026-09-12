@@ -186,3 +186,24 @@ passes 905 tests. [The measured source dossier](../matching/ReadabilityAccessors
 records the structural arms and narrow rejected paths. Reproduce the exhaustive
 real-header byte test with `python3 -m homm2.audit.readability_contracts` inside
 the build shell; compiler flags come from the KB unit's manifest entry.
+
+## Group 3: narrow widget, resource and display operations
+
+| Family | Application and boundary |
+| --- | --- |
+| H02 | Eleven widget-local hit tests in eight TUs use `WIDGET_CONTAINS_LOCAL_POINT`. Coordinates remain narrowed before the call; drop-button and popup rectangles stay explicit. The three-arm probe rejects the inline method (1,270 vs 1,240 bytes) and retains the byte-neutral expression macro. |
+| H03 | All eight widget readers share `READ_WIDGET_GEOMETRY`: four ordered signed-word stores. The live resource pointer is reevaluated before each read; id/kind, lookups and payload reads remain outside. |
+| H05 | Nine assignment/copy pairs in listbox, droplist, Overview and TOWNMGR use `ALLOC_COPY_STRING`. Existing frees and ownership transfer stay explicit. FONT's local declaration/initialization pair stays readable as two statements; no second declaration-generating macro is introduced. Its non-copy scratch allocation, extra-capacity text buffers and ADVMGR's format-string copy are excluded. |
+| H11 | Eight unsheared decoders share `ICON_FITS_CLIP`. It retains left/right/top/bottom comparison order and already-resolved flipped coordinates; clip-mode assignment, inclusive edges and decoder loops remain explicit. |
+| H13 | Ten input/source-coordinate expressions in three TUs use `CLIENT_TO_GAME_X/Y`. Signed conversion, original long/int arithmetic, live dimensions and destination narrowing remain. Width/height scaling and inclusive rectangle preparation stay explicit because the new names describe coordinates. |
+| H15 | Eighty live lvalue selections in seven TUs use `CURRENT_GRAPHICS_CONFIG`. No reference is cached across callbacks; game/editor slot selection and saved scalar fields remain unchanged. |
+| H19 | The existing one-value `LOG_SUMMARY_VALUE` is shared from Misc.h with statement-safe comma sequencing. Fifteen old calls plus fourteen new calls in SMACKMGR, Bzip and dpnetwin retain formatting into `gText` before logging. Other arities/buffers and subsequent shutdown/error operations remain explicit. |
+
+[Seven complete source matrices](../matching/ReadabilityWidgets/shared-operations.cpp)
+record the precise arms and audit results. H02/H03/H11 reproduce the tested retail
+functions. H05/H13/H15/H19 preserve their baseline instructions and relocations
+but retain existing function-local retail normalization residuals; rounded 100%
+is not reported as closure. The final build and original-object control pass
+after the five town/overview string pairs: all 98 objects, 1,516 non-debug
+sections and 42,433 ordered relocations. The retail field-relocation review also
+passes, with no new structural review items.

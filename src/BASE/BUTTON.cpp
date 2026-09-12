@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/button.h>
 #include <BASE/widgetKind.h>
@@ -79,10 +80,7 @@ button::button(
 VA(0x004d3710, 0x115)
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
@@ -157,7 +155,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
             i16 x = msg.payload.mouse.x - m_owner->m_posX;
             i16 y = msg.payload.mouse.y - m_owner->m_posY;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
@@ -165,8 +163,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
 
-            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && x >= m_x && y >= m_y && x < m_x + m_width
-                && y < m_y + m_height) {
+            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 Select(msg);
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
                     PollSound();
@@ -174,7 +171,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     if (msg.type == MESSAGE_MOUSE_MOVE) {
                         x = msg.payload.mouse.x - m_owner->m_posX;
                         y = msg.payload.mouse.y - m_owner->m_posY;
-                        if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                        if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                             if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                                 Select(msg);
                             }

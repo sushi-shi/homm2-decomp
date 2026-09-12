@@ -81,6 +81,12 @@ void ProcessAssert(i32 condition, H2_CONST char* file, i32 line);
 // site lowers to plain operator new/delete (435/524 direct calls image-wide).
 #define H2_ALLOC(size) static_cast<void*>(new u8[size])
 #define H2_FREE(ptr) delete (ptr)
+// Both operands must be stable. Allocation does not free an old destination.
+#define ALLOC_COPY_STRING(destination, source)                                                     \
+    ((destination) = static_cast<char*>(H2_ALLOC(strlen(source) + 1)),                             \
+     strcpy((destination), (source)))
+// The shared buffer is formatted even when LogStr itself is disabled.
+#define LOG_SUMMARY_VALUE(format, value) (sprintf(gText, (format), (value)), LogStr(gText))
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, H2_CONST char* pattern);

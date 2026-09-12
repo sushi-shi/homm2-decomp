@@ -365,7 +365,7 @@ void FadeIn(i32 increment) {
     if (pal == NULL)
         MemError();
     done = false;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
@@ -400,7 +400,7 @@ void FadeOut(i32 increment) {
     if (pal == NULL)
         MemError();
     done = false;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
@@ -1021,18 +1021,18 @@ void ReadPrefsFromRegistry(void) {
                 ""
             );
         RegCloseKey(hKey);
-        if (gConfig.gfx[IDX(giCurExe)].width <= 0)
-            gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
-        if (gConfig.gfx[IDX(giCurExe)].height <= 0)
-            gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
-        if (gConfig.gfx[IDX(giCurExe)].x < 0)
-            gConfig.gfx[IDX(giCurExe)].x = 0;
-        if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-            gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-        if (gConfig.gfx[IDX(giCurExe)].y < 0)
-            gConfig.gfx[IDX(giCurExe)].y = 0;
-        if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-            gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
+        if (CURRENT_GRAPHICS_CONFIG.width <= 0)
+            CURRENT_GRAPHICS_CONFIG.width = MINIMUM_WINDOW_WIDTH;
+        if (CURRENT_GRAPHICS_CONFIG.height <= 0)
+            CURRENT_GRAPHICS_CONFIG.height = MINIMUM_WINDOW_HEIGHT;
+        if (CURRENT_GRAPHICS_CONFIG.x < 0)
+            CURRENT_GRAPHICS_CONFIG.x = 0;
+        if (CURRENT_GRAPHICS_CONFIG.x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+            CURRENT_GRAPHICS_CONFIG.x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
+        if (CURRENT_GRAPHICS_CONFIG.y < 0)
+            CURRENT_GRAPHICS_CONFIG.y = 0;
+        if (CURRENT_GRAPHICS_CONFIG.y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+            CURRENT_GRAPHICS_CONFIG.y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
     }
 }
 
