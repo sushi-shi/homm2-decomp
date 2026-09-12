@@ -78,7 +78,7 @@ include/SOURCE/ExpCampaign.h	153	0	1	read	96f9d7cdb3e1bb99fe3bb93377ab8389c1531b
 include/SOURCE/FINDPATH.h	16	0	1	read	7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665	B14: complete terrain cost declaration; no bodies
 include/SOURCE/GAME.h	170	0	1	read	709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185	B13: complete calendar/serialization/player/random/weekly domains and free APIs; no bodies
 include/SOURCE/HERO.h	17	0	1	read	40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6	B13: complete hero UI declarations; no bodies
-include/SOURCE/KB.h	723	2	3	read	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; H15/R12
+include/SOURCE/KB.h	723	2	3	read	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	B10: complete declarations/domains and two inline bodies; map-extra operand contracts; implementation covered B43; H15/R12
 include/SOURCE/KB_TYPES.h	969	26	11	read	3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02	B10: complete domains/layouts and all 26 helper/strict-bridge bodies; trigger and direction vocabulary; R12
 include/SOURCE/Modem.h	91	1	1	read	1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d	B26: complete modem framing/state/queue/interface declarations and TruncateModemResponse inline body; implementation covered in B28
 include/SOURCE/NOOPT.h	10	0	1	read	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	B10: complete pointer/value delay API declarations; R10; no bodies
@@ -195,7 +195,7 @@ src/SOURCE/GAME.cpp	8051	103	56	read	e78a08b9b2fdc8ed202f8d5485c6aec6ff07630136c
 src/SOURCE/HERO.cpp	2131	41	1	read	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9	B13: all 41 bodies; full hero stats/spells/skills/level/deallocation and UI handlers/setup/splits; H01/H21-H23/R15
 src/SOURCE/HEXCELL.cpp	138	8	0	read	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	B12: 8 bodies; current/dead occupants, facing-dependent draws, tower parity and empty hooks; R14
 src/SOURCE/HISCORE.cpp	320	5	0	read	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	B33: all five bodies; full score-manager lifecycle/input/timing/animation/file-record/display/highlight paths; H14/H31/H70/R32
-src/SOURCE/KB.cpp	11500	75	6	unread	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	-
+src/SOURCE/KB.cpp	11500	75	6	read	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	B43: all 75 bodies incl three local inlines; full application/menu/building/end-game/morale/luck/score/chat/network/shutdown/sound/dynamic-window/dialog paths and complete macros/static game/localized data; H01/H02/H15/H17/H20/H22/H30-H32/H68-H70/H72/H85-H88/R43
 src/SOURCE/Modem.cpp	419	15	0	read	0f54ae68a192f37429c53437d53c213c651574b72e8f921dde1da25c6f412d9f	B28: all fifteen bodies; full setup/command/response/byte/handshake/streaming-frame paths and data; H30/R28
 src/SOURCE/NOOPT.cpp	25	3	0	read	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	B10: 3 delay bodies; pointer reread vs value deadline, message then sound polling; R10
 src/SOURCE/Netbios.cpp	247	5	0	read	0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52	B28: all five bodies; full host/guest/name/receive/wait setup and data; H30/R28

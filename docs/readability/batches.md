@@ -714,3 +714,27 @@ retain human/AI rule and ordering differences, local-only helper leads, packed
 recruitment/army behavior and network/presentation contracts. This batch adds
 43 definitions and one fully read file. No executable source, header,
 configuration or behavior changed.
+
+## B43 — complete application core, shared dialogs and static game data
+
+Read all 11,500 lines and 75 definitions of KB.cpp, including all three local
+inlines, empty hooks, full application startup/main/menu/command-line paths,
+building/cost queries, death/end-game/campaign logic, morale/luck descriptions,
+scores/congratulations, chat/network exit flows, shutdown/error/sound owners,
+dynamic-window construction and the complete NormalDialog/handler/update
+family. Read all data through EOF: palette/radar/terrain/building/creature/
+skill/spell/campaign/localized UI tables and six existing local initializer
+macros. Reconciled the complete function index. All owner headers were already
+read; relevant game/calendar, memory-utility and KB declarations were rechecked
+without duplicate credit. Earlier targeted KB snippets earn no extra credit.
+
+H85 proposes an optional default on the existing sample-wait declaration;
+H86 isolates the two-level cheat marker, H87 the day-first calendar query and
+H88 guarded scalar deletion followed by clearing the same pointer. All have
+fully read consumers in multiple TUs, with exact contracts and exclusions.
+H01/H02/H15/H17/H20/H22/H30-H32/H68-H70/H72 gain consumers, completed owner
+reviews or explicit boundaries. R43 retains application/handler/state/ordering,
+network/ownership/formatting distinctions and local-only/data exclusions.
+This batch adds 75 definitions and one fully read file. Only PHILAI.cpp remains
+unread before the final whole-corpus occurrence/consolidation/ranking pass.
+No executable source, header, configuration or behavior changed.

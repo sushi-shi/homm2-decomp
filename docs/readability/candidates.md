@@ -1039,7 +1039,7 @@ integer factor. Its information-visibility conditions stay outside the helper.
 
 ## H30 — shorter calls for a text-only NormalDialog
 
-Disposition: strong fixed-argument readability candidate; owner body review pending.
+Disposition: strong fixed-argument readability candidate; owner fully read in B43.
 
 `hero::ViewStat`, `Dismiss`, `CheckLevel`, `HeroHandler` and
 `CombatSystemOptionsHandler` repeat `NormalDialog(text, mode, -1, -1, -1, 0,
@@ -1051,9 +1051,11 @@ option. Owner: the `NormalDialog` interface in `SOURCE/KB.h`.
 Keep mode explicit, argument evaluation unchanged and the result read by the
 caller. Artifact and secondary-skill dialogs have non-default trailing slots
 and are not instances. Do not hide `sprintf`, `gText` mutation, sound playback,
-button-result interpretation or dismissal side effects. The declaration and
-these callers are read; the large NormalDialog body and wider consumer set
-still require their full planned review before finalizing defaults.
+button-result interpretation or dismissal side effects. B43's complete
+NormalDialog read confirms the exact no-resource/default-position tail. The
+existing declaration can carry these optional arguments without a new wrapper;
+the fixed-arity macro remains an alternative requiring a readability/codegen
+comparison. Both leave the full existing dialog implementation in place.
 
 B19 adds `ViewSpells` and mirror-creation failure. The NORMAL_DIALOG sentinel
 names denote the same -1/zero tail; their long message formatting stays outside.
@@ -2577,6 +2579,12 @@ the surrounding strcpy versus format-as-string sprintf differences. Gain:
 one explicit localized-byte contract instead of duplicated alphabet rules,
 favoring an API that already exists.
 
+B43 adds KB's complete toupper(char) body and its command/name consumers. It
+has the same byte mapping, but is an overload distinct from CRT toupper(int).
+Do not redirect int calls, notably EVENTS::StrEqNoCase, or remove a callable
+overload without auditing all resolution/ABI effects. First-byte assignment,
+surrounding buffer operations and ASCII-only input filters remain caller-owned.
+
 ## H70 — read or write the exact storage size of one file value
 
 Disposition: credible small expression-macro pair, not a serialization framework.
@@ -2601,8 +2609,8 @@ count is correct and removes the repeated spelling of each field.
 Exclude GAME's one-byte slices of wider globals, campaign/state prefixes,
 event-header prefixes, arrays and dynamic payload lengths, char scratch buffers
 read as i32, and `read(fd, this, sizeof(m_difficultyRating))`. HERO's whole/base
-record methods are not field-lvalue instances. KB's searched read of one score
-entry with sizeof(the entire entries array) is also not an exact-size instance;
+record methods are not field-lvalue instances. KB's fully read B43 score reader
+reads one entry with sizeof(the entire entries array), not an exact-size instance;
 do not silently change its byte count. Leave all such schema decisions visible.
 The two consecutive barrier-tent writes/reads stay two calls. R10/R14's file-mode,
 error and legacy-record exclusions remain in force.
@@ -4174,3 +4182,278 @@ and raw outgoing fragment buffer. They do not establish a universal shared
 packet-cast helper. Whole-record copies, first/second fragment slices and
 transport-header offsets remain distinct contracts; H68 only shortens explicit
 default policy arguments.
+
+## H85 — default wait policy on the existing sample-release operation
+
+Disposition: strong optional-argument candidate; no new macro or inline needed.
+
+All 23 calls to WaitEndSample pass -1 as their second argument: CMBTMGR has
+eight, SPELLS/COMMAND/EVENTS three each, TOWNMGR two, and HERO/CURSOR/ARMY/ADVMGR
+one each. These nine caller TUs and the KB owner are fully read. Add the default
+`i32 waitTime = -1` only to the existing declaration at SOURCE/KB.h:525, retaining
+the actual two-argument function and the option to supply an explicit interval.
+This removes repetitive policy sentinels without creating a second sound API.
+
+The complete owner at KB.cpp:3722 first returns for a null SAMPLE2 pointer or
+null pointee. Any negative interval becomes SAMPLE_DEFAULT_WAIT_TIME (=4000)
+inside the function; -1 does NOT mean wait forever. It forms the existing i32l
+deadline, tests DigitalReport before the clock, and processes one Windows
+message before PollSound on each iteration. It disposes the sample and clears
+the caller's pointer even when the deadline ends the loop while sound is still
+reported playing. Preserve all of that, including null-check and clock order.
+
+Do not default the argument to 4000, hoist the timeout into callers, combine
+LoadPlaySample with this operation, or infer an infinite wait from the call's
+name. The declaration and caller spellings are candidates only; no executable
+change or retail-byte verification has been performed.
+
+## H86 — mark ordinary and base-campaign cheating in the existing order
+
+Disposition: credible small statement macro shared by menu and adventure input.
+
+HandleAppSpecificMenuCommands has seven copies beginning at KB.cpp:3955, 3972,
+3980, 3994, 4006, 4013 and 4028. The adventure handler has three at ADVMGR.cpp:
+1889, 1902 and 1914. Each sets `gpGame->m_cheated = 1`, THEN tests gbInCampaign
+and conditionally sets `gpGame->m_campaignCheated = 1`. A statement-safe
+`MARK_GAME_CHEATED()` at the existing SOURCE/KB.h application boundary can name
+exactly this shared policy. Both complete owner TUs have been read.
+
+Keep the first store before the campaign test, repeated global receiver reads,
+and the campaign flag untouched when gbInCampaign is false. A nullary macro
+can express those exact operations without introducing arguments or capturing
+gpGame once in a method call. A game method is a possible alternative only
+after reviewing that receiver-evaluation change and code generation. Do not
+expand the condition to expansion campaigns or assign the second flag from
+gbInCampaign: either changes the contract.
+
+The forced-loss branch at ADVMGR.cpp:1909 marks only ordinary cheating and is
+explicitly excluded. So are initialization/reset and score-reading paths.
+Hero-presence guards, actual cheat effects, map redraw, movement/spell/resource
+changes, victory calls and preference writes all remain outside. Gain: one
+name for a repeated two-level persistent marker, not a generic cheat dispatcher.
+
+## H87 — current-map calendar day query
+
+Disposition: credible small game inline; preserve calculation placement and width.
+
+CheckEndGame at KB.cpp:2463 and game::LoadGame/PerDay/CheckForTimeEvent at
+GAME.cpp:1559, 4467 and 7784 repeat the day-first expression
+`m_day + (m_week - 1) * 7 + (m_month - 1) * 28`. A proposed
+`i32 game::DayNumber() const` at SOURCE/game.h names the existing current-map
+calendar query. Use the shared CALENDAR_DAYS_PER_WEEK and
+CALENDAR_DAYS_PER_MONTH from SOURCE/GAME.h, already included by the owner;
+GAME's private EVENT_DAYS aliases have those exact values.
+
+The packed day/week/month fields are u16 and promote to signed i32 in this
+expression. Do not introduce unsigned subtraction, an i16 return, validation,
+normalization or a cached answer. CheckForTimeEvent's dayNumber4 is also i32.
+Keep left-associated day-first arithmetic and each caller's original storage
+and comparisons. In PerDay, the query occurs AFTER incrementing m_day and
+BEFORE PerWeek/PerMonth rollover; retaining that position matters even though
+a normalized calendar often produces the same mathematical number.
+
+The time-limit loss check uses strict greater-than. Do not replace it with
+greater-or-equal or substitute giCurTurn for a fresh calculation. KB's campaign
+save calculation orders month, week, day; treat that as a separate operation-
+order variant, not an automatic exact replacement. ExpCampaign::Days adds
+stored map days first and returns i16; it is not just this current-map query,
+and rearranging it needs separate narrowing/order/codegen evidence. PHILAI has
+a searched occurrence but earns no consumer/read credit before its full read.
+Gain: a domain name for calendar conversion, without changing packed state.
+
+## H88 — guarded scalar deletion followed by clearing the same pointer
+
+Disposition: plausible period-style statement macro; rank against explicit spelling.
+
+DeleteMainClasses at KB.cpp:351 has fifteen consecutive instances of
+`if (pointer) delete pointer; pointer = NULL;`. Other fully read instances are
+fullMap::Close (EDITOR/mapcell.cpp:27, two), bitmap::~bitmap (BASE/BITMAP.cpp:49),
+mouseManager::Close (BASE/MOUSEMGR.cpp:132), ReleaseFizzleSource
+(BASE/WINMGR.cpp:667), and TOWNMGR's SetTownType (870, two), UnloadTown (964,
+three) and Main (1392, one). These 26 instances span six TUs. A proposed
+`DELETE_AND_NULL(pointer)` belongs in BASE/Misc.h beside existing allocation
+utilities, not in a new ownership framework.
+
+The exact contract is a nonnull test, scalar delete of that same typed lvalue,
+then an unconditional NULL store OUTSIDE the guard, wrapped as one statement.
+Require a stable, side-effect-free pointer lvalue. Preserve its separate reads
+for the test and deletion and the post-destructor lvalue assignment; do not
+capture or clear the pointer before destruction. Keep deletion's static type
+and the scalar spelling even at bitmap/map storage sites allocated as arrays.
+This audit does not repair existing allocation/deletion mismatches.
+
+Keep DeleteMainClasses' sequence explicit: the resource manager is deleted
+LAST, after the executive and other owners. Do not reorder for symmetry with
+construction or use a table of untyped pointers. The caller's active-state
+guards, other object cleanup, loops, recreation and subsequent resets remain
+outside. Unguarded delete/null pairs are not exact instances of the guarded
+candidate; neither are Dispose, H2_FREE, DestroyIcon, RemoveWindow or operations
+that restore a previous pointer instead of clearing it. Their surface overlap
+does not authorize changing the allocation/deallocation vocabulary.
+
+H62 is distinct: it detaches an owned widget before deleting it and deliberately
+does NOT null its pointer within the helper. R04/R14 continue to reject generic
+owner/lifetime algorithms. H88 proposes only a literal small sequence; its
+readability benefit and expansion behavior still require final ranking and
+retail/codegen evidence before implementation.
+
+## B43 — extensions to established candidates
+
+H01 gains exact message prefixes in PopNetBox, SetWinText, NormalDialog's text
+update and UpdateNormalDialog. Header reuse, id-before-command and payload-
+before-id variants are not additional exact prefixes. H02 gains a menu-hotspot
+test-order/domain variant, not a new narrow-coordinate widget consumer; the
+existing InMapArea already names the adventure rectangle. H15 gains oldmain's
+current-executable graphics access. H17 gains FileError's one meaningful
+integer log argument; its saved errno and text formatting stay outside.
+
+H20/H22 gain building and embarked-state tests in morale/luck information,
+not their whole descriptive/stat calculation. H30 now has its complete owner
+review, numerous KB text-only calls and nested EventWindowHandler callers.
+H31 gains checked menu/net/dialog widgets, but InitMainClasses' allocations,
+SetupDynamicWindow's window and other unchecked allocations stay unchecked.
+The full MemError read confirms reentry can return; no noreturn assumption.
+
+H32 gains EventWindowHandler's timeout and deselection result/id/command
+triples; retyping on timeout and clearing timeout afterward remain outside.
+WaitHandler stores a FIXED result before retyping, and RecruitHeroHandler's
+tail does not copy the current id into a result: neither is the exact protocol.
+H68 gains default-policy startup/chat/exit sends; sudden exit's explicit final
+zero/zero pair is excluded. H69 gains the separately callable char overload.
+H70 gains AddScoreToHighScore's per-entry writes only, not its whole-array-sized
+reads from an entry address. H72 explicitly excludes GetBuildingCost: it
+computes a capped local level but indexes the cost table with mageLevel + 1.
+No cleanup may silently substitute that unused capped value.
+
+## R43 — application orchestration, dialogs, network exits and static game data
+
+All 75 definitions and 11,500 lines of KB were read, including the three local
+inlines, empty shutdown/resize hooks, the full oldmain and CheckEndGame, all
+704 source lines of NormalDialog's definition span, and the data after the last
+function through EOF. Six existing GROUND_REPEAT/frame-set initializer macros
+are local table compression and are undefined after use, not shared operation
+candidates. Palette/radar/terrain/building/creature/skill/spell/campaign data,
+fixed-format strings and localized UI tables remain data, not a general macro
+or string-builder opportunity. Existing GetHero/GetTown and GetTownName already
+provide the vocabulary behind private GetHeroSlot/GetCastleRec (R26).
+
+PollSound's reentry guard covers distinct mouse, color-cycle and sound/network
+timers with separate clock reads. Foreground gating applies to sound, not all
+remote polling. ForcePollSound changes the timer then invokes the owner. Do
+not cache one timestamp for the whole function or combine these into a generic
+pump. EarlySetup marks/returns state asymmetrically; CD failures perform palette,
+display and sound actions before their particular early shutdown/dialog paths.
+Those are not a shared error-cleanup transaction.
+
+oldmain owns startup, movies, menu/restart/load dispatch, setup, campaign map
+transitions, remote setup transfer, current-player initialization, adventure
+manager lifetime and postgame display. Keep each AddManager/MainLoop/Remove
+sequence's actual error handling rather than automatically using CallManager.
+Window deletion, result retrieval, campaign reentry gotos, fades and update
+flags have different placements. The remote name-matching and fallback passes
+use differently directed map indices and different marker updates; do not
+repair them into a single mapping algorithm. Compression calculation, full
+setup-player copies and setup-before-save transmission order stay explicit.
+
+InterpretCommandLine is a character scan with special slash/space rules and
+does not skip consumed subarguments by advancing the outer index. It sets
+defaults, sometimes writes preferences while parsing, accepts specific bounded
+address/name prefixes and validates TCP requirements only after scanning.
+Keep this behavior, char toupper overload and first-four-human initialization;
+a conventional argv parser is not a helper extraction. Menu toggles use
+1 - flag; selection/highlight handlers vary in event-type/id/command order,
+result ownership, forwarding and Shingle updates. No generic menu framework.
+
+GetBuildingCost/GetBuildingInfo/GetBuildingBaseResourceValue use different
+special-case order, row selection and early returns. Disabled building costs
+can return without filling the destination; CanBuy's local cost buffer has no
+extra initialization or CanBuild guard. CanBuild's six upgrade-to-base mask
+propagations are local-only: BuyBuild displays prerequisite bits but does not
+repeat that normalization. The necromancer guild-level rule and prerequisite
+display use different thresholds. Monster cost already has an owner API; do
+not replace rare-resource amounts or gold-first initialization with a broader
+building/creature-cost framework.
+
+PlayerDead resets retreat state and increments dead count without an already-
+dead check, unclaims mines and removes heroes in reverse order before remote
+handling. CheckEndGame performs separate elimination, alive-player counts,
+scenario-specific win/loss checks, ordinary completion and forced-result
+overrides. Gold victory processing occurs INSIDE its player scan with last-tie
+selection; win and loss flags can remain set together and later assignments
+can override the end sequence. Preserve strict time comparisons, campaign
+special cases, repeated hero/artifact searches and carryover selection. The
+eight-ultimate-artifact HasArtifact chain is only one local occurrence, not
+a proven cross-TU predicate. No consolidated outcome enum or auto-clearing of
+opposite flags is implied by the similarities.
+
+Morale/luck descriptions are not duplicate implementations of their computed
+stats. All-undead morale jumps directly to the dialog, mixed-alignment handling
+has artifact exceptions, and town/artifact/skill/event text checks retain order
+and repeated owner queries. gText is sometimes passed as a printf format.
+Do not fuse message construction with H30 or replace repeated live queries with
+cached results merely to shorten the description code.
+
+Score insertion uses opposite ranking directions for standard/campaign tables,
+inserts before equal scores, shifts whole records and may skip display when no
+position qualifies. Existing-file reads request the whole-array size once per
+entry; writes request one entry. Keep that mismatch visible and unchanged.
+ShowCongrats always makes a standard-score insertion internally even when its
+caller additionally handles a campaign score. Its score/day calls, palette
+copies, movie selection and final update flags are not one campaign abstraction.
+SmackFade has its own grayscale selection and linear-screen remap, not a shared
+RGB-distance converter. QuickViewWait, CongratsWait and TestDynamicWindow
+differ in flush/poll behavior and accepted input event sets; retain separate
+existing names rather than an all-purpose wait macro.
+
+PopNetBox temporarily saves display state, creates a checked window, displays
+four text/color lines and owns an ASCII-only editor/caret loop. It consumes
+unreliable packets, handles chat packets, but leaves other reliable packets
+queued while exiting. Incoming truncation differs between its initial message
+and in-loop chat paths. Caret bytes temporarily occupy the input buffer and
+message timeout/blink/exit-delay checks use different conditions. Close removes
+the window without deleting it and restores display state through distinct
+redraw branches. Do not infer ownership or merge this with new-game chat.
+
+Remote exit handling distinguishes eliminated, timed-out, forwarded and local-
+loss cases. Sudden exit initializes selected packet fields only, transmits with
+its own final policy values, ignores the result and delays; no implicit zero-
+initialization or checked-send wrapper. Host reports shift selected fields
+rather than whole player records and adjust game/network maps in place. The
+two-player and multiparty paths save, ask, transmit, clean up and recompute
+control at different points. DropDownToOnePlayer filters by local NET position,
+not game position. Existing remote APIs remain the abstraction boundary.
+
+ShutDown and MemError have reentry returns; they cannot be assumed nonreturning
+just because normal execution eventually exits. Shutdown snapshots message
+text before other calls can overwrite gText, then performs ordered resource,
+remote, executive, map-extra and class teardown. Dispose-and-null, H2_FREE-and-
+null, guarded scalar deletion and handle destruction are different contracts.
+CleanUpMenus clears only the application menu handle, not every destroyed
+handle. UnloadSystemwideIcons does not clear its disposed pointers. No common
+RAII/null-all cleanup may change these effects.
+
+SetupDynamicWindow calculates output geometry before its window-type early
+return and leaves the output window pointer untouched for unsupported types.
+It uses signed tile-count arithmetic and paired random edge draws in a fixed
+order; its unchecked window and checked widgets remain distinct. Its centered
+right shift is not NormalDialogCenterOffset's signed division by two. Normal
+dialog rows have an upper clamp only, unlike other window builders. Keep all
+these boundary/domain differences and the existing owner-specific builders.
+
+NormalDialog normalizes only the first resource tag, may ignore the second
+when the first is absent, calculates height by resource-specific rules and
+uses its original default/offscreen position tests. Secondary text can be
+allocated twice with the earlier widget retaining the first pointer. Checked
+widgets coexist with unchecked border/text allocations. Monster text can
+overwrite gText before the final text-widget assignment, so do not eagerly
+copy or reformat the incoming text argument. Resource metadata, quantity
+encoding, 'or' text and quick/wait/ordinary handler selection remain explicit.
+
+The dialog saves the current window and four resource globals, but NOT the
+global timeout or mouse hide count. It unhides the pointer repeatedly, then
+deletes the dialog window, restores pointer appearance and the four resource
+globals, and finally restores the prior window pointer. It does not clear that
+pointer after deletion or restore a previous timeout. UpdateNormalDialog draws
+with its exact foreground/background flags and does not call UpdateScreen.
+H30 shortens only identical arguments; it must not introduce a reentrancy guard,
+scope cleanup, new resource lifetime or automatic presentation protocol.
