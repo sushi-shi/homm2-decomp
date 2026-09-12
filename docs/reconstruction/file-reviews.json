@@ -12,8 +12,8 @@
     "note": "Full109-line header, eight inline accessors and actual0x11b player/0x68 AI records read. Eight hero, two available-hero,72 town and7 resource slots real. S31 unknown44-byte saved/6-byte barrier/28-byte AI regions require semantic recovery; their presence in serialized/shared owners is not proof of deletable padding. Six-float attention record is meaningful named state."
   },
   "src/SOURCE/HERO.cpp": {
-    "sha256": "9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9",
-    "note": "Full2131-line TU, all41 physical definitions, prolog enums/macro and trailing globals read. Actual12-entry XP table,41 bodies and all UI IDs reconciled. G40-G42 skill joins, R06 type/count temporary, S32 unused locals, C27 literal const_cast and B49/B50 record/domain/text contracts tracked per function. U10 header change has whole native proof; no fake stack owner or manual argument-slot access found."
+    "sha256": "93cd9baaf8dbc390b944a950cf2437f5f41210a39c66ee44f63fb4850c98fa70",
+    "note": "Full2131-line TU, all41 physical definitions, prolog enums/macro and trailing globals read. Actual12-entry XP table and all UI IDs reconciled. G40-G42 skill joins, R06 type/count temporary, S32 unused locals and B49/B50 record/domain/text contracts tracked per function. U10 header change has whole native proof; C27 literal const_cast removal has44-function native and complete scoped retail proof. No fake stack owner or manual argument-slot access found."
   },
   "src/SOURCE/ADVMGR.cpp": {
     "sha256": "39137e1b441e663ecb34500b39488aab633d6c3f4b39f021598c5a6fe6137d4f",

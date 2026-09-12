@@ -1,4 +1,20 @@
 {
+  "src/SOURCE/KB.cpp:LoadPlaySample(char * name)#1": {
+    "body_sha256": "24460b67ead49e60e44b4ab6fbb423532901d0b6784d1de4dc06489a26f66ff3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual const-correct name forwarder to GetSample, null-checked playback channel setup and sample return. It never modifies name; C27 caller needs no const_cast. B50 caller text termination/resource/backend lifecycle remains, no local buffer, fake aggregate or manual varargs."
+  },
   "src/SOURCE/HERO.cpp:hero::hero(void)#1": {
     "body_sha256": "c6640b1bf848f4877a65591a8c93fa8f123f48ddbd88a108dd5d0813de01aa94",
     "patterns": {
@@ -352,9 +368,9 @@
     "note": "Delegates exactly to ApplyBattleWinTemps; no local casts, unions, buffers or other debt pattern."
   },
   "src/SOURCE/HERO.cpp:hero::CheckLevel(void)#1": {
-    "body_sha256": "e9899c8cbd3643c58efd633d9d0aa7e29cbca569091fd7343e418f81e1b4365e",
+    "body_sha256": "c34a19efcd8fa5eba1474bebf7ae03f8d02af7762870eba3f3c7e062f4b8d4f4",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "open",
       "address": "absent",
@@ -365,7 +381,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 unnecessary literalconst_cast despite const-correct LoadPlaySample. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. Choice scan cycles0..13 and5000 bound; valid faction/skill/count, newLevel arithmetic and B50 retail template/text concatenation bounds remain. One-choice/choice text indexes current level directly while display useslevel-1 elsewhere; maxskill-level input must be checked."
+    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 literalconst_cast removed after complete two-arm matrix,44-function native equivalence and all1699 retail bytes/sites/targets proof. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. Choice scan cycles0..13 and5000 bound; valid faction/skill/count, newLevel arithmetic and B50 retail template/text concatenation bounds remain. One-choice/choice text indexes current level directly while display useslevel-1 elsewhere; maxskill-level input must be checked."
   },
   "src/SOURCE/HERO.cpp:hero::NumArtifacts(void)#1": {
     "body_sha256": "272dd39fb46e103ace01836331b1d97024af2e789007a83a350371eb0c06b83f",

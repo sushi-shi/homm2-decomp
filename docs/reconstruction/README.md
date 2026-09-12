@@ -274,8 +274,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - U10/C26: [the hero patrol owner](U10.md) replaces a misleading boat/patrol
   union with unsigned coordinates and a signed radius, removing two casts.
   All98 units remain native-identical; four affected bodies have retail proof.
-- C27: the level-up sample literal has an unnecessary `const_cast` despite
-  the already const-correct sample API; its source alternatives need measurement.
+- C27: the level-up sample literal now passes directly to the const-correct
+  sample API, with [complete native and retail proof](C27.md).
 - G40-G42: hero level-up choice, secondary-skill status text and secondary-skill
   dialog joins need structured matrices. R06 records the army type/count swap
   sharing a scalar temporary; S31/S32 cover serialized unknown regions and

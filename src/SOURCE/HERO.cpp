@@ -872,7 +872,7 @@ void hero::CheckLevel(void) {
         }
 
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[IDX(m_owner)]) {
-            samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
+            samp = LoadPlaySample("nwherolv.82m");
             if (choices[0] == HERO_SKILL_NONE) {
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else if (choices[1] == HERO_SKILL_NONE) {
