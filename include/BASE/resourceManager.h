@@ -69,8 +69,8 @@ public:
     i16 ReadWord(void);
     i32l ReadLong(void);
     u32l MakeId(H2_CONST char*, i32);
-    void Read13(i8*);
-    void ReadBlock(i8*, u32l);
+    void Read13(char*);
+    void ReadBlock(void*, u32l);
 };
 #pragma pack(pop)
 SIZE(resourceManager, 0x44e);

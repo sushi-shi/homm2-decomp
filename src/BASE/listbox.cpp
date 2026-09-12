@@ -105,7 +105,7 @@ listBoxWidget::~listBoxWidget() {
 VA(0x004ce840, 0x41c)
 void listBoxWidget::Read(void) {
     IconEntry* entry;
-    i8 name[RESOURCE_NAME_CAPACITY];
+    char name[RESOURCE_NAME_CAPACITY];
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -113,11 +113,11 @@ void listBoxWidget::Read(void) {
     m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(name));
+    m_font = gpResourceManager->GetFont(name);
     gpResourceManager->RestorePosition();
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(name));
+    m_icon = gpResourceManager->GetIcon(name);
     gpResourceManager->RestorePosition();
     m_maxVisibleItems = gpResourceManager->ReadWord();
     m_normalColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());

@@ -3679,7 +3679,7 @@ void game::ViewArmy(
     gpResourceManager
         ->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[IDX(monsterType)], 1));
     gpResourceManager->ReadBlock(
-        reinterpret_cast<i8*>(&sViewArmyMonFrameInfo),
+        &sViewArmyMonFrameInfo,
         sizeof(sViewArmyMonFrameInfo)
     );
     ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);

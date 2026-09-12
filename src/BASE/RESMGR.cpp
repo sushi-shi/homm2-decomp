@@ -59,7 +59,7 @@ void resourceManager::GetBackdrop(H2_CONST char* name, class bitmap* backdrop, i
         ReadWord();
         ReadWord();
         ReadBlock(
-            reinterpret_cast<i8*>(backdrop->m_pixels),
+            backdrop->m_pixels,
             backdrop->m_width * backdrop->m_height
         );
     }
@@ -89,7 +89,7 @@ void resourceManager::GetBackdropAtLoc(
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
                 (curRow * BACKDROP_ROW_BYTES)
-                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
+                    + destination->m_pixels + destinationX,
                 width
             );
         }
@@ -477,12 +477,12 @@ u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
 }
 
 VA(0x004b8f40, 0x1b)
-void resourceManager::Read13(i8* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
 VA(0x004b8f60, 0x9b)
-void resourceManager::ReadBlock(i8* destination, u32l size) {
+void resourceManager::ReadBlock(void* destination, u32l size) {
     H2_ASSERT(
         m_aggregateFd[m_curAggregate] != INVALID_FILE,
         "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP",

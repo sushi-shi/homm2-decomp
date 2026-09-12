@@ -270,11 +270,11 @@ void mouseManager::SetPointer(i32 frame) {
 
         gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
         gpResourceManager->ReadBlock(
-            reinterpret_cast<i8*>(cColorBits[m_cursorSizeIndex]),
+            cColorBits[m_cursorSizeIndex],
             MOUSE_CURSOR_BITMAP_HEADER_BYTES
         );
         gpResourceManager->ReadBlock(
-            reinterpret_cast<i8*>(cColorBits[m_cursorSizeIndex]),
+            cColorBits[m_cursorSizeIndex],
             MOUSE_CURSOR_COLOR_BYTES
         );
         memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);

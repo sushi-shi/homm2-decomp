@@ -71,7 +71,7 @@ dropListWidget::~dropListWidget() {
 VA(0x004cff40, 0x2f8)
 void dropListWidget::Read(void) {
     IconEntry* entry;
-    i8 name[RESOURCE_NAME_CAPACITY];
+    char name[RESOURCE_NAME_CAPACITY];
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -79,11 +79,11 @@ void dropListWidget::Read(void) {
     m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(name));
+    m_font = gpResourceManager->GetFont(name);
     gpResourceManager->RestorePosition();
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(name));
+    m_icon = gpResourceManager->GetIcon(name);
     gpResourceManager->RestorePosition();
     m_contentX = m_x + gpResourceManager->ReadWord();
     m_contentY = m_y + gpResourceManager->ReadWord();

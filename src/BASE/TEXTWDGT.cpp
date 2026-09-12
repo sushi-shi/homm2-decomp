@@ -53,8 +53,8 @@ void textWidget::Read(void) {
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(len));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->ReadBlock(m_text, len);
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();

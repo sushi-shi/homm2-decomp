@@ -62,7 +62,7 @@ void border::Read(void) {
     m_backgroundIcon = NULL;
     if (m_kind == WIDGET_KIND_BITMAP) {
         char bitmapName[RESOURCE_NAME_CAPACITY];
-        gpResourceManager->Read13(reinterpret_cast<i8*>(bitmapName));
+        gpResourceManager->Read13(bitmapName);
         gpResourceManager->SavePosition();
         m_backgroundBitmap = gpResourceManager->GetBitmap(bitmapName);
         gpResourceManager->RestorePosition();
@@ -70,7 +70,7 @@ void border::Read(void) {
     }
     if (m_kind == WIDGET_KIND_ICON) {
         char iconName[RESOURCE_NAME_CAPACITY];
-        gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
+        gpResourceManager->Read13(iconName);
         gpResourceManager->SavePosition();
         m_backgroundIcon = gpResourceManager->GetIcon(iconName);
         gpResourceManager->RestorePosition();
