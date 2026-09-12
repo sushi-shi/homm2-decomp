@@ -272,10 +272,10 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD size;
-    i32 to;
+    DPID to;
     i32 H2_UNUSED(i);
     i32 H2_UNUSED(j);  // i and j are unreferenced; retail's frame reserves both slots
-    i32 sender;
+    DPID sender;
     i32 receiveResult;
 
     if (lpIDC == NULL)
@@ -283,8 +283,8 @@ void dpProcessMessages(void) {
     while (1) {
         size = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
-            reinterpret_cast<LPDPID>(&sender),
-            reinterpret_cast<LPDPID>(&to),
+            &sender,
+            &to,
             1,
             rcvBufIn,
             &size
@@ -295,7 +295,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, RETAIL_FILE, 335);
         if (sender == 0) {
         } else {
-            if (to == 0 || static_cast<DPID>(to) == dcoID)
+            if (to == 0 || to == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
