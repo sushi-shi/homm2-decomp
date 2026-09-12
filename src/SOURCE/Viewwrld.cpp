@@ -58,7 +58,7 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_RADAR_TOP            = 0x10,
     WORLD_RADAR_BOTTOM         = 0xa0,
     INITIAL_CENTER_OFFSET      = 7,
-    SCALE_OFFSET_CAPACITY      = 4,
+
     GROUND_HORIZONTAL_FLIP     = 2,
     GROUND_ALTERNATE_SET       = 1,
     GROUND_ALTERNATE_OFFSET    = 9,
@@ -260,12 +260,12 @@ void advManager::VWCompleteDraw(void) {
     i32 screenX;
     MineType resource0;
     u32 shape;
-    i8 iconX1[SCALE_OFFSET_CAPACITY];
-    i8 townFlagX0[SCALE_OFFSET_CAPACITY];
+    i8 iconX1[ADVMGR_VIEW_WORLD_SCALE_COUNT];
+    i8 townFlagX0[ADVMGR_VIEW_WORLD_SCALE_COUNT];
     H2_ENUM_STORAGE(IconDrawOrientation, u32) orientation1;
     i32 color0;
     mapCell* cell;
-    i8 letterY1[SCALE_OFFSET_CAPACITY];
+    i8 letterY1[ADVMGR_VIEW_WORLD_SCALE_COUNT];
 
     frame0 = 0;
     FillBitmapArea(
