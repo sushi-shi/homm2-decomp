@@ -308,6 +308,18 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME combat_cursor COMMAND homm2_combat_cursor_test)
+  add_executable(homm2_font_clip_test
+    tools/font_clip_test.cpp
+    src/BASE/FONT.cpp
+    src/BASE/Utf8.cpp
+    src/BASE/Icon2b.cpp
+    src/BASE/icon2bc.cpp)
+  target_include_directories(homm2_font_clip_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_font_clip_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  add_test(NAME font_clip COMMAND homm2_font_clip_test)
   add_executable(homm2_binary_io_test tools/binary_io_test.cpp)
   target_include_directories(homm2_binary_io_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

@@ -7,6 +7,7 @@
 #include <cstdint>
 
 class icon;
+struct SLimitData;
 
 typedef enum FontGlyphConstant {
     FONT_SPACER_CHAR    = 0x1f,
@@ -49,7 +50,10 @@ public:
     void DrawString(const char*, i32, i32, FontDrawMode);
     i32 GetCharacterWidth(std::uint32_t);
     void ExtractLine(const char*, char*, i32*, i32, i32*, u8);
-    void DrawBoundedString(const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
+    void DrawBoundedString(
+        const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment,
+        const SLimitData* clip = nullptr
+    );
     i32 LineLength(const char*, i32);
     i32 LineWidth(const char*);
 };
