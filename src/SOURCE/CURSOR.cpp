@@ -299,13 +299,10 @@ void advManager::DrawCursor(void) {
             bMoveSoundMade = true;
             if (EveryOther == 0) {
                 gpSoundManager->MemorySample(
-                    m_cursorSamples[IDX(giGroundToTerrain[GetCell(
-                                                             m_mapOriginX
-                                                                 + CURSOR_MAP_DRAW_OFFSET,
-                                                             m_mapOriginY
-                                                                 + CURSOR_MAP_DRAW_OFFSET
-                                                         )
-                                                             ->m_terrainImageIndex])]
+                    m_cursorSamples[IDX(CELL_TERRAIN(GetCell(
+                        m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
+                        m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
+                    )))]
                 );
             }
         }
@@ -568,7 +565,7 @@ mapCell* advManager::MoveHero(
         gbMoveShown = true;
 
     currentCell_g = GetCell(movingHero_g->m_x, movingHero_g->m_y);
-    currentTerrain_a = giGroundToTerrain[currentCell_g->m_terrainImageIndex];
+    currentTerrain_a = CELL_TERRAIN(currentCell_g);
     destinationCell = GetCell(movingHero_g->m_x + directionX_a, movingHero_g->m_y + directionY);
     terrainCost_h = CalcTerrainCost(
         currentTerrain_a,
@@ -579,7 +576,7 @@ mapCell* advManager::MoveHero(
         destinationCell->m_isRoad
     );
     nextTerrainCost_n = CalcTerrainCost(
-        giGroundToTerrain[destinationCell->m_terrainImageIndex],
+        CELL_TERRAIN(destinationCell),
         0,
         movingHero_g->m_remainingMobility - terrainCost_h,
         IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
@@ -1065,18 +1062,14 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     if (destinationCell->m_flags & CURSOR_CELL_BLOCKED_FLAG)
         return 0;
 
-    if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
+    if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
         if (m_cursorType != HERO_TYPE_BOAT
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
             return 0;
-        if (giGroundToTerrain[currentCell_c->m_terrainImageIndex] == TERRAIN_WATER
-            && directionX != 0 && directionY_c != 0) {
-            if (giGroundToTerrain[m_mapData->GetCell(centerX + directionX, centerY)
-                                      ->m_terrainImageIndex]
-                    != TERRAIN_WATER
-                || giGroundToTerrain[m_mapData->GetCell(centerX, centerY + directionY_c)
-                                         ->m_terrainImageIndex]
+        if (CELL_TERRAIN(currentCell_c) == TERRAIN_WATER && directionX != 0 && directionY_c != 0) {
+            if (CELL_TERRAIN(m_mapData->GetCell(centerX + directionX, centerY)) != TERRAIN_WATER
+                || CELL_TERRAIN(m_mapData->GetCell(centerX, centerY + directionY_c))
                        != TERRAIN_WATER)
                 return 0;
         }
@@ -1088,23 +1081,17 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     northDirection_a = (1 << IDX(direction)) & CURSOR_NORTH_DIRECTION_MASK;
     southDirection_a = (1 << IDX(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection_a) {
-        if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && currentCell_c->m_objectTileset != TILESET_DUMMY
-            && !(currentCell_c->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+        if (CELL_HAS_NON_SHADOW_OBJECT(currentCell_c)
             && currentCell_c->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
         if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             northNeighborCell_a = m_mapData->GetCell(destinationCellX, destinationCellY_f + 1);
-            if (northNeighborCell_a->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && northNeighborCell_a->m_objectTileset != TILESET_DUMMY
-                && !(northNeighborCell_a->m_flags & CURSOR_OBJECT_PASSABLE_FLAG))
+            if (CELL_HAS_NON_SHADOW_OBJECT(northNeighborCell_a))
                 return 0;
         }
     }
     if (southDirection_a) {
-        if (destinationCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && destinationCell->m_objectTileset != TILESET_DUMMY
-            && !(destinationCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+        if (CELL_HAS_NON_SHADOW_OBJECT(destinationCell)
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL))
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
@@ -1112,9 +1099,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         if (currentCell_c->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             southNeighborCell_i =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
-            if (southNeighborCell_i->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && southNeighborCell_i->m_objectTileset != TILESET_DUMMY
-                && !(southNeighborCell_i->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+            if (CELL_HAS_NON_SHADOW_OBJECT(southNeighborCell_i)
                 && !(southNeighborCell_i->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
                 return 0;
         }

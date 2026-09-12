@@ -1136,8 +1136,7 @@ cleanup:
 
         if (message.type == MESSAGE_WIDGET) {
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
-                    || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
+                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
                     if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
                          && message.payload.widget.id
@@ -2038,9 +2037,8 @@ void game::GetLossConditionText(char* text) {
                 sprintf(
                     text,
                     "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc %s '%s'.",
-                    (city2->m_buildings & IDX(TOWN_BUILDING_CASTLE))
-                        ? "\xe7\xe0\xec\xee\xea"
-                        : "\xe3\xee\xf0\xee\xe4",
+                    HAS(city2->m_buildings, IDX(TOWN_BUILDING_CASTLE)) ? "\xe7\xe0\xec\xee\xea"
+                                                                       : "\xe3\xee\xf0\xee\xe4",
                     city2->m_name
                 );
                 break;
@@ -2099,7 +2097,7 @@ void game::GetVictoryConditionText(char* text) {
                 sprintf(
                     text,
                     "\xc7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc %s '%s'",
-                    (targetTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+                    HAS(targetTown->m_buildings, IDX(TOWN_BUILDING_CASTLE))
                         ? "\xe7\xe0\xec\xee\xea"
                         : "\xe3\xee\xf0\xee\xe4",
                     targetTown->m_name

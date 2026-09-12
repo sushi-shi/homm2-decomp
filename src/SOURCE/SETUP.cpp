@@ -697,8 +697,7 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -732,8 +731,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -767,8 +765,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -801,8 +798,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -833,8 +829,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -864,8 +859,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -889,8 +883,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -917,8 +910,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
-        if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+        if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
             helpIndex = NO_HELP;
             switch (message.payload.widget.id) {
                 case CHOICE_ONE:
@@ -956,8 +948,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -981,8 +972,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -1006,8 +996,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && (message.payload.widget.command == WIDGET_COMMAND_SELECT
-            || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
+        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:

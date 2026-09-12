@@ -1,4 +1,6 @@
 #include <va.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/KB_TYPES.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
@@ -2714,7 +2716,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         );
         return 1;
     }
-    if (giGroundToTerrain[cellPtr->m_terrainImageIndex] == TERRAIN_WATER) {
+    if (CELL_TERRAIN(cellPtr) == TERRAIN_WATER) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -2907,16 +2909,12 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     return MESSAGE_DISPATCH_CONSUME;
                 }
 
-                if (!((m_cursorType == HERO_TYPE_BOAT
-                       || giGroundToTerrain[hoverCell->m_terrainImageIndex] != TERRAIN_WATER
+                if (!((m_cursorType == HERO_TYPE_BOAT || CELL_TERRAIN(hoverCell) != TERRAIN_WATER
                        || hoverCell->m_triggerType
                               == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
-                       || hoverCell->m_triggerType
-                              == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
-                       || hoverCell->m_triggerType
-                              == (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
-                      && (m_cursorType != HERO_TYPE_BOAT
-                          || giGroundToTerrain[hoverCell->m_terrainImageIndex] == TERRAIN_WATER
+                       || hoverCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
+                       || hoverCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
+                      && (m_cursorType != HERO_TYPE_BOAT || CELL_TERRAIN(hoverCell) == TERRAIN_WATER
                           || hoverCell->m_triggerType == MAP_OBJECT_COAST))) {
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
@@ -2996,8 +2994,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             } else {
                                 if (HAS(hoverCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                                     if (m_cursorType != HERO_TYPE_BOAT) {
-                                        if (giGroundToTerrain[hoverCell->m_terrainImageIndex]
-                                            != TERRAIN_WATER) {
+                                        if (CELL_TERRAIN(hoverCell) != TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
                                                 cursorBase + POINTER_ACTION
                                             );
@@ -3014,8 +3011,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                             break;
                                         }
                                     } else {
-                                        if (giGroundToTerrain[hoverCell->m_terrainImageIndex]
-                                            == TERRAIN_WATER) {
+                                        if (CELL_TERRAIN(hoverCell) == TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
                                                 daysLeft + POINTER_WATER_ACTION
                                             );
@@ -4548,9 +4544,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
                         if (setId == TILESET_X_LOC2
                             && cell->m_triggerType == MAP_OBJECT_ROCK) {
-                            color =
-                                gMapColors[IDX(giGroundToTerrain[cell->m_terrainImageIndex])]
-                                + RADAR_TERRAIN_SHADE;
+                            color = gMapColors[IDX(CELL_TERRAIN(cell))] + RADAR_TERRAIN_SHADE;
                         } else {
                             switch (setId) {
                                 case TILESET_OBJNTOWN:
@@ -4595,12 +4589,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                                      : gpGame->m_players[owner].m_color];
                                             break;
                                         default:
-                                            color =
-                                                gMapColors[IDX(
-                                                    giGroundToTerrain[cell
-                                                                          ->m_terrainImageIndex]
-                                                )]
-                                                + RADAR_TERRAIN_SHADE;
+                                            color = gMapColors[IDX(CELL_TERRAIN(cell))]
+                                                    + RADAR_TERRAIN_SHADE;
                                             break;
                                     }
                                     break;
@@ -4620,9 +4610,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                                      : gpGame->m_players[owner].m_color];
                                             break;
                                         default:
-                                            color = gMapColors[IDX(
-                                                giGroundToTerrain[cell->m_terrainImageIndex]
-                                            )];
+                                            color = gMapColors[IDX(CELL_TERRAIN(cell))];
                                             break;
                                     }
                                     break;
@@ -5036,7 +5024,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if ((currentCell->m_objectIndex != MAPCELL_SPRITE_NONE
                          && currentCell->m_objectTileset != TILESET_DUMMY)
                         || currentCell->m_overlayIndex != MAPCELL_SPRITE_NONE
-                        || giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER) {
+                        || CELL_TERRAIN(currentCell) == TERRAIN_WATER) {
                         blocked = true;
                     } else {
                         blocked = false;
@@ -5044,10 +5032,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s\n%s",
-                        gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])],
-                        blocked
-                            ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
-                            : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
+                        gTerrainNames[IDX(CELL_TERRAIN(currentCell))],
+                        blocked ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
+                                : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
@@ -5131,11 +5118,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         );
                         gText[0] = uppercaseResult;
                     } else {
-                        sprintf(
-                            gText,
-                            "%s",
-                            gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])]
-                        );
+                        sprintf(gText, "%s", gTerrainNames[IDX(CELL_TERRAIN(currentCell))]);
                     }
                     break;
                 case MAP_OBJECT_EXPANSION_OBJECT: {
@@ -5484,7 +5467,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
             msg.payload.widget.data.value =
                 IDX(gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
-            if (!(gpGame->GetTown(whichTown)->m_buildings & IDX(TOWN_BUILDING_CASTLE))) {
+            if (!HAS(gpGame->GetTown(whichTown)->m_buildings, IDX(TOWN_BUILDING_CASTLE))) {
                 msg.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
             }
             m_adventureWindow->BroadcastMessage(msg);
@@ -6042,8 +6025,8 @@ i32 advManager::UpdBottomViewKingdom(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     for (i = 0; i < gpCurPlayer->m_townCount; ++i) {
-        if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_buildings
-            & IDX(TOWN_BUILDING_CASTLE)) {
+        if (HAS(gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_buildings,
+                IDX(TOWN_BUILDING_CASTLE))) {
             ++nCastles;
         } else {
             ++numVillage;
@@ -6345,12 +6328,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             msg.payload.widget.data.text = gText;
             win->BroadcastMessage(msg);
         }
-        sprintf(
-            gText,
-            "%d/%d",
-            targetHero->m_spellPoints,
-            targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
-        );
+        sprintf(gText, "%d/%d", targetHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*targetHero));
         msg.payload.widget.id = HERO_QUICK_MANA_WIDGET;
         msg.payload.widget.data.text = gText;
         win->BroadcastMessage(msg);
@@ -6708,7 +6686,7 @@ void advManager::TownQuickView(
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, TOWN_QUICK_PORTRAIT_WIDGET);
     message.payload.widget.data.value =
         IDX(townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
-    if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
+    if (HAS(gpGame->GetTown(townId)->m_buildings, BIT(BUILDING_SLOT_CASTLE)) == 0) {
         message.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
     }
     window->BroadcastMessage(message);
@@ -7116,9 +7094,7 @@ void advManager::SetTownContext(i32 townId) {
     UpdateScreen(0, 0);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
-    townNo =
-        IDX(giGroundToTerrain[GetCell(tp->m_x, tp->m_y)
-                                  ->m_terrainImageIndex]);
+    townNo = IDX(CELL_TERRAIN(GetCell(tp->m_x, tp->m_y)));
     if (static_cast<TerrainType>(townNo) != m_currentTerrain) {
         m_currentTerrain = townNo;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
@@ -7190,7 +7166,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     UpdateScreen(0, 0);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
-    heroSlot = static_cast<i32>(giGroundToTerrain[currentCell->m_terrainImageIndex]);
+    heroSlot = static_cast<i32>(CELL_TERRAIN(currentCell));
     if (static_cast<TerrainType>(heroSlot) != m_currentTerrain) {
         m_currentTerrain = heroSlot;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
@@ -8080,7 +8056,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* cell = m_mapData->GetCell(x, y);
     AdventureEnvironmentSoundId H2_UNUSED(soundId) = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
-    if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
+    if (CELL_TERRAIN(cell) == TERRAIN_WATER
         && (giGroundShape[cell->m_terrainImageIndex] & SOUND_GROUND_SHAPE_MASK)) {
         return ADVMGR_SOUND_COASTLINE;
     }
@@ -8380,7 +8356,7 @@ void advManager::TeleportTo(
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         1
     );
-    terrain = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
+    terrain = CELL_TERRAIN(destinationCell29);
     if (terrain != m_currentTerrain) {
         m_currentTerrain = terrain;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
@@ -8415,10 +8391,8 @@ void advManager::DimensionDoor(void) {
         newX = m_mapOriginX + m_lastHoverCell;
         newY = m_mapOriginY + m_hoverCellY;
         targetCell = GetCell(newX, newY);
-        if ((targetHero->IsEmbarked()
-             && giGroundToTerrain[targetCell->m_terrainImageIndex] != TERRAIN_WATER)
-            || (!targetHero->IsEmbarked()
-                && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
+        if ((targetHero->IsEmbarked() && CELL_TERRAIN(targetCell) != TERRAIN_WATER)
+            || (!targetHero->IsEmbarked() && CELL_TERRAIN(targetCell) == TERRAIN_WATER)) {
             NormalDialog(
                 "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc "
                 "\xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 "
@@ -8608,7 +8582,7 @@ void advManager::SummonBoat(void) {
     foundBoat = false;
     destinationCell =
         GetCell(m_mapOriginX + SUMMON_CENTER_OFFSET, m_mapOriginY + SUMMON_CENTER_OFFSET);
-    if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
+    if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
         goto summon_done;
     }
 
@@ -8623,7 +8597,7 @@ void advManager::SummonBoat(void) {
         destinationCell = GetCell(placeX, placeY);
         if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE
             && destinationCell->m_triggerType == MAP_OBJECT_NONE
-            && giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
+            && CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
             okCell = true;
             break;
         }
@@ -8796,9 +8770,9 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             mapX += normalDirTable[dir].x;
             mapY += normalDirTable[dir].y;
             nextTile = GetCell(mapX, mapY);
-            terr = giGroundToTerrain[thisTile->m_terrainImageIndex];
+            terr = CELL_TERRAIN(thisTile);
             cost = CalcTerrainCost(
-                giGroundToTerrain[nextTile->m_terrainImageIndex],
+                CELL_TERRAIN(nextTile),
                 dir & 1,
                 ROUTE_TERRAIN_COST_INFINITY,
                 IDX(hero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
@@ -9175,9 +9149,8 @@ void advManager::SetInitialMapOrigin(void) {
         }
     }
 
-    m_currentTerrain = giGroundToTerrain
-        [GetCell(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET)
-             ->m_terrainImageIndex];
+    m_currentTerrain =
+        CELL_TERRAIN(GetCell(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET));
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
     Reseed(0, 0);
@@ -9876,8 +9849,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     b32 handled = false;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-            if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+            if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                 i32 helpIndex = PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                     case PANEL_VIEW_WORLD:
@@ -9998,8 +9970,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-            if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+            if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                 helpIndex = PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                     case CONTROL_RESTART:
@@ -10561,8 +10532,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (visionHero->m_army.CanJoin(type) && fRatio > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && type != CREATURE_GHOST
-        && type != CREATURE_EARTH_ELEMENTAL && type != CREATURE_AIR_ELEMENTAL
-        && type != CREATURE_FIRE_ELEMENTAL && type != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(type)) {
         if (isForced) {
             sprintf(
                 msg,

@@ -1,4 +1,7 @@
 #include <va.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/army.h>
+#include <SOURCE/KB_TYPES.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -266,7 +269,7 @@ void combatManager::SetupCombat(
     else
         m_battlefieldCell = NULL;
 
-    m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
+    m_terrainType = CELL_TERRAIN(m_battlefieldCell);
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != NULL) {
@@ -327,25 +330,25 @@ void combatManager::SetupCombat(
             m_visitingHeroPresent[IDX(COMBAT_DEFENDER_SIDE)] = false;
         }
 
-        m_inCastleCombat = (defenderTown->m_buildings & IDX(TOWN_BUILDING_CASTLE)) != 0;
+        m_inCastleCombat = HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_CASTLE)) != 0;
 
         if (m_inCastleCombat != 0)
-            m_drawbridgeBackgroundVisible = (defenderTown->m_buildings & IDX(TOWN_BUILDING_MOAT)) != 0;
+            m_drawbridgeBackgroundVisible =
+                HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_MOAT)) != 0;
 
         m_drawbridgeState = COMBAT_CASTLE_GATE_OPEN;
         m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] = defenderTown;
         m_originalCombatTown = defenderTown;
 
         if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] == NULL
-            && (defenderTown->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
+            && HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
             m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
             for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++)
                 m_captain.m_primaryStats[index] =
                     captainStats[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                 [index];
-            m_captain.m_spellPoints =
-                m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
+            m_captain.m_spellPoints = HERO_NORMAL_SPELL_POINTS(m_captain);
             m_captain.m_cursorType = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type;
             m_captain.m_portrait = static_cast<HeroPortrait>(
                 static_cast<i32>(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)
@@ -379,8 +382,9 @@ void combatManager::InitNonVisualVars(void) {
         m_spellPower[IDX(side)] = 0;
         if (m_heroes[IDX(side)] != NULL)
             m_spellPower[IDX(side)] = m_heroes[IDX(side)]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[IDX(side)] != NULL && m_combatTowns[IDX(side)]->m_type == FACTION_NECROMANCER
-            && (m_combatTowns[IDX(side)]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
+        if (m_combatTowns[IDX(side)] != NULL
+            && m_combatTowns[IDX(side)]->m_type == FACTION_NECROMANCER
+            && HAS(m_combatTowns[IDX(side)]->m_buildings, IDX(TOWN_BUILDING_SHRINE)))
             m_spellPower[IDX(side)] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
@@ -612,11 +616,11 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
         if (!HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED)
             && m_armies[IDX(side)][index].m_quantity > 0
             && (m_playerId[IDX(side)] == -1
-                || ((m_armies[IDX(side)][index].m_monsterType != CREATURE_EARTH_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_AIR_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_FIRE_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_WATER_ELEMENTAL)
-                    || !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)))
+                || ((!IS_ELEMENTAL_CREATURE(m_armies[IDX(side)][index].m_monsterType))
+                    || !HAS(
+                        m_armies[IDX(side)][index].m_monster.flags.all,
+                        MONSTER_FLAGS_SUMMONED
+                    )))
             && !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
             m_armyGroups[IDX(side)]->m_creatureTypes[m_armies[IDX(side)][index].m_armyGroupSlot] =
                 m_armies[IDX(side)][index].m_monsterType;
@@ -821,7 +825,7 @@ void combatManager::LoadIcons(void) {
     m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon("spellinf.icn");
 
     if (m_inCastleCombat) {
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_MOAT)) {
+        if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_MOAT))) {
             m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
             m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
@@ -1633,11 +1637,8 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     for (armyIndex = 0; armyIndex < COMBAT_ARMY_CAPACITY; armyIndex++) {
         if (m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex].IsAlive()) {
             target9 = &m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex];
-            if (target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
-                || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
-                || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
+            if (ARMY_HAS_INCAPACITATING_SPELL(*target9)
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*target9)) {
                 priority7 = KEEP_PRIORITY_DISABLED;
             } else if (HAS(target9->m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
                 priority7 = KEEP_PRIORITY_SHOOTER;
@@ -1809,16 +1810,20 @@ void combatManager::SetupAndLoadObstacles(void) {
             m_wallStates[cellIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-                && (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings
-                    & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
+                && HAS(
+                    m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings,
+                    IDX(TOWN_BUILDING_FORTIFICATIONS)
+                )) {
                 m_wallStates[cellIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
+        if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings,
+                IDX(TOWN_BUILDING_LEFT_TURRET)))
             m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
+        if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings,
+                IDX(TOWN_BUILDING_RIGHT_TURRET)))
             m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
 

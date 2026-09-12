@@ -168,6 +168,10 @@ H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_SET_WIDTH                  = 0x3d
 H2_ENUM_CLASS_END(BaseWidgetCommand)
 
+// Command only: callers retain type, button and routing policy checks.
+#define IS_WIDGET_SELECTION_COMMAND(command) \
+    ((command) == WIDGET_COMMAND_SELECT || (command) == WIDGET_COMMAND_ALTERNATE_SELECT)
+
 H2_ENUM_CLASS_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_NONE                   = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT            = 1,

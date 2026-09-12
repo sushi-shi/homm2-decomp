@@ -147,18 +147,23 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
         if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
             && castleSlotsBase[slotNum] <= BUILDING_SLOT_DWELLING_SIXTH
-            && ((m_town->m_buildings & (1L << IDX(castleSlotsBase[slotNum])))
-                || (m_town->m_buildings
-                    & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))
+            && (HAS(m_town->m_buildings, (1L << IDX(castleSlotsBase[slotNum])))
+                || HAS(
+                    m_town->m_buildings,
+                    (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET))
+                )
                 || (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
-                    && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
+                    && HAS(m_town->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
             && (gTownEligibleBuildMask[IDX(m_town->m_type)]
                 & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
-                && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
-                    || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
+                && (HAS(m_town->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
+                    || HAS(
+                        m_town->m_buildings,
+                        IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)
+                    ))) {
                 castleSlotsUse[slotNum] = BUILDING_SLOT_DWELLING_LAST;
             } else {
                 castleSlotsUse[slotNum] = castleSlotsBase[slotNum] + CASTLE_UPGRADE_OFFSET;
@@ -217,7 +222,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         stateFrame = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << IDX(castleSlotsUse[slotNum])))
+        if (HAS(m_town->m_buildings, (1L << IDX(castleSlotsUse[slotNum])))
             && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
                 || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
             stateFrame = FRAME_BUILT;
@@ -392,11 +397,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     tileX = BACKGROUND_LEFT;
     tileY = BACKGROUND_TOP;
-    terrainIconFrame = (IDX(giGroundToTerrain
-                                  [gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)
-                                       ->m_terrainImageIndex])
-                          - 1)
-                         * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
+    terrainIconFrame = (IDX(CELL_TERRAIN(gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y))) - 1)
+                       * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
     raceBase = IDX(m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backFrame = 0;
@@ -589,7 +591,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             "\xf1\xf2\xf0\xee\xe8\xeb\xe8 \xe7\xe4\xe5\xf1\xfc \xe2 \xfd\xf2\xee\xec \xf5\xee\xe4\xf3."
                             /* "Нельзя построить. Вы уже строили здесь в этом ходу." */
                     );
-                } else if (gpTownManager->m_town->m_buildings & BIT(whichBuilding)) {
+                } else if (HAS(gpTownManager->m_town->m_buildings, BIT(whichBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_ALREADY_BUILT)],
@@ -772,7 +774,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case IDX(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
                     case IDX(BUILDING_SLOT_SPECIAL_THIRTY):
                         if (!quickFlag) {
-                            if ((gpTownManager->m_town->m_buildings & BIT(whichBuilding))
+                            if (HAS(gpTownManager->m_town->m_buildings, BIT(whichBuilding))
                                 || !(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
                                 break;
                         }

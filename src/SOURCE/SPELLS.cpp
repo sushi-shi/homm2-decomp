@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -904,8 +905,7 @@ void combatManager::CastSpell(
             damage1 = spellPower6 * SPELL_COLD_RAY_DAMAGE_PER_POWER;
             if (target3->m_monsterType == CREATURE_FIRE_ELEMENTAL)
                 damage1 <<= 1;
-            if (target3->m_monsterType == CREATURE_IRON_GOLEM
-                || target3->m_monsterType == CREATURE_STEEL_GOLEM)
+            if (IS_GOLEM_CREATURE(target3->m_monsterType))
                 damage1 = static_cast<i32l>(damage1 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(
                 &damage1,
@@ -978,8 +978,7 @@ void combatManager::CastSpell(
             damage1 = spellPower6 * SPELL_LIGHTNING_DAMAGE_PER_POWER;
             if (target3->m_monsterType == CREATURE_AIR_ELEMENTAL)
                 damage1 <<= 1;
-            if (target3->m_monsterType == CREATURE_IRON_GOLEM
-                || target3->m_monsterType == CREATURE_STEEL_GOLEM)
+            if (IS_GOLEM_CREATURE(target3->m_monsterType))
                 damage1 = static_cast<i32l>(damage1 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(
                 &damage1,
@@ -1352,8 +1351,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                     if ((spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
                         && target->m_monsterType == CREATURE_WATER_ELEMENTAL)
                         damage *= ELEMENTAL_WEAKNESS_MULTIPLIER;
-                    if (target->m_monsterType == CREATURE_IRON_GOLEM
-                        || target->m_monsterType == CREATURE_STEEL_GOLEM) {
+                    if (IS_GOLEM_CREATURE(target->m_monsterType)) {
                         damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
                     target->Damage(damage, spell);
@@ -1505,8 +1503,7 @@ void combatManager::ElementalStorm(void) {
                 dmg2 = baseDam;
                 if (stack->m_monsterType == CREATURE_AIR_ELEMENTAL)
                     dmg2 <<= 1;
-                if (stack->m_monsterType == CREATURE_IRON_GOLEM
-                    || stack->m_monsterType == CREATURE_STEEL_GOLEM) {
+                if (IS_GOLEM_CREATURE(stack->m_monsterType)) {
                     dmg2 = static_cast<i32l>(dmg2 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[whichSide] && m_heroes[whichSide]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
@@ -1550,8 +1547,7 @@ void combatManager::Armageddon(void) {
             target1 = &m_armies[side6][armyIndex8];
             if (target1->SpellCastWorks(SPELL_ARMAGEDDON)) {
                 damage = baseDamage;
-                if (target1->m_monsterType == CREATURE_IRON_GOLEM
-                    || target1->m_monsterType == CREATURE_STEEL_GOLEM) {
+                if (IS_GOLEM_CREATURE(target1->m_monsterType)) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side6] && m_heroes[side6]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
@@ -2450,8 +2446,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetDamage9 = damage;
         if (target1->m_monsterType == CREATURE_AIR_ELEMENTAL)
             targetDamage9 *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
-        if (target1->m_monsterType == CREATURE_IRON_GOLEM
-            || target1->m_monsterType == CREATURE_STEEL_GOLEM)
+        if (IS_GOLEM_CREATURE(target1->m_monsterType))
             targetDamage9 = static_cast<i32>(targetDamage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
         target1->Damage(targetDamage9, SPELL_NONE);
         damage >>= 1;

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <math.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -345,14 +346,10 @@ i32 army::FlyTo(i32 destination) {
                 }
                 if (m_animationFrame % m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
                     == FLIGHT_SOUND_FRAME) {
-                    if ((m_monsterType == CREATURE_VAMPIRE
-                         || m_monsterType == CREATURE_VAMPIRE_LORD)
-                        && leg == 0) {
+                    if (IS_VAMPIRE_CREATURE(m_monsterType) && leg == 0) {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
                         DelayMilli(VAMPIRE_FLIGHT_SOUND_DELAY);
-                    } else if ((m_monsterType == CREATURE_VAMPIRE
-                                || m_monsterType == CREATURE_VAMPIRE_LORD)
-                               && leg == stepCount1 - 1) {
+                    } else if (IS_VAMPIRE_CREATURE(m_monsterType) && leg == stepCount1 - 1) {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)]);
                     } else {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_MOVE)]);
@@ -407,9 +404,7 @@ i32 army::FlyTo(i32 destination) {
 
                 DelayTil(glTimers);
                 if (m_animationFrame < frameStart
-                    || (m_animationFrame + 1 >= midCount
-                        && (m_monsterType == CREATURE_VAMPIRE
-                            || m_monsterType == CREATURE_VAMPIRE_LORD))) {
+                    || (m_animationFrame + 1 >= midCount && IS_VAMPIRE_CREATURE(m_monsterType))) {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount()
                         + m_frameInfo.walkDuration * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE

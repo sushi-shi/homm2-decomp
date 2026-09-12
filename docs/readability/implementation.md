@@ -207,3 +207,35 @@ is not reported as closure. The final build and original-object control pass
 after the five town/overview string pairs: all 98 objects, 1,516 non-debug
 sections and 42,433 ordered relocations. The retail field-relocation review also
 passes, with no new structural review items.
+
+## Group 4: domain predicates and precise query boundaries
+
+| Family | Application or measured retention |
+| --- | --- |
+| H20 | 138 building-mask queries use existing `HAS`, with the same raw `u32l` storage and explicit `IDX`/`BIT`/shifted masks. No normalized-return town API is added. Mutations, the raw captain-mask store and unclassified literal-mask tests stay explicit. |
+| H21 | Retain the direct type-sentinel comparison. `HasTroop` changes HasAllUndead from 90 to 101 bytes; a macro merely wrapping one already-named comparison would add little clarity. No positive-quantity condition is introduced. |
+| H24 | 56 pointer-based terrain queries use `CELL_TERRAIN`. It preserves the byte/table lvalue, exact supplied cell expression and one evaluation, including existing GetCell calls and their caller-specific fallback. Index-only and dot/row-view variants stay explicit. |
+| H25 | Nine ordered sprite/index/flag conjunctions use `CELL_HAS_NON_SHADOW_OBJECT`. Existing 0x80 aliases share the map owner's shadow-only flag; no passability rule or tileset/frame shadow detection is implied. The repeated-GetCell negation remains explicit. |
+| H28 | Retain direct combat-array access. The reference-returning GetArmy probe keeps 161 bytes but changes instructions/register use. A three-argument macro would not improve the existing owner/two-index spelling enough to justify another API. Physical, controlling and mixed side/index choices remain visible. |
+| H29 | Fifteen `Stats(KNOWLEDGE) * 10` prefixes use `HERO_NORMAL_SPELL_POINTS`. Caller narrowing, further multiplication and each Stats call remain. The method alternative changes instructions; the macro preserves them. |
+| H33 | Ten exact earth/air/fire/water memberships, including ordered negations, use `IS_ELEMENTAL_CREATURE`. Different comparison orders, the three-elemental frame case and surrounding summon/mirror/undead policies remain explicit. |
+| H47 | Eleven iron/steel memberships use `IS_GOLEM_CREATURE`. The inline alternative adds 53 bytes in its probe; the macro is unchanged. Runtime/AI spell coverage, double half-damage arithmetic and destination casts remain outside. |
+| H48 | Two green/red/black/bone memberships use `IS_DRAGON_CREATURE`. Three-living-dragon immunity is not changed. |
+| H49 | Nine berserk/hypnotize pairs use `ARMY_HAS_BERSERK_OR_HYPNOTIZE`, including the independently measured ordered zero conjunctions. Reversed order and other ownership/action policies remain explicit. |
+| H50 | Seven blind/paralyze/petrified triples use `ARMY_HAS_INCAPACITATING_SPELL`, including the independently measured ordered zero conjunctions. Other orders, death, quantity and the separate mind-influence pair are not folded in. |
+| H55 | Fourteen exact lich, vampire and troll base/upgrade memberships use three separate named predicates. Vampire-lord healing remains a single-type test. |
+| H76 | Five positive-stack queries in Overview, TOWNMGR and SWAPMGR use `ARMY_GROUP_HAS_POSITIVE_STACK`. Type-first evaluation, signed counts and the unused census remain. H21's type-only queries do not acquire this condition. |
+| H78 | Sixteen select/alternate-select command pairs use `IS_WIDGET_SELECTION_COMMAND`. Message type, right-button guards, routing and dialog behavior remain in each caller; Newgame's equivalent command aliases are included. |
+
+[Twenty complete structural matrices](../matching/ReadabilityDomains/shared-operations.cpp)
+preserve the attempted source and individual exact/non-exact audit results.
+No rejected method or compiler-state probe remains in game headers. Redundant
+grouping around primary-expression calls was removed after the measured grouping
+pair; control-statement and enclosing-call parentheses are retained.
+
+The final build, original-object control and retail field-relocation review pass:
+98 objects, 1,516 unchanged non-debug sections and 42,433 ordered relocation
+records. Existing local retail normalization residuals remain distinct from the
+passing before/after proof. The real-header VC6 integration check now also passes
+all 256 signed-byte inputs for six creature sets and the selection predicate,
+plus 32,768 sprite tileset/flag/sentinel combinations, alongside the 512 case folds.

@@ -1323,11 +1323,11 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             "\xe8\xf7\xe5\xf1\xf2\xe2\xee \xee\xf7\xea\xee\xe2 \xec\xe0\xe3"
                             "\xe8\xe8 \xec\xee\xe6\xe5\xf2 \xef\xf0\xe5\xe2\xfb\xf8\xe0\xf2"
                             "\xfc \xee\xe1\xfb\xf7\xed\xfb\xe9 \xeb\xe8\xec\xe8\xf2."
-                            /* "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит." */,
+                            /* "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит." */
+                            ,
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
-                            gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                                * HERO_SPELL_POINTS_PER_KNOWLEDGE
+                            HERO_NORMAL_SPELL_POINTS(*gpHVHero)
                         );
                         NormalDialog(
                             gText,
@@ -1719,12 +1719,7 @@ void SetupHeroView(void) {
     msg.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(
-        gText,
-        "%d/%d",
-        gpHVHero->m_spellPoints,
-        gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
-    );
+    sprintf(gText, "%d/%d", gpHVHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*gpHVHero));
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_SPELL_POINTS_LAST;
     msg.payload.widget.data.text = gText;

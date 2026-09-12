@@ -685,7 +685,9 @@ void combatManager::DrawBackground(void) {
                 0
             );
         if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-            && (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RAINBOW)) != 0)
+            && HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings,
+                   IDX(TOWN_BUILDING_RAINBOW))
+                   != 0)
             IconToBitmap(
                 backgroundIcon,
                 m_backgroundBuffer,
@@ -1263,7 +1265,8 @@ void combatManager::DrawFrame(
         }
 
         if (m_inCastleCombat == 0
-            || (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_MOAT)) == 0)
+            || HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_MOAT))
+                   == 0)
             goto endRow;
         if (row == DRAW_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;

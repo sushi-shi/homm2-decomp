@@ -662,6 +662,7 @@ extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern H2_ENUM_STORAGE(TerrainType, u8) giGroundToTerrain[];
+#define CELL_TERRAIN(cell) (giGroundToTerrain[(cell)->m_terrainImageIndex])
 extern i32 giHighMemBuffer;
 extern i32 giMainVideoModeColorDepth;
 extern i32 giNumHumanPlayers;

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <string.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/KB.h>
@@ -336,8 +337,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
         case COMBAT_AI_ATTACK_SHOOT:
             if (AttemptAdjacentAttack(thisArmy))
                 goto finish;
-            if (thisArmy->m_monsterType == CREATURE_LICH
-                || thisArmy->m_monsterType == CREATURE_POWER_LICH) {
+            if (IS_LICH_CREATURE(thisArmy->m_monsterType)) {
                 DoLichShot(thisArmy);
                 goto finish;
             }
@@ -598,15 +598,10 @@ i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = armyIndex + m_armies[IDX(side)];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                   == 0
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0
-            && currentArmy->m_monster.shots > 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && currentArmy->m_monster.shots > 0 && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -642,14 +637,10 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                   == 0
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -685,16 +676,12 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                   == 0
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) == 0
             && (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) == 0
                 || currentArmy->m_monster.shots <= 0)
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -712,11 +699,8 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
         currentArmy =
             m_armies[IDX(side)] + idx;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                   == 0
-            && (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] != 0
-                || currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] != 0
-                || currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] != 0))
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
+            && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
             result |= bitMask;
         bitMask <<= 1;
     }
@@ -733,10 +717,8 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = &m_armies[IDX(side)][armyIndex];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                   == 0
-            && (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0
-                || currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] != 0))
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
+            && ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -756,21 +738,8 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
             strength8 =
                 (m_armies[IDX(side)] + armyIndex2)
                     ->Strength();
-            if ((m_armies[IDX(side)] + armyIndex2)
-                        ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
-                    != 0
-                || (m_armies[IDX(side)] + armyIndex2)
-                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                       != 0
-                || (m_armies[IDX(side)] + armyIndex2)
-                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                       != 0
-                || (m_armies[IDX(side)] + armyIndex2)
-                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
-                       != 0
-                || (m_armies[IDX(side)] + armyIndex2)
-                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
-                       != 0)
+            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[IDX(side)] + armyIndex2))
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[IDX(side)] + armyIndex2)))
                 strength8 >>= 1;
             if (strength8 > bestStrength8) {
                 best = armyIndex2;

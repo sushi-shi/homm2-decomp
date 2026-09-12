@@ -347,8 +347,7 @@ void advManager::VWCompleteDraw(void) {
                         (cellY * GROUND_RANDOM_X_MULTIPLIER + cellX) & GROUND_RANDOM_FRAME_MASK;
                 else
                     frame0 += GROUND_FRAME_OFFSET;
-                frame0 += IDX(giGroundToTerrain[cell->m_terrainImageIndex])
-                                 * WORLD_TERRAIN_FRAME_STRIDE;
+                frame0 += IDX(CELL_TERRAIN(cell)) * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit) || iVWDrawAllTerrains) {
                     pVWGround->DrawToBuffer(
                         screenX

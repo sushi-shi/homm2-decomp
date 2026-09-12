@@ -112,10 +112,10 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     moraleCount += IDX(alignValue);
 
     if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER
-        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
+        && HAS(occupiedTown->m_buildings, IDX(TOWN_BUILDING_TAVERN)))
         ++moraleCount;
     if (occupiedTown != NULL && occupiedTown->m_type == FACTION_BARBARIAN
-        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
+        && HAS(occupiedTown->m_buildings, IDX(TOWN_BUILDING_COLISEUM)))
         moraleCount += COLISEUM_MORALE_BONUS;
 
     if (moraleCount < ARMY_GROUP_MORALE_MIN)

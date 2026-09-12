@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -822,8 +823,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                    || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                     i32 helpIndex = -1;
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
                         case CONTROL_MAIN_BUTTON:
@@ -1079,8 +1079,7 @@ void combatManager::ResetRound(void) {
             army* currentArmy = m_armies[IDX(side)] + armyIndex;
             if (currentArmy->m_quantity > 0) {
                 currentArmy->m_monster.flags.abilityFlags &= MONSTER_FLAGS_ROUND_PERSISTENT_MASK;
-                if (currentArmy->m_monsterType == CREATURE_TROLL
-                    || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
+                if (IS_TROLL_CREATURE(currentArmy->m_monsterType))
                     currentArmy->m_hitPointsLost = 0;
                 currentArmy->DecrementSpellRounds();
                 if (currentArmy->m_roundCounter == 0)
@@ -2047,10 +2046,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
             }
             if (CombatResultForSide(combatSide) == winningSide && pTroop->m_quantity > 0
                 && HAS(pTroop->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
-                && pTroop->m_monsterType != CREATURE_EARTH_ELEMENTAL
-                && pTroop->m_monsterType != CREATURE_AIR_ELEMENTAL
-                && pTroop->m_monsterType != CREATURE_FIRE_ELEMENTAL
-                && pTroop->m_monsterType != CREATURE_WATER_ELEMENTAL
+                && !IS_ELEMENTAL_CREATURE(pTroop->m_monsterType)
                 && pTroop->m_monsterType != CREATURE_SKELETON) {
                 ++necroEligible;
             }
@@ -2952,12 +2948,8 @@ void combatManager::AddArmy(
         }
         if (m_armies[IDX(side)][index].m_quantity == 0
             && HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)
-                    != 0
-                || m_armies[IDX(side)][index].m_monsterType == CREATURE_EARTH_ELEMENTAL
-                || m_armies[IDX(side)][index].m_monsterType == CREATURE_AIR_ELEMENTAL
-                || m_armies[IDX(side)][index].m_monsterType == CREATURE_FIRE_ELEMENTAL
-                || m_armies[IDX(side)][index].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
+            && (HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
+                || IS_ELEMENTAL_CREATURE(m_armies[IDX(side)][index].m_monsterType))) {
             armyIdx = index;
             reusedArmy = true;
             break;
@@ -3075,7 +3067,7 @@ void combatManager::ViewBallista(i32 quickView) {
         description,
         ""
     );
-    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
+    if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_LEFT_TURRET))
         != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(
@@ -3111,7 +3103,8 @@ void combatManager::ViewBallista(i32 quickView) {
         strcat(gText, description);
     }
 
-    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
+    if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_RIGHT_TURRET))
+
         != 0) {
         strcpy(
             description,

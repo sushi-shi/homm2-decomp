@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1037,8 +1038,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints_j =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
@@ -1085,8 +1085,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints_o =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
                         "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
@@ -6110,8 +6109,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
         if (i == IDX(HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
-            maxSpellPoints =
-                targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
+            maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*targetHero);
             if (targetHero->m_spellPoints > maxSpellPoints)
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
@@ -7317,8 +7315,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata == 0)
                 break;
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-            springSpellPoints_j =
-                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero);
             if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
                 eventHero->m_spellPoints =
                     static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
@@ -7327,8 +7324,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MAGIC_WELL) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                wellSpellPoints_o =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero);
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
@@ -7787,12 +7783,9 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && armyRatio
-            > 2.0 /* MONSTER_STRENGTH_JOIN */
+    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > 2.0 /* MONSTER_STRENGTH_JOIN */
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -7973,11 +7966,9 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     * gMonsterDatabase[IDX(monsterType)].fightValue
                 );
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
-        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-        && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+        && armyRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,

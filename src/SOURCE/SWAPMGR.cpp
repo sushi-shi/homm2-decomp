@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/armyGroup.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <stdio.h>
@@ -795,8 +796,7 @@ VA(0x004a3699, 0x14e)
 void swapManager::SwapMons(void) {
     i32 H2_UNUSED(selectedArmyCount) = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
-        if (m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
-            && m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
+        if (ARMY_GROUP_HAS_POSITIVE_STACK(m_heroes[IDX(m_selectedSide)]->m_army, slot_1))
             ++selectedArmyCount;
     }
 

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/hero.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -770,12 +771,12 @@ i32 playerData::BuildingsOwned(FactionType townType, BuildingSlotType buildingIn
         town* ownedTown = &gpGame->m_castleRecs[m_townIds[i]];
         if (buildingIndex < BUILDING_SLOT_DWELLING_FIRST || ownedTown->m_type == townType) {
             if (buildingIndex == BUILDING_SLOT_MAGE_GUILD) {
-                if (ownedTown->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
+                if (HAS(ownedTown->m_buildings, IDX(TOWN_BUILDING_MAGE_GUILD))) {
                     if (ownedTown->m_buildState == buildState)
                         count++;
                 }
             } else {
-                if (ownedTown->m_buildings & (1 << IDX(buildingIndex)))
+                if (HAS(ownedTown->m_buildings, (1 << IDX(buildingIndex))))
                     count++;
             }
         }
@@ -850,8 +851,7 @@ void ComputeUALoc(i32 playerIndex) {
                   && gpGame->m_worldMap.GetCell(x, y)->m_triggerType == MAP_OBJECT_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE
-                  && giGroundToTerrain[gpGame->m_worldMap.GetCell(x, y)->m_terrainImageIndex]
-                         != TERRAIN_WATER)
+                  && CELL_TERRAIN(gpGame->m_worldMap.GetCell(x, y)) != TERRAIN_WATER)
             ) {
                 triesCount++;
                 heading = 0;
@@ -949,9 +949,8 @@ i32 game::IsMobile(i32 heroId) {
         return 0;
     hero* mobileHero = &m_heroRecs[heroId];
     mapCell* cell = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
-    return mobileHero->m_remainingMobility
-           >= CalcTerrainCost(
-               giGroundToTerrain[cell->m_terrainImageIndex],
+    return mobileHero->m_remainingMobility >= CalcTerrainCost(
+               CELL_TERRAIN(cell),
                1,
                mobileHero->m_remainingMobility,
                IDX(mobileHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
@@ -1354,8 +1353,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_destinationX = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_level = HERO_INITIAL_LEVEL;
-        m_heroRecs[i].m_spellPoints =
-            m_heroRecs[i].Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+        m_heroRecs[i].m_spellPoints = HERO_NORMAL_SPELL_POINTS(m_heroRecs[i]);
         m_heroRecs[i].m_secondarySkillCount = 0;
         for (j = 0; j < IDX(HERO_SKILL_COUNT); j++) {
             m_heroRecs[i].m_secondarySkills[j] = HERO_SKILL_LEVEL_NONE;
@@ -1736,7 +1734,7 @@ void game::GiveTroopsToNeutralTowns(void) {
     i32 i;
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         GiveTroopsToNeutralTown(i);
-        if (m_castleRecs[i].m_buildings & IDX(TOWN_BUILDING_CASTLE)) {
+        if (HAS(m_castleRecs[i].m_buildings, IDX(TOWN_BUILDING_CASTLE))) {
             if (Random(0, REINFORCEMENT_ROLL_PERCENT_MAX) < REINFORCEMENT_CASTLE_CHANCE)
                 GiveTroopsToNeutralTown(i);
         } else {
@@ -1864,11 +1862,10 @@ void game::NewMap(char* filename) {
             for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
                 for (nTown = 0; nTown < m_players[player].m_townCount; nTown++) {
                     if (selectedTown == -1
-                        && m_castleRecs[(m_players + player)->m_townIds[nTown]]
-                                   .m_occupyingHeroId
+                        && m_castleRecs[(m_players + player)->m_townIds[nTown]].m_occupyingHeroId
                                == -1
-                        && ((m_castleRecs[(m_players + player)->m_townIds[nTown]].m_buildings
-                             & IDX(TOWN_BUILDING_CASTLE))
+                        && (HAS(m_castleRecs[(m_players + player)->m_townIds[nTown]].m_buildings,
+                                IDX(TOWN_BUILDING_CASTLE))
                                 != 0
                             || iPass == STARTING_HERO_ALLOW_NON_CASTLE_PASS))
                         selectedTown = nTown;
@@ -2014,16 +2011,13 @@ void game::NewMap(char* filename) {
         Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
         + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
         + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
-    while (player < ULTIMATE_ARTIFACT_BORDER_MARGIN
-           || nTown < ULTIMATE_ARTIFACT_BORDER_MARGIN
+    while (player < ULTIMATE_ARTIFACT_BORDER_MARGIN || nTown < ULTIMATE_ARTIFACT_BORDER_MARGIN
            || player > MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || nTown > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || m_worldMap.GetCell(player, nTown)->m_objectIndex != MAPCELL_SPRITE_NONE
            || m_worldMap.GetCell(player, nTown)->m_overlayIndex != MAPCELL_SPRITE_NONE
-           || giGroundToTerrain[m_worldMap.GetCell(player, nTown)->m_terrainImageIndex]
-                  == TERRAIN_WATER
-           || (giNumHumanPlayers == 1
-               && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
+           || CELL_TERRAIN(m_worldMap.GetCell(player, nTown)) == TERRAIN_WATER
+           || (giNumHumanPlayers == 1 && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
                && ultimateDistance
                       >= abs(player - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
                              + abs(nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
@@ -2338,7 +2332,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREASURE_CHEST):
-                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
+                    if (CELL_TERRAIN(cell2) == TERRAIN_WATER) {
                         cell2->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_SEA_CHEST);
                         randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                         if (randomValue5 < SEA_CHEST_EMPTY_CUTOFF)
@@ -2626,8 +2620,7 @@ void game::RandomizeEvents(void) {
                             xPos - CASTLE_BOAT_X_OFFSET,
                             yPos + CASTLE_BOAT_Y_OFFSET
                         );
-                        if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
-                            == TERRAIN_WATER) {
+                        if (CELL_TERRAIN(townEntrance2) == TERRAIN_WATER) {
                             townRec->m_boatX = static_cast<i8>(xPos - CASTLE_BOAT_X_OFFSET);
                             townRec->m_boatY = static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
                         } else {
@@ -2635,8 +2628,7 @@ void game::RandomizeEvents(void) {
                                 xPos + CASTLE_BOAT_X_OFFSET,
                                 yPos + CASTLE_BOAT_Y_OFFSET
                             );
-                            if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
-                                == TERRAIN_WATER) {
+                            if (CELL_TERRAIN(townEntrance2) == TERRAIN_WATER) {
                                 townRec->m_boatX =
                                     static_cast<i8>(xPos + CASTLE_BOAT_X_OFFSET);
                                 townRec->m_boatY =
@@ -3555,17 +3547,18 @@ void game::ViewArmy(
         for (loopIndex = IDX(BUILDING_SLOT_DWELLING_SECOND);
              loopIndex <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
              loopIndex++) {
-            if (gDwellingType[IDX(castle->m_type)]
-                             [loopIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+            if (gDwellingType[IDX(castle->m_type)][loopIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                     == monsterType
-                && (castle->m_buildings
-                    & (1 << (loopIndex + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))) {
+                && HAS(
+                    castle->m_buildings,
+                    (1 << (loopIndex + VIEW_ARMY_DWELLING_UPGRADE_OFFSET))
+                )) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = NextCreatureType(monsterType);
             }
         }
         if ((monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON)
-            && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
+            && HAS(castle->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
             gbAllowUpgrade = true;
             iViewArmyUpgradeToType = CREATURE_BLACK_DRAGON;
         }
@@ -4239,13 +4232,13 @@ i32 game::ComputeDailyGold(i32 player) {
 
     for (index = 0; index < GAME_TOWN_COUNT; index++) {
         if (m_castleRecs[index].m_owner == player) {
-            dailyGold += (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_UPGRADE_CASTLE))
-                        ? DAILY_GOLD_VILLAGE_INCOME
-                        : DAILY_GOLD_TOWN_INCOME;
-            if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL_SEVEN))
+            dailyGold += HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_UPGRADE_CASTLE))
+                             ? DAILY_GOLD_VILLAGE_INCOME
+                             : DAILY_GOLD_TOWN_INCOME;
+            if (HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_SPECIAL_SEVEN)))
                 dailyGold += DAILY_GOLD_STATUE_INCOME;
             if (m_castleRecs[index].m_type == FACTION_WARLOCK
-                && (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
+                && HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_SPECIAL)))
                 dailyGold += DAILY_GOLD_DUNGEON_INCOME;
         }
     }
@@ -4409,8 +4402,7 @@ void game::PerDay(void) {
     for (player = 0; player < GAME_HERO_COUNT; player++) {
         currentHero7 = &m_heroRecs[player];
         restoredSpellPoints14 = currentHero7->m_spellPoints;
-        maxSpellPoints9 =
-            currentHero7->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+        maxSpellPoints9 = HERO_NORMAL_SPELL_POINTS(*currentHero7);
         restoredSpellPoints14 +=
             IDX(currentHero7->m_secondarySkills[IDX(HERO_SKILL_MYSTICISM)]) + 1;
         if (currentHero7->HasArtifact(ARTIFACT_POWER_RING))
@@ -4425,12 +4417,11 @@ void game::PerDay(void) {
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
         currentTown1 = GetTown(player);
-        if (!(currentTown1->m_buildings & BIT(BUILDING_SLOT_MAGE_GUILD)))
+        if (!HAS(currentTown1->m_buildings, BIT(BUILDING_SLOT_MAGE_GUILD)))
             continue;
         if (currentTown1->m_occupyingHeroId != -1) {
             townHero6 = GetHero(currentTown1->m_occupyingHeroId);
-            maxSpellPoints9 =
-                townHero6->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            maxSpellPoints9 = HERO_NORMAL_SPELL_POINTS(*townHero6);
             if (maxSpellPoints9 > townHero6->m_spellPoints)
                 townHero6->m_spellPoints = static_cast<i16>(maxSpellPoints9);
         }
@@ -4465,14 +4456,14 @@ void game::PerWeek(void) {
         castle5 = GetTown(outerIndex);
         for (innerIndex = WEEKLY_FIRST_DWELLING; innerIndex <= WEEKLY_LAST_DWELLING;
              innerIndex++) {
-            if (castle5->m_buildings & (1 << innerIndex)) {
+            if (HAS(castle5->m_buildings, (1 << innerIndex))) {
                 growth2 = gMonsterDatabase[IDX(gDwellingType[IDX(castle5->m_type)]
                                                              [innerIndex - WEEKLY_FIRST_DWELLING])]
                                .growth;
-                if (castle5->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
+                if (HAS(castle5->m_buildings, BIT(BUILDING_SLOT_SPECIAL_FOUR)))
                     growth2 += CASTLE_GROWTH_SPECIAL_BONUS;
                 if (innerIndex == WEEKLY_FIRST_DWELLING
-                    && (castle5->m_buildings & BIT(BUILDING_SLOT_WELL_EXTRA)))
+                    && HAS(castle5->m_buildings, BIT(BUILDING_SLOT_WELL_EXTRA)))
                     growth2 += CASTLE_GROWTH_WELL_BONUS;
                 if (castle5->m_owner == -1)
                     growth2 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
@@ -4744,14 +4735,14 @@ void game::PerMonth(void) {
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         for (j = WEEKLY_FIRST_DWELLING; j <= WEEKLY_LAST_DWELLING; j++) {
             twn = GetTown(i);
-            if (twn->m_buildings & (1 << j)) {
+            if (HAS(twn->m_buildings, (1 << j))) {
                 growth = gMonsterDatabase[IDX(gDwellingType[IDX(twn->m_type)]
                                                            [j - WEEKLY_FIRST_DWELLING])]
                               .growth;
-                if (twn->m_buildings & WELL_BUILDING)
+                if (HAS(twn->m_buildings, WELL_BUILDING))
                     growth += WELL_GROWTH;
                 if (j == WEEKLY_FIRST_DWELLING
-                    && (twn->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
+                    && HAS(twn->m_buildings, FIRST_DWELLING_BONUS_BUILDING))
                     growth += FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
@@ -4775,8 +4766,7 @@ void game::PerMonth(void) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 spot = gpAdvManager->GetCell(x, y);
                 if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
-                    && !spot->m_objectLayerBit0
-                    && giGroundToTerrain[spot->m_terrainImageIndex] != TERRAIN_WATER) {
+                    && !spot->m_objectLayerBit0 && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
@@ -4965,7 +4955,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     H2_ENUM_STORAGE(TerrainType, i32) terrain;
     u8 mineFrame;
 
-    terrain = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
+    terrain = CELL_TERRAIN(WORLDMAP->GetCell(x, y));
     for (count = 0; count < RANDOM_MINE_RETRY_LIMIT; count++) {
         switch (terrain) {
             case TERRAIN_GRASS:
@@ -5638,7 +5628,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     luck += h->m_luck;
     luck += IDX(h->m_secondarySkills[IDX(HERO_SKILL_LUCK)]);
     if (castle != NULL && castle->m_type == FACTION_SORCERESS
-        && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
+        && HAS(castle->m_buildings, IDX(TOWN_BUILDING_RAINBOW))) {
         luck += RAINBOW_BONUS;
     }
     if (luck < MINIMUM)
@@ -5965,7 +5955,7 @@ void game::SetupTowns(void) {
 
         if (extra0->hasCustomBuildings) {
             castle8->m_buildings =
-                (castle8->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)))
+                HAS(castle8->m_buildings, (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)))
                 | (extra0->buildings & gTownEligibleBuildMask[IDX(castle8->m_type)]);
             castle8->m_buildState = extra0->mageGuildLevel;
         } else {
@@ -5993,7 +5983,7 @@ void game::SetupTowns(void) {
 
         for (slot12 = TOWN_UPGRADE_BUILDING_FIRST; slot12 <= TOWN_UPGRADE_BUILDING_LAST;
              slot12++) {
-            if (castle8->m_buildings & (1 << slot12)) {
+            if (HAS(castle8->m_buildings, (1 << slot12))) {
                 if (slot12 == TOWN_UPGRADE_BUILDING_LAST)
                     castle8->m_buildings &=
                         ~(IDX(TOWN_BUILDING_DWELLING_6)
@@ -6006,7 +5996,7 @@ void game::SetupTowns(void) {
         for (slot12 = TOWN_DWELLING_BUILDING_FIRST;
              slot12 <= TOWN_DWELLING_BUILDING_LAST;
              slot12++) {
-            if (castle8->m_buildings & (1 << slot12)) {
+            if (HAS(castle8->m_buildings, (1 << slot12))) {
                 castle8->m_garrison[slot12 - TOWN_DWELLING_BUILDING_FIRST] =
                     gMonsterDatabase[IDX(
                         gDwellingType[IDX(castle8->m_type)]
@@ -6015,11 +6005,11 @@ void game::SetupTowns(void) {
                         .growth;
             }
         }
-        if (castle8->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
+        if (HAS(castle8->m_buildings, IDX(TOWN_BUILDING_MAGE_GUILD))) {
             for (slot12 = 1; slot12 <= castle8->m_buildState; slot12++) {
                 castle8->m_spellCounts[slot12] = gSpellLimits[slot12 - 1];
                 if (castle8->m_type == FACTION_WIZARD
-                    && (castle8->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
+                    && HAS(castle8->m_buildings, BIT(BUILDING_SLOT_SPECIAL)))
                     castle8->m_spellCounts[slot12]++;
             }
         }
@@ -7021,8 +7011,8 @@ i32 game::GetNumThievesGuilds(i32 color) {
     i32 num = 0;
     i32 i;
     for (i = 0; i < m_players[color].m_townCount; i++) {
-        if (gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings
-            & IDX(TOWN_BUILDING_THIEVES_GUILD))
+        if (HAS(gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings,
+                IDX(TOWN_BUILDING_THIEVES_GUILD)))
             num++;
     }
     return num;
@@ -7531,13 +7521,14 @@ void game::SetupNewRumour(void) {
             } else if (selectionRoll7 < 66) {
                 sprintf(
                     m_rumour,
-                    "%s, \xf2\xee \xec\xe5\xf1\xf2\xee \xe3\xe4\xe5 \xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
-                    "\xed\xe0\xe9\xe4\xe5\xed \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
-                    cRumourTerrainDescriptions
-                        [IDX(giGroundToTerrain
-                                 [gpAdvManager
-                                      ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
-                                      ->m_terrainImageIndex])]
+                    "%s, \xf2\xee \xec\xe5\xf1\xf2\xee \xe3\xe4\xe5 \xec\xee\xe6\xe5\xf2 "
+                    "\xe1\xfb\xf2\xfc "
+                    "\xed\xe0\xe9\xe4\xe5\xed "
+                    "\xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 "
+                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
+                    cRumourTerrainDescriptions[IDX(CELL_TERRAIN(
+                        gpAdvManager->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
+                    ))]
                 );
             } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
                 sprintf(
@@ -7800,7 +7791,7 @@ i32 game::CountShrines(i32 player) {
                     castle = GetCastle(occupier->m_occupiedTown);
             }
             if (castle != NULL && castle->m_owner == player
-                && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
+                && HAS(castle->m_buildings, IDX(TOWN_BUILDING_TAVERN))
                 && castle->m_type == FACTION_NECROMANCER)
                 count++;
         }

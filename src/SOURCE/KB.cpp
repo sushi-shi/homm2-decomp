@@ -1639,7 +1639,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     i32 curMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
+    if (building != BUILDING_SLOT_CASTLE && !HAS(t->m_buildings, IDX(TOWN_BUILDING_CASTLE)))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
         && t->m_type == FACTION_NECROMANCER)
@@ -1659,18 +1659,18 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
-         && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG)))
+         && HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_FIRST_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_THIRD
-            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG)))
+            && HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_SECOND_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_FOURTH
-            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG)))
+            && HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_THIRD_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_FIFTH
-            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG)))
+            && HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_SIXTH
-            && ((t->m_buildings & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-                || (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && (HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
+                || HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
-            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && HAS(t->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
     reqBits = gHierarchyMask[IDX(t->m_type)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     curMask = t->m_buildings;
@@ -2698,11 +2698,11 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
 
     if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
-        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
+        && HAS(h->GetOccupiedTown()->m_buildings, IDX(TOWN_BUILDING_COLISEUM))) {
         strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
     }
     if (h->GetOccupiedTown() != NULL
-        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
+        && HAS(h->GetOccupiedTown()->m_buildings, IDX(TOWN_BUILDING_TAVERN))) {
         strcat(gText, cMoraleInfo[IDX(INFO_TAVERN)]);
     }
 
@@ -2783,7 +2783,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     sprintf(gText, cLuckInfo[IDX(LUCK_INFO_HEADER)], description4);
     modifierStart = strlen(gText);
     if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
-        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
+        && HAS(h->GetOccupiedTown()->m_buildings, IDX(TOWN_BUILDING_RAINBOW)))
         strcat(gText, cLuckInfo[IDX(INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
         strcat(gText, cLuckInfo[IDX(INFO_RABBIT_FOOT)]);

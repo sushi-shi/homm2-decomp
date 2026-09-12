@@ -230,6 +230,8 @@ public:
 };
 #pragma pack(pop)
 SIZE(hero, 250);
+#define HERO_NORMAL_SPELL_POINTS(h)                                                                \
+    ((h).Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE)
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];

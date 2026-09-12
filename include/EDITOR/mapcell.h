@@ -138,6 +138,10 @@ public:
     }
 };
 SIZE(mapCell, 12);
+// This is the stored sprite property, not a passability or tileset-shadow query.
+#define CELL_HAS_NON_SHADOW_OBJECT(cell)                                                           \
+    ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \
+     && ((cell)->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)) == 0)
 
 struct oldMapCell {
     u8 raw[20];

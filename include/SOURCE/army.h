@@ -154,6 +154,14 @@ public:
 };
 #pragma pack(pop)
 SIZE(army, 0x482);
+// These duration queries deliberately exclude other action/ownership conditions.
+#define ARMY_HAS_BERSERK_OR_HYPNOTIZE(a)                                                           \
+    ((a).m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]                                       \
+     || (a).m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
+#define ARMY_HAS_INCAPACITATING_SPELL(a)                                                           \
+    ((a).m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]                                         \
+     || (a).m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]                                   \
+     || (a).m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)])
 extern b32 bSecondAttack;
 extern b32 gbGenieHalf;
 

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/armyGroup.h>
 #include <BASE/message.h>
 #include <BASE/BITS.h>
 #include <BASE/Misc.h>
@@ -383,7 +384,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 townFrame = IDX(record->m_type);
-                if ((record->m_buildings & IDX(TOWN_BUILDING_CASTLE)) == 0) {
+                if (HAS(record->m_buildings, IDX(TOWN_BUILDING_CASTLE)) == 0) {
                     townFrame += TOWN_UNFORTIFIED_FRAME_OFFSET;
                 }
                 OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
@@ -430,7 +431,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             if (record->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
                 heroData = GetHero(record->m_occupyingHeroId);
             } else {
-                if ((record->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS)) != 0) {
+                if (HAS(record->m_buildings, IDX(TOWN_BUILDING_CAPTAIN_QUARTERS)) != 0) {
                     capt = true;
                 }
             }
@@ -517,8 +518,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 displayedTroops = 0;
                 for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
-                    if (record->m_army.m_creatureTypes[i] != CREATURE_NONE
-                        && record->m_army.m_creatureCounts[i] > 0) {
+                    if (ARMY_GROUP_HAS_POSITIVE_STACK(record->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(
                                 displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X
@@ -612,8 +612,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             break;
                     }
 
-                    if ((record->m_buildings
-                         & (1 << (IDX(building) + IDX(TOWN_DWELLING_BUILDING_BIT_BASE))))
+                    if (HAS(record->m_buildings,
+                            (1 << (IDX(building) + IDX(TOWN_DWELLING_BUILDING_BIT_BASE))))
+
                         != 0) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(
@@ -784,8 +785,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 shown = 0;
                 for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
-                    if (curHero->m_army.m_creatureTypes[i] != CREATURE_NONE
-                        && curHero->m_army.m_creatureCounts[i] > 0) {
+                    if (ARMY_GROUP_HAS_POSITIVE_STACK(curHero->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X),
                             static_cast<i16>(
