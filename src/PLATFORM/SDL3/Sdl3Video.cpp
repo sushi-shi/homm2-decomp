@@ -95,6 +95,10 @@ bool Video::Open(const DisplayMode& mode) {
 }
 
 void Video::Close() {
+    ResetCursor();
+    for (const auto& cursor : m_cursors)
+        SDL_DestroyCursor(cursor.handle);
+    m_cursors.clear();
     if (m_texture != nullptr) {
         SDL_DestroyTexture(m_texture);
         m_texture = nullptr;
@@ -243,6 +247,41 @@ void Video::ShowCursor(bool visible) {
     } else {
         SDL_HideCursor();
     }
+}
+
+bool Video::SetMonochromeCursor(const MonochromeCursor& cursor) {
+    if (m_window == nullptr || cursor.hotspot.x < 0 || cursor.hotspot.y < 0
+        || cursor.hotspot.x >= MonochromeCursor::Width
+        || cursor.hotspot.y >= MonochromeCursor::Height)
+        return false;
+
+    for (const auto& cached : m_cursors) {
+        if (cached.image == cursor) {
+            if (SDL_SetCursor(cached.handle))
+                return true;
+            std::fprintf(stderr, "[homm2] SDL_SetCursor: %s\n", SDL_GetError());
+            return false;
+        }
+    }
+    SDL_Cursor* handle = SDL_CreateCursor(
+        cursor.data.data(), cursor.mask.data(), MonochromeCursor::Width,
+        MonochromeCursor::Height, cursor.hotspot.x, cursor.hotspot.y);
+    if (handle == nullptr) {
+        std::fprintf(stderr, "[homm2] SDL_CreateCursor: %s\n", SDL_GetError());
+        return false;
+    }
+    if (!SDL_SetCursor(handle)) {
+        std::fprintf(stderr, "[homm2] SDL_SetCursor: %s\n", SDL_GetError());
+        SDL_DestroyCursor(handle);
+        return false;
+    }
+    m_cursors.push_back({cursor, handle});
+    return true;
+}
+
+void Video::ResetCursor() {
+    if (m_videoInitialized)
+        SDL_SetCursor(SDL_GetDefaultCursor());
 }
 
 void Video::MaybeCapture() {
