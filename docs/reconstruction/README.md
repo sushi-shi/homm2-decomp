@@ -231,9 +231,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   map, with [complete native and retail equivalence](B44.md).
 - C20: system-options scalar boolean conversions/materialization require
   native comparison; event widget payload unions themselves remain meaningful.
-- U08/U09: bottom-view widget storage has integer locator aliases and typed
-  overlay/padding views; adventure remote payload has a raw-byte/save/exit
-  union. Remaining consumers must establish the correct shared owners.
+- U08: two bottom-view unions and their integer/derived/padding views now
+  use [actual widget-pointer arrays with complete native equivalence](U08.md).
+  U09 adventure remote payload still has a raw-byte/save/exit union requiring
+  remaining consumer review.
 - G27-G30: adventure command movement, keyboard cheat/confirmation, search
   completion and default-hover joins await structured matrices. R03/R04 cover
   unrelated dispatcher scalar roles; S30 covers unused adventure locals and

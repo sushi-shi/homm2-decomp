@@ -6,6 +6,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 
 | pattern | one-line trigger |
 | :-- | :-- |
+| [widget-pointer-array-owner](widget-pointer-array-owner.md) | common-interface widget storage permits real base-pointer arrays instead of integer/derived/scalar union views, with constant slot offsets folded into unchanged addressing |
 | [trivial-array-delete](trivial-array-delete.md) | a scalar operator-delete call can be the exact lowering of `delete[]` for a recovered trivial array; compare bytes and ordered targets before choosing the source form |
 | [serial-api-scalar-storage](serial-api-scalar-storage.md) | a one-byte read and a DWORD API output need scalar owners; VC6 preserves the aligned reservation and low-width loads |
 | [single-word-count-reservation](single-word-count-reservation.md) | two-byte read/load in a four-byte aligned reservation permits a scalar count without a fictional second array element |

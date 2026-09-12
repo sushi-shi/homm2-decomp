@@ -506,7 +506,7 @@ SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	100.0000	19989d4b899b
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	100.0000	58fbf54c80dc
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	367f9621bc52
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	001c91f6647b
-SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	41e8ff083dde
+SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	03886e2d7d20
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	72dc17660c80
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	100.0000	521bb1784414
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	2e7fbfc0b3e2
@@ -534,11 +534,11 @@ SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	a061cc113604
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	100.0000	107faf766ea0
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	100.0000	5073920d615f
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	100.0000	03f520de57f2
-SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	100.0000	e718aa72332d
-SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	100.0000	a9730f7deb0a
-SOURCE/ADVMGR	?UpdBottomViewKingdom@advManager@@QAEHXZ	100.0000	bf508dc931ca
-SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	100.0000	47750e0d4efa
-SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	76d2dadd7cc5
+SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	100.0000	99c0e56ca4b2
+SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	100.0000	831edbef301e
+SOURCE/ADVMGR	?UpdBottomViewKingdom@advManager@@QAEHXZ	100.0000	df16c51ccd50
+SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	100.0000	9ef8475d4985
+SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	bdfa21153b2b
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	100.0000	627e2dd7ab18
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	1639c004dcf4
 SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	100.0000	b5a6baffd31e
