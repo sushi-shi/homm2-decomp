@@ -19,12 +19,12 @@ void FillBitmapAreaClip(
     i32 cliph
 );
 void BlitBitmap(
-    class bitmap* src,
+    class bitmap* source,
     i32 sx,
     i32 sy,
     i32 w,
     i32 h,
-    class bitmap* dst,
+    class bitmap* destination,
     i32 dx,
     i32 dy
 );

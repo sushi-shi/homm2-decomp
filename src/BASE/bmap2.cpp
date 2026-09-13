@@ -60,21 +60,21 @@ void FillBitmapAreaClip(
 
 VA(0x004c65d0, 0xb7)
 void BlitBitmap(
-    class bitmap* src,
+    class bitmap* source,
     i32 sx,
     i32 sy,
     i32 w,
     i32 h,
-    class bitmap* dst,
+    class bitmap* destination,
     i32 dx,
     i32 dy
 ) {
-    gBlitSrc = src->m_pixels + sx + sy * src->m_width;
-    gBlitDst = dst->m_pixels + dx + dy * dst->m_width;
+    gBlitSrc = source->m_pixels + sx + sy * source->m_width;
+    gBlitDst = destination->m_pixels + dx + dy * destination->m_width;
     for (gBlitRow = 0; gBlitRow < h; gBlitRow++) {
         memcpy(gBlitDst, gBlitSrc, w);
-        gBlitSrc += src->m_width;
-        gBlitDst += dst->m_width;
+        gBlitSrc += source->m_width;
+        gBlitDst += destination->m_width;
     }
 }
 

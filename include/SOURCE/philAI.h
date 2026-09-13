@@ -57,8 +57,8 @@ public:
     void ValueOfBuyingCreature(class town* townPtr, CreatureType creature, i32& resourceValue, i32 purchaseCount, float& benefitCost);
     void GetBestCreature(class town* townPtr, struct BHC& best, float& bestValue);
     i32 CreaturesToBuy(class town* t, i32 level);
-    i32 CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b);
-    i32 MaxBuyableCreatures(CreatureType level);
+    i32 CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) creatureType, i32 availableCount);
+    i32 MaxBuyableCreatures(CreatureType creatureType);
     void ValueOfBuyingHero(class town* townPtr, class hero* heroPtr, i32& resourceValue, float& benefitCost);
     void GetBestHero(class town* townPtr, struct BHC& best, float& bestValue);
     void
@@ -122,7 +122,7 @@ public:
     i32 DamageGroup(class armyGroup* ag, class hero* loser, class hero*, float dmg);
     void IncrementHourGlass(void);
     void TownEvent(class mapCell* cell, class hero* h, i32 x, i32 y);
-    i32 ComputeUpgradeValue(CreatureType a1, CreatureType a2);
+    i32 ComputeUpgradeValue(CreatureType baseCreatureType, CreatureType upgradedCreatureType);
     i32 ComputeValueOfSS(
         class hero* h,
         H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,

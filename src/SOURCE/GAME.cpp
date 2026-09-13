@@ -3249,25 +3249,25 @@ void game::UpdateSpellWidgets(void) {
 }
 
 VA(0x00454d5e, 0x673)
-MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
+MessageDispatchResult ViewSpellsHandler(tag_message& message) {
     SpellType spell;
 
-    if (msg.type == MESSAGE_MOUSE_MOVE) {
-        gpWindowManager->ConvertToHover(msg);
-        if (gpWindowManager->m_lastHoverId == msg.payload.hover.id) {
+    if (message.type == MESSAGE_MOUSE_MOVE) {
+        gpWindowManager->ConvertToHover(message);
+        if (gpWindowManager->m_lastHoverId == message.payload.hover.id) {
             return MESSAGE_DISPATCH_CONSUME;
         } else {
-            return gpGame->m_viewSpellsCallback(msg);
+            return gpGame->m_viewSpellsCallback(message);
         }
     }
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
+                if (message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+                    || (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
                     break;
                 {
-                    switch (msg.payload.widget.id) {
+                    switch (message.payload.widget.id) {
                         case VIEW_SPELL_MANA_LABEL_ID:
                         case VIEW_SPELL_MANA_HUNDREDS_ID:
                         case VIEW_SPELL_MANA_TENS_ID:
@@ -3312,16 +3312,16 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case EVENT_WINDOW_FIRST_BUTTON:
-                            msg.payload.widget.id = VIEW_SPELL_CLOSE_ID;
+                            message.payload.widget.id = VIEW_SPELL_CLOSE_ID;
                             break;
                     }
                 }
                 break;
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
-                    switch (msg.payload.widget.id) {
+                if (message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+                    || (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
+                    switch (message.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
                         case VIEW_SPELL_ICON_ID_1:
                         case VIEW_SPELL_ICON_ID_2:
@@ -3337,7 +3337,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
                                 gpGame->m_viewSpellsType,
                                 gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)]
-                                    + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
+                                    + (message.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             NormalDialog(
                                 gSpellDesc[IDX(spell)],
@@ -3389,7 +3389,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             break;
                     }
                 } else {
-                    switch (msg.payload.widget.id) {
+                    switch (message.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
                         case VIEW_SPELL_ICON_ID_1:
                         case VIEW_SPELL_ICON_ID_2:
@@ -3405,7 +3405,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
                                 gpGame->m_viewSpellsType,
                                 gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)]
-                                    + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
+                                    + (message.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
                                 NormalDialog(
@@ -3435,7 +3435,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 return MESSAGE_DISPATCH_CONTINUE;
                             }
                             gpGame->m_viewSpell = spell;
-                            msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                             return MESSAGE_DISPATCH_FORWARD;
                     }
                 }
@@ -3444,8 +3444,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                 break;
         }
 
-        if (msg.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
-            msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
+        if (message.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
+            message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
             return MESSAGE_DISPATCH_FORWARD;
         }
     }
@@ -3453,12 +3453,12 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
 }
 
 VA(0x004553d1, 0x158)
-MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
-    if (msg.type == MESSAGE_MOUSE_MOVE) {
-        if (msg.payload.hover.id == gpWindowManager->m_lastHoverId)
+MessageDispatchResult ViewSpecialHandler(tag_message& message) {
+    if (message.type == MESSAGE_MOUSE_MOVE) {
+        if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
             return MESSAGE_DISPATCH_CONSUME;
-        gpWindowManager->m_lastHoverId = msg.payload.hover.id;
-        switch (msg.payload.hover.id) {
+        gpWindowManager->m_lastHoverId = message.payload.hover.id;
+        switch (message.payload.hover.id) {
             case VIEW_SPELL_PREVIOUS_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_PREVIOUS]);
                 break;
@@ -3826,7 +3826,7 @@ void game::ViewArmy(
 }
 
 VA(0x00456231, 0x37d)
-MessageDispatchResult ViewArmyHandler(tag_message& msg) {
+MessageDispatchResult ViewArmyHandler(tag_message& message) {
     i32 resourceCost;
     i16 H2_UNUSED(frameDelay6);
     i16 H2_UNUSED(frameOffset);
@@ -3837,15 +3837,15 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     gbUpgradeArmy = false;
     frameDelay6 = VIEW_ARMY_HANDLER_FRAME_DELAY;
 
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                        msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
+                        message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
@@ -3856,8 +3856,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         );
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
-                            msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                            msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                            message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
+                            message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
@@ -3899,8 +3899,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 if (resourceType7 != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType7)] -= resourceCost;
                                 gbUpgradeArmy = true;
-                                msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                                msg.payload.widget.command =
+                                message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
+                                message.payload.widget.command =
                                     BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
@@ -3929,17 +3929,17 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     }
 
     if (glTimers[0] < KBTickCount()) {
-        SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_FRAME, VIEW_ARMY_MONSTER_WIDGET_ID);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, VIEW_ARMY_MONSTER_WIDGET_ID);
         iViewArmyFrame = (iViewArmyFrame + 1)
                          % sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
-        msg.payload.widget.data.value =
+        message.payload.widget.data.value =
             sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][iViewArmyFrame];
-        gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        msg.payload.widget.command = WIDGET_COMMAND_SET_X;
-        msg.payload.widget.data.value =
+        gpGame->m_viewArmyWindow->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_SET_X;
+        message.payload.widget.data.value =
             viewArmyBaseX
             + viewArmyFacingWIPXMod * sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame];
-        gpGame->m_viewArmyWindow->BroadcastMessage(msg);
+        gpGame->m_viewArmyWindow->BroadcastMessage(message);
         gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
             KBTickCount()
@@ -7167,6 +7167,10 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
     return len;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationFile destFile
+#endif
 VA(0x0045f47a, 0x553)
 void CreateDiffFile(
     char* oldName,
@@ -7188,7 +7192,7 @@ void CreateDiffFile(
     u8* diffOut;
     i32 oldSize;
     b32 fullSend;
-    i32 destFile;
+    i32 destinationFile;
     i32 position;
 
     timeIn = KBTickCount();
@@ -7283,18 +7287,18 @@ void CreateDiffFile(
 
 Finish:
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    destFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (destFile == -1)
+    destinationFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (destinationFile == -1)
         FileError(gText);
-    write(destFile, diffOut, diffTotal);
-    close(destFile);
+    write(destinationFile, diffOut, diffTotal);
+    close(destinationFile);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    destFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (destFile == -1)
+    destinationFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (destinationFile == -1)
         FileError(gText);
-    write(destFile, fullData, joinSize);
-    close(destFile);
+    write(destinationFile, fullData, joinSize);
+    close(destinationFile);
 
     if (prevData != NULL)
         H2_FREE(prevData);
@@ -7304,6 +7308,9 @@ Finish:
         H2_FREE(diffOut);
     return;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationFile
+#endif
 
 VA(0x0045f9cd, 0x37e)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
@@ -7656,18 +7663,23 @@ i32 CalcFileCRC(char* file) {
     return checksum;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceCrc srcCrc
+#define sourceCrcCheck srcCrcCheck
+#endif
 VA(0x0046099a, 0x120)
 void CompressTest2(void) {
     i32l H2_UNUSED(plainSize);
     char* unpackedData;
     i32l compSize;
-    i32 H2_UNUSED(srcCrc);
+    i32 H2_UNUSED(sourceCrc);
     i32 dataSz;
     i32 index;
     i32 H2_UNUSED(unpackedCrc);
     char* fromData;
     char* encoded;
-    i32 H2_UNUSED(srcCrcCheck);
+    i32 H2_UNUSED(sourceCrcCheck);
 
     dataSz = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
     fromData =
@@ -7684,26 +7696,35 @@ void CompressTest2(void) {
         );
     for (index = 0; index < dataSz; index++)
         fromData[index] = static_cast<char>(Random(0, 255));
-    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
     compSize = EncodeData(encoded, fromData, dataSz);
     plainSize = DecodeData(unpackedData, encoded, compSize);
     unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), dataSz);
-    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
     H2_FREE(fromData);
     H2_FREE(encoded);
     H2_FREE(unpackedData);
 }
+#if !H2_STRICT_ENUMS
+#undef sourceCrc
+#undef sourceCrcCheck
+#endif
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceCrc srcCrc
+#define sourceCrcCheck srcCrcCheck
+#endif
 VA(0x00460aba, 0x18c)
 void CompressTest(void) {
     char* fromData;
     char* encoded;
-    i32 H2_UNUSED(srcCrcCheck);
+    i32 H2_UNUSED(sourceCrcCheck);
     i32 H2_UNUSED(unpackedCrc);
     i32 hFile;
     i32l fileSize;
     char diffName[TEST_FILENAME_SIZE];
-    i32 H2_UNUSED(srcCrc);
+    i32 H2_UNUSED(sourceCrc);
     char* unpackedData;
     i32l compSize;
     i32l H2_UNUSED(plainSize);
@@ -7726,7 +7747,7 @@ void CompressTest(void) {
         FileError(diffName);
     read(hFile, fromData, fileSize);
     LogStr(const_cast<char*>("C3"));
-    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
+    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
     LogStr(const_cast<char*>("C4"));
     close(hFile);
     LogStr(const_cast<char*>("C5"));
@@ -7735,12 +7756,16 @@ void CompressTest(void) {
     plainSize = DecodeData(unpackedData, encoded, compSize);
     LogStr(const_cast<char*>("C7"));
     unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), fileSize);
-    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
+    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
     H2_FREE(fromData);
     H2_FREE(encoded);
     H2_FREE(unpackedData);
     LogStr(const_cast<char*>("C8"));
 }
+#if !H2_STRICT_ENUMS
+#undef sourceCrc
+#undef sourceCrcCheck
+#endif
 
 VA(0x00460c46, 0x46)
 void CompressTest3(void) {

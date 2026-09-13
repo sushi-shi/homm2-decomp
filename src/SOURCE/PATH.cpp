@@ -120,9 +120,13 @@ i32 army::ValidMove(CombatHexDirection direction) {
     return ValidMove(m_hex, direction);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationHexNext destHexNext
+#endif
 VA(0x0047d13b, 0x226)
 i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
-    i32 destHexNext;
+    i32 destinationHexNext;
     i32 rearSquare;
     b32 frontValid;
     b32 rearValidResult;
@@ -130,14 +134,14 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     if (!ValidHex(sourceHex))
         return 0;
 
-    destHexNext = GetAdjacentCellIndex(sourceHex, direction);
-    if (!ValidHex(destHexNext))
+    destinationHexNext = GetAdjacentCellIndex(sourceHex, direction);
+    if (!ValidHex(destinationHexNext))
         return 0;
 
     frontValid = false;
-    if (gpCombatManager->m_hexCells[destHexNext].m_occupantSide == COMBAT_SIDE_NONE
-        && (!gpCombatManager->m_hexCells[destHexNext].m_blocked
-            || CAN_PASS_CASTLE_GATE(destHexNext))) {
+    if (gpCombatManager->m_hexCells[destinationHexNext].m_occupantSide == COMBAT_SIDE_NONE
+        && (!gpCombatManager->m_hexCells[destinationHexNext].m_blocked
+            || CAN_PASS_CASTLE_GATE(destinationHexNext))) {
         frontValid = true;
     }
 
@@ -148,13 +152,13 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                 if (direction == COMBAT_DIRECTION_EAST)
                     return frontValid;
                 else
-                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_WEST);
+                    rearSquare = GetAdjacentCellIndex(destinationHexNext, COMBAT_DIRECTION_WEST);
                 break;
             case ARMY_FACING_RIGHT:
                 if (direction == COMBAT_DIRECTION_WEST)
                     return frontValid;
                 else
-                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_EAST);
+                    rearSquare = GetAdjacentCellIndex(destinationHexNext, COMBAT_DIRECTION_EAST);
                 break;
         }
 
@@ -177,6 +181,9 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     } else
         return frontValid;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationHexNext
+#endif
 
 VA(0x0047d361, 0x1d8)
 i32 army::ValidAttack(
@@ -396,6 +403,10 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceRow srcRow
+#endif
 VA(0x0047d9ec, 0x77e)
 CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
     b32 isMovingDown;
@@ -404,14 +415,14 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     i32 colTarget;
     i32 targetRowVal;
     b32 isMovingUp;
-    i32 srcRow;
+    i32 sourceRow;
     b32 isMovingRight;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return COMBAT_DIRECTION_INVALID;
 
     sourceColumnCheck = sourceHex % ARMY_HEX_COLUMNS;
-    srcRow = sourceHex / ARMY_HEX_COLUMNS;
+    sourceRow = sourceHex / ARMY_HEX_COLUMNS;
     colTarget = targetHex % ARMY_HEX_COLUMNS;
     targetRowVal = targetHex / ARMY_HEX_COLUMNS;
     isMovingUp = false;
@@ -424,14 +435,14 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     else if (colTarget != sourceColumnCheck)
         leftFl = true;
 
-    if (targetRowVal > srcRow)
+    if (targetRowVal > sourceRow)
         isMovingDown = true;
-    else if (targetRowVal != srcRow)
+    else if (targetRowVal != sourceRow)
         isMovingUp = true;
 
     if (isMovingRight == leftFl) {
         if (isMovingUp == 1) {
-            if (srcRow & 1) {
+            if (sourceRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
                 else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
@@ -467,7 +478,7 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_WIDE_EAST;
             }
         } else {
-            if (srcRow & 1) {
+            if (sourceRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
                 else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
@@ -614,6 +625,9 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     }
     return COMBAT_DIRECTION_INVALID;
 }
+#if !H2_STRICT_ENUMS
+#undef sourceRow
+#endif
 
 VA_COMPGEN(0x0047e16a, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)
 VA_COMPGEN(0x0047e191, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)

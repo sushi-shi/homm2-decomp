@@ -611,23 +611,27 @@ void army::Wince(void) {
     m_animationFrame = 0;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationHex destHex
+#endif
 VA(0x004197b2, 0xa27)
 void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing) {
     i32 frame;
     i32 newHex;
     i32 H2_UNUSED(saveHex);
-    i32 destHex;
+    i32 destinationHex;
     i32 tempTop;
     i32 tempLeft;
     i32 tempRight;
     i32 otherHex;
     i32 tempBottom;
 
-    destHex = GetAdjacentCellIndex(m_hex, direction);
+    destinationHex = GetAdjacentCellIndex(m_hex, direction);
     if (m_side == COMBAT_DEFENDER_SIDE && gpCombatManager->m_inCastleCombat
-        && (destHex == COMBAT_CASTLE_GATE_APPROACH_HEX
-            || destHex == IDX(COMBAT_CASTLE_HEX_GATE)
-            || (destHex == DRAWBRIDGE_WIDE_EXIT_HEX && m_side == COMBAT_DEFENDER_SIDE
+        && (destinationHex == COMBAT_CASTLE_GATE_APPROACH_HEX
+            || destinationHex == IDX(COMBAT_CASTLE_HEX_GATE)
+            || (destinationHex == DRAWBRIDGE_WIDE_EXIT_HEX && m_side == COMBAT_DEFENDER_SIDE
                 && HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)))
         && gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
         m_animationSequence = ARMY_ANIMATION_STAND;
@@ -641,9 +645,9 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
     giWalkingFrom2 = HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)
                          ? m_hex + ArmyFacingRearHexOffset(m_facing)
                          : -1;
-    giWalkingTo = destHex;
+    giWalkingTo = destinationHex;
     giWalkingTo2 = HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)
-                       ? destHex + ArmyFacingRearHexOffset(m_facing)
+                       ? destinationHex + ArmyFacingRearHexOffset(m_facing)
                        : -1;
     giWalkingYMod = 0;
     BuildTempWalkSeq(&m_frameInfo, finishStanding, skipDrawing);
@@ -854,7 +858,14 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
         gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
 }
+#if !H2_STRICT_ENUMS
+#undef destinationHex
+#endif
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define combatMessage combatMsg
+#endif
 VA(0x0041a1d9, 0x165f)
 void army::SpecialAttack(void) {
     i32 xCentre;
@@ -866,7 +877,7 @@ void army::SpecialAttack(void) {
     i32 moveCount;
     i32 oldTipY;
     i32 castX;
-    char combatMsg[ARMY_COMBAT_TEXT_SIZE];
+    char combatMessage[ARMY_COMBAT_TEXT_SIZE];
     CombatEffectType powVal;
     i32 castY;
     char hisCol;
@@ -1264,7 +1275,7 @@ void army::SpecialAttack(void) {
         );
         gText[0] = CyrillicToUpper(gText[0]);
     }
-    strcpy(combatMsg, gText);
+    strcpy(combatMessage, gText);
     switch (m_monsterType) {
         case CREATURE_ARCHMAGE:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE && pEnemy
@@ -1274,7 +1285,7 @@ void army::SpecialAttack(void) {
             break;
     }
     PowEffect(powVal, 0, castX, castY);
-    gpCombatManager->CombatMessage(combatMsg, 1, 1, 0);
+    gpCombatManager->CombatMessage(combatMessage, 1, 1, 0);
     WaitSample(ARMY_SAMPLE_SHOT);
 
     if (m_facing != wasFacing) {
@@ -1300,6 +1311,9 @@ void army::SpecialAttack(void) {
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
 }
+#if !H2_STRICT_ENUMS
+#undef combatMessage
+#endif
 
 VA(0x0041b838, 0x20)
 void army::DirDoAttack(CombatHexDirection direction) {

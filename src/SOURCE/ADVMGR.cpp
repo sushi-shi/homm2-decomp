@@ -2195,6 +2195,11 @@ void advManager::Reseed(i32, i32) {
     giSeedingValid = false;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define inputMessage msg
+#define radarMessage radMsg
+#endif
 VA(0x004035e9, 0xd1f)
 MessageDispatchResult
 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
@@ -2205,9 +2210,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     i32 objectIdIndex;
     b32 visible;
     mapCell* theCell;
-    tag_message radMsg;
+    tag_message radarMessage;
     float fScale;
-    tag_message msg;
+    tag_message inputMessage;
     i32 mobileResult;
     hero* currentHero;
 
@@ -2459,37 +2464,37 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             CompleteDraw(0);
             UpdateScreen(0, 0);
 
-            msg.type = MESSAGE_NONE;
-            while (msg.type != MESSAGE_LEFT_BUTTON_UP) {
+            inputMessage.type = MESSAGE_NONE;
+            while (inputMessage.type != MESSAGE_LEFT_BUTTON_UP) {
                 Process1WindowsMessage();
-                msg = gpInputManager->GetEvent();
-                radMsg = msg;
-                while (msg.type != MESSAGE_LEFT_BUTTON_UP
-                       && msg.type != MESSAGE_NONE) {
-                    if (msg.type == MESSAGE_MOUSE_MOVE) {
-                        radMsg = msg;
+                inputMessage = gpInputManager->GetEvent();
+                radarMessage = inputMessage;
+                while (inputMessage.type != MESSAGE_LEFT_BUTTON_UP
+                       && inputMessage.type != MESSAGE_NONE) {
+                    if (inputMessage.type == MESSAGE_MOUSE_MOVE) {
+                        radarMessage = inputMessage;
                     }
                     Process1WindowsMessage();
-                    msg = gpInputManager->GetEvent();
+                    inputMessage = gpInputManager->GetEvent();
                 }
-                if (radMsg.type == MESSAGE_MOUSE_MOVE) {
-                    if (radMsg.payload.mouse.x < RADAR_LEFT) {
-                        radMsg.payload.mouse.x = RADAR_LEFT;
+                if (radarMessage.type == MESSAGE_MOUSE_MOVE) {
+                    if (radarMessage.payload.mouse.x < RADAR_LEFT) {
+                        radarMessage.payload.mouse.x = RADAR_LEFT;
                     }
-                    if (radMsg.payload.mouse.x >= RADAR_RIGHT) {
-                        radMsg.payload.mouse.x = RADAR_RIGHT - 1;
+                    if (radarMessage.payload.mouse.x >= RADAR_RIGHT) {
+                        radarMessage.payload.mouse.x = RADAR_RIGHT - 1;
                     }
-                    if (radMsg.payload.mouse.y < RADAR_TOP) {
-                        radMsg.payload.mouse.y = RADAR_TOP;
+                    if (radarMessage.payload.mouse.y < RADAR_TOP) {
+                        radarMessage.payload.mouse.y = RADAR_TOP;
                     }
-                    if (radMsg.payload.mouse.y >= RADAR_BOTTOM) {
-                        radMsg.payload.mouse.y = RADAR_BOTTOM - 1;
+                    if (radarMessage.payload.mouse.y >= RADAR_BOTTOM) {
+                        radarMessage.payload.mouse.y = RADAR_BOTTOM - 1;
                     }
-                    gpMouseManager->Main(radMsg);
+                    gpMouseManager->Main(radarMessage);
                     mouseX =
-                        static_cast<i32>((radMsg.payload.mouse.x - RADAR_LEFT) / fScale);
+                        static_cast<i32>((radarMessage.payload.mouse.x - RADAR_LEFT) / fScale);
                     mouseY =
-                        static_cast<i32>((radMsg.payload.mouse.y - RADAR_TOP) / fScale);
+                        static_cast<i32>((radarMessage.payload.mouse.y - RADAR_TOP) / fScale);
                     m_mapOriginX = mouseX - VIEW_CENTER_CELL;
                     m_mapOriginY = mouseY - VIEW_CENTER_CELL;
                     if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2507,7 +2512,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     UpdateRadar(1, 0);
                     CompleteDraw(0);
                     UpdateScreen(0, 0);
-                    radMsg.type = MESSAGE_NONE;
+                    radarMessage.type = MESSAGE_NONE;
                 }
             }
             break;
@@ -2523,6 +2528,10 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#if !H2_STRICT_ENUMS
+#undef inputMessage
+#undef radarMessage
+#endif
 
 VA(0x00404308, 0x38a)
 MessageDispatchResult
@@ -5164,62 +5173,66 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0040a85c, 0x292)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 i;
     i32 whichTown;
-    tag_message msg;
+    tag_message message;
     double step;
 
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         return;
     }
 
-    msg.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
+    message.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
     for (i = 0; i < LOCATOR_VISIBLE_COUNT; ++i) {
         whichTown = gpCurPlayer->m_townIds[gpCurPlayer->m_townLocatorPage + i];
-        msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
-        msg.payload.widget.id = i + LOCATOR_TOWN_BORDER_BASE;
-        msg.payload.widget.data.value =
+        message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
+        message.payload.widget.id = i + LOCATOR_TOWN_BORDER_BASE;
+        message.payload.widget.data.value =
             (gpCurPlayer->m_currentTown != TOWN_ID_NONE
              && whichTown == gpCurPlayer->m_currentTown && !gbAllBlack)
                 ? LOCATOR_SELECTED_COLOR
                 : LOCATOR_NORMAL_COLOR;
-        m_adventureWindow->BroadcastMessage(msg);
+        m_adventureWindow->BroadcastMessage(message);
 
-        msg.payload.widget.id = i + LOCATOR_TOWN_IMAGE_BASE;
+        message.payload.widget.id = i + LOCATOR_TOWN_IMAGE_BASE;
         if (whichTown == TOWN_ID_NONE || gbAllBlack) {
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            message.payload.widget.data.value =
                 i + LOCATOR_TOWN_EMPTY_FRAME_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
-            msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            message.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(message);
         } else {
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            message.payload.widget.data.value =
                 IDX(gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
             if (!HAS(gpGame->GetTown(whichTown)->m_buildings, IDX(TOWN_BUILDING_CASTLE))) {
-                msg.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
+                message.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
             }
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
 
             if (BitTest(gpGame->m_knownTowns, whichTown)) {
-                msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+                message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
             } else {
-                msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+                message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
             }
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
-            msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
+            message.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            message.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(message);
         }
     }
 
@@ -5237,6 +5250,9 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         m_adventureWindow->DrawWindow(updateScreen);
     }
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x0040aaee, 0x15e)
 void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen) {
@@ -5317,13 +5333,17 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0040ad72, 0x53b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     b32 updated;
-    tag_message msg;
+    tag_message message;
 
     updated = false;
-    msg.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
+    message.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
     if (iCurBottomView != BOTTOM_VIEW_ENEMY_TURN) {
         updated = true;
         gbForceUpdate = true;
@@ -5377,10 +5397,10 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             updated = true;
 
             if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] != NULL) {
-                msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-                msg.payload.widget.id = ENEMY_TURN_SAND_ID;
-                msg.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
-                m_adventureWindow->BroadcastMessage(msg);
+                message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+                message.payload.widget.id = ENEMY_TURN_SAND_ID;
+                message.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
+                m_adventureWindow->BroadcastMessage(message);
             } else {
                 m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] = new iconWidget(
                     ENEMY_TURN_ANIMATION_X,
@@ -5412,11 +5432,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             iCurHourGlassPhase = 0;
         }
         if (m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] != NULL) {
-            msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-            msg.payload.widget.id = ENEMY_TURN_CREST_ID;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.payload.widget.id = ENEMY_TURN_CREST_ID;
+            message.payload.widget.data.value =
                 gpGame->m_players[IDX(static_cast<char>(giCurPlayer))].m_color;
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
         } else {
             m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] = new iconWidget(
                 ENEMY_TURN_CREST_X,
@@ -5447,10 +5467,10 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         iLastHourGlassPhase = iCurHourGlassPhase;
         giLastHourGlassUpdateTime = KBTickCount();
         if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] != NULL) {
-            msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-            msg.payload.widget.id = ENEMY_TURN_PHASE_ID;
-            msg.payload.widget.data.value = iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
-            m_adventureWindow->BroadcastMessage(msg);
+            message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.payload.widget.id = ENEMY_TURN_PHASE_ID;
+            message.payload.widget.data.value = iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
+            m_adventureWindow->BroadcastMessage(message);
         } else {
             m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] = new iconWidget(
                 ENEMY_TURN_ANIMATION_X,
@@ -5475,6 +5495,9 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     }
     return updated;
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x0040b2ad, 0x387)
 i32 advManager::UpdBottomViewNewTurn(void) {
@@ -5970,6 +5993,10 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
 
@@ -5992,9 +6019,9 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     i32 savedY;
     i32 oldX;
     iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
-    tag_message msg;
+    tag_message message;
 
-    msg.type = MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     if (heroId == INVALID_HERO) {
         return;
     }
@@ -6027,27 +6054,27 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         }
     }
 
-    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    msg.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
-    msg.payload.widget.data.value = IDX(targetHero->m_portrait);
-    win->BroadcastMessage(msg);
-    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    msg.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
-    msg.payload.widget.data.value =
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+    message.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
+    message.payload.widget.data.value = IDX(targetHero->m_portrait);
+    win->BroadcastMessage(message);
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+    message.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
+    message.payload.widget.data.value =
         gpGame->m_players[IDX(targetHero->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
-    win->BroadcastMessage(msg);
-    ++msg.payload.widget.id;
-    ++msg.payload.widget.data.value;
-    win->BroadcastMessage(msg);
+    win->BroadcastMessage(message);
+    ++message.payload.widget.id;
+    ++message.payload.widget.data.value;
+    win->BroadcastMessage(message);
     sprintf(
         gText,
         "%s",
         targetHero->m_name
     );
-    msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    msg.payload.widget.id = HERO_QUICK_NAME_WIDGET;
-    msg.payload.widget.data.text = gText;
-    win->BroadcastMessage(msg);
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = HERO_QUICK_NAME_WIDGET;
+    message.payload.widget.data.text = gText;
+    win->BroadcastMessage(message);
 
     creatureCount = 0;
     for (ii = 0; ii < ARMY_QUICK_SLOT_COUNT; ++ii) {
@@ -6064,14 +6091,14 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 "%d",
                 targetHero->Stats(HeroPrimaryStat(ii))
             );
-            msg.payload.widget.id = ii + HERO_QUICK_PRIMARY_STAT_WIDGET;
-            msg.payload.widget.data.text = gText;
-            win->BroadcastMessage(msg);
+            message.payload.widget.id = ii + HERO_QUICK_PRIMARY_STAT_WIDGET;
+            message.payload.widget.data.text = gText;
+            win->BroadcastMessage(message);
         }
         sprintf(gText, "%d/%d", targetHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*targetHero));
-        msg.payload.widget.id = HERO_QUICK_MANA_WIDGET;
-        msg.payload.widget.data.text = gText;
-        win->BroadcastMessage(msg);
+        message.payload.widget.id = HERO_QUICK_MANA_WIDGET;
+        message.payload.widget.data.text = gText;
+        win->BroadcastMessage(message);
 
         if (creatureCount != 0) {
             i32 armyStart =
@@ -6309,12 +6336,15 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     UpdateRadar(1, 0);
     CompleteDraw(0);
     UpdateScreen(0, 0);
-    if (msg.type == MESSAGE_LEFT_BUTTON_DOWN
+    if (message.type == MESSAGE_LEFT_BUTTON_DOWN
         && targetHero->m_owner == giCurPlayer) {
         SetHeroContext(targetHero->m_id, 0);
     }
     gpResourceManager->Dispose(iconRef);
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x0040d11d, 0xdc)
 H2_CONST char* advManager::GetArmySizeName(
@@ -9082,23 +9112,37 @@ disposeSamples:
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x004132d4, 0xc8)
 void advManager::DisableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
     }
-    tag_message msg;
-    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
+    tag_message message;
+    SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0041339c, 0xc8)
 void advManager::EnableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
     }
-    tag_message msg;
-    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
+    tag_message message;
+    SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x00413464, 0x142)
 void advManager::SaveAdventureBorder(void) {
@@ -9770,25 +9814,29 @@ void advManager::SystemOptions(void) {
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x00414b62, 0x320)
 void UpdateSystemOptions(i32 initialDraw) {
     AdventureMusicQuality musicQuality;
-    tag_message msg;
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
+    tag_message message;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_VOLUME);
-    msg.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
-    msg.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
+    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_VOLUME);
+    message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
+    message.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
                                     + ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
+    message.payload.widget.data.value =
         IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
@@ -9796,79 +9844,82 @@ void UpdateSystemOptions(i32 initialDraw) {
     } else {
         musicQuality = MUSIC_QUALITY_CD_OPERA;
     }
-    msg.payload.widget.data.value =
+    message.payload.widget.data.value =
         IDX(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_SHOW_ROUTE);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_SHOW_ROUTE);
+    message.payload.widget.data.value =
         static_cast<i32>(gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
+        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     } else {
-        msg.payload.widget.data.value =
+        message.payload.widget.data.value =
             IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     }
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
+    message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO);
+    message.payload.widget.data.value =
         static_cast<i32>(gConfig.slowVideo != 0) + ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_COLOR_CURSOR);
-    msg.payload.widget.data.value = gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_COLOR_CURSOR);
+    message.payload.widget.data.value = gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                                         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
+    cPanel->BroadcastMessage(message);
 
-    msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
-    msg.payload.widget.id =
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[gConfig.showRoute];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[gConfig.showRoute];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = localization::Tr("system.options.do_not_show");
+        message.payload.widget.data.text = localization::Tr("system.options.do_not_show");
     } else {
-        msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
+        message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     }
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         IDX(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text =
+    message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
-    cPanel->BroadcastMessage(msg);
+    cPanel->BroadcastMessage(message);
 
     if (initialDraw == 0) {
         cPanel->DrawWindow(1, 0, ADVMGR_SYSTEM_OPTIONS_DRAW_MASK);
     }
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 // The redbook and MIDI readiness flags this handler used to test went away
 // with the CD subsystem; both music paths now report present, which makes the
@@ -10115,6 +10166,10 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x004154ac, 0x43d)
 i32 advManager::DoVisions(hero* visionHero) {
     CreatureType type;
@@ -10127,7 +10182,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     i32 count;
     float fRatio;
     i32 isForced;
-    char msg[VISIONS_MESSAGE_BUFFER_SIZE];
+    char message[VISIONS_MESSAGE_BUFFER_SIZE];
     i32 nearDist;
     i32 joinNum;
     i32 joinFee;
@@ -10181,11 +10236,11 @@ i32 advManager::DoVisions(hero* visionHero) {
         && !IS_ELEMENTAL_CREATURE(type)) {
         if (isForced) {
             sprintf(
-                msg,
+                message,
                 localization::Tr("adventure.spell.visions.forced_join")
 
             );
-            strcat(gText, msg);
+            strcat(gText, message);
             goto showVision;
         } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
@@ -10214,7 +10269,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
             if (joinNum == count) {
                 sprintf(
-                    msg,
+                    message,
                     localization::Tr("adventure.spell.visions.all_join_fee")
                         /* "Все существа вступят в нашу армию... / за плату в размере %d
                            золотых." */,
@@ -10222,7 +10277,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                 );
             } else {
                 sprintf(
-                    msg,
+                    message,
                     localization::Tr("adventure.spell.visions.some_join_fee")
                         /* "%d существ присоединятся к нам... / за плату в размере %d
                            золотых." */,
@@ -10230,7 +10285,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                     joinFee
                 );
             }
-            strcat(gText, msg);
+            strcat(gText, message);
             goto showVision;
         }
     }
@@ -10238,26 +10293,29 @@ i32 advManager::DoVisions(hero* visionHero) {
     if (fRatio > MONSTER_STRENGTH_FLEE) {
     creaturesFlee:
         sprintf(
-            msg,
+            message,
             localization::Tr("adventure.spell.visions.flee")
 
         );
-        strcat(gText, msg);
+        strcat(gText, message);
         goto showVision;
     }
 creaturesFight:
     sprintf(
-        msg,
+        message,
         localization::Tr("adventure.spell.visions.fight")
 
     );
-    strcat(gText, msg);
+    strcat(gText, message);
     goto showVision;
 
 showVision:
     NormalDialog(gText, 1);
     return 1;
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x004158e9, 0xc2)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {

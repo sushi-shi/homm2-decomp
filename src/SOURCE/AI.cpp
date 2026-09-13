@@ -845,6 +845,10 @@ i32 combatManager::AttemptAttack(
     return 0;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationHex destHex
+#endif
 VA(0x004180ba, 0x144)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 =
@@ -856,7 +860,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     CombatHexDirection direction;
     i32 H2_UNUSED(hexes);
     i32 enemyArmy;
-    i32 destHex;
+    i32 destinationHex;
 
     if (availableMask4 == 0)
         return 0;
@@ -872,10 +876,10 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
                 direction,
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
-                &destHex
+                &destinationHex
             )
-            && destHex >= 0)
-            enemyMask |= 1 << m_hexCells[destHex].m_occupantIndex;
+            && destinationHex >= 0)
+            enemyMask |= 1 << m_hexCells[destinationHex].m_occupantIndex;
         oneBit <<= 1;
     }
     if (currentArmy->m_monsterType == CREATURE_GHOST)
@@ -889,6 +893,9 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         return 0;
     }
 }
+#if !H2_STRICT_ENUMS
+#undef destinationHex
+#endif
 
 VA(0x004181fe, 0x207)
 i32 combatManager::WalkTowardArmyFront(

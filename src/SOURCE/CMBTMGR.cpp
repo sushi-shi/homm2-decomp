@@ -1991,6 +1991,11 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceLine srcLine
+#define targetLine tgtLine
+#endif
 VA(0x0042aabf, 0x29b)
 i32 combatManager::ShotIsThroughWall(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 sourceHex, i32 targetHex
@@ -1999,7 +2004,7 @@ i32 combatManager::ShotIsThroughWall(
     i32 colTarget;
     float rowStride;
     i32 traceLength;
-    i32 tgtLine;
+    i32 targetLine;
     i32 traceSquare;
     float traceRow;
     float traceColumn;
@@ -2008,7 +2013,7 @@ i32 combatManager::ShotIsThroughWall(
     i32 columnDist;
     i32 rowSpan;
     i32 sourceColumn;
-    i32 srcLine;
+    i32 sourceLine;
 
     if (!m_inCastleCombat)
         return 0;
@@ -2022,11 +2027,11 @@ i32 combatManager::ShotIsThroughWall(
         return 0;
 
     sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
-    srcLine = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    sourceLine = sourceHex / COMBAT_GRID_ROW_LENGTH;
     colTarget = targetHex % COMBAT_GRID_ROW_LENGTH;
-    tgtLine = targetHex / COMBAT_GRID_ROW_LENGTH;
+    targetLine = targetHex / COMBAT_GRID_ROW_LENGTH;
     columnDist = colTarget - sourceColumn;
-    rowSpan = tgtLine - srcLine;
+    rowSpan = targetLine - sourceLine;
     if (abs(columnDist) > abs(rowSpan)) {
         traceLength = abs(columnDist);
         columnStride = columnDist > 0 ? 1 : -1;
@@ -2040,7 +2045,7 @@ i32 combatManager::ShotIsThroughWall(
     ;
     rowStride /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     traceColumn = static_cast<float>(sourceColumn);
-    traceRow = static_cast<float>(srcLine);
+    traceRow = static_cast<float>(sourceLine);
     for (traceIx = 0; traceIx < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
          traceIx++) {
         traceColumn += columnStride;
@@ -2068,6 +2073,10 @@ i32 combatManager::ShotIsThroughWall(
     }
     return 0;
 }
+#if !H2_STRICT_ENUMS
+#undef sourceLine
+#undef targetLine
+#endif
 
 VA(0x0042ad5a, 0x4e0)
 void combatManager::ShootMissile(

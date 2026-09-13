@@ -647,11 +647,11 @@ static void __fastcall nb_recv_complete(i32 session) {
 }
 
 VA(0x004753fa, 0x76)
-static void __fastcall nb_format_name(char* src, u8* dst) {
+static void __fastcall nb_format_name(char* source, u8* destination) {
     u32 i;
-    memset(dst, 0, NETBIOS_NAME_SIZE);
-    for (i = 0; i < NETBIOS_NAME_SIZE - 1 && *src != '\0'; i++, src++)
-        dst[i] = *src;
+    memset(destination, 0, NETBIOS_NAME_SIZE);
+    for (i = 0; i < NETBIOS_NAME_SIZE - 1 && *source != '\0'; i++, source++)
+        destination[i] = *source;
     for (; i < NETBIOS_NAME_SIZE - 1; i++)
-        dst[i] = ' ';
+        destination[i] = ' ';
 }

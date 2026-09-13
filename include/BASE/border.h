@@ -27,7 +27,7 @@ public:
     );
     virtual H2_RETAIL_INLINE ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message& msg) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
 };
 #pragma pack(pop)

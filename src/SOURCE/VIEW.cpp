@@ -72,49 +72,67 @@ H2_ENUM_BEGIN(ViewGeneralHoverHelp)
     GENERAL_HOVER_HELP_CAPTAIN   = 6
 H2_ENUM_END(ViewGeneralHoverHelp)
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define messageConst1 msgConst1
+#define messageConst10 msgConst10
+#define messageConst15 msgConst15
+#define messageConst17 msgConst17
+#define messageConst18 msgConst18
+#define messageConst2 msgConst2
+#define messageConst26 msgConst26
+#define messageConst28 msgConst28
+#define messageConst29 msgConst29
+#define messageConst3 msgConst3
+#define messageConst37 msgConst37
+#define messageConst4 msgConst4
+#define messageConst5 msgConst5
+#define messageConst6 msgConst6
+#define messageConst7 msgConst7
+#endif
 VA(0x004ad4b0, 0x6f9)
 i32 combatManager::ViewGeneral(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
 ) {
-    i16 H2_UNUSED(msgConst37);
-    i16 H2_UNUSED(msgConst4);
-    i16 H2_UNUSED(msgConst10);
-    i16 H2_UNUSED(msgConst3);
-    i16 H2_UNUSED(msgConst29);
-    i16 H2_UNUSED(msgConst2);
+    i16 H2_UNUSED(messageConst37);
+    i16 H2_UNUSED(messageConst4);
+    i16 H2_UNUSED(messageConst10);
+    i16 H2_UNUSED(messageConst3);
+    i16 H2_UNUSED(messageConst29);
+    i16 H2_UNUSED(messageConst2);
     i32 luck14;
-    i16 H2_UNUSED(msgConst1);
+    i16 H2_UNUSED(messageConst1);
     i32 morale11;
-    i16 H2_UNUSED(msgConst7);
-    i16 H2_UNUSED(msgConst6);
-    i16 H2_UNUSED(msgConst5);
-    i16 H2_UNUSED(msgConst17);
-    i16 H2_UNUSED(msgConst18);
-    i16 H2_UNUSED(msgConst15);
+    i16 H2_UNUSED(messageConst7);
+    i16 H2_UNUSED(messageConst6);
+    i16 H2_UNUSED(messageConst5);
+    i16 H2_UNUSED(messageConst17);
+    i16 H2_UNUSED(messageConst18);
+    i16 H2_UNUSED(messageConst15);
     i32 H2_UNUSED(cost2);
     heroWindow* generalWindow26;
-    i16 H2_UNUSED(msgConst28);
+    i16 H2_UNUSED(messageConst28);
     tag_message message16;
-    i16 H2_UNUSED(msgConst26);
+    i16 H2_UNUSED(messageConst26);
 
     if (m_heroes[IDX(side)] == NULL)
         return 0;
     iViewGeneralWhichSide = side;
-    msgConst5 = GENERAL_NAME_WIDGET;
-    msgConst1 = GENERAL_PORTRAIT_WIDGET;
-    msgConst15 = GENERAL_COLOR_WIDGET;
-    msgConst37 = GENERAL_STATS_WIDGET;
-    msgConst7 = GENERAL_CAPTAIN_WIDGET;
-    msgConst18 = GENERAL_CONTROL_NONE;
-    msgConst26 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst2 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst17 = GENERAL_CLOSE;
-    msgConst3 = GENERAL_RETREAT;
-    msgConst29 = GENERAL_SURRENDER;
-    msgConst10 = GENERAL_CONTROL_THIRTEEN;
-    msgConst6 = GENERAL_CONTROL_FOURTEEN;
+    messageConst5 = GENERAL_NAME_WIDGET;
+    messageConst1 = GENERAL_PORTRAIT_WIDGET;
+    messageConst15 = GENERAL_COLOR_WIDGET;
+    messageConst37 = GENERAL_STATS_WIDGET;
+    messageConst7 = GENERAL_CAPTAIN_WIDGET;
+    messageConst18 = GENERAL_CONTROL_NONE;
+    messageConst26 = GENERAL_NAME_WIDGET;
+    messageConst4 = GENERAL_CONTROL_SEVEN;
+    messageConst2 = GENERAL_CONTROL_EIGHT;
+    messageConst28 = GENERAL_CONTROL_NINE;
+    messageConst17 = GENERAL_CLOSE;
+    messageConst3 = GENERAL_RETREAT;
+    messageConst29 = GENERAL_SURRENDER;
+    messageConst10 = GENERAL_CONTROL_THIRTEEN;
+    messageConst6 = GENERAL_CONTROL_FOURTEEN;
     giCurGeneral = side;
 
     message16.type = MESSAGE_WIDGET;
@@ -241,40 +259,74 @@ i32 combatManager::ViewGeneral(
         DoCommand(static_cast<CombatMessageCommand>(gpWindowManager->m_dialogResult));
     return 0;
 }
+#if !H2_STRICT_ENUMS
+#undef messageConst1
+#undef messageConst10
+#undef messageConst15
+#undef messageConst17
+#undef messageConst18
+#undef messageConst2
+#undef messageConst26
+#undef messageConst28
+#undef messageConst29
+#undef messageConst3
+#undef messageConst37
+#undef messageConst4
+#undef messageConst5
+#undef messageConst6
+#undef messageConst7
+#endif
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define messageConst0 msgConst0
+#define messageConst1 msgConst1
+#define messageConst15 msgConst15
+#define messageConst17 msgConst17
+#define messageConst18 msgConst18
+#define messageConst19 msgConst19
+#define messageConst28 msgConst28
+#define messageConst3 msgConst3
+#define messageConst4 msgConst4
+#define messageConst5 msgConst5
+#define messageConst6 msgConst6
+#define messageConst7 msgConst7
+#define messageConst8 msgConst8
+#define messageConst9 msgConst9
+#endif
 VA(0x004adba9, 0x286)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 H2_UNUSED(msgConst8);
-    i16 H2_UNUSED(msgConst28);
-    i16 H2_UNUSED(msgConst1);
-    i16 H2_UNUSED(msgConst19);
-    i16 H2_UNUSED(msgConst6);
+    i16 H2_UNUSED(messageConst8);
+    i16 H2_UNUSED(messageConst28);
+    i16 H2_UNUSED(messageConst1);
+    i16 H2_UNUSED(messageConst19);
+    i16 H2_UNUSED(messageConst6);
     b32 handled28;
-    i16 H2_UNUSED(msgConst0);
-    i16 H2_UNUSED(msgConst18);
-    i16 H2_UNUSED(msgConst17);
-    i16 H2_UNUSED(msgConst3);
-    i16 H2_UNUSED(msgConst4);
+    i16 H2_UNUSED(messageConst0);
+    i16 H2_UNUSED(messageConst18);
+    i16 H2_UNUSED(messageConst17);
+    i16 H2_UNUSED(messageConst3);
+    i16 H2_UNUSED(messageConst4);
     i32 helpIndex36;
     i32 hintIndex11;
-    i16 H2_UNUSED(msgConst5);
-    i16 H2_UNUSED(msgConst9);
-    i16 H2_UNUSED(msgConst7);
-    i16 H2_UNUSED(msgConst15);
-    msgConst18 = GENERAL_NAME_WIDGET;
-    msgConst5 = GENERAL_PORTRAIT_WIDGET;
-    msgConst0 = GENERAL_COLOR_WIDGET;
-    msgConst3 = GENERAL_STATS_WIDGET;
-    msgConst9 = GENERAL_CONTROL_NONE;
-    msgConst19 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst7 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst15 = GENERAL_CLOSE;
-    msgConst1 = GENERAL_RETREAT;
-    msgConst6 = GENERAL_SURRENDER;
-    msgConst8 = GENERAL_CONTROL_THIRTEEN;
-    msgConst17 = GENERAL_CONTROL_FOURTEEN;
+    i16 H2_UNUSED(messageConst5);
+    i16 H2_UNUSED(messageConst9);
+    i16 H2_UNUSED(messageConst7);
+    i16 H2_UNUSED(messageConst15);
+    messageConst18 = GENERAL_NAME_WIDGET;
+    messageConst5 = GENERAL_PORTRAIT_WIDGET;
+    messageConst0 = GENERAL_COLOR_WIDGET;
+    messageConst3 = GENERAL_STATS_WIDGET;
+    messageConst9 = GENERAL_CONTROL_NONE;
+    messageConst19 = GENERAL_NAME_WIDGET;
+    messageConst4 = GENERAL_CONTROL_SEVEN;
+    messageConst7 = GENERAL_CONTROL_EIGHT;
+    messageConst28 = GENERAL_CONTROL_NINE;
+    messageConst15 = GENERAL_CLOSE;
+    messageConst1 = GENERAL_RETREAT;
+    messageConst6 = GENERAL_SURRENDER;
+    messageConst8 = GENERAL_CONTROL_THIRTEEN;
+    messageConst17 = GENERAL_CONTROL_FOURTEEN;
     handled28 = false;
 
     switch (message.type) {
@@ -352,6 +404,22 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#if !H2_STRICT_ENUMS
+#undef messageConst0
+#undef messageConst1
+#undef messageConst15
+#undef messageConst17
+#undef messageConst18
+#undef messageConst19
+#undef messageConst28
+#undef messageConst3
+#undef messageConst4
+#undef messageConst5
+#undef messageConst6
+#undef messageConst7
+#undef messageConst8
+#undef messageConst9
+#endif
 
 VA(0x004ade2f, 0x143)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {

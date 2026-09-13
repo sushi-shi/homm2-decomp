@@ -32,7 +32,7 @@ public:
     );
     virtual H2_RETAIL_INLINE ~textWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message& msg) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
     void SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color);
     void SetText(H2_CONST char* text);

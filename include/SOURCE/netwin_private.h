@@ -15,7 +15,7 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb);
 static void __fastcall nb_arm_recv(i32 session);
 static void __fastcall nb_close_session(i32 session);
 static void __fastcall nb_recv_complete(i32 session);
-static void __fastcall nb_format_name(char* src, u8* dst);
+static void __fastcall nb_format_name(char* source, u8* destination);
 
 extern "C" H2_ENUM_PARAM(NetbiosResult, u8) __stdcall Netbios(NetbiosControlBlock* controlBlock);
 

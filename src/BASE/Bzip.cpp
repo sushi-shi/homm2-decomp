@@ -1438,11 +1438,11 @@ void spotBlock(Bool weAreCompressing) {
 }
 
 VA(0x004c9b20, 0x134)
-Int32 getRLEpair(FILE* src) {
+Int32 getRLEpair(FILE* source) {
     Int32 runLength;
     IntNative ch, chLatest;
 
-    ch = getc(src);
+    ch = getc(source);
 
     if (ch == EOF) {
         ERROR_IF_NOT_ZERO(errno);
@@ -1451,13 +1451,13 @@ Int32 getRLEpair(FILE* src) {
 
     runLength = 0;
     do {
-        chLatest = getc(src);
+        chLatest = getc(source);
         runLength++;
         bytesIn++;
     } while (ch == chLatest && runLength < 255);
 
     if (chLatest != EOF) {
-        if (ungetc(chLatest, src) == EOF)
+        if (ungetc(chLatest, source) == EOF)
             panic(const_cast<char*>("getRLEpair: ungetc failed"));
     } else {
         ERROR_IF_NOT_ZERO(errno);
@@ -1475,7 +1475,7 @@ Int32 getRLEpair(FILE* src) {
 }
 
 VA(0x004c9c60, 0x20c)
-Bool loadAndRLEsource(FILE* src) {
+Bool loadAndRLEsource(FILE* source) {
     Int32 ch, allowableBlockSize;
 
     last = -1;
@@ -1485,7 +1485,7 @@ Bool loadAndRLEsource(FILE* src) {
 
     while (last < allowableBlockSize && ch != MY_EOF) {
         Int32 rlePair, runLen;
-        rlePair = getRLEpair(src);
+        rlePair = getRLEpair(source);
         ch = rlePair & 0xFFFF;
         runLen = (UInt32)rlePair >> 16;
 
@@ -1530,7 +1530,7 @@ Bool loadAndRLEsource(FILE* src) {
 }
 
 VA(0x004c9e70, 0x176)
-void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
+void unRLEandDump(FILE* destination, Bool thisIsTheLastBlock) {
     IntNative retVal;
     Int32 lastCharToSpew, i, count, chPrev, ch;
     UInt32 localCrc;
@@ -1550,7 +1550,7 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
         ch = block[i];
         i++;
 
-        retVal = putc(ch, dst);
+        retVal = putc(ch, destination);
         ERROR_IF_EOF(retVal);
         UPDATE_CRC(localCrc, (UChar)ch);
 
@@ -1561,7 +1561,7 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
             if (count >= 4) {
                 Int32 j;
                 for (j = 0; j < (Int32)block[i]; j++) {
-                    retVal = putc(ch, dst);
+                    retVal = putc(ch, destination);
                     ERROR_IF_EOF(retVal);
                     UPDATE_CRC(localCrc, (UChar)ch);
                 }
@@ -1931,7 +1931,7 @@ void uncompress(Char* name) {
 }
 
 VA(0x004ca980, 0x259)
-i32l EncodeData(char* dst, char* src, u32l srcLen) {
+i32l EncodeData(char* destination, char* source, u32l sourceLength) {
     char fname[450] = H2_ZERO_INIT;
     i32 fd;
     i32 H2_UNUSED(result);
@@ -1955,7 +1955,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
         FileError(fname);
-    _write(fd, src, srcLen);
+    _write(fd, source, sourceLength);
     _close(fd);
     compress(fname);
 
@@ -1964,7 +1964,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     result = fseek(fp, 0, 2);
     flen = ftell(fp);
     result = fseek(fp, 0, 0);
-    result = fread(dst, flen, 1, fp);
+    result = fread(destination, flen, 1, fp);
     result = fclose(fp);
     result = remove(fname);
     FreeCompressStructures();
@@ -1973,7 +1973,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
 }
 
 VA(0x004cabe0, 0x266)
-i32l DecodeData(char* dst, char* src, u32l srcLen) {
+i32l DecodeData(char* destination, char* source, u32l sourceLength) {
     char fname[450] = H2_ZERO_INIT;
     i32 fd;
     i32 H2_UNUSED(result);
@@ -1997,7 +1997,7 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
         FileError(fname);
-    _write(fd, src, srcLen);
+    _write(fd, source, sourceLength);
     _close(fd);
     uncompress(fname);
 
@@ -2006,7 +2006,7 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     result = fseek(fp, 0, 2);
     flen = ftell(fp);
     result = fseek(fp, 0, 0);
-    result = fread(dst, flen, 1, fp);
+    result = fread(destination, flen, 1, fp);
     result = fclose(fp);
     result = remove(fname);
     FreeCompressStructures();

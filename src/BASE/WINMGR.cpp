@@ -321,11 +321,11 @@ void heroWindowManager::Close(void) {
 }
 
 VA(0x004b71f0, 0x5b)
-MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
+MessageDispatchResult heroWindowManager::Main(struct tag_message& message) {
     MessageDispatchResult ret = MESSAGE_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
     while (w != NULL) {
-        switch (ret = w->BroadcastMessage(msg)) {
+        switch (ret = w->BroadcastMessage(message)) {
             case MESSAGE_DISPATCH_CONTINUE:
                 break;
             case MESSAGE_DISPATCH_CONSUME:
@@ -338,20 +338,27 @@ MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
 }
 
 VA(0x004b7250, 0x1c)
-MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& msg) {
-    return Main(msg);
+MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& message) {
+    return Main(message);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x004b7270, 0x36)
 MessageDispatchResult
-heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
-    tag_message msg;
-    msg.type = type;
-    msg.payload.widget.command = p2;
-    msg.payload.widget.id = p3;
-    msg.payload.widget.data.value = p4;
-    return Main(msg);
+heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value) {
+    tag_message message;
+    message.type = type;
+    message.payload.widget.command = command;
+    message.payload.widget.id = widgetId;
+    message.payload.widget.data.value = value;
+    return Main(message);
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x004b72b0, 0x142)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {

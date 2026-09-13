@@ -38,9 +38,9 @@ public:
     heroWindowManager(void);
     virtual i32 Open(i32 managerOrder) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message& msg) OVERRIDE;
-    MessageDispatchResult ConvertToHover(struct tag_message& msg);
-    MessageDispatchResult BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4);
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    MessageDispatchResult ConvertToHover(struct tag_message& message);
+    MessageDispatchResult BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value);
     void AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags);
     void RemoveWindow(class heroWindow* w);
     i32 DoDialog(class heroWindow* window, MessageDispatchHandler handler, i32 fade);

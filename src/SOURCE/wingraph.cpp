@@ -849,17 +849,24 @@ void WGInitializePalette(void) {
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationHeight destHeight3
+#define destinationWidth destW
+#define destinationX destX7
+#define destinationY destY0
+#endif
 VA(0x004b15d6, 0x1bd)
 i32 WGAppPaint(void* window, void* paintDC) {
     i32 H2_UNUSED(padding8);
     char H2_UNUSED(unusedByte0);
     RECT clientRect16;
-    i32 destY0;
+    i32 destinationY;
     i32 xSource;
     PAINTSTRUCT paint5;
-    i32 destHeight3;
-    i32 destW;
-    i32 destX7;
+    i32 destinationHeight;
+    i32 destinationWidth;
+    i32 destinationX;
     i32 fromY;
 
     unusedByte0 = 0;
@@ -868,52 +875,58 @@ i32 WGAppPaint(void* window, void* paintDC) {
         SelectPalette(static_cast<HDC>(paintDC), hpalApp, 0);
         RealizePalette(static_cast<HDC>(paintDC));
         GetClientRect(reinterpret_cast<HWND>(window), &clientRect16);
-        destX7 = 0;
-        xSource = destX7;
-        destY0 = 0;
-        fromY = destY0;
-        destW = clientRect16.right - clientRect16.left;
-        destHeight3 = clientRect16.bottom - clientRect16.top;
-        xSource = CLIENT_TO_GAME_X(destX7);
-        fromY = CLIENT_TO_GAME_Y(destY0);
+        destinationX = 0;
+        xSource = destinationX;
+        destinationY = 0;
+        fromY = destinationY;
+        destinationWidth = clientRect16.right - clientRect16.left;
+        destinationHeight = clientRect16.bottom - clientRect16.top;
+        xSource = CLIENT_TO_GAME_X(destinationX);
+        fromY = CLIENT_TO_GAME_Y(destinationY);
         if (giScrollX != 0)
             xSource += giScrollX;
         if (giScrollY != 0)
             fromY += giScrollY;
         giTtlBlts++;
         if (iMainWinScreenWidth == WINGRAPH_WIDTH && iMainWinScreenHeight == WINGRAPH_HEIGHT) {
-            destX7 = paint5.rcPaint.left & WINGRAPH_PAINT_ALIGN_MASK;
-            destW = paint5.rcPaint.right - destX7 + 1;
-            destY0 = paint5.rcPaint.top;
-            destHeight3 = paint5.rcPaint.bottom - destY0 + 1;
+            destinationX = paint5.rcPaint.left & WINGRAPH_PAINT_ALIGN_MASK;
+            destinationWidth = paint5.rcPaint.right - destinationX + 1;
+            destinationY = paint5.rcPaint.top;
+            destinationHeight = paint5.rcPaint.bottom - destinationY + 1;
             WinGBitBlt(
                 static_cast<HDC>(paintDC),
-                destX7,
-                destY0,
-                destW,
-                destHeight3,
+                destinationX,
+                destinationY,
+                destinationWidth,
+                destinationHeight,
                 hdcImage,
-                destX7 + giScrollX,
-                destY0 + giScrollY
+                destinationX + giScrollX,
+                destinationY + giScrollY
             );
         } else {
             WinGStretchBlt(
                 static_cast<HDC>(paintDC),
-                destX7,
-                destY0,
-                destW,
-                destHeight3,
+                destinationX,
+                destinationY,
+                destinationWidth,
+                destinationHeight,
                 hdcImage,
                 xSource,
                 fromY,
-                (destW * WINGRAPH_WIDTH) / iMainWinScreenWidth,
-                (destHeight3 * WINGRAPH_HEIGHT) / iMainWinScreenHeight
+                (destinationWidth * WINGRAPH_WIDTH) / iMainWinScreenWidth,
+                (destinationHeight * WINGRAPH_HEIGHT) / iMainWinScreenHeight
             );
         }
         EndPaint(reinterpret_cast<HWND>(window), &paint5);
     }
     return 1;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationHeight
+#undef destinationWidth
+#undef destinationX
+#undef destinationY
+#endif
 
 VA(0x004b1793, 0x67)
 void WGCleanUpWinGraphics(void) {

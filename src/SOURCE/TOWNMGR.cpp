@@ -1948,9 +1948,13 @@ void townManager::RedrawTownScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH, TOWN_SCREEN_HEIGHT);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define messageId msgId
+#endif
 VA(0x004a84b7, 0x376)
 void townManager::SplitArmy(void) {
-    i16 H2_UNUSED(msgId) = 1;
+    i16 H2_UNUSED(messageId) = 1;
     i16 H2_UNUSED(amountId) = 4;
     b32 sameType;
     tag_message message;
@@ -1997,6 +2001,9 @@ void townManager::SplitArmy(void) {
         m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] -= m_splitAmount;
     }
 }
+#if !H2_STRICT_ENUMS
+#undef messageId
+#endif
 
 VA(0x004a882d, 0x16)
 void townManager::ShiftQualChange(void) {

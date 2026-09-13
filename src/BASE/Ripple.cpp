@@ -22,6 +22,10 @@ H2_ENUM_BEGIN(RippleConstant)
     SWEEP_END     = SCREEN_WIDTH + PROFILE_RADIUS
 H2_ENUM_END(RippleConstant)
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceRow srcRow
+#endif
 VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 idx;
@@ -30,7 +34,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 blitWidth;
     i32 column7;
     i32 blitX3;
-    i32 srcRow;
+    i32 sourceRow;
     i32 sweepPosition;
 
     gpMouseManager->HideColorPointer();
@@ -58,10 +62,10 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
             u8* sourcePixel =
                 source->m_pixels + column7 + rippleProfile[idx] * SCREEN_WIDTH * strength;
 
-            srcRow = rippleProfile[idx] * strength;
-            for (; srcRow < height; srcRow++) {
+            sourceRow = rippleProfile[idx] * strength;
+            for (; sourceRow < height; sourceRow++) {
                 *destinationPixel = *sourcePixel;
-                if (srcRow + 1 == height)
+                if (sourceRow + 1 == height)
                     break;
                 destinationPixel += SCREEN_WIDTH;
                 sourcePixel += SCREEN_WIDTH;
@@ -86,3 +90,6 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
 
     gpMouseManager->ShowColorPointer();
 }
+#if !H2_STRICT_ENUMS
+#undef sourceRow
+#endif

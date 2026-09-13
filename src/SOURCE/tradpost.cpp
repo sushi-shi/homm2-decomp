@@ -255,6 +255,11 @@ void UpdateTradingPost(i32 draw) {
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationValue dstVal
+#define sourceValue srcVal
+#endif
 VA(0x004aceac, 0xc6)
 void ComputeTradeRatios(
     i32 sourceResource,
@@ -263,9 +268,9 @@ void ComputeTradeRatios(
     i32* leftDenominated,
     i32* maxTrade
 ) {
-    float srcVal = coreRatio[sourceResource] * fTradingPostEfficiency;
-    float dstVal = coreRatio[destinationResource];
-    float tRatio = dstVal / srcVal;
+    float sourceValue = coreRatio[sourceResource] * fTradingPostEfficiency;
+    float destinationValue = coreRatio[destinationResource];
+    float tRatio = destinationValue / sourceValue;
 
     if (tRatio >= 1.0f) {
         *leftDenominated = 0;
@@ -277,6 +282,10 @@ void ComputeTradeRatios(
         *maxTrade = gpCurPlayer->m_resources[sourceResource];
     }
 }
+#if !H2_STRICT_ENUMS
+#undef destinationValue
+#undef sourceValue
+#endif
 
 VA(0x004acf72, 0x133)
 void DoTradeKnob(struct tag_message message) {

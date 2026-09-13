@@ -1971,6 +1971,10 @@ VA(0x004c05d0, 0x10)
 i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x004c05e0, 0x464)
 void GetDataEntry(
     H2_CONST char* prompt,
@@ -1989,7 +1993,7 @@ void GetDataEntry(
     i32 textLines;
     char cBuf[TEXT_BUFFER_CAPACITY];
     textEntryWidget* pText;
-    tag_message msg;
+    tag_message message;
     i32 nFrame;
 
     wId = ENTRY_TEXT_WIDGET;
@@ -2021,9 +2025,9 @@ void GetDataEntry(
     if (DataEntryWin == NULL)
         MemError();
 
-    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, ENTRY_PROMPT_WIDGET);
-    msg.payload.widget.data.text = prompt;
-    DataEntryWin->BroadcastMessage(msg);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_PROMPT_WIDGET);
+    message.payload.widget.data.text = prompt;
+    DataEntryWin->BroadcastMessage(message);
 
     if (initialText != NULL)
         strcpy(cBuf, initialText);
@@ -2032,27 +2036,27 @@ void GetDataEntry(
             cBuf,
             ""
         );
-    msg.payload.widget.id = ENTRY_TEXT_WIDGET;
-    msg.payload.widget.data.text = cBuf;
-    DataEntryWin->BroadcastMessage(msg);
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
+    message.payload.widget.data.text = cBuf;
+    DataEntryWin->BroadcastMessage(message);
     strcpy(destination, cBuf);
 
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    msg.payload.widget.id = ENTRY_BUTTON_ONE;
-    DataEntryWin->BroadcastMessage(msg);
-    msg.payload.widget.id = ENTRY_BUTTON_SEVEN;
-    DataEntryWin->BroadcastMessage(msg);
-    msg.payload.widget.id = ENTRY_BUTTON_EIGHT;
-    DataEntryWin->BroadcastMessage(msg);
-    msg.payload.widget.id = ENTRY_BUTTON_FIVE;
-    DataEntryWin->BroadcastMessage(msg);
-    msg.payload.widget.id = ENTRY_BUTTON_SIX;
-    DataEntryWin->BroadcastMessage(msg);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    message.payload.widget.id = ENTRY_BUTTON_ONE;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = ENTRY_BUTTON_FIVE;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = ENTRY_BUTTON_SIX;
+    DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
-        msg.payload.widget.id = ENTRY_CANCEL_BUTTON;
-        DataEntryWin->BroadcastMessage(msg);
+        message.payload.widget.id = ENTRY_CANCEL_BUTTON;
+        DataEntryWin->BroadcastMessage(message);
     }
 
     pText = new textEntryWidget(
@@ -2092,6 +2096,9 @@ void GetDataEntry(
     );
     gbAllowTextEntryEscape = true;
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x004c0a50, 0x1fa)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {

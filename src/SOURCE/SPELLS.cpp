@@ -443,11 +443,15 @@ i32 combatManager::FindResurrectArmyIndex(
     return NO_SELECTION;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationHex destHex
+#endif
 VA(0x0049912f, 0x379)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
     i32 H2_UNUSED(unused);
-    i32 destHex;
+    i32 destinationHex;
     if (!ValidHex(hex))
         return 0;
 
@@ -529,12 +533,12 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
 
         case SPELL_TELEPORT:
             if (bInTeleportGetDest) {
-                destHex = hex;
-                if (destHex == giNextActionGridIndex
+                destinationHex = hex;
+                if (destinationHex == giNextActionGridIndex
                     || !m_armies[IDX(
                         gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide
                     )][gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantIndex]
-                            .CanFit(destHex, 0, NULL))
+                            .CanFit(destinationHex, 0, NULL))
                     return 0;
             } else {
                 if (m_hexCells[hex].m_occupantSide != m_currentSide)
@@ -555,6 +559,9 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     }
     return 1;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationHex
+#endif
 
 VA(0x004994a8, 0x1ab)
 void combatManager::SpellMessage(SpellType spell, i32 hex) {

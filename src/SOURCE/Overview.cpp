@@ -1038,20 +1038,27 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0047bd2a, 0x77)
 void game::SetupResources(void) {
     H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resourceIdx;
-    tag_message msg;
+    tag_message message;
 
-    msg.type = MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
-        msg.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
-        msg.payload.widget.data.text = gText;
+        message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
+        message.payload.widget.data.text = gText;
         sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resourceIdx)]);
-        msg.payload.widget.id = IDX(resourceIdx) + RESOURCE_FIRST_WIDGET;
-        overWin->BroadcastMessage(msg);
+        message.payload.widget.id = IDX(resourceIdx) + RESOURCE_FIRST_WIDGET;
+        overWin->BroadcastMessage(message);
     }
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x0047bda1, 0x4b2)
 void game::Overview(void) {

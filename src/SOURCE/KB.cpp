@@ -1076,6 +1076,11 @@ char toupper(char c) {
     return c;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationIndex dstIndex
+#define sourceIndex srcIndex
+#endif
 VA(0x00467ca8, 0x5f3)
 i32 InterpretCommandLine(void) {
     i32 size;
@@ -1165,31 +1170,31 @@ i32 InterpretCommandLine(void) {
                             }
                             case 'A': {
                                 if (i + 3 < size) {
-                                    i32 dstIndex = 0;
-                                    i32 srcIndex = i + 3;
-                                    while (dstIndex < LINE_TCP_TEXT_LENGTH
-                                           && gcCommandLine[srcIndex]
-                                           && gcCommandLine[srcIndex] != ' ') {
-                                        gcTCPAddress[dstIndex] = gcCommandLine[srcIndex];
-                                        srcIndex++;
-                                        dstIndex++;
+                                    i32 destinationIndex = 0;
+                                    i32 sourceIndex = i + 3;
+                                    while (destinationIndex < LINE_TCP_TEXT_LENGTH
+                                           && gcCommandLine[sourceIndex]
+                                           && gcCommandLine[sourceIndex] != ' ') {
+                                        gcTCPAddress[destinationIndex] = gcCommandLine[sourceIndex];
+                                        sourceIndex++;
+                                        destinationIndex++;
                                     }
-                                    gcTCPAddress[dstIndex] = 0;
+                                    gcTCPAddress[destinationIndex] = 0;
                                 }
                                 break;
                             }
                             case 'N': {
                                 if (i + 3 < size) {
-                                    i32 dstIndex = 0;
-                                    i32 srcIndex = i + 3;
-                                    while (dstIndex < LINE_TCP_TEXT_LENGTH
-                                           && gcCommandLine[srcIndex]
-                                           && gcCommandLine[srcIndex] != ' ') {
-                                        gcTCPName[dstIndex] = gcCommandLine[srcIndex];
-                                        srcIndex++;
-                                        dstIndex++;
+                                    i32 destinationIndex = 0;
+                                    i32 sourceIndex = i + 3;
+                                    while (destinationIndex < LINE_TCP_TEXT_LENGTH
+                                           && gcCommandLine[sourceIndex]
+                                           && gcCommandLine[sourceIndex] != ' ') {
+                                        gcTCPName[destinationIndex] = gcCommandLine[sourceIndex];
+                                        sourceIndex++;
+                                        destinationIndex++;
                                     }
-                                    gcTCPName[dstIndex] = 0;
+                                    gcTCPName[destinationIndex] = 0;
                                 }
                                 break;
                             }
@@ -1237,9 +1242,13 @@ i32 InterpretCommandLine(void) {
     }
     return 1;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationIndex
+#undef sourceIndex
+#endif
 
 VA(0x0046829b, 0x619)
-MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
+MessageDispatchResult InitMenuHandler(struct tag_message& message) {
     b32 handled = false;
     i32 idx;
     i32 menu;
@@ -1247,11 +1256,11 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     i32 hoverIndex;
 
     PollSound();
-    if (msg.payload.widget.parameter & MENU_DISABLE_MASK) {
-        if (msg.payload.widget.command == INIT_MENU_HOVER_COMMAND
-            || msg.payload.widget.command == INIT_MENU_HELP_COMMAND) {
+    if (message.payload.widget.parameter & MENU_DISABLE_MASK) {
+        if (message.payload.widget.command == INIT_MENU_HOVER_COMMAND
+            || message.payload.widget.command == INIT_MENU_HELP_COMMAND) {
             helpIndex = -1;
-            switch (msg.payload.widget.id) {
+            switch (message.payload.widget.id) {
                 case MENU_NEW_GAME:
                     helpIndex = MENU_HELP_NEW_GAME;
                     break;
@@ -1273,8 +1282,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             }
         }
     } else {
-        if (msg.type == INIT_MENU_KEY_PRESS) {
-            switch (msg.payload.keyboard.keyCode) {
+        if (message.type == INIT_MENU_KEY_PRESS) {
+            switch (message.payload.keyboard.keyCode) {
                 case MENU_KEY_NEW:
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
                     handled = true;
@@ -1296,22 +1305,22 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     handled = true;
                     break;
             }
-        } else if (msg.type == INIT_MENU_MESSAGE) {
-            if (msg.payload.widget.id < MENU_FIRST_COMMAND
-                || msg.payload.widget.id > MENU_LAST_ACTION) {
+        } else if (message.type == INIT_MENU_MESSAGE) {
+            if (message.payload.widget.id < MENU_FIRST_COMMAND
+                || message.payload.widget.id > MENU_LAST_ACTION) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
-            switch (msg.payload.widget.command) {
+            switch (message.payload.widget.command) {
                 case INIT_MENU_HOVER_COMMAND:
-                    if (msg.payload.widget.id == MENU_MOVIE)
+                    if (message.payload.widget.id == MENU_MOVIE)
                         break;
-                    menu = msg.payload.widget.id - MENU_FIRST_COMMAND;
+                    menu = message.payload.widget.id - MENU_FIRST_COMMAND;
                     idx = menu + MENU_WIDGET_OFFSET;
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = idx;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
+                    message.type = INIT_MENU_MESSAGE;
+                    message.payload.widget.id = idx;
+                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
+                    gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(0, idx, idx);
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_X)],
@@ -1321,7 +1330,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     );
                     break;
                 case INIT_MENU_CLICK_COMMAND:
-                    if (msg.payload.widget.id == MENU_MOVIE) {
+                    if (message.payload.widget.id == MENU_MOVIE) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
@@ -1334,14 +1343,14 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
                         break;
                     } else {
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
                         for (idx = MENU_FIRST_WIDGET; idx <= MENU_LAST_WIDGET; idx++) {
-                            msg.type = INIT_MENU_MESSAGE;
-                            msg.payload.widget.id = idx;
-                            msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                            msg.payload.widget.data.value =
+                            message.type = INIT_MENU_MESSAGE;
+                            message.payload.widget.id = idx;
+                            message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                            message.payload.widget.data.value =
                                 (idx - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
-                            gpInitWin->BroadcastMessage(msg);
+                            gpInitWin->BroadcastMessage(message);
                         }
                         gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
                         gpWindowManager->UpdateScreenRegion(
@@ -1354,15 +1363,15 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     }
                     break;
             }
-        } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
+        } else if (message.type == INIT_MENU_MOUSE_MOVE) {
             hoverIndex = -1;
             for (idx = 0; idx < MENU_HOTSPOT_COUNT; idx++) {
-                if (msg.payload.mouse.screenX >= IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)]
-                    && msg.payload.mouse.screenY >= IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)]
-                    && msg.payload.mouse.screenX
+                if (message.payload.mouse.screenX >= IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)]
+                    && message.payload.mouse.screenY >= IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)]
+                    && message.payload.mouse.screenX
                            < IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)]
                                  + IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_WIDTH)]
-                    && msg.payload.mouse.screenY
+                    && message.payload.mouse.screenY
                            < IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)]
                                  + IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_HEIGHT)]) {
                     hoverIndex = idx;
@@ -1370,12 +1379,12 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             }
             if (hoverIndex != lastIMHoverID) {
                 if (lastIMHoverID != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value =
+                    message.type = INIT_MENU_MESSAGE;
+                    message.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
+                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.data.value =
                         lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
                         0,
                         lastIMHoverID + MENU_WIDGET_OFFSET,
@@ -1389,12 +1398,12 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     );
                 }
                 if (hoverIndex != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value =
+                    message.type = INIT_MENU_MESSAGE;
+                    message.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
+                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.data.value =
                         hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
                         0,
                         hoverIndex + MENU_WIDGET_OFFSET,
@@ -1413,9 +1422,9 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     }
 
     if (handled || giMenuCommand != -1) {
-        msg.type = INIT_MENU_MESSAGE;
-        msg.payload.widget.id = MENU_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = INIT_MENU_MESSAGE;
+        message.payload.widget.id = MENU_CLOSE_COMMAND;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     CheckShingleUpdate();
@@ -1423,20 +1432,20 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
 }
 
 VA(0x004688b4, 0x10)
-MessageDispatchResult NullHandler(struct tag_message& H2_UNUSED(msg)) {
+MessageDispatchResult NullHandler(struct tag_message& H2_UNUSED(message)) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004688c4, 0x145)
-MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
+MessageDispatchResult RecruitHeroHandler(tag_message& message) {
     i16 H2_UNUSED(unusedLocal0L) = 2, H2_UNUSED(unusedLocal1H) = 3,
         H2_UNUSED(unusedLocal2D) = 8, H2_UNUSED(unusedLocal3A) = 9;
     b32 shouldClose = false;
     i32 H2_UNUSED(unusedResult);
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
-                switch (msg.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
@@ -1449,14 +1458,14 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
                 }
                 break;
             case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_recruitState = -1;
                         shouldClose = true;
                         break;
                     case EVENT_WINDOW_THIRD_BUTTON:
                         gpTownManager->m_recruitState = 0;
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
                         break;
                 }
@@ -1466,8 +1475,8 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
         }
     }
     if (shouldClose == 1) {
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1527,14 +1536,14 @@ H2_CONST char* GetBuildingName(FactionType race, BuildingSlotType building) {
 }
 
 VA(0x00468beb, 0xf0)
-void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel) {
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel) {
     i32 level;
     if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
-        memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building >= BUILDING_SLOT_DWELLING_FIRST
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
-            dest,
+            destination,
             gDwellingCosts[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)],
             KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
         );
@@ -1542,14 +1551,14 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
         level = mageLevel + 1;
         if (level > KB_MAGE_GUILD_MAX_LEVEL)
             level = KB_MAGE_GUILD_MAX_LEVEL;
-        memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        memcpy(dest, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
         if (building >= BUILDING_SLOT_DISABLED_SECOND)
             return;
         memcpy(
-            dest,
+            destination,
             gNeutralBuildingCosts[IDX(building)],
             KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
         );
@@ -1693,14 +1702,14 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
 }
 
 VA(0x00469180, 0x1af)
-MessageDispatchResult WaitHandler(tag_message& msg) {
+MessageDispatchResult WaitHandler(tag_message& message) {
     i32 result = 0;
     gbFunctionComplete = true;
     PollSound();
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
                     case EVENT_WINDOW_THIRD_BUTTON:
@@ -1759,16 +1768,16 @@ MessageDispatchResult WaitHandler(tag_message& msg) {
     CheckShingleUpdate();
     if (result != 0) {
         gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046932f, 0x3f2)
-MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
+MessageDispatchResult EventWindowHandler(struct tag_message& message) {
     i32 resType;
     i32 resExtra;
 
@@ -1777,21 +1786,21 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
-        msg.type = MESSAGE_WIDGET;
-        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = MESSAGE_WIDGET;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
-                if (msg.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
-                    switch (msg.payload.widget.id) {
+                if (message.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                    switch (message.payload.widget.id) {
                         case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
                             resType = giResType1;
                             resExtra = giResExtra1;
@@ -1863,7 +1872,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                 }
                 break;
             case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
                     case EVENT_WINDOW_THIRD_BUTTON:
@@ -1872,9 +1881,9 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     case EVENT_WINDOW_SIXTH_BUTTON:
                     case EVENT_WINDOW_SEVENTH_BUTTON:
                     case EVENT_WINDOW_EIGHTH_BUTTON:
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-                        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_IGNORED_BUTTON:
@@ -1890,8 +1899,8 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
 }
 
 VA(0x00469721, 0x13)
-MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg) {
-    return EventWindowHandler(msg);
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& message) {
+    return EventWindowHandler(message);
 }
 
 VA(0x00469734, 0x165)
@@ -2767,10 +2776,10 @@ void ClearMapExtra(void) {
 }
 
 VA(0x0046ba95, 0x79)
-i32 GetMonType(i32 score, HighScoreType campaign) {
+i32 GetMonType(i32 score, HighScoreType highScoreType) {
     i32 idx;
     for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
-        if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
+        if (highScoreType == HIGH_SCORE_CAMPAIGN || highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
             if (score <= giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)])
                 return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
         } else {
@@ -2781,6 +2790,10 @@ i32 GetMonType(i32 score, HighScoreType campaign) {
     return giScoreMon[0][IDX(MONSTER_SCORE_TYPE)];
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationIndex dest_o
+#endif
 VA(0x0046bb0e, 0x405)
 i32 AddScoreToHighScore(
     i32 score,
@@ -2789,7 +2802,7 @@ i32 AddScoreToHighScore(
     HighScoreType highScoreType,
     H2_CONST char* scenarioName
 ) {
-    i32 dest_o;
+    i32 destinationIndex;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
     i32 file_c;
     i32 entry_a;
@@ -2840,8 +2853,8 @@ i32 AddScoreToHighScore(
     }
 
     if (entry_a < HIGH_SCORE_ENTRY_COUNT) {
-        for (dest_o = HIGH_SCORE_LAST_SHIFT_SOURCE; dest_o >= entry_a; dest_o--)
-            entries_a[dest_o + 1] = entries_a[dest_o];
+        for (destinationIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; destinationIndex >= entry_a; destinationIndex--)
+            entries_a[destinationIndex + 1] = entries_a[destinationIndex];
 
         GetDataEntry(
             localization::Tr("high_score.name_prompt"),
@@ -2872,6 +2885,9 @@ i32 AddScoreToHighScore(
     }
     return 0;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationIndex
+#endif
 
 VA(0x0046bf13, 0x5e)
 void BVResMsg(H2_CONST char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
@@ -3234,7 +3250,7 @@ void AddNetBoxLine(H2_CONST char* str, char color) {
 }
 
 VA(0x0046cc61, 0x1d9)
-void ShutDown(H2_CONST char* msg) {
+void ShutDown(H2_CONST char* message) {
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
@@ -3243,8 +3259,8 @@ void ShutDown(H2_CONST char* msg) {
     gbClosingApp = true;
     buf[0] = 0;
     gpMouseManager->SetColorMice(false);
-    if (msg) {
-        strcpy(buf, msg);
+    if (message) {
+        strcpy(buf, message);
         SetFullScreenStatus(false);
         LogStr(buf);
         MessageBoxA(
@@ -3325,7 +3341,7 @@ H2_ENUM_BEGIN(SmackFadeConstant)
 H2_ENUM_END(SmackFadeConstant)
 
 VA(0x0046ced3, 0x236)
-void SmackFade(u8* src, u8* dst) {
+void SmackFade(u8* source, u8* destination) {
     u8* l;
     u8* g;
     i32 a;
@@ -3344,15 +3360,15 @@ void SmackFade(u8* src, u8* dst) {
     memset(l, 0, MISC_PALETTE_BYTE_COUNT);
     memset(g, 0, WINGRAPH_PALETTE_SIZE);
     for (f = SMACK_FADE_FIRST_COLOR; f < SMACK_FADE_COLOR_LIMIT; f++) {
-        b = (src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-             + src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-             + src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
+        b = (source[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
+             + source[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
+             + source[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
             / MISC_PALETTE_COMPONENT_BYTES;
         k = SMACK_FADE_DISTANCE_SENTINEL;
         for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_MATCH_COLOR_LIMIT; h++) {
-            c = (dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-                 + dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-                 + dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
+            c = (destination[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
+                 + destination[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
+                 + destination[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
                 / MISC_PALETTE_COMPONENT_BYTES;
             j = abs(b - c);
             if (j < k) {
@@ -3362,12 +3378,12 @@ void SmackFade(u8* src, u8* dst) {
         }
         memcpy(
             l + f * MISC_PALETTE_COMPONENT_BYTES,
-            dst + a * MISC_PALETTE_COMPONENT_BYTES,
+            destination + a * MISC_PALETTE_COMPONENT_BYTES,
             MISC_PALETTE_COMPONENT_BYTES
         );
         g[f] = (u8)a;
     }
-    FadeTo(src, l, HIGH_SCORE_FADE_STEPS);
+    FadeTo(source, l, HIGH_SCORE_FADE_STEPS);
     i = gpWindowManager->m_screen->m_pixels;
     for (d = 0; d < SMACK_FADE_SCREEN_WIDTH; d++) {
         for (e = 0; e < SMACK_FADE_SCREEN_HEIGHT; e++) {
@@ -3376,7 +3392,7 @@ void SmackFade(u8* src, u8* dst) {
         }
     }
     gpWindowManager->UpdateScreen();
-    UpdatePalette(reinterpret_cast<i8*>(dst));
+    UpdatePalette(reinterpret_cast<i8*>(destination));
     H2_FREE(l);
     H2_FREE(g);
 }
@@ -3453,22 +3469,29 @@ void ShowCongrats(HighScoreType highScoreType) {
     memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0046d4bb, 0x79)
 void CongratsWait(void) {
     i32 H2_UNUSED(command) = 0;
     b32 done = false;
-    tag_message msg;
+    tag_message message;
     gpInputManager->Flush();
     while (!done) {
         PollSound();
         Process1WindowsMessage();
-        msg = gpInputManager->GetEvent();
-        if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN
-            || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN
-            || msg.type == MESSAGE_RIGHT_BUTTON_UP)
+        message = gpInputManager->GetEvent();
+        if (message.type == MESSAGE_KEY_DOWN || message.type == MESSAGE_LEFT_BUTTON_DOWN
+            || message.type == MESSAGE_LEFT_BUTTON_UP || message.type == MESSAGE_RIGHT_BUTTON_DOWN
+            || message.type == MESSAGE_RIGHT_BUTTON_UP)
             done = true;
     }
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 H2_ENUM_BEGIN(SamplePlaybackConstant)
     SAMPLE_PLAYBACK_CHANNEL_GROUP = 2,
@@ -4593,20 +4616,27 @@ i32 GetManaCost(SpellType spell, hero* h) {
     return c;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0046f4ca, 0x88)
 void SetWinText(heroWindow* j, i32 id) {
     i32 H2_UNUSED(a) = 0;
     i32 i;
-    tag_message msg;
+    tag_message message;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
             a++;
-            SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
-            msg.payload.widget.data.text = gWinSetup[i].text;
-            j->BroadcastMessage(msg);
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
+            message.payload.widget.data.text = gWinSetup[i].text;
+            j->BroadcastMessage(message);
         }
     }
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 H2_ENUM_BEGIN(ShingleAnimationConstant)
     SHINGLE_ANIMATION_INTERVAL = 250,

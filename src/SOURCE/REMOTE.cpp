@@ -106,11 +106,15 @@ void RemoteCleanup(void) {
     gbInRemoteCleanup = false;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define gameMessage gameMsg
+#endif
 VA(0x0048d1ac, 0x5ff)
 void RemoteMain(RemoteGameMode gameMode) {
     i8 gotPlayers[REMOTE_PLAYER_COUNT];
     i32 H2_UNUSED(playerState);
-    char* gameMsg;
+    char* gameMessage;
     char* recvData;
     i32 netPlayer;
     b32 pending;
@@ -260,7 +264,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             LogStr("RM 6");
         }
     }
-    gameMsg = NULL;
+    gameMessage = NULL;
     if (giThisNetPos == 0) {
         TransmitRemoteData(
             NULL,
@@ -272,23 +276,23 @@ void RemoteMain(RemoteGameMode gameMode) {
     } else {
         while (bGotGameType == 0) {
             PollSound();
-            gameMsg = GetRemoteData(1);
-            if (gameMsg != NULL
-                && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE) {
+            gameMessage = GetRemoteData(1);
+            if (gameMessage != NULL
+                && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE) {
                 setupCounter = 0;
                 setupCounter++;
                 setupCounter++;
                 setupCounter++;
             }
-            if (gameMsg != NULL
-                && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMsg)->command == IDX(SETUP_CAMPAIGN_GAME)) {
+            if (gameMessage != NULL
+                && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
+                && REMOTE_MESSAGE(gameMessage)->command == IDX(SETUP_CAMPAIGN_GAME)) {
                 bGotGameType = true;
                 giSetupGameType = 1;
             }
-            if (gameMsg != NULL
-                && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMsg)->command == IDX(SETUP_STANDARD_GAME)) {
+            if (gameMessage != NULL
+                && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
+                && REMOTE_MESSAGE(gameMessage)->command == IDX(SETUP_STANDARD_GAME)) {
                 bGotGameType = true;
                 giSetupGameType = 0;
             }
@@ -297,6 +301,9 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("Out Remote Main");
     gbInRemoteMain = false;
 }
+#if !H2_STRICT_ENUMS
+#undef gameMessage
+#endif
 
 VA(0x0048d7ab, 0x51)
 void UnloadRemoteDriver(i16 networkDriver) {
@@ -482,6 +489,10 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define message msg
+#endif
 VA(0x0048dcc0, 0x1d2)
 i32 TransmitRemoteData(
     char* data,
@@ -495,7 +506,7 @@ i32 TransmitRemoteData(
     i32 rv;
     i32 i;
     i32 H2_UNUSED(j);  // unreferenced; retail's frame reserves the slot
-    RemoteMessage msg;
+    RemoteMessage message;
     i32 tries;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
@@ -503,20 +514,20 @@ i32 TransmitRemoteData(
     rv = 0;
     tries = 0;
     iIDCtr++;
-    msg.sender = static_cast<i8>(giThisNetPos);
-    msg.id = iIDCtr;
+    message.sender = static_cast<i8>(giThisNetPos);
+    message.id = iIDCtr;
     if (messageType != REMOTE_MESSAGE_DEFAULT) {
-        msg.type = messageType;
+        message.type = messageType;
     } else {
-        msg.type = reliable != 0 ? REMOTE_MESSAGE_RELIABLE : REMOTE_MESSAGE_UNRELIABLE;
+        message.type = reliable != 0 ? REMOTE_MESSAGE_RELIABLE : REMOTE_MESSAGE_UNRELIABLE;
     }
-    msg.payloadSize = static_cast<u16>(length);
-    msg.command = command;
+    message.payloadSize = static_cast<u16>(length);
+    message.command = command;
     if (length > 0)
-        memcpy(msg.payload, data, length);
+        memcpy(message.payload, data, length);
     while (rv == 0 && tries <= REMOTE_RETRY_COUNT) {
         rv = SendRemoteData(
-            reinterpret_cast<u8*>(&msg),
+            reinterpret_cast<u8*>(&message),
             NULL,
             destination,
             length + REMOTE_MESSAGE_HEADER_SIZE
@@ -549,6 +560,9 @@ i32 TransmitRemoteData(
     }
     return rv;
 }
+#if !H2_STRICT_ENUMS
+#undef message
+#endif
 
 VA(0x0048de92, 0xdd)
 char* GetRemoteData(i8 remove) {

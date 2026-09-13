@@ -994,13 +994,18 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
     gpCurAIHero->UseSpell(SPELL_DIMENSION_DOOR);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationX destX
+#define destinationY destY
+#endif
 VA(0x0047f72a, 0x3b3)
 i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     i32 mx;
     i32 bestX;
-    i32 destX;
+    i32 destinationX;
     i32 my;
-    i32 destY;
+    i32 destinationY;
     i32 bestY;
     i32 side;
     i32 x;
@@ -1050,32 +1055,32 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                         if (posValue > bestVal) {
                             for (side = 0; side < DIMENSION_DOOR_LANDING_CANDIDATE_COUNT; side++) {
                                 if (side == 0) {
-                                    destX = x - 1;
-                                    destY = y;
+                                    destinationX = x - 1;
+                                    destinationY = y;
                                 } else if (side == 1) {
-                                    destX = x;
-                                    destY = y + 1;
+                                    destinationX = x;
+                                    destinationY = y + 1;
                                 } else {
-                                    destX = x + 1;
-                                    destY = y;
+                                    destinationX = x + 1;
+                                    destinationY = y;
                                 }
-                                if (gpSearchArray->GetRow(destX, 1)[MAP_WIDTH * destY].visited)
+                                if (gpSearchArray->GetRow(destinationX, 1)[MAP_WIDTH * destinationY].visited)
                                     continue;
-                                if (destX == gpCurAIHero->m_x && destY == gpCurAIHero->m_y)
+                                if (destinationX == gpCurAIHero->m_x && destinationY == gpCurAIHero->m_y)
                                     continue;
-                                if (destX < 0 || destX > MAP_WIDTH - 1 || destY < 0
-                                    || destY > MAP_HEIGHT - 1)
+                                if (destinationX < 0 || destinationX > MAP_WIDTH - 1 || destinationY < 0
+                                    || destinationY > MAP_HEIGHT - 1)
                                     continue;
                                 if (gpAdvManager->FindAdjacentMonster(
-                                        destX,
-                                        destY,
+                                        destinationX,
+                                        destinationY,
                                         &mx,
                                         &my,
                                         -1,
                                         -1
                                     ))
                                     continue;
-                                arriveCell = gpAdvManager->GetCell(destX, destY);
+                                arriveCell = gpAdvManager->GetCell(destinationX, destinationY);
                                 if (CELL_TERRAIN(arriveCell) == TERRAIN_WATER)
                                     continue;
                                 if (arriveCell->m_flags & IDX(MAP_CELL_OCCUPIED))
@@ -1085,8 +1090,8 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                                 if (arriveCell->m_objectIndex != MAPCELL_SPRITE_NONE
                                     && !(arriveCell->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)))
                                     continue;
-                                bestX = destX;
-                                bestY = destY;
+                                bestX = destinationX;
+                                bestY = destinationY;
                                 bestVal = posValue;
                             }
                         }
@@ -1101,6 +1106,10 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     }
     return 0;
 }
+#if !H2_STRICT_ENUMS
+#undef destinationX
+#undef destinationY
+#endif
 
 VA(0x0047fadd, 0x147)
 i32 philAI::DoDimensionDoor(hero* pHero) {
@@ -2856,12 +2865,12 @@ i32 philAI::CreaturesToBuy(town* t, i32 level) {
 }
 
 VA(0x00483e3a, 0x47)
-i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b) {
-    i32 n = MaxBuyableCreatures(a);
+i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) creatureType, i32 availableCount) {
+    i32 n = MaxBuyableCreatures(creatureType);
     if (n > 1)
         n >>= 1;
-    if (n > b)
-        n = b;
+    if (n > availableCount)
+        n = availableCount;
     if (n > 1)
         return n;
     else
@@ -2869,11 +2878,11 @@ i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b) {
 }
 
 VA(0x00483e81, 0x82)
-i32 philAI::MaxBuyableCreatures(CreatureType level) {
+i32 philAI::MaxBuyableCreatures(CreatureType creatureType) {
     i32 res;
     i32 i;
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
-    GetMonsterCost(level, cost);
+    GetMonsterCost(creatureType, cost);
     for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
         if (cost[i] == 0)
             res = CREATURE_PURCHASE_UNLIMITED;
@@ -4207,6 +4216,10 @@ void philAI::HeroInteractionAtHero(
     }
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationStrength dstStrength
+#endif
 VA(0x00486ed0, 0x7b7)
 void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteraction, i32* value) {
     i32 townFV;
@@ -4225,7 +4238,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     i32 statSum;
     float transferShare;
     i32 battlePower;
-    i32 dstStrength;
+    i32 destinationStrength;
     i32 transferRating;
     b32 hasRoom;
     float transferFactor;
@@ -4396,10 +4409,10 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         secondArmy = (townBetter ? &heroPtr->m_army : &townPtr->m_army);
         if (townBetter) {
             winStrength = townFV;
-            dstStrength = battlePower;
+            destinationStrength = battlePower;
         } else {
             winStrength = battlePower;
-            dstStrength = townFV;
+            destinationStrength = townFV;
         }
         RedistributeTroops(
             fromArmy,
@@ -4407,7 +4420,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
             !townBetter,
             townBetter,
             winStrength,
-            dstStrength,
+            destinationStrength,
             moveCount
         );
         if (giHumanTownConquered == townPtr->m_id
@@ -4415,7 +4428,14 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
             heroPtr->m_remainingMobility = 0;
     }
 }
+#if !H2_STRICT_ENUMS
+#undef destinationStrength
+#endif
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define destinationIndex dstI
+#endif
 VA(0x00487687, 0x3d1)
 void philAI::RedistributeTroops(
     armyGroup* sourceArmy,
@@ -4431,7 +4451,7 @@ void philAI::RedistributeTroops(
     i32 stackValue;
     i32 bestSpeed;
     i32 bestSlot;
-    i32 dstI;
+    i32 destinationIndex;
     i32 fromIdx;
     b32 again;
     i32 army;
@@ -4452,11 +4472,11 @@ void philAI::RedistributeTroops(
         bestSlot = AI_TROOP_EMPTY_SLOT;
         for (fromIdx = 0; fromIdx < AI_TOWN_ARMY_SLOTS; fromIdx++) {
             if (bestSlot == AI_TROOP_EMPTY_SLOT) {
-                for (dstI = 0; dstI < AI_TOWN_ARMY_SLOTS;
-                     dstI++) {
+                for (destinationIndex = 0; destinationIndex < AI_TOWN_ARMY_SLOTS;
+                     destinationIndex++) {
                     if (sourceArmy->m_creatureTypes[fromIdx] != CREATURE_NONE
                         && sourceArmy->m_creatureTypes[fromIdx]
-                               == destinationArmy->m_creatureTypes[dstI]) {
+                               == destinationArmy->m_creatureTypes[destinationIndex]) {
                         bestSlot = fromIdx;
                         break;
                     }
@@ -4553,6 +4573,9 @@ void philAI::RedistributeTroops(
         }
     }
 }
+#if !H2_STRICT_ENUMS
+#undef destinationIndex
+#endif
 
 VA(0x00487a58, 0x23)
 i32 philAI::ChooseGoldOrExperience(i32, i32) {
@@ -5198,17 +5221,17 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 }
 
 VA(0x00488e2b, 0x8a)
-i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
-    i32 cnt = gpCurAIHero->CreatureTypeCount(a1);
+i32 philAI::ComputeUpgradeValue(CreatureType baseCreatureType, CreatureType upgradedCreatureType) {
+    i32 cnt = gpCurAIHero->CreatureTypeCount(baseCreatureType);
     if (cnt == 0)
         return 0;
     i32 rv = static_cast<i32>(
         static_cast<float>(
-            cnt * (gMonsterDatabase[IDX(a2)].fightValue - gMonsterDatabase[IDX(a1)].fightValue)
+            cnt * (gMonsterDatabase[IDX(upgradedCreatureType)].fightValue - gMonsterDatabase[IDX(baseCreatureType)].fightValue)
         )
         * gpCurPlayer->m_aiData.m_upgradeValueWeight
     );
-    if (gpCurAIHero->CreatureTypeCount(a2) != 0)
+    if (gpCurAIHero->CreatureTypeCount(upgradedCreatureType) != 0)
         rv = static_cast<i32>(rv * AI_UPGRADE_EXISTING_STACK_FACTOR);
     return rv;
 }

@@ -212,6 +212,10 @@ i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
+#if !H2_STRICT_ENUMS
+// Preserve VC6's name-dependent stack layout.
+#define sourceRearHex srcRearHex0
+#endif
 VA(0x0044b5ce, 0x9e2)
 i32 army::FlyTo(i32 destination) {
     float xPos;
@@ -232,7 +236,7 @@ i32 army::FlyTo(i32 destination) {
     float xSpeed;
     i32 column;
     i32 frameCount0;
-    i32 srcRearHex0;
+    i32 sourceRearHex;
     i32 H2_UNUSED(slack);
     i32 length;
     i32 lastMinX;
@@ -296,10 +300,10 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        srcRearHex0 = m_hex + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
-        gpCombatManager->m_hexCells[srcRearHex0].m_occupantIndex = -1;
-        gpCombatManager->m_hexCells[srcRearHex0].m_occupantSide = COMBAT_SIDE_NONE;
-        gpCombatManager->m_hexCells[srcRearHex0].m_occupantFrame = ARMY_FACING_NONE;
+        sourceRearHex = m_hex + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
     }
 
     if (!gbNoShowCombat) {
@@ -470,3 +474,6 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->TestRaiseDoor();
     return 1;
 }
+#if !H2_STRICT_ENUMS
+#undef sourceRearHex
+#endif
