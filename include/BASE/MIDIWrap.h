@@ -8,7 +8,7 @@
 class MIDIWrap : public resource {
 public:
     char* m_data;
-    MIDIWrap(H2_CONST char*);
+    MIDIWrap(H2_CONST char* name);
     virtual H2_RETAIL_INLINE ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)

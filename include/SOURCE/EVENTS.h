@@ -323,9 +323,9 @@ H2_ENUM_BEGIN(EventEffectConstant)
     EVENT_FIZZLE_STEPS               = 65
 H2_ENUM_END(EventEffectConstant)
 
-i8 StrEqNoCase(H2_CONST char*, H2_CONST char*);
-i32 GiveArtifact(class hero* heroPtr, ArtifactType artifact, b32 checkEndGame, i8 extra = -1);
-void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
-i32 RiddleStringsEqual(H2_CONST char*, H2_CONST char*);
+i8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString);
+i32 GiveArtifact(class hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra = -1);
+void GiveTakeArtifactStat(class hero* targetHero, ArtifactType artifact, b32 take);
+i32 RiddleStringsEqual(H2_CONST char* answer, H2_CONST char* expected);
 
 #endif
