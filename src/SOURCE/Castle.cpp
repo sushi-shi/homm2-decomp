@@ -142,18 +142,17 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
         if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
             && castleSlotsBase[slotNum] <= BUILDING_SLOT_DWELLING_SIXTH
-            && ((m_town->m_buildings & (1L << H2EnumIndex(castleSlotsBase[slotNum])))
-                || (m_town->m_buildings
-                    & (1L << (H2EnumIndex(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))
+            && ((H2EnumIndex((m_town->m_buildings) & ((1L << H2EnumIndex(castleSlotsBase[slotNum])))))
+                || (H2EnumIndex((m_town->m_buildings) & ((1L << (H2EnumIndex(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))))
                 || (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
-                    && (m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
+                    && (H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
             && (gTownEligibleBuildMask[H2EnumIndex(m_town->m_type)]
                 & (1L << (H2EnumIndex(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
-                && ((m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6))
-                    || (m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
+                && ((H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6))))
+                    || (H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))))) {
                 castleSlotsUse[slotNum] = BUILDING_SLOT_DWELLING_LAST;
             } else {
                 castleSlotsUse[slotNum] = castleSlotsBase[slotNum] + CASTLE_UPGRADE_OFFSET;
@@ -197,8 +196,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("castle.mage_guild.level")
                      ,
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
-                                                                     : TOWN_MAGE_GUILD_MAX_LEVEL
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
             );
             msg.payload.widget.data.text = gText;
         } else {
@@ -212,9 +210,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         stateFrame = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << H2EnumIndex(castleSlotsUse[slotNum])))
-            && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+        if (TOWN_BUILDING_COMPLETE(*m_town, castleSlotsUse[slotNum])) {
             stateFrame = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << H2EnumIndex(castleSlotsUse[slotNum]))))
@@ -657,9 +653,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = CASTLE_WIDGET_TEXT;
-        message.payload.widget.id = CONTROL_STATUS_TEXT;
+        SET_WIDGET_MESSAGE(message, CASTLE_WIDGET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
@@ -681,19 +675,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case CONTROL_CAPTAIN_FORMATION_SPREAD:
                         if (quickFlag) {
-                            NormalDialog(
-                                localization::Tr("formation.spread.help")
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.spread.help"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
@@ -703,19 +685,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case CONTROL_CAPTAIN_FORMATION_GROUPED:
                         if (quickFlag) {
-                            NormalDialog(
-                                localization::Tr("formation.grouped.help")
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.grouped.help"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;

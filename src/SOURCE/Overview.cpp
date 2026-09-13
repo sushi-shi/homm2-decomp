@@ -362,8 +362,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             b32 capt;
             i32 captainMana;
             {
-                valueText = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1));
-                strcpy(valueText, record->m_name);
+                ALLOC_COPY_STRING(valueText, record->m_name);
 
                 OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                     TOWN_NAME_X,
@@ -383,7 +382,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 townFrame = H2EnumIndex(record->m_type);
-                if ((record->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE)) == 0) {
+                if ((H2EnumIndex((record->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))) == 0) {
                     townFrame += TOWN_UNFORTIFIED_FRAME_OFFSET;
                 }
                 OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
@@ -430,7 +429,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             if (record->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
                 heroData = GetHero(record->m_occupyingHeroId);
             } else {
-                if ((record->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS)) != 0) {
+                if ((H2EnumIndex((record->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS)))) != 0) {
                     capt = true;
                 }
             }
@@ -517,8 +516,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 displayedTroops = 0;
                 for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
-                    if (record->m_army.m_creatureTypes[i] != CREATURE_NONE
-                        && record->m_army.m_creatureCounts[i] > 0) {
+                    if (ARMY_GROUP_HAS_POSITIVE_STACK(record->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(
                                 displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X
@@ -796,8 +794,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 shown = 0;
                 for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
-                    if (curHero->m_army.m_creatureTypes[i] != CREATURE_NONE
-                        && curHero->m_army.m_creatureCounts[i] > 0) {
+                    if (ARMY_GROUP_HAS_POSITIVE_STACK(curHero->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X),
                             static_cast<i16>(
@@ -1007,9 +1004,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         giOverviewTop[H2EnumIndex(giOverviewType)] = 0;
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
-    message.payload.widget.id = TITLE_WIDGET;
+    SET_WIDGET_MESSAGE(message, OVERVIEW_WIDGET_SET_FRAME, TITLE_WIDGET);
     message.payload.widget.data.value = H2EnumIndex(giOverviewType) + OVERVIEW_TITLE_FRAME_BASE;
     overWin->BroadcastMessage(message);
     message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
@@ -1036,10 +1031,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         }
     }
     for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        titleText = static_cast<char*>(
-            H2_ALLOC(strlen(cOverviewText[col + H2EnumIndex(giOverviewType) * OVERVIEW_TITLE_COUNT]) + 1)
-        );
-        strcpy(titleText, cOverviewText[col + H2EnumIndex(giOverviewType) * OVERVIEW_TITLE_COUNT]);
+        ALLOC_COPY_STRING(titleText, cOverviewText[col + H2EnumIndex(giOverviewType) * OVERVIEW_TITLE_COUNT]);
         textWidgetTitle[col] = new textWidget(
             titleX[H2EnumIndex(giOverviewType)][col],
             OVERVIEW_TITLE_Y,
@@ -1473,15 +1465,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                 item = widgetId - HERO_STAT_FIRST;
                 NormalDialog(
                     gStatDesc[item],
-                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_VALUE,
-                    0
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                 );
             }
         }

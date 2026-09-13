@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <BASE/widget.h>
+#include <BASE/message.h>
 #include <BASE/button.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -74,10 +76,7 @@ button::button(
 
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
@@ -94,11 +93,6 @@ void button::Read(void) {
 inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
-
-#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
-    messageValue.type = MESSAGE_WIDGET;                                                          \
-    messageValue.payload.widget.command = commandValue;                                          \
-    messageValue.payload.widget.id = idValue
 
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && (H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))
@@ -155,7 +149,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
             i16 x = msg.payload.mouse.x - m_owner->m_posX;
             i16 y = msg.payload.mouse.y - m_owner->m_posY;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
@@ -163,8 +157,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
 
-            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) && x >= m_x && y >= m_y && x < m_x + m_width
-                && y < m_y + m_height) {
+            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) && WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 Select(msg);
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
                     PollSound();
@@ -172,7 +165,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     if (msg.type == MESSAGE_MOUSE_MOVE) {
                         x = msg.payload.mouse.x - m_owner->m_posX;
                         y = msg.payload.mouse.y - m_owner->m_posY;
-                        if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                        if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                             if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                                 Select(msg);
                             }
@@ -237,7 +230,6 @@ MessageDispatchResult button::Deselect(struct tag_message& msg) {
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-#undef SET_WIDGET_MESSAGE
 
 void button::Draw(void) {
     if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {

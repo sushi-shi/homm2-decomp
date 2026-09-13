@@ -2,6 +2,7 @@
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -69,9 +70,7 @@ i32 DoArenaDialog(void) {
         MemError();
 
     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("adventure.arena.choose_skill"));
-    message14.type = MESSAGE_WIDGET;
-    message14.payload.widget.command = ARENA_BROADCAST_TEXT;
-    message14.payload.widget.id = BROADCAST_TEXT_ID;
+    SET_WIDGET_MESSAGE(message14, ARENA_BROADCAST_TEXT, BROADCAST_TEXT_ID);
     message14.payload.widget.data.text = gText;
     arenaWinPtr->BroadcastMessage(message14);
 
@@ -162,18 +161,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
                         case WIDGET_FIRST_ID + 1:
                         case WIDGET_LAST_ID:
                             choice = message_1.payload.widget.id - WIDGET_FIRST_ID;
-                            NormalDialog(
-                                gStatDesc[choice],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
-                            );
+                            NormalDialog(gStatDesc[choice], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
                 }

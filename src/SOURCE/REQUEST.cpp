@@ -400,9 +400,7 @@ i32 fileRequester::Open(i32 id) {
         m_window->BroadcastMessage(message);
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
-    message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
     m_window->BroadcastMessage(message);
     Update(0);
@@ -432,9 +430,11 @@ i32 fileRequester::Open(i32 id) {
 
 void fileRequester::SetOK(i32 enabled) {
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.id = FILE_REQUESTER_OK;
+    SET_WIDGET_MESSAGE(
+        message,
+        enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
+        FILE_REQUESTER_OK
+    );
     message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAG_GRAYED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -529,15 +529,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     localization::Tr("requester.selection.required")
 
                                     ,
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -633,15 +625,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (helpIndexMouse >= REQUESTER_HELP_VALID_BEGIN) {
                             NormalDialog(
                                 gFileRequestHelp[H2EnumIndex(helpIndexMouse)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         }
                     } else {
@@ -663,18 +647,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         ),
                                         giNumHumanPlayers
                                     );
-                                    NormalDialog(
-                                        gText,
-                                        NORMAL_DIALOG_INFO,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        NORMAL_DIALOG_NO_VALUE,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0
-                                    );
+                                    NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                                     break;
                                 }
                                 giMapSizeFilter = FileRequesterMapSizeFilterFromCode(iResult);
@@ -699,9 +672,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             case FILE_REQUESTER_FILENAME_ENTRY: {
-                                broadcastMessage.type = MESSAGE_WIDGET;
-                                broadcastMessage.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
-                                broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+                                SET_WIDGET_MESSAGE(
+                                    broadcastMessage,
+                                    WIDGET_COMMAND_GET_TEXT,
+                                    FILE_REQUESTER_FILENAME_ENTRY
+                                );
                                 m_window->BroadcastMessage(broadcastMessage);
 
                                 memset(newNameData, 0, FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE);
@@ -854,18 +829,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult,
                     giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
@@ -877,18 +841,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult,
                     iResult - giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_CONFIRM,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
                     acceptStep = false;
                 }

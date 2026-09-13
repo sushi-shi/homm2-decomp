@@ -271,9 +271,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 0,
                 sizeof(SNetPlayerInfo),
                 H2EnumIndex(SETUP_PLAYER_INFO),
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             LogStr("RM 6");
         }
@@ -284,12 +282,8 @@ void RemoteMain(RemoteGameMode gameMode) {
             NULL,
             REMOTE_BROADCAST_PLAYER,
             0,
-            static_cast<i8>(
-                giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME
-            ),
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
+            static_cast<i8>(giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME),
+            1
         );
     } else {
         while (bGotGameType == 0) {
@@ -435,16 +429,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                         nb_snd(static_cast<i16>(destination), static_cast<i16>(size), PacketSend)
                     );
                     if (sendStatus != 0) {
-                        LogInt(
-                            "Bad return on Send Data",
-                            destination,
-                            sendStatus,
-                            size,
-                            0,
-                            0,
-                            LOG_UNUSED_VALUE,
-                            LOG_UNUSED_VALUE
-                        );
+                        LogInt("Bad return on Send Data", destination, sendStatus, size, 0, 0);
                         return false;
                     }
                 } while (sendStatus != 0);
@@ -553,18 +538,7 @@ i32 TransmitRemoteData(
             DelayMilli(REMOTE_SEND_RETRY_DELAY);
         }
         if (allowRetryDialog != 0 && tries == REMOTE_RETRY_COUNT && rv == 0) {
-            NormalDialog(
-                  localization::Tr("network.send.retry"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("network.send.retry"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 tries = -1;
         }
@@ -664,9 +638,7 @@ void PollRemote(void) {
                     localization::Tr("network.remote.player_not_responding"),
                     gsNetPlayerInfo[queueIndex].name
                 );
-                NormalDialog(
-                    gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                     lLastHeartbeatReceive[queueIndex] = platform::Ticks();
                 } else {
@@ -700,9 +672,7 @@ void PollRemote(void) {
                     localization::Tr("network.remote.connection_broken")
                 );
             }
-            NormalDialog(
-                gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-            );
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 lLastHeartbeatReceive[0] = platform::Ticks();
             } else if (giThisNetPos == 1) {
@@ -719,9 +689,7 @@ void PollRemote(void) {
                     localization::Tr("network.player_exit.continue_with_computers"),
                     save_names::PlayerExit
                 );
-                NormalDialog(
-                    gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                     DropDownToOnePlayer();
                 else
@@ -815,33 +783,14 @@ i32 TransmitAndWait(
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
     receivedData = NULL;
-    result = TransmitRemoteData(
-        bytes,
-        destination,
-        length,
-        command,
-        1,
-        1,
-        REMOTE_MESSAGE_DEFAULT
-    );
+    result = TransmitRemoteData(bytes, destination, length, command, 1);
     if (result == 0)
         goto transmitComplete;
     clock = platform::Ticks();
     complete = false;
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < platform::Ticks()) {
-            NormalDialog(
-                  localization::Tr("network.send.retry"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("network.send.retry"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 clock = platform::Ticks();
             } else {

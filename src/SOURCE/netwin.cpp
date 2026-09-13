@@ -28,12 +28,8 @@ i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     i32 plr;
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
-        NormalDialog(
-            localization::Tr("network.tcp.fullscreen_warning"),
-            1,
-            -1, -1, -1, 0, -1, 0, -1, 0
-        );
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
+        NormalDialog(localization::Tr("network.tcp.fullscreen_warning"), 1);
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;
@@ -73,14 +69,14 @@ i16 wsnet_init(void) {
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         } else {
             utf8::Format(
                 cWSTextBuffer,
                 localization::Tr("network.tcp.host.waiting_guests"),
                 platform::HostText(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -98,7 +94,7 @@ i16 wsnet_init(void) {
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
             }
         } else {
             utf8::Format(
@@ -110,7 +106,7 @@ i16 wsnet_init(void) {
                 platform::HostText(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
@@ -144,18 +140,7 @@ i16 wsnet_init(void) {
             }
             giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
             if (giNetPosToDCOPos[0] == -1) {
-                NormalDialog(
-                    localization::Tr("network.tcp.host_address.invalid"),
-                    NORMAL_DIALOG_WAIT_FIRST,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("network.tcp.host_address.invalid"), NORMAL_DIALOG_WAIT_FIRST);
             }
         } while (giNetPosToDCOPos[0] == -1);
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
@@ -165,7 +150,7 @@ i16 wsnet_init(void) {
             "%s",
             localization::Tr("network.tcp.host.searching")
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -229,7 +214,7 @@ void wsSendMessage(
                     localization::Tr("network.tcp.send_command_error"),
                     error
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
                 H2_FREE(packetBuffer);
                 return;
             }
@@ -239,7 +224,7 @@ void wsSendMessage(
         iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
         if (iRc < 0) {
             utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
             H2_FREE(packetBuffer);
             return;
         }
@@ -321,16 +306,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         }
                     }
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                    LogInt(
-                        "Got HereIAm from ",
-                        sender,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
-                    );
+                    LogInt("Got HereIAm from ", sender);
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(message);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
@@ -350,16 +326,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = *(message + offsetof(WinsockStartupMessage, playerCount));
             giThisNetPos = *(message + offsetof(WinsockStartupMessage, netPosition));
-            LogInt(
-                "WSMSGSTARTUP",
-                giThisNetPos,
-                sender,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("WSMSGSTARTUP", giThisNetPos, sender);
             memcpy(
                 giNetPosToDCOPos,
                 message + offsetof(WinsockStartupMessage, playerAddresses),
@@ -374,7 +341,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 "%s",
                 localization::Tr("network.tcp.host.rejected")
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
@@ -384,9 +351,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 "%s",
                 localization::Tr("network.tcp.host.waiting_setup")
             );
-            windowMessage.type = MESSAGE_WIDGET;
-            windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            windowMessage.payload.widget.id = 1;
+            SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, 1);
             windowMessage.payload.widget.data.text = cWSTextBuffer;
             pNormalDialogWindow->BroadcastMessage(windowMessage);
             pNormalDialogWindow->DrawWindow();
@@ -401,7 +366,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             );
             if (giDebugLevel > 0) {
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cWSTextBuffer);
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
             LogStr(cWSTextBuffer);
             break;
@@ -432,9 +397,7 @@ i32 wsWaitForExtraGuests(void) {
             platform::HostText(gIn_addrIP),
             giNumHumanPlayers - 1
         );
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = 1;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
         message.payload.widget.data.text = cWSTextBuffer;
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();
@@ -467,7 +430,7 @@ i32 wsWaitForHost(void) {
                     "%s",
                     localization::Tr("network.tcp.host.not_responding")
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(NULL);
                 iWSAttempts = 0;

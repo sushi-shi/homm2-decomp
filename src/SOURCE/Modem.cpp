@@ -82,7 +82,7 @@ void ModemSetup(i32 mode) {
             directConnectMessage3,
             localization::Tr("network.modem.direct_wait")
         );
-        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         LogStr("MS5");
@@ -128,7 +128,7 @@ void GUIModemCommand(const char* message, const char* command) {
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
     strcpy(cModemCommand, command);
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
 }
@@ -165,7 +165,7 @@ i8 GUIModemResponse(const char* message, const char* response) {
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
     giWaitType = DIALOG_WAIT_MODEM_RESPONSE;
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
     return 0;

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -217,8 +218,7 @@ army::army(void) {
         m_samples[H2EnumIndex(sampleType)] = NULL;
     }
     m_drawEnabled = true;
-    m_targetSide = COMBAT_SIDE_NONE;
-    m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*this);
     m_attackDirection = COMBAT_DIRECTION_INVALID;
     m_unknown5e = 0;
     m_moveTargetHex = 0;
@@ -272,8 +272,7 @@ void army::Init(
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     m_luckOutcome = 0;
-    m_targetSide = COMBAT_SIDE_NONE;
-    m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*this);
     m_attackDirection = COMBAT_DIRECTION_INVALID;
     m_speed = m_monster.speed;
     m_quantity = quantity;
@@ -292,9 +291,7 @@ void army::Init(
         gpCombatManager->m_combatTowns[H2EnumIndex(m_side)],
         gpCombatManager->m_armyGroups[H2EnumIndex(OppositeCombatSide(m_side))]
     );
-    if (m_monsterType == CREATURE_EARTH_ELEMENTAL || m_monsterType == CREATURE_AIR_ELEMENTAL
-        || m_monsterType == CREATURE_FIRE_ELEMENTAL || m_monsterType == CREATURE_WATER_ELEMENTAL
-        || (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_NO_MORALE)))) {
+    if (IS_ELEMENTAL_CREATURE(m_monsterType) || (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_NO_MORALE)))) {
         m_morale = 0;
     }
     m_luck = gpGame->GetLuck(
@@ -344,13 +341,13 @@ void army::LoadResources(void) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sshot.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_SHOT)] = gpResourceManager->GetSample(gText);
     }
-    if (m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD) {
+    if (IS_VAMPIRE_CREATURE(m_monsterType)) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sext1.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sext2.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_TWO)] = gpResourceManager->GetSample(gText);
     }
-    if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
+    if (IS_LICH_CREATURE(m_monsterType)) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sexpl.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
     }
@@ -363,13 +360,13 @@ void army::LoadResources(void) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "halflmsl.icn");
         } else if (m_monsterType == CREATURE_ARCHER || m_monsterType == CREATURE_RANGER) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "arch_msl.icn");
-        } else if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
+        } else if (IS_LICH_CREATURE(m_monsterType)) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "lich_msl.icn");
         } else if (m_monsterType == CREATURE_ORC || m_monsterType == CREATURE_ORC_CHIEF) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "orc__msl.icn");
         } else if (m_monsterType == CREATURE_DRUID || m_monsterType == CREATURE_GREATER_DRUID) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "druidmsl.icn");
-        } else if (m_monsterType == CREATURE_TROLL || m_monsterType == CREATURE_WAR_TROLL) {
+        } else if (IS_TROLL_CREATURE(m_monsterType)) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "trollmsl.icn");
         } else {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "elf__msl.icn");
@@ -564,10 +561,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 quantY,
                 QUANTITY_STATUS_FRAME,
                 &m_creatureLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         } else if (giSpellEffectShowType == SPELL_EFFECT_DISPLAY_SPELL_ICON) {
             drawn = gpCombatManager->m_combatIcons[H2EnumIndex(COMBAT_ICON_STATUS)]->CombatClipDrawToBuffer(
@@ -592,10 +586,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 quantY,
                 statusIcon + EFFECT_STATUS_FRAME_OFFSET,
                 &m_creatureLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (drawn != ICON_DRAW_SKIPPED) {
@@ -848,12 +839,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
                 + m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed]
                       / m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
             );
-            gpWindowManager->UpdateScreenRegion(
-                tempLeft,
-                tempTop,
-                tempRight - tempLeft + 1,
-                tempBottom - tempTop + 1
-            );
+            UPDATE_INCLUSIVE_REGION(tempLeft, tempTop, tempRight, tempBottom);
         }
     }
 
@@ -990,7 +976,7 @@ void army::SpecialAttack(void) {
 
     xCentre = pEnemy->MidX();
     yCentre = pEnemy->MidY();
-    if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
+    if (IS_LICH_CREATURE(m_monsterType)) {
         xCentre = gpCombatManager->m_hexCells[pEnemy->m_hex].m_x;
         yCentre =
             gpCombatManager->m_hexCells[pEnemy->m_hex].m_y - PROJECTILE_TARGET_Y_OFFSET;
@@ -1066,7 +1052,7 @@ void army::SpecialAttack(void) {
     arrowHalfH = DEFAULT_MISSILE_HALF_HEIGHT;
     spacing = DEFAULT_MISSILE_SPACING;
     shotDelay = DEFAULT_MISSILE_DELAY;
-    if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
+    if (IS_LICH_CREATURE(m_monsterType)) {
         spacing = LICH_MISSILE_SPACING;
         shotDelay = LICH_MISSILE_DELAY;
         arrowHalfW = LICH_MISSILE_HALF_WIDTH;
@@ -1089,18 +1075,11 @@ void army::SpecialAttack(void) {
     landY = pEnemy->MidY();
     xStretch = landX - startX;
     yStretch = landY - startY;
-    pathDist = static_cast<i32>(
-        sqrt(static_cast<double>(xStretch * xStretch + yStretch * yStretch))
-    );
+    pathDist = INTEGER_VECTOR_LENGTH(xStretch, yStretch);
     moveCount = (pathDist + (spacing >> 1)) / spacing;
 
     if (m_monsterType == CREATURE_MAGE || m_monsterType == CREATURE_ARCHMAGE) {
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         DelayMilli(
             static_cast<i32l>(
                 H2EnumIndex(ARMY_MAGE_BOLT_DELAY)
@@ -1210,20 +1189,12 @@ void army::SpecialAttack(void) {
                 bIconFlip
             );
             if (k == 0) {
-                gpWindowManager->UpdateScreenRegion(
-                    giMinExtentX,
-                    giMinExtentY,
-                    giMaxExtentX - giMinExtentX + 1,
-                    giMaxExtentY - giMinExtentY + 1
-                );
+                UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             } else {
                 DelayTil(glTimers);
-                gpWindowManager
-                    ->UpdateScreenRegion(clipLeft, clipTop, maxX - clipLeft + 1, maxY - clipTop + 1);
+                UPDATE_INCLUSIVE_REGION(clipLeft, clipTop, maxX, maxY);
             }
-            glTimers[0] = static_cast<i32>(
-                platform::Ticks() + shotDelay * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(shotDelay);
             oldTipX = inFlightX;
             oldTipY = inFlightY;
             inFlightX += gainX;
@@ -1254,7 +1225,7 @@ void army::SpecialAttack(void) {
     powVal = COMBAT_EFFECT_INVALID;
     effectX = -1;
     effectY = -1;
-    if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
+    if (IS_LICH_CREATURE(m_monsterType)) {
         i32 adjacentHex;
         army* splashTarget;
 
@@ -1303,21 +1274,18 @@ void army::SpecialAttack(void) {
         } else {
             FormatCombatDamage(
                 gText,
-                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                CREATURE_DISPLAY_NAME(m_monsterType, m_quantity),
                 m_quantity > 1,
                 damageDone,
                 killed,
-                killed > 1 ? gArmyNamesPlural[H2EnumIndex(pEnemy->m_monsterType)]
-                           : gArmyNames[H2EnumIndex(pEnemy->m_monsterType)]
+                CREATURE_DISPLAY_NAME(pEnemy->m_monsterType, killed)
             );
             utf8::UppercaseFirst(gText);
         }
     } else {
         FormatCombatDamage(
             gText,
-            m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                           : gArmyNames[H2EnumIndex(m_monsterType)],
+            CREATURE_DISPLAY_NAME(m_monsterType, m_quantity),
             m_quantity > 1,
             damageDone,
             0,
@@ -1358,8 +1326,7 @@ void army::SpecialAttack(void) {
         SpecialAttack();
         bSecondAttack = false;
     }
-    if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
-        || m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
+    if (ARMY_HAS_BERSERK_OR_HYPNOTIZE(*this)) {
         CancelSpellType(ArmySpellCancelType(1));
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
@@ -1439,8 +1406,7 @@ void army::DoHydraAttack(i32) {
     gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_ATTACK)]);
     FormatCombatDamage(
         gText,
-        m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                       : gArmyNames[H2EnumIndex(m_monsterType)],
+        CREATURE_DISPLAY_NAME(m_monsterType, m_quantity),
         m_quantity > 1,
         totDamage,
         totKilled,
@@ -1587,28 +1553,24 @@ void army::DoAttack(i32 retaliation) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::TrPlural("combat.genie.destroy_half", m_quantity),
-            m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                           : gArmyNames[H2EnumIndex(m_monsterType)]
+            CREATURE_DISPLAY_NAME(m_monsterType, m_quantity)
         );
         utf8::UppercaseFirst(gText);
     } else {
         if (killed_1 > 0) {
             FormatCombatDamage(
                 gText,
-                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                CREATURE_DISPLAY_NAME(m_monsterType, m_quantity),
                 m_quantity > 1,
                 damage_4,
                 killed_1,
-                killed_1 > 1 ? gArmyNamesPlural[H2EnumIndex(target_18->m_monsterType)]
-                             : gArmyNames[H2EnumIndex(target_18->m_monsterType)]
+                CREATURE_DISPLAY_NAME(target_18->m_monsterType, killed_1)
             );
             utf8::UppercaseFirst(gText);
         } else {
             FormatCombatDamage(
                 gText,
-                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                CREATURE_DISPLAY_NAME(m_monsterType, m_quantity),
                 m_quantity > 1,
                 damage_4,
                 0,
@@ -1715,7 +1677,7 @@ void army::DoAttack(i32 retaliation) {
         || (target_18->m_monsterType != CREATURE_GRIFFIN
             && (H2EnumIndex((target_18->m_monster.flags.all) & (MONSTER_FLAGS_RETALIATED))))
         || m_monsterType == CREATURE_ROGUE || m_monsterType == CREATURE_SPRITE
-        || m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD
+        || IS_VAMPIRE_CREATURE(m_monsterType)
         || effectStopsRetaliation_4 || retaliation;
     if (!retaliationBlocked) {
         DelayMilli(
@@ -1795,9 +1757,7 @@ void army::DoAttack(i32 retaliation) {
         }
     }
 attackDone:
-    if (!retaliation
-        && (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
-            || m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])) {
+    if (!retaliation && ARMY_HAS_BERSERK_OR_HYPNOTIZE(*this)) {
         CancelSpellType(ArmySpellCancelType(1));
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
@@ -1969,8 +1929,7 @@ void army::CheckLuck(void) {
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::TrPlural("combat.luck.bad", m_quantity),
-                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                               : gArmyNames[H2EnumIndex(m_monsterType)]
+                CREATURE_DISPLAY_NAME(m_monsterType, m_quantity)
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
@@ -1978,13 +1937,12 @@ void army::CheckLuck(void) {
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::TrPlural("combat.luck.good", m_quantity),
-                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
-                               : gArmyNames[H2EnumIndex(m_monsterType)]
+                CREATURE_DISPLAY_NAME(m_monsterType, m_quantity)
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
         }
-        WaitEndSample(&luckSample, -1);
+        WaitEndSample(&luckSample);
         if (m_luckOutcome > 0) {
             gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
             gpMouseManager->ShowColorPointer();
@@ -2028,10 +1986,7 @@ void army::DamageEnemy(
     diff = m_monster.attack + attackAdd
                         - (target->m_monster.defense + defBonus + defenseModifier);
     if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)]
-        && (target->m_monsterType == CREATURE_GREEN_DRAGON
-            || target->m_monsterType == CREATURE_RED_DRAGON
-            || target->m_monsterType == CREATURE_BLACK_DRAGON
-            || target->m_monsterType == CREATURE_BONE_DRAGON)) {
+        && IS_DRAGON_CREATURE(target->m_monsterType)) {
         diff += ARMY_DRAGON_SLAYER_BONUS;
     }
     if (gpCombatManager->m_drawbridgeBackgroundVisible) {
@@ -2417,7 +2372,7 @@ void army::PowEffect(
             }
         }
         glTimers[0] =
-            static_cast<i32>(platform::Ticks() + frameDelay * gfCombatSpeedMod[gConfig.combatSpeed]);
+            COMBAT_DEADLINE(frameDelay);
         if (drawEffect && animFrame < giNumPowFrames[H2EnumIndex(gCurLoadedSpellEffect)]) {
             gCurSpellEffectFrame = animFrame;
         }
@@ -2429,18 +2384,10 @@ void army::PowEffect(
                 effectY + m_spellEffectYOffset,
                 gCurSpellEffectFrame,
                 &m_spellLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
     }
     if (!gbNoShowCombat) {
         WaitSample(ARMY_SAMPLE_ATTACK);
@@ -2504,9 +2451,7 @@ void army::PowEffect(
             }
         }
         if (animMore) {
-            glTimers[0] = static_cast<i32>(
-                platform::Ticks() + frameDelay * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(frameDelay);
             gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
     }
@@ -2559,8 +2504,7 @@ u32l army::Strength(void) {
 }
 
 i32 army::LeaveNoBody(void) {
-    return m_monsterType == CREATURE_EARTH_ELEMENTAL || m_monsterType == CREATURE_AIR_ELEMENTAL
-           || m_monsterType == CREATURE_FIRE_ELEMENTAL || m_monsterType == CREATURE_WATER_ELEMENTAL
+    return IS_ELEMENTAL_CREATURE(m_monsterType)
            || (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)));
 }
 
@@ -2597,8 +2541,7 @@ void army::ProcessDeath(i32 immediate) {
             gpCombatManager->m_removedArmies[H2EnumIndex(m_side)][m_index] = 1;
             gpCombatManager->m_removedArmyPresent = 1;
         } else {
-            frontCell_1->m_occupantSide = COMBAT_SIDE_NONE;
-            frontCell_1->m_occupantIndex = -1;
+            CLEAR_HEX_OCCUPANT(*frontCell_1);
         }
     }
     if (frontCell_1->m_deadOccupantCount < CORPSE_LIMIT && !LeaveNoBody()
@@ -2621,11 +2564,9 @@ void army::ProcessDeath(i32 immediate) {
         }
     }
     if (!LeaveNoBody()) {
-        frontCell_1->m_occupantSide = COMBAT_SIDE_NONE;
-        frontCell_1->m_occupantIndex = -1;
+        CLEAR_HEX_OCCUPANT(*frontCell_1);
         if (rearCell) {
-            rearCell->m_occupantSide = COMBAT_SIDE_NONE;
-            rearCell->m_occupantIndex = -1;
+            CLEAR_HEX_OCCUPANT(*rearCell);
         }
     }
     if (m_mirrorSourceIndex != -1) {
@@ -2974,9 +2915,9 @@ void army::GoBerserk(void) {
         }
         if (nearestIndex_1 != -1 && (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER)))
             && m_monster.shots > 0) {
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex =
-                gpCombatManager->m_armies[H2EnumIndex(nearestSide_8)][nearestIndex_1].m_hex;
+            SET_NEXT_COMBAT_MOVE(
+                gpCombatManager->m_armies[H2EnumIndex(nearestSide_8)][nearestIndex_1].m_hex
+            );
             goto berserkFinish;
         }
         {
@@ -3056,8 +2997,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
 
 again:
     gpCombatManager->m_limitCreature = false;
-    m_targetSide = COMBAT_SIDE_NONE;
-    m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*this);
     if (!ValidHex(destination)) {
         return;
     }
@@ -3117,8 +3057,7 @@ again:
                     adjacentHex_16 = GetAdjacentCellIndex(sourceHex_8, direction_3);
                     if (ValidHex(adjacentHex_16)) {
                         adjacentCell = &gpCombatManager->m_hexCells[adjacentHex_16];
-                        if (adjacentCell->m_occupantSide == m_targetSide
-                            && adjacentCell->m_occupantIndex == m_targetIndex) {
+                        if (HEX_HAS_OCCUPANT(*adjacentCell, m_targetSide, m_targetIndex)) {
                             m_attackDirection = direction_3;
                         }
                     }
@@ -3196,10 +3135,8 @@ float army::SpellCastWorkChance(SpellType spell) {
     if (m_monsterType == CREATURE_CRUSADER && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))) || m_monsterType == CREATURE_EARTH_ELEMENTAL
-         || m_monsterType == CREATURE_AIR_ELEMENTAL || m_monsterType == CREATURE_FIRE_ELEMENTAL
-         || m_monsterType == CREATURE_WATER_ELEMENTAL || m_monsterType == CREATURE_GIANT
-         || m_monsterType == CREATURE_TITAN)
+    if (((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))) || IS_ELEMENTAL_CREATURE(m_monsterType)
+         || m_monsterType == CREATURE_GIANT || m_monsterType == CREATURE_TITAN)
         && (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE || spell == SPELL_PARALYZE
             || spell == SPELL_BLIND)) {
         return ARMY_SPELL_CHANCE_NONE;
