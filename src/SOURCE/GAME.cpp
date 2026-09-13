@@ -864,7 +864,7 @@ void ComputeUALoc(i32 playerIndex) {
             chance = HINT_CHANCE_MAXIMUM;
         if (chance < HINT_CHANCE_MINIMUM)
             chance = HINT_CHANCE_MINIMUM;
-        gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = static_cast<i8>(chance);
+        gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = chance;
 
         if (Random(HINT_CHANCE_MINIMUM, HINT_CHANCE_MAXIMUM)
             <= gpGame->m_players[playerIndex].m_ultimateArtifactHintChance) {
@@ -903,8 +903,8 @@ void ComputeUALoc(i32 playerIndex) {
                 }
             }
         saveLocation:
-            gpGame->m_players[playerIndex].m_ultimateArtifactHintX = static_cast<i8>(x);
-            gpGame->m_players[playerIndex].m_ultimateArtifactHintY = static_cast<i8>(y);
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintX = x;
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintY = y;
         }
     }
 }
@@ -1001,16 +1001,16 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     if (boatIdx != -1) {
         if (notify == 0)
             SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
-        m_boatSlots[boatIdx] = static_cast<i8>(boatIdx);
+        m_boatSlots[boatIdx] = boatIdx;
         boatRecord* boat = &m_boats[boatIdx];
-        boat->id = static_cast<i8>(boatIdx);
-        boat->x = static_cast<i8>(x);
-        boat->y = static_cast<i8>(y);
+        boat->id = boatIdx;
+        boat->x = x;
+        boat->y = y;
         boat->direction = MAP_DIRECTION_EAST;
-        boat->owner = static_cast<i8>(giCurPlayer);
+        boat->owner = giCurPlayer;
         mapCell* square = WORLDMAP->GetCell(x, y);
         boat->savedTriggerType = square->m_triggerType;
-        boat->savedEventData = static_cast<u8>(square->m_objectMetadata);
+        boat->savedEventData = square->m_objectMetadata;
         square->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         square->m_objectMetadata = boatIdx;
     }
@@ -2973,7 +2973,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     if (!gbInNewGameSetup)
         SendMapChange(
             MAP_CHANGE_CLAIM_TOWN,
-            static_cast<i8>(townId),
+            townId,
             0,
             0,
             player,
@@ -2994,9 +2994,9 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         m_castleRecs[townId].m_turnsOwned = TOWN_NEW_OWNER_TURN_COUNT;
     else
         m_castleRecs[townId].m_turnsOwned = 0;
-    m_castleRecs[townId].m_owner = static_cast<i8>(player);
-    m_townOwners[townId] = static_cast<i8>(player);
-    m_players[player].m_townIds[m_players[player].m_townCount] = static_cast<i8>(townId);
+    m_castleRecs[townId].m_owner = player;
+    m_townOwners[townId] = player;
+    m_players[player].m_townIds[m_players[player].m_townCount] = townId;
     m_players[player].m_townCount++;
 
     cellPtr8 = m_worldMap.GetCell(m_castleRecs[townId].m_x - 1, m_castleRecs[townId].m_y);
@@ -3035,15 +3035,15 @@ void game::ClaimMine(i32 mineId, i32 player) {
 
     SendMapChange(
         MAP_CHANGE_CLAIM_MINE,
-        static_cast<i8>(mineId),
+        mineId,
         0,
         0,
         player,
         0,
         0
     );
-    m_mines[mineId].owner = static_cast<i8>(player);
-    m_mineOwners[mineId] = static_cast<i8>(player);
+    m_mines[mineId].owner = player;
+    m_mineOwners[mineId] = player;
     switch (m_mines[mineId].resourceType) {
         case MINE_TYPE_ALCHEMIST_LAB:
             flag1 = MINE_FLAG_ALCHEMIST_OFFSET;

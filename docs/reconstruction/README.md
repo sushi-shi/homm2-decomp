@@ -361,8 +361,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   S35 covers unknown game-layout regions, not proven deletable padding.
   C34 [removes seven SetupOrigData casts after all 128 combinations pass](C34-setup.md);
   B55 tracks game getter, saved-player and initialization-domain contracts.
-- G47: ultimate-artifact hint retry exit needs a structured-source matrix.
-  C34 also covers bounded byte stores in hint/boat setup; C35 covers the
+- G47: [retains the hint retry goto after complete structural/cast products](C34-map-G47.md).
+  C34 removes 16 written conversions across hint/boat/town/mine setup; three
+  color-lookup argument casts remain after their alternatives change bytes.
+  C34's other functions remain separate. C35 covers the
   puzzle interpolator's [applied constant-conversion cleanup](S34-C35.md).
   S36 tracks unread selection locals.
   B56 tracks standard-filename mutation, capacity, aliasing and loop-limit contracts.
