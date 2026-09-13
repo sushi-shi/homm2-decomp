@@ -393,9 +393,7 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
     OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
     OLD_MAIN_DIALOG_WAIT                      = 6,
-    OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
-    OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
-    OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE         = 1
+    OLD_MAIN_REMOTE_PAYLOAD_SIZE              = REMOTE_MESSAGE_PAYLOAD_SIZE
 H2_ENUM_END(OldMainConstant)
 
 #pragma pack(push, 1)
@@ -417,22 +415,18 @@ SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 #pragma pack(push, 1)
 struct KbRemotePacket {
     i8 sender;
-    char reserved1[OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE];
+    i32 id;
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
-    char reserved2[OLD_MAIN_REMOTE_BODY_RESERVED_SIZE];
+    i16 payloadSize;
     union {
         OldMainNetSetup setup;
-        struct {
-            i32 saveId;
-            i32 saveOffset;
-            i32 saveSize;
-        } save;
-        char data[OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE];
+        RemoteSaveInitialization save;
+        char data[OLD_MAIN_REMOTE_PAYLOAD_SIZE];
     } payload;
 };
 #pragma pack(pop)
-SIZE(KbRemotePacket, 0xdd);
+SIZE(KbRemotePacket, REMOTE_MESSAGE_SIZE);
 
 H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_CHECKED             = 8,

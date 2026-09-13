@@ -59,7 +59,7 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 - [Global data and annotation reconciliation](data-and-metadata.md): complete
   KB data tail, X_GLOBAL catalogs/runtime owners and va.h metadata read.
-  All 1,656 physical functions and all 228 project files now have manual
+  All 1,656 physical functions and all 229 project files now have manual
   reviews; remaining findings retain their individual dispositions.
 
 - C79/C80/O09/S72/S73/R29/G106-G108/A05/B94: all43 EVENTS definitions
@@ -278,8 +278,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   native comparison; event widget payload unions themselves remain meaningful.
 - U08: two bottom-view unions and their integer/derived/padding views now
   use [actual widget-pointer arrays with complete native equivalence](U08.md).
-  U09 adventure remote payload still has a raw-byte/save/exit union requiring
-  remaining consumer review.
+  [U09/U14 now share the save header and recover complete247-byte payload
+  views](U09-U14.md); the tagged union remains meaningful.
 - G27-G30: adventure command movement, keyboard cheat/confirmation, search
   completion and default-hover joins await structured matrices. R03/R04 cover
   unrelated dispatcher scalar roles; S30 covers unused adventure locals and
@@ -312,8 +312,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - G35-G39: summon-boat completion, sound disposal, adjacent-monster output,
   control-panel confirmation and visions tails await structured-source matrices.
 - C25/C32: [recovered the signed-byte cheat flag](C25-C32.md), removing both
-  compensating casts with complete98-unit native equivalence. U09's byte view forwards variable
-  network payloads, so its16-byte view does not prove those consumer extents.
+  compensating casts with complete98-unit native equivalence. [U09's former
+  16-byte view now covers the actual247-byte payload](U09-U14.md); received
+  lengths and initialization remain contracts.
 - B48: [network-control selection has a retail-confirmed non-advancing loop
   and possible negative index](B48.md). The genuine behavior is retained.
 - U10/C26: [the hero patrol owner](U10.md) replaces a misleading boat/patrol
@@ -415,9 +416,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   rumour fallback joins still need structural tests.
 - B61/B64/B65: turn-state, town/hero setup, rumour/event and compression
   domains remain function-specific contracts. [C44 removes 24 transfer casts
-  and recovers the exit-flag name](C44-G50-S43.md). U14/C44 still tracks typed
-  save-packet ownership and erased byte-buffer interfaces; no fabricated
-  padding is added.
+  and recovers the exit-flag name](C44-G50-S43.md). [U14 recovers typed packet
+  owners and removes eight more pointer casts](U09-U14.md). Wider C44 byte-buffer
+  interfaces remain open; no fabricated padding is added.
 - B62/B63: [retail confirms](B62-B63.md) the receiver's100-byte acknowledgement fill with
   a200-byte transmission, and diff completion using the old-file remainder.
   These defects are separate from byte-preserving reconstruction fixes.

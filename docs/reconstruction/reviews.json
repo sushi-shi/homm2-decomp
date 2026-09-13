@@ -1024,10 +1024,10 @@
     "note": "C25 applied direct truth test of recovered signed b8 game::m_cheated; complete98-unit native equivalence preserves writers/serializers and both consumers. Standalone retail checker agrees on all530 ordinary bytes/DIR32 but cannot resolve four pre-existing local-static identities, so no standalone closure claim. Actual once-warning statics and saved-game/turn flow. Fixed warnings fit gText768; B43 loaded player state/rmtRCName contract remains."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNet(void)#1": {
-    "body_sha256": "ff8dd9eec482bde7db9140ca9d601235e8e46bdaf551da2e0eea2da780141236",
+    "body_sha256": "dee86928b74d26ebc92f8e89dcbe6bcfd355138cd2427c8c77ab476e6bbe8e26",
     "patterns": {
       "casts": "open",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -1037,7 +1037,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C17 raw returned packet and payload casts; U09 all save/exit/bytes union views have actual tagged consumers, but bytes[16] also forwards variable group-map-change/NetBox data, so payload-owner extent still needs protocol recovery. B41 no received size accompanies header/save/exit reads; sender mapping can return-1. Actual SPlayerExit local has each semantic field set, not artificial stack aggregation."
+    "note": "C17/U09/U14 recover shared RemoteSaveInitialization16 and the actual247-byte AdventureRemotePayload; tagged save16/exit7/chat/map-change44 views all have real consumers. Boundary reinterpretations remain meaningful. Complete501-byte ordinary retail check and all98 native objects pass. B41 payload lengths/termination, sender mapping and peek/dequeue lifecycle are still unchecked. The save-exit path initializes six SPlayerExit input fields; continueGame is deliberately not initialized here and ReceiveRemotePlayerExit overwrites it before read/transmit on the eliminated branch. No fake stack aggregate or manual varargs. U09-U14.md records shared types, real extents and remaining contracts."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNetPlayerWait(struct tag_message & message,i32 doMain)#1": {
     "body_sha256": "fa4ee46939d67106ddc7be5a0cbf3dba8ebd6b989eb9dd8f1eb2a8926ccb3c55",
@@ -15952,10 +15952,10 @@
     "note": "B53 whole-retail1029-byte proof confirms each read requests1000 bytes at entries[i] with100-byte stride, in a ten-record1000-byte stack owner. Normal1000-byte file reaches EOF after first read; oversized/short-read/error handling remains hazardous. Real filename and20-byte input buffers,17/41-byte record names and29 serialized reserved bytes are not fake padding. B52 name/filename contracts; array shift8..insertion bounds dest+1<=9. No cast, union, goto or manual varargs."
   },
   "src/SOURCE/KB.cpp:WaitForOtherPlayer(void)#1": {
-    "body_sha256": "dc9689ca40a923dc766feb89ce186adeafba2f0dd68dab89c2a5c23201d80efe",
+    "body_sha256": "7cec438ad9009c38ea940f140387caffdbe62099decbb6b2c28c97701b575633",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -15965,13 +15965,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Reinterprets transport bytes as actual tagged KbRemotePacket; setup copies6 mapping and6x34 player bytes, save arm passes three dwords. Both payload arms used. B41/B51 received size/type, sender and map result domains need validation; no local buffer, fake owner or manual varargs."
+    "note": "U14 recovers shared RemoteSaveInitialization16: first three fields are dataSize/crc/wireCrc, not save ID/offset/size. KbRemotePacket now claims the transport256-byte owner, id at1, payloadSize at7 and payload247 at9. Both setup212 and save16 are real tagged views; fourth exit flag is not used by this handler. Transport-boundary cast retained. All217 retail bytes/sites/ordered targets and all98 native objects unchanged. B41/B51 size/type/sender/mapping and initialization contracts remain unchecked. See U09-U14.md."
   },
   "src/SOURCE/KB.cpp:PopNetBox(char * text,i32 netPlayer)#1": {
     "body_sha256": "18c101a8accd8a4be8edefdbba0a0173332cc2958a74aa3108cba38fbff3e4f7",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -15981,7 +15981,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full289-line input/network/dialog loop reviewed. S33 four assigned-but-unread layout locals. Real inputText150: input length0..93 plus cursor and NUL requires95 bytes, so local input writes fit. Actual keyboard/widget/remote tagged views and byte narrowing retained. B52 incoming/untrusted text formatted before120-byte truncation; remote chat path has no truncation before140-byte AddNetBoxLine. B41 one-byte payload.data is variable tail, not sufficient receive extent. B51 sender/map indices and peek/consume lifecycle remain."
+    "note": "Full289-line input/network/dialog loop reviewed. S33 four assigned-but-unread layout locals. Real inputText150: input length0..93 plus cursor and NUL requires95 bytes, so local input writes fit. Actual keyboard/widget/remote tagged views and byte narrowing retained. B52 incoming/untrusted text formatted before120-byte truncation; remote chat path has no truncation before140-byte AddNetBoxLine. B41 one-byte payload.data is variable tail, not sufficient receive extent. B51 sender/map indices and peek/consume lifecycle remain. U09/U14 follow-up replaces KbRemotePacket payload.data[1] with the complete247-byte message payload (owner256), resolving the fake one-byte tail claim. Full290-line consumer reread; chat sender uses at most94 bytes including NUL, group map change requires44 initialized bytes; no received length or termination enforcement added. S33 unread locals and B52 formatting/truncation/sender/lifetime contracts remain as previously reviewed. All98 native objects unchanged. Full2853 ordinary bytes agree with retail, but the checker retains the same baseline private-EH-handler and three __except_list DIR32-model gaps; not claimed fully certified. See U09-U14.md."
   },
   "src/SOURCE/KB.cpp:AddNetBoxLine(char * str,char color)#1": {
     "body_sha256": "42d07adfaefa7a5ca35fdf27c91085cf8e9f5bd27fedbd6015a4dc121d24a9d6",
@@ -26464,10 +26464,10 @@
     "note": "Unsigned-byte CP1251 first-character fold returning text char; covers all256 byte inputs without indexing or pointer access. ASCII capitals and basic Russian capitals including Ё map to lowercase; all other bytes remain unchanged. C43 recovered inline sibling of ToUpperCp1251; actual helper tested exhaustively under both C++98/20 and both call-site native sequences remain retail exact. No cast,union,goto,address/owner/outside trick,varargs,reuse,aggregate or unresolved buffer."
   },
   "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 playerExited,i32 useCurrentSave)#1": {
-    "body_sha256": "4775664f077ef6bfddfaeac98b676114559d1c95e7841b6ca8e330c50ef54a87",
+    "body_sha256": "56b7c9845eeccd79529226805e2c2b5ac3c7b705693061d455b28b69b09b9fac",
     "patterns": {
       "casts": "applied",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "retain",
       "address": "absent",
       "owner": "absent",
@@ -26477,13 +26477,13 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C44 removes9 literal const_casts and2 direct i16 assignment casts; existing destination narrowing remains. U14 identifies fourth header word as playerExited, not a player ID, from all3 call sites and CheckHandleNet; i32 ABI/raw flag preserved. The256-byte allocation really alternates four-word init and i16-index+payload protocol states; typed packet/API ownership remains open. G50/S43 complete128-arm guard/5-unread-local/oldTrack product retains original; guard loses8 bytes, each unread deletion changes bytes even when size stays1971. Two32-arm initialization products and receiver16-arm structure product retain measured stores; no fake padding/steering. Reply initialization and compression-failure cleanup remain meaningful. B62 filenames fit19/452 if config names terminate within13; allocation products, file reads, signed indices/tracking5000/batch100/reply lengths and codec capacities remain contracts. Full1971 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. See C44-G50-S43.md; bounds not hardened."
+    "note": "C44 removes9 literal const_casts and2 direct i16 assignment casts; existing destination narrowing remains. U14 identifies fourth header word as playerExited, not a player ID, from all3 call sites and CheckHandleNet; i32 ABI/raw flag preserved. The256-byte allocation really alternates four-word init and i16-index+payload protocol states; typed packet/API ownership remains open. G50/S43 complete128-arm guard/5-unread-local/oldTrack product retains original; guard loses8 bytes, each unread deletion changes bytes even when size stays1971. Two32-arm initialization products and receiver16-arm structure product retain measured stores; no fake padding/steering. Reply initialization and compression-failure cleanup remain meaningful. B62 filenames fit19/452 if config names terminate within13; allocation products, file reads, signed indices/tracking5000/batch100/reply lengths and codec capacities remain contracts. Full1971 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. See C44-G50-S43.md; bounds not hardened. U14 follow-up replaces the i32 allocation view with RemoteSaveBuffer256 and shared RemoteSaveInitialization16 fields; six pointer casts and the byte-offset expression disappear. Real init/chunk/raw-byte union models command reuse. Chunk physical data capacity245 covers payload247 after index2, while sender still transmits at most200. Fourth flag shared with CheckHandleNet/WaitForOtherPlayer; no interface/CRC validation change. Allocation and char codec/API casts remain real boundaries pending wider C44 review. Full1971 ordinary retail bytes/sites/ordered targets and all98 native objects unchanged. U09-U14.md supersedes the earlier open typed-packet question, not G50/S43 measured negatives or B62 contracts."
   },
   "src/SOURCE/GAME.cpp:game::ReceiveSaveGame(i32 dataSize,i32 expectedCrc,i32 expectedTransmitCrc,i32 remotePlayer)#1": {
-    "body_sha256": "5b43ce5f49ebee44562c4bba8e0ee7e5cbf6293f638b602d17853b7167d031ca",
+    "body_sha256": "c2c75db7fae6a73eb5c9a447c50a8d7eb04316652dd3ec209fda9e4c97c25615",
     "patterns": {
       "casts": "applied",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -26493,6 +26493,6 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C44 removes13 literal const_casts through existing text APIs. Tagged RemoteMessage/i16 prefix, char/u8 codec/CRC interfaces and acknowledgement owner recovery remain open with U14. S43 complete16-arm unused2080/file/packet/oldTrack product and32-arm ackBuffer/incomingData/decodedData/received/success initialization product retain original: every individual deletion loses10 bytes, all tested nonbaseline subsets differ. B62 filenames fit19/452 with terminated config name13; packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 remain unchecked. Retail allocates ackBuffer256, fills100 and sends200; CRCs are logged, not compared; sender not locally checked. Alias-aware cleanup retained. All1736 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. No goto/fake aggregate/manual varargs/member recovery. See C44-G50-S43.md; no hardening."
+    "note": "C44 removes13 literal const_casts through existing text APIs. Tagged RemoteMessage/i16 prefix, char/u8 codec/CRC interfaces and acknowledgement owner recovery remain open with U14. S43 complete16-arm unused2080/file/packet/oldTrack product and32-arm ackBuffer/incomingData/decodedData/received/success initialization product retain original: every individual deletion loses10 bytes, all tested nonbaseline subsets differ. B62 filenames fit19/452 with terminated config name13; packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 remain unchecked. Retail allocates ackBuffer256, fills100 and sends200; CRCs are logged, not compared; sender not locally checked. Alias-aware cleanup retained. All1736 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. No goto/fake aggregate/manual varargs/member recovery. See C44-G50-S43.md; no hardening. U14 follow-up recovers RemoteSaveMessage256 at GetRemoteData boundary and reads its typed chunk index/data directly, removing two primitive-prefix casts and the byte-offset expression. Payload247/index2/data245 preserve the complete physical receive extent independently of sender chunk limit200. The one transport-boundary cast and codec/acknowledgement interfaces remain; no malformed-length validation added. Full1736 ordinary retail bytes/sites/ordered targets and all98 native objects unchanged. U09-U14.md resolves typed packet ownership; earlier S43 and B62 defects remain."
   }
 }

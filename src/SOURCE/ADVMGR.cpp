@@ -9368,11 +9368,11 @@ char* advManager::CheckHandleNet(void) {
             || packet9->type == REMOTE_MESSAGE_UNRELIABLE)) {
         switch (packet9->command) {
             case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-                playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;
+                playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->save.playerExited;
                 if (!gpGame->ReceiveSaveGame(
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveDataSize,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveCrc,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveTransmitCrc,
+                        ADVMGR_REMOTE_PAYLOAD(packet9)->save.dataSize,
+                        ADVMGR_REMOTE_PAYLOAD(packet9)->save.crc,
+                        ADVMGR_REMOTE_PAYLOAD(packet9)->save.wireCrc,
                         packet9->sender
                     )) {
                     ShutDown(NULL);

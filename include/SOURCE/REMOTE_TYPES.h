@@ -3,6 +3,22 @@
 
 #include <va.h>
 
+H2_ENUM_BEGIN(RemoteMessageLayoutConstant)
+    REMOTE_MESSAGE_SIZE         = 256,
+    REMOTE_MESSAGE_HEADER_SIZE  = 9,
+    REMOTE_MESSAGE_PAYLOAD_SIZE = REMOTE_MESSAGE_SIZE - REMOTE_MESSAGE_HEADER_SIZE
+H2_ENUM_END(RemoteMessageLayoutConstant)
+
+#pragma pack(push, 1)
+struct RemoteSaveInitialization {
+    i32 dataSize;
+    i32 crc;
+    i32 wireCrc;
+    i32 playerExited;
+};
+#pragma pack(pop)
+SIZE(RemoteSaveInitialization, 16);
+
 H2_ENUM_BEGIN(NetPlayerInfoConstant)
     NET_PLAYER_INFO_SYSTEM_ID_SIZE = 4,
     NET_PLAYER_INFO_NAME_SIZE      = 21,

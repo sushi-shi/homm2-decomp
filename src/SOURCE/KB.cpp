@@ -3133,9 +3133,9 @@ i32 WaitForOtherPlayer(void) {
                 break;
             case BOX_REMOTE_SAVE:
                 result = gpGame->ReceiveSaveGame(
-                    data->payload.save.saveId,
-                    data->payload.save.saveOffset,
-                    data->payload.save.saveSize,
+                    data->payload.save.dataSize,
+                    data->payload.save.crc,
+                    data->payload.save.wireCrc,
                     data->sender
                 );
                 break;
