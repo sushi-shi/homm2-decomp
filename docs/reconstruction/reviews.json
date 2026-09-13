@@ -17956,7 +17956,7 @@
     "patterns": {
       "casts": "retain",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -17965,12 +17965,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Typed byte allocation boundary; G52 mapSized skips search init but still frees/reallocates mapExtra. B58 positive nonoverflowing w*h/allocation success; equal sizes do not skip allocation. No fake owner/stack, union or manual varargs."
+    "note": "Typed byte allocation boundary; G52 mapSized skips search init but still frees/reallocates mapExtra. B58 positive nonoverflowing w*h/allocation success; equal sizes do not skip allocation. No fake owner/stack, union or manual varargs. Follow-up: G52 complete2-arm guard alternative loses9 bytes,185 to176; original join retained. Search initialization can be skipped, but mapExtra allocation still occurs. Full retail proof passes. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:WriteDiffHeaderInfo(u8 cmd,i32 len,u8 * buf,i32 * pos)#1": {
-    "body_sha256": "aab4c09894fbaea35f532503687d8e4a9064c4634bb7e69f44adce0eec6479ca",
+    "body_sha256": "06e9ef9fde4ff4f9c35d11d02184fabd318390ffd9d02c9669698aca535e16f1",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17981,7 +17981,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C44 little-endian unaligned word overlay into byte stream, low-word/byte narrowing candidates. B63 len/cmd domain, pos and capacity for1/2/3-byte header required. Flags encode real format, not artificial address arithmetic; no union/goto/fake stack/manual varargs/unrelated reuse."
+    "note": "C44 little-endian unaligned word overlay into byte stream, low-word/byte narrowing candidates. B63 len/cmd domain, pos and capacity for1/2/3-byte header required. Flags encode real format, not artificial address arithmetic; no union/goto/fake stack/manual varargs/unrelated reuse. Follow-up: C44 removes both scalar casts after complete4-arm equivalence. The unaligned little-endian word overlay remains a format boundary. B63 cmd0/1 and lengths0..700000 round-trip in the source-derived model; LEN_HIGH_MASK0x2f0000 loses bit20 at0x100000, which decodes0. No mask repair or input validation; buffer/pos bounds remain required. Full263 retail bytes/sites/targets pass. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:GetSkipCopyLen(u8 * buf,i32 * pos)#1": {
     "body_sha256": "b6cc02317b834e2379fb1058e2747416534ef36c91d0691ec86921904721f8f8",
@@ -17997,28 +17997,28 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real little-endian word decoder cast. B63 pos/remaining1/2/3 bytes required, no local length parameter. Natural cursor advance; no owner recovery/goto/fake stack/manual varargs/unrelated reuse."
+    "note": "Real little-endian word decoder cast. B63 pos/remaining1/2/3 bytes required, no local length parameter. Natural cursor advance; no owner recovery/goto/fake stack/manual varargs/unrelated reuse. Follow-up: B63 follow-up checks this decoder against the writer for all lengths0..700000 and commands0/1; format loses bit20 at0x100000. Full215-byte retail proof; remaining input1/2/3-byte availability and position checks remain absent. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:CreateDiffFile(char * oldName,char * joinName,char * diffName,i32 remotePlayer,i32 forceWhole)#1": {
-    "body_sha256": "86162dfe8523f47295e06941d2462978ea9e13e811c0c4eb15af3c8811f9f5a7",
+    "body_sha256": "4fd382abd65b17c10114a4f998e852b08bcccf38a32dbe3fe80c0ecad6e526ca",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "open",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "G53 Finish after terminal copy; real heap allocations and C37 log literals. S43 unusedVal/timeIn/overwritten initial sizes and matchLen. B63 whole1363-byte retail proof: terminal length=oldSize-position then memcpy from fullData+position; shorter join can overread, longer tail omitted. Only zero-copy permits one-past source. diffOut max(old,join)+5000 needs encoded-overhead proof; empty/error/short-read files and pathgText768 remain contracts. No manual varargs/fake owner/stack; copy/match cursors retain roles."
+    "note": "G53 Finish after terminal copy; real heap allocations and C37 log literals. S43 unusedVal/timeIn/overwritten initial sizes and matchLen. B63 whole1363-byte retail proof: terminal length=oldSize-position then memcpy from fullData+position; shorter join can overread, longer tail omitted. Only zero-copy permits one-past source. diffOut max(old,join)+5000 needs encoded-overhead proof; empty/error/short-read files and pathgText768 remain contracts. No manual varargs/fake owner/stack; copy/match cursors retain roles. Follow-up: C44 removes logging literal cast. G53/S43 complete16-arm break/unusedVal/timeIn/matchLen family retains original: individual sizes1356/1363/1360/1357 vs1363; discarded clock call preserved in its candidate. Complete32-arm four-initialization/logging family retains all initial stores (each deletion loses7 bytes). B63 destination bound proved: differential output<=oldSize+5; full-send<=joinSize+2, within max+5000 under nonnegative, nonoverflowing sizes. This does not fix the inherited oldSize terminal source overread/new-tail omission. Full1363-byte retail proof and all98 native objects unchanged. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:CreateJoinFile(char * oldName,char * diffName,char * joinName)#1": {
-    "body_sha256": "bc0025b085b4ca64356d04be0f87443934ff84050178cac148cf754abdef6072",
+    "body_sha256": "f963c8b8a5ee06d32a26876def911ca990aab3897b8d1c460b476d704da65f61",
     "patterns": {
-      "casts": "retain",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -18026,10 +18026,10 @@
       "outside": "open",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "absent",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "Typed heap byte arrays and length decoder reflect format. B63 diffLength>=2/full payload<=700000/oldSize<=700000, command bytes and nonoverflowing skip/copy/outSize required; malformed lengths can form outside pointers. No goto/fake stack/union/manual varargs/owner recovery; file handle retains input role."
+    "note": "Typed heap byte arrays and length decoder reflect format. B63 diffLength>=2/full payload<=700000/oldSize<=700000, command bytes and nonoverflowing skip/copy/outSize required; malformed lengths can form outside pointers. No goto/fake stack/union/manual varargs/owner recovery; file handle retains input role. Follow-up: C44 removes logging literal cast. Complete8-arm product retains diffData/outData initializations, each deletion894->887; oldBuf null and initial outSize are meaningful. Full894 retail proof. B63 encoder output-capacity proof does not validate this decoder input/skip-copy lengths or700000 output capacity. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:game::HeroIDToHeroPos(playerData * pd,i32 heroId)#1": {
     "body_sha256": "9966c32bac2a548c674e706c86375b691b24dc5485c9f5c262dca95ee51fc32a",
@@ -18128,9 +18128,9 @@
     "note": "C34 GetNewHeroId0..53 byte assignment; B61 playerCount<=6/heroCount<=8, fixed two available slots. IDs compared, no union/goto/scratch/manual varargs/owner arithmetic."
   },
   "src/SOURCE/GAME.cpp:CalcFileCRC(char * file)#1": {
-    "body_sha256": "a88ef4856a0a450cddd90d22dd57e2fc308d521cc64aae82d1213d8f266339c1",
+    "body_sha256": "eb33f33be46fb7fb3e0b1c5f8bd820154b5a02a3cf408524e27a86f4dbfbae89",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -18141,12 +18141,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C44 char allocation used by read/u8 CRC suggests unsigned-byte owner; allocation cast meaningful. B65 nonnegative FileSize/successful allocation/complete read; short read leaves CRC over uninitialized bytes. No goto/union/fake stack/manual varargs/owner recovery."
+    "note": "C44 char allocation used by read/u8 CRC suggests unsigned-byte owner; allocation cast meaningful. B65 nonnegative FileSize/successful allocation/complete read; short read leaves CRC over uninitialized bytes. No goto/union/fake stack/manual varargs/owner recovery. Follow-up: C44 now uses u8 allocation ownership, removing the checksum cast; static allocation boundary remains. Two-arm native match and full146-byte retail proof. FileSize must be nonnegative, allocation/read complete; negative length enters the CRC loop rather than being rejected. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:CompressTest2(void)#1": {
-    "body_sha256": "700152aab25d7bc93b34dd7f78e036c44470132d224af4233a45f13556ad88e2",
+    "body_sha256": "ae0d9a6cc8a7675b72f556bea68eb1ec13a03f8df5181a4e4a6110bcdffb7abb",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -18154,15 +18154,15 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C44 byte/char CRC-codec views/random byte cast. S43 four unread outputs plainSize/srcCrc/unpackedCrc/srcCrcCheck; calls may have real side effects. Input Random20000..100000 and fill fit+5000, codec output/decoded length/allocation remain B65. No goto/union/fake aggregate/manual varargs/unrelated reuse."
+    "note": "C44 byte/char CRC-codec views/random byte cast. S43 four unread outputs plainSize/srcCrc/unpackedCrc/srcCrcCheck; calls may have real side effects. Input Random20000..100000 and fill fit+5000, codec output/decoded length/allocation remain B65. No goto/union/fake aggregate/manual varargs/unrelated reuse. Follow-up: C44 removes Random-to-char assignment cast; destination still preserves the native byte narrowing including128..255. Existing char buffers match EncodeData/DecodeData interfaces; unsigned-byte CRC views remain meaningful. Complete32-arm result-storage/cast family retains all4 unread outputs: every individual declaration/store deletion keeps calls but loses3 bytes,288->285. Codec functions copy filesystem output length into capacity-less dst; +5000 is not a proved codec bound. Full288 retail proof passes. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:CompressTest(void)#1": {
-    "body_sha256": "f707432e68c9bf4d38a57b22779dc065b7e1e83d6efa004fa48f8789f1d2d6b6",
+    "body_sha256": "bb6537f260ed0aed914f36f89810203f55ce0f2fb547b20aae31c3c3d8e0d03c",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -18170,10 +18170,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C44 codec/CRC byte views/C37 logging literals; S43 four unread outputs. Fixed c:\\TEMP\\Z.DIF fits32; fileSize+2000/codec capacity/short reads/products remain B65. No goto/union/fake stack/manual varargs/owner recovery."
+    "note": "C44 codec/CRC byte views/C37 logging literals; S43 four unread outputs. Fixed c:\\TEMP\\Z.DIF fits32; fileSize+2000/codec capacity/short reads/products remain B65. No goto/union/fake stack/manual varargs/owner recovery. Follow-up: C44 removes all8 LogStr literal casts. Existing char codec buffers/u8 CRC views remain meaningful after full codec/CRC consumer review. Complete32-arm product retains4 unread result slots while preserving their calls; each individual deletion396->393. Fixed filename fits32; +2000 and decoded/file read lengths remain unvalidated. Full396 retail proof passes. See C44-G52-G53-S43-B63.md; complete native/layout proof, no behavior-changing hardening."
   },
   "src/SOURCE/GAME.cpp:CompressTest3(void)#1": {
     "body_sha256": "0857fef143b7fa05d68b05bafabf6c479364860a8d62108e63bc93c0bf2fa1f9",

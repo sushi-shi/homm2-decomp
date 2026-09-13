@@ -7306,7 +7306,7 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     if (len > LEN_WORD_MAX) {
         flags |= LEN_WORD_FLAG;
         flags |= (len & LEN_HIGH_MASK) >> DIFF_WORD_SHIFT;
-        u16 word = static_cast<u16>(len & LEN_LOW_MASK);
+        u16 word = len & LEN_LOW_MASK;
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
         *pos += DIFF_WORD_HEADER_SIZE;
@@ -7318,7 +7318,7 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
         buf[*pos + 1] = lo;
         *pos += DIFF_BYTE_HEADER_SIZE;
     } else {
-        flags |= static_cast<u8>(len);
+        flags |= len;
         buf[*pos] = flags;
         (*pos)++;
     }
@@ -7392,7 +7392,7 @@ void CreateDiffFile(
     read(readFile, fullData, joinSize);
     close(readFile);
     LogInt(
-        const_cast<char*>("Orig Join CRC"),
+        "Orig Join CRC",
         calc_crc_long(fullData, joinSize),
         joinSize,
         LOG_UNUSED_VALUE,
@@ -7553,7 +7553,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     write(joinFile, outData, outSize);
     close(joinFile);
     LogInt(
-        const_cast<char*>("New Join CRC"),
+        "New Join CRC",
         calc_crc_long(outData, outSize),
         outSize,
         LOG_UNUSED_VALUE,
@@ -7847,12 +7847,12 @@ void CheckValidAvailableHeroes(void) {
 VA(0x00460908, 0x92)
 i32 CalcFileCRC(char* file) {
     i32l len = FileSize(file);
-    char* blk = static_cast<char*>(H2_ALLOC(len));
+    u8* blk = static_cast<u8*>(H2_ALLOC(len));
     i32 fp = open(file, _O_BINARY);
     if (fp == -1)
         FileError(file);
     read(fp, blk, len);
-    i32 checksum = calc_crc_long(reinterpret_cast<u8*>(blk), len);
+    i32 checksum = calc_crc_long(blk, len);
     close(fp);
     H2_FREE(blk);
     return checksum;
@@ -7885,7 +7885,7 @@ void CompressTest2(void) {
             H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
         );
     for (index = 0; index < dataSz; index++)
-        fromData[index] = static_cast<char>(Random(0, 255));
+        fromData[index] = Random(0, 255);
     srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
     compSize = EncodeData(encoded, fromData, dataSz);
     plainSize = DecodeData(unpackedData, encoded, compSize);
@@ -7910,7 +7910,7 @@ void CompressTest(void) {
     i32l compSize;
     i32l H2_UNUSED(plainSize);
 
-    LogStr(const_cast<char*>("C1"));
+    LogStr("C1");
     strcpy(diffName, "c:\\TEMP\\Z.DIF");
     fileSize = FileSize(diffName);
     fromData = static_cast<char*>(
@@ -7922,26 +7922,26 @@ void CompressTest(void) {
     unpackedData = static_cast<char*>(
         H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    LogStr(const_cast<char*>("C2"));
+    LogStr("C2");
     hFile = open(diffName, _O_BINARY);
     if (hFile == -1)
         FileError(diffName);
     read(hFile, fromData, fileSize);
-    LogStr(const_cast<char*>("C3"));
+    LogStr("C3");
     srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
-    LogStr(const_cast<char*>("C4"));
+    LogStr("C4");
     close(hFile);
-    LogStr(const_cast<char*>("C5"));
+    LogStr("C5");
     compSize = EncodeData(encoded, fromData, fileSize);
-    LogStr(const_cast<char*>("C6"));
+    LogStr("C6");
     plainSize = DecodeData(unpackedData, encoded, compSize);
-    LogStr(const_cast<char*>("C7"));
+    LogStr("C7");
     unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), fileSize);
     srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
     H2_FREE(fromData);
     H2_FREE(encoded);
     H2_FREE(unpackedData);
-    LogStr(const_cast<char*>("C8"));
+    LogStr("C8");
 }
 
 VA(0x00460c46, 0x46)

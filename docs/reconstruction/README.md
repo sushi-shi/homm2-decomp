@@ -408,12 +408,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   [four further S41/S42 deletions change native code](C43-S41-S42-B65.md)
   and remain. [S43 transfer locals and overwritten initializations](C44-G50-S43.md)
   retain their measured native-changing forms. Other turn-update and
-  compression locals remain open.
+  compression locals [remain after call-preserving alternatives changed native code](C44-G52-G53-S43-B63.md).
   [R09 tests 22 counter-role/cast variants](C34-C39-R09.md); the measured
   role splits change native code and are retained as negative alternatives.
 - G49-G54: [G50 transfer cleanup retains its measured join](C44-G50-S43.md).
-  Random-monster bounds, score clamping, map-size setup, diff completion and
-  rumour fallback joins still need structural tests.
+  [G52 map-size and G53 diff-completion joins remain after measured alternatives changed native code](C44-G52-G53-S43-B63.md).
+  Random-monster bounds, score clamping and rumour fallback joins still need tests.
 - B61/B64/B65: turn-state, town/hero setup, rumour/event and compression
   domains remain function-specific contracts. [C44 removes 24 transfer casts
   and recovers the exit-flag name](C44-G50-S43.md). [U14 recovers typed packet
@@ -422,6 +422,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B62/B63: [retail confirms](B62-B63.md) the receiver's100-byte acknowledgement fill with
   a200-byte transmission, and diff completion using the old-file remainder.
   These defects are separate from byte-preserving reconstruction fixes.
+  [C44 removes 14 further casts and proves the diff destination bound](C44-G52-G53-S43-B63.md);
+  codec capacities, malformed input and the terminal-copy defect remain explicit.
 - A01/S45–S47: [town-manager pointer expressions and four array extents](A01-C45-S45-S47.md)
   are simplified with complete native equivalence. C45 retains its measured
   16-bit boolean conversion; removing it loses three retail bytes.
