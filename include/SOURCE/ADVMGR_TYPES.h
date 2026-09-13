@@ -8,12 +8,7 @@
 #pragma pack(push, 1)
 union AdventureRemotePayload {
     char bytes[ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE];
-    struct {
-        i32 saveDataSize;
-        i32 saveCrc;
-        i32 saveTransmitCrc;
-        i32 savePlayerExited;
-    };
+    RemoteSaveInitialization save;
     SPlayerExit playerExit;
 };
 #pragma pack(pop)

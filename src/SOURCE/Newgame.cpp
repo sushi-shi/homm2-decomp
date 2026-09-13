@@ -285,7 +285,7 @@ void game::GetMap(void) {
 VA(0x00475682, 0x66)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = false;
-    m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
+    m_newGameHumanCount = giNumHumanPlayers;
     if (m_newGameWindow == NULL)
         return;
     CleanUpNewGameWindow();
@@ -318,7 +318,7 @@ void game::InitNewGame(struct SMapHeader* header) {
         }
         goto selected_player;
     } else {
-        m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
+        m_newGameHumanCount = giNumHumanPlayers;
         if (header != NULL)
             m_mapHeader = *header;
         else
@@ -326,7 +326,7 @@ void game::InitNewGame(struct SMapHeader* header) {
 
         for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
             if (m_mapHeader.playerEnabled[player]) {
-                m_setupPlayerColor[activeColorCount] = static_cast<i8>(player);
+                m_setupPlayerColor[activeColorCount] = player;
                 ++activeColorCount;
             }
         }
@@ -349,7 +349,7 @@ void game::InitNewGame(struct SMapHeader* header) {
             if (m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                 && !m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
-                m_setupPlayerNetworkId[player] = static_cast<i8>(humanCount);
+                m_setupPlayerNetworkId[player] = humanCount;
                 ++humanCount;
             } else if (!m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                        && m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
@@ -367,7 +367,7 @@ void game::InitNewGame(struct SMapHeader* header) {
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerType[player] == GAME_NETWORK_PLAYER_NONE)
-                m_setupPlayerType[player] = static_cast<i8>(playerType);
+                m_setupPlayerType[player] = playerType;
         }
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
@@ -375,7 +375,7 @@ void game::InitNewGame(struct SMapHeader* header) {
                 continue;
             if (humanCount < giNumHumanPlayers
                 && m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]) {
-                m_setupPlayerNetworkId[player] = static_cast<i8>(humanCount);
+                m_setupPlayerNetworkId[player] = humanCount;
                 ++humanCount;
             } else {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
@@ -426,7 +426,7 @@ i32 game::NewGame(void) {
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        switch (static_cast<NewGameMapChoice>(static_cast<i16>(gpWindowManager->m_dialogResult))) {
+        switch (NewGameMapChoice(static_cast<i16>(gpWindowManager->m_dialogResult))) {
             case MAP_CHOICE_STANDARD:
                 xIsExpansionMap = false;
                 break;
@@ -521,35 +521,38 @@ i32 game::NewGame(void) {
             }
         }
     } else {
-    pick_map:
-        wrongExpansionType = false;
-        mapExt = FindLastToken(m_mapFilename, '.');
-        if (mapExt != NULL) {
-            if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
-                wrongExpansionType = true;
-            if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
-                wrongExpansionType = true;
-        }
-        if (!wrongExpansionType) {
-            if (xIsExpansionMap)
-                strcpy(gpGame->m_mapFilename, "arrax.mx2");
-            else
-                strcpy(gpGame->m_mapFilename, "brokena.mp2");
-            m_newGameInitialized = false;
-            m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
-        }
-        if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-            && stricmp(gpGame->m_mapFilename, "brokena.mp2") == 0)
-            strcpy(gpGame->m_mapFilename, "slugfest.mp2");
-        if (giNumHumanPlayers > 1 && stricmp(gpGame->m_mapFilename, "arrax.mx2") == 0)
-            strcpy(gpGame->m_mapFilename, "fullhse.mx2");
+        for (;;) {
+            wrongExpansionType = false;
+            mapExt = FindLastToken(m_mapFilename, '.');
+            if (mapExt != NULL) {
+                if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
+                    wrongExpansionType = true;
+                if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
+                    wrongExpansionType = true;
+            }
+            if (!wrongExpansionType) {
+                if (xIsExpansionMap)
+                    strcpy(gpGame->m_mapFilename, "arrax.mx2");
+                else
+                    strcpy(gpGame->m_mapFilename, "brokena.mp2");
+                m_newGameInitialized = false;
+                m_newGameHumanCount = giNumHumanPlayers;
+            }
+            if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
+                && stricmp(gpGame->m_mapFilename, "brokena.mp2") == 0)
+                strcpy(gpGame->m_mapFilename, "slugfest.mp2");
+            if (giNumHumanPlayers > 1 && stricmp(gpGame->m_mapFilename, "arrax.mx2") == 0)
+                strcpy(gpGame->m_mapFilename, "fullhse.mx2");
 
-        strcpy(gMapName, m_mapFilename);
-        mapHeaderRead = GetMapHeader(m_mapFilename, &m_mapHeader);
-        if (!mapHeaderRead || giNumHumanPlayers < m_mapHeader.minHumanPlayers
-            || giNumHumanPlayers > m_mapHeader.maxHumanPlayers) {
-            gpGame->GetMap();
-            goto pick_map;
+            strcpy(gMapName, m_mapFilename);
+            mapHeaderRead = GetMapHeader(m_mapFilename, &m_mapHeader);
+            if (!mapHeaderRead || giNumHumanPlayers < m_mapHeader.minHumanPlayers
+                || giNumHumanPlayers > m_mapHeader.maxHumanPlayers) {
+                gpGame->GetMap();
+                continue;
+            }
+
+            break;
         }
 
         if (gbRemoteOn) {
@@ -615,7 +618,7 @@ cleanup:
     return result;
 }
 
-    VA(0x004765bc, 0xeb)
+VA(0x004765bc, 0xeb)
     void game::CleanUpNewGameWindow(void) {
         i32 player;
 
@@ -632,7 +635,7 @@ cleanup:
         }
     }
 
-    VA(0x004766a7, 0x794)
+VA(0x004766a7, 0x794)
     void game::InitNewGameWindow(void) {
         i32 columnGap;
         i32 availWidth;
@@ -660,17 +663,15 @@ cleanup:
         for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
             if (giNumHumanPlayers > 1) {
                 iconControl = new iconWidget(
-                    static_cast<i16>(
-                        firstColumnX + playerStep * playerCounter
-                        + PLAYER_HUMAN_X_OFFSET
-                    ),
-                    static_cast<i16>(multiplayerYOffset + PLAYER_HUMAN_Y),
+                    firstColumnX + playerStep * playerCounter
+                        + PLAYER_HUMAN_X_OFFSET,
+                    multiplayerYOffset + PLAYER_HUMAN_Y,
                     PLAYER_HUMAN_WIDTH,
                     PLAYER_HUMAN_HEIGHT,
                     "ngextra.icn",
                     PLAYER_HUMAN_FRAME,
                     ICON_DRAW_NORMAL,
-                    static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
+                    playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
                     WIDGET_KIND_ICON_DIRECT,
                     PLAYER_WIDGET_FILL_COLOR
                 );
@@ -679,17 +680,15 @@ cleanup:
                 m_newGameWindow->AddWidget(iconControl, -1);
 
                 iconControl = new iconWidget(
-                    static_cast<i16>(
-                        firstColumnX + playerStep * playerCounter
-                        + PLAYER_HANDICAP_X_OFFSET
-                    ),
-                    static_cast<i16>(multiplayerYOffset + PLAYER_HANDICAP_Y),
+                    firstColumnX + playerStep * playerCounter
+                        + PLAYER_HANDICAP_X_OFFSET,
+                    multiplayerYOffset + PLAYER_HANDICAP_Y,
                     PLAYER_HANDICAP_WIDTH,
                     PLAYER_HANDICAP_HEIGHT,
                     "ngextra.icn",
                     0,
                     ICON_DRAW_NORMAL,
-                    static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
+                    playerCounter + NEW_GAME_HANDICAP_FIRST,
                     WIDGET_KIND_ICON_DIRECT,
                     PLAYER_WIDGET_FILL_COLOR
                 );
@@ -699,22 +698,16 @@ cleanup:
             }
 
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_RACE_X_OFFSET
-                ),
+                firstColumnX + playerStep * playerCounter + PLAYER_RACE_X_OFFSET,
                 PLAYER_RACE_Y,
                 PLAYER_RACE_WIDTH,
-                static_cast<i16>(
-                    giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
-                                          : GAME_RACE_WIDGET_SINGLE_HEIGHT
-                ),
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
+                                          : GAME_RACE_WIDGET_SINGLE_HEIGHT,
                 "ngextra.icn",
-                static_cast<i16>(
-                    giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
-                                          : GAME_RACE_WIDGET_SINGLE_FRAME
-                ),
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_RACE_WIDGET_SINGLE_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
+                playerCounter + NEW_GAME_RACE_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -723,22 +716,16 @@ cleanup:
             m_newGameWindow->AddWidget(iconControl, -1);
 
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_SELECT_X_OFFSET
-                ),
+                firstColumnX + playerStep * playerCounter + PLAYER_SELECT_X_OFFSET,
                 PLAYER_SELECT_Y,
                 PLAYER_SELECT_WIDTH,
-                static_cast<i16>(
-                    giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT
-                                          : GAME_PLAYER_WIDGET_SINGLE_HEIGHT
-                ),
+                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT
+                                          : GAME_PLAYER_WIDGET_SINGLE_HEIGHT,
                 "ngextra.icn",
-                static_cast<i16>(
-                    giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME
-                                          : GAME_PLAYER_WIDGET_SINGLE_FRAME
-                ),
+                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_PLAYER_WIDGET_SINGLE_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
+                playerCounter + NEW_GAME_PLAYER_SELECT_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -747,19 +734,15 @@ cleanup:
             m_newGameWindow->AddWidget(iconControl, -1);
 
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_COLOR_X_OFFSET
-                ),
+                firstColumnX + playerStep * playerCounter + PLAYER_COLOR_X_OFFSET,
                 PLAYER_COLOR_Y,
                 PLAYER_COLOR_WIDTH,
                 PLAYER_COLOR_HEIGHT,
                 "ngextra.icn",
-                static_cast<i16>(
-                    giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
-                                          : GAME_COLOR_WIDGET_SINGLE_FRAME
-                ),
+                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_COLOR_WIDGET_SINGLE_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
+                playerCounter + NEW_GAME_COLOR_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -771,16 +754,14 @@ cleanup:
                 name = static_cast<char*>(H2_ALLOC(PLAYER_LABEL_CAPACITY));
                 sprintf(name, " ");
                 nameWidget = new textWidget(
-                    static_cast<i16>(
-                        firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET
-                    ),
+                    firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET,
                     PLAYER_NAME_Y,
                     PLAYER_NAME_WIDTH,
                     PLAYER_NAME_HEIGHT,
                     name,
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
-                    static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                    playerCounter + NEW_GAME_PLAYER_NAME_FIRST,
                     WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
@@ -793,19 +774,15 @@ cleanup:
             if (giNumHumanPlayers == 1)
                 yExtra = PLAYER_SINGLE_Y_OFFSET;
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter
-                    + PLAYER_RACE_ICON_X_OFFSET
-                ),
-                static_cast<i16>(
-                    yExtra + multiplayerYOffset + PLAYER_RACE_ICON_Y
-                ),
+                firstColumnX + playerStep * playerCounter
+                    + PLAYER_RACE_ICON_X_OFFSET,
+                yExtra + multiplayerYOffset + PLAYER_RACE_ICON_Y,
                 PLAYER_RACE_ICON_WIDTH,
                 PLAYER_RACE_ICON_HEIGHT,
                 "ngextra.icn",
                 PLAYER_RACE_ICON_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
+                playerCounter + NEW_GAME_RACE_ICON_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -823,19 +800,15 @@ cleanup:
                                 ? PLAYER_RACE_NAME_NARROW_WIDTH
                                 : 0;
             nameWidget = new textWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter
-                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
-                ),
-                static_cast<i16>(
-                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
-                ),
-                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+                firstColumnX + playerStep * playerCounter
+                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
                 PLAYER_RACE_NAME_HEIGHT,
                 name,
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
-                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+                playerCounter + NEW_GAME_RACE_NAME_FIRST,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
@@ -844,19 +817,15 @@ cleanup:
             m_newGameWindow->AddWidget(nameWidget, -1);
 
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter
-                    + PLAYER_RACE_CYCLE_X_OFFSET
-                ),
-                static_cast<i16>(
-                    yExtra + multiplayerYOffset + PLAYER_RACE_CYCLE_Y
-                ),
+                firstColumnX + playerStep * playerCounter
+                    + PLAYER_RACE_CYCLE_X_OFFSET,
+                yExtra + multiplayerYOffset + PLAYER_RACE_CYCLE_Y,
                 PLAYER_RACE_CYCLE_WIDTH,
                 PLAYER_RACE_CYCLE_HEIGHT,
                 "ngextra.icn",
                 PLAYER_RACE_CYCLE_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
+                playerCounter + NEW_GAME_RACE_CYCLE_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -869,7 +838,7 @@ cleanup:
 #if H2_RETAIL_COMPILER
 #define unusedPlayer unusedPlayer17
 #endif
-    VA(0x00476e3b, 0x50f)
+VA(0x00476e3b, 0x50f)
     void game::UpdateNewGameWindow(void) {
         b32 playerLockedValue;
         tag_message message;
@@ -990,7 +959,7 @@ cleanup:
             m_newGameWindow->BroadcastMessage(message);
         }
 
-        gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
+        gpGame->m_difficultyRating = CalcDifficultyRating();
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
         sprintf(gText, "%s %d%%", localization::Tr("new_game.rating.label"), gpGame->m_difficultyRating);
@@ -1002,7 +971,7 @@ cleanup:
 #undef unusedPlayer
 #endif
 
-    VA(0x0047734a, 0xdd1)
+VA(0x0047734a, 0xdd1)
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
         i32 sendResult;
         i32 oldNetworkId;
@@ -1014,12 +983,11 @@ cleanup:
         SMapHeader mapHeader;
         NewGameRemotePacket* remotePacketResult;
         i32 sender;
-        char setupData[GAME_SETUP_BUFFER_SIZE];
         char mapPacketLocal[GAME_MAP_PACKET_SIZE];
         tag_message mapWindowMessageTemp;
         i32 helpDialogIndexLocal;
         i32 H2_UNUSED(unusedSender);
-        char mapNamePacket[MAP_HEADER_NAME_SIZE];
+        char mapNamePacket[MAP_HEADER_NAME_SIZE + GAME_SETUP_BUFFER_SIZE];
 
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
@@ -1096,8 +1064,8 @@ cleanup:
                         break;
                 }
             }
-            if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
-                gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
+            if (KBTickCount() > glTimers[0]) {
+                gpGame->NGKPSetupDisplayString(cNGKPCore, NGKPcursorIndex);
                 gpGame->DrawNGKPDisplayString(1);
             }
         }
@@ -1352,7 +1320,7 @@ cleanup:
                                     } else if (gpGame->m_selectedSetupPlayer
                                                == GAME_NETWORK_PLAYER_NONE) {
                                         gpGame->m_selectedSetupPlayer =
-                                            static_cast<i8>(currentPlayerLocal);
+                                            currentPlayerLocal;
                                     } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal
                                                || (gpGame->m_setupPlayerNetworkId
                                                            [currentPlayerLocal]
@@ -1379,7 +1347,7 @@ cleanup:
                                                     [gpGame->m_selectedSetupPlayer];
                                             gpGame->m_setupPlayerNetworkId
                                                 [gpGame->m_selectedSetupPlayer] =
-                                                static_cast<i8>(swapPlayerTemp);
+                                                swapPlayerTemp;
                                         } else {
                                             NormalDialog(
                                                 localization::Tr("new_game.positions.cannot_swap"),
@@ -1486,7 +1454,7 @@ cleanup:
     }
     if (needSync && gbRemoteOn) {
         memcpy(mapNamePacket, gpGame->m_mapHeader.name, MAP_HEADER_NAME_SIZE);
-        memcpy(setupData, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
+        memcpy(mapNamePacket + MAP_HEADER_NAME_SIZE, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
         sendResult = TransmitRemoteData(
             mapNamePacket,
             GAME_REMOTE_CHANNEL,
@@ -1524,7 +1492,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_DELETE:
-            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore)) {
+            if (NGKPcursorIndex < strlen(cNGKPCore)) {
                 strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
             }
@@ -1536,7 +1504,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore))
+            if (NGKPcursorIndex < strlen(cNGKPCore))
                 ++NGKPcursorIndex;
             break;
 
@@ -1595,7 +1563,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     }
                 } else {
                     keyChar =
-                        static_cast<char>(message.payload.keyboard.keyCode & KEY_ASCII_MASK);
+                        message.payload.keyboard.keyCode & KEY_ASCII_MASK;
 
                     if (keyChar == '{' || keyChar == '}')
                         keyChar = 0;
@@ -1608,7 +1576,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     strcat(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore, gText);
                     ++NGKPcursorIndex;
-                    NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
+                    NGKPSetupDisplayString(cNGKPCore, NGKPcursorIndex);
                     widthResult = smallFont->LineLength(cNGKPDisplay, GAME_CHAT_DRAW_WIDTH);
                     if (widthResult > GAME_CHAT_MAX_LINES) {
                         strcpy(cNGKPCore, buffer);
@@ -1631,7 +1599,7 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
+    if (KBTickCount() > glTimers[0]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
         glTimers[0] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
     }
@@ -1760,16 +1728,14 @@ void game::ShowScenInfo(void) {
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (giNumHumanPlayers > 1) {
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_HUMAN_X_OFFSET
-                ),
-                static_cast<i16>(multiplayerYOffset + SCENARIO_PLAYER_HUMAN_Y),
+                firstColumnX + playerStep * playerCounter + PLAYER_HUMAN_X_OFFSET,
+                multiplayerYOffset + SCENARIO_PLAYER_HUMAN_Y,
                 PLAYER_HUMAN_WIDTH,
                 PLAYER_HUMAN_HEIGHT,
                 "ngextra.icn",
                 PLAYER_HUMAN_FRAME,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
+                playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -1778,16 +1744,14 @@ void game::ShowScenInfo(void) {
             window->AddWidget(iconControl, -1);
 
             iconControl = new iconWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_HANDICAP_X_OFFSET
-                ),
-                static_cast<i16>(multiplayerYOffset + SCENARIO_PLAYER_HANDICAP_Y),
+                firstColumnX + playerStep * playerCounter + PLAYER_HANDICAP_X_OFFSET,
+                multiplayerYOffset + SCENARIO_PLAYER_HANDICAP_Y,
                 PLAYER_HANDICAP_WIDTH,
                 PLAYER_HANDICAP_HEIGHT,
                 "ngextra.icn",
                 0,
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
+                playerCounter + NEW_GAME_HANDICAP_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -1797,22 +1761,16 @@ void game::ShowScenInfo(void) {
         }
 
         iconControl = new iconWidget(
-            static_cast<i16>(
-                firstColumnX + playerStep * playerCounter + PLAYER_RACE_X_OFFSET
-            ),
+            firstColumnX + playerStep * playerCounter + PLAYER_RACE_X_OFFSET,
             SCENARIO_PLAYER_RACE_Y,
             PLAYER_RACE_WIDTH,
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
-                                      : GAME_RACE_WIDGET_SINGLE_HEIGHT
-            ),
+            giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
+                                      : GAME_RACE_WIDGET_SINGLE_HEIGHT,
             "ngextra.icn",
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
-                                      : GAME_RACE_WIDGET_SINGLE_FRAME
-            ),
+            giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
+                                      : GAME_RACE_WIDGET_SINGLE_FRAME,
             ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
+            playerCounter + NEW_GAME_RACE_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
@@ -1821,19 +1779,15 @@ void game::ShowScenInfo(void) {
         window->AddWidget(iconControl, -1);
 
         iconControl = new iconWidget(
-            static_cast<i16>(
-                firstColumnX + playerStep * playerCounter + PLAYER_COLOR_X_OFFSET
-            ),
+            firstColumnX + playerStep * playerCounter + PLAYER_COLOR_X_OFFSET,
             SCENARIO_PLAYER_COLOR_Y,
             PLAYER_COLOR_WIDTH,
             PLAYER_COLOR_HEIGHT,
             "ngextra.icn",
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
-                                      : GAME_COLOR_WIDGET_SINGLE_FRAME
-            ),
+            giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
+                                      : GAME_COLOR_WIDGET_SINGLE_FRAME,
             ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
+            playerCounter + NEW_GAME_COLOR_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
@@ -1847,16 +1801,14 @@ void game::ShowScenInfo(void) {
             );
             sprintf(name, " ");
             nameWidget = new textWidget(
-                static_cast<i16>(
-                    firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET
-                ),
+                firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET,
                 SCENARIO_PLAYER_NAME_Y,
                 PLAYER_NAME_WIDTH,
                 PLAYER_NAME_HEIGHT,
                 name,
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
-                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                playerCounter + NEW_GAME_PLAYER_NAME_FIRST,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
@@ -1867,18 +1819,14 @@ void game::ShowScenInfo(void) {
 
         yExtra = 0;
         iconControl = new iconWidget(
-            static_cast<i16>(
-                firstColumnX + playerStep * playerCounter + PLAYER_RACE_ICON_X_OFFSET
-            ),
-            static_cast<i16>(
-                yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_ICON_Y
-            ),
+            firstColumnX + playerStep * playerCounter + PLAYER_RACE_ICON_X_OFFSET,
+            yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_ICON_Y,
             PLAYER_RACE_ICON_WIDTH,
             PLAYER_RACE_ICON_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_ICON_FRAME,
             ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
+            playerCounter + NEW_GAME_RACE_ICON_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
@@ -1896,19 +1844,15 @@ void game::ShowScenInfo(void) {
                             ? PLAYER_RACE_NAME_NARROW_WIDTH
                             : 0;
         nameWidget = new textWidget(
-            static_cast<i16>(
-                firstColumnX + playerStep * playerCounter + PLAYER_RACE_NAME_X_OFFSET
-                - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
-            ),
-            static_cast<i16>(
-                yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_NAME_Y
-            ),
-            static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+            firstColumnX + playerStep * playerCounter + PLAYER_RACE_NAME_X_OFFSET
+                - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+            yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_NAME_Y,
+            raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
             PLAYER_RACE_NAME_HEIGHT,
             name,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+            playerCounter + NEW_GAME_RACE_NAME_FIRST,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
@@ -1917,18 +1861,14 @@ void game::ShowScenInfo(void) {
         window->AddWidget(nameWidget, -1);
 
         iconControl = new iconWidget(
-            static_cast<i16>(
-                firstColumnX + playerStep * playerCounter + PLAYER_RACE_CYCLE_X_OFFSET
-            ),
-            static_cast<i16>(
-                yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_CYCLE_Y
-            ),
+            firstColumnX + playerStep * playerCounter + PLAYER_RACE_CYCLE_X_OFFSET,
+            yExtra + multiplayerYOffset + SCENARIO_PLAYER_RACE_CYCLE_Y,
             PLAYER_RACE_CYCLE_WIDTH,
             PLAYER_RACE_CYCLE_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_CYCLE_FRAME,
             ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
+            playerCounter + NEW_GAME_RACE_CYCLE_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );

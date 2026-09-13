@@ -263,7 +263,7 @@ i32 game::HandleCampaignWin(void) {
                         m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
                         m_campaignType = sideIndex;
-                        m_campaignScenario = static_cast<i8>(mapIndex);
+                        m_campaignScenario = mapIndex;
                     }
                 }
             }
@@ -743,9 +743,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                         if (!bCampaignViewOnly
                             && gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
                             gpGame->m_campaignChoice[IDX(iCurViewSide)][iCurViewMap] =
-                                static_cast<u8>(
-                                    message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST
-                                );
+                                message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST;
                             gpGame->CampaignInfoUpdate(1);
                         }
                         break;
@@ -777,7 +775,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                     for (map = 0; map < CAMPAIGN_AWARD_COUNT; ++map)
                                         gpGame->m_campaignAwards[map] = 0;
                                 } else {
-                                    gpGame->m_campaignScenario = static_cast<i8>(iCurViewMap);
+                                    gpGame->m_campaignScenario = iCurViewMap;
                                     gpGame->m_campaignType = iCurViewSide;
                                 }
                             } else {
@@ -925,7 +923,7 @@ void game::InitCampaignMap(void) {
             campaignPlayerCurrent->m_heroIds[heroPositionValue] =
                 campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate];
             campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate] =
-                static_cast<i8>(swappedHero);
+                swappedHero;
         }
     }
     if (campaignPlayerCurrent->m_heroCount)
@@ -968,7 +966,7 @@ void game::InitCampaignMap(void) {
                     ->m_army.Add(choiceBest->creature, choiceBest->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            m_players[0].m_cheatValue = static_cast<i8>(choiceBest->value);
+            m_players[0].m_cheatValue = choiceBest->value;
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             savedNewGameSetup = gbInNewGameSetup;

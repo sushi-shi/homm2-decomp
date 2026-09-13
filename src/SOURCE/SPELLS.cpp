@@ -35,7 +35,7 @@
 #define SPELL_VANISH_END_DELAY 500.0f
 #define CHAIN_LIGHTNING_FRAME_DELAY 100.0f
 #define MIRROR_SLIDE_FRAME_DELAY 50.0f
-#define BLAST_FRAME_DELAY static_cast<float>(10.0)
+#define BLAST_FRAME_DELAY 10.0f
 #define SPELL_COLD_RAY_DELAY 175.0f
 #define SPELL_MAGIC_ARROW_DELAY 100.0f
 #define SPELL_AREA_ANIMATION_DELAY 75.0f
@@ -128,7 +128,7 @@ namespace {
     H2_ENUM_END(MassSpellConstant)
 
     H2_ENUM_BEGIN(ElementalSummonConstant)
-        SUMMON_HEX_STORAGE_COUNT = 8,
+        SUMMON_HEX_STORAGE_COUNT = 6,
         SUMMON_HEXES_PER_SIDE = 3,
         SUMMON_RANDOM_OFFSET_MAX = 2,
         ATTACKER_SUMMON_TOP_SLOT = 0,
@@ -824,7 +824,7 @@ void combatManager::CastSpell(
                 sprintf(gText, "telptin.82m");
                 spellSample = LoadPlaySample(gText);
             }
-            if (HAS(teleportArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
+            if (HAS(teleportArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
                 adjacentHex = targetHex;
                 if (teleportArmy->m_facing == ARMY_FACING_RIGHT) {
                     adjacentHex = teleportArmy->GetAdjacentCellIndex(
@@ -1860,7 +1860,7 @@ void combatManager::BloodLustEffect(army* target, H2_ENUM_PARAM(MonsterFlags, i3
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags |= effect;
+    target->m_monster.attributes |= effect;
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -1877,7 +1877,7 @@ void combatManager::BloodLustEffect(army* target, H2_ENUM_PARAM(MonsterFlags, i3
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    H2_ENUM_CLEAR_FLAG(target->m_monster.flags.abilityFlags, effect);
+    H2_ENUM_CLEAR_FLAG(target->m_monster.attributes, effect);
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -1984,9 +1984,9 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     angleX = bolt->endX - bolt->pixelX;
     angleY = bolt->endY - bolt->pixelY;
     bolt->baseAngle =
-        static_cast<float>(atan2(static_cast<double>(angleX), static_cast<double>(angleY)));
+        static_cast<float>(atan2(angleX, angleY));
     averageAngle =
-        static_cast<float>((bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR);
+        (bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR;
     averageAngle = averageAngle
                      * ((BOLT_INITIAL_ANGLE_BIAS - bolt->distanceRatio)
                         / BOLT_INITIAL_ANGLE_DIVISOR);
@@ -2052,8 +2052,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     lastBeamOffset = bolt->widthLast;
     widthRollResult = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
     for (drawStep = 0; drawStep < stepCount; ++drawStep) {
-        bolt->currentX = bolt->currentX + sin(static_cast<double>(bolt->baseAngle));
-        bolt->currentY = bolt->currentY + cos(static_cast<double>(bolt->baseAngle));
+        bolt->currentX = bolt->currentX + sin(bolt->baseAngle);
+        bolt->currentY = bolt->currentY + cos(bolt->baseAngle);
         bolt->pixelX = static_cast<i32>(bolt->currentX);
         bolt->pixelY = static_cast<i32>(bolt->currentY);
         if (bolt->pixelX < 0) {
@@ -2062,7 +2062,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
             bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
-            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1);
+            bolt->currentX = COMBAT_SCREEN_WIDTH - 1;
         }
         if (bolt->pixelY < 0) {
             bolt->pixelY = 0;
@@ -2070,7 +2070,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_AREA_HEIGHT - 1 < bolt->pixelY) {
             bolt->pixelY = COMBAT_AREA_HEIGHT - 1;
-            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
+            bolt->currentY = COMBAT_AREA_HEIGHT - 1;
         }
 
         drawX = bolt->pixelX;
@@ -2219,8 +2219,8 @@ void combatManager::AddBolt(
     bolt->minAngle = minAngle;
     bolt->maxAngle = maxAngle;
     bolt->angleDistance = angleDistance;
-    bolt->currentX = static_cast<float>(startX);
-    bolt->currentY = static_cast<float>(startY);
+    bolt->currentX = startX;
+    bolt->currentY = startY;
     bolt->pixelX = startX;
     bolt->pixelY = startY;
     bolt->finished = false;
@@ -2473,11 +2473,11 @@ void combatManager::DoBolt(
                                 childDistance = remainingDistance >> 1;
                             childX = static_cast<i32>(
                                 bolts[index].pixelX
-                                + childDistance * sin(static_cast<double>(currentAngle))
+                                + childDistance * sin(currentAngle)
                             );
                             childY = static_cast<i32>(
                                 bolts[index].pixelY
-                                + childDistance * cos(static_cast<double>(currentAngle))
+                                + childDistance * cos(currentAngle)
                             );
                             if (bolts[index].endWidth < bolts[index].startWidth)
                                 childWidth = bolts[index].width - 1;
@@ -2874,10 +2874,10 @@ void combatManager::RippleCreature(
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     for (rowIndex = 0; rowIndex < SPELL_MODIFIER_ROW_COUNT; ++rowIndex) {
         wave[rowIndex] = static_cast<float>(
-            (sin(static_cast<double>(
+            (sin(
                  static_cast<float>(rowIndex % RIPPLE_WAVE_PERIOD)
                  / static_cast<float>(RIPPLE_WAVE_DIVISOR)
-             ))
+             )
              - RIPPLE_WAVE_CENTER)
             * RIPPLE_WAVE_RANGE
         );
@@ -3338,7 +3338,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             if (sourcePart == 0) {
                 searchHex = source->m_hex;
             } else {
-                if (HAS(source->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+                if (HAS(source->m_monster.attributes, MONSTER_FLAGS_WIDE)) {
                     searchHex = source->m_facing == ARMY_FACING_RIGHT ? source->m_hex + 1
                                 : source->m_hex - 1;
                 } else {
@@ -3406,7 +3406,7 @@ mirror_found:
     );
     image = &m_armies[IDX(m_hexCells[candidateHex].m_occupantSide)]
                       [m_hexCells[candidateHex].m_occupantIndex];
-    image->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
+    image->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
     duration = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration += SPELL_HOURGLASS_POWER_BONUS;
@@ -3497,7 +3497,7 @@ void combatManager::SummonElemental(H2_ENUM_PARAM(CreatureType, i32) monsterType
     );
     elementals = &m_armies[IDX(m_hexCells[summonHex].m_occupantSide)]
                           [m_hexCells[summonHex].m_occupantIndex];
-    elementals->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
+    elementals->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
     spellPower = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
@@ -3635,8 +3635,8 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     deltaY = targetY - startY;
     distance = INTEGER_VECTOR_LENGTH(deltaX, deltaY);
     segmentCount = distance / frameSpacing;
-    currentX = static_cast<float>(startX);
-    currentY = static_cast<float>(startY);
+    currentX = startX;
+    currentY = startY;
     stepX = static_cast<float>(deltaX) / segmentCount;
     stepY = static_cast<float>(deltaY) / segmentCount;
     deadline = 0;
@@ -3842,7 +3842,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags &= MONSTER_FLAGS_RESURRECTED_MASK;
+    target->m_monster.attributes &= MONSTER_FLAGS_RESURRECTED_MASK;
 }
 #if H2_RETAIL_COMPILER
 #undef deadHex
@@ -4061,7 +4061,7 @@ void combatManager::Earthquake(void) {
             ++impactCount;
             if (newWallStates[index] == COMBAT_WALL_STATE_DESTROYED
                 || newWallStates[index] == COMBAT_WALL_STATE_SECTION_DESTROYED)
-                m_hexCells[iWallToHexCell[index]].m_blocked = 0;
+                m_hexCells[IDX(iWallToHexCell[index])].m_blocked = 0;
         }
 
         newTowerStates[index] = m_wallStates[index];

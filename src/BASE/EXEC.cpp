@@ -20,27 +20,24 @@ H2_ENUM_BEGIN(ExecutiveManagerConstant)
     DIALOG_MANAGER_CAPACITY  = 20
 H2_ENUM_END(ExecutiveManagerConstant)
 
-DATA(0x0051f2f4) static char gExecutiveTextStorage[sizeof(SExecutiveText)] =
-    localization::Tr("system.resources.initialization_failed") "\0\0\0"
-    localization::Tr("system.input.initialization_failed") "\0\0"
-    localization::Tr("system.sound.initialization_failed") "\0\0"
-    localization::Tr("system.mouse.initialization_failed") "\0\0"
-    localization::Tr("system.window.initialization_failed") "\0\0\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    "-----Manager List Start-----" "\0\0\0\0"
-    "-----" "\0\0\0"
-    "Head %d   Tail %d" "\0\0\0"
-    "-----" "\0\0\0"
-    "Manager %20s  this %d   prev %d  next %d" "\0\0\0\0"
-    "--*--Manager List Stop --*--\n\n" "\0\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    localization::Tr("system.manager.add_failed") "\0"
-    "Terminated" "\0";
-
-#define gExecutiveText (*reinterpret_cast<SExecutiveText*>(gExecutiveTextStorage))
+DATA(0x51f2f4) static char gExecutiveResourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE] = localization::Tr("system.resources.initialization_failed");
+DATA(0x51f330) static char gExecutiveInputInitError[EXEC_TEXT_INPUT_INIT_SLOT_SIZE] = localization::Tr("system.input.initialization_failed");
+DATA(0x51f388) static char gExecutiveSoundInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = localization::Tr("system.sound.initialization_failed");
+DATA(0x51f3a8) static char gExecutiveMouseInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = localization::Tr("system.mouse.initialization_failed");
+DATA(0x51f3c8) static char gExecutiveWindowInitError[EXEC_TEXT_WINDOW_INIT_SLOT_SIZE] = localization::Tr("system.window.initialization_failed");
+DATA(0x51f40c) static char gExecutiveDialogManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f428) static char gExecutiveDialogManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f444) static char gExecutiveDialogManagerError3[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f460) static char gExecutiveDialogManagerError4[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f47c) static char gExecutiveManagerListStart[EXEC_TEXT_LIST_START_SLOT_SIZE] = "-----Manager List Start-----";
+DATA(0x51f49c) static char gExecutiveManagerListDivider1[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE] = "-----";
+DATA(0x51f4a4) static char gExecutiveManagerListHeaderFormat[EXEC_TEXT_LIST_HEADER_SLOT_SIZE] = "Head %d   Tail %d";
+DATA(0x51f4b8) static char gExecutiveManagerListDivider2[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE] = "-----";
+DATA(0x51f4c0) static char gExecutiveManagerListEntryFormat[EXEC_TEXT_LIST_ENTRY_SLOT_SIZE] = "Manager %20s  this %d   prev %d  next %d";
+DATA(0x51f4ec) static char gExecutiveManagerListStop[EXEC_TEXT_LIST_STOP_SLOT_SIZE] = "--*--Manager List Stop --*--\n\n";
+DATA(0x51f50c) static char gExecutiveCallManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f528) static char gExecutiveCallManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f544) static char gExecutiveTerminationMessage[EXEC_TEXT_TERMINATION_SLOT_SIZE] = "Terminated";
 
 VA(0x004c4f20, 0x35)
 executive::executive(void) {
@@ -53,17 +50,17 @@ executive::executive(void) {
 VA(0x004c4f60, 0xb0)
 i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.resourceInitError);
+        ShutDown(gExecutiveResourceInitError);
     if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.inputInitError);
+        ShutDown(gExecutiveInputInitError);
     if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
         if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-            ShutDown(gExecutiveText.soundInitError);
+            ShutDown(gExecutiveSoundInitError);
     }
     if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.mouseInitError);
+        ShutDown(gExecutiveMouseInitError);
     if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.windowInitError);
+        ShutDown(gExecutiveWindowInitError);
     return 0;
 }
 
@@ -120,13 +117,13 @@ i32 executive::DoDialog(class baseManager* manager) {
         count++;
     }
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError1);
+        ShutDown(gExecutiveDialogManagerError1);
     if (dialogExecutive.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError2);
+        ShutDown(gExecutiveDialogManagerError2);
     if (dialogExecutive.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError3);
+        ShutDown(gExecutiveDialogManagerError3);
     if (dialogExecutive.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError4);
+        ShutDown(gExecutiveDialogManagerError4);
     dialogExecutive.MainLoop();
     RemoveManager(manager);
     for (index = 0; index < count; index++) {
@@ -149,18 +146,18 @@ i32 executive::DoDialog(class baseManager* manager) {
 #endif
 VA(0x004c5240, 0xac)
 void executive::PrintManagerList(void) {
-    LogStr(gExecutiveText.managerListStart);
-    LogStr(gExecutiveText.managerListDivider1);
-    sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
+    LogStr(gExecutiveManagerListStart);
+    LogStr(gExecutiveManagerListDivider1);
+    sprintf(gText, gExecutiveManagerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
-    LogStr(gExecutiveText.managerListDivider2);
+    LogStr(gExecutiveManagerListDivider2);
     baseManager* currentManager = m_managerListHead;
     while (currentManager != NULL) {
-        sprintf(gText, gExecutiveText.managerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
+        sprintf(gText, gExecutiveManagerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
         LogStr(gText);
         currentManager = currentManager->m_next;
     }
-    LogStr(gExecutiveText.managerListStop);
+    LogStr(gExecutiveManagerListStop);
 }
 #if H2_RETAIL_COMPILER
 #undef currentManager
@@ -254,11 +251,11 @@ void executive::CallManager(class baseManager* manager) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.callManagerError1);
+        ShutDown(gExecutiveCallManagerError1);
     MainLoop();
     RemoveManager(manager);
     if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.callManagerError2);
+        ShutDown(gExecutiveCallManagerError2);
     m_activeManager = saved;
 }
 #if H2_RETAIL_COMPILER
@@ -317,5 +314,5 @@ void executive::MainLoop(void) {
 
 VA(0x004c5700, 0x15)
 void executive::Terminate(void) {
-    ShutDown(gExecutiveText.terminationMessage);
+    ShutDown(gExecutiveTerminationMessage);
 }

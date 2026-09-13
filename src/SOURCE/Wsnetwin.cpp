@@ -147,10 +147,10 @@ i16 wsnet_init(void) {
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
         }
         gbRemoteGameOpen = false;
-        startup.playerCount = static_cast<u8>(giNumHumanPlayers);
+        startup.playerCount = giNumHumanPlayers;
         memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
         for (player = 1; player < giNumHumanPlayers; player++) {
-            startup.netPosition = static_cast<u8>(player);
+            startup.netPosition = player;
             wsSendMessage(
                 giNetPosToDCOPos[player],
                 NETWORK_PACKET_STARTUP,
@@ -349,7 +349,7 @@ void wsProcessMessages(void) {
 
 VA(0x004b2653, 0x344)
 void wsEvaluateMessage(u32l size, i32 sender) {
-    char* message = rcvBufIn + 1;
+    void* message = rcvBufIn + 1;
     tag_message windowMessage;
     i32 player;
 
@@ -363,7 +363,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
                         if (giNetPosToDCOPos[player] == sender
                             || &gsNetPlayerInfo[player]
-                                   == reinterpret_cast<SNetPlayerInfo*>(message)) {
+                                   == static_cast<SNetPlayerInfo*>(message)) {
                             wsSendMessage(
                                 giNetPosToDCOPos[player],
                                 NETWORK_PACKET_GUEST_ACCEPTED,
@@ -376,7 +376,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
                     LogInt("Got HereIAm from ", sender);
                     gsNetPlayerInfo[giNumHumanPlayers] =
-                        *reinterpret_cast<SNetPlayerInfo*>(message);
+                        *static_cast<SNetPlayerInfo*>(message);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = true;
                     wsSendMessage(
@@ -392,12 +392,12 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             }
             break;
         case NETWORK_PACKET_STARTUP:
-            giNumHumanPlayers = *(message + offsetof(WinsockStartupMessage, playerCount));
-            giThisNetPos = *(message + offsetof(WinsockStartupMessage, netPosition));
+            giNumHumanPlayers = static_cast<WinsockStartupMessage*>(message)->playerCount;
+            giThisNetPos = static_cast<WinsockStartupMessage*>(message)->netPosition;
             LogInt("WSMSGSTARTUP", giThisNetPos, sender);
             memcpy(
                 giNetPosToDCOPos,
-                message + offsetof(WinsockStartupMessage, playerAddresses),
+                static_cast<WinsockStartupMessage*>(message)->playerAddresses,
                 sizeof(giNetPosToDCOPos)
             );
             bStartUpInfoReceived = true;

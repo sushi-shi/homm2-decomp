@@ -28,7 +28,7 @@ H2_ENUM_BEGIN(RemoteImplementationConstant)
     DIRECT_LINK_PLAYER_COUNT         = 2,
     MESSAGE_ID_PLAYER_STRIDE         = 100000000,
     CRC_WORD_BIT_COUNT               = 16,
-    CRC_STORAGE_WORD_COUNT           = 2,
+
     GET_REMOTE_DATA_FREE_LINE_OFFSET = 25,
     POLL_REMOTE_ALLOC_LINE_OFFSET    = 235
 H2_ENUM_END(RemoteImplementationConstant)
@@ -352,17 +352,17 @@ void calc_crc(u16* crc, u8* data, i32 length) {
 
 VA(0x0048d8bf, 0x7d)
 i32 EncodePacket(u8* data, char source, char destination, i32 length) {
-    u16 crc[CRC_STORAGE_WORD_COUNT];
+    u16 crc;
 
     REMOTE_PACKET(PacketSend)->source = source;
     REMOTE_PACKET(PacketSend)->destination = destination;
     REMOTE_PACKET(PacketSend)->reserved = 0;
     REMOTE_PACKET(PacketSend)->payloadSize = static_cast<char>(length);
-    crc[0] = 0;
-    REMOTE_PACKET(PacketSend)->crc = crc[0];
+    crc = 0;
+    REMOTE_PACKET(PacketSend)->crc = crc;
     memcpy(PacketSend + REMOTE_PACKET_HEADER_SIZE, data, length);
-    calc_crc(crc, reinterpret_cast<u8*>(PacketSend), length + REMOTE_PACKET_HEADER_SIZE);
-    REMOTE_PACKET(PacketSend)->crc = crc[0];
+    calc_crc(&crc, reinterpret_cast<u8*>(PacketSend), length + REMOTE_PACKET_HEADER_SIZE);
+    REMOTE_PACKET(PacketSend)->crc = crc;
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
@@ -375,11 +375,11 @@ VA(0x0048d93c, 0x10d)
 i32 DecodePacket(u8* data, i32) {
     u16 crc;
     i32 H2_UNUSED(result);
-    u16 computedCrc[CRC_STORAGE_WORD_COUNT];
+    u16 computedCrc;
     char text[REMOTE_ERROR_TEXT_SIZE];
     u32 length;
 
-    computedCrc[0] = 0;
+    computedCrc = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
         sprintf(
@@ -393,13 +393,13 @@ i32 DecodePacket(u8* data, i32) {
     length = static_cast<u8>(REMOTE_PACKET(packet)->payloadSize);
     crc = REMOTE_PACKET(packet)->crc;
     REMOTE_PACKET(packet)->crc = 0;
-    calc_crc(computedCrc, reinterpret_cast<u8*>(packet), length + REMOTE_PACKET_HEADER_SIZE);
-    if (crc != computedCrc[0]) {
+    calc_crc(&computedCrc, reinterpret_cast<u8*>(packet), length + REMOTE_PACKET_HEADER_SIZE);
+    if (crc != computedCrc) {
         sprintf(
             text,
             "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             crc,
-            computedCrc[0]
+            computedCrc
         );
         LogStr(text);
         return 0;

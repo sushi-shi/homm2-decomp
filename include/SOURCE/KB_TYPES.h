@@ -848,15 +848,8 @@ H2_ENUM_BEGIN(MonsterDatabaseConstant)
 H2_ENUM_END(MonsterDatabaseConstant)
 #pragma pack(push, 1)
 struct tag_monsterInfo {
-    union {
-        struct {
-            i16 cost;
-            union {
-                i32 fightValue;
-                i32 randomValue;
-            };
-        };
-    };
+    i16 cost;
+    i32 fightValue;
     i8 iconIndex;
     i8 growth;
     u16 hitPoints;
@@ -868,17 +861,7 @@ struct tag_monsterInfo {
     i8 damageMax;
     i8 shots;
     char spriteName[MONSTER_SPRITE_NAME_SIZE];
-    union {
-        MonsterFlags attributes;
-        union {
-            MonsterFlags all;
-            MonsterFlags abilityFlags;
-            struct {
-                i8 abilities;
-                i8 attributeFlags;
-            } bytes;
-        } flags;
-    };
+    MonsterFlags attributes;
 };
 #pragma pack(pop)
 SIZE(tag_monsterInfo, 0x1a);

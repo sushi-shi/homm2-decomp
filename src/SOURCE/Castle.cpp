@@ -406,14 +406,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         for (rowPosition = BACKGROUND_TERRAIN_FIRST_ROW; rowPosition <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPosition) {
             for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
                 backgroundWidget = new iconWidget(
-                    static_cast<i16>(
-                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
-                    ),
-                    static_cast<i16>((rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT,
+                    (rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntwba.icn",
-                    static_cast<i16>(terrainIconFrame + backFrame),
+                    terrainIconFrame + backFrame,
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
@@ -432,14 +430,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     continue;
                 }
                 backgroundWidget = new iconWidget(
-                    static_cast<i16>(
-                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
-                    ),
-                    static_cast<i16>((rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT,
+                    (rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntown.icn",
-                    static_cast<i16>(raceBase + backFrame),
+                    raceBase + backFrame,
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
@@ -507,15 +503,15 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
-                       < CONTROL_BUILDING_NAME_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                       < CONTROL_BUILDING_NAME_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_ICON_FIRST
                      && message.payload.widget.id
-                            < CONTROL_BUILDING_ICON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                            < CONTROL_BUILDING_ICON_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_BUTTON_FIRST
                      && message.payload.widget.id
-                            < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                            < CONTROL_BUILDING_BUTTON_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
             if (whichBuilding != IDX(BUILDING_SLOT_NONE))
                 whichBuilding = IDX(castleSlotsUse[whichBuilding]);
@@ -592,7 +588,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case IDX(BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
             case IDX(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
             case IDX(BUILDING_SLOT_SPECIAL_THIRTY):
-                if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
+                if (BitTest(gpGame->m_townBuiltToday, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
                         localization::Tr("castle.build.already_this_turn")

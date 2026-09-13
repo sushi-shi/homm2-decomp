@@ -29,6 +29,7 @@ import sys
 from pathlib import Path
 
 from homm2.core import wine
+from homm2.core.retail import RETAIL_SHA256
 
 from . import transforms
 from .crt_order import ninja_link_args
@@ -44,7 +45,6 @@ LIB_EXE = TOOLCHAIN / "bin/LIB.EXE"
 LIBCMT = TOOLCHAIN / "lib/LIBCMT.LIB"
 MSVCPRT = TOOLCHAIN / "lib/MSVCPRT.LIB"
 RETAIL = ROOT / "build/orig/HMM2PL.exe"
-RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
 GENERIC_IMPORT_LIBRARIES = {
     "build/link/audiere.lib": "build/link/generic-imports/audiere.lib",
     "build/link/mss32.lib": "build/link/generic-imports/mss32.lib",

@@ -118,10 +118,10 @@ i16 dpnet_init(void) {
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST);
             gbRemoteGameOpen = false;
-            startup.playerCount = static_cast<u8>(giNumHumanPlayers);
+            startup.playerCount = giNumHumanPlayers;
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
             for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
-                startup.netPosition = static_cast<u8>(guestIndex);
+                startup.netPosition = guestIndex;
                 dpSendMessage(
                     giNetPosToDCOPos[guestIndex],
                     NETWORK_PACKET_STARTUP,
@@ -248,10 +248,10 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD size;
-    i32 destination;
+    DPID destination;
     i32 H2_UNUSED(i);
     i32 H2_UNUSED(j);  // i and j are unreferenced; retail's frame reserves both slots
-    i32 sender;
+    DPID sender;
     i32 receiveResult;
 
     if (lpIDC == NULL)
@@ -259,8 +259,8 @@ void dpProcessMessages(void) {
     while (1) {
         size = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
-            reinterpret_cast<LPDPID>(&sender),
-            reinterpret_cast<LPDPID>(&destination),
+            &sender,
+            &destination,
             1,
             rcvBufIn,
             &size
@@ -271,7 +271,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, RETAIL_FILE, 335);
         if (sender == 0) {
         } else {
-            if (destination == 0 || static_cast<DPID>(destination) == dcoID)
+            if (destination == 0 || destination == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
@@ -282,7 +282,7 @@ void dpProcessMessages(void) {
 
 VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
-    DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
+    void* startup = rcvBufIn + 1;
     i32 i;
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
@@ -300,7 +300,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 if (gbRemoteGameOpen != 0) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
                     gsNetPlayerInfo[giNumHumanPlayers] =
-                        *reinterpret_cast<SNetPlayerInfo*>(startup);
+                        *static_cast<SNetPlayerInfo*>(startup);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = true;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
@@ -317,10 +317,10 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             giHostAcceptStatus = HOST_ACCEPT_REJECTED;
             break;
         case NETWORK_PACKET_STARTUP:
-            giNumHumanPlayers = startup->playerCount;
-            giThisNetPos = startup->netPosition;
+            giNumHumanPlayers = static_cast<DirectPlayStartupMessage*>(startup)->playerCount;
+            giThisNetPos = static_cast<DirectPlayStartupMessage*>(startup)->netPosition;
             LogInt("DPMSGSTARTUP", giThisNetPos, sender);
-            memcpy(giNetPosToDCOPos, startup->playerIds, sizeof(giNetPosToDCOPos));
+            memcpy(giNetPosToDCOPos, static_cast<DirectPlayStartupMessage*>(startup)->playerIds, sizeof(giNetPosToDCOPos));
             bStartUpInfoReceived = true;
             break;
         default:

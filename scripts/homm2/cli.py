@@ -74,6 +74,12 @@ def main(argv=None):
                   'homm2 build --no-match [--ru|--en] [-j JOBS] [-v] (compile + link)')
             return 0
         rest = [arg for arg in rest if arg != '--ru']
+        from homm2.core.retail import verify_retail
+        try:
+            verify_retail(REPO / "build/orig/HMM2PL.exe")
+        except (OSError, ValueError) as error:
+            print(f"[build] {error}", file=sys.stderr)
+            return 1
         if sh("python3", "-m", "homm2.build.localization"): return 1
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1

@@ -290,7 +290,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = SCREEN_WIDTH;
     m_screen->m_height = SCREEN_HEIGHT;
-    m_screen->m_pixels = reinterpret_cast<u8*>(lpInitWin);
+    m_screen->m_pixels = static_cast<u8*>(lpInitWin);
     memset(
         m_screen->m_pixels,
         FRAMEBUFFER_FILL_COLOR,

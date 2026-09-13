@@ -61,7 +61,7 @@ H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_SAVE_NAME_SIZE                  = 0x15f,
     GAME_MAP_FILENAME_SIZE               = 13,
     GAME_SETUP_STATE_PAD_SIZE            = 0x12,
-    GAME_DAILY_EVENT_FLAG_COUNT          = GAME_TOWN_COUNT / 8,
+    GAME_TOWN_BUILD_FLAG_BYTE_COUNT      = GAME_TOWN_COUNT / 8,
     GAME_OBELISK_VISITOR_COUNT           = 48,
     GAME_DEFAULT_PLAYER_NAME_SIZE        = 4,
     GAME_DEFAULT_PLAYER_NAMES_SIZE       = GAME_PLAYER_COUNT * GAME_DEFAULT_PLAYER_NAME_SIZE,
@@ -118,14 +118,8 @@ public:
     class fullMap m_worldMap;
     i8 m_obeliskCount;
     town m_castleRecs[IDX(GAME_TOWN_COUNT)];
-    union {
-        i8 m_castleOwners[IDX(GAME_TOWN_COUNT)];
-        i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
-    };
-    union {
-        char m_dailyEventFlags[GAME_DAILY_EVENT_FLAG_COUNT];
-        u8 m_knownTowns[GAME_DAILY_EVENT_FLAG_COUNT];
-    };
+    i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
+    u8 m_townBuiltToday[GAME_TOWN_BUILD_FLAG_BYTE_COUNT];
     hero m_heroRecs[IDX(GAME_HERO_COUNT)];
     i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];
     mineRecord m_mines[IDX(GAME_MINE_COUNT)];
@@ -140,7 +134,7 @@ public:
     H2_ENUM_STORAGE(ArtifactType, i8) m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
-    u8 m_cheated;
+    b8 m_cheated;
     char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
     char m_rumour[GAME_RUMOUR_TEXT_SIZE];
     u16 m_rumourEventCount;

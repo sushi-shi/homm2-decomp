@@ -55,8 +55,8 @@ void textWidget::Read(void) {
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     i16 length = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(length));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), length);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->ReadBlock(m_text, length);
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();

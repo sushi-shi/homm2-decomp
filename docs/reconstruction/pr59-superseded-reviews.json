@@ -1,0 +1,66 @@
+{
+  "src/SOURCE/ARMY.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
+    "body_sha256": "4100f0663a204c0c4a7b1ef53b2a7898e1d0a48b322239505ef031c019026721",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Complete ASCII/CP1251 including YO case mapping read. Unsigned input and char result express byte-preserving text conversion, including high-bit values; no widening buffer or Unicode substitution. No union, goto, scratch aggregate, varargs, role reuse or pointer arithmetic."
+  },
+  "src/SOURCE/ARMY.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
+    "body_sha256": "e77627defca7ff7d27e6a84cfa8579f93f7adbe6018aecaa58cff99582257518",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Complete reverse ASCII/CP1251/YO mapping read. Real u8-to-char text boundary preserves one-byte encoding; retained rather than imposing ASCII-only conversion. No union, goto, scratch aggregate, varargs, role reuse or artificial pointer."
+  },
+  "src/SOURCE/EVENTS.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
+    "body_sha256": "427e91ff76a6f81b09fd40fd2c584daf538ede55d3617fc7398136b61e6e57fc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Actual unsigned-byte helper: ASCII A..Z, CP1251 c0..df and special A8 are mapped; other bytes preserved. No buffer, alternate owner, unrelated reuse or argument-slot varargs. Its inlined consumers are covered by DoEvent's full retail span. No manual argument-slot varargs or enclosing-owner recovery. Inlined code covered by the DoEvent retail/native comparison. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
+  },
+  "src/SOURCE/TOWNMGR.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
+    "body_sha256": "ef31a709743e4bf00b21d2b6ed2ef268b8175261972cbb6c60cdeac1c736c0f7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unsigned input preserves the high CP1251 ranges; returned char preserves one byte and length. Actual ASCII/Cyrillic/yo mapping, no explicit casts, arrays, unions, gotos, pointer arithmetic, reused roles or unused scratch."
+  }
+}

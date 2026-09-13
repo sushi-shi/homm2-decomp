@@ -113,14 +113,14 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
     m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->ReadBlock(m_text, m_maxLength);
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & COLOR_MASK);
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & COLOR_MASK);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();

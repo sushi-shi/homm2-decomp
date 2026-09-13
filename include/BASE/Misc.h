@@ -28,7 +28,7 @@ H2_ENUM_END(LogConstant)
 // Existing signed integer deltas; no widening or alternative distance metric.
 #define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
 #define INTEGER_VECTOR_LENGTH(dx, dy) \
-    (static_cast<i32>(sqrt(static_cast<double>((dx) * (dx) + (dy) * (dy)))))
+    (static_cast<i32>(sqrt((dx) * (dx) + (dy) * (dy))))
 
 struct indexArray {
     u16 key;

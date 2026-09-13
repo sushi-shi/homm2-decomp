@@ -56,8 +56,6 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
     TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
     TOWN_MAGE_GUILD_SPELLS_PER_LEVEL   = 4,
-    TOWN_SPELL_COUNT_OVERLAY_OFFSET    = 19,
-    TOWN_SPELL_COUNT_OVERLAY_SIZE      = 6,
     TOWN_NAME_CAPACITY                 = 13,
     TOWN_CONVERT_SOURCE_FRAME          = 0x10,
     TOWN_CONVERT_ANY_FRAME             = 0xFF,
@@ -101,11 +99,8 @@ public:
             m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         H2_ENUM_STORAGE(SpellType, i8)
             m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
-        struct {
-            char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
-            i8 m_spellCounts[TOWN_SPELL_COUNT_OVERLAY_SIZE];
-        };
     };
+    i8 m_spellCounts[TOWN_MAGE_GUILD_LEVEL_COUNT];
     u16 m_turnsOwned;
     char m_name[TOWN_NAME_CAPACITY];
     town(void);

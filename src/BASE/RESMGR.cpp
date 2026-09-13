@@ -25,7 +25,7 @@ H2_ENUM_BEGIN(ResourceConstant)
     EVIL_TRANSLATION_COUNT  = 37,
     BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
-    FILE_COUNT_BUFFER_WORDS = 2,
+
     POSITION_STACK_DEPTH    = 10
 H2_ENUM_END(ResourceConstant)
 
@@ -59,7 +59,7 @@ void resourceManager::GetBackdrop(H2_CONST char* name, class bitmap* backdrop, i
         ReadWord();
         ReadWord();
         ReadBlock(
-            reinterpret_cast<i8*>(backdrop->m_pixels),
+            backdrop->m_pixels,
             backdrop->m_width * backdrop->m_height
         );
     }
@@ -89,7 +89,7 @@ void resourceManager::GetBackdropAtLoc(
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
                 (curRow * BACKDROP_ROW_BYTES)
-                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
+                    + destination->m_pixels + destinationX,
                 width
             );
         }
@@ -345,7 +345,7 @@ void resourceManager::Close(void) {
 
 VA(0x004b89b0, 0x138)
 i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i16 fpCountBuffer;
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -371,8 +371,8 @@ i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
-    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
+    read(m_aggregateFd[m_curAggregate], &fpCountBuffer, sizeof(i16));
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer;
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
@@ -513,12 +513,12 @@ u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
 }
 
 VA(0x004b8f40, 0x1b)
-void resourceManager::Read13(i8* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
 VA(0x004b8f60, 0x9b)
-void resourceManager::ReadBlock(i8* destination, u32l size) {
+void resourceManager::ReadBlock(void* destination, u32l size) {
     H2_ASSERT(
         m_aggregateFd[m_curAggregate] != INVALID_FILE,
         "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP",

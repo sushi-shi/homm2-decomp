@@ -9,8 +9,9 @@ retail sign-extends the result through 16 bits first:
 89 8d 1c fe ff ff  movl %ecx, -0x1e4(%ebp)
 ```
 
-A `movswl reg16,reg32` between the select and an `i32` store is a **narrowing
-cast written in the source**, not an enum-width effect.
+A `movswl reg16,reg32` between the select and an `i32` store is evidence of
+a distinct signed16-bit conversion. An explicit narrowing cast reproduces
+it; the instruction alone does not prove the original source tokens.
 
 Measured on `highScoreManager::Update` (RVA 0x654ef), VC6 SP5 `/Od /Ob1`.
 
@@ -32,8 +33,8 @@ f7 d8 negl %eax ; 1b c0 sbbl %eax,%eax ; 83 e0 2f andl $0x2f,%eax ; 83 c0 64 add
 89 8d ..  movl %ecx, <id>
 ```
 
-If VC6 were sizing the enum as `short`, both would narrow. Only one does, so
-the cast is a source token.
+If enum width alone explained this shape, both same-enum selects would
+narrow. Only one does, supporting a distinct conversion at that site.
 
 ## What made it match
 
@@ -53,3 +54,26 @@ Two sites (the enable/disable pair). `highScoreManager::Update` 93.50% -> EXACT.
   cast that may sit on top of it.
 - [short-cast-of-int-sum](short-cast-of-int-sum.md) is the same `movsx` tell
   over an arithmetic expression rather than a select.
+
+## C37: spell-tab selection
+
+The same distinction is measured in ViewSpells at RVA0x546ee. Its widget
+ID field is i32, while the selected value is sign-extended through16 bits:
+
+```cpp
+message.payload.widget.id = static_cast<i16>(
+    spellType == SPELL_TYPE_COMBAT
+    ? VIEW_SPELL_COMBAT_TAB_ID : VIEW_SPELL_ADVENTURE_TAB_ID
+);
+```
+
+The two tab IDs are4 and5. The named selection replaces the arithmetic
+`VIEW_SPELL_COMBAT_TAB_ID + static_cast<i32>(spellType != SPELL_TYPE_COMBAT)`
+without changing the `xor/setne/add4/movswl/store` sequence. Dropping the
+outer i16 cast loses `0f bf c8` and shortens the function481-to478 bytes.
+Removing only the arithmetic bool cast instead adds `25 ff 00 00 00`
+(`and eax,0xff`) and grows it to486 bytes. These byte-verified equivalent
+spellings do not prove the original source token choice; the persistent
+fact is the observed narrowing before the wider store.
+
+See [the complete C37 products](../reconstruction/C34-C37-S39-B59.md).

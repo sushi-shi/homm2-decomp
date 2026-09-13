@@ -251,6 +251,51 @@ class AstVariantSemanticTests(unittest.TestCase):
             and cursor.is_definition()
         }
 
+    def _marker_fixture(self, body):
+        blob = ('#define VA(address, size)\n' + body).encode()
+        tu = ci.Index.create().parse(
+            str(self.source), args=['-x', 'c++', '-std=c++98'],
+            unsaved_files=[(str(self.source), blob.decode())],
+        )
+        self.assertFalse([d for d in tu.diagnostics if d.severity >= ci.Diagnostic.Error])
+        return tu, blob
+
+    def test_marker_selects_definition_before_unannotated_inline_helper(self):
+        tu, blob = self._marker_fixture(
+            'VA(0x00401234, 4)\nvoid Target() {}\n'
+            'inline int Helper() { return 1; }\n'
+            'VA(0x00401238, 4)\nvoid Next() {}\n'
+        )
+        self.assertEqual(generator.target_function(tu, self.source, blob, 0x1234).spelling, 'Target')
+        self.assertEqual(generator.target_function(tu, self.source, blob, 0x1238).spelling, 'Next')
+
+    def test_marker_ignores_a_prototype_before_the_definition(self):
+        tu, blob = self._marker_fixture(
+            'VA(0x00401234, 4)\nvoid Target();\nvoid Target() {}\n'
+            'inline int Helper() { return 1; }\n'
+        )
+        self.assertEqual(generator.target_function(tu, self.source, blob, 0x1234).spelling, 'Target')
+
+    def test_marker_does_not_borrow_definition_from_next_marker(self):
+        tu, blob = self._marker_fixture(
+            'VA(0x00401234, 4)\nvoid Missing();\n'
+            'VA(0x00401238, 4)\nvoid Next() {}\n'
+        )
+        with self.assertRaisesRegex(ValueError, 'found none'):
+            generator.target_function(tu, self.source, blob, 0x1234)
+
+    def test_marker_rejects_ambiguous_first_definition(self):
+        tu, blob = self._marker_fixture('VA(0x00401234, 4)\nvoid Target() {}\n')
+        fn = generator.target_function(tu, self.source, blob, 0x1234)
+        duplicate = SimpleNamespace(cursor=SimpleNamespace(walk_preorder=lambda: iter([fn, fn])))
+        with self.assertRaisesRegex(ValueError, 'ambiguous first function'):
+            generator.target_function(duplicate, self.source, blob, 0x1234)
+
+    def test_marker_missing_address_still_fails(self):
+        tu, blob = self._marker_fixture('void Unmarked() {}\n')
+        with self.assertRaisesRegex(ValueError, 'VA marker not found'):
+            generator.target_function(tu, self.source, blob, 0x1234)
+
     @classmethod
     def _text(cls, cursor):
         return cls.blob[cursor.extent.start.offset:cursor.extent.end.offset].decode()

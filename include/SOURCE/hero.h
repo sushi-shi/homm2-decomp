@@ -51,7 +51,7 @@ H2_ENUM_CLASS_END(HeroPrimaryStat)
 
 H2_ENUM_BEGIN(HeroConstant)
     HERO_OWNER_NONE                           = -1,
-    HERO_BOAT_NONE                            = 0xff,
+    HERO_PATROL_NONE                          = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
     HERO_MAP_CELL_PRESENT                     = 0x40,
@@ -141,18 +141,9 @@ public:
     i32 m_y;
     i32 m_destinationX;
     i32 m_destinationY;
-    union {
-        struct {
-            u8 m_boatId;
-            char m_boatDestY;
-            i8 m_boatTravelRange;
-        };
-        struct {
-            i8 m_patrolX;
-            i8 m_patrolY;
-            i8 m_patrolRadius;
-        };
-    };
+    u8 m_patrolX;
+    u8 m_patrolY;
+    i8 m_patrolRadius;
     H2_ENUM_STORAGE(MapDirection, u8) m_direction;
     H2_OPEN_CODE_STORAGE(MapTriggerCode, i16) m_locationType;
     i16 m_occupiedTown;

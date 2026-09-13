@@ -20,8 +20,8 @@ H2_ENUM_END(WinsockTransportConstant)
 
 #pragma pack(push, 1)
 struct WinsockStartupMessage {
-    u8 playerCount;
-    u8 netPosition;
+    i8 playerCount;
+    i8 netPosition;
     i32 playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
 };
 #pragma pack(pop)

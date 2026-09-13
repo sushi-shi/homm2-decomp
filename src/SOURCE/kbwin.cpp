@@ -142,7 +142,7 @@ i32 AppInit(
         windowRectangle.right - windowRectangle.left + 1,
         windowRectangle.bottom - windowRectangle.top + 1,
         NULL,
-        (CURRENT_GRAPHICS_CONFIG.showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
+        (CURRENT_GRAPHICS_CONFIG.showMenu != 0 ? hmnuDflt : NULL),
         instance,
         NULL
     );
@@ -532,7 +532,7 @@ void SetMenus(HMENU menu, b32 enabled) {
     count = GetMenuItemCount(menu);
     for (index = 0; index < count; index++) {
         id = GetMenuItemID(menu, index);
-        if (id == static_cast<u32>(-1)) {
+        if (id == -1) {
             SetMenus(GetSubMenu(menu, index), enabled);
             disabled = 0;
         } else {

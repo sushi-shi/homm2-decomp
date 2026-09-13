@@ -32,8 +32,8 @@ H2_ENUM_BEGIN(ComSerialConstant)
     BAUD_VALUE_4800        = 4800,
     BAUD_VALUE_9600        = 9600,
     BAUD_VALUE_19200       = 19200,
-    BAUD_VALUE_38400       = 38400,
-    READ_RESULT_WORD_COUNT = 2
+    BAUD_VALUE_38400       = 38400
+
 H2_ENUM_END(ComSerialConstant)
 
 
@@ -259,7 +259,7 @@ void com_term(i16 portIndex) {
 VA(0x00432f87, 0xc1)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     DWORD currentError;
-    i16 bytesRead[READ_RESULT_WORD_COUNT];
+    DWORD bytesRead;
     COMSTAT status;
     BOOL success;
     u32 currentBytesRead;
@@ -274,12 +274,12 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
                 s_comPorts[portIndex].handle,
                 buffer,
                 currentBytesRead,
-                reinterpret_cast<LPDWORD>(bytesRead),
+                &bytesRead,
                 NULL
             );
             if (success == 0)
                 ShutdownComError("Read communications data");
-            return bytesRead[0];
+            return static_cast<i16>(bytesRead);
         }
     }
     return 0;

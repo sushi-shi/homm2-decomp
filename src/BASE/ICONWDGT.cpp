@@ -75,7 +75,7 @@ VA(0x004bb890, 0x113)
 void iconWidget::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
+    gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
     m_icon = gpResourceManager->GetIcon(m_iconId);

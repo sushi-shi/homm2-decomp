@@ -5,6 +5,7 @@
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 class mapCell;
 struct tag_message;
@@ -40,7 +41,7 @@ H2_ENUM_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_COMMAND_PLAYER_EXIT      = 31,
     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
-    ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = 16
+    ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = REMOTE_MESSAGE_PAYLOAD_SIZE
 H2_ENUM_END(AdventureRemoteConstant)
 
 H2_ENUM_BEGIN(AdventureBottomViewSharedConstant)

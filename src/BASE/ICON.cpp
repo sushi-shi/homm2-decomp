@@ -38,7 +38,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     m_frameCount = gpResourceManager->ReadWord();
     u32 length = gpResourceManager->ReadLong();
     m_data = static_cast<u8*>(H2_ALLOC(length));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), length);
+    gpResourceManager->ReadBlock(m_data, length);
 }
 #if H2_RETAIL_COMPILER
 #undef length

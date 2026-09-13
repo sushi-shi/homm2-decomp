@@ -58,7 +58,7 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_RADAR_TOP            = 0x10,
     WORLD_RADAR_BOTTOM         = 0xa0,
     INITIAL_CENTER_OFFSET      = 7,
-    SCALE_OFFSET_CAPACITY      = 4,
+
     GROUND_HORIZONTAL_FLIP     = 2,
     GROUND_ALTERNATE_SET       = 1,
     GROUND_ALTERNATE_OFFSET    = 9,
@@ -272,12 +272,12 @@ void advManager::VWCompleteDraw(void) {
     i32 screenX;
     MineType resource;
     u32 shape;
-    i8 iconX[SCALE_OFFSET_CAPACITY];
-    i8 townFlagX[SCALE_OFFSET_CAPACITY];
+    i8 iconX[ADVMGR_VIEW_WORLD_SCALE_COUNT];
+    i8 townFlagX[ADVMGR_VIEW_WORLD_SCALE_COUNT];
     H2_ENUM_STORAGE(IconDrawOrientation, u32) orientation;
     i32 color;
     mapCell* cell;
-    i8 letterY[SCALE_OFFSET_CAPACITY];
+    i8 letterY[ADVMGR_VIEW_WORLD_SCALE_COUNT];
 
     frame = 0;
     FillBitmapArea(
@@ -553,10 +553,10 @@ void advManager::VWCompleteDraw(void) {
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_TOWNS)) {
                 if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                    color = gpGame->m_castleOwners[cell->m_objectMetadata];
+                    color = gpGame->m_townOwners[cell->m_objectMetadata];
                 else
                     color =
-                        gpGame->m_castleOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
+                        gpGame->m_townOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
                                                    .m_occupiedTown];
                 if (color < 0)
                     color = WORLD_NO_OWNER_COLOR;

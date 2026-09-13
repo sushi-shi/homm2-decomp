@@ -14,8 +14,6 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_FLAG_BIT_COUNT             = 1,
     SEARCH_DIRECTION_BIT_COUNT        = 4,
     SEARCH_CELL_PAD_SIZE              = 4,
-    SEARCH_PATH_HEADER_SIZE           = 3,
-    SEARCH_AI_PATH_HEADER_SIZE        = 4,
     SEARCH_COMBAT_HEX_COUNT           = 117,
     SEARCH_MAX_COST                   = 999999,
     SEARCH_TARGET_COST_WINDOW         = 75,
@@ -41,17 +39,12 @@ struct searchCell {
 #pragma pack(pop)
 SIZE(searchCell, 9);
 
-union searchStorage {
-    struct searchCell* cells;
-    struct searchNode* nodes;
-    struct {
-        char pad[SEARCH_PATH_HEADER_SIZE];
-        u8 directions[SEARCH_PATH_CAPACITY + 1];
-    } path;
-    struct {
-        char pad[SEARCH_AI_PATH_HEADER_SIZE];
-        u8 directions[SEARCH_PATH_CAPACITY];
-    } aiPath;
+struct searchStorage {
+    union {
+        struct searchCell* cells;
+        struct searchNode* nodes;
+    };
+    u8 directions[SEARCH_PATH_CAPACITY];
 };
 
 #pragma pack(push, 1)
@@ -85,27 +78,11 @@ SIZE(searchNode, 9);
 #pragma pack(push, 1)
 class searchArray {
 public:
-    union {
-        struct {
-            i32 m_queueSize;
-            i32 m_queueCursor;
-        };
-        struct {
-            u32 m_queueCount;
-            u32 m_maxQueueCount;
-        };
-    };
+    u32 m_queueCount;
+    u32 m_maxQueueCount;
     i32 m_pathLength;
-    union {
-        struct {
-            i32 m_lastY;
-            i32 m_lastX;
-        };
-        struct {
-            i32 m_specialTargetX;
-            i32 m_specialTargetY;
-        };
-    };
+    i32 m_specialTargetX;
+    i32 m_specialTargetY;
     searchNode m_queue[SEARCH_QUEUE_CAPACITY];
     searchStorage m_storage;
     searchNode* GetRow(i32 y, i32 width) {

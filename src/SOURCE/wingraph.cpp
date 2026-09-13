@@ -171,8 +171,8 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
         return 1;
     {
         gbWinGraphBusy = true;
-        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint);
-        GetClientRect(reinterpret_cast<HWND>(window), &gDDClientRect);
+        paintDC = BeginPaint(window, &paint);
+        GetClientRect(window, &gDDClientRect);
         if (paint.rcPaint.right == 0 || paint.rcPaint.bottom == 0)
             paint.rcPaint = gDDClientRect;
         if (paint.rcPaint.right < WINGRAPH_WIDTH)
@@ -287,7 +287,7 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
                 RETAIL_FILE,
                 286
             );
-        EndPaint(reinterpret_cast<HWND>(window), &paint);
+        EndPaint(window, &paint);
         gbWinGraphBusy = false;
     }
     return 1;
@@ -761,7 +761,7 @@ void WGInitGraphics(void) {
         WinGCreateBitmap(hdcImage, reinterpret_cast<BITMAPINFO*>(&screenImage), &screenImage.bits);
     screenImage.header.biSizeImage = screenImage.header.biWidth * screenImage.header.biHeight;
     screenImage.header.biSizeImage *= Orientation;
-    gbmOldMonoBitmap = static_cast<HBITMAP>(SelectObject(hdcImage, bitmap));
+    gbmOldMonoBitmap = SelectObject(hdcImage, bitmap);
     lpInitWin = screenImage.bits;
     PatBlt(hdcImage, 0, 0, iMainWinScreenWidth, iMainWinScreenHeight, BLACKNESS);
 }
@@ -928,10 +928,10 @@ i32 WGAppPaint(void* window, void* paintDC) {
 
     unusedByte = 0;
     if (screenImage.bits != NULL) {
-        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paintInfo);
-        SelectPalette(static_cast<HDC>(paintDC), hpalApp, 0);
-        RealizePalette(static_cast<HDC>(paintDC));
-        GetClientRect(reinterpret_cast<HWND>(window), &clientRectangle);
+        paintDC = BeginPaint(window, &paintInfo);
+        SelectPalette(paintDC, hpalApp, 0);
+        RealizePalette(paintDC);
+        GetClientRect(window, &clientRectangle);
         destinationX = 0;
         sourceX = destinationX;
         destinationY = 0;
@@ -951,7 +951,7 @@ i32 WGAppPaint(void* window, void* paintDC) {
             destinationY = paintInfo.rcPaint.top;
             destinationHeight = paintInfo.rcPaint.bottom - destinationY + 1;
             WinGBitBlt(
-                static_cast<HDC>(paintDC),
+                paintDC,
                 destinationX,
                 destinationY,
                 destinationWidth,
@@ -962,7 +962,7 @@ i32 WGAppPaint(void* window, void* paintDC) {
             );
         } else {
             WinGStretchBlt(
-                static_cast<HDC>(paintDC),
+                paintDC,
                 destinationX,
                 destinationY,
                 destinationWidth,
@@ -974,7 +974,7 @@ i32 WGAppPaint(void* window, void* paintDC) {
                 (destinationHeight * WINGRAPH_HEIGHT) / iMainWinScreenHeight
             );
         }
-        EndPaint(reinterpret_cast<HWND>(window), &paintInfo);
+        EndPaint(window, &paintInfo);
     }
     return 1;
 }

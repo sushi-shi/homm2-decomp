@@ -374,7 +374,7 @@ i32 fileRequester::Open(i32 id) {
 
     m_scrollKnob = new iconWidget(
         SCROLL_KNOB_X,
-        static_cast<i16>(fGutterMinY),
+        (fGutterMinY),
         SCROLL_KNOB_WIDTH,
         SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
@@ -420,7 +420,7 @@ i32 fileRequester::Open(i32 id) {
     } else {
         enabled = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
-            char mapName[CURRENT_MAP_NAME_CAPACITY];
+            char mapName[CURRENT_MAP_NAME_CLEAR_SIZE];
             fileSlot = 0;
             memset(mapName, 0, CURRENT_MAP_NAME_CLEAR_SIZE);
             while (fileSlot < LEGACY_MAP_BASENAME_SIZE && gMapName[fileSlot] != 0
@@ -784,14 +784,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 positions = m_fileCount - (iMaxListSize - 1);
                                 if (positions < 1)
                                     positions = 1;
-                                stepScreen = static_cast<i32>(
-                                    (fGutterTravelLength
-                                     * IDX(FILE_REQUESTER_GUTTER_SCALE))
-                                    / positions
-                                );
+                                stepScreen = ((fGutterTravelLength * IDX(FILE_REQUESTER_GUTTER_SCALE)) / positions);
                                 mouseX = message.payload.widget.screenX;
                                 screenY = message.payload.widget.screenY;
-                                screenY = static_cast<i32>(screenY - (m_y + fGutterMinY));
+                                screenY = (screenY - (m_y + fGutterMinY));
                                 screenY -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                                 topIndexValue =
                                     (screenY * FILE_REQUESTER_GUTTER_SCALE) / stepScreen;
@@ -941,18 +937,18 @@ void fileRequester::DoKnob(void) {
     while (knobMessage.type != MESSAGE_LEFT_BUTTON_UP
            && knobMessage.type != MESSAGE_RIGHT_BUTTON_UP) {
         if (knobMessage.type == MESSAGE_MOUSE_MOVE) {
-            if (static_cast<float>(knobMessage.payload.mouse.y) < knobOffset + fGutterMinY) {
-                knobMessage.payload.mouse.y = static_cast<i32>(knobOffset + fGutterMinY);
+            if ((knobMessage.payload.mouse.y) < knobOffset + fGutterMinY) {
+                knobMessage.payload.mouse.y = (knobOffset + fGutterMinY);
             }
-            if (static_cast<float>(knobMessage.payload.mouse.y)
+            if ((knobMessage.payload.mouse.y)
                 > knobOffset + fGutterMinY + fGutterTravelLength) {
                 knobMessage.payload.mouse.y =
-                    static_cast<i32>(knobOffset + fGutterMinY + fGutterTravelLength);
+                    (knobOffset + fGutterMinY + fGutterTravelLength);
             }
             gpMouseManager->Main(knobMessage);
             m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
             if (m_fileCount > iMaxListSize) {
-                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep);
+                topIndex = ((m_scrollKnob->m_y - fGutterMinY) / gutterStep);
                 if (topIndex != oldTopIndex) {
                     if (topIndex > m_fileCount - iMaxListSize) {
                         topIndex = m_fileCount - iMaxListSize;
@@ -1164,14 +1160,10 @@ void fileRequester::Update(i32 drawWindow) {
 
     if (m_fileCount <= iMaxListSize) {
         m_scrollKnob->m_y =
-            static_cast<i16>(
-                fGutterTravelLength
-                    / IDX(SCROLL_CENTER_DIVISOR)
-                + fGutterMinY
-            );
+            (fGutterTravelLength / IDX(SCROLL_CENTER_DIVISOR) + fGutterMinY);
     } else {
         gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
-        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount);
+        m_scrollKnob->m_y = (fGutterMinY + m_topIndex * gutterStepCount);
     }
     if (drawWindow) {
         m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);

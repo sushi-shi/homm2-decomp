@@ -183,7 +183,6 @@ namespace {
     H2_ENUM_END(TownSplitConstant)
 
     H2_ENUM_BEGIN(BuildDialogConstant)
-        BUILD_RESOURCE_STORAGE_COUNT = TOWN_RESOURCE_COUNT + 1,
         BUILD_ROW_RESOURCE_CAPACITY = 4,
         BUILD_DESCRIPTION_WIDTH = 240,
         BUILD_WINDOW_BASE_Y = 151,
@@ -233,7 +232,7 @@ namespace {
     H2_ENUM_END(RecruitDialogConstant)
 
     H2_ENUM_BEGIN(WellConstant)
-        WELL_DWELLING_TYPE_STORAGE_COUNT = 8,
+        WELL_DWELLING_TYPE_STORAGE_COUNT = TOWN_WELL_DWELLING_COUNT,
         WELL_DETAIL_TEXT_CAPACITY = 40,
         WELL_ALTERNATE_UPGRADE_INDEX = TOWN_WELL_DWELLING_COUNT * 2 - 1
     H2_ENUM_END(WellConstant)
@@ -567,7 +566,7 @@ townObject::townObject(
             y,
             currentWidth,
             currentHeight,
-            static_cast<i16>(IDX(objectBuildingId)),
+            IDX(objectBuildingId),
             WIDGET_KIND_TRANSPARENT,
             0,
             NULL
@@ -999,7 +998,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
 
     m_command = ARMY_COMMAND_NONE;
     cantMoveLastArmy = false;
-    if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
+    if (m_swapStrip->m_army->GetNumArmies() == 1 && m_swapStrip == m_heroStrip
         && m_pendingStrip != m_swapStrip)
         cantMoveLastArmy = true;
 
@@ -2142,7 +2141,7 @@ i32 townManager::BuyBuild(
     i32 resourcesInRow;
     i32 rowY;
     i32 windowY;
-    i8 resourceTypes[BUILD_RESOURCE_STORAGE_COUNT];
+    i8 resourceTypes[TOWN_RESOURCE_COUNT];
     i32 costCount;
     i16 H2_UNUSED(dialogResult);
     i32 index;
@@ -2163,7 +2162,7 @@ i32 townManager::BuyBuild(
     i32 dwelling;
     i16 H2_UNUSED(dialogHeight);
     i32 entryWidth;
-    i16 costs[BUILD_RESOURCE_STORAGE_COUNT];
+    i16 costs[TOWN_RESOURCE_COUNT];
     widget* descriptionWidget;
 
     mageLevel = 0;
@@ -2676,7 +2675,7 @@ void townManager::SetupMage(heroWindow* window) {
                 spellState = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {
                 spellState =
-                    static_cast<i16>(slot >= m_town->m_spellCounts[level + 1]);
+                    static_cast<i16>(slot >= m_town->m_spellCounts[level]);
             }
 
             message.payload.widget.command =
@@ -2813,7 +2812,7 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
                 if (spellSlot != -1) {
                     level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
                     slot = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
-                    if (slot >= level[gpTownManager->m_town->m_spellCounts + 1])
+                    if (slot >= gpTownManager->m_town->m_spellCounts[level])
                         return MESSAGE_DISPATCH_CONSUME;
                     spell = gpTownManager->m_town->m_spells[level][slot];
                     NormalDialog(
@@ -2877,7 +2876,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         MemError();
     SetWinText(m_heroWindow1, RECRUIT_WINDOW_TEXT_ID);
     m_recruitHero = &gpGame->m_heroRecs[gpCurPlayer->m_availableHeroIds[availableHeroIndex]];
-    m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+    m_recruitHero->m_owner = giCurPlayer;
     message.type = MESSAGE_WIDGET;
 
     if (cannotRecruit != 0) {
@@ -2965,7 +2964,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_recruitResult = true;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            static_cast<i8>(giCurPlayer);
+            giCurPlayer;
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(NULL);
@@ -2975,7 +2974,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         );
         newHeroClass = (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
+            gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
     } else {
@@ -2994,7 +2993,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     );
     m_recruitHero->m_owner = -1;
     if (m_recruitState != -1)
-        m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+        m_recruitHero->m_owner = giCurPlayer;
     return m_recruitState != -1;
 }
 #if H2_RETAIL_COMPILER
@@ -3041,7 +3040,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
             + TOWN_TAVERN_FIRST_ANIMATION_FRAME;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
-        glTimers[0] = static_cast<i32>(KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY);
+        glTimers[0] = KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
@@ -3199,9 +3198,9 @@ void townManager::SetupWell(heroWindow* window) {
                        (1L << (dwellingResult + TOWN_WELL_FIRST_UPGRADE_BUILDING))
                    )) {
             dwellingTypes[dwellingResult] =
-                static_cast<u8>(dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET);
+                dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET;
         } else {
-            dwellingTypes[dwellingResult] = static_cast<u8>(dwellingResult);
+            dwellingTypes[dwellingResult] = dwellingResult;
         }
     }
 
@@ -3379,7 +3378,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i16 H2_UNUSED(unusedIconHeight) = THIEVES_RANK_ICON_HEIGHT;
     i16 H2_UNUSED(unusedPlayerWidth) = 72;
     TownThievesGuildCategory category;
-    i8 categoryOrder[TOWN_THIEVES_ORDER_BUFFER_SIZE];
+    i8 categoryOrder[TOWN_THIEVES_PLAYER_COUNT];
     i32 rank;
     i32 tiedCount;
     i32 rankX;
