@@ -22,6 +22,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+#include <SOURCE/KB_TYPES.h>
 H2_ENUM_CLASS_BEGIN(CombatDrawLayer)
     DRAW_FIRST_LAYER        = 0,
     DRAW_LAYER_COUNT        = 9,
@@ -231,7 +232,7 @@ void combatManager::CombatMessage(
         }
     }
 
-    SET_WIDGET_MESSAGE(windowMessage, COMBAT_MESSAGE_TEXT_ACTION, COMBAT_MESSAGE_WIDGET_FIRST);
+    SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, COMBAT_MESSAGE_WIDGET_FIRST);
     windowMessage.payload.widget.data.text = m_previousCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
     windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_SECOND;
@@ -279,7 +280,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
 
     switch (messageType) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
-            if (HAS(currentArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER) != 0
+            if (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) != 0
                 && currentArmy->m_monster.shots == 0 && targetArmy != NULL)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_NO_SHOTS)]);
             else
@@ -358,7 +359,7 @@ void combatManager::ResetLimitCreature(void) {
     i32 armySlotIndex;
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
+        for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT; armySlotIndex++) {
             m_limitCreatureCount[IDX(side)][armySlotIndex]
                 = HAS(m_armies[IDX(side)][armySlotIndex].m_monster.attributes,
                       COMBAT_ARMY_FLAG_MIRROR_IMAGE)
@@ -903,7 +904,7 @@ void combatManager::DrawFrame(
     if (computeExtent != 0) {
         extentChanged1 = false;
         for (state = 0; IDX(state) < COMBAT_SIDE_COUNT; state++) {
-            for (armyIndex7 = 0; armyIndex7 < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex7++) {
+            for (armyIndex7 = 0; armyIndex7 < COMBAT_ARMY_SLOT_COUNT; armyIndex7++) {
                 if (m_limitCreatureCount[IDX(state)][armyIndex7] > 0) {
                     extentChanged1 = true;
                     gbComputeExtent = true;
@@ -1595,7 +1596,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_LEFT
             );
-            if (HAS(smallArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER))
+            if (HAS(smallArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                 smallFont->DrawBoundedString(
                     cMiniViewText[IDX(SMALL_VIEW_TEXT_SHOTS)],
                     viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1718,7 +1719,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 );
             }
 
-            if (HAS(smallArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER)) {
+            if (HAS(smallArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER)) {
                 sprintf(gText, "%d", smallArmy->m_monster.shots);
                 smallFont->DrawBoundedString(
                     gText,

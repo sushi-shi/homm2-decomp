@@ -14,6 +14,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <io.h>
+#include <BASE/message.h>
 
 VA(0x00465110, 0x59)
 highScoreManager::highScoreManager(void) {
@@ -72,7 +73,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.id = entry + HIGH_SCORE_FIRST_MONSTER_WIDGET;
-            windowMessage.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
+            windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             windowMessage.payload.widget.data.value =
                 m_monsterTypes[entry] * HIGH_SCORE_MONSTER_FRAME_STRIDE
                 + monAnimDrawFrame[m_animationFrames[entry]]
@@ -94,7 +95,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case HIGH_SCORE_WIDGET_TOGGLE:
+                case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
                         case HIGH_SCORE_STANDARD_BUTTON:
                         case HIGH_SCORE_CAMPAIGN_BUTTON:
@@ -145,7 +146,7 @@ void highScoreManager::Update(void) {
 
     hsMessage.type = MESSAGE_WIDGET;
     hsMessage.payload.widget.id = HIGH_SCORE_TITLE_WIDGET;
-    hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
+    hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     hsMessage.payload.widget.data.value =
         m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_TITLE_FRAME : HIGH_SCORE_STANDARD_TITLE_FRAME;
     m_window->BroadcastMessage(hsMessage);
@@ -153,14 +154,14 @@ void highScoreManager::Update(void) {
     hsMessage.payload.widget.id = static_cast<i16>(
         m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_BUTTON : HIGH_SCORE_STANDARD_BUTTON
     );
-    hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SHOW;
+    hsMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
     m_window->BroadcastMessage(hsMessage);
 
     hsMessage.payload.widget.id = static_cast<i16>(
         m_showCampaignScores ? HIGH_SCORE_STANDARD_BUTTON : HIGH_SCORE_CAMPAIGN_BUTTON
     );
-    hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_HIDE;
+    hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
     m_window->BroadcastMessage(hsMessage);
 
@@ -184,8 +185,8 @@ void highScoreManager::Update(void) {
         }
 
         hsMessage.payload.widget.command =
-            highScore.score == HIGH_SCORE_EMPTY ? HIGH_SCORE_WIDGET_SHOW
-                                                 : HIGH_SCORE_WIDGET_HIDE;
+            highScore.score == HIGH_SCORE_EMPTY ? WIDGET_COMMAND_CLEAR_FLAGS
+                                                 : WIDGET_COMMAND_SET_FLAGS;
         hsMessage.payload.widget.id = rank + HIGH_SCORE_FIRST_MONSTER_WIDGET;
         hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
         m_window->BroadcastMessage(hsMessage);
@@ -197,14 +198,14 @@ void highScoreManager::Update(void) {
             m_animationFrames[rank] =
                 (m_animationFrames[rank] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
             hsMessage.payload.widget.id = rank + HIGH_SCORE_FIRST_MONSTER_WIDGET;
-            hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
+            hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             hsMessage.payload.widget.data.value =
                 m_monsterTypes[rank] * HIGH_SCORE_MONSTER_FRAME_STRIDE
                 + monAnimDrawFrame[m_animationFrames[rank]]
                 + HIGH_SCORE_MONSTER_ACTIVE_FRAME_OFFSET;
             m_window->BroadcastMessage(hsMessage);
             hsMessage.payload.widget.id = rank + HIGH_SCORE_FIRST_SHADOW_WIDGET;
-            hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
+            hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             hsMessage.payload.widget.data.value =
                 m_monsterTypes[rank] * HIGH_SCORE_MONSTER_FRAME_STRIDE;
             m_window->BroadcastMessage(hsMessage);
@@ -268,7 +269,7 @@ void highScoreManager::Update(void) {
             sprintf(gText, "%d", highScore.score);
         m_window->BroadcastMessage(hsMessage);
 
-        hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_RESIZE;
+        hsMessage.payload.widget.command = WIDGET_COMMAND_SET_X;
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCENARIO_OFFSET;
@@ -289,10 +290,10 @@ void highScoreManager::Update(void) {
         if (giHighScoreRank == rank) {
             if (!((!m_showCampaignScores || giHighScoreType == HIGH_SCORE_STANDARD)
                   && (m_showCampaignScores || giHighScoreType != HIGH_SCORE_STANDARD))) {
-                hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SELECT;
+                hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
                 hsMessage.payload.widget.data.value = HIGH_SCORE_SECONDARY_SELECTION_FRAME;
             } else {
-                hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SELECT;
+                hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
                 hsMessage.payload.widget.data.value = HIGH_SCORE_PRIMARY_SELECTION_FRAME;
             }
             hsMessage.payload.widget.id =

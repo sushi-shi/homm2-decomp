@@ -892,7 +892,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
         }
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;
+            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
         }
     }

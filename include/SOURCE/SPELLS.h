@@ -18,6 +18,11 @@ H2_ENUM_CLASS_END(BoltColorMode)
 H2_ENUM_FLAGS(BoltColorMode)
 
 H2_ENUM_BEGIN(SpellCastConstant)
+    SPELL_CURE_HIT_POINTS_PER_POWER = 5,
+    SPELL_HOLY_WORD_DAMAGE_PER_POWER = 10,
+    SPELL_HOLY_SHOUT_DAMAGE_PER_POWER = 20,
+    SPELL_DEATH_RIPPLE_DAMAGE_PER_POWER = 5,
+    SPELL_DEATH_WAVE_DAMAGE_PER_POWER = 10,
     SPELL_DEFAULT_CREATURE_POWER                   = 3,
     SPELL_HOURGLASS_POWER_BONUS                    = 2,
     SPELL_WIZARD_HAT_POWER_BONUS                   = 10,
@@ -43,7 +48,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     COMBAT_HERO_CAST_NO_TARGET                     = 3,
     COMBAT_HERO_CAST_LOW                           = 5,
     COMBAT_HERO_CAST_HIGH                          = 7,
-    SPELL_ADJACENT_DIRECTION_COUNT                 = 6,
     SPELL_FIREBALL_FRAME_COUNT                     = 12,
     SPELL_COLD_RING_FRAME_COUNT                    = 7,
     SPELL_FIREBALL_AFFECTED_HEX_COUNT              = 19,

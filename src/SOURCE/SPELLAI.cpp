@@ -7,6 +7,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/combatTypes.h>
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
 // The disabling spells score positive here, unlike PoL 2.0 where the same five
@@ -760,7 +761,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
         creatureEffect = static_cast<i32>(creatureEffect * mirrorMod);
         if (HAS(
                 gMonsterDatabase[IDX(monType)].attributes,
-                MONSTER_ABILITY_FLAG_SHOOTER
+                MONSTER_FLAGS_SHOOTER
             ))
             creatureEffect =
                 static_cast<i32>(creatureEffect * COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
@@ -997,7 +998,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 combatTarget = &m_armies[sideWork_6][index_1];
                 if (cure == 1) {
                     curePointsTotal =
-                        m_spellPower[IDX(m_currentSide)] * COMBAT_SPELL_AI_CURE_POINTS_PER_POWER;
+                        m_spellPower[IDX(m_currentSide)] * SPELL_CURE_HIT_POINTS_PER_POWER;
                     if (curePointsTotal > combatTarget->m_hitPointsLost)
                         curePointsTotal = combatTarget->m_hitPointsLost;
                     positiveEffectResult_19 = static_cast<i32>(
@@ -1093,7 +1094,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     i32 count;
     float H2_UNUSED(workChance);
 
-    resurrectPower = m_spellPower[IDX(m_currentSide)] * COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
+    resurrectPower = m_spellPower[IDX(m_currentSide)] * RESURRECT_HIT_POINTS_PER_POWER;
     if (m_heroes[IDX(m_currentSide)] != NULL && m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ANKH))
         resurrectPower <<= 1;
 
@@ -1130,46 +1131,46 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
 
     switch (spell) {
         case SPELL_ARMAGEDDON:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_ARMAGEDDON_DAMAGE_PER_POWER;
             break;
         case SPELL_HOLY_WORD:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_HOLY_WORD_DAMAGE_PER_POWER;
             break;
         case SPELL_HOLY_SHOUT:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_HOLY_SHOUT_DAMAGE_PER_POWER;
             break;
         case SPELL_DEATH_RIPPLE:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_DEATH_RIPPLE_DAMAGE_PER_POWER;
             break;
         case SPELL_DEATH_WAVE:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_DEATH_WAVE_DAMAGE_PER_POWER;
             break;
         case SPELL_ELEMENTAL_STORM:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_ELEMENTAL_STORM_DAMAGE_PER_POWER;
             break;
         case SPELL_FIREBALL:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_FIREBALL_DAMAGE_PER_POWER;
             break;
         case SPELL_FIREBLAST:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_FIREBALL_DAMAGE_PER_POWER;
             break;
         case SPELL_METEOR_SHOWER:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_METEOR_DAMAGE_PER_POWER;
             break;
         case SPELL_LIGHTNING_BOLT:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_LIGHTNING_DAMAGE_PER_POWER;
             break;
         case SPELL_MAGIC_ARROW:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_MAGIC_ARROW_DAMAGE_PER_POWER;
             break;
         case SPELL_CHAIN_LIGHTNING:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
             break;
         case SPELL_COLD_RAY:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_COLD_RAY_DAMAGE_PER_POWER;
             break;
         case SPELL_COLD_RING:
-            damagePerPowerResult_9 = COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER;
+            damagePerPowerResult_9 = SPELL_FIREBALL_DAMAGE_PER_POWER;
             break;
         default:
             damagePerPowerResult_9 = 0;
@@ -1217,12 +1218,12 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                 }
                 if (step_3 == 0)
                     currentHex_1 = targetHex;
-                if (step_3 > 0 && step_3 <= SPELL_ADJACENT_DIRECTION_COUNT)
+                if (step_3 > 0 && step_3 <= COMBAT_DIRECTION_ADJACENT_COUNT)
                     currentHex_1 = GetAdjacentCellIndexNoArmy(
                         targetHex, static_cast<CombatHexDirection>(step_3 - 1)
                     );
-                if (step_3 > SPELL_ADJACENT_DIRECTION_COUNT
-                    && step_3 <= SPELL_ADJACENT_DIRECTION_COUNT * 2) {
+                if (step_3 > COMBAT_DIRECTION_ADJACENT_COUNT
+                    && step_3 <= COMBAT_DIRECTION_ADJACENT_COUNT * 2) {
                     currentHex_1 = GetAdjacentCellIndexNoArmy(
                         targetHex,
                         static_cast<CombatHexDirection>(

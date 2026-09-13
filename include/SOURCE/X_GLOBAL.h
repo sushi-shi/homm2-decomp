@@ -11,6 +11,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/Overview.h>
 #include <EDITOR/mapcell.h>
+#include <SOURCE/GAME.h>
 
 class ExpCampaign;
 H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
@@ -86,7 +87,6 @@ H2_ENUM_BEGIN(GlobalConstant)
     X_GLOBAL_SHORT_SKILL_LEVEL_COUNT        = 3,
     X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT       = 12,
     X_GLOBAL_PASSWORD_STRING_INDEX_COUNT    = 8,
-    X_GLOBAL_PLAYER_COUNT                   = 6,
     GLOBAL_MAP_NAME_SIZE                    = 0x14,
     GLOBAL_TCP_TEXT_SIZE                    = 0x18,
     GLOBAL_AGGREGATE_PATH_SIZE              = 0x160,
@@ -274,7 +274,6 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT = IDX(TERRAIN_COUNT),
     KB_INTERFACE_TYPE_TEXT_COUNT        = 3,
     KB_BW_MOUSE_TEXT_COUNT              = 2,
-    KB_COMBAT_SPEED_TEXT_COUNT          = KB_COMBAT_SPEED_COUNT,
     KB_COMBAT_MINI_INFO_TEXT_COUNT      = 3,
     KB_COMMAND_LINE_HELP_COUNT          = 14,
     KB_OVERVIEW_TEXT_COUNT              = 6,
@@ -503,7 +502,7 @@ extern H2_CONST char* cDirections[KB_DIRECTION_TEXT_COUNT];
 extern H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];
 extern H2_CONST char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT];
 extern H2_CONST char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT];
-extern H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT];
+extern H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_COUNT];
 extern H2_CONST char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT];
 extern H2_CONST char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT];
 extern H2_CONST char* cOverviewText[KB_OVERVIEW_TEXT_COUNT];
@@ -593,7 +592,7 @@ extern u32l gTimeMark;
 extern char* EXPANSION_AGGREGATE_NAME;
 extern b8 xNetHasOldPlayers;
 extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
-extern char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+extern char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 extern class icon* gCurLoadedSpellIcon;
 extern u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];

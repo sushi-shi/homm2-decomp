@@ -38,6 +38,7 @@ class townManager;
 #include <BASE/message.h>
 #include <BASE/soundManager.h>
 #include <BASE/WINMGR.h>
+#include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(GlobalTimerConstant)
     GLOBAL_TIMER_COUNT               = 10,
@@ -104,7 +105,6 @@ H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
     CAMPAIGN_SETUP_RESET_SIZE         = 0x41,
     CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
-    CAMPAIGN_ARMY_SLOT_COUNT          = 5,
     CAMPAIGN_CARRYOVER_PLAYER         = 3,
     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
     CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
@@ -357,7 +357,6 @@ H2_ENUM_CLASS_BEGIN(DialogWaitType)
 H2_ENUM_CLASS_END(DialogWaitType)
 
 H2_ENUM_BEGIN(OldMainConstant)
-    OLD_MAIN_PLAYER_COUNT                     = 6,
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
     OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
@@ -398,10 +397,10 @@ H2_ENUM_END(OldMainConstant)
 
 #pragma pack(push, 1)
 struct OldMainNetSetup {
-    i8 gamePosToNetPos[OLD_MAIN_PLAYER_COUNT];
+    i8 gamePosToNetPos[GAME_PLAYER_COUNT];
     b8 useRegularCompression;
     b8 useDiffCompression;
-    SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
+    SNetPlayerInfo players[GAME_PLAYER_COUNT];
 };
 #pragma pack(pop)
 SIZE(OldMainNetSetup, 0xd4);

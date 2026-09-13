@@ -57,6 +57,8 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
+#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/armyGroup.h>
 
 H2_ENUM_BEGIN(CampaignChoiceValue)
     CHOICE_VALUE_NONE = -1
@@ -480,8 +482,8 @@ i32 oldmain(void) {
     i32 gamePlayer_m;
     i32 result_i;
     i32 transmissionResult_d;
-    char matchedNetPlayers_d[OLD_MAIN_PLAYER_COUNT];
-    char matchedGamePlayers_c[OLD_MAIN_PLAYER_COUNT];
+    char matchedNetPlayers_d[GAME_PLAYER_COUNT];
+    char matchedGamePlayers_c[GAME_PLAYER_COUNT];
     OldMainNetBuffer netBuffer_f;
 
     if (bKBDone)
@@ -543,7 +545,7 @@ i32 oldmain(void) {
     }
 
     LoadSystemwideIcons();
-    memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+    memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
     quit = false;
     mainScreenLoaded_h = false;
@@ -679,7 +681,7 @@ i32 oldmain(void) {
                 giSetupGameType = OLD_MAIN_SETUP_NEW;
 
             setup_selected:
-                for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                for (player_h = 0; player_h < GAME_PLAYER_COUNT; player_h++)
                     sprintf(
                         cPlayerNames[player_h],
                         ""
@@ -756,12 +758,12 @@ i32 oldmain(void) {
             LogStr("DWM 2");
             if (gbRemoteOn && giThisNetPos == 0) {
                 LogStr("DWM 3");
-                memset(matchedGamePlayers_c, 0, OLD_MAIN_PLAYER_COUNT);
-                memset(matchedNetPlayers_d, 0, OLD_MAIN_PLAYER_COUNT);
-                for (netPlayer_k = 0; netPlayer_k < OLD_MAIN_PLAYER_COUNT; netPlayer_k++) {
+                memset(matchedGamePlayers_c, 0, GAME_PLAYER_COUNT);
+                memset(matchedNetPlayers_d, 0, GAME_PLAYER_COUNT);
+                for (netPlayer_k = 0; netPlayer_k < GAME_PLAYER_COUNT; netPlayer_k++) {
                     if (!gbHumanPlayer[netPlayer_k])
                         continue;
-                    for (gamePlayer_m = 0; gamePlayer_m < OLD_MAIN_PLAYER_COUNT; gamePlayer_m++) {
+                    for (gamePlayer_m = 0; gamePlayer_m < GAME_PLAYER_COUNT; gamePlayer_m++) {
                         if (strlen(&gpGame->m_defaultPlayerNames
                                         [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE])
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
@@ -780,9 +782,9 @@ i32 oldmain(void) {
                     }
                 }
                 gamePlayer_m = 0;
-                while (gamePlayer_m < OLD_MAIN_PLAYER_COUNT && matchedGamePlayers_c[gamePlayer_m])
+                while (gamePlayer_m < GAME_PLAYER_COUNT && matchedGamePlayers_c[gamePlayer_m])
                     gamePlayer_m++;
-                for (netPlayer_k = 0; netPlayer_k < OLD_MAIN_PLAYER_COUNT; netPlayer_k++) {
+                for (netPlayer_k = 0; netPlayer_k < GAME_PLAYER_COUNT; netPlayer_k++) {
                     if (matchedNetPlayers_d[netPlayer_k])
                         continue;
                     if (gbHumanPlayer[netPlayer_k]) {
@@ -793,7 +795,7 @@ i32 oldmain(void) {
                             gsNetPlayerInfo[netPlayer_k].uniqueSystemID
                         );
                         gamePlayer_m++;
-                        while (gamePlayer_m < OLD_MAIN_PLAYER_COUNT
+                        while (gamePlayer_m < GAME_PLAYER_COUNT
                                && matchedGamePlayers_c[gamePlayer_m])
                             gamePlayer_m++;
                     } else {
@@ -801,7 +803,7 @@ i32 oldmain(void) {
                     }
                 }
 
-                memcpy(netBuffer_f.setup.gamePosToNetPos, gbGamePosToNetPos, OLD_MAIN_PLAYER_COUNT);
+                memcpy(netBuffer_f.setup.gamePosToNetPos, gbGamePosToNetPos, GAME_PLAYER_COUNT);
                 memcpy(
                     netBuffer_f.setup.players,
                     gsNetPlayerInfo,
@@ -834,7 +836,7 @@ i32 oldmain(void) {
                     if (!gpGame->TransmitSaveGame(player_h, 0, 1))
                         ShutDown(NULL);
                 }
-                memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+                memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
@@ -977,7 +979,7 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                        for (player_h = 0; player_h < GAME_PLAYER_COUNT; player_h++)
                             sprintf(
                                 cPlayerNames[player_h],
                                 ""
@@ -1001,7 +1003,7 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                        for (player_h = 0; player_h < GAME_PLAYER_COUNT; player_h++)
                             sprintf(
                                 cPlayerNames[player_h],
                                 ""
@@ -1248,8 +1250,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
 
     PollSound();
     if (msg.payload.widget.parameter & MENU_DISABLE_MASK) {
-        if (msg.payload.widget.command == INIT_MENU_HOVER_COMMAND
-            || msg.payload.widget.command == INIT_MENU_HELP_COMMAND) {
+        if (msg.payload.widget.command == WIDGET_COMMAND_SELECT
+            || msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
             helpIndex = -1;
             switch (msg.payload.widget.id) {
                 case MENU_NEW_GAME:
@@ -1273,7 +1275,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             }
         }
     } else {
-        if (msg.type == INIT_MENU_KEY_PRESS) {
+        if (msg.type == MESSAGE_KEY_DOWN) {
             switch (msg.payload.keyboard.keyCode) {
                 case MENU_KEY_NEW:
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
@@ -1296,20 +1298,20 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     handled = true;
                     break;
             }
-        } else if (msg.type == INIT_MENU_MESSAGE) {
+        } else if (msg.type == MESSAGE_WIDGET) {
             if (msg.payload.widget.id < MENU_FIRST_COMMAND
                 || msg.payload.widget.id > MENU_LAST_ACTION) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
             switch (msg.payload.widget.command) {
-                case INIT_MENU_HOVER_COMMAND:
+                case WIDGET_COMMAND_SELECT:
                     if (msg.payload.widget.id == MENU_MOVIE)
                         break;
                     menu = msg.payload.widget.id - MENU_FIRST_COMMAND;
                     idx = menu + MENU_WIDGET_OFFSET;
-                    msg.type = INIT_MENU_MESSAGE;
+                    msg.type = MESSAGE_WIDGET;
                     msg.payload.widget.id = idx;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     msg.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, idx, idx);
@@ -1320,7 +1322,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                     break;
-                case INIT_MENU_CLICK_COMMAND:
+                case WIDGET_COMMAND_DESELECT:
                     if (msg.payload.widget.id == MENU_MOVIE) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop(
@@ -1336,9 +1338,9 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     } else {
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         for (idx = MENU_FIRST_WIDGET; idx <= MENU_LAST_WIDGET; idx++) {
-                            msg.type = INIT_MENU_MESSAGE;
+                            msg.type = MESSAGE_WIDGET;
                             msg.payload.widget.id = idx;
-                            msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                            msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                             msg.payload.widget.data.value =
                                 (idx - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
                             gpInitWin->BroadcastMessage(msg);
@@ -1354,7 +1356,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     }
                     break;
             }
-        } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
+        } else if (msg.type == MESSAGE_MOUSE_MOVE) {
             hoverIndex = -1;
             for (idx = 0; idx < MENU_HOTSPOT_COUNT; idx++) {
                 if (msg.payload.mouse.screenX >= IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)]
@@ -1370,9 +1372,9 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             }
             if (hoverIndex != lastIMHoverID) {
                 if (lastIMHoverID != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
+                    msg.type = MESSAGE_WIDGET;
                     msg.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     msg.payload.widget.data.value =
                         lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
@@ -1389,9 +1391,9 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     );
                 }
                 if (hoverIndex != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
+                    msg.type = MESSAGE_WIDGET;
                     msg.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     msg.payload.widget.data.value =
                         hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
@@ -1413,7 +1415,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     }
 
     if (handled || giMenuCommand != -1) {
-        msg.type = INIT_MENU_MESSAGE;
+        msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = MENU_CLOSE_COMMAND;
         msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
@@ -2468,7 +2470,7 @@ void CheckEndGame(
         }
 
         if (carryoverHeroId != static_cast<u32>(END_GAME_NO_PLAYER)) {
-            for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+            for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
@@ -2487,7 +2489,7 @@ void CheckEndGame(
                 gpGame->m_campaignCarryoverCreatureTypes[0] = CREATURE_PEASANT;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+                for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];
@@ -2909,7 +2911,7 @@ i32 WaitForOtherPlayer(void) {
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
-                    OLD_MAIN_PLAYER_COUNT
+                    GAME_PLAYER_COUNT
                 );
                 gbUseRegularCompression = data->payload.setup.useRegularCompression;
                 gbUseDiffCompression = data->payload.setup.useDiffCompression;
@@ -2992,7 +2994,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     if (netWindow_j == NULL)
         MemError();
 
-    SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
+    SET_WIDGET_MESSAGE(updateMessage_i, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
     updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
     netWindow_j->BroadcastMessage(updateMessage_i);
     updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3004,7 +3006,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 3;
     updateMessage_i.payload.widget.data.text = cNetBoxLine[3];
     netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.command = NET_BOX_COLOR_COMMAND;
+    updateMessage_i.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID;
     updateMessage_i.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
     netWindow_j->BroadcastMessage(updateMessage_i);
@@ -3147,7 +3149,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
 
         if (redrawLines_l) {
             redrawLines_l = false;
-            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
+            SET_WIDGET_MESSAGE(updateMessage_i, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
             updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
             netWindow_j->BroadcastMessage(updateMessage_i);
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3159,7 +3161,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 3;
             updateMessage_i.payload.widget.data.text = cNetBoxLine[3];
             netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.command = NET_BOX_COLOR_COMMAND;
+            updateMessage_i.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID;
             updateMessage_i.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
             netWindow_j->BroadcastMessage(updateMessage_i);
@@ -3184,7 +3186,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             else
                 inputText_b[inputLength_a] = BOX_CURSOR_GLYPH;
             inputText_b[inputLength_a + 1] = 0;
-            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_INPUT_ID);
+            SET_WIDGET_MESSAGE(updateMessage_i, WIDGET_COMMAND_SET_TEXT, BOX_INPUT_ID);
             updateMessage_i.payload.widget.data.text = inputText_b;
             netWindow_j->BroadcastMessage(updateMessage_i);
             netWindow_j->DrawWindow();
@@ -4346,7 +4348,7 @@ VA(0x0046ed70, 0x4f)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
-    for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
+    for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
         if (i != giThisNetPos)
             gbHumanPlayer[i] = false;
     ComputeAdvNetControl();
@@ -4424,13 +4426,13 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         giThisNetPos--;
     gbHumanPlayer[exitInfo.gamePosition] = false;
 
-    for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
+    for (netPosition = exitInfo.netPosition; netPosition < GAME_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
         giNetPosToDCOPos[netPosition] = giNetPosToDCOPos[netPosition + 1];
         strcpy(gsNetPlayerInfo[netPosition].name, gsNetPlayerInfo[netPosition + 1].name);
     }
 
-    for (netPosition = 0; netPosition < REMOTE_PLAYER_COUNT; netPosition++) {
+    for (netPosition = 0; netPosition < GAME_PLAYER_COUNT; netPosition++) {
         if (gbGamePosToNetPos[netPosition] == exitInfo.netPosition)
             gbGamePosToNetPos[netPosition] = -1;
         else if (gbGamePosToNetPos[netPosition] > exitInfo.netPosition)
@@ -4526,7 +4528,7 @@ exitInfoProcessed:
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
-        for (recipient = 0; recipient < REMOTE_PLAYER_COUNT; recipient++) {
+        for (recipient = 0; recipient < GAME_PLAYER_COUNT; recipient++) {
             if ((recipient == exitInfo.netPosition && exitInfo.eliminated && !exitInfo.hostReported)
                 || (recipient != exitInfo.netPosition && recipient < giNumHumanPlayers
                     && recipient != giThisNetPos)) {
@@ -4904,9 +4906,9 @@ void NormalDialog(
     if (!pNormalDialogWindow)
         MemError();
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_b.payload.widget.data.value = IDX(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_b.type = MESSAGE_WIDGET;
+    message_b.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message_b.payload.widget.data.value = IDX(WIDGET_COMMAND_CLEAR_FLAGS);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
         message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
         pNormalDialogWindow->BroadcastMessage(message_b);
@@ -5367,7 +5369,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(borderWidget_k, -1);
     }
 
-    SET_WIDGET_MESSAGE(message_b, NORMAL_DIALOG_SET_TEXT_COMMAND, NORMAL_DIALOG_TEXT_WIDGET_ID);
+    SET_WIDGET_MESSAGE(message_b, WIDGET_COMMAND_SET_TEXT, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message_b.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message_b);
 
@@ -6290,20 +6292,20 @@ DATA(0x00526628) i32 giDebugLevel = 0;
 DATA(0x004fa458) i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {20, 33, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
-    {150, 312, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {200, 463, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
+    {150, 312, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_FLAGS_SHOOTER},
+    {200, 463, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_FLAGS_SHOOTER},
     {200, 639, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
     {250, 824, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
     {250, 1130, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
     {300, 1350, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {300, 1830, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {375, 2273, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
+    {300, 1830, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
+    {375, 2273, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
     {600, 4704, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
     {1000, 5822, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
     {40, 109, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MONSTER_FLAGS_NONE},
-    {140, 299, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {175, 512, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {200, 865, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
+    {140, 299, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_FLAGS_SHOOTER},
+    {175, 512, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_FLAGS_SHOOTER},
+    {200, 865, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_FLAGS_WIDE},
     {300, 1065, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
     {500, 2070, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
     {600, 1921,
@@ -6318,7 +6320,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      8,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_SHOOTER},
     {700, 2337,
      33,
      3,
@@ -6331,7 +6333,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      9,
      16,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_SHOOTER},
     {750, 6074,
      58,
      2,
@@ -6344,13 +6346,13 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      24,
      0,
      "cycl",
-     MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {50, 129, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 129, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_FLAGS_FLYING},
     {200, 500, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
     {250, 716, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {250, 554, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {300, 658, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {350, 1290, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
+    {250, 554, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {300, 658, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {350, 1290, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_FLAGS_SHOOTER},
     {400, 1428,
      36,
      3,
@@ -6363,8 +6365,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      16,
      "drui",
-     MONSTER_ATTRIBUTE_RANGED},
-    {500, 2702, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_SHOOTER},
+    {500, 2702, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_FLAGS_WIDE},
     {1500, 10114,
      56,
      1,
@@ -6377,7 +6379,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {60, 154,
      26,
      8,
@@ -6390,8 +6392,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {200, 579, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_SHOOTER},
+    {200, 579, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_FLAGS_FLYING},
     {300, 1101,
      37,
      4,
@@ -6404,10 +6406,10 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
     {400, 1751, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
     {500, 2252, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {800, 2878, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
+    {800, 2878, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_FLAGS_WIDE},
     {3000, 18153,
      55,
      1,
@@ -6420,7 +6422,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {3500, 22962,
      68,
      1,
@@ -6433,7 +6435,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {4000, 28144,
      74,
      1,
@@ -6446,9 +6448,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {50, 134, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {150, 493, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 134, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_FLAGS_SHOOTER},
+    {150, 493, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_FLAGS_WIDE},
     {300, 951, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
     {350, 1324, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
     {400, 1739,
@@ -6463,9 +6465,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {600, 1935, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {700, 2469, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
+    {600, 1935, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_FLAGS_SHOOTER},
+    {700, 2469, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_FLAGS_SHOOTER},
     {2000, 9589, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
     {5000, 22933,
      79,
@@ -6479,8 +6481,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      24,
      "titn",
-     MONSTER_ATTRIBUTE_RANGED},
-    {75, 203, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER},
+    {75, 203, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_FLAGS_UNDEAD},
     {150, 310,
      21,
      6,
@@ -6493,7 +6495,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {200, 506,
      25,
      6,
@@ -6506,7 +6508,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {250, 868,
      35,
      4,
@@ -6519,7 +6521,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {300, 1056,
      35,
      4,
@@ -6532,7 +6534,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {500, 1685,
      42,
      3,
@@ -6545,7 +6547,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {650, 2461,
      45,
      3,
@@ -6558,7 +6560,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {750, 2069,
      28,
      2,
@@ -6571,7 +6573,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
     {900, 2625,
      29,
      2,
@@ -6584,7 +6586,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
     {1500, 11744,
      78,
      1,
@@ -6597,9 +6599,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {50, 177, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MONSTER_FLAGS_NONE},
-    {200, 805, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
+    {200, 805, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_FLAGS_WIDE},
     {1000, 1545,
      62,
      3,
@@ -6612,7 +6614,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {650, 5692,
      60,
      2,
@@ -6625,8 +6627,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      0,
      "geni",
-     MONSTER_ATTRIBUTE_FLYING},
-    {500, 1979, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_FLYING},
+    {500, 1979, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_FLAGS_WIDE},
     {500, 1732, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
     {500, 1412, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
     {500, 1501, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
@@ -10018,7 +10020,7 @@ DATA(0x004ff020) H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DES
 };
 DATA(0x004ff044) H2_CONST char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = { localization::Tr("table.gInterfaceTypeText.0"), localization::Tr("table.gInterfaceTypeText.1"), localization::Tr("table.gInterfaceTypeText.2")};
 DATA(0x004ff050) H2_CONST char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = { localization::Tr("table.cBWMouseText.0"), localization::Tr("table.cBWMouseText.1")};
-DATA(0x004ff058) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = { localization::Tr("table.combatSpeedText.0"), localization::Tr("table.combatSpeedText.1"), localization::Tr("table.combatSpeedText.2")};
+DATA(0x004ff058) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_COUNT] = { localization::Tr("table.combatSpeedText.0"), localization::Tr("table.combatSpeedText.1"), localization::Tr("table.combatSpeedText.2")};
 DATA(0x004ff064) H2_CONST char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = { localization::Tr("table.combatMiniInfoText.0"), localization::Tr("table.combatMiniInfoText.1"), localization::Tr("table.combatMiniInfoText.2")};
 DATA(0x004ff070) H2_CONST char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     /* \n\n\n***Command Line Help***\n */ "\n\n\n***Command Line Help***\n",
@@ -10372,7 +10374,7 @@ DATA(0x005261e0) configStruct gConfig;
 DATA(0x00525f7c) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00526404) u32l gTimeMark;
 DATA(0x00524e0c) char* EXPANSION_AGGREGATE_NAME;
-DATA(0x00524f98) char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+DATA(0x00524f98) char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 DATA(0x00526124) game* gpGame;
 DATA(0x00525bc3) b8 gbRetreatWin;
 DATA(0x005260fc) DialogWaitType giWaitType;

@@ -48,6 +48,7 @@ import runpy
 import sys
 
 TOOLS = {
+    "enums": ("enums", "group evaluated enum members by value for semantic reuse review"),
     "ledger": ("ledger",
                "match_baseline rows banked against source that changed"),
     "historical-losses": ("historical_exact_losses",

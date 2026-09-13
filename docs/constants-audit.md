@@ -1,5 +1,8 @@
 # Constants audit
 
+For evaluated enum-value groups and reviewed direct reuse, see
+[Enum-value reuse review](enum-reuse.md) and `homm2 audit enums`.
+
 `homm2 constants` inventories numeric constants throughout reconstructed game code. It writes
 the complete occurrence list to `build/constants/literals.tsv` and a semantic unexplained-literal
 list to `build/constants/magic-numbers.tsv`. `build/constants/null-zero.tsv` must remain empty.

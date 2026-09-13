@@ -26,6 +26,7 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/combatTypes.h>
 
 #define ARMY_HASTE_WALK_DURATION_SCALE 0.65
 #define ARMY_SLOW_WALK_DURATION_SCALE 1.5
@@ -69,7 +70,6 @@ H2_ENUM_BEGIN(ArmySpellChanceConstant)
     RESURRECT_POWER_PER_SPELL_POWER = 50,
     HYPNOTIZE_HIT_POINTS_PER_POWER  = 25,
     ARTIFACT_POWER_MULTIPLIER       = 2,
-    CURE_HIT_POINTS_PER_POWER       = 5,
     WIDE_CREATURE_HALF_WIDTH        = 22,
     CONTROL_EFFECT_Y_OFFSET         = 5
 H2_ENUM_END(ArmySpellChanceConstant)
@@ -1697,7 +1697,7 @@ void army::DoAttack(i32 retaliation) {
             }
         }
         target_18->DoAttack(1);
-        target_18->m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
+        target_18->m_monster.attributes |= MONSTER_FLAGS_RETALIATED;
         if (gbRemoteOn && gpCombatManager->m_networkArmyPresent[0]
             && gpCombatManager->m_networkArmyPresent[1]
             && target_18->m_monsterType == CREATURE_GHOST) {
@@ -1801,7 +1801,7 @@ i32 army::WalkTo(i32 destination) {
                 canEnterMoat_1 = true;
             }
             for (direction_3 = IDX(COMBAT_DIRECTION_NORTHEAST);
-                 direction_3 < ARMY_ADJACENT_DIRECTION_COUNT;
+                 direction_3 < COMBAT_DIRECTION_ADJACENT_COUNT;
                  direction_3++) {
                 if (GetAdjacentCellIndex(m_hex, static_cast<CombatHexDirection>(direction_3))
                     == moatCell[moatIndex_1]) {
@@ -2527,7 +2527,7 @@ void army::ProcessDeath(i32 immediate) {
     } else if (Random(0, DEATH_RANDOM_MAX) < DEATH_SECONDARY_CHANCE) {
         gpCombatManager->m_heroAlternateDeathPending[IDX(OppositeCombatSide(m_side))] = 1;
     }
-    m_monster.attributes |= MONSTER_ATTRIBUTE_DEAD;
+    m_monster.attributes |= MONSTER_FLAGS_DEAD;
     m_deathPending = false;
     frontCell_1 = &gpCombatManager->m_hexCells[m_hex];
     rearHex = 0;
@@ -2694,13 +2694,13 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
             if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]) {
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
                 m_damagePenalty = ARMY_DAMAGE_PENALTY_HALF;
-                m_monster.attributes |= MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE;
+                m_monster.attributes |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
             }
             if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
                 || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                 || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]) {
-                m_monster.attributes |= MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE;
-                m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
+                m_monster.attributes |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
+                m_monster.attributes |= MONSTER_FLAGS_RETALIATED;
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
             }
@@ -2723,7 +2723,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
             m_monster.speed = static_cast<i8>(m_speed);
             m_frameInfo.walkDuration = m_walkDuration;
             m_monster.attributes |=
-                gMonsterDatabase[IDX(m_monsterType)].attributes & MONSTER_ATTRIBUTE_FLYING;
+                gMonsterDatabase[IDX(m_monsterType)].attributes & MONSTER_FLAGS_FLYING;
             break;
         case ARMY_SPELL_INFLUENCE_BLIND:
             break;
@@ -2777,9 +2777,9 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_SLOW:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
             m_monster.speed = static_cast<i8>((m_monster.speed + 1) / SLOW_SPEED_DIVISOR);
-            if HAS (m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) {
+            if HAS (m_monster.attributes, MONSTER_FLAGS_FLYING) {
                 H2_ENUM_CLEAR_FLAG(
-                    m_monster.attributes, MONSTER_ATTRIBUTE_FLYING
+                    m_monster.attributes, MONSTER_FLAGS_FLYING
                 );
             }
             m_frameInfo.walkDuration =
@@ -3045,7 +3045,7 @@ again:
             for (direction_3 = COMBAT_DIRECTION_NORTHEAST;
                  IDX(direction_3) < ARMY_COMBAT_DIRECTION_COUNT;
                  direction_3++) {
-                if (IDX(direction_3) < ARMY_ADJACENT_DIRECTION_COUNT
+                if (IDX(direction_3) < COMBAT_DIRECTION_ADJACENT_COUNT
                     || HAS(m_monster.attributes, MONSTER_FLAGS_WIDE)) {
                     sourceHex_8 = m_hex;
                     if (HAS(m_monster.attributes, MONSTER_FLAGS_WIDE)
@@ -3395,7 +3395,7 @@ void army::Cure(i32 amount) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HYPNOTIZE);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
-    m_hitPointsLost -= amount * CURE_HIT_POINTS_PER_POWER;
+    m_hitPointsLost -= amount * SPELL_CURE_HIT_POINTS_PER_POWER;
     if (m_hitPointsLost < 0) {
         m_hitPointsLost = 0;
     }
@@ -3492,7 +3492,7 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
     } else {
         otherRearSquare = -1;
     }
-    for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < ARMY_ADJACENT_DIRECTION_COUNT; i++) {
+    for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < COMBAT_DIRECTION_ADJACENT_COUNT; i++) {
         adjacentSquare = GetAdjacentCellIndex(m_hex, i);
         if (adjacentSquare == otherSquare
             || (adjacentSquare != -1 && adjacentSquare == otherRearSquare)) {
@@ -3501,7 +3501,7 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
     }
     if (HAS(m_monster.attributes, MONSTER_FLAGS_WIDE)) {
         myRearSquare = m_hex + (m_side == COMBAT_ATTACKER_SIDE ? 1 : -1);
-        for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < ARMY_ADJACENT_DIRECTION_COUNT; i++) {
+        for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < COMBAT_DIRECTION_ADJACENT_COUNT; i++) {
             adjacentSquare = GetAdjacentCellIndex(myRearSquare, i);
             if (adjacentSquare == otherSquare
                 || (adjacentSquare != -1 && adjacentSquare == otherRearSquare)) {

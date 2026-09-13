@@ -24,6 +24,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
+#include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(NewGameConstant)
     GAME_TEXT_BUFFER_COUNT                = 3,
@@ -52,7 +53,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_WIDGET_INACTIVE_FRAME            = 2,
     GAME_WIDGET_REFRESH_FRAME             = 4,
     GAME_SHADOW_FRAME                     = 6,
-    GAME_PLAYER_CONTROL_COUNT             = 6,
     GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
@@ -87,8 +87,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_CHAT_DRAW_HEIGHT                 = 0x0c,
     GAME_CHAT_BACKGROUND_WIDTH            = 0x51,
     GAME_CHAT_MAX_LINES                   = 1,
-    GAME_DAYS_PER_WEEK                    = 7,
-    GAME_DAYS_PER_MONTH                   = 28,
     GAME_GOLD_CONDITION_MULTIPLIER        = 1000,
     GAME_SIDE_TEXT_SIZE                   = 100,
     GAME_SCENARIO_WINDOW_TEXT_ID          = 23,
@@ -205,7 +203,7 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
     PLAYER_RACE_NAME_HEIGHT           = 24,
     PLAYER_RACE_NAME_CENTER_DIVISOR   = 2,
     PLAYER_RACE_NAME_NARROW_THRESHOLD = 5,
-    PLAYER_RACE_NAME_HIDDEN_THRESHOLD = MAP_HEADER_PLAYER_COUNT,
+    PLAYER_RACE_NAME_HIDDEN_THRESHOLD = GAME_PLAYER_COUNT,
     PLAYER_RACE_NAME_NARROW_WIDTH     = 16,
     PLAYER_RACE_NAME_WIDE_WIDTH       = 26,
     PLAYER_RACE_CYCLE_X_OFFSET        = 16,
@@ -324,14 +322,14 @@ void game::InitNewGame(struct SMapHeader* header) {
         else
             GetMapHeader(m_mapFilename, &m_mapHeader);
 
-        for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
+        for (player = 0; player < GAME_PLAYER_COUNT; ++player) {
             if (m_mapHeader.playerEnabled[player]) {
                 m_setupPlayerColor[activeColorCount] = player;
                 ++activeColorCount;
             }
         }
 
-        for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
+        for (player = 0; player < GAME_PLAYER_COUNT; ++player) {
             if (player >= m_mapHeader.playerCount) {
                 m_setupPlayerType[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerNetworkId[player] = GAME_NETWORK_PLAYER_NONE;
@@ -487,24 +485,24 @@ i32 game::NewGame(void) {
 
                     windowMessage.type = MESSAGE_WIDGET;
                     windowMessage.payload.widget.id = GAME_MAP_OPTIONS_CONTROL;
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.id = GAME_DIALOG_OK;
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.id = GAME_DIALOG_CANCEL;
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+                    windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
 
@@ -622,7 +620,7 @@ VA(0x004765bc, 0xeb)
     void game::CleanUpNewGameWindow(void) {
         i32 player;
 
-        for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
+        for (player = 0; player < GAME_PLAYER_COUNT; ++player) {
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_SELECT_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_COLOR_FIRST);
@@ -843,24 +841,24 @@ VA(0x00476e3b, 0x50f)
         i32 H2_UNUSED(unusedPlayer17);
 
         strcpy(gText, m_mapHeader.name);
-        SET_WIDGET_MESSAGE(message, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, NEW_GAME_SCENARIO_NAME);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
 
-        message.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
         for (playerIndex = 0; playerIndex < IDX(DIFFICULTY_COUNT); ++playerIndex) {
             message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
             m_newGameWindow->BroadcastMessage(message);
         }
-        message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
             for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
                 sprintf(gText, cTextReceivedBuffer[playerIndex]);
-                message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+                message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
                 message.payload.widget.data.text = gText;
                 m_newGameWindow->BroadcastMessage(message);
@@ -878,14 +876,14 @@ VA(0x00476e3b, 0x50f)
             } else {
                 sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
             }
-            message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+            message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
             message.payload.widget.data.text = gText;
             m_newGameWindow->BroadcastMessage(message);
 
             message.payload.widget.command = playerIndex == m_selectedSetupPlayer
-                                                 ? NEW_GAME_WIDGET_ENABLE
-                                                 : NEW_GAME_WIDGET_DISABLE;
+                                                 ? WIDGET_COMMAND_SET_FLAGS
+                                                 : WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = NEW_GAME_PLAYER_SELECT_FIRST + playerIndex;
             message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
             m_newGameWindow->BroadcastMessage(message);
@@ -896,7 +894,7 @@ VA(0x00476e3b, 0x50f)
                 playerLockedValue = false;
             else
                 playerLockedValue = true;
-            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = NEW_GAME_COLOR_FIRST + playerIndex;
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
                 message.payload.widget.data.value =
@@ -913,11 +911,11 @@ VA(0x00476e3b, 0x50f)
             m_newGameWindow->BroadcastMessage(message);
 
             message.payload.widget.command =
-                playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
+                playerLockedValue ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
             m_newGameWindow->BroadcastMessage(message);
 
-            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = NEW_GAME_HANDICAP_FIRST + playerIndex;
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
                 message.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
@@ -926,8 +924,8 @@ VA(0x00476e3b, 0x50f)
             m_newGameWindow->BroadcastMessage(message);
             message.payload.widget.command =
                 m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER
-                    ? NEW_GAME_WIDGET_DISABLE
-                    : NEW_GAME_WIDGET_ENABLE;
+                    ? WIDGET_COMMAND_CLEAR_FLAGS
+                    : WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
             m_newGameWindow->BroadcastMessage(message);
 
@@ -935,10 +933,10 @@ VA(0x00476e3b, 0x50f)
                 playerLockedValue = false;
             else
                 playerLockedValue = true;
-            message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
             m_newGameWindow->BroadcastMessage(message);
-            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = NEW_GAME_RACE_CYCLE_FIRST + playerIndex;
             message.payload.widget.data.value =
                 (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
@@ -946,18 +944,18 @@ VA(0x00476e3b, 0x50f)
             m_newGameWindow->BroadcastMessage(message);
 
             sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex])]);
-            message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+            message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             message.payload.widget.id = NEW_GAME_RACE_NAME_FIRST + playerIndex;
             message.payload.widget.data.text = gText;
             m_newGameWindow->BroadcastMessage(message);
             message.payload.widget.command =
-                playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
+                playerLockedValue ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
             m_newGameWindow->BroadcastMessage(message);
         }
 
         gpGame->m_difficultyRating = CalcDifficultyRating();
-        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
         sprintf(gText, "%s %d%%", localization::Tr("new_game.rating.label"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
@@ -985,7 +983,7 @@ VA(0x0047734a, 0xdd1)
 
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
-            SET_WIDGET_MESSAGE(windowMessage, NEW_GAME_WIDGET_DISABLE, NEW_GAME_SHADOW);
+            SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_CLEAR_FLAGS, NEW_GAME_SHADOW);
             windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
             gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
         }
@@ -1108,18 +1106,18 @@ VA(0x0047734a, 0xdd1)
                         helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
                     if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST
-                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                + IDX(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_HANDICAP;
                     if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                   <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
@@ -1127,10 +1125,10 @@ VA(0x0047734a, 0xdd1)
                         helpDialogIndexLocal = GAME_HELP_PLAYER;
                     if ((message.payload.widget.id >= NEW_GAME_RACE_CYCLE_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_RACE_ICON_FIRST
                             && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST
-                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                + IDX(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_RACE;
                     if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
@@ -1148,7 +1146,7 @@ VA(0x0047734a, 0xdd1)
                 }
             } else {
                 switch (message.payload.widget.command) {
-                    case NEW_GAME_EVENT_RELEASE:
+                    case WIDGET_COMMAND_DESELECT:
                         switch (message.payload.widget.id) {
                             case GAME_DIALOG_OK:
                                 if (gbRemoteOn) {
@@ -1191,7 +1189,7 @@ VA(0x0047734a, 0xdd1)
                         }
                         break;
 
-                    case NEW_GAME_EVENT_PRESS:
+                    case WIDGET_COMMAND_SELECT:
                         switch (message.payload.widget.id) {
                             case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
                             case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
@@ -1401,7 +1399,7 @@ VA(0x0047734a, 0xdd1)
                                 {
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
-                                        NEW_GAME_WIDGET_DISABLE;
+                                        WIDGET_COMMAND_CLEAR_FLAGS;
                                     mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
                                     mapWindowMessageTemp.payload.widget.data.value =
                                         GAME_WIDGET_INACTIVE_FRAME;
@@ -1409,7 +1407,7 @@ VA(0x0047734a, 0xdd1)
                                     gpGame->GetMap();
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
-                                        NEW_GAME_WIDGET_ENABLE;
+                                        WIDGET_COMMAND_SET_FLAGS;
                                     mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
                                     mapWindowMessageTemp.payload.widget.data.value =
                                         GAME_WIDGET_INACTIVE_FRAME;
@@ -1662,7 +1660,7 @@ void game::ShowScenInfo(void) {
         MemError();
     SetWinText(window, GAME_SCENARIO_WINDOW_TEXT_ID);
 
-    SET_WIDGET_MESSAGE(msg, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
+    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, NEW_GAME_SCENARIO_NAME);
     msg.payload.widget.data.text = m_mapHeader.name;
     window->BroadcastMessage(msg);
 
@@ -1825,7 +1823,7 @@ void game::ShowScenInfo(void) {
         sprintf(name, "A");
         raceNameWidth = m_mapHeader.playerCount < PLAYER_RACE_NAME_NARROW_THRESHOLD
                             ? PLAYER_RACE_NAME_WIDE_WIDTH
-                        : m_mapHeader.playerCount < MAP_HEADER_PLAYER_COUNT
+                        : m_mapHeader.playerCount < GAME_PLAYER_COUNT
                             ? PLAYER_RACE_NAME_NARROW_WIDTH
                             : 0;
         nameWidget = new textWidget(
@@ -1873,15 +1871,15 @@ void game::ShowScenInfo(void) {
         } else {
             sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         msg.payload.widget.id =
             NEW_GAME_PLAYER_NAME_FIRST + playerCounter;
         msg.payload.widget.data.text = gText;
         window->BroadcastMessage(msg);
 
         msg.payload.widget.command = playerCounter != m_selectedSetupPlayer
-                                                         ? NEW_GAME_WIDGET_DISABLE
-                                                         : NEW_GAME_WIDGET_ENABLE;
+                                                         ? WIDGET_COMMAND_CLEAR_FLAGS
+                                                         : WIDGET_COMMAND_SET_FLAGS;
         msg.payload.widget.id =
             NEW_GAME_PLAYER_SELECT_FIRST + playerCounter;
         msg.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
@@ -1893,7 +1891,7 @@ void game::ShowScenInfo(void) {
             locked = false;
         else
             locked = true;
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id =
             NEW_GAME_COLOR_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
@@ -1912,11 +1910,11 @@ void game::ShowScenInfo(void) {
         window->BroadcastMessage(msg);
 
         msg.payload.widget.command =
-            locked ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
+            locked ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
         msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         window->BroadcastMessage(msg);
 
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id =
             NEW_GAME_HANDICAP_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
@@ -1925,12 +1923,12 @@ void game::ShowScenInfo(void) {
             msg.payload.widget.data.value = IDX(m_playerHandicap[playerCounter]);
         window->BroadcastMessage(msg);
         msg.payload.widget.command =
-            m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
-                                                                          : NEW_GAME_WIDGET_ENABLE;
+            m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? WIDGET_COMMAND_CLEAR_FLAGS
+                                                                          : WIDGET_COMMAND_SET_FLAGS;
         msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         window->BroadcastMessage(msg);
 
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id =
             NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
         msg.payload.widget.data.value =
@@ -1939,7 +1937,7 @@ void game::ShowScenInfo(void) {
         window->BroadcastMessage(msg);
 
         sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerCounter])]);
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         msg.payload.widget.id =
             NEW_GAME_RACE_NAME_FIRST + playerCounter;
         msg.payload.widget.data.text = gText;
@@ -1984,12 +1982,12 @@ void game::GetLossConditionText(char* text) {
 
             case MAP_LOSS_TIME:
                 month19 =
-                    (gpGame->m_mapHeader.lossConditionValue - 1) / GAME_DAYS_PER_MONTH + 1;
+                    (gpGame->m_mapHeader.lossConditionValue - 1) / CALENDAR_DAYS_PER_MONTH + 1;
                 week2 = (gpGame->m_mapHeader.lossConditionValue
-                         - (month19 - 1) * GAME_DAYS_PER_MONTH - 1)
-                            / GAME_DAYS_PER_WEEK
+                         - (month19 - 1) * CALENDAR_DAYS_PER_MONTH - 1)
+                            / CALENDAR_DAYS_PER_WEEK
                         + 1;
-                day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
+                day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % CALENDAR_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
                     localization::Tr("scenario.loss.time"),

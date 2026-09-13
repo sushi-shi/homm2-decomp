@@ -286,17 +286,12 @@ H2_ENUM_BEGIN(GameJoinConstant)
 H2_ENUM_END(GameJoinConstant)
 
 H2_ENUM_BEGIN(RemoteSaveConstant)
-    TRANSMIT_FILENAME_CAPACITY       = SAVE_PATH_CAPACITY,
-    RECEIVE_FILENAME_CAPACITY        = SAVE_PATH_CAPACITY,
     REMOTE_LOOPING_SOUND_COUNT       = 4,
     REMOTE_PACKET_TRACKING_CAPACITY  = 5000,
-    REMOTE_HEADER_CAPACITY           = REMOTE_SAVE_BUFFER_SIZE,
     REMOTE_BUFFER_EXTRA              = 2000,
-    REMOTE_PACKET_PAYLOAD_SIZE       = REMOTE_SAVE_CHUNK_SIZE,
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
-    REMOTE_DECODE_BUFFER_SIZE        = JOIN_BUFFER_SIZE,
     REMOTE_RECEIVE_TIMEOUT           = 90000,
     REMOTE_RECEIVE_DIALOG_BUTTONS    = 2,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
@@ -510,8 +505,6 @@ H2_ENUM_BEGIN(GameLuckConstant)
 H2_ENUM_END(GameLuckConstant)
 
 H2_ENUM_BEGIN(GameTimeEventConstant)
-    EVENT_DAYS_PER_WEEK    = 7,
-    EVENT_DAYS_PER_MONTH   = 28,
     EVENT_RESOURCE_COUNT   = 7,
     EVENT_RESOURCE_PENALTY = 100000
 H2_ENUM_END(GameTimeEventConstant)
@@ -546,8 +539,7 @@ H2_ENUM_BEGIN(GameTuningConstant)
 H2_ENUM_END(GameTuningConstant)
 
 H2_ENUM_BEGIN(GamePasswordConstant)
-    PASSWORD_INDEX_COUNT = X_GLOBAL_PASSWORD_STRING_INDEX_COUNT,
-    PASSWORD_INDEX_MASK  = PASSWORD_INDEX_COUNT - 1,
+    PASSWORD_INDEX_MASK  = X_GLOBAL_PASSWORD_STRING_INDEX_COUNT - 1,
     PASSWORD_COLOR_SHIFT = 3
 H2_ENUM_END(GamePasswordConstant)
 
@@ -2859,7 +2851,7 @@ void game::InitializePasswords(void) {
     bchar flag;
     i32 i;
     i32 j;
-    for (i = 0; i < PASSWORD_INDEX_COUNT; i++) {
+    for (i = 0; i < X_GLOBAL_PASSWORD_STRING_INDEX_COUNT; i++) {
         flag = false;
         while (flag == 0) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
@@ -4393,7 +4385,7 @@ void game::PerDay(void) {
     m_day++;
     giCurTurn = GAME_DAY_NUMBER(*this);
     if (!gbGameOver) {
-        if (m_day > EVENT_DAYS_PER_WEEK) {
+        if (m_day > CALENDAR_DAYS_PER_WEEK) {
             m_day = 1;
             PerWeek();
         }
@@ -4561,9 +4553,9 @@ void game::PerWeek(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER): {
                     monsterCount = WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
-                    monsterIncrease8 = monsterCount / EVENT_DAYS_PER_WEEK;
-                    if (Random(1, EVENT_DAYS_PER_WEEK)
-                        <= (monsterCount % EVENT_DAYS_PER_WEEK))
+                    monsterIncrease8 = monsterCount / CALENDAR_DAYS_PER_WEEK;
+                    if (Random(1, CALENDAR_DAYS_PER_WEEK)
+                        <= (monsterCount % CALENDAR_DAYS_PER_WEEK))
                         monsterIncrease8++;
                     monsterCount += monsterIncrease8;
                     if (monsterCount > WEEKLY_MONSTER_LIMIT)
@@ -5239,7 +5231,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     if (!selected[RANDOM_HERO_SECOND_SELECTION])
         selected[1] = true;
 
-    for (index = 0; index < RANDOM_HERO_ARMY_SLOT_COUNT; index++) {
+    for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         army2->m_creatureTypes[index] = CREATURE_NONE;
         army2->m_creatureCounts[index] = RANDOM_HERO_EMPTY_COUNT;
     }
@@ -6250,7 +6242,7 @@ void game::ProcessOnMapHeroes(void) {
                             mapHero14->m_patrolRadius = extra9->patrolRadius;
                         }
                         if (extra9->hasCustomArmy) {
-                            for (armySlot26 = 0; armySlot26 < EVENT_RECORD_ARMY_SLOT_COUNT;
+                            for (armySlot26 = 0; armySlot26 < ARMY_GROUP_SLOT_COUNT;
                                  armySlot26++) {
                                 mapHero14->m_army.m_creatureCounts[armySlot26] =
                                     extra9->troopCounts[armySlot26];
@@ -6467,7 +6459,7 @@ void game::CheckHeroConsistency(void) {
 
 VA(0x0045da83, 0x7b3)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave) {
-    char filename[TRANSMIT_FILENAME_CAPACITY];
+    char filename[SAVE_PATH_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
     i32 H2_UNUSED(unused1d0);
@@ -6531,7 +6523,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     fileSize = FileSize(filename);
     LogInt("PostDiffFileSize", fileSize);
 
-    header = static_cast<RemoteSaveBuffer*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
+    header = static_cast<RemoteSaveBuffer*>(H2_ALLOC(REMOTE_SAVE_BUFFER_SIZE));
     if (gbUseRegularCompression)
         transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
@@ -6577,7 +6569,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
         if (!result)
             ShutDown(NULL);
 
-        packetCount = (fileSize - 1) / REMOTE_PACKET_PAYLOAD_SIZE + 1;
+        packetCount = (fileSize - 1) / REMOTE_SAVE_CHUNK_SIZE + 1;
         batchCount = (packetCount - 1) / REMOTE_PACKET_BATCH_SIZE + 1;
         for (batch = 0; batch < batchCount; batch++) {
             if (batch + 1 == batchCount)
@@ -6594,13 +6586,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                     CheckDoMain(0, 1);
                     if (!acknowledged[packet]) {
                         if (packet + 1 == packetCount)
-                            chunkSize = fileSize - packet * REMOTE_PACKET_PAYLOAD_SIZE;
+                            chunkSize = fileSize - packet * REMOTE_SAVE_CHUNK_SIZE;
                         else
-                            chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
+                            chunkSize = REMOTE_SAVE_CHUNK_SIZE;
                         header->chunk.packetIndex = packet;
                         memcpy(
                             header->chunk.data,
-                            transmitData + packet * REMOTE_PACKET_PAYLOAD_SIZE,
+                            transmitData + packet * REMOTE_SAVE_CHUNK_SIZE,
                             chunkSize
                         );
                         result = TransmitRemoteData(
@@ -6712,7 +6704,7 @@ i32 game::ReceiveSaveGame(
     i32 expectedTransmitCrc,
     i32 remotePlayer
 ) {
-    char filename[RECEIVE_FILENAME_CAPACITY];
+    char filename[SAVE_PATH_CAPACITY];
     i32 receivedCrc;
     b32 finished;
     i32 oldTrack;
@@ -6766,8 +6758,8 @@ i32 game::ReceiveSaveGame(
     received = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(REMOTE_DECODE_BUFFER_SIZE));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
+        decodedData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_SAVE_BUFFER_SIZE));
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA));
 
     lastPacketTime = KBTickCount();
@@ -6796,7 +6788,7 @@ i32 game::ReceiveSaveGame(
                     packetStart = packet->payload.chunk.packetIndex;
                     received[packetStart] = 1;
                     memcpy(
-                        incomingData + packetStart * REMOTE_PACKET_PAYLOAD_SIZE,
+                        incomingData + packetStart * REMOTE_SAVE_CHUNK_SIZE,
                         packet->payload.chunk.data,
                         packet->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
@@ -6810,7 +6802,7 @@ i32 game::ReceiveSaveGame(
                     result = TransmitRemoteData(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
-                        REMOTE_PACKET_PAYLOAD_SIZE,
+                        REMOTE_SAVE_CHUNK_SIZE,
                         REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                         1
                     );

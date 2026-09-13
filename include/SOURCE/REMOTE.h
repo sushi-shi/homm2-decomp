@@ -6,7 +6,6 @@
 #include <SOURCE/REMOTE_TYPES.h>
 
 H2_ENUM_BEGIN(RemoteConstant)
-    REMOTE_PLAYER_COUNT                  = IDX(GAME_PLAYER_COUNT),
     REMOTE_QUEUE_CAPACITY                = 128,
     REMOTE_QUEUE_STORAGE_COUNT           = 138,
     REMOTE_RECENT_ID_COUNT               = 30,
@@ -81,7 +80,7 @@ i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
 
 extern bchar gbUseDiffCompression;
 extern bchar gbUseRegularCompression;
-extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
+extern SNetPlayerInfo gsNetPlayerInfo[GAME_PLAYER_COUNT];
 
 extern i32 iInOrderCtr;
 extern i32 iCurLastID;
@@ -104,7 +103,7 @@ extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
 extern i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 extern char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char gcThisNetName[REMOTE_NET_NAME_SIZE];
-extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+extern i32l lLastHeartbeatReceive[GAME_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];

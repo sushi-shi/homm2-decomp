@@ -14,6 +14,7 @@
 #include <EDITOR/mapcell.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SOURCE/KB_TYPES.h>
 
 namespace {
 
@@ -318,7 +319,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
     for (index = 0; index < COMBAT_HEX_COUNT; index++)
         gpCombatManager->m_hexCells[index].m_pathReachable = 0;
 
-    if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) != 0) {
+    if (HAS(unit->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0) {
         for (index = 0; index < COMBAT_HEX_COUNT; index++) {
             if (unit->CanFit(index, 0, NULL))
                 gpCombatManager->m_hexCells[index].m_pathReachable = 1;
@@ -346,7 +347,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
             gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
         }
 
-        if (HAS(enemy_a->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
+        if (HAS(enemy_a->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
             hex_c = enemy_a->GetAdjacentCellIndex(
                 hex_c,
                 enemy_a->m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST
@@ -395,7 +396,7 @@ i32 searchArray::FindCombatPath(
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
 
-        if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
+        if (HAS(unit->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
             sourceWideHex =
                 unit->m_hex + (unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1);
             targetWideHex = targetHex + (unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1);

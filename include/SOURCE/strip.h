@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/armyGroup.h>
 
 class armyGroup;
 class border;
@@ -10,7 +11,6 @@ class heroWindow;
 class icon;
 
 H2_ENUM_BEGIN(StripConstant)
-    STRIP_ARMY_SLOT_COUNT       = 5,
     STRIP_BORDER_COUNT          = 6,
     STRIP_RUNTIME_GAP_SIZE      = 0x18,
     STRIP_WINDOW_WIDTH          = 0x228,
@@ -42,8 +42,8 @@ public:
     i32 m_selectedSlot;
     border* m_borders[STRIP_BORDER_COUNT];
     icon* m_stripIcon;
-    icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];
-    H2_ENUM_STORAGE(CreatureType, i32) m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    icon* m_creatureIcons[ARMY_GROUP_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i32) m_cachedCreatureTypes[ARMY_GROUP_SLOT_COUNT];
     icon* m_portraitIcon;
     icon* m_flagIcon;
     i32 m_portraitFrame;

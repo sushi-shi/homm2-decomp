@@ -154,7 +154,7 @@ void UpdateTradingPost(i32 draw) {
                                 : localization::Tr("trading.marketplace.title")
         );
     }
-    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
+    SET_WIDGET_MESSAGE(messageTemp, WIDGET_COMMAND_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
@@ -170,13 +170,13 @@ void UpdateTradingPost(i32 draw) {
 
     for (sideCurrent = OFFER_LEFT; sideCurrent < OFFER_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             messageTemp.payload.widget.id =
                 sideCurrent == OFFER_LEFT ? POST_LEFT_OFFER_ICON : POST_RIGHT_OFFER_ICON;
             messageTemp.payload.widget.data.value =
                 sideCurrent == OFFER_LEFT ? leftResource : rightResource;
             tpWindow->BroadcastMessage(messageTemp);
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
@@ -195,7 +195,7 @@ void UpdateTradingPost(i32 draw) {
         }
 
         for (idx = 0; idx < TRADING_POST_RESOURCE_COUNT; idx++) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + idx;

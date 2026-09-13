@@ -27,6 +27,8 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/message.h>
+#include <SOURCE/combatTypes.h>
 
 #define RIPPLE_MODE_ZERO_AMPLITUDE_BASE 0.3f
 #define RIPPLE_MODE_ZERO_AMPLITUDE_STEP 0.05f
@@ -116,14 +118,10 @@ namespace {
     H2_ENUM_END(RippleCreatureConstant)
 
     H2_ENUM_BEGIN(MassSpellConstant)
-        HOLY_WORD_DAMAGE_PER_POWER = 10,
-        HOLY_SHOUT_DAMAGE_PER_POWER = 20,
         HOLY_WORD_COLOR_ADJUSTMENT = -2,
         HOLY_SHOUT_COLOR_ADJUSTMENT = -4,
         DEATH_RIPPLE_STRENGTH = 1,
         DEATH_WAVE_STRENGTH = 2,
-        DEATH_RIPPLE_DAMAGE_PER_POWER = 5,
-        DEATH_WAVE_DAMAGE_PER_POWER = 10,
         MIRROR_SOURCE_PART_COUNT = 2
     H2_ENUM_END(MassSpellConstant)
 
@@ -302,7 +300,7 @@ i32 combatManager::ViewSpells(i32) {
 
 VA(0x00498bc1, 0xfb)
 MessageDispatchResult CombatSpecialHandler(tag_message& message) {
-    if (message.type == SPELL_MESSAGE_HOVER) {
+    if (message.type == MESSAGE_MOUSE_MOVE) {
         if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
             return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
@@ -337,7 +335,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
     i32 hex;
 
     switch (message.type) {
-        case SPELL_MESSAGE_HOVER:
+        case MESSAGE_MOUSE_MOVE:
             hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
             if (hex != indexToCastOn) {
                 if (!gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
@@ -364,7 +362,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
             }
             break;
 
-        case SPELL_MESSAGE_SELECT:
+        case MESSAGE_LEFT_BUTTON_DOWN:
             if (indexToCastOn != NO_SELECTION) {
                 if (bInTeleportGetDest) {
                     giNextActionGridIndex2 = indexToCastOn;
@@ -373,7 +371,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT) {
                         bInTeleportGetDest = true;
                         indexToCastOn = NO_SELECTION;
-                        message.type = SPELL_MESSAGE_HOVER;
+                        message.type = MESSAGE_MOUSE_MOVE;
                         message.payload.mouse.x = message.payload.mouse.screenX;
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
@@ -385,21 +383,21 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     }
                 }
                 bInTeleportGetDest = false;
-                message.type = SPELL_MESSAGE_DIALOG;
-                message.payload.widget.command = SPELL_COMMAND_CLOSE;
+                message.type = MESSAGE_WIDGET;
+                message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                 return MESSAGE_DISPATCH_FORWARD;
             }
             break;
 
-        case SPELL_MESSAGE_MOUSE_DOWN:
+        case MESSAGE_KEY_DOWN:
             if (message.payload.keyboard.keyCode != COMMAND_CANCEL)
                 break;
 
-        case SPELL_MESSAGE_CANCEL:
+        case MESSAGE_RIGHT_BUTTON_DOWN:
             gpCombatManager->m_selectedSpell = SPELL_NONE;
             giNextAction = ACTION_NONE;
-            message.type = SPELL_MESSAGE_DIALOG;
-            message.payload.widget.command = SPELL_COMMAND_CLOSE;
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
             bInTeleportGetDest = false;
             return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1258,7 +1256,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (spell != SPELL_COLD_RING)
         affectedHexes[0] = static_cast<i16>(targetHex);
 
-    for (frame = IDX(COMBAT_DIRECTION_NORTHEAST); frame < SPELL_ADJACENT_DIRECTION_COUNT;
+    for (frame = IDX(COMBAT_DIRECTION_NORTHEAST); frame < COMBAT_DIRECTION_ADJACENT_COUNT;
          ++frame) {
         affectedHexes[frame + 1] = static_cast<i16>(
             GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(frame))
@@ -1362,7 +1360,7 @@ void combatManager::MeteorShower(i32 targetHex) {
 
     target = &m_armies[IDX(m_currentSide)][0] + m_currentArmyIndex;
     hexes[0] = targetHex;
-    for (direction = IDX(COMBAT_DIRECTION_NORTHEAST); direction < SPELL_ADJACENT_DIRECTION_COUNT;
+    for (direction = IDX(COMBAT_DIRECTION_NORTHEAST); direction < COMBAT_DIRECTION_ADJACENT_COUNT;
          ++direction) {
         hexes[direction + 1] =
             GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(direction));
@@ -2837,13 +2835,13 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
         case SPELL_HOLY_WORD:
         case SPELL_HOLY_SHOUT: {
             animateCreatures = true;
-            damage_c = (spell == SPELL_HOLY_WORD ? HOLY_WORD_DAMAGE_PER_POWER
-                                                 : HOLY_SHOUT_DAMAGE_PER_POWER)
+            damage_c = (spell == SPELL_HOLY_WORD ? SPELL_HOLY_WORD_DAMAGE_PER_POWER
+                                                 : SPELL_HOLY_SHOUT_DAMAGE_PER_POWER)
                        * spellPower;
             for (side2 = COMBAT_ATTACKER_SIDE; IDX(side2) < COMBAT_SIDE_COUNT; ++side2) {
                 for (armyIndex = 0; armyIndex < m_armyCount[IDX(side2)]; ++armyIndex) {
                     if (HAS(m_armies[IDX(side2)][armyIndex].m_monster.attributes,
-                            MONSTER_ATTRIBUTE_UNDEAD)
+                            MONSTER_FLAGS_UNDEAD)
                         && m_armies[IDX(side2)][armyIndex].SpellCastWorks(spell))
                         affected2[IDX(side2)][armyIndex] = 1;
                 }
@@ -2875,15 +2873,15 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                 for (armyIndex = 0; armyIndex < m_armyCount[IDX(side2)]; ++armyIndex) {
                     if (!HAS(
                             m_armies[IDX(side2)][armyIndex].m_monster.attributes,
-                            MONSTER_ATTRIBUTE_UNDEAD
+                            MONSTER_FLAGS_UNDEAD
                         )
                         && m_armies[IDX(side2)][armyIndex].SpellCastWorks(spell))
                         affected2[IDX(side2)][armyIndex] = 1;
                 }
             }
             Ripple(spell == SPELL_DEATH_RIPPLE ? DEATH_RIPPLE_STRENGTH : DEATH_WAVE_STRENGTH);
-            damage_c = (spell == SPELL_DEATH_RIPPLE ? DEATH_RIPPLE_DAMAGE_PER_POWER
-                                                    : DEATH_WAVE_DAMAGE_PER_POWER)
+            damage_c = (spell == SPELL_DEATH_RIPPLE ? SPELL_DEATH_RIPPLE_DAMAGE_PER_POWER
+                                                    : SPELL_DEATH_WAVE_DAMAGE_PER_POWER)
                        * spellPower;
             for (side2 = COMBAT_ATTACKER_SIDE; IDX(side2) < COMBAT_SIDE_COUNT; ++side2) {
                 for (armyIndex = 0; armyIndex < m_armyCount[IDX(side2)]; ++armyIndex) {
@@ -2992,7 +2990,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             }
 
             for (direction = COMBAT_DIRECTION_NORTHEAST;
-                 IDX(direction) < SPELL_ADJACENT_DIRECTION_COUNT;
+                 IDX(direction) < COMBAT_DIRECTION_ADJACENT_COUNT;
                  ++direction) {
                 if (source2->m_facing == ARMY_FACING_RIGHT)
                     searchDirection9 = direction;
@@ -3051,7 +3049,7 @@ mirror_found:
     );
     image0 = &m_armies[IDX(m_hexCells[candidateHex].m_occupantSide)]
                       [m_hexCells[candidateHex].m_occupantIndex];
-    image0->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
+    image0->m_monster.attributes |= MONSTER_FLAGS_SUMMONED;
     duration2 = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration2 += SPELL_HOURGLASS_POWER_BONUS;
@@ -3126,7 +3124,7 @@ void combatManager::SummonElemental(H2_ENUM_PARAM(CreatureType, i32) monsterType
     );
     elementals = &m_armies[IDX(m_hexCells[summonHex4].m_occupantSide)]
                           [m_hexCells[summonHex4].m_occupantIndex];
-    elementals->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
+    elementals->m_monster.attributes |= MONSTER_FLAGS_SUMMONED;
     spellPower = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;

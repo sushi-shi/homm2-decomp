@@ -232,7 +232,6 @@ namespace {
     H2_ENUM_END(RecruitDialogConstant)
 
     H2_ENUM_BEGIN(WellConstant)
-        WELL_DWELLING_TYPE_STORAGE_COUNT = TOWN_WELL_DWELLING_COUNT,
         WELL_DETAIL_TEXT_CAPACITY = 40,
         WELL_ALTERNATE_UPGRADE_INDEX = TOWN_WELL_DWELLING_COUNT * 2 - 1
     H2_ENUM_END(WellConstant)
@@ -768,7 +767,7 @@ void townManager::SetupTown(void) {
     i32 H2_UNUSED(crestFrame);
 
     sprintf(gText, GetTownName(m_town->m_id));
-    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_WINDOW_TEXT_CONTROL);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_WINDOW_TEXT_CONTROL);
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
     strcpy(gText, localization::Tr("town.screen.title"));
@@ -778,13 +777,13 @@ void townManager::SetupTown(void) {
     m_townWindow->DrawWindow(0, TOWN_WINDOW_DRAW_WIDTH, TOWN_WINDOW_DRAW_RIGHT);
 
     if (gpCurPlayer->m_townCount == 1) {
-        message.payload.widget.command = TOWN_WIDGET_DISABLE;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         message.payload.widget.data.value = TOWN_WIDGET_DISABLED_VALUE;
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEXT_TOWN;
         m_townWindow->BroadcastMessage(message);
-        message.payload.widget.command = TOWN_WIDGET_ENABLE;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = TOWN_WIDGET_ENABLED_VALUE;
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
@@ -1213,7 +1212,7 @@ VA(0x004a67ce, 0x74)
 void townManager::ShowText(char*) {
     tag_message message;
 
-    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
     m_townWindow->DrawWindow(TOWN_STATUS_DRAW_LEFT, TOWN_STATUS_DRAW_WIDTH, TOWN_STATUS_DRAW_RIGHT);
@@ -1890,12 +1889,12 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             if (m_pendingStrip != m_swapStrip
                 && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
                        != m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]) {
-                for (slot = 0; slot < TOWN_ARMY_SLOT_COUNT; ++slot) {
+                for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
                     if (m_pendingStrip->m_army->m_creatureTypes[slot]
                         == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
                         break;
                 }
-                if (slot < TOWN_ARMY_SLOT_COUNT)
+                if (slot < ARMY_GROUP_SLOT_COUNT)
                     m_pendingArmySlot = slot;
             }
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] +=
@@ -2946,7 +2945,7 @@ void townManager::SetupWell(heroWindow* window) {
     i16 H2_UNUSED(unusedFirstDetail_g) = TOWN_WELL_FIRST_DETAIL_CONTROL;
     i16 H2_UNUSED(unusedFirstAvailable) = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
     i16 H2_UNUSED(unusedFirstAvailableCount) = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
-    u8 dwellingTypes_c[WELL_DWELLING_TYPE_STORAGE_COUNT];
+    u8 dwellingTypes_c[TOWN_WELL_DWELLING_COUNT];
     i32 available_e;
     i32 dwellingResult_a;
     tag_message message_i;
@@ -3090,7 +3089,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i16 H2_UNUSED(unusedIconHeight_a) = THIEVES_RANK_ICON_HEIGHT;
     i16 H2_UNUSED(unusedPlayerWidth_n) = 72;
     TownThievesGuildCategory category_l;
-    i8 categoryOrder_a[TOWN_THIEVES_PLAYER_COUNT];
+    i8 categoryOrder_a[GAME_PLAYER_COUNT];
     i32 rank_a;
     i32 tiedCount_j;
     i32 rankX_e;
@@ -3102,7 +3101,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i32 strongestHeroValue_c;
     char statText_h[THIEVES_STAT_TEXT_CAPACITY];
     i32 armySlot_n;
-    i32l categoryStats_a[TOWN_THIEVES_PLAYER_COUNT];
+    i32l categoryStats_a[GAME_PLAYER_COUNT];
     i32 heroPosition_d;
     i32 heroValue_i;
     i32 strongestCreatureValue_l;
@@ -3138,7 +3137,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     }
 
     for (position_a = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
-         position_a < TOWN_THIEVES_PLAYER_COUNT;
+         position_a < GAME_PLAYER_COUNT;
          ++position_a) {
         SET_WIDGET_MESSAGE(
             message_h,
@@ -3151,7 +3150,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         window->BroadcastMessage(message_h);
     }
     for (position_a = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
-         position_a < TOWN_THIEVES_PLAYER_COUNT;
+         position_a < GAME_PLAYER_COUNT;
          ++position_a) {
         SET_WIDGET_MESSAGE(
             message_h,
@@ -3168,7 +3167,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         SortStats(categoryStats_a, categoryOrder_a);
         firstAtRank_k = 0;
         lastAtRank_b = 0;
-        for (rank_a = 0; rank_a < TOWN_THIEVES_PLAYER_COUNT; ++rank_a) {
+        for (rank_a = 0; rank_a < GAME_PLAYER_COUNT; ++rank_a) {
             if (firstAtRank_k == gpGame->m_playerCount - gpGame->m_deadPlayerCount)
                 break;
             tiedCount_j = 1;
@@ -3363,7 +3362,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                              heroPosition_d < gpGame->m_players[rank_a].m_townCount;
                              ++heroPosition_d) {
                             playerTown_j = gpGame->GetPlayerTown(rank_a, heroPosition_d);
-                            for (armySlot_n = 0; armySlot_n < TOWN_ARMY_SLOT_COUNT;
+                            for (armySlot_n = 0; armySlot_n < ARMY_GROUP_SLOT_COUNT;
                                  ++armySlot_n) {
                                 if (ARMY_GROUP_HAS_POSITIVE_STACK(playerTown_j->m_army, armySlot_n)
                                     && gMonsterDatabase[IDX(playerTown_j->m_army
@@ -3383,7 +3382,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                              heroPosition_d < gpGame->m_players[rank_a].m_heroCount;
                              ++heroPosition_d) {
                             strongestHero_d = gpGame->GetPlayerHero(rank_a, heroPosition_d);
-                            for (armySlot_n = 0; armySlot_n < TOWN_ARMY_SLOT_COUNT;
+                            for (armySlot_n = 0; armySlot_n < ARMY_GROUP_SLOT_COUNT;
                                  ++armySlot_n) {
                                 if (ARMY_GROUP_HAS_POSITIVE_STACK(
                                         strongestHero_d->m_army,

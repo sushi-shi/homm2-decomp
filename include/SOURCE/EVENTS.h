@@ -3,6 +3,8 @@
 
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/GAME.h>
+#include <SOURCE/armyGroup.h>
 
 class hero;
 
@@ -18,8 +20,6 @@ H2_ENUM_END(EventConstant)
 
 H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_RESOURCE_COUNT          = IDX(RES_COUNT),
-    EVENT_RECORD_PLAYER_COUNT            = 6,
-    EVENT_RECORD_ARMY_SLOT_COUNT         = 5,
     EVENT_RECORD_SKILL_CAPACITY          = 8,
     EVENT_RECORD_MAP_ANSWER_COUNT        = 8,
     EVENT_RECORD_MAP_ANSWER_SIZE         = 13,
@@ -95,14 +95,14 @@ struct timeEventExtra {
     u16 repeatInterval;
     char unknown25[EVENT_RECORD_TIME_GAP_SECOND_SIZE];
     u8 appliesToHuman;
-    u8 players[EVENT_RECORD_PLAYER_COUNT];
+    u8 players[GAME_PLAYER_COUNT];
     char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct mapHeroExtra {
     i8 owner;
     u8 hasCustomArmy;
-    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
-    u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[ARMY_GROUP_SLOT_COUNT];
+    u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
     i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
@@ -127,8 +127,8 @@ struct mapTownExtra {
     u32 buildings;
     i8 mageGuildLevel;
     i8 hasCustomArmy;
-    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
-    u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[ARMY_GROUP_SLOT_COUNT];
+    u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasShrine;
     char unused18;
     char name[EVENT_RECORD_TOWN_NAME_SIZE];
@@ -304,7 +304,6 @@ H2_ENUM_END(MonsterInteractionConstant)
 
 H2_ENUM_BEGIN(EventArtifactStatConstant)
     EVENT_ARTIFACT_PRIMARY_STAT_COUNT     = 4,
-    EVENT_ARTIFACT_SLOT_COUNT             = 14,
     EVENT_ARTIFACT_TAKE                   = 1,
     EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER = 10
 H2_ENUM_END(EventArtifactStatConstant)

@@ -1081,7 +1081,7 @@ void advManager::ProcessMapChange(SMapChange change) {
         gpAdvManager->DeactivateCurrTown();
         gpAdvManager->DeactivateCurrHero();
     }
-    if (change.player >= 0 && change.player < CURSOR_PLAYER_COUNT) {
+    if (change.player >= 0 && change.player < GAME_PLAYER_COUNT) {
         giCurPlayer = change.player;
         gpCurPlayer = &gpGame->m_players[giCurPlayer];
         giCurPlayerBit = 1 << giCurPlayer;

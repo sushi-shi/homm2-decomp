@@ -19,6 +19,8 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
+#include <BASE/message.h>
+#include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_POL_INTRO             = 0x27,
@@ -555,7 +557,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     if (viewOnly == 0) {
-        message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
@@ -605,7 +607,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->BroadcastMessage(message);
     }
 
-    message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
+    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
     sprintf(gText, "x_track%d.icn", IDX(m_campaignId) + 1);
@@ -830,9 +832,9 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->BroadcastMessage(message);
 
         if (m_bonusChoices[IDX(m_viewMap)] == i)
-            message.payload.widget.command = CAMPAIGN_MESSAGE_SELECT;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         else
-            message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
+            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = CAMPAIGN_WIDGET_REFRESH_FRAME;
         m_window->BroadcastMessage(message);
     }
@@ -1187,8 +1189,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case CAMPAIGN_MESSAGE_HOVER:
-            case CAMPAIGN_MESSAGE_HELP:
+            case WIDGET_COMMAND_SELECT:
+            case WIDGET_COMMAND_ALTERNATE_SELECT:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_TRACK_WIDGET_0:
                     case CAMPAIGN_TRACK_WIDGET_1:
@@ -1222,7 +1224,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                 }
                 break;
 
-            case CAMPAIGN_MESSAGE_ACTIVATE:
+            case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_DIALOG_REPLAY:
                         xCampaign.ReplaySmacker();
@@ -1284,8 +1286,8 @@ ExpansionCampaignId ExpCampaign::Choose(void) {
 VA(0x004b517b, 0x58)
 i16 ExpCampaign::Days(void) {
     return (m_mapDays[IDX(m_currentMap)]
-            + (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH)
-           + (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK + gpGame->m_day;
+            + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH)
+           + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK + gpGame->m_day;
 }
 
 VA(0x004b51d3, 0x10)

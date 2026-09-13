@@ -13,6 +13,7 @@
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/armyGroup.h>
 
 class army;
 class armyGroup;
@@ -90,20 +91,20 @@ public:
     u8 m_campaignChoice[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScore;
-    H2_ENUM_STORAGE(CreatureType, i16) m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
-    i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i16) m_campaignCarryoverCreatureTypes[ARMY_GROUP_SLOT_COUNT];
+    i16 m_campaignCarryoverCreatureCounts[ARMY_GROUP_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
     char _pad_0xd2[GAME_CAMPAIGN_STATE_PAD_SIZE];
     char m_saveName[GAME_SAVE_NAME_SIZE];
     SMapHeader m_mapHeader;
-    i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE_STEPPED(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
-    i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerColor[GAME_PLAYER_COUNT];
+    H2_ENUM_STORAGE_STEPPED(PlayerHandicap, i8) m_playerHandicap[GAME_PLAYER_COUNT];
+    H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[GAME_PLAYER_COUNT];
+    i8 m_setupPlayerNetworkId[GAME_PLAYER_COUNT];
     H2_ENUM_STORAGE(GameDifficulty, i8) m_difficulty;
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];
-    i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerType[GAME_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
     b8 m_newGameInitialized;
     i8 m_newGameHumanCount;

@@ -122,7 +122,7 @@ i32 combatManager::ViewGeneral(
     if (generalWindow26 == NULL)
         MemError();
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(side)]->m_portrait));
-    message16.payload.widget.command = VIEW_GENERAL_SET_ICON;
+    message16.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message16.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);
@@ -133,14 +133,14 @@ i32 combatManager::ViewGeneral(
     message16.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     generalWindow26->BroadcastMessage(message16);
     if (m_heroes[IDX(side)]->m_isCaptain) {
-        message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+        message16.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message16.payload.widget.data.value = m_playerId[IDX(side)] == -1
             ? GENERAL_CAPTAIN_FRAME
             : gpGame->m_players[m_playerId[IDX(side)]].m_color;
         generalWindow26->BroadcastMessage(message16);
     }
 
-    message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+    message16.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message16.payload.widget.id = GENERAL_COLOR_WIDGET;
     message16.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[IDX(side)]->m_owner) + 1;
     generalWindow26->BroadcastMessage(message16);
@@ -157,7 +157,7 @@ i32 combatManager::ViewGeneral(
             m_heroes[IDX(side)]->m_name,
             gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
         );
-    message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message16.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message16.payload.widget.id = GENERAL_NAME_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);
@@ -187,7 +187,7 @@ i32 combatManager::ViewGeneral(
         m_heroes[IDX(side)]->m_spellPoints,
         HERO_NORMAL_SPELL_POINTS(*m_heroes[IDX(side)])
     );
-    message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message16.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message16.payload.widget.id = GENERAL_STATS_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);

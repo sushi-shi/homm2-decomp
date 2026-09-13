@@ -410,7 +410,6 @@ H2_ENUM_END(AITownEventConstant)
 
 H2_ENUM_BEGIN(AISecondarySkillConstant)
     SECONDARY_SKILL_LEVEL_OFFSET      = 1,
-    SECONDARY_SKILL_ARMY_SLOTS        = 5,
     SECONDARY_SKILL_RANGED_ATTRIBUTE  = 0x00040000,
     SECONDARY_SKILL_MINIMUM_KNOWLEDGE = 2
 H2_ENUM_END(AISecondarySkillConstant)
@@ -429,7 +428,6 @@ H2_ENUM_END(AISideConstant)
 
 H2_ENUM_BEGIN(AICreaturePurchaseConstant)
     CREATURE_PURCHASE_NO_SLOT          = -1,
-    CREATURE_PURCHASE_ARMY_SLOT_COUNT  = 5,
     CREATURE_PURCHASE_VALUE_LIMIT      = 999999,
     CREATURE_PURCHASE_DWELLING_COUNT   = 12,
     CREATURE_PURCHASE_EXPENSIVE_VALUE  = 1000,
@@ -568,7 +566,7 @@ void ShowStatus(void) {}
 VA(0x0047e4dc, 0x48)
 philAI::philAI(void) {
     i32 i;
-    for (i = 0; i < AI_PLAYER_COUNT; i++) {
+    for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         giBuildShipyard[i] = -1;
         giBuildBoat[i] = -1;
         giBuildBoatStuffTurn[i] = 0;
@@ -2286,7 +2284,7 @@ void philAI::ProbableOutcomeOfBattle(
     outcomeValue = static_cast<i32>(outcomeValue * gpCurPlayer->m_aiData.m_upgradeValueWeight);
 
     if (attackerHero != NULL) {
-        for (j = 0; j < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+        for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT;
              j++) {
             if (attackerHero->m_artifacts[j] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(attackerHero->m_artifacts[j])
@@ -2312,7 +2310,7 @@ void philAI::ProbableOutcomeOfBattle(
     }
 
     if (defenderHero != NULL) {
-        for (j = 0; j < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+        for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT;
              j++) {
             if (defenderHero->m_artifacts[j] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(defenderHero->m_artifacts[j])
@@ -2686,8 +2684,8 @@ void philAI::ValueOfBuyingCreature(
         creatureRV = static_cast<i32>(creatureRV * AI_CREATURE_VISITING_HERO_FACTOR);
         if (gMonsterDatabase[IDX(creature)].race == heroPtr->m_cursorType)
             creatureRV = static_cast<i32>(creatureRV * AI_CREATURE_SAME_RACE_FACTOR);
-        if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED)) {
-            for (troopSlot = 0; troopSlot < CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+        if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_FLAGS_SHOOTER)) {
+            for (troopSlot = 0; troopSlot < ARMY_GROUP_SLOT_COUNT;
                  troopSlot++) {
                 if (heroPtr->m_army.m_creatureTypes[troopSlot]
                         != CREATURE_NONE
@@ -2695,7 +2693,7 @@ void philAI::ValueOfBuyingCreature(
                         gMonsterDatabase[IDX(heroPtr->m_army
                                                  .m_creatureTypes[troopSlot])]
                             .attributes,
-                        MONSTER_ATTRIBUTE_RANGED
+                        MONSTER_FLAGS_SHOOTER
                     )) {
                     archers++;
                 }
@@ -2712,13 +2710,13 @@ void philAI::ValueOfBuyingCreature(
         );
     }
 
-    if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED)) {
-        for (townSlot = 0; townSlot < CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+    if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_FLAGS_SHOOTER)) {
+        for (townSlot = 0; townSlot < ARMY_GROUP_SLOT_COUNT;
              townSlot++) {
             if (townPtr->m_army.m_creatureTypes[townSlot] != CREATURE_NONE
                 && HAS(
                     gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[townSlot])].attributes,
-                    MONSTER_ATTRIBUTE_RANGED
+                    MONSTER_FLAGS_SHOOTER
                 )) {
                 archers++;
             }
@@ -2774,13 +2772,13 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
         if (HAS(townPtr->m_buildings, BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
             canAddUnit8 = false;
-            for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
+            for (armyIndex = 0; armyIndex < ARMY_GROUP_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] == CREATURE_NONE
                     || townPtr->m_army.m_creatureTypes[armyIndex] == candidateMonster) {
                     canAddUnit8 = true;
                 }
             }
-            for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
+            for (armyIndex = 0; armyIndex < ARMY_GROUP_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE
                     && gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].fightValue
                            < weakestArmyValue) {
@@ -2908,7 +2906,7 @@ void philAI::ValueOfBuyingHero(
     heroCost[IDX(RES_GOLD)] = AI_HERO_PURCHASE_GOLD_COST;
     rvCost = RVConversion(heroCost);
     heroRV = heroPtr->m_experience + AI_HERO_PURCHASE_EXPERIENCE_BASE;
-    for (i = 0; i < AI_BATTLE_ARTIFACT_SLOT_COUNT; i++) {
+    for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
         if (heroPtr->m_artifacts[i] >= ARTIFACT_ULTIMATE_BOOK
             && heroPtr->m_artifacts[i] < ARTIFACT_EDITOR_ANY_ULTIMATE
             && heroPtr->m_artifacts[i] != ARTIFACT_MAGIC_BOOK) {
@@ -3662,7 +3660,7 @@ i32 philAI::FightValueOfStack(
                     countMod = -0.58f;
 
                 if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                        MONSTER_ATTRIBUTE_RANGED)
+                        MONSTER_FLAGS_SHOOTER)
                     || IS_VAMPIRE_CREATURE(group->m_creatureTypes[slot])
                     || group->m_creatureTypes[slot] == CREATURE_SPRITE
                     || group->m_creatureTypes[slot] == CREATURE_ROGUE
@@ -3679,15 +3677,15 @@ i32 philAI::FightValueOfStack(
 
                 if (useTown) {
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                            MONSTER_ATTRIBUTE_RANGED))
+                            MONSTER_FLAGS_SHOOTER))
                         stackWorth = static_cast<i32>(stackWorth * 1.18);
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                            MONSTER_ATTRIBUTE_FLYING))
+                            MONSTER_FLAGS_FLYING))
                         stackWorth =
                             static_cast<i32>(stackWorth * AI_TOWN_FLYING_CREATURE_FACTOR);
                 }
                 if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                        MONSTER_ATTRIBUTE_RANGED)
+                        MONSTER_FLAGS_SHOOTER)
                     && heroPtr
                     && heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                            != HERO_SKILL_LEVEL_NONE) {
@@ -3699,10 +3697,10 @@ i32 philAI::FightValueOfStack(
                 }
                 if (useEnemyMods) {
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                            MONSTER_ATTRIBUTE_RANGED))
+                            MONSTER_FLAGS_SHOOTER))
                         stackWorth = static_cast<i32>(stackWorth * archerMod);
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
-                            MONSTER_ATTRIBUTE_FLYING))
+                            MONSTER_FLAGS_FLYING))
                         stackWorth = static_cast<i32>(stackWorth * closeCombat);
                     else
                         stackWorth = static_cast<i32>(stackWorth * flyMod);
@@ -3844,10 +3842,10 @@ void philAI::EvaluateOneTimeCreaturePurchase(
     {
         purchaseFightValue15 = purchaseCount * gMonsterDatabase[IDX(creature)].fightValue;
         if (gpCurAIHero->m_army.CanJoin(creature) == 0) {
-            for (armyIndex3 = 0; armyIndex3 < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex3++) {
+            for (armyIndex3 = 0; armyIndex3 < ARMY_GROUP_SLOT_COUNT; armyIndex3++) {
                 if (gpCurAIHero->m_army.m_creatureTypes[armyIndex3] == creature) {
                     replacementSlot = CREATURE_PURCHASE_NO_SLOT;
-                    armyIndex3 = CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+                    armyIndex3 = ARMY_GROUP_SLOT_COUNT;
                 } else {
                     replacementStackValue7 = gpCurAIHero->m_army.m_creatureCounts[armyIndex3]
                                              * gMonsterDatabase[armyIndex3].fightValue;
@@ -3998,7 +3996,7 @@ i32 philAI::QuickCombat(
 
     attTotal = 0;
     defenderCount = 0;
-    for (slot = 0; slot < CREATURE_PURCHASE_ARMY_SLOT_COUNT; slot++) {
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         if (attackerHero->m_army.m_creatureTypes[slot] != CREATURE_NONE)
             attTotal += attackerHero->m_army.m_creatureCounts[slot];
         if (defenderHero != NULL
@@ -4166,7 +4164,7 @@ void philAI::HeroInteractionAtHero(
                    * transferFraction3)
             );
             if (evaluateOnly != 0) {
-                for (statIndex10 = 0; statIndex10 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex10++) {
+                for (statIndex10 = 0; statIndex10 < HERO_ARTIFACT_SLOT_COUNT; statIndex10++) {
                     artifactType4 = recipientHero0->m_artifacts[statIndex10];
                     if (artifactType4 != ARTIFACT_NONE && artifactType4 != ARTIFACT_MAGIC_BOOK)
                         interactionValue1 += gArtifactBaseRV[IDX(artifactType4)];
@@ -5247,13 +5245,13 @@ i32 philAI::ComputeValueOfSS(
         case HERO_SKILL_ARCHERY:
             archerValue = 0;
             totalValue = archerValue;
-            for (idx = 0; idx < SECONDARY_SKILL_ARMY_SLOTS; idx++) {
+            for (idx = 0; idx < ARMY_GROUP_SLOT_COUNT; idx++) {
                 if (h->m_army.m_creatureTypes[idx] != CREATURE_NONE) {
                     troopValue = h->m_army.m_creatureCounts[idx]
                         * gMonsterDatabase[IDX(h->m_army.m_creatureTypes[idx])].fightValue;
                     totalValue += troopValue;
                     if (HAS(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[idx])].attributes,
-                            MONSTER_ATTRIBUTE_RANGED)) {
+                            MONSTER_FLAGS_SHOOTER)) {
                         archerValue += troopValue;
                     }
                 }
@@ -6005,7 +6003,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
 
     switch (genericType) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
-            for (slot = 0; slot < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+            for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT;
                  slot++) {
                 if (IsCursedItem(gpCurAIHero->m_artifacts[slot]))
                     badArtifacts++;
@@ -6034,7 +6032,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
         case GENERIC_SITE_SIRENS:
             if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_SIRENS)) {
                 armyWorth = 0;
-                for (slot = 0; slot < AI_GENERIC_SITE_ARMY_SLOTS;
+                for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT;
                      slot++) {
                     unitType = gpCurAIHero->m_army.m_creatureTypes[slot];
                     if (unitType != CREATURE_NONE) {
@@ -6209,7 +6207,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     i32 remainA;
     i32 remainB;
 
-    if (gpCurAIHero->NumArtifacts() == AI_BATTLE_ARTIFACT_SLOT_COUNT)
+    if (gpCurAIHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
         return 0;
 
     result = 0;
@@ -6726,9 +6724,9 @@ DATA(0x00516460) b32 bEvaluatingTravelGates = true;
 DATA(0x005331a8) b32 gbReduceByBerserk;
 DATA(0x00530bc0) float fBerserkFactor;
 DATA(0x00530abc) i32 giCurPlayer;
-DATA(0x005331b0) i8 giBuildShipyard[AI_PLAYER_COUNT];
+DATA(0x005331b0) i8 giBuildShipyard[GAME_PLAYER_COUNT];
 DATA(0x005331bc) i32 giMaxHeroesForThisPlayer;
-DATA(0x00530bb0) i8 giBuildBoat[AI_PLAYER_COUNT];
+DATA(0x00530bb0) i8 giBuildBoat[GAME_PLAYER_COUNT];
 DATA(0x00530aac) float fReduceFactor;
 DATA(0x00533134) u8 giCurPlayerBit;
 DATA(0x005309d0) i32 giBestShipyardDist;
@@ -6749,7 +6747,7 @@ DATA(0x00530bb8) playerData* gpCurPlayer;
 DATA(0x005309d4) float gfHeroInteractionBonus[GAME_HERO_COUNT];
 DATA(0x005331a4) b32 gbBerserk;
 DATA(0x00530bc4) i32 giCurAIHeroMorale;
-DATA(0x00530bcc) i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
+DATA(0x00530bcc) i8 giBuildBoatStuffTurn[GAME_PLAYER_COUNT];
 DATA(0x00530ac0) i32 iPlacesVisited[ADVMGR_PLACE_VISIT_COUNT][ADVMGR_PLACE_COORDINATE_COUNT];
 DATA(0x005331ac) b32 gbReduceByReload;
 DATA(0x00533128) b32 gbTroopReload;

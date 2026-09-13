@@ -82,7 +82,7 @@ i32 DoArenaDialog(void) {
     );
     lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
     textHeight4 = lineCount11 << TEXT_LINE_SHIFT;
-    SET_WIDGET_MESSAGE(message14, ARENA_BROADCAST_TEXT, BROADCAST_TEXT_ID);
+    SET_WIDGET_MESSAGE(message14, WIDGET_COMMAND_SET_TEXT, BROADCAST_TEXT_ID);
     message14.payload.widget.data.text = gText;
     arenaWinPtr->BroadcastMessage(message14);
 
@@ -123,7 +123,7 @@ i32 DoArenaDialog(void) {
     }
 
     message14.type = MESSAGE_WIDGET;
-    message14.payload.widget.command = ARENA_BROADCAST_CONTROL;
+    message14.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message14.payload.widget.data.value = BROADCAST_CONTROL_VALUE;
     message14.payload.widget.id = EVENT_WINDOW_SEVENTH_BUTTON;
     arenaWinPtr->BroadcastMessage(message14);

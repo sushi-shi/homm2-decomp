@@ -1120,7 +1120,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     if (combatEnded != 0) {
         DoVictory(m_combatResult);
         if (gbNoShowCombat == 0) {
-            message->type = COMBAT_WIN_MESSAGE;
+            message->type = MESSAGE_EXECUTIVE;
             message->payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         }
     }
@@ -1457,7 +1457,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
 
     if (glTimers[0] < KBTickCount()) {
         animationMessage.type = MESSAGE_WIDGET;
-        animationMessage.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
+        animationMessage.payload.widget.command = WIDGET_COMMAND_SET_ICON;
         animationMessage.payload.widget.data.text = iconFile_3;
         ++giWinCmbtFrame;
 
@@ -1526,7 +1526,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
         }
 
-        SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_ANIMATION_COMMAND, WIN_LOSE_RESOURCE_DRAW_ID);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, WIN_LOSE_RESOURCE_DRAW_ID);
         message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
@@ -1563,7 +1563,7 @@ void combatManager::ShowWinLoseArtifact(
     char* artifactName;
 
     sprintf(gText, localization::Tr("combat.reward.enemy_artifact"));
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
 
@@ -1682,7 +1682,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
                                                                 виде скелета." */
         );
     }
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
@@ -1758,7 +1758,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         m_heroes[IDX(m_combatResult)]->m_name,
         gSpellNames[IDX(newSpell)]
     );
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
@@ -2149,7 +2149,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_VICTORY)]);
                     }
                 }
-                SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
+                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, WIN_LOSE_TEXT_ID);
                 message.payload.widget.data.text = gText;
                 m_winLoseWindow->BroadcastMessage(message);
                 ShowDeadArmies(m_winLoseWindow);
@@ -2240,13 +2240,13 @@ void combatManager::DoLoseWindow(void) {
         }
     }
 
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_RESOURCE_COMMAND, WIN_LOSE_RESOURCE_LOAD_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, WIN_LOSE_RESOURCE_LOAD_ID);
     message.payload.widget.data.text = animationFile;
     m_winLoseWindow->BroadcastMessage(message);
     message.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
     message.payload.widget.data.text = animationFile;
     m_winLoseWindow->BroadcastMessage(message);
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     ShowDeadArmies(m_winLoseWindow);
@@ -2292,7 +2292,7 @@ i32 combatManager::DoSurrender(void) {
     window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, "surrendr.bin");
     if (window == NULL)
         MemError();
-    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_RESOURCE_COMMAND, SURRENDER_PORTRAIT_RESOURCE_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, SURRENDER_PORTRAIT_RESOURCE_ID);
     sprintf(
         gText,
         "port%04d.icn",
@@ -2302,13 +2302,13 @@ i32 combatManager::DoSurrender(void) {
     window->BroadcastMessage(message);
     message.payload.widget.command =
         m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain
-        ? COMBAT_SURRENDER_CAPTAIN_PORTRAIT_COMMAND
-        : COMBAT_SURRENDER_HERO_PORTRAIT_COMMAND;
+        ? WIDGET_COMMAND_SET_FLAGS
+        : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SURRENDER_PORTRAIT_WIDGET_ID;
     message.payload.widget.data.value = SURRENDER_PORTRAIT_DEFAULT_COLOR;
     window->BroadcastMessage(message);
     if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0) {
-        message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_OVERLAY_COMMAND;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.data.value =
             m_playerId[IDX(OppositeCombatSide(m_currentSide))] == -1
             ? COMBAT_NEUTRAL_HERO_COLOR
@@ -2316,7 +2316,7 @@ i32 combatManager::DoSurrender(void) {
         window->BroadcastMessage(message);
     }
     message.payload.widget.data.text = gText;
-    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
@@ -2592,7 +2592,7 @@ void combatManager::ResetCyclingCreatures(void) {
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
-            if (HAS(currentTroop->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                     == 0
                 && currentTroop->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
                 && currentTroop->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
@@ -2608,7 +2608,7 @@ void combatManager::ResetCyclingCreatures(void) {
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
-            if (HAS(currentTroop->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                 == 0) {
                 currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
                 currentTroop->m_animationSequence = ARMY_ANIMATION_STAND;
@@ -2678,7 +2678,7 @@ void combatManager::CycleCombatScreen(void) {
     for (side_7 = COMBAT_ATTACKER_SIDE; IDX(side_7) < COMBAT_SIDE_COUNT; ++side_7) {
         for (index_0 = 0; index_0 < gpCombatManager->m_armyCount[IDX(side_7)]; ++index_0) {
             currentArmy_2 = gpCombatManager->m_armies[IDX(side_7)] + index_0;
-            if (HAS(currentArmy_2->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            if (HAS(currentArmy_2->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                     == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
@@ -2877,7 +2877,7 @@ void combatManager::AddArmy(
     b32 reusedArmy = false;
     i32 index;
     army* newStack;
-    for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
+    for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; ++index) {
         if (m_armies[IDX(side)][index].m_monsterType == CREATURE_NONE) {
             armyIdx = index;
             break;

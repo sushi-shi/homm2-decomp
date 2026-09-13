@@ -15,6 +15,7 @@
 #include <SOURCE/philAI.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+#include <SOURCE/combatTypes.h>
 
 #define COMBAT_AI_QUANTITY_ESTIMATE 1.2
 #define COMBAT_AI_TOWN_STRENGTH_MODIFIER 1.1
@@ -88,19 +89,19 @@ i32 combatManager::AICheckRetreat(void) {
             sideHero = NULL;
         }
 
-        for (armyIndex = 0; armyIndex < COMBAT_AI_GROUP_SLOT_COUNT; armyIndex++) {
+        for (armyIndex = 0; armyIndex < ARMY_GROUP_SLOT_COUNT; armyIndex++) {
             armies->m_creatureTypes[armyIndex] = -1;
             armies->m_creatureCounts[armyIndex] = 0;
         }
 
         groupIndex = 0;
-        for (armyIndex = 0; armyIndex < COMBAT_AI_ARMY_SLOT_COUNT; armyIndex++) {
+        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             if ((m_armies[sideNum] + armyIndex)->IsAlive()) {
                 armies->m_creatureTypes[groupIndex] =
                     (m_armies[sideNum] + armyIndex)->m_monsterType;
                 if (HAS((m_armies[sideNum] + armyIndex)
                             ->m_monster.attributes,
-                        MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY)
+                        MONSTER_FLAGS_FULL_AI_QUANTITY)
                     != 0) {
                     armies->m_creatureCounts[groupIndex] =
                         (m_armies[sideNum] + armyIndex)->m_quantity;
@@ -114,7 +115,7 @@ i32 combatManager::AICheckRetreat(void) {
                 }
                 groupIndex++;
             }
-            if (groupIndex >= COMBAT_AI_GROUP_SLOT_COUNT)
+            if (groupIndex >= ARMY_GROUP_SLOT_COUNT)
                 armyIndex = COMBAT_AI_GROUP_SCAN_DONE;
         }
 
@@ -125,7 +126,7 @@ i32 combatManager::AICheckRetreat(void) {
 
         artifactTotals[sideNum] = 0;
         if (sideHero != NULL) {
-            for (armyIndex = 0; armyIndex < AI_BATTLE_ARTIFACT_SLOT_COUNT; armyIndex++) {
+            for (armyIndex = 0; armyIndex < HERO_ARTIFACT_SLOT_COUNT; armyIndex++) {
                 if (sideHero->m_artifacts[armyIndex] >= ARTIFACT_VALID_BEGIN
                     && IDX(sideHero->m_artifacts[armyIndex])
                            < AI_BATTLE_BASE_ARTIFACT_LIMIT) {
@@ -315,12 +316,12 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     if (static_cast<i32>(enemyShooters) > static_cast<i32>(myShootPower))
         stronger = true;
 
-    if (HAS(thisArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
+    if (HAS(thisArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) != 0) {
         if (thisArmy->m_monster.shots > 0)
             plan = COMBAT_AI_ATTACK_SHOOT;
         else
             plan = COMBAT_AI_ATTACK_WALK;
-    } else if (HAS(thisArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_FLYING) != 0) {
+    } else if (HAS(thisArmy->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0) {
         plan = COMBAT_AI_ATTACK_FLY;
     } else {
         plan = COMBAT_AI_ATTACK_WALK;
@@ -470,7 +471,7 @@ finish:
         && giNextActionGridIndex < COMBAT_HEX_COUNT
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == COMBAT_SIDE_NONE) {
         for (dirIndex = COMBAT_DIRECTION_NORTHEAST;
-             IDX(dirIndex) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             IDX(dirIndex) < COMBAT_DIRECTION_ADJACENT_COUNT;
              dirIndex++) {
             adjCell = thisArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex, dirIndex
@@ -493,9 +494,9 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
 
     if (modifiedDamage > remainingHitPoints)
         modifiedDamage = remainingHitPoints;
-    if (HAS(target->m_monster.attributes, MONSTER_ABILITY_FLAG_SHOOTER) != 0)
+    if (HAS(target->m_monster.attributes, MONSTER_FLAGS_SHOOTER) != 0)
         modifiedDamage = modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER;
-    if (HAS(target->m_monster.attributes, MONSTER_ABILITY_FLAG_FLYING) != 0)
+    if (HAS(target->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0)
         modifiedDamage = modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER;
     modifiedDamage = ((target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
         / COMBAT_AI_LICH_HIT_POINT_SCALE);
@@ -513,7 +514,7 @@ void combatManager::DoLichShot(class army* lich) {
     float score;
     CombatHexDirection iDir;
     army* targetArmy;
-    u8 marked[COMBAT_SIDE_COUNT][COMBAT_AI_ARMY_SLOT_COUNT];
+    u8 marked[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 targetHex;
 
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(OppositeCombatSide(m_currentSide))];
@@ -522,7 +523,7 @@ void combatManager::DoLichShot(class army* lich) {
         score = 0;
         targetArmy = &m_armies[IDX(OppositeCombatSide(m_currentSide))][armyIndex];
         if (targetArmy == NULL
-            || HAS(targetArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
+            || HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) != 0
             || targetArmy->m_quantity <= 0)
             continue;
         score = GetModLichDamage(targetArmy, shotDamage);
@@ -530,7 +531,7 @@ void combatManager::DoLichShot(class army* lich) {
             1;
         targetHex = targetArmy->m_hex;
         for (iDir = COMBAT_DIRECTION_NORTHEAST;
-             IDX(iDir) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             IDX(iDir) < COMBAT_DIRECTION_ADJACENT_COUNT;
              iDir++) {
             sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDir);
             if (sideHex >= 0 && sideHex < COMBAT_HEX_COUNT
@@ -568,8 +569,8 @@ i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = armyIndex + m_armies[IDX(side)];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_SHOOTER) != 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) != 0
             && currentArmy->m_monster.shots > 0 && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
             && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
@@ -588,7 +589,7 @@ i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                    == 0
             && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE) != 0)
             bits |= armyBit;
@@ -607,8 +608,8 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_FLYING) != 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0
             && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
             && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
@@ -627,7 +628,7 @@ i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = &m_armies[IDX(side)][armyIndex];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                    == 0
             && currentArmy->m_quantity > 0)
             bits |= armyBit;
@@ -646,9 +647,9 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_FLYING) == 0
-            && (HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_SHOOTER) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_FLYING) == 0
+            && (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) == 0
                 || currentArmy->m_monster.shots <= 0)
             && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
             && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
@@ -669,7 +670,7 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
         currentArmy =
             m_armies[IDX(side)] + idx;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
             && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
             result |= bitMask;
         bitMask <<= 1;
@@ -687,7 +688,7 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = &m_armies[IDX(side)][armyIndex];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
             && ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
@@ -785,7 +786,7 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
         if ((mask & bitMask) != 0) {
             currentArmy = &m_armies[IDX(side)][idx];
             if (currentArmy != NULL
-                && HAS(currentArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+                && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                        == 0)
                 totalStrength += currentArmy->Strength();
         }
@@ -818,7 +819,7 @@ i32 combatManager::AttemptAttack(
             return 1;
         }
         if (HAS(m_armies[IDX(side)][targetArmy].m_monster.attributes,
-                MONSTER_ABILITY_FLAG_WIDE)
+                MONSTER_FLAGS_WIDE)
             != 0) {
             if (m_armies[IDX(side)][targetArmy].m_facing == ARMY_FACING_LEFT)
                 targetHex--;
@@ -901,7 +902,7 @@ i32 combatManager::WalkTowardArmyFront(
     frontDelta = SINGLE_HEX_FRONT_OFFSET;
     frontHex = m_armies[IDX(side)][armyIndex].m_hex;
     if (HAS(m_armies[IDX(side)][armyIndex].m_monster.attributes,
-            MONSTER_ABILITY_FLAG_WIDE)
+            MONSTER_FLAGS_WIDE)
         != 0)
         frontDelta = WIDE_CREATURE_FRONT_OFFSET;
     frontHex += currentArmy->m_facing == ARMY_FACING_RIGHT ? frontDelta : -frontDelta;
@@ -982,7 +983,7 @@ i32 combatManager::WalkTowardArmy(
         0
     );
     if (routeGot == 0
-        && HAS(targetPtr->m_monster.attributes, MONSTER_ABILITY_FLAG_WIDE) != 0) {
+        && HAS(targetPtr->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
         switch (targetPtr->m_facing) {
             case ARMY_FACING_LEFT:
                 targetSquare--;

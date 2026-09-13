@@ -5,6 +5,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(CombatPathConstant)
     SPECIAL_DIRECTION_MASK = 0xc0,
@@ -31,7 +32,7 @@ i32 army::FindPath(
         m_monster.speed = IGNORE_SPEED;
 
     pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
-    if (!pathResult2 && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
+    if (!pathResult2 && HAS(m_monster.attributes, MONSTER_FLAGS_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         switch (m_facing) {
             case ARMY_FACING_LEFT:
@@ -60,7 +61,7 @@ i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     if (!ValidHex(targetHex))
         return 0;
 
-    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_FLYING)
+    if HAS(m_monster.attributes, MONSTER_FLAGS_FLYING)
         return ValidFlight(targetHex, pathMode);
 
     pathResult = FindPath(m_hex, targetHex, m_monster.speed, 0, pathMode);
@@ -97,9 +98,9 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
     i32 attackHexNext_a;
 
     blockedMaskValue_f =
-        HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) ? 0 : SPECIAL_DIRECTION_MASK;
+        HAS(m_monster.attributes, MONSTER_FLAGS_WIDE) ? 0 : SPECIAL_DIRECTION_MASK;
     directionBitFlag = 1;
-    directionCountNext = HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
+    directionCountNext = HAS(m_monster.attributes, MONSTER_FLAGS_WIDE)
                              ? COMBAT_DIRECTION_COUNT
                              : COMBAT_DIRECTION_ADJACENT_COUNT;
 
@@ -141,7 +142,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         frontValid = true;
     }
 
-    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
+    if HAS(m_monster.attributes, MONSTER_FLAGS_WIDE) {
         rearSquare = ARMY_HEX_INVALID;
         switch (m_facing) {
             case ARMY_FACING_LEFT:
@@ -193,7 +194,7 @@ i32 army::ValidAttack(
         return 0;
 
     adjacentSourceHex = sourceHex;
-    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
+    if HAS(m_monster.attributes, MONSTER_FLAGS_WIDE) {
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
@@ -289,7 +290,7 @@ i32 army::ValidRange(i32 targetHex) {
         return 0;
 
     m_moveTargetHex = m_hex;
-    if (!(m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)) {
+    if (!(m_monster.attributes & MONSTER_FLAGS_WIDE)) {
         m_attackDirection = GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
         adj = GetAdjacentCellIndex(m_hex, m_attackDirection);
         if (adj == targetHex)

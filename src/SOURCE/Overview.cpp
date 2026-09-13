@@ -28,6 +28,7 @@
 #include <SOURCE/town.h>
 #include <stdio.h>
 #include <string.h>
+#include <SOURCE/hero.h>
 
 namespace {
 
@@ -515,7 +516,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 displayedTroops = 0;
-                for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
+                for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
                     if (ARMY_GROUP_HAS_POSITIVE_STACK(record->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X,
@@ -766,7 +767,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 shown = 0;
-                for (i = 0; i < OVERVIEW_TROOP_SLOTS; i++) {
+                for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
                     if (ARMY_GROUP_HAS_POSITIVE_STACK(curHero->m_army, i)) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X,
@@ -875,7 +876,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             }
 
             i32 displayedArtifacts = 0;
-            for (i = 0; i < OVERVIEW_ARTIFACT_SLOTS; i++) {
+            for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
                 if (curHero->m_artifacts[i] != ARTIFACT_NONE) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     column = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
@@ -954,14 +955,14 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         giOverviewTop[IDX(giOverviewType)] = 0;
     }
 
-    SET_WIDGET_MESSAGE(message, OVERVIEW_WIDGET_SET_FRAME, TITLE_WIDGET);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, TITLE_WIDGET);
     message.payload.widget.data.value = IDX(giOverviewType) + OVERVIEW_TITLE_FRAME_BASE;
     overWin->BroadcastMessage(message);
-    message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = HERO_TAB_WIDGET;
     message.payload.widget.data.value = giOverviewType == OVERVIEW_HEROES;
     overWin->BroadcastMessage(message);
-    message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = TOWN_TAB_WIDGET;
     message.payload.widget.data.value =
         giOverviewType == OVERVIEW_TOWNS ? TOWN_TAB_SELECTED_FRAME : TOWN_TAB_UNSELECTED_FRAME;
@@ -1009,7 +1010,7 @@ void game::SetupResources(void) {
 
     msg.type = MESSAGE_WIDGET;
     for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
-        msg.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         msg.payload.widget.data.text = gText;
         sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resourceIdx)]);
         msg.payload.widget.id = IDX(resourceIdx) + RESOURCE_FIRST_WIDGET;
@@ -1088,7 +1089,7 @@ void game::Overview(void) {
         }
     }
     for (mine = 0; mine < IDX(RES_COUNT); mine++) {
-        message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.data.text = gText;
         sprintf(gText, "%d", mineCounts[mine]);
         message.payload.widget.id = mine + MINE_FIRST_WIDGET;
@@ -1104,7 +1105,7 @@ void game::Overview(void) {
     }
 
     SetupResources();
-    message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = DAILY_GOLD_WIDGET;
     message.payload.widget.data.text = gText;
     sprintf(gText, "%d", ComputeDailyGold(giCurPlayer));
@@ -1373,7 +1374,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             }
             if (widgetId >= HERO_ARMY_ALT_FIRST
                 && widgetId <= HERO_ARMY_ALT_LAST) {
-                widgetId -= OVERVIEW_TROOP_SLOTS;
+                widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
                 item = widgetId - HERO_ARMY_FIRST;
@@ -1458,7 +1459,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             }
             if (widgetId >= TOWN_ARMY_ALT_FIRST
                 && widgetId <= TOWN_ARMY_ALT_LAST) {
-                widgetId -= OVERVIEW_TROOP_SLOTS;
+                widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
                 item = widgetId - TOWN_ARMY_FIRST;

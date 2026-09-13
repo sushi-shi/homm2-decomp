@@ -33,6 +33,7 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/combatTypes.h>
 
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
@@ -428,7 +429,7 @@ void combatManager::SetupAdjacencyArray(void) {
     for (fromHex = 0; fromHex < COMBAT_HEX_COUNT; fromHex++) {
         row = fromHex / COMBAT_GRID_ROW_LENGTH;
         for (direction = COMBAT_DIRECTION_NORTHEAST;
-             IDX(direction) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             IDX(direction) < COMBAT_DIRECTION_ADJACENT_COUNT;
              direction++) {
             if (fromHex % COMBAT_GRID_ROW_LENGTH == 0
                 || fromHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
@@ -900,7 +901,7 @@ void combatManager::LoadArmies(void) {
 
     m_armyCount[IDX(COMBAT_ATTACKER_SIDE)] = m_armyCount[IDX(COMBAT_DEFENDER_SIDE)] = 0;
 
-    for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++) {
+    for (groupSlot = 0; groupSlot < COMBAT_ARMY_SLOT_COUNT; groupSlot++) {
         for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
             m_armies[IDX(side)][groupSlot].m_quantity = 0;
             m_armies[IDX(side)][groupSlot].m_monsterType = CREATURE_NONE;
@@ -908,7 +909,7 @@ void combatManager::LoadArmies(void) {
     }
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++)
+        for (groupSlot = 0; groupSlot < COMBAT_ARMY_SLOT_COUNT; groupSlot++)
             m_armies[IDX(side)][groupSlot].InitClean();
     }
 
@@ -1144,7 +1145,7 @@ restart:
                 skipEnt = false;
                 curArmy = stackCounter + m_armies[IDX(stackSide)];
                 if (HAS(curArmy->m_monster.attributes,
-                        MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
+                        MONSTER_FLAGS_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
                     || IDX(curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
@@ -1225,7 +1226,7 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     result = true;
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         if (!(m_armies[IDX(side)][index].m_monster.attributes
-              & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
+              & MONSTER_FLAGS_AI_EXCLUDED))
             result = false;
     }
     return result;
@@ -1614,7 +1615,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     army* target9;
     i32 value9;
     CombatKeepTargetPriority priority7;
-    for (armyIndex = 0; armyIndex < COMBAT_ARMY_CAPACITY; armyIndex++) {
+    for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
         if (m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex].IsAlive()) {
             target9 = &m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex];
             if (ARMY_HAS_INCAPACITATING_SPELL(*target9)
@@ -1728,7 +1729,7 @@ i32 combatManager::ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 experienceValue6 = 0;
     i32 index;
 
-    for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
+    for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++) {
         if (m_armies[IDX(side)][index].m_monsterType != CREATURE_NONE
             && !HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_SUMMONED)) {
             experienceValue6 +=
@@ -1747,7 +1748,7 @@ void combatManager::ResetHitByCreature(void) {
     i32 index;
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < COMBAT_ARMY_CAPACITY; index++)
+        for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++)
             m_armies[IDX(side)][index].m_hitByCreature = false;
     }
 }
@@ -2243,7 +2244,7 @@ void combatManager::CombatSystemOptions(void) {
 VA(0x0042b346, 0x1e1)
 void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
-    SET_WIDGET_MESSAGE(message, COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE, SYSTEM_OPTION_SPEED_BUTTON);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, SYSTEM_OPTION_SPEED_BUTTON);
     message.payload.widget.data.value =
         gConfig.combatSpeed + SYSTEM_OPTION_SPEED_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
@@ -2268,7 +2269,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         gConfig.showCombatMouseHex + SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
 
-    message.payload.widget.command = COMBAT_SYSTEM_OPTION_TEXT_MESSAGE;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = SYSTEM_OPTION_SPEED_TEXT;
     message.payload.widget.data.text = combatSpeedText[gConfig.combatSpeed];
     CSPanel->BroadcastMessage(message);
@@ -2295,13 +2296,13 @@ VA(0x0042b527, 0x2b3)
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     b32 bRedraw = false;
     b32 bDone = false;
-    if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
+    if (message.type == MESSAGE_WIDGET) {
         if (HAS(
                 message.payload.widget.modifiers,
                 MESSAGE_MODIFIER_RIGHT_BUTTON
             )) {
-            if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT
-                || message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
+            if (message.payload.widget.command == WIDGET_COMMAND_SELECT
+                || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
                     case SYSTEM_OPTION_CLOSE_BUTTON:
@@ -2332,14 +2333,14 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
+                case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_CLOSE_BUTTON:
                             bDone = true;
                             break;
                     }
                     break;
-                case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
+                case WIDGET_COMMAND_SELECT:
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =

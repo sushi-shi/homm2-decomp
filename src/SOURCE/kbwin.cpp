@@ -10,6 +10,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -518,7 +519,7 @@ void SetMenus(HMENU menu, b32 enabled) {
                 disabled = 1;
             } else {
                 match = 0;
-                for (pos = 0; pos < KBWIN_MENU_ENTRY_COUNT; pos++) {
+                for (pos = 0; pos < MENU_ENABLE_STATUS_COUNT; pos++) {
                     if (gsMenuEnableStatus[pos].command == id) {
                         match = pos;
                     }

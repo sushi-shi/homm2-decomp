@@ -236,7 +236,6 @@ namespace {
     H2_ENUM_END(EraseObjectConstant)
 
     H2_ENUM_BEGIN(CombatMonsterEventConstant)
-        MONSTER_ARMY_SLOTS = 5,
         MONSTER_RANDOM_MAX = 100,
         MONSTER_REDUCED_STACK_CHANCE = 25,
         MONSTER_REDUCED_STACK_COUNT = 3,
@@ -4299,13 +4298,13 @@ VA(0x004433e9, 0x92)
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
 
-    for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT; artifactSlot++) {
+    for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT; artifactSlot++) {
         if (eventHero->m_artifacts[artifactSlot] == ARTIFACT_NONE) {
             break;
         }
     }
 
-    if (artifactSlot == EVENT_ARTIFACT_SLOT_COUNT) {
+    if (artifactSlot == HERO_ARTIFACT_SLOT_COUNT) {
         return IDX(ARTIFACT_NONE);
     }
 
@@ -4963,14 +4962,14 @@ CombatResult advManager::CombatMonsterEvent(
     i32 tertiaryCount,
     i32 tertiaryStacks
 ) {
-    i32 placement4[MONSTER_ARMY_SLOTS];
+    i32 placement4[ARMY_GROUP_SLOT_COUNT];
     i32 H2_UNUSED(combatUnused);
     i32 lastCount;
     i32 groupCount;
     i32 stackCount;
-    CreatureType savedTypes[MONSTER_ARMY_SLOTS];
+    CreatureType savedTypes[ARMY_GROUP_SLOT_COUNT];
     CombatResult battleOutcome;
-    i32 savedCounts[MONSTER_ARMY_SLOTS];
+    i32 savedCounts[ARMY_GROUP_SLOT_COUNT];
     i32 stackIdx;
     i32 H2_UNUSED(combatUnused0);
 
@@ -4988,13 +4987,13 @@ CombatResult advManager::CombatMonsterEvent(
     }
 
     CLEAR_ARMY_GROUP(*gpMonGroup);
-    stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
+    stackCount = ARMY_GROUP_SLOT_COUNT - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
     groupCount = 0;
     SRand(combatX + combatY);
-    if (stackCount == MONSTER_ARMY_SLOTS
-        && HAS(gMonsterDatabase[IDX(monsterType)].attributes, MONSTER_ATTRIBUTE_RANGED) == 0) {
+    if (stackCount == ARMY_GROUP_SLOT_COUNT
+        && HAS(gMonsterDatabase[IDX(monsterType)].attributes, MONSTER_FLAGS_SHOOTER) == 0) {
         i32 roll = SRandom(0, MONSTER_RANDOM_MAX);
         if (roll < MONSTER_REDUCED_STACK_CHANCE)
             stackCount = MONSTER_REDUCED_STACK_COUNT;
@@ -5049,11 +5048,11 @@ CombatResult advManager::CombatMonsterEvent(
     }
     lastCount = stackCount;
 
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+    for (stackIdx = 0; stackIdx < ARMY_GROUP_SLOT_COUNT; stackIdx++) {
         if (gpMonGroup->m_creatureCounts[stackIdx] <= 0)
             gpMonGroup->m_creatureTypes[stackIdx] = CREATURE_NONE;
     }
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++)
+    for (stackIdx = 0; stackIdx < ARMY_GROUP_SLOT_COUNT; stackIdx++)
         placement4[stackIdx] = stackIdx;
 
     if (lastCount == 1) {
@@ -5081,11 +5080,11 @@ CombatResult advManager::CombatMonsterEvent(
         placement4[4] = 1;
     }
 
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+    for (stackIdx = 0; stackIdx < ARMY_GROUP_SLOT_COUNT; stackIdx++) {
         savedTypes[stackIdx] = gpMonGroup->m_creatureTypes[stackIdx];
         savedCounts[stackIdx] = gpMonGroup->m_creatureCounts[stackIdx];
     }
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+    for (stackIdx = 0; stackIdx < ARMY_GROUP_SLOT_COUNT; stackIdx++) {
         gpMonGroup->m_creatureTypes[stackIdx] = savedTypes[placement4[stackIdx]];
         gpMonGroup->m_creatureCounts[stackIdx] =
             savedCounts[placement4[stackIdx]];
@@ -5409,9 +5408,9 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     if (sourceHero == NULL || destinationHero == NULL) {
         return;
     }
-    for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
+    for (targetSlot = 0; targetSlot < HERO_ARTIFACT_SLOT_COUNT; targetSlot++) {
         if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
-            for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
+            for (sourceArtifactSlot = 0; sourceArtifactSlot < HERO_ARTIFACT_SLOT_COUNT;
                  sourceArtifactSlot++) {
                 if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
                     && sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
@@ -5481,7 +5480,7 @@ VA(0x00444b68, 0x118)
 void advManager::DoWhirlpool(hero* eventHero) {
     i32 selectedSlot;
     i32 slotNo;
-    i32 H2_UNUSED(groupValues)[MONSTER_ARMY_SLOTS];
+    i32 H2_UNUSED(groupValues)[ARMY_GROUP_SLOT_COUNT];
     i32 lowestValue;
     i32 creatureValue;
 
@@ -5493,7 +5492,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
     {
         lowestValue = EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT;
         selectedSlot = -1;
-        for (slotNo = 0; slotNo < MONSTER_ARMY_SLOTS; slotNo++) {
+        for (slotNo = 0; slotNo < ARMY_GROUP_SLOT_COUNT; slotNo++) {
             if (eventHero->m_army.m_creatureCounts[slotNo] > 0) {
                 creatureValue = eventHero->m_army.m_creatureCounts[slotNo]
                     * gMonsterDatabase[IDX(eventHero->m_army.m_creatureTypes[slotNo])].fightValue;

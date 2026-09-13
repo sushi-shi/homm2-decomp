@@ -10,6 +10,7 @@
 #include "hero.h"
 #include "hexcell.h"
 #include "SPELLS.h"
+#include <SOURCE/combatTypes.h>
 
 class armyGroup;
 class hero;
@@ -180,7 +181,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_REVERSE_ROW               = 5,
     COMBAT_CASTLE_GATE_ROW                  = 4,
     COMBAT_CASTLE_GATE_APPROACH_HEX         = 58,
-    COMBAT_ARMY_SLOT_COUNT_DRAWING          = COMBAT_ARMY_SLOT_COUNT,
     COMBAT_HERO_LEFT_X                      = 30,
     COMBAT_HERO_LEFT_Y                      = 183,
     COMBAT_HERO_RIGHT_X                     = 610,
@@ -313,7 +313,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_VALID_HEX_MAX                    = 125,
     COMBAT_FIXED_ICON_COUNT                 = 15,
     COMBAT_OBSTACLE_ICON_LOAD_COUNT         = 8,
-    COMBAT_ARMY_CAPACITY                    = 20,
     COMBAT_SPEED_LEVEL_COUNT                = 15,
     COMBAT_MAX_SPEED                        = 14,
     COMBAT_HERO_EXPERIENCE_VALUE            = 500,
@@ -383,8 +382,6 @@ H2_ENUM_BEGIN(CombatRuntimeConstant)
 H2_ENUM_END(CombatRuntimeConstant)
 
 H2_ENUM_BEGIN(CombatAIConstant)
-    COMBAT_AI_ARMY_SLOT_COUNT          = 20,
-    COMBAT_AI_GROUP_SLOT_COUNT         = 5,
     COMBAT_AI_GROUP_SCAN_DONE          = 999,
     COMBAT_AI_LAST_HERO_COUNT          = 1,
     COMBAT_AI_MAX_DIFFICULTY           = 4,
@@ -405,7 +402,6 @@ H2_ENUM_BEGIN(CombatAIConstant)
     COMBAT_AI_DISTANCE_WEIGHT          = 1000,
     COMBAT_AI_WORST_STRENGTH_LIMIT     = 999999999,
     COMBAT_AI_CLOSEST_ARMY_LIMIT       = 9999999,
-    COMBAT_AI_ADJACENT_DIRECTION_COUNT = 6,
     COMBAT_AI_CASTLE_BOUNDARY_COUNT    = 9,
     COMBAT_AI_CASTLE_BOUNDARY_ROW_0    = 8,
     COMBAT_AI_CASTLE_BOUNDARY_ROW_1    = 0x15,
@@ -438,20 +434,6 @@ H2_ENUM_BEGIN(CombatSpellAIConstant)
     COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS            = 3,
     COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN            = 10,
     COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS            = 0xFF,
-    COMBAT_SPELL_AI_CURE_POINTS_PER_POWER            = 5,
-    COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER       = 50,
-    COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER            = 10,
-    COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER       = 25,
-    COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER = 40,
-    COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER       = 10,
-    COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER      = 20,
-    COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER     = 10,
-    COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER      = 50,
-    COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER = 25,
-    COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER        = 20,
-    COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER       = 10,
-    COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER    = 5,
-    COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER      = 10,
     COMBAT_SPELL_AI_DECISIVE_EFFECT                  = 100000000,
     COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE             = 999999
 H2_ENUM_END(CombatSpellAIConstant)
@@ -596,7 +578,7 @@ public:
     u8 m_removedArmies[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     u8 m_removedArmyPresent;
     char m_battlefieldBackgroundName[COMBAT_BACKGROUND_NAME_SIZE];
-    i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
+    i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_DIRECTION_ADJACENT_COUNT];
     class heroWindow* m_winLoseWindow;
     H2_ENUM_STORAGE(SpellType, i32) m_selectedSpell;
     H2_ENUM_STORAGE(CombatResult, i32) m_combatResult;
