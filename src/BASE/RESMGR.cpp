@@ -95,33 +95,45 @@ void resourceManager::GetBackdropAtLoc(
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry r
+#endif
 VA(0x004b8100, 0xbf)
 class palette* resourceManager::GetPalette(H2_CONST char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<palette*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<palette*>(resourceEntry);
     } else {
-        r = new palette(id);
-        AddResource(r);
-        return static_cast<palette*>(r);
+        resourceEntry = new palette(id);
+        AddResource(resourceEntry);
+        return static_cast<palette*>(resourceEntry);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry r
+#endif
 VA(0x004b81c0, 0xbf)
 class bitmap* resourceManager::GetBitmap(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<bitmap*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<bitmap*>(resourceEntry);
     } else {
-        r = new bitmap(fileId);
-        AddResource(r);
-        return static_cast<bitmap*>(r);
+        resourceEntry = new bitmap(fileId);
+        AddResource(resourceEntry);
+        return static_cast<bitmap*>(resourceEntry);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
 VA(0x004b8280, 0x24)
 class icon* resourceManager::GetIcon(H2_CONST char* name) {
@@ -141,19 +153,25 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry r
+#endif
 VA(0x004b8360, 0xbf)
 class tileset* resourceManager::GetTileset(H2_CONST char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<tileset*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<tileset*>(resourceEntry);
     } else {
-        r = new tileset(id);
-        AddResource(r);
-        return static_cast<tileset*>(r);
+        resourceEntry = new tileset(id);
+        AddResource(resourceEntry);
+        return static_cast<tileset*>(resourceEntry);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
 VA(0x004b8420, 0xf)
 class mouse* resourceManager::GetMouse(H2_CONST char*) {
@@ -174,33 +192,45 @@ class font* resourceManager::GetFont(H2_CONST char* name) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry r
+#endif
 VA(0x004b84f0, 0xbf)
 class sample* resourceManager::GetSample(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<sample*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<sample*>(resourceEntry);
     } else {
-        r = new sample(name);
-        AddResource(r);
-        return static_cast<sample*>(r);
+        resourceEntry = new sample(name);
+        AddResource(resourceEntry);
+        return static_cast<sample*>(resourceEntry);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry r
+#endif
 VA(0x004b85b0, 0xbf)
 class MIDIWrap* resourceManager::GetMIDIWrap(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<MIDIWrap*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<MIDIWrap*>(resourceEntry);
     } else {
-        r = new MIDIWrap(name);
-        AddResource(r);
-        return static_cast<MIDIWrap*>(r);
+        resourceEntry = new MIDIWrap(name);
+        AddResource(resourceEntry);
+        return static_cast<MIDIWrap*>(resourceEntry);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
 VA(0x004b8670, 0x75)
 void resourceManager::Dispose(class resource* resourceToDispose) {
@@ -228,19 +258,25 @@ void resourceManager::AddResource(class resource* newResource) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define resourceEntry cur
+#endif
 VA(0x004b8740, 0x7e)
 void resourceManager::Expunge(void) {
     m_expunging = true;
-    resource* cur = m_resourceListHead;
+    resource* resourceEntry = m_resourceListHead;
     resource* next = NULL;
-    while (cur != NULL) {
-        next = cur->m_next;
-        RemoveResource(cur);
-        delete cur;
-        cur = next;
+    while (resourceEntry != NULL) {
+        next = resourceEntry->m_next;
+        RemoveResource(resourceEntry);
+        delete resourceEntry;
+        resourceEntry = next;
     }
     m_expunging = false;
 }
+#if H2_RETAIL_COMPILER
+#undef resourceEntry
+#endif
 
 VA(0x004b87c0, 0x37)
 class resource* resourceManager::Query(u32l resourceId) {

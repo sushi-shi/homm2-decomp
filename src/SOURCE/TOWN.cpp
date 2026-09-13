@@ -112,31 +112,39 @@ void town::View(i32 noFade) {
     bEnteringTown = false;
 }
 
+#if H2_RETAIL_COMPILER
+#define player pp
+#define position pos
+#endif
 VA(0x004a42d0, 0x129)
 void town::Deallocate(void) {
-    playerData* pp = &gpGame->m_players[IDX(m_owner)];
-    i32 pos = TOWN_ID_NONE;
+    playerData* player = &gpGame->m_players[IDX(m_owner)];
+    i32 position = TOWN_ID_NONE;
     i32 i;
 
-    for (i = 0; i < pp->m_townCount; ++i) {
-        if (pp->m_townIds[i] == m_id)
-            pos = i;
+    for (i = 0; i < player->m_townCount; ++i) {
+        if (player->m_townIds[i] == m_id)
+            position = i;
     }
-    for (i = pos; i < pp->m_townCount - 1; ++i)
-        pp->m_townIds[i] = pp->m_townIds[i + 1];
+    for (i = position; i < player->m_townCount - 1; ++i)
+        player->m_townIds[i] = player->m_townIds[i + 1];
 
-    pp->m_townIds[pp->m_townCount - 1] = TOWN_ID_NONE;
-    if (pp->m_currentTown == m_id)
-        pp->m_currentTown = TOWN_ID_NONE;
-    --pp->m_townCount;
-    if (pp->m_townCount < TOWN_PLAYER_WINDOW_SIZE)
-        pp->m_townLocatorPage = 0;
-    else if (pp->m_townLocatorPage + TOWN_PLAYER_WINDOW_SIZE > pp->m_townCount)
-        pp->m_townLocatorPage = pp->m_townCount - TOWN_PLAYER_WINDOW_SIZE;
+    player->m_townIds[player->m_townCount - 1] = TOWN_ID_NONE;
+    if (player->m_currentTown == m_id)
+        player->m_currentTown = TOWN_ID_NONE;
+    --player->m_townCount;
+    if (player->m_townCount < TOWN_PLAYER_WINDOW_SIZE)
+        player->m_townLocatorPage = 0;
+    else if (player->m_townLocatorPage + TOWN_PLAYER_WINDOW_SIZE > player->m_townCount)
+        player->m_townLocatorPage = player->m_townCount - TOWN_PLAYER_WINDOW_SIZE;
 
     gpGame->m_townOwners[IDX(m_id)] = TOWN_OWNER_NONE;
     m_owner = TOWN_OWNER_NONE;
 }
+#if H2_RETAIL_COMPILER
+#undef player
+#undef position
+#endif
 
 VA(0x004a43f9, 0x24c)
 void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {

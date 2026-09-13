@@ -18,20 +18,20 @@ public:
     fullMap(void);
     ~fullMap();
     void Close(void);
-    void Init(i32, i32);
-    void ClearCellExtra(i32);
+    void Init(i32 mapWidth, i32 mapHeight);
+    void ClearCellExtra(i32 index);
     i32 GetNewCellExtraIndex(void);
-    struct mapCellExtra* GetNewCellExtraOverlay(i32, i32);
-    struct mapCellExtra* GetNewCellExtraObject(i32, i32);
-    void Write(i32);
-    void Read(i32, i32);
+    struct mapCellExtra* GetNewCellExtraOverlay(i32 x, i32 y);
+    struct mapCellExtra* GetNewCellExtraObject(i32 x, i32 y);
+    void Write(i32 handle);
+    void Read(i32 handle, i32 convert);
     void ChangeTilesetIndex(
-        class mapCell*,
-        i32,
-        i32,
-        H2_ENUM_PARAM(TilesetId, i32),
-        i32,
-        i32,
+        class mapCell* cell,
+        i32 x,
+        i32 y,
+        H2_ENUM_PARAM(TilesetId, i32) tileset,
+        i32 index,
+        i32 overlay,
         i32
     );
 

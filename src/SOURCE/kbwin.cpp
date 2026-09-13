@@ -69,6 +69,9 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     return message.wParam;
 }
 
+#if H2_RETAIL_COMPILER
+#define windowRectangle windowRect
+#endif
 VA(0x00470f42, 0x2ec)
 i32 AppInit(
     HINSTANCE instance,
@@ -77,7 +80,7 @@ i32 AppInit(
     char* H2_UNUSED(commandLine)
 ) {
 
-    RECT windowRect;
+    RECT windowRectangle;
     WNDCLASSA appClass;
 
     LogInt("hInstApp", reinterpret_cast<i32>(hInstApp));
@@ -128,10 +131,10 @@ i32 AppInit(
         giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
     else
         giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
-    windowRect.left = windowRect.top = 0;
-    windowRect.right = CURRENT_GRAPHICS_CONFIG.width - 1;
-    windowRect.bottom = CURRENT_GRAPHICS_CONFIG.height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
+    windowRectangle.left = windowRectangle.top = 0;
+    windowRectangle.right = CURRENT_GRAPHICS_CONFIG.width - 1;
+    windowRectangle.bottom = CURRENT_GRAPHICS_CONFIG.height - 1;
+    AdjustWindowRect(&windowRectangle, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     hwndApp = CreateWindowExA(
         0,
         szAppName,
@@ -139,8 +142,8 @@ i32 AppInit(
         giCurWindowsStyleFlags,
         CURRENT_GRAPHICS_CONFIG.x,
         CURRENT_GRAPHICS_CONFIG.y,
-        windowRect.right - windowRect.left + 1,
-        windowRect.bottom - windowRect.top + 1,
+        windowRectangle.right - windowRectangle.left + 1,
+        windowRectangle.bottom - windowRectangle.top + 1,
         NULL,
         (CURRENT_GRAPHICS_CONFIG.showMenu != 0 ? hmnuDflt : NULL),
         instance,
@@ -168,6 +171,9 @@ i32 AppInit(
         return 0;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef windowRectangle
+#endif
 
 VA(0x0047122e, 0x1a)
 i32 AppIdle(void) {
@@ -289,19 +295,23 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
+#if H2_RETAIL_COMPILER
+#define commandWindow commandWindow2
+#define notificationType notificationType1
+#endif
 VA(0x00471883, 0x67)
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
-    HWND H2_UNUSED(commandWindow2);
-    u16 H2_UNUSED(notificationType1);
+    HWND H2_UNUSED(commandWindow);
+    u16 H2_UNUSED(notificationType);
 
     switch (message) {
         case WM_INITDIALOG:
             return 1;
         case WM_COMMAND:
             command = LOWORD(messageParam);
-            commandWindow2 = reinterpret_cast<HWND>(messageData);
-            notificationType1 = HIWORD(messageParam);
+            commandWindow = reinterpret_cast<HWND>(messageData);
+            notificationType = HIWORD(messageParam);
             if (command == IDOK)
                 EndDialog(dialog, 1);
             break;
@@ -309,6 +319,10 @@ BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM me
     PollSound();
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef commandWindow
+#undef notificationType
+#endif
 
 VA(0x004718ea, 0xf)
 void AppExit(void) {
@@ -339,28 +353,31 @@ void Process1WindowsMessage(void) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define windowRectangle windowRect
+#endif
 VA(0x0047199a, 0x125)
 void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     i32 windowX;
-    RECT windowRect;
+    RECT windowRectangle;
     i32 targetY;
 
     if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
         return;
-    GetWindowRect(hwndApp, &windowRect);
-    windowX = (x == -1 ? windowRect.left : x);
-    targetY = (y == -1 ? windowRect.top : y);
-    windowRect.left = 0;
-    windowRect.top = 0;
-    windowRect.right = width - 1;
-    windowRect.bottom = height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
+    GetWindowRect(hwndApp, &windowRectangle);
+    windowX = (x == -1 ? windowRectangle.left : x);
+    targetY = (y == -1 ? windowRectangle.top : y);
+    windowRectangle.left = 0;
+    windowRectangle.top = 0;
+    windowRectangle.right = width - 1;
+    windowRectangle.bottom = height - 1;
+    AdjustWindowRect(&windowRectangle, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     MoveWindow(
         hwndApp,
         windowX,
         targetY,
-        windowRect.right - windowRect.left + 1,
-        windowRect.bottom - windowRect.top + 1,
+        windowRectangle.right - windowRectangle.left + 1,
+        windowRectangle.bottom - windowRectangle.top + 1,
         1
     );
     CURRENT_GRAPHICS_CONFIG.x = windowX;
@@ -369,6 +386,9 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     CURRENT_GRAPHICS_CONFIG.height = height;
     WritePrefs();
 }
+#if H2_RETAIL_COMPILER
+#undef windowRectangle
+#endif
 
 VA(0x00471abf, 0x161)
 LRESULT AppCommand(
@@ -500,12 +520,15 @@ void SetNoDialogMenus(b32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
+#if H2_RETAIL_COMPILER
+#define position pos
+#endif
 VA(0x00471eca, 0x12e)
 void SetMenus(HMENU menu, b32 enabled) {
     i32 count;
     u32 id;
     i32 match;
-    i32 pos;
+    i32 position;
     i32 disabled;
     i32 index;
 
@@ -521,9 +544,9 @@ void SetMenus(HMENU menu, b32 enabled) {
                 disabled = 1;
             } else {
                 match = 0;
-                for (pos = 0; pos < MENU_ENABLE_STATUS_COUNT; pos++) {
-                    if (gsMenuEnableStatus[pos].command == id) {
-                        match = pos;
+                for (position = 0; position < MENU_ENABLE_STATUS_COUNT; position++) {
+                    if (gsMenuEnableStatus[position].command == id) {
+                        match = position;
                     }
                 }
                 if (gbInSetupDialog)
@@ -538,6 +561,9 @@ void SetMenus(HMENU menu, b32 enabled) {
     }
     UpdateDfltMenu(menu);
 }
+#if H2_RETAIL_COMPILER
+#undef position
+#endif
 
 VA(0x00471ff8, 0xb)
 i32l KBTickCount(void) {

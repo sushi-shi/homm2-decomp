@@ -586,119 +586,119 @@ public:
     H2_ENUM_STORAGE(SpellType, i32) m_selectedSpell;
     H2_ENUM_STORAGE(CombatResult, i32) m_combatResult;
     combatManager(void);
-    virtual i32 Open(i32) OVERRIDE;
+    virtual i32 Open(i32 openFlags) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void NoShowCombatLog(H2_CONST char*);
-    void ClearCombatMessages(i32);
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    void NoShowCombatLog(H2_CONST char* message);
+    void ClearCombatMessages(i32 force);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(H2_CONST char*, i32, i32, i32);
-    void CombatMessage(CombatMessageCommand);
+    void CombatMessage(H2_CONST char* message, i32 updateScreen, i32 retainPrevious, i32 clear);
+    void CombatMessage(CombatMessageCommand messageType);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
-    void SetupGridForArmy(class army*);
-    i32 UpdateGrid(i32, i32);
+    void SetupGridForArmy(class army* armyPointer);
+    i32 UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid);
     void DrawBackground(void);
-    void UpdateMouseGrid(i32, i32);
-    void DrawFrame(i32, i32, i32, i32, i32, i32, i32);
-    void DrawSmallView(i32, i32);
-    i32 ViewGeneral(H2_ENUM_PARAM(CombatSide, i32), i32, i32);
-    void ViewArmy(class army*, i32);
-    i32 HasValidSpellTarget(SpellType);
+    void UpdateMouseGrid(i32 hexIndex, i32 forceUpdate);
+    void DrawFrame(i32 updateScreen, i32 computeExtent, i32 redrawExtent, i32 extentOnly, i32 delay, i32 drawBackground, i32 waitForTimer);
+    void DrawSmallView(i32 viewIndex, i32 updateScreen);
+    i32 ViewGeneral(H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView);
+    void ViewArmy(class army* viewedArmy, i32 quickView);
+    i32 HasValidSpellTarget(SpellType spell);
     i32 ViewSpells(i32);
     i32 FindResurrectArmyIndex(
-        H2_ENUM_PARAM(CombatSide, i32), H2_ENUM_PARAM(SpellType, i32), i32
+        H2_ENUM_PARAM(CombatSide, i32) side, H2_ENUM_PARAM(SpellType, i32) spell, i32 hex
     );
-    i32 ValidSpellTarget(SpellType, i32);
-    void SpellMessage(SpellType, i32);
-    void CastSpell(SpellType, i32, i32, i32);
-    void DefaultSpell(i32);
-    void Fireball(i32, SpellType);
-    void MeteorShower(i32);
+    i32 ValidSpellTarget(SpellType spell, i32 hex);
+    void SpellMessage(SpellType spell, i32 hex);
+    void CastSpell(SpellType spell, i32 targetHex, i32 castByCreature, i32 teleportDestination);
+    void DefaultSpell(i32 targetHex);
+    void Fireball(i32 targetHex, SpellType spell);
+    void MeteorShower(i32 targetHex);
     void ElementalStorm(void);
     void Armageddon(void);
-    void TurnToStone(class army*);
-    void BloodLustEffect(class army*, H2_ENUM_PARAM(MonsterFlags, i32));
-    void Ripple(i32);
-    void Blur(i32, i32, i32);
-    void ResetBoltAngle(struct SBolt*);
-    void DrawBolt(struct SBolt*, i32);
+    void TurnToStone(class army* target);
+    void BloodLustEffect(class army* target, H2_ENUM_PARAM(MonsterFlags, i32) effect);
+    void Ripple(i32 strength);
+    void Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust);
+    void ResetBoltAngle(struct SBolt* bolt);
+    void DrawBolt(struct SBolt* bolt, i32 stepCount);
     void AddBolt(
-        struct SBolt*,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        BoltColorMode,
-        i32,
-        i32,
-        i32,
-        i32
+        struct SBolt* bolt,
+        i32 startX,
+        i32 startY,
+        i32 endX,
+        i32 endY,
+        i32 branchDistance,
+        i32 startWidth,
+        i32 endWidth,
+        BoltColorMode colorMode,
+        i32 minAngle,
+        i32 maxAngle,
+        i32 angleDistance,
+        i32 forceAngle
     );
     void DoBolt(
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        BoltColorMode,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32
+        i32 managePointer,
+        i32 startX,
+        i32 startY,
+        i32 endX,
+        i32 endY,
+        i32 branchDistance,
+        i32 branchLength,
+        i32 startWidth,
+        i32 endWidth,
+        BoltColorMode colorMode,
+        i32 minAngle,
+        i32 maxAngle,
+        i32 angleDistance,
+        i32 unusedParameter,
+        i32 forceAngle,
+        i32 frameDelay,
+        i32 brightenPalette
     );
-    i32 GetNextChainLightningTarget(class army*, i32);
-    void ChainLightning(i32, i32);
-    void VaporizeCreature(H2_ENUM_PARAM(CombatSide, i32), i32);
-    void RippleCreature(H2_ENUM_PARAM(CombatSide, i32), i32, CombatRippleMode);
+    i32 GetNextChainLightningTarget(class army* source, i32 requireWorks);
+    void ChainLightning(i32 targetHex, i32 spellPower);
+    void VaporizeCreature(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex);
+    void RippleCreature(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex, CombatRippleMode mode);
     void ShowMassSpell(
-        i8 (*const)[COMBAT_ARMY_SLOT_COUNT],
-        H2_ENUM_PARAM(CombatEffectType, i32),
-        i32
+        i8 (*const affected)[COMBAT_ARMY_SLOT_COUNT],
+        H2_ENUM_PARAM(CombatEffectType, i32) effect,
+        i32 animateCreatures
     );
-    void CastMassSpell(SpellType, i32);
-    void MirrorImage(i32);
-    void SummonElemental(H2_ENUM_PARAM(CreatureType, i32), i32);
-    void DoLuck(H2_ENUM_PARAM(CombatSide, i32), i32);
-    void DoBlast(i32, H2_ENUM_PARAM(SpellType, i32));
-    void Resurrect(H2_ENUM_PARAM(SpellType, i32), i32, i32);
+    void CastMassSpell(SpellType spell, i32 spellPower);
+    void MirrorImage(i32 targetHex);
+    void SummonElemental(H2_ENUM_PARAM(CreatureType, i32) monsterType, i32 spellPower);
+    void DoLuck(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex);
+    void DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell);
+    void Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex, i32 spellPower);
     i32 SpaceForElementalExists(void);
-    void ShowSpellCastFailure(class army*, i32);
+    void ShowSpellCastFailure(class army* target, i32);
     void ModifyDamageForArtifacts(
-        i32l*,
-        H2_ENUM_PARAM(SpellType, i32),
-        class hero*,
-        class hero*
+        i32l* damage,
+        H2_ENUM_PARAM(SpellType, i32) spell,
+        class hero* attacker,
+        class hero* defender
     );
     void Earthquake(void);
-    void ShowSpellMessage(i32, H2_ENUM_PARAM(SpellType, i32), class army*);
-    i32 ValidHexToStandOn(i32);
-    void SetCombatDirections(i32);
-    void CheckSetMouseDirection(i32, i32, i32);
-    i32 GetPointer(CombatMessageCommand, i32);
-    MessageDispatchResult ProcessCombatMsg(struct tag_message&);
+    void ShowSpellMessage(i32 castByCreature, H2_ENUM_PARAM(SpellType, i32) spell, class army* target);
+    i32 ValidHexToStandOn(i32 hexIndex);
+    void SetCombatDirections(i32 targetHex);
+    void CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex);
+    i32 GetPointer(CombatMessageCommand command, i32 hexIndex);
+    MessageDispatchResult ProcessCombatMsg(struct tag_message& message);
     i32 IsNegationSphereInEffect(void);
     void ResetRound(void);
-    i32 CheckWin(struct tag_message*);
-    CombatMessageCommand GetCommand(i32);
-    i32 RightClick(i32);
-    void DoCommand(CombatMessageCommand);
-    void ClearWinLoseBottom(class heroWindow*);
-    void ShowWinLoseArtifact(class heroWindow*, H2_ENUM_PARAM(ArtifactType, i32));
-    void ShowSkeletons(class heroWindow*);
-    void ShowEagleEyeSpell(class heroWindow*);
-    void ShowDeadArmies(class heroWindow*);
-    void DoVictory(H2_ENUM_PARAM(CombatResult, i32));
+    i32 CheckWin(struct tag_message* message);
+    CombatMessageCommand GetCommand(i32 hexIndex);
+    i32 RightClick(i32 hexIndex);
+    void DoCommand(CombatMessageCommand command);
+    void ClearWinLoseBottom(class heroWindow* window);
+    void ShowWinLoseArtifact(class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact);
+    void ShowSkeletons(class heroWindow* window);
+    void ShowEagleEyeSpell(class heroWindow* window);
+    void ShowDeadArmies(class heroWindow* window);
+    void DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide);
     void DoLoseWindow(void);
     i32 DoSurrender(void);
     void CheckChangeSelector(void);
@@ -706,49 +706,49 @@ public:
     void CheckGetAIMove(void);
     void GetControl(void);
     void ResetMouse(void);
-    MessageDispatchResult ProcessNextAction(struct tag_message&);
+    MessageDispatchResult ProcessNextAction(struct tag_message& message);
     void ResetCyclingCreatures(void);
     void ResetCycleTimers(void);
     void CycleCombatScreen(void);
-    void SetCombatViewArmySmallLevel(i32);
-    void SetCombatGrid(i32, i32, i32);
+    void SetCombatViewArmySmallLevel(i32 level);
+    void SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel);
     void AddArmy(
-        H2_ENUM_PARAM(CombatSide, i32),
-        H2_ENUM_PARAM(CreatureType, i32),
-        i32,
-        i32,
-        H2_ENUM_PARAM(MonsterFlags, i32),
-        i32
+        H2_ENUM_PARAM(CombatSide, i32) side,
+        H2_ENUM_PARAM(CreatureType, i32) monsterType,
+        i32 quantity,
+        i32 hex,
+        H2_ENUM_PARAM(MonsterFlags, i32) flags,
+        i32 animate
     );
     void SetupSmallView(void);
-    void ViewBallista(i32);
-    i32 DoSpellAI(H2_ENUM_PARAM(CombatSide, i32), i32);
-    void DetermineEffectOfSpell(SpellType, i32*, i32*);
-    i32 EffectSpellCreateCreature(i32, SpellType);
-    i32 RawEffectSpellInfluence(class army*, ArmySpellInfluence);
+    void ViewBallista(i32 quickView);
+    i32 DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted);
+    void DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex);
+    i32 EffectSpellCreateCreature(i32 hex, SpellType spell);
+    i32 RawEffectSpellInfluence(class army* target, ArmySpellInfluence influence);
     void ClearEffects(void);
-    void NextPos(i32*);
-    i32 FirstArmy(i32, i32, i32*);
-    i32 FirstResurrectable(i32, i32*, H2_ENUM_PARAM(SpellType, i32));
-    void EffectSpellCure(i32*, i32, i32, i32);
-    void EffectSpellResurrect(i32*, i32, SpellType);
-    void EffectSpellDamage(i32*, SpellType, i32);
-    void CombineGroups(class armyGroup*, class armyGroup*);
+    void NextPos(i32* hex);
+    i32 FirstArmy(i32 startHex, i32 side, i32* hex);
+    i32 FirstResurrectable(i32 startHex, i32* hex, H2_ENUM_PARAM(SpellType, i32) spell);
+    void EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure);
+    void EffectSpellResurrect(i32* effect, i32 hex, SpellType spell);
+    void EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex);
+    void CombineGroups(class armyGroup* sourceGroup, class armyGroup* targetGroup);
     void SetupCombat(
-        i32,
-        i32,
-        class hero*,
-        class armyGroup*,
-        class town*,
-        class hero*,
-        class armyGroup*,
-        i32,
-        i32,
-        i32
+        i32 mapX,
+        i32 mapY,
+        class hero* attackerHero,
+        class armyGroup* attackerGroup,
+        class town* defenderTown,
+        class hero* defenderHero,
+        class armyGroup* defenderGroup,
+        i32 combatX,
+        i32 combatY,
+        i32 randomSeed
     );
     void InitNonVisualVars(void);
     void SetupAdjacencyArray(void);
-    void UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32));
+    void UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side);
     void GenerateMap(void);
     H2_CONST char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
@@ -756,14 +756,14 @@ public:
     void FreeIcons(void);
     void LoadArmies(void);
     void FreeArmies(void);
-    i32 GetGridIndex(i32, i32);
-    void CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 CheckApplyBadMorale(H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 GetNextArmy(i32);
-    i32 IsWinner(H2_ENUM_PARAM(CombatSide, i32));
-    void CatAttack(H2_ENUM_PARAM(CombatSide, i32));
-    void KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32));
-    i32 ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetGridIndex(i32 x, i32 y);
+    void CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i32 index);
+    i32 CheckApplyBadMorale(H2_ENUM_PARAM(CombatSide, i32) side, i32 index);
+    i32 GetNextArmy(i32 checkMorale);
+    i32 IsWinner(H2_ENUM_PARAM(CombatSide, i32) side);
+    void CatAttack(H2_ENUM_PARAM(CombatSide, i32) side);
+    void KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower);
+    i32 ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side);
     void ResetHitByCreature(void);
     void SaveCombatBorder(void);
     void DrawCombatBorder(void);
@@ -772,29 +772,29 @@ public:
     void LowerDoor(void);
     void RaiseDoor(void);
     void TestRaiseDoor(void);
-    i32 InCastle(i32);
-    i32 ShotIsThroughWall(H2_ENUM_PARAM(CombatSide, i32), i32, i32);
-    void ShootMissile(i32, i32, i32, i32, float*, class icon*);
+    i32 InCastle(i32 hex);
+    i32 ShotIsThroughWall(H2_ENUM_PARAM(CombatSide, i32) side, i32 sourceHex, i32 targetHex);
+    void ShootMissile(i32 sourceX, i32 sourceY, i32 targetX, i32 targetY, float* directionAngles, class icon* missileIcon);
     void CombatSystemOptions(void);
     i32 AICheckRetreat(void);
     void DoCompAI(H2_ENUM_PARAM(CombatSide, i32));
-    float GetModLichDamage(class army*, float);
-    void DoLichShot(class army*);
-    i32 GetShooterMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetAllMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32));
-    i32 GetBestArmy(H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 GetClosestArmy(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
-    u32l GetStrength(H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 AttemptAttack(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 AttemptAdjacentAttack(class army*);
-    i32 WalkTowardArmyFront(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
-    i32 WalkTowardArmy(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
+    float GetModLichDamage(class army* target, float damage);
+    void DoLichShot(class army* lich);
+    i32 GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side);
+    i32 GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    i32 GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    i32 GetClosestArmy(class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    u32l GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    i32 AttemptAttack(class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    i32 AttemptAdjacentAttack(class army* currentArmy);
+    i32 WalkTowardArmyFront(class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
+    i32 WalkTowardArmy(class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask);
 };
 #pragma pack(pop)
 SIZE(combatManager, 0xf877);

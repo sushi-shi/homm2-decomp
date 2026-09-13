@@ -55,13 +55,13 @@ H2_ENUM_END(AIGenericSiteConstant)
 
 #define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
-void ResetHeroRVs(i32, i32, i32);
-void CheckDoMain(i32 a1, i32 doMain);
+void ResetHeroRVs(i32 resetAll, i32 x, i32 y);
+void CheckDoMain(i32 unused, i32 doMain);
 void ShowStatus(void);
 void ValidateHero(hero* pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
-i32 OnMySide(i32);
+i32 OnMySide(i32 player);
 
 extern b32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[IDX(RES_COUNT)];

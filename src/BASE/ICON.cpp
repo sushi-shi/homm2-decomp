@@ -28,14 +28,20 @@ H2_ENUM_BEGIN(IconDrawExtentConstant)
     DRAW_COMBAT_HEIGHT = 444
 H2_ENUM_END(IconDrawExtentConstant)
 
+#if H2_RETAIL_COMPILER
+#define length len
+#endif
 VA(0x004c26f0, 0xb7)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
-    u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8*>(H2_ALLOC(len));
-    gpResourceManager->ReadBlock(m_data, len);
+    u32 length = gpResourceManager->ReadLong();
+    m_data = static_cast<u8*>(H2_ALLOC(length));
+    gpResourceManager->ReadBlock(m_data, length);
 }
+#if H2_RETAIL_COMPILER
+#undef length
+#endif
 
 VA(0x004c27e0, 0x33)
 H2_RETAIL_INLINE icon::~icon() {

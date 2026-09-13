@@ -56,6 +56,9 @@ H2_ENUM_BEGIN(RecruitControl)
     RESOURCE_TOTAL_CONTROL = 0x4f,
 H2_ENUM_END(RecruitControl)
 
+#if H2_RETAIL_COMPILER
+#define character ch
+#endif
 VA(0x0048c330, 0x1f2)
 void SetupRecruitWin(
     class heroWindow* window,
@@ -65,14 +68,14 @@ void SetupRecruitWin(
     i32 resourceCost,
     i32 available
 ) {
-    char ch;
+    char character;
     char monsterName[NAME_SIZE];
     char label[LABEL_SIZE];
     tag_message message;
 
     strcpy(monsterName, GetMonsterPluralName(creatureType));
-    ch = CyrillicToLower(monsterName[0]);
-    monsterName[0] = ch;
+    character = CyrillicToLower(monsterName[0]);
+    monsterName[0] = character;
     sprintf(label, "%s %s", localization::Tr("table.xPasswordStrings.159"), monsterName);
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = label;
@@ -106,6 +109,9 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef character
+#endif
 
 VA(0x0048c522, 0x26b)
 i32 recruitUnit::Open(i32 priority) {

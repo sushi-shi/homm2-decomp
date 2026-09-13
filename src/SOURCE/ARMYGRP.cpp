@@ -141,21 +141,24 @@ i32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define previous prev
+#endif
 VA(0x00421a96, 0x124)
 ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
-    CreatureType prev = CREATURE_NONE;
+    CreatureType previous = CREATURE_NONE;
     i32 numRaces;
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
             if (countRaces == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[IDX(gMonsterDatabase[IDX(m_creatureTypes[i])].race)];
-            if (m_creatureTypes[i] != prev) {
+            if (m_creatureTypes[i] != previous) {
                 ++numCreatureTypes;
-                prev = m_creatureTypes[i];
+                previous = m_creatureTypes[i];
             }
         }
     }
@@ -179,6 +182,9 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
         return ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE;
     return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 }
+#if H2_RETAIL_COMPILER
+#undef previous
+#endif
 
 VA(0x00421bba, 0x3b)
 i32 armyGroup::CanJoin(H2_ENUM_PARAM(CreatureType, i32) creatureType) {

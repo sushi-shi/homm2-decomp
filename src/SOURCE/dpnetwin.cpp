@@ -49,6 +49,9 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     return 1;
 }
 
+#if H2_RETAIL_COMPILER
+#define result rc
+#endif
 VA(0x00436866, 0x2bf)
 i16 dpnet_init(void) {
     DirectPlayStartupMessage startup;
@@ -57,7 +60,7 @@ i16 dpnet_init(void) {
     DirectPlayEnumerateFunction dpEnumerate;
     DirectPlayCreateFunction createFunction;
     i32 guestIndex;
-    i32 rc;
+    i32 result;
 
     if (lpIDC != NULL)
         return 0;
@@ -90,9 +93,9 @@ i16 dpnet_init(void) {
                 g_lpGuid = TCPGuid;
                 break;
         }
-        rc = createFunction(g_lpGuid, &lpIDC, NULL);
-        if (rc != DP_OK)
-            DPSD(rc, RETAIL_FILE, 136);
+        result = createFunction(g_lpGuid, &lpIDC, NULL);
+        if (result != DP_OK)
+            DPSD(result, RETAIL_FILE, 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
@@ -140,6 +143,9 @@ i16 dpnet_init(void) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
 
 VA(0x00436b25, 0xc3)
 void CleanupDPVars(void) {
@@ -236,10 +242,13 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define destination to
+#endif
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD size;
-    DPID to;
+    DPID destination;
     i32 H2_UNUSED(i);
     i32 H2_UNUSED(j);  // i and j are unreferenced; retail's frame reserves both slots
     DPID sender;
@@ -251,7 +260,7 @@ void dpProcessMessages(void) {
         size = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
             &sender,
-            &to,
+            &destination,
             1,
             rcvBufIn,
             &size
@@ -262,11 +271,14 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, RETAIL_FILE, 335);
         if (sender == 0) {
         } else {
-            if (to == 0 || to == dcoID)
+            if (destination == 0 || destination == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef destination
+#endif
 
 VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
@@ -317,10 +329,13 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define result rv
+#endif
 VA(0x00437177, 0x16a)
 i32 dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
-    i32 rv;
+    i32 result;
 
     switch (iDPWaitForFirstGuestStatus) {
         case FIRST_GUEST_CREATE_SESSION:
@@ -330,9 +345,9 @@ i32 dpWaitForFirstGuest(void) {
             session.guidSession = *g_lpGuid;
             session.dwFlags = IDX(SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
-            rv = lpIDC->Open(&session);
-            if (rv != DP_OK)
-                DPSD(rv, RETAIL_FILE, 442);
+            result = lpIDC->Open(&session);
+            if (result != DP_OK)
+                DPSD(result, RETAIL_FILE, 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -341,14 +356,14 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(
+            result = lpIDC->CreatePlayer(
                 &dcoID,
                 "Dude",
                 "Heroes Player",
                 &dphEvent
             );
-            if (rv != DP_OK)
-                DPSD(rv, RETAIL_FILE, 472);
+            if (result != DP_OK)
+                DPSD(result, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -359,6 +374,9 @@ i32 dpWaitForFirstGuest(void) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
 
 VA(0x004372e1, 0x7c)
 i32 dpWaitForExtraGuests(void) {
@@ -381,10 +399,13 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define result rv
+#endif
 VA(0x0043735d, 0x396)
 i32 dpWaitForHost(void) {
     DPSESSIONDESC session;
-    i32 rv;
+    i32 result;
     char text[STATUS_TEXT_SIZE];
     DWORD timeout;
 
@@ -406,16 +427,16 @@ i32 dpWaitForHost(void) {
                 timeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
             else
                 timeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
-            rv =
+            result =
                 lpIDC
                     ->EnumSessions(&session, timeout, dpEnumSession, NULL, 0);
             iEnumCount++;
-            if (rv == DPERR_NOSESSIONS) {
+            if (result == DPERR_NOSESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 return 0;
             }
-            if (rv != DP_OK)
-                DPSD(rv, RETAIL_FILE, 548);
+            if (result != DP_OK)
+                DPSD(result, RETAIL_FILE, 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -429,20 +450,20 @@ i32 dpWaitForHost(void) {
             session.dwFlags = IDX(SESSION_OPEN_JOIN);
             session.dwSession = lSessions[iSessionToTry];
             strcpy(session.szSessionName, "Heroes 2");
-            rv = lpIDC->Open(&session);
-            if (rv != DP_OK)
-                DPSD(rv, RETAIL_FILE, 567);
+            result = lpIDC->Open(&session);
+            if (result != DP_OK)
+                DPSD(result, RETAIL_FILE, 567);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(
+            result = lpIDC->CreatePlayer(
                 &dcoID,
                 "Dude",
                 "Heroes Player",
                 &dphEvent
             );
-            if (rv != DP_OK)
-                DPSD(rv, RETAIL_FILE, 577);
+            if (result != DP_OK)
+                DPSD(result, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -467,9 +488,9 @@ i32 dpWaitForHost(void) {
                     iDPWaitForHostStatus = HOST_JOIN_SESSION;
                     iSessionToTry++;
                 }
-                rv = lpIDC->Close();
-                if (rv != DP_OK)
-                    DPSD(rv, RETAIL_FILE, 603);
+                result = lpIDC->Close();
+                if (result != DP_OK)
+                    DPSD(result, RETAIL_FILE, 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }
@@ -482,6 +503,9 @@ i32 dpWaitForHost(void) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
 
 VA(0x004376f3, 0x5d5)
 void DPSD(i32 result, H2_CONST char* file, i32 line) {

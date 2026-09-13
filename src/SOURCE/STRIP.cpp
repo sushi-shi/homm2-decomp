@@ -122,11 +122,14 @@ void strip::Draw(void) {
     gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT);
 }
 
+#if H2_RETAIL_COMPILER
+#define iconsCurrent iconsCurrent_8
+#endif
 VA(0x004a1cb0, 0x37d)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[ARMY_GROUP_SLOT_COUNT];
     CreatureType oldCreatureTypes[ARMY_GROUP_SLOT_COUNT];
-    b32 iconsCurrent_8;
+    b32 iconsCurrent;
     i32 slot;
     CreatureType creatureType;
 
@@ -140,14 +143,14 @@ void strip::DrawIcons(i32 drawWindow) {
         m_window->DrawWindow(drawWindow);
         return;
     }
-    iconsCurrent_8 = true;
+    iconsCurrent = true;
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         if (m_army->m_creatureTypes[slot] != CREATURE_NONE
             && m_cachedCreatureTypes[slot] != m_army->m_creatureTypes[slot])
-            iconsCurrent_8 = false;
+            iconsCurrent = false;
     }
 
-    if (iconsCurrent_8 == 0) {
+    if (iconsCurrent == 0) {
         for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
@@ -210,6 +213,9 @@ void strip::DrawIcons(i32 drawWindow) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef iconsCurrent
+#endif
 
 VA(0x004a202d, 0x28)
 void strip::DrawFrame(void) {
@@ -234,23 +240,29 @@ bankBox::~bankBox() {
     delete m_window;
 }
 
+#if H2_RETAIL_COMPILER
+#define currentText str
+#endif
 VA(0x004a215f, 0xc0)
 void bankBox::Update(i32 drawWindow) {
-    char str[BOX_TEXT_SIZE];
+    char currentText[BOX_TEXT_SIZE];
     tag_message message;
     i32 resource;
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     for (resource = 0; resource < BOX_NON_GOLD_RESOURCE_COUNT; resource++) {
-        sprintf(str, "%d", m_player->m_resources[resource]);
+        sprintf(currentText, "%d", m_player->m_resources[resource]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource;
-        message.payload.widget.data.text = str;
+        message.payload.widget.data.text = currentText;
         m_window->BroadcastMessage(message);
     }
-    sprintf(str, "%d", m_player->m_resources[IDX(RES_GOLD)]);
+    sprintf(currentText, "%d", m_player->m_resources[IDX(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
-    message.payload.widget.data.text = str;
+    message.payload.widget.data.text = currentText;
     m_window->BroadcastMessage(message);
     m_window->DrawWindow(drawWindow);
 }
+#if H2_RETAIL_COMPILER
+#undef currentText
+#endif

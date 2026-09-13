@@ -196,7 +196,33 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
             "retail\n"
             "#endif\n"
         )
-        self.assertEqual(clean_source.resolve_strict_conditionals(text), "typed\n")
+        self.assertEqual(clean_source.resolve_build_conditionals(text), "typed\n")
+
+    def test_retail_local_aliases_are_removed_from_portable_source(self):
+        text = (
+            "#if H2_RETAIL_COMPILER\n"
+            "#define destinationY destY0\n"
+            "#endif\n"
+            "void Paint() { i32 destinationY; }\n"
+            "#if H2_RETAIL_COMPILER\n"
+            "#undef destinationY\n"
+            "#endif\n"
+        )
+        self.assertEqual(
+            clean_source.resolve_build_conditionals(text),
+            "void Paint() { i32 destinationY; }\n",
+        )
+
+    def test_compiler_guard_keeps_portable_arm_and_unrelated_conditionals(self):
+        text = (
+            "#if !H2_RETAIL_COMPILER\n"
+            "#ifdef FEATURE\nportable\n#endif\n"
+            "#else\nretail\n#endif\n"
+        )
+        self.assertEqual(
+            clean_source.resolve_build_conditionals(text),
+            "#ifdef FEATURE\nportable\n#endif\n",
+        )
 
     def test_clear_flag_expands_to_typed_bit_removal(self):
         self.assertEqual(

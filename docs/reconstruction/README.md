@@ -1,14 +1,19 @@
 # King's Field reconstruction-pattern audit
 
+Current handoff: [continuation after #59 and #63](continuation.md). The generated
+ledgers below are historical snapshots at `36ace4cae`, not current review coverage
+after the #62/#64 integration. The handoff separates research from review refresh
+and records the first follow-up batch.
+
 Base: `decomp-gold-2.1-buka` at `ca2904a91`. Work branch:
 `audit/buka-reconstruction-patterns`. This is an ongoing review, not a completion
 claim. [Progress](progress.md), [every function](functions.tsv), and
 [file coverage](files.tsv) distinguish inspected source from pending work.
 
-PR59 now incorporates the base's common-helper and localization changes. The
-completed 1,656-function/229-file reading below describes the pre-merge revision;
-changed bodies are honestly marked pending in the current hash-bound inventory.
-See [merge resolutions, validation, and the review revision boundary](pr59-base-merge.md).
+The completed 1,656-function/229-file reading below describes the original audit
+revision. [The first base-merge report](pr59-base-merge.md) describes the later
+`36ace4cae` snapshot after helpers/localization. For current integration validation,
+stale review keys and remaining work, use the continuation document above.
 
 The supplied checklist is the scope: casts, unions, gotos, artificial address
 arithmetic, recovering owners from member pointers, out-of-object pointers,

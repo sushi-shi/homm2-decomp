@@ -108,17 +108,23 @@ void SetMilesSampleHandleVolume(struct _SAMPLE* sampleHandle, i32 volume) {
     Process1WindowsMessage();
 }
 
+#if H2_RETAIL_COMPILER
+#define index idx
+#endif
 VA(0x004cdcf0, 0x79)
 void StopAllMilesSamples(void) {
-    for (i32 idx = 0; idx < gMilesSamples.handleCount; ++idx) {
-        if (AIL_sample_status(gMilesSamples.handles[idx]) == MILES_SAMPLE_STATUS_PLAYING)
-            AIL_end_sample(gMilesSamples.handles[idx]);
+    for (i32 index = 0; index < gMilesSamples.handleCount; ++index) {
+        if (AIL_sample_status(gMilesSamples.handles[index]) == MILES_SAMPLE_STATUS_PLAYING)
+            AIL_end_sample(gMilesSamples.handles[index]);
     }
     for (i32 waitIndex = 0; waitIndex < MILES_STOP_ALL_WAIT_COUNT; ++waitIndex) {
         ServiceMilesSamples();
         DelayMilli(1);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#endif
 
 VA(0x004cdd70, 0x1c)
 void StopMilesSample(class sample* sampleResource) {

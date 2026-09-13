@@ -100,26 +100,26 @@ H2_RETAIL_INLINE button::~button() {
 }
 
 VA(0x004d3890, 0x4d8)
-MessageDispatchResult button::Main(tag_message& msg) {
+MessageDispatchResult button::Main(tag_message& message) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] < KBTickCount()) {
-        return Deselect(msg);
+        return Deselect(message);
     }
 
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
-        if (msg.type == MESSAGE_WIDGET)
-            return widget::Main(msg);
+        if (message.type == MESSAGE_WIDGET)
+            return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    switch (msg.type) {
+    switch (message.type) {
         case MESSAGE_WIDGET:
-            switch (msg.payload.widget.command) {
+            switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_REPLACE_ICON:
-                    if (m_iconId == static_cast<u32l>(msg.payload.widget.id)) {
-                        m_iconId = msg.payload.widget.data.value;
+                    if (m_iconId == static_cast<u32l>(message.payload.widget.id)) {
+                        m_iconId = message.payload.widget.data.value;
                         gpResourceManager->Dispose(m_icon);
-                        m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);
+                        m_icon = gpResourceManager->GetIcon(message.payload.widget.data.value);
                     }
                     return MESSAGE_DISPATCH_CONTINUE;
             }
@@ -132,8 +132,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 break;
             if (HAS(m_flags, WIDGET_FLAG_DIMMED))
                 break;
-            if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
-                return Select(msg);
+            if (m_hotkey != NO_HOTKEY && m_hotkey == message.payload.keyboard.keyCode)
+                return Select(message);
             return MESSAGE_DISPATCH_CONTINUE;
 
         case MESSAGE_KEY_UP:
@@ -143,8 +143,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 break;
             if (HAS(m_flags, WIDGET_FLAG_DIMMED))
                 break;
-            if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
-                return Deselect(msg);
+            if (m_hotkey != NO_HOTKEY && m_hotkey == message.payload.keyboard.keyCode)
+                return Deselect(message);
             return MESSAGE_DISPATCH_CONTINUE;
 
         case MESSAGE_LEFT_BUTTON_DOWN:
@@ -152,38 +152,38 @@ MessageDispatchResult button::Main(tag_message& msg) {
             if (!HAS(m_flags, WIDGET_FLAG_DRAW))
                 break;
 
-            i16 x = msg.payload.mouse.x - m_owner->m_posX;
-            i16 y = msg.payload.mouse.y - m_owner->m_posY;
-            if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+            i16 x = message.payload.mouse.x - m_owner->m_posX;
+            i16 y = message.payload.mouse.y - m_owner->m_posY;
+            if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                    SET_WIDGET_MESSAGE(msg, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
-                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONTINUE;
             }
 
             if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                Select(msg);
-                while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
+                Select(message);
+                while (message.type != MESSAGE_LEFT_BUTTON_UP && message.type != MESSAGE_RIGHT_BUTTON_UP) {
                     PollSound();
-                    gpMouseManager->Main(msg);
-                    if (msg.type == MESSAGE_MOUSE_MOVE) {
-                        x = msg.payload.mouse.x - m_owner->m_posX;
-                        y = msg.payload.mouse.y - m_owner->m_posY;
+                    gpMouseManager->Main(message);
+                    if (message.type == MESSAGE_MOUSE_MOVE) {
+                        x = message.payload.mouse.x - m_owner->m_posX;
+                        y = message.payload.mouse.y - m_owner->m_posY;
                         if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                             if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                                Select(msg);
+                                Select(message);
                             }
                         } else if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                            Deselect(msg);
+                            Deselect(message);
                         }
                     }
                     Process1WindowsMessage();
-                    msg = gpInputManager->GetEvent();
+                    message = gpInputManager->GetEvent();
                 }
                 if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                    Deselect(msg);
+                    Deselect(message);
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONSUME;
@@ -195,36 +195,36 @@ MessageDispatchResult button::Main(tag_message& msg) {
             if (!HAS(m_flags, WIDGET_FLAG_DRAW))
                 break;
             if (HAS(m_flags, WIDGET_FLAG_SELECTED))
-                return Deselect(msg);
+                return Deselect(message);
             goto normalEvent;
     }
 
 normalEvent:
-    return widget::Main(msg);
+    return widget::Main(message);
 }
 
 VA(0x004d3d70, 0xe9)
-H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
+H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& message) {
     i16 x = m_owner->m_posX + m_x;
     i16 y = m_owner->m_posY + m_y;
     m_icon->DrawToBuffer(x, y, m_pressedFrame, ICON_DRAW_NORMAL);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= WIDGET_FLAG_SELECTED;
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.id = m_id;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.id = m_id;
     if (m_selectMode == BUTTON_SELECT_DIALOG_RESULT) {
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     } else {
-        msg.payload.widget.command = WIDGET_NOTIFY_SELECT;
+        message.payload.widget.command = WIDGET_NOTIFY_SELECT;
     }
     glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
-    iLeftRightSave = msg.payload.widget.modifiers
+    iLeftRightSave = message.payload.widget.modifiers
         & MESSAGE_MODIFIER_BUTTON_MASK;
     return MESSAGE_DISPATCH_FORWARD;
 }
 
 VA(0x004d3e60, 0xb7)
-H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
+H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
         return MESSAGE_DISPATCH_CONTINUE;
     m_flags &= ~WIDGET_FLAG_SELECTED;
@@ -235,8 +235,8 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& 
         m_width,
         m_height
     );
-    SET_WIDGET_MESSAGE(msg, WIDGET_NOTIFY_DESELECT, m_id);
-    msg.payload.widget.modifiers = iLeftRightSave;
+    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
+    message.payload.widget.modifiers = iLeftRightSave;
     iLeftRightSave = MESSAGE_MODIFIER_NONE;
     return MESSAGE_DISPATCH_FORWARD;
 }

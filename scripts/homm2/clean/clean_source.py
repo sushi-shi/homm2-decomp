@@ -183,6 +183,7 @@ def _arg(index: int, parenthesize: bool = False):
 # matching tree cannot build this way -- production needs each domain to *be* an
 # integer so the pinned MSVC lowers it identically.
 STRICT_MACRO = "H2_STRICT_ENUMS"
+RETAIL_COMPILER_MACRO = "H2_RETAIL_COMPILER"
 
 
 # Domains that would stay plain integers. Empty on purpose: demoting a domain
@@ -639,8 +640,8 @@ def _directive(line: str) -> tuple[str, str] | None:
     return parts[0], (parts[1].split("(")[0] if len(parts) > 1 else "")
 
 
-def _strict_condition(line: str) -> bool | None:
-    """Branch taken for an #if controlled solely by the strict-types macro.
+def _build_condition(line: str) -> bool | None:
+    """Branch taken for a known build switch in the portable source view.
 
     None when it is about something else and must pass through untouched.
     """
@@ -648,22 +649,28 @@ def _strict_condition(line: str) -> bool | None:
     if not stripped.startswith("#"):
         return None
     body = stripped[1:].lstrip()
+    values = {STRICT_MACRO: True, RETAIL_COMPILER_MACRO: False}
     for prefix, taken in (("ifdef", True), ("ifndef", False)):
         if body.startswith(prefix):
             rest = body[len(prefix):].strip()
-            if rest.split("//")[0].strip() == STRICT_MACRO:
+            if rest.split("//")[0].strip() in values:
                 return taken
     if body.startswith("if "):
         condition = body[3:].split("//")[0].strip()
-        if condition in (STRICT_MACRO, "defined(%s)" % STRICT_MACRO):
-            return True
-        if condition in ("!%s" % STRICT_MACRO, "!defined(%s)" % STRICT_MACRO):
-            return False
+        for macro, value in values.items():
+            if condition == macro:
+                return value
+            if condition == "!%s" % macro:
+                return not value
+            if condition == "defined(%s)" % macro:
+                return True
+            if condition == "!defined(%s)" % macro:
+                return False
     return None
 
 
-def resolve_strict_conditionals(text: str) -> str:
-    """Collapse `#ifdef HOMM2_STRICT_ENUM_TYPES` to its typed branch.
+def resolve_build_conditionals(text: str) -> str:
+    """Resolve retail-compiler and strict-type switches for portable source.
 
     Every other `#if` is copied verbatim, with nesting tracked so its
     `#else`/`#endif` are still matched correctly.
@@ -682,7 +689,7 @@ def resolve_strict_conditionals(text: str) -> str:
 
         if stripped.startswith("#"):
             body = stripped[1:].lstrip()
-            taken = _strict_condition(line)
+            taken = _build_condition(line)
 
             if body.startswith(("if", "ifdef", "ifndef")) and not body.startswith("include"):
                 stack.append([taken, taken] if taken is not None else None)
@@ -833,7 +840,7 @@ def _replace_word(text: str, word: str, replacement: str) -> str:
 
 
 def clean(text: str, relative: str = "") -> str:
-    text = resolve_strict_conditionals(text)
+    text = resolve_build_conditionals(text)
     text = rewrite_directives(text)
 
     # The base name, not __FILE__: several units store this in fixed-size char
@@ -1700,7 +1707,7 @@ INTENTIONALLY_KEPT = {
     "__stdcall",
 }
 MARKER_PREFIXES = ("H2_ENUM_",)
-MARKER_NAMES = {STRICT_MACRO, "RETAIL_FILE"}
+MARKER_NAMES = {STRICT_MACRO, RETAIL_COMPILER_MACRO, "RETAIL_FILE"}
 
 
 def residue(out_root: Path) -> dict[str, int]:

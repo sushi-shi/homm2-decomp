@@ -19,6 +19,9 @@ H2_ENUM_END(VesaBlitConstant)
 DATA(0x005201b8) static char gInvalidateRectFailedText[] = "InvalidateRect Failed";
 DATA(0x005201d0) static char gUpdateWindowFailedText[] = "UpdateWindow Failed";
 
+#if H2_RETAIL_COMPILER
+#define invalidRectangle invalidRect
+#endif
 VA(0x004d4610, 0x1e6)
 extern "C" void __cdecl BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
@@ -66,19 +69,22 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
             height = NET_BOX_TOP - destinationY;
     }
 
-    RECT invalidRect;
-    invalidRect.left = destinationX * iMainWinScreenWidth / LOGICAL_SCREEN_WIDTH;
-    invalidRect.top = destinationY * iMainWinScreenHeight / LOGICAL_SCREEN_HEIGHT;
-    invalidRect.right =
+    RECT invalidRectangle;
+    invalidRectangle.left = destinationX * iMainWinScreenWidth / LOGICAL_SCREEN_WIDTH;
+    invalidRectangle.top = destinationY * iMainWinScreenHeight / LOGICAL_SCREEN_HEIGHT;
+    invalidRectangle.right =
         (destinationX + width) * iMainWinScreenWidth / LOGICAL_SCREEN_WIDTH - 1;
-    invalidRect.bottom =
+    invalidRectangle.bottom =
         (destinationY + height) * iMainWinScreenHeight / LOGICAL_SCREEN_HEIGHT - 1;
 
-    if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
+    if (InvalidateRect(hwndApp, &invalidRectangle, 0) == 0)
         LogStr(gInvalidateRectFailedText);
     if (UpdateWindow(hwndApp) == 0)
         LogStr(gUpdateWindowFailedText);
 }
+#if H2_RETAIL_COMPILER
+#undef invalidRectangle
+#endif
 
 VA(0x004d4800, 0x8)
 i16 AutoInitSVGA(void) {

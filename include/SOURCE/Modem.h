@@ -3,21 +3,21 @@
 
 #include <va.h>
 
-void ModemSetup(i32);
+void ModemSetup(i32 mode);
 i32l Dial(void);
 i32l Wait(void);
-void GUIModemCommand(H2_CONST char*, H2_CONST char*);
+void GUIModemCommand(H2_CONST char* message, H2_CONST char* command);
 i8 GUIModemCommandExec(void);
-void ModemCommand(H2_CONST char*);
-i8 GUIModemResponse(H2_CONST char*, H2_CONST char*);
+void ModemCommand(H2_CONST char* command);
+i8 GUIModemResponse(H2_CONST char* message, H2_CONST char* response);
 i8 GUIModemResponseExec(void);
-i32 write_buffer(H2_CONST char*, i32);
+i32 write_buffer(H2_CONST char* buffer, i32 length);
 i32 read_byte(void);
-void write_byte(i32);
+void write_byte(i32 value);
 void Connect(void);
 i32 WaitForDirectConnect(void);
 char ReadPacket(void);
-void WriteModemPacket(H2_CONST char*, i32);
+void WriteModemPacket(H2_CONST char* buffer, i32 length);
 
 H2_ENUM_BEGIN(ModemSetupMode)
     MODEM_MODE_DIAL = 3,

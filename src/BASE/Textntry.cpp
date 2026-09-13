@@ -372,16 +372,19 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     return widget::Main(message);
 }
 
+#if H2_RETAIL_COMPILER
+#define length len
+#endif
 VA(0x004d2dc0, 0x253)
 void textEntryWidget::Draw(void) {
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         char display[TEXT_BUFFER_CAPACITY];
-        u32 len;
+        u32 length;
 
         strcpy(display, m_text + m_displayOffset);
-        len = strlen(display);
+        length = strlen(display);
         while (m_font->LineWidth(display) > m_innerW)
-            display[--len] = 0;
+            display[--length] = 0;
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_rectX,
             m_owner->m_posY + m_rectY,
@@ -417,6 +420,9 @@ void textEntryWidget::Draw(void) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef length
+#endif
 
 VA(0x004d3020, 0x29a)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {

@@ -98,14 +98,14 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
+    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
+    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
+    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(ExpansionCampaignId);
+    void InitNewCampaign(ExpansionCampaignId campaignId);
     void InitMap(void);
-    void ShowInfo(i32, i32);
-    void UpdateInfo(i32);
+    void ShowInfo(i32 viewOnly, i32);
+    void UpdateInfo(i32 redraw);
     i32 HandleVictory(void);
     void HandleVictory1(void);
     void HandleVictory2(void);
@@ -120,7 +120,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static MessageDispatchResult MessageHandler(struct tag_message&);
+    static MessageDispatchResult MessageHandler(struct tag_message& message);
 
 public:
     void Autosave(void);
@@ -129,9 +129,9 @@ public:
     i32 CampaignID(void);
     H2_CONST char* JosephName(void);
     H2_CONST char* IvanName(void);
-    i8 IsSpecialGoldenBow(i32, i32);
+    i8 IsSpecialGoldenBow(i32 x, i32 y);
     i8 IsSpecialUA(void);
-    i8 IsSpecialLossCondition(i32);
+    i8 IsSpecialLossCondition(i32 playerIndex);
 };
 #pragma pack(pop)
 SIZE(ExpCampaign, 0x4f);

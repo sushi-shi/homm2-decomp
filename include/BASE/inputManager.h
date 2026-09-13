@@ -133,15 +133,15 @@ public:
     i32 field_0x862;
     i32 field_0x866;
     inputManager(void);
-    virtual i32 Open(i32) OVERRIDE;
+    virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
     void SetMouseCoords(i32, i32);
-    void SetKeyCodeType(H2_ENUM_PARAM(InputManagerKeyCodeType, i32));
-    void AsciiConvert(struct tag_message&);
+    void SetKeyCodeType(H2_ENUM_PARAM(InputManagerKeyCodeType, i32) keyCodeType);
+    void AsciiConvert(struct tag_message& event);
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
 };

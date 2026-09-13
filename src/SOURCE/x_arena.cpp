@@ -47,30 +47,47 @@ H2_ENUM_BEGIN(ArenaConstant)
     DRAW_MODE             = 1
 H2_ENUM_END(ArenaConstant)
 
+#if H2_RETAIL_COMPILER
+#define lineCount lineCount11
+#define message message14
+#define statWidgets statWidgets0
+#define textHeight textHeight4
+#define unusedValue1 statValue0
+#define unusedValue2 statValue2
+#define unusedValue3 statValue3
+#define unusedValue4 statValue7
+#define widgetIndex widgetIndex1
+#define widgetMode widgetMode10
+#define windowHeight windowHeight16
+#define windowLines windowLines2
+#define windowName windowName7
+#define windowX windowX4
+#define windowY windowY3
+#endif
 VA(0x004b2ba0, 0x3bb)
 i32 DoArenaDialog(void) {
-    i32 H2_UNUSED(statValue0);
-    i32 H2_UNUSED(statValue2);
-    i32 H2_UNUSED(statValue3);
-    i32 H2_UNUSED(statValue7);
-    i32 windowLines2 = WINDOW_RESOURCE;
-    i16 H2_UNUSED(widgetMode10) = 1;
+    i32 H2_UNUSED(unusedValue1);
+    i32 H2_UNUSED(unusedValue2);
+    i32 H2_UNUSED(unusedValue3);
+    i32 H2_UNUSED(unusedValue4);
+    i32 windowLines = WINDOW_RESOURCE;
+    i16 H2_UNUSED(widgetMode) = 1;
     i32 H2_UNUSED(windowWidth) = WINDOW_WIDTH;
-    i32 windowHeight16 = windowLines2 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
-    i32 windowX4 = WINDOW_X;
-    i32 windowY3 = (LOGICAL_SCREEN_HEIGHT - windowHeight16) / WINDOW_CENTER_DIVISOR;
-    char windowName7[WINDOW_NAME_SIZE];
-    i32 lineCount11;
-    i32 H2_UNUSED(textHeight4);
-    tag_message message14;
-    i32 widgetIndex1;
-    textWidget* statWidgets0[CHOICE_COUNT];
+    i32 windowHeight = windowLines * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
+    i32 windowX = WINDOW_X;
+    i32 windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
+    char windowName[WINDOW_NAME_SIZE];
+    i32 lineCount;
+    i32 H2_UNUSED(textHeight);
+    tag_message message;
+    i32 widgetIndex;
+    textWidget* statWidgets[CHOICE_COUNT];
 
-    if (windowY3 > WINDOW_MAX_Y)
-        windowY3 = WINDOW_MAX_Y;
+    if (windowY > WINDOW_MAX_Y)
+        windowY = WINDOW_MAX_Y;
     choice = 0;
-    sprintf(windowName7, "evntwin%d.bin", windowLines2);
-    arenaWinPtr = new heroWindow(windowX4, windowY3, windowName7);
+    sprintf(windowName, "evntwin%d.bin", windowLines);
+    arenaWinPtr = new heroWindow(windowX, windowY, windowName);
     if (arenaWinPtr == NULL)
         MemError();
 
@@ -80,73 +97,96 @@ i32 DoArenaDialog(void) {
            тренер гладиаторов согласился научить вас одному навыку на ваш выбор. */
         localization::Tr("adventure.arena.choose_skill")
     );
-    lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
-    textHeight4 = lineCount11 << TEXT_LINE_SHIFT;
-    SET_WIDGET_MESSAGE(message14, WIDGET_COMMAND_SET_TEXT, BROADCAST_TEXT_ID);
-    message14.payload.widget.data.text = gText;
-    arenaWinPtr->BroadcastMessage(message14);
+    lineCount = bigFont->LineLength(gText, TEXT_WIDTH);
+    textHeight = lineCount << TEXT_LINE_SHIFT;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, BROADCAST_TEXT_ID);
+    message.payload.widget.data.text = gText;
+    arenaWinPtr->BroadcastMessage(message);
 
-    for (widgetIndex1 = 0; widgetIndex1 < CHOICE_COUNT; widgetIndex1++) {
-        skillWidget[widgetIndex1] = new iconWidget(
-            widgetIndex1 * WIDGET_X_STEP + ICON_FIRST_X,
+    for (widgetIndex = 0; widgetIndex < CHOICE_COUNT; widgetIndex++) {
+        skillWidget[widgetIndex] = new iconWidget(
+            widgetIndex * WIDGET_X_STEP + ICON_FIRST_X,
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
             "xprimary.icn",
-            widgetIndex1 == choice ? widgetIndex1 + SELECTED_FRAME_OFFSET
-                                     : widgetIndex1,
+            widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET
+                                     : widgetIndex,
             ICON_DRAW_NORMAL,
-            widgetIndex1 + WIDGET_FIRST_ID,
+            widgetIndex + WIDGET_FIRST_ID,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (skillWidget[widgetIndex1] == NULL)
+        if (skillWidget[widgetIndex] == NULL)
             MemError();
 
-        statWidgets0[widgetIndex1] = new textWidget(
-            widgetIndex1 * WIDGET_X_STEP + TEXT_FIRST_X,
+        statWidgets[widgetIndex] = new textWidget(
+            widgetIndex * WIDGET_X_STEP + TEXT_FIRST_X,
             TEXT_Y,
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
             // Retail passes static text into a widget that assumes ownership.
-            const_cast<char*>(gStatNames[widgetIndex1]),
+            const_cast<char*>(gStatNames[widgetIndex]),
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (statWidgets0[widgetIndex1] == NULL)
+        if (statWidgets[widgetIndex] == NULL)
             MemError();
-        arenaWinPtr->AddWidget(skillWidget[widgetIndex1], -1);
-        arenaWinPtr->AddWidget(statWidgets0[widgetIndex1], -1);
+        arenaWinPtr->AddWidget(skillWidget[widgetIndex], -1);
+        arenaWinPtr->AddWidget(statWidgets[widgetIndex], -1);
     }
 
-    message14.type = MESSAGE_WIDGET;
-    message14.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message14.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    message14.payload.widget.id = DIALOG_BUTTON_7;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = DIALOG_BUTTON_8;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = DIALOG_BUTTON_1;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = DIALOG_BUTTON_5;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = DIALOG_BUTTON_6;
-    arenaWinPtr->BroadcastMessage(message14);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    message.payload.widget.id = DIALOG_BUTTON_7;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_8;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_1;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_5;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_6;
+    arenaWinPtr->BroadcastMessage(message);
 
     gpWindowManager->DoDialog(arenaWinPtr, ArenaWindowHandler, 0);
     delete arenaWinPtr;
     return choice;
 }
+#if H2_RETAIL_COMPILER
+#undef lineCount
+#undef message
+#undef statWidgets
+#undef textHeight
+#undef unusedValue1
+#undef unusedValue2
+#undef unusedValue3
+#undef unusedValue4
+#undef widgetIndex
+#undef widgetMode
+#undef windowHeight
+#undef windowLines
+#undef windowName
+#undef windowX
+#undef windowY
+#endif
 
+#if H2_RETAIL_COMPILER
+#define dialogMessage dialogMessage_12
+#define extra extra_18
+#define unusedDialogResourceType type_13
+#define widgetIndex widgetIndex_5
+#endif
 VA(0x004b2f5b, 0x1e1)
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
-    tag_message H2_UNUSED(dialogMessage_12);
-    i32 H2_UNUSED(widgetIndex_5);
-    i32 H2_UNUSED(type_13);
-    i32 H2_UNUSED(extra_18);
+    tag_message H2_UNUSED(dialogMessage);
+    i32 H2_UNUSED(widgetIndex);
+    i32 H2_UNUSED(unusedDialogResourceType);
+    i32 H2_UNUSED(extra);
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -172,8 +212,8 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         switch (message_1.payload.widget.command) {
             case WIDGET_NOTIFY_SELECT:
             case WIDGET_NOTIFY_RIGHT_CLICK:
-                extra_18 = NORMAL_DIALOG_NO_VALUE;
-                type_13 = NORMAL_DIALOG_NO_RESOURCE;
+                extra = NORMAL_DIALOG_NO_VALUE;
+                unusedDialogResourceType = NORMAL_DIALOG_NO_RESOURCE;
                 if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
                     switch (message_1.payload.widget.id) {
                         case WIDGET_FIRST_ID:
@@ -210,6 +250,12 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#if H2_RETAIL_COMPILER
+#undef dialogMessage
+#undef extra
+#undef unusedDialogResourceType
+#undef widgetIndex
+#endif
 
 VA(0x004b313c, 0x169)
 void UpdateArenaIcons(void) {
