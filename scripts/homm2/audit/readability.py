@@ -4,6 +4,10 @@ Run with Universal Ctags 6 on PATH:
   python3 -m homm2.audit.readability --write
   python3 -m homm2.audit.readability --check
 
+Generated reports live under build/readability/inventory/ and are not committed.
+Human review records remain input at docs/readability/reviews.json; generation
+never edits them or grants new reading credit.
+
 Ctags indexes physical definitions, including header bodies and inactive branches.
 An independent preprocessor pass covers macros in branches the C++ parser skips.
 Project enum macros are expanded only for indexing; game files are never rewritten.
@@ -22,7 +26,8 @@ import re
 import subprocess
 
 REPO = Path(__file__).resolve().parents[3]
-REPORT = Path("docs/readability")
+REPORT = Path("build/readability/inventory")
+REVIEWS = Path("docs/readability/reviews.json")
 VA = re.compile(r"^\s*VA\(\s*(0x[0-9a-fA-F]+)\s*,[^\n]*\)\s*$", re.M)
 PROC = re.compile(r"^(\w+)\s+PROC\b", re.M | re.I)
 IGNORES = (
@@ -193,7 +198,7 @@ def generate(root: Path, executable: str) -> dict[str, str]:
         if path.endswith(".asm"):
             functions += assembly_rows(path, blobs[path])
     marker_count = attach_addresses(functions, blobs)
-    review_path = root / REPORT / "reviews.json"
+    review_path = root / REVIEWS
     reviews = json.loads(review_path.read_text()) if review_path.exists() else {}
     if set(reviews) - set(paths):
         raise ValueError(f"Reviews reference missing files: {sorted(set(reviews) - set(paths))}")

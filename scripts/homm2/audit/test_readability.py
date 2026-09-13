@@ -1,10 +1,15 @@
 """Reading credit and inventory rejection controls; no retail assets required."""
+from contextlib import redirect_stdout
+import io
+import json
 import os
 from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 
+from homm2.audit import readability
 from homm2.audit.readability import (
     assembly_rows, attach_addresses, ctags_rows, digest, reviewed, tag_rows, tsv,
 )
@@ -89,6 +94,71 @@ class ReadabilityTests(unittest.TestCase):
         self.assertNotEqual(digest(b"old"), digest(b"new"))
         self.assertEqual(tsv([dict(a="hello", b="line\tbreak")], ["a", "b"]),
                          'a\tb\nhello\t"line\tbreak"\n')
+
+
+class InventoryOutputTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.source = self.root / 'src/test.cpp'
+        self.source.parent.mkdir()
+        self.source.write_text('void f() {}\n')
+        self.reviews = self.root / 'docs/readability/reviews.json'
+        self.reviews.parent.mkdir(parents=True)
+        self.reviews.write_text(json.dumps({'src/test.cpp': {
+            'sha256': digest(self.source.read_bytes()), 'note': 'B01: full fixture read',
+        }}))
+        self.review_bytes = self.reviews.read_bytes()
+        paths = mock.patch.object(readability, 'tracked_files', return_value=['src/test.cpp'])
+        tags = mock.patch.object(readability, 'ctags_rows', return_value=[{
+            'path': 'src/test.cpp', 'line': 1, 'end': 1,
+            'kind': 'function', 'name': 'f', 'signature': '()',
+        }])
+        paths.start()
+        tags.start()
+        self.addCleanup(paths.stop)
+        self.addCleanup(tags.stop)
+
+    def run_inventory(self, mode):
+        with redirect_stdout(io.StringIO()) as output:
+            result = readability.main(['--root', str(self.root), mode])
+        return result, output.getvalue()
+
+    def test_write_uses_build_directory_and_preserves_review_input(self):
+        self.assertEqual(self.run_inventory('--write')[0], 0)
+        reports = self.root / 'build/readability/inventory'
+        self.assertEqual({p.name for p in reports.iterdir()},
+                         {'files.tsv', 'functions.tsv', 'macros.tsv', 'progress.md'})
+        self.assertIn('Files read: 1 / 1', (reports / 'progress.md').read_text())
+        self.assertEqual(self.reviews.read_bytes(), self.review_bytes)
+        self.assertEqual(list(self.reviews.parent.iterdir()), [self.reviews])
+        self.assertEqual(self.run_inventory('--check')[0], 0)
+
+    def test_check_reports_missing_build_inventory_without_writing(self):
+        code, message = self.run_inventory('--check')
+        self.assertEqual(code, 1)
+        self.assertIn('build/readability/inventory/functions.tsv', message)
+        self.assertFalse((self.root / 'build').exists())
+        self.assertEqual(self.reviews.read_bytes(), self.review_bytes)
+
+    def test_source_change_invalidates_generated_inventory_not_review_input(self):
+        self.run_inventory('--write')
+        self.source.write_text('void f() { return; }\n')
+        self.assertEqual(self.run_inventory('--check')[0], 1)
+        code, message = self.run_inventory('--write')
+        self.assertEqual(code, 0)
+        self.assertIn('Files read: 0 / 1', message)
+        self.assertIn('STALE: B01',
+                      (self.root / 'build/readability/inventory/files.tsv').read_text())
+        self.assertEqual(self.reviews.read_bytes(), self.review_bytes)
+
+    def test_missing_review_input_does_not_grant_credit_or_create_records(self):
+        self.reviews.unlink()
+        code, message = self.run_inventory('--write')
+        self.assertEqual(code, 0)
+        self.assertIn('Files read: 0 / 1', message)
+        self.assertFalse(self.reviews.exists())
 
 
 CTAGS = os.environ.get("HOMM2_READABILITY_CTAGS") or shutil.which("ctags")

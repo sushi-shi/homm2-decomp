@@ -1,84 +1,47 @@
-# Buka common-helper reading audit
+# Buka common-helper readability
 
-Scope: the canonical `decomp-gold-2.1-buka` game source and headers, starting at
-`ca2904a91`. Propagation to generated source and the cross-platform port is a
-later step. This audit searches deliberately for small, period-plausible shared
-macros and inline functions that explain code across translation units.
+The applied refactor targets canonical `decomp-gold-2.1-buka`. It names narrow
+shared operations while preserving Buka's behavior and compiler output; it does
+not claim original developer macro names or propagate changes to portable source.
 
-This is a source-reading audit, not a claim to have recovered original source
-spelling. Similar code alone does not prove a historical macro or inline.
+- [Final decisions and contracts](findings.md): all 99 finding families and 46
+  exclusions, with retained subsets distinguished from deliberately explicit code.
+- [Verification and limitations](implementation.md): reproducible checks, baseline
+  prerequisites and links to the eight measured matching experiments.
+- [Reading records](reviews.json) and [implementation delta records](implementation-review.tsv):
+  compact, hash-bound provenance inputs, not a live progress report.
 
-The deliberate pass completed at `77b87cd47`: **228 files and 1,655 physical
-function definitions read**, including header bodies and assembly. Start with the
-[ranked findings](findings.md), then use the [detailed ledger](candidates.md)
-for the exact contracts, call sites and exclusions. It records 99 finding
-families and 46 local/rejected observations; those are not 99 required new APIs.
-The [completion audit](completion.md) states the evidence and its limits.
+## Archived audit
 
-The findings have since been [applied and measured](implementation.md): 56
-families have retained applications; every other family has an explicit
-retention decision. The inventory below reflects the applied source, while
-whole-file read credit stays bound to the original hashes. Thus the 96 modified
-files correctly show stale/unread, not an unearned new whole-file review.
-[Implementation delta records](implementation-review.tsv) preserve both hashes
-and the separate caller/contract review evidence.
+The complete pre-implementation reading pass is preserved on
+`audit/buka-common-helpers` at
+[`77b87cd47`](https://github.com/sushi-shi/homm2-decomp/tree/77b87cd47c847aa5ff6aa95d2c691601d0057f6d/docs/readability). It contains the original candidate
+ledger, B01–B45 reading diary, completion report and all-read inventories.
+The applied snapshot before this documentation cleanup is `750ce56aa`.
+Historical records are not rewritten to claim a new whole-file read.
 
-## Inventory and reading contract
+`reviews.json` records whole-file reads at the audit snapshot. Its B/H/R references
+refer to that archive. Changed files become unread when current hashes differ.
+`implementation-review.tsv` records the separate caller/contract review between
+the audit and applied snapshots; it does not grant whole-file reading credit.
 
-- [Every function definition](functions.tsv), including constructors, destructors,
-  header bodies, unannotated helpers, and the fixed assembly routines.
-- [Every source/header file](files.tsv), including files with no function bodies.
-- [Existing macros](macros.tsv), including conditional variants and include guards;
-  these are classified during the owning-file read, not counted as helper ideas.
-- [Current progress](progress.md) and [review records](reviews.json).
-- [Ranked findings](findings.md), [candidate ledger](candidates.md),
-  [batch notes](batches.md), and [completion evidence](completion.md).
+## Generate a local inventory
 
-`read` means the complete file, all its function bodies, and relevant declarations
-were deliberately read; its indexed function boundaries were reconciled. Searches,
-call-site snippets, and automated clone detection do not earn that mark. Files
-containing a partially read long function remain `unread` until the complete body
-and the rest of the file have been covered. Review records bind to whole-file
-SHA-256, so changes reset the file and its functions to `unread` on regeneration.
-Reading shared declarations/call sites also remains necessary when judging a helper.
-
-Universal Ctags 6 indexes physical definitions using explicit expansions of the
-project's enum annotation macros. A separate CPreProcessor pass indexes macros,
-including alternatives to inline functions that the C++ parser can skip. Each
-source `VA` must have an indexed body.
-This is a navigation/completeness aid, not a C++ correctness proof. Human reading
-must reconcile unannotated and conditional bodies too. Vendor SDK/library sources,
-build tooling, and hypothetical compiler-generated bodies are outside the game
-function checklist; bundled Bzip under `src/BASE` remains inside it.
-
-Regenerate/check from the repository root (Python standard library only):
+With Universal Ctags 6 on PATH, run from the repository root:
 
 ```sh
 PYTHONPATH=scripts python3 -m homm2.audit.readability --write
 PYTHONPATH=scripts python3 -m homm2.audit.readability --check
 ```
 
-Use `--ctags /path/to/ctags` if it is not on PATH. Edit review records only after
-reading the complete file; each needs its current hash and a batch-note reference.
-Inventory generation never marks a file read and never edits game source.
+Use `--ctags /path/to/ctags` when needed. Outputs are ignored build artifacts:
+`build/readability/inventory/{files,functions,macros}.tsv` and `progress.md`.
+`--check` compares those local products with the current source and reports
+missing/stale files; run `--write` first in a fresh worktree. Neither mode edits
+the committed reading records or game source.
 
-## Decision criteria
-
-A candidate needs named occurrences in at least two TUs, a precise contract, a
-natural owner header, and an explanation of what the name makes clearer. Record
-argument evaluation, signedness/narrowing, inclusive/exclusive bounds, mutation,
-field-store order, aliasing, and control-flow effects where relevant. Prefer an
-existing abstraction when one already carries the exact contract.
-
-Separate (1) existing duplicate macro definitions, (2) credible shared expressions
-or statement idioms, (3) possible inlines needing retail evidence, (4) one-TU local
-cleanup, and (5) rejected similarities. Do not wrap entire algorithms in macros or
-hide materially different resource lifetimes, clipping modes, wire formats, or
-event protocols behind one name. C++98-era methods/free inlines and narrow macros
-are the idiom under consideration, not modern abstraction frameworks.
-
-No executable refactor is considered verified merely because it looks equivalent.
-On this branch a later retained change needs the matching build, raw bytes and
-ordered relocations; inline expansion can affect `/Od /Ob1` frames and code shape.
-The search can proceed without the original executable. Implementation/propagation
-must not invent matching evidence if retail inputs remain unavailable.
+The inventory covers tracked game source and headers, including header bodies,
+unannotated helpers, conditional macros, fixed assembly and bundled Bzip.
+Ctags supplies navigation and VA/body association checks, not proof of complete
+C++ parsing, human reading or byte equivalence. A deliberate whole-file review
+must reconcile the index before updating its hash-bound reading record.

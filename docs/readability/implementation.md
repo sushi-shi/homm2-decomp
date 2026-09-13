@@ -1,434 +1,110 @@
-# Applying the common-helper audit
+# Common-helper verification
 
-Applied on `refactor/buka-common-helpers`, based on the completed audit
-at `77b87cd47` and canonical `decomp-gold-2.1-buka` at `ca2904a91`.
-The requested deliverable is the applied readability changes and a pull request
-against the canonical branch. Generated/portable-source propagation remains a
-separate step.
+The refactor is based on canonical `ca2904a91`, with the completed reading audit
+at `77b87cd47` and final applied source at `610e19c1` (documented in `750ce56aa`).
+The [final decision table](findings.md) records all retained subsets and exclusions.
+Generated/portable-source propagation and gameplay repairs are outside this PR.
 
-## Scope and acceptance
+## Acceptance and measured alternatives
 
-Apply the [ranked findings](findings.md) according to their precise contracts in
-[candidates.md](candidates.md). Work through the A and B families in small measured
-groups; give every H family an explicit final disposition. Rank C observations
-are not mandatory abstractions, and R entries remain exclusions. Do not make a
-generic helper out of variants with different evaluation, narrowing, mutation,
-ownership or event order. Preserve meaningful call policies and existing APIs.
+Retained changes preserve types, evaluation, narrowing, mutation, ownership,
+callback order and raw compiler output. Before/after equivalence supplements the
+retail comparison; it does not establish original developer spelling or turn a
+pre-existing retail residual into an exact closure.
 
-Retained changes require the canonical build and byte/ordered-relocation review.
-Before/after compiler-object comparisons supplement the retail comparison; they
-are not substitutes for it. Test the strict modern declarations too. Update the
-reading inventory for reviewed changes, then publish the branch and open the PR.
+The eight source dossiers retain complete tested alternatives and measured
+results. They are documentation, not game build input. Disposable matrix axes,
+manifests, results and objects stay under `build/readability/`.
 
-Original work plan:
-
-1. Existing widget-message macro and seven optional-argument API families.
-2. Existing accessors, affected-army indexing and CP1251 vocabulary.
-3. Narrow widget, graphics and resource operations.
-4. Army, creature, spell, combat-grid and action contracts.
-5. Map, town, player-resource, event and calendar contracts.
-6. Small transport storage operations and fixed UI/campaign protocols.
-7. Whole-tree caller/contract review, explicit disposition of every finding,
-   combined verification, refreshed inventory and PR handoff.
-
-All H01-H99 families now have explicit dispositions below: 56 A/B families have
-retained applications (with documented subsets), 14 A/B families remain explicit
-after measured non-equivalent alternatives, and all 29 rank-C families remain
-explicit by design. All 46 R exclusions are preserved. A family disposition is
-not a claim that every variant was bulk-replaced or that a new API was mandatory.
-
-## Reproducible verification inputs
-
-- Retail image extracted without running the installer from the existing local
-  Buka disc archive: `homm2g-buka.iso`,
-  `Autorun/Launch/Setup2/data1.cab` / `data1.hdr` / `data2.cab`,
-  `Program Executable Files\\HMM2PL.exe`.
-  SHA-256: `bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a`;
-  this is the checked-in retail-image pin. All extracted files stay gitignored.
-- The published `toolchain-vc6-sp5` archive currently hashes to
-  `b243b68a1df8c2c54f7830a14221fa0a73fd3bbca78343fd1dd81a815a32ecec`, not the
-  repository's pin. The installer correctly refused it; no checksum was changed.
-- Rebuilt with `nix-shell scripts/toolchain/create-toolchain-release.nix`.
-  All 12 pinned compiler/linker/assembler/runtime artifacts verified, and the
-  produced archive matches the repository pin exactly:
-  `accfbb0ab1a63d4b698d0d205950611386c39b81b1868b336dbfdab413bb84c4`.
-  `homm2.init.toolchain --check` passes after extraction into `build/toolchain`.
-
-## Setup repairs and controls
-
-Fresh `homm2 build` failed before compiling: the link-graph generator split its
-address-sorted objects at data-only X_GLOBAL. Without generated symbols this
-placed BASE/Midi in the direct-link group and left no Midi archive member.
-Archive membership now follows the BASE unit tier, preserving address order
-within each group. Four regressions cover fresh inventories, unanchored X_GLOBAL,
-known ordering and fixed OMF assembly members; all four pass.
-
-The first parallel annotation pass raced while initializing lowercase SDK-header
-symlinks. Running `python3 -m homm2.init.clangd` serially initialized the mirror;
-no SDK file, compiler flag or game declaration was changed for that setup race.
-
-All 98 original TUs compiled. Annotation parsing then rejected OldMain's ternary
-of two string literals passed to the legacy mutable-char score API. An explicit
-`const_cast<char*>` preserves the existing interface and does not authorize a
-write to the literal. Recompiled KB before/after: all 11 non-debug sections have
-identical bytes, sizes and flags; all 5,085 ordered relocations retain their
-types, sites and targets. Compiler-generated `$SG`/`$T`/`$L` numbers may differ,
-but resolve to identical sections/offsets; named symbol identities are unchanged.
-The KB annotation pass now succeeds (508 symbols). This is a compatibility
-prerequisite, not a newly implemented audit helper or a retail-exactness claim.
-
-The initialized baseline passes `homm2 build`; its current report is 1,727/1,727
-exact compared functions and 291,995/291,995 data bytes. Those report totals do
-not replace the raw-byte/ordered-relocation controls above. `homm2 selftest`
-passes all 888 tests, including the four new link-graph regressions.
-
-## Group 1: existing message and optional-argument APIs
-
-| Family | Retained application |
+| Evidence | Scope |
 | --- | --- |
-| H01 | One `SET_WIDGET_MESSAGE` in `BASE/message.h`, replacing two private definitions and 75 exact ordered triples in 26 further TUs. Four existing calls remain. Type/command/id order, payload tails, modifier preservation and subsequent id-only broadcasts are unchanged. |
-| H17 | Six trailing sentinel defaults on `LogInt` and its strict enum bridge; 42 calls shortened at their actual trailing-sentinel boundary. Required first value and meaningful numeric zero slots stay explicit. |
-| H30 | Exact text-only defaults on `NormalDialog`; 238 calls shortened. Mode is required; resource-bearing dialogs and nondefault positions retain their full arguments. |
-| H42 | Three trailing draw defaults on `CombatClipDrawToBuffer`; 29 calls shortened. Limits/orientation/result tests remain, as do nonzero offsets and palette/shear arguments. |
-| H68 | Retry-dialog/default-message defaults on `TransmitRemoteData`; 25 calls shortened. Reliability remains the explicit fifth argument, including SendMapChange's zero. The explicit non-default message type remains. |
-| H82 | Final `i8 extra = -1` on `GiveArtifact`; 31 calls shortened. End-game policy and the four special spell/metadata grants remain explicit. |
-| H85 | Final `waitTime = -1` on `WaitEndSample`; all 23 calls shortened. The negative sentinel still selects the callee's finite 4000-ms default. |
-| H94 | Three final zero defaults on `FightValueOfStack`; 24 calls shortened. Hero/raw mode remains explicit. The five nondefault town/enemy cases, including town id -1, stay unchanged. |
+| [Widget message](../matching/SetWidgetMessage/shared-macro.cpp) | Ordered header writes; the comma expression is retained, `do/while(0)` adds VC6 `/Od` instructions. |
+| [Accessors and byte rules](../matching/ReadabilityAccessors/reuse.cpp) | Existing accessors and CP1251 folds; staged-byte calendar/filename alternatives remain explicit. |
+| [Widgets and resources](../matching/ReadabilityWidgets/shared-operations.cpp) | Hit tests, geometry reads, allocation/copy, icon bounds and display/configuration operations. |
+| [Domain predicates](../matching/ReadabilityDomains/shared-operations.cpp) | Precise creature, map, building, spell and stack queries. |
+| [Ordered operations](../matching/ReadabilityOrdered/shared-operations.cpp) | Dialog, extent, deadline, creature-name and combat-state sequences. |
+| [Formulas](../matching/ReadabilityFormulas/shared-operations.cpp) | Combat-grid, distance, gate, scouting, building, calendar and packed-count expressions. |
+| [Protocols](../matching/ReadabilityProtocols/shared-operations.cpp) | UI/campaign/resource operations and measured rejected wrappers. |
+| [Storage](../matching/ReadabilityStorage/shared-operations.cpp) | Adventure drawing, exact-size file values and separate transport-storage primitives. |
 
-Total: 412 shorter calls and 75 named message-header protocols. Declaration
-parameter types, decorated callable identities and out-of-line implementations
-are unchanged. Only changed C++ ranges were formatted, without include sorting.
+## Reproducible inputs and baseline prerequisites
 
-H01 has two complete four-arm clean-state structural comparisons, documented in
-[the measured source dossier](../matching/SetWidgetMessage/shared-macro.cpp).
-The original sequence, parenthesized sequence and comma expression all reproduce
-the tested retail functions. `do/while(0)` adds instructions at `/Od` and is
-rejected. The comma expression is one safe statement at a conditional call site;
-its repeated message operand must remain a stable expression.
+- Retail image: Buka `HMM2PL.exe`, SHA-256
+  `bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a`.
+  The audit extracted it from `homm2g-buka.iso`, under
+  `Autorun/Launch/Setup2/data1.cab` / `data1.hdr` / `data2.cab`, entry
+  `Program Executable Files\HMM2PL.exe`. Retail files remain ignored.
+- VC6 SP5 archive: SHA-256
+  `accfbb0ab1a63d4b698d0d205950611386c39b81b1868b336dbfdab413bb84c4`.
+  At setup, the published archive failed the pin. Rebuilding with
+  `nix-shell scripts/toolchain/create-toolchain-release.nix` verified all 12
+  pinned tools/runtime artifacts and reproduced the expected archive. No pin,
+  vendor-header patch or compiler-flag change was retained.
+- Fresh link graphs now derive BASE archive membership from the unit tier, not
+  an address-sorted split at data-only X_GLOBAL. This prevents BASE/Midi from
+  entering the direct-link group when generated symbols are not yet available.
+  Tests cover fresh inventories, missing anchors, ordering and OMF members.
+- OldMain's legacy mutable-char score API receives an explicit `const_cast<char*>`
+  for its literal ternary. This fixes annotation parsing without changing the API
+  or authorizing mutation. All 11 KB non-debug sections and 5,085 ordered
+  relocations were unchanged before/after this prerequisite.
+- Initialize the lowercase SDK mirror once with `python3 -m homm2.init.clangd`
+  before parallel annotation jobs on a fresh setup.
 
-The combined raw-object control passes for all 98 objects: 1,516 non-debug
-sections retain their bytes, sizes and flags, and all 42,433 ordered relocation
-records retain their sites, types and destinations. All named symbol coordinates
-and storage classes remain unchanged. Only actual defined static-data `$SG`/`$T`
-and code-label `$L` counter suffixes may be renumbered, never their destinations. The reusable
-`homm2.audit.object_equivalence` control includes 16 negative/positive tests;
-it rejects changed instructions, addends, ordered targets, section flags, named
-symbols, empty comparisons and missing/added objects.
-The full tool suite passes all 904 tests after group 1.
+## Verification
 
-Reproduce after saving the pre-edit raw object directory:
+Enter `nix develop .#build` from the intended worktree and confirm `HOMM2_DIR`
+resolves there. Save separately compiled pre-edit objects before rebuilding:
 
 ```sh
 homm2 build
 python3 -m homm2.audit.object_equivalence \
-  build/readability/baseline-objects build/objdiff/base
+  /path/to/pre-edit-objects build/objdiff/base
 homm2 relocs --fields
+python3 -m homm2.audit.readability_contracts
 homm2 selftest
+python3 -m homm2.audit.readability --write
+python3 -m homm2.audit.readability --check
 ```
 
-`homm2 build` keeps the baseline report totals. Explicit `homm2 relocs --fields`
-passes: 1,727 functions, 38,307 ordered sites and zero structural review items.
-The fixed-width-integer gate also passes.
+At the applied snapshot, all 98 raw objects compare unchanged: 1,516 non-debug
+sections and 42,433 ordered relocations, including sites, types, destinations and
+addends. Named symbols retain identity, coordinates and storage class; only actual
+compiler counter suffixes may differ at identical destinations. The comparison
+rejects empty/missing/added objects and changed bytes, flags, labels or relocations.
 
-## Existing verification limitations (not suppressed)
+The report retains 1,727/1,727 compared functions and 291,995/291,995 data bytes.
+The separate field audit scans 1,727 functions and 38,307 ordered sites with zero
+structural review items. Rounded report totals do not supersede the local retail
+residuals explicitly retained in the source dossiers.
 
-The canonical branch has `AUDITS = False` in `homm2/cli.py`; its `homm2 build`
-does **not** run the hard gates described by the older build documentation.
-This PR does not switch that policy or silently count skipped checks as passes.
-The separately invoked gates reveal existing failures:
+The applied snapshot passed 905 selftests with Universal Ctags 6.2.1 and no skips.
+The documentation/output-path cleanup passes 909 tests with no skips, including
+four new inventory-path/read-credit regressions. All four generated inventories
+are byte-identical to the former tracked products. The build, 98-object comparison
+and field-relocation review were rerun successfully; game source and the eight
+matching dossiers are unchanged by this cleanup.
 
-- `assert_decls`: AudiereEffectsState and SeedPositionState are TU-local structs.
-- `assert_defs_declared`: the same five missing-owner-header/declaration reports
-  reproduce in the unchanged audit worktree at `77b87cd47`.
-- `assert_no_fake_labels`: two existing missing functions and 97 attribution
-  reports. The all-object control confirms the entire named-symbol set is
-  unchanged by group 1.
-- `annotated_functions`: private-function parsing rejects the VC6 STL headers.
-- Strict Clang: 95/96 TUs fail in those old SDK headers. Repeating the complete
-  check with `-ferror-limit=0` produces 1,615 errors, all confined to eight VC6
-  STL headers, and **zero errors in game source/headers**. This is not a passing
-  strict compile. No vendor-header patch, error suppression, weakened gate or
-  compiler-flag change is retained.
+The real-header VC6 contract executable checks all 256 uppercase and lowercase
+CP1251 inputs, creature/widget/map predicates, signed formulas, exact-size scalar
+and record I/O, single operand evaluation, short reads and EOF. It sends no network
+packets and does not validate or repair the retained transport defects. Explicit
+global-data, global-definition, vtable and fixed-width-integer gates passed.
 
-These baseline limitations remain distinct from the passing raw-object and
-retail-relocation controls. They are not permission to introduce new failures.
+## Known baseline limitations
 
-## Group 2: existing accessors and localized byte rules
+`AUDITS = False` remains unchanged: `homm2 build` does not run the older documented
+general hard gates. Separately rerun checks reproduced these existing failures:
 
-| Family | Application and boundary |
-| --- | --- |
-| H22 | 33 direct `HAS(..., HERO_EVENT_EMBARKED)` queries in eight TUs now use the existing `IsEmbarked`. Its masked integer result, surrounding guards and lookup timing are preserved; flag mutations and boat-object tests are not changed. |
-| H27 | Five SEARCH node accesses use the existing reference-returning `GetNode`, already used by FINDPATH. The global stride, coordinates and searchNode overlay stay unchanged. |
-| H52 | Five flattened affected-army accesses in SPELLS/SPELLAI use the existing two-dimensional array spelling. Both reads and writable stores retain the 20-slot stride and their original chance-query order. |
-| H69 | Shared uppercase reuse, one companion `CyrillicToLower`, and shared code-point constants replace private/expanded character folds across six TUs. Locals and result-byte stores remain. The callable `toupper(char)` and CRT `toupper(int)` remain distinct and unchanged. Three GAME u8-staged sequences remain explicit after measured non-equivalent helper attempts. |
+- Declaration policy: TU-local AudiereEffectsState and SeedPositionState structs.
+- Definition ownership: the same five missing-owner/declaration reports.
+- Fake-label audit: two existing missing functions and 97 attribution reports.
+- Private-function annotation: parsing rejects the old VC6 STL headers.
+- Strict Clang: 95/96 TUs fail; unlimited diagnostics reproduce 1,615 errors in
+  eight SDK headers, with zero game-source/header errors. This is not a passing
+  strict build; no diagnostic suppression is counted as a fix.
 
-The H22/H27 structural pairs preserve target bytes; the combined H22/H27/H52
-all-object control also passes. H69's two representative uppercase-reuse pairs
-preserve instruction bytes, but their existing function-local retail relocation
-residuals are not described as exact closures. The definitive retained-change
-control is the before/after all-object comparison, not rounded fuzzy scores.
-
-H69's two calendar sites were tested as an independent 2x2 structural product.
-Both explicit u8-store arms retain the 1,277-byte DoNewTurn function; shared
-calls produce 1,282/1,284/1,289 bytes. The filename filter's two-arm comparison
-retains its 428-byte explicit fold instead of the 433-byte call form. All six
-trials completed, source restored. These paths still share code-point constants;
-their filtering, source-dot mutation and calendar message protocols are not
-hidden by an abstraction.
-
-A VC6-compiled executable including the real KB.h tests all 256 uppercase and
-256 lowercase input bytes and passes, including Yo, unsigned interpretation and
-unchanged nonletters. The object control now also permits the numeric counter
-suffix on VC6 `$sourceLabel$counter` LABEL symbols while preserving the label
-name and exact destination; a regression rejects a changed label name.
-
-All four group-2 families are applied. The final build and original-snapshot
-object control pass after removal of the remaining town-color private helper:
-98 objects, 1,516 sections, 42,433 ordered relocations. The full tool suite now
-passes 905 tests. [The measured source dossier](../matching/ReadabilityAccessors/reuse.cpp)
-records the structural arms and narrow rejected paths. Reproduce the exhaustive
-real-header byte test with `python3 -m homm2.audit.readability_contracts` inside
-the build shell; compiler flags come from the KB unit's manifest entry.
-
-## Group 3: narrow widget, resource and display operations
-
-| Family | Application and boundary |
-| --- | --- |
-| H02 | Eleven widget-local hit tests in eight TUs use `WIDGET_CONTAINS_LOCAL_POINT`. Coordinates remain narrowed before the call; drop-button and popup rectangles stay explicit. The three-arm probe rejects the inline method (1,270 vs 1,240 bytes) and retains the byte-neutral expression macro. |
-| H03 | All eight widget readers share `READ_WIDGET_GEOMETRY`: four ordered signed-word stores. The live resource pointer is reevaluated before each read; id/kind, lookups and payload reads remain outside. |
-| H05 | Nine assignment/copy pairs in listbox, droplist, Overview and TOWNMGR use `ALLOC_COPY_STRING`. Existing frees and ownership transfer stay explicit. FONT's local declaration/initialization pair stays readable as two statements; no second declaration-generating macro is introduced. Its non-copy scratch allocation, extra-capacity text buffers and ADVMGR's format-string copy are excluded. |
-| H11 | Eight unsheared decoders share `ICON_FITS_CLIP`. It retains left/right/top/bottom comparison order and already-resolved flipped coordinates; clip-mode assignment, inclusive edges and decoder loops remain explicit. |
-| H13 | Ten input/source-coordinate expressions in three TUs use `CLIENT_TO_GAME_X/Y`. Signed conversion, original long/int arithmetic, live dimensions and destination narrowing remain. Width/height scaling and inclusive rectangle preparation stay explicit because the new names describe coordinates. |
-| H15 | Eighty live lvalue selections in seven TUs use `CURRENT_GRAPHICS_CONFIG`. No reference is cached across callbacks; game/editor slot selection and saved scalar fields remain unchanged. |
-| H19 | The existing one-value `LOG_SUMMARY_VALUE` is shared from Misc.h with statement-safe comma sequencing. Fifteen old calls plus fourteen new calls in SMACKMGR, Bzip and dpnetwin retain formatting into `gText` before logging. Other arities/buffers and subsequent shutdown/error operations remain explicit. |
-
-[Seven complete source matrices](../matching/ReadabilityWidgets/shared-operations.cpp)
-record the precise arms and audit results. H02/H03/H11 reproduce the tested retail
-functions. H05/H13/H15/H19 preserve their baseline instructions and relocations
-but retain existing function-local retail normalization residuals; rounded 100%
-is not reported as closure. The final build and original-object control pass
-after the five town/overview string pairs: all 98 objects, 1,516 non-debug
-sections and 42,433 ordered relocations. The retail field-relocation review also
-passes, with no new structural review items.
-
-## Group 4: domain predicates and precise query boundaries
-
-| Family | Application or measured retention |
-| --- | --- |
-| H20 | 138 building-mask queries use existing `HAS`, with the same raw `u32l` storage and explicit `IDX`/`BIT`/shifted masks. No normalized-return town API is added. Mutations, the raw captain-mask store and unclassified literal-mask tests stay explicit. |
-| H21 | Retain the direct type-sentinel comparison. `HasTroop` changes HasAllUndead from 90 to 101 bytes; a macro merely wrapping one already-named comparison would add little clarity. No positive-quantity condition is introduced. |
-| H24 | 56 pointer-based terrain queries use `CELL_TERRAIN`. It preserves the byte/table lvalue, exact supplied cell expression and one evaluation, including existing GetCell calls and their caller-specific fallback. Index-only and dot/row-view variants stay explicit. |
-| H25 | Nine ordered sprite/index/flag conjunctions use `CELL_HAS_NON_SHADOW_OBJECT`. Existing 0x80 aliases share the map owner's shadow-only flag; no passability rule or tileset/frame shadow detection is implied. The repeated-GetCell negation remains explicit. |
-| H28 | Retain direct combat-array access. The reference-returning GetArmy probe keeps 161 bytes but changes instructions/register use. A three-argument macro would not improve the existing owner/two-index spelling enough to justify another API. Physical, controlling and mixed side/index choices remain visible. |
-| H29 | Fifteen `Stats(KNOWLEDGE) * 10` prefixes use `HERO_NORMAL_SPELL_POINTS`. Caller narrowing, further multiplication and each Stats call remain. The method alternative changes instructions; the macro preserves them. |
-| H33 | Ten exact earth/air/fire/water memberships, including ordered negations, use `IS_ELEMENTAL_CREATURE`. Different comparison orders, the three-elemental frame case and surrounding summon/mirror/undead policies remain explicit. |
-| H47 | Eleven iron/steel memberships use `IS_GOLEM_CREATURE`. The inline alternative adds 53 bytes in its probe; the macro is unchanged. Runtime/AI spell coverage, double half-damage arithmetic and destination casts remain outside. |
-| H48 | Two green/red/black/bone memberships use `IS_DRAGON_CREATURE`. Three-living-dragon immunity is not changed. |
-| H49 | Nine berserk/hypnotize pairs use `ARMY_HAS_BERSERK_OR_HYPNOTIZE`, including the independently measured ordered zero conjunctions. Reversed order and other ownership/action policies remain explicit. |
-| H50 | Seven blind/paralyze/petrified triples use `ARMY_HAS_INCAPACITATING_SPELL`, including the independently measured ordered zero conjunctions. Other orders, death, quantity and the separate mind-influence pair are not folded in. |
-| H55 | Fourteen exact lich, vampire and troll base/upgrade memberships use three separate named predicates. Vampire-lord healing remains a single-type test. |
-| H76 | Five positive-stack queries in Overview, TOWNMGR and SWAPMGR use `ARMY_GROUP_HAS_POSITIVE_STACK`. Type-first evaluation, signed counts and the unused census remain. H21's type-only queries do not acquire this condition. |
-| H78 | Sixteen select/alternate-select command pairs use `IS_WIDGET_SELECTION_COMMAND`. Message type, right-button guards, routing and dialog behavior remain in each caller; Newgame's equivalent command aliases are included. |
-
-[Twenty complete structural matrices](../matching/ReadabilityDomains/shared-operations.cpp)
-preserve the attempted source and individual exact/non-exact audit results.
-No rejected method or compiler-state probe remains in game headers. Redundant
-grouping around primary-expression calls was removed after the measured grouping
-pair; control-statement and enclosing-call parentheses are retained.
-
-The final build, original-object control and retail field-relocation review pass:
-98 objects, 1,516 unchanged non-debug sections and 42,433 ordered relocation
-records. Existing local retail normalization residuals remain distinct from the
-passing before/after proof. The real-header VC6 integration check now also passes
-all 256 signed-byte inputs for six creature sets and the selection predicate,
-plus 32,768 sprite tileset/flag/sentinel combinations, alongside the 512 case folds.
-
-## Group 5: ordered UI and combat operations
-
-| Family | Application or measured retention |
-| --- | --- |
-| H32 | Ten `FINISH_DIALOG_MESSAGE` calls save the original widget id, then store the close id and dialog-select command. Handler returns, the timeout's preceding type write/following reset, SETUP's later cancel override and all other payload remain explicit. The town event handler has the same three-store contract. |
-| H34 | Retain the six exact-order four-`if` clamps. The statement-safe `do/while(0)` macro increases Walk from 2,599 to 2,609 bytes. Its definition is removed; no unguarded multi-statement macro or reordered ternaries are substituted. |
-| H35 | Sixteen `UPDATE_INCLUSIVE_REGION` calls name endpoint-to-size conversion at the window-manager boundary, with stable local/global bounds. Other drawing/fizzle APIs, clipping and caller flags are untouched. |
-| H36 | Fifteen `COMBAT_DEADLINE` expressions retain the `i32` conversion after floating tick addition and the original delay-first product. Long-cast, reversed-product, division and double-factor variants remain explicit, as do timer slots and polling. |
-| H38 | Seven `CREATURE_DISPLAY_NAME` calls preserve the lazy table selection and `count <= 1`, including SPELLS' equivalent `PLURAL_QUANTITY_MINIMUM - 1`. Separate-format branches, `== 1` variants and lowercased `gTargetName` remain explicit. |
-| H40 | Eight `CLEAR_HEX_OCCUPANT` calls clear side then index only. Repeated cell expressions, front/rear selection and guards are retained; grid initialization, reversed stores and frame/corpse state remain explicit. |
-| H53 | Thirteen `SET_NEXT_COMBAT_MOVE` calls set action before evaluating/storing the destination. Intervening ValidAttack work, previously selected destinations, action-extra stores and returns remain outside. |
-| H57 | Seven `CLEAR_ARMY_TARGET` calls preserve side/index order. Attack direction, move/previous-target hexes, save/restore and index-first variants remain explicit. |
-
-[Eight complete two-arm matrices](../matching/ReadabilityOrdered/shared-operations.cpp)
-record the exact attempted source and results. H32/H35/H57 match their retail
-probes; the other retained expressions preserve baseline instruction and
-relocation hashes with the existing local retail residuals. H34's added code is
-a measured rejection, not an untested claim that no possible helper could match.
-
-The combined build and original-object control pass: all 98 objects, 1,516
-non-debug sections and 42,433 ordered relocations are unchanged. Retail field
-review passes for 1,727 functions and 38,307 sites with zero structural items.
-
-## Group 6: combat, town, calendar and distance formulas
-
-| Family | Application or measured retention |
-| --- | --- |
-| H43 | Two complete range/column tests use `IS_INTERIOR_COMBAT_HEX`. Existing ValidHex calls, partial column tests and COMMAND's special/sentinel hex rules stay unchanged. |
-| H44 | Eight local-delta expressions use `INTEGER_VECTOR_LENGTH`: signed integer squares/sum, then double sqrt, then i32 truncation. Abs calls and step rounding stay outside. The map-radius repeated-subtraction variant remains explicit. |
-| H56 | Eight `HEX_HAS_OCCUPANT` queries compare side before index, with no requested-index narrowing. Empty-cell alternatives, cell lookup, validity and blocked-state tests remain in the callers. |
-| H58 | Two positive PATH and three negative COMMAND gate exceptions use `CAN_PASS_CASTLE_GATE`. Both forms are independently measured. The seven ordered conditions still read gpCombatManager even when the caller reads candidate cells through a different receiver; no passability or TestRaiseDoor policy is added. |
-| H63 | Both scouting-plus-telescope expressions use `HERO_SCOUTING_VISIBILITY_RADIUS`. Signed skill/table indexing, one artifact Boolean, distinct origins and visibility timing remain. Scouting-only GAME sites are excluded. |
-| H72 | Four offered/displayed level expressions use `NEXT_MAGE_GUILD_LEVEL`, preserving saved locals and upper-only signed capping. The value inline adds five bytes to SetupCastle and is removed. KB's uncapped actual cost subscript remains unchanged. |
-| H73 | Both completed-building queries use `TOWN_BUILDING_COMPLETE`: mask first, then non-guild or level exactly five. BIT and Castle's signed-long shift are separately measured; both remain 32-bit mask operations on the existing u32l owner. No affordability or raw captain-mask query is changed. |
-| H87 | Five day-first queries use `GAME_DAY_NUMBER`, with packed u16 promotion to signed i32 and no caching or normalization. PerDay still queries before rollover; month-first campaign arithmetic and its i16-return variant stay explicit. |
-| H92 | Four tent-mask tests use `PLAYER_HAS_VISITED_TENT`, retaining the signed byte promotion and raw mask result. Color decoding and the password-before-flag order remain outside. |
-| H93 | Retain the explicit i16 store followed by the named count shift. `RecruitSiteCount(i16)` changes RecruitSiteEvent from 368 to 362 bytes and changes instructions. A second macro merely naming the already-named shift would not justify another API. The rejected inline is removed. |
-| H96 | Twenty-four exact two-delta sums use `MANHATTAN_LENGTH`. Actual deltas, including ResetHeroRVs' two X-coordinate reads, remain unchanged; outer absolute values, shifts, thresholds and tie-breaking are untouched. |
-
-[Thirteen complete structural matrices](../matching/ReadabilityFormulas/shared-operations.cpp)
-include both gate forms, both building-mask spellings and the three-arm guild-level
-probe. All retained arms preserve their baseline instruction and relocation hashes.
-H56/H58/H63 also pass the target-local exact audit; other baseline retail residuals
-remain explicitly recorded in the dossier.
-
-The combined build, all-98-object comparison and retail field-relocation review
-pass with the same section/relocation totals. FLY now explicitly includes the
-math-helper owner header. The real-header VC6 executable additionally passes
-2,048 signed tent-mask/color combinations, 2,001 hex/guild-level inputs and
-1,089 signed delta pairs against independent bounded integer expectations.
-
-## Group 7: UI, campaign and resource protocols
-
-| Family | Application or measured retention |
-| --- | --- |
-| H45 | Retain the guarded spell-icon dispose/load/cache update. Its expanded statement-safe block changes the probe from 863 to 869 bytes. Resource ownership and reload conditions remain visible. |
-| H46 | Retain the two ordered artifact tests and additive bonuses. The statement-safe block changes the probe from 3,918 to 3,924 bytes; neither test becomes else-if or one cached artifact query. |
-| H61 | Retain the five ordered independent frame-remap tests and separate final offset. The statement-safe block adds six bytes (9,310 to 9,316). |
-| H71 | Retain the explicit type-then-count stores. Both existing Dismiss and a separate inline were measured without changing the out-of-line ABI: 775 bytes becomes 767 with a new call relocation, or 783 with the inline. The trial inline is removed. |
-| H74 | Four `SET_ADVENTURE_BUTTON_FLAGS` calls preserve message type, command, enabled-bit payload, then each id/broadcast from 1 through 6. Active-manager guards remain only where originally present. Receiver/message expressions remain live across callbacks. |
-| H79 | Both `PRESENT_RESTARTED_CAMPAIGN_MAP` calls preserve invalidation, bottom-view reset, fade-out, origin setup, redraw and fade-in. Different initialization calls and dialog guards remain outside. |
-| H80 | Retain each campaign-bonus widget protocol. Its statement-safe block changes the probe from 2,268 to 2,278 bytes; selection guards and refresh order are not generalized. |
-| H81 | Five `ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL` calls preserve add-before-CheckLevel and both receiver evaluations, including the repeated GetHero calls. Setup suppression, cached levels and reward policy remain explicit. |
-| H83 | Retain event-resource addition followed by floor-to-zero. The trial player method changes 4,347 to 4,290 bytes and 159 relocations to 153, and is removed. Raw resource indices, overflow and event timing are not repaired. |
-| H86 | Retain cheat-flag assignment followed by campaign-conditional assignment. Its statement-safe block adds six bytes (3,587 to 3,593). |
-| H89 | Retain the ascending seven-resource cost loops. The trial player method changes the probe from 645 to 649 bytes and removes a relocation, and is removed. No affordability, saturation or transaction layer is added. |
-| H90 | Five `CLEAR_ARMY_GROUP` calls retain the two array-major clears: type bytes to -1, then signed count storage to zero. Aliased quantity storage has the same address/size. No whole-object memset or per-slot loop is introduced. |
-| H91 | Retain presence-first signed quantity summation. The trial CountCreatures inline changes 977 to 983 bytes, and is removed. Count zero, absent types, and the existing unsigned troop alias are not conflated. |
-
-[Thirteen complete matrices](../matching/ReadabilityProtocols/shared-operations.cpp)
-record 27 arms, including both H71 alternatives. H74 and H90 match the retail
-probes exactly; H79 and H81 retain the baseline bytes/relocation hashes with
-their pre-existing retail residuals. The five statement-safe-block experiments
-measure the actual expanded bodies with `do/while(0)`, not a claim that every
-possible inline or macro spelling has been disproved. None is retained.
-
-The combined build, original-snapshot object comparison and retail field review
-pass again: 98 objects, 1,516 non-debug sections, 42,433 ordered object relocations;
-1,727 retail functions and 38,307 field sites, with zero structural review items.
-
-## Group 8: adventure viewport, file values and transport storage
-
-| Family | Application or measured retention |
-| --- | --- |
-| H60 | Forty-two `DRAW_ADVENTURE_ICON` and seven separately named flipped calls keep the current screen and 480-square adventure viewport. Clipping mode, coordinate/frame expressions and normal/flipped semantics remain explicit. Zero-extent cloud/boat calls and other rendering APIs stay unchanged. |
-| H64 | Both backends use separate initialization, enqueue and array-disposal operations. The first two retain allocation/store/copy order and repeated global reads; the disposal inline retains conditional frees and unconditional null stores. It does not drain payloads or reset indices. The copy/dequeue inline adds eleven bytes (147 to 158) and is removed, leaving that fourth operation explicit after each backend's ProcessMessages. The stored-size/copy-size discrepancy and different backend drain policies remain unchanged. |
-| H65 | Retain the explicit allocation/tag/guarded-copy prefix. The tested pointer-return inline adds four bytes (467 to 471) and changes relocation sites, and is removed. Caller locals, u16 promotion, unchecked allocation and Winsock's existing error-return/free behavior are not repaired. |
-| H66 | Five `FREE_NODE_QUEUE` calls preserve the caller's node lvalue, final null, repeated pop and one scalar H2_FREE per node. This is a single while statement, safe as a conditional body; no extra wrapper loop, traversal, lock or shutdown is added. The alternative inline keeps the 233-byte size but changes instructions and is removed. |
-| H70 | Forty-four reads and 46 writes use exact-size file-value expressions in six TUs, including the plain PCX header and KB's individually sized entry writes. Results, address/sizeof identity, duplicate tent fields and partial-read effects remain. Arrays, wider-global slices, prefixes, KB's oversized entry reads and REQUEST's distinct pointer/sizeof(*header) spelling stay explicit. |
-
-[Eleven complete matrices](../matching/ReadabilityStorage/shared-operations.cpp)
-record 23 arms, including both H66 alternatives and independent normal/flipped
-draw and read/write probes. H60, H64 disposal, H66's macro and the plain-record
-write probe pass their retail exact audits. The other retained arms preserve
-their baseline instruction/relocation hashes and documented retail residuals.
-
-The combined 98-object build and original-snapshot comparison pass with all
-1,516 non-debug sections and 42,433 ordered relocations unchanged. Retail field
-review again scans 1,727 functions and 38,307 sites with zero structural items.
-The real-header VC6 executable now also checks scalar/record file sizes, single
-evaluation of descriptor and value operands, partial reads and EOF through a
-local CRT pipe; all pass. It does not send network packets or claim runtime
-validation of the intentionally retained transport defects.
-
-## Rank-C and exclusion dispositions
-
-The following are final **retain-explicit** decisions for all 29 rank-C families,
-not pending mandatory APIs. Their precise variants remain documented in the
-audit. These are readability/scope decisions, not claims of newly measured
-compiler rejection; only experiments in the measured dossiers have that status.
-
-| Family | Reason to retain the current boundary |
-| --- | --- |
-| H04 | Save/lookup/restore remains visible; stored MakeId and larger protected regions are distinct, and a general position guard would obscure that distinction. |
-| H06 | Keep the existing GetIconEntry API and explicit addressing at their current sites; no second accessor or unmeasured new out-of-line call is added. |
-| H07 | Explicit clamps show lower/upper order and already-narrowed stores; a universal clamp would hide negative-range and interleaved-axis differences. |
-| H08 | Parameter-heavy list-layout helpers would move the same arithmetic behind longer calls; row selection and thumb travel remain separate. |
-| H09 | Origin adjustment and far-edge shrinking remain explicit, including the interleaved Fizzle axes. |
-| H10 | Keep actual base/pitch expressions visible; decoder state and fixed screen pitch do not become bitmap-width assumptions. |
-| H12 | Retain existing cursor/palette APIs and distinct decoder expressions. The cursor helper's load/increment order and the two palette domains are not interchangeable. |
-| H14 | Three named manager-field stores do not justify a name that could imply registration or resource initialization. |
-| H16 | Eight-edge predicates would hide comparison order and saved/raw rectangle choices with little reduction in argument noise. |
-| H18 | The component shift is already short; preserve caller-specific promotion/store types rather than add another palette conversion layer. |
-| H23 | Keep compaction after the last-match search, old-tail sentinel and external count/selection changes visible. |
-| H26 | Map bounds remain local to their actual dimensions, comparison order and access timing; no broad guard is introduced. |
-| H31 | An explicit null test followed by MemError is clearer than another macro, especially because MemError is not assumed nonreturning. Unchecked allocations stay unchecked. |
-| H37 | Keep the small midpoint scan beside its distinct angle/count/animation context; no generic count repair or projectile-loop extraction. |
-| H39 | Existing QuickDistance already names the approximate metric. Coordinate extraction and combat-cell choices remain visible without another forwarding API. |
-| H41 | Eight operands and several store-order variants outweigh the gain from an extent-growth macro. |
-| H51 | Keep CombatMessage history/update arguments explicit; these are meaningful policies, unlike the applied sentinel defaults. |
-| H54 | Retain the existing Wince boundary and explicit sequence/frame pairs; no redundant animation-start API or unmeasured call substitution. |
-| H59 | CompleteDraw and UpdateScreen already describe the two operations well. No combined redraw API is added. |
-| H62 | Keep guarded pointer detach/delete and the later separate null stores visible, rather than conceal the ownership/lifetime distinction. |
-| H67 | Three statements clearly show first-pop then conditional second-pop; no extra priority or locking semantics are implied. |
-| H75 | Disable then defer-dim remains explicit, with its message-state differences and special flag. |
-| H77 | The reverse defer-dim then disable protocol remains separate; symmetry is not a reason for a second public API. |
-| H84 | Six operands would make reward-history bookkeeping harder to follow than the conditional copy and new-primary stores. |
-| H88 | Typed guarded scalar deletion and unconditional nulling stay explicit; no deletion-form repair or generic ownership guard. |
-| H95 | After H94 shortens the stack-value calls, retain the ratio's visible signed product, double division and float store rather than introduce another wrapper. |
-| H97 | The named INFO/QUICK_VIEW ternary remains clear after H30; keep that mode choice visible. |
-| H98 | Retain the short rounded-step expression beside each caller's positive-speed/minimum-one policy. |
-| H99 | Keep hover equality, state update and consume return together in the handler; no stateful query obscures the dispatch boundary. |
-
-All 46 R entries remain exclusions under their original contracts in
-[candidates.md](candidates.md). No helper authorizes a behavior repair, transport
-validation, ownership rewrite, generalized serialization, geometry substitution
-or merged game/UI workflow described by those exclusions.
-
-## Final verification and inventory handoff
-
-The combined source state at `610e19c1` passes `homm2 build`, the complete
-original-object control (98 objects, 1,516 non-debug sections, 42,433 ordered
-relocations), and retail field review (1,727 functions, 38,307 sites, zero
-structural items). The build report retains 1,727/1,727 compared functions and
-291,995/291,995 data bytes. The target-local residuals in the measured dossiers
-remain visible; rounded report totals are not substituted for those audits.
-
-The final full tool suite passes **905 tests, no skips**, with Universal Ctags
-6.2.1 on PATH. The real-header VC6 contract executable passes all finite-domain
-and file-I/O cases described above. The explicitly invoked global-data,
-global-definition, vtable and fixed-width-integer gates also pass; all 30
-source-owned vtable identities remain accounted for.
-
-The five baseline limitations listed earlier were rerun, not bypassed:
-declaration, definition-owner, fake-label and annotation diagnostics are exactly
-unchanged from the initialized baseline. Unlimited-error strict Clang again
-reports 1,615 errors, byte-for-byte the same diagnostic lines in the same eight
-SDK headers, with zero game-source/header errors (95/96 TUs still fail). The
-strict build is **not** claimed as passing, and AUDITS remains unchanged.
-
-The reading inventory is regenerated and its `--check` passes. It now indexes
-228 files, 1,652 physical definitions, 1,491 VA-associated bodies and 792 macros.
-The three-body net reduction is reconciled: five private CP1251 folds were
-removed in favor of shared vocabulary, while CyrillicToLower and the transport
-array-disposal inline were added. LogInt's inventory signature changes only
-because its trailing defaults are now explicit.
-
-Historical whole-file reading credit remains bound to the original audit at
-`77b87cd47`; it is **not** silently transferred to changed files. The 96 changed
-files therefore correctly show stale/unread whole-file status (132 unchanged
-files and 264 definitions retain their original credit). Their
-[implementation review records](implementation-review.tsv) bind both audit and
-applied hashes and point to the caller/contract/compiler reviews above. Those
-delta reviews are implementation evidence, not a newly claimed whole-tree read.
-The completed original reading/search remains available in Git at `77b87cd47`.
-
-Generated source and the portable branch have not been modified. The PR targets
-`decomp-gold-2.1-buka`; propagation remains the separate follow-up originally
-specified by the audit.
+The [reading records](reviews.json) remain bound to the original audit hashes.
+The [implementation delta records](implementation-review.tsv) record the separate
+caller/contract review for 96 changed files, not a new whole-file reading pass.
+Current inventories are generated locally as described in [README.md](README.md).
