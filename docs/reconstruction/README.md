@@ -105,7 +105,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   consumer's order of reads and writes.
 - C02: recovered both cursor byte-buffer owners, removing four repeated views
   and adding two allocation-boundary casts. [Full native and retail proof](C02-G03-C06.md).
-- C03: executive text is a character array reinterpreted as an aggregate.
+- C03: replaced the executive text aggregate overlay with18 actual character
+  array owners. [Full native graph and604-byte retail storage proof](C03.md).
 - C04/C05: framebuffer and palette interface signedness need owner review.
 - C06: retain the fizzle u16 lookup cast; the complete two-arm removal test
   changes native text. G03's structured color-tail alternative also changes

@@ -596,8 +596,8 @@
     "note": "All15 constructors/methods, record-tag enum and geometry constants; B06 resource name bound, U01 real DRAW message."
   },
   "src/BASE/EXEC.cpp": {
-    "sha256": "283b7943ab658836555d12a197ee281c3bf1d8c1e753dae2915a37fcce0ee990",
-    "note": "All10 methods and gExecutiveText macro/concatenated initializer; C03 typed text-owner candidate, B03 manager-array and B04 log format bounds."
+    "sha256": "d9d9934b547afa6024bf076ad8e3e5d418d800b570ae921d9d9900ee2edbcc66",
+    "note": "Complete source and all10 physical methods plus18 separate DATA text slots read. C03 removes char-storage aggregate reinterpretation using existing-capacity character arrays; direct-record/packing/inferred-string alternatives measured and rejected for section alignment/length. All98 objects/1826 emitted functions native exact after18 explicit owner-offset rewrites; all604 retail data bytes and five consumers fully exact. B03 manager count and B04 log format/name contracts remain; no unrelated changes."
   },
   "src/BASE/miscwin.cpp": {
     "sha256": "14d866b4c87c49c46eb75011803c8cfbc14b146d711c408f930f1fc65a6bff0e",
@@ -633,7 +633,7 @@
   },
   "include/BASE/EXEC_TYPES.h": {
     "sha256": "6dc2b87ee2f064cbe61463780dad2ae31f234c0977f0095de8c126c3c610fa5f",
-    "note": "All18 text-slot fields total0x25c; C03 char buffer overlay macro in EXEC.cpp may be real initialized aggregate."
+    "note": "All18 text-slot capacities totaling0x25c read. C03 now uses separate actual character arrays with those capacities; existing layout declaration is not instantiated or reinterpreted. No object extension, new padding owner or signature change; complete native/retail proof in C03.md."
   },
   "include/BASE/miscwin.h": {
     "sha256": "170685792af3e1f291e28ccbbd8b863f78e0c83e8c4dc4442522a4b518324686",
