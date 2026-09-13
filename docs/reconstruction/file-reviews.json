@@ -726,5 +726,13 @@
   "include/SOURCE/town.h": {
     "sha256": "80eaf880f8d0cc72be7e82547467d4a2045af7758473d51bee1646edf92471cd",
     "note": "Full packed100-byte town layout, enums/prototypes/accessor and every spell/count consumer reviewed. U15 removes19-byte overlay prefix and unused sixth overlapping count, retaining real20-byte flat/2D spell union followed by five counts. All98 native objects/1826 function instances/sections/ordered relocs identical; VC6 explicit layout assertions prove spells@0x3c,counts@0x50,turns@0x55,name@0x57,size100. No fake padding or before-array pointer."
+  },
+  "include/SOURCE/PHILAI.h": {
+    "sha256": "dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18",
+    "note": "Full115-line owner header read. U16 BHC has real town pointer, purchase tag, integer/building union and quantity; pending complete producers before simplifying. Player arrays6 and resource arrays7 agree with reviewed consumers; all prototypes/macros/forward declarations read, no function bodies."
+  },
+  "include/SOURCE/philAI.h": {
+    "sha256": "3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c",
+    "note": "Full138-line method declarations header read; typed enum parameter domains and real output-reference/pointer signatures. No data members, hidden inline body, aggregate scratch or active macro definition. PHILAI source review remains partial."
   }
 }

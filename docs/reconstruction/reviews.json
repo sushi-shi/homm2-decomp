@@ -18974,5 +18974,325 @@
       "bounds": "open"
     },
     "note": "Entire211-line pre-edit body read including spell valuation and transfer branches. U15 adjacent five-count owner applied across all consumers; all98 native objects/1826 emitted instances/sections/ordered relocs identical.1975 ordinary retail bytes and DIR32 sites pass; fixed13-float supplement proves all remaining operands. C47 bounded town-ID/turn narrowing needs review; double/float and float-to-i32 conversions are real precision/truncation boundaries. R11 stackSlot begins as Manhattan distance then army-slot index. S49 scratchVal unread and initial statSum0 overwritten. B68 live hero/town/value/player, valid wisdom/count/spell/terrain/creature domains, nonzero townFV+battlePower and representable transfer arithmetic required. Five-slot loops fit actual army owner; quantity alias retained. No goto, fake stack aggregate, artificial owner pointer, outside pointer or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:ResetHeroRVs(i32 resetAll,i32 x,i32 y)#1": {
+    "body_sha256": "0319b5dbd7e1b240874bc0f0173f046096ed835908bc1cc79f63d17c950604f7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "R12 node is a map-column index then a hero-record index. Real contiguous grid indexing, not artificial address recovery. B69 final x+y*width store guards only -1, so valid coordinates and allocated width*height grids required. Hero-distance expression uses hero.x twice; all391 ordinary retail bytes/sites/ordered targets independently pass, so not silently corrected. No cast, union, goto, fake scratch or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:CheckDoMain(i32 a1,i32 doMain)#1": {
+    "body_sha256": "c8e0209190d2cbcfb0028e9fefa53181f3f01ff57e039b9b59af95c4e3b11b15",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Saves/restores actual display state and view coordinates around manager calls; same-role locals, no aggregate or unrelated reuse. B69 timer addition/wrap and live UI/global manager contracts. No casts, unions, goto, artificial pointers or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:ShowStatus(void)#1": {
+    "body_sha256": "a624f84385929bc39712d537ce491109592ad515eb18c924bde1d8975b854c89",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Entire empty body reviewed; no instance of any of the ten patterns."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::philAI(void)#1": {
+    "body_sha256": "9802ea9623dbb57c318618da5339dd8082d63ab72f0e2efb65994f03ce9d9e2c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Six iterations initialize three actual six-player ship/boat request arrays. Bounds agree with owner declarations; no cast, union, goto, fake scratch, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DoAllHeroInteractions(void)#1": {
+    "body_sha256": "7190de074e88d5dca2848ea66e3f5583fb45606fe8ccec7d7fcdb65f728f99d2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Walks player town IDs and checks occupant sentinel before GetHero; B69 live player/game, townCount<=72 and valid IDs required. iDummy is a real output argument, not manual varargs. No cast, union, goto, fake aggregate or unrelated roles."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::CheckForCreatureUpgrades(void)#1": {
+    "body_sha256": "5875aa2ab13c550d032f82e94bc7746bdc4415dbaf3c8eafbe733895bf3c7581",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "U06 quantity alias remains. S50 upgradedType initial NONE is overwritten whenever hasUpgrade is set. Both town/hero armies, all five slots, dwelling upgrades, dragon special case and merge tail read. B69 valid faction/creature/town IDs, nonnegative quantities and representable cost/merge arithmetic required; RES_NONE guarded before resource indexing. No cast, goto, fake aggregate, manual varargs or unrelated-role reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:GetCastleSlot(i32 id)#1": {
+    "body_sha256": "f179ac7194cf7c203f1b454090b9a57edca5f9be808da67b75bad9e8d49fd4f2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual typed castle-array accessor. B69 id must be0..71 and gpGame live; no offset-based owner recovery, explicit cast, union, goto, aggregate or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::CheckBuyStuff(void)#1": {
+    "body_sha256": "b0d49296608b5439658a8e38232d02aee9b5286cab1356c25fb999ade0d17ad6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "U16 BHC is a real purchase descriptor; type selects building or integer hero/creature-slot meaning, all producers still need review. S50 bought flag never consumed; first dockTown assignment is repeated via inline accessor, not a different semantic role. B69 player/town IDs, owner request consistency, valid boat coordinates and eventual purchase progress required. Temporary resource reservation is restored according to pending request, not an unrelated variable reuse. No cast, goto, fake owner pointer or manual varargs; LogInt is an ordinary fixed-argument call."
+  },
+  "src/SOURCE/PHILAI.cpp:GetHeroSlot(i32 id)#1": {
+    "body_sha256": "4e844a0ed0759391c7f18aa8e2c23168dd89fcee7aaa40b88dd6acc8134b04a2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Typed hero-array accessor; B69 ordinary contract id0..53, but GetTurnAIVars forms it from an unguarded occupyingHeroId that can be-1. This is a caller-domain/outside-pointer finding, not a fabricated biased base or owner-from-member trick. No casts, unions, goto, scratch or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::GoodAdjacent(MapDirection * direction)#1": {
+    "body_sha256": "96ea7ee91689c018a6737f50319fbe7755e914ac7311ac6dd348699bf40e670a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Eight real direction candidates, ValidMoveWithEvent guard, tagged town/hero metadata and live output pointer required B69. Saves two global value factors and restores on ordinary tail, but stone-lith early return leaves both1; recorded behavior, not a buffer fix. No casts, union, goto, fake aggregate, manual varargs or unrelated roles."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::CheckReload(void)#1": {
+    "body_sha256": "0efdc00d06b2f021ca2ff96057f25066a29c0c37c0504450b7a57b41092a5349",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Integer-to-float conversions force real division rather than integer division; retain. U02/U03/U04 search node/pointer aliases remain. B69 initialized search grid, map/metadata domains, strength arithmetic and positive distance denominators required; clamps own strength before half-strength denominator. No goto, fake array, artificial pointer or manual varargs; misleading names do not themselves imply unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::CheckBerserk(void)#1": {
+    "body_sha256": "20097c190ebe6b63e3b7f74a4db2e466de4ec4d406741cba52bd8f49c92540f4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real scaled float-to-i32 truncation retained. Full map scan with tagged hero/town metadata, B69 valid owners/IDs and representable doubled strength required. Early returns are coherent rejection paths; no goto, union, fake scratch, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DimensionDoorTo(i32 x,i32 y)#1": {
+    "body_sha256": "501655fcb0408dbbe6269dd84ada87fb50fb2047b420ebac130eb8447c0cfbb4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Typed teleport and mobility/spell updates; IDX on integer y introduces no pointer conversion. B69 live current hero, legal destination and spell/mobility contract supplied by caller. No written cast, union, goto, scratch, artificial address or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DoAnywhereDDoorTownGate(i32 targetValue)#1": {
+    "body_sha256": "8f24a19f0f71b8eeb39779ae0cd038a84426191b0484ac9f8f6e64c10098f79b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U02 search pointer view is real. B69 candidate visited lookup precedes coordinate guard; negative/one-past grid access possible for edge candidates under source-domain counterexamples. All947 ordinary retail bytes/DIR32 sites/ordered targets pass; local byte evidence in B69-S50.md. No normal gameplay reachability claim. bestY initialized whenever bestX becomes usable. No casts, goto, fake scratch, owner recovery, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DoDimensionDoor(hero * pHero)#1": {
+    "body_sha256": "e3a278ed8494f6679dcc138a996dad71c5b91bdcb324e8228ec45e3baa1884b6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U02 path/aiPath overlay pending all-consumer recovery; walks actual directions array backward. B69 pathLength<=256, direction0..7, generated path inside map and currentHero matching argument required. len/bestY are assigned whenever bestX is valid and protected by short circuit; not uninitialized on that tail. No casts, goto, fake local arrays, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::SetupRelativeHeroStrengths(void)#1": {
+    "body_sha256": "d8a757ba9e33ddd0831e635f4ad1133dbe7a30fb4c40698aafca38149268f140",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Selects strongest owned hero using live count and IDs; B69 heroCount<=8 and valid hero IDs required. Empty loop leaves explicit -1 alpha sentinel. No casts, unions, goto, scratch aggregate, artificial pointers, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:ValidateHero(hero * pHero)#1": {
+    "body_sha256": "ad47c0a97e15c5a24a5d965df946b05a0b1d909520659ac2ff2b0174e0728985",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S50 j initialized then incremented only for invalid creature ID and never consumed; body does not actually reject or repair invalid state. B69 live hero required, loop itself fits five army slots. No casts, unions, goto, fake aggregate, manual varargs or unrelated local reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DoAI(i32 player)#1": {
+    "body_sha256": "3766af2130f33749de71b7db29b1fa577f1f7bda563312ee0ed2ef2388e03488",
+    "patterns": {
+      "casts": "open",
+      "unions": "open",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire orchestration body read. C48 narrow direction storage and enum recovery need owner review; real floating scaling/truncation retained. U02 aiPath overlay pending. G58 cleanup, retarget, special move and next-hero joins; special move jumps past initialization of stopAfterStep6/move flags/path index. R12 pathIndex0 is hero/resource/visited-position/path index. S50 savedShow3 uses only element0 and unusedVars1[7] never used; complete6/6 owner family rejects all five smaller candidates by raw size, source restored. B69 coordinates/path/IDs, text inputs, movement and cleanup lifetime contracts remain; four private floats prevent general whole-function target closure. No manual varargs, invented owner offset or aggregate replacing unrelated objects."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::GetGameAIVars(void)#1": {
+    "body_sha256": "5ac29ea2629fe29a6b5e4dc011b97e560c1cd6fa39f447869b941b8f5c31a77f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Simple player-count traversal delegates attention setup; B69 playerCount<=6 and live game required. No casts, unions, goto, fake local storage, manual varargs, unrelated reuse or artificial addresses."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::GetTurnAIVars(i32 player)#1": {
+    "body_sha256": "14b1bfc8d7aa2fc6ecd93d41919f674f46cc6c114b32544cacbad06d993eef52",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire259-line setup body read. C48 bounded mineValue i8 conversion plus real floating precision/truncation boundaries. U12 castleOwners alias and U02 node pointer remain. G59 one nested first-week break join. R12 generalIndex4 spans hero/town/artifact/player/global-bonus indices. S50 unusedFightValue9 unread; initial fightValueFloat0 overwritten before all reads. B69 search y loop uses MAP_WIDTH, assuming square map; threat-town occupant-1 not guarded before GetHeroSlot/member army address. Mine neighborhood has explicit x/y guards and value0..4. Resource, hero, town, player counts, nonzero divisors and arithmetic/float ranges remain caller contracts.3295 ordinary retail bytes/sites pass,11 private floats unresolved by general checker. No fake aggregate, manual varargs or artificial owner arithmetic."
   }
 }

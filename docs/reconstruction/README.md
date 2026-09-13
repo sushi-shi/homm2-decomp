@@ -361,6 +361,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   its real floating conversions; bounded ID/turn conversions, distance/slot
   reuse, unread scratch and numeric/game-state domains remain separate findings.
 
+- B69/C48/R12/S50/G58/G59/U16: the first20 PHILAI definitions and both owner
+  headers now have individual reviews. [Runtime and local-owner evidence](B69-S50.md)
+  confirms the pre-guard candidate-grid read and records special-move
+  initialization and threat-occupant contracts. The complete six-arm DoAI
+  storage family rejects all smaller owners; no source change retained.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
