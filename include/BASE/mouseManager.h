@@ -98,8 +98,8 @@ extern b32 gbInSetPointer;
 extern b32 bInNewMouseUpdate;
 extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-extern void* cAndBits[MOUSE_CURSOR_COUNT];
-extern void* cColorBits[MOUSE_CURSOR_COUNT];
+extern u8* cAndBits[MOUSE_CURSOR_COUNT];
+extern u8* cColorBits[MOUSE_CURSOR_COUNT];
 extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 

@@ -116,8 +116,8 @@
     "note": "Full255-line TU/8bodies read. S19 unknown class gap; real icon snapshots and12-byte numeric scratch retained. B36 cache/asset contracts; tagged message protocol preserved."
   },
   "src/SOURCE/RECRUIT.cpp": {
-    "sha256": "52ef23662146f8456341dc1772b3d149856a2cad4c49df5b26810289ad90093b",
-    "note": "Full458-line TU/8bodies read. C14 two const casts removed with11-function/all-section native equivalence. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost."
+    "sha256": "801b298faf802f09b349ffbe24f8ad67ab90598ec19fbc99c8c902866f3adae2",
+    "note": "Full458-line TU/8bodies read. C14 two const casts retained: native-equivalent removal fails required C++98 annotation recovery. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost."
   },
   "src/SOURCE/SWAPMGR.cpp": {
     "sha256": "ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473",
@@ -580,8 +580,8 @@
     "note": "Complete font owner and256-character metric/offset domains; string API output capacity remains caller contract B01."
   },
   "src/BASE/MOUSEMGR.cpp": {
-    "sha256": "32af17cb76a3fb41714fe9f8d62fd0ab07dd1cf42cbd46bb56a15bbb5c884077",
-    "note": "All17 functions and96 cursor dimensions/hotspots/handles; max66x43 fits saved66x64. C02 pixel owners, G03/G04 joins. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+    "sha256": "d1590e70dd95dccfb16a83683c66ba3eadb76cf59c227b19a5b0f45ca0f2ad05",
+    "note": "All17 functions and96 cursor dimensions/hotspots/handles; max66x43 fits saved66x64. C02 pixel owners, G03/G04 joins. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C02 typed byte owners verified across every named consumer,98 native objects and all three full retail bodies. Handle-assert and G03 structured-tail complete products reject removal; G04 separate."
   },
   "src/BASE/DIMMER.cpp": {
     "sha256": "3c1d3913f68139f13037a4311226dc90930383e28c95c5cb9ee973cd73a4a74a",
@@ -612,8 +612,8 @@
     "note": "All22 definitions including FadeSavedUpdate and empty table stubs; DATA macro override reviewed,96-byte palette covers rotation accesses; G05,C04-C06,B08. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "include/BASE/mouseManager.h": {
-    "sha256": "ced722d60d2253b37f9d4601539f6f3ea8826795b08604f8ae3544db95bee402",
-    "note": "Complete packed0x8a manager,96 cursor slots,3 type offsets and saved66x64 bitmap constants; C02 void* buffer globals."
+    "sha256": "54e670433710bf63c7e3e0aadb0afd16d1842a450c36d8e7e25b9ae38d8684d6",
+    "note": "Complete packed0x8a manager,96 cursor slots,3 type offsets and saved66x64 bitmap constants; C02 recovered u8* buffer globals; both384-byte arrays/layout and all consumers verified with98-object native proof."
   },
   "include/BASE/dimmerWidget.h": {
     "sha256": "ad38b443d5f1b7569d272ac4b06a9dcfed296b11f05dd7908f788071972ba849",
@@ -776,8 +776,8 @@
     "note": "Complete1475-line TU read through EOF and all11 physical VA-marked definitions reconciled. ClearEffects already credited under O05; ten new full-body reviews here. Private target-mode/layout enums, numerical macros, eleven named float DATA modifiers, two real11-entry duration tables and spell-group global reviewed. C60/C61 remove five casts with full native98-object1826-function preservation; fixed numeric operands and16-byte enum map checked against genuine retail. S57/R18 measured negatives and B77 caller/numeric/retail scoring behavior recorded without hardening or fabricated padding. No manual varargs or owner-recovery macro hidden outside functions."
   },
   "src/SOURCE/CMBTMGR.cpp": {
-    "sha256": "25c9a4070c58d898a068bf2b7ff8fd769241325b274e9e27870e8362b48149ec",
-    "note": "Full2443-line source read and38 physical bodies reconciled, including prolog enums/macros,six actual data owners and vtable. C62/C63 remove38 written casts with complete measured source products and98-native-object evidence. G72-G74/S58/R19/C64 and B78/B79 retain detailed per-body results and limits; no whole-repository closure implied."
+    "sha256": "9a98c7687c543fffcd57d406762c6c21e38d4c2ff83d5a73d08dd874bb1eef12",
+    "note": "Full2443-line source read and38 physical bodies reconciled, including prolog enums/macros,six actual data owners and vtable. C62/C63 remove37 written casts with complete measured source products and98-native-object evidence. G72-G74/S58/R19/C64 and B78/B79 retain detailed per-body results and limits; no whole-repository closure implied. Conditional cloud-name cast restored for C++98 annotation compatibility."
   },
   "include/SOURCE/CMBTMGR.h": {
     "sha256": "9e2fc82b267ab2b69708140660f3ae6998f60f1ddfb2b4c14dbce6aaa2f9f43e",

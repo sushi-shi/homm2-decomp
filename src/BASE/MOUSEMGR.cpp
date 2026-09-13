@@ -35,11 +35,11 @@ DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = H2_ZERO_INIT;
 DATA(0x005352d0) static i32 gOldMouseRight = 0;
 DATA(0x005352d4) HICON hMouseCursor[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x00535454) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT] = {NULL};
-DATA(0x005355d4) void* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x005355d4) u8* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x00535754) static i32 gOldMouseBottom = 0;
 DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = H2_ZERO_INIT;
 DATA(0x00535ed8) static POINT gMouseScreenPt = H2_ZERO_INIT;
-DATA(0x00535ee0) void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x00535ee0) u8* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x00536060) static POINT gMouseCheckPt = H2_ZERO_INIT;
 DATA(0x00536068) b32 gbInSetPointer = false;
 DATA(0x0053606c) b32 bInNewMouseUpdate = false;
@@ -245,8 +245,8 @@ void mouseManager::SetPointer(i32 frame) {
         goto done;
     }
     if (hMouseCursor[m_cursorSizeIndex] == NULL) {
-        cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES);
-        cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES);
+        cColorBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES));
+        cAndBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_AND_BYTES));
 
         char filename[RESOURCE_NAME_CAPACITY];
         if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
@@ -283,19 +283,19 @@ void mouseManager::SetPointer(i32 frame) {
             i32 y;
             for (y = 0; y < MOUSE_CURSOR_BITMAP_WIDTH; y++) {
                 for (x = 0; x < MOUSE_CURSOR_BITMAP_WIDTH; x++) {
-                    if (*(static_cast<u8*>(cColorBits[m_cursorSizeIndex]) + x
+                    if (*(cColorBits[m_cursorSizeIndex] + x
                           + y * MOUSE_CURSOR_BITMAP_WIDTH)
                         == 0)
-                        *(static_cast<u8*>(cAndBits[m_cursorSizeIndex])
+                        *(cAndBits[m_cursorSizeIndex]
                           + y * MOUSE_CURSOR_MASK_ROW_BYTES
                           + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
                             1
                             << (MOUSE_CURSOR_MASK_HIGH_BIT
                                 - (x & MOUSE_CURSOR_MASK_HIGH_BIT));
-                    else if (*(static_cast<u8*>(cColorBits[m_cursorSizeIndex]) + x
+                    else if (*(cColorBits[m_cursorSizeIndex] + x
                                + y * MOUSE_CURSOR_BITMAP_WIDTH)
                              == 1)
-                        *(static_cast<u8*>(cAndBits[m_cursorSizeIndex])
+                        *(cAndBits[m_cursorSizeIndex]
                           + MOUSE_CURSOR_MASK_PLANE_BYTES + y * MOUSE_CURSOR_MASK_ROW_BYTES
                           + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
                             1

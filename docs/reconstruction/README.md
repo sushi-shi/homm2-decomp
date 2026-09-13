@@ -93,7 +93,7 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 - C01: implemented `Read13(char*)`, `ReadBlock(void*)` and text name arrays;
   26 casts removed, native before/after bytes and relocation graphs identical.
-  [Evidence and remaining full-build gate](C01.md).
+  [Evidence and passing full-build gate](C01.md).
 - S01: `LoadAggregateHeader` now uses the single signed 16-bit count it reads,
   removing an unused array element with [full native/retail proof](S01.md).
 - G01: retain the button's shared-dispatch goto; a measured `break` replacement
@@ -103,10 +103,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   replacing these unions with casts or fresh whole-message initialization would
   lose preserved payload fields. Retain the tagged views while reviewing each
   consumer's order of reads and writes.
-- C02: mouse color/AND bitplanes use `void*` owners then repeated byte casts.
+- C02: recovered both cursor byte-buffer owners, removing four repeated views
+  and adding two allocation-boundary casts. [Full native and retail proof](C02-G03-C06.md).
 - C03: executive text is a character array reinterpreted as an aggregate.
 - C04/C05: framebuffer and palette interface signedness need owner review.
-- C06: fizzle lookup index is cast to u16 although composed of two u8 values.
+- C06: retain the fizzle u16 lookup cast; the complete two-arm removal test
+  changes native text. G03's structured color-tail alternative also changes
+  bytes; retain the cleanup goto. [Measured dispositions](C02-G03-C06.md).
 - G02-G06: font next-character joins, mouse cleanup/rectangle joins, palette
   cycle join and input coordinate join need structured-source experiments.
 - B01-B09: font extraction, text-entry scratch, dialog saved-manager arrays,
@@ -196,9 +199,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   as sentinel; caller reservation/lifecycle proof is required. Two unused
   map helper scalars need native frame checks. Reloading an extra pointer after
   reallocating its owner is necessary, not avoidable pointer reuse.
-- C14: two recruitment filename const casts removed through the existing
-  const-correct window interface. [Full native equivalence and retail-check
-  limits](C14.md) distinguish instruction/ordinary-target proof from EH aliases.
+- C14: retain both recruitment filename casts for the required C++98
+  annotation dialect. The [native-equivalent removal experiment](C14.md)
+  fails that parser even though the modern interface accepts const text.
 - U06: army-group duplicate type/count union aliases need all-consumer review;
   the unsigned troop-count view must not silently change serialized meaning.
 - S18-S21: unread morale/recruitment/swap scalars and unknown interior strip/
@@ -448,7 +451,7 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   lifecycle contracts still requiring caller guarantees.
 
 - C62/C63/S58/G72-G74/R19/C64/B78/B79: [combat-manager review](C62-C63-S58-B78.md)
-  reconciles all38 CMBTMGR functions and both headers. Thirty-eight casts are
+  reconciles all38 CMBTMGR functions and both headers. Thirty-seven casts are
   removed, including two following one-byte castle-hex table recovery. All98
   native objects/1826 emitted functions and allocated sections are unchanged.
   Complete source products retain the original goto and unused-local forms;

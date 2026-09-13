@@ -4,7 +4,9 @@
 // condition ? a : b. All arms: Open 619 bytes, 19 blocks, 99.954025% fuzzy.
 // Runner baseline has the same compiler-EH relocation limitations. Independent
 // native before/after proof: all 11 functions and all allocated sections exact,
-// including EH metadata. Retain both direct expressions. See C14.md for the
+// including EH metadata. Final disposition: restore both const_casts because
+// direct conditional expressions fail the required C++98 annotation dialect.
+// The direct expressions below are rejected experiment arms. See C14.md for the
 // explicit distinction between native equivalence and partial retail proof.
 
 // recruitUnit::Open, existing heroWindow(H2_CONST char*) interface:

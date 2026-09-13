@@ -92,8 +92,8 @@ owners. Earlier per-function applied changes and open contracts remain
 explicit; complete review coverage is not a claim that every retail input is
 safe or that every proposed simplification has a byte-compatible spelling.
 
-The latest full build (`build/build-events-final2.log`) passes with 1,727
-data objects / 291,987 bytes. Its strict before/after comparison
+The latest full build (`build/build-events-final2.log`) passes with 1,727/1,727
+exact function checks and 291,987/291,987 data bytes. Its strict before/after comparison
 (`build/events-final2-native.log`) checks all 98 native objects, 1,826 emitted
 functions, allocated sections and ordered relocation graphs. This final
 metadata pass changes only audit documentation and review hashes.

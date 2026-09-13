@@ -4352,9 +4352,9 @@
     "note": "CP1251 byte reinterpretation/narrowing is necessary. Retail longest monster name21bytes gives title<=29bytes including NUL, fitting both40-byte arrays. Tagged message data follows command changes and synchronous text copy."
   },
   "src/SOURCE/RECRUIT.cpp:recruitUnit::Open(i32 priority)#1": {
-    "body_sha256": "4665b7f1a51eed38dbda086d42d6abd914429c4cb44891a3390c2aa8db1719e6",
+    "body_sha256": "ecfb3c4e479107301a63183a7382cb5eb42cafffe68c66180b84e562fc1c158b",
     "patterns": {
-      "casts": "applied",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -4365,7 +4365,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C14 applied: remove const_cast around conditional resource filename; heroWindow accepts H2_CONST char*. All11 native funcs/sections identical. Retail instruction bytes agree; generic checker still needs SEH target handling. B36 valid creature costs are positive; available/resource lifecycle remains."
+    "note": "C14 retained: both conditional filename const_casts are VC6-byte-neutral but required by C++98 annotation recovery with H2_CONST empty. No parser exception or signature change. B36 valid creature costs are positive; available/resource lifecycle remains."
   },
   "src/SOURCE/RECRUIT.cpp:recruitUnit::Close(void)#1": {
     "body_sha256": "f4dd08be6d333cffe6499b6271bb4e67db874302b9f4abe1a8bc49fccbb2d52d",
@@ -4448,9 +4448,9 @@
     "note": "B36 town/faction/dwelling bounds select borrowed army and garrison member pointers. Real cost[7] filled by GetMonsterCost; resource enum conversion preserves domain. S20 unmodeled class gaps retained."
   },
   "src/SOURCE/RECRUIT.cpp:QuickViewRecruit(class town * townData,i32 dwelling)#1": {
-    "body_sha256": "c52d2d6c7be42d5ebb46cecfb0823132e6cba777fe60740006926fa5ef4e3b8b",
+    "body_sha256": "b0ec7ced410d5c4829aa3e358ad892f99a2b923b73a8bd0596170670e8facb44",
     "patterns": {
-      "casts": "applied",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -4461,7 +4461,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C14 applied: filename conditional uses existing const-correct window interface; full11-function native equivalence, retail instruction bytes agree pending generic SEH resolution. Real seven-cost array fits GetMonsterCost. B36 dwelling/faction domains; removed window is not deleted here (lifecycle evidence, not silently fixed)."
+    "note": "C14 retained: both conditional filename const_casts are VC6-byte-neutral but required by C++98 annotation recovery with H2_CONST empty. No parser exception or signature change. Real seven-cost array fits GetMonsterCost. B36 dwelling/faction domains; removed window is not deleted here (retail lifecycle unchanged)."
   },
   "src/SOURCE/STRIP.cpp:strip::strip(i32 x,i32 y,i32 stripType,u32l portraitIconId,i32 portraitFrame,class armyGroup * army,i32 firstBorderId,i32 drawWindow,i32 flagFrame)#1": {
     "body_sha256": "2dc9501914506cfd125bcdb6782262516d323d2c700ea568f67e3fb9f2562ea2",
@@ -13101,7 +13101,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "96-slot cursor loop and two hotspot axes bounded by declared arrays; manager name fits30 chars."
+    "note": "96-slot cursor loop and two hotspot axes bounded by declared arrays; manager name fits30 chars. C02 follow-up: all96 typed byte-owner slots and complete initialization/free lifecycle reviewed; native and full retail bytes/sites/ordered destinations pass."
   },
   "src/BASE/MOUSEMGR.cpp:mouseManager::Open(i32 priority)#1": {
     "body_sha256": "2f97b4e533f8b0aef125e30ae3ff9b30ea1214247fbe80a0a9d245307fcad03d",
@@ -13133,7 +13133,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Bounded96-slot cleanup of SDK handles and allocated buffers; typed resource disposal."
+    "note": "Bounded96-slot cleanup of SDK handles and allocated buffers; typed resource disposal. C02 follow-up: all96 typed byte-owner slots and complete initialization/free lifecycle reviewed; native and full retail bytes/sites/ordered destinations pass."
   },
   "src/BASE/MOUSEMGR.cpp:mouseManager::Main(struct tag_message &)#1": {
     "body_sha256": "0797e8702da710ebfe02995cc6450217ee35c4c929e608d5081ad2412dfa31c7",
@@ -13168,11 +13168,11 @@
     "note": "Three fixed icon names fit char[16]; saved cursor-ready flag and cursor type have distinct live roles."
   },
   "src/BASE/MOUSEMGR.cpp:mouseManager::SetPointer(i32 frame)#1": {
-    "body_sha256": "c61e8302d35563e5f6ff556b8e95d6668d68ee2a0b4a0b6bb43a3b50811ddfb0",
+    "body_sha256": "6e3808cffc051eb3ec2da343003dc6c847fd7b98afe1386895824c4aa8b9c0cb",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "retain",
       "owner": "absent",
       "outside": "absent",
@@ -13181,7 +13181,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes ReadBlock casts. C02: void* pixel arrays cause four byte-view casts; test byte owners with allocation-boundary casts and pointer-nonnull assertions. G03: color path jumps to shared RestorePosition/reentry cleanup, test else. 32x32 color bytes and two128-byte mask planes fit1024/256 buffers; valid frames fit filename[16]. Type assumes0..2 before frame assertion."
+    "note": "C01 ReadBlock interface retained. C02 actual u8* pixel owners remove four repeated views and add two allocation-boundary casts; all98 native objects and complete1376-byte/76-relocation retail proof pass. Four-arm handle-assertion matrix changes bytes for every removal, retain pointer-to-i32 boundaries. G03 two-arm structured color else changes1376 to1372, retain cleanup goto. Real32x32 colors/two128-byte planes fit1024/256 buffers; valid frames fit filename16; type0..2 is required before assertion."
   },
   "src/BASE/MOUSEMGR.cpp:mouseManager::NewUpdate(i32 force)#1": {
     "body_sha256": "188ad1842efe67cbdd61823440e4f1b33b7889fb8de7b9d5e7dd4f430f2fe776",
@@ -14226,7 +14226,7 @@
   "src/BASE/WINMGR.cpp:heroWindowManager::FizzleForward(i32 x,i32 y,i32 width,i32 height,i32 delay,i8 * startPalette,i8 * endPalette)#1": {
     "body_sha256": "ca1fb93f72b5188b4f8b00f8e10d2f0e86cd3acd7dd1a1943278c271030d4b53",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "retain",
@@ -14237,7 +14237,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Allocation casts are real void* boundaries; bounded640x480 dimensions fit i16. u16 table index is already composed of two bytes (C06 candidate removable cast). Two768-byte palettes and65536 lookup buffer cover indexed accesses; saved source must be same prior clipped rectangle. Cursors advance at most one-past final row; no fake pointer. Palette interpolation reuses one component consistently."
+    "note": "Allocation casts are real void* boundaries; bounded640x480 dimensions fit i16. u16 table index is already composed of two bytes (C06 complete two-arm removal changes1133 to1128 bytes; retained). Two768-byte palettes and65536 lookup buffer cover indexed accesses; saved source must be same prior clipped rectangle. Cursors advance at most one-past final row; no fake pointer. Palette interpolation reuses one component consistently."
   },
   "src/BASE/WINMGR.cpp:heroWindowManager::ReleaseFizzleSource(void)#1": {
     "body_sha256": "6cfc8d8f61efa8e90b5c66b0e5a39641a33b213a849f5f40b166a4995be08d4e",
@@ -22128,7 +22128,7 @@
     "note": "Tests opposite-side defeated/retreated then scans that side for any nonexcluded army. Toggling the side is a related perspective change, not unrelated variable reuse. U05 flags retained; B78 two-side domain and valid count are required for inverse indexing. No buffer or fabricated pointer owner."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::CatAttack(CombatSide side)#1": {
-    "body_sha256": "cc55ef70560b0743fa6d07bf193b16cefad1ad206eb98bd595aa57912f9ec491",
+    "body_sha256": "895ccee8ccb06adf662d9f37af426410297446abae982006263549fcffcf4af1",
     "patterns": {
       "casts": "applied",
       "unions": "absent",
@@ -22141,7 +22141,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C62 six casts removed, C63 two more via typed byte castle-hex tables with all consumers/native proof. Real float truncations, double constants and integer midpoint division retained. G74 foundMissHex exits nested neighbor search;2-arm explicit-found loop changes3544 to3576. R19 frame has direction/projectile/cloud roles; S58 post-search frame increment/sample initialization untried. B78 wall/hex/resource/side/arithmetic/screen contracts and B79 fixed cloud/name text recorded; no enlarged owners."
+    "note": "C62 five casts removed, C63 two more via typed byte castle-hex tables with all consumers/native proof. Real float truncations, double constants and integer midpoint division retained. G74 foundMissHex exits nested neighbor search;2-arm explicit-found loop changes3544 to3576. R19 frame has direction/projectile/cloud roles; S58 post-search frame increment/sample initialization untried. B78 wall/hex/resource/side/arithmetic/screen contracts and B79 fixed cloud/name text recorded; no enlarged owners. Conditional cloud-name const_cast restored for required C++98 annotation dialect; native removal was byte-neutral but not parser-compatible."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::KeepAttack(CombatTowerSelector tower)#1": {
     "body_sha256": "9420e853105db2027ca72ccbc693149a5d5206e921de546ada9f462684cac8a5",

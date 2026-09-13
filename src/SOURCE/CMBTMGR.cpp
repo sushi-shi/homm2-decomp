@@ -1507,7 +1507,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
     icon* cloud =
-        gpResourceManager->GetIcon(missShot19 ? "smalclod.icn" : "lichclod.icn");
+        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? "smalclod.icn" : "lichclod.icn"));
 
     for (frame = 0; frame < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame++) {
         if (frame >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT

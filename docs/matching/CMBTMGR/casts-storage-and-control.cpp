@@ -2,6 +2,10 @@
 // Parent a03eb49c: clean source, no TU-state census or universal closure claim.
 // Source record, not compilable replacement TU input.
 // See docs/reconstruction/C62-C63-S58-B78.md for native proof and limits.
+// Final dialect correction: restore CatAttack's conditional cloud-name
+// const_cast. Its removal is VC6-byte-neutral in this matrix but fails the
+// required C++98 annotation parser with H2_CONST empty. Historical matrix
+// measurements below are unchanged; this axis is no longer adopted.
 
 // c62-ctor src/SOURCE/CMBTMGR.cpp RVA 0x25de0
 // build/source-variant-batch/c62-ctor/results.json
