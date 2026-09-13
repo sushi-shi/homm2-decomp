@@ -105,7 +105,7 @@ bool IsVowel(std::uint32_t codePoint) {
 }
 
 void font::DrawStringExecute(
-    const char* str,
+    const char* text,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -114,13 +114,13 @@ void font::DrawStringExecute(
     i32 clipR,
     i32 clipB
 ) {
-    i32 pos = x;
-    const char* cursor = str;
+    i32 position = x;
+    const char* cursor = text;
     while (cursor != NULL && *cursor != 0) {
         const utf8::Decoded decoded = utf8::Decode(cursor);
         const std::uint32_t codePoint = decoded.codePoint;
         if (codePoint == FONT_SPACER_CHAR) {
-            pos += GetCharacterWidth(codePoint);
+            position += GetCharacterWidth(codePoint);
             cursor += decoded.length;
             continue;
         }
@@ -141,7 +141,7 @@ void font::DrawStringExecute(
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -156,7 +156,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -172,7 +172,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -188,7 +188,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -201,14 +201,14 @@ void font::DrawStringExecute(
                     1
                 );
         }
-        pos += GetCharacterWidth(codePoint);
+        position += GetCharacterWidth(codePoint);
         cursor += decoded.length;
     }
 }
 
-void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(const char* text, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = false;
-    DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
+    DrawStringExecute(text, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
 i32 font::GetCharacterWidth(std::uint32_t codePoint) {
@@ -334,78 +334,78 @@ void font::ExtractLine(
 }
 
 void font::DrawBoundedString(
-    const char* str,
+    const char* text,
     i32 x,
     i32 y,
-    i32 w,
-    i32 h,
+    i32 width,
+    i32 height,
     FontDrawMode mode,
     FontAlignment align
 ) {
-    if (str == NULL)
+    if (text == NULL)
         return;
 
-    const i32 len = static_cast<i32>(strlen(str));
+    const i32 length = static_cast<i32>(strlen(text));
     i32 xPosition = 0;
     i32 yPosition = 0;
-    i32 pos = 0;
-    i32 lw = 0;
-    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
+    i32 position = 0;
+    i32 lineWidth = 0;
+    std::vector<char> line(static_cast<std::size_t>(length) + 2, 0);
     if ((H2EnumIndex((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
-        i32 lineCount = LineLength(str, w);
+        i32 lineCount = LineLength(text, width);
         i32 totalH = lineCount * m_height;
-        if (totalH < h)
-            yPosition = (h - totalH) / CENTER_DIVISOR;
+        if (totalH < height)
+            yPosition = (height - totalH) / CENTER_DIVISOR;
     }
     m_suppressDraw = false;
-    while (pos < len && str[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
-        if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
-            ExtractLine(str, line.data(), &pos, w, &lw, 1);
+    while (position < length && text[position] != 0 && (yPosition + m_height <= height || yPosition == 0)) {
+        if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > height)
+            ExtractLine(text, line.data(), &position, width, &lineWidth, 1);
         else
-            ExtractLine(str, line.data(), &pos, w, &lw, 0);
+            ExtractLine(text, line.data(), &position, width, &lineWidth, 0);
         switch (align) {
             case FONT_ALIGN_LEFT:
                 xPosition = 0;
                 break;
             case FONT_ALIGN_CENTER:
-                xPosition = (w - lw) / CENTER_DIVISOR + 1;
+                xPosition = (width - lineWidth) / CENTER_DIVISOR + 1;
                 break;
             case FONT_ALIGN_RIGHT:
-                xPosition = w - lw;
+                xPosition = width - lineWidth;
                 break;
             default:
                 xPosition = 0;
                 break;
         }
-        DrawStringExecute(line.data(), xPosition + x, yPosition + y, mode, x, y, w, h);
+        DrawStringExecute(line.data(), xPosition + x, yPosition + y, mode, x, y, width, height);
         yPosition += m_height;
-        lw = 0;
+        lineWidth = 0;
     }
 }
 
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-i32 font::LineLength(const char* str, i32 maxW) {
-    if (str == NULL)
+i32 font::LineLength(const char* text, i32 maxW) {
+    if (text == NULL)
         return 0;
-    const i32 len = static_cast<i32>(strlen(str));
+    const i32 length = static_cast<i32>(strlen(text));
     i32 count = 0;
-    i32 pos = 0;
-    i32 lw = 0;
-    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
-    while (pos < len && str[pos] != 0) {
-        ExtractLine(str, line.data(), &pos, maxW, &lw, 0);
+    i32 position = 0;
+    i32 lineWidth = 0;
+    std::vector<char> line(static_cast<std::size_t>(length) + 2, 0);
+    while (position < length && text[position] != 0) {
+        ExtractLine(text, line.data(), &position, maxW, &lineWidth, 0);
         count++;
-        lw = 0;
+        lineWidth = 0;
     }
     return count;
 }
 
-i32 font::LineWidth(const char* str) {
+i32 font::LineWidth(const char* text) {
     i32 width = 0;
-    const char* cursor = str;
+    const char* cursor = text;
     while (cursor != NULL && *cursor != 0) {
         const utf8::Decoded decoded = utf8::Decode(cursor);
         if (decoded.codePoint == '\n')

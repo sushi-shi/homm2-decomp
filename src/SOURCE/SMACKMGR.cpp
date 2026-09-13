@@ -150,24 +150,24 @@ void DoAdvance(
 }
 
 void SmackManagerMain(void) {
-    b32 playing17;
-    b32 musicStarted0;
-    b32 companionStarted26;
-    b32 primaryStarted7;
-    i8 savedPalette4[PALETTE_DATA_SIZE];
+    b32 playing;
+    b32 musicStarted;
+    b32 companionStarted;
+    b32 primaryStarted;
+    i8 savedPalette[PALETTE_DATA_SIZE];
 
     gpSoundManager->SaveBackend();
     gbLastFramePlayed = false;
-    musicStarted0 = false;
+    musicStarted = false;
     if (bSmackNum == CHOOSE_CAMPAIGN) {
-        i32 initialMouseY29;
-        i32 initialMouseX3;
+        i32 initialMouseY;
+        i32 initialMouseX;
 
         brotherIcon = gpResourceManager->GetIcon(
             "brothers.icn"
         );
-        gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
-        if (initialMouseX3 < CAMPAIGN_DIVIDER_X)
+        gpMouseManager->MouseCoords(initialMouseX, initialMouseY);
+        if (initialMouseX < CAMPAIGN_DIVIDER_X)
             gbCampaignSideChoice = CAMPAIGN_ARCHIBALD;
         else
             gbCampaignSideChoice = CAMPAIGN_ROLAND;
@@ -176,7 +176,7 @@ void SmackManagerMain(void) {
     platform::ChangeMenu(hmnuDflt);
     gpMouseManager->HideColorPointer();
     bMainDone = true;
-    memcpy(savedPalette4, gPalette->m_data, PALETTE_DATA_SIZE);
+    memcpy(savedPalette, gPalette->m_data, PALETTE_DATA_SIZE);
 
     bSmackSound = IsSoundBackendActive(gpSoundManager)
                && gConfig.soundVolume != CONFIG_VOLUME_MUTED
@@ -241,9 +241,9 @@ void SmackManagerMain(void) {
     if (SmackOptions[bSmackNum].fadeIn)
         gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
 
-    playing17 = true;
-    primaryStarted7 = false;
-    companionStarted26 = false;
+    playing = true;
+    primaryStarted = false;
+    companionStarted = false;
 
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         platform::PumpEvents();
@@ -251,9 +251,9 @@ void SmackManagerMain(void) {
             ;
     }
 
-    while (playing17) {
+    while (playing) {
         if (bSmackNum == EXPANSION_CAMPAIGN) {
-            if (!primaryStarted7) {
+            if (!primaryStarted) {
                 gpMouseManager->SetPointer(
                     "advmice.mse",
                     POINTER_ID,
@@ -278,21 +278,21 @@ void SmackManagerMain(void) {
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
                 gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
-                primaryStarted7 = true;
+                primaryStarted = true;
             }
         } else if (!platform::MovieWaiting(smk1)) {
-            if (bSmackNum == INTRO_MUSIC && !musicStarted0) {
-                musicStarted0 = true;
+            if (bSmackNum == INTRO_MUSIC && !musicStarted) {
+                musicStarted = true;
                 gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
             }
-            if ((!primaryStarted7 || platform::MovieFrameCount(smk1) > 1)
+            if ((!primaryStarted || platform::MovieFrameCount(smk1) > 1)
                 && (bSmackNum != CONGRATS
                     || platform::MovieFrameIndex(smk1)
                         != platform::MovieFrameCount(smk1) - 1)) {
-                DoAdvance(smk1, 1, 1, primaryStarted7 || !SmackOptions[bSmackNum].fadeIn, 0);
+                DoAdvance(smk1, 1, 1, primaryStarted || !SmackOptions[bSmackNum].fadeIn, 0);
             }
             if (platform::MovieFrameIndex(smk1) > 0 || platform::MovieFrameCount(smk1) <= 1) {
-                if (!primaryStarted7) {
+                if (!primaryStarted) {
                     if (bSmackNum == CHOOSE_CAMPAIGN) {
                         gpMouseManager->SetPointer(
                             "advmice.mse",
@@ -310,28 +310,28 @@ void SmackManagerMain(void) {
                     if (bSmackNum == SPECIAL_MUSIC)
                         gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 }
-                primaryStarted7 = true;
+                primaryStarted = true;
             }
         }
 
-        if (smk2 != platform::kInvalidMovie && primaryStarted7
+        if (smk2 != platform::kInvalidMovie && primaryStarted
             && !platform::MovieWaiting(smk2)) {
-            if (companionStarted26
+            if (companionStarted
                 && platform::MovieFrameIndex(smk2)
                     == platform::MovieFrameCount(smk2) - 1) {
                 b32 drawLastFrame;
-                b32 advanceLastFrame2;
+                b32 advanceLastFrame;
 
-                advanceLastFrame2 = false;
+                advanceLastFrame = false;
                 if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo) {
                     drawLastFrame = true;
                 } else if (bSmackNum == EXPANSION_CAMPAIGN) {
                     drawLastFrame = true;
-                    advanceLastFrame2 = true;
+                    advanceLastFrame = true;
                 } else {
                     drawLastFrame = false;
                 }
-                DoAdvance(smk2, drawLastFrame, advanceLastFrame2, 0, 1);
+                DoAdvance(smk2, drawLastFrame, advanceLastFrame, 0, 1);
                 gbLastFramePlayed = true;
                 while (platform::MovieWaiting(smk2))
                     platform::PumpEvents();
@@ -342,7 +342,7 @@ void SmackManagerMain(void) {
                     DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
             }
             if (smk2 != platform::kInvalidMovie && platform::MovieFrameIndex(smk2) > 0)
-                companionStarted26 = true;
+                companionStarted = true;
         }
 
         platform::PumpEvents();
@@ -351,18 +351,18 @@ void SmackManagerMain(void) {
         switch (message.type) {
             case MESSAGE_MOUSE_MOVE:
                 if (bSmackNum == CHOOSE_CAMPAIGN) {
-                    i32 campaignMouseX5;
-                    i32 campaignMouseY3;
-                    CampaignSide campaignChoice4;
+                    i32 campaignMouseX;
+                    i32 campaignMouseY;
+                    CampaignSide campaignChoice;
 
-                    gpMouseManager->MouseCoords(campaignMouseX5, campaignMouseY3);
-                    if (campaignMouseX5 < CAMPAIGN_DIVIDER_X)
-                        campaignChoice4 = CAMPAIGN_ARCHIBALD;
+                    gpMouseManager->MouseCoords(campaignMouseX, campaignMouseY);
+                    if (campaignMouseX < CAMPAIGN_DIVIDER_X)
+                        campaignChoice = CAMPAIGN_ARCHIBALD;
                     else
-                        campaignChoice4 = CAMPAIGN_ROLAND;
-                    if (campaignChoice4 == gbCampaignSideChoice)
+                        campaignChoice = CAMPAIGN_ROLAND;
+                    if (campaignChoice == gbCampaignSideChoice)
                         break;
-                    gbCampaignSideChoice = campaignChoice4;
+                    gbCampaignSideChoice = campaignChoice;
                     if (gbCampaignSideChoice == CAMPAIGN_ARCHIBALD) {
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
@@ -380,13 +380,13 @@ void SmackManagerMain(void) {
                         CAMPAIGN_BLIT_Y
                     );
                 } else if (bSmackNum == EXPANSION_CAMPAIGN) {
-                    i32 expansionMouseX6;
-                    i32 expansionMouseY4;
-                    ExpansionCampaignId expansionChoice0;
+                    i32 expansionMouseX;
+                    i32 expansionMouseY;
+                    ExpansionCampaignId expansionChoice;
 
-                    gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
-                    expansionChoice0 = ExpansionCampaignRect(expansionMouseX6, expansionMouseY4);
-                    if (expansionChoice0 != xLastChoice) {
+                    gpMouseManager->MouseCoords(expansionMouseX, expansionMouseY);
+                    expansionChoice = ExpansionCampaignRect(expansionMouseX, expansionMouseY);
+                    if (expansionChoice != xLastChoice) {
                         backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
                         BlitBitmapToScreen(
                             gpWindowManager->m_screen,
@@ -397,14 +397,14 @@ void SmackManagerMain(void) {
                             0,
                             0
                         );
-                        xLastChoice = expansionChoice0;
+                        xLastChoice = expansionChoice;
                         if (smk2 != platform::kInvalidMovie) {
                             platform::MovieClose(smk2);
                             smk2 = platform::kInvalidMovie;
                         }
-                        if (expansionChoice0 != EXPANSION_CAMPAIGN_NONE) {
+                        if (expansionChoice != EXPANSION_CAMPAIGN_NONE) {
                             bExpansionSmackNum =
-                                static_cast<i8>(expansionChoice0 + EXPANSION_FIRST_MOVIE);
+                                static_cast<i8>(expansionChoice + EXPANSION_FIRST_MOVIE);
                             const std::string expansionMoviePath =
                                 moviePath(SmackOptions[bExpansionSmackNum].fileName);
                             smk2 = platform::MovieOpen(expansionMoviePath.c_str(), bSmackSound);
@@ -444,8 +444,8 @@ void SmackManagerMain(void) {
 
         if (bSmackNum == CONGRATS
             && platform::MovieFrameIndex(smk1) + 1 == platform::MovieFrameCount(smk1)
-            && !musicStarted0) {
-            musicStarted0 = true;
+            && !musicStarted) {
+            musicStarted = true;
             gpSoundManager->PlayAmbientMusic(LOSE_MUSIC);
         }
 
@@ -454,11 +454,11 @@ void SmackManagerMain(void) {
                 || (smk2 != platform::kInvalidMovie
                     && (platform::MovieFrameIndex(smk2)
                             >= platform::MovieFrameCount(smk2) - 1
-                        || (platform::MovieFrameIndex(smk2) <= 0 && companionStarted26)))
+                        || (platform::MovieFrameIndex(smk2) <= 0 && companionStarted)))
                 || (smk2 == platform::kInvalidMovie
                     && (platform::MovieFrameIndex(smk1) >= platform::MovieFrameCount(smk1)
-                        || (platform::MovieFrameIndex(smk1) <= 0 && primaryStarted7))))) {
-            playing17 = false;
+                        || (platform::MovieFrameIndex(smk1) <= 0 && primaryStarted))))) {
+            playing = false;
             gbPlayedThrough = true;
         }
     }
@@ -522,7 +522,7 @@ playbackDone:
         platform::MovieClose(smk2);
     smk2 = platform::kInvalidMovie;
     if (bSmackNum != CONGRATS) {
-        memcpy(gPalette->m_data, savedPalette4, PALETTE_DATA_SIZE);
+        memcpy(gPalette->m_data, savedPalette, PALETTE_DATA_SIZE);
         UpdatePalette(gPalette->m_data);
     }
     gpMouseManager->ShowColorPointer();

@@ -17,9 +17,9 @@ public:
     void ShutDownSystem(void);
     i32 DoDialog(class baseManager* manager);
     void PrintManagerList(void);
-    i32 AddManager(class baseManager* mgr, i32 priority);
-    void RemoveManager(class baseManager* mgr);
-    void CallManager(class baseManager* mgr);
+    i32 AddManager(class baseManager* manager, i32 priority);
+    void RemoveManager(class baseManager* manager);
+    void CallManager(class baseManager* manager);
     void MainLoop(void);
     void Terminate(void);
 };

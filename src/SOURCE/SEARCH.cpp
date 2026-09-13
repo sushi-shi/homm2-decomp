@@ -70,10 +70,10 @@ i32 searchArray::BuildPath(
                 break;
             }
         }
-        MapDirection backDir =
+        MapDirection backDirection =
             OppositeMapDirection(MapDirectionFromCode(node->direction));
-        destinationX += normalDirTable[H2EnumIndex(backDir)].x;
-        destinationY += normalDirTable[H2EnumIndex(backDir)].y;
+        destinationX += normalDirTable[H2EnumIndex(backDirection)].x;
+        destinationY += normalDirTable[H2EnumIndex(backDirection)].y;
     }
     return m_pathLength;
 }
