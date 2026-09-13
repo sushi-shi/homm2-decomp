@@ -45,7 +45,6 @@ H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     WIDGET_NOTIFY_DESELECT          = 13,
     // Emitted on right-button-down; the receiving screen decides whether to show help.
     WIDGET_NOTIFY_RIGHT_CLICK       = 14,
-    WIDGET_COMMAND_REMOTE_WAIT_EXIT = 16,
     WIDGET_COMMAND_SET_MAX_LENGTH   = 0x33,
     WIDGET_COMMAND_SET_X            = 0x34,
     WIDGET_COMMAND_SET_Y            = 0x35,

@@ -99,7 +99,7 @@ i32 combatManager::AICheckRetreat(void) {
                     (m_armies[sideNum] + armyIndex)->m_monsterType;
                 if (HAS((m_armies[sideNum] + armyIndex)
                             ->m_monster.attributes,
-                        MONSTER_FLAGS_FULL_AI_QUANTITY)
+                        MONSTER_FLAGS_TURN_SPENT)
                     != 0) {
                     armies->m_creatureCounts[groupIndex] =
                         (m_armies[sideNum] + armyIndex)->m_quantity;
@@ -410,7 +410,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
                     goto finish;
                 if (WalkTowardArmyFront(thisArmy, m_currentSide, shooters[IDX(m_currentSide)]))
                     goto finish;
-                giNextAction = ACTION_WAIT;
+                giNextAction = ACTION_SKIP_TURN;
                 goto finish;
             }
             if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
@@ -458,7 +458,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             }
             break;
     }
-    giNextAction = ACTION_WAIT;
+    giNextAction = ACTION_SKIP_TURN;
 
 finish:
     if (giNextAction == ACTION_MOVE && giNextActionGridIndex > 0
@@ -963,7 +963,7 @@ i32 combatManager::WalkTowardArmy(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
         );
     if (atkMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
-        giNextAction = ACTION_WAIT;
+        giNextAction = ACTION_SKIP_TURN;
         return 1;
     }
 

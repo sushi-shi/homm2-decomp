@@ -13,13 +13,16 @@
 #include <SOURCE/VIEW.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
+H2_ENUM_BEGIN(ViewGeneralAction)
+    GENERAL_ACTION_CLOSE      = DIALOG_BUTTON_0,
+    GENERAL_ACTION_CAST_SPELL = IDX(COMBAT_MESSAGE_COMMAND_CAST_SPELL),
+    GENERAL_ACTION_RETREAT    = IDX(COMBAT_MESSAGE_COMMAND_RETREAT),
+    GENERAL_ACTION_SURRENDER  = IDX(COMBAT_MESSAGE_COMMAND_SURRENDER)
+H2_ENUM_END(ViewGeneralAction)
+
 H2_ENUM_BEGIN(ViewGeneralConstant)
-    GENERAL_CAST_SPELL         = DIALOG_BUTTON_0,
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
-    GENERAL_CLOSE              = 10,
-    GENERAL_RETREAT            = 11,
-    GENERAL_SURRENDER          = 12,
     GENERAL_TEXT_COLOR_COUNT   = 11,
     GENERAL_MORALE_TEXT_OFFSET = 3,
     GENERAL_LUCK_TEXT_OFFSET   = 3,
@@ -57,19 +60,19 @@ H2_ENUM_BEGIN(ViewGeneralLabel)
 H2_ENUM_END(ViewGeneralLabel)
 
 H2_ENUM_BEGIN(ViewGeneralLongHelp)
-    GENERAL_LONG_HELP_CLOSE     = 0,
-    GENERAL_LONG_HELP_RETREAT   = 1,
-    GENERAL_LONG_HELP_SURRENDER = 2,
-    GENERAL_LONG_HELP_CAST      = 3
+    GENERAL_LONG_HELP_CAST_SPELL = 0,
+    GENERAL_LONG_HELP_RETREAT    = 1,
+    GENERAL_LONG_HELP_SURRENDER  = 2,
+    GENERAL_LONG_HELP_CLOSE      = 3
 H2_ENUM_END(ViewGeneralLongHelp)
 
 H2_ENUM_BEGIN(ViewGeneralHoverHelp)
-    GENERAL_HOVER_HELP_CLOSE     = 1,
-    GENERAL_HOVER_HELP_RETREAT   = 2,
-    GENERAL_HOVER_HELP_SURRENDER = 3,
-    GENERAL_HOVER_HELP_CAST      = 4,
-    GENERAL_HOVER_HELP_HERO      = 5,
-    GENERAL_HOVER_HELP_CAPTAIN   = 6
+    GENERAL_HOVER_HELP_CAST_SPELL = 1,
+    GENERAL_HOVER_HELP_RETREAT    = 2,
+    GENERAL_HOVER_HELP_SURRENDER  = 3,
+    GENERAL_HOVER_HELP_CLOSE      = 4,
+    GENERAL_HOVER_HELP_HERO       = 5,
+    GENERAL_HOVER_HELP_CAPTAIN    = 6
 H2_ENUM_END(ViewGeneralHoverHelp)
 
 VA(0x004ad4b0, 0x6f9)
@@ -110,9 +113,9 @@ i32 combatManager::ViewGeneral(
     msgConst4 = GENERAL_CONTROL_SEVEN;
     msgConst2 = GENERAL_CONTROL_EIGHT;
     msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst17 = GENERAL_CLOSE;
-    msgConst3 = GENERAL_RETREAT;
-    msgConst29 = GENERAL_SURRENDER;
+    msgConst17 = GENERAL_ACTION_CAST_SPELL;
+    msgConst3 = GENERAL_ACTION_RETREAT;
+    msgConst29 = GENERAL_ACTION_SURRENDER;
     msgConst10 = GENERAL_CONTROL_THIRTEEN;
     msgConst6 = GENERAL_CONTROL_FOURTEEN;
     giCurGeneral = side;
@@ -196,7 +199,7 @@ i32 combatManager::ViewGeneral(
         || m_heroes[IDX(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[IDX(side)] != 0
         || giCurGeneral != m_currentSide) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_CLOSE;
+        message16.payload.widget.id = GENERAL_ACTION_CAST_SPELL;
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -207,7 +210,7 @@ i32 combatManager::ViewGeneral(
         || giCurGeneral != m_currentSide
         || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_SURRENDER;
+        message16.payload.widget.id = GENERAL_ACTION_SURRENDER;
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -220,7 +223,7 @@ i32 combatManager::ViewGeneral(
         || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
         || m_sideRetreated[1] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_RETREAT;
+        message16.payload.widget.id = GENERAL_ACTION_RETREAT;
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -270,9 +273,9 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     msgConst4 = GENERAL_CONTROL_SEVEN;
     msgConst7 = GENERAL_CONTROL_EIGHT;
     msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst15 = GENERAL_CLOSE;
-    msgConst1 = GENERAL_RETREAT;
-    msgConst6 = GENERAL_SURRENDER;
+    msgConst15 = GENERAL_ACTION_CAST_SPELL;
+    msgConst1 = GENERAL_ACTION_RETREAT;
+    msgConst6 = GENERAL_ACTION_SURRENDER;
     msgConst8 = GENERAL_CONTROL_THIRTEEN;
     msgConst17 = GENERAL_CONTROL_FOURTEEN;
     handled28 = false;
@@ -283,17 +286,17 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 helpIndex36 = -1;
                 if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     switch (message.payload.widget.id) {
-                        case GENERAL_CLOSE:
-                            helpIndex36 = GENERAL_LONG_HELP_CLOSE;
+                        case GENERAL_ACTION_CAST_SPELL:
+                            helpIndex36 = GENERAL_LONG_HELP_CAST_SPELL;
                             break;
-                        case GENERAL_RETREAT:
+                        case GENERAL_ACTION_RETREAT:
                             helpIndex36 = GENERAL_LONG_HELP_RETREAT;
                             break;
-                        case GENERAL_SURRENDER:
+                        case GENERAL_ACTION_SURRENDER:
                             helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
                             break;
-                        case GENERAL_CAST_SPELL:
-                            helpIndex36 = GENERAL_LONG_HELP_CAST;
+                        case GENERAL_ACTION_CLOSE:
+                            helpIndex36 = GENERAL_LONG_HELP_CLOSE;
                             break;
                     }
                     if (helpIndex36 != -1)
@@ -304,10 +307,10 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case GENERAL_CLOSE:
-                        case GENERAL_RETREAT:
-                        case GENERAL_SURRENDER:
-                        case GENERAL_CAST_SPELL:
+                        case GENERAL_ACTION_CAST_SPELL:
+                        case GENERAL_ACTION_RETREAT:
+                        case GENERAL_ACTION_SURRENDER:
+                        case GENERAL_ACTION_CLOSE:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
                             handled28 = true;
                             break;
@@ -323,17 +326,17 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 return MESSAGE_DISPATCH_CONSUME;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
-                case GENERAL_CLOSE:
-                    hintIndex11 = GENERAL_HOVER_HELP_CLOSE;
+                case GENERAL_ACTION_CAST_SPELL:
+                    hintIndex11 = GENERAL_HOVER_HELP_CAST_SPELL;
                     break;
-                case GENERAL_RETREAT:
+                case GENERAL_ACTION_RETREAT:
                     hintIndex11 = GENERAL_HOVER_HELP_RETREAT;
                     break;
-                case GENERAL_SURRENDER:
+                case GENERAL_ACTION_SURRENDER:
                     hintIndex11 = GENERAL_HOVER_HELP_SURRENDER;
                     break;
-                case GENERAL_CAST_SPELL:
-                    hintIndex11 = GENERAL_HOVER_HELP_CAST;
+                case GENERAL_ACTION_CLOSE:
+                    hintIndex11 = GENERAL_HOVER_HELP_CLOSE;
                     break;
                 default:
                     hintIndex11 = GENERAL_HOVER_HELP_HERO;
@@ -346,7 +349,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             return MESSAGE_DISPATCH_CONSUME;
     }
     if (handled28) {
-        message.payload.widget.id = GENERAL_CLOSE;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
     }

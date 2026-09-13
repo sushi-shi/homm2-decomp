@@ -1,5 +1,6 @@
 #include <SOURCE/KB.h>
 #include <BASE/message.h>
+#include <BASE/inputManager.h>
 #include <BASE/dialog.h>
 #include <BASE/font.h>
 #include <BASE/widget.h>
@@ -8,6 +9,7 @@
 #include <SOURCE/fileRequester.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/combatManager.h>
+#include <SOURCE/COMMAND.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 #include <BASE/Misc.h>
@@ -23,10 +25,14 @@ i32 __cdecl main() {
         || IDX(WIDGET_NOTIFY_RIGHT_CLICK) != 14 || CAMPAIGN_DIALOG_CANCEL != DIALOG_BUTTON_1
         || CAMPAIGN_DIALOG_ACCEPT != DIALOG_BUTTON_2 || FILE_REQUESTER_CANCEL != DIALOG_BUTTON_1
         || FILE_REQUESTER_OK != DIALOG_BUTTON_2 || HIGH_SCORE_CLOSE_BUTTON != DIALOG_BUTTON_0
+        || NORMAL_DIALOG_YES != DIALOG_BUTTON_5 || NORMAL_DIALOG_NO != DIALOG_BUTTON_6
         || IDX(FONT_DRAW_DEFAULT) != 1 || IDX(FONT_DRAW_YELLOW) != 2 || IDX(FONT_DRAW_DIMMED) != 3
         || IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW) != 6
         || IDX(WIDGET_FLAG_DIMMED) != 8 || IDX(WIDGET_FLAGS_ARGUMENT_DIMMED) != 0x1000
         || IDX(MONSTER_FLAGS_DEAD) != 0x10 || IDX(MONSTER_FLAGS_MIRROR_IMAGE) != 0x100
+        || IDX(MONSTER_FLAGS_TURN_SPENT) != 0x80 || IDX(MONSTER_FLAGS_DEFERRED_TURN) != 0x1000
+        || IDX(ACTION_SKIP_TURN) != 3 || IDX(ACTION_DEFER_TURN) != 7
+        || IDX(INPUT_SCAN_F2) != 0x3c || IDX(INPUT_SCAN_Q) != 0x10
         || IDX(HERO_EVENT_RESERVED_FOR_RECRUITMENT) != 0x10000
         || HERO_BASE_LEARNABLE_SPELL_LEVEL != 2
         || COMBAT_ALL_DIRECTIONS_BLOCKED != 0xff) {

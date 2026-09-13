@@ -4389,7 +4389,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[hostNetPosition].name
             );
             NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
                 DropDownToOnePlayer();
             } else {
                 RemoteCleanup();
@@ -4502,7 +4502,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             );
         }
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-        exitInfo.continueGame = gpWindowManager->m_dialogResult == DIALOG_BUTTON_5;
+        exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES;
     }
 
 exitInfoProcessed:
@@ -4922,9 +4922,9 @@ void NormalDialog(
         pNormalDialogWindow->BroadcastMessage(message_b);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message_b.payload.widget.id = DIALOG_BUTTON_5;
+        message_b.payload.widget.id = NORMAL_DIALOG_YES;
         pNormalDialogWindow->BroadcastMessage(message_b);
-        message_b.payload.widget.id = DIALOG_BUTTON_6;
+        message_b.payload.widget.id = NORMAL_DIALOG_NO;
         pNormalDialogWindow->BroadcastMessage(message_b);
     }
 

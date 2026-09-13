@@ -27,7 +27,7 @@ later case's span, move the label there and give the earlier cases a `goto`.
 
 The same rule places a label inside an `if` body: at
 `DoEvent`'s `MAP_OBJECT_TROLL_BRIDGE` the `recruitTroll:` label is *inside*
-`if (dialogResult == MONSTER_DIALOG_YES) { ... }` in the last arm, so the
+`if (dialogResult == NORMAL_DIALOG_YES) { ... }` in the last arm, so the
 guarded arm's `goto recruitTroll` jumps past the re-test.
 
 **Closes.** `advManager::DoEvent`:

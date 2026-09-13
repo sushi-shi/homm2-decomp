@@ -1,7 +1,6 @@
 #ifndef HOMM2_EVENTS_H
 #define HOMM2_EVENTS_H
 
-#include <BASE/dialog.h>
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/GAME.h>
@@ -294,8 +293,6 @@ H2_ENUM_CLASS_BEGIN(FlotsamReward)
 H2_ENUM_CLASS_END(FlotsamReward)
 
 H2_ENUM_BEGIN(MonsterInteractionConstant)
-    MONSTER_DIALOG_NO                       = DIALOG_BUTTON_6,
-    MONSTER_DIALOG_YES                      = DIALOG_BUTTON_5,
     MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,

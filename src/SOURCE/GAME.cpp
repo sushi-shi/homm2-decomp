@@ -62,8 +62,8 @@
     0.66
 
 H2_ENUM_BEGIN(ViewArmyControlId)
-    VIEW_ARMY_UPGRADE_ID    = DIALOG_BUTTON_3,
-    VIEW_ARMY_QUICK_VIEW_ID = DIALOG_BUTTON_0,
+    VIEW_ARMY_DISMISS_ID    = DIALOG_BUTTON_3,
+    VIEW_ARMY_CLOSE_BUTTON  = DIALOG_BUTTON_0,
 H2_ENUM_END(ViewArmyControlId)
 
 H2_ENUM_BEGIN(MapTilesetConstant)
@@ -594,7 +594,7 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_DETAIL_WIDGET_ID        = 4,
     VIEW_ARMY_MONSTER_WIDGET_ID       = 5,
     VIEW_ARMY_UPGRADE_ACTION_ID       = 500,
-    VIEW_ARMY_CLOSE_ID                = 10,
+    VIEW_ARMY_FINISH_COMMAND          = IDX(WIDGET_COMMAND_DIALOG_SELECT),
     VIEW_ARMY_WINDOW_X                = 19,
     VIEW_ARMY_WINDOW_Y                = 75,
     VIEW_ARMY_MONSTER_BASE_X          = 167,
@@ -3505,7 +3505,7 @@ void game::ViewArmy(
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 numTroops,
     town* castle,
-    i32 disableUpgrade,
+    i32 disableDismiss,
     H2_ENUM_PARAM(ArmyFacing, i32) facing,
     i32 quickView,
     hero* theHero,
@@ -3742,16 +3742,16 @@ void game::ViewArmy(
         message.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
-    if (disableUpgrade) {
+    if (disableDismiss) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
+        message.payload.widget.id = VIEW_ARMY_DISMISS_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (quickView) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
+        message.payload.widget.id = VIEW_ARMY_CLOSE_BUTTON;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (numTroops < 1) {
@@ -3845,13 +3845,13 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
         switch (msg.payload.widget.command) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (msg.payload.widget.id) {
-                    case DIALOG_BUTTON_0:
+                    case VIEW_ARMY_CLOSE_BUTTON:
                     case DIALOG_BUTTON_1:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                        msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                        msg.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                        msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                         return MESSAGE_DISPATCH_FORWARD;
-                    case DIALOG_BUTTON_3:
+                    case VIEW_ARMY_DISMISS_ID:
                         NormalDialog(
                             const_cast<char*>(
                                 localization::Tr("army.confirm.dismiss")
@@ -3860,8 +3860,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         );
                         if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             gbDismissArmy = true;
-                            msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                            msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                            msg.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                            msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
@@ -3903,9 +3903,9 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 if (resourceType7 != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType7)] -= resourceCost;
                                 gbUpgradeArmy = true;
-                                msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
+                                msg.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
                                 msg.payload.widget.command =
-                                    BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                                    BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {

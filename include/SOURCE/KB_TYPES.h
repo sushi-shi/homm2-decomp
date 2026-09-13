@@ -774,9 +774,9 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_FLAGS_DEAD                  = 0x00000010,
     MONSTER_FLAGS_HIGH_MORALE           = 0x00000020,
     MONSTER_FLAGS_RETALIATED            = 0x00000040,
-    MONSTER_FLAGS_WOKE_FROM_DAMAGE      = 0x00000080,
-    MONSTER_FLAGS_BAD_MORALE            = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
-    MONSTER_FLAGS_FULL_AI_QUANTITY      = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
+    // Set after acting, skipping, bad morale or waking from disabling damage.
+    // GetNextArmy excludes the stack until ResetRound (or a good-morale bonus).
+    MONSTER_FLAGS_TURN_SPENT            = 0x00000080,
     MONSTER_FLAGS_MIRROR_IMAGE          = 0x00000100,
     MONSTER_FLAGS_LIGHT_PALETTE         = MONSTER_FLAGS_MIRROR_IMAGE,
     MONSTER_FLAGS_BLOOD_LUST            = 0x00000200,

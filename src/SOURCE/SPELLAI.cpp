@@ -249,7 +249,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                       [m_hexCells[hexCell_9].m_occupantIndex];
             giCurrSpellGroup = IDX(m_hexCells[hexCell_9].m_occupantSide);
             fullQuantityFlag_4 =
-                HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
+                HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT) != 0;
 
             spellPowerWork = m_spellPower[IDX(m_currentSide)];
             if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
@@ -1010,7 +1010,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 }
 
                 fullQuantityWork =
-                    HAS(combatTarget->m_monster.attributes, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
+                    HAS(combatTarget->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT) != 0;
                 armyValueResult_3 = combatTarget->m_quantity
                                   * gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue;
                 if (HAS(combatTarget->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE)) {

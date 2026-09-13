@@ -1070,9 +1070,9 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.attributes, MONSTER_FLAGS_BAD_MORALE)
+    if HAS (activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT)
         H2_ENUM_CLEAR_FLAG(
-            activeArmy->m_monster.attributes, MONSTER_FLAGS_BAD_MORALE
+            activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT
         );
     activeArmy->m_monster.attributes |= MONSTER_FLAGS_HIGH_MORALE;
 
@@ -1117,7 +1117,7 @@ i32 combatManager::CheckApplyBadMorale(
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
-    activeArmy->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
+    activeArmy->m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample);
     return 1;
@@ -1145,7 +1145,7 @@ restart:
                 skipEnt = false;
                 curArmy = stackCounter + m_armies[IDX(stackSide)];
                 if (HAS(curArmy->m_monster.attributes,
-                        MONSTER_FLAGS_DEAD | MONSTER_FLAGS_BAD_MORALE)
+                        MONSTER_FLAGS_DEAD | MONSTER_FLAGS_TURN_SPENT)
                     || IDX(curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]

@@ -96,8 +96,8 @@ namespace {
     H2_ENUM_CLASS_END(CombatBattleResultText)
 
     H2_ENUM_CLASS_BEGIN(CombatControlId)
-        CONTROL_ATTACK = 1,
-        CONTROL_WAIT = 2,
+        CONTROL_DEFER_TURN = 1,
+        CONTROL_SKIP_TURN = 2,
         CONTROL_DISABLE_SELECTION = 3,
         CONTROL_SYSTEM_OPTIONS = 4,
         CONTROL_HELP_FIRST = 10,
@@ -294,8 +294,8 @@ namespace {
     H2_ENUM_CLASS_END(CombatHelpTextIndex)
 
     H2_ENUM_CLASS_BEGIN(CombatLongHelpIndex)
-        LONG_HELP_ATTACK = 0,
-        LONG_HELP_WAIT = 1,
+        LONG_HELP_DEFER_TURN = 0,
+        LONG_HELP_SKIP_TURN = 1,
         LONG_HELP_DISABLE_SELECTION = 2,
         LONG_HELP_SYSTEM_OPTIONS = 3,
         LONG_HELP_CONTROLS = 4
@@ -810,11 +810,11 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         case CONTROL_MAIN_BUTTON:
                             RightClick(m_selectedHex);
                             break;
-                        case CONTROL_ATTACK:
-                            helpIndex = IDX(LONG_HELP_ATTACK);
+                        case CONTROL_DEFER_TURN:
+                            helpIndex = IDX(LONG_HELP_DEFER_TURN);
                             break;
-                        case CONTROL_WAIT:
-                            helpIndex = IDX(LONG_HELP_WAIT);
+                        case CONTROL_SKIP_TURN:
+                            helpIndex = IDX(LONG_HELP_SKIP_TURN);
                             break;
                         case CONTROL_DISABLE_SELECTION:
                             helpIndex = IDX(LONG_HELP_DISABLE_SELECTION);
@@ -848,11 +848,11 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         case CONTROL_DISABLE_SELECTION:
                             m_gridSelectionDisabled = true;
                             break;
-                        case CONTROL_WAIT:
-                            giNextAction = ACTION_WAIT;
+                        case CONTROL_SKIP_TURN:
+                            giNextAction = ACTION_SKIP_TURN;
                             break;
-                        case CONTROL_ATTACK:
-                            giNextAction = ACTION_DEFEND;
+                        case CONTROL_DEFER_TURN:
+                            giNextAction = ACTION_DEFER_TURN;
                             break;
                         case CONTROL_SYSTEM_OPTIONS:
                             CombatSystemOptions();
@@ -964,7 +964,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     }
                     break;
                 case IDX(INPUT_SCAN_SPACE):
-                    giNextAction = ACTION_WAIT;
+                    giNextAction = ACTION_SKIP_TURN;
                     break;
                 case IDX(INPUT_SCAN_1): {
                     i32 currentMouseX_18;
@@ -2499,7 +2499,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         case ACTION_MOVE:
             ResetCyclingCreatures();
             actingArmy_29->MoveAttack(giNextActionGridIndex, 0);
-            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
             if (CheckWin(&message) != 0) {
                 dispatchResult_1 = MESSAGE_DISPATCH_FORWARD;
                 goto Finished;
@@ -2514,7 +2514,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 actingArmy_29->MoveAttack(giNextActionExtra, 1);
             }
             actingArmy_29->MoveAttack(giNextActionGridIndex, 0);
-            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
             if (CheckWin(&message) != 0) {
                 dispatchResult_1 = MESSAGE_DISPATCH_FORWARD;
                 goto Finished;
@@ -2538,11 +2538,11 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
             ResetCycleTimers();
             break;
-        case ACTION_WAIT:
-            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
+        case ACTION_SKIP_TURN:
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
             shouldAdvance = true;
             break;
-        case ACTION_DEFEND:
+        case ACTION_DEFER_TURN:
             actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_DEFERRED_TURN;
             shouldAdvance = true;
             break;

@@ -194,6 +194,12 @@ H2_ENUM_BEGIN(NormalDialogResourceType)
     NORMAL_DIALOG_PRIMARY_SKILL    = 25
 H2_ENUM_END(NormalDialogResourceType)
 
+// Results of the standard Yes/No confirmation layout, not monster-specific actions.
+H2_ENUM_BEGIN(NormalDialogAnswer)
+    NORMAL_DIALOG_YES = DIALOG_BUTTON_5,
+    NORMAL_DIALOG_NO  = DIALOG_BUTTON_6,
+H2_ENUM_END(NormalDialogAnswer)
+
 H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_INFO                     = 1,
     NORMAL_DIALOG_CONFIRM                  = 2,

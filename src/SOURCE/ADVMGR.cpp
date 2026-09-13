@@ -298,8 +298,8 @@ H2_ENUM_BEGIN(AdventureTravelSpellConstant)
 H2_ENUM_END(AdventureTravelSpellConstant)
 
 H2_ENUM_BEGIN(AdventureTownPortalMessage)
-    TOWN_PORTAL_LAST_CHOICE   = DIALOG_BUTTON_2,
-    TOWN_PORTAL_FIRST_CHOICE  = DIALOG_BUTTON_1,
+    TOWN_PORTAL_CONFIRM   = DIALOG_BUTTON_2,
+    TOWN_PORTAL_CANCEL  = DIALOG_BUTTON_1,
     TOWN_PORTAL_TITLE_WIDGET  = 1,
     TOWN_PORTAL_CHOICE_WIDGET = 100,
     TOWN_PORTAL_CLOSE_WIDGET  = 10,
@@ -8086,8 +8086,8 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case TOWN_PORTAL_FIRST_CHOICE:
-                    case TOWN_PORTAL_LAST_CHOICE:
+                    case TOWN_PORTAL_CANCEL:
+                    case TOWN_PORTAL_CONFIRM:
                         choiceMessage.type = MESSAGE_WIDGET;
                         choiceMessage.payload.widget.id = TOWN_PORTAL_CHOICE_WIDGET;
                         choiceMessage.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
@@ -8165,7 +8165,7 @@ void advManager::TownGate(SpellType spellId) {
         gpWindowManager->DoDialog(townPortalWin, TownPortalHandler, 0);
         selectedTown = giTownPortalChoice;
         delete townPortalWin;
-        if (gpWindowManager->m_dialogResult == TOWN_PORTAL_FIRST_CHOICE) {
+        if (gpWindowManager->m_dialogResult == TOWN_PORTAL_CANCEL) {
             return;
         }
     } else {
@@ -8946,13 +8946,13 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
 
     CheckDoMain(1, doMain);
     if (message.type == MESSAGE_KEY_DOWN) {
-        switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_REPLACE_ICON:
+        switch (message.payload.keyboard.keyCode) {
+            case IDX(INPUT_SCAN_F2):
                 PopNetBox(NULL, -1);
                 break;
 
-            case WIDGET_COMMAND_REMOTE_WAIT_EXIT:
-                if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+            case IDX(INPUT_SCAN_Q):
+                if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                     message.type = MESSAGE_EXECUTIVE;
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return MESSAGE_DISPATCH_FORWARD;

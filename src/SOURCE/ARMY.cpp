@@ -2688,12 +2688,12 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
             if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]) {
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
                 m_damagePenalty = ARMY_DAMAGE_PENALTY_HALF;
-                m_monster.attributes |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
+                m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
             }
             if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
                 || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                 || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]) {
-                m_monster.attributes |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
+                m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
                 m_monster.attributes |= MONSTER_FLAGS_RETALIATED;
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
                 CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
@@ -2981,7 +2981,7 @@ void army::GoBerserk(void) {
             ))
             goto berserkFinish;
     }
-    giNextAction = ACTION_WAIT;
+    giNextAction = ACTION_SKIP_TURN;
 berserkFinish:
     if (giNextAction == ACTION_MOVE
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == m_side) {
