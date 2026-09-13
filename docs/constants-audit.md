@@ -1,7 +1,10 @@
 # Constants audit
 
-For evaluated enum-value groups and reviewed direct reuse, see
-[Enum-value reuse review](enum-reuse.md) and `homm2 audit enums`.
+`homm2 audit enums --duplicates` groups evaluated enum members by value for reuse
+investigation. Use `--value 0x200` to inspect one value, `--json` to save the inventory
+under `build/`, or `--strict` to inspect the typed-enum view. Equal integers are
+candidates, not proof of a shared semantic domain; game enums and SDK diagnostics
+are reported separately.
 
 `homm2 constants` inventories numeric constants throughout reconstructed game code. It writes
 the complete occurrence list to `build/constants/literals.tsv` and a semantic unexplained-literal

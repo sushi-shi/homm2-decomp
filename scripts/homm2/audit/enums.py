@@ -126,123 +126,6 @@ def group_values(rows: list[dict]) -> dict[int, list[dict]]:
     return dict(sorted(groups.items()))
 
 
-def verify_reuse(before: dict, after: dict, ledger: list[dict]) -> list[str]:
-    """Account for every starting/current member, not only renamed members."""
-    def inventory(report):
-        result = {}
-        owners = {}
-        for row in report["constants"]:
-            key = (row["file"], row["name"])
-            owner = row.get("enum", "")
-            if key in owners and owners[key] != owner:
-                raise ValueError(f"ambiguous member name in reuse ledger: {key}")
-            owners[key] = owner
-            result.setdefault(key, set()).add(row["value"])
-        return result
-
-    starting, current = inventory(before), inventory(after)
-    expected = dict(starting)
-    errors = []
-    seen = set()
-    for row in ledger:
-        required = {"source_file", "old_name", "canonical_file", "canonical_name", "value", "reason"}
-        if not required <= row.keys():
-            raise ValueError("reuse ledger is missing required columns")
-        source = (row["source_file"], row["old_name"])
-        target = (row["canonical_file"], row["canonical_name"])
-        value = int(row["value"])
-        if source in seen:
-            errors.append(f"duplicate reuse decision: {source}")
-        seen.add(source)
-        if not row["reason"].strip():
-            errors.append(f"missing reuse reason: {source}")
-        if starting.get(source) != {value}:
-            errors.append(f"starting value/identity mismatch: {source}")
-        if source == target or source in current:
-            errors.append(f"alias not removed: {source}")
-        if current.get(target) != {value}:
-            errors.append(f"canonical value/identity mismatch: {target}")
-        expected.pop(source, None)
-        if target in expected and expected[target] != {value}:
-            errors.append(f"conflicting canonical value: {target}")
-        expected[target] = {value}
-    for key in sorted(expected.keys() | current.keys()):
-        if expected.get(key) != current.get(key):
-            errors.append(f"unaccounted member/value change: {key}: "
-                          f"{expected.get(key)} -> {current.get(key)}")
-    return errors
-
-
-def verify_review(report: dict, ledger: list[dict], *, manifest: dict | None = None) -> list[str]:
-    """Verify a complete review, including retained and conditional members.
-
-    Each starting member carries its separately evaluated retail/strict value.
-    A target records the reviewed consolidation or owner move. The expected
-    target inventory must equal the whole current inventory, not just a subset.
-    """
-    if report.get("partial"):
-        raise ValueError("review verification requires an unfiltered inventory")
-    mode = report.get("mode")
-    if mode not in {"retail", "strict"}:
-        raise ValueError("review verification requires an explicit language mode")
-
-    def key(file, enum, name):
-        # Anonymous source line numbers change when preceding aliases disappear.
-        return file, "anonymous" if enum.startswith("anonymous@") else enum, name
-
-    expected, current = {}, {}
-    seen_blocks, seen_members = set(), set()
-    errors = []
-    if manifest is not None:
-        if len(ledger) != manifest["blocks"]:
-            errors.append("reviewed block coverage differs from the baseline manifest")
-        all_entries = [entry for block in ledger for entry in json.loads(block["members"])]
-        if len(all_entries) != manifest["members"]:
-            errors.append("reviewed member coverage differs from the baseline manifest")
-        for view in ("retail", "strict"):
-            if sum(view in entry for entry in all_entries) != manifest[view]:
-                errors.append(f"reviewed {view} coverage differs from the baseline manifest")
-    for block in ledger:
-        block_key = block["source_file"], block["source_enum"], block["source_line"]
-        if block_key in seen_blocks:
-            errors.append(f"duplicate reviewed block: {block_key}")
-        seen_blocks.add(block_key)
-        if not block["reason"].strip():
-            errors.append(f"missing block review reason: {block_key}")
-        entries = json.loads(block["members"])
-        retained = sum("target" not in entry for entry in entries)
-        if (len(entries) != int(block["starting_members"])
-                or retained != int(block["retained_members"])
-                or len(entries) - retained != int(block["reused_or_moved_members"])):
-            errors.append(f"review count mismatch: {block_key}")
-        for entry in entries:
-            source = key(block["source_file"], block["source_enum"], entry["name"])
-            if source in seen_members:
-                errors.append(f"duplicate reviewed member: {source}")
-            seen_members.add(source)
-            if not any(view in entry for view in ("retail", "strict")):
-                errors.append(f"missing member language modes: {source}")
-            if "target" in entry and not entry.get("reason", "").strip():
-                errors.append(f"missing reuse reason: {source}")
-            if mode not in entry:
-                continue
-            target = entry.get("target")
-            destination = key(target["file"], target["enum"], target["name"]) if target else source
-            value = entry[mode]
-            if type(value) is not int:
-                errors.append(f"non-integer reviewed value: {source}")
-            if destination in expected and expected[destination] != {value}:
-                errors.append(f"conflicting reviewed target value: {destination}")
-            expected[destination] = {value}
-    for row in report["constants"]:
-        current.setdefault(key(row["file"], row["enum"], row["name"]), set()).add(row["value"])
-    for member in sorted(expected.keys() | current.keys()):
-        if expected.get(member) != current.get(member):
-            errors.append(f"unaccounted reviewed member/value: {member}: "
-                          f"{expected.get(member)} -> {current.get(member)}")
-    return errors
-
-
 def collect(repo: Path = REPO, *, filters: tuple[str, ...] = (), strict: bool = False) -> dict:
     source_blocks.cache_clear()
     repo = repo.resolve()
@@ -299,35 +182,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--duplicates", action="store_true")
     parser.add_argument("--strict", action="store_true", help="evaluate the modern typed-enum view")
     parser.add_argument("--json", action="store_true")
-    parser.add_argument("--verify-before", type=Path, help="check all member values against a prior JSON census")
-    parser.add_argument("--reuse-ledger", type=Path, default=REPO / "docs/enum-reuse.tsv")
-    parser.add_argument("--verify-review", action="store_true",
-                        help="verify every retained/reused member in the complete review ledger")
-    parser.add_argument("--review-ledger", type=Path, default=REPO / "docs/enum-review.tsv")
     args = parser.parse_args(argv)
     try:
         report = collect(filters=tuple(args.tu), strict=args.strict)
-        if args.verify_review:
-            if args.value or args.duplicates:
-                raise ValueError("review verification requires unfiltered value groups")
-            with args.review_ledger.open(newline="") as stream:
-                ledger = list(csv.DictReader(stream, delimiter="\t"))
-            manifest = json.loads(args.review_ledger.with_suffix(".json").read_text())
-            errors = verify_review(report, ledger, manifest=manifest)
-            if errors:
-                raise ValueError("complete review verification failed:\n" + "\n".join(errors))
-            print("[enums] complete review: all retained/reused members accounted for", file=sys.stderr)
-        if args.verify_before:
-            before = json.loads(args.verify_before.read_text())
-            if before.get("partial") or report["partial"]:
-                raise ValueError("reuse verification requires unfiltered TU inventories")
-            if before.get("mode", "retail") != report["mode"]:
-                raise ValueError("reuse verification requires the same language mode")
-            with args.reuse_ledger.open(newline="") as stream:
-                errors = verify_reuse(before, report, list(csv.DictReader(stream, delimiter="\t")))
-            if errors:
-                raise ValueError("reuse verification failed:\n" + "\n".join(errors))
-            print("[enums] all starting/current member values accounted for", file=sys.stderr)
     except (ValueError, RuntimeError, OSError, ci.TranslationUnitLoadError) as error:
         print(f"enums: {error}", file=sys.stderr)
         return 2
