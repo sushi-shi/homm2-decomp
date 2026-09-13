@@ -27,15 +27,8 @@ typedef i32 ArmyGroupAlignmentResult;
 #pragma pack(push, 1)
 class armyGroup {
 public:
-    union {
-        i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
-        i8 m_troopTypes[ARMY_GROUP_SLOT_COUNT];
-    };
-    union {
-        i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
-        u16 m_troopCounts[ARMY_GROUP_SLOT_COUNT];
-        i16 m_quantities[ARMY_GROUP_SLOT_COUNT];
-    };
+    i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
+    i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
     armyGroup(void);
     void View(i32);
     i32 HasAllUndead(void);

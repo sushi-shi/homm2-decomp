@@ -17,6 +17,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/display.h>
 
 enum {
     COLOR_TABLE_SKIP_DIM  = 0,
@@ -24,8 +25,6 @@ enum {
 };
 typedef i32 IconColorTableMode;
 typedef enum IconDrawExtentConstant {
-    DRAW_SCREEN_WIDTH  = 640,
-    DRAW_SCREEN_HEIGHT = 480,
     DRAW_COMBAT_HEIGHT = 444
 } IconDrawExtentConstant;
 
@@ -34,7 +33,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     m_frameCount = gpResourceManager->ReadWord();
     u32 length = gpResourceManager->ReadLong();
     m_data = static_cast<u8*>(H2_ALLOC(length));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), length);
+    gpResourceManager->ReadBlock(m_data, length);
 }
 
  icon::~icon() {
@@ -54,8 +53,8 @@ void icon::DrawToBuffer(
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
-            DRAW_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0
         );
         return;
@@ -69,8 +68,8 @@ void icon::DrawToBuffer(
         ICON_DRAW_NO_CLIP,
         0,
         0,
-        DRAW_SCREEN_WIDTH,
-        DRAW_SCREEN_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         0
     );
 }
@@ -127,7 +126,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 yModify
@@ -142,7 +141,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 yModify
@@ -158,7 +157,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable,
@@ -174,7 +173,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable
@@ -218,7 +217,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             ICON_DRAW_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
             offset
         );
@@ -232,7 +231,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             ICON_DRAW_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
             offset
         );

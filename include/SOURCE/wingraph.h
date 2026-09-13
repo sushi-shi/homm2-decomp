@@ -5,16 +5,14 @@
 #include <ddraw.h>
 #include <wing.h>
 #include <Ints.h>
+#include <BASE/display.h>
 
 typedef enum WingraphConstant {
-    WINGRAPH_WIDTH                 = 640,
-    WINGRAPH_HEIGHT                = 480,
     WINGRAPH_COLOR_DEPTH           = 8,
-    WINGRAPH_PALETTE_SIZE          = 256,
     WINGRAPH_PALETTE_VERSION       = 0x300,
     WINGRAPH_SYSTEM_PALETTE_SIZE   = 10,
     WINGRAPH_SCROLL_MARGIN         = 16,
-    WINGRAPH_SCROLL_SIZE           = WINGRAPH_HEIGHT - WINGRAPH_SCROLL_MARGIN * 2,
+    WINGRAPH_SCROLL_SIZE           = LOGICAL_SCREEN_HEIGHT - WINGRAPH_SCROLL_MARGIN * 2,
     WINGRAPH_LIMITED_COMBAT_HEIGHT = 458,
     WINGRAPH_PAINT_ALIGN_MASK      = 0xfffc,
     WINGRAPH_LOAD_LIBRARY_SUCCESS  = 32,
@@ -31,13 +29,13 @@ typedef i32 WingraphGraphicsType;
 struct _PALETTE {
     WORD version;
     WORD entryCount;
-    PALETTEENTRY entries[WINGRAPH_PALETTE_SIZE];
+    PALETTEENTRY entries[PALETTE_COLOR_COUNT];
 };
 #pragma pack(pop)
 
 struct _IMAGE {
     BITMAPINFOHEADER header;
-    RGBQUAD colors[WINGRAPH_PALETTE_SIZE];
+    RGBQUAD colors[PALETTE_COLOR_COUNT];
     void* bits;
 };
 
@@ -52,7 +50,7 @@ i32 DDQueryNewPalette(void);
 void CreatePrimary(void);
 void SetupClipper(void);
 void DDInitGraphics(void);
-i32 DDAppPaint(void* window, void* paintDC);
+i32 DDAppPaint(HWND window, HDC paintDC);
 void DDInitializePalette(void);
 i32 DDSetPalette(void);
 struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary);
@@ -64,7 +62,7 @@ i32 WGQueryNewPalette(void);
 void WGInitGraphics(void);
 void __cdecl WGUpdatePalette(i8* paletteData);
 void WGInitializePalette(void);
-i32 WGAppPaint(void* window, void* paintDC);
+i32 WGAppPaint(HWND window, HDC paintDC);
 void WGCleanUpWinGraphics(void);
 void ConnectToDLLs(void);
 void DisconnectDLLs(void);
@@ -72,7 +70,7 @@ void RestoreDisplayMode(void);
 i32 SetPalette(void);
 void GetGraphicsInfo(void);
 void InitGraphics(void);
-i32 AppPaint(void* window, void* message);
+i32 AppPaint(HWND window, HDC paintDC);
 void InitializePalette(void);
 void __cdecl UpdatePalette(i8* paletteData);
 void CleanUpWinGraphics(void);

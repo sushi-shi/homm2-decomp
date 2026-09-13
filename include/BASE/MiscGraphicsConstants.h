@@ -1,11 +1,4 @@
 #ifndef HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H
 #define HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H
 
-typedef enum MiscPaletteConstant {
-    MISC_PALETTE_COMPONENT_BYTES = 3,
-    MISC_PALETTE_BYTE_COUNT      = 0x300,
-    MISC_PALETTE_LEVEL_COUNT     = 0x40,
-    MISC_PALETTE_MAX_LEVEL       = 0x3f
-} MiscPaletteConstant;
-
 #endif

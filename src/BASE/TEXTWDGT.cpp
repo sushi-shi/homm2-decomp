@@ -49,8 +49,8 @@ void textWidget::Read(void) {
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     i16 length = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(length));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), length);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->ReadBlock(m_text, length);
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
@@ -102,7 +102,7 @@ MessageDispatchResult textWidget::Main(tag_message& message) {
                 m_flags |= WIDGET_FLAG_SELECTED;
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN)
                     message.payload.widget.parameter = (MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
@@ -114,7 +114,7 @@ MessageDispatchResult textWidget::Main(tag_message& message) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
                 if (message.type == MESSAGE_RIGHT_BUTTON_UP)
                     message.payload.widget.parameter = (MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

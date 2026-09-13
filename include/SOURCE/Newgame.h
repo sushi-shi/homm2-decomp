@@ -27,20 +27,14 @@ typedef enum NewGameControlConstant {
     NEW_GAME_RACE_NAME_FIRST       = 0x4e
 } NewGameControlConstant;
 
-typedef enum NewGameRemotePacketConstant {
-    NEW_GAME_REMOTE_RESERVED_SIZE     = 4,
-    NEW_GAME_REMOTE_SEQUENCE_SIZE     = 2,
-    NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE = 1
-} NewGameRemotePacketConstant;
-
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
     i8 sender;
-    u8 reserved[NEW_GAME_REMOTE_RESERVED_SIZE];
+    i32 id;
     i8 type;
     i8 command;
-    u8 sequence[NEW_GAME_REMOTE_SEQUENCE_SIZE];
-    char payload[NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE];
+    i16 payloadSize;
+    char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 
 #pragma pack(pop)

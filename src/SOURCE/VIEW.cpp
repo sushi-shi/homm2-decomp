@@ -11,21 +11,24 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+typedef enum ViewGeneralAction {
+    GENERAL_ACTION_CLOSE      = DIALOG_BUTTON_0,
+    GENERAL_ACTION_CAST_SPELL = (COMBAT_MESSAGE_COMMAND_CAST_SPELL),
+    GENERAL_ACTION_RETREAT    = (COMBAT_MESSAGE_COMMAND_RETREAT),
+    GENERAL_ACTION_SURRENDER  = (COMBAT_MESSAGE_COMMAND_SURRENDER)
+} ViewGeneralAction;
+
 typedef enum ViewGeneralConstant {
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
-    GENERAL_CLOSE              = 10,
-    GENERAL_RETREAT            = 11,
-    GENERAL_SURRENDER          = 12,
-    GENERAL_CAST_SPELL         = 0x7800,
     GENERAL_TEXT_COLOR_COUNT   = 11,
     GENERAL_MORALE_TEXT_OFFSET = 3,
     GENERAL_LUCK_TEXT_OFFSET   = 3,
-    GENERAL_MANA_PER_KNOWLEDGE = 10,
     GENERAL_CAPTAIN_FRAME      = 6,
     ARMY_WIDTH                 = 488,
     ARMY_HEIGHT                = 229,
-    ARMY_SCREEN_WIDTH          = 640,
     ARMY_SCREEN_HEIGHT         = 460,
     ARMY_LEFT_FACING_X_OFFSET  = 123,
     ARMY_RIGHT_FACING_X_OFFSET = 80,
@@ -57,19 +60,19 @@ typedef enum ViewGeneralLabel {
 } ViewGeneralLabel;
 
 typedef enum ViewGeneralLongHelp {
-    GENERAL_LONG_HELP_CLOSE     = 0,
-    GENERAL_LONG_HELP_RETREAT   = 1,
-    GENERAL_LONG_HELP_SURRENDER = 2,
-    GENERAL_LONG_HELP_CAST      = 3
+    GENERAL_LONG_HELP_CAST_SPELL = 0,
+    GENERAL_LONG_HELP_RETREAT    = 1,
+    GENERAL_LONG_HELP_SURRENDER  = 2,
+    GENERAL_LONG_HELP_CLOSE      = 3
 } ViewGeneralLongHelp;
 
 typedef enum ViewGeneralHoverHelp {
-    GENERAL_HOVER_HELP_CLOSE     = 1,
-    GENERAL_HOVER_HELP_RETREAT   = 2,
-    GENERAL_HOVER_HELP_SURRENDER = 3,
-    GENERAL_HOVER_HELP_CAST      = 4,
-    GENERAL_HOVER_HELP_HERO      = 5,
-    GENERAL_HOVER_HELP_CAPTAIN   = 6
+    GENERAL_HOVER_HELP_CAST_SPELL = 1,
+    GENERAL_HOVER_HELP_RETREAT    = 2,
+    GENERAL_HOVER_HELP_SURRENDER  = 3,
+    GENERAL_HOVER_HELP_CLOSE      = 4,
+    GENERAL_HOVER_HELP_HERO       = 5,
+    GENERAL_HOVER_HELP_CAPTAIN    = 6
 } ViewGeneralHoverHelp;
 
 i32 combatManager::ViewGeneral(
@@ -109,9 +112,9 @@ i32 combatManager::ViewGeneral(
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_CLOSE;
-    retreatWidgetId = GENERAL_RETREAT;
-    surrenderWidgetId = GENERAL_SURRENDER;
+    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    retreatWidgetId = GENERAL_ACTION_RETREAT;
+    surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
     fourteenthControlWidgetId = GENERAL_CONTROL_FOURTEEN;
     giCurGeneral = side;
@@ -121,7 +124,7 @@ i32 combatManager::ViewGeneral(
     if (generalWindow == NULL)
         MemError();
     sprintf(gText, "port%04d.icn", (m_heroes[(side)]->m_portrait));
-    message.payload.widget.command = VIEW_GENERAL_SET_ICON;
+    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message.payload.widget.data.text = gText;
     generalWindow->BroadcastMessage(message);
@@ -132,14 +135,14 @@ i32 combatManager::ViewGeneral(
     message.payload.widget.data.value = (WIDGET_FLAG_DRAW);
     generalWindow->BroadcastMessage(message);
     if (m_heroes[(side)]->m_isCaptain) {
-        message.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.data.value = m_playerId[(side)] == -1
             ? GENERAL_CAPTAIN_FRAME
             : gpGame->m_players[m_playerId[(side)]].m_color;
         generalWindow->BroadcastMessage(message);
     }
 
-    message.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = GENERAL_COLOR_WIDGET;
     message.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[(side)]->m_owner) + 1;
     generalWindow->BroadcastMessage(message);
@@ -156,7 +159,7 @@ i32 combatManager::ViewGeneral(
             m_heroes[(side)]->m_name,
             gAlignmentNames[(m_heroes[(side)]->m_cursorType)]
         );
-    message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = GENERAL_NAME_WIDGET;
     message.payload.widget.data.text = gText;
     generalWindow->BroadcastMessage(message);
@@ -186,7 +189,7 @@ i32 combatManager::ViewGeneral(
         m_heroes[(side)]->m_spellPoints,
         HERO_NORMAL_SPELL_POINTS(*m_heroes[(side)])
     );
-    message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = GENERAL_STATS_WIDGET;
     message.payload.widget.data.text = gText;
     generalWindow->BroadcastMessage(message);
@@ -195,22 +198,22 @@ i32 combatManager::ViewGeneral(
         || m_heroes[(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[(side)] != 0
         || giCurGeneral != m_currentSide) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.id = GENERAL_CLOSE;
+        message.payload.widget.id = GENERAL_ACTION_CAST_SPELL;
         message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow->BroadcastMessage(message);
     }
     if (allowActions == 0 || m_heroes[(OppositeCombatSide(m_currentSide))] == NULL
         || giCurGeneral != m_currentSide
         || m_heroes[(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.id = GENERAL_SURRENDER;
+        message.payload.widget.id = GENERAL_ACTION_SURRENDER;
         message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow->BroadcastMessage(message);
     }
     if (allowActions == 0 || giCurGeneral != m_currentSide
@@ -219,11 +222,11 @@ i32 combatManager::ViewGeneral(
         || m_sideRetreated[(COMBAT_ATTACKER_SIDE)] != 0
         || m_sideRetreated[1] != 0 || m_heroes[(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.id = GENERAL_RETREAT;
+        message.payload.widget.id = GENERAL_ACTION_RETREAT;
         message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow->BroadcastMessage(message);
     }
 
@@ -268,9 +271,9 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_CLOSE;
-    retreatWidgetId = GENERAL_RETREAT;
-    surrenderWidgetId = GENERAL_SURRENDER;
+    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    retreatWidgetId = GENERAL_ACTION_RETREAT;
+    surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
     fourteenthControlWidgetId = GENERAL_CONTROL_FOURTEEN;
     handled = false;
@@ -279,19 +282,19 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
         case MESSAGE_WIDGET:
             if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 helpIndex = -1;
-                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+                if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     switch (message.payload.widget.id) {
-                        case GENERAL_CLOSE:
-                            helpIndex = GENERAL_LONG_HELP_CLOSE;
+                        case GENERAL_ACTION_CAST_SPELL:
+                            helpIndex = GENERAL_LONG_HELP_CAST_SPELL;
                             break;
-                        case GENERAL_RETREAT:
+                        case GENERAL_ACTION_RETREAT:
                             helpIndex = GENERAL_LONG_HELP_RETREAT;
                             break;
-                        case GENERAL_SURRENDER:
+                        case GENERAL_ACTION_SURRENDER:
                             helpIndex = GENERAL_LONG_HELP_SURRENDER;
                             break;
-                        case GENERAL_CAST_SPELL:
-                            helpIndex = GENERAL_LONG_HELP_CAST;
+                        case GENERAL_ACTION_CLOSE:
+                            helpIndex = GENERAL_LONG_HELP_CLOSE;
                             break;
                     }
                     if (helpIndex != -1)
@@ -300,12 +303,12 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 break;
             }
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case GENERAL_CLOSE:
-                        case GENERAL_RETREAT:
-                        case GENERAL_SURRENDER:
-                        case GENERAL_CAST_SPELL:
+                        case GENERAL_ACTION_CAST_SPELL:
+                        case GENERAL_ACTION_RETREAT:
+                        case GENERAL_ACTION_SURRENDER:
+                        case GENERAL_ACTION_CLOSE:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
                             handled = true;
                             break;
@@ -321,17 +324,17 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 return MESSAGE_DISPATCH_CONSUME;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
-                case GENERAL_CLOSE:
-                    hintIndex = GENERAL_HOVER_HELP_CLOSE;
+                case GENERAL_ACTION_CAST_SPELL:
+                    hintIndex = GENERAL_HOVER_HELP_CAST_SPELL;
                     break;
-                case GENERAL_RETREAT:
+                case GENERAL_ACTION_RETREAT:
                     hintIndex = GENERAL_HOVER_HELP_RETREAT;
                     break;
-                case GENERAL_SURRENDER:
+                case GENERAL_ACTION_SURRENDER:
                     hintIndex = GENERAL_HOVER_HELP_SURRENDER;
                     break;
-                case GENERAL_CAST_SPELL:
-                    hintIndex = GENERAL_HOVER_HELP_CAST;
+                case GENERAL_ACTION_CLOSE:
+                    hintIndex = GENERAL_HOVER_HELP_CLOSE;
                     break;
                 default:
                     hintIndex = GENERAL_HOVER_HELP_HERO;
@@ -344,7 +347,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             return MESSAGE_DISPATCH_CONSUME;
     }
     if (handled) {
-        message.payload.widget.id = GENERAL_CLOSE;
+        message.payload.widget.id = (WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -377,7 +380,7 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         xWnd -= xDelta;
         if (xWnd < 0)
             xWnd = 0;
-        if (xWnd + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
+        if (xWnd + ARMY_WIDTH > LOGICAL_SCREEN_WIDTH)
             xWnd = ARMY_RIGHT_CLAMP;
         yWindow -= ARMY_Y_OFFSET;
         if (yWindow < 0)

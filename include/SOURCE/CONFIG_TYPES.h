@@ -36,6 +36,12 @@ enum {
 typedef i32 ConfigWalkSpeed;
 
 enum {
+    CONFIG_WALK_SPEED_COMPUTER = 0,
+    CONFIG_WALK_SPEED_HUMAN    = 1,
+    CONFIG_WALK_SPEED_OWNER_COUNT = 2
+};
+typedef i32 ConfigWalkSpeedOwner;
+enum {
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
     CONFIG_VOLUME_MAX         = 10,
@@ -82,8 +88,7 @@ enum {
 };
 typedef i32 ConfigBaudRate;
 struct configStruct {
-    ConfigWalkSpeed computerWalkSpeed;
-    ConfigWalkSpeed walkSpeed;
+    ConfigWalkSpeed walkSpeeds[(CONFIG_WALK_SPEED_OWNER_COUNT)];
     ConfigVolumeLevel musicVolume;
     ConfigVolumeLevel soundVolume;
     i32 autosave;

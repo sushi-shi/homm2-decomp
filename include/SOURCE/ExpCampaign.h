@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
+#include <SOURCE/KB.h>
 
 class heroWindow;
 struct tag_message;
@@ -66,27 +67,15 @@ enum {
 typedef i32 ExpansionCampaignAward;
 
 typedef enum ExpansionCampaignConstant {
-    EXPANSION_CAMPAIGN_MAX_MAP_COUNT           = 8,
-    EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT      = 3,
-    EXPANSION_CAMPAIGN_AWARD_COUNT             = 11,
-    EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE        = 4,
-    EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE = 0x41,
-    EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE   = 52,
-    EXPANSION_CAMPAIGN_HERO_COUNT              = 54,
-    EXPANSION_CAMPAIGN_TRACK_ICON_SIZE         = 41,
-    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE       = 13,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL     = 1,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL           = 12,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT_LEVEL = 2,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT       = 2,
-    EXPANSION_CAMPAIGN_ICON_FRAME_BASE         = 15,
-    EXPANSION_CAMPAIGN_MUSIC                   = 24,
-    EXPANSION_CAMPAIGN_DAYS_PER_WEEK           = 7,
-    EXPANSION_CAMPAIGN_DAYS_PER_MONTH          = 28,
-    EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET        = 6,
-    EXPANSION_CAMPAIGN_MAIN_PLAYER             = 0,
-    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X      = 5,
-    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y      = 0
+    EXPANSION_CAMPAIGN_MAX_MAP_COUNT      = 8,
+    EXPANSION_CAMPAIGN_AWARD_COUNT        = 11,
+    EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE   = 4,
+    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE  = 13,
+    EXPANSION_CAMPAIGN_ICON_FRAME_BASE    = 15,
+    EXPANSION_CAMPAIGN_MUSIC              = 24,
+    EXPANSION_CAMPAIGN_MAIN_PLAYER        = 0,
+    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X = 5,
+    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y = 0
 } ExpansionCampaignConstant;
 
 #pragma pack(push, 1)
@@ -149,5 +138,5 @@ public:
 
 extern struct SCampaignChoice xCampaignChoices[(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
-                                              [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
+                                              [CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif

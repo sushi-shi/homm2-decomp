@@ -6,10 +6,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-
-typedef enum BitmapConstant {
-    COPY_STRIDE = 640
-} BitmapConstant;
+#include <BASE/display.h>
 
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
@@ -37,7 +34,7 @@ bitmap::bitmap(u32l id)
     size = m_width * m_height;
     m_pixels = new u8[size];
     PollSound();
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
+    gpResourceManager->ReadBlock(m_pixels, size);
     PollSound();
 }
 
@@ -144,18 +141,18 @@ void bitmap::CopyTo(
     i32 height
 ) {
     PollSound();
-    if (width != COPY_STRIDE) {
+    if (width != LOGICAL_SCREEN_WIDTH) {
         for (i32 row = 0; row < height; row++) {
             memcpy(
-                destination->m_pixels + destinationX + (destinationY + row) * COPY_STRIDE,
-                m_pixels + sourceX + (sourceY + row) * COPY_STRIDE,
+                destination->m_pixels + destinationX + (destinationY + row) * LOGICAL_SCREEN_WIDTH,
+                m_pixels + sourceX + (sourceY + row) * LOGICAL_SCREEN_WIDTH,
                 width
             );
         }
     } else {
         memcpy(
-            destination->m_pixels + destinationX + destinationY * COPY_STRIDE,
-            m_pixels + sourceX + sourceY * COPY_STRIDE,
+            destination->m_pixels + destinationX + destinationY * LOGICAL_SCREEN_WIDTH,
+            m_pixels + sourceX + sourceY * LOGICAL_SCREEN_WIDTH,
             width * height
         );
     }

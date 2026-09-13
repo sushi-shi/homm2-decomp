@@ -6,7 +6,6 @@
 #include <SOURCE/combatTypes.h>
 
 typedef enum HexcellConstant {
-    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
     HEXCELL_LIMIT_COUNT           = 2
 } HexcellConstant;
 

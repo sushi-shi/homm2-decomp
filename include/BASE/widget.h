@@ -24,15 +24,15 @@ enum {
     WIDGET_FLAG_ENABLED  = 2,
     WIDGET_FLAG_DRAW     = 4,
     WIDGET_FLAG_DIMMED   = 8,
-    WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
 };
 typedef i32 WidgetFlag;
 
 enum {
-    WIDGET_COMMAND_DIMMED = 0x1000
+
+    WIDGET_FLAGS_ARGUMENT_DIMMED = 0x1000
 };
-typedef i32 WidgetCommandArgument;
+typedef i32 WidgetFlagArgument;
 #pragma pack(push, 1)
 class widget {
 public:

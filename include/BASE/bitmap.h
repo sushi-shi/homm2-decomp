@@ -7,7 +7,6 @@
 enum {
     BITMAP_TYPE_NONE           = 0,
     BITMAP_TYPE_MEMORY         = 0x21,
-    COMBAT_MISSILE_BITMAP_TYPE = BITMAP_TYPE_MEMORY
 };
 typedef i16 BitmapType;
 #pragma pack(push, 1)

@@ -28,8 +28,8 @@ typedef enum DirectPlayTransportConstant {
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {
-    char playerCount;
-    char netPosition;
+    i8 playerCount;
+    i8 netPosition;
     i32 playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 };
 

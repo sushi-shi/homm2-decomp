@@ -7,6 +7,7 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 #include <SOURCE/KB.h>
+#include <BASE/display.h>
 
 
 static i32 s_left = 0;
@@ -115,7 +116,7 @@ void IconToBitmapColorTable(
                 if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {
                     s_dimPal = reinterpret_cast<u8*>(uDimPal)
                                + (static_cast<u32>(s_run & ICON_RLE_DIM_LEVEL_MASK) >> 2)
-                                     * DIM_PALETTE_COLOR_COUNT;
+                                     * PALETTE_COLOR_COUNT;
                     if (clip == ICON_DRAW_NO_CLIP) {
                         s_dst = s_row + s_x;
                         for (s_loopCount = 0; s_loopCount < s_dimLen; s_loopCount++) {

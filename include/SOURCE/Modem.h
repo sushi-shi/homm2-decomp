@@ -19,33 +19,45 @@ i32 WaitForDirectConnect(void);
 char ReadPacket(void);
 void WriteModemPacket(const char* buffer, i32 length);
 
-typedef enum ModemConstant {
-    MODEM_MODE_DIAL                  = 3,
-    MODEM_MODE_WAIT                  = 4,
+typedef enum ModemSetupMode {
+    MODEM_MODE_DIAL = 3,
+    MODEM_MODE_WAIT = 4,
+} ModemSetupMode;
+
+typedef enum ModemConnectionStage {
     MODEM_CONNECTION_INIT_STAGE      = 0,
     MODEM_CONNECTION_HANDSHAKE_STAGE = 1,
     MODEM_CONNECTION_READY_STAGE     = 2,
-    MODEM_BAUD_CLOCK                 = 115200,
-    MODEM_QUEUE_GUARD                = 16,
-    MODEM_OUT_QUEUE_SIZE             = 0x800,
-    MODEM_COMMAND_INTERVAL           = 250,
-    MODEM_COMMAND_DELAY              = 100,
-    MODEM_RESET_DELAY                = 200,
-    MODEM_ID_MODULUS                 = 1000000,
-    MODEM_ID_SIZE                    = 8,
-    MODEM_NUMBER_BUFFER_SIZE         = 36,
-    MODEM_COMMAND_BUFFER_SIZE        = 40,
-    MODEM_WORK_TEXT_SIZE             = 200,
-    MODEM_RESPONSE_SIZE              = 80,
-    MODEM_RESPONSE_TRUNCATE_INDEX    = 17,
-    MODEM_PACKET_PAYLOAD_SIZE        = 256,
-    MODEM_PACKET_BUFFER_SIZE         = 0x110,
-    MODEM_ENCODED_PACKET_SIZE        = 516,
-    MODEM_QUEUE_INPUT_SIZE           = 0x1000,
-    MODEM_QUEUE_OUTPUT_SIZE          = 0x800,
-    MODEM_ESCAPE_BYTE                = 0x70,
-    MODEM_PACKET_END                 = 1
-} ModemConstant;
+} ModemConnectionStage;
+
+typedef enum ModemTimingConstant {
+    MODEM_BAUD_CLOCK       = 115200,
+    MODEM_COMMAND_INTERVAL = 250,
+    MODEM_COMMAND_DELAY    = 100,
+    MODEM_RESET_DELAY      = 200,
+} ModemTimingConstant;
+
+typedef enum ModemStorageConstant {
+    MODEM_QUEUE_GUARD             = 16,
+    MODEM_OUT_QUEUE_SIZE          = 0x800,
+    MODEM_ID_SIZE                 = 8,
+    MODEM_NUMBER_BUFFER_SIZE      = 36,
+    MODEM_COMMAND_BUFFER_SIZE     = 40,
+    MODEM_WORK_TEXT_SIZE          = 200,
+    MODEM_RESPONSE_SIZE           = 80,
+    MODEM_RESPONSE_TRUNCATE_INDEX = 17,
+    MODEM_PACKET_PAYLOAD_SIZE     = 256,
+    MODEM_PACKET_BUFFER_SIZE      = 0x110,
+    MODEM_ENCODED_PACKET_SIZE     = 516,
+    MODEM_QUEUE_INPUT_SIZE        = 0x1000,
+    MODEM_QUEUE_OUTPUT_SIZE       = 0x800,
+} ModemStorageConstant;
+
+typedef enum ModemPacketEncodingConstant {
+    MODEM_ID_MODULUS  = 1000000,
+    MODEM_ESCAPE_BYTE = 0x70,
+    MODEM_PACKET_END  = 1,
+} ModemPacketEncodingConstant;
 
 struct inque_t {
     i32 readPosition;

@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include <BASE/baseManager.h>
+#include <SOURCE/KB_TYPES.h>
 
 class heroWindow;
 class icon;
@@ -15,7 +16,6 @@ class hero;
 struct tag_message;
 
 typedef enum TownManagerStorageConstant {
-    TOWN_MANAGER_OBJECT_COUNT     = 32,
     TOWN_MANAGER_STATUS_TEXT_SIZE = 0x50
 } TownManagerStorageConstant;
 
@@ -34,7 +34,7 @@ class townManager H2_FINAL : public baseManager {
 public:
     town* m_town;
     icon* m_backgroundIcon;
-    townObject* m_townObjects[TOWN_MANAGER_OBJECT_COUNT];
+    townObject* m_townObjects[(BUILDING_SLOT_COUNT)];
     i32 m_townObjectCount;
     i32 m_lastTownType;
     i32 m_unknownC6;

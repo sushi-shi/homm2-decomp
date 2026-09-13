@@ -46,25 +46,22 @@ typedef enum TownFormation {
 } TownFormation;
 
 typedef enum TownConstant {
-    TOWN_GARRISON_SLOT_COUNT           = 12,
-    TOWN_OWNER_NONE                    = -1,
-    TOWN_ID_NONE                       = -1,
-    TOWN_OCCUPYING_HERO_NONE           = -1,
-    TOWN_DOCK_COORDINATE_NONE          = 0xFF,
-    TOWN_PLAYER_WINDOW_SIZE            = 5,
-    TOWN_MAGE_GUILD_LEVEL_COUNT        = 5,
-    TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
-    TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
-    TOWN_MAGE_GUILD_SPELLS_PER_LEVEL   = 4,
-    TOWN_SPELL_COUNT_OVERLAY_OFFSET    = 19,
-    TOWN_SPELL_COUNT_OVERLAY_SIZE      = 6,
-    TOWN_NAME_CAPACITY                 = 13,
-    TOWN_CONVERT_SOURCE_FRAME          = 0x10,
-    TOWN_CONVERT_ANY_FRAME             = 0xFF,
-    TOWN_CONVERT_OBJECT_NONE           = 0,
-    TOWN_VIEW_MEMORY_REQUIREMENT       = 0x514,
-    TOWN_VIEW_LOW_MEMORY_LIMIT         = 0x320,
-    TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
+    TOWN_GARRISON_SLOT_COUNT         = 12,
+    TOWN_OWNER_NONE                  = -1,
+    TOWN_ID_NONE                     = -1,
+    TOWN_OCCUPYING_HERO_NONE         = -1,
+    TOWN_DOCK_COORDINATE_NONE        = 0xFF,
+    TOWN_PLAYER_WINDOW_SIZE          = 5,
+    TOWN_MAGE_GUILD_LEVEL_COUNT      = 5,
+    TOWN_MAGE_GUILD_FIRST_LEVEL      = 1,
+    TOWN_MAGE_GUILD_SPELLS_PER_LEVEL = 4,
+    TOWN_NAME_CAPACITY               = 13,
+    TOWN_CONVERT_SOURCE_FRAME        = 0x10,
+    TOWN_CONVERT_ANY_FRAME           = 0xFF,
+    TOWN_CONVERT_OBJECT_NONE         = 0,
+    TOWN_VIEW_MEMORY_REQUIREMENT     = 0x514,
+    TOWN_VIEW_LOW_MEMORY_LIMIT       = 0x320,
+    TOWN_VIEW_HIGH_MEMORY_LIMIT      = 0xb54
 } TownConstant;
 
 
@@ -101,11 +98,8 @@ public:
             m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         i8
             m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
-        struct {
-            char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
-            i8 m_spellCounts[TOWN_SPELL_COUNT_OVERLAY_SIZE];
-        };
     };
+    i8 m_spellCounts[TOWN_MAGE_GUILD_LEVEL_COUNT];
     u16 m_turnsOwned;
     char m_name[TOWN_NAME_CAPACITY];
     town(void);

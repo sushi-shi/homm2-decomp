@@ -7,6 +7,17 @@
 class sample;
 struct _DIG_DRIVER;
 
+typedef enum MilesSampleStorageConstant {
+    MILES_SAMPLE_HANDLE_STORAGE_COUNT = 16
+} MilesSampleStorageConstant;
+
+
+struct MilesSampleState {
+    i32 ready;
+    struct _SAMPLE* handles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
+    i32 handleCount;
+};
+
 struct AudiereSampleNode {
     audiere::OutputStreamPtr stream;
     class sample* sampleResource;

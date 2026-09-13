@@ -7,7 +7,6 @@ typedef enum NetbiosConstant {
     NETBIOS_SESSION_COUNT               = 7,
     NETBIOS_STATUS_COUNT                = 10,
     NETBIOS_THREAD_EVENT_COUNT          = 9,
-    NETBIOS_THREAD_EVENT_STORAGE_COUNT  = 10,
     NETBIOS_RECEIVE_EVENT_FIRST         = 2,
     NETBIOS_RECEIVE_EVENT_COUNT         = 5,
     NETBIOS_NAME_SIZE                   = 0x10,
@@ -106,9 +105,8 @@ struct NetbiosName {
     u8 bytes[NETBIOS_NAME_SIZE];
 };
 
-union NetbiosPayload {
+struct NetbiosPayload {
     u8 bytes[NETBIOS_PAYLOAD_SIZE];
-    u32l words[NETBIOS_PAYLOAD_SIZE / sizeof(u32l)];
 };
 
 struct NetbiosSessionBuffer {
@@ -116,7 +114,7 @@ struct NetbiosSessionBuffer {
 };
 
 struct NetbiosThreadEvents {
-    void* handles[NETBIOS_THREAD_EVENT_STORAGE_COUNT];
+    void* handles[NETBIOS_THREAD_EVENT_COUNT];
 };
 
 i32 is_netbios_avail(void);

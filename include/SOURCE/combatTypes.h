@@ -88,10 +88,55 @@ typedef enum CombatHexDirectionConstant {
 } CombatHexDirectionConstant;
 
 enum {
-    COMBAT_AI_PATH_TO_TARGET   = -1,
-    ARMY_PATH_ANY_TARGET_HEX   = 0,
-    ARMY_PATH_EXACT_TARGET_HEX = 1,
-    COMBAT_AI_PATH_TO_FRONT    = ARMY_PATH_EXACT_TARGET_HEX
+    COMBAT_CASTLE_HEX_NONE           = -1,
+    COMBAT_CASTLE_HEX_TOP_TOWER      = 9,
+    COMBAT_CASTLE_HEX_TOP_WALL       = 22,
+    COMBAT_CASTLE_HEX_SECOND_TOWER   = 34,
+    COMBAT_CASTLE_HEX_SECOND_WALL    = 47,
+    COMBAT_CASTLE_HEX_GATE           = 59,
+    COMBAT_CASTLE_HEX_THIRD_WALL     = 73,
+    COMBAT_CASTLE_HEX_KEEP           = 77,
+    COMBAT_CASTLE_HEX_THIRD_TOWER    = 86,
+    COMBAT_CASTLE_HEX_MOAT           = 92,
+    COMBAT_CASTLE_HEX_BOTTOM_WALL    = 100,
+    COMBAT_CASTLE_HEX_BOTTOM_TOWER   = 113,
+    COMBAT_CASTLE_SPECIAL_HEX_FIRST  = 114,
+    COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
+};
+typedef i32 CombatCastleHex;
+enum {
+    ARMY_PATH_ASSIGNED_TARGET_HEX = -1,
+    ARMY_PATH_ANY_TARGET_HEX      = 0,
+    ARMY_PATH_EXACT_TARGET_HEX    = 1,
 };
 typedef i32 ArmyPathTarget;
+typedef enum CombatGeometryConstant {
+    COMBAT_GRID_ROW_LENGTH = 13,
+    COMBAT_AREA_HEIGHT     = 443,
+    COMBAT_MAX_EXTENT_Y    = 442,
+    COMBAT_HEX_COUNT       = 117,
+} CombatGeometryConstant;
+
+typedef enum CombatStorageConstant {
+    COMBAT_WIN_LOSE_WIDGET_COUNT  = 25,
+    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
+} CombatStorageConstant;
+
+typedef enum CombatElevationOverlayConstant {
+    COMBAT_ELEVATION_OVERLAY_COUNT      = 25,
+    COMBAT_ELEVATION_OVERLAY_CELL_COUNT = 15,
+} CombatElevationOverlayConstant;
+
+typedef enum CombatMissileAnimationConstant {
+    COMBAT_MISSILE_HALF_WIDTH  = 25,
+    COMBAT_MISSILE_HALF_HEIGHT = 25,
+    COMBAT_MISSILE_SPACING     = 31,
+    COMBAT_MISSILE_TIMER_DELAY = 25,
+} CombatMissileAnimationConstant;
+
+typedef enum CombatDirectionMask {
+
+    COMBAT_ALL_DIRECTIONS_BLOCKED = 255,
+} CombatDirectionMask;
+
 #endif
