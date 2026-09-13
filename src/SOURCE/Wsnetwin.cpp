@@ -24,13 +24,16 @@ H2_ENUM_BEGIN(WinsockPrivateConstant)
     EXTRA_GUEST_PLAYER_THRESHOLD = 2
 H2_ENUM_END(WinsockPrivateConstant)
 
+#if H2_RETAIL_COMPILER
+#define player plr
+#endif
 VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     struct hostent* pHost;
     u_long blockMode;
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
-    i32 plr;
+    i32 player;
 
     if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         sprintf(
@@ -146,10 +149,10 @@ i16 wsnet_init(void) {
         gbRemoteGameOpen = false;
         startup.playerCount = giNumHumanPlayers;
         memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
-        for (plr = 1; plr < giNumHumanPlayers; plr++) {
-            startup.netPosition = plr;
+        for (player = 1; player < giNumHumanPlayers; player++) {
+            startup.netPosition = player;
             wsSendMessage(
-                giNetPosToDCOPos[plr],
+                giNetPosToDCOPos[player],
                 NETWORK_PACKET_STARTUP,
                 sizeof(startup),
                 &startup
@@ -195,6 +198,9 @@ i16 wsnet_init(void) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef player
+#endif
 
 VA(0x004b2262, 0xb3)
 void wsnet_term(void) {
@@ -305,18 +311,21 @@ i16 wsnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
+#if H2_RETAIL_COMPILER
+#define bufferLength bufLen
+#endif
 VA(0x004b25c8, 0x8b)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
     i32 addressLength = sizeof(remote);
-    i32 bufLen;
+    i32 bufferLength;
 
     for (;;) {
-        bufLen = WS_TRANSPORT_BUFFER_SIZE;
+        bufferLength = WS_TRANSPORT_BUFFER_SIZE;
         iRc = recvfrom(
             sd_dg,
             rcvBufIn,
-            bufLen,
+            bufferLength,
             0,
             reinterpret_cast<struct sockaddr*>(&remote),
             &addressLength
@@ -334,6 +343,9 @@ void wsProcessMessages(void) {
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef bufferLength
+#endif
 
 VA(0x004b2653, 0x344)
 void wsEvaluateMessage(u32l size, i32 sender) {

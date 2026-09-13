@@ -42,13 +42,13 @@ public:
     b32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);
-    virtual i32 Open(i32) OVERRIDE;
+    virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void SetPointer(H2_CONST char*, i32, MouseCursorType);
-    void SetPointer(i32);
-    void NewUpdate(i32);
-    void MouseCoords(i32&, i32&);
+    void SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cursorType);
+    void SetPointer(i32 frame);
+    void NewUpdate(i32 force);
+    void MouseCoords(i32& x, i32& y);
     void SaveAndDraw(void);
     void RestoreUnderlying(void);
     void ReallyHidePointer(void);
@@ -57,7 +57,7 @@ public:
     void ShowColorPointer(void);
     i32 IsVis(void);
     void CheckUpdateMousePos(void);
-    void SetColorMice(b32);
+    void SetColorMice(b32 enabled);
 };
 #pragma pack(pop)
 SIZE(mouseManager, 0x8a);

@@ -3,6 +3,12 @@
 
 #include <Ints.h>
 
+#if defined(_MSC_VER) && _MSC_VER == 1200 && !defined(__clang__)
+#define H2_RETAIL_COMPILER 1
+#else
+#define H2_RETAIL_COMPILER 0
+#endif
+
 #ifdef __clang__
 
 #define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))

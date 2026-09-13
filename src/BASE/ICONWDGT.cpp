@@ -94,44 +94,44 @@ H2_RETAIL_INLINE iconWidget::~iconWidget() {
 }
 
 VA(0x004bba10, 0x355)
-MessageDispatchResult iconWidget::Main(tag_message& msg) {
+MessageDispatchResult iconWidget::Main(tag_message& message) {
     // A switch arm may not jump past an initialisation, so the hit-test
     // coordinates are declared for the whole function.
     i16 x;
     i16 y;
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)
-        && (msg.type != MESSAGE_WIDGET
-            || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
-        if (msg.type == MESSAGE_WIDGET)
-            return widget::Main(msg);
+        && (message.type != MESSAGE_WIDGET
+            || message.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
+        if (message.type == MESSAGE_WIDGET)
+            return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    switch (msg.type) {
+    switch (message.type) {
         case MESSAGE_WIDGET:
-            switch (msg.payload.widget.command) {
+            switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_REPLACE_ICON:
-                    if (m_iconId == static_cast<u32l>(msg.payload.widget.id)) {
-                        m_iconId = msg.payload.widget.data.value;
+                    if (m_iconId == static_cast<u32l>(message.payload.widget.id)) {
+                        m_iconId = message.payload.widget.data.value;
                         gpResourceManager->Dispose(m_icon);
-                        m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);
+                        m_icon = gpResourceManager->GetIcon(message.payload.widget.data.value);
                     }
                     return MESSAGE_DISPATCH_CONTINUE;
 
                 case WIDGET_COMMAND_SET_ICON:
-                    if (msg.payload.widget.id == m_id) {
+                    if (message.payload.widget.id == m_id) {
                         if (m_icon != NULL) {
                             gpResourceManager->Dispose(m_icon);
-                            m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.text);
+                            m_icon = gpResourceManager->GetIcon(message.payload.widget.data.text);
                         }
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_FRAME:
-                    if (msg.payload.widget.id == m_id) {
+                    if (message.payload.widget.id == m_id) {
                         i16 frame = static_cast<i16>(
-                            msg.payload.widget.data.value & FRAME_INDEX_MASK
+                            message.payload.widget.data.value & FRAME_INDEX_MASK
                         );
                         m_frame = frame;
                         return MESSAGE_DISPATCH_CONSUME;
@@ -139,8 +139,8 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
                     break;
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
-                    if (msg.payload.widget.id == m_id) {
-                        m_fillColor = msg.payload.widget.data.value & COLOR_INDEX_MASK;
+                    if (message.payload.widget.id == m_id) {
+                        m_fillColor = message.payload.widget.data.value & COLOR_INDEX_MASK;
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
@@ -149,18 +149,18 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN:
-            x = msg.payload.mouse.x - m_owner->m_posX;
-            y = msg.payload.mouse.y - m_owner->m_posY;
+            x = message.payload.mouse.x - m_owner->m_posX;
+            y = message.payload.mouse.y - m_owner->m_posY;
             if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                    msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 } else {
                     m_flags |= WIDGET_FLAG_SELECTED;
-                    msg.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
                 }
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
+                message.type = MESSAGE_WIDGET;
+                message.payload.widget.id = m_id;
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
@@ -169,16 +169,16 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                // Never taken: msg.type was retyped to MESSAGE_WIDGET above.
-                if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
+                // Never taken: message.type was retyped to MESSAGE_WIDGET above.
+                if (message.type == MESSAGE_RIGHT_BUTTON_UP)
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    return widget::Main(msg);
+    return widget::Main(message);
 }
 
 VA(0x004bbd70, 0x175)

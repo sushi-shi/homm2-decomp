@@ -42,6 +42,9 @@ DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SE
 DATA(0x00533e1c) static i32 s_bestTargetCost;
 DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
 
+#if H2_RETAIL_COMPILER
+#define backDirection backDir
+#endif
 VA(0x004916c0, 0x116)
 i32 searchArray::BuildPath(
     i32 startX,
@@ -65,13 +68,16 @@ i32 searchArray::BuildPath(
                 break;
             }
         }
-        MapDirection backDir =
+        MapDirection backDirection =
             OppositeMapDirection(static_cast<MapDirection>(node->direction));
-        destinationX += normalDirTable[IDX(backDir)].x;
-        destinationY += normalDirTable[IDX(backDir)].y;
+        destinationX += normalDirTable[IDX(backDirection)].x;
+        destinationY += normalDirTable[IDX(backDirection)].y;
     }
     return m_pathLength;
 }
+#if H2_RETAIL_COMPILER
+#undef backDirection
+#endif
 
 VA(0x004917d6, 0xcc2)
 void searchArray::SeedPosition(

@@ -51,20 +51,20 @@ public:
     widget* m_widgetListHead;
     bitmap* m_savedBackground;
     heroWindow(void);
-    heroWindow(i32, i32, i32, i32, H2_ENUM_PARAM(WindowFlag, i32));
-    heroWindow(i32, i32, H2_CONST char*);
-    i32 Open(i32, i32);
-    void RemoveAndDeleteWidget(i32);
+    heroWindow(i32 x, i32 y, i32 width, i32 height, H2_ENUM_PARAM(WindowFlag, i32) flags);
+    heroWindow(i32 x, i32 y, H2_CONST char* resourceName);
+    i32 Open(i32 x, i32 flags);
+    void RemoveAndDeleteWidget(i32 id);
     void Close(void);
-    void AddWidget(class widget*, i32);
-    void RemoveWidget(class widget*);
-    MessageDispatchResult BroadcastMessage(struct tag_message&);
+    void AddWidget(class widget* newWidget, i32 zOrder);
+    void RemoveWidget(class widget* currentWidget);
+    MessageDispatchResult BroadcastMessage(struct tag_message& message);
     void DrawWindow(void);
-    void DrawWindow(i32);
-    void DrawWindow(i32, i32, i32);
+    void DrawWindow(i32 flags);
+    void DrawWindow(i32 update, i32 firstId, i32 lastId);
     i32 SaveBackground(void);
     void RestoreBackground(void);
-    void MoveWindow(i32, i32);
+    void MoveWindow(i32 dx, i32 dy);
 };
 #pragma pack(pop)
 #endif

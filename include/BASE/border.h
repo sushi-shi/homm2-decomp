@@ -16,18 +16,18 @@ public:
     i16 m_fillColor;
     border(void);
     border(
-        i16,
-        i16,
-        i16,
-        i16,
-        i16,
-        H2_ENUM_PARAM(WidgetKind, i16),
-        i16,
-        H2_CONST char*
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        i16 widgetId,
+        H2_ENUM_PARAM(WidgetKind, i16) kind,
+        i16 fillColor,
+        H2_CONST char* name
     );
     virtual H2_RETAIL_INLINE ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
 };
 #pragma pack(pop)

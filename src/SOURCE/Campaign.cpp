@@ -811,29 +811,37 @@ void game::InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32) side) {
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
+#if H2_RETAIL_COMPILER
+#define campaignPlayerCurrent campaignPlayerCurrent9
+#define choiceBest choiceBest1
+#define heroPriorityBest heroPriorityBest3
+#define mapHeaderResultCampaign mapHeaderResultCampaign3
+#define playerSlotSlot playerSlotSlot4
+#define selectedChoicePosition selectedChoicePosition0
+#endif
 VA(0x0042387e, 0xa5d)
 void game::InitCampaignMap(void) {
-    playerData* campaignPlayerCurrent9;
+    playerData* campaignPlayerCurrent;
     i32 bestHeroPriorityLocal;
     i32 swappedHero;
     i32 heroPositionValue;
     i32 scanPositionId;
     b32 savedNewGameSetup;
-    i32 playerSlotSlot4;
-    SCampaignChoice* choiceBest1;
-    i32 heroPriorityBest3;
+    i32 playerSlotSlot;
+    SCampaignChoice* choiceBest;
+    i32 heroPriorityBest;
     i32 bestHeroPositionCandidate;
-    i32 selectedChoicePosition0;
-    i32 H2_UNUSED(mapHeaderResultCampaign3);
+    i32 selectedChoicePosition;
+    i32 H2_UNUSED(mapHeaderResultCampaign);
     CampaignBonusHeroPosition bonusHeroIndexPosition;
 
-    selectedChoicePosition0 = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
+    selectedChoicePosition = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        choiceBest1 =
-            &campaignChoices[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][selectedChoicePosition0];
+        choiceBest =
+            &campaignChoices[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][selectedChoicePosition];
     } else {
-        choiceBest1 =
-            &campaignChoices[IDX(m_campaignType)][m_campaignScenario][selectedChoicePosition0];
+        choiceBest =
+            &campaignChoices[IDX(m_campaignType)][m_campaignScenario][selectedChoicePosition];
     }
 
     gpGame->m_campaignScenarioWon = 0;
@@ -858,19 +866,19 @@ void game::InitCampaignMap(void) {
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);
-    mapHeaderResultCampaign3 = GetMapHeader(m_mapFilename, &m_mapHeader);
+    mapHeaderResultCampaign = GetMapHeader(m_mapFilename, &m_mapHeader);
     LoadGame("origdata.bin", 1, 0);
     InitNewGame(NULL);
 
-    if (choiceBest1->type == CAMPAIGN_CHOICE_ALIGNMENT) {
-        playerSlotSlot4 = 0;
+    if (choiceBest->type == CAMPAIGN_CHOICE_ALIGNMENT) {
+        playerSlotSlot = 0;
         if (m_campaignType == CAMPAIGN_ARCHIBALD) {
             if (m_mapHeader.playerEnabled[0])
-                ++playerSlotSlot4;
+                ++playerSlotSlot;
             if (m_mapHeader.playerEnabled[1])
-                ++playerSlotSlot4;
+                ++playerSlotSlot;
         }
-        m_setupPlayerRace[playerSlotSlot4] = choiceBest1->faction;
+        m_setupPlayerRace[playerSlotSlot] = choiceBest->faction;
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
@@ -883,53 +891,53 @@ void game::InitCampaignMap(void) {
     NewMap(gMapName);
 
     bestHeroPositionCandidate = 0;
-    campaignPlayerCurrent9 = &gpGame->m_players[0];
-    for (heroPositionValue = 0; heroPositionValue < campaignPlayerCurrent9->m_heroCount;
+    campaignPlayerCurrent = &gpGame->m_players[0];
+    for (heroPositionValue = 0; heroPositionValue < campaignPlayerCurrent->m_heroCount;
          ++heroPositionValue) {
         bestHeroPriorityLocal = -1;
         for (scanPositionId = heroPositionValue;
-             scanPositionId < campaignPlayerCurrent9->m_heroCount;
+             scanPositionId < campaignPlayerCurrent->m_heroCount;
              ++scanPositionId) {
-            if (gpGame->m_heroRecs[campaignPlayerCurrent9->m_heroIds[scanPositionId]].m_portrait
+            if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
                     == CAMPAIGN_HERO_ROLAND
-                || gpGame->m_heroRecs[campaignPlayerCurrent9->m_heroIds[scanPositionId]].m_portrait
+                || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
                        == CAMPAIGN_HERO_ARCHIBALD) {
-                heroPriorityBest3 = CAMPAIGN_HERO_PRIORITY_HIGH;
-            } else if (gpGame->m_heroRecs[campaignPlayerCurrent9->m_heroIds[scanPositionId]]
+                heroPriorityBest = CAMPAIGN_HERO_PRIORITY_HIGH;
+            } else if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                .m_portrait
                            == CAMPAIGN_HERO_CORLAGON
-                       || gpGame->m_heroRecs[campaignPlayerCurrent9->m_heroIds[scanPositionId]]
+                       || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                   .m_portrait
                               == CAMPAIGN_HERO_HALTON) {
-                heroPriorityBest3 = CAMPAIGN_HERO_PRIORITY_NORMAL;
+                heroPriorityBest = CAMPAIGN_HERO_PRIORITY_NORMAL;
             } else {
-                heroPriorityBest3 = 0;
+                heroPriorityBest = 0;
             }
-            if (heroPriorityBest3 > bestHeroPriorityLocal) {
-                bestHeroPriorityLocal = heroPriorityBest3;
+            if (heroPriorityBest > bestHeroPriorityLocal) {
+                bestHeroPriorityLocal = heroPriorityBest;
                 bestHeroPositionCandidate = scanPositionId;
             }
         }
         if (bestHeroPriorityLocal != -1) {
-            swappedHero = campaignPlayerCurrent9->m_heroIds[heroPositionValue];
-            campaignPlayerCurrent9->m_heroIds[heroPositionValue] =
-                campaignPlayerCurrent9->m_heroIds[bestHeroPositionCandidate];
-            campaignPlayerCurrent9->m_heroIds[bestHeroPositionCandidate] =
+            swappedHero = campaignPlayerCurrent->m_heroIds[heroPositionValue];
+            campaignPlayerCurrent->m_heroIds[heroPositionValue] =
+                campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate];
+            campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate] =
                 swappedHero;
         }
     }
-    if (campaignPlayerCurrent9->m_heroCount)
-        campaignPlayerCurrent9->m_currentHero = campaignPlayerCurrent9->m_heroIds[0];
+    if (campaignPlayerCurrent->m_heroCount)
+        campaignPlayerCurrent->m_currentHero = campaignPlayerCurrent->m_heroIds[0];
 
-    switch (choiceBest1->type) {
+    switch (choiceBest->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            m_players[0].m_resources[IDX(choiceBest1->resource)] += choiceBest1->amount;
+            m_players[0].m_resources[IDX(choiceBest->resource)] += choiceBest->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (m_players[0].m_heroCount > 0)
                 GiveArtifact(
                     gpGame->GetHero(m_players[0].m_heroIds[0]),
-                    choiceBest1->artifact,
+                    choiceBest->artifact,
                     false
                 );
             break;
@@ -941,24 +949,24 @@ void game::InitCampaignMap(void) {
                     && m_players[0].m_heroCount > 1)
                     bonusHeroIndexPosition = CAMPAIGN_BONUS_HERO_SECOND;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
-                    ->m_spells[IDX(choiceBest1->spell)] = 1;
+                    ->m_spells[IDX(choiceBest->spell)] = 1;
             }
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
                     ->SetSS(
-                        static_cast<HeroSecondarySkill>(choiceBest1->value),
-                        static_cast<HeroSkillLevel>(choiceBest1->amount)
+                        static_cast<HeroSecondarySkill>(choiceBest->value),
+                        static_cast<HeroSkillLevel>(choiceBest->amount)
                     );
             break;
         case CAMPAIGN_CHOICE_CREATURES:
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
-                    ->m_army.Add(choiceBest1->creature, choiceBest1->amount, -1);
+                    ->m_army.Add(choiceBest->creature, choiceBest->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            m_players[0].m_cheatValue = choiceBest1->value;
+            m_players[0].m_cheatValue = choiceBest->value;
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             savedNewGameSetup = gbInNewGameSetup;
@@ -966,7 +974,7 @@ void game::InitCampaignMap(void) {
             if (m_players[0].m_heroCount > 0) {
                 ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
                     *gpGame->GetHero(m_players[0].m_heroIds[0]),
-                    choiceBest1->value
+                    choiceBest->value
                 );
             }
             gbInNewGameSetup = savedNewGameSetup;
@@ -1071,6 +1079,14 @@ void game::InitCampaignMap(void) {
         && m_campaignScenario + 1 == SCENARIO_SEVEN)
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
+#if H2_RETAIL_COMPILER
+#undef campaignPlayerCurrent
+#undef choiceBest
+#undef heroPriorityBest
+#undef mapHeaderResultCampaign
+#undef playerSlotSlot
+#undef selectedChoicePosition
+#endif
 
 DATA(0x004f0828) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {

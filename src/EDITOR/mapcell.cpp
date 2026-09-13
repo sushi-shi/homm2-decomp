@@ -33,14 +33,24 @@ void fullMap::Close(void) {
     extraCount = 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define mapHeight h
+#define mapWidth w
+#define unused n
+#endif
 VA(0x004720f2, 0x4d)
-void fullMap::Init(i32 w, i32 h) {
-    i32 H2_UNUSED(n);
-    width = w;
-    height = h;
+void fullMap::Init(i32 mapWidth, i32 mapHeight) {
+    i32 H2_UNUSED(unused);
+    width = mapWidth;
+    height = mapHeight;
     Close();
     cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
 }
+#if H2_RETAIL_COMPILER
+#undef mapHeight
+#undef mapWidth
+#undef unused
+#endif
 
 VA(0x0047213f, 0x151)
 void fullMap::ClearCellExtra(i32 index) {
@@ -57,36 +67,48 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].nextIndex = 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define extraIndex n
+#define newExtras i
+#endif
 VA(0x00472290, 0x113)
 i32 fullMap::GetNewCellExtraIndex(void) {
-    i32 n;
-    mapCellExtra* i;
+    i32 extraIndex;
+    mapCellExtra* newExtras;
     i32 j;
 
-    for (n = 1; n < extraCount; n++) {
-        if (extras[n].nextIndex == MAPCELL_EXTRA_FREE) {
-            ClearCellExtra(n);
-            return n;
+    for (extraIndex = 1; extraIndex < extraCount; extraIndex++) {
+        if (extras[extraIndex].nextIndex == MAPCELL_EXTRA_FREE) {
+            ClearCellExtra(extraIndex);
+            return extraIndex;
         }
     }
-    i = static_cast<mapCellExtra*>(
+    newExtras = static_cast<mapCellExtra*>(
         H2_ALLOC((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
     );
-    memcpy(i, extras, extraCount * sizeof(mapCellExtra));
+    memcpy(newExtras, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
-    extras = i;
+    extras = newExtras;
     for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
         extras[j].nextIndex = MAPCELL_EXTRA_FREE;
     extraCount += EXTRA_ALLOCATION_STEP;
     ClearCellExtra(extraCount - EXTRA_ALLOCATION_STEP);
     return extraCount - EXTRA_ALLOCATION_STEP;
 }
+#if H2_RETAIL_COMPILER
+#undef extraIndex
+#undef newExtras
+#endif
 
+#if H2_RETAIL_COMPILER
+#define index ix
+#define newExtraIndex ni
+#endif
 VA(0x004723a3, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
     mapCellExtra* node;
-    i32 ix;
-    i32 ni;
+    i32 index;
+    i32 newExtraIndex;
     mapCell* cell;
 
     if (Column(x)[y * width].m_extraIndex == 0) {
@@ -94,29 +116,37 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
         cell->m_extraIndex = GetNewCellExtraIndex();
         return &extras[Column(x)[y * width].m_extraIndex];
     } else {
-        ix = Column(x)[y * width].m_extraIndex;
+        index = Column(x)[y * width].m_extraIndex;
         node = &extras[Column(x)[y * width].m_extraIndex];
         for (;;) {
             if (node->overlayIndex == MAPCELL_SPRITE_NONE)
                 return node;
             if (node->nextIndex == 0) {
-                ni = GetNewCellExtraIndex();
-                node = Extra(ix);
-                node->nextIndex = ni;
+                newExtraIndex = GetNewCellExtraIndex();
+                node = Extra(index);
+                node->nextIndex = newExtraIndex;
                 return Extra(node->nextIndex);
             } else {
-                ix = node->nextIndex;
+                index = node->nextIndex;
                 node = Extra(node->nextIndex);
             }
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#undef newExtraIndex
+#endif
 
+#if H2_RETAIL_COMPILER
+#define index ix
+#define newExtraIndex ni
+#endif
 VA(0x00472508, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     mapCellExtra* node;
-    i32 ix;
-    i32 ni;
+    i32 index;
+    i32 newExtraIndex;
     mapCell* cell;
 
     if (Column(x)[y * width].m_extraIndex == 0) {
@@ -124,23 +154,27 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
         cell->m_extraIndex = GetNewCellExtraIndex();
         return &extras[Column(x)[y * width].m_extraIndex];
     } else {
-        ix = Column(x)[y * width].m_extraIndex;
+        index = Column(x)[y * width].m_extraIndex;
         node = &extras[Column(x)[y * width].m_extraIndex];
         for (;;) {
             if (node->objectIndex == MAPCELL_SPRITE_NONE)
                 return node;
             if (node->nextIndex == 0) {
-                ni = GetNewCellExtraIndex();
-                node = Extra(ix);
-                node->nextIndex = ni;
+                newExtraIndex = GetNewCellExtraIndex();
+                node = Extra(index);
+                node->nextIndex = newExtraIndex;
                 return Extra(node->nextIndex);
             } else {
-                ix = node->nextIndex;
+                index = node->nextIndex;
                 node = Extra(node->nextIndex);
             }
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#undef newExtraIndex
+#endif
 
 VA(0x0047266d, 0x8c)
 void fullMap::Write(i32 handle) {
@@ -151,23 +185,28 @@ void fullMap::Write(i32 handle) {
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
+#if H2_RETAIL_COMPILER
+#define extraIndex nb
+#define oldCells tmp1
+#define oldExtras tmp2
+#endif
 VA(0x004726f9, 0x258)
 void fullMap::Read(i32 handle, i32 convert) {
-    i32 nb;
-    oldMapCell* tmp1;
+    i32 extraIndex;
+    oldMapCell* oldCells;
     i32 x, y;
-    oldMapCellExtra* tmp2;
+    oldMapCellExtra* oldExtras;
 
     READ_FILE_VALUE(handle, width);
     READ_FILE_VALUE(handle, height);
     Init(width, height);
     if (convert) {
-        tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
-        read(handle, tmp1, width * height * sizeof(oldMapCell));
+        oldCells = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        read(handle, oldCells, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
-        delete tmp1;
+                memcpy(cells + x + y * width, oldCells + x + y * width, sizeof(mapCell));
+        delete oldCells;
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
     }
@@ -176,16 +215,27 @@ void fullMap::Read(i32 handle, i32 convert) {
         delete extras;
     extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
     if (convert) {
-        tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
-        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
-        for (nb = 0; nb < extraCount; nb++)
-            memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
-        delete tmp2;
+        oldExtras = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
+        read(handle, oldExtras, extraCount * sizeof(oldMapCellExtra));
+        for (extraIndex = 0; extraIndex < extraCount; extraIndex++)
+            memcpy(extras + extraIndex, oldExtras + extraIndex, sizeof(mapCellExtra));
+        delete oldExtras;
     } else {
         read(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
+#if H2_RETAIL_COMPILER
+#undef extraIndex
+#undef oldCells
+#undef oldExtras
+#endif
 
+#if H2_RETAIL_COMPILER
+#define extra ptr
+#define extraIndex idx
+#define newTileset t
+#define unused a
+#endif
 VA(0x00472951, 0x314)
 void fullMap::ChangeTilesetIndex(
     mapCell* cell,
@@ -196,69 +246,75 @@ void fullMap::ChangeTilesetIndex(
     i32 overlay,
     i32
 ) {
-    i32 idx;
-    mapCellExtra* ptr;
-    TilesetId t;
-    i32 H2_UNUSED(a);
+    i32 extraIndex;
+    mapCellExtra* extra;
+    TilesetId newTileset;
+    i32 H2_UNUSED(unused);
 
-    ptr = NULL;
-    t = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
+    extra = NULL;
+    newTileset = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
 
     if (overlay == 0) {
         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
-            idx = cell->m_extraIndex;
-            while (idx != 0) {
-                ptr = Extra(idx);
-                if (ptr->objectIndex != MAPCELL_SPRITE_NONE && ptr->objectTileset != tileset) {
-                    idx = ptr->nextIndex;
+            extraIndex = cell->m_extraIndex;
+            while (extraIndex != 0) {
+                extra = Extra(extraIndex);
+                if (extra->objectIndex != MAPCELL_SPRITE_NONE && extra->objectTileset != tileset) {
+                    extraIndex = extra->nextIndex;
                 } else {
-                    ptr->animatedObject = 0;
-                    ptr->objectLayerBit0 = 0;
-                    ptr->objectLayerBit1 = 0;
-                    ptr->objectDrawnAsOverlay = 0;
-                    ptr->objectTileset = t;
-                    ptr->objectIndex = index;
+                    extra->animatedObject = 0;
+                    extra->objectLayerBit0 = 0;
+                    extra->objectLayerBit1 = 0;
+                    extra->objectDrawnAsOverlay = 0;
+                    extra->objectTileset = newTileset;
+                    extra->objectIndex = index;
                     break;
                 }
             }
-            if (idx == 0) {
-                ptr = GetNewCellExtraObject(x, y);
-                ptr->objectTileset = t;
-                ptr->objectIndex = index;
+            if (extraIndex == 0) {
+                extra = GetNewCellExtraObject(x, y);
+                extra->objectTileset = newTileset;
+                extra->objectIndex = index;
             }
         } else {
             cell->m_animatedObject = 0;
             cell->m_objectLayerBit0 = 0;
             cell->m_objectLayerBit1 = 0;
             cell->m_objectDrawnAsOverlay = 0;
-            cell->m_objectTileset = t;
+            cell->m_objectTileset = newTileset;
             cell->m_objectIndex = index;
         }
     } else {
         if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE && cell->m_overlayTileset != tileset) {
-            idx = cell->m_extraIndex;
-            while (idx != 0) {
-                ptr = Extra(idx);
-                if (ptr->overlayIndex != MAPCELL_SPRITE_NONE && ptr->overlayTileset != tileset) {
-                    idx = ptr->nextIndex;
+            extraIndex = cell->m_extraIndex;
+            while (extraIndex != 0) {
+                extra = Extra(extraIndex);
+                if (extra->overlayIndex != MAPCELL_SPRITE_NONE && extra->overlayTileset != tileset) {
+                    extraIndex = extra->nextIndex;
                 } else {
-                    ptr->animatedOverlay = 0;
-                    ptr->drawOverlayOnTop = 0;
-                    ptr->overlayTileset = t;
-                    ptr->overlayIndex = index;
+                    extra->animatedOverlay = 0;
+                    extra->drawOverlayOnTop = 0;
+                    extra->overlayTileset = newTileset;
+                    extra->overlayIndex = index;
                     break;
                 }
             }
-            if (idx == 0) {
-                ptr = GetNewCellExtraOverlay(x, y);
-                ptr->overlayTileset = t;
-                ptr->overlayIndex = index;
+            if (extraIndex == 0) {
+                extra = GetNewCellExtraOverlay(x, y);
+                extra->overlayTileset = newTileset;
+                extra->overlayIndex = index;
             }
         } else {
             cell->m_animatedOverlay = 0;
             cell->m_drawOverlayOnTop = 0;
-            cell->m_overlayTileset = t;
+            cell->m_overlayTileset = newTileset;
             cell->m_overlayIndex = index;
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef extra
+#undef extraIndex
+#undef newTileset
+#undef unused
+#endif

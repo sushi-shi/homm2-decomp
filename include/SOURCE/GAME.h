@@ -147,20 +147,20 @@ H2_ENUM_BEGIN(GameHeroPoolConstant)
 H2_ENUM_END(GameHeroPoolConstant)
 
 i32 GetNumObelisks(i32 color);
-void ComputeUALoc(i32);
-void GenerateStandardFileName(char*, char*);
-MessageDispatchResult ViewSpellsHandler(struct tag_message&);
-MessageDispatchResult ViewSpecialHandler(struct tag_message&);
-MessageDispatchResult ViewArmyHandler(struct tag_message&);
+void ComputeUALoc(i32 playerIndex);
+void GenerateStandardFileName(char* source, char* destination);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
+MessageDispatchResult ViewArmyHandler(struct tag_message& message);
 i32 IsCursedItem(ArtifactType item);
-i32 CalcBaseScore(i32);
-void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
-i32 GetSkipCopyLen(u8* buf, i32* pos);
-void CreateDiffFile(char*, char*, char*, i32, i32);
-void CreateJoinFile(char*, char*, char*);
+i32 CalcBaseScore(i32 days);
+void WriteDiffHeaderInfo(u8 command, i32 length, u8* buffer, i32* position);
+i32 GetSkipCopyLen(u8* buffer, i32* position);
+void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
+void CreateJoinFile(char* oldName, char* diffName, char* joinName);
 EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
-i32 CalcFileCRC(char* filename);
+i32 CalcFileCRC(char* file);
 void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);

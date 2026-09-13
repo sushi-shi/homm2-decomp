@@ -44,6 +44,6 @@ struct NewGameRemotePacket {
 #pragma pack(pop)
 SIZE(NewGameRemotePacket, 0x100);
 
-MessageDispatchResult NewGameHandler(struct tag_message&);
+MessageDispatchResult NewGameHandler(struct tag_message& message);
 
 #endif

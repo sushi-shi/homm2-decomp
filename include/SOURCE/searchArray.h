@@ -96,50 +96,50 @@ public:
     }
     searchArray(void);
     ~searchArray();
-    i32 BuildPath(i32, i32, i32, i32, i32);
+    i32 BuildPath(i32 startX, i32 startY, i32 destinationX, i32 destinationY, i32 maximumCost);
     void SeedPosition(
-        i32,
-        i32,
-        H2_ENUM_PARAM(MapDirection, i32),
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32
+        i32 seedX,
+        i32 seedY,
+        H2_ENUM_PARAM(MapDirection, i32) seedDirection,
+        i32 maximumCost,
+        i32 waterMode,
+        i32 findAdjacentMonster,
+        i32 mobility,
+        i32 pathfindingSkill,
+        i32 targetX,
+        i32 targetY,
+        i32 continueSeed,
+        i32 scanMap
     );
     void Init(void);
     void Close(void);
     void Clear(void);
-    i32 QuickDistance(i32, i32, i32, i32);
+    i32 QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2);
     void PushPoint(
-        i32,
-        i32,
-        H2_ENUM_PARAM(MapDirection, i32),
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32
+        i32 x,
+        i32 y,
+        H2_ENUM_PARAM(MapDirection, i32) direction,
+        i32 cost,
+        i32 mobility,
+        i32 unknownFlag,
+        i32 rvFlag1,
+        i32 valueX,
+        i32 valueY,
+        i32 rvFlag2,
+        i32 previousX,
+        i32 previousY
     );
     void TestPossibleDirections(
-        i32,
-        i32,
-        H2_ENUM_STORAGE(TerrainType, i8) * const,
-        i8* const,
-        i32,
-        i32
+        i32 x,
+        i32 y,
+        H2_ENUM_STORAGE(TerrainType, i8) * const terrain,
+        i8* const occupied,
+        i32 allowOccupied,
+        i32 waterMode
     );
-    void SeedCombatPosition(class army*);
-    i32 FindCombatPath(i32, i32, class army*, ArmyPathTarget, i32);
-    void PushCombatPoint(i32, H2_ENUM_PARAM(CombatHexDirection, i32), i32, i32);
+    void SeedCombatPosition(class army* unit);
+    i32 FindCombatPath(i32 sourceHex, i32 targetHex, class army* unit, ArmyPathTarget attackPath, i32 ignoreTargetMoat);
+    void PushCombatPoint(i32 hex, H2_ENUM_PARAM(CombatHexDirection, i32) direction, i32 distance, i32 speed);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];
     }

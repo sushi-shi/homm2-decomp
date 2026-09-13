@@ -1,5 +1,10 @@
 # King's Field reconstruction-pattern audit
 
+Current handoff: [continuation after #59 and #63](continuation.md). The generated
+ledgers below are historical snapshots at `36ace4cae`, not current review coverage
+after the #62/#64 integration. The handoff separates research from review refresh
+and records the first follow-up batch.
+
 Base: `decomp-gold-2.1-buka` at `ca2904a91`. Work branch:
 `audit/buka-reconstruction-patterns`. This is an ongoing review, not a completion
 claim. [Progress](progress.md), [every function](functions.tsv), and
