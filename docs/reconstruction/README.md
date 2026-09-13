@@ -387,6 +387,15 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   none was retained. Cache output ordering and mine probability truncation
   are documented separately from reconstruction changes.
 
+- C55/C56/B73/C57/G63-G65/R16/S54: [army review](C55-C56-B73.md)
+  completes all47 ARMY definitions and both headers. Sixteen casts disappear:
+  eight in C55 and eight in C56 (seven following unsigned-owner recovery and
+  one integer-identity cast). Full98-object native proof preserves
+  every emitted function and allocated section. Text catalogs establish
+  concrete capacities; frame concatenation and Y clipping retain retail
+  behavior and explicit input contracts. The sole external writer, CastSpell,
+  is also fully reviewed (B74/G66/S55).
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

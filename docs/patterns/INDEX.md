@@ -6,6 +6,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 
 | pattern | one-line trigger |
 | :-- | :-- |
+| [unsigned-byte-boolean-owner](unsigned-byte-boolean-owner.md) | zero-extending truth tests and boolean-only writers justify u8 fields, removing seven compensating casts with whole-native proof |
 | [patrol-coordinate-owner](patrol-coordinate-owner.md) | loader and AI coordinate semantics replace duplicate boat/patrol union views with unsigned anchor bytes and a signed radius, removing compensating casts |
 | [widget-pointer-array-owner](widget-pointer-array-owner.md) | common-interface widget storage permits real base-pointer arrays instead of integer/derived/scalar union views, with constant slot offsets folded into unchanged addressing |
 | [trivial-array-delete](trivial-array-delete.md) | a scalar operator-delete call can be the exact lowering of `delete[]` for a recovered trivial array; compare bytes and ordered targets before choosing the source form |

@@ -738,5 +738,17 @@
   "src/SOURCE/PHILAI.cpp": {
     "sha256": "7d3db45d825546d14bd96d15413fae1256d1cfd020668f500fff2255e9b60fd2",
     "note": "Full6864-line TU read across ordered batches, including private enums/macros, all84 physical bodies and trailing globals/compiler data. Both declaration headers separately reviewed. U15/C49/C51/C53 retained changes have complete native proof; real U16 tagged purchases retained after full producer/consumer review. C48/C50/C52/C54, G58-G62, R12-R15, S50-S53 and B69-B72 retain per-function dispositions and measured/untried distinctions. Real resource/army/spell/count owners reconciled; unread local arrays are not falsely credited as removed. Search/cache owners and U12 aliases retain pending shared-consumer contracts. Review completion is not all-findings application or whole-TU semantic/retail closure."
+  },
+  "src/SOURCE/ARMY.cpp": {
+    "sha256": "d25ec78c6d3db6d80e1406133de58b1323391d5301bc88b28b7e3734c01fdaf0",
+    "note": "Full3674-line parent TU read (3672 after measured cleanup), including prolog enums/macros, all47 physical definitions and three data owners;45 new reviews, two earlier corpse functions reread without duplicate credit. C55/C56 measured cast cleanup; G63-G65 joins, R16 roles, S54 unused state and B73 resource/hex/numeric contracts retained individually. U05 flag views real; unused BerserkMaskIndex historical enum noted, not evidence of live aggregate. Text bounds proven against both66-entry retail name tables, frame/animation contracts separately open. C56 owner follow-up removes all seven byte-boolean casts with full98-object native proof; whole source retains current hashes."
+  },
+  "include/SOURCE/army.h": {
+    "sha256": "d8fcdd206d516e67d86ffb8960ce33fbb9f207c1e5d18fe0f650168bbe9cb13b",
+    "note": "Full160-line packed0x482 army layout, declarations and IsAlive inline read against complete ARMY implementation. Four real limit rectangles,15 spell bytes,7 sample owners, monster/frame records inspected. S54 unknown5e/unknownD4 fields remain actual layout storage, not declared disposable padding; semantics require remaining combat consumers. Animation/resource and side/hex/count lifecycle contracts documented per body. C56 unsigned byte animation fields replace plain-char owners after every reader/writer, including complete CastSpell, was reviewed; all98 native objects remain identical. No packed-layout change."
+  },
+  "include/SOURCE/ARMY.h": {
+    "sha256": "882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658",
+    "note": "Full166-line enum/prototype and packed0x335 SMonFrameInfo owner read. Six16-byte source offsets,16 walk offsets,34 sequence counts and34x16 frames, ten standing chances, three missile offsets,12 projectile angles and two quantity offsets are genuine resource dimensions. B73 external frame counts/cumulative walk assembly bounds remain; unknown00 is uninterpreted resource byte, not safely removable padding. No hidden function body."
   }
 }

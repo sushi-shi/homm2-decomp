@@ -1015,16 +1015,14 @@ void army::SpecialAttack(void) {
     if (fullXLen == 0) {
         frameIndex =
             fullYLen > 0 ? m_frameInfo.projectileDirectionCount - 1 : 0;
-        fShotAngle = static_cast<float>(
-            fullYLen > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
-        );
+        fShotAngle = fullYLen > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE;
     } else {
         /* The parenthesised divisor cast keeps both operands on the x87 stack;
            without it VC6 folds the divisor into a single `fidiv`. */
-        incline = static_cast<float>(-fullYLen)
+        incline = -fullYLen
                 / (static_cast<float>(fullXLen));
         fShotAngle = static_cast<float>(
-            atan(static_cast<double>(incline)) * PROJECTILE_HALF_TURN_DEGREES_FLOAT
+            atan(incline) * PROJECTILE_HALF_TURN_DEGREES_FLOAT
             / ARMY_PROJECTILE_PI
         );
         for (k = 1; k < m_frameInfo.projectileDirectionCount; k++) {
@@ -1095,7 +1093,7 @@ void army::SpecialAttack(void) {
     xStretch = landX - startX;
     yStretch = landY - startY;
     pathDist = static_cast<i32>(
-        sqrt(static_cast<double>(xStretch * xStretch + yStretch * yStretch))
+        sqrt(xStretch * xStretch + yStretch * yStretch)
     );
     moveCount = (pathDist + (spacing >> 1)) / spacing;
 
@@ -1363,7 +1361,7 @@ void army::SpecialAttack(void) {
     }
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
         || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
-        CancelSpellType(ArmySpellCancelType(1));
+        CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_ATTACK);
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
 }
@@ -1822,7 +1820,7 @@ attackDone:
     if (!retaliation
         && (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
             || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])) {
-        CancelSpellType(ArmySpellCancelType(1));
+        CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_ATTACK);
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
     targetHex_3 = ARMY_HEX_INVALID;
@@ -1910,7 +1908,7 @@ i32 army::WalkTo(i32 destination) {
             direction_3 = -1;
         }
     }
-    CancelSpellType(ArmySpellCancelType(0));
+    CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -1962,7 +1960,7 @@ i32 army::AttackTo(i32 destination) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
-            CancelSpellType(ArmySpellCancelType(0));
+            CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
             m_attackDirection = static_cast<CombatHexDirection>(
                 gpSearchArray->m_storage.path.directions[1]
             );
@@ -2270,7 +2268,7 @@ void army::PowEffect(
     for (sideNum = COMBAT_ATTACKER_SIDE; IDX(sideNum) < COMBAT_SIDE_COUNT; sideNum++) {
         for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[IDX(sideNum)]; armyIndex++) {
             current = &gpCombatManager->m_armies[IDX(sideNum)][armyIndex];
-            if (static_cast<u8>(current->m_animationState)) {
+            if (current->m_animationState) {
                 leadFrames =
                     current->m_frameInfo.animationFrameCount[IDX(m_pendingAnimationSequence)];
                 endFrameCount =
@@ -2320,8 +2318,8 @@ void army::PowEffect(
                 gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle = false;
             }
             if ((gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_damagePending
-                 || static_cast<u8>(gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationState)
-                 || static_cast<u8>(gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle))
+                 || gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationState
+                 || gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle)
                 && !gpCombatManager->m_limitCreatureCount[IDX(sideNum)][armyIndex]) {
                 gpCombatManager->m_limitCreatureCount[IDX(sideNum)][armyIndex]++;
             }
@@ -2355,8 +2353,8 @@ void army::PowEffect(
             current->m_effectAnimationStart = ARMY_ANIMATION_NONE;
             current->m_effectAnimationEnd = ARMY_ANIMATION_NONE;
             current->m_effectAnimationStarted = false;
-            if (current->m_damagePending || static_cast<u8>(current->m_animationState)) {
-                if (static_cast<u8>(current->m_animationState)) {
+            if (current->m_damagePending || current->m_animationState) {
+                if (current->m_animationState) {
                     current->m_effectAnimationStart = m_pendingAnimationSequence;
                     current->m_effectAnimationEnd = m_pendingAnimationSequence + 1;
                 } else if (current->m_deathPending) {
@@ -2389,7 +2387,7 @@ void army::PowEffect(
         for (sideNum = COMBAT_ATTACKER_SIDE; IDX(sideNum) < COMBAT_SIDE_COUNT; sideNum++) {
             for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[IDX(sideNum)]; armyIndex++) {
                 current = &gpCombatManager->m_armies[IDX(sideNum)][armyIndex];
-                if (static_cast<u8>(current->m_animationCycle)) {
+                if (current->m_animationCycle) {
                     if (current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
                         || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD
                         || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
@@ -2408,8 +2406,8 @@ void army::PowEffect(
                 }
                 if (current->m_effectAnimationStart != ARMY_ANIMATION_NONE
                     && !current->m_effectAnimationStarted
-                    && (static_cast<u8>(current->m_animationState)
-                        || static_cast<i32>(spellFrames - animFrame - 1)
+                    && (current->m_animationState
+                        || (spellFrames - animFrame - 1)
                                <= current->m_effectAnimationLength
                         || (maxStartFrames && animFrame >= maxStartFrames - 1)
                         || (!maxStartFrames
