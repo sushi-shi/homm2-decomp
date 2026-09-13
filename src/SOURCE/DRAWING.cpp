@@ -313,7 +313,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 gText,
                 cCombatMessage[IDX(MESSAGE_TEXT_SHOOT)],
                 gArmyNamesPlural[IDX(targetMonsterType)],
-                static_cast<i32>(currentArmy->m_monster.shots)
+                currentArmy->m_monster.shots
             );
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
@@ -1387,7 +1387,7 @@ void combatManager::DrawFrame(
         if (waitForTimer != 0)
             DelayTil(glTimers);
         glTimers[0] =
-            static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay;
         gbFullCombatScreenDrawn = false;
         if (updateScreen == 1) {
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
@@ -1406,7 +1406,7 @@ void combatManager::DrawFrame(
             DelayTil(glTimers);
         gbFullCombatScreenDrawn = true;
         glTimers[0] =
-            static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay;
         UpdateCombatArea();
     }
 
@@ -1659,7 +1659,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     FONT_ALIGN_LEFT
                 );
 
-            sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.attack));
+            sprintf(gText, "%d", smallArmy->m_monster.attack);
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1670,7 +1670,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.defense));
+            sprintf(gText, "%d", smallArmy->m_monster.defense);
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1681,7 +1681,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<u32>(smallArmy->m_monster.hitPoints));
+            sprintf(gText, "%d", smallArmy->m_monster.hitPoints);
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1695,8 +1695,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             sprintf(
                 gText,
                 "%d-%d",
-                static_cast<i32>(smallArmy->m_monster.damageMin),
-                static_cast<i32>(smallArmy->m_monster.damageMax)
+                smallArmy->m_monster.damageMin,
+                smallArmy->m_monster.damageMax
             );
             smallFont->DrawBoundedString(
                 gText,
@@ -1772,7 +1772,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             }
 
             if (HAS(smallArmy->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER)) {
-                sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.shots));
+                sprintf(gText, "%d", smallArmy->m_monster.shots);
                 smallFont->DrawBoundedString(
                     gText,
                     viewX1 + COMBAT_SMALL_VIEW_TEXT_X,

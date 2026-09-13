@@ -482,6 +482,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   shared scratch and signed-timer contracts remain
   [explicit in the full report](C74-S67-B89.md).
 
+- C75/S68/R26/G91–G94/B90: all thirteen combat-drawing functions and the
+  clipping/shear domain headers reconciled. Nine numeric casts removed;
+  thirteen complete products/158 arms retain unsupported control-flow,
+  unused-slot/store and role rewrites. All98 native objects unchanged.
+  [Real message/table owners and conditional scan bounds](C75-S68-R26-G91-G94-B90.md)
+  are distinguished from configuration/resource/input contracts and one
+  unchanged private EH/FS model gap.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

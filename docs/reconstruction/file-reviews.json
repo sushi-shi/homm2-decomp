@@ -850,5 +850,17 @@
   "include/SOURCE/kbwin.h": {
     "sha256": "d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561",
     "note": "Full86lines read, nofunctionbodies/unions. ActualSDKrecord/handle andcallingconventionowners preserved; 1024messagecapacity,61/60copyconstants,70menutablebound,style/timer/commanddomains reconciled with all16 consumers/retail. Real long tick identity and taggedcommandenum retained; no padding/storage shrink fromunusedexterns. B89actualgraphics2owner/configboolean/APIlife contracts retained."
+  },
+  "src/SOURCE/DRAWING.cpp": {
+    "sha256": "8e0d479d635192194dbc6c1d87c2a0c9b607d2969fcbf9e9eb7c7588234973d6",
+    "note": "Full1830lines including13functions/sevenprivateenumdomains/threeDATAowners read; SetupGridForArmy B19 reconciled. C75nine numericcasts removed withall98native/1826function proof, dualdialect exactexternaldiagnostics andfullbuild. Thirteencomplete158arm products preserve unsupported G91..94/S68/R26 forms. All13retailspans bytesexact,twelveallsites/orderedtargets; UpdateMouseGrid unchangedEH/FSgap explicit. B90real700log/400wrap/120lineowners,55wallinitializerstores/72spellpositionstores/117grid/ninemoatcells/catalogtext andconditional15spellscan bounds checked. APIresource/config/index/signedduration/timer contracts open; nofakeaggregate/manualarg/owner subtraction."
+  },
+  "include/BASE/IconDraw.h": {
+    "sha256": "33208ff1322cf39240a04e3b6f7f2f23fd18002dc0e9f60f0db55b07c2ac71a7",
+    "note": "Full21lines read: real clipping0/1, orientation0/1 withsplit i8 storage and drawresult0/1 domains. No functions, unions, aggregate storage, casts, gotos, varargs, pointer arithmetic or buffers. Drawing consumers and prior icon decoder/clip consumers reviewed; header unchanged andfull98native proof preserved."
+  },
+  "include/BASE/IconShear.h": {
+    "sha256": "d5e75c40d24efe8ffcc7efd8a8dd6ac2f198923f130b968f3fe5c8685862fa97",
+    "note": "Full8lines read: semantic ICON_SHEAR_SKIP_ROW0x7f constant shared by previously reviewed shear decoders. No functions, unions, array/storage, casts, gotos, varargs or owner recovery. Skip sentinel isnot fabricatedpadding; unchanged declaration."
   }
 }

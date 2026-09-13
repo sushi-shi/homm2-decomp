@@ -8013,7 +8013,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "All grid writes are NONE0, REACHABLE1 or EMPTY_BLOCKED3; this proves DimIconToBitmap levels0/2 after guarded shade-1. Saves/restores actual army target side/index around seeding, with distinct typed scalars. B19 occupantIndex is shifted into an attack bit mask and requires valid lifecycle range; grid loop itself is bounded by COMBAT_HEX_COUNT. No artificial aggregate/owner recovery."
+    "note": "B19 reconciled: all117 grid cells bounded, only shade0/1/3 written. Saves/restores separate target-side/index scalars around path seeding. Occupant mask shift needs valid index and initialized placement/search data; no fake aggregate or avoidable cast. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 425 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
   },
   "include/BASE/IconRle.h:ReadIconRleByte(u8 * & cursor)#1": {
     "body_sha256": "eb109e9ac50234ee9739bd4606cc1fafd32a3203d280e9f678c497822a4f2d47",
@@ -24414,5 +24414,197 @@
       "bounds": "absent"
     },
     "note": "Empty return; no listed pattern applies. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 5 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::NoShowCombatLog(char * message)#1": {
+    "body_sha256": "a9ac462ab1487d0fdfc84c6e7f909b1fdbef409c203e6627ab3bad6834b73497",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real 700-byte log buffer; `NC: %s` needs input length + 5. Sole in-tree caller has the separate 400-byte scratch, so a valid terminated source needs at most 404/700. The public entry still requires valid, bounded text; it does not enforce that limit. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 56 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::ClearCombatMessages(i32 force)#1": {
+    "body_sha256": "f9fa18f3d9326f99b4617da570f8195f047302ebdcca2345a482230373c26b9c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Resets pending before inspecting both actual 120-byte line strings. Empty-string copies fit; strlen requires initialized terminators. Expiration comparisons and downstream message/window lifecycle remain contracts. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 186 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::CheckUpdateCombatMessages(void)#1": {
+    "body_sha256": "0ef560c05eb6ece1adb8290864648bc768bbe34f1faa36e84d20c6ed43d61256",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Pending and nonzero-expiration guards precede clock comparison and empty clear-message call. No fabricated owner or unused local; initialized state and timer/wrap conventions required. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 70 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::CombatMessage(char * message,i32 updateScreen,i32 retainPrevious,i32 clear)#1": {
+    "body_sha256": "76b32a6e749e1f11a94cb192b94d6e9e81c8f2bab47ad0665fb5e4ec4fa303c3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real writable 400-byte static owner and 400-byte wrapped local; source is copied before no-show/window/nonvisual guards. Requires input at most 399 chars. Temporary newline mutation is within that owner and restored; preceding-byte read has pointer-greater-than-start guard. Replacing a period-following newline with two spaces needs input at most 398 chars. Each destination line separately needs at most 119 chars; pixel LineLength is not a byte-capacity proof. Tagged widget payload and old extent flags are real related state. Clock + 2500 can overflow signed long. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 935 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::CombatMessage(CombatMessageCommand messageType)#1": {
+    "body_sha256": "b07662a5f7a2318aac2870164aa0a879301f1c58d6dc0552e0da923407fb1b35",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C75 one promotion cast removed. Default twelve-entry catalog plus all66 creature-name entries bounds formatted output at 56/120 including NUL. Actual side/index/creature/selected-hex/occupant domains remain necessary: target only has lower-bound checks, view info indexes army on current side. Unsupported command has no default and forwards old gText; no initialization or behavior fix invented. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 887 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::ResetLimitCreature(void)#1": {
+    "body_sha256": "6e05bcd60186e078f0397cbe317a2266aab3bded0e6ece8d1009a2ac24dca656",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Two sides × 20 active slots are bounded within actual two × 21 army storage and matching limit array. Monster mirror flag view and four hero flags are real; resets extent extrema. No unallocated aggregate or owner arithmetic. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 223 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::UpdateCombatArea(void)#1": {
+    "body_sha256": "23cdb94db6b3c395cbd8af6bc389fadcc0d2da7ae9bb44b726c1d933270d8c0a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "No-show/window guards; real 640×443 screen update. Sets enlarge flag false then true, not save/restore; retained behavior. Requires screen/window resources. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 81 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::UpdateGrid(i32 resetGridDisplay,i32 rebuildGrid)#1": {
+    "body_sha256": "dd76a9363007a628170a31c2b1724a4c3f68b4ab400091a7281a926287c85581",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G91 joins retained after complete products. Actual117-byte old/current shade arrays, loops bounded by117; drawing uses levels0/2 under producer's shade0/1/3 invariant. Current side, player -1-or-valid slot, army and resource ownership required. Changed extents clipped to copy rectangle; coordinate ordering, bitmap/icon validity and configuration lifecycle remain contracts. Early no-shading/no-grid return skips state copy, deliberately unchanged. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 1240 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::DrawBackground(void)#1": {
+    "body_sha256": "29cad49be069ab462f949bf03f558b364944fcc13807305fe62ac46c00610f48",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S68 unused scalar pair retained. Actual temporary resource handle reused for successive backgrounds, disposed each time; not unrelated semantic reuse. Numeric background filenames need at most20/768 bytes, faction filename13/768. Castle faction and town/resource/frame/bitmap domains required. No-clipping draws still depend on source resource dimensions. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 833 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::UpdateMouseGrid(i32 hexIndex,i32 forceUpdate)#1": {
+    "body_sha256": "2ab33ccc672192754dfa55554041ce203ae5d8d577c659dabbaf56f63211869a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Incoming hex outside0..116 or in sentinel columns is mapped to -1. Only constructor(-1) and this validated assignment write old selection in tree; under initialized unmodified owner its use is bounded. Real44×52 bitmap, clipped copy height and paired old/new extents; save/restore flags are meaningful, not fake stack storage. Allocation, grid coordinates, screen and icon lifecycle required. Existing EH/FS target model gap remains explicit. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 1376 retail bytes; unchanged EH/FS +6/c/14/556 model gaps, ordinary targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::DrawFrame(i32 updateScreen,i32 computeExtent,i32 redrawExtent,i32 extentOnly,i32 delay,i32 drawBackground,i32 waitForTimer)#1": {
+    "body_sha256": "50efb174810190c7748a07f7c01feb58b99b7587393fe7bc074e2d37a7b55e11",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C75 two timer casts removed; G92–G94/S68/R26 measured originals retained. Real9 rows and1..11/reversed11..1 columns address99 of117 cells; fixed nine moat centers and each ±1 neighbor are in bounds. Actual6×8 u16 wall coordinates and seven u8 frame offsets initialized every iteration, not fabricated padding. Faction0..5, wall-state0..6, hero sprite/state/frame, army hex and walking-coordinate domains required. Extent clamping does not validate every caller-provided rectangle or resource. Finite three-entry speed domain and representable float timer result required. Cursor/sound cleanup and draw order preserved. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 5406 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+  },
+  "src/SOURCE/DRAWING.cpp:combatManager::DrawSmallView(i32 viewIndex,i32 updateScreen)#1": {
+    "body_sha256": "fd8baff74905a9402bb82669b8e299ca3becdbe3a1a29d13dcf6c69fc7be9b3d",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C75 six promotions removed; S68/R26 originals retained. Real6×6×2 byte position table, including rectangular255 filler. Positive loop entry and min(count,6) bound both table indices and never select filler. Fifteen-byte active-spell scan is bounded only if count agrees with nonzero entries; all32768 occupancy masks checked under that contract. Producer casts duration to u8: zero or truncated-to-zero duration can break it. Two-view side/army index, resource/frame and screen lifecycle required. Fixed quantity/stat text fits768; morale/luck drawing needs intended small values and avoids signed INT_MIN negation. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 2857 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
   }
 }

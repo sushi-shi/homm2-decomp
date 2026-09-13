@@ -726,11 +726,11 @@ SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	42af6d1e62be
 SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	5baea0a09320
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	7f30eec552d5
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	cd1aaf115aac
-SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	6874ea4612d3
+SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	8102bd6ed067
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	29c1a4f27f0f
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	b9eb4918c770
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	100.0000	589383a78468
-SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	d7bb3d33103c
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	100.0000	8ece6b0e77f0
+SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	f161a9a26e7c
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	b7335fe4b4e3
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	3441c709fcca
 SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	0b9e5cbbbf0a
