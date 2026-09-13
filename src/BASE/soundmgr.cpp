@@ -137,27 +137,27 @@ bool soundManager::CDStartup(void) {
 }
 
 i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
-    i32 local_8 = 0;
+    i32 convertedVolume = 0;
     if (soundType == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= CONFIG_VOLUME_MIN
             && gConfig.musicVolume <= CONFIG_VOLUME_MAX) {
-            local_8 = (volume * (FADE_TOTAL_STEPS - H2EnumIndex(gConfig.musicVolume)))
+            convertedVolume = (volume * (FADE_TOTAL_STEPS - H2EnumIndex(gConfig.musicVolume)))
                       / H2EnumIndex(CONFIG_VOLUME_MAX);
-            if (local_8 < 1)
-                local_8 = 1;
+            if (convertedVolume < 1)
+                convertedVolume = 1;
         }
     } else if (gConfig.soundVolume >= CONFIG_VOLUME_MIN
                && gConfig.soundVolume <= CONFIG_VOLUME_MAX) {
-        local_8 =
+        convertedVolume =
             (volume * (FADE_TOTAL_STEPS - H2EnumIndex(gConfig.soundVolume))) / H2EnumIndex(CONFIG_VOLUME_MAX);
-        if (local_8 < 1)
-            local_8 = 1;
+        if (convertedVolume < 1)
+            convertedVolume = 1;
     }
-    if (local_8 < 0)
-        local_8 = 0;
-    if (MIDI_VOLUME_MAX < local_8)
-        local_8 = MIDI_VOLUME_MAX;
-    return local_8;
+    if (convertedVolume < 0)
+        convertedVolume = 0;
+    if (MIDI_VOLUME_MAX < convertedVolume)
+        convertedVolume = MIDI_VOLUME_MAX;
+    return convertedVolume;
 }
 
 float soundManager::ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode soundType) {

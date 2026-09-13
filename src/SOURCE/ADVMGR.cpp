@@ -1669,13 +1669,13 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
 MessageDispatchResult advManager::Main(struct tag_message& message) {
     MessageDispatchResult result;
     i32 quit;
-    i32 c;
-    i32 mx [[maybe_unused]];
-    i32 my [[maybe_unused]];
+    i32 commandValue;
+    i32 unusedMouseX [[maybe_unused]];
+    i32 unusedMouseY [[maybe_unused]];
     i32 town;
     mapCell* evtCell;
     MapDirection direction;
-    hero* hero2;
+    hero* currentHero;
     i32 helpId;
     hero* curHero;
     i32 bMoved;
@@ -1813,57 +1813,57 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_F8:
                         break;
                     case INPUT_SCAN_F9:
-                        for (c = 0; c < H2EnumIndex(RES_COUNT); ++c) {
-                            gpCurPlayer->m_resources[c] +=
-                                (c == H2EnumIndex(RES_GOLD) ? CHEAT_GOLD_AMOUNT : CHEAT_RESOURCE_AMOUNT);
+                        for (commandValue = 0; commandValue < H2EnumIndex(RES_COUNT); ++commandValue) {
+                            gpCurPlayer->m_resources[commandValue] +=
+                                (commandValue == H2EnumIndex(RES_GOLD) ? CHEAT_GOLD_AMOUNT : CHEAT_RESOURCE_AMOUNT);
                         }
                         break;
                     case INPUT_SCAN_0:
-                        c = 0;
+                        commandValue = 0;
                         goto process_cheat_digit;
                     case INPUT_SCAN_1:
-                        c = 1;
+                        commandValue = 1;
                         goto process_cheat_digit;
                     case INPUT_SCAN_2:
-                        c = 2;
+                        commandValue = 2;
                         goto process_cheat_digit;
                     case INPUT_SCAN_3:
-                        c = 3;
+                        commandValue = 3;
                         goto process_cheat_digit;
                     case INPUT_SCAN_4:
-                        c = 4;
+                        commandValue = 4;
                         goto process_cheat_digit;
                     case INPUT_SCAN_5:
-                        c = 5;
+                        commandValue = 5;
                         goto process_cheat_digit;
                     case INPUT_SCAN_6:
-                        c = 6;
+                        commandValue = 6;
                         goto process_cheat_digit;
                     case INPUT_SCAN_7:
-                        c = 7;
+                        commandValue = 7;
                         goto process_cheat_digit;
                     case INPUT_SCAN_8:
-                        c = 8;
+                        commandValue = 8;
                         goto process_cheat_digit;
                     case INPUT_SCAN_9:
-                        c = 9;
+                        commandValue = 9;
                         goto process_cheat_digit;
                     process_cheat_digit:
-                        hero2 = NULL;
+                        currentHero = NULL;
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
-                            hero2 = gpGame->GetHero(gpCurPlayer->m_currentHero);
+                            currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
                         }
                         giCheatSeq =
-                            giCheatSeq * CHEAT_SEQUENCE_RADIX % CHEAT_SEQUENCE_MODULUS + c;
+                            giCheatSeq * CHEAT_SEQUENCE_RADIX % CHEAT_SEQUENCE_MODULUS + commandValue;
                         if (!gbRemoteOn) {
                             if (giCheatSeq % CHEAT_CREATURES_MODULUS == CHEAT_CREATURES
-                                && hero2 != NULL) {
+                                && currentHero != NULL) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
                                 gpGame->GiveArmy(
-                                    &hero2->m_army,
+                                    &currentHero->m_army,
                                     CREATURE_BLACK_DRAGON,
                                     CHEAT_BLACK_DRAGON_COUNT,
                                     -1
@@ -2009,21 +2009,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         ViewWorld(SPELL_VIEW_ALL, false, false);
                         break;
                     case INPUT_SCAN_N:
-                        c = 'e';
+                        commandValue = 'e';
                         strcpy(
                             gText,
                             localization::Tr("adventure.confirm.restart")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
-                        c = 'f';
+                        commandValue = 'f';
                         strcpy(
                             gText,
                             localization::Tr("adventure.confirm.load_new_game")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
-                        c = 'i';
+                        commandValue = 'i';
                         strcpy(
                             gText,
                             localization::Tr("adventure.confirm.quit")
@@ -2035,7 +2035,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                             quit = 0;
                         } else {
-                            gGameCommand = c;
+                            gGameCommand = commandValue;
                         }
                         break;
                     case INPUT_SCAN_S:
@@ -2084,16 +2084,16 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                                 town = gpCurPlayer->m_townIds[0];
                             } else {
                                 town = 0;
-                                for (c = 0;
-                                     c < gpCurPlayer->m_townCount;
-                                     ++c) {
+                                for (commandValue = 0;
+                                     commandValue < gpCurPlayer->m_townCount;
+                                     ++commandValue) {
                                     if (gpCurPlayer->CurrentTown()
-                                        == gpCurPlayer->m_townIds[c]) {
-                                        if (c == gpCurPlayer->m_townCount - 1) {
+                                        == gpCurPlayer->m_townIds[commandValue]) {
+                                        if (commandValue == gpCurPlayer->m_townCount - 1) {
                                             town = gpCurPlayer->m_townIds[0];
                                         } else {
                                             town =
-                                                gpCurPlayer->m_townIds[c + 1];
+                                                gpCurPlayer->m_townIds[commandValue + 1];
                                         }
                                     }
                                 }
@@ -2176,9 +2176,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     i32 objectIdIndex;
     b32 visible;
     mapCell* theCell;
-    tag_message radMsg;
+    tag_message radarMessage;
     float fScale;
-    tag_message msg;
+    tag_message inputMessage;
     i32 mobileResult;
     hero* currentHero;
 
@@ -2427,37 +2427,37 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             CompleteDraw(0);
             UpdateScreen(0, 0);
 
-            msg.type = MESSAGE_NONE;
-            while (msg.type != MESSAGE_LEFT_BUTTON_UP) {
+            inputMessage.type = MESSAGE_NONE;
+            while (inputMessage.type != MESSAGE_LEFT_BUTTON_UP) {
                 Process1WindowsMessage();
-                msg = gpInputManager->GetEvent();
-                radMsg = msg;
-                while (msg.type != MESSAGE_LEFT_BUTTON_UP
-                       && msg.type != MESSAGE_NONE) {
-                    if (msg.type == MESSAGE_MOUSE_MOVE) {
-                        radMsg = msg;
+                inputMessage = gpInputManager->GetEvent();
+                radarMessage = inputMessage;
+                while (inputMessage.type != MESSAGE_LEFT_BUTTON_UP
+                       && inputMessage.type != MESSAGE_NONE) {
+                    if (inputMessage.type == MESSAGE_MOUSE_MOVE) {
+                        radarMessage = inputMessage;
                     }
                     Process1WindowsMessage();
-                    msg = gpInputManager->GetEvent();
+                    inputMessage = gpInputManager->GetEvent();
                 }
-                if (radMsg.type == MESSAGE_MOUSE_MOVE) {
-                    if (radMsg.payload.mouse.x < RADAR_LEFT) {
-                        radMsg.payload.mouse.x = RADAR_LEFT;
+                if (radarMessage.type == MESSAGE_MOUSE_MOVE) {
+                    if (radarMessage.payload.mouse.x < RADAR_LEFT) {
+                        radarMessage.payload.mouse.x = RADAR_LEFT;
                     }
-                    if (radMsg.payload.mouse.x >= RADAR_RIGHT) {
-                        radMsg.payload.mouse.x = RADAR_RIGHT - 1;
+                    if (radarMessage.payload.mouse.x >= RADAR_RIGHT) {
+                        radarMessage.payload.mouse.x = RADAR_RIGHT - 1;
                     }
-                    if (radMsg.payload.mouse.y < RADAR_TOP) {
-                        radMsg.payload.mouse.y = RADAR_TOP;
+                    if (radarMessage.payload.mouse.y < RADAR_TOP) {
+                        radarMessage.payload.mouse.y = RADAR_TOP;
                     }
-                    if (radMsg.payload.mouse.y >= RADAR_BOTTOM) {
-                        radMsg.payload.mouse.y = RADAR_BOTTOM - 1;
+                    if (radarMessage.payload.mouse.y >= RADAR_BOTTOM) {
+                        radarMessage.payload.mouse.y = RADAR_BOTTOM - 1;
                     }
-                    gpMouseManager->Main(radMsg);
+                    gpMouseManager->Main(radarMessage);
                     mouseX =
-                        static_cast<i32>((radMsg.payload.mouse.x - RADAR_LEFT) / fScale);
+                        static_cast<i32>((radarMessage.payload.mouse.x - RADAR_LEFT) / fScale);
                     mouseY =
-                        static_cast<i32>((radMsg.payload.mouse.y - RADAR_TOP) / fScale);
+                        static_cast<i32>((radarMessage.payload.mouse.y - RADAR_TOP) / fScale);
                     m_mapOriginX = mouseX - VIEW_CENTER_CELL;
                     m_mapOriginY = mouseY - VIEW_CENTER_CELL;
                     if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2475,7 +2475,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     UpdateRadar(1, 0);
                     CompleteDraw(0);
                     UpdateScreen(0, 0);
-                    radMsg.type = MESSAGE_NONE;
+                    radarMessage.type = MESSAGE_NONE;
                 }
             }
             break;
@@ -2603,9 +2603,9 @@ inline hero* GetHeroSlot(i32 i) {
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     SAMPLE2 sample;
     hero* hero;
-    i32 pl;
-    mapCell* cellPtr;
-    tag_message evt [[maybe_unused]];
+    i32 player;
+    mapCell* cellPointer;
+    tag_message message [[maybe_unused]];
     char special;
     i32 gaveArtifact [[maybe_unused]];
 
@@ -2641,10 +2641,10 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         x = m_mapOriginX + VIEW_CENTER_OFFSET;
         y = m_mapOriginY + VIEW_CENTER_OFFSET;
     }
-    cellPtr = GetCell(x, y);
-    if (!((cellPtr->m_objectIndex == MAPCELL_SPRITE_NONE
-           || cellPtr->m_objectTileset == TILESET_DUMMY)
-          && cellPtr->m_overlayIndex == MAPCELL_SPRITE_NONE)) {
+    cellPointer = GetCell(x, y);
+    if (!((cellPointer->m_objectIndex == MAPCELL_SPRITE_NONE
+           || cellPointer->m_objectTileset == TILESET_DUMMY)
+          && cellPointer->m_overlayIndex == MAPCELL_SPRITE_NONE)) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -2654,7 +2654,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         );
         return 1;
     }
-    if (CELL_TERRAIN(cellPtr) == TERRAIN_WATER) {
+    if (CELL_TERRAIN(cellPointer) == TERRAIN_WATER) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -2670,13 +2670,13 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             "DIGSOUND.82M"
         );
     }
-    if (cellPtr->m_objectIndex == MAPCELL_SPRITE_NONE
-        || cellPtr->m_objectTileset == TILESET_DUMMY) {
-        cellPtr->m_objectTileset = TILESET_OBJNDIRT;
-        cellPtr->m_objectIndex = DIG_HOLE_FRAME;
-        cellPtr->m_objectLayerBit0 = 1;
-        cellPtr->m_objectLayerBit1 = 1;
-        cellPtr->m_flags |= H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY);
+    if (cellPointer->m_objectIndex == MAPCELL_SPRITE_NONE
+        || cellPointer->m_objectTileset == TILESET_DUMMY) {
+        cellPointer->m_objectTileset = TILESET_OBJNDIRT;
+        cellPointer->m_objectIndex = DIG_HOLE_FRAME;
+        cellPointer->m_objectLayerBit0 = 1;
+        cellPointer->m_objectLayerBit1 = 1;
+        cellPointer->m_flags |= H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY);
     }
     CompleteDraw(0);
     UpdateScreen(0, 0);
@@ -2736,8 +2736,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     if (gbHumanPlayer[giCurPlayer]) {
         WaitEndSample(&sample);
     }
-    for (pl = 0; pl < gpGame->m_playerCount; ++pl) {
-        ComputeUALoc(pl);
+    for (player = 0; player < gpGame->m_playerCount; ++player) {
+        ComputeUALoc(player);
     }
     hero->m_remainingMobility = 0;
     UpdBottomView(true, true, true);
@@ -4095,11 +4095,11 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
 
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     u8* line;
-    u8* pixPtr;
+    u8* pixelPointer;
     u8 color = RADAR_UNSEEN_COLOR;
     i32 xrem;
     i32 ymod;
-    i32 w [[maybe_unused]];
+    i32 unusedWidth [[maybe_unused]];
     i32 offX;
     i32 delta [[maybe_unused]];
     float fScale;
@@ -4110,36 +4110,36 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     b32 bNoFrame;
     i32 i;
     i32 j;
-    i32 cx [[maybe_unused]];
-    i32 minx;
-    i32 miny;
-    i32 xhi;
-    i32 yhi;
+    i32 unusedX [[maybe_unused]];
+    i32 minX;
+    i32 minY;
+    i32 maxX;
+    i32 maxY;
     mapCell* cell;
     H2EnumStorage<TilesetId, i32> setId;
     i32 owner;
 
     if (partial == 0) {
-        minx = 0;
-        miny = 0;
-        xhi = MAP_WIDTH - 1;
-        yhi = MAP_HEIGHT - 1;
+        minX = 0;
+        minY = 0;
+        maxX = MAP_WIDTH - 1;
+        maxY = MAP_HEIGHT - 1;
     } else {
-        minx = m_mapOriginX - RADAR_PARTIAL_MARGIN;
-        miny = m_mapOriginY - RADAR_PARTIAL_MARGIN;
-        xhi = m_mapOriginX + RADAR_PARTIAL_SPAN;
-        yhi = m_mapOriginY + RADAR_PARTIAL_SPAN;
-        if (minx < 0) {
-            minx = 0;
+        minX = m_mapOriginX - RADAR_PARTIAL_MARGIN;
+        minY = m_mapOriginY - RADAR_PARTIAL_MARGIN;
+        maxX = m_mapOriginX + RADAR_PARTIAL_SPAN;
+        maxY = m_mapOriginY + RADAR_PARTIAL_SPAN;
+        if (minX < 0) {
+            minX = 0;
         }
-        if (miny < 0) {
-            miny = 0;
+        if (minY < 0) {
+            minY = 0;
         }
-        if (xhi > MAP_WIDTH - 1) {
-            xhi = MAP_WIDTH - 1;
+        if (maxX > MAP_WIDTH - 1) {
+            maxX = MAP_WIDTH - 1;
         }
-        if (yhi > MAP_HEIGHT - 1) {
-            yhi = MAP_HEIGHT - 1;
+        if (maxY > MAP_HEIGHT - 1) {
+            maxY = MAP_HEIGHT - 1;
         }
     }
 
@@ -4152,35 +4152,35 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
             line = gpWindowManager->m_screen->m_pixels
-                   + (miny * RADAR_SMALL_CELL_PIXELS + RADAR_TOP) * RADAR_SCREEN_PITCH
+                   + (minY * RADAR_SMALL_CELL_PIXELS + RADAR_TOP) * RADAR_SCREEN_PITCH
                    + RADAR_LEFT;
-            offX = minx * RADAR_SMALL_CELL_PIXELS;
+            offX = minX * RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
             line = gpWindowManager->m_screen->m_pixels
-                   + (miny * RADAR_MEDIUM_CELL_PIXELS + RADAR_TOP) * RADAR_SCREEN_PITCH
+                   + (minY * RADAR_MEDIUM_CELL_PIXELS + RADAR_TOP) * RADAR_SCREEN_PITCH
                    + RADAR_LEFT;
-            offX = minx * RADAR_MEDIUM_CELL_PIXELS;
+            offX = minX * RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             line = gpWindowManager->m_screen->m_pixels
-                   + (miny + (miny + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR
+                   + (minY + (minY + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR
                       + RADAR_TOP)
                          * RADAR_SCREEN_PITCH
                    + RADAR_LEFT;
-            offX = minx + (minx + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR;
-            xrem = minx % RADAR_LARGE_SCALE_DIVISOR;
-            ymod = miny % RADAR_LARGE_SCALE_DIVISOR;
+            offX = minX + (minX + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR;
+            xrem = minX % RADAR_LARGE_SCALE_DIVISOR;
+            ymod = minY % RADAR_LARGE_SCALE_DIVISOR;
             break;
         default:
-            line = gpWindowManager->m_screen->m_pixels + (miny + RADAR_TOP) * RADAR_SCREEN_PITCH
+            line = gpWindowManager->m_screen->m_pixels + (minY + RADAR_TOP) * RADAR_SCREEN_PITCH
                    + RADAR_LEFT;
-            offX = minx;
+            offX = minX;
             break;
     }
 
-    for (j = miny; j <= yhi; ++j) {
-        pixPtr = line + offX;
+    for (j = minY; j <= maxY; ++j) {
+        pixelPointer = line + offX;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
                 line += RADAR_SCREEN_PITCH * RADAR_SMALL_CELL_PIXELS;
@@ -4204,7 +4204,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
         }
 
-        for (i = minx; i <= xhi; ++i) {
+        for (i = minX; i <= maxX; ++i) {
             if (gbAllBlack != 0 || (MAP_EXTRA_AT_WFIRST(i, j) & giCurPlayerBit) == 0) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
@@ -4320,53 +4320,53 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    memset(pixPtr, color, RADAR_SMALL_CELL_PIXELS);
+                    memset(pixelPointer, color, RADAR_SMALL_CELL_PIXELS);
                     memset(
-                        pixPtr + RADAR_SCREEN_PITCH,
+                        pixelPointer + RADAR_SCREEN_PITCH,
                         color,
                         RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixPtr + RADAR_SCREEN_PITCH * RADAR_MEDIUM_CELL_PIXELS,
+                        pixelPointer + RADAR_SCREEN_PITCH * RADAR_MEDIUM_CELL_PIXELS,
                         color,
                         RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixPtr + RADAR_SCREEN_PITCH * (RADAR_SMALL_CELL_PIXELS - 1),
+                        pixelPointer + RADAR_SCREEN_PITCH * (RADAR_SMALL_CELL_PIXELS - 1),
                         color,
                         RADAR_SMALL_CELL_PIXELS
                     );
-                    pixPtr += RADAR_SMALL_CELL_PIXELS;
+                    pixelPointer += RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    memset(pixPtr, color, RADAR_MEDIUM_CELL_PIXELS);
+                    memset(pixelPointer, color, RADAR_MEDIUM_CELL_PIXELS);
                     memset(
-                        pixPtr + RADAR_SCREEN_PITCH,
+                        pixelPointer + RADAR_SCREEN_PITCH,
                         color,
                         RADAR_MEDIUM_CELL_PIXELS
                     );
-                    pixPtr += RADAR_MEDIUM_CELL_PIXELS;
+                    pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     if (xrem != 0) {
                         if (ymod != 0) {
-                            pixPtr[0] = color;
-                            ++pixPtr;
+                            pixelPointer[0] = color;
+                            ++pixelPointer;
                         } else {
-                            pixPtr[0] = color;
-                            pixPtr[RADAR_SCREEN_PITCH] = color;
-                            ++pixPtr;
+                            pixelPointer[0] = color;
+                            pixelPointer[RADAR_SCREEN_PITCH] = color;
+                            ++pixelPointer;
                         }
                     } else if (ymod != 0) {
-                        pixPtr[0] = color;
-                        pixPtr[1] = color;
-                        pixPtr += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer[0] = color;
+                        pixelPointer[1] = color;
+                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
                     } else {
-                        pixPtr[0] = color;
-                        pixPtr[1] = color;
-                        pixPtr[RADAR_SCREEN_PITCH] = color;
-                        pixPtr[RADAR_SCREEN_PITCH + 1] = color;
-                        pixPtr += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer[0] = color;
+                        pixelPointer[1] = color;
+                        pixelPointer[RADAR_SCREEN_PITCH] = color;
+                        pixelPointer[RADAR_SCREEN_PITCH + 1] = color;
+                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
                     }
                     ++xrem;
                     if (xrem > RADAR_LARGE_SCALE_DIVISOR - 1) {
@@ -4374,7 +4374,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     }
                     break;
                 case MAP_DIMENSION_XLARGE:
-                    *pixPtr++ = color;
+                    *pixelPointer++ = color;
                     break;
             }
         }
@@ -4469,10 +4469,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<i32>(minx * fScale + ADVMGR_RADAR_LEFT_FLOAT),
-                static_cast<i32>(miny * fScale + ADVMGR_RADAR_TOP_FLOAT),
-                static_cast<i32>((xhi - minx + 1) * fScale),
-                static_cast<i32>((yhi - miny + 1) * fScale)
+                static_cast<i32>(minX * fScale + ADVMGR_RADAR_LEFT_FLOAT),
+                static_cast<i32>(minY * fScale + ADVMGR_RADAR_TOP_FLOAT),
+                static_cast<i32>((maxX - minX + 1) * fScale),
+                static_cast<i32>((maxY - minY + 1) * fScale)
             );
         } else {
             gpWindowManager->UpdateScreenRegion(RADAR_LEFT, RADAR_TOP, RADAR_SIZE, RADAR_SIZE);
@@ -4482,7 +4482,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     HeroEventFlag visitedMaskValue;
-    TilesetId icn;
+    TilesetId tileset;
     mapCell* currentCell;
     i32 posX;
     heroWindow* pWin;
@@ -4492,7 +4492,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     char guardStr[QUICK_INFO_TEXT_CAPACITY];
     char savedTextLocal[QUICK_INFO_SAVED_TEXT_CAPACITY];
     tag_message message;
-    char ch [[maybe_unused]];
+    char character [[maybe_unused]];
     i32 quickInfoShowFlag [[maybe_unused]];
     i32 j [[maybe_unused]];
     i32 expansionSite;
@@ -4819,16 +4819,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_EXPANSION_OBJECT: {
-                    ch = -1;
+                    character = -1;
                     if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         iFrame = currentCell->m_objectIndex;
-                        icn = currentCell->m_objectTileset;
+                        tileset = currentCell->m_objectTileset;
                     } else {
                         iFrame = currentCell->m_overlayIndex;
-                        icn = currentCell->m_overlayTileset;
+                        tileset = currentCell->m_overlayTileset;
                     }
                     expansionSite = H2EnumIndex(GENERIC_SITE_UNKNOWN);
-                    switch (icn) {
+                    switch (tileset) {
                         case TILESET_X_LOC1:
                             if (iFrame < 0) {
                                 break;
@@ -4896,13 +4896,13 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_EXPANSION_DWELLING: {
                     if (currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                         iFrame = currentCell->m_objectIndex;
-                        icn = currentCell->m_objectTileset;
+                        tileset = currentCell->m_objectTileset;
                     } else {
                         iFrame = currentCell->m_overlayIndex;
-                        icn = currentCell->m_overlayTileset;
+                        tileset = currentCell->m_overlayTileset;
                     }
                     expansionSite = H2EnumIndex(RECRUITMENT_SITE_UNKNOWN);
-                    switch (icn) {
+                    switch (tileset) {
                         case TILESET_X_LOC1:
                             if (iFrame < RECRUITMENT_START) {
                                 break;
@@ -4996,7 +4996,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
     tag_message message;
     i32 i;
     i32 manaFr;
-    hero* heroPtr;
+    hero* heroPointer;
     i32 moveFrm;
 
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
@@ -5044,7 +5044,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
             m_adventureWindow->BroadcastMessage(message);
         }
     } else {
-        heroPtr = gpGame->GetHero(whichHero);
+        heroPointer = gpGame->GetHero(whichHero);
         message.payload.widget.id = widgetBase + LOCATOR_HERO_IMAGE_OFFSET;
         message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
         message.payload.widget.data.value = LOCATOR_HERO_DEFAULT_FRAME;
@@ -5057,13 +5057,13 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
             m_adventureWindow->BroadcastMessage(message);
         }
 
-        moveFrm = GetMobilityFrame(heroPtr->m_remainingMobility);
+        moveFrm = GetMobilityFrame(heroPointer->m_remainingMobility);
         message.payload.widget.id = widgetBase + LOCATOR_HERO_MOBILITY_OFFSET;
         message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
         message.payload.widget.data.value = moveFrm;
         m_adventureWindow->BroadcastMessage(message);
 
-        manaFr = GetManaFrame(heroPtr->m_spellPoints);
+        manaFr = GetManaFrame(heroPointer->m_spellPoints);
         message.payload.widget.id = widgetBase + LOCATOR_HERO_MANA_OFFSET;
         message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
         message.payload.widget.data.value = manaFr;
@@ -5071,7 +5071,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 
         message.payload.widget.id = widgetBase + LOCATOR_HERO_PORTRAIT_OFFSET;
         message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-        message.payload.widget.data.value = H2EnumIndex(heroPtr->m_portrait);
+        message.payload.widget.data.value = H2EnumIndex(heroPointer->m_portrait);
         m_adventureWindow->BroadcastMessage(message);
     }
 
@@ -5122,58 +5122,58 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 i;
     i32 whichTown;
-    tag_message msg;
+    tag_message message;
     double step;
 
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         return;
     }
 
-    msg.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
+    message.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
     for (i = 0; i < LOCATOR_VISIBLE_COUNT; ++i) {
         whichTown = gpCurPlayer->m_townIds[gpCurPlayer->m_townLocatorPage + i];
-        msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
-        msg.payload.widget.id = i + LOCATOR_TOWN_BORDER_BASE;
-        msg.payload.widget.data.value =
+        message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
+        message.payload.widget.id = i + LOCATOR_TOWN_BORDER_BASE;
+        message.payload.widget.data.value =
             (gpCurPlayer->m_currentTown != TOWN_ID_NONE
              && whichTown == gpCurPlayer->m_currentTown && !gbAllBlack)
                 ? LOCATOR_SELECTED_COLOR
                 : LOCATOR_NORMAL_COLOR;
-        m_adventureWindow->BroadcastMessage(msg);
+        m_adventureWindow->BroadcastMessage(message);
 
-        msg.payload.widget.id = i + LOCATOR_TOWN_IMAGE_BASE;
+        message.payload.widget.id = i + LOCATOR_TOWN_IMAGE_BASE;
         if (whichTown == TOWN_ID_NONE || gbAllBlack) {
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            message.payload.widget.data.value =
                 i + LOCATOR_TOWN_EMPTY_FRAME_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
-            msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            message.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(message);
         } else {
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
-            m_adventureWindow->BroadcastMessage(msg);
-            msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+            message.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(message);
+            message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            message.payload.widget.data.value =
                 H2EnumIndex(gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
             if (!(H2EnumIndex((gpGame->GetTown(whichTown)->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE))))) {
-                msg.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
+                message.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
             }
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
 
             if (H2BitTest(gpGame->m_knownTowns, whichTown)) {
-                msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+                message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
             } else {
-                msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+                message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
             }
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
-            msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
-            m_adventureWindow->BroadcastMessage(msg);
+            message.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            message.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(message);
         }
     }
 
@@ -5271,10 +5271,10 @@ void advManager::ClearBottomView(void) {
 
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     b32 updated;
-    tag_message msg;
+    tag_message message;
 
     updated = false;
-    msg.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
+    message.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
     if (iCurBottomView != BOTTOM_VIEW_ENEMY_TURN) {
         updated = true;
         gbForceUpdate = true;
@@ -5328,10 +5328,10 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             updated = true;
 
             if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] != NULL) {
-                msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-                msg.payload.widget.id = ENEMY_TURN_SAND_ID;
-                msg.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
-                m_adventureWindow->BroadcastMessage(msg);
+                message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+                message.payload.widget.id = ENEMY_TURN_SAND_ID;
+                message.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
+                m_adventureWindow->BroadcastMessage(message);
             } else {
                 m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] = new iconWidget(
                     ENEMY_TURN_ANIMATION_X,
@@ -5363,11 +5363,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             iCurHourGlassPhase = 0;
         }
         if (m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] != NULL) {
-            msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-            msg.payload.widget.id = ENEMY_TURN_CREST_ID;
-            msg.payload.widget.data.value =
+            message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.payload.widget.id = ENEMY_TURN_CREST_ID;
+            message.payload.widget.data.value =
                 gpGame->m_players[H2EnumIndex(static_cast<char>(giCurPlayer))].m_color;
-            m_adventureWindow->BroadcastMessage(msg);
+            m_adventureWindow->BroadcastMessage(message);
         } else {
             m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] = new iconWidget(
                 ENEMY_TURN_CREST_X,
@@ -5398,10 +5398,10 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         iLastHourGlassPhase = iCurHourGlassPhase;
         giLastHourGlassUpdateTime = KBTickCount();
         if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] != NULL) {
-            msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
-            msg.payload.widget.id = ENEMY_TURN_PHASE_ID;
-            msg.payload.widget.data.value = iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
-            m_adventureWindow->BroadcastMessage(msg);
+            message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.payload.widget.id = ENEMY_TURN_PHASE_ID;
+            message.payload.widget.data.value = iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
+            m_adventureWindow->BroadcastMessage(message);
         } else {
             m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] = new iconWidget(
                 ENEMY_TURN_ANIMATION_X,
@@ -5538,7 +5538,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     i32 iconWidth;
     i32 iconHeight;
     i32 textY;
-    i32 lineCnt;
+    i32 lineCount;
     char* messageText;
     char* countString;
 
@@ -5568,8 +5568,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
     textY = 0;
     if (giBottomViewResource < RES_VALID_BEGIN) {
         textY = RESOURCE_VIEW_MULTILINE_HEIGHT;
-        lineCnt = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
-        textY -= lineCnt * RESOURCE_VIEW_LINE_HEIGHT;
+        lineCount = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
+        textY -= lineCount * RESOURCE_VIEW_LINE_HEIGHT;
     }
     messageText = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
     sprintf(messageText, gcBottomViewText);
@@ -5774,7 +5774,7 @@ i32 advManager::UpdBottomViewHero(void) {
     i32 labelY;
     i32 leftEdge [[maybe_unused]];
     icon* creatureIcons;
-    i32 layoutPos;
+    i32 layoutPosition;
     i32 countWidth;
     i32 blockWidth;
     i32 displayIndex;
@@ -5846,14 +5846,14 @@ i32 advManager::UpdBottomViewHero(void) {
                     );
                 }
 
-                layoutPos = slotLayouts[usedCount - 1][displayIndex];
-                iconX = iconPositions[layoutPos * BOTTOM_HERO_POSITION_COMPONENT_COUNT];
-                iconY = iconPositions[layoutPos * BOTTOM_HERO_POSITION_COMPONENT_COUNT + 1];
+                layoutPosition = slotLayouts[usedCount - 1][displayIndex];
+                iconX = iconPositions[layoutPosition * BOTTOM_HERO_POSITION_COMPONENT_COUNT];
+                iconY = iconPositions[layoutPosition * BOTTOM_HERO_POSITION_COMPONENT_COUNT + 1];
                 labelY = iconY + BOTTOM_HERO_LABEL_Y_OFFSET;
                 iconEntryValue = reinterpret_cast<IconEntry*>(
                     creature * sizeof(IconEntry) + creatureIcons->m_data
                 );
-                if (layoutPos == 0 || layoutPos == 1) {
+                if (layoutPosition == 0 || layoutPosition == 1) {
                     labelY -= BOTTOM_HERO_TOP_LABEL_SHIFT;
                     if (iconEntryValue->h < BOTTOM_HERO_TOP_MIN_HEIGHT) {
                         iconY += BOTTOM_HERO_TOP_MIN_HEIGHT - iconEntryValue->h;
@@ -5930,16 +5930,16 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     icon* iconRef;
     i16 statId [[maybe_unused]] = HERO_QUICK_PRIMARY_STAT_WIDGET;
     i16 playerColorWidget [[maybe_unused]] = HERO_QUICK_PLAYER_COLOR_WIDGET;
-    heroWindow* win;
+    heroWindow* window;
     hero* targetHero;
     char* labels[ARMY_QUICK_SLOT_COUNT];
-    i32 ii;
+    i32 index;
     i32 savedY;
     i32 oldX;
     iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
-    tag_message msg;
+    tag_message message;
 
-    msg.type = MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     if (heroId == INVALID_HERO) {
         return;
     }
@@ -5952,89 +5952,89 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             windowX = HERO_QUICK_DEFAULT_WINDOW_X;
             windowY = locatorSlot * HERO_QUICK_LOCATOR_ROW_HEIGHT + HERO_QUICK_LOCATOR_BASE_Y;
         }
-        win = new heroWindow(
+        window = new heroWindow(
             windowX,
             windowY,
             "qhero0.bin"
         );
-        if (win == NULL) {
+        if (window == NULL) {
             MemError();
         }
-        SetWinText(win, HERO_QUICK_WINDOW_TEXT);
+        SetWinText(window, HERO_QUICK_WINDOW_TEXT);
     } else {
-        win = new heroWindow(
+        window = new heroWindow(
             windowX,
             windowY,
             "qhero1.bin"
         );
-        if (win == NULL) {
+        if (window == NULL) {
             MemError();
         }
     }
 
-    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    msg.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
-    msg.payload.widget.data.value = H2EnumIndex(targetHero->m_portrait);
-    win->BroadcastMessage(msg);
-    msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    msg.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
-    msg.payload.widget.data.value =
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+    message.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
+    message.payload.widget.data.value = H2EnumIndex(targetHero->m_portrait);
+    window->BroadcastMessage(message);
+    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+    message.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
+    message.payload.widget.data.value =
         gpGame->m_players[H2EnumIndex(targetHero->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
-    win->BroadcastMessage(msg);
-    ++msg.payload.widget.id;
-    ++msg.payload.widget.data.value;
-    win->BroadcastMessage(msg);
+    window->BroadcastMessage(message);
+    ++message.payload.widget.id;
+    ++message.payload.widget.data.value;
+    window->BroadcastMessage(message);
     sprintf(
         gText,
         "%s",
         targetHero->m_name
     );
-    msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    msg.payload.widget.id = HERO_QUICK_NAME_WIDGET;
-    msg.payload.widget.data.text = gText;
-    win->BroadcastMessage(msg);
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = HERO_QUICK_NAME_WIDGET;
+    message.payload.widget.data.text = gText;
+    window->BroadcastMessage(message);
 
     creatureCount = 0;
-    for (ii = 0; ii < ARMY_QUICK_SLOT_COUNT; ++ii) {
-        if (targetHero->m_army.m_creatureTypes[ii] != CREATURE_NONE) {
+    for (index = 0; index < ARMY_QUICK_SLOT_COUNT; ++index) {
+        if (targetHero->m_army.m_creatureTypes[index] != CREATURE_NONE) {
             ++creatureCount;
         }
     }
 
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
-        for (ii = 0; ii < HERO_PRIMARY_STAT_COUNT; ++ii) {
+        for (index = 0; index < HERO_PRIMARY_STAT_COUNT; ++index) {
             sprintf(
                 gText,
                 "%d",
-                targetHero->Stats(HeroPrimaryStat(ii))
+                targetHero->Stats(HeroPrimaryStat(index))
             );
-            msg.payload.widget.id = ii + HERO_QUICK_PRIMARY_STAT_WIDGET;
-            msg.payload.widget.data.text = gText;
-            win->BroadcastMessage(msg);
+            message.payload.widget.id = index + HERO_QUICK_PRIMARY_STAT_WIDGET;
+            message.payload.widget.data.text = gText;
+            window->BroadcastMessage(message);
         }
         sprintf(gText, "%d/%d", targetHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*targetHero));
-        msg.payload.widget.id = HERO_QUICK_MANA_WIDGET;
-        msg.payload.widget.data.text = gText;
-        win->BroadcastMessage(msg);
+        message.payload.widget.id = HERO_QUICK_MANA_WIDGET;
+        message.payload.widget.data.text = gText;
+        window->BroadcastMessage(message);
 
         if (creatureCount != 0) {
             i32 armyStart =
                 (HERO_QUICK_ARMY_AREA_WIDTH - creatureCount * ARMY_QUICK_ICON_SIZE)
                     / ARMY_QUICK_CENTER_DIVISOR
                 + ARMY_QUICK_AREA_LEFT;
-            i32 idx = 0;
+            i32 currentIndex = 0;
             i32 monster;
-            for (ii = 0; ii < creatureCount; ++ii) {
-                while (targetHero->m_army.m_creatureTypes[idx]
+            for (index = 0; index < creatureCount; ++index) {
+                while (targetHero->m_army.m_creatureTypes[currentIndex]
                        == CREATURE_NONE) {
-                    ++idx;
+                    ++currentIndex;
                 }
-                monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[idx]);
+                monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[currentIndex]);
                 if (monster != ARMY_QUICK_EMPTY_SLOT) {
-                    stackIcons[ii] = new iconWidget(
+                    stackIcons[index] = new iconWidget(
                         static_cast<i16>(
-                            armyStart + ii * ARMY_QUICK_ICON_SIZE
+                            armyStart + index * ARMY_QUICK_ICON_SIZE
                             - GetIconEntry(iconRef, monster)->x
                             + (ARMY_QUICK_ICON_SIZE - GetIconEntry(iconRef, monster)->w)
                                   / ARMY_QUICK_CENTER_DIVISOR
@@ -6054,43 +6054,43 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         WIDGET_KIND_ICON_DIRECT,
                         1
                     );
-                    if (stackIcons[ii] == NULL) {
+                    if (stackIcons[index] == NULL) {
                         MemError();
                     }
-                    labels[ii] =
+                    labels[index] =
                         static_cast<char*>(H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY));
                     sprintf(
-                        labels[ii],
+                        labels[index],
                         "%d",
-                        targetHero->m_army.m_creatureCounts[idx]
+                        targetHero->m_army.m_creatureCounts[currentIndex]
                     );
-                    sizeWidgets[ii] = new textWidget(
-                        static_cast<i16>(armyStart + ii * ARMY_QUICK_ICON_SIZE),
+                    sizeWidgets[index] = new textWidget(
+                        static_cast<i16>(armyStart + index * ARMY_QUICK_ICON_SIZE),
                         static_cast<i16>(
                             HERO_QUICK_DETAILED_CREATURE_Y + H2EnumIndex(ARMY_QUICK_ICON_SIZE)
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
-                        labels[ii],
+                        labels[index],
                         "smalfont.fnt",
                         FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
                         FONT_ALIGN_CENTER
                     );
-                    if (sizeWidgets[ii] == NULL) {
+                    if (sizeWidgets[index] == NULL) {
                         MemError();
                     }
-                    win->AddWidget(stackIcons[ii], -1);
-                    win->AddWidget(sizeWidgets[ii], -1);
+                    window->AddWidget(stackIcons[index], -1);
+                    window->AddWidget(sizeWidgets[index], -1);
                 }
-                ++idx;
+                ++currentIndex;
             }
         }
     } else if (creatureCount != 0) {
         i32 rowY = HERO_QUICK_VAGUE_FIRST_ROW_Y;
         i32 topRow;
-        i32 row2;
+        i32 rowCreatureCount;
         i32 monster;
         switch (creatureCount) {
             case 1:
@@ -6098,30 +6098,30 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             case ARMY_QUICK_TOP_ROW_MAX:
                 rowY += ARMY_QUICK_FIRST_ROW_SHIFT;
                 topRow = creatureCount;
-                row2 = 0;
+                rowCreatureCount = 0;
                 break;
             case ARMY_QUICK_FOUR_STACK_COUNT:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_FIRST_ROW_COUNT;
+                rowCreatureCount = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_TOP_ROW_MAX;
+                rowCreatureCount = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
-        i32 idx = 0;
+        i32 currentIndex = 0;
         i32 stride = HERO_QUICK_ARMY_AREA_WIDTH / topRow;
         i32 armyStart =
             (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR + ARMY_QUICK_AREA_LEFT;
-        for (ii = 0; ii < topRow; ++ii) {
-            while (targetHero->m_army.m_creatureTypes[idx] == CREATURE_NONE) {
-                ++idx;
+        for (index = 0; index < topRow; ++index) {
+            while (targetHero->m_army.m_creatureTypes[currentIndex] == CREATURE_NONE) {
+                ++currentIndex;
             }
-            monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[idx]);
-            stackIcons[ii] = new iconWidget(
+            monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[currentIndex]);
+            stackIcons[index] = new iconWidget(
                 static_cast<i16>(
-                    armyStart + stride * ii
+                    armyStart + stride * index
                     - GetIconEntry(iconRef, monster)->x
                     + (ARMY_QUICK_ICON_SIZE - GetIconEntry(iconRef, monster)->w)
                           / ARMY_QUICK_CENTER_DIVISOR
@@ -6140,51 +6140,51 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (stackIcons[ii] == NULL) {
+            if (stackIcons[index] == NULL) {
                 MemError();
             }
-            labels[ii] = static_cast<char*>(H2_ALLOC(15));
+            labels[index] = static_cast<char*>(H2_ALLOC(15));
             strcpy(
-                labels[ii],
+                labels[index],
                 GetArmySizeName(
-                    targetHero->m_army.m_creatureCounts[idx],
+                    targetHero->m_army.m_creatureCounts[currentIndex],
                     ARMY_SIZE_NAME_TITLE
                 )
             );
-            sizeWidgets[ii] = new textWidget(
-                static_cast<i16>(stride * ii + ARMY_QUICK_AREA_LEFT),
+            sizeWidgets[index] = new textWidget(
+                static_cast<i16>(stride * index + ARMY_QUICK_AREA_LEFT),
                 static_cast<i16>(rowY + ARMY_QUICK_ICON_SIZE),
                 stride,
                 ARMY_QUICK_LABEL_HEIGHT,
-                labels[ii],
+                labels[index],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
-            if (sizeWidgets[ii] == NULL) {
+            if (sizeWidgets[index] == NULL) {
                 MemError();
             }
-            win->AddWidget(stackIcons[ii], -1);
-            win->AddWidget(sizeWidgets[ii], -1);
-            ++idx;
+            window->AddWidget(stackIcons[index], -1);
+            window->AddWidget(sizeWidgets[index], -1);
+            ++currentIndex;
         }
 
-        if (row2 != 0) {
-            stride = HERO_QUICK_ARMY_AREA_WIDTH / row2;
+        if (rowCreatureCount != 0) {
+            stride = HERO_QUICK_ARMY_AREA_WIDTH / rowCreatureCount;
             armyStart = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
                                 + ARMY_QUICK_AREA_LEFT;
             rowY += ARMY_QUICK_SECOND_ROW_SHIFT;
-            for (ii = topRow; ii < topRow + row2;
-                 ++ii) {
-                while (targetHero->m_army.m_creatureTypes[idx] == CREATURE_NONE) {
-                    ++idx;
+            for (index = topRow; index < topRow + rowCreatureCount;
+                 ++index) {
+                while (targetHero->m_army.m_creatureTypes[currentIndex] == CREATURE_NONE) {
+                    ++currentIndex;
                 }
-                monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[idx]);
-                stackIcons[ii] = new iconWidget(
+                monster = H2EnumIndex(targetHero->m_army.m_creatureTypes[currentIndex]);
+                stackIcons[index] = new iconWidget(
                     static_cast<i16>(
-                        armyStart + stride * (ii - HERO_QUICK_SECOND_ROW_FIRST_SLOT)
+                        armyStart + stride * (index - HERO_QUICK_SECOND_ROW_FIRST_SLOT)
                         - GetIconEntry(iconRef, monster)->x
                         + (ARMY_QUICK_ICON_SIZE - GetIconEntry(iconRef, monster)->w)
                               / ARMY_QUICK_CENTER_DIVISOR
@@ -6204,38 +6204,38 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     WIDGET_KIND_ICON_DIRECT,
                     1
                 );
-                if (stackIcons[ii] == NULL) {
+                if (stackIcons[index] == NULL) {
                     MemError();
                 }
-                labels[ii] = static_cast<char*>(H2_ALLOC(15));
+                labels[index] = static_cast<char*>(H2_ALLOC(15));
                 strcpy(
-                    labels[ii],
+                    labels[index],
                     GetArmySizeName(
-                        targetHero->m_army.m_creatureCounts[idx],
+                        targetHero->m_army.m_creatureCounts[currentIndex],
                         ARMY_SIZE_NAME_TITLE
                     )
                 );
-                sizeWidgets[ii] = new textWidget(
+                sizeWidgets[index] = new textWidget(
                     static_cast<i16>(
-                        stride * (ii - HERO_QUICK_SECOND_ROW_FIRST_SLOT)
+                        stride * (index - HERO_QUICK_SECOND_ROW_FIRST_SLOT)
                         + ARMY_QUICK_AREA_LEFT
                     ),
                     static_cast<i16>(rowY + HERO_QUICK_SECOND_ROW_TEXT_SHIFT),
                     stride,
                     ARMY_QUICK_LABEL_HEIGHT,
-                    labels[ii],
+                    labels[index],
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
-                if (sizeWidgets[ii] == NULL) {
+                if (sizeWidgets[index] == NULL) {
                     MemError();
                 }
-                win->AddWidget(stackIcons[ii], -1);
-                win->AddWidget(sizeWidgets[ii], -1);
-                ++idx;
+                window->AddWidget(stackIcons[index], -1);
+                window->AddWidget(sizeWidgets[index], -1);
+                ++currentIndex;
             }
         }
     }
@@ -6245,16 +6245,16 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     m_mapOriginX = targetHero->m_x - VIEW_CENTER_CELL;
     m_mapOriginY = targetHero->m_y - VIEW_CENTER_CELL;
     UpdateRadar(1, 0);
-    gpWindowManager->AddWindow(win, -1, 1);
+    gpWindowManager->AddWindow(window, -1, 1);
     QuickViewWait();
-    gpWindowManager->RemoveWindow(win);
-    delete win;
+    gpWindowManager->RemoveWindow(window);
+    delete window;
     m_mapOriginX = oldX;
     m_mapOriginY = savedY;
     UpdateRadar(1, 0);
     CompleteDraw(0);
     UpdateScreen(0, 0);
-    if (msg.type == MESSAGE_LEFT_BUTTON_DOWN
+    if (message.type == MESSAGE_LEFT_BUTTON_DOWN
         && targetHero->m_owner == giCurPlayer) {
         SetHeroContext(targetHero->m_id, 0);
     }
@@ -6308,9 +6308,9 @@ void advManager::TownQuickView(
 
     i32 creatureCount;
     i16 creatureIconHeight [[maybe_unused]];
-    i16 on [[maybe_unused]];
+    i16 unusedEnabled [[maybe_unused]];
     heroWindow* window;
-    town* townPtr;
+    town* townPointer;
     i16 playerColorWidget [[maybe_unused]];
     i32 oldX;
     i32 scouting;
@@ -6329,7 +6329,7 @@ void advManager::TownQuickView(
     leftEdge = ARMY_QUICK_AREA_LEFT;
     creatureIconWidth = ARMY_QUICK_ICON_SIZE;
     creatureIconHeight = ARMY_QUICK_ICON_SIZE;
-    on = 1;
+    unusedEnabled = 1;
     faceWidget = TOWN_QUICK_PORTRAIT_WIDGET;
     playerColorWidget = TOWN_QUICK_PLAYER_COLOR_WIDGET;
 
@@ -6338,7 +6338,7 @@ void advManager::TownQuickView(
     }
 
     creatureIcon = gpResourceManager->GetIcon("mons32.icn");
-    townPtr = gpGame->GetTown(townId);
+    townPointer = gpGame->GetTown(townId);
     if (windowX == -1) {
         windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
         windowY = TOWN_QUICK_DEFAULT_WINDOW_Y;
@@ -6352,7 +6352,7 @@ void advManager::TownQuickView(
         MemError();
     }
 
-    if (townPtr->m_owner == giCurPlayer || giDebugLevel >= TOWN_QUICK_DEBUG_INFORMATION) {
+    if (townPointer->m_owner == giCurPlayer || giDebugLevel >= TOWN_QUICK_DEBUG_INFORMATION) {
         scouting = TOWN_QUICK_INFORMATION_EXACT;
     } else {
         scouting = gpGame->GetNumThievesGuilds(giCurPlayer);
@@ -6360,7 +6360,7 @@ void advManager::TownQuickView(
             scouting = TOWN_QUICK_INFORMATION_ESTIMATES;
         }
     }
-    if (IsCrystalBallInEffect(townPtr->m_x, townPtr->m_y, CRYSTAL_BALL_RADIUS)) {
+    if (IsCrystalBallInEffect(townPointer->m_x, townPointer->m_y, CRYSTAL_BALL_RADIUS)) {
         scouting = TOWN_QUICK_INFORMATION_EXACT;
     }
 
@@ -6368,21 +6368,21 @@ void advManager::TownQuickView(
     creatureCount = 0;
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, TOWN_QUICK_PORTRAIT_WIDGET);
     message.payload.widget.data.value =
-        H2EnumIndex(townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
+        H2EnumIndex(townPointer->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
     if ((H2EnumIndex((gpGame->GetTown(townId)->m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_CASTLE))))) == 0) {
         message.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
     }
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
-        || H2BitTest(gpGame->m_knownTowns, townPtr->m_id) == 0) {
+        || H2BitTest(gpGame->m_knownTowns, townPointer->m_id) == 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message);
     }
 
-    if (townPtr->m_owner == -1) {
+    if (townPointer->m_owner == -1) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
@@ -6393,14 +6393,14 @@ void advManager::TownQuickView(
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
         message.payload.widget.data.value =
-            gpGame->m_players[H2EnumIndex(townPtr->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
+            gpGame->m_players[H2EnumIndex(townPointer->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
         window->BroadcastMessage(message);
         ++message.payload.widget.id;
         ++message.payload.widget.data.value;
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, GetTownName(townPtr->m_id));
+    sprintf(gText, GetTownName(townPointer->m_id));
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_QUICK_NAME_WIDGET;
     message.payload.widget.data.text = gText;
@@ -6408,7 +6408,7 @@ void advManager::TownQuickView(
 
     creatureCount = 0;
     for (armyIndex = 0; armyIndex < ARMY_QUICK_SLOT_COUNT; ++armyIndex) {
-        if (townPtr->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE) {
+        if (townPointer->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE) {
             ++creatureCount;
         }
     }
@@ -6447,12 +6447,12 @@ void advManager::TownQuickView(
         textWidget* sizeWidgets[ARMY_QUICK_SLOT_COUNT];
         i32 monster;
         iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
-        i32 row2;
+        i32 rowCreatureCount;
         i32 stride;
         i32 armySlot [[maybe_unused]];
         char* troopNames[ARMY_QUICK_SLOT_COUNT];
         i32 fiveShift;
-        i32 basePos;
+        i32 basePosition;
         i32 curY;
         i32 creatureSlot;
         i32 topRow;
@@ -6464,15 +6464,15 @@ void advManager::TownQuickView(
             case ARMY_QUICK_TOP_ROW_MAX:
                 curY += ARMY_QUICK_FIRST_ROW_SHIFT;
                 topRow = creatureCount;
-                row2 = 0;
+                rowCreatureCount = 0;
                 break;
             case ARMY_QUICK_FOUR_STACK_COUNT:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_FIRST_ROW_COUNT;
+                rowCreatureCount = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_TOP_ROW_MAX;
+                rowCreatureCount = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
@@ -6480,7 +6480,7 @@ void advManager::TownQuickView(
         wIndex = 0;
         creatureSlot = 0;
         stride = TOWN_QUICK_ARMY_AREA_WIDTH / topRow;
-        basePos = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
+        basePosition = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
                          + ARMY_QUICK_AREA_LEFT;
         fiveShift = 0;
         for (armyIndex = 0; armyIndex < topRow; ++armyIndex) {
@@ -6488,13 +6488,13 @@ void advManager::TownQuickView(
                 fiveShift =
                     armyIndex == 0 ? ARMY_QUICK_FIVE_STACK_X_SHIFT : -ARMY_QUICK_FIVE_STACK_X_SHIFT;
             }
-            while (townPtr->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
+            while (townPointer->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
                 ++creatureSlot;
             }
-            monster = H2EnumIndex(townPtr->m_army.m_creatureTypes[creatureSlot]);
+            monster = H2EnumIndex(townPointer->m_army.m_creatureTypes[creatureSlot]);
             stackIcons[wIndex] = new iconWidget(
                 static_cast<i16>(
-                    basePos + stride * wIndex + fiveShift
+                    basePosition + stride * wIndex + fiveShift
                     - GetIconEntry(creatureIcon, monster)->x
                     + (ARMY_QUICK_ICON_SIZE - GetIconEntry(creatureIcon, monster)->w)
                           / ARMY_QUICK_CENTER_DIVISOR
@@ -6522,13 +6522,13 @@ void advManager::TownQuickView(
                 sprintf(
                     troopNames[wIndex],
                     "%d",
-                    townPtr->m_army.m_creatureCounts[creatureSlot]
+                    townPointer->m_army.m_creatureCounts[creatureSlot]
                 );
             } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
                 strcpy(
                     troopNames[wIndex],
                     GetArmySizeName(
-                        townPtr->m_army.m_creatureCounts[creatureSlot],
+                        townPointer->m_army.m_creatureCounts[creatureSlot],
                         ARMY_SIZE_NAME_TITLE
                     )
                 );
@@ -6540,7 +6540,7 @@ void advManager::TownQuickView(
             }
             sizeWidgets[wIndex] = new textWidget(
                 static_cast<i16>(
-                    basePos + stride * wIndex + fiveShift
+                    basePosition + stride * wIndex + fiveShift
                     - ARMY_QUICK_TEXT_X_ADJUSTMENT
                 ),
                 static_cast<i16>(curY + ARMY_QUICK_ICON_SIZE),
@@ -6562,21 +6562,21 @@ void advManager::TownQuickView(
             ++creatureSlot;
         }
 
-        if (row2 != 0) {
-            stride = TOWN_QUICK_ARMY_AREA_WIDTH / row2;
-            basePos = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
+        if (rowCreatureCount != 0) {
+            stride = TOWN_QUICK_ARMY_AREA_WIDTH / rowCreatureCount;
+            basePosition = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
                              + ARMY_QUICK_AREA_LEFT;
             curY += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = topRow;
-                 armyIndex < topRow + row2;
+                 armyIndex < topRow + rowCreatureCount;
                  ++armyIndex) {
-                while (townPtr->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
+                while (townPointer->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
                     ++creatureSlot;
                 }
-                monster = H2EnumIndex(townPtr->m_army.m_creatureTypes[creatureSlot]);
+                monster = H2EnumIndex(townPointer->m_army.m_creatureTypes[creatureSlot]);
                 stackIcons[wIndex] = new iconWidget(
                     static_cast<i16>(
-                        basePos + stride * (wIndex - topRow)
+                        basePosition + stride * (wIndex - topRow)
                         - GetIconEntry(creatureIcon, monster)->x
                         + (ARMY_QUICK_ICON_SIZE - GetIconEntry(creatureIcon, monster)->w)
                               / ARMY_QUICK_CENTER_DIVISOR
@@ -6604,13 +6604,13 @@ void advManager::TownQuickView(
                     sprintf(
                         troopNames[wIndex],
                         "%d",
-                        townPtr->m_army.m_creatureCounts[creatureSlot]
+                        townPointer->m_army.m_creatureCounts[creatureSlot]
                     );
                 } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
                     strcpy(
                         troopNames[wIndex],
                         GetArmySizeName(
-                            townPtr->m_army.m_creatureCounts[creatureSlot],
+                            townPointer->m_army.m_creatureCounts[creatureSlot],
                             ARMY_SIZE_NAME_TITLE
                         )
                     );
@@ -6622,7 +6622,7 @@ void advManager::TownQuickView(
                 }
                 sizeWidgets[wIndex] = new textWidget(
                     static_cast<i16>(
-                        basePos + stride * (wIndex - topRow)
+                        basePosition + stride * (wIndex - topRow)
                         - ARMY_QUICK_TEXT_X_ADJUSTMENT
                     ),
                     static_cast<i16>(curY + ARMY_QUICK_ICON_SIZE),
@@ -6649,8 +6649,8 @@ void advManager::TownQuickView(
     gpWindowManager->AddWindow(window, -1, 1);
     oldX = m_mapOriginX;
     oldY = m_mapOriginY;
-    m_mapOriginX = townPtr->m_x - VIEW_CENTER_CELL;
-    m_mapOriginY = townPtr->m_y - VIEW_CENTER_CELL;
+    m_mapOriginX = townPointer->m_x - VIEW_CENTER_CELL;
+    m_mapOriginY = townPointer->m_y - VIEW_CENTER_CELL;
     UpdateRadar(1, 0);
     QuickViewWait();
     gpWindowManager->RemoveWindow(window);
@@ -6660,8 +6660,8 @@ void advManager::TownQuickView(
     UpdateRadar(1, 0);
     CompleteDraw(0);
     UpdateScreen(0, 0);
-    if (message.type == MESSAGE_LEFT_BUTTON_DOWN && townPtr->m_owner == giCurPlayer) {
-        SetTownContext(townPtr->m_id);
+    if (message.type == MESSAGE_LEFT_BUTTON_DOWN && townPointer->m_owner == giCurPlayer) {
+        SetTownContext(townPointer->m_id);
     }
     gpResourceManager->Dispose(creatureIcon);
 }
@@ -6723,18 +6723,18 @@ void advManager::DemobilizeCurrHero(void) {
     }
 
     m_heroContextLocked = false;
-    hero* hp = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    hero* heroPointer = gpGame->GetHero(gpCurPlayer->m_currentHero);
     StopCursor(1);
-    mapCell* cell = GetCell(hp->m_x, hp->m_y);
-    hp->m_locationType = cell->m_triggerType;
-    hp->m_occupiedTown = cell->m_objectMetadata;
-    hp->m_direction = m_cursorDirection;
+    mapCell* cell = GetCell(heroPointer->m_x, heroPointer->m_y);
+    heroPointer->m_locationType = cell->m_triggerType;
+    heroPointer->m_occupiedTown = cell->m_objectMetadata;
+    heroPointer->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
-        hp->m_eventFlags =
-            HeroEventFlag(static_cast<i32>(hp->m_eventFlags) | H2EnumIndex(HERO_EVENT_EMBARKED));
+        heroPointer->m_eventFlags =
+            HeroEventFlag(static_cast<i32>(heroPointer->m_eventFlags) | H2EnumIndex(HERO_EVENT_EMBARKED));
     }
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
-    cell->m_objectMetadata = hp->m_id;
+    cell->m_objectMetadata = heroPointer->m_id;
     cell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
     m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
@@ -6744,9 +6744,9 @@ void advManager::DemobilizeCurrHero(void) {
 void advManager::SetTownContext(i32 townId) {
     DeactivateCurrHero();
     gpCurPlayer->m_currentTown = static_cast<i8>(townId);
-    town* tp = gpGame->GetTown(gpCurPlayer->m_currentTown);
-    m_mapOriginX = tp->m_x - VIEW_CENTER_OFFSET;
-    m_mapOriginY = tp->m_y - VIEW_CENTER_OFFSET;
+    town* townPointer = gpGame->GetTown(gpCurPlayer->m_currentTown);
+    m_mapOriginX = townPointer->m_x - VIEW_CENTER_OFFSET;
+    m_mapOriginY = townPointer->m_y - VIEW_CENTER_OFFSET;
 
     i32 townNo = 0;
     i32 index;
@@ -6771,7 +6771,7 @@ void advManager::SetTownContext(i32 townId) {
     UpdateScreen(0, 0);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
-    townNo = H2EnumIndex(CELL_TERRAIN(GetCell(tp->m_x, tp->m_y)));
+    townNo = H2EnumIndex(CELL_TERRAIN(GetCell(townPointer->m_x, townPointer->m_y)));
     if (static_cast<TerrainType>(townNo) != m_currentTerrain) {
         m_currentTerrain = townNo;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
@@ -7051,7 +7051,7 @@ void advManager::CastSpell(SpellType spell) {
 }
 
 i32 SaveGame(void) {
-    i32 ok = 0;
+    i32 currentSuccess = 0;
     i32 nPlayers = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer(
@@ -7082,7 +7082,7 @@ i32 SaveGame(void) {
         sprintf(pattern, "*.GM%d", nPlayers);
     }
 
-    fileRequester* req = new fileRequester(
+    fileRequester* requester = new fileRequester(
         SAVE_REQUESTER_X,
         SAVE_REQUESTER_Y,
         FILE_REQUESTER_SAVE_GAME,
@@ -7090,15 +7090,15 @@ i32 SaveGame(void) {
         gcGamePath,
         suffix
     );
-    if (req == NULL) {
+    if (requester == NULL) {
         MemError();
     }
-    i32 status = gpExec->DoDialog(req);
+    i32 status = gpExec->DoDialog(requester);
     if (status == FILE_REQUESTER_OK) {
-        ok = 1;
+        currentSuccess = 1;
         bFreshSave = true;
-        ok = gpGame->SaveGame(gLastFilename, 0, 0);
-        if (ok) {
+        currentSuccess = gpGame->SaveGame(gLastFilename, 0, 0);
+        if (currentSuccess) {
             NormalDialog(
                 localization::Tr("save.success")
                 ,
@@ -7106,9 +7106,9 @@ i32 SaveGame(void) {
             );
         }
     }
-    delete req;
+    delete requester;
     gpAdvManager->EnableButtons();
-    return ok;
+    return currentSuccess;
 }
 
 void advManager::CheckCastSpell(void) {
@@ -7886,12 +7886,12 @@ void advManager::TeleportTo(
 ) {
     b32 savedShow;
     H2EnumStorage<TerrainType, i32> terrain;
-    mapCell* cellOld2;
-    b32 oldCellFlag26;
+    mapCell* cellOld;
+    b32 oldCellFlag;
     i32 unused [[maybe_unused]];
-    mapCell* destinationCell29;
-    i32 fizzleTime36 [[maybe_unused]];
-    town* occupiedTown47;
+    mapCell* destinationCell;
+    i32 fizzleTime [[maybe_unused]];
+    town* occupiedTown;
 
     savedShow = bShowIt;
     if (skipMapChange == 0) {
@@ -7906,17 +7906,17 @@ void advManager::TeleportTo(
         );
     }
 
-    destinationCell29 = GetCell(destinationX, destinationY);
-    cellOld2 = GetCell(mapHero->m_x, mapHero->m_y);
+    destinationCell = GetCell(destinationX, destinationY);
+    cellOld = GetCell(mapHero->m_x, mapHero->m_y);
     if (mapHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-        occupiedTown47 = gpGame->GetTown(mapHero->m_occupiedTown);
-        occupiedTown47->m_occupyingHeroId = INVALID_HERO;
+        occupiedTown = gpGame->GetTown(mapHero->m_occupiedTown);
+        occupiedTown->m_occupyingHeroId = INVALID_HERO;
     }
 
-    oldCellFlag26 = false;
-    if (cellOld2->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
-        cellOld2->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
-        oldCellFlag26 = true;
+    oldCellFlag = false;
+    if (cellOld->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
+        cellOld->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
+        oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
             mapHero->m_x,
@@ -7959,7 +7959,7 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell29->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
         gpWindowManager->SaveFizzleSource(
             UPDATE_VIEWPORT_ORIGIN,
             UPDATE_VIEWPORT_ORIGIN,
@@ -7968,9 +7968,9 @@ void advManager::TeleportTo(
         );
         CompleteDraw(0);
         PollSound();
-        fizzleTime36 = TELEPORT_FIZZLE_TIME;
+        fizzleTime = TELEPORT_FIZZLE_TIME;
         if (gbThisNetHumanPlayer[giCurPlayer] == 0) {
-            fizzleTime36 -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
+            fizzleTime -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
         }
         gpWindowManager->FizzleForward(
             UPDATE_VIEWPORT_ORIGIN,
@@ -7983,14 +7983,14 @@ void advManager::TeleportTo(
         );
         PollSound();
     } else {
-        mapHero->m_locationType = destinationCell29->m_triggerType;
-        mapHero->m_occupiedTown = destinationCell29->m_objectMetadata;
-        if (oldCellFlag26 != 0) {
-            destinationCell29->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        mapHero->m_locationType = destinationCell->m_triggerType;
+        mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
+        if (oldCellFlag != 0) {
+            destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
         } else {
-            destinationCell29->m_triggerType =
+            destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
-            destinationCell29->m_objectMetadata = mapHero->m_id;
+            destinationCell->m_objectMetadata = mapHero->m_id;
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags =
@@ -8004,7 +8004,7 @@ void advManager::TeleportTo(
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         1
     );
-    terrain = CELL_TERRAIN(destinationCell29);
+    terrain = CELL_TERRAIN(destinationCell);
     if (terrain != m_currentTerrain) {
         m_currentTerrain = terrain;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
@@ -8195,7 +8195,7 @@ void advManager::SummonBoat(void) {
     mapCell* destinationCell;
     b32 okCell;
     i32 slotIndex;
-    i32 iDir;
+    i32 iDirection;
     i32 placeY;
     b32 foundBoat;
     i32 heroSlot;
@@ -8215,9 +8215,9 @@ void advManager::SummonBoat(void) {
         goto summon_done;
     }
 
-    for (iDir = 0; iDir < SUMMON_DIRECTION_COUNT; ++iDir) {
-        placeX = m_mapOriginX + SUMMON_CENTER_OFFSET + normalDirTable[iDir].x;
-        placeY = m_mapOriginY + SUMMON_CENTER_OFFSET + normalDirTable[iDir].y;
+    for (iDirection = 0; iDirection < SUMMON_DIRECTION_COUNT; ++iDirection) {
+        placeX = m_mapOriginX + SUMMON_CENTER_OFFSET + normalDirTable[iDirection].x;
+        placeY = m_mapOriginY + SUMMON_CENTER_OFFSET + normalDirTable[iDirection].y;
         if (placeX < 0 || placeX >= MAP_WIDTH || placeY < 0
             || placeY >= MAP_HEIGHT) {
             continue;
@@ -8304,10 +8304,10 @@ void advManager::SummonBoat(void) {
             }
 
             boatRec->x = static_cast<i8>(
-                m_mapOriginX + SUMMON_CENTER_OFFSET + normalDirTable[iDir].x
+                m_mapOriginX + SUMMON_CENTER_OFFSET + normalDirTable[iDirection].x
             );
             boatRec->y = static_cast<i8>(
-                m_mapOriginY + SUMMON_CENTER_OFFSET + normalDirTable[iDir].y
+                m_mapOriginY + SUMMON_CENTER_OFFSET + normalDirTable[iDirection].y
             );
             boatRec->savedTriggerType = destinationCell->m_triggerType;
             boatRec->savedEventData = static_cast<u8>(destinationCell->m_objectMetadata);
@@ -8352,13 +8352,13 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     mapCell* nextTile;
     i32 frame;
     i32 cost;
-    i32 fromDir;
+    i32 fromDirection;
     i32 remain;
     i32 mapX;
     i32 index;
     i32 mapY;
     mapCell* thisTile;
-    i32 dir;
+    i32 direction;
     H2EnumStorage<TerrainType, i32> terr;
     BaseWidgetCommand buttonFrame;
 
@@ -8393,15 +8393,15 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         mapY = hero->m_y;
 
         for (index = gpSearchArray->m_pathLength - 1; index >= 0; --index) {
-            dir = gpSearchArray->m_storage.path.directions[index + 1];
+            direction = gpSearchArray->m_storage.path.directions[index + 1];
             thisTile = GetCell(mapX, mapY);
-            mapX += normalDirTable[dir].x;
-            mapY += normalDirTable[dir].y;
+            mapX += normalDirTable[direction].x;
+            mapY += normalDirTable[direction].y;
             nextTile = GetCell(mapX, mapY);
             terr = CELL_TERRAIN(thisTile);
             cost = CalcTerrainCost(
                 CELL_TERRAIN(nextTile),
-                dir & 1,
+                direction & 1,
                 ROUTE_TERRAIN_COST_INFINITY,
                 H2EnumIndex(hero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
                 thisTile->m_isRoad,
@@ -8409,14 +8409,14 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             );
             remain -= CalcTerrainCost(
                 terr,
-                dir & 1,
+                direction & 1,
                 remain,
                 H2EnumIndex(hero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
                 thisTile->m_isRoad,
                 nextTile->m_isRoad
             );
 
-            if (dir & 1) {
+            if (direction & 1) {
                 if (cost == ROUTE_DIAGONAL_COST_0) {
                     frame = ROUTE_FRAME_COST_0;
                 } else if (cost == ROUTE_DIAGONAL_COST_1) {
@@ -8453,9 +8453,9 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             if (index == 0) {
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = 1;
             } else {
-                fromDir = gpSearchArray->m_storage.path.directions[index];
+                fromDirection = gpSearchArray->m_storage.path.directions[index];
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = static_cast<u16>(
-                    frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir]
+                    frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDirection][direction]
                     + ROUTE_ARROW_FRAME_OFFSET
                 );
             }
@@ -8725,10 +8725,10 @@ i32 advManager::MouseInScrollZone(void) {
 
 void advManager::SetInitialMapOrigin(void) {
     game* gameState [[maybe_unused]];
-    town* currentTown9;
-    playerData* initialPlayer8;
-    hero* initialHero5;
-    town* initialTown9;
+    town* currentTown;
+    playerData* initialPlayer;
+    hero* initialHero;
+    town* initialTown;
 
     gpWindowManager->BroadcastMessage(
         ADVMGR_BUTTON_MESSAGE,
@@ -8742,26 +8742,26 @@ void advManager::SetInitialMapOrigin(void) {
     gbHeroMoving = false;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->m_currentTown != TOWN_ID_NONE) {
-        currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->m_currentTown];
-        m_mapOriginX = currentTown9->m_x - VIEW_CENTER_OFFSET;
-        m_mapOriginY = currentTown9->m_y - VIEW_CENTER_OFFSET;
+        currentTown = &gpGame->m_castleRecs[gpCurPlayer->m_currentTown];
+        m_mapOriginX = currentTown->m_x - VIEW_CENTER_OFFSET;
+        m_mapOriginY = currentTown->m_y - VIEW_CENTER_OFFSET;
     } else if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->m_currentHero != INVALID_HERO) {
         MobilizeCurrHero(0);
     } else {
         if (gbThisNetHumanPlayer[giCurPlayer]) {
-            initialPlayer8 = gpCurPlayer;
+            initialPlayer = gpCurPlayer;
         } else {
-            initialPlayer8 = &gpGame->m_players[giThisGamePos];
+            initialPlayer = &gpGame->m_players[giThisGamePos];
         }
 
-        if (initialPlayer8->m_heroCount > 0) {
-            initialHero5 = &gpGame->m_heroRecs[initialPlayer8->m_heroIds[0]];
-            m_mapOriginX = initialHero5->m_x - VIEW_CENTER_OFFSET;
-            m_mapOriginY = initialHero5->m_y - VIEW_CENTER_OFFSET;
-        } else if (initialPlayer8->m_townCount > 0) {
-            initialTown9 = &gpGame->m_castleRecs[initialPlayer8->m_townIds[0]];
-            m_mapOriginX = initialTown9->m_x - VIEW_CENTER_OFFSET;
-            m_mapOriginY = initialTown9->m_y - VIEW_CENTER_OFFSET;
+        if (initialPlayer->m_heroCount > 0) {
+            initialHero = &gpGame->m_heroRecs[initialPlayer->m_heroIds[0]];
+            m_mapOriginX = initialHero->m_x - VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialHero->m_y - VIEW_CENTER_OFFSET;
+        } else if (initialPlayer->m_townCount > 0) {
+            initialTown = &gpGame->m_castleRecs[initialPlayer->m_townIds[0]];
+            m_mapOriginX = initialTown->m_x - VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialTown->m_y - VIEW_CENTER_OFFSET;
         } else {
             m_mapOriginX = 0;
             m_mapOriginY = 0;
@@ -8838,69 +8838,69 @@ void advManager::LoadRemote(void) {
 }
 
 char* advManager::CheckHandleNet(void) {
-    RemoteMessage* packet9;
-    i32 playerExited5;
-    SPlayerExit exitInfo4;
+    RemoteMessage* packet;
+    i32 playerExited;
+    SPlayerExit exitInfo;
 
-    packet9 = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
-    if (packet9
-        && (packet9->type == REMOTE_MESSAGE_RELIABLE
-            || packet9->type == REMOTE_MESSAGE_UNRELIABLE)) {
-        switch (packet9->command) {
+    packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
+    if (packet
+        && (packet->type == REMOTE_MESSAGE_RELIABLE
+            || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
+        switch (packet->command) {
             case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-                playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;
+                playerExited = ADVMGR_REMOTE_PAYLOAD(packet)->savePlayerExited;
                 if (!gpGame->ReceiveSaveGame(
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveDataSize,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveCrc,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveTransmitCrc,
-                        packet9->sender
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveDataSize,
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveCrc,
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveTransmitCrc,
+                        packet->sender
                     )) {
                     ShutDown(NULL);
                 }
-                if (playerExited5) {
-                    exitInfo4.netPosition = packet9->sender;
-                    exitInfo4.gamePosition = static_cast<i8>(NetPosToGamePos(packet9->sender));
-                    exitInfo4.updateNetworkControl = false;
-                    exitInfo4.eliminated = true;
-                    exitInfo4.hostReported = true;
-                    exitInfo4.timedOut = true;
-                    ReceiveRemotePlayerExit(exitInfo4);
+                if (playerExited) {
+                    exitInfo.netPosition = packet->sender;
+                    exitInfo.gamePosition = static_cast<i8>(NetPosToGamePos(packet->sender));
+                    exitInfo.updateNetworkControl = false;
+                    exitInfo.eliminated = true;
+                    exitInfo.hostReported = true;
+                    exitInfo.timedOut = true;
+                    ReceiveRemotePlayerExit(exitInfo);
                 }
                 LoadRemote();
                 break;
 
             case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
-                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes, packet9->sender);
+                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet)->bytes, packet->sender);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
-                    return reinterpret_cast<char*>(packet9);
+                    return reinterpret_cast<char*>(packet);
                 } else {
-                    DoNetCombat(reinterpret_cast<char*>(packet9));
+                    DoNetCombat(reinterpret_cast<char*>(packet));
                 }
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
-                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
+                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
-                    packet9->sender,
-                    ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
+                    packet->sender,
+                    ADVMGR_REMOTE_PAYLOAD(packet)->playerExit,
                     0
                 );
                 break;
 
             case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
-                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes);
+                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet)->bytes);
                 break;
 
             default:
-                return reinterpret_cast<char*>(packet9);
+                return reinterpret_cast<char*>(packet);
         }
     }
     return NULL;
@@ -8990,16 +8990,16 @@ void advManager::DisableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
     }
-    tag_message msg;
-    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
+    tag_message message;
+    SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
 }
 
 void advManager::EnableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
     }
-    tag_message msg;
-    SET_ADVENTURE_BUTTON_FLAGS(msg, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
+    tag_message message;
+    SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
 }
 
 void advManager::SaveAdventureBorder(void) {
@@ -9274,14 +9274,14 @@ void advManager::ViewPuzzle(void) {
     puzzleY += yOff;
     PuzzleDraw(puzzleX, puzzleY, gpGame->m_ultimateArtifactX, gpGame->m_ultimateArtifactY);
 
-    u8* pixPtr;
+    u8* pixelPointer;
     u8* end;
     for (i = PUZZLE_VIEW_ORIGIN; i < PUZZLE_VIEW_END; ++i) {
-        pixPtr =
+        pixelPointer =
             gpWindowManager->m_screen->m_pixels + i * SCREEN_WIDTH + PUZZLE_VIEW_ORIGIN;
-        end = pixPtr + PUZZLE_VIEW_SIZE;
-        for (; pixPtr < end; ++pixPtr) {
-            *pixPtr = gColorTableTan[*pixPtr];
+        end = pixelPointer + PUZZLE_VIEW_SIZE;
+        for (; pixelPointer < end; ++pixelPointer) {
+            *pixelPointer = gColorTableTan[*pixelPointer];
         }
     }
 
@@ -9314,12 +9314,12 @@ void advManager::ViewPuzzle(void) {
 }
 
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    i32 unusedPuzzle0 [[maybe_unused]];
-    i32 unused1 [[maybe_unused]];
-    i32 unused2 [[maybe_unused]];
-    i32 unused3 [[maybe_unused]];
-    i32 unused4 [[maybe_unused]];
-    i32 unused6 [[maybe_unused]];
+    i32 unusedPuzzle [[maybe_unused]];
+    i32 unusedValue1 [[maybe_unused]];
+    i32 unusedValue2 [[maybe_unused]];
+    i32 unusedValue3 [[maybe_unused]];
+    i32 unusedValue4 [[maybe_unused]];
+    i32 unusedValue5 [[maybe_unused]];
 
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
@@ -9616,7 +9616,7 @@ void advManager::SystemOptions(void) {
     i32 oldInterfaceMode;
     ConfigWalkSpeed prevWalkSpeed;
     b32 heroMobile;
-    i32 n;
+    i32 sampleIndex;
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     gpMouseManager->SetPointer(
@@ -9644,8 +9644,8 @@ void advManager::SystemOptions(void) {
     delete cPanel;
 
     if (gConfig.walkSpeed != prevWalkSpeed) {
-        for (n = 0; n < CURSOR_SAMPLE_COUNT; ++n) {
-            gpResourceManager->Dispose(m_cursorSamples[n]);
+        for (sampleIndex = 0; sampleIndex < CURSOR_SAMPLE_COUNT; ++sampleIndex) {
+            gpResourceManager->Dispose(m_cursorSamples[sampleIndex]);
         }
         GetCursorSampleSet(gConfig.walkSpeed);
     }
@@ -9662,22 +9662,22 @@ void advManager::SystemOptions(void) {
 
 void UpdateSystemOptions(i32 initialDraw) {
     AdventureMusicQuality musicQuality;
-    tag_message msg;
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
+    tag_message message;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_VOLUME);
-    msg.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME);
-    msg.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_VOLUME);
+    message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME);
+    message.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
                                     + ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_HERO_SPEED);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_HERO_SPEED);
+    message.payload.widget.data.value =
         H2EnumIndex(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE);
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
@@ -9685,74 +9685,74 @@ void UpdateSystemOptions(i32 initialDraw) {
     } else {
         musicQuality = MUSIC_QUALITY_CD_OPERA;
     }
-    msg.payload.widget.data.value =
+    message.payload.widget.data.value =
         H2EnumIndex(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE);
+    message.payload.widget.data.value =
         static_cast<i32>(gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED);
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
+        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     } else {
-        msg.payload.widget.data.value =
+        message.payload.widget.data.value =
             H2EnumIndex(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     }
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_INTERFACE);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_INTERFACE);
+    message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO);
-    msg.payload.widget.data.value =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO);
+    message.payload.widget.data.value =
         static_cast<i32>(gConfig.slowVideo != 0) + ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR);
-    msg.payload.widget.data.value = gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR);
+    message.payload.widget.data.value = gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                                         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
-    cPanel->BroadcastMessage(msg);
+    cPanel->BroadcastMessage(message);
 
-    msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
-    msg.payload.widget.id =
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.musicVolume)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.musicVolume)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.soundVolume)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.soundVolume)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.walkSpeed)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.walkSpeed)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = musicQualityText[H2EnumIndex(musicQuality)];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = musicQualityText[H2EnumIndex(musicQuality)];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[gConfig.showRoute];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    message.payload.widget.data.text = onOffText[gConfig.showRoute];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = localization::Tr("system.options.do_not_show");
+        message.payload.widget.data.text = localization::Tr("system.options.do_not_show");
     } else {
-        msg.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.computerWalkSpeed)];
+        message.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.computerWalkSpeed)];
     }
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
-    cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id =
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text =
+    message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
-    cPanel->BroadcastMessage(msg);
+    cPanel->BroadcastMessage(message);
 
     if (initialDraw == 0) {
         cPanel->DrawWindow(1, 0, ADVMGR_SYSTEM_OPTIONS_DRAW_MASK);
@@ -10008,7 +10008,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     i32 count;
     float fRatio;
     i32 isForced;
-    char msg[VISIONS_MESSAGE_BUFFER_SIZE];
+    char message[VISIONS_MESSAGE_BUFFER_SIZE];
     i32 nearDist;
     i32 joinNum;
     i32 joinFee;
@@ -10062,11 +10062,11 @@ i32 advManager::DoVisions(hero* visionHero) {
         && !IS_ELEMENTAL_CREATURE(type)) {
         if (isForced) {
             sprintf(
-                msg,
+                message,
                 localization::Tr("adventure.spell.visions.forced_join")
 
             );
-            strcat(gText, msg);
+            strcat(gText, message);
             goto showVision;
         } else if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
@@ -10095,7 +10095,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
             if (joinNum == count) {
                 sprintf(
-                    msg,
+                    message,
                     localization::Tr("adventure.spell.visions.all_join_fee")
 
 ,
@@ -10103,7 +10103,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                 );
             } else {
                 sprintf(
-                    msg,
+                    message,
                     localization::Tr("adventure.spell.visions.some_join_fee")
 
 ,
@@ -10111,7 +10111,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                     joinFee
                 );
             }
-            strcat(gText, msg);
+            strcat(gText, message);
             goto showVision;
         }
     }
@@ -10119,20 +10119,20 @@ i32 advManager::DoVisions(hero* visionHero) {
     if (fRatio > MONSTER_STRENGTH_FLEE) {
     creaturesFlee:
         sprintf(
-            msg,
+            message,
             localization::Tr("adventure.spell.visions.flee")
 
         );
-        strcat(gText, msg);
+        strcat(gText, message);
         goto showVision;
     }
 creaturesFight:
     sprintf(
-        msg,
+        message,
         localization::Tr("adventure.spell.visions.fight")
 
     );
-    strcat(gText, msg);
+    strcat(gText, message);
     goto showVision;
 
 showVision:

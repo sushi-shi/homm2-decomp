@@ -97,12 +97,12 @@ i32 ShowThisMapGame(char* filename) {
     return 1;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
-    i32 ix;
+    i32 index;
     strcpy(mapName, filename);
     mapName[LEGACY_MAP_BASENAME_SIZE] = 0;
-    for (ix = 0; ix < LEGACY_MAP_BASENAME_SIZE; ++ix) {
-        if (mapName[ix] == '.') {
-            mapName[ix] = 0;
+    for (index = 0; index < LEGACY_MAP_BASENAME_SIZE; ++index) {
+        if (mapName[index] == '.') {
+            mapName[index] = 0;
         }
     }
     if (strcmpi(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
@@ -121,10 +121,10 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     i32 haveMore;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
-    char* dotPtr;
+    char* dotPointer;
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
     WIN32_FIND_DATA findFileData;
-    i32 indexData5;
+    i32 indexData;
     i32 moveValue;
     char fullPath[FILE_REQUESTER_PATH_SIZE];
 
@@ -178,13 +178,13 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         }
     }
 
-    for (indexData5 = 0; indexData5 < m_fileCount; ++indexData5) {
+    for (indexData = 0; indexData < m_fileCount; ++indexData) {
         strcpy(
-            m_fileNames[indexData5].text,
+            m_fileNames[indexData].text,
             ""
         );
         strcpy(
-            m_extensions[indexData5].text,
+            m_extensions[indexData].text,
             ""
         );
     }
@@ -215,15 +215,15 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             }
 
             strcpy(nameBuffer, findFileData.cFileName);
-            dotPtr = FindLastToken(nameBuffer, '.');
-            if (dotPtr != NULL) {
-                strcpy(extension, dotPtr);
-                *dotPtr = 0;
+            dotPointer = FindLastToken(nameBuffer, '.');
+            if (dotPointer != NULL) {
+                strcpy(extension, dotPointer);
+                *dotPointer = 0;
             }
 
-            for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-                if (strcmpi(nameBuffer, m_fileNames[indexData5].text) < 0) {
-                    for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
+            for (indexData = 0; indexData < insertCount; ++indexData) {
+                if (strcmpi(nameBuffer, m_fileNames[indexData].text) < 0) {
+                    for (moveValue = insertCount; moveValue > indexData; --moveValue) {
                         strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
                         strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
                     }
@@ -231,8 +231,8 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 }
             }
         InsertName:
-            strcpy(m_fileNames[indexData5].text, nameBuffer);
-            strcpy(m_extensions[indexData5].text, extension);
+            strcpy(m_fileNames[indexData].text, nameBuffer);
+            strcpy(m_extensions[indexData].text, extension);
             ++insertCount;
         InsertNextFile:
             haveMore = FindNextFile(findHandleWork, &findFileData);
@@ -241,9 +241,9 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            sprintf(fullPath, "%s%s", m_fileNames[indexData5].text, m_extensions[indexData5].text);
-            GetMapHeader(fullPath, &m_mapHeaders[indexData5]);
+        for (indexData = 0; indexData < insertCount; ++indexData) {
+            sprintf(fullPath, "%s%s", m_fileNames[indexData].text, m_extensions[indexData].text);
+            GetMapHeader(fullPath, &m_mapHeaders[indexData]);
         }
     }
     return m_fileCount;
@@ -891,17 +891,17 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
 
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex;
-    double gutterStep7;
-    i32 mouseX7;
+    double gutterStep;
+    i32 mouseX;
     i32 knobOffset;
-    i32 mouseY7;
+    i32 mouseY;
     tag_message knobMessage;
     i32 topIndex;
 
     oldTopIndex = m_topIndex;
-    gutterStep7 = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
-    gpMouseManager->MouseCoords(mouseX7, mouseY7);
-    knobOffset = mouseY7 - m_scrollKnob->m_y;
+    gutterStep = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
+    gpMouseManager->MouseCoords(mouseX, mouseY);
+    knobOffset = mouseY - m_scrollKnob->m_y;
     gpInputManager->Flush();
     knobMessage = gpInputManager->GetEvent();
     while (knobMessage.type != MESSAGE_LEFT_BUTTON_UP
@@ -918,7 +918,7 @@ void fileRequester::DoKnob(void) {
             gpMouseManager->Main(knobMessage);
             m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
             if (m_fileCount > iMaxListSize) {
-                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep7);
+                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep);
                 if (topIndex != oldTopIndex) {
                     if (topIndex > m_fileCount - iMaxListSize) {
                         topIndex = m_fileCount - iMaxListSize;
@@ -950,10 +950,10 @@ void fileRequester::Update(i32 drawWindow) {
     double gutterSpan [[maybe_unused]];
     i32 localState [[maybe_unused]];
     tag_message message;
-    char localStorage1 [[maybe_unused]][FILE_REQUESTER_UPDATE_STORAGE_SIZE];
+    char localStorage [[maybe_unused]][FILE_REQUESTER_UPDATE_STORAGE_SIZE];
     i32 i;
-    double gutterStepCount1;
-    i32 unusedState7 [[maybe_unused]];
+    double gutterStepCount;
+    i32 unusedValue [[maybe_unused]];
 
     message.type = MESSAGE_WIDGET;
     localState = 0;
@@ -1125,8 +1125,8 @@ void fileRequester::Update(i32 drawWindow) {
                 + fGutterMinY
             );
     } else {
-        gutterStepCount1 = fGutterTravelLength / (m_fileCount - iMaxListSize);
-        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount1);
+        gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
+        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount);
     }
     if (drawWindow) {
         m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);

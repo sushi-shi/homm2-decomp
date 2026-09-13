@@ -142,9 +142,9 @@ void ShutdownComError(const char* function) {
 }
 
 i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
-    i32 err [[maybe_unused]];
+    i32 error [[maybe_unused]];
     i32 slot;
-    BOOL rv;
+    BOOL result;
     DCB state;
     char portName[PORT_NAME_SIZE];
     COMMTIMEOUTS portTimeouts;
@@ -206,18 +206,18 @@ i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
     state.Parity = NOPARITY;
     state.StopBits = ONESTOPBIT;
 
-    rv = SetupComm(s_comPorts[slot].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
-    if (rv == 0)
+    result = SetupComm(s_comPorts[slot].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
+    if (result == 0)
         ShutdownComError("Initialize communications paramaters");
-    rv = SetCommState(s_comPorts[slot].handle, &state);
-    if (rv == 0)
+    result = SetCommState(s_comPorts[slot].handle, &state);
+    if (result == 0)
         ShutdownComError("Configure communications device");
 
     portTimeouts.ReadIntervalTimeout = MAXDWORD;
     portTimeouts.ReadTotalTimeoutMultiplier = portTimeouts.ReadTotalTimeoutConstant = 0;
     portTimeouts.WriteTotalTimeoutMultiplier = portTimeouts.WriteTotalTimeoutConstant = 0;
-    rv = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
-    if (rv == 0)
+    result = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
+    if (result == 0)
         ShutdownComError("Set communications timeouts");
 
     init_anchor(&s_comPorts[slot].normalQueue, 1, 0);
@@ -239,22 +239,22 @@ void com_term(i16 portIndex) {
 }
 
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
-    DWORD err;
+    DWORD currentError;
     i16 bytesRead[READ_RESULT_WORD_COUNT];
     COMSTAT status;
     BOOL success;
-    u32 n;
+    u32 currentBytesRead;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
-        success = ClearCommError(s_comPorts[portIndex].handle, &err, &status);
+        success = ClearCommError(s_comPorts[portIndex].handle, &currentError, &status);
         if (success == 0)
             ShutdownComError("Clear communications error queue");
-        n = requested < status.cbInQue ? requested : status.cbInQue;
-        if (n != 0) {
+        currentBytesRead = requested < status.cbInQue ? requested : status.cbInQue;
+        if (currentBytesRead != 0) {
             success = ReadFile(
                 s_comPorts[portIndex].handle,
                 buffer,
-                n,
+                currentBytesRead,
                 reinterpret_cast<LPDWORD>(bytesRead),
                 NULL
             );
@@ -267,30 +267,30 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
 }
 
 i16 com_snd(i16 portIndex, u16, u16 length, const void* data, i32 priority) {
-    BOOL result2;
-    tag_Node* sendNode2;
+    BOOL result;
+    tag_Node* sendNode;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
         if (length == 0) {
-            result2 = SetCommBreak(s_comPorts[portIndex].handle);
-            if (result2 == 0)
+            result = SetCommBreak(s_comPorts[portIndex].handle);
+            if (result == 0)
                 ShutdownComError("Set communications break");
             Sleep(BREAK_DELAY);
-            result2 = ClearCommBreak(s_comPorts[portIndex].handle);
-            if (result2 == 0)
+            result = ClearCommBreak(s_comPorts[portIndex].handle);
+            if (result == 0)
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode2 = static_cast<tag_Node*>(
+        sendNode = static_cast<tag_Node*>(
             H2_ALLOC(length + NODE_HEADER_SIZE)
         );
-        if (sendNode2 != NULL) {
-            sendNode2->len = length;
-            memcpy(sendNode2->comData, data, length);
+        if (sendNode != NULL) {
+            sendNode->len = length;
+            memcpy(sendNode->comData, data, length);
             if (priority != 0)
-                add_node(&s_comPorts[portIndex].priorityQueue, sendNode2);
+                add_node(&s_comPorts[portIndex].priorityQueue, sendNode);
             else
-                add_node(&s_comPorts[portIndex].normalQueue, sendNode2);
+                add_node(&s_comPorts[portIndex].normalQueue, sendNode);
             return 0;
         }
     }

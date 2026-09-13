@@ -54,7 +54,7 @@ i16 dpnet_init(void) {
     DirectPlayEnumerateFunction dpEnumerate;
     DirectPlayCreateFunction createFunction;
     i32 guestIndex;
-    i32 rc;
+    i32 result;
 
     if (lpIDC != NULL)
         return 0;
@@ -87,9 +87,9 @@ i16 dpnet_init(void) {
                 g_lpGuid = TCPGuid;
                 break;
         }
-        rc = createFunction(g_lpGuid, &lpIDC, NULL);
-        if (rc != DP_OK)
-            DPSD(rc, "dpnetwin.cpp", 136);
+        result = createFunction(g_lpGuid, &lpIDC, NULL);
+        if (result != DP_OK)
+            DPSD(result, "dpnetwin.cpp", 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
@@ -228,7 +228,7 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 
 void dpProcessMessages(void) {
     DWORD size;
-    i32 to;
+    i32 destination;
     i32 i [[maybe_unused]];
     i32 j [[maybe_unused]];
     i32 sender;
@@ -240,7 +240,7 @@ void dpProcessMessages(void) {
         size = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
             reinterpret_cast<LPDPID>(&sender),
-            reinterpret_cast<LPDPID>(&to),
+            reinterpret_cast<LPDPID>(&destination),
             1,
             rcvBufIn,
             &size
@@ -251,7 +251,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, "dpnetwin.cpp", 335);
         if (sender == 0) {
         } else {
-            if (to == 0 || static_cast<DPID>(to) == dcoID)
+            if (destination == 0 || static_cast<DPID>(destination) == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
@@ -307,7 +307,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
 i32 dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
-    i32 rv;
+    i32 result;
 
     switch (iDPWaitForFirstGuestStatus) {
         case FIRST_GUEST_CREATE_SESSION:
@@ -317,9 +317,9 @@ i32 dpWaitForFirstGuest(void) {
             session.guidSession = *g_lpGuid;
             session.dwFlags = H2EnumIndex(SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
-            rv = lpIDC->Open(&session);
-            if (rv != DP_OK)
-                DPSD(rv, "dpnetwin.cpp", 442);
+            result = lpIDC->Open(&session);
+            if (result != DP_OK)
+                DPSD(result, "dpnetwin.cpp", 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -328,14 +328,14 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(
+            result = lpIDC->CreatePlayer(
                 &dcoID,
                 const_cast<LPSTR>("Dude"),
                 const_cast<LPSTR>("Heroes Player"),
                 &dphEvent
             );
-            if (rv != DP_OK)
-                DPSD(rv, "dpnetwin.cpp", 472);
+            if (result != DP_OK)
+                DPSD(result, "dpnetwin.cpp", 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -369,7 +369,7 @@ i32 dpWaitForExtraGuests(void) {
 
 i32 dpWaitForHost(void) {
     DPSESSIONDESC session;
-    i32 rv;
+    i32 result;
     char text[STATUS_TEXT_SIZE];
     DWORD timeout;
 
@@ -391,16 +391,16 @@ i32 dpWaitForHost(void) {
                 timeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
             else
                 timeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
-            rv =
+            result =
                 lpIDC
                     ->EnumSessions(&session, timeout, dpEnumSession, NULL, 0);
             iEnumCount++;
-            if (rv == DPERR_NOSESSIONS) {
+            if (result == DPERR_NOSESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 return 0;
             }
-            if (rv != DP_OK)
-                DPSD(rv, "dpnetwin.cpp", 548);
+            if (result != DP_OK)
+                DPSD(result, "dpnetwin.cpp", 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -414,20 +414,20 @@ i32 dpWaitForHost(void) {
             session.dwFlags = H2EnumIndex(SESSION_OPEN_JOIN);
             session.dwSession = lSessions[iSessionToTry];
             strcpy(session.szSessionName, "Heroes 2");
-            rv = lpIDC->Open(&session);
-            if (rv != DP_OK)
-                DPSD(rv, "dpnetwin.cpp", 567);
+            result = lpIDC->Open(&session);
+            if (result != DP_OK)
+                DPSD(result, "dpnetwin.cpp", 567);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(
+            result = lpIDC->CreatePlayer(
                 &dcoID,
                 const_cast<LPSTR>("Dude"),
                 const_cast<LPSTR>("Heroes Player"),
                 &dphEvent
             );
-            if (rv != DP_OK)
-                DPSD(rv, "dpnetwin.cpp", 577);
+            if (result != DP_OK)
+                DPSD(result, "dpnetwin.cpp", 577);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -452,9 +452,9 @@ i32 dpWaitForHost(void) {
                     iDPWaitForHostStatus = HOST_JOIN_SESSION;
                     iSessionToTry++;
                 }
-                rv = lpIDC->Close();
-                if (rv != DP_OK)
-                    DPSD(rv, "dpnetwin.cpp", 603);
+                result = lpIDC->Close();
+                if (result != DP_OK)
+                    DPSD(result, "dpnetwin.cpp", 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }

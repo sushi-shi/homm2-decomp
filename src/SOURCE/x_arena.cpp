@@ -48,28 +48,28 @@ typedef enum ArenaConstant {
 } ArenaConstant;
 
 i32 DoArenaDialog(void) {
-    i32 statValue0 [[maybe_unused]];
-    i32 statValue2 [[maybe_unused]];
-    i32 statValue3 [[maybe_unused]];
-    i32 statValue7 [[maybe_unused]];
-    i32 windowLines2 = WINDOW_RESOURCE;
-    i16 widgetMode10 [[maybe_unused]] = 1;
+    i32 unusedValue1 [[maybe_unused]];
+    i32 unusedValue2 [[maybe_unused]];
+    i32 unusedValue3 [[maybe_unused]];
+    i32 unusedValue4 [[maybe_unused]];
+    i32 windowLines = WINDOW_RESOURCE;
+    i16 widgetMode [[maybe_unused]] = 1;
     i32 windowWidth [[maybe_unused]] = WINDOW_WIDTH;
-    i32 windowHeight16 = windowLines2 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
-    i32 windowX4 = WINDOW_X;
-    i32 windowY3 = (WINDOW_SCREEN_HEIGHT - windowHeight16) / WINDOW_CENTER_DIVISOR;
-    char windowName7[WINDOW_NAME_SIZE];
-    i32 lineCount11;
-    i32 textHeight4 [[maybe_unused]];
-    tag_message message14;
-    i32 widgetIndex1;
-    textWidget* statWidgets0[CHOICE_COUNT];
+    i32 windowHeight = windowLines * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
+    i32 windowX = WINDOW_X;
+    i32 windowY = (WINDOW_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
+    char windowName[WINDOW_NAME_SIZE];
+    i32 lineCount;
+    i32 textHeight [[maybe_unused]];
+    tag_message message;
+    i32 widgetIndex;
+    textWidget* statWidgets[CHOICE_COUNT];
 
-    if (windowY3 > WINDOW_MAX_Y)
-        windowY3 = WINDOW_MAX_Y;
+    if (windowY > WINDOW_MAX_Y)
+        windowY = WINDOW_MAX_Y;
     choice = 0;
-    sprintf(windowName7, "evntwin%d.bin", windowLines2);
-    arenaWinPtr = new heroWindow(windowX4, windowY3, windowName7);
+    sprintf(windowName, "evntwin%d.bin", windowLines);
+    arenaWinPtr = new heroWindow(windowX, windowY, windowName);
     if (arenaWinPtr == NULL)
         MemError();
 
@@ -79,61 +79,61 @@ i32 DoArenaDialog(void) {
 
         localization::Tr("adventure.arena.choose_skill")
     );
-    lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
-    textHeight4 = lineCount11 << TEXT_LINE_SHIFT;
-    SET_WIDGET_MESSAGE(message14, ARENA_BROADCAST_TEXT, BROADCAST_TEXT_ID);
-    message14.payload.widget.data.text = gText;
-    arenaWinPtr->BroadcastMessage(message14);
+    lineCount = bigFont->LineLength(gText, TEXT_WIDTH);
+    textHeight = lineCount << TEXT_LINE_SHIFT;
+    SET_WIDGET_MESSAGE(message, ARENA_BROADCAST_TEXT, BROADCAST_TEXT_ID);
+    message.payload.widget.data.text = gText;
+    arenaWinPtr->BroadcastMessage(message);
 
-    for (widgetIndex1 = 0; widgetIndex1 < CHOICE_COUNT; widgetIndex1++) {
-        skillWidget[widgetIndex1] = new iconWidget(
-            widgetIndex1 * WIDGET_X_STEP + ICON_FIRST_X,
+    for (widgetIndex = 0; widgetIndex < CHOICE_COUNT; widgetIndex++) {
+        skillWidget[widgetIndex] = new iconWidget(
+            widgetIndex * WIDGET_X_STEP + ICON_FIRST_X,
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
             "xprimary.icn",
-            widgetIndex1 == choice ? widgetIndex1 + SELECTED_FRAME_OFFSET
-                                     : widgetIndex1,
+            widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET
+                                     : widgetIndex,
             ICON_DRAW_NORMAL,
-            widgetIndex1 + WIDGET_FIRST_ID,
+            widgetIndex + WIDGET_FIRST_ID,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (skillWidget[widgetIndex1] == NULL)
+        if (skillWidget[widgetIndex] == NULL)
             MemError();
 
-        statWidgets0[widgetIndex1] = new textWidget(
-            widgetIndex1 * WIDGET_X_STEP + TEXT_FIRST_X,
+        statWidgets[widgetIndex] = new textWidget(
+            widgetIndex * WIDGET_X_STEP + TEXT_FIRST_X,
             TEXT_Y,
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
 
-            const_cast<char*>(gStatNames[widgetIndex1]),
+            const_cast<char*>(gStatNames[widgetIndex]),
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (statWidgets0[widgetIndex1] == NULL)
+        if (statWidgets[widgetIndex] == NULL)
             MemError();
-        arenaWinPtr->AddWidget(skillWidget[widgetIndex1], -1);
-        arenaWinPtr->AddWidget(statWidgets0[widgetIndex1], -1);
+        arenaWinPtr->AddWidget(skillWidget[widgetIndex], -1);
+        arenaWinPtr->AddWidget(statWidgets[widgetIndex], -1);
     }
 
-    message14.type = MESSAGE_WIDGET;
-    message14.payload.widget.command = ARENA_BROADCAST_CONTROL;
-    message14.payload.widget.data.value = BROADCAST_CONTROL_VALUE;
-    message14.payload.widget.id = EVENT_WINDOW_SEVENTH_BUTTON;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = EVENT_WINDOW_EIGHTH_BUTTON;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = EVENT_WINDOW_SECOND_BUTTON;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = EVENT_WINDOW_FIFTH_BUTTON;
-    arenaWinPtr->BroadcastMessage(message14);
-    message14.payload.widget.id = EVENT_WINDOW_SIXTH_BUTTON;
-    arenaWinPtr->BroadcastMessage(message14);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = ARENA_BROADCAST_CONTROL;
+    message.payload.widget.data.value = BROADCAST_CONTROL_VALUE;
+    message.payload.widget.id = EVENT_WINDOW_SEVENTH_BUTTON;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = EVENT_WINDOW_EIGHTH_BUTTON;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = EVENT_WINDOW_SECOND_BUTTON;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = EVENT_WINDOW_FIFTH_BUTTON;
+    arenaWinPtr->BroadcastMessage(message);
+    message.payload.widget.id = EVENT_WINDOW_SIXTH_BUTTON;
+    arenaWinPtr->BroadcastMessage(message);
 
     gpWindowManager->DoDialog(arenaWinPtr, ArenaWindowHandler, 0);
     delete arenaWinPtr;
@@ -141,10 +141,10 @@ i32 DoArenaDialog(void) {
 }
 
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
-    tag_message dialogMessage_12 [[maybe_unused]];
-    i32 widgetIndex_5 [[maybe_unused]];
-    i32 type_13 [[maybe_unused]];
-    i32 extra_18 [[maybe_unused]];
+    tag_message dialogMessage [[maybe_unused]];
+    i32 widgetIndex [[maybe_unused]];
+    i32 unusedDialogResourceType [[maybe_unused]];
+    i32 extra [[maybe_unused]];
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -170,8 +170,8 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         switch (message_1.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                extra_18 = NORMAL_DIALOG_NO_VALUE;
-                type_13 = NORMAL_DIALOG_NO_RESOURCE;
+                extra = NORMAL_DIALOG_NO_VALUE;
+                unusedDialogResourceType = NORMAL_DIALOG_NO_RESOURCE;
                 if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
                     switch (message_1.payload.widget.id) {
                         case WIDGET_FIRST_ID:

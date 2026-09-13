@@ -234,7 +234,7 @@ i32 game::SetupNetworkGame2(void) {
     OSVERSIONINFO osInfo;
     HINSTANCE hLib;
     i32 gotVersion;
-    tag_message msg;
+    tag_message message;
 
     heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
     if (dialogWindow == NULL)
@@ -245,23 +245,23 @@ i32 game::SetupNetworkGame2(void) {
     gotVersion = GetVersionEx(&osInfo);
     LogInt("Version", gotVersion, osInfo.dwPlatformId);
     if (gotVersion != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        msg.payload.widget.id = CHOICE_THREE;
-        dialogWindow->BroadcastMessage(msg);
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.id = CHOICE_THREE;
+        dialogWindow->BroadcastMessage(message);
     }
 
     hLib = NULL;
     hLib = LoadLibraryA("DPLAYX.DLL");
     if (hLib == NULL) {
-        tag_message dimMsg;
+        tag_message dimMessage;
 
-        dimMsg.type = MESSAGE_WIDGET;
-        dimMsg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        dimMsg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        dimMsg.payload.widget.id = CHOICE_ONE;
-        dialogWindow->BroadcastMessage(dimMsg);
+        dimMessage.type = MESSAGE_WIDGET;
+        dimMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        dimMessage.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
+        dimMessage.payload.widget.id = CHOICE_ONE;
+        dialogWindow->BroadcastMessage(dimMessage);
     }
 
     gpWindowManager->DoDialog(dialogWindow, SetupNetworkGame2Handler, 0);

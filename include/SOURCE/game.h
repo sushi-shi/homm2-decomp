@@ -190,7 +190,7 @@ public:
     i32 Scan(i8* array, i32 start, i32 length);
     i32 RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
-    i32 GetTownId(i32 col, i32 row);
+    i32 GetTownId(i32 column, i32 row);
     hero* GetHero(i32 id) {
         return &m_heroRecs[id];
     }
@@ -206,7 +206,7 @@ public:
     i32 GetPlayerColor(i32 player) {
         return m_players[player].m_color;
     }
-    i32 GetMineId(i32 col, i32 row);
+    i32 GetMineId(i32 column, i32 row);
     i32 SaveGame(const char* filename, i32 generateName, i8 expansionFormat);
     void SetupOrigData(void);
     void LoadGame(const char* filename, i32 loadFromFile, i32);
@@ -269,17 +269,17 @@ public:
     void SetVisibility(i32 x, i32 y, i32 player, i32 radius);
     void MakeAllWaterVisible(i32 player);
     void GiveArmy(class armyGroup* group, CreatureType type, i32 count, i32 slot);
-    i32 ExperienceValueOfStack(class armyGroup* group, class hero* h);
-    i32 GetLuck(class hero* h, class army*, class town* castle);
+    i32 ExperienceValueOfStack(class armyGroup* group, class hero* heroPointer);
+    i32 GetLuck(class hero* heroPointer, class army*, class town* castle);
     void SetupAdjacentMons(void);
     void CancelComputerScreen(void);
     void ShowComputerScreen(void);
     void ShowHeroesLogo(void);
     void WaitForPlayer(char* text, i32 player);
-    i32 HasLateOverlay(i32 col, i32 row);
-    void ConvertFlagToLateOverlay(i32 col, i32 row);
-    i32 HasObjectTilesetIndex(i32 col, i32 row, TilesetId tileset, i32 index);
-    void ConvertAllToLateOverlay(i32 col, i32 row);
+    i32 HasLateOverlay(i32 column, i32 row);
+    void ConvertFlagToLateOverlay(i32 column, i32 row);
+    i32 HasObjectTilesetIndex(i32 column, i32 row, TilesetId tileset, i32 index);
+    void ConvertAllToLateOverlay(i32 column, i32 row);
     void ProcessMapExtra(void);
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
@@ -296,16 +296,16 @@ public:
         MapTriggerCode objectType,
         i32 barrier,
         class mapCell* passedCell,
-        i32 p6
+        i32 unused
     );
-    void SetMapSize(i32 w, i32 h);
-    i32 HeroIDToHeroPos(class playerData* pd, i32 heroId);
-    i32 TownIDToTownPos(class playerData* pd, i32 townId);
+    void SetMapSize(i32 width, i32 height);
+    i32 HeroIDToHeroPos(class playerData* player, i32 heroId);
+    i32 TownIDToTownPos(class playerData* player, i32 townId);
     void SetupNewRumour(void);
     void CheckForTimeEvent(void);
     i32 CountShrines(i32 player);
-    void ShowMoraleInfo(class hero* h, i32 dialogType);
-    void ShowLuckInfo(class hero* h, i32 dialogType);
+    void ShowMoraleInfo(class hero* heroPointer, i32 dialogType);
+    void ShowLuckInfo(class hero* heroPointer, i32 dialogType);
     void GetMap(void);
     void ProcessNewMap(struct SMapHeader* header);
     void InitNewGame(struct SMapHeader* header);

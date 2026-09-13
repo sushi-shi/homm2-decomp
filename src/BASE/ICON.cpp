@@ -33,9 +33,9 @@ typedef enum IconDrawExtentConstant {
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
-    u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8*>(H2_ALLOC(len));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
+    u32 length = gpResourceManager->ReadLong();
+    m_data = static_cast<u8*>(H2_ALLOC(length));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), length);
 }
 
  icon::~icon() {
