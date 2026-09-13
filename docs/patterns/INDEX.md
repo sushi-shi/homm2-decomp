@@ -133,3 +133,4 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [narrow-compound-assignment](narrow-compound-assignment.md) | retail performs byte/word arithmetic directly where ours promotes to 32 bits → use `++`, `--`, or compound assignment on the narrow lvalue |
 | [od-frame-compiler-invariance](od-frame-compiler-invariance.md) | VC4.2 and VC6 SP5 produce the same `/Od` name-hash, scope-group, array, and inline-local frame layout on paired probes |
 | [od-slot-scope-groups](od-slot-scope-groups.md) | required slot order is not bucket-monotone → reconstruct lexical scope groups instead of renaming locals |
+| [two-dimensional-array-owner](two-dimensional-array-owner.md) | replace first-row pointer flattening with the real side/slot owner; complete five-site VC6 byte/relocation proof |

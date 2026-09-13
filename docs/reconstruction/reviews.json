@@ -21054,5 +21054,597 @@
       "bounds": "open"
     },
     "note": "Full576-line eagle-eye/targeting/hero-animation/sound/spell dispatch and cleanup body read as sole external animation-state writer. C56 false store preserves recovered u8 owner; entire SPELLS native object unchanged. C57 teleport index narrowings remain; real numeric truncations and printf int-versus-long boundary casts retained. U05 flags real. G66 shared cast_done failure cleanup untried; S55 unusedCastA8/B1 unread; nine missile angles and SAMPLE2 sample pointer are genuine. B74 combat IDs0..47 all have nonempty <=8-byte retail sound prefixes, filename<=13 fits16; special101/102 normalized before lookup. Adventure48..64 empty names leave filename uninitialized if misrouted, not ordinary reachability proof. Valid current-side hero required for hero casting despite earlier guard; valid target/teleport/area hex, side/index, animation/resource and representable damage/power domains required. No fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::HasValidSpellTarget(SpellType spell)#1": {
+    "body_sha256": "57512def89868ec3aa963926a14ff46e929c20b861085f77481cf372a108688d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Entire interior-hex scan read. hex ranges0..116 and excludes both border columns before ValidSpellTarget; no direct army/table access. Inherits the spell-domain and combat-lifecycle contracts of that predicate. No casts, union, goto, artificial owner, varargs, role reuse or unused aggregate."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ViewSpells(i32)#1": {
+    "body_sha256": "e53747c864682cfab8c7c8b111b3cd644a39618641eccdcc8c95139e27fdb86a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete spell-book selection, elemental/earthquake/mass/targeted dispatch and cursor restoration read. G67 four check_elemental and two set_action jumps share switch tails; structured matrices untried. B75 hero/current-side, spell/icon-index and20-army lifecycle required; SpaceForElementalExists and count checks precede summon dispatch. B76 all three gText writes fit768; decimal army count is at most11 characters. No cast, union, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:CombatSpecialHandler(tag_message & message)#1": {
+    "body_sha256": "cdffc570f9efffe42fa222eac9ef57be1955fda6bca5d8f8129f94752ab024ca",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Whole hover help dispatcher read. U01 event-guarded hover payload is a real tagged view. Fixed cSpellHelp IDs0,1,4,6,7 fit eight entries; duplicate-hover guard consumes without redraw. Live window/combat managers required. No cast, goto, unused scratch, manual varargs, role reuse or owner arithmetic."
+  },
+  "src/SOURCE/SPELLS.cpp:HandleCastSpell(tag_message & message)#1": {
+    "body_sha256": "71a7c1f82d592168040e0ae3f0367007681c0ea3d43fed0da75a79ce9f76c721",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete hover/selection/cancel and recursive teleport destination transition read. U01 mouse coordinates become a hover event and widget close command in the same real message; recursive call occurs once after setting destination mode. B75 valid selected-spell/icon and persistent source occupancy required between events; hover delegates invalid hex handling to ValidSpellTarget. No cast, goto, fake aggregate, manual varargs or unrelated scalar reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::FindResurrectArmyIndex(CombatSide side,SpellType spell,i32 hex)#1": {
+    "body_sha256": "0290c9bd557b092f12c2dc625da9f93e062060219886e925df7de8283205f74b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire live-occupant/descending corpse search read. No casts, union, goto or scratch aggregate. B75 hex must already be valid; facing tests inspect hex+1/-1 before separate bounds checks, relying on legal wide corpse placement. Corpse count must fit its arrays and stored sides/indices name live army owners. Chance predicate is not an occupancy validator."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ValidSpellTarget(SpellType spell,i32 hex)#1": {
+    "body_sha256": "148ce099e245402e313a7058dda024996a9cdefd48127d584a4181bf1e3f3f04",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full initial hex guard, anti-magic/chance checks and every spell case read. S56 unused local remains untried. B75 validates hex but trusts occupant side/index; teleport destination dereferences stored source hex/occupancy without revalidation. Non-combat/default spell IDs can return true, so this predicate does not establish the65-entry spell-table domain. No cast, union, goto, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::SpellMessage(SpellType spell,i32 hex)#1": {
+    "body_sha256": "ad3888c8d37c11177afebd703a56a7482a16f0b7e19ed062dfdd1a7c4986f82d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Whole area, teleport, resurrection and occupied-target message switch read. G68 occupied_target and format_target joins remain untried. B76 formats fit768 with proven spell/creature catalogs. B75 successful FindResurrectArmyIndex and valid live occupied hex are required before pointer formation; -1 is not locally guarded. No casts, union, scratch aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::DefaultSpell(i32 targetHex)#1": {
+    "body_sha256": "179bd883f4860de34f475eacc5e06e281b355f6f66c7a2b4e25ba7fe33532675",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full valid-hex/nonnegative-side guard and effect dispatch read. B75 guard does not bound positive occupant side, slot or selectedSpell; live army/effect resources required. No casts, union, goto, scratch aggregate, manual varargs or owner arithmetic."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Fireball(i32 targetHex,SpellType spell)#1": {
+    "body_sha256": "c47fdbf98f4754903ab68847dd2c9b3af0d800deb1a6f1e911cf187cb99cbfc4",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full173-line animation,19-hex construction, deduplicated damage and message path read. O05 both effect-mask accesses use actual side/slot dimensions after complete4-arm and native/retail proof. C59 bounded i16 hex stores remain; timer/damage truncations and i32l-to-i32 %d boundary retained. R17 frame also indexes neighbors/affected hexes. Real19-short array covers all slots; B75 valid neighbor sentinels/current army, spell/creature/resources/speed and representable damage required. B76 text fits768. No goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::MeteorShower(i32 targetHex)#1": {
+    "body_sha256": "382b71b46a423233f4a5eef4a5c584226bd2a89a20ddfd39c9e4f79f95704e40",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete seven-hex setup, two animation passes and deduplicated damage read. O05 both effect-mask accesses corrected with complete4-arm and full native/retail proof. Real seven-entry hex array; typed direction cast and timer truncation retained. R17 direction reused for neighbors, animation passes and damage targets. B75 valid side/army/resource and sentinel-return contracts; B76 decimal message fits768. No goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ElementalStorm(void)#1": {
+    "body_sha256": "fe4317d4a18464e32d42b747fdee7d869ca2abd8f2301016123848c327440113",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Whole6x10 tiled animation and two-side damage pass read. Actual SLimitData output record, not artificial scratch; float damage/timer truncations retained. B75 counts<=20, loaded ten-frame icon, screen640x443, palette/artifact/stat/speed domains and valid numeric values required. hit true ensures stack was assigned before final PowEffect, although it can name the final visited rather than final damaged army. B76 text fits768. No goto, union, unused aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Armageddon(void)#1": {
+    "body_sha256": "627966640636e4a6e80fa0fa1bbba2ca3eccb5362b848f713825084058f3159a",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full217-line damage, palette brightening, four shake passes and restoration read. Real fifteen XY pairs,768-byte palettes and640x443 framebuffer owners. C59 eight unsigned palette-byte reads compensate for signed Data API; actual truncations retained. B75 no-show skips palette creation yet unconditional tail calls Data on NULL; actual retail bytes/branch/Data call sites confirmed, no normal-game reachability claim. Empty army counts leave target1 unassigned. Shake source/destination arithmetic is real framebuffer indexing with one-row margin; positive bounded fixed shifts fit. No goto, union, fabricated aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::TurnToStone(army * target)#1": {
+    "body_sha256": "5f7c9c3bd8af9e40a9674f14ffeb99e69b0ad550c0ae8fcb5c4d30ca5a5d0353",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire limit/save/draw/petrify/fizzle sequence read. Target and target side/index must be live; inclusive extents must cover a valid saved rectangle and frame resources. No cast, union, goto, unused local, fake aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::BloodLustEffect(army * target,MonsterFlags effect)#1": {
+    "body_sha256": "0de34723847d540b66d027e864aa4598f4f4a01e8add7d4b71be0480e76992cb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full set-flag/fizzle/save/clear-flag/fizzle sequence read. U05 actual abilityFlags view retained. Clearing effect does not restore a preexisting bit; caller must supply a transient animation flag. B75 live target/side/slot and valid inclusive extents/resources required. No cast, goto, scratch aggregate, manual varargs or owner arithmetic."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Ripple(i32 strength)#1": {
+    "body_sha256": "c5e838958f55c3d3a2adab8e4b64faf1e07147cf3604b917e6adbf8ed089d123",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full framebuffer copy, ripple call and redraw read. S56 two unused scalar locals untried, not fake array padding. B75 both pixel owners must cover640x443 and strength satisfy DoRipple; memcpy requires nonoverlap. No casts, union, goto, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Blur(i32 redAdjust,i32 greenAdjust,i32 blueAdjust)#1": {
+    "body_sha256": "5e687c3071178d4153d706e6135be877035184f232455a10c9038753599de0f1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full framebuffer copy, DoBlur and background invalidation read. B75 nonoverlapping640x443 pixel owners and valid color adjustments required. No cast, union, goto, unused aggregate, manual varargs or role reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ResetBoltAngle(SBolt * bolt)#1": {
+    "body_sha256": "c74a6e688cdfad96558db75f01bc45bd312590004424d3d636babbea49dc3447",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Whole near-target return, distance/width interpolation and random angle calculation read. C58 four redundant casts removed after16/16 family and native/retail proof; integer average division is deliberately unchanged, and actual ratio float operands/result truncations remain. S56 unusedBoltAngleWord8 untried. B75 totalDistance must be positive on division path, widths/angles/ranges valid and arithmetic representable; AddBolt can produce zero totalDistance for coincident endpoints. No goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::DrawBolt(SBolt * bolt,i32 stepCount)#1": {
+    "body_sha256": "080e49c7280fe0656f13a1432f24c3aacdebc8836be324620d35074856cef2f8",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire133-line floating motion, clamp, beam palette switch and termination logic read. C58 four casts removed with16/16 family and complete final native/retail proof. S56 two unused words and unused widthRollResult retain Random call/state effects. B75 retail MOVSX indexes gColorTableRed before its owner for pixel>=128; real signed conversion is retained, not an identity cleanup. Beam width must fit five red or15 rainbow entries; pixel writes are guarded within640x443. SBolt fields are real geometry state, not union/stack padding. No goto or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::AddBolt(SBolt * bolt,i32 startX,i32 startY,i32 endX,i32 endY,i32 branchDistance,i32 startWidth,i32 endWidth,BoltColorMode colorMode,i32 minAngle,i32 maxAngle,i32 angleDistance,i32 forceAngle)#1": {
+    "body_sha256": "6f4b02db8f650dea0d7b886359c77fc1e86d69946e9725108bfcbb3d50dce97e",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full coordinate clamps, real SBolt initialization, orientation and distance setup read. C58 three casts removed after8/8 family and full native/retail proof. Clamps bound squared distance below signed overflow, but coincident endpoints give totalDistance0 before ResetBoltAngle division. Width/angle domain and live bolt owner still required. unused1C in real0x78 heap record is not proven removable. No goto, union, fake stack aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::DoBolt(i32 managePointer,i32 startX,i32 startY,i32 endX,i32 endY,i32 branchDistance,i32 branchLength,i32 startWidth,i32 endWidth,BoltColorMode colorMode,i32 minAngle,i32 maxAngle,i32 angleDistance,i32 unusedParameter,i32 forceAngle,i32 frameDelay,i32 brightenPalette)#1": {
+    "body_sha256": "7c071bfd2ec8fae55469da7e5183cf23c73c904fc1044923250db19ac4c3a05f",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete257-line optional palette setup,25-bolt allocation, drawing/branching and cleanup read. C58 two redundant trig argument casts removed with4/4 family and full native preservation; EH/FS operands prevent claiming independent whole retail closure. G69 boltsDone exits nested drawing loop; untried. R17 index8 spans palette components, angle swap and bolt indices. B75 angleDistance nonzero/positive, numeric widths/ranges, successful allocation and terminating trajectories required; branch count guard bounds25. Palette channels expected0..63 before signed-byte brightening. Real SBolt array, no fake aggregate, union or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::GetNextChainLightningTarget(army * source,i32 requireWorks)#1": {
+    "body_sha256": "a3ef04bcbaa9224d02448557d0501b88727a7ec6bab67a604b6461870435138c",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete two-side closest unaffected target search read. C58 one sqrt-argument cast removed with2/2 family and native/retail proof; result truncation remains. Actual effect array dimensions already correct. B75 live source, valid side counts/creatures/icons and representable coordinate distances required; returns -1 if none. No goto, union, fake aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ChainLightning(i32 targetHex,i32 spellPower)#1": {
+    "body_sha256": "10a056921435625470504338e7c8e151fc2ae3cefa4b2acaab3ee115112eb3af",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Whole four-strike damage/mark/bolt/nearest-target loop and mass animation read. C58 one sqrt argument cast removed with2/2 family and native/retail proof. S56 three unused chain words untried. B75 initial occupied target required, later -1 next-target guarded; branch distance clamps8..30, damage arithmetic and icons/speed remain contracts. Real two-dimensional affected array and ordinary geometry locals; no goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::VaporizeCreature(CombatSide side,i32 armyIndex)#1": {
+    "body_sha256": "095b901a7168ee0a1e73761ddaa58dc3012ea21e163703e5b24491ecfdb1317c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire three-phase stripe mask animation and cleanup read. Typed H2_ALLOC result and delay truncation are real boundaries. O06 gyModify-row*5 forms a before-owner intermediate; complete three-form matrix retains original615-byte17-block form, signed-index617 and last-row-index615 alternatives not exact. This rejects only tested parent spellings, not recovery itself. S56 unused word and unread height assignment remain. B75 rounded extents must keep every final mask index0..479; lastY-bottom can be negative for tiny/top extents. No goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::RippleCreature(CombatSide side,i32 armyIndex,CombatRippleMode mode)#1": {
+    "body_sha256": "7f0bac346f8139194d2cd2b71648661fa0ee5823332b0539d430af0d34049d1c",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete three-mode setup,480-entry wave generation, phase masks and cleanup read. C58 redundant sin argument widening removed after2/2 family and native/retail proof; explicit float division and i8 mask conversions remain. S56 height unused. B75 row/extent and fade-range contracts remain; fade starts at giMinExtentY-1 and can extend below/above actual480-byte gyModify owner. Wave index alone is checked; not evidence for mask extent safety. Real separately allocated wave/mask arrays, no union/goto/fake aggregation/manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ShowMassSpell(i8 (* const affected)[COMBAT_ARMY_SLOT_COUNT],CombatEffectType effect,i32 animateCreatures)#1": {
+    "body_sha256": "724bb3e575fe7dfcdb5843de182af792af9b0cfaea81841d2d8eb66a191daf99",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete130-line affected-mask animation, return and death/vanish handling read. Actual pointer-to20-entry rows, no artificial cross-row arithmetic. S56 unusedMassSpellWord2 untried. B75 counts<=20, valid effect catalog/resource frame counts and army sequences required. effectFrames begins count-1 and global frame assignment only occurs if frame+1<count; this is distinct from the earlier army::SpellEffect count-valued issue. No cast, union, goto, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::CastMassSpell(SpellType spell,i32 spellPower)#1": {
+    "body_sha256": "80542599addc6874d77b10aea0af9f306bd39634258e503ce62aec7bb475e68e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full171-line target-mask selection, holy/death damage and influence application read. Real2x20 i8 affected array is fully zeroed; fifteen influence indices bounded. U05 undead attributes are actual flags. G70 no-show jump skips presentation, not damage/influence; structured wrapper untried. B75 valid selected combat spell, counts/hero/effect/stat/duration and resource domains; B76 text fits768. No written cast, artificial owner, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::MirrorImage(i32 targetHex)#1": {
+    "body_sha256": "6eb0ef34709a7f06b9a141dee83e3df4aea5bc44c7ed23fcdd37e80fb8448595",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete four-level search, AddArmy/linked mirror metadata and16-frame slide read. G71 mirror_found nested exit remains untried. U05 real wide/summoned flags; real timer conversion retained. B75 validated original occupied hex, army capacity, successful AddArmy and nonnull current hero required; CanFit does not establish capacity. Invalid intermediate neighbor continues next step and relies on neighbor helper sentinel behavior. No fake aggregate, varargs or unrelated scalar reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::SummonElemental(CreatureType monsterType,i32 spellPower)#1": {
+    "body_sha256": "cbff79d85b0293f9ceda2ded92a75bb41c0fe03abe1a39580054a34ed1bfc576",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "Full six-position selection and elemental creation read. S56 reduces summonHexes8 to6 after complete2/2 family and exact482-byte/full native proof; no fabricated padding remains. Only slots0..5 are written/read for side0..1 and random0..2. R17 final spellPower changes from quantity power to duration, but result is never stored; artifact calls retained. Unsigned -1 sentinel cast and U05 summoned flag are meaningful. B75 SpaceForElementalExists/capacity/hero/AddArmy success required; otherwise sentinel0xffffffff reaches hex lookup, and final hero calls lack null guards. No goto or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::DoLuck(CombatSide side,i32 armyIndex)#1": {
+    "body_sha256": "f094e2c9b925b77722e148f09438ab144a328f096418e75b77e2e73aae3ed73c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Whole icon-height and facing-dependent bolt geometry read. Real GetIconEntry call, not owner recovery. B75 side/slot/hex/standing-frame and live resources required; X clamped, Y has lower bound and AddBolt clamps endpoints.15-pixel rainbow width exactly fits15 colors. No cast, union, goto, fake aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::DoBlast(i32 targetHex,SpellType spell)#1": {
+    "body_sha256": "f54bb24be4175188bf1f333635fdb98511e36efdeefac4f72e101d17c1d08cb0",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full two-resource ray interpolation and clipped drawing read. C58 three body casts plus BLAST_FRAME_DELAY cast removed with16/16 product and full native/retail proof. Actual SLimitData and floating division/result truncations retained. B75 target/hero coordinates and resources valid; segmentCount=distance/18 or24 must be positive before step division. For count1, first frame (-1)/1=-1; for count>=2 truncation gives0. Local clipping bounds rectangles, not frame validity. No goto, union, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Resurrect(SpellType spell,i32 targetHex,i32 spellPower)#1": {
+    "body_sha256": "ec4237e4a13cb12850e2c915692dffd96b883e393b24feb3e2c9eda1a16566cd",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire142-line quantity/corpse removal,22-frame animation and flag restoration read. S56 three unused words; R17 index_o spans corpse and icon-frame indices. U05 real ability flags, timer conversion retained. B75 successful corpse selection, positive HP and representable power required. After match, every following corpse iteration overwrites live occupant; only side/index are shifted, not frame; count decremented even if no match. Full1426 retail bytes/sites/targets plus fixed75f prove sequence, not normal reachability of inconsistent corpse states. B76 formatted names fit768. No goto, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::SpaceForElementalExists(void)#1": {
+    "body_sha256": "9765ffcddc385bc5d19111e9b8c8822f797003cd30cd62b785a089ee3677e6b2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Entire two-side three-cell occupancy predicate read. All six fixed hexes are inside117-cell owner. Requires currentSide0..1: invalid side returns1 but never indexes a side array here. It only checks free hexes, not army count or hero presence. No casts, union, goto, scratch aggregate, manual varargs or role reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ShowSpellCastFailure(army * target,i32)#1": {
+    "body_sha256": "2b739f96c9c63901c0900be72b3cb963ec3b6462b58a06cb25122ee67e12ec4c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete sample load, singular/plural resistance text and WaitEndSample read. SAMPLE2 is a sample pointer passed by address, not a fabricated handle aggregate. B76 fixed catalogs/prefix yield bounded768-byte text; B75 target creature and sound lifecycle required. Ignored integer remains ABI input. No casts, union, goto, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ModifyDamageForArtifacts(i32l * damage,SpellType spell,hero * attacker,hero * defender)#1": {
+    "body_sha256": "896f84ab6b225e2266e706c9b5b6ee1347ef557989ff4babc3b93e49ac758b1c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full attacker/defender artifact-specific multipliers and hot/cold vulnerability branches read. i32l damage owner is real call ABI; explicit floating truncations preserve successive rounding, not removable identity casts. B75 nonnull damage and representable numeric operations required; null hero pointers are guarded. No goto, union, fake aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::Earthquake(void)#1": {
+    "body_sha256": "a251a57ed326e7fc6fb8a0c58151e53e46d77f6930f1edfb7b34a9ec096f234a",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire197-line screen shake, structure selection, ten-impact schedule and frame7 state update read. Four wall/four tower states,15 XY shifts,10 XY impacts and10 delays are actual arrays:4+4+2 proves maximum10, no spare impact entries. S56 two unused words untried; R17 index7 spans structures/delays/cloud frames. B75 valid town/wall/hex mapping/resources and640x443 framebuffers required; fixed shifts plus one-row margin bound copy accesses/cursors. Timers are real conversions; no goto, union, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/SPELLS.cpp:combatManager::ShowSpellMessage(i32 castByCreature,SpellType spell,army * target)#1": {
+    "body_sha256": "04cc78e4bab40cd00c89c8d7e0831b4a1ca4fa5c88d0e60d1521e8ed120af008",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete creature/hero/captain presentation branches read. Real targetName60/message400 arrays; B76 all fixed catalogs and22 non-CastSpell format literals prove conservative maximum199 including NUL. Plural names contain no percent, so their use as a format is safe for this catalog. S56 unhandledSpell5 dummy writes remain. B75 unsupported creature spell leaves message uninitialized; creature path requires target, hero path current hero/name termination. No cast, union, goto, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::ClearEffects(void)#1": {
+    "body_sha256": "df2b44a3c34b4e8eacaf39cc0a572c39ed15883b0bd76b4f298aa541bf3502cf",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Full two-side/twenty-slot clear loop read. O05 replaces first-row pointer flattening with the actual gArmyEffected[side][idx] owner after complete2/2 family and82-byte/full native/retail proof. Both loop ranges exactly match2x20 declared storage. No casts, union, goto, fake aggregate, manual varargs, unrelated reuse or before-owner pointer remains."
   }
 }

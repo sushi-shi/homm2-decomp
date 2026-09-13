@@ -750,5 +750,13 @@
   "include/SOURCE/ARMY.h": {
     "sha256": "882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658",
     "note": "Full166-line enum/prototype and packed0x335 SMonFrameInfo owner read. Six16-byte source offsets,16 walk offsets,34 sequence counts and34x16 frames, ten standing chances, three missile offsets,12 projectile angles and two quantity offsets are genuine resource dimensions. B73 external frame counts/cumulative walk assembly bounds remain; unknown00 is uninterpreted resource byte, not safely removable padding. No hidden function body."
+  },
+  "src/SOURCE/SPELLS.cpp": {
+    "sha256": "06f074cca1ccc19589955158434c239811b2402cd24918d43802d050ace89fd8",
+    "note": "Full3918-line parent TU reconciled:36 new bodies read in full; CastSpell already fully reviewed in B74 and unchanged body hash verified. All37 VA markers match physical definitions. Private enums/macros and seven final data owners read, including real five red/15 rainbow colors, gyModify pointer, cast coordinates and teleport UI state. O05 five cross-row uses across this TU/ClearEffects recovered; C58 twenty casts removed; S56 summon owner6. B75/B76 contracts and G67-G71/R17/S56/O06 remaining findings recorded per body. Final3908-line source; no source literal/padding/unknown fake storage invented."
+  },
+  "include/SOURCE/SPELLS.h": {
+    "sha256": "d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f",
+    "note": "Full184-line spell header read through EOF: BoltColorMode tagged palette modes, spell/animation/geometry constants, real16-byte sample filename and9-angle domains, Damage multiplier macro, two message-handler declarations. No function body hidden; no struct/union definition or manual-varargs macro. Checked six summon positions,19 fireball cells,15 shake pairs,10 quake impacts,480 wave rows and real caller-domain limits against all37 SPELLS functions."
   }
 }

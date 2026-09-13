@@ -396,6 +396,15 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   behavior and explicit input contracts. The sole external writer, CastSpell,
   is also fully reviewed (B74/G66/S55).
 
+- O05/C58/S56/B75/B76: [spell review](O05-C58-S56-B75.md) reconciles all37
+  SPELLS functions and its header, plus ClearEffects. Five effect-mask accesses
+  recover real array rows, twenty casts are removed, and summon scratch uses
+  six entries. Both native TUs are unchanged across all54 emitted functions
+  and allocated sections. Fixed catalog/format checks bound messages; signed
+  palette indexing, no-show cleanup and corpse bookkeeping preserve verified
+  retail behavior. O06's vaporization pointer issue and G67-G71/R17/C59/S56
+  residuals remain explicit, not presented as closed.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

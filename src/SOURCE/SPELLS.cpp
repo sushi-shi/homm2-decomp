@@ -34,7 +34,7 @@
 #define SPELL_VANISH_END_DELAY 500.0f
 #define CHAIN_LIGHTNING_FRAME_DELAY 100.0f
 #define MIRROR_SLIDE_FRAME_DELAY 50.0f
-#define BLAST_FRAME_DELAY static_cast<float>(10.0)
+#define BLAST_FRAME_DELAY 10.0f
 #define SPELL_COLD_RAY_DELAY 175.0f
 #define SPELL_MAGIC_ARROW_DELAY 100.0f
 #define SPELL_AREA_ANIMATION_DELAY 75.0f
@@ -127,7 +127,7 @@ namespace {
     H2_ENUM_END(MassSpellConstant)
 
     H2_ENUM_BEGIN(ElementalSummonConstant)
-        SUMMON_HEX_STORAGE_COUNT = 8,
+        SUMMON_HEX_STORAGE_COUNT = 6,
         SUMMON_HEXES_PER_SIDE = 3,
         SUMMON_RANDOM_OFFSET_MAX = 2,
         ATTACKER_SUMMON_TOP_SLOT = 0,
@@ -1405,16 +1405,10 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             target = &m_armies[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex];
             if (target->SpellCastWorks(spell)
-                && !*(
-                    gArmyEffected[0]
-                    + IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)
-                          * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[affectedHexes[frame]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)
-                        * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[affectedHexes[frame]].m_occupantIndex) = 1;
+                && !gArmyEffected[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex]) {
+                gArmyEffected[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                             [m_hexCells[affectedHexes[frame]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (spell == SPELL_COLD_RING
@@ -1505,14 +1499,10 @@ void combatManager::MeteorShower(i32 targetHex) {
             target = &m_armies[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
                               [m_hexCells[hexes[direction]].m_occupantIndex];
             if (target->SpellCastWorks(SPELL_METEOR_SHOWER)
-                && !*(
-                    gArmyEffected[0]
-                    + IDX(m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[hexes[direction]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + IDX(m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[hexes[direction]].m_occupantIndex) = 1;
+                && !gArmyEffected[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
+                                 [m_hexCells[hexes[direction]].m_occupantIndex]) {
+                gArmyEffected[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
+                             [m_hexCells[hexes[direction]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (target->m_monsterType == CREATURE_EARTH_ELEMENTAL)
@@ -1944,7 +1934,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
 
     deltaX5 = abs(bolt->endX - bolt->pixelX);
     deltaY3 = abs(bolt->endY - bolt->pixelY);
-    distance2 = static_cast<i32>(sqrt(static_cast<double>(deltaX5 * deltaX5 + deltaY3 * deltaY3)));
+    distance2 = static_cast<i32>(sqrt(deltaX5 * deltaX5 + deltaY3 * deltaY3));
     if (distance2 > bolt->totalDistance)
         bolt->distanceRatio = 0;
     else
@@ -1968,9 +1958,9 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     angleX7 = bolt->endX - bolt->pixelX;
     angleY9 = bolt->endY - bolt->pixelY;
     bolt->baseAngle =
-        static_cast<float>(atan2(static_cast<double>(angleX7), static_cast<double>(angleY9)));
+        static_cast<float>(atan2(angleX7, angleY9));
     averageAngle0 =
-        static_cast<float>((bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR);
+        (bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR;
     averageAngle0 = averageAngle0
                      * ((BOLT_INITIAL_ANGLE_BIAS - bolt->distanceRatio)
                         / BOLT_INITIAL_ANGLE_DIVISOR);
@@ -2014,8 +2004,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     widthLast5 = bolt->widthLast;
     widthRollResult = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
     for (drawStep = 0; drawStep < stepCount; ++drawStep) {
-        bolt->currentX = bolt->currentX + sin(static_cast<double>(bolt->baseAngle));
-        bolt->currentY = bolt->currentY + cos(static_cast<double>(bolt->baseAngle));
+        bolt->currentX = bolt->currentX + sin(bolt->baseAngle);
+        bolt->currentY = bolt->currentY + cos(bolt->baseAngle);
         bolt->pixelX = static_cast<i32>(bolt->currentX);
         bolt->pixelY = static_cast<i32>(bolt->currentY);
         if (bolt->pixelX < 0) {
@@ -2024,7 +2014,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
             bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
-            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1);
+            bolt->currentX = COMBAT_SCREEN_WIDTH - 1;
         }
         if (bolt->pixelY < 0) {
             bolt->pixelY = 0;
@@ -2032,7 +2022,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_AREA_HEIGHT - 1 < bolt->pixelY) {
             bolt->pixelY = COMBAT_AREA_HEIGHT - 1;
-            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
+            bolt->currentY = COMBAT_AREA_HEIGHT - 1;
         }
 
         drawX6 = bolt->pixelX;
@@ -2170,8 +2160,8 @@ void combatManager::AddBolt(
     bolt->minAngle = minAngle;
     bolt->maxAngle = maxAngle;
     bolt->angleDistance = angleDistance;
-    bolt->currentX = static_cast<float>(startX);
-    bolt->currentY = static_cast<float>(startY);
+    bolt->currentX = startX;
+    bolt->currentY = startY;
     bolt->pixelX = startX;
     bolt->pixelY = startY;
     bolt->finished = false;
@@ -2192,7 +2182,7 @@ void combatManager::AddBolt(
     i32 deltaX = abs(endX - startX);
     i32 deltaY = abs(endY - startY);
     bolt->totalDistance =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+        static_cast<i32>(sqrt(deltaX * deltaX + deltaY * deltaY));
     ResetBoltAngle(bolt);
 }
 
@@ -2397,11 +2387,11 @@ void combatManager::DoBolt(
                                 childDistance2 = remainingDistance36 >> 1;
                             childX = static_cast<i32>(
                                 bolts10[index8].pixelX
-                                + childDistance2 * sin(static_cast<double>(currentAngle16))
+                                + childDistance2 * sin(currentAngle16)
                             );
                             childY4 = static_cast<i32>(
                                 bolts10[index8].pixelY
-                                + childDistance2 * cos(static_cast<double>(currentAngle16))
+                                + childDistance2 * cos(currentAngle16)
                             );
                             if (bolts10[index8].endWidth < bolts10[index8].startWidth)
                                 childWidth28 = bolts10[index8].width - 1;
@@ -2479,7 +2469,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
                     xDelta = abs(candidate->MidX() - sourceX);
                     y = abs(candidate->MidY() - fromY);
                     len = static_cast<i32>(
-                        sqrt(static_cast<double>(xDelta * xDelta + y * y))
+                        sqrt(xDelta * xDelta + y * y)
                     );
                     if (len < closest) {
                         closest = len;
@@ -2543,7 +2533,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         deltaX3 = abs(targetX9 - startX0);
         deltaY5 = abs(targetY - startY1);
         distance7 =
-            static_cast<i32>(sqrt(static_cast<double>(deltaX3 * deltaX3 + deltaY5 * deltaY5)));
+            static_cast<i32>(sqrt(deltaX3 * deltaX3 + deltaY5 * deltaY5));
         branchDistance6 = distance7 / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
         if (branchDistance6 > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
             branchDistance6 = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
@@ -2709,10 +2699,10 @@ void combatManager::RippleCreature(
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     for (row_i = 0; row_i < SPELL_MODIFIER_ROW_COUNT; ++row_i) {
         wave[row_i] = static_cast<float>(
-            (sin(static_cast<double>(
+            (sin(
                  static_cast<float>(row_i % RIPPLE_WAVE_PERIOD)
                  / static_cast<float>(RIPPLE_WAVE_DIVISOR)
-             ))
+             )
              - RIPPLE_WAVE_CENTER)
             * RIPPLE_WAVE_RANGE
         );
@@ -3384,10 +3374,10 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     deltaX_a = targetX_a - startX_n;
     deltaY_g = targetY9 - startY_d;
     distance8 =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_g * deltaY_g)));
+        static_cast<i32>(sqrt(deltaX_a * deltaX_a + deltaY_g * deltaY_g));
     segmentCount9 = distance8 / frameSpacing4;
-    currentX_i = static_cast<float>(startX_n);
-    currentY9 = static_cast<float>(startY_d);
+    currentX_i = startX_n;
+    currentY9 = startY_d;
     stepX_e = static_cast<float>(deltaX_a) / segmentCount9;
     stepY_e = static_cast<float>(deltaY_g) / segmentCount9;
     deadline_k = 0;
