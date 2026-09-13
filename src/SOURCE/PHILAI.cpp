@@ -330,28 +330,10 @@ H2_ENUM_BEGIN(AIResourceValue)
     NEARBY_RADIUS = 10
 H2_ENUM_END(AIResourceValue)
 
-H2_ENUM_CLASS_BEGIN(AIArtifactEventMode)
-    AI_ARTIFACT_EVENT_VALUE               = 1,
-    AI_ARTIFACT_EVENT_NO_VALUE            = 2,
-    AI_ARTIFACT_EVENT_PAY_GOLD            = 3,
-    AI_ARTIFACT_EVENT_REQUIRES_WISDOM     = 4,
-    AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP = 5,
-    AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE  = 6,
-    AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE   = 7
-H2_ENUM_CLASS_END(AIArtifactEventMode)
-
 H2_ENUM_BEGIN(AIArtifactEventConstant)
-    AI_ARTIFACT_EVENT_MODE_MASK             = 0xf,
     AI_EVENT_RESOURCE_TYPE_MASK             = 0xf,
     AI_ARTIFACT_EVENT_CREATURE_MASK         = 0xff,
-    AI_ARTIFACT_EVENT_RESOURCE_MASK         = 0xf0,
-    AI_ARTIFACT_EVENT_RESOURCE_SHIFT        = 4,
-    AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT = 3,
-    AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT  = 5,
     AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT     = 10,
-    AI_ARTIFACT_EVENT_GOLD_COST             = 2000,
-    AI_ARTIFACT_EVENT_RESOURCE_THREE_COST   = 2500,
-    AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST    = 3000
 H2_ENUM_END(AIArtifactEventConstant)
 
 H2_ENUM_BEGIN(AIFightEventConstant)
@@ -382,14 +364,9 @@ H2_ENUM_BEGIN(AIFightEventConstant)
     FIGHT_EVENT_REWARD_5000       = 5000
 H2_ENUM_END(AIFightEventConstant)
 
-H2_ENUM_BEGIN(AIShipwreckSurvivorConstant)
-    SKELETON_ARTIFACT_METADATA_OFFSET = 2
-H2_ENUM_END(AIShipwreckSurvivorConstant)
-
 H2_ENUM_BEGIN(AIHeroInteractionConstant)
     HERO_INTERACTION_HERO_COUNT                = 2,
     HERO_INTERACTION_COMBAT_PRIMARY_STAT_COUNT = 2,
-    HERO_INTERACTION_PRIMARY_STAT_COUNT        = 4,
     HERO_INTERACTION_PRIMARY_STAT_VALUE        = 800,
     HERO_INTERACTION_COMBAT_STAT_MAX           = 10
 H2_ENUM_END(AIHeroInteractionConstant)
@@ -429,7 +406,6 @@ H2_ENUM_END(AISideConstant)
 H2_ENUM_BEGIN(AICreaturePurchaseConstant)
     CREATURE_PURCHASE_NO_SLOT          = -1,
     CREATURE_PURCHASE_VALUE_LIMIT      = 999999,
-    CREATURE_PURCHASE_DWELLING_COUNT   = 12,
     CREATURE_PURCHASE_EXPENSIVE_VALUE  = 1000,
     CREATURE_PURCHASE_RANGED_ATTRIBUTE = 0x04
 H2_ENUM_END(AICreaturePurchaseConstant)
@@ -444,7 +420,6 @@ H2_ENUM_BEGIN(AIRuntimeConstant)
     SHIPYARD_GOLD_COST                        = 2000,
     SHIPYARD_WOOD_COST                        = 20,
     DIMENSION_DOOR_LANDING_CANDIDATE_COUNT    = 3,
-    INTERACTION_TURN_UNSET                    = -99,
     CREATURE_PURCHASE_UNLIMITED               = 9999
 H2_ENUM_END(AIRuntimeConstant)
 
@@ -628,7 +603,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                 }
                 if ((army->m_creatureTypes[slot] == CREATURE_GREEN_DRAGON
                      || army->m_creatureTypes[slot] == CREATURE_RED_DRAGON)
-                    && HAS(townRef->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
+                    && HAS(townRef->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
                     hasUpgrade = true;
                     upgradedType = CREATURE_BLACK_DRAGON;
                 }
@@ -791,7 +766,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
          & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_STONE_LITHS)
         return 0;
-    for (dirIdx = MAP_DIRECTION_NORTH; IDX(dirIdx) < NORMAL_DIRECTION_COUNT;
+    for (dirIdx = MAP_DIRECTION_NORTH; IDX(dirIdx) < IDX(MAP_DIRECTION_COUNT);
          dirIdx++) {
         if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, dirIdx)) {
             kn = gpCurAIHero->m_x + normalDirTable[IDX(dirIdx)].x;
@@ -1203,7 +1178,7 @@ void philAI::DoAI(i32 player) {
     if (gpGame->m_day == 1 || gpGame->m_day == 1) {
         for (pathIndex0 = 0; pathIndex0 < gpCurPlayer->m_heroCount; pathIndex0++) {
             GetHeroSlot(gpCurPlayer->m_heroIds[pathIndex0])->m_lastTownInteractionTurn =
-                INTERACTION_TURN_UNSET;
+                HERO_INTERACTION_TURN_NONE;
         }
     }
     ShowStatus();
@@ -2378,7 +2353,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 buildingLevel;
     i32 indexBuilding_2;
     CreatureType currentCreatureType_1;
-    i32 costsByResource_7[AI_PURCHASE_RESOURCE_COUNT];
+    i32 costsByResource_7[IDX(RES_COUNT)];
     float estimatedAttackChance_9;
     float enemyStrengthLocal_9;
     i32 currentAttackTurns_2;
@@ -2657,7 +2632,7 @@ void philAI::ValueOfBuyingCreature(
     float& benefitCost
 ) {
     float chance;
-    i32 buyCost[AI_PURCHASE_RESOURCE_COUNT];
+    i32 buyCost[IDX(RES_COUNT)];
     float peril;
     i32 creatureRV;
     i32 costRV;
@@ -2766,7 +2741,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     numberToBuy = 0;
     bestRawValue0 = AI_PURCHASE_INITIAL_VALUE;
     bestRandomizedScore0 = AI_PURCHASE_INITIAL_VALUE;
-    for (dwelling = 0; dwelling < CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
+    for (dwelling = 0; dwelling < KB_DWELLING_TYPE_COUNT; dwelling++) {
         candidateMonster = gDwellingType[IDX(townPtr->m_type)][dwelling];
         weakestArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
         if (HAS(townPtr->m_buildings, BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
@@ -2870,9 +2845,9 @@ VA(0x00483e81, 0x82)
 i32 philAI::MaxBuyableCreatures(CreatureType level) {
     i32 res;
     i32 i;
-    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
+    i32 cost[IDX(RES_COUNT)];
     GetMonsterCost(level, cost);
-    for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
+    for (i = 0; i < IDX(RES_COUNT); i++) {
         if (cost[i] == 0)
             res = CREATURE_PURCHASE_UNLIMITED;
         else if (gpCurPlayer->m_resources[i] > 0)
@@ -2890,7 +2865,7 @@ void philAI::ValueOfBuyingHero(
     i32& resourceValue,
     float& benefitCost
 ) {
-    i32 heroCost[AI_PURCHASE_RESOURCE_COUNT];
+    i32 heroCost[IDX(RES_COUNT)];
     i32 rvCost;
     b32 spellCaster;
     i32 i;
@@ -3081,7 +3056,7 @@ float philAI::TurnsToBuy(i32* const p) {
     float maxT = 0;
     i32 res;
     float turnCount;
-    for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
+    for (res = 0; res < IDX(RES_COUNT); res++) {
         if (gpCurPlayer->m_resources[res] < p[res]) {
             if (gpCurPlayer->m_aiData.m_income[res] > 0)
                 turnCount = static_cast<float>(
@@ -3500,14 +3475,14 @@ i32 philAI::ValueOfTown(town* t) {
 VA(0x00485740, 0x10e)
 void philAI::TurnCostResource(i32 player) {
     playerAIData* pAI;
-    float frac[AI_PURCHASE_RESOURCE_COUNT];
+    float frac[IDX(RES_COUNT)];
     float avg;
     i32 res;
     i32 sum;
-    i32 resValue[AI_PURCHASE_RESOURCE_COUNT];
+    i32 resValue[IDX(RES_COUNT)];
     pAI = &gpGame->m_players[player].m_aiData;
     sum = 0;
-    for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
+    for (res = 0; res < IDX(RES_COUNT); res++) {
         resValue[res] = static_cast<i32>(
             gResourceBaseValue[res]
             * ((pAI->m_income[res] * 5) * 0.7
@@ -3515,8 +3490,8 @@ void philAI::TurnCostResource(i32 player) {
         );
         sum += resValue[res];
     }
-    avg = (sum / AI_PURCHASE_RESOURCE_COUNT);
-    for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
+    avg = (sum / IDX(RES_COUNT));
+    for (res = 0; res < IDX(RES_COUNT); res++) {
         frac[res] = resValue[res] / avg;
         gafAITurnCostResource[res] = (gResourceBaseValue[res] / (frac[res] / 2.0f + 0.5));
     }
@@ -4111,7 +4086,7 @@ void philAI::HeroInteractionAtHero(
         for (heroIndex0 = 0; heroIndex0 < HERO_INTERACTION_HERO_COUNT; heroIndex0++) {
             currentHero9 = heroIndex0 == 0 ? firstHero : secondHero;
             heroValues6[heroIndex0] = 0;
-            for (statIndex10 = 0; statIndex10 < HERO_INTERACTION_PRIMARY_STAT_COUNT;
+            for (statIndex10 = 0; statIndex10 < HERO_PRIMARY_STAT_COUNT;
                  statIndex10++) {
                 if (statIndex10 < HERO_INTERACTION_COMBAT_PRIMARY_STAT_COUNT
                     || currentHero9->HasArtifact(ARTIFACT_MAGIC_BOOK))
@@ -4647,7 +4622,7 @@ i32 philAI::ChooseToPayRansomOnHero(i32) {
 VA(0x00487c24, 0xd2)
 void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 i;
-    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
+    i32 cost[IDX(RES_COUNT)];
     sprintf(
         gText,
         "Player %d built %s in town %d.\n",
@@ -4661,7 +4636,7 @@ void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) buildin
         DelayMilli(AI_PURCHASE_DEBUG_DELAY);
     }
     GetBuildingCost(t->m_type, building, cost, t->m_buildState);
-    for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++)
+    for (i = 0; i < IDX(RES_COUNT); i++)
         gpCurPlayer->m_resources[i] -= cost[i];
     t->BuildBuilding(building);
     ShowStatus();
@@ -4737,7 +4712,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
 VA(0x00487fff, 0x285)
 void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     float weakestValue;
-    i32 monsterCosts[AI_PURCHASE_RESOURCE_COUNT];
+    i32 monsterCosts[IDX(RES_COUNT)];
     b32 hasRoom;
     i32 lowSlot;
     i32 slotIdx;
@@ -4801,7 +4776,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     }
 
     GetMonsterCost(creature, monsterCosts);
-    for (slotIdx = 0; slotIdx < AI_PURCHASE_RESOURCE_COUNT; slotIdx++) {
+    for (slotIdx = 0; slotIdx < IDX(RES_COUNT); slotIdx++) {
         gpCurPlayer->m_resources[slotIdx] -= purchaseCount * monsterCosts[slotIdx];
     }
     townPtr->m_garrison[dwelling] -= purchaseCount;
@@ -4813,7 +4788,7 @@ VA(0x00488284, 0x117)
 i32 philAI::CanBuyBHC(BHC& bhc) {
     i32 j;
     i32 index;
-    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
+    i32 cost[IDX(RES_COUNT)];
     switch (bhc.type) {
         case PURCHASE_BUILDING:
             if (CanBuy(bhc.pTown, bhc.building))
@@ -4830,7 +4805,7 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
             if (bhc.num > bhc.pTown->m_garrison[bhc.what])
                 return 0;
             GetMonsterCost(CreatureType(j), cost);
-            for (index = 0; index < AI_PURCHASE_RESOURCE_COUNT; index++)
+            for (index = 0; index < IDX(RES_COUNT); index++)
                 if (gpCurPlayer->m_resources[index] < cost[index] * bhc.num)
                     return 0;
             return 1;
@@ -5332,7 +5307,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     i32 gateY;
     i32 H2_UNUSED(chosenExitY);
     i32 H2_UNUSED(chosenExitX);
-    i32 costList[AI_PURCHASE_RESOURCE_COUNT];
+    i32 costList[IDX(RES_COUNT)];
     i32 positionValue;
     i32 exitLiveChance;
     i32 bestRV;
@@ -5579,8 +5554,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 } else {
                     res = (theCell->m_objectMetadata & AI_EVENT_RESOURCE_TYPE_MASK) - 1;
                     amount =
-                        (theCell->m_objectMetadata & AI_ARTIFACT_EVENT_RESOURCE_MASK)
-                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT;
+                        (theCell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> ARTIFACT_EVENT_RESOURCE_SHIFT;
                     eventRV = static_cast<i32>(gafAITurnCostResource[IDX(res)] * amount);
                 }
                 break;
@@ -5688,7 +5663,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     eventRV = 0;
                 else
                     eventRV =
-                        gArtifactBaseRV[theCell->m_objectMetadata - SKELETON_ARTIFACT_METADATA_OFFSET];
+                        gArtifactBaseRV[theCell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET];
                 break;
             case MAP_OBJECT_GRAVEYARD:
             case MAP_OBJECT_SHIPWRECK:
@@ -6047,7 +6022,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
             }
             break;
         case GENERIC_SITE_STABLES:
-            value = ComputeUpgradeValue(AI_GENERIC_SITE_UPGRADE_FROM, AI_GENERIC_SITE_UPGRADE_TO);
+            value = ComputeUpgradeValue(CREATURE_CAVALRY, CREATURE_CHAMPION);
             if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_STABLES)) {
                 value = static_cast<i32>(
                     value
@@ -6252,18 +6227,18 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             guardRV = 0;
         result = guardRV;
     } else {
-        switch (static_cast<AIArtifactEventMode>(eventData & AI_ARTIFACT_EVENT_MODE_MASK)) {
-            case AI_ARTIFACT_EVENT_VALUE:
+        switch (static_cast<ArtifactEventMode>(eventData & ARTIFACT_EVENT_MODE_MASK)) {
+            case ARTIFACT_EVENT_MODE_PICKUP:
                 result = plainVal;
                 break;
-            case AI_ARTIFACT_EVENT_REQUIRES_WISDOM:
+            case ARTIFACT_EVENT_MODE_WISDOM:
                 if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
                     != HERO_SKILL_LEVEL_NONE)
                     result = plainVal;
                 else
                     result = 0;
                 break;
-            case AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP:
+            case ARTIFACT_EVENT_MODE_LEADERSHIP:
                 if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
                     != HERO_SKILL_LEVEL_NONE)
                     result = plainVal;
@@ -6272,25 +6247,25 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
                 break;
             case AI_ARTIFACT_EVENT_NO_VALUE:
                 break;
-            case AI_ARTIFACT_EVENT_PAY_GOLD:
-                result = NetValueOfArtifact(IDX(artifact), AI_ARTIFACT_EVENT_GOLD_COST, 0, 0);
+            case ARTIFACT_EVENT_MODE_GOLD:
+                result = NetValueOfArtifact(IDX(artifact), ARTIFACT_EVENT_GOLD_COST, 0, 0);
                 break;
-            case AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE:
+            case ARTIFACT_EVENT_MODE_RESOURCE_3:
                 result = NetValueOfArtifact(
                     IDX(artifact),
-                    AI_ARTIFACT_EVENT_RESOURCE_THREE_COST,
-                    (eventData & AI_ARTIFACT_EVENT_RESOURCE_MASK)
-                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT,
-                    AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT
+                    ARTIFACT_EVENT_RESOURCE_3_GOLD_COST,
+                    (eventData & ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> ARTIFACT_EVENT_RESOURCE_SHIFT,
+                    ARTIFACT_EVENT_RESOURCE_3_AMOUNT
                 );
                 break;
-            case AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE:
+            case ARTIFACT_EVENT_MODE_RESOURCE_5:
                 result = NetValueOfArtifact(
                     IDX(artifact),
-                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST,
-                    (eventData & AI_ARTIFACT_EVENT_RESOURCE_MASK)
-                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT,
-                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT
+                    ARTIFACT_EVENT_RESOURCE_5_GOLD_COST,
+                    (eventData & ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> ARTIFACT_EVENT_RESOURCE_SHIFT,
+                    ARTIFACT_EVENT_RESOURCE_5_AMOUNT
                 );
                 break;
         }
@@ -6734,11 +6709,11 @@ DATA(0x00533130) b32 bHeroBuiltThisTurn;
 DATA(0x00533138) i16 gaiHeroLiveChance[GAME_HERO_COUNT];
 DATA(0x00530ab0) i32 giHumanTownConquered;
 DATA(0x0053312c) i32 giCurTurn;
-DATA(0x00530bd4) i32 costTemp[AI_PURCHASE_RESOURCE_COUNT];
+DATA(0x00530bd4) i32 costTemp[IDX(RES_COUNT)];
 DATA(0x00530c0c) i32 iAlphaMale;
 DATA(0x00530ab4) i32 iDummy;
 DATA(0x00530bc8) b32 gbPossibleShipyardFound;
-DATA(0x00530bf0) float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
+DATA(0x00530bf0) float gafAITurnCostResource[IDX(RES_COUNT)];
 DATA(0x005331b8) i32 iCurPlaceToVisit;
 DATA(0x00530ab8) i32 giBestShipyardId;
 DATA(0x005331c4) b32 gbActualBoatFound;

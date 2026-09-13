@@ -18,6 +18,8 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
+#include <BASE/dialog.h>
+#include <SOURCE/GAME.h>
 H2_ENUM_BEGIN(CampaignScenarioArmyCount)
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
     BARBARIAN_OGRE_COUNT       = 18,
@@ -270,9 +272,9 @@ i32 game::HandleCampaignWin(void) {
         }
         gpGame->ShowCampaignInfo(0, 0);
         switch (gpWindowManager->m_dialogResult) {
-            case CAMPAIGN_DIALOG_ACCEPT:
+            case DIALOG_BUTTON_2:
                 return 1;
-            case CAMPAIGN_DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 return 0;
         }
     }
@@ -470,7 +472,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
-        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
             InitCampaignMap();
             PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
@@ -699,8 +701,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -756,7 +758,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                         gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
                         campWin->DrawWindow();
                         break;
-                    case CAMPAIGN_DIALOG_ACCEPT:
+                    case DIALOG_BUTTON_2:
                         if (!bCampaignViewOnly) {
                             if (gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
                                 if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
@@ -788,12 +790,12 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 break;
                             }
                         }
-                    case CAMPAIGN_DIALOG_CANCEL:
+                    case DIALOG_BUTTON_1:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command =
-                            BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
+                            BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -985,7 +987,7 @@ void game::InitCampaignMap(void) {
     gbRetreatWin = true;
 
     if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
-        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
+        for (heroPositionValue = 0; heroPositionValue < GAME_HERO_COUNT; ++heroPositionValue) {
             if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
                 gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
         }

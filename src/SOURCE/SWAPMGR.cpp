@@ -22,6 +22,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/swapManager.h>
 #include <SOURCE/townManager.h>
+#include <BASE/dialog.h>
 H2_ENUM_BEGIN(SwapManagerControl)
     CONTROL_LEFT_HERO               = 0x41,
     CONTROL_RIGHT_HERO              = 0x42,
@@ -44,12 +45,8 @@ H2_ENUM_BEGIN(SwapManagerControl)
 H2_ENUM_END(SwapManagerControl)
 
 H2_ENUM_BEGIN(SwapManagerConstant)
-    SECONDARY_SKILL_WIDGET_COUNT = 8,
     WINDOW_TEXT_ID               = 0x15,
-    CONTROL_CLOSE                = 0x7800,
     SPLIT_MODIFIER_MASK          = 3,
-    LEFT_PORTRAIT_WIDGET         = 0x41,
-    RIGHT_PORTRAIT_WIDGET        = 0x42,
     TITLE_WIDGET                 = 0x4d,
     ADVENTURE_WIDGET_FIRST       = 1,
     ADVENTURE_WIDGET_LAST        = 6,
@@ -70,7 +67,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     ARTIFACT_SELECTOR_FRAME      = 2,
     EMPTY_ITEM_VALUE             = 4,
     ARTIFACT_FIRST_ROW_LAST      = 6,
-    PRIMARY_SKILL_COUNT          = 4,
     LEFT_PRIMARY_SKILL_FIRST     = 0x43,
     RIGHT_PRIMARY_SKILL_FIRST    = 0x48,
     LEFT_ARMY_COUNT_FIRST        = 0x74,
@@ -80,8 +76,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SPLIT_WINDOW_X               = 0xb1,
     SPLIT_WINDOW_Y               = 0x14,
     SPLIT_TEXT_CONTROL           = 1,
-    SPLIT_AMOUNT_CONTROL         = 0x44,
-    SPLIT_CONFIRM                = 0x7802
 H2_ENUM_END(SwapManagerConstant)
 
 VA(0x004a2260, 0x79)
@@ -131,12 +125,12 @@ i32 swapManager::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
-    message.payload.widget.id = LEFT_PORTRAIT_WIDGET;
+    message.payload.widget.id = CONTROL_LEFT_HERO;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait));
-    message.payload.widget.id = RIGHT_PORTRAIT_WIDGET;
+    message.payload.widget.id = CONTROL_RIGHT_HERO;
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -151,16 +145,16 @@ i32 swapManager::Open(i32 id) {
     m_window->BroadcastMessage(message);
 
     for (SwapManagerSide swapSide = SWAP_SIDE_LEFT; swapSide < SWAP_SIDE_COUNT; ++swapSide) {
-        for (skillWidget = 0; skillWidget < SECONDARY_SKILL_WIDGET_COUNT; ++skillWidget) {
+        for (skillWidget = 0; skillWidget < HERO_SECONDARY_SKILL_CAPACITY; ++skillWidget) {
             if (skillWidget < m_heroes[IDX(swapSide)]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = IDX(m_heroes[IDX(swapSide)]->GetNthSS(skillWidget));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 message.payload.widget.data.text = gText;
                 sprintf(
@@ -171,7 +165,7 @@ i32 swapManager::Open(i32 id) {
                 m_window->BroadcastMessage(message);
             } else {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = EMPTY_SKILL_VALUE;
                 m_window->BroadcastMessage(message);
@@ -308,7 +302,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                 case WIDGET_COMMAND_DESELECT:
                     if (quickView_9)
                         break;
-                    if (message.payload.widget.id == CONTROL_CLOSE)
+                    if (message.payload.widget.id == DIALOG_BUTTON_0)
                         closeRequested_5 = true;
                     break;
 
@@ -748,10 +742,10 @@ void swapManager::SwapArtifacts(void) {
         i32 slotSkill;
         message.type = MESSAGE_WIDGET;
         for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
-            for (slotSkill = 0; slotSkill < SECONDARY_SKILL_WIDGET_COUNT; ++slotSkill) {
+            for (slotSkill = 0; slotSkill < HERO_SECONDARY_SKILL_CAPACITY; ++slotSkill) {
                 if (slotSkill < m_heroes[IDX(side)]->m_secondarySkillCount) {
                     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                    message.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
+                    message.payload.widget.id = IDX(side) * HERO_SECONDARY_SKILL_CAPACITY
                                                   + slotSkill + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                     message.payload.widget.data.text = gText;
                     sprintf(
@@ -800,7 +794,7 @@ void swapManager::Update(void) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
 
-    for (slot = 0; slot < PRIMARY_SKILL_COUNT; ++slot) {
+    for (slot = 0; slot < HERO_PRIMARY_STAT_COUNT; ++slot) {
         message.payload.widget.id = slot + LEFT_PRIMARY_SKILL_FIRST;
         sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message);
@@ -916,7 +910,7 @@ void swapManager::SplitMons(void) {
     tag_message message;
     i32 H2_UNUSED(dlgState);
 
-    unusedAmountControl = SPLIT_AMOUNT_CONTROL;
+    unusedAmountControl = TOWN_SPLIT_AMOUNT_CONTROL;
     dlgState = 0;
     selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
     targetTroops = &m_heroes[IDX(m_targetSide)]->m_army;
@@ -950,13 +944,13 @@ void swapManager::SplitMons(void) {
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
-    message.payload.widget.id = SPLIT_AMOUNT_CONTROL;
+    message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
     delete gpTownManager->m_heroWindow1;
 
-    if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
+    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
         if (targetTroops->m_creatureTypes[m_targetSlot]
             == selectedArmy->m_creatureTypes[m_selectedSlot]) {
             selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;

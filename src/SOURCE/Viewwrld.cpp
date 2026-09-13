@@ -28,13 +28,14 @@
 #include <SOURCE/Viewwrld.h>
 #include <stdio.h>
 #include <string.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_WINDOW_X             = 0x1e0,
     WORLD_WINDOW_Y             = 0x10,
     WORLD_ICON_WIDGET          = 3,
     WORLD_POINTER_FRAME        = 0,
-    WORLD_TILESET_COUNT        = IDX(TILESET_COUNT),
     WORLD_GROUND_SHAPE_MASK    = GROUND_SHAPE_FLIPPED - 1,
     WORLD_TERRAIN_FRAME_STRIDE = 21,
     WORLD_DRAW_SIZE            = 0x1c0,
@@ -42,8 +43,6 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_TOP                  = 0x10,
     WORLD_RIGHT                = 0x1d0,
     WORLD_BOTTOM               = 0x1d0,
-    WORLD_SCREEN_WIDTH         = 0x280,
-    WORLD_SCREEN_HEIGHT        = 0x1e0,
     WORLD_BACKGROUND_COLOR     = 0x24,
     WORLD_NO_OWNER_COLOR       = 6,
     WORLD_HIGHLIGHT_BASE       = 0xd7,
@@ -243,7 +242,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 VA(0x004ae4ee, 0x11e2)
 void advManager::VWCompleteDraw(void) {
     u8* endPixel0;
-    u8 drawTilesets0[WORLD_TILESET_COUNT];
+    u8 drawTilesets0[TILESET_COUNT];
     u8* pix0;
     i32 H2_UNUSED(spare);
     i32 cellX;
@@ -272,7 +271,7 @@ void advManager::VWCompleteDraw(void) {
         WORLD_DRAW_SIZE,
         WORLD_BACKGROUND_COLOR
     );
-    memset(drawTilesets0, 1, WORLD_TILESET_COUNT);
+    memset(drawTilesets0, 1, TILESET_COUNT);
     drawTilesets0[IDX(TILESET_OBJNARTI)] = 0;
     drawTilesets0[IDX(TILESET_ART32)] = 0;
     drawTilesets0[IDX(TILESET_FLAG32)] = 0;
@@ -367,8 +366,8 @@ void advManager::VWCompleteDraw(void) {
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
-                        WORLD_SCREEN_WIDTH,
-                        WORLD_SCREEN_HEIGHT,
+                        LOGICAL_SCREEN_WIDTH,
+                        LOGICAL_SCREEN_HEIGHT,
                         IDX(giViewWorldScale)
                     );
                 }
@@ -389,8 +388,8 @@ void advManager::VWCompleteDraw(void) {
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
-                            WORLD_SCREEN_WIDTH,
-                            WORLD_SCREEN_HEIGHT,
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT,
                             IDX(giViewWorldScale)
                         );
                     }
@@ -413,8 +412,8 @@ void advManager::VWCompleteDraw(void) {
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
-                        WORLD_SCREEN_WIDTH,
-                        WORLD_SCREEN_HEIGHT,
+                        LOGICAL_SCREEN_WIDTH,
+                        LOGICAL_SCREEN_HEIGHT,
                         IDX(giViewWorldScale)
                     );
                 }
@@ -435,8 +434,8 @@ void advManager::VWCompleteDraw(void) {
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
-                            WORLD_SCREEN_WIDTH,
-                            WORLD_SCREEN_HEIGHT,
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT,
                             IDX(giViewWorldScale)
                         );
                     }
@@ -459,8 +458,8 @@ void advManager::VWCompleteDraw(void) {
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
-                        WORLD_SCREEN_WIDTH,
-                        WORLD_SCREEN_HEIGHT,
+                        LOGICAL_SCREEN_WIDTH,
+                        LOGICAL_SCREEN_HEIGHT,
                         IDX(giViewWorldScale)
                     );
                 }
@@ -480,8 +479,8 @@ void advManager::VWCompleteDraw(void) {
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
-                            WORLD_SCREEN_WIDTH,
-                            WORLD_SCREEN_HEIGHT,
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT,
                             IDX(giViewWorldScale)
                         );
                     }
@@ -498,7 +497,7 @@ void advManager::VWCompleteDraw(void) {
 
     for (cellY = WORLD_TOP; cellY < WORLD_BOTTOM; cellY++) {
         pix0 =
-            gpWindowManager->m_screen->m_pixels + cellY * WORLD_SCREEN_WIDTH + WORLD_LEFT;
+            gpWindowManager->m_screen->m_pixels + cellY * LOGICAL_SCREEN_WIDTH + WORLD_LEFT;
         endPixel0 = pix0 + WORLD_DRAW_SIZE;
         for (; pix0 < endPixel0; pix0++)
             *pix0 = gColorTableNoCycle[*pix0];
@@ -816,16 +815,16 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         );
                         gpAdvManager->VWCompleteDraw();
                         break;
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
-                    case EVENT_WINDOW_THIRD_BUTTON:
-                    case EVENT_WINDOW_FOURTH_BUTTON:
-                    case EVENT_WINDOW_FIFTH_BUTTON:
-                    case EVENT_WINDOW_SIXTH_BUTTON:
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
+                    case DIALOG_BUTTON_2:
+                    case DIALOG_BUTTON_3:
+                    case DIALOG_BUTTON_5:
+                    case DIALOG_BUTTON_6:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command =
-                            BaseWidgetCommand(EVENT_WINDOW_CLOSE_COMMAND);
+                            BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;

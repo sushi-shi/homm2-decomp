@@ -4,6 +4,7 @@
 #include <va.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
+#include <SOURCE/KB.h>
 
 class heroWindow;
 struct tag_message;
@@ -66,13 +67,8 @@ H2_ENUM_STEPPED(ExpansionCampaignAward)
 
 H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT           = 8,
-    EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT      = 3,
     EXPANSION_CAMPAIGN_AWARD_COUNT             = 11,
     EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE        = 4,
-    EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE = 0x41,
-    EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE   = 52,
-    EXPANSION_CAMPAIGN_HERO_COUNT              = 54,
-    EXPANSION_CAMPAIGN_TRACK_ICON_SIZE         = 41,
     EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE       = 13,
     EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL     = 1,
     EXPANSION_CAMPAIGN_SPECIAL_SKILL           = 12,
@@ -146,5 +142,5 @@ SIZE(ExpCampaign, 0x4f);
 
 extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
-                                              [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
+                                              [CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif

@@ -11,6 +11,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <EDITOR/mapcell.h>
 VA(0x004a3ff0, 0x5a)
 town::town(void) {
     m_type = FACTION_KNIGHT;
@@ -69,10 +70,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE
@@ -82,10 +83,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE

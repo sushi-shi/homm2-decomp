@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <BASE/message.h>
+#include <BASE/dialog.h>
 
 VA(0x00465110, 0x59)
 highScoreManager::highScoreManager(void) {
@@ -103,7 +104,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
                             Update();
                             m_window->DrawWindow(1);
                             break;
-                        case HIGH_SCORE_CLOSE_BUTTON:
+                        case DIALOG_BUTTON_0:
                             message.payload.widget.data.value = message.payload.widget.id;
                             result = true;
                             break;

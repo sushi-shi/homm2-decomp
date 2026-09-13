@@ -8,13 +8,11 @@ class army;
 extern i32 MAP_WIDTH;
 
 H2_ENUM_BEGIN(SearchConstant)
-    SEARCH_DIRECTION_COUNT            = 8,
     SEARCH_QUEUE_CAPACITY             = 1024,
     SEARCH_PATH_CAPACITY              = 256,
     SEARCH_FLAG_BIT_COUNT             = 1,
     SEARCH_DIRECTION_BIT_COUNT        = 4,
     SEARCH_CELL_PAD_SIZE              = 4,
-    SEARCH_COMBAT_HEX_COUNT           = 117,
     SEARCH_MAX_COST                   = 999999,
     SEARCH_TARGET_COST_WINDOW         = 75,
     SEARCH_MONSTER_RESEED_WINDOW      = 300,
@@ -22,7 +20,6 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_CELL_UNREACHABLE           = 0x08,
     SEARCH_MAP_BLOCKED                = 0x80,
     SEARCH_CELL_BLOCKED               = 0x80,
-    SEARCH_CLEAR_GROUND_TILESET       = 0x2f,
     SEARCH_INVALID_COORDINATE         = -1,
     SEARCH_NO_OBJECT                  = 0xFF,
     SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
@@ -146,6 +143,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
-extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
+extern u8 bIsMoatSlowed[COMBAT_HEX_COUNT];
 
 #endif

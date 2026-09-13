@@ -16,7 +16,6 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)
     ARMY_ANIMATION_WALK                  = 6,
     ARMY_ANIMATION_STAND                 = 7,
     ARMY_ANIMATION_STANDING_FIRST        = 8,
-    COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST = ARMY_ANIMATION_STANDING_FIRST,
     COMBAT_CREATURE_CYCLE_SEQUENCE_LAST  = 12,
     ARMY_ANIMATION_STANDING_END          = 13,
     ARMY_ANIMATION_DEATH                 = 13,
@@ -60,12 +59,6 @@ H2_ENUM_BEGIN(ArmyCombatConstant)
     ARMY_PRIMARY_SAMPLE_COUNT            = IDX(ARMY_SAMPLE_KILL) + 1,
     ARMY_QUANTITY_TEXT_SIZE              = 12,
     ARMY_SPELL_EFFECT_ANIMATION_DURATION = 275,
-    ARMY_HEX_COLUMNS                     = 13,
-    ARMY_COMBAT_WIDTH                    = 640,
-    ARMY_COMBAT_HEIGHT                   = 443,
-    ARMY_PROJECTILE_CLIP_HEIGHT          = 480,
-    ARMY_COMBAT_MAX_X                    = ARMY_COMBAT_WIDTH - 1,
-    ARMY_COMBAT_MAX_Y                    = ARMY_COMBAT_HEIGHT - 1,
     ARMY_COMBAT_FRAME_DELAY              = 75,
     ARMY_MAGE_BOLT_DELAY                 = 115,
     ARMY_POW_EFFECT_DELAY                = 120,
@@ -102,7 +95,6 @@ H2_ENUM_CLASS_END(ArmySpellCancelType)
 
 H2_ENUM_BEGIN(ArmyAttackConstant)
     ARMY_COMBAT_TEXT_SIZE              = 800,
-    ARMY_COMBAT_DIRECTION_COUNT        = 8,
     ARMY_MOAT_CELL_COUNT               = 9,
     ARMY_MOAT_GATE_INDEX               = 4,
     ARMY_LUCK_ROLL_MAX                 = 24,

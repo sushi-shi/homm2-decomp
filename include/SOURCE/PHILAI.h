@@ -29,7 +29,6 @@ struct BHC {
 };
 
 H2_ENUM_BEGIN(AIPurchaseConstant)
-    AI_PURCHASE_RESOURCE_COUNT     = IDX(RES_COUNT),
     AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_LEVEL        = 3,
     AI_PURCHASE_DEBUG_DELAY        = 1500,
@@ -65,7 +64,7 @@ void CloseAIMapVars(void);
 i32 OnMySide(i32);
 
 extern b32 bHeroBuiltThisTurn;
-extern float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
+extern float gafAITurnCostResource[IDX(RES_COUNT)];
 extern i8* gaiEnemyHeroReachable;
 extern i16* gaiHeroEventStratRVOfPos;
 extern i16* gaiHeroStrategicRVOfPos;

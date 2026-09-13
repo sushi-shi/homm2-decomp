@@ -23,6 +23,8 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 #include <SOURCE/KB_TYPES.h>
+#include <BASE/display.h>
+#include <SOURCE/combatTypes.h>
 H2_ENUM_CLASS_BEGIN(CombatDrawLayer)
     DRAW_FIRST_LAYER        = 0,
     DRAW_LAYER_COUNT        = 9,
@@ -32,8 +34,6 @@ H2_ENUM_CLASS_BEGIN(CombatDrawLayer)
     DRAW_WALL_MIDDLE_LAYER  = 5,
     DRAW_GATE_LAYER         = 6,
     DRAW_CATAPULT_LAYER     = 7,
-    DRAW_CASTLE_GATE_ROW    = DRAW_WALL_TOP_LAYER,
-    DRAW_CASTLE_REVERSE_ROW = DRAW_WALL_MIDDLE_LAYER
 H2_ENUM_CLASS_END(CombatDrawLayer)
 H2_ENUM_STEPPED(CombatDrawLayer)
 
@@ -74,7 +74,6 @@ H2_ENUM_CLASS_BEGIN(CombatMessageText)
 H2_ENUM_CLASS_END(CombatMessageText)
 
 H2_ENUM_BEGIN(CombatDrawingConstant)
-    FULL_SCREEN_HEIGHT            = 480,
     DRAWBRIDGE_TOWER_FRAME_BASE   = 21,
     WALL_COORDINATE_COUNT         = 8,
     WALL_FRAME_OFFSET_COUNT       = 7,
@@ -374,7 +373,7 @@ void combatManager::ResetLimitCreature(void) {
     m_drawHeroOverlay[1] = 0;
     giMaxExtentY = 0;
     giMaxExtentX = giMaxExtentY;
-    giMinExtentX = COMBAT_MAX_EXTENT_X;
+    giMinExtentX = LOGICAL_SCREEN_MAX_X;
     giMinExtentY = COMBAT_MAX_EXTENT_Y;
 }
 
@@ -386,7 +385,7 @@ void combatManager::UpdateCombatArea(void) {
         return;
 
     gbEnlargeScreenBlit = false;
-    gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     gbEnlargeScreenBlit = true;
 }
 
@@ -459,7 +458,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         return 0;
 
     didRedraw = false;
-    minX = COMBAT_MAX_EXTENT_X;
+    minX = LOGICAL_SCREEN_MAX_X;
     minY = COMBAT_MAX_EXTENT_Y;
     maxX = 0;
     maxY = 0;
@@ -534,7 +533,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT
             );
             didRedraw = true;
@@ -558,7 +557,7 @@ DrawCombatGrid:
                     ICON_DRAW_CLIP,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT
                 );
             }
@@ -593,7 +592,7 @@ void combatManager::DrawBackground(void) {
         ICON_DRAW_CLIP,
         0,
         0,
-        COMBAT_SCREEN_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT,
         0
     );
@@ -611,7 +610,7 @@ void combatManager::DrawBackground(void) {
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT,
             0
         );
@@ -630,7 +629,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH / IDX(COMBAT_SIDE_COUNT),
+                LOGICAL_SCREEN_WIDTH / IDX(COMBAT_SIDE_COUNT),
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -644,7 +643,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -666,7 +665,7 @@ void combatManager::DrawBackground(void) {
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT,
             0
         );
@@ -680,7 +679,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -697,7 +696,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -711,7 +710,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -734,7 +733,7 @@ void combatManager::DrawBackground(void) {
         0,
         0,
         0,
-        COMBAT_SCREEN_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT
     );
     m_backgroundDrawn = true;
@@ -808,7 +807,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
             ICON_DRAW_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT
         );
     }
@@ -825,8 +824,8 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentX = m_hexCells[m_mouseGridHex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
         giMaxExtentY = m_hexCells[m_mouseGridHex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
     } else {
-        giMinExtentX = COMBAT_SCREEN_WIDTH;
-        giMinExtentY = FULL_SCREEN_HEIGHT;
+        giMinExtentX = LOGICAL_SCREEN_WIDTH;
+        giMinExtentY = LOGICAL_SCREEN_HEIGHT;
         giMaxExtentX = 0;
         giMaxExtentY = 0;
     }
@@ -979,8 +978,8 @@ void combatManager::DrawFrame(
             giMinExtentX = 0;
         if (giMinExtentY < 0)
             giMinExtentY = 0;
-        if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
-            giMaxExtentX = COMBAT_MAX_EXTENT_X;
+        if (giMaxExtentX > LOGICAL_SCREEN_MAX_X)
+            giMaxExtentX = LOGICAL_SCREEN_MAX_X;
         if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
             giMaxExtentY = COMBAT_MAX_EXTENT_Y;
     }
@@ -1004,7 +1003,7 @@ void combatManager::DrawFrame(
                     0,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT
                 );
             }
@@ -1064,7 +1063,7 @@ void combatManager::DrawFrame(
         startColumn = COMBAT_GRID_FIRST_COLUMN;
         endColumn = COMBAT_GRID_COLUMN_END;
         columnStep1 = 1;
-        if (m_inCastleCombat != 0 && row >= DRAW_CASTLE_REVERSE_ROW) {
+        if (m_inCastleCombat != 0 && IDX(row) >= IDX(COMBAT_CASTLE_REVERSE_ROW)) {
             startColumn = COMBAT_GRID_REVERSE_FIRST_COLUMN;
             endColumn = COMBAT_GRID_REVERSE_COLUMN_END;
             columnStep1 = -1;
@@ -1262,7 +1261,7 @@ void combatManager::DrawFrame(
             || HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_MOAT))
                    == 0)
             goto endRow;
-        if (row == DRAW_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
+        if (IDX(row) == IDX(COMBAT_CASTLE_GATE_ROW) && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;
 
         if (giWalkingTo == moatCell[IDX(row)] || giWalkingTo2 == moatCell[IDX(row)]
@@ -1313,7 +1312,7 @@ void combatManager::DrawFrame(
                     ICON_DRAW_CLIP,
                     0,
                     drawbridgeTop,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     drawbridgeBottom - drawbridgeTop + 1,
                     0
                 );

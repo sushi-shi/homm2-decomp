@@ -29,6 +29,8 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/message.h>
 #include <SOURCE/combatTypes.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 #define RIPPLE_MODE_ZERO_AMPLITUDE_BASE 0.3f
 #define RIPPLE_MODE_ZERO_AMPLITUDE_STEP 0.05f
@@ -65,14 +67,12 @@ namespace {
         CONTROL_NEXT_PAGE = 3,
         CONTROL_FIRST_MANA = 6,
         CONTROL_LAST_MANA = 9,
-        CONTROL_CLOSE = 0x7800,
         HELP_PREVIOUS_PAGE = 0,
         HELP_NEXT_PAGE = 1,
         HELP_CLOSE = 4,
         HELP_MANA = 6,
         HELP_DEFAULT = 7,
         NO_SELECTION = -1,
-        HEX_COLUMN_COUNT = 13,
         HEX_RIGHT_BORDER = 12,
         ELEMENTAL_ARMY_LIMIT = 20
     H2_ENUM_END(CombatSpellUiConstant)
@@ -165,7 +165,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
-        if (hex % HEX_COLUMN_COUNT == 0 || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
+        if (hex % COMBAT_GRID_ROW_LENGTH == 0 || hex % COMBAT_GRID_ROW_LENGTH == HEX_RIGHT_BORDER)
             continue;
         if (ValidSpellTarget(spell, hex))
             return 1;
@@ -312,7 +312,7 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
             case CONTROL_NEXT_PAGE:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_NEXT_PAGE], 1, 0, 0);
                 break;
-            case CONTROL_CLOSE:
+            case DIALOG_BUTTON_0:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_CLOSE], 1, 0, 0);
                 break;
             case CONTROL_FIRST_MANA:
@@ -544,8 +544,8 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            if (hex == COMBAT_HEX_EMPTY || hex % HEX_COLUMN_COUNT == 0
-                || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
+            if (hex == COMBAT_HEX_EMPTY || hex % COMBAT_GRID_ROW_LENGTH == 0
+                || hex % COMBAT_GRID_ROW_LENGTH == HEX_RIGHT_BORDER)
                 return 0;
             break;
         default:
@@ -1222,7 +1222,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -1236,7 +1236,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                     ICON_DRAW_CLIP,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT,
                     0
                 );
@@ -1541,20 +1541,20 @@ void combatManager::Armageddon(void) {
         effectPalette = new palette;
         if (!effectPalette)
             MemError();
-        memcpy(effectPalette->Data(), originalPalette9->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
+        memcpy(effectPalette->Data(), originalPalette9->Data(), PALETTE_DATA_SIZE);
 
         glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
         effectData28 = effectPalette->Data();
         for (pass1 = 0; pass1 < SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT; ++pass1) {
-            for (color9 = 0; color9 < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color9) {
+            for (color9 = 0; color9 < PALETTE_COLOR_COUNT; ++color9) {
                 if (effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)]
-                    < SPELL_ARMAGEDDON_CHANNEL_MAX)
+                    < PALETTE_CHANNEL_MAX)
                     ++effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)];
                 if (effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)]
-                    < SPELL_ARMAGEDDON_CHANNEL_MAX)
+                    < PALETTE_CHANNEL_MAX)
                     ++effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)];
                 if (effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)]
-                    < SPELL_ARMAGEDDON_CHANNEL_MAX)
+                    < PALETTE_CHANNEL_MAX)
                     ++effectData28[color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)];
             }
             DelayTil(&glTimers[0]);
@@ -1595,7 +1595,7 @@ void combatManager::Armageddon(void) {
         memcpy(
             m_backgroundBuffer->m_pixels,
             gpWindowManager->m_screen->m_pixels,
-            COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+            LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
         );
 
         for (shakePass5 = 0; shakePass5 < SPELL_ARMAGEDDON_SHAKE_PASS_COUNT; ++shakePass5) {
@@ -1604,7 +1604,7 @@ void combatManager::Armageddon(void) {
             );
             for (frame8 = 0; frame8 < SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT; ++frame8) {
                 if (shakePass5 == 0) {
-                    for (color9 = 0; color9 < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color9) {
+                    for (color9 = 0; color9 < PALETTE_COLOR_COUNT; ++color9) {
                         if (effectData28
                                 [color9 * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)]
                             > SPELL_ARMAGEDDON_CHANNEL_STEP)
@@ -1627,27 +1627,27 @@ void combatManager::Armageddon(void) {
                 timer0 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
                 PollSound();
                 copyWidth =
-                    COMBAT_SCREEN_WIDTH
+                    LOGICAL_SCREEN_WIDTH
                     - abs(static_cast<i32>(shakeOffsets15[frame8][IDX(COORDINATE_AXIS_X)] * scale1));
                 copyHeight1 =
                     COMBAT_AREA_HEIGHT
                     - abs(static_cast<i32>(shakeOffsets15[frame8][IDX(COORDINATE_AXIS_Y)] * scale1))
                     - 1;
                 source0 = m_backgroundBuffer->m_pixels + (offsetX18 >= 0 ? offsetX18 : 0)
-                          + (offsetY9 >= 0 ? offsetY9 : 0) * COMBAT_SCREEN_WIDTH;
+                          + (offsetY9 >= 0 ? offsetY9 : 0) * LOGICAL_SCREEN_WIDTH;
                 destination3 = gpWindowManager->m_screen->m_pixels
                                + (offsetX18 > 0 ? 0 : -offsetX18)
-                               + (offsetY9 > 0 ? 0 : -offsetY9) * COMBAT_SCREEN_WIDTH;
+                               + (offsetY9 > 0 ? 0 : -offsetY9) * LOGICAL_SCREEN_WIDTH;
                 for (row5 = 0; row5 < copyHeight1; ++row5) {
                     memcpy(destination3, source0, copyWidth);
-                    source0 += COMBAT_SCREEN_WIDTH;
-                    destination3 += COMBAT_SCREEN_WIDTH;
+                    source0 += LOGICAL_SCREEN_WIDTH;
+                    destination3 += LOGICAL_SCREEN_WIDTH;
                 }
                 BlitBitmapToScreen(
                     gpWindowManager->m_screen,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT,
                     0,
                     0
@@ -1664,7 +1664,7 @@ void combatManager::Armageddon(void) {
     effectDataRestore9 = effectPalette->Data();
     originalData3 = originalPalette9->Data();
     for (restorePass9 = 0; restorePass9 < SPELL_ARMAGEDDON_RESTORE_PASS_COUNT; ++restorePass9) {
-        for (component = 0; component < SPELL_ARMAGEDDON_PALETTE_SIZE; ++component) {
+        for (component = 0; component < PALETTE_DATA_SIZE; ++component) {
             if (static_cast<u8>(effectDataRestore9[component])
                 == static_cast<u8>(originalData3[component]))
                 continue;
@@ -1774,7 +1774,7 @@ void combatManager::Ripple(i32 strength) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
     );
     DoRipple(m_backgroundBuffer, gpWindowManager->m_screen, COMBAT_AREA_HEIGHT, strength);
     m_backgroundDrawn = false;
@@ -1786,7 +1786,7 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
     );
     DoBlur(
         m_backgroundBuffer,
@@ -1895,9 +1895,9 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
             bolt->pixelX = 0;
             bolt->currentX = 0;
         }
-        if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
-            bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
-            bolt->currentX = COMBAT_SCREEN_WIDTH - 1;
+        if (LOGICAL_SCREEN_WIDTH - 1 < bolt->pixelX) {
+            bolt->pixelX = LOGICAL_SCREEN_WIDTH - 1;
+            bolt->currentX = LOGICAL_SCREEN_WIDTH - 1;
         }
         if (bolt->pixelY < 0) {
             bolt->pixelY = 0;
@@ -1922,7 +1922,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                     drawY = bolt->pixelY + beamOffset0;
                 else
                     drawX6 = bolt->pixelX + beamOffset0;
-                if (drawX6 < 0 || drawX6 >= COMBAT_SCREEN_WIDTH || drawY < 0
+                if (drawX6 < 0 || drawX6 >= LOGICAL_SCREEN_WIDTH || drawY < 0
                     || drawY >= COMBAT_AREA_HEIGHT)
                     continue;
                 {
@@ -1933,24 +1933,24 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                     switch (bolt->colorMode) {
                         case BOLT_COLOR_RED_TABLE:
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] =
                                 gColorTableRed[static_cast<i8>(
                                     (gpWindowManager->m_screen->m_pixels
-                                     + drawY * COMBAT_SCREEN_WIDTH)[drawX6]
+                                     + drawY * LOGICAL_SCREEN_WIDTH)[drawX6]
                                 )];
                             break;
                         case BOLT_COLOR_RED_BEAM:
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] = uRedBeam[edgeShade29];
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] = uRedBeam[edgeShade29];
                             break;
                         case BOLT_COLOR_RAINBOW_FORWARD:
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] =
                                 uRainbow[beamOffset0 - widthFirst];
                             break;
                         case BOLT_COLOR_RAINBOW_REVERSE:
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] =
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (beamOffset0 - widthFirst)];
                             break;
                         case BOLT_COLOR_LIGHTNING: {
@@ -1967,12 +1967,12 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                             else
                                 color4 = BOLT_LIGHTNING_SHADE_5;
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] = color4;
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] = color4;
                             break;
                         }
                         default:
                             (gpWindowManager->m_screen->m_pixels
-                             + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
+                             + drawY * LOGICAL_SCREEN_WIDTH)[drawX6] =
                                 static_cast<u8>(bolt->colorMode);
                             break;
                     }
@@ -2016,16 +2016,16 @@ void combatManager::AddBolt(
 ) {
     if (startX < 0)
         startX = 0;
-    if (COMBAT_SCREEN_WIDTH - 1 < startX)
-        startX = COMBAT_SCREEN_WIDTH - 1;
+    if (LOGICAL_SCREEN_WIDTH - 1 < startX)
+        startX = LOGICAL_SCREEN_WIDTH - 1;
     if (startY < 0)
         startY = 0;
     if (COMBAT_AREA_HEIGHT - 1 < startY)
         startY = COMBAT_AREA_HEIGHT - 1;
     if (endX < 0)
         endX = 0;
-    if (COMBAT_SCREEN_WIDTH - 1 < endX)
-        endX = COMBAT_SCREEN_WIDTH - 1;
+    if (LOGICAL_SCREEN_WIDTH - 1 < endX)
+        endX = LOGICAL_SCREEN_WIDTH - 1;
     if (endY < 0)
         endY = 0;
     if (COMBAT_AREA_HEIGHT - 1 < endY)
@@ -2055,7 +2055,7 @@ void combatManager::AddBolt(
     bolt->forceAngle = forceAngle;
 
     if (colorMode == BOLT_COLOR_RAINBOW_FORWARD || colorMode == BOLT_COLOR_RAINBOW_REVERSE) {
-        if (startX <= 0 || startX >= COMBAT_SCREEN_WIDTH - 1)
+        if (startX <= 0 || startX >= LOGICAL_SCREEN_WIDTH - 1)
             bolt->drawVertically = true;
         else
             bolt->drawVertically = false;
@@ -2132,12 +2132,12 @@ void combatManager::DoBolt(
         effectPalette5 = new palette;
         if (!effectPalette5)
             MemError();
-        memcpy(effectPalette5->Data(), originalPalette->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
+        memcpy(effectPalette5->Data(), originalPalette->Data(), PALETTE_DATA_SIZE);
         effectData3 = effectPalette5->Data();
-        for (index8 = 0; index8 < SPELL_ARMAGEDDON_PALETTE_SIZE; ++index8) {
+        for (index8 = 0; index8 < PALETTE_DATA_SIZE; ++index8) {
             effectData3[index8] += BOLT_PALETTE_BRIGHTEN_STEP;
-            if (effectData3[index8] > BOLT_PALETTE_COMPONENT_MAX)
-                effectData3[index8] = BOLT_PALETTE_COMPONENT_MAX;
+            if (effectData3[index8] > PALETTE_CHANNEL_MAX)
+                effectData3[index8] = PALETTE_CHANNEL_MAX;
         }
         SetPalette(effectData3, 1);
     }
@@ -2208,8 +2208,8 @@ void combatManager::DoBolt(
                 minX9 = 0;
             if (minY8 < 0)
                 minY8 = 0;
-            if (COMBAT_SCREEN_WIDTH - 1 < maxX6)
-                maxX6 = COMBAT_SCREEN_WIDTH - 1;
+            if (LOGICAL_SCREEN_WIDTH - 1 < maxX6)
+                maxX6 = LOGICAL_SCREEN_WIDTH - 1;
             if (COMBAT_AREA_HEIGHT - 1 < maxY19)
                 maxY19 = COMBAT_AREA_HEIGHT - 1;
 
@@ -2478,8 +2478,8 @@ void combatManager::VaporizeCreature(H2_ENUM_PARAM(CombatSide, i32) side, i32 ar
     ResetLimitCreature();
     ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT));
-    memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
+    gyModify = static_cast<i8*>(H2_ALLOC(LOGICAL_SCREEN_HEIGHT));
+    memset(gyModify, 0, LOGICAL_SCREEN_HEIGHT);
     height = giMaxExtentY - giMinExtentY + 1;
     target_d->m_palette = gyModify;
     target_d->m_showQuantity = false;
@@ -2572,10 +2572,10 @@ void combatManager::RippleCreature(
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
     height = giMaxExtentY - giMinExtentY + 1;
-    gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT));
-    wave = static_cast<float*>(H2_ALLOC(sizeof(float) * SPELL_MODIFIER_ROW_COUNT));
-    memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
-    for (row_i = 0; row_i < SPELL_MODIFIER_ROW_COUNT; ++row_i) {
+    gyModify = static_cast<i8*>(H2_ALLOC(LOGICAL_SCREEN_HEIGHT));
+    wave = static_cast<float*>(H2_ALLOC(sizeof(float) * LOGICAL_SCREEN_HEIGHT));
+    memset(gyModify, 0, LOGICAL_SCREEN_HEIGHT);
+    for (row_i = 0; row_i < LOGICAL_SCREEN_HEIGHT; ++row_i) {
         wave[row_i] = static_cast<float>(
             (sin(
                  static_cast<float>(row_i % RIPPLE_WAVE_PERIOD)
@@ -2591,8 +2591,8 @@ void combatManager::RippleCreature(
     giMaxExtentX += RIPPLE_MARGIN;
     if (giMinExtentX < 0)
         giMinExtentX = 0;
-    if (giMaxExtentX > COMBAT_SCREEN_WIDTH - 1)
-        giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
+    if (giMaxExtentX > LOGICAL_SCREEN_WIDTH - 1)
+        giMaxExtentX = LOGICAL_SCREEN_WIDTH - 1;
     extentHeight2 = giMaxExtentY - giMinExtentY + 1;
 
     for (phase = RIPPLE_PHASE_START; phase < RIPPLE_PHASE_END; phase += phaseStep7) {
@@ -2623,7 +2623,7 @@ void combatManager::RippleCreature(
                 waveIndex = giMinExtentY - row_i
                             + (phase - RIPPLE_PHASE_START) * RIPPLE_WAVE_PHASE_MULTIPLIER;
             waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
-            if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
+            if (waveIndex >= 0 && waveIndex < LOGICAL_SCREEN_HEIGHT)
                 gyModify[row_i] = static_cast<i8>((wave[waveIndex]) * amplitude5);
         }
         if (mode == COMBAT_RIPPLE_DEATH_RIPPLE && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
@@ -3164,13 +3164,13 @@ void combatManager::DoLuck(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex) {
         startX_b = targetX + targetY_l / LUCK_DIAGONAL_DIVISOR + LUCK_EDGE_INSET;
     }
     if (targetY_l < LUCK_SHORT_BOLT_HEIGHT) {
-        startX_b = side == COMBAT_ATTACKER_SIDE ? 0 : COMBAT_SCREEN_WIDTH - 1;
+        startX_b = side == COMBAT_ATTACKER_SIDE ? 0 : LOGICAL_SCREEN_WIDTH - 1;
         startY = targetY_l + LUCK_MIN_TARGET_Y;
     }
     if (startX_b < 0)
         startX_b = 0;
-    if (COMBAT_SCREEN_WIDTH - 1 < startX_b)
-        startX_b = COMBAT_SCREEN_WIDTH - 1;
+    if (LOGICAL_SCREEN_WIDTH - 1 < startX_b)
+        startX_b = LOGICAL_SCREEN_WIDTH - 1;
     DoBolt(
         0,
         startX_b,
@@ -3254,8 +3254,8 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
             giMinExtentX = 0;
         if (giMinExtentY < 0)
             giMinExtentY = 0;
-        if (COMBAT_SCREEN_WIDTH - 1 < giMaxExtentX)
-            giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
+        if (LOGICAL_SCREEN_WIDTH - 1 < giMaxExtentX)
+            giMaxExtentX = LOGICAL_SCREEN_WIDTH - 1;
         if (COMBAT_AREA_HEIGHT - 1 < giMaxExtentY)
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_k);
@@ -3384,7 +3384,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -3530,13 +3530,13 @@ void combatManager::Earthquake(void) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
     );
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
         for (frame8 = 0; frame8 < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame8) {
             deadline7 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
             PollSound();
-            width0 = COMBAT_SCREEN_WIDTH - abs(shakeOffsets17[frame8][IDX(COORDINATE_AXIS_X)]);
+            width0 = LOGICAL_SCREEN_WIDTH - abs(shakeOffsets17[frame8][IDX(COORDINATE_AXIS_X)]);
             height9 = COMBAT_AREA_HEIGHT - abs(shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)]) - 1;
             source1 = m_backgroundBuffer->m_pixels
                          + (shakeOffsets17[frame8][IDX(COORDINATE_AXIS_X)] < 0
@@ -3545,7 +3545,7 @@ void combatManager::Earthquake(void) {
                          + (shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)] < 0
                                 ? 0
                                 : shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)])
-                               * COMBAT_SCREEN_WIDTH;
+                               * LOGICAL_SCREEN_WIDTH;
             destination2 = gpWindowManager->m_screen->m_pixels
                           + (shakeOffsets17[frame8][IDX(COORDINATE_AXIS_X)] > 0
                                  ? 0
@@ -3553,17 +3553,17 @@ void combatManager::Earthquake(void) {
                           + (shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)] > 0
                                  ? 0
                                  : -shakeOffsets17[frame8][IDX(COORDINATE_AXIS_Y)])
-                                * COMBAT_SCREEN_WIDTH;
+                                * LOGICAL_SCREEN_WIDTH;
             for (row5 = 0; row5 < height9; ++row5) {
                 memcpy(destination2, source1, width0);
-                source1 += COMBAT_SCREEN_WIDTH;
-                destination2 += COMBAT_SCREEN_WIDTH;
+                source1 += LOGICAL_SCREEN_WIDTH;
+                destination2 += LOGICAL_SCREEN_WIDTH;
             }
             BlitBitmapToScreen(
                 gpWindowManager->m_screen,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0,
                 0
@@ -3655,7 +3655,7 @@ void combatManager::Earthquake(void) {
                         ICON_DRAW_CLIP,
                         0,
                         0,
-                        COMBAT_SCREEN_WIDTH,
+                        LOGICAL_SCREEN_WIDTH,
                         COMBAT_AREA_HEIGHT,
                         0
                     );

@@ -1,10 +1,11 @@
 import tempfile
 import unittest
+import json
 from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
-from homm2.audit.enums import collect, group_values, scan_file, source_blocks, verify_reuse
+from homm2.audit.enums import collect, group_values, scan_file, source_blocks, verify_review, verify_reuse
 
 
 class EnumAuditTests(unittest.TestCase):
@@ -142,6 +143,93 @@ class EnumReuseTests(unittest.TestCase):
     def test_rejects_malformed_ledger(self):
         with self.assertRaisesRegex(ValueError, "missing required columns"):
             verify_reuse(self.before, self.after, [{"old_name": "OLD"}])
+
+
+class EnumReviewTests(unittest.TestCase):
+    def setUp(self):
+        self.entries = [
+            {"name": "RETAINED", "retail": 255, "strict": -1},
+            {"name": "ALIAS", "retail": 7, "strict": 7,
+             "target": {"file": "include/shared.h", "enum": "Shared", "name": "CANONICAL"},
+             "reason": "Same field."},
+        ]
+        self.block = {"source_file": "include/test.h", "source_enum": "Original", "source_line": "1",
+                      "starting_members": "2", "retained_members": "1", "reused_or_moved_members": "1",
+                      "reason": "Retain signed sentinel; share the field alias."}
+        self.report = {"mode": "retail", "partial": False, "constants": [
+            {"file": "include/test.h", "enum": "Original", "name": "RETAINED", "value": 255},
+            {"file": "include/shared.h", "enum": "Shared", "name": "CANONICAL", "value": 7},
+        ]}
+
+    def ledger(self):
+        return [{**self.block, "members": json.dumps(self.entries)}]
+
+    def test_accounts_for_retained_and_reused_members(self):
+        self.assertEqual(verify_review(self.report, self.ledger()), [])
+
+    def test_rejects_surviving_alias(self):
+        self.report["constants"].append(
+            {"file": "include/test.h", "enum": "Original", "name": "ALIAS", "value": 7})
+        self.assertTrue(verify_review(self.report, self.ledger()))
+
+    def test_rejects_removed_retained_member(self):
+        self.report["constants"].pop(0)
+        self.assertTrue(verify_review(self.report, self.ledger()))
+
+    def test_rejects_unreviewed_addition(self):
+        self.report["constants"].append(
+            {"file": "include/test.h", "enum": "New", "name": "NEW", "value": 7})
+        self.assertTrue(verify_review(self.report, self.ledger()))
+
+    def test_preserves_mode_specific_signed_value(self):
+        self.report["mode"] = "strict"
+        self.assertTrue(verify_review(self.report, self.ledger()))
+        self.report["constants"][0]["value"] = -1
+        self.assertEqual(verify_review(self.report, self.ledger()), [])
+
+    def test_rejects_partial_census(self):
+        self.report["partial"] = True
+        with self.assertRaisesRegex(ValueError, "unfiltered"):
+            verify_review(self.report, self.ledger())
+
+    def test_requires_reasons_and_correct_counts(self):
+        self.block["reason"] = ""
+        self.block["retained_members"] = "0"
+        self.entries[1]["reason"] = ""
+        self.assertEqual(len(verify_review(self.report, self.ledger())), 3)
+
+    def test_rejects_duplicate_blocks(self):
+        ledger = self.ledger()
+        self.assertTrue(verify_review(self.report, ledger + ledger))
+
+    def test_tracks_conditional_members(self):
+        del self.entries[0]["retail"]
+        self.report["constants"].pop(0)
+        self.assertEqual(verify_review(self.report, self.ledger()), [])
+        self.report["mode"] = "strict"
+        self.assertTrue(verify_review(self.report, self.ledger()))
+
+    def test_anonymous_enum_source_line_can_move(self):
+        self.block["source_enum"] = "anonymous@1"
+        self.report["constants"][0]["enum"] = "anonymous@20"
+        self.assertEqual(verify_review(self.report, self.ledger()), [])
+
+    def test_rejects_conflicting_target_values(self):
+        self.entries[0]["target"] = self.entries[1]["target"]
+        self.entries[0]["reason"] = "Conflicting value."
+        self.block["retained_members"] = "0"
+        self.block["reused_or_moved_members"] = "2"
+        self.assertTrue(any("conflicting" in error for error in verify_review(self.report, self.ledger())))
+
+    def test_cannot_omit_an_entire_current_block(self):
+        self.assertTrue(verify_review(self.report, []))
+
+    def test_manifest_detects_missing_alias_only_block(self):
+        # The current target can still be covered by another alias, so checking
+        # only the current inventory cannot prove starting-review completeness.
+        manifest = {"blocks": 2, "members": 3, "retail": 3, "strict": 3}
+        self.assertEqual(verify_review(self.report, self.ledger()), [])
+        self.assertEqual(len(verify_review(self.report, self.ledger(), manifest=manifest)), 4)
 
 
 if __name__ == "__main__":

@@ -15,16 +15,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SOURCE/KB_TYPES.h>
+#include <BASE/display.h>
+#include <SOURCE/combatTypes.h>
 
 namespace {
 
 H2_ENUM_BEGIN(FindPathConstant)
-    ATTACK_MASK_SURROUNDED         = 0xff,
     DISTANCE_MINOR_DIVISOR         = 2,
     BINARY_SEARCH_MIDPOINT_DIVISOR = 2,
     DRAWBRIDGE_MOAT_INDEX          = 4,
     MOAT_MOVEMENT_PENALTY          = 2,
-    INITIAL_BEST_DISTANCE          = COMBAT_SCREEN_WIDTH
+    INITIAL_BEST_DISTANCE          = LOGICAL_SCREEN_WIDTH
 H2_ENUM_END(FindPathConstant)
 
 }
@@ -35,7 +36,7 @@ DATA(0x00524548) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType =
 DATA(0x0052454c) static i32 gSearchNextX = 0;
 DATA(0x00524550) static i32 gSearchDirection = 0;
 DATA(0x00524554) static mapCell* gSearchCurrentCell = NULL;
-DATA(0x00524558) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = H2_ZERO_INIT;
+DATA(0x00524558) u8 bIsMoatSlowed[COMBAT_HEX_COUNT] = H2_ZERO_INIT;
 DATA(0x005245d0) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain = 0;
 DATA(0x005245d4) static i32 gSearchMiddle = 0;
 DATA(0x005245d8) static searchNode* gSearchCell = NULL;
@@ -191,10 +192,10 @@ void searchArray::TestPossibleDirections(
     i32 waterMode
 ) {
 
-    memset(occupied, 0, SEARCH_DIRECTION_COUNT);
+    memset(occupied, 0, IDX(MAP_DIRECTION_COUNT));
     gSearchCurrentCell = gpAdvManager->GetCell(x, y);
 
-    for (gSearchDirection = 0; gSearchDirection < SEARCH_DIRECTION_COUNT; gSearchDirection++) {
+    for (gSearchDirection = 0; gSearchDirection < IDX(MAP_DIRECTION_COUNT); gSearchDirection++) {
         gSearchNextX = x + normalDirTable[gSearchDirection].x;
         gSearchNextY = y + normalDirTable[gSearchDirection].y;
         if (gSearchNextX < 0 || gSearchNextX >= MAP_WIDTH || gSearchNextY < 0
@@ -341,7 +342,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
 
         if (unit->m_monster.shots > 0
             && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
-                   == ATTACK_MASK_SURROUNDED) {
+                   == COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
             gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
         } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
             gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
@@ -356,7 +357,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
             if (unit->m_monster.shots > 0
                 && unit->GetAttackMask(
                        unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
-                   ) == ATTACK_MASK_SURROUNDED) {
+                   ) == COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
                 gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
             } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
                 gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
@@ -455,8 +456,8 @@ i32 searchArray::FindCombatPath(
                 ARMY_ATTACK_TARGET_ASSIGNED,
                 attackTargetHex_a
             );
-            if (attackMask != ATTACK_MASK_SURROUNDED) {
-                for (direction_a = 0; direction_a < SEARCH_DIRECTION_COUNT;
+            if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+                for (direction_a = 0; direction_a < IDX(MAP_DIRECTION_COUNT);
                      direction_a++) {
                     if ((attackMask & (1 << direction_a)) == 0) {
                         *path_d++ = static_cast<u8>(direction_a);
@@ -477,7 +478,7 @@ i32 searchArray::FindCombatPath(
         }
 
         moveMask = unit->GetMoveMask(node_g.x);
-        for (direction_a = 0; direction_a < SEARCH_DIRECTION_COUNT; direction_a++) {
+        for (direction_a = 0; direction_a < IDX(MAP_DIRECTION_COUNT); direction_a++) {
             i32 nextHex;
 
             if ((moveMask & (1 << direction_a)) != 0)

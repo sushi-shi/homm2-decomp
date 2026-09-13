@@ -27,6 +27,10 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <SOURCE/ARMY.h>
+#include <SOURCE/combatTypes.h>
 
 #define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
@@ -46,30 +50,10 @@
 
 namespace {
 
-    H2_ENUM_CLASS_BEGIN(CombatKeyCommand)
-        KEY_MOUSE_COORDS = 2,
-        KEY_VIEW_ARMY = 0x14,
-        KEY_VIEW_GENERAL = 0x23,
-        KEY_CAST_SPELL = 0x2e,
-        KEY_WAIT = 0x39,
-        KEY_CLOSE_NETWORK_BOX = 0x3c,
-        KEY_REDRAW_SCREEN = 0x3d,
-        KEY_CYCLE_ARMY_VIEW = 0x3f,
-        KEY_TOGGLE_GRID = 0x40,
-        KEY_TOGGLE_MOUSE_HEX = 0x41,
-        KEY_CYCLE_SHADE = 0x42,
-        KEY_CYCLE_SPELL_EFFECT = 0x43,
-        KEY_DEBUG_CREATURE_EFFECT = 0x57
-    H2_ENUM_CLASS_END(CombatKeyCommand)
-
     H2_ENUM_BEGIN(CombatWinLoseConstant)
-        WIN_LOSE_WIDGET_COUNT = 25,
-        WIN_LOSE_NEXT_CONTROL = 0x7800,
-        WIN_LOSE_CLOSE_COMMAND = 10,
         WIN_LOSE_TEXT_ID = 101,
         WIN_LOSE_RESOURCE_LOAD_ID = 200,
         WIN_LOSE_RESOURCE_DRAW_ID = 201,
-        WIN_LOSE_DRAW_DEPTH = 0x7fff,
         WIN_LOSE_FIRST_ANIMATION_FRAME = 1,
         WIN_LOSE_LOOP_FRAME_COUNT = 20,
         WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME = 43,
@@ -177,8 +161,6 @@ namespace {
         CONTROL_RIGHT_MIN_X = 590,
         CONTROL_LEFT_MAX_X = 50,
         CONTROL_SYSTEM_OPTIONS_MIN_Y = 460,
-        SCREEN_MAX_X = 639,
-        SCREEN_MAX_Y = 479,
         ARMY_VIEW_LEVEL_COUNT = 3,
         COMMAND_FRAME_DELAY = 75
     H2_ENUM_END(CombatCommandGeometry)
@@ -366,8 +348,8 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
         if (gbThisNetHasControl == 0) {
             if (message.type == MESSAGE_KEY_DOWN) {
-                switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
-                    case KEY_CLOSE_NETWORK_BOX:
+                switch (static_cast<InputManagerScanCode>(message.payload.keyboard.keyCode)) {
+                    case IDX(INPUT_SCAN_F2):
                         PopNetBox(NULL, -1);
                         break;
                 }
@@ -927,49 +909,49 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             return MESSAGE_DISPATCH_CONSUME;
 
         case MESSAGE_KEY_DOWN:
-            switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
-                case KEY_CLOSE_NETWORK_BOX:
+            switch (static_cast<InputManagerScanCode>(message.payload.keyboard.keyCode)) {
+                case IDX(INPUT_SCAN_F2):
                     PopNetBox(NULL, -1);
                     break;
-                case KEY_REDRAW_SCREEN:
+                case IDX(INPUT_SCAN_F3):
                     gpWindowManager->UpdateScreenRegion(
                         0,
                         0,
-                        COMBAT_SCREEN_WIDTH - 1,
-                        COMBAT_SCREEN_HEIGHT - 1
+                        LOGICAL_SCREEN_WIDTH - 1,
+                        LOGICAL_SCREEN_HEIGHT - 1
                     );
                     break;
-                case KEY_CYCLE_ARMY_VIEW:
+                case IDX(INPUT_SCAN_F5):
                     SetCombatViewArmySmallLevel(
                         (gConfig.combatArmyInfoLevel + 1) % ARMY_VIEW_LEVEL_COUNT
                     );
                     break;
-                case KEY_TOGGLE_GRID:
+                case IDX(INPUT_SCAN_F6):
                     SetCombatGrid(
                         1 - gConfig.showCombatGrid,
                         gConfig.showCombatMouseHex,
                         gConfig.combatShadeLevel
                     );
                     break;
-                case KEY_TOGGLE_MOUSE_HEX:
+                case IDX(INPUT_SCAN_F7):
                     SetCombatGrid(
                         gConfig.showCombatGrid,
                         1 - gConfig.showCombatMouseHex,
                         gConfig.combatShadeLevel
                     );
                     break;
-                case KEY_CYCLE_SHADE:
+                case IDX(INPUT_SCAN_F8):
                     SetCombatGrid(
                         gConfig.showCombatGrid,
                         gConfig.showCombatMouseHex,
                         1 - gConfig.combatShadeLevel
                     );
                     break;
-                case KEY_CYCLE_SPELL_EFFECT:
+                case IDX(INPUT_SCAN_F9):
                     giSpellEffectShowType = NextSpellEffectDisplayType(giSpellEffectShowType);
                     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
                     break;
-                case KEY_DEBUG_CREATURE_EFFECT:
+                case IDX(INPUT_SCAN_F11):
                     if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)) {
                         VaporizeCreature(COMBAT_DEFENDER_SIDE, 1);
                     } else if (HAS(message.payload.keyboard.modifiers,
@@ -980,28 +962,28 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_WAVE);
                     }
                     break;
-                case KEY_WAIT:
+                case IDX(INPUT_SCAN_SPACE):
                     giNextAction = ACTION_WAIT;
                     break;
-                case KEY_MOUSE_COORDS: {
+                case IDX(INPUT_SCAN_1): {
                     i32 currentMouseX_18;
                     i32 currentMouseY_18;
                     gpMouseManager->MouseCoords(currentMouseX_18, currentMouseY_18);
                     break;
                 }
-                case KEY_VIEW_GENERAL:
+                case IDX(INPUT_SCAN_H):
                     if (m_heroes[IDX(m_currentSide)] != NULL) {
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                         ViewGeneral(m_currentSide, 1, 0);
                         ResetMouse();
                     }
                     break;
-                case KEY_VIEW_ARMY:
+                case IDX(INPUT_SCAN_T):
                     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                     ViewArmy(&m_armies[IDX(m_currentArmySide)][m_currentArmyIndex], 0);
                     ResetMouse();
                     break;
-                case KEY_CAST_SPELL:
+                case IDX(INPUT_SCAN_C):
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
                             localization::Tr("combat.spell.no_hero")
@@ -1371,7 +1353,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 ,
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 giNextAction = ACTION_RETREAT;
             ResetMouse();
             break;
@@ -1412,7 +1394,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case WIN_LOSE_NEXT_CONTROL:
+                    case DIALOG_BUTTON_0:
                         if (gbShowingLoseWindow != 0)
                             goto ExitDialog;
                         if (iCurTransferArtifact + 1 < iMaxTransferArtifacts) {
@@ -1529,7 +1511,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, WIN_LOSE_RESOURCE_DRAW_ID);
         message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
-        gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
+        gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = KBTickCount() + iDelay_3;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1538,7 +1520,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
 VA(0x0042e370, 0x108)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
-    for (widgetIndex = 0; widgetIndex < WIN_LOSE_WIDGET_COUNT; widgetIndex++) {
+    for (widgetIndex = 0; widgetIndex < COMBAT_WIN_LOSE_WIDGET_COUNT; widgetIndex++) {
         if (m_winLoseBottomWidgets[widgetIndex] != NULL) {
             window->RemoveWidget(m_winLoseBottomWidgets[widgetIndex]);
             delete m_winLoseBottomWidgets[widgetIndex];
@@ -1792,7 +1774,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     char* text_1;
     icon* monsterIcons;
 
-    for (side_4 = 0; side_4 < WIN_LOSE_WIDGET_COUNT; ++side_4) {
+    for (side_4 = 0; side_4 < COMBAT_WIN_LOSE_WIDGET_COUNT; ++side_4) {
         m_winLoseBottomWidgets[side_4] = NULL;
         m_winLoseBottomTextWidgets[side_4] = NULL;
     }
@@ -2027,12 +2009,12 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
             gpWindowManager->m_screen,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
-            COMBAT_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             VICTORY_DIM_STEP
         );
         PollSound();
-        gpWindowManager->UpdateScreenRegion(0, 0, SCREEN_MAX_X, SCREEN_MAX_Y);
+        gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_MAX_X, LOGICAL_SCREEN_MAX_Y);
         PollSound();
     }
 
@@ -2328,7 +2310,7 @@ i32 combatManager::DoSurrender(void) {
     window->BroadcastMessage(message);
     gpWindowManager->DoDialog(window, TrueFalseDialogHandler, 0);
     delete window;
-    return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
+    return gpWindowManager->m_dialogResult == DIALOG_BUTTON_2;
 }
 
 VA(0x00430858, 0xb5)
@@ -2594,7 +2576,7 @@ void combatManager::ResetCyclingCreatures(void) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
             if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
                     == 0
-                && currentTroop->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                && currentTroop->m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
                 && currentTroop->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
                 ++rotateCount;
                 ++gpCombatManager->m_limitCreatureCount[IDX(sideIndex)][index];
@@ -2645,7 +2627,7 @@ void combatManager::ResetCycleTimers(void) {
 
 VA(0x004315b9, 0x41)
 i32 InCombatArea(i32 x, i32 y) {
-    return x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT;
+    return x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT;
 }
 
 VA(0x004315fa, 0x930)
@@ -2683,7 +2665,7 @@ void combatManager::CycleCombatScreen(void) {
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-                && ((currentArmy_2->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                && ((currentArmy_2->m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
                      && currentArmy_2->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)
                     || (currentArmy_2->m_animationSequence == ARMY_ANIMATION_STAND
                         && currentArmy_2->m_lastAnimationTime
@@ -2787,7 +2769,7 @@ void combatManager::CycleCombatScreen(void) {
                     }
                     currentArmy_2->m_animationSequence = ArmyAnimationSequence(
                         currentArmy_2->m_standingAnimation
-                        + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
+                        + IDX(ARMY_ANIMATION_STANDING_FIRST)
                     );
                     currentArmy_2->m_animationFrame = 0;
                 } else {
@@ -2800,7 +2782,7 @@ void combatManager::CycleCombatScreen(void) {
                     if (currentArmy_2->m_animationFrame
                         >= currentArmy_2->m_frameInfo.animationFrameCount
                                [currentArmy_2->m_standingAnimation
-                                + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)]) {
+                                + IDX(ARMY_ANIMATION_STANDING_FIRST)]) {
                         currentArmy_2->m_animationSequence = ARMY_ANIMATION_STAND;
                         currentArmy_2->m_animationFrame = 0;
                         currentArmy_2->m_lastAnimationTime = KBTickCount();

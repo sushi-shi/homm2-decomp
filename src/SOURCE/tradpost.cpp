@@ -15,6 +15,8 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
+#include <BASE/dialog.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_LEFT_OFFER_ICON  = 0x14,
@@ -194,7 +196,7 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
         }
 
-        for (idx = 0; idx < TRADING_POST_RESOURCE_COUNT; idx++) {
+        for (idx = 0; idx < IDX(RES_COUNT); idx++) {
             messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
@@ -379,7 +381,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                 break;
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case NORMAL_DIALOG_BUTTON_TWO:
+                    case DIALOG_BUTTON_2:
                         exitFlag = true;
                         break;
                     case POST_EXECUTE:
@@ -423,4 +425,4 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-DATA(0x005198dc) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
+DATA(0x005198dc) u16 coreRatio[IDX(RES_COUNT)] = {250, 500, 250, 500, 500, 500, 1};

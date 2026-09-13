@@ -6,10 +6,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-
-H2_ENUM_BEGIN(BitmapConstant)
-    COPY_STRIDE = 640
-H2_ENUM_END(BitmapConstant)
+#include <BASE/display.h>
 
 VA(0x004c5cd0, 0x4c)
 bitmap::bitmap(void)
@@ -155,18 +152,18 @@ void bitmap::CopyTo(
     i32 height
 ) {
     PollSound();
-    if (width != COPY_STRIDE) {
+    if (width != LOGICAL_SCREEN_WIDTH) {
         for (i32 row = 0; row < height; row++) {
             memcpy(
-                destination->m_pixels + destinationX + (destinationY + row) * COPY_STRIDE,
-                m_pixels + sourceX + (sourceY + row) * COPY_STRIDE,
+                destination->m_pixels + destinationX + (destinationY + row) * LOGICAL_SCREEN_WIDTH,
+                m_pixels + sourceX + (sourceY + row) * LOGICAL_SCREEN_WIDTH,
                 width
             );
         }
     } else {
         memcpy(
-            destination->m_pixels + destinationX + destinationY * COPY_STRIDE,
-            m_pixels + sourceX + sourceY * COPY_STRIDE,
+            destination->m_pixels + destinationX + destinationY * LOGICAL_SCREEN_WIDTH,
+            m_pixels + sourceX + sourceY * LOGICAL_SCREEN_WIDTH,
             width * height
         );
     }

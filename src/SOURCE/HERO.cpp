@@ -29,6 +29,9 @@
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/armyGroup.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <BASE/widget.h>
 
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
@@ -99,9 +102,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_SECONDARY_SKILL_ROW2_LAST = 0x19f,
     UI_SECONDARY_SKILL_ROW3_FIRST = 0x1a0,
     UI_SECONDARY_SKILL_ROW3_LAST = 0x1a7,
-    UI_CLOSE = 0x7800,
-    UI_DISMISS = 0x7803,
-    UI_DIALOG_CLOSE_COMMAND = 10,
     UI_VIEW_ARMY_X = 0x77,
     UI_VIEW_ARMY_Y = 0x14,
     UI_VIEW_SPELLS_SPECIAL = 1,
@@ -109,18 +109,13 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_ARMY_EMPTY_FRAME = 2,
     UI_WIDGET_FRAME_ACTIVE = 4,
     UI_ARTIFACT_DIALOG_ICON = 0x1c,
-    UI_SCREEN_WIDTH = 640,
-    UI_SCREEN_HEIGHT = 480,
     UI_STATUS_REGION_Y = 459,
     UI_STATUS_REGION_HEIGHT = 20,
     UI_FADE_STEPS = 8,
-    UI_LOOPING_SOUND_KEEP_COUNT = 4,
     UI_VIEW_CLOSED = 0,
     UI_VIEW_DISMISSED = 1,
     UI_WINDOW_TEXT_ID = 6,
     UI_BACKDROP_PALETTE = 1,
-    UI_DIALOG_DISMISS = 0x7803,
-    UI_DIALOG_SPLIT = 0x7802,
     UI_SPLIT_WINDOW_X = 0xb1,
     UI_SPLIT_WINDOW_Y = 0x14,
     UI_SPLIT_TEXT = 1,
@@ -128,7 +123,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_CONTROL_VALUE_DEFAULT = 6,
     UI_CONTROL_FRAME_DEFAULT = 4,
     UI_CYCLE_BUTTON_FRAME = 2,
-    UI_CYCLE_BUTTON_DISABLED_FRAME = 0x1000,
     UI_LUCK_NEGATIVE_FRAME = 3,
     UI_LUCK_NEUTRAL_FRAME = 6,
     UI_LUCK_POSITIVE_FRAME = 2,
@@ -190,8 +184,6 @@ H2_ENUM_END(HeroSkillProbabilityBand)
 
 H2_ENUM_BEGIN(HeroImplementationConstant)
     EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
-    TEMPLE_MORALE_BONUS = 2,
-    PYRAMID_LUCK_PENALTY = 2
 H2_ENUM_END(HeroImplementationConstant)
 
 VA(0x00460e50, 0x64)
@@ -390,7 +382,7 @@ void HeroMessageUpdate(H2_CONST char* text) {
     gheroWin->BroadcastMessage(message);
     gheroWin->DrawWindow(0, UI_PREVIOUS_HERO, UI_STATUS_TEXT_WIDGET);
     gpWindowManager
-        ->UpdateScreenRegion(0, UI_STATUS_REGION_Y, UI_SCREEN_WIDTH, UI_STATUS_REGION_HEIGHT);
+        ->UpdateScreenRegion(0, UI_STATUS_REGION_Y, LOGICAL_SCREEN_WIDTH, UI_STATUS_REGION_HEIGHT);
 }
 
 VA(0x0046148c, 0x94)
@@ -410,7 +402,7 @@ void hero::HeroScreenUpdate(void) {
         heroWin->BroadcastMessage(message);
     }
     heroWin->DrawWindow();
-    gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
 VA(0x00461520, 0x1c3)
@@ -509,7 +501,7 @@ i32 hero::Dismiss(void) {
         ,
         NORMAL_DIALOG_CONFIRM
     );
-    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
         Deallocate(1);
         return 1;
     }
@@ -900,7 +892,7 @@ void hero::CheckLevel(void) {
                     -1,
                     0
                 );
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SEVEN)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_7)
                     GiveSS(choices[0], HERO_SKILL_LEVEL_BASIC);
                 else
                     GiveSS(choices[1], HERO_SKILL_LEVEL_BASIC);
@@ -1087,7 +1079,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 );
             break;
 
-        case UI_DISMISS:
+        case DIALOG_BUTTON_3:
             sprintf(
                 gText,
                 cHeroScreen[IDX(TEXT_DISMISS)],
@@ -1096,7 +1088,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             );
             break;
 
-        case UI_CLOSE:
+        case DIALOG_BUTTON_0:
             strcpy(gText, cHeroScreen[IDX(TEXT_EXIT)]);
             break;
 
@@ -1189,11 +1181,11 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
             case WIDGET_COMMAND_DESELECT:
                 if (quickView == 0) {
                     switch (message.payload.widget.id) {
-                        case UI_DISMISS:
+                        case DIALOG_BUTTON_3:
                             if (gpHVHero->Dismiss())
                                 bExit = true;
                             break;
-                        case UI_CLOSE:
+                        case DIALOG_BUTTON_0:
                             bExit = true;
                             break;
                         case UI_PREVIOUS_HERO:
@@ -1489,7 +1481,7 @@ VA(0x004638b2, 0x44)
 void RedrawHeroScreen(void) {
     gpResourceManager->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
     heroWin->DrawWindow();
-    gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
 VA(0x004638f6, 0x219)
@@ -1498,7 +1490,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
 
     gbNoDismiss = noDismiss;
     iOrigHeroViewID = heroId;
-    gpAdvManager->TrimLoopingSounds(UI_LOOPING_SOUND_KEEP_COUNT);
+    gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
     gpHVHero = gpGame->GetHero(heroId);
     gbHeroWindShowing = true;
     if (fadeAlreadyOut == 0)
@@ -1526,7 +1518,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     delete heroWin;
     gheroWin = NULL;
 
-    if (gpWindowManager->m_dialogResult == UI_DIALOG_DISMISS) {
+    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_3) {
         return UI_VIEW_DISMISSED;
     } else {
         gpHVHero->m_mobility = gpHVHero->CalcMobility();
@@ -1562,7 +1554,7 @@ void SetupHeroView(void) {
 
     if (gpHVHero->m_owner != giCurPlayer || gpCurPlayer->m_heroCount == UI_SINGLE_HERO_COUNT) {
         msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = UI_CYCLE_BUTTON_DISABLED_FRAME;
+        msg.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         msg.payload.widget.id = UI_PREVIOUS_HERO;
         heroWin->BroadcastMessage(msg);
         msg.payload.widget.id = UI_NEXT_HERO;
@@ -1589,7 +1581,7 @@ void SetupHeroView(void) {
         msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     else
         msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    msg.payload.widget.id = UI_DISMISS;
+    msg.payload.widget.id = DIALOG_BUTTON_3;
     msg.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
@@ -1806,7 +1798,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
     delete gpTownManager->m_heroWindow1;
 
-    if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
+    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2 && gpTownManager->m_splitAmount != 0) {
         if (gpHVHero->m_army.m_creatureTypes[destinationSlot]
             == gpHVHero->m_army.m_creatureTypes[sourceSlot]) {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -= gpTownManager->m_splitAmount;

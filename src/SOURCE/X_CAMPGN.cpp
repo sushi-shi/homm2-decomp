@@ -21,6 +21,8 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
+#include <BASE/dialog.h>
+#include <SOURCE/Campaign.h>
 
 H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_POL_INTRO             = 0x27,
@@ -118,7 +120,7 @@ DATA(0x0051b1b8) static i32 expansionCampaignMapCounts[IDX(EXPANSION_CAMPAIGN_CO
 
 DATA(0x0051b1c8) SCampaignChoice xCampaignChoices[IDX(
     EXPANSION_CAMPAIGN_COUNT
-)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT] = {
+)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
     {{{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MEDAL_OF_VALOR)}, CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_STEALTH_SHIELD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MINOR_SCROLL)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
@@ -328,7 +330,7 @@ void ExpCampaign::InitMap(void) {
     SCampaignChoice* bonus =
         &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
 
-    memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
+    memset(gpGame->m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
     sprintf(
         gpGame->m_mapFilename,
         "CAMP%d_%02d.HXC",
@@ -461,7 +463,7 @@ void ExpCampaign::InitMap(void) {
                         );
                     break;
                 case AWARD_DEFEAT_KRAEGER:
-                    for (heroSlot = 0; heroSlot < EXPANSION_CAMPAIGN_HERO_COUNT;
+                    for (heroSlot = 0; heroSlot < GAME_HERO_COUNT;
                          ++heroSlot) {
                         if (gpGame->m_heroRecs[heroSlot].m_portrait == HERO_DAINWIN)
                             gpGame->m_heroRecs[heroSlot].Deallocate(0);
@@ -523,8 +525,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         trackWidget = new iconWidget(
             expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][0],
             expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][1],
-            EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
-            EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
+            CAMPAIGN_TRACK_ICON_SIZE,
+            CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
             0,
             ICON_DRAW_NORMAL,
@@ -574,7 +576,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
-        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
             InitMap();
             PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
@@ -585,7 +587,7 @@ VA(0x004b3e05, 0x83d)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     SCampaignChoice* choice;
     tag_message message;
-    char armyName[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
+    char armyName[CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
     b8 hasVisibleAward;
     i32 i;
     b8 showScroll;
@@ -645,7 +647,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         sprintf(gText, localization::Tr("common.none"));
     m_window->BroadcastMessage(message);
 
-    for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
+    for (i = 0; i < CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
         choice = &xCampaignChoices[IDX(m_campaignId)][IDX(m_viewMap)][i];
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
@@ -822,7 +824,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->BroadcastMessage(message);
     }
 
-    for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
+    for (i = 0; i < CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
         message.payload.widget.id = i + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         if (m_viewOnly == 0 && m_mapChoices[IDX(m_viewMap)] != 0)
@@ -878,7 +880,7 @@ i32 ExpCampaign::HandleVictory(void) {
         }
     }
     ShowInfo(0, 0);
-    if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_ACCEPT)
+    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2)
         return 1;
     return 0;
 }
@@ -1182,8 +1184,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1230,7 +1232,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         xCampaign.ReplaySmacker();
                         xCampaign.m_window->DrawWindow();
                         break;
-                    case CAMPAIGN_DIALOG_ACCEPT:
+                    case DIALOG_BUTTON_2:
                         if (xCampaign.m_viewOnly == 0) {
                             if (xCampaign.m_mapChoices[IDX(xCampaign.m_viewMap)]) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
@@ -1244,12 +1246,12 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 break;
                             }
                         }
-                    case CAMPAIGN_DIALOG_CANCEL:
+                    case DIALOG_BUTTON_1:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command =
-                            BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
+                            BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                     default:

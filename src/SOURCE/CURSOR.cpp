@@ -27,24 +27,13 @@
 #include <BASE/message.h>
 #include <stdio.h>
 #include <string.h>
-
-H2_ENUM_BEGIN(CursorHeroShadowFrame)
-    SPRITE_UP_STEP_1        = 0x2e,
-    SPRITE_UP_STEP_2        = 0x2f,
-    SPRITE_UP_STEP_3        = 0x31,
-    SPRITE_UP_STEP_4        = 0x32,
-    SPRITE_UP_STEP_5        = 0x33,
-    SPRITE_UP_SHADOW_WIDE   = 0x37,
-    SPRITE_UP_SHADOW_STEP_5 = 0x38,
-    SPRITE_UP_SHADOW_STEP_4 = 0x39,
-    SPRITE_UP_SHADOW_STEP_3 = 0x3a
-H2_ENUM_END(CursorHeroShadowFrame)
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(CursorPrivateConstant)
     SLOW_CURSOR_CYCLE_START  = 2,
     SKIPPED_ANIMATION_FRAME  = 4,
     FOOTSTEP_ANIMATION_FRAME = 3,
-    DIRECTION_HALF_COUNT     = CURSOR_DIRECTION_COUNT / 2,
+    DIRECTION_HALF_COUNT     = IDX(MAP_DIRECTION_COUNT) / 2,
     TURN_FRAME_MULTIPLIER    = 2,
     MOVE_TILE_HALF_COUNT     = 2,
     GROUP_ALLOC_LINE_OFFSET  = 7,
@@ -167,7 +156,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
+                            + m_updateMaxY % IDX(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_FLIPPED_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -224,7 +213,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
+                            + m_updateMaxY % IDX(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -534,7 +523,7 @@ mapCell* advManager::MoveHero(
     movingHero_g->m_direction = direction;
 
     if (movingHero_g->IsEmbarked() && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
-        for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
+        for (step_a = 0; step_a < GAME_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId == movingHero_g->m_id)
                 break;
         }
@@ -799,14 +788,14 @@ adjacentDone:
     if (mapEvent) {
         if (processEvent) {
             if (mapEvent->applyToComputer) {
-                for (step_a = 0; step_a < CURSOR_RESOURCE_COUNT; ++step_a) {
+                for (step_a = 0; step_a < IDX(RES_COUNT); ++step_a) {
                     gpGame->m_players[giCurPlayer].m_resources[step_a] +=
                         mapEvent->resources[step_a];
                     if (gpGame->m_players[giCurPlayer].m_resources[step_a] < 0)
                         gpGame->m_players[giCurPlayer].m_resources[step_a] = 0;
                 }
                 if (mapEvent->artifact != -1
-                    && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
+                    && movingHero_g->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
                     GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
                     mapEvent->active = false;
@@ -816,7 +805,7 @@ adjacentDone:
             i32 primaryAmount = 0;
             i32 secondaryType = -1;
             i32 secondaryAmount = 0;
-            for (step_a = 0; step_a < CURSOR_RESOURCE_COUNT; ++step_a) {
+            for (step_a = 0; step_a < IDX(RES_COUNT); ++step_a) {
                 i32 eventAmount = mapEvent->resources[step_a];
                 if (-eventAmount > gpGame->m_players[giCurPlayer].m_resources[step_a]) {
                     eventAmount = -gpGame->m_players[giCurPlayer].m_resources[step_a];
@@ -834,13 +823,13 @@ adjacentDone:
                 }
             }
             if (mapEvent->artifact != -1
-                && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
+                && movingHero_g->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;
                 }
-                primaryType = CURSOR_RESOURCE_COUNT;
+                primaryType = IDX(RES_COUNT);
                 primaryAmount = mapEvent->artifact;
             }
             if (mapEvent->cancelAfterVisit)
@@ -984,7 +973,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
 
     destinationCell = m_mapData->GetCell(destinationCellX, destinationCellY_f);
     currentCell_c = m_mapData->GetCell(centerX, centerY);
-    if (destinationCell->m_flags & CURSOR_CELL_BLOCKED_FLAG)
+    if (destinationCell->m_flags & IDX(MAP_CELL_OCCUPIED))
         return 0;
 
     if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
@@ -1009,7 +998,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         if (CELL_HAS_NON_SHADOW_OBJECT(currentCell_c)
             && currentCell_c->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
-        if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (destinationCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             northNeighborCell_a = m_mapData->GetCell(destinationCellX, destinationCellY_f + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(northNeighborCell_a))
                 return 0;
@@ -1021,7 +1010,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
             return 0;
-        if (currentCell_c->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (currentCell_c->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             southNeighborCell_i =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(southNeighborCell_i)

@@ -9,9 +9,9 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(RippleConstant)
-    SCREEN_WIDTH   = 640,
     PROFILE_RADIUS = 25,
     PROFILE_SIZE   = PROFILE_RADIUS * 2 + 1,
     // The profile is flat over its outer seven samples, so only the middle
@@ -19,13 +19,13 @@ H2_ENUM_BEGIN(RippleConstant)
     REDRAW_RADIUS = 18,
     REDRAW_WIDTH  = 37,
     SWEEP_STEP    = 4,
-    SWEEP_END     = SCREEN_WIDTH + PROFILE_RADIUS
+    SWEEP_END     = LOGICAL_SCREEN_WIDTH + PROFILE_RADIUS
 H2_ENUM_END(RippleConstant)
 
 VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 idx;
-    u8 previous[SCREEN_WIDTH];
+    u8 previous[LOGICAL_SCREEN_WIDTH];
     i32 deadline7;
     i32 blitWidth;
     i32 column7;
@@ -49,22 +49,22 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
 
         for (idx = 0; idx <= PROFILE_SIZE - 1; idx++) {
             column7 = sweepPosition + idx - PROFILE_RADIUS;
-            if (column7 < 0 || column7 >= SCREEN_WIDTH)
+            if (column7 < 0 || column7 >= LOGICAL_SCREEN_WIDTH)
                 continue;
             if (rippleProfile[idx] == previous[column7])
                 continue;
 
             u8* destinationPixel = destination->m_pixels + column7;
             u8* sourcePixel =
-                source->m_pixels + column7 + rippleProfile[idx] * SCREEN_WIDTH * strength;
+                source->m_pixels + column7 + rippleProfile[idx] * LOGICAL_SCREEN_WIDTH * strength;
 
             srcRow = rippleProfile[idx] * strength;
             for (; srcRow < height; srcRow++) {
                 *destinationPixel = *sourcePixel;
                 if (srcRow + 1 == height)
                     break;
-                destinationPixel += SCREEN_WIDTH;
-                sourcePixel += SCREEN_WIDTH;
+                destinationPixel += LOGICAL_SCREEN_WIDTH;
+                sourcePixel += LOGICAL_SCREEN_WIDTH;
             }
             previous[column7] = rippleProfile[idx];
         }
@@ -75,8 +75,8 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
             blitWidth += blitX3;
             blitX3 = 0;
         }
-        if (blitX3 + blitWidth > SCREEN_WIDTH)
-            blitWidth = SCREEN_WIDTH - blitX3;
+        if (blitX3 + blitWidth > LOGICAL_SCREEN_WIDTH)
+            blitWidth = LOGICAL_SCREEN_WIDTH - blitX3;
         if (blitWidth < 1)
             continue;
 

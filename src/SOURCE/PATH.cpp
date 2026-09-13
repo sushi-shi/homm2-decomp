@@ -6,6 +6,7 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(CombatPathConstant)
     SPECIAL_DIRECTION_MASK = 0xc0,
@@ -411,10 +412,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return COMBAT_DIRECTION_INVALID;
 
-    sourceColumnCheck = sourceHex % ARMY_HEX_COLUMNS;
-    srcRow = sourceHex / ARMY_HEX_COLUMNS;
-    colTarget = targetHex % ARMY_HEX_COLUMNS;
-    targetRowVal = targetHex / ARMY_HEX_COLUMNS;
+    sourceColumnCheck = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    srcRow = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    colTarget = targetHex % COMBAT_GRID_ROW_LENGTH;
+    targetRowVal = targetHex / COMBAT_GRID_ROW_LENGTH;
     isMovingUp = false;
     isMovingDown = false;
     leftFl = false;

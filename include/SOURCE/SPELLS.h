@@ -68,13 +68,10 @@ H2_ENUM_BEGIN(SpellCastConstant)
     SPELL_STORM_COLUMN_COUNT                       = 12,
     SPELL_STORM_TILE_SIZE                          = 54,
     SPELL_STORM_FRAME_COLUMN_STEP                  = 3,
-    SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT           = 256,
-    SPELL_ARMAGEDDON_PALETTE_SIZE                  = 0x300,
     SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT           = 16,
     SPELL_ARMAGEDDON_SHAKE_PASS_COUNT              = 4,
     SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT             = 15,
     SPELL_ARMAGEDDON_RESTORE_PASS_COUNT            = 16,
-    SPELL_ARMAGEDDON_CHANNEL_MAX                   = 63,
     SPELL_ARMAGEDDON_CHANNEL_STEP                  = 3,
     SPELL_PETRIFY_DURATION                         = 3,
     SPELL_FIZZLE_FRAME_DELAY                       = 75,
@@ -99,7 +96,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     BOLT_BRANCH_RANDOM_HIGH                        = 80,
     BOLT_BRANCH_PERCENT_LIMIT                      = 100,
     BOLT_PALETTE_BRIGHTEN_STEP                     = 16,
-    BOLT_PALETTE_COMPONENT_MAX                     = 63,
     CHAIN_LIGHTNING_MAX_TARGETS                    = 4,
     CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER       = 40,
     CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER       = 2,
@@ -114,7 +110,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     CHAIN_LIGHTNING_MAX_ANGLE                      = 80,
     CHAIN_LIGHTNING_FIRST_MIN_ANGLE                = 10,
     CHAIN_LIGHTNING_FIRST_MAX_ANGLE                = 80,
-    SPELL_MODIFIER_ROW_COUNT                       = 480,
     VAPORIZE_STRIPE_WIDTH                          = 5,
     VAPORIZE_PHASE_COUNT                           = 3,
     VAPORIZE_MASKED                                = 0x7f,
@@ -184,5 +179,9 @@ H2_ENUM_END(SpellCastConstant)
 
 MessageDispatchResult CombatSpecialHandler(struct tag_message&);
 MessageDispatchResult HandleCastSpell(struct tag_message&);
+
+H2_ENUM_BEGIN(SpellStatConstant)
+    SPELL_HASTE_SPEED_BONUS = 2,
+H2_ENUM_END(SpellStatConstant)
 
 #endif

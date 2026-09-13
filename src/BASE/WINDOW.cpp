@@ -18,6 +18,7 @@
 #include <SOURCE/KB.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/display.h>
 H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
     WIDGET_RECORD_END                   = 0,
     WIDGET_RECORD_BORDER                = 1,
@@ -35,8 +36,6 @@ H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
 H2_ENUM_CLASS_END(WindowWidgetRecordType)
 
 H2_ENUM_BEGIN(WindowConstant)
-    SCREEN_WIDTH  = 640,
-    SCREEN_HEIGHT = 480,
     OPEN_FAILURE  = 3
 H2_ENUM_END(WindowConstant)
 
@@ -46,8 +45,8 @@ heroWindow::heroWindow(void) {
     m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
     m_posX = m_posY = 0;
-    m_winWidth = SCREEN_WIDTH;
-    m_winHeight = SCREEN_HEIGHT;
+    m_winWidth = LOGICAL_SCREEN_WIDTH;
+    m_winHeight = LOGICAL_SCREEN_HEIGHT;
     m_winFlags = WINDOW_FLAG_FIXED_LAYER;
     m_winState = WINDOW_STATE_CLOSED;
     m_widgetListTail = m_widgetListHead = NULL;
@@ -364,10 +363,10 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
         toX = 0;
     if (toY < 0)
         toY = 0;
-    if (SCREEN_WIDTH < toX + m_winWidth)
-        toX = SCREEN_WIDTH - m_winWidth;
-    if (SCREEN_HEIGHT < toY + m_winHeight)
-        toY = SCREEN_HEIGHT - m_winHeight;
+    if (LOGICAL_SCREEN_WIDTH < toX + m_winWidth)
+        toX = LOGICAL_SCREEN_WIDTH - m_winWidth;
+    if (LOGICAL_SCREEN_HEIGHT < toY + m_winHeight)
+        toY = LOGICAL_SCREEN_HEIGHT - m_winHeight;
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
     m_posX = toX;
     m_posY = toY;

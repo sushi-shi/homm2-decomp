@@ -17,12 +17,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(SetupConstant)
     WINDOW_X = 405,
     WINDOW_Y = 8,
-    DIALOG_CANCEL = NORMAL_DIALOG_BUTTON_ONE,
-    DIALOG_YES = NORMAL_DIALOG_BUTTON_FIVE,
     PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
     PLAYER_NAME_LENGTH = GLOBAL_PLAYER_NAME_SIZE - 1,
     DEFAULT_PLAYER_NAME_CAPACITY = 24,
@@ -87,7 +86,7 @@ i32 game::SetupBaud(void) {
         case CHOICE_FOUR:
             gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_38400;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
     return 1;
@@ -119,7 +118,7 @@ i32 game::SetupComPort(void) {
         case CHOICE_FOUR:
             gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_4;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
 
@@ -172,7 +171,7 @@ i32 game::SetupHotSeatGame(void) {
         case CHOICE_FIVE:
             giNumHumanPlayers = SIX_PLAYERS;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
 
@@ -188,7 +187,7 @@ i32 game::SetupHotSeatGame(void) {
              localization::Tr("network.hotseat.enter_names_prompt")
         );
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-        if (gpWindowManager->m_dialogResult == DIALOG_YES) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
             for (i = 0; i < giNumHumanPlayers; i++) {
                 strcpy(
                     name,
@@ -229,7 +228,7 @@ i32 game::SetupNetworkGame(void) {
         case CHOICE_TWO:
             iMPExtendedType = REMOTE_GAME_NETWORK_GUEST;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
     return 1;
@@ -286,7 +285,7 @@ i32 game::SetupNetworkGame2(void) {
         case CHOICE_FOUR:
             iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_CONNECT;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
     if (!SetupNetworkGame())
@@ -359,7 +358,7 @@ i32 game::SetupModemGame(void) {
         case CHOICE_THREE:
             gbDoModemConfig = true;
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
     return 1;
@@ -421,7 +420,7 @@ i32 game::SetupMultiPlayerGame(void) {
             }
             LogStr("Common Modem 7");
             break;
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             return 0;
     }
     return 1;
@@ -552,7 +551,7 @@ i32 game::SetupGame(void) {
                         xIsPlayingExpansionCampaign = 1;
                         xIsExpansionMap = true;
                         break;
-                    case DIALOG_CANCEL:
+                    case DIALOG_BUTTON_1:
                         result = false;
                         goto done;
                 }
@@ -576,7 +575,7 @@ i32 game::SetupGame(void) {
                         xIsExpansionMap = true;
                         xCampaign.InitNewCampaign(xCampaign.Choose());
                         break;
-                    case DIALOG_CANCEL:
+                    case DIALOG_BUTTON_1:
                         result = false;
                         goto done;
                 }
@@ -590,7 +589,7 @@ i32 game::SetupGame(void) {
             }
             break;
 
-        case DIALOG_CANCEL:
+        case DIALOG_BUTTON_1:
             result = false;
             goto done;
     }
@@ -645,7 +644,7 @@ i32 game::PickLoadGame(void) {
             case CHOICE_TWO:
                 xIsExpansionMap = true;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 return 0;
         }
 
@@ -666,7 +665,7 @@ i32 game::PickLoadGame(void) {
     if (fileReq == NULL)
         MemError();
     dialogResult = gpExec->DoDialog(fileReq);
-    if (dialogResult == FILE_REQUESTER_OK) {
+    if (dialogResult == DIALOG_BUTTON_2) {
         gpGame->LoadGame(gLastFilename, 0, 0);
         delete fileReq;
         return 1;
@@ -701,7 +700,7 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 4;
                 break;
         }
@@ -735,7 +734,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 4;
                 break;
         }
@@ -772,7 +771,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
             case CHOICE_FIVE:
                 helpIndex = 4;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 5;
                 break;
         }
@@ -799,7 +798,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
             case CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 3;
                 break;
         }
@@ -833,7 +832,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 4;
                 break;
         }
@@ -857,7 +856,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 2;
                 break;
         }
@@ -884,7 +883,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
             case CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 3;
                 break;
         }
@@ -911,7 +910,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
                 case CHOICE_THREE:
                     helpIndex = 2;
                     break;
-                case DIALOG_CANCEL:
+                case DIALOG_BUTTON_1:
                     helpIndex = 3;
                     break;
             }
@@ -946,7 +945,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 2;
                 break;
         }
@@ -970,7 +969,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 2;
                 break;
         }
@@ -994,7 +993,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_CANCEL:
+            case DIALOG_BUTTON_1:
                 helpIndex = 2;
                 break;
         }
@@ -1014,7 +1013,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
             case WIDGET_COMMAND_DESELECT:
                 if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
-                    || message.payload.widget.id == DIALOG_CANCEL)
+                    || message.payload.widget.id == DIALOG_BUTTON_1)
                     handled = true;
         }
     }
@@ -1022,7 +1021,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     if (handled || giMenuCommand != -1) {
         FINISH_DIALOG_MESSAGE(message);
         if (giMenuCommand != -1)
-            gpWindowManager->m_dialogResult = DIALOG_CANCEL;
+            gpWindowManager->m_dialogResult = DIALOG_BUTTON_1;
         return MESSAGE_DISPATCH_FORWARD;
     }
 

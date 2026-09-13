@@ -451,7 +451,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             rowLimit[6] = COMBAT_AI_CASTLE_BOUNDARY_ROW_6;
             rowLimit[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
             rowLimit[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
-            rowIndex = thisArmy->m_hex / ARMY_HEX_COLUMNS;
+            rowIndex = thisArmy->m_hex / COMBAT_GRID_ROW_LENGTH;
             if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0
                 && thisArmy->m_hex < rowLimit[rowIndex]) {
                 targetHex = rowLimit[rowIndex];
@@ -855,7 +855,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     oneBit = COMBAT_AI_MASK_FIRST_BIT;
     enemyMask = 0;
     for (direction = COMBAT_DIRECTION_NORTHEAST;
-         IDX(direction) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
+         IDX(direction) < IDX(COMBAT_DIRECTION_COUNT);
          direction++) {
         if ((availableMask4 & oneBit) != 0
             && currentArmy->ValidAttack(
@@ -906,7 +906,7 @@ i32 combatManager::WalkTowardArmyFront(
         != 0)
         frontDelta = WIDE_CREATURE_FRONT_OFFSET;
     frontHex += currentArmy->m_facing == ARMY_FACING_RIGHT ? frontDelta : -frontDelta;
-    if (frontHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1 || frontHex % ARMY_HEX_COLUMNS == 0)
+    if (frontHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1 || frontHex % COMBAT_GRID_ROW_LENGTH == 0)
         return WalkTowardArmy(currentArmy, side, mask);
 
     oldSpeed = currentArmy->m_monster.speed;
@@ -915,7 +915,7 @@ i32 combatManager::WalkTowardArmyFront(
         currentArmy->m_hex,
         frontHex,
         currentArmy,
-        COMBAT_AI_PATH_TO_FRONT,
+        ARMY_PATH_EXACT_TARGET_HEX,
         0
     );
     currentArmy->m_monster.speed = oldSpeed;

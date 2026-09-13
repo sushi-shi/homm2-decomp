@@ -800,7 +800,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             newSpd = (target->m_monster.speed + 1) >> 1;
             goto hasteSlowCommon;
         case ARMY_SPELL_INFLUENCE_HASTE:
-            newSpd = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
+            newSpd = target->m_monster.speed + SPELL_HASTE_SPEED_BONUS;
             if (HAS(target->m_monster.attributes, MONSTER_FLAGS_FLYING))
                 return 0;
         hasteSlowCommon:
@@ -810,10 +810,10 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                 return 0;
             attackMask =
                 target->GetAttackMask(target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
-            if (attackMask != COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS)
+            if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS)
                 return 0;
 
-            columnIndex = target->m_hex % ARMY_HEX_COLUMNS;
+            columnIndex = target->m_hex % COMBAT_GRID_ROW_LENGTH;
             distance = m_currentSide == COMBAT_ATTACKER_SIDE
                            ? columnIndex - COMBAT_SPELL_AI_MINIMUM_DISTANCE
                            : COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - columnIndex;

@@ -39,7 +39,6 @@ H2_ENUM_CLASS_END_SPLIT(HeroPortrait, u8)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_NONE            = -1,
-    RECRUIT_NO_RESOURCE = RES_NONE,
     RES_VALID_BEGIN     = 0,
     RES_WOOD            = RES_VALID_BEGIN,
     RES_MERCURY         = 1,
@@ -104,9 +103,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_SWORDSMAN           = 5,
     CREATURE_MASTER_SWORDSMAN    = 6,
     CREATURE_CAVALRY             = 7,
-    AI_GENERIC_SITE_UPGRADE_FROM = CREATURE_CAVALRY,
     CREATURE_CHAMPION            = 8,
-    AI_GENERIC_SITE_UPGRADE_TO   = CREATURE_CHAMPION,
     CREATURE_PALADIN             = 9,
     CREATURE_CRUSADER            = 10,
     CREATURE_GOBLIN              = 11,
@@ -266,7 +263,6 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_WAND_NEGATION         = 62,
     ARTIFACT_GOLDEN_BOW            = 63,
     ARTIFACT_TELESCOPE             = 64,
-    CURSOR_VISIBILITY_ARTIFACT     = ARTIFACT_TELESCOPE,
     ARTIFACT_STATESMANS_QUILL      = 65,
     ARTIFACT_WIZARD_HAT            = 66,
     ARTIFACT_POWER_RING            = 67,
@@ -692,7 +688,6 @@ H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_NONE                          = -1,
     TOWN_OBJECT_NONE                            = BUILDING_SLOT_NONE,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
-    CASTLE_MAGE_GUILD                           = BUILDING_SLOT_MAGE_GUILD,
     TOWN_OBJECT_MAGE_GUILD                      = BUILDING_SLOT_MAGE_GUILD,
     TOWN_OBJECT_PRIMARY_ANIMATION               = BUILDING_SLOT_MAGE_GUILD,
     BUILDING_SLOT_SPECIAL_ONE                   = 1,
@@ -731,7 +726,6 @@ H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_DISABLED_FIRST                = 14,
     TOWN_OBJECT_BOAT                            = BUILDING_SLOT_DISABLED_FIRST,
     BUILDING_SLOT_NEUTRAL_LAST                  = 15,
-    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST,
     TOWN_OBJECT_CAPTAIN_QUARTERS                = BUILDING_SLOT_NEUTRAL_LAST,
     BUILDING_SLOT_DISABLED_SECOND               = 16,
     TOWN_OBJECT_RACE_OVERLAY                    = BUILDING_SLOT_DISABLED_SECOND,
@@ -910,7 +904,6 @@ H2_ENUM_FLAGS(SpellInfoAttribute)
 
 H2_ENUM_BEGIN(SpellInfoConstant)
     SPELL_INFO_SOUND_NAME_SIZE = 9,
-    SPELL_INFO_RACE_COUNT      = IDX(FACTION_COUNT)
 H2_ENUM_END(SpellInfoConstant)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(SpellLevel, u8)
@@ -928,7 +921,7 @@ struct SSpellInfo {
     H2_ENUM_STORAGE(CombatEffectType, u8) combatEffect;
     i16 aiValue;
     u8 cost;
-    u8 raceChance[SPELL_INFO_RACE_COUNT];
+    u8 raceChance[IDX(FACTION_COUNT)];
     SpellInfoAttribute attributes;
 };
 SIZE(SSpellInfo, 0x16);
@@ -942,5 +935,9 @@ struct SWinSetup {
 };
 SIZE(SWinSetup, 7);
 #pragma pack(pop)
+
+H2_ENUM_BEGIN(DwellingLayoutConstant)
+    KB_DWELLING_TYPE_COUNT = 12,
+H2_ENUM_END(DwellingLayoutConstant)
 
 #endif

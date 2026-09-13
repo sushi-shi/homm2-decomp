@@ -39,6 +39,7 @@ class townManager;
 #include <BASE/soundManager.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/town.h>
 
 H2_ENUM_BEGIN(GlobalTimerConstant)
     GLOBAL_TIMER_COUNT               = 10,
@@ -109,7 +110,6 @@ H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
     CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
     CAMPAIGN_NORMAL_SCENARIO_LIMIT    = 5,
-    CAMPAIGN_HERO_COUNT               = 54,
     CAMPAIGN_HERO_PRIORITY_HIGH       = 100,
     CAMPAIGN_HERO_PRIORITY_NORMAL     = 90,
     CAMPAIGN_EXPERIENCE_BONUS         = 5000,
@@ -151,18 +151,8 @@ SIZE(SPlayerExit, 7);
 
 H2_ENUM_BEGIN(EventWindowConstant)
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
-    EVENT_WINDOW_CLOSE_COMMAND          = 10,
     EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
     EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
-    EVENT_WINDOW_FIRST_BUTTON           = 0x7800,
-    EVENT_WINDOW_SECOND_BUTTON          = 0x7801,
-    EVENT_WINDOW_THIRD_BUTTON           = 0x7802,
-    EVENT_WINDOW_FOURTH_BUTTON          = 0x7803,
-    EVENT_WINDOW_IGNORED_BUTTON         = 0x7804,
-    EVENT_WINDOW_FIFTH_BUTTON           = 0x7805,
-    EVENT_WINDOW_SIXTH_BUTTON           = 0x7806,
-    EVENT_WINDOW_SEVENTH_BUTTON         = 0x7807,
-    EVENT_WINDOW_EIGHTH_BUTTON          = 0x7808,
     EVENT_WINDOW_LUCK                   = 10,
     EVENT_WINDOW_BAD_LUCK               = 11,
     EVENT_WINDOW_MORALE                 = 12,
@@ -172,26 +162,8 @@ H2_ENUM_END(EventWindowConstant)
 
 H2_ENUM_BEGIN(KbBuildingConstant)
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
-    KB_BUILDING_RESOURCE_COUNT = 7,
-    KB_MAGE_GUILD_MAX_LEVEL    = 5,
-    KB_MAGE_GUILD_LEVEL_COUNT  = KB_MAGE_GUILD_MAX_LEVEL + 1,
-    KB_DWELLING_TYPE_COUNT     =
-        IDX(BUILDING_SLOT_DWELLING_LAST) - IDX(BUILDING_SLOT_DWELLING_FIRST) + 1
+    KB_MAGE_GUILD_LEVEL_COUNT  = TOWN_MAGE_GUILD_LEVEL_COUNT + 1,
 H2_ENUM_END(KbBuildingConstant)
-
-H2_ENUM_CLASS_BEGIN(KbDwellingFlag)
-    KB_DWELLING_FIRST_FLAG          = 0x00100000,
-    KB_DWELLING_SECOND_FLAG         = 0x00200000,
-    KB_DWELLING_THIRD_FLAG          = 0x00400000,
-    KB_DWELLING_FOURTH_FLAG         = 0x00800000,
-    KB_DWELLING_FIFTH_FLAG          = 0x01000000,
-    KB_DWELLING_UPGRADE_FIRST_FLAG  = 0x02000000,
-    KB_DWELLING_UPGRADE_SECOND_FLAG = 0x04000000,
-    KB_DWELLING_UPGRADE_THIRD_FLAG  = 0x08000000,
-    KB_DWELLING_UPGRADE_FOURTH_FLAG = 0x10000000,
-    KB_DWELLING_UPGRADE_FIFTH_FLAG  = 0x20000000,
-    KB_DWELLING_UPGRADE_SIXTH_FLAG  = 0x40000000
-H2_ENUM_CLASS_END(KbDwellingFlag)
 
 H2_ENUM_BEGIN(NormalDialogResourceType)
     NORMAL_DIALOG_NO_RESOURCE      = -1,
@@ -242,21 +214,12 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_MAX_ROWS                 = 6,
     NORMAL_DIALOG_TEXT_LINE_WIDTH          = 244,
     NORMAL_DIALOG_TEXT_LINE_HEIGHT         = 16,
-    NORMAL_DIALOG_SCREEN_RIGHT             = 639,
-    NORMAL_DIALOG_SCREEN_BOTTOM            = 479,
-    NORMAL_DIALOG_SCREEN_HEIGHT            = 480,
     NORMAL_DIALOG_MAX_TOP                  = 28,
     NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID     = 100,
     NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID = 0x1e14,
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
     NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
     NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
-    NORMAL_DIALOG_BUTTON_ONE               = 0x7801,
-    NORMAL_DIALOG_BUTTON_TWO               = 0x7802,
-    NORMAL_DIALOG_BUTTON_FIVE              = 0x7805,
-    NORMAL_DIALOG_BUTTON_SIX               = 0x7806,
-    NORMAL_DIALOG_BUTTON_SEVEN             = 0x7807,
-    NORMAL_DIALOG_BUTTON_EIGHT             = 0x7808,
 H2_ENUM_END(NormalDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
@@ -361,8 +324,6 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
     OLD_MAIN_DEFAULT_NAME_STRIDE              = 4,
-    OLD_MAIN_SCREEN_WIDTH                     = 640,
-    OLD_MAIN_SCREEN_HEIGHT                    = 480,
     OLD_MAIN_MAIN_MUSIC                       = 42,
     OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
     OLD_MAIN_FADE_SPEED                       = 8,
@@ -392,7 +353,6 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
     OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
     OLD_MAIN_DIALOG_WAIT                      = 6,
-    OLD_MAIN_REMOTE_PAYLOAD_SIZE              = REMOTE_MESSAGE_PAYLOAD_SIZE
 H2_ENUM_END(OldMainConstant)
 
 #pragma pack(push, 1)
@@ -421,7 +381,7 @@ struct KbRemotePacket {
     union {
         OldMainNetSetup setup;
         RemoteSaveInitialization save;
-        char data[OLD_MAIN_REMOTE_PAYLOAD_SIZE];
+        char data[REMOTE_MESSAGE_PAYLOAD_SIZE];
     } payload;
 };
 #pragma pack(pop)
@@ -431,10 +391,8 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_CHECKED             = 8,
     APP_MENU_UNCHECKED           = 0,
     APP_MENU_CONFIRM_DIALOG      = 2,
-    APP_MENU_CONFIRM_OK          = 0x7805,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
-    APP_MENU_MAX_SPELLS          = 0x41,
     APP_MENU_SPELL_COUNT         = 10,
     APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
@@ -447,7 +405,6 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_ARMY_LAST           = 41066,
     APP_MENU_SECONDARY_FIRST     = 42000,
     APP_MENU_SECONDARY_LAST      = 42056,
-    APP_MENU_SECONDARY_LEVELS    = 4,
     APP_MENU_BUILDING_FIRST      = 43000,
     APP_MENU_BUILDING_LAST       = 43101,
     APP_MENU_COMBAT_FIRST        = 44000,
@@ -644,7 +601,7 @@ extern configStruct gConfig;
 #define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[IDX(giCurExe)])
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
-extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][IDX(RES_COUNT)];
 extern H2_CONST char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
 extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][KB_DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
@@ -671,11 +628,11 @@ extern i32 giTotalHighMem;
 extern DialogWaitType giWaitType;
 extern i32 glTimers[GLOBAL_TIMER_COUNT];
 extern i32 gMageBaseResourceValues[];
-extern i32 gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gMageBuildingCosts[][IDX(RES_COUNT)];
 extern tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)];
 extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern i32 gNeutralBaseResourceValues[];
-extern i32 gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gNeutralBuildingCosts[][IDX(RES_COUNT)];
 extern H2_CONST char* gNeutralBuildingNames[];
 extern advManager* gpAdvManager;
 extern palette* gPalette;
@@ -694,7 +651,7 @@ extern class heroWindowManager* gpWindowManager;
 extern i32 gResourceBaseValue[];
 extern icon* gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
-extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gSpecialBuildingCosts[][IDX(RES_COUNT)];
 extern H2_CONST char* gSpecialBuildingNames[];
 extern SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)];
 extern icon* gSystemIcons;

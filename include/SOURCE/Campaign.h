@@ -23,9 +23,6 @@ H2_ENUM_CLASS_BEGIN(CampaignAward)
 H2_ENUM_CLASS_END(CampaignAward)
 
 H2_ENUM_BEGIN(CampaignMessageConstant)
-    CAMPAIGN_CLOSE_COMMAND               = 10,
-    CAMPAIGN_DIALOG_CANCEL               = 0x7801,
-    CAMPAIGN_DIALOG_ACCEPT               = 0x7802,
     CAMPAIGN_DIALOG_RESTART              = 0x385,
     CAMPAIGN_DIALOG_REPLAY               = 0x386,
     CAMPAIGN_TRACK_WIDGET_0              = 0x352,

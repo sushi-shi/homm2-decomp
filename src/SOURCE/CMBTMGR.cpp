@@ -34,6 +34,8 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/combatTypes.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
@@ -60,7 +62,6 @@ H2_ENUM_BEGIN(CombatSystemOptionWidget)
     SYSTEM_OPTION_GRID_TEXT         = 23,
     SYSTEM_OPTION_SHADE_TEXT        = 24,
     SYSTEM_OPTION_MOUSE_HEX_TEXT    = 25,
-    SYSTEM_OPTION_CLOSE_BUTTON      = 0x7800
 H2_ENUM_END(CombatSystemOptionWidget)
 
 H2_ENUM_BEGIN(CombatSystemOptionConstant)
@@ -72,7 +73,6 @@ H2_ENUM_BEGIN(CombatSystemOptionConstant)
     SYSTEM_OPTION_GRID_STATE_OFFSET       = 8,
     SYSTEM_OPTION_SHADE_STATE_OFFSET      = 10,
     SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET  = 12,
-    SYSTEM_OPTION_DRAW_MASK               = 0x7fff,
     SYSTEM_OPTION_WINDOW_X                = 160,
     SYSTEM_OPTION_WINDOW_Y                = 33
 H2_ENUM_END(CombatSystemOptionConstant)
@@ -100,7 +100,6 @@ H2_ENUM_BEGIN(CombatPresentationConstant)
 H2_ENUM_END(CombatPresentationConstant)
 
 H2_ENUM_BEGIN(CombatMapConstant)
-    MONSTER_COUNT_SAVE_LIMIT  = 4000,
     MAP_RANDOM_OFFSET_MINIMUM = 8,
     MAP_RANDOM_OFFSET_MAXIMUM = 15
 H2_ENUM_END(CombatMapConstant)
@@ -482,7 +481,7 @@ void combatManager::SetupAdjacencyArray(void) {
 VA(0x004269fe, 0x427)
 i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
-    memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
+    memcpy(m_savedPalette, gPalette->m_data, PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = true;
     i32 savedMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
@@ -493,7 +492,7 @@ i32 combatManager::Open(i32 openFlags) {
     gpSoundManager->PlayAmbientMusic(-1);
     m_combatBuffer =
         new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
-    m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, LOGICAL_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     m_mouseGridBuffer = NULL;
     m_smallViewLastX[IDX(COMBAT_ATTACKER_SIDE)] = -1;
     m_smallViewLastX[IDX(COMBAT_DEFENDER_SIDE)] = -1;
@@ -528,7 +527,7 @@ i32 combatManager::Open(i32 openFlags) {
     CombatMessage("", 1, 1, 0);
     gConfig.showCombatMouseHex = savedMouseHex;
     if (gpBufferPalette->m_data != m_combatPalette->m_data)
-        memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
+        memmove(m_combatPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(&preBattleSample);
@@ -550,8 +549,8 @@ void combatManager::Close(void) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gbLimitedCombatUpdatePalette = false;
     if (!gbClosingApp) {
-        memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
-        memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
+        memcpy(gPalette->m_data, m_savedPalette, PALETTE_DATA_SIZE);
+        memcpy(gpBufferPalette->m_data, m_savedPalette, PALETTE_DATA_SIZE);
     }
     gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
@@ -576,8 +575,8 @@ void combatManager::Close(void) {
     }
 
     if (m_battlefieldCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER))) {
-        if (total > MONSTER_COUNT_SAVE_LIMIT)
-            total = MONSTER_COUNT_SAVE_LIMIT;
+        if (total > WEEKLY_MONSTER_LIMIT)
+            total = WEEKLY_MONSTER_LIMIT;
         m_battlefieldCell->m_objectMetadata = total & IDX(MAP_MONSTER_COUNT_MASK);
     }
 
@@ -751,7 +750,7 @@ i32 combatManager::MoreTreesNear(void) {
     mapCell* combatCell10;
     i32 radius;
     i32 combatOriginX10;
-    NearbyFeature nearbyTypeTable4[NEARBY_RADIUS_COUNT][NORMAL_DIRECTION_COUNT];
+    NearbyFeature nearbyTypeTable4[NEARBY_RADIUS_COUNT][IDX(MAP_DIRECTION_COUNT)];
     H2_ENUM_STORAGE(TilesetId, u8) nearbyTileset;
     i32 nearbyDirection6;
     i32 centerY8;
@@ -761,7 +760,7 @@ i32 combatManager::MoreTreesNear(void) {
     centerY8 = m_combatY;
 
     for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
-        for (nearbyDirection6 = 0; nearbyDirection6 < NORMAL_DIRECTION_COUNT; nearbyDirection6++) {
+        for (nearbyDirection6 = 0; nearbyDirection6 < IDX(MAP_DIRECTION_COUNT); nearbyDirection6++) {
             x = combatOriginX10 + normalDirTable[nearbyDirection6].x * radius;
             y = centerY8 + normalDirTable[nearbyDirection6].y * radius;
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
@@ -793,7 +792,7 @@ i32 combatManager::MoreTreesNear(void) {
     treeCount6 = 0;
     mountainCounter1 = 0;
     for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
-        for (nearbyDirection6 = 0; nearbyDirection6 < NORMAL_DIRECTION_COUNT; nearbyDirection6++) {
+        for (nearbyDirection6 = 0; nearbyDirection6 < IDX(MAP_DIRECTION_COUNT); nearbyDirection6++) {
             if (nearbyTypeTable4[radius][nearbyDirection6] == NEARBY_MOUNTAIN)
                 mountainCounter1++;
             if (nearbyTypeTable4[radius][nearbyDirection6] == NEARBY_TREE)
@@ -918,7 +917,7 @@ void combatManager::LoadArmies(void) {
             != CREATURE_NONE) {
             if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]
                 && HAS(m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
-                hex = COMBAT_GROUPED_HEX_STEP * groupSlot + COMBAT_ATTACKER_GROUPED_HEX;
+                hex = COMBAT_GRID_ROW_LENGTH * groupSlot + COMBAT_ATTACKER_GROUPED_HEX;
             else
                 hex = COMBAT_GRID_ROW_LENGTH * groupSlot * 2 + COMBAT_ATTACKER_SPREAD_HEX;
 
@@ -940,7 +939,7 @@ void combatManager::LoadArmies(void) {
                  && HAS(m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
                 || (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]
                     && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_formation))
-                hex = COMBAT_GROUPED_HEX_STEP * groupSlot + COMBAT_DEFENDER_GROUPED_HEX;
+                hex = COMBAT_GRID_ROW_LENGTH * groupSlot + COMBAT_DEFENDER_GROUPED_HEX;
             else
                 hex = COMBAT_GRID_ROW_LENGTH * groupSlot * 2 + COMBAT_DEFENDER_SPREAD_HEX;
 
@@ -1018,10 +1017,10 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
         if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX && y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN
             && y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
             return COMBAT_GRID_LEFT_SPECIAL_HEX;
-        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
+        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= LOGICAL_SCREEN_MAX_X
             && y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN && y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
             return COMBAT_GRID_RIGHT_UPPER_HEX;
-        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
+        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= LOGICAL_SCREEN_MAX_X
             && y >= COMBAT_GRID_RIGHT_LOWER_Y_MIN && y <= COMBAT_GRID_RIGHT_LOWER_Y_MAX
             && m_inCastleCombat)
             return COMBAT_BALLISTA_HEX;
@@ -1454,8 +1453,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 giMinExtentX = 0;
             if (giMinExtentY < 0)
                 giMinExtentY = 0;
-            if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
-                giMaxExtentX = COMBAT_MAX_EXTENT_X;
+            if (giMaxExtentX > LOGICAL_SCREEN_MAX_X)
+                giMaxExtentX = LOGICAL_SCREEN_MAX_X;
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
                 giMaxExtentY = COMBAT_MAX_EXTENT_Y;
             if (giMaxExtentY < COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y)
@@ -1493,8 +1492,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         giMinExtentX -= COMBAT_CATAPULT_IMPACT_EXTENT_X;
     if (giMinExtentX < 0)
         giMinExtentX = 0;
-    if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
-        giMaxExtentX = COMBAT_MAX_EXTENT_X;
+    if (giMaxExtentX > LOGICAL_SCREEN_MAX_X)
+        giMaxExtentX = LOGICAL_SCREEN_MAX_X;
     if (giMinExtentY < 0)
         giMinExtentY = 0;
     if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
@@ -1522,7 +1521,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -1537,7 +1536,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -1647,7 +1646,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     sprintf(gText, "keepshot.82M");
     SAMPLE2 keepSample7 = LoadPlaySample(gText);
 
-    CombatTowerOrigin towerOrigins7[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
+    CombatTowerOrigin towerOrigins7[IDX(FACTION_COUNT)][COMBAT_KEEP_TOWER_COUNT] = {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
@@ -2137,7 +2136,7 @@ void combatManager::ShootMissile(
     missileHalfWidth = COMBAT_MISSILE_HALF_WIDTH;
     missileHalfHeight = COMBAT_MISSILE_HALF_HEIGHT;
     missileBackground = new bitmap(
-        COMBAT_MISSILE_BITMAP_TYPE,
+        BITMAP_TYPE_MEMORY,
         missileHalfWidth * MISSILE_DIAMETER_MULTIPLIER,
         missileHalfHeight * MISSILE_DIAMETER_MULTIPLIER
     );
@@ -2149,9 +2148,9 @@ void combatManager::ShootMissile(
 
     oldX = posX;
     oldY = posY;
-    minimumX = COMBAT_MAX_EXTENT_X;
+    minimumX = LOGICAL_SCREEN_MAX_X;
     maxX = 0;
-    minY = COMBAT_SCREEN_HEIGHT;
+    minY = LOGICAL_SCREEN_HEIGHT;
     maxY = 0;
     for (frame = 0; frame < missileSteps; frame++) {
         if (oldX - missileHalfWidth < minimumX)
@@ -2160,8 +2159,8 @@ void combatManager::ShootMissile(
             minimumX = 0;
         if (oldX + missileHalfWidth > maxX)
             maxX = oldX + missileHalfWidth;
-        if (maxX > COMBAT_MAX_EXTENT_X)
-            maxX = COMBAT_MAX_EXTENT_X;
+        if (maxX > LOGICAL_SCREEN_MAX_X)
+            maxX = LOGICAL_SCREEN_MAX_X;
         if (oldY - missileHalfHeight < minY)
             minY = oldY - missileHalfHeight;
         if (minY < 0)
@@ -2289,7 +2288,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
     message.payload.widget.data.text = onOffText[gConfig.showCombatMouseHex];
     CSPanel->BroadcastMessage(message);
     if (!initialDraw)
-        CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
+        CSPanel->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
 }
 
 VA(0x0042b527, 0x2b3)
@@ -2305,7 +2304,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
-                    case SYSTEM_OPTION_CLOSE_BUTTON:
+                    case DIALOG_BUTTON_0:
                         helpIndex = IDX(HELP_CLOSE);
                         break;
                     case SYSTEM_OPTION_SPEED_BUTTON:
@@ -2335,7 +2334,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
-                        case SYSTEM_OPTION_CLOSE_BUTTON:
+                        case DIALOG_BUTTON_0:
                             bDone = true;
                             break;
                     }

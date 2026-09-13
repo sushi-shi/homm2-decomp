@@ -11,6 +11,7 @@
 #include "hexcell.h"
 #include "SPELLS.h"
 #include <SOURCE/combatTypes.h>
+#include <BASE/palette.h>
 
 class armyGroup;
 class hero;
@@ -147,7 +148,6 @@ H2_ENUM_BEGIN(CombatCatapultConstant)
     COMBAT_CATAPULT_CLOUD_Y_OFFSET            = 25,
     COMBAT_CATAPULT_KEEP_IMPACT_X             = 600,
     COMBAT_CATAPULT_KEEP_IMPACT_Y             = 160,
-    COMBAT_KEEP_FACTION_COUNT                 = IDX(FACTION_COUNT),
     COMBAT_KEEP_TOWER_COUNT                   = 3,
     COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
     COMBAT_KEEP_TOWER_DAMAGE_BONUS            = 2,
@@ -161,7 +161,6 @@ H2_ENUM_END(CombatCatapultConstant)
 
 H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_GRID_ROW_COUNT                   = 9,
-    COMBAT_GRID_ROW_LENGTH                  = 13,
     COMBAT_GRID_FIRST_COLUMN                = 1,
     COMBAT_GRID_COLUMN_END                  = 12,
     COMBAT_GRID_REVERSE_FIRST_COLUMN        = 11,
@@ -172,7 +171,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_MESSAGE_STATE_PAD_SIZE           = 0x64,
     COMBAT_RUNTIME_DOUBLE_PAD_SIZE          = 0x8,
     COMBAT_SMALL_VIEW_PAD_SIZE              = 0x10,
-    COMBAT_WIN_LOSE_WIDGET_COUNT            = 25,
     COMBAT_DIRECTION_MAP_COUNT              = 24,
     COMBAT_BACKGROUND_NAME_SIZE             = 13,
     COMBAT_DURATION_MOD_COUNT               = 11,
@@ -193,11 +191,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_GATE_FRAME                = 0x1a,
     COMBAT_CASTLE_GATE_CLOSED_FRAME         = 0x14,
     COMBAT_CASTLE_WALL_BASE_FRAME           = 0x11,
-    COMBAT_SCREEN_WIDTH                     = 0x280,
-    COMBAT_SCREEN_HEIGHT                    = 480,
-    COMBAT_AREA_HEIGHT                      = 0x1bb,
-    COMBAT_MAX_EXTENT_X                     = 0x27f,
-    COMBAT_MAX_EXTENT_Y                     = 0x1ba,
     COMBAT_OBSTACLE_TYPE_COUNT              = 32,
     COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH     = 32,
     COMBAT_OBSTACLE_CELL_ROLL_MAX           = 116,
@@ -205,8 +198,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_OBSTACLE_MIN_COLUMN_OFFSET       = 1,
     COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT       = 3,
     COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST      = 10,
-    COMBAT_ELEVATION_OVERLAY_COUNT          = 25,
-    COMBAT_ELEVATION_OVERLAY_CELL_COUNT     = 15,
     COMBAT_ELEVATION_OVERLAY_CHANCE         = 40,
     COMBAT_ELEVATION_OVERLAY_TRY_LIMIT      = 100,
     COMBAT_RANDOM_PERCENT_MAX               = 99,
@@ -221,11 +212,7 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_WALL_TRACE_SUBDIVISIONS          = 10,
     COMBAT_MISSILE_DIRECTION_COUNT          = 9,
     COMBAT_MISSILE_LAST_DIRECTION           = 8,
-    COMBAT_MISSILE_HALF_WIDTH               = 25,
-    COMBAT_MISSILE_HALF_HEIGHT              = 25,
-    COMBAT_MISSILE_SPACING                  = 31,
     COMBAT_MISSILE_SPACING_ROUND            = 15,
-    COMBAT_MISSILE_TIMER_DELAY              = 25,
     COMBAT_SMALL_VIEW_FULL_INFO             = 2,
     COMBAT_SMALL_VIEW_LEFT_X                = 5,
     COMBAT_SMALL_VIEW_RIGHT_X               = 555,
@@ -273,7 +260,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_MESSAGE_WIDGET_SECOND            = 13,
     COMBAT_MESSAGE_DRAW_FIRST_WIDGET        = 10,
     COMBAT_BALLISTA_HEX                     = 77,
-    COMBAT_HEX_COUNT                        = 117,
     COMBAT_GRID_COPY_LEFT                   = 67,
     COMBAT_GRID_COPY_TOP                    = 63,
     COMBAT_GRID_COPY_RIGHT                  = 573,
@@ -288,7 +274,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_MOUSE_REDRAW_DELAY               = 75,
     COMBAT_BACKGROUND_COPY_WIDTH            = 507,
     COMBAT_BACKGROUND_COPY_HEIGHT           = 380,
-    COMBAT_PALETTE_DATA_SIZE                = 0x300,
     COMBAT_HEX_HORIZONTAL_STEP              = 44,
     COMBAT_HEX_VERTICAL_STEP                = 42,
     COMBAT_HEX_ROW_STAGGER                  = 22,
@@ -316,7 +301,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_SPEED_LEVEL_COUNT                = 15,
     COMBAT_MAX_SPEED                        = 14,
     COMBAT_HERO_EXPERIENCE_VALUE            = 500,
-    COMBAT_GROUPED_HEX_STEP                 = 13,
     COMBAT_SPREAD_HEX_STEP                  = 26,
     COMBAT_ATTACKER_GROUPED_HEX             = 27,
     COMBAT_ATTACKER_SPREAD_HEX              = 1,
@@ -371,7 +355,6 @@ H2_ENUM_CLASS_END(CombatIconIndex)
 
 H2_ENUM_BEGIN(CombatRuntimeConstant)
     COMBAT_RANDOM_X_MULTIPLIER            = 100,
-    COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER = 10,
     COMBAT_CAPTAIN_SPRITE_OFFSET          = IDX(FACTION_COUNT),
     COMBAT_NEUTRAL_HERO_COLOR             = IDX(FACTION_COUNT),
     COMBAT_POINTER_DEFAULT                = 6,
@@ -396,8 +379,6 @@ H2_ENUM_BEGIN(CombatAIConstant)
     COMBAT_AI_NO_ARMY                  = -1,
     COMBAT_AI_LICH_DAMAGE_PER_CREATURE = 9,
     COMBAT_AI_LICH_HIT_POINT_BONUS     = 100,
-    COMBAT_AI_ATTACK_DIRECTION_COUNT   = 8,
-    COMBAT_AI_ALL_ATTACK_DIRECTIONS    = 0xFF,
     COMBAT_AI_UNLIMITED_PATH_SPEED     = 0x7f,
     COMBAT_AI_DISTANCE_WEIGHT          = 1000,
     COMBAT_AI_WORST_STRENGTH_LIMIT     = 999999999,
@@ -429,11 +410,9 @@ H2_ENUM_END(CombatAIConstant)
 H2_ENUM_BEGIN(CombatSpellAIConstant)
     COMBAT_SPELL_AI_MIRROR_POWER_ONE                 = 1,
     COMBAT_SPELL_AI_MIRROR_POWER_TWO                 = 2,
-    COMBAT_SPELL_AI_HASTE_SPEED_BONUS                = 2,
     COMBAT_SPELL_AI_MINIMUM_DISTANCE                 = 2,
     COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS            = 3,
     COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN            = 10,
-    COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS            = 0xFF,
     COMBAT_SPELL_AI_DECISIVE_EFFECT                  = 100000000,
     COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE             = 999999
 H2_ENUM_END(CombatSpellAIConstant)
@@ -464,7 +443,7 @@ H2_ENUM_CLASS_END_T(CombatGridShade, u8)
 class combatManager H2_FINAL : public baseManager {
 public:
     class palette* m_combatPalette;
-    i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];
+    i8 m_savedPalette[PALETTE_DATA_SIZE];
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
     H2_ENUM_STORAGE(CombatGridShade, u8) m_previousGridState[COMBAT_HEX_COUNT];

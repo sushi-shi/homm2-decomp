@@ -51,8 +51,6 @@ H2_ENUM_BEGIN(FileRequesterControlId)
     FILE_REQUESTER_MAP_PLAYER_ICON_FIRST       = 220,
     FILE_REQUESTER_MAP_VICTORY_ICON_FIRST      = 240,
     FILE_REQUESTER_MAP_LOSS_ICON_FIRST         = 260,
-    FILE_REQUESTER_CANCEL                      = 0x7801,
-    FILE_REQUESTER_OK                          = 0x7802,
     FILE_REQUESTER_FILTER_SMALL                = 100,
     FILE_REQUESTER_FILTER_MEDIUM               = 101,
     FILE_REQUESTER_FILTER_LARGE                = 102,

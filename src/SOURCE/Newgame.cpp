@@ -25,6 +25,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 #include <SOURCE/GAME.h>
+#include <BASE/dialog.h>
+#include <BASE/widget.h>
 
 H2_ENUM_BEGIN(NewGameConstant)
     GAME_TEXT_BUFFER_COUNT                = 3,
@@ -45,11 +47,7 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_REMOTE_CANCEL                    = 0x36,
     GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
-    GAME_DIALOG_CLOSE_MESSAGE             = 10,
-    GAME_DIALOG_CANCEL                    = 0x7801,
-    GAME_DIALOG_OK                        = 0x7802,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
-    GAME_WIDGET_ACTIVE_FRAME              = 0x1000,
     GAME_WIDGET_INACTIVE_FRAME            = 2,
     GAME_WIDGET_REFRESH_FRAME             = 4,
     GAME_SHADOW_FRAME                     = 6,
@@ -108,16 +106,6 @@ H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
     GAME_KEY_ENTER          = 10,
     GAME_KEY_BACKSPACE      = 0x7f,
     GAME_KEY_FIRST_EXTENDED = 0x100,
-    GAME_KEYPAD_HOME        = 0x47,
-    GAME_KEYPAD_UP          = 0x48,
-    GAME_KEYPAD_PAGE_UP     = 0x49,
-    GAME_KEYPAD_LEFT        = 0x4b,
-    GAME_KEYPAD_CENTER      = 0x4c,
-    GAME_KEYPAD_RIGHT       = 0x4d,
-    GAME_KEYPAD_END         = 0x4f,
-    GAME_KEYPAD_DOWN        = 0x50,
-    GAME_KEYPAD_PAGE_DOWN   = 0x51,
-    GAME_KEYPAD_INSERT      = 0x52
 H2_ENUM_CLASS_END(NewGameKeyCode)
 
 H2_ENUM_BEGIN(NewGameStorageConstant)
@@ -144,7 +132,6 @@ H2_ENUM_END(NewGameDialogConstant)
 H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
     MAP_CHOICE_STANDARD  = 1,
     MAP_CHOICE_EXPANSION = 2,
-    MAP_CHOICE_CANCEL    = GAME_DIALOG_CANCEL
 H2_ENUM_CLASS_END(NewGameMapChoice)
 
 H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
@@ -267,7 +254,7 @@ void game::GetMap(void) {
     if (requesterResult == NULL)
         MemError();
     loadResult = gpExec->DoDialog(requesterResult);
-    if (loadResult == FILE_REQUESTER_OK) {
+    if (loadResult == DIALOG_BUTTON_2) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
         if (stricmp(savedName, gMapName) != 0) {
@@ -424,14 +411,14 @@ i32 game::NewGame(void) {
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        switch (NewGameMapChoice(static_cast<i16>(gpWindowManager->m_dialogResult))) {
-            case MAP_CHOICE_STANDARD:
+        switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
+            case IDX(MAP_CHOICE_STANDARD):
                 xIsExpansionMap = false;
                 break;
-            case MAP_CHOICE_EXPANSION:
+            case IDX(MAP_CHOICE_EXPANSION):
                 xIsExpansionMap = true;
                 break;
-            case MAP_CHOICE_CANCEL:
+            case DIALOG_BUTTON_1:
                 return 0;
         }
     }
@@ -486,21 +473,21 @@ i32 game::NewGame(void) {
                     windowMessage.type = MESSAGE_WIDGET;
                     windowMessage.payload.widget.id = GAME_MAP_OPTIONS_CONTROL;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.id = GAME_DIALOG_OK;
+                    windowMessage.payload.widget.id = DIALOG_BUTTON_2;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.id = GAME_DIALOG_CANCEL;
+                    windowMessage.payload.widget.id = DIALOG_BUTTON_1;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_ACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                     windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
@@ -509,7 +496,7 @@ i32 game::NewGame(void) {
                     gbNewGameDialogOver = false;
                     gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
                     delete m_newGameWindow;
-                    if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
+                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_1) {
                         result = false;
                         goto cleanup;
                     }
@@ -598,7 +585,7 @@ i32 game::NewGame(void) {
         gbNewGameDialogOver = false;
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
         delete m_newGameWindow;
-        if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_1) {
             result = false;
         } else {
             m_playerCount = m_mapHeader.playerCount;
@@ -996,9 +983,9 @@ VA(0x0047734a, 0xdd1)
                 switch (remotePacketResult->command) {
                     case GAME_REMOTE_START:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
+                        gpWindowManager->m_dialogResult = DIALOG_BUTTON_2;
                         message.type = MESSAGE_WIDGET;
-                        message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
 
@@ -1137,9 +1124,9 @@ VA(0x0047734a, 0xdd1)
                         helpDialogIndexLocal = GAME_HELP_MAP;
                     if (message.payload.widget.id == NEW_GAME_RATING)
                         helpDialogIndexLocal = GAME_HELP_RATING;
-                    if (message.payload.widget.id == GAME_DIALOG_OK)
+                    if (message.payload.widget.id == DIALOG_BUTTON_2)
                         helpDialogIndexLocal = GAME_HELP_OK;
-                    if (message.payload.widget.id == GAME_DIALOG_CANCEL)
+                    if (message.payload.widget.id == DIALOG_BUTTON_1)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
                         NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
@@ -1148,7 +1135,7 @@ VA(0x0047734a, 0xdd1)
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
                         switch (message.payload.widget.id) {
-                            case GAME_DIALOG_OK:
+                            case DIALOG_BUTTON_2:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
@@ -1159,12 +1146,12 @@ VA(0x0047734a, 0xdd1)
                                     );
                                 }
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
-                                message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                                message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                                 message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                                 gbNewGameDialogOver = true;
                                 return MESSAGE_DISPATCH_FORWARD;
 
-                            case GAME_DIALOG_CANCEL:
+                            case DIALOG_BUTTON_1:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
@@ -1176,7 +1163,7 @@ VA(0x0047734a, 0xdd1)
                                     ShutDown(NULL);
                                 }
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
-                                message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                                message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                                 message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                                 gbNewGameDialogOver = true;
                                 return MESSAGE_DISPATCH_FORWARD;
@@ -1400,7 +1387,7 @@ VA(0x0047734a, 0xdd1)
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
                                         WIDGET_COMMAND_CLEAR_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    mapWindowMessageTemp.payload.widget.id = DIALOG_BUTTON_1;
                                     mapWindowMessageTemp.payload.widget.data.value =
                                         GAME_WIDGET_INACTIVE_FRAME;
                                     gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
@@ -1408,7 +1395,7 @@ VA(0x0047734a, 0xdd1)
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
                                         WIDGET_COMMAND_SET_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    mapWindowMessageTemp.payload.widget.id = DIALOG_BUTTON_1;
                                     mapWindowMessageTemp.payload.widget.data.value =
                                         GAME_WIDGET_INACTIVE_FRAME;
                                     gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
@@ -1518,35 +1505,35 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
                     scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
                         >> KEY_SCAN_CODE_SHIFT;
-                    switch (static_cast<NewGameKeyCode>(scanCode)) {
-                        case GAME_KEYPAD_INSERT:
+                    switch (static_cast<InputManagerScanCode>(scanCode)) {
+                        case IDX(INPUT_SCAN_NUMPAD_0):
                             keyChar = '0';
                             break;
-                        case GAME_KEYPAD_END:
+                        case IDX(INPUT_SCAN_NUMPAD_1):
                             keyChar = '1';
                             break;
-                        case GAME_KEYPAD_DOWN:
+                        case IDX(INPUT_SCAN_NUMPAD_2):
                             keyChar = '2';
                             break;
-                        case GAME_KEYPAD_PAGE_DOWN:
+                        case IDX(INPUT_SCAN_NUMPAD_3):
                             keyChar = '3';
                             break;
-                        case GAME_KEYPAD_LEFT:
+                        case IDX(INPUT_SCAN_NUMPAD_4):
                             keyChar = '4';
                             break;
-                        case GAME_KEYPAD_CENTER:
+                        case IDX(INPUT_SCAN_NUMPAD_5):
                             keyChar = '5';
                             break;
-                        case GAME_KEYPAD_RIGHT:
+                        case IDX(INPUT_SCAN_NUMPAD_6):
                             keyChar = '6';
                             break;
-                        case GAME_KEYPAD_HOME:
+                        case IDX(INPUT_SCAN_NUMPAD_7):
                             keyChar = '7';
                             break;
-                        case GAME_KEYPAD_UP:
+                        case IDX(INPUT_SCAN_NUMPAD_8):
                             keyChar = '8';
                             break;
-                        case GAME_KEYPAD_PAGE_UP:
+                        case IDX(INPUT_SCAN_NUMPAD_9):
                             keyChar = '9';
                             break;
                     }

@@ -8,7 +8,6 @@
 struct tag_message;
 
 H2_ENUM_BEGIN(TradingPostConstant)
-    TRADING_POST_RESOURCE_COUNT     = IDX(RES_COUNT),
     TRADING_POST_WINDOW_X           = 0x9f,
     TRADING_POST_WINDOW_Y           = 0x17,
     TRADING_POST_KNOB_X             = 0x43,
@@ -34,7 +33,7 @@ void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
 MessageDispatchResult TradingPostHandler(struct tag_message&);
 
-extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
+extern u16 coreRatio[IDX(RES_COUNT)];
 extern class iconWidget* tradeKnob;
 extern i32 qtyToTrade;
 extern i32 leftResource;

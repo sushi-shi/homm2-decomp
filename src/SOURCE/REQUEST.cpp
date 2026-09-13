@@ -18,6 +18,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     REQUESTER_HELP_NONE          = -1,
@@ -68,12 +69,6 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
     FILTER_FRAME_BASE           = 9,
     SELECTED_FILL_COLOR         = 2,
     SCROLL_CENTER_DIVISOR       = 2,
-    CP1251_UPPER_FIRST          = 0xc0,
-    CP1251_UPPER_LAST           = 0xdf,
-    CP1251_LOWER_FIRST          = 0xe0,
-    CP1251_LOWER_LAST           = 0xff,
-    CP1251_YO_UPPER             = 0xa8,
-    CP1251_YO_LOWER             = 0xb8
 H2_ENUM_END(FileRequesterPrivateConstant)
 
 VA(0x0048e730, 0x70)
@@ -464,7 +459,7 @@ void fileRequester::SetOK(i32 enabled) {
     SET_WIDGET_MESSAGE(
         message,
         enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
-        FILE_REQUESTER_OK
+        DIALOG_BUTTON_2
     );
     message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAG_GRAYED);
     m_window->BroadcastMessage(message);
@@ -554,7 +549,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 Update(1);
                             }
                             break;
-                        case FILE_REQUESTER_OK:
+                        case DIALOG_BUTTON_2:
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
@@ -568,7 +563,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             message.payload.widget.data.value = message.payload.widget.id;
                             acceptStep = true;
                             break;
-                        case FILE_REQUESTER_CANCEL:
+                        case DIALOG_BUTTON_1:
                             message.payload.widget.data.value = message.payload.widget.id;
                             acceptStep = true;
                             break;
@@ -600,10 +595,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             case FILE_REQUESTER_FILENAME_ENTRY:
                                 helpIndexMouse = REQUESTER_HELP_FILENAME;
                                 break;
-                            case FILE_REQUESTER_OK:
+                            case DIALOG_BUTTON_2:
                                 helpIndexMouse = REQUESTER_HELP_OK;
                                 break;
-                            case FILE_REQUESTER_CANCEL:
+                            case DIALOG_BUTTON_1:
                                 helpIndexMouse = REQUESTER_HELP_CANCEL;
                                 break;
                             case FILE_REQUESTER_MAP_SIZE:
@@ -733,12 +728,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                               && newNameData[iResult] <= 'z')
                                           || (newNameData[iResult] >= '0'
                                               && newNameData[iResult] <= '9')
-                                          || (newNameData[iResult] >= CP1251_UPPER_FIRST
-                                              && newNameData[iResult] <= CP1251_UPPER_LAST)
-                                          || (newNameData[iResult] >= CP1251_LOWER_FIRST
-                                              && newNameData[iResult] <= CP1251_LOWER_LAST)
-                                          || newNameData[iResult] == CP1251_YO_UPPER
-                                          || newNameData[iResult] == CP1251_YO_LOWER
+                                          || (newNameData[iResult] >= CYRILLIC_CAPITAL_A
+                                              && newNameData[iResult] <= CYRILLIC_CAPITAL_YA)
+                                          || (newNameData[iResult] >= CYRILLIC_SMALL_A
+                                              && newNameData[iResult] <= CYRILLIC_SMALL_YA)
+                                          || newNameData[iResult] == CYRILLIC_CAPITAL_YO
+                                          || newNameData[iResult] == CYRILLIC_SMALL_YO
                                           || newNameData[iResult] == '_'
                                           || newNameData[iResult] == ' '
                                           || FindToken(
@@ -834,8 +829,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             SelectListItem:
                                 if (iResult + m_topIndex == m_selectedIndex) {
-                                    message.payload.widget.data.value = FILE_REQUESTER_OK;
-                                    message.payload.widget.id = FILE_REQUESTER_OK;
+                                    message.payload.widget.data.value = DIALOG_BUTTON_2;
+                                    message.payload.widget.id = DIALOG_BUTTON_2;
                                     acceptStep = true;
                                     break;
                                 }
@@ -855,7 +850,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
 
     if (acceptStep == 1) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
-            && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
+            && message.payload.widget.data.value != DIALOG_BUTTON_1
             && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
             && strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
             iResult =
@@ -885,7 +880,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult - giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5) {
                     acceptStep = false;
                 }
             }

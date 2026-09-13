@@ -11,21 +11,20 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 H2_ENUM_BEGIN(ViewGeneralConstant)
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
     GENERAL_CLOSE              = 10,
     GENERAL_RETREAT            = 11,
     GENERAL_SURRENDER          = 12,
-    GENERAL_CAST_SPELL         = 0x7800,
     GENERAL_TEXT_COLOR_COUNT   = 11,
     GENERAL_MORALE_TEXT_OFFSET = 3,
     GENERAL_LUCK_TEXT_OFFSET   = 3,
-    GENERAL_MANA_PER_KNOWLEDGE = 10,
     GENERAL_CAPTAIN_FRAME      = 6,
     ARMY_WIDTH                 = 488,
     ARMY_HEIGHT                = 229,
-    ARMY_SCREEN_WIDTH          = 640,
     ARMY_SCREEN_HEIGHT         = 460,
     ARMY_LEFT_FACING_X_OFFSET  = 123,
     ARMY_RIGHT_FACING_X_OFFSET = 80,
@@ -292,7 +291,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                             helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
                             break;
-                        case GENERAL_CAST_SPELL:
+                        case DIALOG_BUTTON_0:
                             helpIndex36 = GENERAL_LONG_HELP_CAST;
                             break;
                     }
@@ -307,7 +306,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_CLOSE:
                         case GENERAL_RETREAT:
                         case GENERAL_SURRENDER:
-                        case GENERAL_CAST_SPELL:
+                        case DIALOG_BUTTON_0:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
                             handled28 = true;
                             break;
@@ -332,7 +331,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 case GENERAL_SURRENDER:
                     hintIndex11 = GENERAL_HOVER_HELP_SURRENDER;
                     break;
-                case GENERAL_CAST_SPELL:
+                case DIALOG_BUTTON_0:
                     hintIndex11 = GENERAL_HOVER_HELP_CAST;
                     break;
                 default:
@@ -380,7 +379,7 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         xWnd -= xDelta;
         if (xWnd < 0)
             xWnd = 0;
-        if (xWnd + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
+        if (xWnd + ARMY_WIDTH > LOGICAL_SCREEN_WIDTH)
             xWnd = ARMY_RIGHT_CLAMP;
         yWindow -= ARMY_Y_OFFSET;
         if (yWindow < 0)

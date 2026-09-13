@@ -22,6 +22,8 @@
 #include <SOURCE/townObject.h>
 #include <stdio.h>
 #include <string.h>
+#include <BASE/dialog.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(CastleControl)
     CONTROL_BUILDING_OVERLAY_FIRST             = 400,
@@ -42,7 +44,6 @@ H2_ENUM_BEGIN(CastleControl)
     CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE = 215,
     CONTROL_CAPTAIN_FORMATION_GROUPED          = 216,
     CONTROL_STATUS_TEXT                        = 502,
-    CONTROL_CLOSE                              = EVENT_WINDOW_FIRST_BUTTON
 H2_ENUM_END(CastleControl)
 
 H2_ENUM_BEGIN(CastleWidgetFrame)
@@ -202,7 +203,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         msg.payload.widget.id = CONTROL_BUILDING_NAME_FIRST + slotNum;
-        if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
+        if (castleSlotsUse[slotNum] == BUILDING_SLOT_MAGE_GUILD) {
             sprintf(
                 gText,
                 localization::Tr("castle.mage_guild.level")
@@ -338,13 +339,13 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         casWin->BroadcastMessage(msg);
     } else {
-        if (!CanBuild(m_town, CASTLE_CAPTAIN))
+        if (!CanBuild(m_town, TOWN_OBJECT_CAPTAIN_QUARTERS))
             stateFrame = FRAME_CANNOT_BUILD;
-        else if (!CanBuy(m_town, CASTLE_CAPTAIN))
+        else if (!CanBuy(m_town, TOWN_OBJECT_CAPTAIN_QUARTERS))
             stateFrame = FRAME_CANNOT_AFFORD;
-        if (CanBuild(m_town, CASTLE_CAPTAIN))
+        if (CanBuild(m_town, TOWN_OBJECT_CAPTAIN_QUARTERS))
             m_buildableBuildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
-        if (CanBuy(m_town, CASTLE_CAPTAIN))
+        if (CanBuy(m_town, TOWN_OBJECT_CAPTAIN_QUARTERS))
             m_affordableBuildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
     }
 
@@ -368,7 +369,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     else
         stateFrame = FRAME_NONE;
 
-    for (slotNum = 0; slotNum < PLAYER_AVAILABLE_HERO_COUNT; ++slotNum) {
+    for (slotNum = 0; slotNum < HERO_AVAILABLE_SLOT_COUNT; ++slotNum) {
         msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         msg.payload.widget.id = CONTROL_RECRUIT_FIRST + slotNum;
         if (stateFrame != FRAME_NONE) {
@@ -484,7 +485,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             hoverMessage = true;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
-            whichBuilding = IDX(CASTLE_CAPTAIN);
+            whichBuilding = IDX(TOWN_OBJECT_CAPTAIN_QUARTERS);
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
             whichBuilding = CONTROL_CAPTAIN_FORMATION_GROUPED;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
@@ -543,9 +544,9 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
                         objIndex = IDX(INFO_BUILD_MAGE_GUILD);
-                    else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)
+                    else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT)
                         objIndex = IDX(INFO_MAGE_GUILD_MAX_LEVEL);
-                    else if (!CanBuy(gpTownManager->m_town, CASTLE_MAGE_GUILD))
+                    else if (!CanBuy(gpTownManager->m_town, BUILDING_SLOT_MAGE_GUILD))
                         objIndex = IDX(INFO_CANNOT_AFFORD_MAGE_LEVEL);
                     else
                         objIndex = IDX(INFO_ADD_MAGE_GUILD_LEVEL);
@@ -657,7 +658,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             );
                         }
                         break;
-                    case CONTROL_CLOSE:
+                    case DIALOG_BUTTON_0:
                         strcpy(gText, cCastleInfo[IDX(INFO_EXIT)]);
                         break;
                     default:
@@ -679,7 +680,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                if (message.payload.widget.id == CONTROL_CLOSE)
+                if (message.payload.widget.id == DIALOG_BUTTON_0)
                     ret = 1;
                 break;
             case WIDGET_COMMAND_SELECT:
@@ -719,7 +720,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case IDX(TOWN_OBJECT_MAGE_GUILD):
                         if (!quickFlag) {
-                            if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
+                            if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT
                                 || !(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
                                 break;
                         }
@@ -799,7 +800,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     }
 
     if (ret != 0) {
-        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }

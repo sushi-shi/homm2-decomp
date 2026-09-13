@@ -21,6 +21,7 @@
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(RemoteImplementationConstant)
     CRC_FEEDBACK_BIT                 = 0x08000000,
@@ -543,7 +544,7 @@ i32 TransmitRemoteData(
                 localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 tries = -1;
         }
         tries++;
@@ -646,7 +647,7 @@ void PollRemote(void) {
                     gsNetPlayerInfo[queueIndex].name
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     lLastHeartbeatReceive[queueIndex] = KBTickCount();
                 } else {
                     hostExit.netPosition = static_cast<i8>(queueIndex);
@@ -682,7 +683,7 @@ void PollRemote(void) {
                 );
             }
             NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 lLastHeartbeatReceive[0] = KBTickCount();
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
@@ -703,7 +704,7 @@ void PollRemote(void) {
                     localization::Tr("network.player_exit.continue_alone.buka")
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     DropDownToOnePlayer();
                 else
                     ShutDown("");
@@ -810,7 +811,7 @@ i32 TransmitAndWait(
                 localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 clock = KBTickCount();
             } else {
                 result = 0;

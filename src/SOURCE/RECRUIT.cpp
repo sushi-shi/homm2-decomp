@@ -18,6 +18,8 @@
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <BASE/dialog.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
     RESOURCE_COUNT = 6,
@@ -50,9 +52,6 @@ H2_ENUM_BEGIN(RecruitControl)
     GOLD_TOTAL_CONTROL = 0x4d,
     RESOURCE_IMAGE_CONTROL = 0x4e,
     RESOURCE_TOTAL_CONTROL = 0x4f,
-    CLOSE_CONTROL = 0x7800,
-    CANCEL_CONTROL = 0x7801,
-    CONFIRM_CONTROL = 0x7802
 H2_ENUM_END(RecruitControl)
 
 VA(0x0048c330, 0x1f2)
@@ -80,7 +79,7 @@ void SetupRecruitWin(
     sprintf(label, "%d", goldCost);
     message.payload.widget.id = GOLD_ICON_CONTROL;
     window->BroadcastMessage(message);
-    if (resourceType != RECRUIT_NO_RESOURCE) {
+    if (resourceType != RES_NONE) {
         sprintf(label, "%d", resourceCost);
         message.payload.widget.id = RESOURCE_COST_CONTROL;
         window->BroadcastMessage(message);
@@ -95,7 +94,7 @@ void SetupRecruitWin(
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, CREATURE_CONTROL);
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
-    if (resourceType != RECRUIT_NO_RESOURCE) {
+    if (resourceType != RES_NONE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RESOURCE_ICON_CONTROL;
         message.payload.widget.data.value = IDX(resourceType);
@@ -114,7 +113,7 @@ i32 recruitUnit::Open(i32 priority) {
     m_window = new heroWindow(
         WINDOW_X,
         WINDOW_Y,
-        const_cast<char*>(m_resourceType == RECRUIT_NO_RESOURCE ? "recruit0.bin" : "recruit1.bin")
+        const_cast<char*>(m_resourceType == RES_NONE ? "recruit0.bin" : "recruit1.bin")
     );
     if (m_window == NULL)
         MemError();
@@ -134,13 +133,13 @@ i32 recruitUnit::Open(i32 priority) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_SET_FLAGS,
-        IDX(CLOSE_CONTROL),
+        IDX(DIALOG_BUTTON_0),
         BROADCAST_FLAGS
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
 
     goldMaximum = gpCurPlayer->m_resources[GOLD_RESOURCE] / m_goldCost;
-    if (m_resourceType != RECRUIT_NO_RESOURCE) {
+    if (m_resourceType != RES_NONE) {
         resourceMaximum = gpCurPlayer->m_resources[IDX(m_resourceType)] / m_resourceCost;
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
     } else
@@ -153,13 +152,13 @@ i32 recruitUnit::Open(i32 priority) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            CONFIRM_CONTROL,
+            DIALOG_BUTTON_2,
             IDX(WIDGET_FLAG_ENABLED)
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            CONFIRM_CONTROL,
+            DIALOG_BUTTON_2,
             BROADCAST_FLAGS
         );
     }
@@ -194,7 +193,7 @@ void recruitUnit::Close(void) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        IDX(CLOSE_CONTROL),
+        IDX(DIALOG_BUTTON_0),
         BROADCAST_FLAGS
     );
     if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
@@ -222,7 +221,7 @@ void recruitUnit::Update(void) {
     sprintf(gText, "%d", m_goldTotal);
     message.payload.widget.id = GOLD_TOTAL_CONTROL;
     m_window->BroadcastMessage(message);
-    if (m_resourceType != RECRUIT_NO_RESOURCE) {
+    if (m_resourceType != RES_NONE) {
         m_resourceTotal = m_quantity * m_resourceCost;
         sprintf(gText, "%d", m_resourceTotal);
         message.payload.widget.id = RESOURCE_TOTAL_CONTROL;
@@ -305,13 +304,13 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         Update();
                         m_window->DrawWindow(1, 0, DRAW_DEPTH);
                         break;
-                    case CANCEL_CONTROL:
+                    case DIALOG_BUTTON_1:
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
                         done = true;
                         break;
-                    case CONFIRM_CONTROL:
+                    case DIALOG_BUTTON_2:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {
@@ -326,7 +325,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             goto checkClose;
                         }
                         gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
-                        if (m_resourceType != RECRUIT_NO_RESOURCE) {
+                        if (m_resourceType != RES_NONE) {
                             gpCurPlayer->m_resources[IDX(m_resourceType)] -=
                                 m_quantity * m_resourceCost;
                         }
@@ -370,7 +369,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
-        m_resourceType = RECRUIT_NO_RESOURCE;
+        m_resourceType = RES_NONE;
         m_resourceCost = 0;
     }
 }
@@ -395,7 +394,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
-        m_resourceType = RECRUIT_NO_RESOURCE;
+        m_resourceType = RES_NONE;
         m_resourceCost = 0;
     }
 }
@@ -423,14 +422,14 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
         resourceType = ResourceType(resourceIndex);
         resourceCost = unitCosts[IDX(resourceType)];
     } else {
-        resourceType = RECRUIT_NO_RESOURCE;
+        resourceType = RES_NONE;
         resourceCost = 0;
     }
 
     recruitWindow = new heroWindow(
         QUICK_WINDOW_X,
         QUICK_WINDOW_Y,
-        const_cast<char*>(resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
+        const_cast<char*>(resourceType == RES_NONE ? "recruiq0.bin" : "recruiq1.bin")
     );
     if (recruitWindow == NULL)
         MemError();

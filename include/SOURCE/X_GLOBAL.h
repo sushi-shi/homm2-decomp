@@ -12,6 +12,7 @@
 #include <SOURCE/Overview.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/GAME.h>
+#include <BASE/display.h>
 
 class ExpCampaign;
 H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
@@ -22,13 +23,10 @@ H2_ENUM_BEGIN(SecondarySkillValueTableConstant)
 H2_ENUM_END(SecondarySkillValueTableConstant)
 
 H2_ENUM_BEGIN(ElevationOverlayConstant)
-    ELEVATION_OVERLAY_COUNT           = 25,
-    ELEVATION_OVERLAY_CELL_COUNT      = 15,
     COMBAT_OBSTACLE_CELL_OFFSET_COUNT = 8
 H2_ENUM_END(ElevationOverlayConstant)
 
 H2_ENUM_BEGIN(TownEligibleBuildMaskConstant)
-    TOWN_ELIGIBLE_BUILD_MASK_COUNT       = 6,
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK      = 0x3ff8bf9f,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK   = 0x1bf8bf9f,
     TOWN_ELIGIBLE_BUILD_SORCERESS_MASK   = 0x0ff8bf9f,
@@ -65,20 +63,18 @@ struct SCmbtObstacle {
 
 struct SElevationOverlay {
     u16 terrainMask;
-    i8 cellOffsets[ELEVATION_OVERLAY_CELL_COUNT];
+    i8 cellOffsets[COMBAT_ELEVATION_OVERLAY_CELL_COUNT];
 };
 #pragma pack(pop)
 SIZE(SCmbtObstacle, 0xe);
 SIZE(SElevationOverlay, 0x11);
 
 H2_ENUM_BEGIN(GlobalConstant)
-    HERO_TYPE_INITIAL_COUNT                 = IDX(FACTION_COUNT),
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT     = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT            = 5,
     X_GLOBAL_RECRUIT_BUY_COUNT              = 5,
     X_GLOBAL_PASSWORD_STRING_COUNT          = 211,
     X_GLOBAL_STABLE_TEXT_COUNT              = 4,
-    X_GLOBAL_BUILDING_RESOURCE_COUNT        = 7,
     X_GLOBAL_SETUP_HELP_COUNT               = 3,
     X_GLOBAL_EXPANSION_CAMPAIGN_COUNT       = 4,
     X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT   = 8,
@@ -144,7 +140,7 @@ extern H2_CONST char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
 extern H2_CONST char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
 extern i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
-extern i32 xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
+extern i32 xShrineBuildingCost[IDX(RES_COUNT)];
 
 H2_ENUM_BEGIN(RadarColorTableCount)
     RADAR_MAP_COLOR_COUNT    = 12,
@@ -162,11 +158,6 @@ H2_ENUM_BEGIN(KbControlTableConstant)
     CASTLE_RESOURCE_SLOT_COUNT         = 4,
     CASTLE_AMOUNT_COUNT                = 4,
     VESA_MODE_VALUE_COUNT              = 6,
-    NORMAL_DIRECTION_COUNT             = 8,
-    RESOURCE_VALUE_COUNT               = 7,
-    STARTING_RESOURCE_DIFFICULTY_COUNT = 5,
-    STARTING_RESOURCE_TYPE_COUNT       = 7,
-    MINE_CHARACTERISTIC_COUNT          = 7,
     VESA_SET_MODE_FUNCTION             = 0x4f02,
     VESA_MODE_640_480_256              = 0x0101
 H2_ENUM_END(KbControlTableConstant)
@@ -182,13 +173,10 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_INTERFACE_TYPE_COUNT             = 37,
     KB_INTERFACE_VARIANT_COUNT          = 2,
     KB_COMBAT_SPEED_COUNT               = 3,
-    KB_COMBAT_FX_COUNT                  = IDX(COMBAT_EFFECT_COUNT),
     KB_TOWN_COMMAND_COUNT               = 28,
-    KB_HERO_DEFAULT_NAME_COUNT          = 54,
     KB_ARMY_EFFECT_COUNT                = 20,
     KB_MUSIC_TRACK_COUNT                = 0x3c,
     KB_ARTIFACT_LEVEL_COUNT             = IDX(ARTIFACT_COUNT) + 1,
-    KB_ARTIFACT_BASE_VALUE_COUNT        = IDX(ARTIFACT_COUNT),
     KB_STAT_POWER_COUNT                 = 41,
     KB_SPELL_LIMIT_COUNT                = 5,
     KB_SPELL_MOD_COUNT                  = 11,
@@ -196,20 +184,17 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_CLOUD_MASK_COUNT                 = 256,
     KB_HERO_LEVEL_BAND_COUNT            = 2,
     KB_SPELL_INFLUENCE_MAP_COUNT        = 16,
-    KB_SPELL_EFFECT_COUNT               = 32,
     KB_COMBAT_BACKGROUND_COUNT          = 19,
     KB_COMBAT_OBSTACLE_COUNT            = 32,
     KB_TERRAIN_TYPE_COUNT               = IDX(TERRAIN_COUNT) + 1,
     KB_TERRAIN_STEP_TYPE_COUNT          = 2,
     KB_TRIGGER_TYPE_COUNT               = 124,
-    KB_TOWN_OBJECT_NAME_COUNT           = 32,
     KB_CASTLE_WALL_SEGMENT_COUNT        = 4,
     KB_CASTLE_TOWER_COUNT               = 4,
     KB_CASTLE_DOOR_POSITION_COUNT       = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT    = 11,
     KB_MOAT_CELL_COUNT                  = 9,
     KB_ALIGNMENT_NAME_COUNT             = IDX(FACTION_COUNT) + 2,
-    KB_MINE_NAME_COUNT                  = 7,
     KB_QUICK_VIEW_TEXT_COUNT            = 124,
     KB_EVENT_TEXT_TABLE_COUNT           = 95,
     KB_CONTROL_PANEL_HELP_COUNT         = 5,
@@ -255,16 +240,11 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_BATTLE_RESULT_TEXT_COUNT         = 11,
     KB_MORALE_INFO_TEXT_COUNT           = 32,
     KB_MAP_SIZE_TEXT_COUNT              = 4,
-    KB_DIFFICULTY_TEXT_COUNT            = 5,
     KB_START_DIFFICULTY_TEXT_COUNT      = 4,
     KB_CAMPAIGN_LEADER_TEXT_COUNT       = 4,
     KB_WIN_TEXT_COUNT                   = 5,
-    KB_HUMAN_DIFFICULTY_TEXT_COUNT      = 5,
-    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 5,
     KB_MUSIC_QUALITY_TEXT_COUNT         = 3,
-    KB_SPELL_TEXT_COUNT                 = IDX(SPELL_COUNT),
     KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = IDX(HERO_SKILL_LEVEL_COUNT) - 1,
-    KB_SECONDARY_SKILL_TEXT_COUNT       = IDX(HERO_SKILL_COUNT),
     KB_NEUTRAL_BUILDING_TEXT_COUNT      = 19,
     KB_WELL_EXTRA_NAME_COUNT            = 7,
     KB_SPECIAL_BUILDING_NAME_COUNT      = 7,
@@ -304,10 +284,10 @@ H2_ENUM_CLASS_BEGIN(InitMenuHotSpotField)
 H2_ENUM_CLASS_END(InitMenuHotSpotField)
 
 extern u8 giGroundShape[GROUND_TILE_IMAGE_COUNT];
-extern u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT];
-extern u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT];
-extern u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT];
-extern u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT];
+extern u8 gColorTableTan[PALETTE_COLOR_COUNT];
+extern u8 gColorTableGray[PALETTE_COLOR_COUNT];
+extern u8 gColorTableRed[PALETTE_COLOR_COUNT];
+extern u8 gColorTableDarkBrown[PALETTE_COLOR_COUNT];
 extern i32 giMainVideoModeWidth;
 extern i32 giMainVideoModeHeight;
 extern u8 gMapColors[RADAR_MAP_COLOR_COUNT];
@@ -315,15 +295,15 @@ extern u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT];
 extern H2_CONST char* gTilesetFiles[IDX(TILESET_COUNT)];
 extern u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
-extern u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT];
-extern u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT];
+extern u8 gColorTableLighten[PALETTE_COLOR_COUNT];
+extern u8 gColorTableNoCycle[PALETTE_COLOR_COUNT];
 extern b32 gbReturnAfterComputeExtent;
 extern b32 gbAllowTextEntryEscape;
 extern b32 giScreenScroll;
 extern i32 giMenuCommand;
 extern b32 gbSendMouseMoveMessages;
 extern b32 gbColorMice;
-extern u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT];
+extern u32l gTownEligibleBuildMask[IDX(FACTION_COUNT)];
 extern u8 giMapSizes[KB_MAP_SIZE_COUNT];
 extern b32 gbUseEvilInterface;
 extern H2_CONST char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT];
@@ -337,15 +317,15 @@ extern i32 giNewMonsterCycleFrame;
 extern b32 gbLeaveNetBoxAlone;
 extern b32 gbUseWaveout;
 extern b32 gbShowAllMaps;
-extern H2_CONST char* gCombatFxNames[KB_COMBAT_FX_COUNT];
+extern H2_CONST char* gCombatFxNames[IDX(COMBAT_EFFECT_COUNT)];
 extern i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
 extern i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
 extern i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT];
 extern i16 gCastleAmounts[CASTLE_AMOUNT_COUNT];
 extern i16 gVesaMode[VESA_MODE_VALUE_COUNT];
-extern i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
-extern i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
-extern i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
+extern i32 gInitResourcesHuman[IDX(DIFFICULTY_COUNT)][IDX(RES_COUNT)];
+extern i32 gInitResourcesComputer[IDX(DIFFICULTY_COUNT)][IDX(RES_COUNT)];
+extern i32 gMineCharacteristics[IDX(RES_COUNT)];
 extern i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern H2_ENUM_STORAGE(ArtifactLevelMask, u8) gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
 extern i32 gUltArtifactAvgValue;
@@ -358,7 +338,7 @@ extern float gfSpellCastNumMod[KB_SPELL_MOD_COUNT];
 extern float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT];
 extern float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT];
 extern float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT];
-extern i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
+extern i8 gbArrow[IDX(MAP_DIRECTION_COUNT)][IDX(MAP_DIRECTION_COUNT)];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
 H2_ENUM_CLASS_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE        = 0,
@@ -391,7 +371,7 @@ extern RemoteNetworkProtocol iMPNetProtocol;
 extern i32 iLastDiffSendTo;
 extern u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern H2_ENUM_STORAGE(SpellType, u8) giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
-extern u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT];
+extern u8 giNumPowFrames[IDX(COMBAT_EFFECT_COUNT)];
 extern SpellEffectDisplayType giSpellEffectShowType;
 extern i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT];
 extern H2_CONST char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT];
@@ -406,11 +386,11 @@ extern u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT];
 extern i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)]
                         [KB_TERRAIN_STEP_TYPE_COUNT];
 extern H2_CONST char* gTownPrefixNames[IDX(FACTION_COUNT)];
-extern H2_CONST char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
+extern H2_CONST char* gTownObjNames[IDX(BUILDING_SLOT_COUNT)];
 extern i32 giDebugBuildingToBuild;
 extern u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)];
 extern H2_CONST char* cHeroTypeShortName[IDX(FACTION_COUNT)];
-extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
+extern char cHeroTypeInitial[IDX(FACTION_COUNT)];
 extern i32 giDeferObjDrawX;
 extern i32 giDeferObjDrawY;
 extern class heroWindow* gpInitWin;
@@ -420,7 +400,7 @@ extern u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)];
 extern u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)];
 extern u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)];
 extern float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT];
-extern struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT];
+extern struct SElevationOverlay sElevationOverlay[COMBAT_ELEVATION_OVERLAY_COUNT];
 extern b32 gbDrawingPuzzle;
 extern i32 giWalkingFrom;
 extern i32 giWalkingFrom2;
@@ -436,8 +416,8 @@ extern H2_CONST char* gStatNames[HERO_PRIMARY_STAT_COUNT];
 extern H2_CONST char* gStatDesc[HERO_PRIMARY_STAT_COUNT];
 extern H2_CONST char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
 extern H2_CONST char* gTerrainNames[IDX(TERRAIN_COUNT)];
-extern H2_CONST char* gResourceNames[RESOURCE_VALUE_COUNT];
-extern H2_CONST char* gMineNames[KB_MINE_NAME_COUNT];
+extern H2_CONST char* gResourceNames[IDX(RES_COUNT)];
+extern H2_CONST char* gMineNames[IDX(RES_COUNT)];
 extern H2_CONST char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT];
 extern H2_CONST char* gEventText[KB_EVENT_TEXT_TABLE_COUNT];
 extern H2_CONST char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT];
@@ -470,7 +450,7 @@ extern H2_CONST char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT];
 extern H2_CONST char* cCombatHelp[KB_COMBAT_HELP_COUNT];
 extern H2_CONST char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT];
 extern H2_CONST char* cTownCommand[KB_TOWN_COMMAND_COUNT];
-extern H2_CONST char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT];
+extern H2_CONST char* gHeroDefaultNames[GAME_HERO_COUNT];
 extern H2_CONST char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT];
 extern H2_CONST char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT];
 extern H2_CONST char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT];
@@ -486,17 +466,17 @@ extern H2_CONST char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT];
 extern H2_CONST char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT];
 extern H2_CONST char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT];
 extern H2_CONST char* cMapSize[KB_MAP_SIZE_TEXT_COUNT];
-extern H2_CONST char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT];
+extern H2_CONST char* cDifficulty[IDX(DIFFICULTY_COUNT)];
 extern H2_CONST char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT];
 extern H2_CONST char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT];
 extern H2_CONST char* cWinText[KB_WIN_TEXT_COUNT];
-extern H2_CONST char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT];
-extern H2_CONST char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT];
+extern H2_CONST char* cHumanDifficulty[IDX(DIFFICULTY_COUNT)];
+extern H2_CONST char* cHumanInfoDifficulty[IDX(DIFFICULTY_COUNT)];
 extern H2_CONST char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT];
-extern H2_CONST char* gSpellDesc[KB_SPELL_TEXT_COUNT];
-extern H2_CONST char* gSpellNames[KB_SPELL_TEXT_COUNT];
+extern H2_CONST char* gSpellDesc[IDX(SPELL_COUNT)];
+extern H2_CONST char* gSpellNames[IDX(SPELL_COUNT)];
 extern H2_CONST char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT];
-extern H2_CONST char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT];
+extern H2_CONST char* gSecondarySkills[IDX(HERO_SKILL_COUNT)];
 extern H2_CONST char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern H2_CONST char* cDirections[KB_DIRECTION_TEXT_COUNT];
 extern H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];

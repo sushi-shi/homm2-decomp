@@ -40,6 +40,8 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
+#include <BASE/dialog.h>
+#include <EDITOR/mapcell.h>
 
 #define GENERIC_SITE_SIREN_ARMY_REMAINDER                                          \
     0.7
@@ -99,21 +101,10 @@ namespace {
         EVENT_MINE_SPELL_LOOP_END = 999,
         EVENT_MINE_SPELL_POWER_MAX = 51,
         EVENT_MINE_SPELL_COUNT_SCALE = 5,
-        EVENT_DAEMON_GOLD = 2500,
-        EVENT_SEA_CHEST_GOLD = 1500,
-        EVENT_SEA_CHEST_ARTIFACT_GOLD = 1000,
-        EVENT_TREE_GOLD = 2000,
-        EVENT_TREE_GEMS = 10,
-        EVENT_ARTIFACT_GOLD = 2000,
-        EVENT_ARTIFACT_RESOURCE_3_GOLD = 2500,
-        EVENT_ARTIFACT_RESOURCE_5_GOLD = 3000,
-        EVENT_ARTIFACT_RESOURCE_3 = 3,
-        EVENT_ARTIFACT_RESOURCE_5 = 5,
         EVENT_TELEPORT_STONE_DISTANCE = 1,
         EVENT_TELEPORT_WHIRLPOOL_DISTANCE = 3,
         EVENT_ABANDONED_MINE_ARMY_DIVISOR = 5,
         EVENT_OBSERVATION_RADIUS = 20,
-        EVENT_WINDMILL_EMPTY = 99,
         EVENT_RANDOM_EVENT_SUCCESS = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
         EVENT_BOAT_RESTORE_MODE = 3,
@@ -121,8 +112,6 @@ namespace {
         EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD = 1500,
         EVENT_SIRENS_MIN_ARMY_QUANTITY = 1,
         EVENT_CREATURE_UPGRADE_MOBILITY = 400,
-        EVENT_HERO_LIMIT = 8,
-        EVENT_JAILED_HERO = 0x41
     H2_ENUM_END(AIEventConstant)
 
     H2_ENUM_BEGIN(MonsterCombatValueIndex)
@@ -148,7 +137,6 @@ namespace {
     H2_ENUM_END(RiddleComparisonConstant)
 
     H2_ENUM_BEGIN(BarrierEventConstant)
-        COLOR_MASK = 7,
         PASSWORD_SHIFT = 3,
         INPUT_LENGTH = 14
     H2_ENUM_END(BarrierEventConstant)
@@ -259,8 +247,6 @@ namespace {
     H2_ENUM_BEGIN(DoEventConstant)
         ARTESIAN_SPRING_MANA_MULTIPLIER = 2,
         XANADU_DIPLOMACY_MULTIPLIER = 2,
-        TEMPLE_MORALE_BONUS = 2,
-        PYRAMID_LUCK_PENALTY = 2,
         SIGN_MINIMUM_TEXT_LENGTH = 1,
         SIGN_RANDOM_TEXT_COUNT = 4,
         CHEST_EXPERIENCE_LEVEL_OFFSET = 1,
@@ -439,7 +425,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.c15ae0e09ee99d18")
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     sprintf(
                         gText,
                         localization::Tr("event.inline.785dc53c14bdbc91"),
@@ -474,7 +460,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
 
                         if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
-                            && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
+                            && eventHero2->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                             GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true);
                             if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_k = primaryReward_e;
@@ -676,7 +662,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SEA_CHEST:
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)
-                && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
+                && eventHero2->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 sprintf(
                     gText,
                     localization::Tr("event.inline.c96f2e927c9e47ef"),
@@ -786,7 +772,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         }
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
-            if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
+            if (eventHero2->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 sprintf(
                     gText,
                     localization::Tr("event.inline.4967a4ae1966d928"),
@@ -827,7 +813,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.19dbe84af3193778"),
                     NORMAL_DIALOG_CONFIRM
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     gpCurPlayer->m_resources[IDX(RES_GOLD)] -= MAGELLAN_MAP_COST;
                     gpGame->MakeAllWaterVisible(giCurPlayer);
                     CompleteDraw(0);
@@ -844,7 +830,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO);
-            } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
+            } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_CAPACITY) {
                 sprintf(
                     gText,
                     localization::Tr("event.inline.8432c04b1a757522"),
@@ -1080,7 +1066,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_TREASURE_CHEST:
             if (cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) {
-                if (eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
+                if (eventHero2->NumArtifacts() >= HERO_ARTIFACT_SLOT_COUNT) {
                     cell->m_objectMetadata = CHEST_REWARD_SMALL;
                     goto chestGold;
                 }
@@ -1119,7 +1105,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         * CHEST_EXPERIENCE_MULTIPLIER,
                     NORMAL_DIALOG_SHOW_OR_TEXT
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     GiveResource(
                         eventHero2,
                         RES_GOLD,
@@ -1389,7 +1375,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 break;
             }
             if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
-                if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY)
+                if (eventHero2->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
                     goto wagonEmpty;
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
@@ -1449,7 +1435,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 default:
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                    if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
+                    if (eventHero2->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT) {
                         sprintf(
                             gText,
                             "%s.",
@@ -1777,7 +1763,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
                     eraseObject_l = 1;
@@ -1810,7 +1796,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     RecruitEvent(eventHero2, CREATURE_SPRITE, cell);
             }
             break;
@@ -1839,7 +1825,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     RecruitEvent(eventHero2, CREATURE_MEDUSA, cell);
             }
             break;
@@ -1867,7 +1853,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5
                     && CombatMonsterEvent(
                            eventHero2,
                            CREATURE_TROLL,
@@ -1899,7 +1885,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                         goto recruitTroll;
                 }
                 break;
@@ -1915,7 +1901,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 recruitTroll:
                     RecruitEvent(eventHero2, CREATURE_TROLL, cell);
                 }
@@ -1945,7 +1931,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     if (CombatMonsterEvent(
                             eventHero2,
                             CREATURE_VAMPIRE_LORD,
@@ -1977,7 +1963,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     goto recruitLich;
                     }
                 }
@@ -1994,7 +1980,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 recruitLich:
                     RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
                 }
@@ -2024,7 +2010,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 dragonFactor_i = DRAGON_CITY_BASE_FACTOR;
                 if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
                     && gpGame->m_campaignScenario + 1 == DRAGON_CITY_ARCHIBALD_SCENARIO)
@@ -2063,7 +2049,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     goto recruitDragon;
                 }
                 }
@@ -2080,7 +2066,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 recruitDragon:
                     RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
                 }
@@ -2111,7 +2097,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
             }
             break;
@@ -2140,7 +2126,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     RecruitEvent(eventHero2, CREATURE_NOMAD, cell);
             }
             break;
@@ -2241,7 +2227,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1,
                                 0
                             );
-                            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
@@ -2269,7 +2255,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1,
                                 0
                             );
-                            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                                 gpCurPlayer->m_resources[IDX(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
@@ -2441,7 +2427,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             artifact_g = static_cast<ArtifactType>(cell->m_objectIndex / 2);
             guardedMonster_c =
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
-            if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
+            if (eventHero2->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT) {
                 NormalDialog(
                     localization::Tr("event.inline.b880ecbc34dcdb8b"),
                     NORMAL_DIALOG_INFO
@@ -2490,7 +2476,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 break;
             }
 
-            if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
+            if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
                     NormalDialog(
@@ -2509,7 +2495,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                     NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 artifactFight:
                     if (CombatMonsterEvent(
                             eventHero2,
@@ -2618,7 +2604,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0,
                             -1
                         );
-                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
                                 gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
@@ -2659,7 +2645,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             0
                         );
-                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
                                 && gpGame->m_players[IDX(eventHero2->m_owner)]
@@ -2706,7 +2692,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             0
                         );
-                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
                                 && gpGame->m_players[IDX(eventHero2->m_owner)]
@@ -2818,7 +2804,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_NO)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6)
                 break;
             if (cell->m_objectMetadata == DAEMON_CAVE_EMPTY) {
                 EventWindow(
@@ -2843,7 +2829,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 localization::Tr("event.inline.bf2299125ded4930")
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 if (CombatMonsterEvent(
                         eventHero2,
                         monsterType_f,
@@ -2899,7 +2885,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
 
                 case DAEMON_REWARD_ARTIFACT:
-                    if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY)
+                    if (eventHero2->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
                         goto daemonExperienceGold;
                     if (gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true) == -1)
                         goto daemonExperienceGold;
@@ -2953,7 +2939,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                         if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                             < DAEMON_GOLD) {
                             EventWindow(
@@ -2992,7 +2978,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3038,7 +3024,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3088,7 +3074,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3138,7 +3124,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
                         localization::Tr("event.inline.414c8dd999ff1206"),
@@ -3230,7 +3216,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 if (CombatMonsterEvent(
                         eventHero2,
                         gpGame->m_mines[cell->m_objectMetadata].guardianType,
@@ -3265,10 +3251,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         y + ABANDONED_MINE_Y_TOP,
                         x + ABANDONED_MINE_X_MAX,
                         y + ABANDONED_MINE_Y_TOP,
-                        ABANDONED_MINE_TILESET_TOP_A,
+                        TILESET_OBJNDIRT,
                         MINE_TOP_A_FIRST_FRAME,
                         MINE_TOP_A_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_A,
+                        TILESET_MTNDIRT,
                         MINE_BOTTOM_A_FRAME,
                         MAP_OBJECT_ABANDONED_MINE,
                         MAP_OBJECT_MINE
@@ -3278,10 +3264,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         y,
                         x + ABANDONED_MINE_X_MAX,
                         y,
-                        ABANDONED_MINE_TILESET_TOP_A,
+                        TILESET_OBJNDIRT,
                         MINE_SECOND_A_FIRST_FRAME,
                         MINE_SECOND_A_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_A,
+                        TILESET_MTNDIRT,
                         MINE_SECOND_BOTTOM_A_FRAME,
                         MAP_OBJECT_ABANDONED_MINE,
                         MAP_OBJECT_MINE
@@ -3291,10 +3277,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         y + ABANDONED_MINE_Y_TOP,
                         x + ABANDONED_MINE_X_MAX,
                         y + ABANDONED_MINE_Y_TOP,
-                        ABANDONED_MINE_TILESET_TOP_B,
+                        TILESET_OBJNGRAS,
                         MINE_TOP_B_FIRST_FRAME,
                         MINE_TOP_B_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_B,
+                        TILESET_MTNGRAS,
                         MINE_BOTTOM_B_FRAME,
                         MAP_OBJECT_ABANDONED_MINE,
                         MAP_OBJECT_MINE
@@ -3304,10 +3290,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         y,
                         x + ABANDONED_MINE_X_MAX,
                         y,
-                        ABANDONED_MINE_TILESET_TOP_B,
+                        TILESET_OBJNGRAS,
                         MINE_SECOND_B_FIRST_FRAME,
                         MINE_SECOND_B_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_B,
+                        TILESET_MTNGRAS,
                         MINE_SECOND_BOTTOM_B_FRAME,
                         MAP_OBJECT_ABANDONED_MINE,
                         MAP_OBJECT_MINE
@@ -3317,10 +3303,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         y,
                         x,
                         y,
-                        ABANDONED_MINE_TILESET_CENTER,
+                        TILESET_EXTRAOVR,
                         MINE_CENTER_GHOST_FRAME,
                         MINE_CENTER_GHOST_FRAME,
-                        ABANDONED_MINE_TILESET_CENTER,
+                        TILESET_EXTRAOVR,
                         MINE_CENTER_GOLD_FRAME,
                         MAP_OBJECT_ABANDONED_MINE,
                         MAP_OBJECT_MINE
@@ -3584,7 +3570,7 @@ VA(0x00441fbc, 0x125)
 i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     SAMPLE2 eventSample = NULL;
     i32 colorIndex = cell->m_objectMetadata;
-    colorIndex &= COLOR_MASK;
+    colorIndex &= EVENT_BARRIER_COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= PASSWORD_SHIFT;
     char word[INPUT_LENGTH];
@@ -3641,7 +3627,7 @@ VA(0x00442176, 0xe0)
 void advManager::PasswordEvent(mapCell* cell, hero*) {
     SAMPLE2 playSample = NULL;
     i32 color = cell->m_objectMetadata;
-    color &= COLOR_MASK;
+    color &= EVENT_BARRIER_COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= PASSWORD_SHIFT;
 
@@ -3710,7 +3696,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     );
                 }
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
                             if (IsCursedItem(eventHero->m_artifacts[index8])) {
@@ -3787,7 +3773,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 for (mapY14 = 0; mapY14 < MAP_HEIGHT; mapY14++) {
                     currentCell36 = gpGame->m_worldMap.GetCell(mapX37, mapY14);
                     currentSiteType10 = currentCell36->m_objectMetadata;
-                    currentSiteType10 &= COLOR_MASK;
+                    currentSiteType10 &= EVENT_BARRIER_COLOR_MASK;
                     if ((currentCell36->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                             == MAP_OBJECT_EXPANSION_OBJECT
                         && currentSiteType10 == SITE_HUT_COLOR) {
@@ -3926,7 +3912,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     } else {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, quantity, &recruitSample);
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, xRecruitBuy[index], -1, 0, -1, 0, -1);
-        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
             ExpansionRecruitEvent(eventHero, creatureType1, &quantity);
             packedValue = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | IDX(recruitSiteType);
             cell->m_objectMetadata = packedValue;
@@ -3954,7 +3940,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* freedHero;
 
     heroId = cell->m_objectMetadata;
-    if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
+    if (gpGame->m_availableHeroes[heroId] != HERO_AVAILABILITY_JAILED) {
         NormalDialog(
             localization::Tr("event.inline.dd448d43b4794460"),
             NORMAL_DIALOG_INFO
@@ -3963,7 +3949,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         return;
     }
 
-    if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
+    if (gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY) {
         NormalDialog(
             localization::Tr("event.inline.30d6f33566016021"),
             NORMAL_DIALOG_INFO
@@ -4280,7 +4266,7 @@ void advManager::EventWindow(
     eventDone = 0;
     unusedStyle9 = 1;
 
-    if (eventId >= 0 && eventId < EVENT_TEXT_COUNT)
+    if (eventId >= 0 && eventId < KB_EVENT_TEXT_TABLE_COUNT)
         sprintf(eventText, gEventText[eventId]);
     else if (eventId == MAP_EVENT_REWARD_NONE)
         sprintf(eventText, text);
@@ -4922,7 +4908,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             0,
             -1
         );
-        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
             if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
                 eventHero->m_army.Add(
                     creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1
@@ -5124,7 +5110,7 @@ CombatResult advManager::CombatMonsterEvent(
 
 VA(0x00444571, 0x3d8)
 void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
-    i32 stats[EVENT_ARTIFACT_PRIMARY_STAT_COUNT];
+    i32 stats[HERO_PRIMARY_STAT_COUNT];
     i32 i;
     i32 maxSpellPoints;
 
@@ -5390,7 +5376,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
             break;
     }
 
-    for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
+    for (i = 0; i < HERO_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
         if (i == IDX(HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
             maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*targetHero);
@@ -5864,9 +5850,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
                     true
                 );
-                GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_ARTIFACT_GOLD);
+                GiveResource(eventHero, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
-                GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_GOLD);
+                GiveResource(eventHero, RES_GOLD, SEA_CHEST_GOLD);
             }
             eraseObject_l = 1;
             break;
@@ -5973,13 +5959,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WINDMILL:
-            if (cell->m_objectMetadata != EVENT_WINDMILL_EMPTY) {
+            if (cell->m_objectMetadata != WINDMILL_EMPTY) {
                 GiveResource(
                     eventHero,
                     ResourceType(cell->m_objectMetadata),
                     WINDMILL_RESOURCE_AMOUNT
                 );
-                cell->m_objectMetadata = EVENT_WINDMILL_EMPTY;
+                cell->m_objectMetadata = WINDMILL_EMPTY;
             }
             break;
 
@@ -6121,8 +6107,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         eventHero->CheckLevel();
                         break;
                     case TREE_KNOWLEDGE_GOLD:
-                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] > EVENT_TREE_GOLD) {
-                            gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_TREE_GOLD;
+                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] > TREE_KNOWLEDGE_GOLD_COST) {
+                            gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
                             GiveExperience(eventHero, levelExperience_g, 1);
                             eventHero->m_treeKnowledgeVisits |=
                                 1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
@@ -6130,8 +6116,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         }
                         break;
                     case TREE_KNOWLEDGE_GEMS:
-                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] > EVENT_TREE_GEMS) {
-                            gpCurPlayer->m_resources[IDX(RES_GEMS)] -= EVENT_TREE_GEMS;
+                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] > TREE_KNOWLEDGE_GEM_COST) {
+                            gpCurPlayer->m_resources[IDX(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
                             GiveExperience(eventHero, levelExperience_g, 1);
                             eventHero->m_treeKnowledgeVisits |=
                                 1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
@@ -6226,7 +6212,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 eraseObject_l = 1;
                 break;
             }
-            if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
+            if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
                 if (artifactGuardCount_b == CREATURE_ROGUE) {
                     artifactGuardResult_e = EVENT_ROGUE_COUNT;
                     goto artifactFight;
@@ -6265,37 +6251,37 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
-                    if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), EVENT_ARTIFACT_GOLD, 0, 0)) {
+                    if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), ARTIFACT_EVENT_GOLD_COST, 0, 0)) {
                         gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
-                            EVENT_ARTIFACT_GOLD;
+                            ARTIFACT_EVENT_GOLD_COST;
                         goto artifactPickup;
                     }
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_3:
                     if (gpPhilAI->NetValueOfArtifact(
                             IDX(artifact_g),
-                            EVENT_ARTIFACT_RESOURCE_3_GOLD,
+                            ARTIFACT_EVENT_RESOURCE_3_GOLD_COST,
                             artifactResource_p,
-                            EVENT_ARTIFACT_RESOURCE_3
+                            ARTIFACT_EVENT_RESOURCE_3_AMOUNT
                         )) {
                         gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
-                            EVENT_ARTIFACT_RESOURCE_3_GOLD;
+                            ARTIFACT_EVENT_RESOURCE_3_GOLD_COST;
                         gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(artifactResource_p)] -=
-                            EVENT_ARTIFACT_RESOURCE_3;
+                            ARTIFACT_EVENT_RESOURCE_3_AMOUNT;
                         goto artifactPickup;
                     }
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_5:
                     if (gpPhilAI->NetValueOfArtifact(
                             IDX(artifact_g),
-                            EVENT_ARTIFACT_RESOURCE_5_GOLD,
+                            ARTIFACT_EVENT_RESOURCE_5_GOLD_COST,
                             artifactResource_p,
-                            EVENT_ARTIFACT_RESOURCE_5
+                            ARTIFACT_EVENT_RESOURCE_5_AMOUNT
                         )) {
                         gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
-                            EVENT_ARTIFACT_RESOURCE_5_GOLD;
+                            ARTIFACT_EVENT_RESOURCE_5_GOLD_COST;
                         gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(artifactResource_p)] -=
-                            EVENT_ARTIFACT_RESOURCE_5;
+                            ARTIFACT_EVENT_RESOURCE_5_AMOUNT;
                         goto artifactPickup;
                     }
                     break;
@@ -6378,14 +6364,14 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case DAEMON_REWARD_EXPERIENCE_GOLD:
                     GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
-                    GiveResource(eventHero, RES_GOLD, EVENT_DAEMON_GOLD);
+                    GiveResource(eventHero, RES_GOLD, DAEMON_GOLD);
                     break;
                 case DAEMON_REWARD_RANSOM:
                     if (gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)]
-                        >= EVENT_DAEMON_GOLD) {
-                        if (gpPhilAI->ChooseToPayRansomOnHero(EVENT_DAEMON_GOLD)) {
+                        >= DAEMON_GOLD) {
+                        if (gpPhilAI->ChooseToPayRansomOnHero(DAEMON_GOLD)) {
                             gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
-                                EVENT_DAEMON_GOLD;
+                                DAEMON_GOLD;
                         } else {
                             HeroLoses(eventHero);
                         }
@@ -6493,10 +6479,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     y + ABANDONED_MINE_Y_TOP,
                     x + ABANDONED_MINE_X_MAX,
                     y + ABANDONED_MINE_Y_TOP,
-                    ABANDONED_MINE_TILESET_TOP_A,
+                    TILESET_OBJNDIRT,
                     MINE_TOP_A_FIRST_FRAME,
                     MINE_TOP_A_LAST_FRAME,
-                    ABANDONED_MINE_TILESET_BOTTOM_A,
+                    TILESET_MTNDIRT,
                     MINE_BOTTOM_A_FRAME,
                     MAP_OBJECT_ABANDONED_MINE,
                     MAP_OBJECT_MINE
@@ -6506,10 +6492,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     y,
                     x + ABANDONED_MINE_X_MAX,
                     y,
-                    ABANDONED_MINE_TILESET_TOP_A,
+                    TILESET_OBJNDIRT,
                     MINE_SECOND_A_FIRST_FRAME,
                     MINE_SECOND_A_LAST_FRAME,
-                    ABANDONED_MINE_TILESET_BOTTOM_A,
+                    TILESET_MTNDIRT,
                     MINE_SECOND_BOTTOM_A_FRAME,
                     MAP_OBJECT_ABANDONED_MINE,
                     MAP_OBJECT_MINE
@@ -6519,10 +6505,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     y + ABANDONED_MINE_Y_TOP,
                     x + ABANDONED_MINE_X_MAX,
                     y + ABANDONED_MINE_Y_TOP,
-                    ABANDONED_MINE_TILESET_TOP_B,
+                    TILESET_OBJNGRAS,
                     MINE_TOP_B_FIRST_FRAME,
                     MINE_TOP_B_LAST_FRAME,
-                    ABANDONED_MINE_TILESET_BOTTOM_B,
+                    TILESET_MTNGRAS,
                     MINE_BOTTOM_B_FRAME,
                     MAP_OBJECT_ABANDONED_MINE,
                     MAP_OBJECT_MINE
@@ -6532,10 +6518,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     y,
                     x + ABANDONED_MINE_X_MAX,
                     y,
-                    ABANDONED_MINE_TILESET_TOP_B,
+                    TILESET_OBJNGRAS,
                     MINE_SECOND_B_FIRST_FRAME,
                     MINE_SECOND_B_LAST_FRAME,
-                    ABANDONED_MINE_TILESET_BOTTOM_B,
+                    TILESET_MTNGRAS,
                     MINE_SECOND_BOTTOM_B_FRAME,
                     MAP_OBJECT_ABANDONED_MINE,
                     MAP_OBJECT_MINE
@@ -6545,10 +6531,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     y,
                     x,
                     y,
-                    ABANDONED_MINE_TILESET_CENTER,
+                    TILESET_EXTRAOVR,
                     MINE_CENTER_GHOST_FRAME,
                     MINE_CENTER_GHOST_FRAME,
-                    ABANDONED_MINE_TILESET_CENTER,
+                    TILESET_EXTRAOVR,
                     MINE_CENTER_GOLD_FRAME,
                     MAP_OBJECT_ABANDONED_MINE,
                     MAP_OBJECT_MINE
@@ -6850,11 +6836,11 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* releasedHero13;
 
     heroId9 = cell->m_objectMetadata;
-    if (gpGame->m_availableHeroes[heroId9] != EVENT_JAILED_HERO) {
+    if (gpGame->m_availableHeroes[heroId9] != HERO_AVAILABILITY_JAILED) {
         EraseObj(cell, x, y);
         return;
     }
-    if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT)
+    if (gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY)
         return;
     gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
     gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
@@ -6908,7 +6894,7 @@ void advManager::PlayerMonsterInteract(
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
+    creatureCount = cell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
     armyRatio = static_cast<double>(
                     gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0)
                 )
@@ -6995,7 +6981,7 @@ void advManager::PlayerMonsterInteract(
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 eventHero->m_army.Add(monsterType, creatureCount, -1);
                 *handled = 1;
                 return;
@@ -7078,7 +7064,7 @@ void advManager::PlayerMonsterInteract(
                 -1,
                 0
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
                 gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -= joiningCost;
@@ -7107,7 +7093,7 @@ void advManager::PlayerMonsterInteract(
             gArmyNamesPlural[IDX(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
             goto fightMonsters;
         *handled = 1;
         return;
@@ -7148,7 +7134,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     i32 joiningCount;
 
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
-    creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
+    creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     armyRatio = static_cast<double>(
                     gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0)
@@ -7263,7 +7249,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         } else {
             cell->m_objectMetadata =
                 (cell->m_objectMetadata & MONSTER_FLAGS_MASK)
-                + (creatureCount[MONSTER_COMBAT_REMAINING_COUNT] & MONSTER_COUNT_MASK);
+                + (creatureCount[MONSTER_COMBAT_REMAINING_COUNT] & IDX(MAP_MONSTER_COUNT_MASK));
         }
     }
 }
@@ -7794,7 +7780,7 @@ void advManager::ReceiveHeroTownData(
                 localization::Tr("event.inline.2b436715930a57ee"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 lastPacketTime7 = KBTickCount();
             else
                 ShutDown(localization::Tr("event.inline.d7ee33967c36bb8b"));

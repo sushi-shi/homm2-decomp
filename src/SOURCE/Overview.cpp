@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/KB_TYPES.h>
 
 namespace {
 
@@ -44,7 +45,6 @@ H2_ENUM_END(OverviewStorageConstant)
 H2_ENUM_BEGIN(OverviewPresentationConstant)
     OVERVIEW_ICON_FILL_COLOR          = 1,
     OVERVIEW_FADE_STEPS               = 8,
-    OVERVIEW_LOOPING_SOUND_KEEP_COUNT = 4,
     OVERVIEW_WINDOW_TEXT_ID           = 9,
     OVERVIEW_POINTER_FRAME            = 0
 H2_ENUM_END(OverviewPresentationConstant)
@@ -563,7 +563,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 displayedTroops = 0;
-                for (i = 0; i < OVERVIEW_DWELLING_SLOTS; i++) {
+                for (i = 0; i < KB_DWELLING_TYPE_COUNT; i++) {
                     switch (i) {
                         case DWELLING_ORDER_LEVEL_1:
                             building = DWELLING_INDEX_LEVEL_1;
@@ -812,7 +812,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 }
             }
 
-            for (i = 0; i < OVERVIEW_SECONDARY_SKILL_SLOTS; i++) {
+            for (i = 0; i < HERO_SECONDARY_SKILL_CAPACITY; i++) {
                 skillIndex = curHero->GetNthSS(i);
                 if (skillIndex != HERO_SKILL_NONE) {
                     detailRow = i / OVERVIEW_SECONDARY_SKILL_COLUMNS;
@@ -1029,7 +1029,7 @@ void game::Overview(void) {
     giOverviewReturnAction = OVERVIEW_RETURN_NONE;
     giOverviewReturnActionExtra = OVERVIEW_RETURN_ID_NONE;
     message.type = MESSAGE_WIDGET;
-    gpAdvManager->TrimLoopingSounds(OVERVIEW_LOOPING_SOUND_KEEP_COUNT);
+    gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
     gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
     for (mine = 0; mine < OVERVIEW_TITLE_COUNT; mine++) {
         textWidgetTitle[mine] = NULL;
@@ -1483,7 +1483,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             }
             if (widgetId >= TOWN_RECRUIT_ALT_FIRST
                 && widgetId <= TOWN_RECRUIT_ALT_LAST) {
-                widgetId -= OVERVIEW_DWELLING_SLOTS;
+                widgetId -= KB_DWELLING_TYPE_COUNT;
             }
             if (widgetId >= TOWN_RECRUIT_FIRST && widgetId <= TOWN_RECRUIT_LAST) {
                 item = widgetId - TOWN_RECRUIT_FIRST;

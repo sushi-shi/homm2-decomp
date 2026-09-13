@@ -11,6 +11,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/KB_TYPES.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -272,7 +274,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                         localization::Tr("adventure.confirm.quit"),
                         NORMAL_DIALOG_CONFIRM
                     );
-                    if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
+                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                         DestroyWindow(window);
                     return 0;
                 }
@@ -399,7 +401,7 @@ LRESULT AppCommand(
             );
             break;
         case KBWIN_MENU_SIZE_640_480:
-            ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
+            ResizeWindow(-1, -1, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
             break;
         case KBWIN_MENU_SIZE_800_600:
             ResizeWindow(-1, -1, KBWIN_WIDTH_800, KBWIN_HEIGHT_600);
@@ -426,7 +428,7 @@ void UpdateDfltMenu(HMENU menu) {
 
     if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
-    if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
+    if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
     if (giMainVideoModeWidth <= KBWIN_WIDTH_800)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_800_600), MF_GRAYED);

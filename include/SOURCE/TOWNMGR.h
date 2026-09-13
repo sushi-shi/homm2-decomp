@@ -46,7 +46,6 @@ H2_ENUM_STEPPED(TownThievesGuildCategory)
 
 H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_DEBUG_BUILD_ALL                     = 100,
-    TOWN_BUILDING_COUNT                      = 32,
     TOWN_OBJECT_FILENAME_SIZE                = 16,
     TOWN_MANAGER_EVENT_MASK                  = 0x800,
     TOWN_SELECTED_BUILDING_NONE              = -1,
@@ -57,12 +56,9 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_MUSIC_STOP                          = -1,
     TOWN_POINTER_DEFAULT                     = -1,
     TOWN_WINDOW_TEXT_CONTROL                 = 0x89,
-    TOWN_WIDGET_DISABLED_VALUE               = 0x1000,
     TOWN_WIDGET_ENABLED_VALUE                = 2,
     TOWN_WINDOW_DRAW_WIDTH                   = 0x320,
     TOWN_WINDOW_DRAW_RIGHT                   = 0x321,
-    TOWN_SCREEN_WIDTH                        = 0x280,
-    TOWN_SCREEN_HEIGHT                       = 0x1e0,
     TOWN_BANK_BOX_X                          = 0x222,
     TOWN_GARRISON_STRIP_Y                    = 0x100,
     TOWN_HERO_STRIP_Y                        = 0x163,
@@ -92,17 +88,11 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_STATUS_REGION_HEIGHT                = 0xf,
     TOWN_ARMY_VIEW_X                         = 0x77,
     TOWN_ARMY_VIEW_Y                         = 0x14,
-    TOWN_MAX_BOATS                           = 48,
-    TOWN_MAX_ARTIFACTS                       = 14,
     TOWN_SPELL_BOOK_COST                     = 500,
     TOWN_BOAT_GOLD_COST                      = 1000,
     TOWN_BOAT_WOOD_COST                      = 10,
     TOWN_INTERFACE_BROADCAST_FLAGS           = 0x4008,
     TOWN_CONTROL_STATUS_TEXT                 = 0x386,
-    TOWN_DIALOG_CONFIRM                      = 0x7802,
-    TOWN_RESOURCE_COUNT                      = 7,
-    TOWN_MAGE_GUILD_MAX_LEVEL                = 5,
-    TOWN_MAGE_SPELLS_PER_LEVEL               = 4,
     TOWN_MAGE_SPELL_UNAVAILABLE              = 999,
     TOWN_MAGE_FIRST_SPELL_CONTROL            = 10,
     TOWN_MAGE_FIRST_ICON_CONTROL             = 0x28,
@@ -117,7 +107,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_SPLIT_AMOUNT_CONTROL                = 0x44,
     TOWN_SPLIT_INCREASE_CONTROL              = 0x45,
     TOWN_SPLIT_DECREASE_CONTROL              = 0x46,
-    TOWN_FACTION_COUNT                       = 6,
     TOWN_REDRAW_INTERVAL                     = 150,
     TOWN_WELL_DWELLING_COUNT                 = 6,
     TOWN_WELL_FIRST_NAME_CONTROL             = 7,
@@ -145,12 +134,11 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_THIEVES_INFO_PERSONALITY            = 3,
     TOWN_THIEVES_INFO_STRONGEST_CREATURE     = 4,
     TOWN_THIEVES_INFO_ALL_CATEGORIES         = 5,
-    TOWN_THIEVES_PRIMARY_STAT_COUNT          = 4,
     TOWN_THIEVES_DEAD_PLAYER_STAT            = -1,
     TOWN_THIEVES_RANK_ICON_FRAME_BASE        = 22
 H2_ENUM_END(TownManagerConstant)
 
-extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
+extern SBuildingInfo sBuildingInfo[][IDX(BUILDING_SLOT_COUNT)];
 
 MessageDispatchResult MageGuildHandler(struct tag_message&);
 MessageDispatchResult TavernHandler(struct tag_message&);

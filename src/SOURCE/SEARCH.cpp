@@ -10,6 +10,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
+#include <SOURCE/KB_TYPES.h>
 
 // Persistent search scratch has independently addressed owners, not one record.
 DATA(0x00533dc4) static i32 s_currentWater;
@@ -33,12 +34,12 @@ DATA(0x00533e18) static searchNode* s_neighborNode;
 DATA(0x00533dc0) static i32 s_adjacentCost;
 DATA(0x00533e00) static i32 s_mapX;
 DATA(0x00533ddc) static i32 s_mapY;
-DATA(0x00533dec) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
+DATA(0x00533dec) static i8 s_directionCosts[IDX(MAP_DIRECTION_COUNT)];
 DATA(0x00533df4) static i32 s_currentCost;
 DATA(0x00533da0) static b32 s_hasTarget;
 DATA(0x00533e14) static i32 s_processedPointCount;
 DATA(0x00533e28) static hero* s_currentHero;
-DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SEARCH_DIRECTION_COUNT];
+DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[IDX(MAP_DIRECTION_COUNT)];
 DATA(0x00533e1c) static i32 s_bestTargetCost;
 DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
 

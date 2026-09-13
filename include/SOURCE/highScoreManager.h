@@ -19,7 +19,6 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_TEXT_WIDGET_STRIDE          = 4,
     HIGH_SCORE_STANDARD_BUTTON             = 100,
     HIGH_SCORE_CAMPAIGN_BUTTON             = 0x93,
-    HIGH_SCORE_CLOSE_BUTTON                = 0x7800,
     HIGH_SCORE_FIRST_MONSTER_WIDGET        = 0xc9,
     HIGH_SCORE_FIRST_SHADOW_WIDGET         = 0xdd,
     HIGH_SCORE_FIRST_TEXT_WIDGET           = 0x6a,

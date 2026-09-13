@@ -14,7 +14,6 @@
 #include <SOURCE/X_GLOBAL.h>
 
 H2_ENUM_BEGIN(ExecutiveManagerConstant)
-    MANAGER_DEFAULT_PRIORITY = -1,
     MANAGER_SUCCESS          = 0,
     MANAGER_ERROR            = 3,
     DIALOG_MANAGER_CAPACITY  = 20
@@ -49,17 +48,17 @@ executive::executive(void) {
 
 VA(0x004c4f60, 0xb0)
 i32 executive::InitSystem(void) {
-    if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpResourceManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveResourceInitError);
-    if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpInputManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveInputInitError);
     if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
-        if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+        if (gpSoundManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
             ShutDown(gExecutiveSoundInitError);
     }
-    if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveMouseInitError);
-    if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveWindowInitError);
     return 0;
 }
@@ -102,13 +101,13 @@ i32 executive::DoDialog(class baseManager* manager) {
         p = p->m_next;
         count++;
     }
-    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveDialogManagerError1);
-    if (ex.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveDialogManagerError2);
-    if (ex.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveDialogManagerError3);
-    if (ex.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveDialogManagerError4);
     ex.MainLoop();
     RemoveManager(manager);
@@ -139,7 +138,7 @@ VA(0x004c52f0, 0x13c)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == NULL)
         return MANAGER_ERROR;
-    if (priority == MANAGER_DEFAULT_PRIORITY) {
+    if (priority == BASE_MANAGER_PRIORITY_UNASSIGNED) {
         if (m_managerListTail == NULL)
             priority = 0;
         else
@@ -203,11 +202,11 @@ VA(0x004c5500, 0x7c)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
-    if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(mgr, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveCallManagerError1);
     MainLoop();
     RemoveManager(mgr);
-    if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(saved, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(gExecutiveCallManagerError2);
     m_activeManager = saved;
 }
