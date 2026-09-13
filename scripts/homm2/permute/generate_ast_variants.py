@@ -178,9 +178,15 @@ def target_function(tu: ci.TranslationUnit, source: Path, blob: bytes, rva: int)
             continue
         if marker_start <= cursor.extent.start.offset < span_end:
             matches.append(cursor)
-    if len(matches) != 1:
-        raise ValueError(f"expected one function in RVA marker span, found {len(matches)}")
-    return matches[0]
+    if not matches:
+        raise ValueError("expected a function definition after RVA marker, found none")
+    # A marker owns the next definition, not every definition before the next
+    # marker. Unannotated inline helpers may follow the claimed function.
+    first_offset = min(cursor.extent.start.offset for cursor in matches)
+    first = [cursor for cursor in matches if cursor.extent.start.offset == first_offset]
+    if len(first) != 1:
+        raise ValueError(f"ambiguous first function after RVA marker: {len(first)} definitions")
+    return first[0]
 
 
 def classify_parse_errors(
