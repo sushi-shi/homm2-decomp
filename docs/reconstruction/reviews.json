@@ -3731,7 +3731,7 @@
     "body_sha256": "cc5ca9e316ee5edfc82ba8ba8f15a0ca8e722342b9f900773d72d4e7def8e32a",
     "patterns": {
       "casts": "retain",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -3741,7 +3741,7 @@
       "stack": "open",
       "bounds": "retain"
     },
-    "note": "S23 unread result scalar; S24 ten-handle owner but only9 initialized/created. Full arrays7 initialized with sizeof; index0/6 supplied by all callers. Allocator void*->u8* is real byte-status output, API block/reset name slots0/2 bounded16."
+    "note": "S23 unread result scalar; S24 ten-handle owner but only9 initialized/created. Full arrays7 initialized with sizeof; index0/6 supplied by all callers. Allocator void*->u8* is real byte-status output, API block/reset name slots0/2 bounded16. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_term(void)#1": {
     "body_sha256": "fdc9c9d1abd4e546a3b29f8764fdf3f8333ca6e2804467d755f25af13612d027",
@@ -3757,7 +3757,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "H2_UNUSED(block) is misleading but block IS used as real cancellation/delete-name API record. B40 successful-init lifecycle required for gNbMaxSess and critical sections; closes/zeros event handles then SetEvent(handles[0]) remains observed source behavior, not a cleanup authorization."
+    "note": "H2_UNUSED(block) is misleading but block IS used as real cancellation/delete-name API record. B40 successful-init lifecycle required for gNbMaxSess and critical sections; closes/zeros event handles then SetEvent(handles[0]) remains observed source behavior, not a cleanup authorization. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_rcv(i16 session,void * buf)#1": {
     "body_sha256": "09969f57544d09ad87e2f182dd65a415bda400be1b347568812d1ea5774d3db9",
@@ -3789,7 +3789,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Tagged serial/network node tail is meaningful. B40 signed session/length unchecked before table access and allocation len+11, then variable payload copy from caller. Callers use0/1/6 and encoded message sizes; full length proof is B41, not inferred from allocation."
+    "note": "Tagged serial/network node tail is meaningful. B40 signed session/length unchecked before table access and allocation len+11, then variable payload copy from caller. Callers use0/1/6 and encoded message sizes; full length proof is B41, not inferred from allocation. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_sess(NetbiosSessionOperation operation,...)#1": {
     "body_sha256": "eb4a03c306c7bfc30deffb03af9b2a4eba78468bd254fea9251ed8fc09175425",
@@ -3837,7 +3837,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "S23 unused64-byte block. Event scans0 and2..6 fit initialized9; B40 node.session/payload length govern7-slot and4096-byte copies plus flexible tail. Retry loop leaves sendComplete false on closed/out-of-range result; behavior preserved rather than silently fixed."
+    "note": "S23 unused64-byte block. Event scans0 and2..6 fit initialized9; B40 node.session/payload length govern7-slot and4096-byte copies plus flexible tail. Retry loop leaves sendComplete false on closed/out-of-range result; behavior preserved rather than silently fixed. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_add_name(void)#1": {
     "body_sha256": "b478208a6f7d11e9a6814d8dedc8f36ac02d853e5064b1224d13a43330d3df87",
@@ -3875,7 +3875,7 @@
     "body_sha256": "cd380f519f7585adc1dcf4faced87aaaa58c825a32fe41c3a690e1f4b1e13acb",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -3885,13 +3885,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Setup supplies session0, within7; NCB explicitly receives4096 bytes into its full4096 payload owner and installs real callback. No artificial pointer arithmetic."
+    "note": "Setup supplies session0, within7; NCB explicitly receives4096 bytes into its full4096 payload owner and installs real callback. No artificial pointer arithmetic. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_recv_any_done(NetbiosControlBlock * ncb)#1": {
     "body_sha256": "069e5fc5a3b74d47bb6368a549de964754ae9a98dae3ede83a4e290118b6751c",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "retain",
@@ -3901,7 +3901,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Owner index found by bounded pointer-equality scan of7 real NCBs, never subtracting member offsets. B40 broadcast prefix/name compares fit4096 allocation but omit received length, so stale/short data is not validated. Matched index then feeds nb_call."
+    "note": "Owner index found by bounded pointer-equality scan of7 real NCBs, never subtracting member offsets. B40 broadcast prefix/name compares fit4096 allocation but omit received length, so stale/short data is not validated. Matched index then feeds nb_call. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_call(i32 session,void * name)#1": {
     "body_sha256": "a90c5e5f4b6d29f3a7d27bf6d9547d250532fa287b390ff520c0d6a87ca709a6",
@@ -3955,7 +3955,7 @@
     "body_sha256": "214b541ea085cb8447ee51c0528c50c2309fd47e26ca1f8b581c1bb0ce565131",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -3965,7 +3965,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "All traced callers supply scanned session0..6 or move destination1; receive owner4096 and event indexsession+2<=8 fit initialized9. Repeated API retry loop is semantic, not fabricated goto."
+    "note": "All traced callers supply scanned session0..6 or move destination1; receive owner4096 and event indexsession+2<=8 fit initialized9. Repeated API retry loop is semantic, not fabricated goto. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_close_session(i32 session)#1": {
     "body_sha256": "8818a9629774be9b81a56fc34c2875445469ed53952184cc2b84a4e83fe77419",
@@ -3987,7 +3987,7 @@
     "body_sha256": "1157c3b1896d63a0ab2759a5a286cbf2f604a5af51c14ff4ba1151406133d6f0",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -3997,7 +3997,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Polled sessions0..4 fit7. Allocator conversion and session narrowing are real. B40 API length must stay<=4096; data[1] flexible tail is accessed over runtime allocation len+11 and successful node construction/lifecycle is assumed."
+    "note": "Polled sessions0..4 fit7. Allocator conversion and session narrowing are real. B40 API length must stay<=4096; data[1] flexible tail is accessed over runtime allocation len+11 and successful node construction/lifecycle is assumed. U07/S24 follow-up applied: byte-only4096-byte payload and exact nine-handle36-byte event owner; all named consumers reconciled. Whole98-object native equivalence and this function complete retail bytes/size/DIR32 sites/ordered targets pass. S23 unread locals and B38/B40 protocol/lifecycle contracts remain separate. See U07-S24.md."
   },
   "src/SOURCE/netwin.cpp:nb_format_name(char * src,u8 * dst)#1": {
     "body_sha256": "f0ee410c99752fa5462b6a7af5b46259c6966261d0f4b7f72928dd605cd21719",

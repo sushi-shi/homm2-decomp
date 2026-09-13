@@ -237,9 +237,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   need explicit contracts. Known serial callers use slot0; the500-byte error
   formatter is bounded to473 bytes by all callers and genuine retail strings.
   NetBIOS session/payload lengths and short broadcast initialization remain.
-- U07/S24: the NetBIOS payload union has an unused word view; event storage
-  declares ten handles but only nine are initialized/used. Shared layout and
-  native evidence must decide whether those declarations can be simplified.
+- U07/S24: [removed the unused NetBIOS word view and tenth handle](U07-S24.md).
+  Byte-only4096-byte payloads and nine36-byte event handles preserve all98
+  native objects; all eight direct retail consumers and VC6/dialect layouts pass.
+  The four bytes before the next global are compiler alignment, not a handle.
 - V01: NetBIOS session dispatch uses typed SDK `va_arg`; adding its omitted
   `va_end` calls produces extra retail-incompatible stores. [Measured retain
   decision and exact baseline proof](V01.md); portability debt stays explicit.

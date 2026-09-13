@@ -76,8 +76,8 @@
     "note": "Full62-line header read. tag_Node has meaningful serial tail offset10 and NetBIOS tagged tail offset11, each represented by1-byte flexible member (B40). Real96-byte ComPortState has4/24-byte interior gaps S23; SDK DCB/timeouts are real."
   },
   "include/SOURCE/netwin.h": {
-    "sha256": "1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27",
-    "note": "Full136-line header read. NCB64 packed SDK fields/reserved10 are real ABI. U07 NetbiosPayload unused word arm; S24 events10 vs initialized9; session/name/payload extents7/16/4096. B38 wildcard copy is a source literal contract issue, not missing NCB space."
+    "sha256": "fe9583dd3a03f1d3c96f12ab5f70d46f95c970a7777be1e5c695dc270f1218a1",
+    "note": "Full updated header and all named payload/event consumers reviewed. U07 removes unused word arm and keeps4096-byte byte struct; S24 declares exactly nine36-byte event handles. Compiler alignment padding is not an extra handle. VC6 and both source dialects pass; all98 native objects and all eight direct retail consumers pass. NCB64 packed SDK fields/reserved10 remain real ABI. Session/name/payload extents7/16/4096 and existing B38/B40 protocol/lifecycle contracts unchanged. See U07-S24.md."
   },
   "include/SOURCE/netwin_private.h": {
     "sha256": "335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11",
