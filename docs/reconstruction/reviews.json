@@ -17072,20 +17072,20 @@
     "note": "Actual instance->m_castleRecs[index] address; B55 nonnull game and index0..71. Real inline accessor, no container recovery, cast, goto, scratch, varargs or fake offset."
   },
   "src/SOURCE/GAME.cpp:game::RandomizeEvents(void)#1": {
-    "body_sha256": "b69eb0d567a307552019270ffda920a84e3200cbae5c9766d18d8589e59d1d58",
+    "body_sha256": "3efba1efdb6cf6afa6c80a731ee40dbc0b6862bc6b7133d92802fd6b406d6642",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "open",
-      "stack": "open",
+      "reuse": "retain",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "Entire body and all switch arms/three map sweeps read. Erased ppMapExtra casts selected by trigger represent real tagged variable records; real Creature/Artifact conversions retained. C34 bounded event coordinates/guardian-count stores and coordinate-byte domains need alternatives. R08 mineId6 alternates town/mine IDs, randomValue5 alternates outcome roll/layer index. S38 upperIndexes8/lowerIndexes28 arrays5 written but never read; tileset arrays5 and guardian choices10 are real, completely bounded local arrays. B58 mapEventCount append has no local50-capacity check; extras require valid typed lengths/terminated sphinx riddle; chain indices/termination and terrain/artifact indices must be valid. Castle/mines metadata rectangles use unclamped fullMap cells and can cross edges; GetTownId/GetMineId may return-1 before owner access, while boat checks call clamping advManager accessor. Five-slot collection loops guard count before write; guardian minor0..3/major4..9 fit10. No goto, manual varargs, fake address math or owner recovery."
+    "note": "Entire653-line body/all switch arms/three sweeps reread. C36 complete128-arm product removes seven assignment casts: u16 event coordinates, u8 boat coordinates and u8 guardian count30..60; same stored low bits. Real tagged ppMapExtra payload casts and Creature/Artifact domain conversions remain. S38 four-arm product retains both write-only index arrays5 plus stores; deletion changes9926 bytes to9881/9884/9839. R08 four-arm semantic scoped town-ID/layer-index split changes size to9935/9951/9960, so shared roles remain. Tileset arrays5 and guardian choices10 are genuine bounded locals; collection guards count before writes. B58 unchecked mapEventCount append to50, typed extra lengths/sphinx termination, chain indices/termination, terrain/artifact indices and map dimensions/edges remain contracts. Castle/mine metadata uses unclamped fullMap; town/mine lookup can return-1 before access; boat probes use clamping advManager. No goto/manual varargs/fake arithmetic/owner recovery. Full9926 retail bytes/size/DIR32/ordered targets pass despite existing300/301 block partition, all98 native objects unchanged. C36-S37-S38.md; native label-name changes retain exact section/offsets."
   },
   "src/SOURCE/GAME.cpp:game::InitializePasswords(void)#1": {
     "body_sha256": "2b35921c09322637a6387692fd40c17c576a595bcc1b2d9819b6edd6470d7ed5",
@@ -17136,9 +17136,9 @@
     "note": "Forwards live mapCell to RandomizeBarrier; tagged metadata transformation inherited, not owner recovery. No local cast, union, goto, buffer, scratch or varargs."
   },
   "src/SOURCE/GAME.cpp:game::LoadMap(char * filename)#1": {
-    "body_sha256": "d15a313bf0aca88fb5635860cdc89918179c21ef633e753a7e61d88a1b2ca544",
+    "body_sha256": "0b074138e06e89060c930aa609f222b03dcfc5a2f87c377880d2b7b73603cdba",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17146,10 +17146,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "applied",
       "bounds": "open"
     },
-    "note": "Whole1077-byte function independently matches ordinary bytes, complete DIR32 sites and ordered retail targets. C36 x/y char arrays are read one unsigned coordinate byte then repeatedly castu8; unsigned owner recovery candidate, while type byte has real signed high-bit test/enum conversion and erased allocations need typed boundary. S37 x4/y4/type8 only1 and junk8 only2 accessed. B57 pathgText768, header event counts30/50, extra allocation products and signed lengths, file termination/read failures and unchecked dimensions remain contracts. Fixed town72/mine144 loops fit; old-format extra72 mine slots explicitly initialized-1. No union/goto/owner recovery/artificial address/varargs/unrelated reuse."
+    "note": "C36/S37 complete128-arm owner/extent product: unsigned x/y byte owners remove six casts and shrink4-to1; type becomes signed i8 while retaining8 bytes, junk8 retains despite2-byte read. All smaller type/junk alternatives change bytes even though every function size remains1077. VC6 signed-char/sentinel/unsigned-destination probe, all256 byte values and both dialects with exact actual local extents/types pass. Signed high-bit castle flag and faction/mine enum conversions remain; erased allocations retain casts. Whole1077 retail bytes/size/DIR32/ordered targets pass, all98 native objects unchanged. B57 gText768 path capacity, header counts30/50, extra allocation products and signed lengths, file termination/read failures and dimensions remain contracts. Town72/mine144 loops fit; old-format extra72 mine slots initialize x/y/type to-1, same255 coordinate sentinel. No union/goto/owner arithmetic/manual varargs/unrelated reuse. C36-S37-S38.md."
   },
   "src/SOURCE/GAME.cpp:game::ClaimTown(i32 townId,i32 player,i32 suppressVisibility)#1": {
     "body_sha256": "31b093c6d22ee38623de0abd00e97a4ae073a675564d4dce154c31db9e0caffd",

@@ -377,9 +377,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   Map scratch remains separate; no padding is silently removed.
 - G48/R07: new-map award joins and player/town counters reused as artifact
   coordinates need structural recovery. R08 tracks event random-roll/layer-index
-  and town/mine-ID reuse; S38 tracks event layer-index arrays written but not read.
+  and town/mine-ID reuse; [its scoped alternatives and S38's write-only array
+  deletions change bytes and remain](C36-S37-S38.md).
 - B58: map-event allocation, terrain, layer-chain and town/mine-edge contracts
-  remain open. C36 covers map-coordinate byte owners; C37 covers spell-widget
+  remain open. C36 [recovers LoadMap byte owners and removes13 casts across
+  LoadMap/RandomizeEvents](C36-S37-S38.md); S37 reduces only x/y scratch to1 byte.
+  C37 covers spell-widget
   [eight cast removals through direct literals and named selections](C34-C37-S39-B59.md).
   S39 retains the overwritten spell-message assignment after its deletion
   loses seven bytes. B59 proves complete spell labels fit35 bytes in768;

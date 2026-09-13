@@ -2259,8 +2259,8 @@ void game::RandomizeEvents(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
                     m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
                     mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
-                    mapEvent0->x = static_cast<i16>(xPos);
-                    mapEvent0->y = static_cast<i16>(yPos);
+                    mapEvent0->x = xPos;
+                    mapEvent0->y = yPos;
                     mapEvent0->active = true;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
@@ -2658,8 +2658,8 @@ void game::RandomizeEvents(void) {
                         );
                         if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
                             == TERRAIN_WATER) {
-                            townRec->m_boatX = static_cast<i8>(xPos - CASTLE_BOAT_X_OFFSET);
-                            townRec->m_boatY = static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
+                            townRec->m_boatX = xPos - CASTLE_BOAT_X_OFFSET;
+                            townRec->m_boatY = yPos + CASTLE_BOAT_Y_OFFSET;
                         } else {
                             townEntrance2 = gpAdvManager->GetCell(
                                 xPos + CASTLE_BOAT_X_OFFSET,
@@ -2668,9 +2668,9 @@ void game::RandomizeEvents(void) {
                             if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
                                 == TERRAIN_WATER) {
                                 townRec->m_boatX =
-                                    static_cast<i8>(xPos + CASTLE_BOAT_X_OFFSET);
+                                    xPos + CASTLE_BOAT_X_OFFSET;
                                 townRec->m_boatY =
-                                    static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
+                                    yPos + CASTLE_BOAT_Y_OFFSET;
                             }
                         }
                     }
@@ -2682,10 +2682,10 @@ void game::RandomizeEvents(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE):
                     mineId6 = GetMineId(xPos, yPos);
                     m_mines[mineId6].guardianType = CREATURE_GHOST;
-                    m_mines[mineId6].guardianCount = static_cast<u8>(Random(
+                    m_mines[mineId6].guardianCount = Random(
                         ABANDONED_MINE_GUARDIAN_COUNT_MIN,
                         ABANDONED_MINE_GUARDIAN_COUNT_MAX
-                    ));
+                    );
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB):
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MINE):
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL):
@@ -2881,9 +2881,9 @@ void game::RandomizePassword(mapCell* cell) {
 
 VA(0x00453b9e, 0x435)
 i32 game::LoadMap(char* filename) {
-    char x[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
-    char y[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
-    char type[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    u8 x[1];
+    u8 y[1];
+    i8 type[LOAD_MAP_RECORD_SCRATCH_SIZE];
     char junk[LOAD_MAP_RECORD_SCRATCH_SIZE];
     i32 i;
     i32 handle;
@@ -2900,10 +2900,10 @@ i32 game::LoadMap(char* filename) {
         read(handle, x, sizeof(x[0]));
         read(handle, y, sizeof(y[0]));
         read(handle, type, sizeof(type[0]));
-        if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+        if (x[0] != SAVED_TOWN_OFF_MAP) {
             m_castleRecs[i].m_onMap = 1;
-            m_castleRecs[i].m_x = static_cast<u8>(x[0]);
-            m_castleRecs[i].m_y = static_cast<u8>(y[0]);
+            m_castleRecs[i].m_x = x[0];
+            m_castleRecs[i].m_y = y[0];
             m_castleRecs[i].m_type =
                 static_cast<FactionType>(type[0] & TOWN_RECORD_TYPE_MASK);
             if (type[0] < 0)
@@ -2923,10 +2923,10 @@ i32 game::LoadMap(char* filename) {
             read(handle, y, sizeof(y[0]));
             read(handle, type, sizeof(type[0]));
         }
-        if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+        if (x[0] != SAVED_TOWN_OFF_MAP) {
             m_mines[i].guardianType = CREATURE_NONE;
-            m_mines[i].x = static_cast<u8>(x[0]);
-            m_mines[i].y = static_cast<u8>(y[0]);
+            m_mines[i].x = x[0];
+            m_mines[i].y = y[0];
             m_mines[i].resourceType = static_cast<MineType>(type[0]);
         }
     }
