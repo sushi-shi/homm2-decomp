@@ -390,11 +390,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - C38/C39: [army-view name storage is now text](C38-C41-S41-S44.md), and five variadic numeric
   arguments use normal promotions. B60 covers the complete198-byte detail
   chain in550 bytes. S40 records unread army-dialog locals.
-- C40-C43: sprite sentinels, logo upcasts, event-flag conversions and new-turn
-  lowercase text ownership are reviewed individually. C41's logo upcast is
-  removed; other candidates still require their own matrices.
+- C40-C43: [all ten sprite casts are removed](C34-C40-S41.md), with named
+  sentinels and natural byte assignments. C41's logo upcast is removed;
+  event-flag conversions and new-turn lowercase text ownership remain separate.
 - S41/S44: dwelling-roll and rumour-order scratch now match ten entries and
-  six players. Other random-army/setup storage remains open. S42/S43 cover
+  six players. [Hero initialization removes three casts](C34-C40-S41.md);
+  its unused third army-table column stays after complete native-changing
+  alternatives. Other setup storage remains open. S42/S43 cover
   unused turn-update and transfer/compression locals. R09 tracks indices
   reused across distinct player/hero/town roles.
 - G49-G54: random-monster bounds, transfer cleanup, score clamping, map-size

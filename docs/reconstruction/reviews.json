@@ -17440,9 +17440,9 @@
     "note": "C34 selected creature byte from12-entry giMonType; CreatureType calls are real enum boundary. R09 i starts as period roll then town index. Fixed town72/dwelling12/giMonType0..11 loops fit. B61 faction/type/terrain/map domains and garrison arithmetic required. No goto, fake aggregate, varargs or owner tricks."
   },
   "src/SOURCE/GAME.cpp:game::ConvertObject(i32 left,i32 top,i32 right,i32 bottom,TilesetId oldTileset,i32 oldFirstIndex,i32 oldLastIndex,TilesetId newTileset,i32 newFirstIndex,MapObjectType oldTrigger,MapObjectType newTrigger)#1": {
-    "body_sha256": "f933b74c6d1c775ca5e1a24265af98caf91a45a47935a04c1913bbf658594363",
+    "body_sha256": "c903c9d4496bc3be55ae120e825957e619dc273a58fc5c9a34c00a845a059a36",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17453,7 +17453,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C40 six u8(-1) sentinels can use MAPCELL_SPRITE_NONE; four frame-remapping byte casts retain input domain. Explicit coordinate guards precede fullMap access; B58 inclusive-endpoint arithmetic, extra indices/termination and remapped frames remain. Actual typed chain cursors, no owner recovery/goto/fake stack/varargs."
+    "note": "C40 complete64-arm sentinel product followed by16-arm remapping product removes all10 casts: six comparisons use actual MAPCELL_SPRITE_NONE255, four assignments use real u8 index destinations. Object/overlay chains retain every sentinel and next-index test; coordinate guards precede fullMap access. B58 inclusive-endpoint/overflow arithmetic, valid dimensions/extra chains and remapped-frame domains remain; implicit narrowing does not clamp or validate inputs. Trigger bit preservation unchanged. No goto/manual varargs/unions/fake aggregate/owner arithmetic or unrelated reuse. Full962 retail bytes/size/DIR32/ordered targets pass, all98 native objects unchanged and both dialects pass. C34-C40-S41.md."
   },
   "src/SOURCE/GAME.cpp:game::RandomizeTown(i32 x,i32 y,i32)#1": {
     "body_sha256": "6e173209ec671d6500229add7dc6761df0622999ec510adf8dd3ddecb07ec186",
@@ -17536,9 +17536,9 @@
     "note": "Seven artifact enum equality tests, no indexing/casts/unions/goto/storage/pointers/manual varargs."
   },
   "src/SOURCE/GAME.cpp:game::RandomizeHeroPool(void)#1": {
-    "body_sha256": "70add5e2049c681d5d41722c01459fccc1f1188dac6485545c8a0526260be7cf",
+    "body_sha256": "ee2c4748804a7dba28cd86264b924b27996212dabcb7101cedf54327851be6a0",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17549,12 +17549,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C34 bounded0..255 seed cast; fixed54 heroes and named known-spell indices fit. B61 CalcMobility and hero class/skill contracts inherited. No union/goto/local aggregate/varargs/owner arithmetic."
+    "note": "C34 two-arm product removes seed assignment cast; actual range1..255 fits realu8 destination. Fixed54 heroes and named known-spell indices fit. B61 class/skill/CalcMobility contracts inherited; random call order and all stores unchanged. No union/goto/local aggregate/varargs/owner arithmetic. Full424 retail bytes/size/DIR32/ordered targets pass, all98 native objects and both dialects pass. C34-C40-S41.md."
   },
   "src/SOURCE/GAME.cpp:game::SetRandomHeroArmies(i32 heroId,i32 strongArmy)#1": {
-    "body_sha256": "0ebbc441dd3ca0c9ecab155a81c6a35f3b7f1632c1f5a26297c19dbe0abfd5d9",
+    "body_sha256": "589fc388dcb5b3ffedbb663422585b20e4b8dd7de1ff592917510ad219eaa435",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17562,10 +17562,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C34 bounded creature/count casts from six-faction table. S41 real6x3 six-byte records, but third column unused by selection loop2; selected[2] IS read to force selected[1], cannot remove flag. Five slots initialized, at most two filled. B61 hero0..53/faction0..5; fixed random counts fit i16. No union/goto/fake address/manual varargs."
+    "note": "C34/S41 complete8-arm table/cast product removes two creature/count assignment casts while retaining real6x3 six-byte table. Third column unselected by loop2, but two-column source changes834-to642 bytes under all cast combinations. selected[2] genuinely controls selected[1] and stays. Five slots initialized, at most two filled; first-two-column counts2..50 including strong-army rounding, valid creature IDs fit i8-backed domain. B61 hero0..53/faction0..5 and lifecycle required. No union/goto/fake address/manual varargs or unrelated reuse. Full834 retail bytes/size/DIR32/ordered targets pass; all98 native objects and both dialects pass. C34-C40-S41.md."
   },
   "src/SOURCE/GAME.cpp:game::ProcessRandomObjects(void)#1": {
     "body_sha256": "43564bfc49c94e44790d4e5beac172a427c924db331b49c97d266d2a9ff2607c",

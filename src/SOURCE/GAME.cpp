@@ -4912,19 +4912,19 @@ void game::ConvertObject(
             if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
                 continue;
             cell = WORLDMAP->GetCell(x, y);
-            if (cell->m_objectIndex != static_cast<u8>(-1)
+            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE
                 && cell->m_objectTileset == oldTileset
                 && cell->m_objectIndex >= oldFirstIndex
                 && cell->m_objectIndex <= oldLastIndex) {
                 cell->m_objectTileset = newTileset;
                 cell->m_objectIndex =
-                    static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
+                    cell->m_objectIndex - oldFirstIndex + newFirstIndex;
             }
             if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
                 cell->m_triggerType = MAP_TRIGGER_WITH_OBJECT(cell->m_triggerType, newTrigger);
 
             if (cell->m_extraIndex != 0
-                && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
+                && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
                 ext = WORLDMAP->Extra(cell->m_extraIndex);
             else
                 ext = NULL;
@@ -4934,25 +4934,25 @@ void game::ConvertObject(
                     && ext->objectIndex <= oldLastIndex) {
                     ext->objectTileset = newTileset;
                     ext->objectIndex =
-                        static_cast<u8>(ext->objectIndex - oldFirstIndex + newFirstIndex);
+                        ext->objectIndex - oldFirstIndex + newFirstIndex;
                 }
                 if (ext->nextIndex != 0
-                    && WORLDMAP->Extra(ext->nextIndex)->objectIndex != static_cast<u8>(-1))
+                    && WORLDMAP->Extra(ext->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
                     ext = WORLDMAP->Extra(ext->nextIndex);
                 else
                     ext = NULL;
             }
 
-            if (cell->m_overlayIndex != static_cast<u8>(-1)
+            if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE
                 && cell->m_overlayTileset == oldTileset
                 && cell->m_overlayIndex >= oldFirstIndex
                 && cell->m_overlayIndex <= oldLastIndex) {
                 cell->m_overlayTileset = newTileset;
                 cell->m_overlayIndex =
-                    static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
+                    cell->m_overlayIndex - oldFirstIndex + newFirstIndex;
             }
             if (cell->m_extraIndex != 0
-                && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != static_cast<u8>(-1))
+                && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != MAPCELL_SPRITE_NONE)
                 ext = WORLDMAP->Extra(cell->m_extraIndex);
             else
                 ext = NULL;
@@ -4962,10 +4962,10 @@ void game::ConvertObject(
                     && ext->overlayIndex <= oldLastIndex) {
                     ext->overlayTileset = newTileset;
                     ext->overlayIndex =
-                        static_cast<u8>(ext->overlayIndex - oldFirstIndex + newFirstIndex);
+                        ext->overlayIndex - oldFirstIndex + newFirstIndex;
                 }
                 if (ext->nextIndex != 0
-                    && WORLDMAP->Extra(ext->nextIndex)->overlayIndex != static_cast<u8>(-1))
+                    && WORLDMAP->Extra(ext->nextIndex)->overlayIndex != MAPCELL_SPRITE_NONE)
                     ext = WORLDMAP->Extra(ext->nextIndex);
                 else
                     ext = NULL;
@@ -5266,7 +5266,7 @@ void game::RandomizeHeroPool(void) {
         m_heroRecs[heroId].m_remainingMobility = m_heroRecs[heroId].CalcMobility();
         m_heroRecs[heroId].m_mobility = m_heroRecs[heroId].m_remainingMobility;
         m_heroRecs[heroId].m_randomSeed =
-            static_cast<u8>(Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX));
+            Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX);
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
         if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
@@ -5322,7 +5322,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     for (index = 0; index < RANDOM_HERO_ARMY_SELECTION_COUNT; index++) {
         if (selected[index]) {
             army2->m_creatureTypes[armySlot16] =
-                static_cast<i8>(armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].creature);
+                armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].creature;
             minimum3 = armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].minimum
                        * RANDOM_HERO_COUNT_SCALE;
             maximum = armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].maximum
@@ -5332,7 +5332,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
                 minimum3 =
                     (minimum3 + maximum) / RANDOM_HERO_AVERAGE_DIVISOR;
             army2->m_creatureCounts[armySlot16] =
-                static_cast<i16>(Random(minimum3, maximum) / RANDOM_HERO_COUNT_SCALE);
+                Random(minimum3, maximum) / RANDOM_HERO_COUNT_SCALE;
             armySlot16++;
         }
     }
