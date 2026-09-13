@@ -384,7 +384,7 @@ BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	922016057c18.708746330242
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	100.0000	4c257cfc7c9b
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	a461d52425e4
-BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	8423a0f4f799
+BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	57000f96af7a
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	a0a4500d9aa3
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	dcd7ce3959af
 BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	100.0000	fd3ada851f1a
@@ -1222,14 +1222,14 @@ SOURCE/SETUP	?SetupNetworkGame2@game@@QAEHXZ	100.0000	63234e748e61
 SOURCE/SETUP	?SetupNetworkGame2Handler@@YIHAAUtag_message@@@Z	100.0000	073c850d1a69
 SOURCE/SETUP	?SetupNetworkGame@game@@QAEHXZ	100.0000	d14a8656befb
 SOURCE/SETUP	?SetupNetworkGameHandler@@YIHAAUtag_message@@@Z	100.0000	299616f6c597
-SOURCE/SMACKMGR	?ConvertSmackerPalette@@YIXPAE@Z	100.0000	52bdce66d0c5
+SOURCE/SMACKMGR	?ConvertSmackerPalette@@YIXPAE@Z	100.0000	884b3c756f2c
 SOURCE/SMACKMGR	?DoAdvance@@YIXPAUSmackTag@@HHHH@Z	100.0000	fdd1d421c85d
 SOURCE/SMACKMGR	?ExpansionCampaignRect@@YIHHH@Z	100.0000	1e4d315e4c73
-SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	100.0000	94f862596ce1
+SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	100.0000	c0c5de3972de
 SOURCE/SMACKMGR	?PointInRect@@YICHHPAUtag_rect@@@Z	100.0000	f415a2ca88d8
 SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	483233059e5c
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	ad88574cbded
-SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	ea5f06c2d890
+SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	277e95c332c6
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	9f506a9e1f79
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	100.0000	232efdc576d2
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	bff21f860d44
@@ -1467,7 +1467,7 @@ SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	bd232a97f75f
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	186b89cf6807
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	939fae3c0aba
 SOURCE/wingraph	?CreatePrimary@@YIXXZ	100.0000	8265f94ff0a1
-SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	100.0000	d3ead000800d
+SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	100.0000	e4cbc68fa5bc
 SOURCE/wingraph	?DDCleanUpWinGraphics@@YIXXZ	100.0000	66a8240b4631
 SOURCE/wingraph	?DDCreateSurface@@YIPAUIDirectDrawSurface@@KKH@Z	100.0000	dbcc41d010b4
 SOURCE/wingraph	?DDInitGraphics@@YIXXZ	100.0000	6b9d60d800d3
@@ -1489,9 +1489,9 @@ SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	100.0000	7d95177c5924
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	6a31694c14c2
 SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	d494d18515bc
 SOURCE/wingraph	?UpdatePalette@@YAXPAC@Z	100.0000	3058483c7812
-SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	100.0000	8bee59e8653a
+SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	100.0000	dde2651aa868
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	8af52d636ced
-SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	0bf3ad9bbfd5
+SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	3c085401f4bc
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	100.0000	fa1f99060d2f
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	0711bbf5a0a0
 SOURCE/wingraph	?WGUpdatePalette@@YAXPAC@Z	100.0000	404b1bdb1369

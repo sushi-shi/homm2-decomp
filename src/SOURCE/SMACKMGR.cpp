@@ -77,7 +77,7 @@ void ConvertSmackerPalette(u8* paletteData) {
 
     for (i = 0; i < PALETTE_DATA_SIZE; ++i)
         paletteData[i] =
-            static_cast<u8>(static_cast<i32>(paletteData[i]) >> PALETTE_VALUE_SHIFT);
+            paletteData[i] >> PALETTE_VALUE_SHIFT;
 }
 
 VA(0x0049457f, 0x1ea)
@@ -469,7 +469,7 @@ void SmackManagerMain(void) {
                         }
                         if (expansionChoice0 != EXPANSION_CAMPAIGN_NONE) {
                             bExpansionSmackNum =
-                                static_cast<i8>(expansionChoice0 + EXPANSION_FIRST_MOVIE);
+                                IDX(expansionChoice0) + EXPANSION_FIRST_MOVIE;
                             sprintf(
                                 gText,
                                 "%s%s.SMK",
@@ -599,10 +599,10 @@ playbackDone:
     }
     gpMouseManager->ShowColorPointer();
     if (brotherIcon)
-        gpResourceManager->Dispose(static_cast<resource*>(brotherIcon));
+        gpResourceManager->Dispose(brotherIcon);
     brotherIcon = NULL;
     if (backImage)
-        gpResourceManager->Dispose(static_cast<resource*>(backImage));
+        gpResourceManager->Dispose(backImage);
     backImage = NULL;
     if (bSmackSound)
         AIL_set_digital_master_volume(digitalDriver5, savedVolume8);
@@ -648,7 +648,7 @@ i32 PlaySmacker(i32 smackNumber) {
         }
         PrintSummaryInfo(&smksum);
     }
-    bSmackNum = static_cast<i8>(smackNumber);
+    bSmackNum = smackNumber;
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, PALETTE_DATA_SIZE);
     gpWindowManager->m_updateFlags = oldUpdateFlags;

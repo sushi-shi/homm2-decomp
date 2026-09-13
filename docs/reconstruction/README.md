@@ -107,7 +107,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   and adding two allocation-boundary casts. [Full native and retail proof](C02-G03-C06.md).
 - C03: replaced the executive text aggregate overlay with18 actual character
   array owners. [Full native graph and604-byte retail storage proof](C03.md).
-- C04/C05: framebuffer and palette interface signedness need owner review.
+- C04/C05: framebuffer SDK publication remains void*, with its normal byte
+  conversion corrected; signed palette interfaces and unsigned raw-byte views
+  remain explicit boundaries. [Owner review and proof](C04-C05-C08-C11-S11-S13-G14.md).
 - C06: retain the fizzle u16 lookup cast; the complete two-arm removal test
   changes native text. G03's structured color-tail alternative also changes
   bytes; retain the cleanup goto. [Measured dispositions](C02-G03-C06.md).
@@ -151,12 +153,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   retries. S09/S10 record unused trading-message aggregate/send-result scalar.
 - B21: trading-ratio indexing can receive an unselected resource (-1);
   caller/UI and retail proof must distinguish reconstruction error from old behavior.
-- C08/C09: explicit resource upcasts and promoted-byte casts in movie playback.
-  G14 is its shared playback exit; S11 covers unread frame scalars and B22 its
-  path, movie-index, volume and rectangle input domains.
-- C10/C11: arena static-text ownership casts and graphics HWND/HDC/assertion
-  conversions need owner/API-native proof. S12/S13 cover unused arena message
-  storage/scalars and graphics scalar slots, not genuine Win32 output records.
+- C08/C09/C11: removed17 written playback/graphics casts with full native
+  proof and both dialects checked. C08 uses the real enum-to-index boundary
+  before the movie offset. G14, S11 and S13 retain their original forms after
+  complete source products reject deletion. [Evidence and contracts](C04-C05-C08-C11-S11-S13-G14.md).
+- C10/S12: retain the arena's required const boundary and all measured
+  unused slots. Its static-text-to-owning-widget path is a retail ownership
+  defect, not repaired by removing a cast. [Lifecycle proof and144 arms](C10-S12.md).
 - B23: graphics row pitch, screen extents and signed palette component ranges
   require caller/API contracts; fixed256-entry palette loops themselves fit.
 - S14: three world-map offset arrays now use the actual three-scale domain,

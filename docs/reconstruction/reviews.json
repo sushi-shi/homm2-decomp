@@ -8490,10 +8490,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "absent"
     },
-    "note": "S13: unused scalar has no accesses; test deletion with native frame evidence. Busy/foreground early returns otherwise ordinary."
+    "note": "S13: unused scalar has no accesses; test deletion with native frame evidence. Busy/foreground early returns otherwise ordinary. S13 complete2-arm unused-slot deletion changes45 to42 bytes; retain original frame."
   },
   "src/SOURCE/wingraph.cpp:CreatePrimary(void)#1": {
     "body_sha256": "e7e17a66b8b6c6f1ab963fd56554cf9b23520b2ac4737b92edb194e508f50634",
@@ -8544,9 +8544,9 @@
     "note": "Full/windowed API configuration and surface/palette initialization use real typed owners and no artificial control joins."
   },
   "src/SOURCE/wingraph.cpp:DDAppPaint(void * window,void * paintDC)#1": {
-    "body_sha256": "a29de2399eb89cb280b08fe1557875b3bb06a59ea5b42f1130f9e16d39765666",
+    "body_sha256": "42cf9b5239b61400a65b1f9ba38f4d66bea4fb19f515fcdb0f72d44d9806c936",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8557,7 +8557,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C04/C11: lpInitWin pixel owner and redundant HWND casts under NO_STRICT deserve typed API review. PAINTSTRUCT/POINT are genuine OS outputs, all required fields retained. B23: nonzero screen extents, source rectangle and pitch assumptions need callers/API proof; no local pointer overrun is repaired by guess."
+    "note": "C11 three identity HWND casts removed in complete8-arm family under required NO_STRICT; all1242 retail bytes/sites/ordered targets and whole98-object native proof pass. C04 SDK void* surface publication remains natural; byte conversion stays at raster boundary. PAINTSTRUCT/POINT are real OS outputs. B23 nonzero screen extents, source rectangle and locked pitch/lifecycle contracts remain."
   },
   "src/SOURCE/wingraph.cpp:DDInitializePalette(void)#1": {
     "body_sha256": "ff85be60117e938b9dab4266261da88beb5a00b8ec91c445a7d03218e044cce4",
@@ -8594,7 +8594,7 @@
   "src/SOURCE/wingraph.cpp:DDCreateSurface(u32l width,u32l height,i32 primary)#1": {
     "body_sha256": "356fa1f3a733f4e7bb1e3f8bb300c2d392f6d2e3038ba9d0c2da06f02d9a150e",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8602,10 +8602,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C04: output void* surface becomes framebuffer pixels; narrow owner at assignment boundary. S13: cnt/unused unread scalars; DDSURFACEDESC is a genuine API record including unions, not fake stack storage. B23: caller dimensions/locked pitch contract remains."
+    "note": "C04 retain actual SDK void* output and explicit raster byte conversion; lpInitWin publishes the erased surface, not an independently indexed byte owner. S13 complete4-arm cnt/unused removal changes265 to259/256, keep both slots. DDSURFACEDESC including its SDK unions is real output storage. B23 caller dimensions, successful creation/lock and row-pitch contracts remain."
   },
   "src/SOURCE/wingraph.cpp:DDSD(i32 error,char * file,i32 line)#1": {
     "body_sha256": "d22d1e9325cdecda7df3f0fc711553130aec663a6f9ea1e33caf7cd20069f26b",
@@ -8618,15 +8618,15 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "S13: HRESULT and unused integer stored but never read. Actual RestoreDisplayMode side effect must survive any deletion. Error strings fit char[200]; B15/B23: formatted gText includes caller filename whose extent needs proof. Ordinary printf varargs, no manual argument layout."
+    "note": "S13: HRESULT and unused integer stored but never read. Actual RestoreDisplayMode side effect must survive any deletion. Error strings fit char[200]; B15/B23: formatted gText includes caller filename whose extent needs proof. Ordinary printf varargs, no manual argument layout. S13 complete4-arm ignored API-result/scratch removal changes1556 to1553/1549/1546 bytes; all API calls preserved in trials, original retained."
   },
   "src/SOURCE/wingraph.cpp:DDUpdatePalette(i8 * paletteData)#1": {
     "body_sha256": "f9ff1dba0db68c508929bdf4aa64f4cdf0f99b1831d47aeab30cf41232fb827f",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8637,7 +8637,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C11: pointer-as-integer ProcessAssert argument can express nonnull but needs native proof. B23/C05: signed palette components must be proven0..63 before left shift; interior236 entries and SetEntries span fit256."
+    "note": "C11 complete2-arm nonnull-assertion alternative changes238 to244 bytes; retain the pointer-to-i32 ProcessAssert boundary. C05 retain signed palette component interpretation, confirmed by three retail MOVSX loads. B23 components0..63 before left shift and actual768-byte input remain contracts; interior236 palette entries/SetEntries span fit256."
   },
   "src/SOURCE/wingraph.cpp:DDCleanUpWinGraphics(void)#1": {
     "body_sha256": "b6e7d23f852e25679a92c222468205506bca074fb46b8d3f32a9669d69a4a789",
@@ -8650,10 +8650,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "absent"
     },
-    "note": "S13: unread restoreResult stores an effectful COM result; test effect-preserving simplification. Resource release/nulling has real lifecycle, no goto."
+    "note": "S13: unread restoreResult stores an effectful COM result; test effect-preserving simplification. Resource release/nulling has real lifecycle, no goto. S13 complete2-arm ignored RestoreDisplayMode result removal changes330 to325 bytes; call preserved, original slot/store retained."
   },
   "src/SOURCE/wingraph.cpp:DDSetFullScreenStatus(b32 fullScreen)#1": {
     "body_sha256": "dc89a085aee6e70d4e0b185f01d5acda55ba7aad63877bb4aa69c3eee90f9c16",
@@ -8688,9 +8688,9 @@
     "note": "Actual palette/DC handles are used at SDK boundaries; realized-count branch is ordinary, no reconstruction debt found."
   },
   "src/SOURCE/wingraph.cpp:WGInitGraphics(void)#1": {
-    "body_sha256": "db86852369e8d1577714b6d39bdd72b7a9f3215473f7a50a464f70b758a4b627",
+    "body_sha256": "ce1be4be6cba580f7d67a34c6e6fe7c6c95b50f7126b7644772db3c1aa67d3d4",
     "patterns": {
-      "casts": "retain",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8701,7 +8701,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "_IMAGE genuinely extends BITMAPINFO with256 colors and trailing output bits; prefix casts serve variable-length SDK layout, not member-to-owner subtraction. SelectObject handle cast is API boundary. B23: PatBlt/window-vs-bitmap dimensions need domain proof; C04 pixel owner is shared."
+    "note": "C11 HBITMAP identity cast removed in complete2-arm family, with315 full retail bytes/sites/ordered targets and all98 native objects unchanged. Real _IMAGE BITMAPINFO prefix/256 colors/void** output retain their SDK casts and layout. C04 lpInitWin remains the backend void* publication. B23 successful WinG setup and PatBlt/window-vs-bitmap extents remain contracts."
   },
   "src/SOURCE/wingraph.cpp:WGUpdatePalette(i8 * paletteData)#1": {
     "body_sha256": "d0da342b398b7f08b618e6ab94a13d33d4768beac90ad0a326a81e0647cd6466",
@@ -8714,10 +8714,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "LOGPALETTE prefix cast retains genuine256-entry record. S13 unread RealizePalette result can be discarded only with frame/effect proof. B23 signed component shift domain unresolved; all palette indices/236-entry API spans fit."
+    "note": "LOGPALETTE prefix cast retains genuine256-entry record. S13 unread RealizePalette result can be discarded only with frame/effect proof. B23 signed component shift domain unresolved; all palette indices/236-entry API spans fit. S13 complete2-arm ignored RealizePalette result removal changes449 to446 bytes; call preserved, original retained. C05 signed palette component loads retain their real interpretation."
   },
   "src/SOURCE/wingraph.cpp:WGInitializePalette(void)#1": {
     "body_sha256": "734ef8844f910d25eedafff9fb59217a4899a59bbf2399e13d5d391ca2bd3f36",
@@ -8736,9 +8736,9 @@
     "note": "Full256-entry RGBQUAD/PALETTEENTRY arrays initialized in disjoint10/236/10 spans. LOGPALETTE prefix cast is required by SDK variable-length record convention."
   },
   "src/SOURCE/wingraph.cpp:WGAppPaint(void * window,void * paintDC)#1": {
-    "body_sha256": "4500e0195fb2485ea7d08ef45847839ec3dfb46d6427a34ad9f3db72c90f9c15",
+    "body_sha256": "4f99ae5689d0ceb171163ca2e9fd7eeed83d49dbbe390cbb65b323846a50f47a",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8746,10 +8746,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C11: HWND/HDC casts reflect void* API wrapper signatures under NO_STRICT; investigate owner signatures. S13: padding8 unread, unusedByte0 only assigned; RECT/PAINTSTRUCT are real SDK outputs. B23: screen divisors and blit rectangle clipping remain caller/API questions."
+    "note": "C11 all seven HWND/HDC identity casts removed in complete128-arm family under NO_STRICT; full445 retail bytes/sites/ordered targets and98-object native proof pass. S13 all4 padding8/unusedByte0 deletion subsets change bytes/frame, keep both. Real RECT/PAINTSTRUCT outputs and screen/paint rectangles remain; B23 nonzero divisors and valid clipping/scroll domains required."
   },
   "src/SOURCE/wingraph.cpp:WGCleanUpWinGraphics(void)#1": {
     "body_sha256": "002d658788de4a9630174f9d7f7423fbb88b4518eb0a7d7e3829792f84f0bad5",
@@ -8866,7 +8866,7 @@
   "src/SOURCE/wingraph.cpp:AppPaint(void * window,void * message)#1": {
     "body_sha256": "a965ed8afdd17bcc7aef26bbbb203e2adfe24c34aefc7febd1aed86df50ec837",
     "patterns": {
-      "casts": "open",
+      "casts": "absent",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8877,7 +8877,7 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "C11 owner-signature propagation candidate: two void* parameters forward HWND/HDC to backend wrappers; no casts in this body."
+    "note": "C11 follow-up: two void* arguments are the native non-STRICT handle interface and forward unchanged to the selected backend. Identity casts at those consumers were removed with full native proof; no signature rewrite is required here. No written cast or fake storage in this dispatcher."
   },
   "src/SOURCE/wingraph.cpp:InitializePalette(void)#1": {
     "body_sha256": "91d41fdb32df19ef90ed64e9d631c8f1b7f9720e9541403044b84bc60ccc8cba",
@@ -8909,7 +8909,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C05/B23: signed palette interface forwards component pointer without extent/domain metadata; body is ordinary dispatch."
+    "note": "C05 retain the signed-byte palette interface; backend MOVSX interpretation and unsigned raw-byte views are explicit boundaries, not an adopted owner-wide rewrite. Body is ordinary backend dispatch. B23 component domain and actual768-byte input extent remain caller contracts."
   },
   "src/SOURCE/wingraph.cpp:CleanUpWinGraphics(void)#1": {
     "body_sha256": "e7138452a8320c07bab475958a0c4c14633b43cded501505ee9a1d5208ff6247",
@@ -8962,7 +8962,7 @@
   "src/SOURCE/wingraph.cpp:SetGraphicsType(WingraphGraphicsType graphicsType)#1": {
     "body_sha256": "20dd5eb3a532bbfdef684bec2961273dd5b184ca72469801e19c91ca0741d66b",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -8973,12 +8973,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C04: two casts from lpInitWin to pixel owner should follow typed storage. Real allocated640x480 backup buffer is used by memcpy, so void* is natural here. B23 fixed framebuffer extent/row-pitch assumptions require owner evidence."
+    "note": "C04 retain the two actual SDK void* publication-to-byte raster conversions. Changing lpInitWin to u8* would move three reader conversions into five SDK writes, without recovering a new owner. Real640x480 backup allocation is copied/restored via void* memcpy. B23 fixed screen extent/row pitch and successful backend transition remain contracts."
   },
   "src/SOURCE/x_arena.cpp:DoArenaDialog(void)#1": {
     "body_sha256": "69a54a66c8d6739b9600ab721baf964ca530a729e30f32518fcce0134689e2ee",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "retain",
       "gotos": "absent",
       "address": "absent",
@@ -8986,10 +8986,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "retain"
     },
-    "note": "C10 static stat-name const_cast conflicts with textWidget ownership metadata; review lifecycle before changing. S12 four unread stat scalars plus unread widgetMode/windowWidth/textHeight; native proof needed. Real3-pointer array fully used; window name evntwin5.bin fits16 and choice loop fits3. U01 message payload is tagged."
+    "note": "C10 const_cast is required by the modern owned-char* widget API; direct removal fails constructor typing. Retail proves static gStatNames[0..2] pointers are stored directly at textWidget+20 and the resource-window close path reaches operator delete of that pointer; no observed crash or behavioral fix claimed. S12 all128 subsets of four stat slots and widget-mode/window-width/text-height storage change955-byte native text/frame, keep original. Real3-pointer array, evntwin5.bin within16 and tagged messages remain. Window/font/resource lifecycle plus the concrete static-pointer ownership mismatch are documented in C10-S12.md."
   },
   "src/SOURCE/x_arena.cpp:ArenaWindowHandler(struct tag_message & message_1)#1": {
     "body_sha256": "d467152b3f608ad77737fbff5cf3b4cdc82e8f6393bb52ff8d1c5f72f8eaba0a",
@@ -9002,10 +9002,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "retain"
     },
-    "note": "S12 wholly unused tag_message plus unread widgetIndex/type/extra scalars (two assigned). U01 timeout retypes message while preserving payload ID; not synthetic union. Choice is wrapped0..2 or produced by three enumerated widget IDs, so stat-description index is bounded."
+    "note": "S12 all16 unused message/index/type/extra deletion subsets change481-byte text/frame, keep storage/stores. Real evolving message tag and command-specific payload; control IDs100..102 and cycle wrap bound choice0..2 within actual three widgets/four stat descriptions. Timeout and select exits retain dialog protocol. Manager/music/resource/modal-event lifecycle remains; no cast, artificial owner arithmetic or manual varargs."
   },
   "src/SOURCE/x_arena.cpp:UpdateArenaIcons(void)#1": {
     "body_sha256": "153f91b8452af0da007b9719dd06058275c73679f1c43ee01aa462467f16c9b0",
@@ -9024,9 +9024,9 @@
     "note": "Three-element owned-widget array is removed/deleted/recreated with0..2 loop; actual selection changes icon frame only. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "src/SOURCE/SMACKMGR.cpp:ConvertSmackerPalette(u8 * paletteData)#1": {
-    "body_sha256": "d3abd902deeb81d36fefba361cd54cba9e9f511b1685433c26d5a32c61620e26",
+    "body_sha256": "a3d2a625faa2475f476a5672f43441fd595c87e5ffa96526b806903138149ed5",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -9037,12 +9037,12 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C09: u8-to-i32 cast before shifting is redundant with integer promotion; test removal. Final u8 conversion is channel narrowing. Exactly768 real palette bytes are scaled from8-bit to6-bit, not an artificial address loop."
+    "note": "C09 both promotion/store casts removed in complete4-arm family; all63 retail bytes and no relocations match. Exactly768 actual u8 palette bytes shift2 to0..63, with ordinary promotion and destination conversion; no owner reinterpretation, fake loop or unresolved local extent. Both language dialects and all98 native objects pass."
   },
   "src/SOURCE/SMACKMGR.cpp:DoAdvance(Smack * smack,i32 drawFrame,i32 advanceFrame,i32 updatePalette,i32 skipPalette)#1": {
     "body_sha256": "8a2d9398f9682e9f911f6a2d87520f8426179602015942126245c1bb751697a4",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -9053,23 +9053,23 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C05: signed palette owner to u8 conversion remains an interface candidate. Both copied palettes cover768 bytes; B07/B22: Smacker-provided rectangles and companion positions need screen-fit contract evidence. No owner recovery or scratch aggregates."
+    "note": "C05 retain explicit unsigned character view when scaling copied8-bit Smacker bytes into the signed six-bit palette interface; no owner-wide unsigned rewrite is adopted. Both buffers cover768 bytes. B07/B22 Smacker rectangles and companion placement require screen-fit/lifecycle contracts; no fake owner recovery or stack aggregate."
   },
   "src/SOURCE/SMACKMGR.cpp:SmackManagerMain(void)#1": {
-    "body_sha256": "c6503d75e8fb7160c7686360e80d40a3b4b646dc24652c264a00752eed135f90",
+    "body_sha256": "9a6d04bf402ff872d28706ed83d49d2b887f40b1ba90df46987c0a54b7b693b8",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "retain",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C08: two explicit resource base upcasts at disposal appear avoidable; C05 palette signedness is shared debt. G14 playbackDone exits input switch and playback loop to real cleanup. S11 four unread scalars (one stored) need frame tests. B22 path[352] combines registry paths; movie index must be0..74, volume0..10. savedPalette[768] is genuine fully saved/restored state; message union is tagged. No manual varargs."
+    "note": "C08 two resource upcasts removed; movie byte store unwraps the campaign index with IDX before offset68. Direct enum-to-byte removal fails modern typing, so the complete3-arm domain family selects the valid boundary. All4477 retail bytes, sites and ordered targets match;207 diagnostic blocks exact and all98 native objects unchanged. G14 flag-exit alternative changes4477 to4489; S11 every one of16 unused-slot subsets changes bytes/frame; keep goto and four slots/stores. C05 signed palette/raw-byte roles retained. B22 real path352/savedPalette768, movie0..74, volume0..10, Smacker/resource/backend/rectangle lifecycle contracts remain. Tagged event message is genuine; no manual varargs."
   },
   "src/SOURCE/SMACKMGR.cpp:ShutDownSmacker(void)#1": {
     "body_sha256": "1c3b88069b695f6f024309c21fb020da4356a93b1c3722f687a03678e82e84d4",
@@ -9088,9 +9088,9 @@
     "note": "Closes two real Smack handles and clears them; no cast, union, goto, address or scratch-storage debt."
   },
   "src/SOURCE/SMACKMGR.cpp:PlaySmacker(i32 smackNumber)#1": {
-    "body_sha256": "687533f1d84df5936eff252035fee3350632ccbf267eb9adcd11231cb1dc4c44",
+    "body_sha256": "9fe3332be16c6b8a0348e77bed4da030081aac97ea5936d4fc6288eef6747647",
     "patterns": {
-      "casts": "retain",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -9101,7 +9101,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "B22: integer movie choice narrows to signed byte then indexes75 options in Main; caller choice domain required. Real768-byte palette and saved flags are restored. SmackSum is an SDK output record, not a fake aggregate despite only selected fields read."
+    "note": "C09 explicit i8 movie-store cast removed in complete2-arm family; same narrowing still occurs at the destination. All315 retail bytes/sites/ordered targets and whole98-object native proof pass, both dialects valid. B22 integer caller choice still requires resulting movie0..74; no new clamp. Real768-byte palette, saved update flags and actual SmackSum SDK output are retained."
   },
   "src/SOURCE/SMACKMGR.cpp:ExpansionCampaignRect(i32 x,i32 y)#1": {
     "body_sha256": "ee46dd5788cf5c930488059b2d8ce54773b185f58a98bb0c82f81a56c24384a0",
@@ -10338,7 +10338,7 @@
   "src/BASE/Misc.cpp:FadeTo(u8 * source,u8 * destination,i32 increment)#1": {
     "body_sha256": "85fcc8a2d51e0b171ff1403dea4a9db29ecb4379a6fa20359325606260edcb55",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -10349,12 +10349,12 @@
       "stack": "open",
       "bounds": "retain"
     },
-    "note": "C05: unsigned palette buffer is reinterpreted for the signed-byte UpdatePalette interface; audit owner-wide signedness. S07: delay is assigned/modified but never consumed. Real 768-byte temp is fully used; threshold index is clamped below to 0 and at most 15 from level>=48/increment>=1. Cursors finish one-past, not beyond."
+    "note": "C05 retain the unsigned character-buffer view at the signed-byte UpdatePalette boundary; backend signed interpretation is preserved, no owner-wide rewrite adopted. S07: delay is assigned/modified but never consumed. Real 768-byte temp is fully used; threshold index is clamped below to 0 and at most 15 from level>=48/increment>=1. Cursors finish one-past, not beyond."
   },
   "src/BASE/Misc.cpp:FadeToColorTable(u8 * colorTable,i32 increment)#1": {
     "body_sha256": "2d6cc6e3225886a24b5e819cc189a8bdb0f32bed67e62d0ddeca3a16c5e9c204",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -10365,7 +10365,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C05: signed/unsigned palette interface conversion remains open. Real tempPal[768] is fully populated from u8 table indices 0..255 and the screen cursor visits 640x480 pixels before ending one-past."
+    "note": "C05 retain the signed/unsigned character-byte interface boundary; no owner-wide rewrite adopted. Real tempPal[768] is fully populated from u8 table indices 0..255 and the screen cursor visits 640x480 pixels before ending one-past."
   },
   "src/BASE/Misc.cpp:IsCycleColor(i32 color)#1": {
     "body_sha256": "c50424a90aa3d0833dd59ddd9983b2bd0548ebfee247bc1ae6398b7b2b9507e7",
@@ -11403,9 +11403,9 @@
       "varargs": "absent",
       "reuse": "absent",
       "stack": "absent",
-      "bounds": "absent"
+      "bounds": "open"
     },
-    "note": "Constructor stores the supplied text pointer and resource font; no cast or unrelated parameter reuse. Text lifetime is the established widget API contract."
+    "note": "Constructor stores the supplied text pointer and resource font; no cast or unrelated parameter reuse. Text lifetime is the established widget API contract. C10 follow-up: ownership requires a delete-compatible heap pointer; arena passes image strings instead. Direct +20 store/load and operator-delete target are retail-proven, while private EH operands remain generic-checker limits. No borrowed-text flag or implicit copy exists here."
   },
   "src/BASE/TEXTWDGT.cpp:textWidget::Read(void)#1": {
     "body_sha256": "34a43303742d43e08a31f5780a5f35b9a6667430c65a2472b74b4f956de6a992",
@@ -11435,9 +11435,9 @@
       "varargs": "absent",
       "reuse": "absent",
       "stack": "absent",
-      "bounds": "absent"
+      "bounds": "open"
     },
-    "note": "Disposes font and frees text through established owners; no extra stack aggregate or reinterpretation."
+    "note": "Disposes font and frees text through established owners; no extra stack aggregate or reinterpretation. C10 follow-up: ownership requires a delete-compatible heap pointer; arena passes image strings instead. Direct +20 store/load and operator-delete target are retail-proven, while private EH operands remain generic-checker limits. No borrowed-text flag or implicit copy exists here."
   },
   "src/BASE/TEXTWDGT.cpp:textWidget::Main(tag_message & msg)#1": {
     "body_sha256": "3affb649fd6391c6906d9d0008a4e4dc72239d7b701e155cbaf6af4bcefc2bae",
@@ -13984,9 +13984,9 @@
     "note": "Initializes real window/bitmap owners and manager fields; no scratch storage."
   },
   "src/BASE/WINMGR.cpp:heroWindowManager::Open(i32 managerOrder)#1": {
-    "body_sha256": "a569208d9e23f0ca1acc3eafbfe5e4a7ea64a9bfa64287bd2c572f2968e96270",
+    "body_sha256": "82b3d3f980832434143a06dadd157154da6790e01853d115ae0443c06848b6e1",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -13997,7 +13997,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C04: lpInitWin framebuffer reinterpreted to u8*, inspect Win32 allocation owner type. Screen640x480 byte clear fits published screen owner and manager name fits30."
+    "note": "C04 replaces reinterpret_cast with static_cast at the actual SDK void*-to-u8* boundary; complete2-arm text equivalence and all98-object native graph preservation pass. All302 ordinary retail bytes agree; generic checker retains known EH limitations, with18-byte manager literal separately proven at0051dfe8. Published640x480 screen clear and30-byte manager-name owner fit under valid backend allocation."
   },
   "src/BASE/WINMGR.cpp:heroWindowManager::Close(void)#1": {
     "body_sha256": "a388a65dd43c98461597d6905f5883f71a359fc1d7c9d71fe42088406b8cab7d",
@@ -14178,7 +14178,7 @@
   "src/BASE/WINMGR.cpp:heroWindowManager::ScreenShot(void)#1": {
     "body_sha256": "a7af87a60d365d5f3f7cb2cb56d7295cdccd5022b3b1c3ca35a64c69c7382398",
     "patterns": {
-      "casts": "open",
+      "casts": "retain",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -14189,7 +14189,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C05: signed palette bytes viewed as u8 for PCX API; investigate common palette type. B08: SHOT%04d.PCX into16 bytes can require19 for arbitrary signed counter; prove operational bound or document retail limit."
+    "note": "C05 retain the raw unsigned PCX byte view of the signed palette owner; its backend numeric interpretation is not silently changed. B08: SHOT%04d.PCX into16 bytes can require19 for arbitrary signed counter; prove operational bound or document retail limit."
   },
   "src/BASE/WINMGR.cpp:heroWindowManager::SaveFizzleSource(i32 x,i32 y,i32 width,i32 height)#1": {
     "body_sha256": "d2bc93b1f917a1f06467f1380830feb7d57c2516fc82e477fb61a8528d35aa38",

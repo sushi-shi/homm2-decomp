@@ -324,24 +324,24 @@
     "note": "Full17-line header: three explicit4/6/12 scales and handler prototype; no function body, aggregate or executable macro."
   },
   "src/SOURCE/wingraph.cpp": {
-    "sha256": "3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9",
-    "note": "Full1158-line TU/32 functions plus all storage/macros reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Genuine API records retained; C04/C11, S13 and B23 are open native/caller investigations."
+    "sha256": "d60c7e6e8f891b120134038b5fd579831a5a7055076822f0764235970a44e49f",
+    "note": "Full1158-line TU/32 functions plus all storage/macros reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Genuine API records retained; C04/C11, S13 and B23 are open native/caller investigations. C11 eleven identity handle casts removed under NO_STRICT; all3changed full retail bodies and all98 native objects pass. All S13 nine-slot deletion families and DD pointer assertion reject removal. C04 erased SDK surface/C05 signed component interpretation retained with explicit boundary rationale."
   },
   "src/SOURCE/x_arena.cpp": {
     "sha256": "198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a",
-    "note": "Full257-line TU/three functions, arena constants and globals reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C10/S12 open; real3-slot choice arrays and tagged messages are not artificial aggregates."
+    "note": "Complete256-line source/three bodies and data owners reread. C10 required modern text const boundary retained; static-pointer deletion path proven through widget/window lifecycle and fixed retail operands, no runtime crash claim or behavior change. S12 both complete128/16 products reject every unused-storage deletion; original remains. Genuine3-slot widget arrays and bounded choice/name paths recorded."
   },
   "include/SOURCE/wingraph.h": {
     "sha256": "0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f",
-    "note": "Full header, palette404/image42c layouts and graphics API/prototypes read. Both prefix records genuinely provide256 entries to variable-length Win32 interfaces. No function bodies; framebuffer/API owner typing C04/C11 remains."
+    "note": "Full header, palette404/image42c layouts and graphics API/prototypes read. Both prefix records genuinely provide256 entries to variable-length Win32 interfaces. No function bodies; framebuffer/API owner typing C04/C11 remains. C04/C05/C11 follow-up keeps SDK void** pixel output, non-STRICT handle ABI, real variable-length record prefixes and signed palette interpretation; no header change."
   },
   "include/SOURCE/x_arena.h": {
     "sha256": "af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02",
     "note": "Full17-line declarations/externs reviewed; no body or pointer macro. Real three-choice array is defined and bounded in source."
   },
   "src/SOURCE/SMACKMGR.cpp": {
-    "sha256": "a1eb2af13ac68e181d71fda6de78f61da3742d2e8bec5a82bb437c26c00c88c6",
-    "note": "All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed."
+    "sha256": "6e3d8523d67e18d952134d295eaa98ba9b8fd4ded09515afcd91fc4f606dbf42",
+    "note": "All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed. C08/C09 follow-up removes six written casts with195-arm API-family record including valid IDX campaign-domain recovery; all98 native objects and all three changed retail bodies exact. G14/S11 complete families reject cleanup/unused removal; C05 byte/numeric palette boundary retained."
   },
   "include/SOURCE/SMACKMGR.h": {
     "sha256": "21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20",
@@ -608,8 +608,8 @@
     "note": "All18 functions including two inline helpers, EncodeScanCode macro,128-byte CP1251 map, U01 event rings, G06 coordinate join, B09 scan index. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "src/BASE/WINMGR.cpp": {
-    "sha256": "b99f4ae56fe2208ad41fd1ae17a0745e597123d36ba60839435bbc3130bdefee",
-    "note": "All22 definitions including FadeSavedUpdate and empty table stubs; DATA macro override reviewed,96-byte palette covers rotation accesses; G05,C04-C06,B08. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+    "sha256": "f7a7d8fc33356dd7d3871762dbb37aa17990a84513dfa2f00c76c6214fa6b882",
+    "note": "All22 definitions including FadeSavedUpdate and empty table stubs; DATA macro override reviewed,96-byte palette covers rotation accesses; G05,C04-C06,B08. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C04 Open void* conversion kind corrected in complete2-arm family, full98-object native proof; generic EH checker limit documented. C05 screenshot raw-byte view retained; DoDialog/RemoveWindow ownership chain reread for C10."
   },
   "include/BASE/mouseManager.h": {
     "sha256": "54e670433710bf63c7e3e0aadb0afd16d1842a450c36d8e7e25b9ae38d8684d6",
