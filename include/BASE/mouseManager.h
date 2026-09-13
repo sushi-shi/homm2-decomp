@@ -66,8 +66,6 @@ typedef enum MouseManagerConstant {
     MOUSE_CURSOR_HORIZONTAL            = 0,
     MOUSE_CURSOR_VERTICAL              = 1,
     MOUSE_CURSOR_AXIS_COUNT            = 2,
-    MOUSE_SCREEN_WIDTH                 = 640,
-    MOUSE_SCREEN_HEIGHT                = 480,
     MOUSE_SCREEN_CENTER_X              = 320,
     MOUSE_SCREEN_CENTER_Y              = 240,
     MOUSE_SAVED_BITMAP_WIDTH           = 0x42,

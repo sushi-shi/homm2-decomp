@@ -20,6 +20,7 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <BASE/display.h>
 
 typedef enum ResourceConstant {
     INVALID_FILE            = -1,
@@ -27,8 +28,6 @@ typedef enum ResourceConstant {
     LOAD_ERROR              = 3,
     ENTRY_BYTES             = 0xc,
     EVIL_TRANSLATION_COUNT  = 37,
-    BACKDROP_ROW_BYTES      = 640,
-    FILE_COUNT_BUFFER_WORDS = 2,
     POSITION_STACK_DEPTH    = 10
 } ResourceConstant;
 
@@ -86,7 +85,7 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                destination->m_pixels + curRow * BACKDROP_ROW_BYTES + destinationX,
+                destination->m_pixels + curRow * LOGICAL_SCREEN_WIDTH + destinationX,
                 width
             );
         }
@@ -309,7 +308,7 @@ i32 resourceManager::LoadAggregateHeader(
     bool locale,
     bool required
 ) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS] = {};
+    i16 fpCountBuffer = 0;
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -356,16 +355,16 @@ i32 resourceManager::LoadAggregateHeader(
         return LOAD_ERROR;
     };
     if (!platform::FileReadExact(
-            m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(fpCountBuffer[0])
+            m_aggregateFd[m_curAggregate], &fpCountBuffer, sizeof(fpCountBuffer)
         )) {
         return rejectAggregate("missing entry count");
     }
-    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer;
     const i32 aggregateLength = platform::FileLength(m_aggregateFd[m_curAggregate]);
     if (m_aggregateEntryCount[m_curAggregate] <= 0
-        || aggregateLength < static_cast<i32>(sizeof(fpCountBuffer[0]))
+        || aggregateLength < static_cast<i32>(sizeof(fpCountBuffer))
         || m_aggregateEntryCount[m_curAggregate]
-               > (aggregateLength - static_cast<i32>(sizeof(fpCountBuffer[0]))) / ENTRY_BYTES) {
+               > (aggregateLength - static_cast<i32>(sizeof(fpCountBuffer))) / ENTRY_BYTES) {
         return rejectAggregate("entry table exceeds the file");
     }
     directoryBytes = static_cast<u32>(m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES);
@@ -490,7 +489,7 @@ i32l resourceManager::ReadLong(void) {
 u32l resourceManager::MakeId(const char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (platform::CompareIgnoringCase(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
@@ -501,7 +500,7 @@ u32l resourceManager::MakeId(const char* name, i32 translate) {
     return result;
 }
 
-void resourceManager::Read13(void* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 

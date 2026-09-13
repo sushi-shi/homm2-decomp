@@ -30,8 +30,8 @@ typedef enum ArmyHexConstant {
 #pragma pack(push, 1)
 class army {
 public:
-    bchar m_animationState;
-    char m_animationCycle;
+    u8 m_animationState;
+    u8 m_animationCycle;
     H2SteppedEnumStorage<ArmyAnimationSequence, char> m_pendingAnimationSequence;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationStart;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationEnd;

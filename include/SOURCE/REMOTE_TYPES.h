@@ -3,6 +3,21 @@
 
 #include <Ints.h>
 
+typedef enum RemoteMessageLayoutConstant {
+    REMOTE_MESSAGE_SIZE         = 256,
+    REMOTE_MESSAGE_HEADER_SIZE  = 9,
+    REMOTE_MESSAGE_PAYLOAD_SIZE = REMOTE_MESSAGE_SIZE - REMOTE_MESSAGE_HEADER_SIZE
+} RemoteMessageLayoutConstant;
+
+#pragma pack(push, 1)
+struct RemoteSaveInitialization {
+    i32 dataSize;
+    i32 crc;
+    i32 wireCrc;
+    i32 playerExited;
+};
+#pragma pack(pop)
+
 typedef enum NetPlayerInfoConstant {
     NET_PLAYER_INFO_SYSTEM_ID_SIZE = 4,
     NET_PLAYER_INFO_NAME_SIZE      = 21,
@@ -63,7 +78,6 @@ enum class RemoteNetworkProtocol : i32 {
     DP_PROTOCOL_IPX                = REMOTE_PROTOCOL_DIRECT_PLAY,
     REMOTE_PROTOCOL_WINSOCK        = 2,
     DP_PROTOCOL_TCP                = REMOTE_PROTOCOL_WINSOCK,
-    OLD_MAIN_NETWORK_PROTOCOL      = REMOTE_PROTOCOL_WINSOCK,
     REMOTE_PROTOCOL_MODEM          = 3,
     REMOTE_PROTOCOL_DIRECT_CONNECT = 4
 };

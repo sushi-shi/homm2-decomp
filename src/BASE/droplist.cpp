@@ -71,16 +71,16 @@ dropListWidget::~dropListWidget() {
 
 void dropListWidget::Read(void) {
     IconEntry* entry;
-    i8 name[RESOURCE_NAME_CAPACITY];
+    char name[RESOURCE_NAME_CAPACITY];
 
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(name));
+    m_font = gpResourceManager->GetFont(name);
     gpResourceManager->RestorePosition();
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(name));
+    m_icon = gpResourceManager->GetIcon(name);
     gpResourceManager->RestorePosition();
     m_contentX = m_x + gpResourceManager->ReadWord();
     m_contentY = m_y + gpResourceManager->ReadWord();
@@ -221,7 +221,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
             i16 y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -231,7 +231,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     && x < m_dropButtonX + m_dropButtonWidth
                     && y < m_dropButtonY + m_dropButtonHeight) {
                     ProcessSelectDialog();
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONTINUE;

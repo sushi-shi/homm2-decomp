@@ -5,39 +5,44 @@
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-typedef enum RemoteConstant {
-    REMOTE_PLAYER_COUNT                  = H2EnumIndex(GAME_PLAYER_COUNT),
-    REMOTE_QUEUE_CAPACITY                = 128,
-    REMOTE_QUEUE_STORAGE_COUNT           = 138,
-    REMOTE_RECENT_ID_COUNT               = 30,
-    REMOTE_NET_NAME_SIZE                 = 32,
-    REMOTE_ENCODED_BUFFER_SIZE           = 268,
-    REMOTE_RECEIVE_BUFFER_SIZE           = 266,
-    REMOTE_TRANSPORT_BUFFER_SIZE         = 268,
-    REMOTE_MESSAGE_SIZE                  = 256,
-    REMOTE_MESSAGE_PAYLOAD_SIZE          = 247,
-    REMOTE_PACKET_HEADER_SIZE            = 6,
-    REMOTE_MESSAGE_HEADER_SIZE           = 9,
-    REMOTE_BROADCAST_PLAYER              = 0x7f,
+typedef enum RemoteStorageConstant {
+    REMOTE_QUEUE_CAPACITY        = 128,
+    REMOTE_QUEUE_STORAGE_COUNT   = 138,
+    REMOTE_RECENT_ID_COUNT       = 30,
+    REMOTE_NET_NAME_SIZE         = 32,
+    REMOTE_ENCODED_BUFFER_SIZE   = 268,
+    REMOTE_RECEIVE_BUFFER_SIZE   = 266,
+    REMOTE_TRANSPORT_BUFFER_SIZE = 268,
+    REMOTE_BAUD_RATE_COUNT       = 7,
+    REMOTE_IRQ_COUNT             = 7,
+    REMOTE_ERROR_TEXT_SIZE       = 200,
+} RemoteStorageConstant;
+
+typedef enum RemotePacketEncodingConstant {
+    REMOTE_PACKET_HEADER_SIZE     = 6,
+    REMOTE_BROADCAST_PLAYER       = 0x7f,
+    REMOTE_HEARTBEAT_MESSAGE_SIZE = 10,
+    REMOTE_HEARTBEAT_CONTROL_FLAG = 0x80,
+    REMOTE_HEARTBEAT_PLAYER_SHIFT = 4,
+    REMOTE_HEARTBEAT_PHASE_MASK   = 0x0f,
+} RemotePacketEncodingConstant;
+
+typedef enum RemoteTransportTimingConstant {
     REMOTE_RETRY_COUNT                   = 25,
     REMOTE_CONFIRM_POLL_COUNT            = 50,
-    REMOTE_BAUD_RATE_COUNT               = 7,
-    REMOTE_IRQ_COUNT                     = 7,
     REMOTE_CONFIRM_POLL_DELAY            = 20,
     REMOTE_SEND_RETRY_DELAY              = 1000,
     REMOTE_HEARTBEAT_INTERVAL            = 5000,
-    REMOTE_HEARTBEAT_MESSAGE_SIZE        = 10,
-    REMOTE_HEARTBEAT_CONTROL_FLAG        = 0x80,
-    REMOTE_HEARTBEAT_PLAYER_SHIFT        = 4,
-    REMOTE_HEARTBEAT_PHASE_MASK          = 0x0f,
-    REMOTE_ERROR_TEXT_SIZE               = 200,
     REMOTE_HOST_TIMEOUT                  = 60000,
     REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT = 30000,
     REMOTE_GUEST_TIMEOUT                 = 60000,
     REMOTE_CHAIN_TIMEOUT                 = 90000,
     REMOTE_INITIAL_HEARTBEAT             = 1999999999,
-    REMOTE_ORDER_SENTINEL                = 999999999
-} RemoteConstant;
+} RemoteTransportTimingConstant;
+
+typedef enum RemoteQueueSentinel {
+    REMOTE_ORDER_SENTINEL = 999999999,
+} RemoteQueueSentinel;
 
 #pragma pack(push, 1)
 struct RemotePacketHeader {
@@ -82,7 +87,7 @@ i32 TransmitAndWait(char* bytes, i32 destination, i32 length, i8 command, i8 res
 
 extern char gbUseDiffCompression;
 extern char gbUseBzip2Compression;
-extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
+extern SNetPlayerInfo gsNetPlayerInfo[GAME_PLAYER_COUNT];
 
 extern i32 iInOrderCtr;
 extern i32 iCurLastID;
@@ -105,7 +110,7 @@ extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
 extern i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 extern char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char gcThisNetName[REMOTE_NET_NAME_SIZE];
-extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+extern i32l lLastHeartbeatReceive[GAME_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];

@@ -128,7 +128,7 @@ MessageDispatchResult textWidget::Main(tag_message& message) {
                 m_flags |= WIDGET_FLAG_SELECTED;
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN)
                     message.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
@@ -140,7 +140,7 @@ MessageDispatchResult textWidget::Main(tag_message& message) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
                 if (message.type == MESSAGE_RIGHT_BUTTON_UP)
                     message.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

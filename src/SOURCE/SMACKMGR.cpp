@@ -20,6 +20,8 @@
 #include <PLATFORM/Movie.h>
 #include <stdio.h>
 #include <string.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 #include <string>
 
@@ -48,7 +50,7 @@ typedef enum SmackManagerConstant {
     POINTER_ID                     = 40,
     POINTER_DEFAULT                = 0,
     EXPANSION_RECT_COUNT           = 4,
-    CAMPAIGN_DIVIDER_X             = GRAPHICS_WIDTH / 2,
+    CAMPAIGN_DIVIDER_X             = LOGICAL_SCREEN_WIDTH / 2,
     CAMPAIGN_LEFT_FRAME            = 0,
     CAMPAIGN_RIGHT_FRAME           = 1,
     CAMPAIGN_RIGHT_SELECTED_FRAME  = 2,
@@ -58,8 +60,9 @@ typedef enum SmackManagerConstant {
     CONGRATS_TEXT_Y                = 98,
     CONGRATS_TEXT_WIDTH            = 134,
     CONGRATS_TEXT_HEIGHT           = 217,
-    CONGRATS_BLIT_WIDTH            = GRAPHICS_WIDTH - 1,
-    CONGRATS_BLIT_HEIGHT           = GRAPHICS_HEIGHT - 1,
+    CONGRATS_BLIT_WIDTH            = LOGICAL_SCREEN_WIDTH - 1,
+    CONGRATS_BLIT_HEIGHT           = LOGICAL_SCREEN_HEIGHT - 1,
+    MOVIE_PATH_SIZE                = 352,
     MILES_SOUND_SYSTEM_PREFERENCE  = 15,
     CAMPAIGN_BLIT_X                = 49,
     CAMPAIGN_BLIT_Y                = 78,
@@ -78,7 +81,7 @@ void ConvertSmackerPalette(u8* paletteData) {
 
     for (i = 0; i < PALETTE_DATA_SIZE; ++i)
         paletteData[i] =
-            static_cast<u8>(static_cast<i32>(paletteData[i]) >> PALETTE_VALUE_SHIFT);
+            paletteData[i] >> PALETTE_VALUE_SHIFT;
 }
 
 void DoAdvance(
@@ -228,13 +231,13 @@ void SmackManagerMain(void) {
         }
     }
 
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0, GRAPHICS_WIDTH, GRAPHICS_HEIGHT, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT, 0);
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         0,
-        GRAPHICS_WIDTH,
-        GRAPHICS_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         0,
         0
     );
@@ -392,8 +395,8 @@ void SmackManagerMain(void) {
                             gpWindowManager->m_screen,
                             0,
                             0,
-                            GRAPHICS_WIDTH,
-                            GRAPHICS_HEIGHT,
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT,
                             0,
                             0
                         );
@@ -404,7 +407,7 @@ void SmackManagerMain(void) {
                         }
                         if (expansionChoice != EXPANSION_CAMPAIGN_NONE) {
                             bExpansionSmackNum =
-                                static_cast<i8>(expansionChoice + EXPANSION_FIRST_MOVIE);
+                                H2EnumIndex(expansionChoice) + EXPANSION_FIRST_MOVIE;
                             const std::string expansionMoviePath =
                                 moviePath(SmackOptions[bExpansionSmackNum].fileName);
                             smk2 = platform::MovieOpen(expansionMoviePath.c_str(), bSmackSound);
@@ -480,16 +483,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            GRAPHICS_WIDTH,
-            GRAPHICS_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            GRAPHICS_WIDTH,
-            GRAPHICS_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );
@@ -500,16 +503,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            GRAPHICS_WIDTH,
-            GRAPHICS_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            GRAPHICS_WIDTH,
-            GRAPHICS_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );
@@ -527,10 +530,10 @@ playbackDone:
     }
     gpMouseManager->ShowColorPointer();
     if (brotherIcon)
-        gpResourceManager->Dispose(static_cast<resource*>(brotherIcon));
+        gpResourceManager->Dispose(brotherIcon);
     brotherIcon = NULL;
     if (backImage)
-        gpResourceManager->Dispose(static_cast<resource*>(backImage));
+        gpResourceManager->Dispose(backImage);
     backImage = NULL;
     gpSoundManager->RestoreBackend();
 }
@@ -573,7 +576,7 @@ i32 PlaySmacker(i32 smackNumber) {
             WritePrefs();
         }
     }
-    bSmackNum = static_cast<i8>(smackNumber);
+    bSmackNum = smackNumber;
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, PALETTE_DATA_SIZE);
     gpWindowManager->m_updateFlags = oldUpdateFlags;

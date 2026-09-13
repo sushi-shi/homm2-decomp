@@ -15,38 +15,38 @@
 #include <SOURCE/advManager.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/x_arena.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 typedef enum ArenaConstant {
-    CHOICE_COUNT            = 3,
-    WINDOW_RESOURCE         = 5,
-    WINDOW_WIDTH            = 306,
-    WINDOW_BASE_HEIGHT      = 180,
-    WINDOW_ROW_HEIGHT       = 45,
-    WINDOW_X                = 159,
-    WINDOW_SCREEN_HEIGHT    = 480,
-    WINDOW_MAX_Y            = 28,
-    WINDOW_CENTER_DIVISOR   = 2,
-    WINDOW_NAME_SIZE        = 16,
-    TEXT_WIDTH              = 244,
-    TEXT_LINE_HEIGHT        = 16,
-    TEXT_LINE_SHIFT         = 4,
-    ICON_FIRST_X            = 84,
-    TEXT_FIRST_X            = 79,
-    WIDGET_X_STEP           = 60,
-    ICON_Y                  = 244,
-    ICON_WIDTH              = 39,
-    ICON_HEIGHT             = 34,
-    TEXT_Y                  = 282,
-    TEXT_WIDTH_PIXELS       = 49,
-    TEXT_HEIGHT             = 24,
-    WIDGET_FIRST_ID         = 100,
-    WIDGET_LAST_ID          = 102,
-    SELECTED_FRAME_OFFSET   = 4,
-    TEXT_BACKGROUND         = -1,
-    CYCLE_KEY               = 15,
-    BROADCAST_TEXT_ID       = 1,
-    BROADCAST_CONTROL_VALUE = 6,
-    DRAW_MODE               = 1
+    CHOICE_COUNT          = 3,
+    WINDOW_RESOURCE       = 5,
+    WINDOW_WIDTH          = 306,
+    WINDOW_BASE_HEIGHT    = 180,
+    WINDOW_ROW_HEIGHT     = 45,
+    WINDOW_X              = 159,
+    WINDOW_MAX_Y          = 28,
+    WINDOW_CENTER_DIVISOR = 2,
+    WINDOW_NAME_SIZE      = 16,
+    TEXT_WIDTH            = 244,
+    TEXT_LINE_HEIGHT      = 16,
+    TEXT_LINE_SHIFT       = 4,
+    ICON_FIRST_X          = 84,
+    TEXT_FIRST_X          = 79,
+    WIDGET_X_STEP         = 60,
+    ICON_Y                = 244,
+    ICON_WIDTH            = 39,
+    ICON_HEIGHT           = 34,
+    TEXT_Y                = 282,
+    TEXT_WIDTH_PIXELS     = 49,
+    TEXT_HEIGHT           = 24,
+    WIDGET_FIRST_ID       = 100,
+    WIDGET_LAST_ID        = 102,
+    SELECTED_FRAME_OFFSET = 4,
+    TEXT_BACKGROUND       = -1,
+    CYCLE_KEY             = 15,
+    BROADCAST_TEXT_ID     = 1,
+    DRAW_MODE             = 1
 } ArenaConstant;
 
 i32 DoArenaDialog(void) {
@@ -55,7 +55,7 @@ i32 DoArenaDialog(void) {
 
     i32 windowHeight = windowLines * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
     i32 windowX = WINDOW_X;
-    i32 windowY = (WINDOW_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
+    i32 windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
     char windowName[WINDOW_NAME_SIZE];
     tag_message message;
     i32 widgetIndex;
@@ -70,7 +70,7 @@ i32 DoArenaDialog(void) {
         MemError();
 
     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("adventure.arena.choose_skill"));
-    SET_WIDGET_MESSAGE(message, ARENA_BROADCAST_TEXT, BROADCAST_TEXT_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, BROADCAST_TEXT_ID);
     message.payload.widget.data.text = gText;
     arenaWinPtr->BroadcastMessage(message);
 
@@ -110,17 +110,17 @@ i32 DoArenaDialog(void) {
     }
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = ARENA_BROADCAST_CONTROL;
-    message.payload.widget.data.value = BROADCAST_CONTROL_VALUE;
-    message.payload.widget.id = EVENT_WINDOW_SEVENTH_BUTTON;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    message.payload.widget.id = DIALOG_BUTTON_7;
     arenaWinPtr->BroadcastMessage(message);
-    message.payload.widget.id = EVENT_WINDOW_EIGHTH_BUTTON;
+    message.payload.widget.id = DIALOG_BUTTON_8;
     arenaWinPtr->BroadcastMessage(message);
-    message.payload.widget.id = EVENT_WINDOW_SECOND_BUTTON;
+    message.payload.widget.id = DIALOG_BUTTON_1;
     arenaWinPtr->BroadcastMessage(message);
-    message.payload.widget.id = EVENT_WINDOW_FIFTH_BUTTON;
+    message.payload.widget.id = DIALOG_BUTTON_5;
     arenaWinPtr->BroadcastMessage(message);
-    message.payload.widget.id = EVENT_WINDOW_SIXTH_BUTTON;
+    message.payload.widget.id = DIALOG_BUTTON_6;
     arenaWinPtr->BroadcastMessage(message);
 
     gpWindowManager->DoDialog(arenaWinPtr, ArenaWindowHandler, 0);
@@ -137,7 +137,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         message_1.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
-        message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message_1.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message_1.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
@@ -152,8 +152,8 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         }
     } else if (message_1.type == MESSAGE_WIDGET) {
         switch (message_1.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
 
                 if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
                     switch (message_1.payload.widget.id) {
@@ -167,7 +167,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
                 }
                 break;
 
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message_1.payload.widget.id) {
                     case WIDGET_FIRST_ID:
                     case WIDGET_FIRST_ID + 1:
@@ -175,9 +175,9 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
                         choice = message_1.payload.widget.id - WIDGET_FIRST_ID;
                         UpdateArenaIcons();
                         break;
-                    case EVENT_WINDOW_THIRD_BUTTON:
+                    case DIALOG_BUTTON_2:
                         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
-                        message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+                        message_1.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
                         message_1.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;

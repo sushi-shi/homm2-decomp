@@ -14,7 +14,7 @@ palette::palette(u32l id)
     : resource(RESOURCE_CATEGORY_PALETTE, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     m_data = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     gpResourceManager->PointToFile(id);
-    gpResourceManager->ReadBlock(m_data, MISC_PALETTE_BYTE_COUNT);
+    gpResourceManager->ReadBlock(m_data, PALETTE_DATA_SIZE);
 }
 
 palette::~palette() {
