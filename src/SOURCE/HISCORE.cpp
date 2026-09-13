@@ -163,7 +163,7 @@ void highScoreManager::Update(void) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
         else
-            read(inputFile, &highScore, sizeof(highScore));
+            READ_FILE_VALUE(inputFile, highScore);
 
         if (highScore.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[rank] = 0;
@@ -218,7 +218,7 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                "\n(\xd7\xe8\xf2\xe5\xf0)"
+                localization::Tr("high_score.cheater_suffix")
             );
         m_window->BroadcastMessage(hsMessage);
 

@@ -1,8 +1,12 @@
 #include <Ints.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/army.h>
+#include <SOURCE/KB_TYPES.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/DebugCheck.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindow.h>
@@ -267,7 +271,7 @@ void combatManager::SetupCombat(
     else
         m_battlefieldCell = NULL;
 
-    m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
+    m_terrainType = CELL_TERRAIN(m_battlefieldCell);
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != NULL) {
@@ -328,25 +332,25 @@ void combatManager::SetupCombat(
             m_visitingHeroPresent[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = false;
         }
 
-        m_inCastleCombat = (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE)) != 0;
+        m_inCastleCombat = (H2EnumIndex((defenderTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))) != 0;
 
         if (m_inCastleCombat != 0)
-            m_drawbridgeBackgroundVisible = (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_MOAT)) != 0;
+            m_drawbridgeBackgroundVisible =
+                (H2EnumIndex((defenderTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT)))) != 0;
 
         m_drawbridgeState = COMBAT_CASTLE_GATE_OPEN;
         m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = defenderTown;
         m_originalCombatTown = defenderTown;
 
         if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == NULL
-            && (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
+            && (H2EnumIndex((defenderTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS))))) {
             m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
             for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++)
                 m_captain.m_primaryStats[index] =
                     captainStats[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
                                 [index];
-            m_captain.m_spellPoints =
-                m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
+            m_captain.m_spellPoints = HERO_NORMAL_SPELL_POINTS(m_captain);
             m_captain.m_cursorType = m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type;
             m_captain.m_portrait = static_cast<HeroPortrait>(
                 static_cast<i32>(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)
@@ -354,7 +358,7 @@ void combatManager::SetupCombat(
             );
             strcpy(
                 m_captain.m_name,
-                "\xca\xe0\xef\xe8\xf2\xe0\xed"
+                localization::Tr("hero.captain")
             );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
@@ -379,8 +383,9 @@ void combatManager::InitNonVisualVars(void) {
         m_spellPower[H2EnumIndex(side)] = 0;
         if (m_heroes[H2EnumIndex(side)] != NULL)
             m_spellPower[H2EnumIndex(side)] = m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[H2EnumIndex(side)] != NULL && m_combatTowns[H2EnumIndex(side)]->m_type == FACTION_NECROMANCER
-            && (m_combatTowns[H2EnumIndex(side)]->m_buildings & H2EnumIndex(TOWN_BUILDING_SHRINE)))
+        if (m_combatTowns[H2EnumIndex(side)] != NULL
+            && m_combatTowns[H2EnumIndex(side)]->m_type == FACTION_NECROMANCER
+            && (H2EnumIndex((m_combatTowns[H2EnumIndex(side)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_SHRINE)))))
             m_spellPower[H2EnumIndex(side)] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
@@ -524,7 +529,7 @@ i32 combatManager::Open(i32 openFlags) {
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
-    WaitEndSample(&preBattleSample, -1);
+    WaitEndSample(&preBattleSample);
 
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
@@ -608,10 +613,7 @@ void combatManager::UpdateArmyGroup(CombatSide side) {
         if (!(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_AI_EXCLUDED)))
             && m_armies[H2EnumIndex(side)][index].m_quantity > 0
             && (m_playerId[H2EnumIndex(side)] == -1
-                || ((m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_EARTH_ELEMENTAL
-                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_AIR_ELEMENTAL
-                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_FIRE_ELEMENTAL
-                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_WATER_ELEMENTAL)
+                || ((!IS_ELEMENTAL_CREATURE(m_armies[H2EnumIndex(side)][index].m_monsterType))
                     || !(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_SUMMONED)))))
             && !(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)))) {
             m_armyGroups[H2EnumIndex(side)]->m_creatureTypes[m_armies[H2EnumIndex(side)][index].m_armyGroupSlot] =
@@ -813,7 +815,7 @@ void combatManager::LoadIcons(void) {
     m_combatIcons[H2EnumIndex(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon("spellinf.icn");
 
     if (m_inCastleCombat) {
-        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_MOAT)) {
+        if ((H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT))))) {
             m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
             m_combatIcons[H2EnumIndex(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
@@ -1041,15 +1043,13 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1061,7 +1061,7 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
     if (!gbNoShowCombat)
-        WaitEndSample(&moraleSample, -1);
+        WaitEndSample(&moraleSample);
 }
 
 i32 combatManager::CheckApplyBadMorale(
@@ -1087,15 +1087,13 @@ i32 combatManager::CheckApplyBadMorale(
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1104,7 +1102,7 @@ i32 combatManager::CheckApplyBadMorale(
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
-        WaitEndSample(&moraleSample, -1);
+        WaitEndSample(&moraleSample);
     return 1;
 }
 
@@ -1451,17 +1449,9 @@ void combatManager::CatAttack(CombatSide side) {
             static_cast<i32l>(projectileY4),
             spriteFrame16,
             &limits9,
-            ICON_DRAW_NORMAL,
-            0,
-            NULL,
-            NULL
+            ICON_DRAW_NORMAL
         );
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         previousX7 = static_cast<i32l>(projectileX11);
         previousY4 = static_cast<i32l>(projectileY4);
         projectileX11 += xStep0;
@@ -1534,12 +1524,7 @@ void combatManager::CatAttack(CombatSide side) {
                 0
             );
         }
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         DelayTil(&glTimers[COMBAT_CATAPULT_TIMER_SLOT]);
 
         if (((frame == COMBAT_CATAPULT_WALL_IMPACT_FRAME && gateIndex11 == -1)
@@ -1582,8 +1567,8 @@ void combatManager::CatAttack(CombatSide side) {
     m_catapultFrame[H2EnumIndex(side)] = 0;
     DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
     gpResourceManager->Dispose(boulder3);
-    WaitEndSample(&impactSound19, -1);
-    WaitEndSample(&catapultSound, -1);
+    WaitEndSample(&impactSound19);
+    WaitEndSample(&catapultSound);
     if (loadedSample18)
         gpResourceManager->Dispose(loadedSample18);
     LogStr("CA2");
@@ -1614,11 +1599,8 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
     for (armyIndex = 0; armyIndex < COMBAT_ARMY_CAPACITY; armyIndex++) {
         if (m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][armyIndex].IsAlive()) {
             target9 = &m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][armyIndex];
-            if (target9->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)]
-                || target9->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                || target9->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                || target9->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
-                || target9->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
+            if (ARMY_HAS_INCAPACITATING_SPELL(*target9)
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*target9)) {
                 priority7 = KEEP_PRIORITY_DISABLED;
             } else if ((H2EnumIndex((target9->m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER)))) {
                 priority7 = KEEP_PRIORITY_SHOOTER;
@@ -1698,29 +1680,29 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+            tower == COMBAT_TOWER_GARRISON
+                ? localization::Tr("combat.tower.garrison.damage.prefix")
+                : localization::Tr("combat.tower.keep.damage.prefix"),
             damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
+            localization::Tr("combat.fragment.damage_points"),
             killed0,
-            killed0 <= 1 ? gArmyNames[H2EnumIndex(target9->m_monsterType)]
-                         : gArmyNamesPlural[H2EnumIndex(target9->m_monsterType)],
-            killed0 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+            CREATURE_DISPLAY_NAME(target9->m_monsterType, killed0),
+            killed0 <= 1 ? localization::Tr("combat.fragment.dies") : localization::Tr("combat.fragment.killed")
         );
     } else {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+            tower == COMBAT_TOWER_GARRISON ? localization::Tr("combat.tower.garrison.damage.prefix")
+                                                : localization::Tr("combat.tower.keep.damage.prefix"),
             damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
+            localization::Tr("combat.fragment.damage_points")
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target9->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
     target9->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-    WaitEndSample(&keepSample7, -1);
+    WaitEndSample(&keepSample7);
 }
 
 i32 combatManager::ExperienceValueOfStack(CombatSide side) {
@@ -1784,16 +1766,15 @@ void combatManager::SetupAndLoadObstacles(void) {
             m_wallStates[cellIndex + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-                && (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings
-                    & H2EnumIndex(TOWN_BUILDING_FORTIFICATIONS))) {
+                && (H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_FORTIFICATIONS))))) {
                 m_wallStates[cellIndex + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
-        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_LEFT_TURRET))
+        if ((H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_LEFT_TURRET)))))
             m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
-        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_RIGHT_TURRET))
+        if ((H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_RIGHT_TURRET)))))
             m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
 
@@ -1891,15 +1872,12 @@ void combatManager::MakeCreaturesVanish(void) {
         for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[iSide]; armyIndex++) {
             if (m_removedArmies[iSide][armyIndex]) {
                 removedArmy = &m_armies[iSide][armyIndex];
-                m_hexCells[removedArmy->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[removedArmy->m_hex].m_occupantIndex = -1;
+                CLEAR_HEX_OCCUPANT(m_hexCells[removedArmy->m_hex]);
                 if ((H2EnumIndex((removedArmy->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-                    m_hexCells[removedArmy->m_hex
-                               + ArmyFacingRearHexOffset(removedArmy->m_facing)]
-                            .m_occupantSide = COMBAT_SIDE_NONE;
-                    m_hexCells[removedArmy->m_hex
-                               + ArmyFacingRearHexOffset(removedArmy->m_facing)]
-                            .m_occupantIndex = -1;
+                    CLEAR_HEX_OCCUPANT(
+                        m_hexCells
+                            [removedArmy->m_hex + ArmyFacingRearHexOffset(removedArmy->m_facing)]
+                    );
                 }
             }
         }
@@ -1930,7 +1908,7 @@ void combatManager::LowerDoor(void) {
         m_drawbridgeState = bridgeFrame;
         DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     }
-    WaitEndSample(&drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample);
 }
 
 void combatManager::RaiseDoor(void) {
@@ -1945,7 +1923,7 @@ void combatManager::RaiseDoor(void) {
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
-    WaitEndSample(&drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample);
 }
 
 void combatManager::TestRaiseDoor(void) {
@@ -2111,7 +2089,7 @@ void combatManager::ShootMissile(
             angleFrame = COMBAT_MISSILE_LAST_DIRECTION;
     }
 
-    total = static_cast<i32>(sqrt(static_cast<double>(xSize * xSize + yLen * yLen)));
+    total = INTEGER_VECTOR_LENGTH(xSize, yLen);
     missileSteps = (total + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
     if (missileSteps > 1) {
         incX = xSize / (missileSteps - 1);
@@ -2181,15 +2159,10 @@ void combatManager::ShootMissile(
         }
         missileIcon->DrawToBuffer(posX, posY, angleFrame, reverseMissile);
         if (frame == 0) {
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         } else {
             DelayTil(glTimers);
-            gpWindowManager->UpdateScreenRegion(minimumX, minY, maxX - minimumX + 1, maxY - minY + 1);
+            UPDATE_INCLUSIVE_REGION(minimumX, minY, maxX, maxY);
         }
         glTimers[0] = static_cast<i32>(
             KBTickCount()
@@ -2235,9 +2208,7 @@ void combatManager::CombatSystemOptions(void) {
 
 void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
-    message.type = COMBAT_SYSTEM_OPTION_EVENT;
-    message.payload.widget.command = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
-    message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
+    SET_WIDGET_MESSAGE(message, COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE, SYSTEM_OPTION_SPEED_BUTTON);
     message.payload.widget.data.value =
         gConfig.combatSpeed + SYSTEM_OPTION_SPEED_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
@@ -2317,18 +2288,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(
-                        gCSPanelHelp[helpIndex],
-                        SYSTEM_OPTION_HELP_DIALOG,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(gCSPanelHelp[helpIndex], SYSTEM_OPTION_HELP_DIALOG);
                 }
             }
         } else {
@@ -2382,9 +2342,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     if (bRedraw)
         UpdateCombatSystemOptions(0);
     if (bDone) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
-        message.payload.widget.command = BaseWidgetCommand(SYSTEM_OPTION_SPEED_BUTTON);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

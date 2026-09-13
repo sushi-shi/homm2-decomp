@@ -25,19 +25,19 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
-        "\xc3\xe5\xf0\xee\xe8\x20\x49\x49"
+        localization::Tr("system.title.short")
     );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
-            "\xd2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xed\xe0\x20\xea\xee\xef\xe8\xff\x20\x25\x73\x20\xec\xee\xe6\xe5\xf2\x20\xe1\xfb\xf2\xfc\x20\xe7\xe0\xef\xf3\xf9\xe5\xed\xe0\x20\xee\xe4\xed\xee\xe2\xf0\xe5\xec\xe5\xed\xed\xee",
-            "\xc3\xe5\xf0\xee\xe8\x20\xcc\xe5\xf7\xe0\x20\xe8\x20\xcc\xe0\xe3\xe8\xe8\x20\x49\x49"
+            localization::Tr("system.single_instance"),
+            localization::Tr("system.title.full")
         );
         MessageBoxA(
             NULL,
             gText,
-            "\xce\xf8\xe8\xe1\xea\xe0\x20\xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+            localization::Tr("system.startup_error.title"),
             MB_ICONHAND
         );
         return 0;
@@ -75,16 +75,7 @@ i32 AppInit(
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt(
-        "hInstApp",
-        reinterpret_cast<i32>(hInstApp),
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp));
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
     bProcessMessage[WM_KEYDOWN] = 1;
@@ -114,7 +105,7 @@ i32 AppInit(
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
-            "\xc3\xe5\xf0\xee\xe8\x20\x49\x49"
+            localization::Tr("system.title.short")
         );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
@@ -128,25 +119,25 @@ i32 AppInit(
             return 0;
     }
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu != 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu != 0)
         giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
     else
         giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
     windowRect.left = windowRect.top = 0;
-    windowRect.right = gConfig.gfx[H2EnumIndex(giCurExe)].width - 1;
-    windowRect.bottom = gConfig.gfx[H2EnumIndex(giCurExe)].height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[H2EnumIndex(giCurExe)].showMenu);
+    windowRect.right = CURRENT_GRAPHICS_CONFIG.width - 1;
+    windowRect.bottom = CURRENT_GRAPHICS_CONFIG.height - 1;
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     hwndApp = CreateWindowExA(
         0,
         szAppName,
         szTitle,
         giCurWindowsStyleFlags,
-        gConfig.gfx[H2EnumIndex(giCurExe)].x,
-        gConfig.gfx[H2EnumIndex(giCurExe)].y,
+        CURRENT_GRAPHICS_CONFIG.x,
+        CURRENT_GRAPHICS_CONFIG.y,
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
         NULL,
-        (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
+        (CURRENT_GRAPHICS_CONFIG.showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
         instance,
         NULL
     );
@@ -162,7 +153,7 @@ i32 AppInit(
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
-        if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
+        if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
             SetMenuStatus(0);
         InitGraphics();
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
@@ -222,10 +213,10 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 return 0;
             lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
             if ((lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0 && gbClosingApp == 0
-                && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
+                && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
                 GetWindowRect(window, &rcTemp);
-                gConfig.gfx[H2EnumIndex(giCurExe)].x = rcTemp.left;
-                gConfig.gfx[H2EnumIndex(giCurExe)].y = rcTemp.top;
+                CURRENT_GRAPHICS_CONFIG.x = rcTemp.left;
+                CURRENT_GRAPHICS_CONFIG.y = rcTemp.top;
                 WritePrefs();
             }
             return 0;
@@ -253,9 +244,9 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (iMainWinScreenHeight < 1)
                 iMainWinScreenHeight = 1;
             if (hwndApp != NULL && (lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0
-                && gbClosingApp == 0 && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
-                gConfig.gfx[H2EnumIndex(giCurExe)].width = iMainWinScreenWidth;
-                gConfig.gfx[H2EnumIndex(giCurExe)].height = iMainWinScreenHeight;
+                && gbClosingApp == 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
+                CURRENT_GRAPHICS_CONFIG.width = iMainWinScreenWidth;
+                CURRENT_GRAPHICS_CONFIG.height = iMainWinScreenHeight;
                 WritePrefs();
             }
             return 0;
@@ -273,16 +264,8 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (window == hwndApp) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
-                        NORMAL_DIALOG_CONFIRM,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
+                        localization::Tr("adventure.confirm.quit"),
+                        NORMAL_DIALOG_CONFIRM
                     );
                     if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
                         DestroyWindow(window);
@@ -351,7 +334,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     RECT windowRect;
     i32 targetY;
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
         return;
     GetWindowRect(hwndApp, &windowRect);
     windowX = (x == -1 ? windowRect.left : x);
@@ -360,7 +343,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     windowRect.top = 0;
     windowRect.right = width - 1;
     windowRect.bottom = height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[H2EnumIndex(giCurExe)].showMenu);
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     MoveWindow(
         hwndApp,
         windowX,
@@ -369,10 +352,10 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
         windowRect.bottom - windowRect.top + 1,
         1
     );
-    gConfig.gfx[H2EnumIndex(giCurExe)].x = windowX;
-    gConfig.gfx[H2EnumIndex(giCurExe)].y = targetY;
-    gConfig.gfx[H2EnumIndex(giCurExe)].width = width;
-    gConfig.gfx[H2EnumIndex(giCurExe)].height = height;
+    CURRENT_GRAPHICS_CONFIG.x = windowX;
+    CURRENT_GRAPHICS_CONFIG.y = targetY;
+    CURRENT_GRAPHICS_CONFIG.width = width;
+    CURRENT_GRAPHICS_CONFIG.height = height;
     WritePrefs();
 }
 
@@ -418,7 +401,7 @@ LRESULT AppCommand(
             ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
             break;
         case KBWIN_MENU_FULLSCREEN:
-            SetFullScreenStatus(1 - gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
+            SetFullScreenStatus(1 - CURRENT_GRAPHICS_CONFIG.fullScreen);
             break;
         default:
             return HandleAppSpecificMenuCommands(command);
@@ -430,7 +413,7 @@ void UpdateDfltMenu(HMENU menu) {
     i32 result [[maybe_unused]];
     i32 value [[maybe_unused]];
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
         EnableMenuItem(menu, H2EnumIndex(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
@@ -450,7 +433,7 @@ void KBChangeMenu(HMENU menu) {
     else
         hmnuCurrent = menu;
     hmnuApp = menu;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu) {
+    if (CURRENT_GRAPHICS_CONFIG.showMenu) {
         if (menu != NULL) {
             SetMenu(hwndApp, menu);
             UpdateDfltMenu(menu);
@@ -469,24 +452,24 @@ void SetMenuStatus(i32 showMenu) {
     i32l windowStyle [[maybe_unused]];
     i32l replacedStyle [[maybe_unused]];
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen && showMenu)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen && showMenu)
         return;
     {
-        winWidth = gConfig.gfx[H2EnumIndex(giCurExe)].width;
-        height = gConfig.gfx[H2EnumIndex(giCurExe)].height;
-        gConfig.gfx[H2EnumIndex(giCurExe)].showMenu = showMenu;
+        winWidth = CURRENT_GRAPHICS_CONFIG.width;
+        height = CURRENT_GRAPHICS_CONFIG.height;
+        CURRENT_GRAPHICS_CONFIG.showMenu = showMenu;
         KBChangeMenu(NULL);
-        gConfig.gfx[H2EnumIndex(giCurExe)].width = winWidth;
-        gConfig.gfx[H2EnumIndex(giCurExe)].height = height;
+        CURRENT_GRAPHICS_CONFIG.width = winWidth;
+        CURRENT_GRAPHICS_CONFIG.height = height;
         WritePrefs();
         windowStyle = GetWindowLongA(hwndApp, GWL_STYLE);
-        if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu)
+        if (CURRENT_GRAPHICS_CONFIG.showMenu)
             giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
         else
             giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
         replacedStyle = SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         ShowWindow(hwndApp, SW_SHOWNA);
-        ResizeWindow(-1, -1, gConfig.gfx[H2EnumIndex(giCurExe)].width, gConfig.gfx[H2EnumIndex(giCurExe)].height);
+        ResizeWindow(-1, -1, CURRENT_GRAPHICS_CONFIG.width, CURRENT_GRAPHICS_CONFIG.height);
     }
 }
 
@@ -547,9 +530,9 @@ void InitVideo(void) {
     return;
 }
 
-char szAppName[] = "\xc3\xe5\xf0\xee\xe8 II";
+char szAppName[] = localization::Tr("system.title.short");
 char szTitle[] =
-    "\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II";
+    localization::Tr("system.title.full");
 HWND hwndApp = NULL;
 HMENU hmnuApp = NULL;
 HANDLE gEventHandle = NULL;

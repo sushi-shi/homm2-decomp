@@ -305,7 +305,7 @@ i32 resourceManager::LoadAggregateHeader(const char* aggregateName) {
         sprintf(
             gText,
 
-            "\xcd\xe5 \xec\xee\xe3\xf3 \xee\xf2\xea\xf0\xfb\xf2\xfc \xf4\xe0\xe9\xeb: %s",
+            localization::Tr("resource.file.open_failed"),
             aggregateName
         );
         ShutDown(gText);
@@ -403,21 +403,21 @@ void resourceManager::RestorePosition(void) {
 i8 resourceManager::ReadByte(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i8 value = 0;
-    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
 i16 resourceManager::ReadWord(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i16 value = 0;
-    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
 i32l resourceManager::ReadLong(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i32l value = 0;
-    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 

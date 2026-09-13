@@ -472,15 +472,34 @@ void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
+typedef enum Cp1251CaseConstant {
+    CYRILLIC_CASE_OFFSET = 0x20,
+    CYRILLIC_CAPITAL_YO = 0xa8,
+    CYRILLIC_SMALL_YO = 0xb8,
+    CYRILLIC_CAPITAL_A = 0xc0,
+    CYRILLIC_CAPITAL_YA = 0xdf,
+    CYRILLIC_SMALL_A = 0xe0,
+    CYRILLIC_SMALL_YA = 0xff
+} Cp1251CaseConstant;
 
 
 inline char CyrillicToUpper(char c) {
     if (static_cast<u8>(c) >= 'a' && static_cast<u8>(c) <= 'z')
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) >= 0xE0 && static_cast<u8>(c) <= 0xFF)
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) == 0xB8)
-        return static_cast<char>(0xA8);
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_SMALL_A && static_cast<u8>(c) <= CYRILLIC_SMALL_YA)
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_SMALL_YO)
+        return static_cast<char>(CYRILLIC_CAPITAL_YO);
+    return c;
+}
+
+inline char CyrillicToLower(char c) {
+    if (static_cast<u8>(c) >= 'A' && static_cast<u8>(c) <= 'Z')
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_CAPITAL_A && static_cast<u8>(c) <= CYRILLIC_CAPITAL_YA)
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_CAPITAL_YO)
+        return static_cast<char>(CYRILLIC_SMALL_YO);
     return c;
 }
 i32 InterpretCommandLine(void);
@@ -518,7 +537,7 @@ void SmackFade(u8* src, u8* dst);
 void ShowCongrats(HighScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(const char* name);
-void WaitEndSample(SAMPLE2* s, i32 waitTime);
+void WaitEndSample(SAMPLE2* s, i32 waitTime = -1);
 void MemError(void);
 const char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
@@ -558,7 +577,18 @@ i32 CheckMem(void);
 i32 GetManaCost(SpellType spell, hero* h);
 void SetWinText(heroWindow* j, i32 id);
 void CheckShingleUpdate(void);
-void NormalDialog(const char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void NormalDialog(
+    const char* text,
+    i32 dialogType,
+    i32 windowX = -1,
+    i32 windowY = -1,
+    i32 firstResourceType = -1,
+    i32 firstResourceValue = 0,
+    i32 secondResourceType = -1,
+    i32 secondResourceValue = 0,
+    i32 showOrText = -1,
+    i32 timeout = 0
+);
 void UpdateNormalDialog(const char* text);
 
 extern b32 bDoColorCycle;
@@ -574,6 +604,9 @@ extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern const char* cOutOfMemory;
 extern const char* gArmyNames[H2EnumIndex(CREATURE_COUNT)];
 extern const char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)];
+
+#define CREATURE_DISPLAY_NAME(type, count)                                                         \
+    ((count) <= 1 ? gArmyNames[H2EnumIndex(type)] : gArmyNamesPlural[H2EnumIndex(type)])
 extern const char* cMonFilename[H2EnumIndex(CREATURE_COUNT)];
 extern const char* cArmyFrameFileNames[H2EnumIndex(CREATURE_COUNT)];
 extern const char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)];
@@ -609,6 +642,8 @@ extern const char* gBuildingInfoSpecial[];
 extern icon* gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
+
+#define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[H2EnumIndex(giCurExe)])
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
 extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
@@ -625,6 +660,7 @@ extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern H2EnumStorage<TerrainType, u8> giGroundToTerrain[];
+#define CELL_TERRAIN(cell) (giGroundToTerrain[(cell)->m_terrainImageIndex])
 extern i32 giHighMemBuffer;
 extern i32 giMainVideoModeColorDepth;
 extern i32 giNumHumanPlayers;

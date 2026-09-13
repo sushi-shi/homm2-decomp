@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Icond2b.h>
 #include <BASE/Iconm2b.h>
@@ -228,9 +229,7 @@ void combatManager::CombatMessage(
         }
     }
 
-    windowMessage.type = COMBAT_MESSAGE_BROADCAST_EVENT;
-    windowMessage.payload.widget.command = COMBAT_MESSAGE_TEXT_ACTION;
-    windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_FIRST;
+    SET_WIDGET_MESSAGE(windowMessage, COMBAT_MESSAGE_TEXT_ACTION, COMBAT_MESSAGE_WIDGET_FIRST);
     windowMessage.payload.widget.data.text = m_previousCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
     windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_SECOND;
@@ -400,8 +399,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     memset(m_gridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_gridState));
     oldSide = armyPtr->m_targetSide;
     oldIndex = armyPtr->m_targetIndex;
-    armyPtr->m_targetSide = COMBAT_SIDE_NONE;
-    armyPtr->m_targetIndex = -1;
+    CLEAR_ARMY_TARGET(*armyPtr);
     gpSearchArray->SeedCombatPosition(armyPtr);
     armyPtr->m_targetSide = oldSide;
     armyPtr->m_targetIndex = oldIndex;
@@ -677,7 +675,8 @@ void combatManager::DrawBackground(void) {
                 0
             );
         if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-            && (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_RAINBOW)) != 0)
+            && (H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_RAINBOW))))
+                   != 0)
             IconToBitmap(
                 backgroundIcon,
                 m_backgroundBuffer,
@@ -748,8 +747,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     if (gbProcessingCombatAction != 0 && forceUpdate == 0)
         return;
 
-    if (hexIndex < 0 || hexIndex >= COMBAT_HEX_COUNT || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
-        || hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1)
+    if (!IS_INTERIOR_COMBAT_HEX(hexIndex))
         hexIndex = -1;
     if (hexIndex == m_mouseGridHex)
         return;
@@ -845,12 +843,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
-    gpWindowManager->UpdateScreenRegion(
-        giMinExtentX,
-        giMinExtentY,
-        giMaxExtentX - giMinExtentX + 1,
-        giMaxExtentY - giMinExtentY + 1
-    );
+    UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
     giMinExtentX = savedMinX;
     giMinExtentY = savedMinY;
     giMaxExtentX = oldMaxX;
@@ -926,12 +919,10 @@ void combatManager::DrawFrame(
                     H2EnumIndex(state) == 0 ? COMBAT_HERO_LEFT_X : COMBAT_HERO_RIGHT_X,
                     H2EnumIndex(state) == 0 ? COMBAT_HERO_LEFT_Y : COMBAT_HERO_RIGHT_Y,
                     sCmbtHero[m_heroSpriteIndex[H2EnumIndex(state)]]
-                        .animationFrames[m_heroAnimationState[H2EnumIndex(state)]][m_heroAnimationFrame[H2EnumIndex(state)]],
+                        .animationFrames[m_heroAnimationState[H2EnumIndex(state)]]
+                                        [m_heroAnimationFrame[H2EnumIndex(state)]],
                     &m_heroLimits[H2EnumIndex(state)],
-                    ICON_DRAW_FLIPPED,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_FLIPPED
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -945,19 +936,16 @@ void combatManager::DrawFrame(
                 gbReturnAfterComputeExtent = true;
                 m_heroOverlayIcons[H2EnumIndex(state)]->CombatClipDrawToBuffer(
                     H2EnumIndex(state) == 0 ? COMBAT_HERO_LEFT_X
-                               : ((m_heroes[H2EnumIndex(state)]->m_isCaptain ? -1 : 0)
-                                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
-                                     + COMBAT_HERO_RIGHT_X,
+                                    : ((m_heroes[H2EnumIndex(state)]->m_isCaptain ? -1 : 0)
+                                       & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
+                                          + COMBAT_HERO_RIGHT_X,
                     H2EnumIndex(state) == 0 ? COMBAT_HERO_LEFT_Y
-                               : ((m_heroes[H2EnumIndex(state)]->m_isCaptain ? -1 : 0)
-                                  & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
-                                     + COMBAT_HERO_RIGHT_Y,
+                                    : ((m_heroes[H2EnumIndex(state)]->m_isCaptain ? -1 : 0)
+                                       & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
+                                          + COMBAT_HERO_RIGHT_Y,
                     m_heroOverlayFrame[H2EnumIndex(state)],
                     &m_heroOverlayLimits[H2EnumIndex(state)],
-                    ICON_DRAW_FLIPPED,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_FLIPPED
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -1030,20 +1018,14 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[H2EnumIndex(COMBAT_DEFENDER_SIDE)]]
                                     [m_heroAnimationFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)]],
                 &m_heroLimits[1],
-                ICON_DRAW_FLIPPED,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_FLIPPED
             );
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
                 COMBAT_HERO_RIGHT_X,
                 COMBAT_HERO_RIGHT_Y,
                 m_heroOverlayFrame[1],
                 &m_heroOverlayLimits[1],
-                ICON_DRAW_FLIPPED,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_FLIPPED
             );
         }
 
@@ -1055,20 +1037,14 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[H2EnumIndex(COMBAT_ATTACKER_SIDE)]]
                                     [m_heroAnimationFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)]],
                 &m_heroLimits[0],
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
                 m_heroOverlayFrame[0],
                 &m_heroOverlayLimits[0],
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
 
@@ -1087,10 +1063,7 @@ void combatManager::DrawFrame(
                 COMBAT_CATAPULT_Y,
                 m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)],
                 &m_catapultLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_WALL_TOP_LAYER
@@ -1100,10 +1073,7 @@ void combatManager::DrawFrame(
                 0,
                 H2EnumIndex(m_drawbridgeState) + DRAWBRIDGE_TOWER_FRAME_BASE,
                 &m_upperWallLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_WALL_MIDDLE_LAYER
@@ -1113,25 +1083,18 @@ void combatManager::DrawFrame(
                 0,
                 COMBAT_CASTLE_TOP_LAYER_FRAME,
                 &m_middleWallLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_GATE_LAYER) {
             m_combatIcons[H2EnumIndex(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
-                m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)]
-                            == COMBAT_WALL_STATE_KEEP_STANDING
+                m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING
                     ? COMBAT_CASTLE_GATE_CLOSED_FRAME
                     : COMBAT_CASTLE_GATE_FRAME,
                 &m_gateLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
 
@@ -1256,10 +1219,7 @@ void combatManager::DrawFrame(
                             wallY,
                             wallFrame1,
                             &m_hexCells[H2EnumIndex(castleHex)].m_limits[0],
-                            ICON_DRAW_NORMAL,
-                            0,
-                            NULL,
-                            NULL
+                            ICON_DRAW_NORMAL
                         );
                     }
                 }
@@ -1278,7 +1238,8 @@ void combatManager::DrawFrame(
         }
 
         if (m_inCastleCombat == 0
-            || (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_MOAT)) == 0)
+            || (H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT))))
+                   == 0)
             goto endRow;
         if (row == DRAW_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;
@@ -1342,9 +1303,7 @@ void combatManager::DrawFrame(
                 goto endRow;
         drawMoat:
             m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT)]
-                ->CombatClipDrawToBuffer(
-                    0, 0, H2EnumIndex(row), &m_moatLimits[H2EnumIndex(row)], ICON_DRAW_NORMAL, 0, NULL, NULL
-                );
+                ->CombatClipDrawToBuffer(0, 0, H2EnumIndex(row), &m_moatLimits[H2EnumIndex(row)], ICON_DRAW_NORMAL);
             m_hexCells[moatCell[H2EnumIndex(row)] - 1].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[H2EnumIndex(row)]].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[H2EnumIndex(row)] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
@@ -1374,12 +1333,7 @@ void combatManager::DrawFrame(
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
                 giMaxExtentY = COMBAT_MAX_EXTENT_Y;
             gbEnlargeScreenBlit = false;
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             gbEnlargeScreenBlit = true;
         }
     } else if (updateScreen == 1) {
@@ -1471,12 +1425,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             giMaxExtentX = m_smallViewLastX[viewIndex] + m_smallViewWidth[viewIndex] - 1;
             giMaxExtentY = m_smallViewLastY[viewIndex] + m_smallViewHeight[viewIndex] - 1;
             DrawFrame(0, 0, 0, 0, 0, 1, 1);
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             gbLimitToExtent = false;
             m_smallViewLastX[viewIndex] = -1;
         }
@@ -1538,10 +1487,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         viewY,
         gConfig.combatArmyInfoLevel != COMBAT_SMALL_VIEW_FULL_INFO,
         &m_smallViewLimits,
-        ICON_DRAW_NORMAL,
-        0,
-        NULL,
-        NULL
+        ICON_DRAW_NORMAL
     );
     viewX1 += COMBAT_SMALL_VIEW_INSET_X;
     if (drawResult1 != ICON_DRAW_SKIPPED) {

@@ -45,14 +45,6 @@ typedef enum TradingPostPrivateConstant {
     OFFER_NAME_SIZE = 52
 } TradingPostPrivateConstant;
 
-typedef enum Cp1251Case {
-    CP1251_CASE_DELTA  = 0x20,
-    CP1251_UPPER_FIRST = 0xc0,
-    CP1251_UPPER_LAST  = 0xdf,
-    CP1251_UPPER_YO    = 0xa8,
-    CP1251_LOWER_YO    = 0xb8
-} Cp1251Case;
-
 
 float fTradingPostEfficiency = 0.0f;
 i32 bLeftDenominated = 0;
@@ -127,69 +119,41 @@ void UpdateTradingPost(i32 draw) {
             offeredValue = 1;
         }
         strcpy(rightName, gResourceNames[rightResource]);
-        if (static_cast<u8>(rightName[0]) >= 'A' && static_cast<u8>(rightName[0]) <= 'Z')
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(rightName[0]) <= CP1251_UPPER_LAST)
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) == CP1251_UPPER_YO)
-            chr1 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr1 = rightName[0];
+        chr1 = CyrillicToLower(rightName[0]);
         rightName[0] = chr1;
 
         strcpy(leftName, gResourceNames[leftResource]);
-        if (static_cast<u8>(leftName[0]) >= 'A' && static_cast<u8>(leftName[0]) <= 'Z')
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(leftName[0]) <= CP1251_UPPER_LAST)
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) == CP1251_UPPER_YO)
-            chr2 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr2 = leftName[0];
+        chr2 = CyrillicToLower(leftName[0]);
         leftName[0] = chr2;
 
         sprintf(
             gText,
-            "{%s}\n\n\xcd\xe0 \xec\xee\xe5\xec \xf0\xfb\xed\xea\xe5 %s \xe8 %s "
-            "\xec\xe5\xed\xff\xfe\xf2\xf1\xff \xe8\xe7 \xf1\xee\xee\xf2\xed\xee\xf8\xe5\xed\xe8\xff "
-            "%d %s \xea %d %s"  ,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea"
-                                : "\xd0\xfb\xed\xee\xea"  ,
+            localization::Tr("trading.bargain.buka"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title"),
             rightName,
             leftName,
             offeredValue,
-            offeredValue > 1 ? "\xe5\xe4."   : "\xe5\xe4."  ,
+            offeredValue > 1 ? localization::Tr("trading.unit") : localization::Tr("trading.unit"),
             requestedValue,
-            requestedValue > 1 ? "\xe5\xe4."   : "\xe5\xe4."
+            requestedValue > 1 ? localization::Tr("trading.unit") : localization::Tr("trading.unit")
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            "{%s}\n\n\xc2\xe0\xec \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe0 "
-            "\xe4\xee\xf1\xf2\xee\xe9\xed\xe0\xff \xf1\xe4\xe5\xeb\xea\xe0. \xdf \xed\xe5 "
-            "\xef\xfb\xf2\xe0\xfe\xf1\xfc \xed\xe0\xe6\xe8\xf2\xfc\xf1\xff \xed\xe0 \xed\xe5\xe9. "
-            "\xc2\xe0\xf1 \xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2 \xf7\xf2\xee-\xed\xe8\xe1\xf3\xe4\xfc "
-            "\xe8\xe7 \xec\xee\xe8\xf5 \xf2\xee\xe2\xe0\xf0\xee\xe2?"  ,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea"
-                                : "\xd0\xfb\xed\xee\xea"
+            localization::Tr("trading.bargain"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title")
         );
     } else {
         sprintf(
             gText,
-            "{%s}\n\n\xcf\xee\xf1\xec\xee\xf2\xf0\xe8\xf2\xe5 \xed\xe0 \xed\xe0\xf8\xe8 "
-            "\xf2\xee\xe2\xe0\xf0\xfb. \xc5\xf1\xeb\xe8 \xf7\xf2\xee-\xf2\xee \xe2\xe0\xf1 "
-            "\xe7\xe0\xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2, \xf9\xe5\xeb\xea\xed\xe8\xf2\xe5 "
-            "\xef\xee \xed\xf3\xe6\xed\xfb\xec \xe2\xe5\xf9\xe0\xec \xe8 \xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5, "
-            "\xed\xe0 \xf7\xf2\xee \xf5\xee\xf2\xe8\xf2\xe5 \xef\xee\xec\xe5\xed\xff\xf2\xfc."  ,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea"
-                                : "\xd0\xfb\xed\xee\xea"
+            localization::Tr("trading.inspect_wares"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title")
         );
     }
-    messageTemp.type = MESSAGE_WIDGET;
-    messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
-    messageTemp.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
@@ -239,7 +203,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
                     if (leftResource == idx) {
-                        sprintf(gText, "\xed/\xe4"  );
+                        sprintf(gText, localization::Tr("common.not_applicable"));
                     } else {
                         ComputeTradeRatios(
                             leftResource,

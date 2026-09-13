@@ -139,6 +139,10 @@ public:
     }
 };
 
+#define CELL_HAS_NON_SHADOW_OBJECT(cell)                                                           \
+    ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \
+     && ((cell)->m_flags & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)) == 0)
+
 struct oldMapCell {
     u8 raw[20];
 };

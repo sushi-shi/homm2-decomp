@@ -340,12 +340,7 @@ void ExpCampaign::InitMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
-                GiveArtifact(
-                    gpGame->GetHero(player->m_heroIds[0]),
-                    bonus->artifact,
-                    false,
-                    -1
-                );
+                GiveArtifact(gpGame->GetHero(player->m_heroIds[0]), bonus->artifact, false);
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
@@ -388,8 +383,10 @@ void ExpCampaign::InitMap(void) {
             b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
-                gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
-                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(player->m_heroIds[0]),
+                    bonus->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -434,8 +431,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WOOD_BONUS:
@@ -445,8 +441,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_DEFEAT_KRAEGER:
@@ -461,8 +456,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WAYWARD_SON:
@@ -473,8 +467,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_SET_GUARDIAN:
@@ -487,8 +480,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
-                            false,
-                            -1
+                            false
                         );
                     break;
             }
@@ -562,27 +554,12 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
 
-            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-            "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc "
-            "\xf1\xed\xe0\xf7\xe0\xeb\xe0 \xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
+            localization::Tr("campaign.confirm.restart_scenario"),
+            CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -647,7 +624,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "\xcd\xe5\xf2"  );
+        sprintf(gText, localization::Tr("common.none"));
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
@@ -661,85 +638,85 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     case ARTIFACT_MINOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea"
+                            localization::Tr("campaign.bonus.artifact.minor_scroll")
                         );
                         break;
                     case ARTIFACT_MAGE_RING:
                         strcpy(
                             gText,
-                            "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0"
+                            localization::Tr("campaign.bonus.artifact.mage_ring")
                         );
                         break;
                     case ARTIFACT_DEFENDER_HELM:
                         strcpy(
                             gText,
 
-                            "\xd9\xeb\xe5\xec \xe7\xe0\xf9\xe8\xf2\xed\xe8\xea\xe0"
+                            localization::Tr("campaign.bonus.artifact.defender_helm")
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb"  );
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.power_axe"));
                         break;
                     case ARTIFACT_DRAGON_SWORD:
                         strcpy(
                             gText,
-                            "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7"
+                            localization::Tr("campaign.bonus.artifact.dragon_sword")
                         );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8"  );
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.breastplate"));
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
                             gText,
 
-                            "\xd1\xe8\xec\xe2\xee\xeb \xed\xe5\xf3\xe4\xe0\xf7\xe8"
+                            localization::Tr("campaign.bonus.artifact.fizbin_medal")
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
                         strcpy(
                             gText,
 
-                            "\xc3\xf0\xee\xec\xee\xe2\xe0\xff \xef\xe0\xeb\xe8\xf6\xe0"
+                            localization::Tr("campaign.bonus.artifact.thunder_mace")
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8"  );
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.gauntlets"));
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea"
+                            localization::Tr("campaign.bonus.artifact.minor_scroll")
                         );
                         break;
                     case ARTIFACT_FOREMOST_SCROLL:
                         strcpy(
                             gText,
 
-                            "\xd1\xe2\xe8\xf2\xee\xea \xe2\xfb\xf1\xf8. \xe7\xed."
+                            localization::Tr("campaign.bonus.artifact.foremost_scroll")
                         );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0"  );
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.ballista"));
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
                         strcpy(
                             gText,
-                            "\xcd\xe5\xe7\xf0\xe8\xec\xfb\xe9 \xf9\xe8\xf2"
+                            localization::Tr("table.gArtifactNames.22")
                         );
                         break;
                     case ARTIFACT_NOMAD_BOOTS:
                         strcpy(
                             gText,
 
-                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xea\xee\xf7\xe5\xe2\xed\xe8\xea\xe0"
+                            localization::Tr("table.gArtifactNames.33")
                         );
                         break;
                     case ARTIFACT_TRAVELER_BOOTS:
                         strcpy(
                             gText,
 
-                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xef\xf3\xf2\xed\xe8\xea\xe0"
+                            localization::Tr("table.gArtifactNames.34")
                         );
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
@@ -753,8 +730,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(
                         gText,
-                        "\xcf\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xe7\xe5\xec\xeb\xff\xed\xfb\xf5 \xfd"
-                        "\xeb."
+                        localization::Tr("campaign.bonus.spell.summon_earth")
                     );
                 else
                     sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
@@ -788,14 +764,14 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     gText,
                     "%d %s",
                     choice->value,
-                    "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb"
+                    localization::Tr("campaign.bonus.puzzle_pieces.label")
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2"  );
+                sprintf(gText, "%d %s", choice->value, localization::Tr("campaign.bonus.experience.label"));
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "\xed/\xe4"  );
+                sprintf(gText, localization::Tr("common.not_applicable"));
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[H2EnumIndex(choice->faction)]);
@@ -816,7 +792,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         gText,
                         "%s %s",
                         gSpellNames[H2EnumIndex(choice->spell)],
-                        "\xd1\xe2\xe8\xf2\xee\xea"
+                        localization::Tr("table.xPasswordStrings.170")
                     );
                 } else {
                     sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
@@ -1231,21 +1207,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 NormalDialog(
 
 
-                                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff "
-                                    "\xea\xe0\xf0\xf2\xe0 - \xef\xeb\xee\xf5\xee\xe9 "
-                                    "\xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff "
-                                    "\xe2\xe0\xf8\xe5\xe3\xee "
-                                    "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee "
-                                    "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xff.",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    localization::Tr("campaign.selection.invalid_next_scenario"),
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }

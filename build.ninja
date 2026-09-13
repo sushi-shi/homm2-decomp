@@ -1,8 +1,8 @@
 ninja_required_version = 1.10
-builddir = build
+builddir = build/ru
 cxx = clang++
 dlltool = llvm-dlltool
-cxxflags = --target=i686-w64-windows-gnu -std=gnu++20 -O0 -mno-sse -mno-sse2 -mfpmath=387 -fms-extensions -fsjlj-exceptions -ferror-limit=0 -Wall -Wextra -Werror=unused-parameter -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=parentheses -Werror=write-strings -Wformat-security -Wno-error=format-security -Werror=enum-conversion -Werror=narrowing -D_X86_ -DWIN32 -D_WINDOWS -D_MT -Dregister= -Iinclude -Ivendor/audiere-1.9.2 -Ivendor/miles-3.6 -Ivendor/smacker-3.0g -Ivendor/wing-1.0
+cxxflags = --target=i686-w64-windows-gnu -std=gnu++20 -O0 -mno-sse -mno-sse2 -mfpmath=387 -fms-extensions -fsjlj-exceptions -ferror-limit=0 -Wall -Wextra -Werror=unused-parameter -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=parentheses -Werror=write-strings -Wformat-security -Wno-error=format-security -Werror=enum-conversion -Werror=narrowing -D_X86_ -DWIN32 -D_WINDOWS -D_MT -Dregister= -Ibuild/ru/localized/include -Ivendor/audiere-1.9.2 -Ivendor/miles-3.6 -Ivendor/smacker-3.0g -Ivendor/wing-1.0
 ldflags = --target=i686-w64-windows-gnu -fuse-ld=lld -mwindows -fsjlj-exceptions -static -static-libgcc -static-libstdc++
 system_libs = -lkernel32 -luser32 -lgdi32 -lwinmm -lws2_32 -lddraw -ldplayx -ladvapi32 -lole32 -luuid -lcomdlg32 -lshell32 -lnetapi32
 runtime_libs = -Wl,--start-group -lstdc++ -lgcc_eh -lgcc -lmcfgthread -lntdll -Wl,--end-group
@@ -12,7 +12,7 @@ rule mkdir
   restat = 1
 
 rule cxx
-  command = $cxx $cxxflags -MMD -MF $out.d -c $in -o $out
+  command = $${CXX:-$cxx} $cxxflags -MMD -MF $out.d -c $in -o $out
   depfile = $out.d
   deps = gcc
   description = CXX $in
@@ -22,109 +22,114 @@ rule implib
   description = IMPLIB $in
 
 rule link
-  command = $cxx $ldflags -o $out $in $system_libs $runtime_libs
+  command = $${CXX:-$cxx} $ldflags -o $out $in $system_libs $runtime_libs
   description = LINK $out
 
 build $builddir/obj: mkdir
 build $builddir/imports: mkdir
-build $builddir/obj/BASE_AudiereEffects.o: cxx src/BASE/AudiereEffects.cpp || $builddir/obj
-build $builddir/obj/BASE_AudiereMusic.o: cxx src/BASE/AudiereMusic.cpp || $builddir/obj
-build $builddir/obj/BASE_BASEMGR.o: cxx src/BASE/BASEMGR.cpp || $builddir/obj
-build $builddir/obj/BASE_BITMAP.o: cxx src/BASE/BITMAP.cpp || $builddir/obj
-build $builddir/obj/BASE_BITS.o: cxx src/BASE/BITS.cpp || $builddir/obj
-build $builddir/obj/BASE_BORDER.o: cxx src/BASE/BORDER.cpp || $builddir/obj
-build $builddir/obj/BASE_BUTTON.o: cxx src/BASE/BUTTON.cpp || $builddir/obj
-build $builddir/obj/BASE_Blur.o: cxx src/BASE/Blur.cpp || $builddir/obj
-build $builddir/obj/BASE_Bzip.o: cxx src/BASE/Bzip.cpp || $builddir/obj
-build $builddir/obj/BASE_DIMMER.o: cxx src/BASE/DIMMER.cpp || $builddir/obj
-build $builddir/obj/BASE_EXEC.o: cxx src/BASE/EXEC.cpp || $builddir/obj
-build $builddir/obj/BASE_FONT.o: cxx src/BASE/FONT.cpp || $builddir/obj
-build $builddir/obj/BASE_ICON.o: cxx src/BASE/ICON.cpp || $builddir/obj
-build $builddir/obj/BASE_ICONWDGT.o: cxx src/BASE/ICONWDGT.cpp || $builddir/obj
-build $builddir/obj/BASE_INPUTMGR.o: cxx src/BASE/INPUTMGR.cpp || $builddir/obj
-build $builddir/obj/BASE_Icon2b.o: cxx src/BASE/Icon2b.cpp || $builddir/obj
-build $builddir/obj/BASE_Icond2b.o: cxx src/BASE/Icond2b.cpp || $builddir/obj
-build $builddir/obj/BASE_Icondf2b.o: cxx src/BASE/Icondf2b.cpp || $builddir/obj
-build $builddir/obj/BASE_Iconf2b.o: cxx src/BASE/Iconf2b.cpp || $builddir/obj
-build $builddir/obj/BASE_Iconm2b.o: cxx src/BASE/Iconm2b.cpp || $builddir/obj
-build $builddir/obj/BASE_Iconmf2b.o: cxx src/BASE/Iconmf2b.cpp || $builddir/obj
-build $builddir/obj/BASE_MOUSEMGR.o: cxx src/BASE/MOUSEMGR.cpp || $builddir/obj
-build $builddir/obj/BASE_Midi.o: cxx src/BASE/Midi.cpp || $builddir/obj
-build $builddir/obj/BASE_MilesSound.o: cxx src/BASE/MilesSound.cpp || $builddir/obj
-build $builddir/obj/BASE_Misc.o: cxx src/BASE/Misc.cpp || $builddir/obj
-build $builddir/obj/BASE_MusicFlags.o: cxx src/BASE/MusicFlags.cpp || $builddir/obj
-build $builddir/obj/BASE_PALETTE.o: cxx src/BASE/PALETTE.cpp || $builddir/obj
-build $builddir/obj/BASE_RESMGR.o: cxx src/BASE/RESMGR.cpp || $builddir/obj
-build $builddir/obj/BASE_RESOURCE.o: cxx src/BASE/RESOURCE.cpp || $builddir/obj
-build $builddir/obj/BASE_Ripple.o: cxx src/BASE/Ripple.cpp || $builddir/obj
-build $builddir/obj/BASE_SAMPLE.o: cxx src/BASE/SAMPLE.cpp || $builddir/obj
-build $builddir/obj/BASE_TEXTWDGT.o: cxx src/BASE/TEXTWDGT.cpp || $builddir/obj
-build $builddir/obj/BASE_TILE.o: cxx src/BASE/TILE.cpp || $builddir/obj
-build $builddir/obj/BASE_TILESET.o: cxx src/BASE/TILESET.cpp || $builddir/obj
-build $builddir/obj/BASE_Textntry.o: cxx src/BASE/Textntry.cpp || $builddir/obj
-build $builddir/obj/BASE_WIDGET.o: cxx src/BASE/WIDGET.cpp || $builddir/obj
-build $builddir/obj/BASE_WINDOW.o: cxx src/BASE/WINDOW.cpp || $builddir/obj
-build $builddir/obj/BASE_WINMGR.o: cxx src/BASE/WINMGR.cpp || $builddir/obj
-build $builddir/obj/BASE_bmap2.o: cxx src/BASE/bmap2.cpp || $builddir/obj
-build $builddir/obj/BASE_droplist.o: cxx src/BASE/droplist.cpp || $builddir/obj
-build $builddir/obj/BASE_icon2bc.o: cxx src/BASE/icon2bc.cpp || $builddir/obj
-build $builddir/obj/BASE_icon2bs.o: cxx src/BASE/icon2bs.cpp || $builddir/obj
-build $builddir/obj/BASE_icon2by.o: cxx src/BASE/icon2by.cpp || $builddir/obj
-build $builddir/obj/BASE_iconf2bc.o: cxx src/BASE/iconf2bc.cpp || $builddir/obj
-build $builddir/obj/BASE_iconf2by.o: cxx src/BASE/iconf2by.cpp || $builddir/obj
-build $builddir/obj/BASE_listbox.o: cxx src/BASE/listbox.cpp || $builddir/obj
-build $builddir/obj/BASE_miscwin.o: cxx src/BASE/miscwin.cpp || $builddir/obj
-build $builddir/obj/BASE_soundmgr.o: cxx src/BASE/soundmgr.cpp || $builddir/obj
-build $builddir/obj/EDITOR_mapcell.o: cxx src/EDITOR/mapcell.cpp || $builddir/obj
-build $builddir/obj/SOURCE_ADVMGR.o: cxx src/SOURCE/ADVMGR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_AI.o: cxx src/SOURCE/AI.cpp || $builddir/obj
-build $builddir/obj/SOURCE_ARMY.o: cxx src/SOURCE/ARMY.cpp || $builddir/obj
-build $builddir/obj/SOURCE_ARMYGRP.o: cxx src/SOURCE/ARMYGRP.cpp || $builddir/obj
-build $builddir/obj/SOURCE_CMBTMGR.o: cxx src/SOURCE/CMBTMGR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_COMMAND.o: cxx src/SOURCE/COMMAND.cpp || $builddir/obj
-build $builddir/obj/SOURCE_CURSOR.o: cxx src/SOURCE/CURSOR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Campaign.o: cxx src/SOURCE/Campaign.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Castle.o: cxx src/SOURCE/Castle.cpp || $builddir/obj
-build $builddir/obj/SOURCE_DRAWING.o: cxx src/SOURCE/DRAWING.cpp || $builddir/obj
-build $builddir/obj/SOURCE_EVENTS.o: cxx src/SOURCE/EVENTS.cpp || $builddir/obj
-build $builddir/obj/SOURCE_FINDPATH.o: cxx src/SOURCE/FINDPATH.cpp || $builddir/obj
-build $builddir/obj/SOURCE_FLY.o: cxx src/SOURCE/FLY.cpp || $builddir/obj
-build $builddir/obj/SOURCE_GAME.o: cxx src/SOURCE/GAME.cpp || $builddir/obj
-build $builddir/obj/SOURCE_HERO.o: cxx src/SOURCE/HERO.cpp || $builddir/obj
-build $builddir/obj/SOURCE_HEXCELL.o: cxx src/SOURCE/HEXCELL.cpp || $builddir/obj
-build $builddir/obj/SOURCE_HISCORE.o: cxx src/SOURCE/HISCORE.cpp || $builddir/obj
-build $builddir/obj/SOURCE_KB.o: cxx src/SOURCE/KB.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Modem.o: cxx src/SOURCE/Modem.cpp || $builddir/obj
-build $builddir/obj/SOURCE_NOOPT.o: cxx src/SOURCE/NOOPT.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Netbios.o: cxx src/SOURCE/Netbios.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Newgame.o: cxx src/SOURCE/Newgame.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Overview.o: cxx src/SOURCE/Overview.cpp || $builddir/obj
-build $builddir/obj/SOURCE_PATH.o: cxx src/SOURCE/PATH.cpp || $builddir/obj
-build $builddir/obj/SOURCE_PHILAI.o: cxx src/SOURCE/PHILAI.cpp || $builddir/obj
-build $builddir/obj/SOURCE_RECRUIT.o: cxx src/SOURCE/RECRUIT.cpp || $builddir/obj
-build $builddir/obj/SOURCE_REMOTE.o: cxx src/SOURCE/REMOTE.cpp || $builddir/obj
-build $builddir/obj/SOURCE_REQUEST.o: cxx src/SOURCE/REQUEST.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SEARCH.o: cxx src/SOURCE/SEARCH.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SETUP.o: cxx src/SOURCE/SETUP.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SMACKMGR.o: cxx src/SOURCE/SMACKMGR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SPELLAI.o: cxx src/SOURCE/SPELLAI.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SPELLS.o: cxx src/SOURCE/SPELLS.cpp || $builddir/obj
-build $builddir/obj/SOURCE_STRIP.o: cxx src/SOURCE/STRIP.cpp || $builddir/obj
-build $builddir/obj/SOURCE_SWAPMGR.o: cxx src/SOURCE/SWAPMGR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_TOWN.o: cxx src/SOURCE/TOWN.cpp || $builddir/obj
-build $builddir/obj/SOURCE_TOWNMGR.o: cxx src/SOURCE/TOWNMGR.cpp || $builddir/obj
-build $builddir/obj/SOURCE_VIEW.o: cxx src/SOURCE/VIEW.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Viewwrld.o: cxx src/SOURCE/Viewwrld.cpp || $builddir/obj
-build $builddir/obj/SOURCE_Wsnetwin.o: cxx src/SOURCE/Wsnetwin.cpp || $builddir/obj
-build $builddir/obj/SOURCE_X_CAMPGN.o: cxx src/SOURCE/X_CAMPGN.cpp || $builddir/obj
-build $builddir/obj/SOURCE_X_GLOBAL.o: cxx src/SOURCE/X_GLOBAL.cpp || $builddir/obj
-build $builddir/obj/SOURCE_comwin.o: cxx src/SOURCE/comwin.cpp || $builddir/obj
-build $builddir/obj/SOURCE_dpnetwin.o: cxx src/SOURCE/dpnetwin.cpp || $builddir/obj
-build $builddir/obj/SOURCE_kbwin.o: cxx src/SOURCE/kbwin.cpp || $builddir/obj
-build $builddir/obj/SOURCE_netwin.o: cxx src/SOURCE/netwin.cpp || $builddir/obj
-build $builddir/obj/SOURCE_tradpost.o: cxx src/SOURCE/tradpost.cpp || $builddir/obj
-build $builddir/obj/SOURCE_wingraph.o: cxx src/SOURCE/wingraph.cpp || $builddir/obj
-build $builddir/obj/SOURCE_x_arena.o: cxx src/SOURCE/x_arena.cpp || $builddir/obj
+rule localize
+  command = python3 build.py --prepare --ru
+  restat = 1
+  description = LOCALIZE ru
+build build/ru/localized/include/BASE/BITS.h build/ru/localized/include/BASE/Blur.h build/ru/localized/include/BASE/Bzip.h build/ru/localized/include/BASE/DebugCheck.h build/ru/localized/include/BASE/EXEC_TYPES.h build/ru/localized/include/BASE/INPUTMGR.h build/ru/localized/include/BASE/Icon2b.h build/ru/localized/include/BASE/IconDraw.h build/ru/localized/include/BASE/IconEntry.h build/ru/localized/include/BASE/IconMonoRle.h build/ru/localized/include/BASE/IconRle.h build/ru/localized/include/BASE/IconShear.h build/ru/localized/include/BASE/Icond2b.h build/ru/localized/include/BASE/Icondf2b.h build/ru/localized/include/BASE/Iconf2b.h build/ru/localized/include/BASE/Iconm2b.h build/ru/localized/include/BASE/Iconmf2b.h build/ru/localized/include/BASE/MIDIWrap.h build/ru/localized/include/BASE/Midi.h build/ru/localized/include/BASE/Misc.h build/ru/localized/include/BASE/MiscEnums.h build/ru/localized/include/BASE/MiscGraphicsConstants.h build/ru/localized/include/BASE/MusicFlags.h build/ru/localized/include/BASE/Ripple.h build/ru/localized/include/BASE/TILE.h build/ru/localized/include/BASE/WINMGR.h build/ru/localized/include/BASE/baseManager.h build/ru/localized/include/BASE/bitmap.h build/ru/localized/include/BASE/bmap2.h build/ru/localized/include/BASE/border.h build/ru/localized/include/BASE/button.h build/ru/localized/include/BASE/dimmerWidget.h build/ru/localized/include/BASE/dropListWidget.h build/ru/localized/include/BASE/executive.h build/ru/localized/include/BASE/font.h build/ru/localized/include/BASE/heroWindow.h build/ru/localized/include/BASE/heroWindowManager.h build/ru/localized/include/BASE/icon.h build/ru/localized/include/BASE/icon2bc.h build/ru/localized/include/BASE/icon2bs.h build/ru/localized/include/BASE/icon2by.h build/ru/localized/include/BASE/iconWidget.h build/ru/localized/include/BASE/iconf2bc.h build/ru/localized/include/BASE/iconf2by.h build/ru/localized/include/BASE/inputManager.h build/ru/localized/include/BASE/listBoxWidget.h build/ru/localized/include/BASE/message.h build/ru/localized/include/BASE/miscwin.h build/ru/localized/include/BASE/mouseManager.h build/ru/localized/include/BASE/palette.h build/ru/localized/include/BASE/resource.h build/ru/localized/include/BASE/resourceManager.h build/ru/localized/include/BASE/sample.h build/ru/localized/include/BASE/sampleData.h build/ru/localized/include/BASE/soundBackends.h build/ru/localized/include/BASE/soundManager.h build/ru/localized/include/BASE/textEntryWidget.h build/ru/localized/include/BASE/textWidget.h build/ru/localized/include/BASE/tileset.h build/ru/localized/include/BASE/widget.h build/ru/localized/include/BASE/widgetKind.h build/ru/localized/include/EDITOR/fullMap.h build/ru/localized/include/EDITOR/mapcell.h build/ru/localized/include/Ints.h build/ru/localized/include/SOURCE/ADVMGR.h build/ru/localized/include/SOURCE/ADVMGR_TYPES.h build/ru/localized/include/SOURCE/ARMY.h build/ru/localized/include/SOURCE/CMBTMGR.h build/ru/localized/include/SOURCE/COMMAND.h build/ru/localized/include/SOURCE/CONFIG_TYPES.h build/ru/localized/include/SOURCE/CURSOR.h build/ru/localized/include/SOURCE/Campaign.h build/ru/localized/include/SOURCE/Castle.h build/ru/localized/include/SOURCE/EVENTS.h build/ru/localized/include/SOURCE/EVENTS_TYPES.h build/ru/localized/include/SOURCE/ExpCampaign.h build/ru/localized/include/SOURCE/FINDPATH.h build/ru/localized/include/SOURCE/GAME.h build/ru/localized/include/SOURCE/HERO.h build/ru/localized/include/SOURCE/KB.h build/ru/localized/include/SOURCE/KB_TYPES.h build/ru/localized/include/SOURCE/Modem.h build/ru/localized/include/SOURCE/NOOPT.h build/ru/localized/include/SOURCE/Netbios.h build/ru/localized/include/SOURCE/Newgame.h build/ru/localized/include/SOURCE/Overview.h build/ru/localized/include/SOURCE/PATH.h build/ru/localized/include/SOURCE/PHILAI.h build/ru/localized/include/SOURCE/RECRUIT.h build/ru/localized/include/SOURCE/REMOTE.h build/ru/localized/include/SOURCE/REMOTE_TYPES.h build/ru/localized/include/SOURCE/REQUEST.h build/ru/localized/include/SOURCE/SETUP.h build/ru/localized/include/SOURCE/SMACKMGR.h build/ru/localized/include/SOURCE/SPELLS.h build/ru/localized/include/SOURCE/TOWNMGR.h build/ru/localized/include/SOURCE/VIEW.h build/ru/localized/include/SOURCE/Viewwrld.h build/ru/localized/include/SOURCE/Wsnetwin.h build/ru/localized/include/SOURCE/X_GLOBAL.h build/ru/localized/include/SOURCE/advManager.h build/ru/localized/include/SOURCE/army.h build/ru/localized/include/SOURCE/armyGroup.h build/ru/localized/include/SOURCE/bankBox.h build/ru/localized/include/SOURCE/combatManager.h build/ru/localized/include/SOURCE/combatTypes.h build/ru/localized/include/SOURCE/comwin.h build/ru/localized/include/SOURCE/dimPalette.h build/ru/localized/include/SOURCE/dpnetwin.h build/ru/localized/include/SOURCE/fileRequester.h build/ru/localized/include/SOURCE/game.h build/ru/localized/include/SOURCE/hero.h build/ru/localized/include/SOURCE/hexcell.h build/ru/localized/include/SOURCE/highScoreManager.h build/ru/localized/include/SOURCE/kbwin.h build/ru/localized/include/SOURCE/netwin.h build/ru/localized/include/SOURCE/netwin_private.h build/ru/localized/include/SOURCE/philAI.h build/ru/localized/include/SOURCE/playerData.h build/ru/localized/include/SOURCE/recruitUnit.h build/ru/localized/include/SOURCE/searchArray.h build/ru/localized/include/SOURCE/strip.h build/ru/localized/include/SOURCE/swapManager.h build/ru/localized/include/SOURCE/town.h build/ru/localized/include/SOURCE/townManager.h build/ru/localized/include/SOURCE/townObject.h build/ru/localized/include/SOURCE/tradpost.h build/ru/localized/include/SOURCE/wingraph.h build/ru/localized/include/SOURCE/x_arena.h build/ru/localized/src/BASE/AudiereEffects.cpp build/ru/localized/src/BASE/AudiereMusic.cpp build/ru/localized/src/BASE/BASEMGR.cpp build/ru/localized/src/BASE/BITMAP.cpp build/ru/localized/src/BASE/BITS.cpp build/ru/localized/src/BASE/BORDER.cpp build/ru/localized/src/BASE/BUTTON.cpp build/ru/localized/src/BASE/Blur.cpp build/ru/localized/src/BASE/Bzip.cpp build/ru/localized/src/BASE/DIMMER.cpp build/ru/localized/src/BASE/EXEC.cpp build/ru/localized/src/BASE/FONT.cpp build/ru/localized/src/BASE/ICON.cpp build/ru/localized/src/BASE/ICONWDGT.cpp build/ru/localized/src/BASE/INPUTMGR.cpp build/ru/localized/src/BASE/Icon2b.cpp build/ru/localized/src/BASE/Icond2b.cpp build/ru/localized/src/BASE/Icondf2b.cpp build/ru/localized/src/BASE/Iconf2b.cpp build/ru/localized/src/BASE/Iconm2b.cpp build/ru/localized/src/BASE/Iconmf2b.cpp build/ru/localized/src/BASE/MOUSEMGR.cpp build/ru/localized/src/BASE/Midi.cpp build/ru/localized/src/BASE/MilesSound.cpp build/ru/localized/src/BASE/Misc.cpp build/ru/localized/src/BASE/MusicFlags.cpp build/ru/localized/src/BASE/PALETTE.cpp build/ru/localized/src/BASE/RESMGR.cpp build/ru/localized/src/BASE/RESOURCE.cpp build/ru/localized/src/BASE/Ripple.cpp build/ru/localized/src/BASE/SAMPLE.cpp build/ru/localized/src/BASE/TEXTWDGT.cpp build/ru/localized/src/BASE/TILE.cpp build/ru/localized/src/BASE/TILESET.cpp build/ru/localized/src/BASE/Textntry.cpp build/ru/localized/src/BASE/WIDGET.cpp build/ru/localized/src/BASE/WINDOW.cpp build/ru/localized/src/BASE/WINMGR.cpp build/ru/localized/src/BASE/bmap2.cpp build/ru/localized/src/BASE/droplist.cpp build/ru/localized/src/BASE/icon2bc.cpp build/ru/localized/src/BASE/icon2bs.cpp build/ru/localized/src/BASE/icon2by.cpp build/ru/localized/src/BASE/iconf2bc.cpp build/ru/localized/src/BASE/iconf2by.cpp build/ru/localized/src/BASE/listbox.cpp build/ru/localized/src/BASE/miscwin.cpp build/ru/localized/src/BASE/soundmgr.cpp build/ru/localized/src/EDITOR/mapcell.cpp build/ru/localized/src/SOURCE/ADVMGR.cpp build/ru/localized/src/SOURCE/AI.cpp build/ru/localized/src/SOURCE/ARMY.cpp build/ru/localized/src/SOURCE/ARMYGRP.cpp build/ru/localized/src/SOURCE/CMBTMGR.cpp build/ru/localized/src/SOURCE/COMMAND.cpp build/ru/localized/src/SOURCE/CURSOR.cpp build/ru/localized/src/SOURCE/Campaign.cpp build/ru/localized/src/SOURCE/Castle.cpp build/ru/localized/src/SOURCE/DRAWING.cpp build/ru/localized/src/SOURCE/EVENTS.cpp build/ru/localized/src/SOURCE/FINDPATH.cpp build/ru/localized/src/SOURCE/FLY.cpp build/ru/localized/src/SOURCE/GAME.cpp build/ru/localized/src/SOURCE/HERO.cpp build/ru/localized/src/SOURCE/HEXCELL.cpp build/ru/localized/src/SOURCE/HISCORE.cpp build/ru/localized/src/SOURCE/KB.cpp build/ru/localized/src/SOURCE/Modem.cpp build/ru/localized/src/SOURCE/NOOPT.cpp build/ru/localized/src/SOURCE/Netbios.cpp build/ru/localized/src/SOURCE/Newgame.cpp build/ru/localized/src/SOURCE/Overview.cpp build/ru/localized/src/SOURCE/PATH.cpp build/ru/localized/src/SOURCE/PHILAI.cpp build/ru/localized/src/SOURCE/RECRUIT.cpp build/ru/localized/src/SOURCE/REMOTE.cpp build/ru/localized/src/SOURCE/REQUEST.cpp build/ru/localized/src/SOURCE/SEARCH.cpp build/ru/localized/src/SOURCE/SETUP.cpp build/ru/localized/src/SOURCE/SMACKMGR.cpp build/ru/localized/src/SOURCE/SPELLAI.cpp build/ru/localized/src/SOURCE/SPELLS.cpp build/ru/localized/src/SOURCE/STRIP.cpp build/ru/localized/src/SOURCE/SWAPMGR.cpp build/ru/localized/src/SOURCE/TOWN.cpp build/ru/localized/src/SOURCE/TOWNMGR.cpp build/ru/localized/src/SOURCE/VIEW.cpp build/ru/localized/src/SOURCE/Viewwrld.cpp build/ru/localized/src/SOURCE/Wsnetwin.cpp build/ru/localized/src/SOURCE/X_CAMPGN.cpp build/ru/localized/src/SOURCE/X_GLOBAL.cpp build/ru/localized/src/SOURCE/comwin.cpp build/ru/localized/src/SOURCE/dpnetwin.cpp build/ru/localized/src/SOURCE/kbwin.cpp build/ru/localized/src/SOURCE/netwin.cpp build/ru/localized/src/SOURCE/tradpost.cpp build/ru/localized/src/SOURCE/wingraph.cpp build/ru/localized/src/SOURCE/x_arena.cpp: localize include/BASE/BITS.h include/BASE/Blur.h include/BASE/Bzip.h include/BASE/DebugCheck.h include/BASE/EXEC_TYPES.h include/BASE/INPUTMGR.h include/BASE/Icon2b.h include/BASE/IconDraw.h include/BASE/IconEntry.h include/BASE/IconMonoRle.h include/BASE/IconRle.h include/BASE/IconShear.h include/BASE/Icond2b.h include/BASE/Icondf2b.h include/BASE/Iconf2b.h include/BASE/Iconm2b.h include/BASE/Iconmf2b.h include/BASE/MIDIWrap.h include/BASE/Midi.h include/BASE/Misc.h include/BASE/MiscEnums.h include/BASE/MiscGraphicsConstants.h include/BASE/MusicFlags.h include/BASE/Ripple.h include/BASE/TILE.h include/BASE/WINMGR.h include/BASE/baseManager.h include/BASE/bitmap.h include/BASE/bmap2.h include/BASE/border.h include/BASE/button.h include/BASE/dimmerWidget.h include/BASE/dropListWidget.h include/BASE/executive.h include/BASE/font.h include/BASE/heroWindow.h include/BASE/heroWindowManager.h include/BASE/icon.h include/BASE/icon2bc.h include/BASE/icon2bs.h include/BASE/icon2by.h include/BASE/iconWidget.h include/BASE/iconf2bc.h include/BASE/iconf2by.h include/BASE/inputManager.h include/BASE/listBoxWidget.h include/BASE/message.h include/BASE/miscwin.h include/BASE/mouseManager.h include/BASE/palette.h include/BASE/resource.h include/BASE/resourceManager.h include/BASE/sample.h include/BASE/sampleData.h include/BASE/soundBackends.h include/BASE/soundManager.h include/BASE/textEntryWidget.h include/BASE/textWidget.h include/BASE/tileset.h include/BASE/widget.h include/BASE/widgetKind.h include/EDITOR/fullMap.h include/EDITOR/mapcell.h include/Ints.h include/SOURCE/ADVMGR.h include/SOURCE/ADVMGR_TYPES.h include/SOURCE/ARMY.h include/SOURCE/CMBTMGR.h include/SOURCE/COMMAND.h include/SOURCE/CONFIG_TYPES.h include/SOURCE/CURSOR.h include/SOURCE/Campaign.h include/SOURCE/Castle.h include/SOURCE/EVENTS.h include/SOURCE/EVENTS_TYPES.h include/SOURCE/ExpCampaign.h include/SOURCE/FINDPATH.h include/SOURCE/GAME.h include/SOURCE/HERO.h include/SOURCE/KB.h include/SOURCE/KB_TYPES.h include/SOURCE/Modem.h include/SOURCE/NOOPT.h include/SOURCE/Netbios.h include/SOURCE/Newgame.h include/SOURCE/Overview.h include/SOURCE/PATH.h include/SOURCE/PHILAI.h include/SOURCE/RECRUIT.h include/SOURCE/REMOTE.h include/SOURCE/REMOTE_TYPES.h include/SOURCE/REQUEST.h include/SOURCE/SETUP.h include/SOURCE/SMACKMGR.h include/SOURCE/SPELLS.h include/SOURCE/TOWNMGR.h include/SOURCE/VIEW.h include/SOURCE/Viewwrld.h include/SOURCE/Wsnetwin.h include/SOURCE/X_GLOBAL.h include/SOURCE/advManager.h include/SOURCE/army.h include/SOURCE/armyGroup.h include/SOURCE/bankBox.h include/SOURCE/combatManager.h include/SOURCE/combatTypes.h include/SOURCE/comwin.h include/SOURCE/dimPalette.h include/SOURCE/dpnetwin.h include/SOURCE/fileRequester.h include/SOURCE/game.h include/SOURCE/hero.h include/SOURCE/hexcell.h include/SOURCE/highScoreManager.h include/SOURCE/kbwin.h include/SOURCE/netwin.h include/SOURCE/netwin_private.h include/SOURCE/philAI.h include/SOURCE/playerData.h include/SOURCE/recruitUnit.h include/SOURCE/searchArray.h include/SOURCE/strip.h include/SOURCE/swapManager.h include/SOURCE/town.h include/SOURCE/townManager.h include/SOURCE/townObject.h include/SOURCE/tradpost.h include/SOURCE/wingraph.h include/SOURCE/x_arena.h src/BASE/AudiereEffects.cpp src/BASE/AudiereMusic.cpp src/BASE/BASEMGR.cpp src/BASE/BITMAP.cpp src/BASE/BITS.cpp src/BASE/BORDER.cpp src/BASE/BUTTON.cpp src/BASE/Blur.cpp src/BASE/Bzip.cpp src/BASE/DIMMER.cpp src/BASE/EXEC.cpp src/BASE/FONT.cpp src/BASE/ICON.cpp src/BASE/ICONWDGT.cpp src/BASE/INPUTMGR.cpp src/BASE/Icon2b.cpp src/BASE/Icond2b.cpp src/BASE/Icondf2b.cpp src/BASE/Iconf2b.cpp src/BASE/Iconm2b.cpp src/BASE/Iconmf2b.cpp src/BASE/MOUSEMGR.cpp src/BASE/Midi.cpp src/BASE/MilesSound.cpp src/BASE/Misc.cpp src/BASE/MusicFlags.cpp src/BASE/PALETTE.cpp src/BASE/RESMGR.cpp src/BASE/RESOURCE.cpp src/BASE/Ripple.cpp src/BASE/SAMPLE.cpp src/BASE/TEXTWDGT.cpp src/BASE/TILE.cpp src/BASE/TILESET.cpp src/BASE/Textntry.cpp src/BASE/WIDGET.cpp src/BASE/WINDOW.cpp src/BASE/WINMGR.cpp src/BASE/bmap2.cpp src/BASE/droplist.cpp src/BASE/icon2bc.cpp src/BASE/icon2bs.cpp src/BASE/icon2by.cpp src/BASE/iconf2bc.cpp src/BASE/iconf2by.cpp src/BASE/listbox.cpp src/BASE/miscwin.cpp src/BASE/soundmgr.cpp src/EDITOR/mapcell.cpp src/SOURCE/ADVMGR.cpp src/SOURCE/AI.cpp src/SOURCE/ARMY.cpp src/SOURCE/ARMYGRP.cpp src/SOURCE/CMBTMGR.cpp src/SOURCE/COMMAND.cpp src/SOURCE/CURSOR.cpp src/SOURCE/Campaign.cpp src/SOURCE/Castle.cpp src/SOURCE/DRAWING.cpp src/SOURCE/EVENTS.cpp src/SOURCE/FINDPATH.cpp src/SOURCE/FLY.cpp src/SOURCE/GAME.cpp src/SOURCE/HERO.cpp src/SOURCE/HEXCELL.cpp src/SOURCE/HISCORE.cpp src/SOURCE/KB.cpp src/SOURCE/Modem.cpp src/SOURCE/NOOPT.cpp src/SOURCE/Netbios.cpp src/SOURCE/Newgame.cpp src/SOURCE/Overview.cpp src/SOURCE/PATH.cpp src/SOURCE/PHILAI.cpp src/SOURCE/RECRUIT.cpp src/SOURCE/REMOTE.cpp src/SOURCE/REQUEST.cpp src/SOURCE/SEARCH.cpp src/SOURCE/SETUP.cpp src/SOURCE/SMACKMGR.cpp src/SOURCE/SPELLAI.cpp src/SOURCE/SPELLS.cpp src/SOURCE/STRIP.cpp src/SOURCE/SWAPMGR.cpp src/SOURCE/TOWN.cpp src/SOURCE/TOWNMGR.cpp src/SOURCE/VIEW.cpp src/SOURCE/Viewwrld.cpp src/SOURCE/Wsnetwin.cpp src/SOURCE/X_CAMPGN.cpp src/SOURCE/X_GLOBAL.cpp src/SOURCE/comwin.cpp src/SOURCE/dpnetwin.cpp src/SOURCE/kbwin.cpp src/SOURCE/netwin.cpp src/SOURCE/tradpost.cpp src/SOURCE/wingraph.cpp src/SOURCE/x_arena.cpp | build.py tools/catalog.py locales/messages.def locales/ru.po
+build $builddir/obj/BASE_AudiereEffects.o: cxx build/ru/localized/src/BASE/AudiereEffects.cpp || $builddir/obj
+build $builddir/obj/BASE_AudiereMusic.o: cxx build/ru/localized/src/BASE/AudiereMusic.cpp || $builddir/obj
+build $builddir/obj/BASE_BASEMGR.o: cxx build/ru/localized/src/BASE/BASEMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_BITMAP.o: cxx build/ru/localized/src/BASE/BITMAP.cpp || $builddir/obj
+build $builddir/obj/BASE_BITS.o: cxx build/ru/localized/src/BASE/BITS.cpp || $builddir/obj
+build $builddir/obj/BASE_BORDER.o: cxx build/ru/localized/src/BASE/BORDER.cpp || $builddir/obj
+build $builddir/obj/BASE_BUTTON.o: cxx build/ru/localized/src/BASE/BUTTON.cpp || $builddir/obj
+build $builddir/obj/BASE_Blur.o: cxx build/ru/localized/src/BASE/Blur.cpp || $builddir/obj
+build $builddir/obj/BASE_Bzip.o: cxx build/ru/localized/src/BASE/Bzip.cpp || $builddir/obj
+build $builddir/obj/BASE_DIMMER.o: cxx build/ru/localized/src/BASE/DIMMER.cpp || $builddir/obj
+build $builddir/obj/BASE_EXEC.o: cxx build/ru/localized/src/BASE/EXEC.cpp || $builddir/obj
+build $builddir/obj/BASE_FONT.o: cxx build/ru/localized/src/BASE/FONT.cpp || $builddir/obj
+build $builddir/obj/BASE_ICON.o: cxx build/ru/localized/src/BASE/ICON.cpp || $builddir/obj
+build $builddir/obj/BASE_ICONWDGT.o: cxx build/ru/localized/src/BASE/ICONWDGT.cpp || $builddir/obj
+build $builddir/obj/BASE_INPUTMGR.o: cxx build/ru/localized/src/BASE/INPUTMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_Icon2b.o: cxx build/ru/localized/src/BASE/Icon2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Icond2b.o: cxx build/ru/localized/src/BASE/Icond2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Icondf2b.o: cxx build/ru/localized/src/BASE/Icondf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconf2b.o: cxx build/ru/localized/src/BASE/Iconf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconm2b.o: cxx build/ru/localized/src/BASE/Iconm2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconmf2b.o: cxx build/ru/localized/src/BASE/Iconmf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_MOUSEMGR.o: cxx build/ru/localized/src/BASE/MOUSEMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_Midi.o: cxx build/ru/localized/src/BASE/Midi.cpp || $builddir/obj
+build $builddir/obj/BASE_MilesSound.o: cxx build/ru/localized/src/BASE/MilesSound.cpp || $builddir/obj
+build $builddir/obj/BASE_Misc.o: cxx build/ru/localized/src/BASE/Misc.cpp || $builddir/obj
+build $builddir/obj/BASE_MusicFlags.o: cxx build/ru/localized/src/BASE/MusicFlags.cpp || $builddir/obj
+build $builddir/obj/BASE_PALETTE.o: cxx build/ru/localized/src/BASE/PALETTE.cpp || $builddir/obj
+build $builddir/obj/BASE_RESMGR.o: cxx build/ru/localized/src/BASE/RESMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_RESOURCE.o: cxx build/ru/localized/src/BASE/RESOURCE.cpp || $builddir/obj
+build $builddir/obj/BASE_Ripple.o: cxx build/ru/localized/src/BASE/Ripple.cpp || $builddir/obj
+build $builddir/obj/BASE_SAMPLE.o: cxx build/ru/localized/src/BASE/SAMPLE.cpp || $builddir/obj
+build $builddir/obj/BASE_TEXTWDGT.o: cxx build/ru/localized/src/BASE/TEXTWDGT.cpp || $builddir/obj
+build $builddir/obj/BASE_TILE.o: cxx build/ru/localized/src/BASE/TILE.cpp || $builddir/obj
+build $builddir/obj/BASE_TILESET.o: cxx build/ru/localized/src/BASE/TILESET.cpp || $builddir/obj
+build $builddir/obj/BASE_Textntry.o: cxx build/ru/localized/src/BASE/Textntry.cpp || $builddir/obj
+build $builddir/obj/BASE_WIDGET.o: cxx build/ru/localized/src/BASE/WIDGET.cpp || $builddir/obj
+build $builddir/obj/BASE_WINDOW.o: cxx build/ru/localized/src/BASE/WINDOW.cpp || $builddir/obj
+build $builddir/obj/BASE_WINMGR.o: cxx build/ru/localized/src/BASE/WINMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_bmap2.o: cxx build/ru/localized/src/BASE/bmap2.cpp || $builddir/obj
+build $builddir/obj/BASE_droplist.o: cxx build/ru/localized/src/BASE/droplist.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2bc.o: cxx build/ru/localized/src/BASE/icon2bc.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2bs.o: cxx build/ru/localized/src/BASE/icon2bs.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2by.o: cxx build/ru/localized/src/BASE/icon2by.cpp || $builddir/obj
+build $builddir/obj/BASE_iconf2bc.o: cxx build/ru/localized/src/BASE/iconf2bc.cpp || $builddir/obj
+build $builddir/obj/BASE_iconf2by.o: cxx build/ru/localized/src/BASE/iconf2by.cpp || $builddir/obj
+build $builddir/obj/BASE_listbox.o: cxx build/ru/localized/src/BASE/listbox.cpp || $builddir/obj
+build $builddir/obj/BASE_miscwin.o: cxx build/ru/localized/src/BASE/miscwin.cpp || $builddir/obj
+build $builddir/obj/BASE_soundmgr.o: cxx build/ru/localized/src/BASE/soundmgr.cpp || $builddir/obj
+build $builddir/obj/EDITOR_mapcell.o: cxx build/ru/localized/src/EDITOR/mapcell.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ADVMGR.o: cxx build/ru/localized/src/SOURCE/ADVMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_AI.o: cxx build/ru/localized/src/SOURCE/AI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ARMY.o: cxx build/ru/localized/src/SOURCE/ARMY.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ARMYGRP.o: cxx build/ru/localized/src/SOURCE/ARMYGRP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_CMBTMGR.o: cxx build/ru/localized/src/SOURCE/CMBTMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_COMMAND.o: cxx build/ru/localized/src/SOURCE/COMMAND.cpp || $builddir/obj
+build $builddir/obj/SOURCE_CURSOR.o: cxx build/ru/localized/src/SOURCE/CURSOR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Campaign.o: cxx build/ru/localized/src/SOURCE/Campaign.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Castle.o: cxx build/ru/localized/src/SOURCE/Castle.cpp || $builddir/obj
+build $builddir/obj/SOURCE_DRAWING.o: cxx build/ru/localized/src/SOURCE/DRAWING.cpp || $builddir/obj
+build $builddir/obj/SOURCE_EVENTS.o: cxx build/ru/localized/src/SOURCE/EVENTS.cpp || $builddir/obj
+build $builddir/obj/SOURCE_FINDPATH.o: cxx build/ru/localized/src/SOURCE/FINDPATH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_FLY.o: cxx build/ru/localized/src/SOURCE/FLY.cpp || $builddir/obj
+build $builddir/obj/SOURCE_GAME.o: cxx build/ru/localized/src/SOURCE/GAME.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HERO.o: cxx build/ru/localized/src/SOURCE/HERO.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HEXCELL.o: cxx build/ru/localized/src/SOURCE/HEXCELL.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HISCORE.o: cxx build/ru/localized/src/SOURCE/HISCORE.cpp || $builddir/obj
+build $builddir/obj/SOURCE_KB.o: cxx build/ru/localized/src/SOURCE/KB.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Modem.o: cxx build/ru/localized/src/SOURCE/Modem.cpp || $builddir/obj
+build $builddir/obj/SOURCE_NOOPT.o: cxx build/ru/localized/src/SOURCE/NOOPT.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Netbios.o: cxx build/ru/localized/src/SOURCE/Netbios.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Newgame.o: cxx build/ru/localized/src/SOURCE/Newgame.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Overview.o: cxx build/ru/localized/src/SOURCE/Overview.cpp || $builddir/obj
+build $builddir/obj/SOURCE_PATH.o: cxx build/ru/localized/src/SOURCE/PATH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_PHILAI.o: cxx build/ru/localized/src/SOURCE/PHILAI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_RECRUIT.o: cxx build/ru/localized/src/SOURCE/RECRUIT.cpp || $builddir/obj
+build $builddir/obj/SOURCE_REMOTE.o: cxx build/ru/localized/src/SOURCE/REMOTE.cpp || $builddir/obj
+build $builddir/obj/SOURCE_REQUEST.o: cxx build/ru/localized/src/SOURCE/REQUEST.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SEARCH.o: cxx build/ru/localized/src/SOURCE/SEARCH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SETUP.o: cxx build/ru/localized/src/SOURCE/SETUP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SMACKMGR.o: cxx build/ru/localized/src/SOURCE/SMACKMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SPELLAI.o: cxx build/ru/localized/src/SOURCE/SPELLAI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SPELLS.o: cxx build/ru/localized/src/SOURCE/SPELLS.cpp || $builddir/obj
+build $builddir/obj/SOURCE_STRIP.o: cxx build/ru/localized/src/SOURCE/STRIP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SWAPMGR.o: cxx build/ru/localized/src/SOURCE/SWAPMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_TOWN.o: cxx build/ru/localized/src/SOURCE/TOWN.cpp || $builddir/obj
+build $builddir/obj/SOURCE_TOWNMGR.o: cxx build/ru/localized/src/SOURCE/TOWNMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_VIEW.o: cxx build/ru/localized/src/SOURCE/VIEW.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Viewwrld.o: cxx build/ru/localized/src/SOURCE/Viewwrld.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Wsnetwin.o: cxx build/ru/localized/src/SOURCE/Wsnetwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_X_CAMPGN.o: cxx build/ru/localized/src/SOURCE/X_CAMPGN.cpp || $builddir/obj
+build $builddir/obj/SOURCE_X_GLOBAL.o: cxx build/ru/localized/src/SOURCE/X_GLOBAL.cpp || $builddir/obj
+build $builddir/obj/SOURCE_comwin.o: cxx build/ru/localized/src/SOURCE/comwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_dpnetwin.o: cxx build/ru/localized/src/SOURCE/dpnetwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_kbwin.o: cxx build/ru/localized/src/SOURCE/kbwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_netwin.o: cxx build/ru/localized/src/SOURCE/netwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_tradpost.o: cxx build/ru/localized/src/SOURCE/tradpost.cpp || $builddir/obj
+build $builddir/obj/SOURCE_wingraph.o: cxx build/ru/localized/src/SOURCE/wingraph.cpp || $builddir/obj
+build $builddir/obj/SOURCE_x_arena.o: cxx build/ru/localized/src/SOURCE/x_arena.cpp || $builddir/obj
 build $builddir/imports/AUDIERE.a: implib imports/AUDIERE.def || $builddir/imports
 build $builddir/imports/MSS32.a: implib imports/MSS32.def || $builddir/imports
 build $builddir/imports/SMACKW32.a: implib imports/SMACKW32.def || $builddir/imports

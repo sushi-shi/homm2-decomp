@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <string.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/KB.h>
@@ -119,9 +120,7 @@ i32 combatManager::AICheckRetreat(void) {
                 armyIndex = COMBAT_AI_GROUP_SCAN_DONE;
         }
 
-        force[sideNum] =
-            gpPhilAI
-                ->FightValueOfStack(armies, sideHero, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
+        force[sideNum] = gpPhilAI->FightValueOfStack(armies, sideHero, COMBAT_AI_FIGHT_VALUE_MODE);
         if (m_combatTowns[sideNum] != NULL)
             force[sideNum] =
                 static_cast<i32>(force[sideNum] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);
@@ -335,60 +334,41 @@ void combatManager::DoCompAI(CombatSide) {
         case COMBAT_AI_ATTACK_SHOOT:
             if (AttemptAdjacentAttack(thisArmy))
                 goto finish;
-            if (thisArmy->m_monsterType == CREATURE_LICH
-                || thisArmy->m_monsterType == CREATURE_POWER_LICH) {
+            if (IS_LICH_CREATURE(thisArmy->m_monsterType)) {
                 DoLichShot(thisArmy);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, mirrorMask[H2EnumIndex(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[H2EnumIndex(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, shooters[H2EnumIndex(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[H2EnumIndex(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, flyerMask[H2EnumIndex(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[H2EnumIndex(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             if (walkers[H2EnumIndex(sideEnemy)] != 0) {
                 best =
                     GetClosestArmy(thisArmy, sideEnemy, walkers[H2EnumIndex(sideEnemy)]);
                 if (best != -1) {
-                    giNextAction = ACTION_MOVE;
-                    giNextActionGridIndex =
-                        (m_armies[H2EnumIndex(sideEnemy)] + best)
-                            ->m_hex;
+                    SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                     goto finish;
                 }
             }
             best = GetBestArmy(sideEnemy, oddMasks[H2EnumIndex(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[H2EnumIndex(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             best = GetBestArmy(sideEnemy, traitorArray[H2EnumIndex(sideEnemy)]);
             if (best != -1) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex =
-                    (m_armies[H2EnumIndex(sideEnemy)] + best)
-                        ->m_hex;
+                SET_NEXT_COMBAT_MOVE((m_armies[H2EnumIndex(sideEnemy)] + best)->m_hex);
                 goto finish;
             }
             break;
@@ -481,8 +461,7 @@ void combatManager::DoCompAI(CombatSide) {
                 targetCell = &gpCombatManager->m_hexCells[targetHex];
                 if (ValidHex(targetHex) && targetCell->m_occupantSide == COMBAT_SIDE_NONE
                     && targetCell->m_blocked == 0) {
-                    giNextAction = ACTION_MOVE;
-                    giNextActionGridIndex = targetHex;
+                    SET_NEXT_COMBAT_MOVE(targetHex);
                     goto finish;
                 }
             }
@@ -579,8 +558,7 @@ void combatManager::DoLichShot(class army* lich) {
         if (bestIndex == COMBAT_AI_NO_ARMY || score > bestTotal) {
             bestTotal = score;
             bestIndex = armyIndex;
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = targetHex;
+            SET_NEXT_COMBAT_MOVE(targetHex);
         }
     }
 }
@@ -594,15 +572,10 @@ i32 combatManager::GetShooterMask(CombatSide side) {
     for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side)]; armyIndex++) {
         currentArmy = armyIndex + m_armies[H2EnumIndex(side)];
         if (currentArmy != NULL
-            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
-                   == 0
+            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
             && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_SHOOTER))) != 0
-            && currentArmy->m_monster.shots > 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && currentArmy->m_monster.shots > 0 && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -636,14 +609,10 @@ i32 combatManager::GetFlyerMask(CombatSide side) {
     for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side)]; armyIndex++) {
         currentArmy = m_armies[H2EnumIndex(side)] + armyIndex;
         if (currentArmy != NULL
-            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
-                   == 0
+            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
             && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_FLYING))) != 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -677,16 +646,12 @@ i32 combatManager::GetWalkerMask(CombatSide side) {
     for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side)]; armyIndex++) {
         currentArmy = m_armies[H2EnumIndex(side)] + armyIndex;
         if (currentArmy != NULL
-            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
-                   == 0
+            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
             && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_FLYING))) == 0
             && ((H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_SHOOTER))) == 0
                 || currentArmy->m_monster.shots <= 0)
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)] == 0
-            && currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] == 0)
+            && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
+            && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -703,11 +668,8 @@ i32 combatManager::GetOutOfItMask(CombatSide side) {
         currentArmy =
             m_armies[H2EnumIndex(side)] + idx;
         if (currentArmy != NULL
-            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
-                   == 0
-            && (currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] != 0
-                || currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)] != 0
-                || currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)] != 0))
+            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
+            && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
             result |= bitMask;
         bitMask <<= 1;
     }
@@ -723,10 +685,8 @@ i32 combatManager::GetTraitorMask(CombatSide side) {
     for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side)]; armyIndex++) {
         currentArmy = &m_armies[H2EnumIndex(side)][armyIndex];
         if (currentArmy != NULL
-            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
-                   == 0
-            && (currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)] != 0
-                || currentArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)] != 0))
+            && (H2EnumIndex((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
+            && ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -745,21 +705,8 @@ i32 combatManager::GetBestArmy(CombatSide side, i32 mask) {
             strength8 =
                 (m_armies[H2EnumIndex(side)] + armyIndex2)
                     ->Strength();
-            if ((m_armies[H2EnumIndex(side)] + armyIndex2)
-                        ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)]
-                    != 0
-                || (m_armies[H2EnumIndex(side)] + armyIndex2)
-                           ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                       != 0
-                || (m_armies[H2EnumIndex(side)] + armyIndex2)
-                           ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                       != 0
-                || (m_armies[H2EnumIndex(side)] + armyIndex2)
-                           ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
-                       != 0
-                || (m_armies[H2EnumIndex(side)] + armyIndex2)
-                           ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
-                       != 0)
+            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[H2EnumIndex(side)] + armyIndex2))
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[H2EnumIndex(side)] + armyIndex2)))
                 strength8 >>= 1;
             if (strength8 > bestStrength8) {
                 best = armyIndex2;
@@ -860,8 +807,7 @@ i32 combatManager::AttemptAttack(
         targetHex = targetArmy[m_armies[H2EnumIndex(side)]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-            giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = targetHex;
+            SET_NEXT_COMBAT_MOVE(targetHex);
             return 1;
         }
         if ((H2EnumIndex((targetArmy[m_armies[H2EnumIndex(side)]].m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_WIDE)))
@@ -872,8 +818,7 @@ i32 combatManager::AttemptAttack(
                 targetHex++;
             currentArmy->m_moveTargetHex = targetHex;
             if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-                giNextAction = ACTION_MOVE;
-                giNextActionGridIndex = targetHex;
+                SET_NEXT_COMBAT_MOVE(targetHex);
                 return 1;
             }
         }
@@ -919,8 +864,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     else
         enemyArmy = GetBestArmy(OppositeCombatSide(m_currentSide), enemyMask);
     if (enemyArmy != COMBAT_AI_NO_ARMY) {
-        giNextAction = ACTION_MOVE;
-        giNextActionGridIndex = m_armies[H2EnumIndex(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex;
+        SET_NEXT_COMBAT_MOVE(m_armies[H2EnumIndex(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex);
         return 1;
     } else {
         return 0;

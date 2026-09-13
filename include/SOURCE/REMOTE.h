@@ -68,13 +68,13 @@ i32 DecodePacket(u8*, i32);
 i32 SendRemoteData(u8*, u8*, i32, i32);
 i32 ReceiveRemoteData(u8*, u8*, i32);
 i32 TransmitRemoteData(
-    char*,
-    i32,
-    i32,
-    i8,
-    i8,
-    i8,
-    RemoteMessageType
+    char* data,
+    i32 destination,
+    i32 length,
+    i8 command,
+    i8 reliable,
+    i8 allowRetryDialog = 1,
+    RemoteMessageType messageType = REMOTE_MESSAGE_DEFAULT
 );
 char* GetRemoteData(i8);
 void PollRemote(void);

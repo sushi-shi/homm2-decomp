@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <BASE/widget.h>
+#include <BASE/message.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -48,10 +50,7 @@ border::border(
 }
 
 void border::Read(void) {
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = NULL;
@@ -87,7 +86,7 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_DOWN: {
             i16 x = msg.payload.mouse.x - m_owner->m_posX;
             i16 y = msg.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
@@ -106,9 +105,7 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

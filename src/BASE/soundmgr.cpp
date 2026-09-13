@@ -80,11 +80,9 @@ bool soundManager::StartupMilesBackend(void) {
         MessageBoxA(
             hwndApp,
 
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-                "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
-                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee.",
+            localization::Tr("system.audio.initialization_no_device"),
 
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+            localization::Tr("system.startup_error.title"),
             0
         );
         m_digitalDriver = NULL;
@@ -108,8 +106,7 @@ bool soundManager::StartupMilesBackend(void) {
             hwndApp,
             AIL_last_error(),
 
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-                "\xe7\xe2\xf3\xea\xe0!",
+            localization::Tr("system.audio.initialization_error.title"),
             0
         );
         m_digitalDriver = NULL;

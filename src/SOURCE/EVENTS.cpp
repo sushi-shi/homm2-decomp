@@ -1,8 +1,10 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bmap2.h>
@@ -311,29 +313,6 @@ using enum EventSoundVariant;
         MINE_CENTER_GOLD_FRAME = 4
     } AbandonedMineConversionConstant;
 
-    typedef enum Cp1251Letter {
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO = 0xb8,
-        CP1251_CAPITAL_A = 0xc0,
-        CP1251_CAPITAL_YA = 0xdf,
-        CP1251_CASE_STEP = 0x20
-    } Cp1251Letter;
-
-
-    inline char ToLowerCp1251(u8 letter) {
-        char smallLetter;
-
-        if (letter >= 'A' && letter <= 'Z')
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter == CP1251_CAPITAL_YO)
-            smallLetter = CP1251_SMALL_YO;
-        else
-            smallLetter = letter;
-        return smallLetter;
-    }
-
 }
 
 #define TRADING_POST_EFFICIENCY 0.2f
@@ -412,12 +391,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xe7\xe0\xe1\xf0\xe5\xeb\xe8 "
-                        "\xe2 \xe2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4, \xe8\xe7 \xf2\xe5\xf5, \xe3\xe4\xe5 "
-                        "\xf2\xe0\xea \xee\xe1\xee\xe6\xe0\xfe\xf2 \xf0\xe5\xe7\xe2\xe8\xf2\xfc\xf1\xff \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xfb "
-                        "\xf1 \xf4\xe5\xff\xec\xe8, \xed\xee \xf1\xe5\xe3\xee\xe4\xed\xff \xe7\xe4\xe5\xf1\xfc \xed\xe8\xea\xee\xe3\xee."
-                        " \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
-                        "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5.",
+                    localization::Tr("event.inline.14d0296e539d777e"),
                     -1,
                     0,
                     -1,
@@ -429,12 +403,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xef\xee\xe9\xec\xe0\xeb\xe8 "
-                        "\xeb\xe5\xef\xf0\xe5\xea\xee\xed\xe0, \xf2\xe0\xea \xe1\xe5\xf1\xef\xe5\xf7\xed\xee \xe7\xe0\xf1\xed\xf3\xe2\xf8\xe5\xe3\xee "
-                        "\xef\xee\xe4 \xf8\xeb\xff\xef\xea\xee\xe9 \xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe3\xee \xe3\xf0\xe8\xe1\xe0."
-                        " \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xf1\xe2\xee\xe1\xee\xe4\xf3 \xee\xed \xf0\xe0\xf1\xf1\xea\xe0\xe7\xe0\xeb "
-                        "\xe2\xe0\xec, \xe3\xe4\xe5 \xeb\xe5\xe6\xe8\xf2 \xe3\xee\xf0\xf8\xee\xf7\xe5\xea \xf1\xee "
-                        "\xe2\xf1\xff\xea\xe8\xec\xe8 \xf6\xe5\xed\xed\xfb\xec\xe8 \xe2\xe5\xf9\xe8\xf6\xe0\xec\xe8.",
+                    localization::Tr("event.inline.835273ee016ddfeb"),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
                     static_cast<ResourceType>(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
@@ -465,34 +434,20 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra_o->active) {
                 NormalDialog(
-                    "{\xd1\xf4\xe8\xed\xea\xf1}\n\n\xc2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea \xee\xe3\xf0\xee\xec\xed\xee\xec\xf3 "
-                        "\xd1\xf4\xe8\xed\xea\xf1\xf3, \xed\xee \xee\xed \xe4\xe0\xe6\xe5 \xed\xe5 \xf8\xe5\xeb\xee\xf5\xed\xf3\xeb\xf1\xff.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.1553297e35c659a6"),
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             } else {
                 sprintf(
                     gText,
-                    "\"\xc5\xf1\xf2\xfc \xf3 \xec\xe5\xed\xff \xe7\xe0\xe3\xe0\xe4\xea\xe0 \xe4\xeb\xff \xf2\xe5\xe1\xff,"
-                        "\"\xf1\xea\xe0\xe7\xe0\xeb \xd1\xf4\xe8\xed\xea\xf1. \"\xce\xf2\xe2\xe5\xf2\xe8\xf8\xfc "
-                        "\xe2\xe5\xf0\xed\xee - \xef\xee\xeb\xf3\xf7\xe8\xf8\xfc \xed\xe0\xe3\xf0\xe0\xe4\xf3. \xce\xf8\xe8\xe1\xe5\xf8\xfc\xf1\xff "
-                        "- \xff \xf1\xee\xe6\xf0\xf3 \xf2\xe5\xe1\xff. \xcf\xf0\xe8\xed\xe8\xec\xe0\xe5\xf8\xfc \xeb\xe8 "
-                        "\xf2\xfb \xec\xee\xe9 \xe2\xfb\xe7\xee\xe2?\""
+                    localization::Tr("event.inline.c15ae0e09ee99d18")
                 );
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
-                        "\xd1\xf4\xe8\xed\xea\xf1 \xe7\xe0\xe3\xe0\xe4\xe0\xeb \xe2\xe0\xec \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xf3\xfe "
-                            "\xe7\xe0\xe3\xe0\xe4\xea\xf3::\n\n'%s'\n\n\xc2\xe0\xf8 \xee\xf2\xe2\xe5\xf2?",
+                        localization::Tr("event.inline.785dc53c14bdbc91"),
                         eventExtra_o->riddle
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
@@ -525,7 +480,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                         if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true, -1);
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true);
                             if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_k = primaryReward_e;
                                 secondaryAmount_j = primaryAmount_j;
@@ -535,10 +490,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
 
                         NormalDialog(
-                            "\xcd\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf0\xe0\xe7\xee\xf7\xe0\xf0\xee\xe2\xe0\xed\xed\xee "
-                                "\xd1\xf4\xe8\xed\xea\xf1 \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb. \xd2\xfb \xe4\xe0\xeb \xe2\xe5\xf0\xed\xfb\xe9 "
-                                "\xee\xf2\xe2\xe5\xf2, \xe2\xee\xf2 \xf2\xe2\xee\xff \xed\xe0\xe3\xf0\xe0\xe4\xe0. \xc0 \xf2\xe5\xef\xe5\xf0\xfc "
-                                "\xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff.",
+                            localization::Tr("event.inline.b34883b51b1f43be"),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -552,20 +504,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventExtra_o->active = 0;
                     } else {
                         NormalDialog(
-                            "\"\xd2\xe2\xee\xff \xe4\xee\xe3\xe0\xe4\xea\xe0 \xee\xf8\xe8\xe1\xee\xf7\xed\xe0,\" \xf1\xea\xe0\xe7\xe0\xeb,"
-                                " \xf3\xeb\xfb\xe1\xe0\xff\xf1\xfc, \xd1\xf4\xe8\xed\xea\xf1. \xd3\xf5\xec\xfb\xeb\xff\xfe\xf9\xe8\xe9\xf1\xff "
-                                "\xd1\xf4\xe8\xed\xea\xf1 \xef\xee\xe2\xe0\xeb\xe8\xeb \xf2\xe5\xe1\xff \xed\xe0 \xe7\xe5\xec\xeb\xfe "
-                                "\xe8 \xec\xe8\xf0 \xee\xea\xf3\xf2\xe0\xeb\xe0 \xed\xe5\xef\xf0\xee\xe3\xeb\xff\xe4\xed\xe0\xff "
-                                "\xf2\xfc\xec\xe0.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            localization::Tr("event.inline.da87bc41bfb2530c"),
+                            NORMAL_DIALOG_INFO
                         );
                         HeroLoses(eventHero2);
                     }
@@ -576,18 +516,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{\xce\xe1\xe7\xee\xf0\xed\xe0\xff \xe1\xe0\xf8\xed\xff}\n\n\xd1 \xe2\xe5\xf0\xf8\xe8\xed\xfb "
-                    "\xee\xe1\xe7\xee\xf0\xed\xee\xe9 \xe1\xe0\xf8\xed\xe8 \xe2\xfb \xf1\xec\xee\xe3\xeb\xe8 "
-                    "\xf0\xe0\xe7\xe3\xeb\xff\xe4\xe5\xf2\xfc \xe4\xe0\xeb\xfc\xed\xe8\xe5 \xe7\xe5\xec\xeb\xe8.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                localization::Tr("event.inline.fff2b25d391ab29d"),
+                NORMAL_DIALOG_INFO
             );
             gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
             CompleteDraw(0);
@@ -621,12 +551,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc4\xeb\xff \xe2\xf1\xe5\xf5 %s, %s"
-                            " \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 "
-                            "\xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 \xf3 \xec\xe0\xf1\xf2\xe5\xf0\xee\xe2 \xe1\xee\xff \xe8\xe7 "
-                            "\xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 "
-                            "\xe0\xf0\xec\xe8\xe8 \xe8\xec\xe5\xfe\xf2\xf1\xff \xee\xf2\xf0\xff\xe4\xfb %s, %s, \xe8 "
-                            "%s",
+                        localization::Tr("event.inline.36d8db3120534c34"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
                         gArmyNamesPlural[H2EnumIndex(thirdUpgrade_f)],
@@ -637,11 +562,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
-                            "%s \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf8\xeb\xe8 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
-                            "\xf3 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0."
-                            " \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xef\xee\xff\xe2\xe8\xeb\xe8\xf1\xfc "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s.",
+                        localization::Tr("event.inline.6ec6a4f4693dcb8d"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1],
@@ -650,11 +571,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
-                            "%s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
-                            "\xf3 \xe1\xee\xe5\xe2\xfb\xf5 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee "
-                            "\xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
-                            "\xe5\xf1\xf2\xfc \xee\xf2\xf0\xff\xe4 %s.",
+                        localization::Tr("event.inline.6ffe5f935a4c8867"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1]
                     );
@@ -673,12 +590,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xcd\xe5\xee\xe1\xfb\xf7\xed\xfb\xe9 "
-                        "\xf1\xee\xfe\xe7 \xee\xe3\xf0\xee\xe2 \xe8 \xe3\xed\xee\xec\xee\xe2 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe2\xe0\xec \xef\xee\xf2\xf0\xe5\xed\xe8\xf0\xee\xe2\xe0\xf2\xfc (\xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc)"
-                        " \xeb\xfe\xe1\xfb\xe5 \xef\xee\xe4\xee\xe1\xed\xfb\xe5 \xe8\xec \xe2\xee\xe9\xf1\xea\xe0."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xf2\xe0\xea\xe8\xf5 \xef\xf0\xe8 "
-                        "\xf1\xe5\xe1\xe5 \xed\xe5\xf2.",
+                    localization::Tr("event.inline.dfaca12192a50638"),
                     -1,
                     0,
                     -1,
@@ -718,9 +630,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s, %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
-                            "%s, %s, \xe8 %s",
+                        localization::Tr("event.inline.16a4b831c7bd6a44"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
                         gArmyNamesPlural[H2EnumIndex(thirdUpgrade_f)],
@@ -731,9 +641,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
-                            "%s \xe8 %s",
+                        localization::Tr("event.inline.49edf5c404ac2672"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1],
@@ -742,9 +650,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
-                            "%s.",
+                        localization::Tr("event.inline.95b379d46e666d70"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1]
                     );
@@ -763,16 +669,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xca\xf3\xe7\xed\xe5\xf6 "
-                        "\xef\xf0\xe8 \xfd\xf2\xee\xe9 \xeb\xe8\xf2\xe5\xe9\xed\xee\xe9 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe7\xe0\xec\xe5\xed\xe8\xf2\xfc \xee\xf0\xf3\xe6\xe8\xe5 \xea\xee\xef\xe5\xe9\xf9\xe8\xea\xee\xe2 "
-                        "\xe8 \xec\xe5\xf7\xed\xe8\xea\xee\xe2 \xf1 \xe6\xe5\xeb\xe5\xe7\xed\xee\xe3\xee \xed\xe0 "
-                        "\xf1\xf2\xe0\xeb\xfc\xed\xee\xe5. \xce\xed \xf2\xe0\xea\xe6\xe5 \xf1\xea\xe0\xe7\xe0\xeb,"
-                        " \xf7\xf2\xee \xe2\xeb\xe0\xe4\xe5\xe5\xf2 \xf2\xe5\xf5\xed\xee\xeb\xee\xe3\xe8\xe5\xe9 "
-                        "\xef\xee\xe2\xfb\xf8\xe5\xed\xe8\xff \xe6\xe5\xeb\xe5\xe7\xed\xfb\xf5 \xe3\xee\xeb\xe5\xec\xee\xe2 "
-                        "\xe4\xee \xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8\xea\xee\xe3\xee "
-                        "\xe8\xe7 \xed\xe8\xf5 \xed\xe5\xf2 \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe8 "
-                        "\xee\xed \xed\xe5 \xec\xee\xe3\xf3\xf2 \xef\xee\xec\xee\xf7\xfc \xe2\xe0\xec.",
+                    localization::Tr("event.inline.e7075cc43429178b"),
                     -1,
                     0,
                     -1,
@@ -787,10 +684,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
-                        "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
-                        "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee. \xc2\xed\xf3\xf2\xf0\xe8 "
-                        "\xe1\xfb\xeb\xe8 %s \xe8 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    localization::Tr("event.inline.c96f2e927c9e47ef"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
@@ -808,16 +702,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
                 NormalDialog(
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
-                        "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
-                        "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee \xe8 \xed\xe0\xf8\xeb\xe8 "
-                        "\xe2\xed\xf3\xf2\xf0\xe8 1500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    localization::Tr("event.inline.333bff0ee2591ce7"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -831,20 +721,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
             } else {
                 NormalDialog(
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xee\xf2\xf0\xe0\xf2\xe8\xe2 \xf7\xe0\xf1\xfb \xed\xe0 "
-                        "\xf2\xee, \xf7\xf2\xee\xe1\xfb \xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea "
-                        "\xe8\xe7 \xec\xee\xf0\xff, \xe2\xfb \xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 "
-                        "\xe5\xe3\xee \xeb\xe8\xf8\xfc \xe7\xe0 \xf2\xe5\xec, \xf7\xf2\xee\xe1\xfb \xf3\xe2\xe8\xe4\xe5\xf2\xfc:"
-                        " \xe2\xed\xf3\xf2\xf0\xe8 \xef\xf3\xf1\xf2\xee.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.d2a7adee0f4b9a8a"),
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -855,25 +733,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8, \xed\xee \xed\xe8\xf7\xe5\xe3\xee "
-                            "\xed\xe5 \xed\xe0\xf8\xeb\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.fafa7917b1fb1445"),
+                        NORMAL_DIALOG_INFO
                     );
                     break;
                 case FLOTSAM_WOOD:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xe4\xee\xe1\xfb\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
+                        localization::Tr("event.inline.021d355fcf4f31af"),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -888,9 +754,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe7\xee\xeb\xee\xf2\xe0 \xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
+                        localization::Tr("event.inline.d19251bcd8000e2e"),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -906,9 +770,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_LARGE_TREASURE:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb \xe8 \xe7\xee\xeb\xee\xf2\xe0.",
+                        localization::Tr("event.inline.bd36cf6691ab88e7"),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -932,11 +794,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
-                        "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
-                        "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
-                        "\xee\xea\xe5\xe0\xed\xe5. \xcd\xe0\xe3\xf0\xe0\xe4\xe0 \xe7\xe0 \xe2\xe0\xf8\xf3 \xe4\xee\xe1\xf0\xee\xf2\xf3 "
-                        "- %s.",
+                    localization::Tr("event.inline.4967a4ae1966d928"),
                     gArtifactNames[cell->m_objectMetadata]
                 );
                 NormalDialog(
@@ -951,25 +809,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true);
             } else {
                 NormalDialog(
-                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
-                        "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
-                        "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
-                        "\xee\xea\xe5\xe0\xed\xe5. \xc8\xf1\xef\xee\xeb\xed\xe5\xed\xed\xfb\xe9 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xe8,"
-                        " \xe1\xe5\xe4\xed\xff\xe3\xe0 \xf1\xea\xe0\xe7\xe0\xeb: \"\xdf \xe1\xfb \xed\xe0\xe3\xf0\xe0\xe4\xe8\xeb "
-                        "\xe2\xe0\xf1 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xec, \xed\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 "
-                        "\xe4\xeb\xff \xed\xe5\xe3\xee \xec\xe5\xf1\xf2\xe0.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.12821ba5d6cffff7"),
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -979,39 +823,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xca\xe0\xef\xe8\xf2\xe0\xed "
-                        "\xe2\xe7\xe4\xfb\xf5\xe0\xe5\xf2. \"\xd7\xf2\xee, \xe4\xe5\xed\xfc\xe6\xe0\xf2 \xed\xe5 "
-                        "\xf5\xe2\xe0\xf2\xe0\xe5\xf2, \xe4\xe0? \xd2\xfb \xe6\xe5 \xed\xe5 \xe4\xf3\xec\xe0\xe5\xf8\xfc,"
-                        " \xe1\xf3\xe4\xf2\xee \xff \xee\xf2\xe4\xe0\xec \xf2\xe5\xe1\xe5 \xf1\xe2\xee\xe8 \xea\xe0\xf0\xf2\xfb "
-                        "\xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.e81b091ba4b1417f"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xc1\xfb\xe2\xf8\xe8\xe9 "
-                        "\xea\xe0\xef\xe8\xf2\xe0\xed, \xe6\xe8\xe2\xf3\xf9\xe8\xe9 \xed\xe0 \xfd\xf2\xee\xec \xef\xee\xe4\xed\xee\xe2\xeb\xe5\xed\xed\xee\xec "
-                        "\xf0\xfb\xe1\xee\xeb\xee\xe2\xed\xee\xec \xef\xf0\xe8\xf7\xe0\xeb\xe5, \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe2\xe0\xec \xea\xe0\xf0\xf2\xfb, \xf1\xee\xf1\xf2\xe0\xe2\xeb\xe5\xed\xed\xfb\xe5 \xe2 "
-                        "\xef\xf0\xe5\xe6\xed\xe8\xe5 \xe4\xed\xe8, \xe7\xe0 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xe8\xf5 \xea\xf3\xef\xe8\xf2\xfc?",
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.19dbe84af3193778"),
+                    NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= MAGELLAN_MAP_COST;
@@ -1026,42 +845,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->m_secondarySkills[cell->m_objectMetadata] != HERO_SKILL_LEVEL_NONE) {
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
-                        "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
-                        "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
-                        "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
-                        "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
-                        "\xe8 \xec\xee\xeb\xe2\xe8\xeb\xe0: \"\xc2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xf2\xee,"
-                        " \xf7\xe5\xec\xf3 \xff \xec\xee\xe3\xeb\xe0 \xe1\xfb \xed\xe0\xf3\xf7\xe8\xf2\xfc. \xc1\xee\xeb\xfc\xf8\xe5 "
-                        "\xed\xe8\xf7\xe5\xec \xef\xee\xec\xee\xf7\xfc \xed\xe5 \xf1\xec\xee\xe3\xf3.\"",
+                    localization::Tr("event.inline.68e1e92f9a9d12d5"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
-                        "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
-                        "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
-                        "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
-                        "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
-                        "\xe8 \xed\xe0\xf1\xf2\xe0\xe2\xe8\xeb\xe0 \xed\xe0 \xe2\xe0\xf1 \xf1\xe2\xee\xe9 \xf1\xf2\xe5\xea\xeb\xff\xed\xed\xfb\xe9 "
-                        "\xe3\xeb\xe0\xe7. \"\xd2\xfb \xf3\xe6\xe5 \xe8 \xf2\xe0\xea \xe7\xed\xe0\xe5\xf8\xfc \xe2\xf1\xe5,"
-                        " \xf7\xe5\xe3\xee \xe7\xe0\xf1\xeb\xf3\xe6\xe8\xe2\xe0\xe5\xf8\xfc!\" - \xe7\xe0\xe2\xee\xef\xe8\xeb\xe0 "
-                        "\xe2\xe5\xe4\xfc\xec\xe0. \"- \xc0 \xf2\xe5\xef\xe5\xf0\xfc \xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff "
-                        "\xe8\xe7 \xec\xee\xe5\xe3\xee \xe4\xee\xec\xe0!\"",
+                    localization::Tr("event.inline.8432c04b1a757522"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xc4\xf0\xff\xf5\xeb\xe0\xff, \xed\xee "
-                        "\xe1\xe5\xf1\xf1\xec\xe5\xf0\xf2\xed\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0, \xe6\xe8\xe2\xf3\xf9\xe0\xff "
-                        "\xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5 \xed\xe0 \xea\xf3\xf0\xfc\xe8\xf5 \xed\xee\xe6\xea\xe0\xf5,"
-                        " \xef\xee \xea\xe0\xea\xe8\xec-\xf2\xee \xed\xe5\xef\xee\xed\xff\xf2\xed\xfb\xec \xf1\xee\xee\xe1\xf0\xe0\xe6\xe5\xed\xe8\xff\xec "
-                        "\xf0\xe5\xf8\xe8\xeb\xe0, \xf7\xf2\xee %s \xe2\xe0\xec \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff.",
+                    localization::Tr("event.inline.4f16d62af9eceb3d"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 EventWindow(
@@ -1084,59 +883,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xdd\xf2\xee\xf2 "
-                        "\xf0\xee\xe4\xed\xe8\xea \xe2\xee\xf1\xef\xee\xeb\xed\xff\xe5\xf2\xf1\xff \xf0\xe0\xe7 \xe2 "
-                        "\xed\xe5\xe4\xe5\xeb\xfe, \xe0 \xea\xf2\xee-\xf2\xee \xf3\xe6\xe5 \xef\xf0\xe8\xea\xeb\xe0\xe4\xfb\xe2\xe0\xeb\xf1\xff "
-                        "\xea \xed\xe5\xec\xf3 \xed\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.87ca55017c24c23b"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints_j =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xe4\xe2\xee\xe5 \xef\xee\xe2\xfb\xf8\xe0\xe5\xf2 "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, "
-                            "\xed\xee \xe2\xfb \xf3\xe6\xe5 \xef\xf0\xe8\xe1\xfb\xe2\xe0\xe5\xf2\xe5 \xe2 \xef\xee\xe4\xee\xe1\xed\xee\xec "
-                            "\xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.ee47b77e069dbc64"),
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xf3 "
-                            "\xea\xf0\xee\xe2\xfc \xec\xe0\xe3\xe8\xe5\xe9! \xd2\xe5\xef\xe5\xf0\xfc \xf3 \xe2\xe0\xf1 "
-                            "\xe2 \xe7\xe0\xef\xe0\xf1\xe5 \xe2\xe4\xe2\xee\xe5 \xe1\xee\xeb\xfc\xf8\xe5 \xee\xe1\xfb\xf7\xed\xee\xe3\xee "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9 \xfd\xed\xe5\xf0\xe3\xe8\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.db769672add76670"),
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_spellPoints = springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 }
@@ -1146,54 +909,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if ((H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_MAGIC_WELL)))) {
                 NormalDialog(
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
-                        "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xf2\xee\xf0\xee\xe9 \xe3\xeb\xee\xf2\xee\xea \xe8\xe7 "
-                        "\xea\xee\xeb\xee\xe4\xf6\xe0 \xe7\xe0 \xe4\xe5\xed\xfc \xe2\xe0\xec \xed\xe5 \xef\xee\xec\xee\xe6\xe5\xf2.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.6e512f3b213f3c96"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints_o =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2 "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 "
-                            "\xee\xed\xe0 \xf3 \xe2\xe0\xf1 \xe8 \xf2\xe0\xea \xed\xe0 \xef\xf0\xe5\xe4\xe5\xeb\xe5.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.fa57992068d990d5"),
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xe2\xee\xf1\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.0ec7b47d176de1a3"),
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero2->m_eventFlags) | H2EnumIndex(HERO_EVENT_MAGIC_WELL)
@@ -1204,7 +935,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_COAST:
-            if ((H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+            if (eventHero2->IsEmbarked()) {
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) & ~H2EnumIndex(HERO_EVENT_EMBARKED)
                 );
@@ -1230,7 +961,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL,
                     NULL
                 );
-                WaitEndSample(&playedSample3, -1);
+                WaitEndSample(&playedSample3);
                 CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
@@ -1366,10 +1097,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
                 sprintf(
                     gText,
-                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
-                        " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe7\xe0\xf0\xfb\xf2\xfb\xe9 "
-                        "\xeb\xe0\xf0\xe5\xf6, \xe0 \xe2 \xed\xe5\xec - \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 "
-                        "'%s'",
+                    localization::Tr("event.inline.5ad75e9e7fadd1a6"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
@@ -1387,20 +1115,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGold:
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
-                        " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
-                        "\xeb\xe0\xf0\xe5\xf6. \xc7\xee\xeb\xee\xf2\xee \xec\xee\xe6\xed\xee \xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc "
-                        "\xf1\xe5\xe1\xe5 \xe8\xeb\xe8 \xf0\xe0\xe7\xe4\xe0\xf2\xfc \xea\xf0\xe5\xf1\xf2\xfc\xff\xed\xe0\xec "
-                        "\xe2 \xee\xe1\xec\xe5\xed \xed\xe0 \xee\xef\xfb\xf2. \xce\xf1\xf2\xe0\xe2\xe8\xf2\xe5 \xf1\xe5\xe1\xe5 "
-                        "\xe7\xee\xeb\xee\xf2\xee?",
+                    localization::Tr("event.inline.f28640c80e1c5d9c"),
                     H2EnumIndex(RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     NORMAL_DIALOG_EXPERIENCE,
@@ -1494,12 +1216,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
-                        " \xc3\xee\xe2\xee\xf0\xff\xf2, \xee\xed \xef\xf0\xe8\xed\xee\xf1\xe8\xf2 \xf3\xe4\xe0\xf7\xf3 "
-                        "\xf2\xe5\xec, \xea\xf2\xee \xe5\xe3\xee \xed\xe0\xe2\xe5\xf9\xe0\xe5\xf2, \xed\xee \xef\xee\xf1\xea\xee\xeb\xfc\xea\xf3 "
-                        "\xe7\xe2\xe5\xe7\xe4\xfb \xe8 \xf2\xe0\xea \xef\xee\xea\xf0\xee\xe2\xe8\xf2\xe5\xeb\xfc\xf1\xf2\xe2\xf3\xfe\xf2 "
-                        "\xe2\xe0\xec, \xe8\xe4\xee\xeb \xed\xe8\xf7\xe5\xe3\xee \xed\xee\xe2\xee\xe3\xee \xe2\xe0\xec "
-                        "\xed\xe5 \xe4\xe0\xeb.",
+                    localization::Tr("event.inline.37291a931defe30b"),
                     -1,
                     0,
                     -1,
@@ -1515,11 +1232,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
-                        " \xc3\xee\xe2\xee\xf0\xff\xf2, \xe5\xf1\xeb\xe8 \xe5\xe3\xee \xef\xee\xf6\xe5\xeb\xee\xe2\xe0\xf2\xfc,"
-                        " \xfd\xf2\xee \xef\xf0\xe8\xed\xe5\xf1\xe5\xf2 \xf3\xe4\xe0\xf7\xf3 - \xe2\xfb \xf2\xe0\xea "
-                        "\xe8 \xef\xee\xf1\xf2\xf3\xef\xe8\xeb\xe8. \xca\xe0\xec\xe5\xed\xfc \xee\xea\xe0\xe7\xe0\xeb\xf1\xff "
-                        "\xee\xf7\xe5\xed\xfc \xf5\xee\xeb\xee\xe4\xe5\xed \xe4\xeb\xff \xe3\xf3\xe1.",
+                    localization::Tr("event.inline.c47e37b66bb1b531"),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1565,10 +1278,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc2\xfb\xef\xe8\xe2\xea\xe0 \xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2,"
-                        " \xed\xee \xe8\xed\xfb\xf5 \xe1\xeb\xe0\xe3 \xed\xe5 \xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xc8\xf1\xf2\xee\xf7\xed\xe8\xea "
-                        "\xf1\xed\xee\xe2\xe0 \xef\xee\xec\xee\xe6\xe5\xf2 \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
+                    localization::Tr("event.inline.96fabc1a4bb74b61"),
                     -1,
                     0,
                     -1,
@@ -1586,10 +1296,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc4\xee\xe1\xf0\xfb\xe9 \xe3\xeb\xee\xf2\xee\xea "
-                        "\xe8\xf1\xef\xee\xeb\xed\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xee\xe9\xf1\xea\xe0 \xf1\xe8\xeb\xfb "
-                        "\xe8 \xef\xee\xe4\xed\xff\xeb \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 "
-                        "\xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe4\xe0\xeb\xfc\xf8\xe5.",
+                    localization::Tr("event.inline.d665709349b9262f"),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1604,11 +1311,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xeb\xe0\xe3\xe8 \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
-                        "\xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2, \xed\xee \xe8\xed\xee\xe9 \xef\xee\xeb\xfc\xe7\xfb \xed\xe5 "
-                        "\xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xdd\xf2\xee\xf2 \xee\xe0\xe7\xe8\xf1, \xe2\xee\xe7\xec\xee\xe6\xed\xee,"
-                        " \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
+                    localization::Tr("event.inline.5bee846fe950642e"),
                     -1,
                     0,
                     -1,
@@ -1626,10 +1329,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xee\xe4\xfb \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
-                        "\xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2 \xf1\xe8\xeb\xee\xe9 "
-                        "\xe8 \xef\xee\xe4\xed\xe8\xec\xe0\xe5\xf2 \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb "
-                        "\xf1\xec\xee\xe6\xe5\xf2\xe5 \xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe1\xee\xeb\xfc\xf8\xe5.",
+                    localization::Tr("event.inline.4a92b05b80d8fdb1"),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1642,18 +1342,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_TEMPLE:
             if ((H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
                 NormalDialog(
-                    "{\xd5\xf0\xe0\xec}\n\n\xc4\xe2\xee\xe9\xed\xe0\xff \xec\xee\xeb\xe8\xf2\xe2\xe0 \xe2\xee\xe9\xed\xe5 "
-                        "\xed\xe5 \xef\xee\xe4\xf1\xef\xee\xf0\xfc\xe5. \xc7\xe0\xf5\xee\xe4\xe8\xf2\xe5 \xef\xee\xf1\xeb\xe5 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.9824059f04898b92"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1662,8 +1352,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
-                    "{\xd5\xf0\xe0\xec}\n\n\xcf\xee\xf1\xe5\xf9\xe5\xed\xe8\xe5 \xf5\xf0\xe0\xec\xe0 \xe8 \xec\xee\xeb\xe8\xf2\xe2\xe0 "
-                        "\xef\xee\xe4\xed\xff\xeb\xe8 \xec\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe9\xf1\xea.",
+                    localization::Tr("event.inline.229894cb0c595023"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1680,26 +1369,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xdd\xf2\xee \xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe5 \xe4\xe0\xe2\xed\xee "
-                        "\xe1\xf0\xee\xf8\xe5\xed\xee. \xcd\xe8\xf7\xe5\xe3\xee \xf6\xe5\xed\xed\xee\xe3\xee \xf2\xf3\xf2 "
-                        "\xed\xe5\xf2.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.74555e8e4156f4be"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 "
-                        "\xed\xe0\xe2\xe5\xf1. \xcf\xee\xe8\xf1\xea\xe0\xe2 \xe2\xee\xea\xf0\xf3\xe3, \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 "
-                        "\xea\xee\xe5-\xea\xe0\xea\xe8\xe5 \xf0\xe5\xf1\xf3\xf0\xf1\xfb, \xef\xf0\xe8\xef\xf0\xff\xf2\xe0\xed\xed\xfb\xe5 "
-                        "\xef\xee\xe1\xeb\xe8\xe7\xee\xf1\xf2\xe8.",
+                    localization::Tr("event.inline.c451cfe18d2f7330"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1727,11 +1403,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xea\xf2\xee-\xf2\xee \xed\xe0\xf8\xe5\xeb \xe5\xe5 "
-                        "\xe4\xee \xe2\xe0\xf1, \xef\xee\xe2\xee\xe7\xea\xe0 \xef\xf3\xf1\xf2\xe0.",
+                    localization::Tr("event.inline.640141be28ff3fd6"),
                     -1,
                     0,
                     -1,
@@ -1748,10 +1420,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xc2 \xed\xe5\xe9 \xe2\xfb \xed\xe0\xf8\xeb\xe8 %s.",
+                    localization::Tr("event.inline.b7b134ab6de2bf9c"),
                     gArtifactNames[eventValue1]
                 );
                 EventWindow(
@@ -1764,18 +1433,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                 cell->m_objectMetadata = 0;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xc2 \xed\xe5\xe9 \xe6\xe5 \xe2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xee \xf1\xe8\xf5 \xef\xee\xf0 "
-                        "\xed\xe5 \xf2\xf0\xee\xed\xf3\xf2\xfb\xe9 \xe3\xf0\xf3\xe7.",
+                    localization::Tr("event.inline.cb89443bb85658f3"),
                     (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
                     -1,
@@ -1813,7 +1478,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sprintf(
                             gText,
                             "%s.",
-                            "\xd1\xee\xea\xf0\xee\xe2\xe8\xf9\xe5"
+                            localization::Tr("common.treasure")
                         );
                         EventWindow(
                             -1,
@@ -1834,7 +1499,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
                         );
-                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1885,20 +1550,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xd3\xe7\xed\xe0\xe2 \xe2\xe0\xf1, \xeb\xe0\xea\xe5\xe9 "
-                        "\xee\xf2\xea\xe0\xe7\xe0\xeb\xf1\xff \xef\xf3\xf1\xf2\xe8\xf2\xfc \xe2\xed\xf3\xf2\xf0\xfc."
-                        " \"\xcd\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea,\" - \xf1\xea\xe0\xe7\xe0\xeb \xee\xed, - \"\xed\xe5 "
-                        "\xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xee\xe4\xed\xee\xe3\xee \xe8 \xf2\xee\xe3\xee \xe6\xe5 "
-                        "\xf1\xf2\xf3\xe4\xe5\xed\xf2\xe0 \xe4\xe2\xe0\xe6\xe4\xfb.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.da378498c0963c83"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 if (eventHero2->m_level
@@ -1907,20 +1560,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     >= XANADU_ADMISSION_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xe4\xee\xef\xf3\xf1\xf2\xe8\xeb "
-                            "\xe2\xe0\xf1 \xe4\xee \xe0\xf3\xe4\xe8\xe5\xed\xf6\xe8\xe8 \xf1 \xf5\xee\xe7\xff\xe8\xed\xee\xec "
-                            "\xe4\xee\xec\xe0. \xc7\xe0\xed\xff\xf2\xe8\xff \xf1 \xed\xe8\xec \xef\xee\xe2\xfb\xf1\xe8\xeb\xe8 "
-                            "\xf7\xe5\xf2\xfb\xf0\xe5 \xf3\xec\xe5\xed\xe8\xff, \xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xe5 "
-                            "\xea\xe0\xe6\xe4\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.6e67be895f4b2e0b"),
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_ATTACK)]++;
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_DEFENSE)]++;
@@ -1929,22 +1570,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
                 } else {
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xee\xf2\xea\xf0\xfb\xeb \xe4\xe2\xe5\xf0\xfc "
-                            "\xe8 \xee\xe3\xeb\xff\xe4\xe5\xeb \xe2\xe0\xf1 \xf1 \xed\xee\xe3 \xe4\xee \xe3\xee\xeb\xee\xe2\xfb."
-                            " \"\xc2\xfb \xed\xe5 \xf2\xe0\xea \xe7\xed\xe0\xec\xe5\xed\xe8\xf2\xfb \xe8 \xed\xe5 \xf2\xe0\xea\xee\xe9 "
-                            "\xf3\xe6 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2, \xf7\xf2\xee\xe1\xfb \xec\xee\xe9 \xf5\xee\xe7\xff\xe8\xed "
-                            "\xef\xf0\xe8\xed\xff\xeb \xe2\xe0\xf1,\" - \xf4\xfb\xf0\xea\xed\xf3\xeb \xee\xed. - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf2\xe5\xf1\xfc,"
-                            " \xea\xee\xe3\xe4\xe0 \xf1\xee\xf7\xf2\xe5\xf2\xe5 \xf1\xe5\xe1\xff \xe4\xee\xf1\xf2\xee\xe9\xed\xfb\xec."
-                            "\"",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.cfee7ef6dc2dfe29"),
+                        NORMAL_DIALOG_INFO
                     );
                 }
             }
@@ -1953,26 +1580,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FORT:
             if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd4\xee\xf0\xf2}\n\n \"\xcf\xf0\xee\xf1\xe8\xf2\xe5, \xf1\xfd\xf0,\" - \xd1\xea\xe0\xe7\xe0\xeb "
-                        "\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xfc \xe2\xee\xe8\xed\xee\xe2, - \"\xed\xee "
-                        "\xe2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xe2\xf1\xe5, \xf7\xe5\xec\xf3 \xec\xfb \xf1\xef\xee\xf1\xee\xe1\xed\xfb "
-                        "\xed\xe0\xf3\xf7\xe8\xf2\xfc.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.41d63febc86c9f57"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xd4\xee\xf0\xf2}\n\n \xc2\xee\xe8\xed\xfb, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 \xe2 \xfd\xf2\xee\xec "
-                        "\xf4\xee\xf0\xf2\xe5, \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xef\xe0\xf0\xe5 \xed\xee\xe2\xfb\xf5 "
-                        "\xe7\xe0\xf9\xe8\xf2\xed\xfb\xf5 \xef\xf0\xe8\xe5\xec\xee\xe2.",
+                    localization::Tr("event.inline.2ba84ac8f84d579f"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1991,31 +1605,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_STANDING_STONES:
             if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
-                        "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
-                        "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
-                        "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xc4\xf0\xf3\xe8\xe4\xfb, \xed\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff "
-                        "\xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff, \xef\xee\xea\xe0\xe7\xe0\xeb\xe8 \xe6\xe5\xf1\xf2\xe0\xec\xe8,"
-                        " \xf7\xf2\xee \xe8\xec \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe5\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xf3\xf7\xe8\xf2\xfc.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.abd64140cf81cf64"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
-                        "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
-                        "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
-                        "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xcd\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff \xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff,"
-                        " \xee\xed\xe8 \xe2\xf1\xe5 \xe6\xe5 \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xed\xee\xe2\xfb\xec "
-                        "\xf1\xef\xee\xf1\xee\xe1\xe0\xec \xea\xee\xeb\xe4\xee\xe2\xf1\xf2\xe2\xe0.",
+                    localization::Tr("event.inline.21050646fbb7b09b"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2034,29 +1630,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\"\xd3\xe1\xe8\xf0\xe0\xe9\xf1\xff!"
-                        "\" -  \xf0\xff\xe2\xea\xed\xf3\xeb\xe0 \xe2\xe5\xe4\xfc\xec\xe0, \"\xf2\xfb \xe7\xed\xe0\xe5\xf8\xfc "
-                        "\xe2\xf1\xe5, \xf7\xf2\xee \xe7\xed\xe0\xfe \xff.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.adb07f262cb5a288"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xce\xf0\xf7\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0,"
-                        " \xe6\xe8\xe2\xf3\xf9\xe0\xff \xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5, \xee\xe1\xee\xe3\xe0\xf2\xe8\xeb\xe0 "
-                        "\xe2\xe0\xf8\xe8 \xef\xee\xe7\xed\xe0\xed\xe8\xff \xe2 \xec\xe0\xe3\xe8\xe8, \xef\xee\xea\xe0\xe7\xe0\xe2,"
-                        " \xea\xe0\xea \xe3\xe0\xe4\xe0\xf2\xfc \xed\xe0 \xea\xe0\xec\xed\xff\xf5, \xf7\xe8\xf2\xe0\xf2\xfc "
-                        "\xe7\xed\xe0\xec\xe5\xed\xe8\xff \xe8 \xe8\xe7\xe2\xeb\xe5\xea\xe0\xf2\xfc \xf1\xf3\xf9\xed\xee\xf1\xf2\xfc "
-                        "\xe1\xfb\xf2\xe8\xff \xe8\xe7 \xf1\xeb\xee\xe6\xed\xee\xe3\xee \xef\xe5\xf0\xe5\xef\xeb\xe5\xf2\xe5\xed\xe8\xff "
-                        "\xf6\xfb\xef\xeb\xff\xf7\xfc\xe8\xf5 \xef\xee\xf2\xf0\xee\xf5\xee\xe2.",
+                    localization::Tr("event.inline.d0681d4d11aa03cd"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2075,32 +1655,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MERCENARY_CAMP:
             if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
-                        "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xe3\xe4\xe5 \xe2\xee\xe8\xed\xfb "
-                        "\xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf2 \xf2\xe0\xea\xf2\xe8\xea\xf3. \"\xc4\xeb\xff "
-                        "\xed\xe0\xf1 \xe2\xfb \xf1\xeb\xe8\xf8\xea\xee\xec \xf3\xec\xe5\xeb\xfb\xe9 \xe1\xee\xe5\xf6,"
-                        "\" -\xf1\xea\xe0\xe7\xe0\xeb \xea\xe0\xef\xe8\xf2\xe0\xed \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2."
-                        " - \"\xc1\xee\xeb\xfc\xf8\xe5 \xec\xfb \xed\xe8\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xed\xe0\xf3\xf7\xe8\xf2\xfc "
-                        "\xed\xe5 \xec\xee\xe6\xe5\xec.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.66fa174294ad02d5"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
-                        "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf9\xe8\xf5 "
-                        "\xf1\xe2\xee\xfe \xf2\xe0\xea\xf2\xe8\xea\xf3. \xcd\xe0\xe5\xec\xed\xe8\xea\xe8 \xef\xee\xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xee\xe2\xe0\xeb\xe8 "
-                        "\xe2\xe0\xf1 \xe8 \xef\xf0\xe8\xe3\xeb\xe0\xf1\xe8\xeb\xe8 \xe2\xec\xe5\xf1\xf2\xe5 \xf1 "
-                        "\xe2\xe0\xf8\xe8\xec \xee\xf2\xf0\xff\xe4\xee\xec \xef\xee\xe7\xe0\xed\xe8\xec\xe0\xf2\xfc\xf1\xff "
-                        "\xe2\xec\xe5\xf1\xf2\xe5 \xf1 \xed\xe8\xec\xe8.",
+                    localization::Tr("event.inline.412b3e9f25bdd6fb"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2184,7 +1745,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[H2EnumIndex(resourceType_a)]);
-            sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+            sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
@@ -2255,11 +1816,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe9 "
-                        "\xe3\xee\xf0\xee\xe4 \xf4\xe5\xe9. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8 \xee\xe4\xed\xe0 "
-                        "\xf4\xe5\xff \xed\xe5 \xe7\xe0\xf5\xee\xf2\xe5\xeb\xe0 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc \xed\xe0 "
-                        "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xee\xed\xe8 \xef\xe5\xf0\xe5\xe4\xf3\xec\xe0\xfe\xf2.",
+                    localization::Tr("event.inline.b586887c923c2b52"),
                     -1,
                     0,
                     -1,
@@ -2271,11 +1828,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xcd\xe5\xea\xee\xf2\xee\xf0\xfb\xe5 \xf4\xe5\xe8 "
-                        "\xe8\xe7 \xfd\xf2\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0 \xed\xe0 \xe4\xe5\xf0\xe5\xe2\xfc\xff\xf5 "
-                        "\xe6\xe5\xeb\xe0\xfe\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe "
-                        "\xe7\xe0 \xed\xe5\xea\xee\xf2\xee\xf0\xee\xe5 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xf4\xe5\xe9?",
+                    localization::Tr("event.inline.b74e2c6dcdfc9414"),
                     -1,
                     0,
                     -1,
@@ -2292,11 +1845,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb,"
-                    " \xed\xee \xf3\xe1\xe5\xe4\xe8\xeb\xe8\xf1\xfc \xeb\xe8\xf8\xfc, \xf7\xf2\xee \xe6\xe8\xe2\xf8\xe8\xe5 "
-                    "\xf2\xf3\xf2 \xec\xe5\xe4\xf3\xe7\xfb \xf3\xf8\xeb\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
-                    "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xed\xe5\xe4\xe5\xeb\xe5.",
+                    localization::Tr("event.inline.9cf24d321bfa6701"),
                     -1,
                     0,
                     -1,
@@ -2308,11 +1857,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
-                    "\xe8 \xed\xe0\xf8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xe8\xf5 \xec\xe5\xe4\xf3\xe7,"
-                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xf2\xf3\xf2. \xce\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
-                    "\xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xec\xe5\xe4\xf3\xe7?",
+                    localization::Tr("event.inline.1836ce3164cbf13b"),
                     -1,
                     0,
                     -1,
@@ -2329,11 +1874,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xee\xe4\xe8\xed "
-                    "\xe8\xe7 \xf2\xe5\xf5 \xec\xee\xf1\xf2\xee\xe2, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec\xe8 "
-                    "\xf2\xe0\xea \xeb\xfe\xe1\xff\xf2 \xf1\xe5\xeb\xe8\xf2\xfc\xf1\xff \xf2\xf0\xee\xeb\xeb\xe8,"
-                    " \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf2\xf3\xf2 \xed\xe8\xea\xee\xe3\xee \xed\xe5\xf2. \xcc\xee\xe6\xe5\xf2,"
-                        " \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xef\xee\xff\xe2\xff\xf2\xf1\xff.",
+                    localization::Tr("event.inline.6674f02fddf78450"),
                     -1,
                     0,
                     -1,
@@ -2344,9 +1885,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xd2\xf0\xee\xeb\xeb\xe8, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 "
-                    "\xef\xee\xe4 \xfd\xf2\xe8\xec \xec\xee\xf1\xf2\xee\xec \xe1\xf0\xee\xf1\xe0\xfe\xf2 \xe2\xe0\xec "
-                        "\xe2\xfb\xe7\xee\xe2. \xd1\xf0\xe0\xe7\xe8\xf2\xe5\xf1\xfc \xf1 \xed\xe8\xec\xe8?",
+                    localization::Tr("event.inline.e7cd159b9a0d9237"),
                     -1,
                     0,
                     -1,
@@ -2378,12 +1917,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xce\xf1\xf2\xe0\xeb\xee\xf1\xfc \xeb\xe8\xf8\xfc "
-                        "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf2\xf0\xee\xeb\xeb\xe5\xe9, \xe2 \xf1\xf2\xf0\xe0\xf5\xe5 "
-                        "\xe7\xe0\xe1\xe8\xe2\xf8\xe8\xf5\xf1\xff \xef\xee\xe4 \xec\xee\xf1\xf2. \xce\xf1\xec\xe5\xeb\xe5\xe2,"
-                        " \xee\xed\xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 \xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 "
-                        "\xe2 \xea\xe0\xf7\xe5\xf1\xf2\xe2\xe5 \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                            "\xed\xe0\xed\xff\xf2\xfc \xf2\xf0\xee\xeb\xeb\xe5\xe9?",
+                        localization::Tr("event.inline.ead7ae60b21cca0c"),
                         -1,
                         0,
                         -1,
@@ -2399,11 +1933,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xf2\xf0\xee\xeb\xeb\xe5\xe9,"
-                    " \xe6\xe8\xe2\xf3\xf9\xe8\xf5 \xef\xee\xe4 \xec\xee\xf1\xf2\xee\xec, \xe6\xe5\xeb\xe0\xe5\xf2 "
-                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8,"
-                    " \xed\xee \xe7\xe0 \xef\xeb\xe0\xf2\xf3.  \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc "
-                        "\xf2\xf0\xee\xeb\xeb\xe5\xe9?",
+                    localization::Tr("event.inline.fd6fbeb8bebaabb7"),
                     -1,
                     0,
                     -1,
@@ -2422,11 +1952,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2 \xfd\xf2\xee\xec \xe3\xee\xf0\xee\xe4\xe5 "
-                    "\xec\xe5\xf0\xf2\xe2\xe5\xf6\xee\xe2 \xe6\xe8\xe7\xed\xe8 \xed\xe5 \xed\xe0\xe1\xeb\xfe\xe4\xe0\xe5\xf2\xf1\xff,"
-                    " \xed\xe5\xe6\xe8\xf2\xe8 \xf2\xee\xe6\xe5. \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                    "\xed\xe5\xe4\xe5\xeb\xe5 \xea\xf2\xee-\xf2\xee \xe8\xe7 \xed\xe5\xe6\xe8\xf2\xe8 \xe7\xe0\xe1\xf0\xe5\xe4\xe5\xf2 "
-                        "\xf1\xfe\xe4\xe0.",
+                    localization::Tr("event.inline.59f3f5aaa52a791b"),
                     -1,
                     0,
                     -1,
@@ -2437,10 +1963,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
-                    "\xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe3\xee\xf0\xee\xe4\xe0, \xed\xfb\xed\xe5 \xed\xe0\xf1\xe5\xeb\xe5\xed\xed\xee\xe3\xee "
-                    "\xeb\xe8\xf8\xfc \xed\xe5\xe6\xe8\xf2\xfc\xfe. \xce\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc "
-                        "\xe3\xee\xf0\xee\xe4?",
+                    localization::Tr("event.inline.95f1f95998dc4804"),
                     -1,
                     0,
                     -1,
@@ -2472,11 +1995,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xd3\xf6\xe5\xeb\xe5\xe2\xf8\xe8\xe5 "
-                    "\xeb\xe8\xf7\xe8 \xef\xf0\xee\xed\xe8\xea\xeb\xe8\xf1\xfc \xe2\xe0\xf8\xe5\xe9 \xef\xee\xe1\xe5\xe4\xee\xe9 "
-                    "\xed\xe0\xe4 \xe8\xf5 \xf1\xee\xe1\xf0\xe0\xf2\xfc\xff\xec\xe8 \xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 "
-                    "\xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xed\xe0\xed\xff\xf2\xfc \xeb\xe8\xf7\xe5\xe9?",
+                    localization::Tr("event.inline.c9a9da0253003e88"),
                     -1,
                     0,
                     -1,
@@ -2493,10 +2012,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xeb\xe8\xf7\xe5\xe9,"
-                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xe7\xe4\xe5\xf1\xfc, \xe6\xe5\xeb\xe0\xe5\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
-                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xcd\xe0\xed\xff\xf2\xfc "
-                        "\xeb\xe8\xf7\xe5\xe9?",
+                    localization::Tr("event.inline.280d4b94ba469861"),
                     -1,
                     0,
                     -1,
@@ -2515,10 +2031,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcd\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
-                    "\xe2 \xe3\xee\xf0\xee\xe4\xe5 \xed\xe5\xf2 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xe6\xe5\xeb\xe0\xfe\xf9\xe8\xf5 "
-                    "\xef\xf0\xe8\xec\xea\xed\xf3\xf2\xfc \xea \xe2\xe0\xec. \xcd\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xed\xe5\xe4\xe5\xeb\xe5, \xe2\xee\xe7\xec\xee\xe6\xed\xee, \xea\xf2\xee-\xf2\xee \xef\xee\xff\xe2\xe8\xf2\xf1\xff.",
+                    localization::Tr("event.inline.20d6ea6df7166f59"),
                     -1,
                     0,
                     -1,
@@ -2529,12 +2042,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xf1\xf2\xee\xe8\xf2\xe5 "
-                    "\xef\xf0\xe5\xe4 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec \xe3\xee\xf0\xee\xe4\xee\xec, \xec\xe5\xf1\xf2\xee\xec,"
-                    " \xe7\xe0\xef\xf0\xe5\xf2\xed\xfb\xec \xe4\xeb\xff \xef\xf0\xee\xf1\xf2\xfb\xf5 \xf1\xec\xe5\xf0\xf2\xed\xfb\xf5."
-                    " \xd1\xee\xe1\xeb\xe0\xe3\xee\xe2\xee\xeb\xe8\xf2\xe5 \xeb\xe8 \xe2\xfb \xed\xe0\xf0\xf3\xf8\xe8\xf2\xfc "
-                    "\xfd\xf2\xee \xef\xf0\xe0\xe2\xe8\xeb\xee \xe8 \xe1\xf0\xee\xf1\xe8\xf2\xfc \xe2\xfb\xe7\xee\xe2 "
-                        "\xe4\xf0\xe0\xea\xee\xed\xe0\xec?",
+                    localization::Tr("event.inline.78bd160e3f266ea6"),
                     -1,
                     0,
                     -1,
@@ -2573,12 +2081,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcf\xee\xf1\xeb\xe5 \xe2\xe0\xf8\xe5\xe9 "
-                    "\xef\xee\xe1\xe5\xe4\xfb \xed\xe0\xe4 \xeb\xf3\xf7\xf8\xe8\xec\xe8 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec\xe8 "
-                    "\xe2\xee\xe8\xed\xe0\xec\xe8 \xee\xf2\xf6\xfb \xe3\xee\xf0\xee\xe4\xe0 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                    "\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xef\xf0\xe5\xe4\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
-                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
+                    localization::Tr("event.inline.5ae328bcb860b385"),
                     -1,
                     0,
                     -1,
@@ -2595,10 +2098,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 "
-                    "\xe3\xee\xf0\xee\xe4 \xe3\xee\xf2\xee\xe2 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
-                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xed\xe5 \xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
+                    localization::Tr("event.inline.d4b1f646aae1de64"),
                     -1,
                     0,
                     -1,
@@ -2725,21 +2225,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                  & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
                 != 0) {
                 NormalDialog(
-                    "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                    "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                    "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec.  \"\xd0\xe0\xe4 \xe2\xe8\xe4\xe5\xf2\xfc "
-                    "\xf2\xe5\xe1\xff, \xec\xee\xe9 \xf3\xf7\xe5\xed\xe8\xea.  \xcd\xe0\xe4\xe5\xfe\xf1\xfc, "
-                    "\xec\xee\xff \xed\xe0\xf3\xea\xe0 \xef\xee\xf8\xeb\xe0 \xf2\xe5\xe1\xe5 \xed\xe0 \xef\xee\xeb\xfc\xe7\xf3."
-                        "\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.87d5d0b84d168064"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2749,12 +2236,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
                         NormalDialog(
-                            "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                            "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                            "\xe7\xe0\xf1\xe2\xe5\xf2\xe8\xeb\xe8\xf1\xfc \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0,"
-                            " \xf1\xf2\xf0\xe0\xed\xed\xe8\xea! \xcf\xee\xe7\xe2\xee\xeb\xfc \xef\xf0\xe5\xef\xee\xe4\xe0\xf2\xfc "
-                            "\xf2\xe5\xe1\xe5 \xec\xe0\xeb\xf3\xfe \xf2\xee\xeb\xe8\xea\xf3 \xf2\xee\xe3\xee, \xf7\xf2\xee "
-                                "\xff \xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb.\"",
+                            localization::Tr("event.inline.51b8add2648e9e2f"),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -2773,14 +2255,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GOLD:
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                                "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                                "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0, \xef\xf3\xf2\xed\xe8\xea!"
-                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xed\xe0\xf3\xf7\xf3 \xf2\xe5\xe1\xff \xf5\xee\xf2\xff "
-                                "\xe1\xfb \xec\xe0\xeb\xee\xe9 \xf7\xe0\xf1\xf2\xe8 \xf2\xee\xe3\xee, \xf7\xf2\xee \xf3\xf1\xe2\xee\xe8\xeb "
-                                "\xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
-                                    ".",
+                                localization::Tr("event.inline.ce98145109683d0e"),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2799,20 +2274,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc3\xeb\xe0\xe7\xe0 \xe4\xe5\xf0\xe5\xe2\xe0 "
-                                "\xed\xe0\xef\xee\xeb\xed\xe8\xeb\xe8\xf1\xfc \xf1\xeb\xe5\xe7\xe0\xec\xe8. \"\xcc\xed\xe5 "
-                                "\xed\xf3\xe6\xed\xee 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xe2\xe7\xe4\xee\xf5) - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf1\xff, \xea\xee\xe3\xe4\xe0 "
-                                    "\xf1\xec\xee\xe6\xe5\xf8\xfc \xe2\xed\xe5\xf1\xf2\xe8 \xef\xeb\xe0\xf2\xf3.\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.924f82c98b13def7"),
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2820,12 +2283,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GEMS:
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc0, \xef\xf3\xf2\xed\xe8\xea!"
-                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xef\xf0\xe5\xef\xee\xe4\xe0\xec \xf2\xe5\xe1\xe5 "
-                                "\xf5\xee\xf2\xfc \xec\xe0\xeb\xf3\xfe \xf7\xe0\xf1\xf2\xfc \xf2\xee\xe3\xee, \xf7\xf2\xee "
-                                "\xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2."
-                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
-                                    ".",
+                                localization::Tr("event.inline.e5ffff5a51e4796f"),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2844,21 +2302,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xd1\xeb\xe5\xe7\xfb \xef\xe5\xf0\xe5\xef\xee\xeb\xed\xff\xfe\xf2 "
-                                "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0. \"\xcc\xed\xe5 \xed\xf3\xe6\xed\xee "
-                                "10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xc2\xe7\xe4\xee\xf5). \"\xd7\xf2\xee \xe6, \xef\xf0\xe8\xf5\xee\xe4\xe8,"
-                                " \xea\xee\xe3\xe4\xe0 \xf1\xec\xee\xe6\xe5\xf8\xfc \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xfc."
-                                    "\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.ee1576513fcb95bc"),
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2891,12 +2336,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
             strcpy(
                 gText,
-                "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
-                    "\xe8\xe3\xf0\xee\xea\xe0\xf5"
+                localization::Tr("event.inline.bec395b49e2bdfa9")
             );
-            oracleMessage_o.type = MESSAGE_WIDGET;
-            oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            oracleMessage_o.payload.widget.id = 0;
+            SET_WIDGET_MESSAGE(oracleMessage_o, WIDGET_COMMAND_SET_TEXT, 0);
             oracleMessage_o.payload.widget.data.text = gText;
             oracleWindow_o->BroadcastMessage(oracleMessage_o);
             gpWindowManager->DoDialog(oracleWindow_o, TrueFalseDialogHandler, 0);
@@ -2908,12 +2350,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 1-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xec\xe0\xeb\xe5\xed\xfc\xea\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
-                "\xf1\xeb\xf3\xe6\xe0\xf2 \xec\xee\xeb\xee\xe4\xfb\xe5 \xef\xee\xf1\xeb\xf3\xf8\xed\xe8\xea\xe8."
-                "  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xee\xf1\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
-                    "- ",
+                localization::Tr("event.inline.57f459c519bb0e07"),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2922,12 +2359,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 2-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xe1\xee\xe3\xe0\xf2\xee \xf0\xe0\xf1\xef\xe8\xf1\xe0\xed\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5,"
-                " \xe3\xe4\xe5 \xf1\xeb\xf3\xe6\xe0\xf2 \xef\xee\xeb\xed\xee\xef\xf0\xe0\xe2\xed\xfb\xe5 "
-                "\xe1\xf0\xe0\xf2\xfc\xff \xe2\xe5\xf0\xfb.  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 "
-                "\xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 "
-                    "\xed\xee\xe2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe - ",
+                localization::Tr("event.inline.74e932ad068a3630"),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2936,12 +2368,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 3-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xf0\xee\xf1\xea\xee\xf8\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
-                "\xf1\xeb\xf3\xe6\xe0\xf2 \xe2\xfb\xf1\xf8\xe8\xe5 \xe6\xf0\xe5\xf6\xfb.  \xc2 \xee\xe1\xec\xe5\xed "
-                "\xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xe5\xec\xf3\xe4\xf0\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
-                    "- ",
+                localization::Tr("event.inline.8e7c1487402719c9"),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
@@ -2967,18 +2394,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     strcat(
                         gText,
-                        "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5 \xf5\xe2\xe0\xf2\xe0\xe5\xf2 "
-                            "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
-                            " \xe8 \xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                        localization::Tr("event.inline.b2fd77737182a2d9")
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
                 strcat(
                     gText,
-                    "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
-                        "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
-                        "\xe2 \xed\xe5\xe5."
+                    localization::Tr("event.inline.81a2a5818237074f")
                 );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
@@ -2999,11 +2422,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             teleportCount_e = 0;
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                    if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value()
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                    if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value() == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX_e - x) + abs(teleportY_e - y)
+                        && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
                         teleportCount_e++;
@@ -3015,12 +2437,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount_e = Random(1, teleportCount_e);
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                        if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value()
+                        if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))
+                                            ->m_triggerType).value()
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
-                            && abs(teleportX_e - x) + abs(teleportY_e - y)
+                            && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
@@ -3043,17 +2466,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe4\xee\xe1\xf0\xe0\xf2\xfc \xfd\xf2\xee\xf2 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0!",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.b880ecbc34dcdb8b"),
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             }
@@ -3062,14 +2476,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 strcpy(
                     gText,
-                    "\xd1\xea\xe0\xe7\xee\xf7\xed\xfb\xe9 \xe7\xee\xeb\xee\xf2\xee\xe9 \xeb\xf3\xea \xfd\xeb\xfc\xf4\xee\xe2 "
-                    "\xef\xf0\xee\xf1\xf2\xee \xe2\xe0\xeb\xff\xe5\xf2\xf1\xff \xe7\xe4\xe5\xf1\xfc, \xe2 \xe3\xf0\xff\xe7\xe8."
-                    " \xc2\xfb \xef\xee\xe4\xee\xe1\xf0\xe0\xeb\xe8 \xe5\xe3\xee \xe8 \xee\xf2\xe2\xe5\xe7\xeb\xe8 "
-                    "\xe2 \xfd\xeb\xfc\xf4\xe8\xe9\xf1\xea\xe8\xe9 \xe3\xee\xf0\xee\xe4. \xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
-                    "\xe7\xe0 \xfd\xf2\xee\xf2 \xef\xee\xe4\xe2\xe8\xe3 \xea\xee\xf0\xee\xeb\xfc \xfd\xeb\xfc\xf4\xee\xe2 "
-                    "\xef\xee\xee\xe1\xe5\xf9\xe0\xeb \xe2\xe0\xec \xef\xee\xec\xee\xf9\xfc \xf1\xe2\xee\xe5\xe3\xee "
-                    "\xed\xe0\xf0\xee\xe4\xe0 \xe2 \xeb\xfe\xe1\xf3\xfe \xec\xe8\xed\xf3\xf2\xf3, \xea\xee\xe3\xe4\xe0 "
-                        "\xe2\xe0\xec \xfd\xf2\xee \xef\xee\xed\xe0\xe4\xee\xe1\xe8\xf2\xf1\xff."
+                    localization::Tr("event.inline.4e929a833e525afd")
                 );
                 EventWindow(
                     -1,
@@ -3110,20 +2517,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xe7\xe0\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2. \xcd\xee \xe5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 "
-                        "\xea \xed\xe5\xec\xf3, \xe8\xe7 \xea\xf3\xf1\xf2\xee\xe2 \xe2\xfb\xf1\xea\xee\xf7\xe8\xeb\xe0 "
-                        "\xf8\xe0\xe9\xea\xe0 \xf0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea\xee\xe2, \xee\xf5\xf0\xe0\xed\xff\xfe\xf9\xe8\xf5 "
-                            "\xf1\xe2\xee\xe5 \xed\xe0\xe3\xf0\xe0\xe1\xeb\xe5\xed\xed\xee\xe5 \xe4\xee\xe1\xf0\xee.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.47fbd3f75db6688a"),
+                        NORMAL_DIALOG_INFO
                     );
                     guardedCount_i = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
                     goto artifactFight;
@@ -3131,16 +2526,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     guardedCount_i = 1;
                     sprintf(
                         gText,
-                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcd\xe0 \xef\xf0\xee\xe3\xe0\xeb\xe8\xed\xe5 \xe2\xfb "
-                        "\xef\xf0\xe8\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe5\xe3\xee \xf1\xf2\xee\xf0\xee\xe6\xe8\xf2 "
-                        "\xee\xf2\xf0\xff\xe4 %s. \xcd\xe5 \xef\xf3\xe3\xe0\xe5\xf2 \xeb\xe8 \xe2\xe0\xf1 \xf1\xe8\xeb\xe0 "
-                        "%s, \xe8 \xe1\xf3\xe4\xe5\xf2\xe5 \xeb\xe8 \xe2\xfb \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff "
-                            "\xe7\xe0 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2?",
+                        localization::Tr("event.inline.580a8ff25d58cea2"),
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)],
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)]
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 artifactFight:
@@ -3165,8 +2555,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventHero2->CheckLevel();
                         sprintf(
                             gText,
-                            "\xce\xe4\xe5\xf0\xe6\xe0\xe2 \xef\xee\xe1\xe5\xe4\xf3, \xe2\xfb \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 "
-                                "\xf1\xe2\xee\xe9 \xf2\xf0\xee\xf4\xe5\xe9 - %s.",
+                            localization::Tr("event.inline.db0baf49ee252efe"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
                         NormalDialog(
@@ -3185,18 +2574,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     }
                 } else {
                     NormalDialog(
-                        "\xc3\xeb\xe0\xe2\xed\xee\xe5 \xe2 \xe4\xee\xe1\xeb\xe5\xf1\xf2\xe8 - \xe1\xeb\xe0\xe3\xee\xf0\xe0\xe7\xf3\xec\xe8\xe5,"
-                            " \xef\xee\xfd\xf2\xee\xec\xf3 \xe2\xfb \xf0\xe5\xf8\xe8\xeb\xe8 \xef\xee\xea\xe0 \xf7\xf2\xee "
-                            "\xe2\xee\xe7\xe4\xe5\xf0\xe6\xe0\xf2\xfc\xf1\xff \xee\xf2 \xfd\xf2\xee\xe9 \xe1\xe8\xf2\xe2\xfb.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.29ceb4fc2c520780"),
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 break;
@@ -3208,14 +2587,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xe5\xf2\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf3\xe1\xee\xe3\xe8\xe9 "
-                            "\xf1\xea\xe8\xf2 \xe8\xe7\xec\xee\xe6\xe4\xe5\xed\xed\xee\xe3\xee \xee\xf2\xf8\xe5\xeb\xfc\xed\xe8\xea\xe0."
-                            " \xd2\xee\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee %s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff "
-                            "\xef\xe5\xf0\xe2\xee\xec\xf3 \xe6\xe5 \xe2\xf1\xf2\xf0\xe5\xf7\xed\xee\xec\xf3 \xe2\xe5\xeb\xe8\xea\xee\xec\xf3 "
-                                "\xec\xf3\xe4\xf0\xe5\xf6\xf3.",
+                            localization::Tr("event.inline.114341b70ac61964"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
@@ -3224,14 +2599,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xe2\xe5\xf1\xf2\xe8\xeb\xe8 \xf1\xf2\xe0\xf0\xee\xe3\xee "
-                            "\xf1\xee\xeb\xe4\xe0\xf2\xe0 \xe2 \xe5\xe3\xee \xf1\xea\xf0\xee\xec\xed\xee\xec \xe6\xe8\xeb\xe8\xf9\xe5."
-                            " \xd1\xee\xeb\xe4\xe0\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee "
-                            "%s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff \xef\xe5\xf0\xe2\xee\xec\xf3 \xed\xe0\xf1\xf2\xee\xff\xf9\xe5\xec\xf3 "
-                                "\xeb\xe8\xe4\xe5\xf0\xf3, \xea\xee\xf2\xee\xf0\xee\xe3\xee \xee\xed \xe2\xf1\xf2\xf0\xe5\xf2\xe8\xf2.",
+                            localization::Tr("event.inline.85b58cafd168a4e6"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_PICKUP:
@@ -3248,7 +2619,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1
                         );
                     giveArtifact:
-                        GiveArtifact(eventHero2, artifact_g, true, -1);
+                        GiveArtifact(eventHero2, artifact_g, true);
                         eraseObject_l = 1;
                         fizzleType_k = true;
                         break;
@@ -3257,9 +2628,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                                " \xca\xf3\xef\xe8\xf2\xe5 \xe5\xe3\xee?",
+                            localization::Tr("event.inline.219ab198b8338466"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
                         EventWindow(
@@ -3280,36 +2649,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.eb595f1324302ad8"),
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.d2d604b822f6a317"),
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3317,13 +2663,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[H2EnumIndex(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
-                                "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 3 \xe5\xe4\xe8\xed\xe8\xf6\xfb. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                                "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
+                            localization::Tr("event.inline.6ab4a1f0b7bda188"),
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
                         );
@@ -3353,36 +2696,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.eb595f1324302ad8"),
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.d2d604b822f6a317"),
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3390,13 +2710,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[H2EnumIndex(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 3000 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
-                                "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 5 \xe5\xe4\xe8\xed\xe8\xf6. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                                "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
+                            localization::Tr("event.inline.d5ae03d7c7901a43"),
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
                         );
@@ -3426,36 +2743,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.eb595f1324302ad8"),
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                localization::Tr("event.inline.d2d604b822f6a317"),
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3540,11 +2834,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xcf\xe5\xf9\xe5\xf0\xe0 \xe4\xe5\xec\xee\xed\xe0}\n\n\xc2\xf5\xee\xe4 \xe2 \xef\xe5\xf9\xe5\xf0\xf3 "
-                    "\xe7\xe8\xff\xe5\xf2 \xf7\xe5\xf0\xed\xee\xe9 \xe4\xfb\xf0\xee\xe9, \xe8\xe7 \xea\xee\xf2\xee\xf0\xee\xe9 "
-                    "\xf2\xff\xed\xe5\xf2 \xf2\xee\xf8\xed\xee\xf2\xe2\xee\xf0\xed\xfb\xec \xf1\xe5\xf0\xed\xe8\xf1\xf2\xfb\xec "
-                    "\xe7\xeb\xee\xe2\xee\xed\xe8\xe5\xec. \xce\xf2\xe2\xe0\xe6\xe8\xf2\xe5\xf1\xfc \xeb\xe8 "
-                    "\xe2\xfb \xe2\xee\xe9\xf2\xe8?",
+                localization::Tr("event.inline.967de2778f210f98"),
                 -1,
                 0,
                 -1,
@@ -3557,8 +2847,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "\xc5\xf1\xeb\xe8 \xed\xe5 \xf1\xf7\xe8\xf2\xe0\xf2\xfc \xf1\xeb\xe5\xe4\xee\xe2 \xf3\xe6\xe0\xf1\xed\xee\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb, \xef\xe5\xf9\xe5\xf0\xe0 \xef\xf3\xf1\xf2\xe0.",
+                    localization::Tr("event.inline.a55956dc91df9373"),
                     -1,
                     0,
                     -1,
@@ -3574,14 +2863,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             sprintf(
                 gText,
-                "\xc2 \xef\xe5\xf9\xe5\xf0\xe5 \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe3\xf0\xee\xe7\xed\xee\xe3\xee "
-                    "\xe4\xee \xed\xe5\xeb\xe5\xef\xee\xf1\xf2\xe8 \xe4\xe5\xec\xee\xed\xe0. \"\xd1\xe5\xe3\xee\xe4\xed\xff,"
-                    "\" - \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed, - \"\xf2\xe5\xe1\xff \xe6\xe4\xf3\xf2 \xe1\xee\xe9 "
-                    "\xe8 \xe2\xe5\xf0\xed\xe0\xff \xf1\xec\xe5\xf0\xf2\xfc. \xcd\xee \xff \xef\xee\xe7\xe2\xee\xeb\xfe "
-                    "\xf2\xe5\xe1\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xf1\xec\xe5\xf0\xf2\xfc. \xd2\xfb \xec\xee\xe6\xe5\xf8\xfc "
-                    "\xe4\xf0\xe0\xf2\xfc\xf1\xff \xf1\xee \xec\xed\xee\xe9 \xe8\xeb\xe8 \xe6\xe5 \xf1 \xec\xee\xe8\xec\xe8 "
-                    "\xf1\xeb\xf3\xe3\xe0\xec\xe8. \xcf\xf0\xe5\xe4\xef\xee\xf7\xe8\xf2\xe0\xe5\xf8\xfc \xf1\xf0\xe0\xe7\xe8\xf2\xfc\xf1\xff "
-                    "\xf1 \xec\xee\xe8\xec\xe8 \xf1\xeb\xf3\xe3\xe0\xec\xe8?\""
+                localization::Tr("event.inline.bf2299125ded4930")
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -3605,8 +2887,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
-                        "\xce\xe4\xee\xeb\xe5\xe2 \xf1\xeb\xf3\xe3 \xe4\xe5\xec\xee\xed\xe0, \xe2\xfb \xed\xe0\xf8\xeb\xe8 "
-                            "\xea\xeb\xe0\xe4 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                        localization::Tr("event.inline.cb3ce775e0c55740"),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3629,11 +2910,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xea\xf0\xe0\xf2\xea\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5 \xe8 \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 1000 \xee\xf7\xea\xee\xe2 "
-                            "\xee\xef\xfb\xf2\xe0.",
+                        localization::Tr("event.inline.2c0fc1c524da5be1"),
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
                         -1,
@@ -3653,11 +2930,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventValue1 = H2EnumIndex(GiveRandomArtifact(eventHero2));
                     sprintf(
                         gText,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xe1\xe8\xf2\xe2\xfb \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xe0 \xe2 \xe3\xeb\xf3\xe1\xe8\xed\xe5 \xef\xe5\xf9\xe5\xf0\xfb "
-                            "\xed\xe0\xf8\xeb\xe8 %s.",
+                        localization::Tr("event.inline.ea1d54ae68a8c04a"),
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -3679,11 +2952,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xef\xee\xeb\xf3\xf7\xe8\xe2 1000 \xee\xf7\xea\xee\xe2 "
-                            "\xee\xef\xfb\xf2\xe0 \xe8 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                        localization::Tr("event.inline.92b0881ba080eff9"),
                         H2EnumIndex(RES_GOLD),
                         DAEMON_GOLD,
                         NORMAL_DIALOG_EXPERIENCE,
@@ -3700,12 +2969,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "\xc4\xe5\xec\xee\xed \xed\xe0\xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xed\xe0 \xe2\xe0\xf1 \xe8 "
-                            "\xe2\xf6\xe5\xef\xe8\xeb\xf1\xff \xea\xee\xe3\xf2\xff\xec\xe8 \xe2 \xe3\xee\xf0\xeb\xee "
-                            "\xef\xf0\xe5\xe6\xe4\xe5, \xf7\xe5\xec \xe2\xfb \xee\xe1\xed\xe0\xe6\xe8\xeb\xe8 \xec\xe5\xf7."
-                            " \"\xd2\xe2\xee\xff \xe6\xe8\xe7\xed\xfc \xe2 \xec\xee\xe8\xf5 \xf0\xf3\xea\xe0\xf5,\" -"
-                            " \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed. - \"\xdf \xe2\xe5\xf0\xed\xf3 \xe5\xe5 \xf2\xe5\xe1\xe5 "
-                            "\xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.\"",
+                        localization::Tr("event.inline.1b32f445f3853c55"),
                         -1,
                         0,
                         -1,
@@ -3718,11 +2982,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                "\xcf\xee\xed\xff\xe2, \xf7\xf2\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5,"
-                                    " \xe4\xe5\xec\xee\xed \xf0\xe0\xf1\xf2\xe5\xf0\xe7\xe0\xeb \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xec\xe8 "
-                                    "\xea\xeb\xfb\xea\xe0\xec\xe8, \xe8 \xef\xee\xf1\xeb\xe5\xe4\xed\xe5\xe5, \xf7\xf2\xee \xe2\xfb "
-                                    "\xe2\xe8\xe4\xe5\xeb\xe8, \xe1\xfb\xeb\xe0 \xe0\xeb\xe0\xff \xef\xe5\xeb\xe5\xed\xe0 \xef\xe5\xf0\xe5\xe4 "
-                                    "\xe3\xeb\xe0\xe7\xe0\xec\xe8.",
+                                localization::Tr("event.inline.33c78d108003798f"),
                                 -1,
                                 0,
                                 -1,
@@ -3748,12 +3008,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xca\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
-                    "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
-                    "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xef\xee\xf1\xea\xf0\xe8\xef\xfb\xe2\xe0\xe5\xf2,"
-                    " \xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xef\xf0\xe8\xe1\xee\xe5\xec \xed\xe0 "
-                    "\xf1\xea\xe0\xeb\xe0\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc "
-                    "\xee\xe1\xeb\xee\xec\xea\xe8?",
+                localization::Tr("event.inline.b84c63468364c5dd"),
                 -1,
                 0,
                 -1,
@@ -3766,12 +3021,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8, \xe2\xfb "
-                                "\xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 "
-                                "\xed\xe0 \xf0\xfb\xf2\xfc\xe5 \xe2 \xec\xf3\xf1\xee\xf0\xe5, \xed\xee \xf2\xe0\xea \xed\xe8\xf7\xe5\xe3\xee "
-                                "\xe8 \xed\xe5 \xed\xe0\xf8\xeb\xe8. \xd1\xf2\xee\xeb\xfc \xed\xe5\xe1\xeb\xe0\xe3\xee\xe2\xe8\xe4\xed\xee\xe5 "
-                                "\xe7\xe0\xed\xff\xf2\xe8\xe5 \xf1\xed\xe8\xe7\xe8\xeb\xee \xec\xe0\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe5\xe9 "
-                                "\xe0\xf0\xec\xe8\xe8.",
+                            localization::Tr("event.inline.af08a748652258d4"),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3788,9 +3038,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (GhostEvent(
                                 eventHero2,
                                 cell,
-                                "\xce\xe4\xee\xeb\xe5\xe2 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2, \xe2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 "
-                                    "\xee\xf1\xf2\xe0\xed\xea\xe8 \xea\xee\xf0\xe0\xe1\xeb\xff \xe8 \xea\xee\xe5-\xf7\xf2\xee "
-                                    "\xed\xe0\xf8\xeb\xe8!",
+                                localization::Tr("event.inline.6b614dcca0dde223"),
                                 x,
                                 y
                             ))
@@ -3856,11 +3104,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xc1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 \xea\xee\xf0\xe0\xe1\xeb\xfc}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
-                    "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
-                    "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xf1\xea\xf0\xe8\xef\xe8\xf2, "
-                    "\xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xe2\xee\xeb\xed\xe0\xec\xe8 \xed\xe0 \xf1\xea\xe0\xeb\xe0\xf5."
-                    " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc \xea\xee\xf0\xe0\xe1\xeb\xfc?",
+                localization::Tr("event.inline.1fe5ee69b3203322"),
                 -1,
                 0,
                 -1,
@@ -3873,12 +3117,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "\xd3\xf1\xec\xe8\xf0\xe8\xe2 \xf1\xea\xe5\xeb\xe5\xf2\xee\xe2, \xe2\xfb \xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 "
-                                "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 \xed\xe0 \xef\xee\xe8\xf1\xea\xe8 "
-                                "\xf1\xf0\xe5\xe4\xe8 \xe3\xed\xe8\xeb\xfb\xf5 \xee\xe1\xeb\xee\xec\xea\xee\xe2 - \xe8 \xe2\xef\xf3\xf1\xf2\xf3\xfe."
-                                " \xd1\xf2\xee\xeb\xfc \xe3\xf0\xff\xe7\xed\xe0\xff \xf0\xe0\xe1\xee\xf2\xe0 \xef\xeb\xee\xf5\xee "
-                                "\xf1\xea\xe0\xe7\xe0\xeb\xe0\xf1\xfc \xed\xe0 \xec\xee\xf0\xe0\xeb\xe8 \xe2\xe0\xf8\xe5\xe9 "
-                                "\xe0\xf0\xec\xe8\xe8.",
+                            localization::Tr("event.inline.b2f13c84edb58954"),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3899,9 +3138,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (SkeletonEvent(
                                 eventHero2,
                                 skeletonCell_e,
-                                "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1\xee \xf1\xea\xe5\xeb\xe5\xf2\xe0\xec\xe8, \xe2\xfb "
-                                    "\xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xea\xee\xe5-\xf7\xf2\xee "
-                                    "\xed\xe0\xf8\xeb\xe8!",
+                                localization::Tr("event.inline.85fbba93bc78c682"),
                                 x,
                                 y
                             ))
@@ -3917,13 +3154,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
-                    "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xc8\xf1\xea\xf3\xf8\xe5\xed\xe8\xe5 "
-                    "\xef\xee\xe8\xf1\xea\xe0\xf2\xfc \xe2 \xed\xe5\xe9 \xf1\xee\xea\xf0\xee\xe2\xe8\xf9\xe0 "
-                    "\xe2\xe5\xeb\xe8\xea\xee, \xed\xee \xe2\xfb \xf1\xeb\xfb\xf8\xe0\xeb\xe8 \xe2\xf1\xe5 \xfd\xf2\xe8 "
-                    "\xf1\xea\xe0\xe7\xea\xe8 \xee\xe1 \xf3\xe6\xe0\xf1\xed\xfb\xf5 \xef\xf0\xee\xea\xeb\xff\xf2\xe8\xff\xf5 "
-                    "\xe8 \xed\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xf5 \xf1\xf2\xf0\xe0\xe6\xe5\xe9. \xd5\xee\xf2\xe8\xf2\xe5 "
-                    "\xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3?",
+                localization::Tr("event.inline.f275576ff90522c2"),
                 -1,
                 0,
                 -1,
@@ -3933,10 +3164,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
-                        "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
-                            "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xcf\xe5\xf0\xe2\xee\xe5 \xe6\xe5 \xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xed\xe8\xe5 "
-                            "\xef\xe8\xf0\xe0\xec\xe8\xe4\xfb \xef\xee\xea\xe0\xe7\xe0\xeb\xee, \xf7\xf2\xee \xe2 \xed\xe5\xe9 "
-                            "\xe0\xe1\xf1\xee\xeb\xfe\xf2\xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5\xf2.",
+                        localization::Tr("event.inline.414c8dd999ff1206"),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3977,17 +3205,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     sprintf(
                             eventText_b,
                             "%s'%s'.  ",
-                            "\xce\xe4\xee\xeb\xe5\xe2 \xf7\xf3\xe4\xee\xe2\xe8\xf9, \xe2\xfb \xf0\xe0\xf1\xf8\xe8\xf4\xf0\xee\xe2\xe0\xeb\xe8 "
-                                "\xe8\xe5\xf0\xee\xe3\xeb\xe8\xf4\xfb \xed\xe0 \xf1\xf2\xe5\xed\xe5, \xf1\xee\xee\xe1\xf9\xe0\xfe\xf9\xe8\xe5 "
-                                "\xf1\xe5\xea\xf0\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff - ",
+                            localization::Tr("event.inline.3c1ac9096798469d"),
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
                                 eventText_b,
-                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
-                                    "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe2 \xed\xe5\xe5 "
-                                    "\xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
+                                localization::Tr("event.inline.bdc50da8baa48d7e")
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)]
@@ -4009,9 +3233,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         } else {
                             strcat(
                                 eventText_b,
-                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
-                                    "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
-                                    " \xe8\xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                                localization::Tr("event.inline.b748cab66a3bf25b")
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         }
@@ -4026,10 +3248,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "\xc2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe7\xe0\xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe "
-                    "\xe7\xee\xeb\xee\xf2\xf3\xfe \xf8\xe0\xf5\xf2\xf3. \xca\xe0\xe6\xe5\xf2\xf1\xff, \xee\xed\xe0 "
-                    "\xed\xe0\xf1\xe5\xeb\xe5\xed\xe0 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                    "\xe2\xee\xe9\xf2\xe8 \xe2\xed\xf3\xf2\xf0\xfc?",
+                localization::Tr("event.inline.1a911306b482a58b"),
                 -1,
                 0,
                 -1,
@@ -4059,8 +3278,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc2\xfb \xf0\xe0\xe7\xe1\xe8\xeb\xe8 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2 \xe8 \xf1\xec\xee\xe3\xeb\xe8 "
-                            "\xed\xe0\xeb\xe0\xe4\xe8\xf2\xfc \xe4\xee\xe1\xfb\xf7\xf3 \xe7\xee\xeb\xee\xf2\xe0.",
+                        localization::Tr("event.inline.d57cce3fb667b859"),
                         -1,
                         0,
                         -1,
@@ -4172,7 +3390,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     }
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
-    WaitEndSample(&eventSample_f, -1);
+    WaitEndSample(&eventSample_f);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -4395,44 +3613,22 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 
     sprintf(
         gText,
-        "\xc4\xee\xf0\xee\xe3\xf3 \xe2\xe0\xec \xef\xf0\xe5\xe3\xf0\xe0\xe6\xe4\xe0\xe5\xf2 %s "
-            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0. \xd0\xf3\xed\xfb "
-            "\xed\xe0 \xed\xe5\xec \xe3\xeb\xe0\xf1\xff\xf2: \"\xd1\xea\xe0\xe6\xe8 \xf1\xeb\xee\xe2\xee "
-            "\xe8 \xf1\xec\xee\xe6\xe5\xf8\xfc \xef\xf0\xee\xe9\xf2\xe8.\"",
+        localization::Tr("event.inline.95e1a0a20e2b7676"),
         xBarrierColor[colorIndex]
     );
     GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
     if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+        && PLAYER_HAS_VISITED_TENT(*gpCurPlayer, colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
-            "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 "
-                "\xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xea\xe0\xea "
-                "\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0 \xe8\xf1\xf7\xe5\xe7 "
-                "\xe2 \xef\xf3\xf1\xf2\xee\xf2\xe5.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            localization::Tr("event.inline.1ee518efd93cbc65"),
+            NORMAL_DIALOG_INFO
         );
         return 1;
     } else {
         NormalDialog(
-            "\xc2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 \xf1\xeb\xee\xe2\xee, \xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5 \xef\xf0\xee\xe8\xe7\xee\xf8\xeb\xee.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            localization::Tr("event.inline.907f9f79f5b78059"),
+            NORMAL_DIALOG_INFO
         );
         return 0;
     }
@@ -4474,11 +3670,11 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
 
     sprintf(
         gText,
-        "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xf8\xe0\xf2\xe5\xf0 \xe8 \xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xef\xee\xe6\xe8\xeb\xf3\xfe \xe6\xe5\xed\xf9\xe8\xed\xf3 \xf1 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe8\xec \xea\xe0\xec\xed\xe5\xec \xe2 \xf0\xf3\xea\xe0\xf5. \xcf\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 \xed\xe0 \xe2\xe0\xf1, \xee\xed\xe0 \xf1\xea\xe0\xe7\xe0\xeb\xe0: \"\xd1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xf3\xff, \xff \xef\xee\xe7\xed\xe0\xeb\xe0 \xf2\xe0\xe9\xed\xf3\xfe \xec\xe0\xe3\xe8\xfe. \xc2\xe5\xeb\xe8\xea\xe8\xe9 \xee\xf0\xe0\xea\xf3\xeb \xe4\xe0\xf0\xee\xe2\xe0\xeb \xec\xed\xe5 \xe7\xed\xe0\xed\xe8\xff \xe8 \xf3 \xec\xe5\xed\xff \xe5\xf1\xf2\xfc \xee\xf2\xe2\xe5\xf2 \xed\xe0 \xf2\xe2\xee\xe9 \xe2\xee\xef\xf0\xee\xf1.  \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xf1\xed\xe8\xec\xe0\xfe\xf9\xe5\xe5 %s \xe1\xe0\xf0\xfc\xe5\xf0 - '%s'.\"",
+        localization::Tr("event.inline.536b0d04d7ca290d"),
         xBarrierColor[color],
         xPasswordStrings[passwordIndex]
     );
-    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
@@ -4521,16 +3717,16 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (cursedArtifactCount2 == 1) {
                     sprintf(
                         gText,
-                        "\xc5\xe4\xe2\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8 \xe2 \xe1\xe0\xf8\xed\xfe \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0, \xea\xe0\xea \xed\xe0 \xe2\xf1\xf2\xf0\xe5\xf7\xf3 \xe2\xe0\xec \xe2\xfb\xf8\xe5\xeb \xf5\xf0\xee\xec\xee\xe9 \xe8 \xf1\xe5\xe4\xee\xe9 \xec\xf3\xe6\xf7\xe8\xed\xe0. \xce\xed \xef\xf0\xee\xe2\xe5\xf0\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xe5\xf9\xe8 \xe8 \xe7\xe0\xec\xe5\xf2\xe8\xeb, \xf7\xf2\xee \xf1\xf0\xe5\xe4\xe8 \xed\xe8\xf5 \xe5\xf1\xf2\xfc \xee\xe4\xed\xe0 \xef\xf0\xee\xea\xeb\xff\xf2\xe0\xff \xe2\xe5\xf9\xfc. \xc7\xe0 750 \xe7\xee\xeb\xee\xf2\xfb\xf5 \xe0\xeb\xf5\xe8\xec\xe8\xea \xf1\xee\xe3\xeb\xe0\xf1\xe5\xed \xe7\xe0\xe1\xf0\xe0\xf2\xfc \xe5\xe5 \xf3 \xe2\xe0\xf1. \xc2\xfb \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xe5?"
+                        localization::Tr("event.inline.8db49d8e3d5c5308")
                     );
                 } else {
                     sprintf(
                         gText,
-                        " \xc5\xe4\xe2\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8 \xe2 \xe1\xe0\xf8\xed\xfe \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0, \xea\xe0\xea \xed\xe0 \xe2\xf1\xf2\xf0\xe5\xf7\xf3 \xe2\xe0\xec \xe2\xfb\xf8\xe5\xeb \xf5\xf0\xee\xec\xee\xe9 \xe8 \xf1\xe5\xe4\xee\xe9 \xec\xf3\xe6\xf7\xe8\xed\xe0. \xce\xed \xef\xf0\xee\xe2\xe5\xf0\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xe5\xf9\xe8 \xe8 \xe7\xe0\xec\xe5\xf2\xe8\xeb, \xf7\xf2\xee \xf1\xf0\xe5\xe4\xe8 \xed\xe8\xf5 %d \xef\xf0\xee\xea\xeb\xff\xf2\xfb\xe5 \xe2\xe5\xf9\xe8. \xc7\xe0 750 \xe7\xee\xeb\xee\xf2\xfb\xf5 \xe0\xeb\xf5\xe8\xec\xe8\xea \xf1\xee\xe3\xeb\xe0\xf1\xe5\xed \xe7\xe0\xe1\xf0\xe0\xf2\xfc \xe8\xf5 \xf3 \xe2\xe0\xf1. \xc2\xfb \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xe5?",
+                        localization::Tr("event.inline.1c9a29276fc4ba9c"),
                         cursedArtifactCount2
                     );
                 }
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
@@ -4544,31 +3740,15 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
                         NormalDialog(
-                            "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xe8\xe7-\xe7\xe0 \xe7\xe0\xef\xe5\xf0\xf2\xee\xe9 \xe4\xe2\xe5\xf0\xe8: \"\xd3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee \xe7\xee\xeb\xee\xf2\xe0 \xe4\xeb\xff \xec\xee\xe8\xf5 \xf3\xf1\xeb\xf3\xe3.\"",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            localization::Tr("event.inline.35891c3b946b11c8"),
+                            NORMAL_DIALOG_INFO
                         );
                     }
                 }
             } else {
                 NormalDialog(
-                    "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xf1 \xe2\xe5\xf0\xf8\xe8\xed\xfb \xe1\xe0\xf8\xed\xe8: \"\xd3\xe1\xe8\xf0\xe0\xe9\xf2\xe5\xf1\xfc! \xdf \xed\xe5 \xec\xee\xe3\xf3 \xe2\xe0\xec \xef\xee\xec\xee\xf7\xfc!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.4be252d59fc6debb"),
+                    NORMAL_DIALOG_INFO
                 );
             }
             break;
@@ -4576,16 +3756,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_ARENA:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_ARENA)))) {
                 NormalDialog(
-                    "\xd1\xf2\xf0\xe0\xe6\xe0 \xc0\xf0\xe5\xed\xfb \xef\xf0\xe5\xe3\xf0\xe0\xe4\xe8\xeb\xe0 \xe2\xe0\xec \xe4\xee\xf0\xee\xe3\xf3 \xe8 \xed\xe5 \xef\xf3\xf1\xf2\xe8\xeb\xe0 \xe2\xed\xf3\xf2\xf0\xfc.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.5e4d96b705906aad"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4602,16 +3774,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_MERMAID:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_MERMAID)))) {
                 NormalDialog(
-                    "\xd0\xf3\xf1\xe0\xeb\xea\xe8 \xec\xee\xeb\xf7\xe0\xeb\xe8\xe2\xee \xe4\xe0\xeb\xe8 \xe2\xe0\xec \xef\xee\xed\xff\xf2\xfc, \xf7\xf2\xee\xe1\xfb \xe2\xfb \xef\xf0\xe8\xf5\xee\xe4\xe8\xeb\xe8 \xe2 \xe4\xf0\xf3\xe3\xee\xe9 \xf0\xe0\xe7, \xf2\xee\xe3\xe4\xe0 \xee\xed\xe8 \xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xff\xf2 \xe2\xe0\xf1.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.87faaee8cff00588"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4624,7 +3788,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "\xcc\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe0\xff \xea\xf0\xe0\xf1\xee\xf2\xe0 \xf0\xf3\xf1\xe0\xeb\xee\xea \xee\xe1\xe2\xee\xeb\xee\xea\xeb\xe0 \xe2\xe0\xf1 \xe8 \xe2\xe0\xf8\xf3 \xea\xee\xec\xe0\xed\xe4\xf3. \xcd\xe0 \xea\xe0\xea\xee\xe9-\xf2\xee \xec\xe8\xe3 \xe2\xfb \xef\xee\xe7\xe0\xe1\xfb\xeb\xe8 \xee \xe2\xe0\xf8\xe8\xf5 \xef\xf0\xee\xe1\xeb\xe5\xec\xe0\xf5 \xe8 \xed\xe0\xf1\xeb\xe0\xe4\xe8\xeb\xe8\xf1\xfc \xfd\xf2\xe8\xec \xec\xe3\xed\xee\xe2\xe5\xed\xe8\xe5\xec \xea\xf0\xe0\xf1\xee\xf2\xfb. \xd7\xe0\xf0\xfb \xf0\xf3\xf1\xe0\xeb\xee\xea \xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xe8\xeb\xe8 \xe2\xe0\xf1 \xed\xe0 \xf3\xe4\xe0\xf7\xf3 \xe2 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xec \xe1\xee\xfe.",
+                    localization::Tr("event.inline.fae6f0b9369f8351"),
                     SITE_MERMAID_WINDOW_ICON,
                     0,
                     -1,
@@ -4637,16 +3801,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_HUT_OF_MAGI:
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, H2EnumIndex(siteType4), &eventSample9);
             NormalDialog(
-                "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xe2\xe5\xf2\xf5\xf3\xfe \xf5\xe8\xe1\xe0\xf0\xf3 \xe8 \xe7\xe0\xe3\xee\xe2\xee\xf0\xe8\xeb\xe8 \xf1 \xec\xe0\xe3\xee\xec, \xe6\xe8\xe2\xf3\xf9\xe8\xec \xf2\xf3\xf2. \xce\xed \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec \xee \xec\xe5\xf1\xf2\xe0\xf5, \xea\xee\xf2\xee\xf0\xfb\xe5 \xe5\xec\xf3 \xe4\xee\xe2\xee\xe4\xe8\xeb\xee\xf1\xfc \xe2\xe8\xe4\xe5\xf2\xfc. \xdd\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xfc\xf1\xff \xe2\xe0\xec \xe2 \xe2\xe0\xf8\xe8\xf5 \xef\xf3\xf2\xe5\xf8\xe5\xf1\xf2\xe2\xe8\xff\xf5.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                localization::Tr("event.inline.fd826cb8b8a55aeb"),
+                NORMAL_DIALOG_INFO
             );
             for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
                 for (mapY14 = 0; mapY14 < MAP_HEIGHT; mapY14++) {
@@ -4666,32 +3822,16 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
-                "\xca\xe0\xe6\xe5\xf2\xf1\xff, \xfd\xf2\xee\xf2 \xe3\xeb\xe0\xe7 \xe2\xed\xe8\xec\xe0\xf2\xe5\xeb\xfc\xed\xee \xe8\xe7\xf3\xf7\xe0\xe5\xf2 \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                localization::Tr("event.inline.90cd00d12dc7f24b"),
+                NORMAL_DIALOG_INFO
             );
             break;
 
         case GENERIC_SITE_SIRENS:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_SIRENS)))) {
                 NormalDialog(
-                    "\xc2\xfb \xef\xf0\xe8\xea\xe0\xe7\xe0\xeb\xe8 \xf1\xe2\xee\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xe5 \xe7\xe0\xeb\xe8\xf2\xfc \xf3\xf8\xe8 \xe2\xee\xf1\xea\xee\xec, \xef\xf0\xe5\xe6\xe4\xe5 \xf7\xe5\xec \xef\xee\xe4\xef\xeb\xfb\xf2\xfc \xea \xf1\xe8\xf0\xe5\xed\xe0\xec, \xf7\xf2\xee\xe1\xfb \xef\xee\xf1\xeb\xf3\xf8\xe0\xf2\xfc \xe8\xf5 \xef\xe5\xed\xe8\xe5, \xea\xee\xf2\xee\xf0\xee\xe5 \xe7\xe0\xef\xf0\xee\xf1\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xee\xe3\xf3\xe1\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.acc859e4d069b705"),
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 experience11 = 0;
@@ -4716,23 +3856,15 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     );
                     sprintf(
                         gText,
-                        "\xcd\xe0\xe4 \xea\xe0\xec\xed\xff\xec\xe8 \xf0\xe0\xe7\xe4\xe0\xeb\xe0\xf1\xfc \xe6\xf3\xf2\xea\xe0\xff \xef\xe5\xf1\xed\xff \xf1\xe8\xf0\xe5\xed. \xcc\xed\xee\xe3\xe8\xe5 \xe8\xe7 \xe2\xe0\xf8\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xfb \xf0\xee\xf1\xe8\xeb\xe8\xf1\xfc \xe2 \xe2\xee\xe4\xf3 \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe5\xec \xfd\xf2\xe8\xf5 \xf7\xe0\xf0 \xe8 \xf3\xf2\xee\xed\xf3\xeb\xe8 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5. \xc4\xeb\xff \xe2\xe0\xf1 \xfd\xf2\xee \xe1\xfb\xeb \xf5\xee\xf0\xee\xf8\xe8\xe9 \xf3\xf0\xee\xea, \xe4\xe0\xe2\xf8\xe8\xe9 %d \xee\xf7\xea\xee\xe2 \xee\xef\xfb\xf2\xe0.",
+                        localization::Tr("event.inline.d211349fcd9060a7"),
                         experience11
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
                     NormalDialog(
-                        "\xc5\xe4\xe2\xe0 \xf1\xe8\xf0\xe5\xed\xfb \xe7\xe0\xf2\xff\xed\xf3\xeb\xe8 \xf1\xe2\xee\xfe \xf3\xe6\xe0\xf1\xed\xf3\xfe \xef\xe5\xf1\xed\xfe, \xea\xe0\xea \xe2\xe0\xf8\xe0 \xea\xee\xec\xe0\xed\xe4\xe0 \xef\xee\xf1\xe8\xeb\xfc\xed\xe5\xe5 \xed\xe0\xeb\xe5\xe3\xeb\xe0 \xed\xe0 \xe2\xe5\xf1\xeb\xe0 \xe8 \xf3\xe2\xe5\xeb\xe0 \xef\xee\xe4\xe0\xeb\xfc\xf8\xe5 \xea\xee\xf0\xe0\xe1\xeb\xfc \xe2 \xee\xf2\xea\xf0\xfb\xf2\xee \xec\xee\xf0\xe5.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        localization::Tr("event.inline.ee7fce7250a9d986"),
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 eventHero->m_eventFlags = HeroEventFlag(
@@ -4846,19 +3978,8 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     heroId = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
         NormalDialog(
-            "\xd2\xfe\xf0\xe5\xec\xf9\xe8\xea \xf1\xea\xe0\xe7\xe0\xeb \xe2\xe0\xec, "
-                "\xf7\xf2\xee \xe3\xe5\xf0\xee\xe9, \xf2\xee\xec\xe8\xe2\xf8\xe8\xe9\xf1\xff "
-                "\xf2\xf3\xf2 \xe2 \xef\xeb\xe5\xed\xf3 \xe1\xfb\xeb \xee\xf1\xe2\xee\xe1\xee\xe6\xe4\xe5\xed "
-                "\xe5\xe3\xee \xea\xee\xf0\xee\xeb\xe5\xec.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            localization::Tr("event.inline.dd448d43b4794460"),
+            NORMAL_DIALOG_INFO
         );
         EraseObj(cell, x, y);
         return;
@@ -4866,44 +3987,16 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
-            "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 8 \xe3\xe5\xf0\xee\xe5\xe2. "
-                "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe2\xe0\xec \xef\xf0\xe8\xe4\xe5\xf2\xf1\xff "
-                "\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xf2\xee\xec\xe8\xf2\xfc\xf1\xff "
-                "\xfd\xf2\xee\xe3\xee \xe3\xe5\xf0\xee\xff \xe2 \xf2\xe5\xec\xed\xe8\xf6\xe5 "
-                "\xe5\xf9\xe5 \xed\xe5\xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee\xe5 "
-                "\xe2\xf0\xe5\xec\xff.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            localization::Tr("event.inline.30d6f33566016021"),
+            NORMAL_DIALOG_INFO
         );
         return;
     }
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
     NormalDialog(
-        "\xd1 \xee\xf1\xeb\xe5\xef\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9 \xee\xf2\xe2\xe0\xe3\xee\xe9 "
-            "\xe2\xfb \xe2\xee\xf0\xe2\xe0\xeb\xe8\xf1\xfc \xe2 \xec\xe5\xf1\xf2\xed\xf3\xfe "
-            "\xf2\xe5\xec\xed\xe8\xf6\xf3 \xe8 \xee\xf1\xe2\xee\xe1\xee\xe4\xe8\xeb\xe8 "
-            "\xe3\xe5\xf0\xee\xff, \xf2\xee\xec\xff\xf9\xe5\xe3\xee\xf1\xff "
-            "\xe7\xe4\xe5\xf1\xfc \xe2 \xef\xeb\xe5\xed\xf3. "
-            "\xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
-            "\xee\xed \xef\xee\xea\xeb\xff\xeb\xf1\xff \xf1\xeb\xf3\xe6\xe8\xf2\xfc "
-            "\xe2\xe0\xec.",
-        NORMAL_DIALOG_INFO,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
+        localization::Tr("event.inline.5aa1a1227a3f148e"),
+        NORMAL_DIALOG_INFO
     );
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
     gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
@@ -5249,7 +4342,7 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, artifactId, true, -1);
+        GiveArtifact(eventHero, artifactId, true);
     return artifactId;
 }
 
@@ -5902,8 +4995,7 @@ CombatResult advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, H2EnumIndex(CREATURE_NONE), MONSTER_ARMY_SLOTS);
-    memset(gpMonGroup->m_creatureCounts, 0, MONSTER_ARMY_SLOTS * sizeof(i16));
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
@@ -6313,8 +5405,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
         if (i == H2EnumIndex(HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
-            maxSpellPoints =
-                targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
+            maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*targetHero);
             if (targetHero->m_spellPoints > maxSpellPoints)
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
@@ -6339,10 +5430,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             || gbThisNetHumanPlayer[H2EnumIndex(destinationHero->m_owner)]) {
                             sprintf(
                                 gText,
-                                "\xdd\xf2\xee %s! \xc5\xe4\xe2\xe0 \xe2\xfb \xe4\xee\xe1\xf0\xe0\xeb\xe8\xf1\xfc \xe4\xee "
-                                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0, \xea\xe0\xea \xef\xf0\xe5\xe4\xec\xe5\xf2 "
-                                    "\xec\xe8\xf1\xf2\xe8\xf7\xe5\xf1\xea\xe8\xec \xee\xe1\xf0\xe0\xe7\xee\xec \xe8\xf1\xf7\xe5\xe7."
-                                     ,
+                                localization::Tr("event.inline.aa7c539682b9fd51")
+                                    ,
                                 gArtifactNames[H2EnumIndex(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
                             NormalDialog(
@@ -6476,7 +5565,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
             NULL
         );
         gpMouseManager->ShowColorPointer();
-        WaitEndSample(&fizzleSample, -1);
+        WaitEndSample(&fizzleSample);
     }
 }
 
@@ -6542,7 +5631,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
-            if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+            if (eventHero->IsEmbarked()) {
                 eventHero->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero->m_eventFlags) & ~H2EnumIndex(HERO_EVENT_EMBARKED)
                 );
@@ -6632,8 +5721,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGoldOrExperience:
@@ -6735,8 +5823,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveArtifact(
                         eventHero,
                         ArtifactType(cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET),
-                        true,
-                        -1
+                        true
                     );
                     cell->m_objectMetadata = SKELETON_EMPTY;
                     break;
@@ -6779,7 +5866,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT) {
                         index_h = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                        GiveArtifact(eventHero, ArtifactType(index_h), true, -1);
+                        GiveArtifact(eventHero, ArtifactType(index_h), true);
                     }
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 } else {
@@ -6800,8 +5887,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
@@ -7119,7 +6205,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(exitX - x) + abs(exitY_d - y)
+                        && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
                                       ? EVENT_TELEPORT_STONE_DISTANCE
                                       : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
@@ -7136,7 +6222,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
-                            && abs(exitX - x) + abs(exitY_d - y)
+                            && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
@@ -7200,7 +6286,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         if (gpCurPlayer->m_resources[index_h] < 0)
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
-                    GiveArtifact(eventHero, artifact_g, true, -1);
+                    GiveArtifact(eventHero, artifact_g, true);
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
@@ -7510,7 +6596,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true);
             eraseObject_l = 1;
             break;
 
@@ -7518,8 +6604,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata == 0)
                 break;
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-            springSpellPoints_j =
-                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero);
             if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
                 eventHero->m_spellPoints =
                     static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
@@ -7528,8 +6613,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_MAGIC_WELL))) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                wellSpellPoints_o =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero);
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | H2EnumIndex(HERO_EVENT_MAGIC_WELL)
@@ -7567,7 +6651,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 }
                 if (eventExtra_o->artifact != -1
                     && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
-                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true, -1);
+                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true);
                 }
                 eventExtra_o->active = 0;
             } else {
@@ -7610,7 +6694,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 1;
     else
         return 0;
@@ -7856,12 +6940,9 @@ void advManager::PlayerMonsterInteract(
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
-                / static_cast<double>(
-                    creatureCount * gMonsterDatabase[H2EnumIndex(monsterType)].fightValue
-                );
+    armyRatio =
+        static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
+        / static_cast<double>(creatureCount * gMonsterDatabase[H2EnumIndex(monsterType)].fightValue);
 
     if (gbInCampaign
         && ((gpGame->m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
@@ -7874,105 +6955,35 @@ void advManager::PlayerMonsterInteract(
         if (!eventHero->m_army.CanJoin(monsterType)) {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xf3\xfe "
-                        "\xe2\xe0\xf1: \"\xc4\xf0\xf3\xe3 \xd0\xee\xeb\xe0\xed\xe4\xe0 "
-                        "- \xed\xe0\xf8 \xe4\xf0\xf3\xe3. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
-                        "\xef\xf0\xee\xe9\xf2\xe8.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.bc81eedbd225f1cc"),
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xe2\xe0\xf1: "
-                        "\"\xd1\xee\xfe\xe7\xed\xe8\xea\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
-                        "\xec\xee\xe3\xf3\xf2 \xef\xf0\xee\xe9\xf2\xe8.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.cf9fdd5bf3abd972"),
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
-                    "\xc4\xf0\xe0\xea\xee\xed\xfb, \xef\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 "
-                        "\xed\xe0 \xe2\xe0\xf1, \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb\xe8: "
-                        "\"\xcd\xe0\xf8 \xe0\xeb\xfc\xff\xed\xf1 \xf1 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xee\xec "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe0\xe5\xf2 \xed\xe0\xf1 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.  \xca \xed\xe5\xf1\xf7\xe0\xf1\xf2\xfc\xfe, "
-                        "\xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe4\xeb\xff \xed\xe0\xf1 \xec\xe5\xf1\xf2\xe0. "
-                        "\xca\xe0\xea\xe0\xff \xe6\xe0\xeb\xee\xf1\xf2\xfc!\"  \xc8 "
-                        "\xe1\xfb\xf1\xf2\xf0\xee \xf3\xeb\xe5\xf2\xe5\xeb\xe8.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.f68d63dd41307454"),
+                    NORMAL_DIALOG_INFO
                 );
             *handled = 1;
         } else {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xf1\xe2\xee\xe8\xf5 "
-                        "\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2 \xe8 \xf0\xe0\xe4\xfb "
-                        "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea "
-                        "\xed\xe8\xec.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.ca210d925c2d4171"),
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xed\xe0\xf1, "
-                        "\xea\xe0\xea \xe2\xf0\xe0\xe3\xee\xe2 \xe3\xed\xee\xec\xee\xe2 "
-                        "\xe8 \xf0\xe0\xe4\xfb \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec. ",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.7e5ecd33e75d57cd"),
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
-                    "\xc3\xee\xf0\xe4\xe5\xeb\xe8\xe2\xfb\xe5 \xe4\xf0\xe0\xea\xee\xed\xfb "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe5\xed\xfb \xe1\xfb\xeb\xe8 \xef\xf0\xe8\xe7\xed\xe0\xf2\xfc "
-                        "\xe2 \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xf5 '\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2' "
-                        "\xe8 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    localization::Tr("event.inline.f0128914e00d4e7f"),
+                    NORMAL_DIALOG_INFO
                 );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
             *handled = 1;
@@ -7983,17 +6994,8 @@ void advManager::PlayerMonsterInteract(
     if (gbInCampaign && gpGame->m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DWARFBANE)]
         && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
-            "\"\xc2\xf0\xe0\xe3\xe8 \xe3\xed\xee\xec\xee\xe2! \xc1\xe5\xe3\xe8\xf2\xe5, "
-                "\xe5\xf1\xeb\xe8 \xe6\xe8\xe7\xed\xfc \xe4\xee\xf0\xee\xe3\xe0.\"",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            localization::Tr("event.inline.53220bf577626eb3"),
+            NORMAL_DIALOG_INFO
         );
         *handled = 1;
         return;
@@ -8004,59 +7006,22 @@ void advManager::PlayerMonsterInteract(
         *handled = 1;
         if (eventHero->m_army.CanJoin(monsterType)) {
             NormalDialog(
-                "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea "
-                    "\xee\xf2\xf0\xff\xe4\xf3 \xfd\xeb\xfc\xf4\xee\xe2, \xea\xe0\xea "
-                    "\xe8\xf5 \xe2\xee\xe6\xe0\xea \xef\xf0\xe8\xe7\xe2\xe0\xeb "
-                    "\xf1\xe2\xee\xe9 \xee\xf2\xf0\xff\xe4 \xea \xee\xf0\xf3\xe6\xe8\xfe. "
-                    "\xce\xed \xf1\xea\xe0\xe7\xe0\xeb \xe8\xec: \"\xca\xf2\xee "
-                    "\xe8\xe7 \xe2\xe0\xf1 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
-                    "\xf1\xec\xe5\xeb, \xf7\xf2\xee\xe1\xfb \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
-                    "\xe2 \xe0\xf0\xec\xe8\xfe \xed\xe0\xf8\xe5\xe3\xee \xec\xf3\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea\xe0?\" \xc2\xe5\xf1\xfc \xee\xf2\xf0\xff\xe4 "
-                    "\xe5\xe4\xe8\xed\xee\xe4\xf3\xf8\xed\xee \xe2\xf1\xf2\xf3\xef\xe8\xeb "
-                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                localization::Tr("event.inline.4a9a02fcd852e2b3"),
+                NORMAL_DIALOG_INFO
             );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
             NormalDialog(
-                "\xdd\xeb\xfc\xf4\xfb \xed\xe0\xf1\xf2\xee\xf0\xee\xe6\xe8\xeb\xe8\xf1\xfc "
-                    "\xef\xf0\xe8 \xe2\xe0\xf8\xe5\xec \xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8. "
-                    "\xc8\xf5 \xe2\xee\xe6\xe0\xea \xee\xe1\xf0\xe0\xf2\xe8\xeb\xf1\xff "
-                    "\xea \xe2\xe0\xec \xf1\xee \xf1\xeb\xee\xe2\xe0\xec\xe8: \"\xcc\xfb "
-                    "\xed\xe5 \xec\xee\xe6\xe5\xec \xef\xf0\xe8\xed\xff\xf2\xfc "
-                    "\xf3\xf7\xe0\xf1\xf2\xe8\xe5 \xe2 \xe2\xe0\xf8\xe8\xf5 \xe4\xe5\xeb\xe0\xf5, "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea! \xcf\xf0\xee\xf5\xee\xe4\xe8, "
-                    "\xed\xe0\xf8\xe0 \xef\xee\xe1\xe5\xe4\xe0 \xe1\xf3\xe4\xe5\xf2 "
-                    "\xe2\xe0\xf8\xe5\xe9.\"",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                localization::Tr("event.inline.b957bcfea39c68b5"),
+                NORMAL_DIALOG_INFO
             );
         }
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && armyRatio
-            > 2.0
+    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > 2.0
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[H2EnumIndex(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -8102,28 +7067,19 @@ void advManager::PlayerMonsterInteract(
             if (creatureCount == 1) {
                 sprintf(
                     gText,
-                    "%s \xed\xe0\xf5\xee\xe4\xe8\xf2\xf1\xff \xef\xee\xe4 \xe2\xef\xe5\xf7\xe0\xf2\xeb\xe5\xed\xe8\xe5\xec "
-                        "\xe2\xe0\xf8\xe5\xe9 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2\xe8\xf7\xed\xee\xf1\xf2\xe8, "
-                        "\xe8 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 \xf1\xe2\xee\xe8 "
-                        "\xf3\xf1\xeb\xf3\xe3\xe8 \xe2\xe0\xf8\xe5\xec\xf3 \xe2\xee\xe9\xf1\xea\xf3 "
-                        "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
+                    localization::Tr("event.inline.61cb3563007fe53a"),
                     gArmyNames[H2EnumIndex(monsterType)],
                     joiningCost
                 );
             } else {
                 sprintf(
                     gText,
-                    "\xc2\xee\xe8\xed\xfb \xef\xee\xea\xee\xf0\xe5\xed\xfb \xe2\xe0\xf8\xe8\xec "
-                        "\xf8\xe0\xf0\xec\xee\xec \xe8 \xe2\xfb\xe4\xe2\xe8\xed\xf3\xeb\xe8 "
-                        "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xe5:\n\n"
+                    localization::Tr("event.inline.459e418255ebdf2c")
                 );
                 if (numJoining == creatureCount)
                     sprintf(
                         monsterText,
-                        "\xce\xf2\xf0\xff\xe4 \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 "
-                            "\xe2 \xf0\xff\xe4\xfb \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
-                            "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
-                            "\xef\xf0\xe8\xed\xff\xf2\xfc \xe8\xf5?",
+                        localization::Tr("event.inline.ddc9cf3652f5dd02"),
                         creatureCount,
                         gArmyNamesPlural[H2EnumIndex(monsterType)],
                         joiningCost
@@ -8131,10 +7087,7 @@ void advManager::PlayerMonsterInteract(
                 else
                     sprintf(
                         monsterText,
-                        "%d \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xf0\xff\xe4\xfb "
-                            "\xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe0 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff "
-                            "\xee\xf1\xf2\xe0\xe2\xff\xf2 \xe2\xe0\xf1 \xe2 \xef\xee\xea\xee\xe5 "
-                            "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
+                        localization::Tr("event.inline.2f685e157f228f6f"),
                         numJoining,
                         creatureCount,
                         gArmyNamesPlural[H2EnumIndex(monsterType)],
@@ -8180,11 +7133,7 @@ void advManager::PlayerMonsterInteract(
     monstersFlee:
         sprintf(
             gText,
-            "\xc3\xf0\xf3\xef\xef\xe0 %s, \xf1\xf2\xf0\xe0\xf8\xe0\xf1\xfc "
-                "\xec\xee\xf9\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe8\xed\xf1\xf2\xe2\xe0, "
-                "\xe1\xf0\xee\xf1\xe8\xeb\xe0\xf1\xfc \xe2\xf0\xe0\xf1\xf1\xfb\xef\xed\xf3\xfe. "
-                "\xd1\xee\xe8\xe7\xe2\xee\xeb\xe8\xf2\xe5 \xe8\xe7\xeb\xee\xe2\xe8\xf2\xfc "
-                "\xe8\xf5 \xe8 \xe7\xe0\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe4\xf0\xe0\xf2\xfc\xf1\xff?",
+            localization::Tr("event.inline.f87a6ac73c24c595"),
             gArmyNamesPlural[H2EnumIndex(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -8230,19 +7179,15 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
+    armyRatio = static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
                 / static_cast<double>(
                     creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                     * gMonsterDatabase[H2EnumIndex(monsterType)].fightValue
                 );
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
-        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-        && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+        && armyRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
@@ -8579,12 +7524,12 @@ CombatResult advManager::DoCombat(
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
-                "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
-                     ,
+                localization::Tr("network.attack.owner.buka")
+                    ,
                 cPlayerNames[secondPlayer8],
                 combatTown
-                    ? "\xe3\xee\xf0\xee\xe4"
-                    : "\xe3\xe5\xf0\xee\xe9"
+                    ? localization::Tr("scenario.fragment.town")
+                    : localization::Tr("scenario.fragment.hero")
             );
             gpGame->WaitForPlayer(gText, secondPlayer8);
         }
@@ -8722,9 +7667,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8739,9 +7682,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8754,9 +7695,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8771,9 +7710,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8853,9 +7790,7 @@ void advManager::ReceiveHeroTownData(
         *remotePlayer,
         0,
         REMOTE_CONFIRM_COMMAND,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        REMOTE_MESSAGE_DEFAULT
+        COMBAT_REMOTE_FRAGMENT_TYPE
     );
     if (!result7)
         ShutDown(NULL);
@@ -8881,21 +7816,13 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                const_cast<char*>(localization::Tr("event.inline.2b436715930a57ee")),
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();
             else
-                ShutDown(const_cast<char*>("\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."));
+                ShutDown(const_cast<char*>(localization::Tr("event.inline.d7ee33967c36bb8b")));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE

@@ -29,16 +29,7 @@ typedef enum DirectPlayStorageConstant {
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
     LogStr("ServiceProvider:");
     _strupr(name);
-    LogInt(
-        name,
-        reinterpret_cast<i32>(guid),
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(name, reinterpret_cast<i32>(guid));
     if (FindStringInString(name, "IPX") != NULL)
         IPXGuid = guid;
     else if (FindStringInString(name, "TCP") != NULL)
@@ -50,16 +41,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & DPESC_TIMEDOUT)
         return 0;
     LogStr("Sessions:");
-    LogInt(
-        session->szSessionName,
-        session->dwSession,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(session->szSessionName, session->dwSession);
     lSessions[iMaxSession] = session->dwSession;
     iMaxSession++;
     return 1;
@@ -77,28 +59,25 @@ i16 dpnet_init(void) {
     if (lpIDC != NULL)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
-        memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
-        memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+        INIT_TRANSPORT_RECEIVE_STORAGE();
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                 );
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         createFunction = NULL;
         dpEnumerate = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayCreate")
         );
         if (createFunction == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                 );
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         dpEnumerate = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
         if (dpEnumerate == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                 );
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         dpEnumerate(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
@@ -117,27 +96,21 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
             sprintf(
                 gText,
-                "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                    "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
+                localization::Tr("network.waiting_guest.buka")
 
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
-                "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
-                "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
-                "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
-                "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2."
+                localization::Tr("network.directplay.guests_ready.buka")
                 ,
                 giNumHumanPlayers - 1
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST);
             gbRemoteGameOpen = false;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
@@ -154,11 +127,10 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
             sprintf(
                 gText,
-                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff \xed\xe0\xf7\xe0\xeb\xe0 "
-                    "\xe8\xe3\xf0\xfb."
+                localization::Tr("network.waiting_player_start")
 
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
         }
@@ -199,12 +171,7 @@ void dpnet_term(void) {
     lpIDC = NULL;
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
-    if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer);
-    ppDPRcvBuffer = NULL;
-    if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize);
-    piDPRcvBufferSize = NULL;
+    DisposeTransportReceiveStorage();
     if (hinstDplayx != NULL)
         FreeLibrary(hinstDplayx);
     hinstDplayx = NULL;
@@ -296,10 +263,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
-            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-            piDPRcvBufferSize[iDPRcvBufferHead] = size;
-            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
+            ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
@@ -331,22 +295,12 @@ void dpEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = startup->playerCount;
             giThisNetPos = startup->netPosition;
-            LogInt(
-                "DPMSGSTARTUP",
-                giThisNetPos,
-                sender,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("DPMSGSTARTUP", giThisNetPos, sender);
             memcpy(giNetPosToDCOPos, startup->playerIds, sizeof(giNetPosToDCOPos));
             bStartUpInfoReceived = true;
             break;
         default:
-            sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
-            LogStr(gText);
+            LOG_SUMMARY_VALUE("Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
             break;
     }
 }
@@ -401,17 +355,11 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
-            "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
-            "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
-            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
-            "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-            "\xe8\xe3\xf0\xee\xea\xee\xe2."
+            localization::Tr("network.directplay.guests_ready.buka")
             ,
             giNumHumanPlayers - 1
         );
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = 1;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
         message.payload.widget.data.text = gText;
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();

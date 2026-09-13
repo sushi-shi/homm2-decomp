@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -384,7 +385,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+             localization::Tr("requester.file_to_save")
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -414,15 +415,13 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+             localization::Tr("requester.file_to_load")
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
-    message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
     m_window->BroadcastMessage(message);
     Update(0);
@@ -436,7 +435,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-                 "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
+                localization::Tr("save.filename.new_game")
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -452,9 +451,11 @@ i32 fileRequester::Open(i32 id) {
 
 void fileRequester::SetOK(i32 enabled) {
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.id = FILE_REQUESTER_OK;
+    SET_WIDGET_MESSAGE(
+        message,
+        enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
+        FILE_REQUESTER_OK
+    );
     message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAG_GRAYED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -546,20 +547,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
-                                    "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe8\xe7 \xf1\xef\xe8\xf1\xea"
-                                    "\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 \xea\xed\xee"
-                                    "\xef\xea\xf3 \xee\xf2\xec\xe5\xed\xfb."
+                                    localization::Tr("requester.selection.required")
 
                                     ,
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -655,15 +646,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (helpIndexMouse >= REQUESTER_HELP_VALID_BEGIN) {
                             NormalDialog(
                                 gFileRequestHelp[H2EnumIndex(helpIndexMouse)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         }
                     } else {
@@ -680,9 +663,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2 \xf2\xe0\xea\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
+                                            localization::Tr("requester.map.size_mismatch.multiple.buka")
 
                                             ,
                                             giNumHumanPlayers
@@ -690,26 +671,13 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     } else {
                                         sprintf(
                                             gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2\xfb \xfd\xf2\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
+                                            localization::Tr("requester.map.size_mismatch.one.buka")
 
                                             ,
                                             giNumHumanPlayers
                                         );
                                     }
-                                    NormalDialog(
-                                        gText,
-                                        NORMAL_DIALOG_INFO,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        NORMAL_DIALOG_NO_VALUE,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0
-                                    );
+                                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                                     break;
                                 }
                                 giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(iResult);
@@ -734,9 +702,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             case FILE_REQUESTER_FILENAME_ENTRY: {
-                                broadcastMessage.type = MESSAGE_WIDGET;
-                                broadcastMessage.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
-                                broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+                                SET_WIDGET_MESSAGE(
+                                    broadcastMessage,
+                                    WIDGET_COMMAND_GET_TEXT,
+                                    FILE_REQUESTER_FILENAME_ENTRY
+                                );
                                 m_window->BroadcastMessage(broadcastMessage);
 
                                 memset(newNameData, 0, FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE);
@@ -884,58 +854,27 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe2\xe0\xec\xe8 \xe8\xe3\xf0\xe0 \xf0"
-                    "\xe0\xf1\xf1\xf7\xe8\xf2\xe0\xed\xe0 \xf2\xee\xeb\xfc\xea\xee \xed\xe0 %d \xf7"
-                    "\xe5\xeb\xee\xe2\xe5\xea.  \xc0 \xe2\xe0\xec \xed\xf3\xe6\xed\xe0 \xea\xe0\xf0"
-                    "\xf2\xe0, \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xed\xe0 %d \xf7\xe5\xeb"
-                    "\xee\xe2\xe5\xea."
+                    localization::Tr("requester.load.insufficient_human_slots")
 
 
                     ,
                     iResult,
                     giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe8\xe3\xf0\xe0 \xed\xe0\xf7\xed\xe5\xf2"
-                    "\xf1\xff \xf1 %d \xe8\xe3\xf0\xee\xea\xe0\xec\xe8-\xeb\xfe\xe4\xfc\xec\xe8. "
-                    "\xcc\xee\xe6\xed\xee \xeb\xe8 \xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xf3 \xe2"
-                    "\xe7\xff\xf2\xfc \xef\xee\xe4 \xf1\xe2\xee\xe5 \xf3\xef\xf0\xe0\xe2\xeb\xe5"
-                    "\xed\xe8\xe5 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff %d \xec\xe5\xf1\xf2 \xeb"
-                    "\xfe\xe4\xe5\xe9?"
+                    localization::Tr("requester.load.replace_human_slots")
 
 
                     ,
                     iResult,
                     iResult - giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_CONFIRM,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
                     acceptStep = false;
                 }
