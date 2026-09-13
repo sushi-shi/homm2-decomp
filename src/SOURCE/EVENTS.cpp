@@ -4679,13 +4679,13 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 for (index8 = 0; index8 < ARMY_GROUP_SLOT_COUNT; index8++) {
                     creatureType = eventHero->m_army.m_creatureTypes[index8];
                     if (creatureType != CREATURE_NONE) {
-                        oldQuantity3 = eventHero->m_army.m_quantities[index8];
+                        oldQuantity3 = eventHero->m_army.m_creatureCounts[index8];
                         if (oldQuantity3 > 1) {
-                            eventHero->m_army.m_quantities[index8] =
+                            eventHero->m_army.m_creatureCounts[index8] =
                                 oldQuantity3 * GENERIC_SITE_SIREN_ARMY_REMAINDER;
                             experience11 +=
                                 gMonsterDatabase[IDX(creatureType)].hitPoints
-                                * (oldQuantity3 - eventHero->m_army.m_quantities[index8]);
+                                * (oldQuantity3 - eventHero->m_army.m_creatureCounts[index8]);
                         }
                     }
                 }
@@ -7672,13 +7672,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 for (artifactIndex14 = 0; artifactIndex14 < ARMY_GROUP_SLOT_COUNT; artifactIndex14++) {
                     creatureType3 = eventHero->m_army.m_creatureTypes[artifactIndex14];
                     if (creatureType3 != CREATURE_NONE) {
-                        quantity1 = eventHero->m_army.m_quantities[artifactIndex14];
+                        quantity1 = eventHero->m_army.m_creatureCounts[artifactIndex14];
                         if (quantity1 > EVENT_SIRENS_MIN_ARMY_QUANTITY) {
-                            eventHero->m_army.m_quantities[artifactIndex14] =
+                            eventHero->m_army.m_creatureCounts[artifactIndex14] =
                                 quantity1 * AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER;
                             armyValue7 +=
                                 gMonsterDatabase[IDX(creatureType3)].hitPoints
-                                * (quantity1 - eventHero->m_army.m_quantities[artifactIndex14]);
+                                * (quantity1 - eventHero->m_army.m_creatureCounts[artifactIndex14]);
                         }
                     }
                 }

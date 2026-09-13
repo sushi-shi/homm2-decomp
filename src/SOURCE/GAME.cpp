@@ -3910,11 +3910,11 @@ void game::ViewArmy(
     } else {
         gpWindowManager->DoDialog(m_viewArmyWindow, ViewArmyHandler, 0);
         if (gbDismissArmy && theGroup) {
-            theGroup->m_troopTypes[groupIndex] = CREATURE_NONE;
-            theGroup->m_troopCounts[groupIndex] = 0;
+            theGroup->m_creatureTypes[groupIndex] = CREATURE_NONE;
+            theGroup->m_creatureCounts[groupIndex] = 0;
         }
         if (gbUpgradeArmy && theGroup)
-            theGroup->m_troopTypes[groupIndex] = iViewArmyUpgradeToType;
+            theGroup->m_creatureTypes[groupIndex] = iViewArmyUpgradeToType;
     }
     H2_FREE(details0);
     delete m_viewArmyWindow;
@@ -5703,8 +5703,8 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 exp = 0;
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-        if (group->m_quantities[i] > 0) {
-            exp += group->m_quantities[i]
+        if (group->m_creatureCounts[i] > 0) {
+            exp += group->m_creatureCounts[i]
                 * gMonsterDatabase[IDX(group->m_creatureTypes[i])].hitPoints;
         }
     }
@@ -6041,16 +6041,16 @@ void game::SetupTowns(void) {
 
         if (extra0->hasCustomArmy) {
             for (slot12 = 0; slot12 < ARMY_GROUP_SLOT_COUNT; slot12++) {
-                castle8->m_army.m_troopCounts[slot12] = extra0->troopCounts[slot12];
-                if (static_cast<i16>(castle8->m_army.m_troopCounts[slot12]) > 0)
-                    castle8->m_army.m_troopTypes[slot12] = extra0->troopTypes[slot12];
+                castle8->m_army.m_creatureCounts[slot12] = extra0->troopCounts[slot12];
+                if (castle8->m_army.m_creatureCounts[slot12] > 0)
+                    castle8->m_army.m_creatureTypes[slot12] = extra0->troopTypes[slot12];
                 else
-                    castle8->m_army.m_troopTypes[slot12] = CREATURE_NONE;
+                    castle8->m_army.m_creatureTypes[slot12] = CREATURE_NONE;
             }
         } else {
             for (slot12 = 0; slot12 < ARMY_GROUP_SLOT_COUNT; slot12++) {
-                castle8->m_army.m_troopCounts[slot12] = 0;
-                castle8->m_army.m_troopTypes[slot12] = CREATURE_NONE;
+                castle8->m_army.m_creatureCounts[slot12] = 0;
+                castle8->m_army.m_creatureTypes[slot12] = CREATURE_NONE;
             }
             GiveTroopsToNeutralTown(townIndex1);
             GiveTroopsToNeutralTown(townIndex1);
@@ -6331,13 +6331,13 @@ void game::ProcessOnMapHeroes(void) {
                         if (extra9->hasCustomArmy) {
                             for (armySlot26 = 0; armySlot26 < EVENT_RECORD_ARMY_SLOT_COUNT;
                                  armySlot26++) {
-                                mapHero14->m_army.m_troopCounts[armySlot26] =
+                                mapHero14->m_army.m_creatureCounts[armySlot26] =
                                     extra9->troopCounts[armySlot26];
-                                if (static_cast<i16>(mapHero14->m_army.m_troopCounts[armySlot26]) > 0)
-                                    mapHero14->m_army.m_troopTypes[armySlot26] =
+                                if (mapHero14->m_army.m_creatureCounts[armySlot26] > 0)
+                                    mapHero14->m_army.m_creatureTypes[armySlot26] =
                                         extra9->troopTypes[armySlot26];
                                 else
-                                    mapHero14->m_army.m_troopTypes[armySlot26] = CREATURE_NONE;
+                                    mapHero14->m_army.m_creatureTypes[armySlot26] = CREATURE_NONE;
                             }
                         }
                         for (recordPosition14 = 0;
@@ -6512,14 +6512,14 @@ void game::CheckHeroConsistency(void) {
 
     for (player = 0; player < GAME_HERO_COUNT; player++) {
         for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
-            if (m_heroRecs[player].m_army.m_troopTypes[slot] == CREATURE_NONE
+            if (m_heroRecs[player].m_army.m_creatureTypes[slot] == CREATURE_NONE
                 || m_heroRecs[player].m_army.m_creatureCounts[slot] < 0)
                 m_heroRecs[player].m_army.m_creatureCounts[slot] = 0;
         }
     }
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
         for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
-            if (m_castleRecs[player].m_army.m_troopTypes[slot] == CREATURE_NONE
+            if (m_castleRecs[player].m_army.m_creatureTypes[slot] == CREATURE_NONE
                 || m_castleRecs[player].m_army.m_creatureCounts[slot] < 0)
                 m_castleRecs[player].m_army.m_creatureCounts[slot] = 0;
         }

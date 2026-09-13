@@ -17248,7 +17248,7 @@
     "note": "Whole hover dispatch; U01 hover ID read only under mouse-move tag. Eight help-table cases/default use known indices; B59 actual help strings/formats, live viewSpellsHero and gText768 lengths need pinned data evidence. Plain CRT calls not manual varargs; no casts, goto, scratch, unrelated reuse or owner tricks."
   },
   "src/SOURCE/GAME.cpp:game::ViewArmy(i32 x,i32 y,CreatureType monsterType,i32 numTroops,town * castle,i32 disableUpgrade,ArmyFacing facing,i32 quickView,hero * theHero,class army * theArmy,armyGroup * theGroup,i32 groupIndex)#1": {
-    "body_sha256": "1a47ece506204d53beb0b74d064e72eb37f7ca43ebfa115ff072621a78f7cd2c",
+    "body_sha256": "fb29f508bb049607fd3667fe4b59cff73b5e8059dbbef962b539aaa479766054",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -17261,7 +17261,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C38 char name owner removes two pointer casts; C39 five scalar vararg casts removed via complete2/2 and32/32 matrices. All102 GAME functions/sections/ordered relocations native-identical. Remaining literal-const, coordinate narrowing and unsigned health-subtraction boundaries retained for separate review. U01 message numeric/text arms and monster flags meaningful; S40 seven unread i16 widget/frame locals. B60 complete chain198/550, largest gText part32/768, names20/32, filenames13/16, positive troop count11/12 including NUL from pinned retail. B61 live creature/faction/speed/morale/luck/icon-frame domains, spellCount/influence consistency, groupIndex<5 and active-combat nonnull theArmy required. x/y inputs overwritten with window constants, same coordinate role but incoming values unused. No goto, owner recovery, fake offsets or manual varargs. Whole3336 ordinary bytes match; four EH operands/DIR32 unresolved, no whole-retail closure claim. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "C38 char name owner removes two pointer casts; C39 five scalar vararg casts removed via complete2/2 and32/32 matrices. All102 GAME functions/sections/ordered relocations native-identical. Remaining literal-const, coordinate narrowing and unsigned health-subtraction boundaries retained for separate review. U01 message numeric/text arms and monster flags meaningful; S40 seven unread i16 widget/frame locals. B60 complete chain198/550, largest gText part32/768, names20/32, filenames13/16, positive troop count11/12 including NUL from pinned retail. B61 live creature/faction/speed/morale/luck/icon-frame domains, spellCount/influence consistency, groupIndex<5 and active-combat nonnull theArmy required. x/y inputs overwritten with window constants, same coordinate role but incoming values unused. No goto, owner recovery, fake offsets or manual varargs. Whole3336 ordinary bytes match; four EH operands/DIR32 unresolved, no whole-retail closure claim. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. U06 applied: 3 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/GAME.cpp:ViewArmyHandler(tag_message & msg)#1": {
     "body_sha256": "fd0b8e8d682f42b89c812782b81f4e27fffd7fefb90ac54db52e33faa0d2d7e1",
@@ -17632,10 +17632,10 @@
     "note": "S41 unread swap. Search path guards exhausted five slots; explicit slot>=0 path needs slot<5. B61 valid group/creature/count and i16 sum required. No cast, alternate union view, goto, fake pointer or manual arguments."
   },
   "src/SOURCE/GAME.cpp:game::ExperienceValueOfStack(armyGroup * group,hero * h)#1": {
-    "body_sha256": "2bf40fcc62a99a15bef66dacee89b82b123cbd5f199dbecda8e3b33c6a8c0b27",
+    "body_sha256": "01c290be670c1281e6b36d95d8253e8230a5e501e8c952c849e7225678c1a5d9",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17645,7 +17645,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real armyGroup quantity/count alias, fixed five slots. B61 positive quantity does not establish valid creature ID; product/sum must fit i32. No casts/goto/scratch/owner arithmetic/manual varargs."
+    "note": "Real armyGroup quantity/count alias, fixed five slots. B61 positive quantity does not establish valid creature ID; product/sum must fit i32. No casts/goto/scratch/owner arithmetic/manual varargs. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/GAME.cpp:game::GetLuck(hero * h,class army *,town * castle)#1": {
     "body_sha256": "d6dee49556fa1e85ba0decf6639a57afff852ffb7ef898d214882a103a157fec",
@@ -17808,9 +17808,9 @@
     "note": "S41 unused/cost locals unread. Three full sweeps; B64 GetTownId>=0 before extra-index storage. Alchemist y-1/y-2 and mine y-1 accesses guarded; extra-chain contracts remain B58. No casts, union, goto, manual varargs or unrelated role reuse."
   },
   "src/SOURCE/GAME.cpp:game::SetupTowns(void)#1": {
-    "body_sha256": "d36bbab77e2f4368fc82f78e4d6a305ab2680f7e662883b568c48ea385cd1e66",
+    "body_sha256": "701b0177260bc4634e5fdbefa54d8f42d0142571313c96d508ec0416512460ca",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
       "gotos": "absent",
       "address": "absent",
@@ -17821,13 +17821,13 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "S41 dwelling-roll capacity12->10 applied: ten initialized entries, Random0..99/10 indexes0..9. Complete2/2 matrix/all102 GAME native and full2161-byte retail proof pass. Unused scalar remains S41. Real tagged mapTownExtra and flat/2D spell aliases; C34 owner byte and signed troop-count interpretation need owner review. B64 extra/color/faction/mage/name/lifetime domains; neutral owner may index gbHumanPlayer[-1] in default-building branch. attempts17++>500 forbids retry exit once reached until overflow, not a cap. Five levels/six slots and usedSpells are real local arrays. No goto, fake owner, manual varargs or artificial aggregate. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
+    "note": "S41 dwelling-roll capacity12->10 applied: ten initialized entries, Random0..99/10 indexes0..9. Complete2/2 matrix/all102 GAME native and full2161-byte retail proof pass. Unused scalar remains S41. Real tagged mapTownExtra and flat/2D spell aliases; C34 owner byte and signed troop-count interpretation need owner review. B64 extra/color/faction/mage/name/lifetime domains; neutral owner may index gbHumanPlayer[-1] in default-building branch. attempts17++>500 forbids retry exit once reached until overflow, not a cap. Five levels/six slots and usedSpells are real local arrays. No goto, fake owner, manual varargs or artificial aggregate. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent. U06 applied: 6 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged. Direct signed load removes one now-redundant i16 cast after complete2-arm native/retail proof."
   },
   "src/SOURCE/GAME.cpp:game::ProcessOnMapHeroes(void)#1": {
-    "body_sha256": "c152ae548b9fa8b760ae2edf4b84fa7edc4c286b7b15bd1478d0249455612495",
+    "body_sha256": "e3335d502e1ba84cda2370e53c2a885d196161add50ce03065e717b9385b83c7",
     "patterns": {
-      "casts": "open",
-      "unions": "retain",
+      "casts": "applied",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17837,13 +17837,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "All three passes read. U10 real hero patrol owner differs from legitimate mapHeroExtra jail-class/patrol-radius union. C34 byte coordinates/IDs and signed troop-count cast; true Faction/Artifact/Skill boundaries retained. B64 signed custom heroId only tested<54 (negative can reach usedHeroes[-1]); both RandomScan calls can return-1. Player/faction/color/count<8 and extra/name/skill extents needed. Fixed54 flags/five troops/eight serialized skills fit; y-1 guarded. No goto/fake aggregate/manual varargs/owner arithmetic."
+    "note": "All three passes read. U10 real hero patrol owner differs from legitimate mapHeroExtra jail-class/patrol-radius union. C34 byte coordinates/IDs and signed troop-count cast; true Faction/Artifact/Skill boundaries retained. B64 signed custom heroId only tested<54 (negative can reach usedHeroes[-1]); both RandomScan calls can return-1. Player/faction/color/count<8 and extra/name/skill extents needed. Fixed54 flags/five troops/eight serialized skills fit; y-1 guarded. No goto/fake aggregate/manual varargs/owner arithmetic. U06 applied: 4 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged. Direct signed load removes one now-redundant i16 cast after complete2-arm native/retail proof."
   },
   "src/SOURCE/GAME.cpp:game::CheckHeroConsistency(void)#1": {
-    "body_sha256": "ce0180d23ed996675da5125f3bbd3cc2c2e3b580328b8ad3e86c2bfa7e34c0e8",
+    "body_sha256": "a403271b7b58e519632df196ef2679a5e666ee613775d82842ad481d87822f76",
     "patterns": {
       "casts": "open",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17853,7 +17853,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C34 bounded replacement hero; S42 sane assigned unread. R09 player becomes hero then town index. B61 counts/list IDs/occupiedTown required; map metadata explicitly checked0..53 before hero access, invalid owner handled. Five troop slots fit all54/72 records. No goto, fake aggregate, union, raw owner pointer or manual varargs."
+    "note": "C34 bounded replacement hero; S42 sane assigned unread. R09 player becomes hero then town index. B61 counts/list IDs/occupiedTown required; map metadata explicitly checked0..53 before hero access, invalid owner handled. Five troop slots fit all54/72 records. No goto, fake aggregate, union, raw owner pointer or manual varargs. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 player,i32 useCurrentSave)#1": {
     "body_sha256": "60dc23611282f5e1988e7a88379a3483e41b051087057390419f0e79857ff503",
@@ -18960,7 +18960,7 @@
     "note": "Assigns supplied typed town pointer to its actual owner field; no ten-pattern instance, cast or fabricated offset."
   },
   "src/SOURCE/PHILAI.cpp:philAI::HeroInteractionAtTown(hero * heroPtr,town * townPtr,i32 doInteraction,i32 * value)#1": {
-    "body_sha256": "bb034e6b61de1d9427e0e6c5bec17923a9da8c08f3eca0babfba9cc81d249bca",
+    "body_sha256": "962f6006e4420b67308f7dc090889cd9604247e4db07bd9828e2f3963d685aef",
     "patterns": {
       "casts": "open",
       "unions": "applied",
@@ -18973,7 +18973,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire211-line pre-edit body read including spell valuation and transfer branches. U15 adjacent five-count owner applied across all consumers; all98 native objects/1826 emitted instances/sections/ordered relocs identical.1975 ordinary retail bytes and DIR32 sites pass; fixed13-float supplement proves all remaining operands. C47 bounded town-ID/turn narrowing needs review; double/float and float-to-i32 conversions are real precision/truncation boundaries. R11 stackSlot begins as Manhattan distance then army-slot index. S49 scratchVal unread and initial statSum0 overwritten. B68 live hero/town/value/player, valid wisdom/count/spell/terrain/creature domains, nonzero townFV+battlePower and representable transfer arithmetic required. Five-slot loops fit actual army owner; quantity alias retained. No goto, fake stack aggregate, artificial owner pointer, outside pointer or manual varargs."
+    "note": "Entire211-line pre-edit body read including spell valuation and transfer branches. U15 adjacent five-count owner applied across all consumers; all98 native objects/1826 emitted instances/sections/ordered relocs identical.1975 ordinary retail bytes and DIR32 sites pass; fixed13-float supplement proves all remaining operands. C47 bounded town-ID/turn narrowing needs review; double/float and float-to-i32 conversions are real precision/truncation boundaries. R11 stackSlot begins as Manhattan distance then army-slot index. S49 scratchVal unread and initial statSum0 overwritten. B68 live hero/town/value/player, valid wisdom/count/spell/terrain/creature domains, nonzero townFV+battlePower and representable transfer arithmetic required. Five-slot loops fit actual army owner; quantity alias retained. No goto, fake stack aggregate, artificial owner pointer, outside pointer or manual varargs. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:ResetHeroRVs(i32 resetAll,i32 x,i32 y)#1": {
     "body_sha256": "0319b5dbd7e1b240874bc0f0173f046096ed835908bc1cc79f63d17c950604f7",
@@ -19056,10 +19056,10 @@
     "note": "Walks player town IDs and checks occupant sentinel before GetHero; B69 live player/game, townCount<=72 and valid IDs required. iDummy is a real output argument, not manual varargs. No cast, union, goto, fake aggregate or unrelated roles."
   },
   "src/SOURCE/PHILAI.cpp:philAI::CheckForCreatureUpgrades(void)#1": {
-    "body_sha256": "5875aa2ab13c550d032f82e94bc7746bdc4415dbaf3c8eafbe733895bf3c7581",
+    "body_sha256": "dfd3a19f98a33c7da4372f9eacaf5cf34a9917cfd4a82654963b1beded923ebe",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19069,7 +19069,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "U06 quantity alias remains. S50 upgradedType initial NONE is overwritten whenever hasUpgrade is set. Both town/hero armies, all five slots, dwelling upgrades, dragon special case and merge tail read. B69 valid faction/creature/town IDs, nonnegative quantities and representable cost/merge arithmetic required; RES_NONE guarded before resource indexing. No cast, goto, fake aggregate, manual varargs or unrelated-role reuse."
+    "note": "U06 quantity alias remains. S50 upgradedType initial NONE is overwritten whenever hasUpgrade is set. Both town/hero armies, all five slots, dwelling upgrades, dragon special case and merge tail read. B69 valid faction/creature/town IDs, nonnegative quantities and representable cost/merge arithmetic required; RES_NONE guarded before resource indexing. No cast, goto, fake aggregate, manual varargs or unrelated-role reuse. U06 applied: 7 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:GetCastleSlot(i32 id)#1": {
     "body_sha256": "f179ac7194cf7c203f1b454090b9a57edca5f9be808da67b75bad9e8d49fd4f2",
@@ -19376,10 +19376,10 @@
     "note": "Entire constant1.0f return read; unused ABI argument intentionally not read. No instance of any ten-pattern category."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ValueOfBuyingBuilding(town * townPtr,BuildingSlotType building,i32 & resourceValue,float & benefitCost)#1": {
-    "body_sha256": "a5f3248012423a8997d2727648c1c25f7f779d829acffa0b139fd9260a255eb4",
+    "body_sha256": "700a0d6c48dc8f3c8233feb2b35a13b08845d62bb4feb54490cc29e1648a73a1",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -19389,7 +19389,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full building switch and danger/resource tails read. C50 building enum-to-i32 can use domain accessor; actual float conversions retained. U06 real army quantities. G61 two deferEarlyBuilding joins. R13 indexBuilding_2 spans building and army-slot indices. Seven-resource array is a real cost vector and all threat outputs are actual scalar reference arguments. B70 valid faction/building/mage/garrison/creature domains, initialized GetBuildingCost output and nonzero RVConversion divisor required. Existing B51 unsupported-cost/mage-index conditions remain, no artificial array enlargement or manual varargs."
+    "note": "Full building switch and danger/resource tails read. C50 building enum-to-i32 can use domain accessor; actual float conversions retained. U06 real army quantities. G61 two deferEarlyBuilding joins. R13 indexBuilding_2 spans building and army-slot indices. Seven-resource array is a real cost vector and all threat outputs are actual scalar reference arguments. B70 valid faction/building/mage/garrison/creature domains, initialized GetBuildingCost output and nonzero RVConversion divisor required. Existing B51 unsupported-cost/mage-index conditions remain, no artificial array enlargement or manual varargs. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::GetBestBuilding(town * t,BHC & bhc,float & fOut)#1": {
     "body_sha256": "f395a3dbccfab385b3b9fb487b487a0d55072bdfcfbcdc84a38c39aba3301e31",
@@ -19728,10 +19728,10 @@
     "note": "Real TurnsToBuy discount with lower clamp0. No explicit casts, union, goto, stack aggregate, manual varargs, unrelated reuse or artificial pointer. B71 inherits seven-resource-vector and finite arithmetic requirements from TurnsToBuy; lower clamp is not input-domain validation."
   },
   "src/SOURCE/PHILAI.cpp:philAI::FightValueOfStack(armyGroup * group,hero * heroPtr,i32 useHero,i32 useTown,i32 townId,i32 useEnemyMods)#1": {
-    "body_sha256": "a08407fc5d2dec5b0e758e8122cdca286a0437347a2a4a11e02dd3d6a6c96cac",
+    "body_sha256": "85c4dddf8c50c30c1400ad2e6c0376d31e9639aa1f0e01b7c745350bf3bd9068",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19741,13 +19741,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire five-stack/town/hero/spell valuation read. C52 functional spell-enum conversions could use typed loop roles; real floating boundaries retained. U06 army quantity alias remains. R14 slot spans army slots, spell IDs and ranked spell selections. S52 rangeVal assigned but unread. B71 group live, enemyMods implies heroPtr, town/creature/skill/spell/cost domains and arithmetic ranges required. Spell-score array is real and bounded by at most one entry per spell; all scores forcedpositive before max selection, and selection loop stops at spellCount, so bestSpellIdx initialized before use. Spell-power lookup clamps only upper bound; nonnegative Stats needed. Repeated >2 count branch is source behavior, not fixed. No goto, fake aggregate/manual varargs/owner arithmetic."
+    "note": "Entire five-stack/town/hero/spell valuation read. C52 functional spell-enum conversions could use typed loop roles; real floating boundaries retained. U06 army quantity alias remains. R14 slot spans army slots, spell IDs and ranked spell selections. S52 rangeVal assigned but unread. B71 group live, enemyMods implies heroPtr, town/creature/skill/spell/cost domains and arithmetic ranges required. Spell-score array is real and bounded by at most one entry per spell; all scores forcedpositive before max selection, and selection loop stops at spellCount, so bestSpellIdx initialized before use. Spell-power lookup clamps only upper bound; nonnegative Stats needed. Repeated >2 count branch is source behavior, not fixed. No goto, fake aggregate/manual varargs/owner arithmetic. U06 applied: 17 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateOneTimeCreaturePurchase(CreatureType creature,i32 availableCount,i32 useAvailableCount,i32 & purchaseCount,i32 & purchaseValue,i32 & replacementSlot)#1": {
-    "body_sha256": "5b679d81cbabc47a265b9ff340a3e71cacf54a6c93c5a937a6f596b740d2b048",
+    "body_sha256": "9580d9e30e8e9ffe1c5d066e1d6d89fbd7e55392daada0e1007b8d4e1c6eb127",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19757,13 +19757,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real five-slot replacement selection, initialized outputs and cost vector read. B71 replacementStackValue uses gMonsterDatabase[armyIndex3] rather than the actual creature ID; full405-byte retail/sites/ordered-target proof confirms literal slot index. No semantic repair applied. U06 quantity alias retained; current hero/creature domains, nonnegative availability and representable strength/cost products required. Real float truncation retained; no goto, fake aggregate, manual varargs or unrelated role reuse."
+    "note": "Real five-slot replacement selection, initialized outputs and cost vector read. B71 replacementStackValue uses gMonsterDatabase[armyIndex3] rather than the actual creature ID; full405-byte retail/sites/ordered-target proof confirms literal slot index. No semantic repair applied. U06 quantity alias retained; current hero/creature domains, nonnegative availability and representable strength/cost products required. Real float truncation retained; no goto, fake aggregate, manual varargs or unrelated role reuse. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::QuickCombat(armyGroup * attacker,hero * attackerHero,armyGroup * defender,hero * defenderHero,i32 townBattle,i32 townId,float & attackerDamage,float & defenderDamage)#1": {
-    "body_sha256": "9cb1e3456bfe420a98a44fe6e5b4391a352ed3584517f00f23c0a705deb2b168",
+    "body_sha256": "b07e3600f11da1aa70cca0c34812c247c742338cdfd170ac7e16bccc29e9ab6c",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19773,7 +19773,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete odds/random casualty, outcome callbacks, artifacts, damage, necromancy, eagle-eye and town-claim flow read. C52 enum loops/redundant numeric operands candidates; actual precision/truncation stays. U06 quantity alias. R14 slot army then spell ID. S52 army assigned NULL/winner but unread, spare1/tmp unused, multiple outcome locals actual reference outputs but unused by caller. B71 attackerHero is required despite some null guards; later CheckLevel/army/temps dereference unconditionally. Defender-win branch calls attacker ApplyBattleWinTemps when defender nonnull, and final both-hero win callbacks are source behavior. No normal bug reachability claim or callback correction. No goto/fake aggregate/manual varargs/owner trick."
+    "note": "Complete odds/random casualty, outcome callbacks, artifacts, damage, necromancy, eagle-eye and town-claim flow read. C52 enum loops/redundant numeric operands candidates; actual precision/truncation stays. U06 quantity alias. R14 slot army then spell ID. S52 army assigned NULL/winner but unread, spare1/tmp unused, multiple outcome locals actual reference outputs but unused by caller. B71 attackerHero is required despite some null guards; later CheckLevel/army/temps dereference unconditionally. Defender-win branch calls attacker ApplyBattleWinTemps when defender nonnull, and final both-hero win callbacks are source behavior. No normal bug reachability claim or callback correction. No goto/fake aggregate/manual varargs/owner trick. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::HeroInteractionAtHero(hero * firstHero,hero * secondHero,i32 evaluateOnly,i32 * value)#1": {
     "body_sha256": "3450be392342d1c4c0f63289694eafb055a8a1a77558e0920ca222e98847d1ed",
@@ -19792,10 +19792,10 @@
     "note": "Full two-hero value and transfer body read. C52 i16 turn fields and typed primary/secondary/artifact loop candidates; real float ratios/truncations retained. R14 statIndex10 spans primary, secondary and artifact domains. S52 savedHero9 stores old recipient but is never read; later assignment makes dominant/recipient same pointer, not a swap. Whole909 ordinary bytes/sites plus fixed four-double supplement prove retail behavior. B71 valid hero/value outputs, skill/artifact domains and nonzero combined hero/army values required. Two-element heroValues array is real. No goto/union/fake aggregate/manual varargs/owner arithmetic."
   },
   "src/SOURCE/PHILAI.cpp:philAI::RedistributeTroops(armyGroup * sourceArmy,armyGroup * destinationArmy,i32 preserveOne,i32 preferFast,i32 sourceStrength,i32 destinationStrength,i32 transferBudget)#1": {
-    "body_sha256": "d14c6c7fcd46bb831a7f0f339569371d6044521ca6f894affaf43397728d32d2",
+    "body_sha256": "934fe94a429f72847ba9c20104b404be9cf1ee7f3afc46cf1ab6ef7f9e842135",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19805,7 +19805,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full compatible-stack scan/speed selection, preservation, rounding/budget and transfer tail read. Nested double-to-float-to-i32 conversions are real rounding/precision boundaries; retain. U06 actual quantity alias. B71 distinct live armies, valid creature IDs/positive fight values, quantities and representable budget/strength arithmetic required. army total is initialized and read only when preserveOne true; unused destinationStrength is ABI input. No goto, fake aggregate, manual varargs or unrelated local-role reuse."
+    "note": "Full compatible-stack scan/speed selection, preservation, rounding/budget and transfer tail read. Nested double-to-float-to-i32 conversions are real rounding/precision boundaries; retain. U06 actual quantity alias. B71 distinct live armies, valid creature IDs/positive fight values, quantities and representable budget/strength arithmetic required. army total is initialized and read only when preserveOne true; unused destinationStrength is ABI input. No goto, fake aggregate, manual varargs or unrelated local-role reuse. U06 applied: 10 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ChooseGoldOrExperience(i32,i32)#1": {
     "body_sha256": "0955dcb7ca87341369a14259ac73078bd7e041ce81bacbe4c2c6c8648ae37f41",
@@ -19840,10 +19840,10 @@
     "note": "Real scalar output references to ProbableOutcomeOfBattle, value adjustment and positive-result flag. S52 p unused; other temporary outputs are actual arguments, not invented aggregate. B71 live compatible armies/heroes/output references and finite representable weighted score required. Real truncation retained; no union/goto/manual varargs/unrelated reuse/artificial pointer."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ChooseToFightForArtifact(ArtifactType artifact,CreatureType monster,i32 quantity)#1": {
-    "body_sha256": "9fdbc2cd31ef7382869874cd3905ce70789ffbf1a28000667f70ed5ac6970fe0",
+    "body_sha256": "e915b4351fc28f2617f8b35843dc77f79da0d65f1e3c62810a033bb7d365f024",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19853,7 +19853,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "All five monster types set and only first quantity1; supplied quantity ABI argument ignored. C52 boolean-to-i16 quantity cast candidate, real weighted-score truncation retained. U06 count alias. B71 valid artifact/creature IDs, live scratch/current armies and representable score required. No goto, fake stack aggregate, manual varargs, unrelated reuse or artificial owner pointer."
+    "note": "All five monster types set and only first quantity1; supplied quantity ABI argument ignored. C52 boolean-to-i16 quantity cast candidate, real weighted-score truncation retained. U06 count alias. B71 valid artifact/creature IDs, live scratch/current armies and representable score required. No goto, fake stack aggregate, manual varargs, unrelated reuse or artificial owner pointer. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::NetValueOfArtifact(i32 a1,i32 a2,i32 a3,i32 a4)#1": {
     "body_sha256": "1b9a0b1d2d03827d0ec1421b1724c590780e6ce285807a3c9aa2dd90cf5f1902",
@@ -19920,10 +19920,10 @@
     "note": "Entire player append, hero initialization, map update, wire send and replacement-candidate sequence read. C52 owner char, coordinate u8 and replacement hero-ID i8 conversions need domain/type review. B71 available slot0..1, heroCount<8, valid old/new hero IDs and map/player/town lifecycle required. GetNewHeroId result is indexed immediately after narrowing with no -1 guard. No union/goto/fake aggregate/manual varargs/unrelated reuse/owner recovery."
   },
   "src/SOURCE/PHILAI.cpp:philAI::BuildCreature(town * townPtr,i32 dwelling,i32 purchaseCount)#1": {
-    "body_sha256": "1dbd3783161488f6d7ef55a680defa16bd8e5f3ff668814c291bc9fd34e428a6",
+    "body_sha256": "94fc672b4e18b1c66d1dfac089e9d27d1d1d6c2159b4b725e6adb9df371a1fa9",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19933,13 +19933,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full logging, capacity scan, weakest-stack sale, cost subtraction and recruitment read. Actual float valuation boundaries retained; U06 quantities. R14 slotIdx spans army then seven-resource domains. lowSlot fallback0 protects absent minimum; B71 valid faction/dwelling/creature, nonnegative quantity and representable cost/refund/garrison arithmetic required. Seven-element cost vector is real, not fake scratch. No goto/manual varargs/owner arithmetic."
+    "note": "Full logging, capacity scan, weakest-stack sale, cost subtraction and recruitment read. Actual float valuation boundaries retained; U06 quantities. R14 slotIdx spans army then seven-resource domains. lowSlot fallback0 protects absent minimum; B71 valid faction/dwelling/creature, nonnegative quantity and representable cost/refund/garrison arithmetic required. Seven-element cost vector is real, not fake scratch. No goto/manual varargs/owner arithmetic. U06 applied: 3 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::CombatMonsterEvent(hero * h,CreatureType monType,i32 * pCount,mapCell * cell)#1": {
-    "body_sha256": "beda48c27fb7d0ac9c2d1d2c878ea2b67f919bca99237ef0e79eb7d8999fa169",
+    "body_sha256": "bb53b3fc1b3d0c091817d587f7da1004b67fa2fbf0b295fc26cc0174c1c171d3",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19949,13 +19949,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Clears actual five-element type/count arrays, splits quotient/remainder across them, calls QuickCombat and sums survivors. C52 quotient-to-i16 quantity cast needs valid total domain; U06 aliases retained. B71 nonnegative representable count, valid creature/live hero/group required. For nonnegative count remainder loop visits0..3 safely, negative count invalid not masked by padding. No goto, fake aggregate, manual varargs, unrelated role reuse or artificial pointer."
+    "note": "Clears actual five-element type/count arrays, splits quotient/remainder across them, calls QuickCombat and sums survivors. C52 quotient-to-i16 quantity cast needs valid total domain; U06 aliases retained. B71 nonnegative representable count, valid creature/live hero/group required. For nonnegative count remainder loop visits0..3 safely, negative count invalid not masked by padding. No goto, fake aggregate, manual varargs, unrelated role reuse or artificial pointer. U06 applied: 5 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::FightEvent(hero * h,mapCell * cell,i32 evaluateOnly)#1": {
-    "body_sha256": "2f69da23b8e7f9e6bb3bb985f78c59e33248d4df621109798f51b1a35f058aea",
+    "body_sha256": "5e60873d3eae8a52357302f65b7efb289ef2186e7802362e01c8178c14237205",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19965,7 +19965,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete encounter dispatch, evaluation and combat tail read. C54 bounded encounter counts narrowed to i16; real casualty/value truncations retained. U06 army quantity alias remains. Three four-entry quantity tables are real, indexed by metadata minus2: only metadata1 is guarded, so callers must supply2..5 otherwise. B72 live hero/cell/army, valid monster/artifact/map domains and representable scores required. S53 unusedValue10 unread. No goto, fake owner, manual varargs or unrelated role reuse."
+    "note": "Complete encounter dispatch, evaluation and combat tail read. C54 bounded encounter counts narrowed to i16; real casualty/value truncations retained. U06 army quantity alias remains. Three four-entry quantity tables are real, indexed by metadata minus2: only metadata1 is guarded, so callers must supply2..5 otherwise. B72 live hero/cell/army, valid monster/artifact/map domains and representable scores required. S53 unusedValue10 unread. No goto, fake owner, manual varargs or unrelated role reuse. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::DamageGroup(armyGroup * ag,hero * loser,hero *,float dmg)#1": {
     "body_sha256": "06480fda372f177cc71e247349a130049edb9028d9f5c058d4fa08c085ce60b1",
@@ -20032,10 +20032,10 @@
     "note": "Full two-creature count/value and existing-stack discount read. C54 inner explicit float conversion may be redundant; final i32 truncations are real. B72 valid creature IDs/live hero/player and representable count times value delta required. No union, goto, stack aggregate, artificial pointer, varargs or unrelated reuse."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ComputeValueOfSS(hero * h,HeroSecondarySkill skill,HeroSkillLevel level)#1": {
-    "body_sha256": "a88f27c0e2b968ac5b7a58fdb6390543ee6997785539ea22dec41718f2e488d9",
+    "body_sha256": "682e0d5ef5f8c889da40ade9ef05d84fe07674d28c9a5055b2498929af93dbd7",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20045,7 +20045,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full skill table, army weighting and navigation/archery/wisdom/mysticism dispatch read. C54 numerator promotion candidate; real float division and i32 truncations retained, parenthesized divisor kept. U06 army count view. B72 skill0..13/level1..3, live hero/player, nonzero upgrade weight and archery totalValue required; empty army can make latter0. Five-stack traversal is bounded. No goto, fake aggregate, artificial owner, varargs or unrelated reuse."
+    "note": "Full skill table, army weighting and navigation/archery/wisdom/mysticism dispatch read. C54 numerator promotion candidate; real float division and i32 truncations retained, parenthesized divisor kept. U06 army count view. B72 skill0..13/level1..3, live hero/player, nonzero upgrade weight and archery totalValue required; empty army can make latter0. Five-stack traversal is bounded. No goto, fake aggregate, artificial owner, varargs or unrelated reuse. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ComputeValueOfFreeSS(hero * h,HeroSecondarySkill skill)#1": {
     "body_sha256": "8f355d72e538a6f4b45715311cde7bd1441cb2473c15d55991b31656f20b9453",
@@ -20080,10 +20080,10 @@
     "note": "C53 removes redundant numerator float conversion and modernizes divisor/result casts while preserving parenthesized float divisor. Complete16/16 family; twelve strict112-byte exact arms, four implicit-divisor arms110 bytes rejected. Retained arm and full89-function native TU comparison plus independent retail sites/targets pass. B72 valid hero/knowledge/level, nonnegative spell points and representable capacity/score required. Under normal nonnegative inputs deficit>0 implies positive capacity, so not labeled an unconditional zero-divisor bug. No other pattern instance."
   },
   "src/SOURCE/PHILAI.cpp:philAI::ValueOfEventAtPosition(i32 x,i32 y,i32 immediate,i32 * liveChance)#1": {
-    "body_sha256": "c1a98a3077a526a20bf982056277629adf395119c61f4be802792f214f9698fd",
+    "body_sha256": "5a0ba3a8a375aedb7331f0e97b320288d658499514abc6e6dc46ec3b5db1ccb1",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -20093,13 +20093,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire674-line event switch, travel recursion, purchase shared tail and cache writeback read. C54 domain/count/enum casts; cache clamp to +/-32000 proves final i16 range. U06 army and real mapcell metadata/tent tag views retained. G62 sixteen creature_purchase joins untried. R15 i spans spell IDs then army slots. S53 four unread arrays3/3/3/9 tested complete16/16 keep/remove product: every removal changes size, none retained; other unused scalars/selected exit coordinates and unconsumed purchase outputs remain. B72 cached return precedes liveChance=100 and reload/berserk initialization; cache lacks those outputs. Valid grids/player, event metadata/resource/visit-shift domains, recursion and finite arithmetic required. Default masked-object diagnostic fits text768; flotsam gold assignment is overwritten by wood expression. No behavior correction, fake owner, manual varargs or artificial address."
+    "note": "Entire674-line event switch, travel recursion, purchase shared tail and cache writeback read. C54 domain/count/enum casts; cache clamp to +/-32000 proves final i16 range. U06 army and real mapcell metadata/tent tag views retained. G62 sixteen creature_purchase joins untried. R15 i spans spell IDs then army slots. S53 four unread arrays3/3/3/9 tested complete16/16 keep/remove product: every removal changes size, none retained; other unused scalars/selected exit coordinates and unconsumed purchase outputs remain. B72 cached return precedes liveChance=100 and reload/berserk initialization; cache lacks those outputs. Valid grids/player, event metadata/resource/visit-shift domains, recursion and finite arithmetic required. Default masked-object diagnostic fits text768; flotsam gold assignment is overwritten by wood expression. No behavior correction, fake owner, manual varargs or artificial address. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateGenericSite(mapCell * cell)#1": {
-    "body_sha256": "848e55b61408743aa5d55d02cd4da3cb3a03eec12f14da17d0e4fca6e2f68804",
+    "body_sha256": "4c509275b973fbda3a6814175009441a147655c53723018e5b33ac02a27ae4d3",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20109,7 +20109,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete generic-site switch read. C54 enum-mask-enum roundtrip candidate; genuine float truncations retained. U06 army quantity alias. R15 slot spans fourteen artifacts then five army stacks. S53 decoded level and unusedValue unread. B72 live metadata/hero/player, valid artifact/creature/day domains and representable hitpoint/value arithmetic required. No goto, fake aggregate, artificial owner or manual varargs."
+    "note": "Complete generic-site switch read. C54 enum-mask-enum roundtrip candidate; genuine float truncations retained. U06 army quantity alias. R15 slot spans fourteen artifacts then five army stacks. S53 decoded level and unusedValue unread. B72 live metadata/hero/player, valid artifact/creature/day domains and representable hitpoint/value arithmetic required. No goto, fake aggregate, artificial owner or manual varargs. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateBarrier(mapCell * cell)#1": {
     "body_sha256": "d50e66d0e1e7764b8f94d75be851d89413865226bea72de2a52ca799aa147597",
@@ -20224,10 +20224,10 @@
     "note": "Entire campaign/scenario/victory-side predicate read. NO_PLAYER(-1) short-circuits first; other player IDs and current player must be0..5 before color indexing. Genuine campaign and map-header fields, not alternate fake owner. No cast, union, goto, scratch aggregate, artificial pointer, varargs or unrelated reuse."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateArtifactEvent(ArtifactType artifact,i32 eventData)#1": {
-    "body_sha256": "66fb616bfe57a2af99b8377fc8f4264125736202ab49e80b8e90f224abf1b02c",
+    "body_sha256": "536a97dbd562f8a6354e08f077c3a09102d18df7078c1bfb3ef27b2794303f6d",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20237,13 +20237,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full artifact, guardian/resource gate, army and scroll valuation read. C54 bounded first-slot boolean count conversion candidate; real floating truncations retained. U06 counts. S53 extraValue/junkVal/unusedRV unused. B72 valid artifact/scroll/low-byte creature and high-nibble resource0..6 required; nibble extraction alone allows0..15. Artifact count equality14 assumes valid inventory capacity. Real guardian quantity is rogue10 otherwise first slot1. No goto, fake aggregate, artificial owner, varargs or unrelated reuse."
+    "note": "Full artifact, guardian/resource gate, army and scroll valuation read. C54 bounded first-slot boolean count conversion candidate; real floating truncations retained. U06 counts. S53 extraValue/junkVal/unusedRV unused. B72 valid artifact/scroll/low-byte creature and high-nibble resource0..6 required; nibble extraction alone allows0..15. Artifact count equality14 assumes valid inventory capacity. Real guardian quantity is rogue10 otherwise first slot1. No goto, fake aggregate, artificial owner, varargs or unrelated reuse. U06 applied: 1 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateMineEvent(i32 mineIndex,i32 x,i32 y,i32 * liveChance)#1": {
-    "body_sha256": "be776f14aed12afaeb5c949e069039c6bacd5d9008f847e6c882c91bcf55b9d2",
+    "body_sha256": "0031a043a7453e23dba6ff4078a163353ebe246f8fd96bd8e30d6977b78afb2f",
     "patterns": {
       "casts": "retain",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20253,13 +20253,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire ownership/threat/guardian battle/resource valuation read. B72 winChance is stored through i32 truncation without *100, unlike sibling event evaluators; full696-byte retail and ordered sites/targets confirm this. Early friendly return also leaves liveChance unchanged, relying on caller initialization. No corrective percentage scaling added. Valid mine/grid/resource/player/guardian domains and nonzero battle denominators required. S53 battle loss/remain outputs not consumed. Real numeric casts retained; no goto, union, fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+    "note": "Entire ownership/threat/guardian battle/resource valuation read. B72 winChance is stored through i32 truncation without *100, unlike sibling event evaluators; full696-byte retail and ordered sites/targets confirm this. Early friendly return also leaves liveChance unchanged, relying on caller initialization. No corrective percentage scaling added. Valid mine/grid/resource/player/guardian domains and nonzero battle denominators required. S53 battle loss/remain outputs not consumed. Real numeric casts retained; no goto, union, fake aggregate, manual varargs, unrelated reuse or owner arithmetic. U06 applied: 4 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateMonsterEvent(CreatureType monsterType,i32 eventData,i32 * liveChance)#1": {
-    "body_sha256": "e7ecabd25e7436556853817a79995bc10ca6a84869bb9526aedbfe37ff04bb7f",
+    "body_sha256": "c8d2ea0afc6c6158da1e405b1e8d854094237670e6ee8d459c3494cfa441533d",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20269,7 +20269,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full count split, joining/hiring, combat ratio and chance valuation read. C54 eventData&0xfff gives quantity0..4095, per-stack quotient fits i16; real float/probability truncations retained. U06 counts. R15 attackerLoss6 reused as purchase-value output after casualty role. S53 unusedPurchaseValue7 replacement-slot output and purchaseCost9 count output unconsumed. B72 zero total count can produce zero strength divisor; valid creature/army/player required. ratio>5 return leaves chance to caller; joining sets100 then weighted result overwrites it. No goto, fake aggregate, varargs or artificial owner pointer."
+    "note": "Full count split, joining/hiring, combat ratio and chance valuation read. C54 eventData&0xfff gives quantity0..4095, per-stack quotient fits i16; real float/probability truncations retained. U06 counts. R15 attackerLoss6 reused as purchase-value output after casualty role. S53 unusedPurchaseValue7 replacement-slot output and purchaseCost9 count output unconsumed. B72 zero total count can produce zero strength divisor; valid creature/army/player required. ratio>5 return leaves chance to caller; joining sets100 then weighted result overwrites it. No goto, fake aggregate, varargs or artificial owner pointer. U06 applied: 4 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/PHILAI.cpp:philAI::EvaluateHeroEvent(i32 heroId,i32 x,i32 y,i32 mode,i32 * liveChance)#1": {
     "body_sha256": "b2dd5f1d2ecd82c622bd82c5acc70699a911416e775a0327456cc68ae6bd517e",
@@ -23795,7 +23795,7 @@
     "body_sha256": "21f5941393f30606ef87220aad7662bc0fef58471bfae6a5832a6a68571e8f3f",
     "patterns": {
       "casts": "applied",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "open",
       "owner": "absent",
@@ -23805,7 +23805,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C72 redundant scalar/literal conversions removed; six strong enum-to-frame casts and conditional-filename const_cast retained after C++98/C++20 checks. A04 actual flat11200-byte heaps, row70 address stages; flattened macros7750->7549/cleanup7727 rejected. S65 unread scalar removal7744 rejected; R24 distinct role/count splits7771/7756 rejected. B87 each row town24icons18texts/hero58icons17texts <70; real5army/4stats/8skills/14artifacts/12dwellings bounded with typed inputs. Positivei16 quantities fit6 but arbitrary garrison signed16 needs7; signed8 stats5 vs4, valid skill0..9 fits2. Names termination/allocation/widget lifetimes remain. Negative top not excluded before roster lookup; normal cache NONE short-circuit avoids reset-1 lookup, never-updated cache retained. U06 army alternate views still open. Full7750bytes/ordinary targets and three fixed numeric operands pass; existing EH+6,c,14,1e10 gaps not closed; all98native unchanged."
+    "note": "C72 redundant scalar/literal conversions removed; six strong enum-to-frame casts and conditional-filename const_cast retained after C++98/C++20 checks. A04 actual flat11200-byte heaps, row70 address stages; flattened macros7750->7549/cleanup7727 rejected. S65 unread scalar removal7744 rejected; R24 distinct role/count splits7771/7756 rejected. B87 each row town24icons18texts/hero58icons17texts <70; real5army/4stats/8skills/14artifacts/12dwellings bounded with typed inputs. Positivei16 quantities fit6 but arbitrary garrison signed16 needs7; signed8 stats5 vs4, valid skill0..9 fits2. Names termination/allocation/widget lifetimes remain. Negative top not excluded before roster lookup; normal cache NONE short-circuit avoids reset-1 lookup, never-updated cache retained. U06 army alternate views still open. Full7750bytes/ordinary targets and three fixed numeric operands pass; existing EH+6,c,14,1e10 gaps not closed; all98native unchanged. U06 resolved by shared-owner recovery: all alternate consumers reconciled, both army unions removed; this unchanged body and all98 objects retain complete native byte/relocation equivalence. U06.md records serialized signedness and layout proof."
   },
   "src/SOURCE/Overview.cpp:game::SetupNewOverviewType(OverviewType overviewType,i32 redrawFrom)#1": {
     "body_sha256": "02a64611541cf95c53d22ed6762af74f93cb3f76e6b19d705181b35c0b0b9dc5",
@@ -23891,7 +23891,7 @@
     "body_sha256": "eb82382729e3c5f56a4953ed31ce29675fd2d127fac84b3ac1760d28e22941bc",
     "patterns": {
       "casts": "applied",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23901,7 +23901,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C72 literal backdrop cast removed. B87 IDs200..999 produce row0..3 but top+row==count accepted by > guard before GetHero/GetTown; ordinary created widgets omit emptyrows so bad-widget reachability not presumed. Subwidget ranges bound real5army/8skill/14artifact/4stat/12dwelling owners under typed owner/input contract. Related widgetId decode not unrelatedreuse; R24 non-strict skill/artifact role split changes bytes at1187 size retainedoriginal. U06 army normal view consumer does not resolve alternate signed/count union debt; no fake aggregate/goto/manualvarargs/owner arithmetic. Full1187bytes/ordinary58targets pass, EH+6,c,14,499 explicit; helper4blocks outside function not mismatch."
+    "note": "C72 literal backdrop cast removed. B87 IDs200..999 produce row0..3 but top+row==count accepted by > guard before GetHero/GetTown; ordinary created widgets omit emptyrows so bad-widget reachability not presumed. Subwidget ranges bound real5army/8skill/14artifact/4stat/12dwelling owners under typed owner/input contract. Related widgetId decode not unrelatedreuse; R24 non-strict skill/artifact role split changes bytes at1187 size retainedoriginal. U06 army normal view consumer does not resolve alternate signed/count union debt; no fake aggregate/goto/manualvarargs/owner arithmetic. Full1187bytes/ordinary58targets pass, EH+6,c,14,499 explicit; helper4blocks outside function not mismatch. U06 resolved by shared-owner recovery: all alternate consumers reconciled, both army unions removed; this unchanged body and all98 objects retain complete native byte/relocation equivalence. U06.md records serialized signedness and layout proof."
   },
   "src/SOURCE/REQUEST.cpp:GetMapHeader(char * filename,struct SMapHeader * header)#1": {
     "body_sha256": "4aea73e25922640111a71d8d8412eee3fd167f59f5c224ceb0c3f0ad7d203074",
@@ -25904,10 +25904,10 @@
     "note": "Eight-color masked lookup and flag shift are bounded. Packed password requires0..210; generated passwords establish it, malformed metadata does not. Two-name formatting fits768 using actual color/password maxima11/14 including NUL. Sample/UI owners and current player remain required. No manual argument-slot varargs or enclosing-owner recovery. Full224 retail bytes; all sites/ordered targets pass. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
   },
   "src/SOURCE/EVENTS.cpp:advManager::GenericSiteEvent(mapCell * cell,hero * eventHero)#1": {
-    "body_sha256": "aa8e6cafe201779bbdda843ba25ebab5629f9be154118a452e6e648c36933ca5",
+    "body_sha256": "a15a38aeecf4487c940dd5a596b9a0a58b2053fe01ee0ecc308a6085806baca2",
     "patterns": {
       "casts": "applied",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -25917,7 +25917,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C79 four flag pairs and Sirens short destination applied. S72 unused locals/site-level and two unused stable constants remain after products. Arena selection, global callbacks, five-army Sirens loop and all site switches read. Fixed stable catalog fits500; Sirens quantity>1 makes ordinary reduction positive but HP multiplication/experience sum may overflow. Magi hut color is3. Alchemist removes artifact stats through its human path. No manual argument-slot varargs or enclosing-owner recovery. Full1788 retail bytes; all sites/ordered targets pass with independently pinned numeric operands. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
+    "note": "C79 four flag pairs and Sirens short destination applied. S72 unused locals/site-level and two unused stable constants remain after products. Arena selection, global callbacks, five-army Sirens loop and all site switches read. Fixed stable catalog fits500; Sirens quantity>1 makes ordinary reduction positive but HP multiplication/experience sum may overflow. Magi hut color is3. Alchemist removes artifact stats through its human path. No manual argument-slot varargs or enclosing-owner recovery. Full1788 retail bytes; all sites/ordered targets pass with independently pinned numeric operands. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged. U06 applied: 3 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/EVENTS.cpp:advManager::RecruitSiteEvent(mapCell * cell,hero * eventHero)#1": {
     "body_sha256": "e4f94cb19a47fa2d7767cec96adcb0bf173c98ad2417e9877a5878e41836b15a",
@@ -26304,10 +26304,10 @@
     "note": "Same bounded color shift writes tent flags. Unread one-word array is S72 and remains after a two-arm text difference. No password/string buffer or enclosing-owner recovery. No manual argument-slot varargs or enclosing-owner recovery. Full84 retail bytes; all sites/ordered targets pass. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
   },
   "src/SOURCE/EVENTS.cpp:advManager::GenericSiteAIEvent(mapCell * cell,hero * eventHero)#1": {
-    "body_sha256": "ce55fa7c6d5e61eddd9aa2113c056fd81adc04473197481f877910d64253050b",
+    "body_sha256": "6719fc73062cf36174fa4c394921cd011cff1d4a9093f2cb1d8d2e7509f62702",
     "patterns": {
       "casts": "applied",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -26317,7 +26317,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C79 four flag pairs and Sirens short destination removed. S72 unused arrays/site-level remain after8 arms. Five-army Sirens access is bounded; signed reward arithmetic remains a contract. Alchemist AI requires1500 but spends750 and does not call the human artifact-stat removal helper; this asymmetry is retail. No manual argument-slot varargs or enclosing-owner recovery. Full849 retail bytes; all sites/ordered targets pass with independently pinned numeric operands. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
+    "note": "C79 four flag pairs and Sirens short destination removed. S72 unused arrays/site-level remain after8 arms. Five-army Sirens access is bounded; signed reward arithmetic remains a contract. Alchemist AI requires1500 but spends750 and does not call the human artifact-stat removal helper; this asymmetry is retail. No manual argument-slot varargs or enclosing-owner recovery. Full849 retail bytes; all sites/ordered targets pass with independently pinned numeric operands. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged. U06 applied: 3 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
   },
   "src/SOURCE/EVENTS.cpp:advManager::RecruitSiteAIEvent(mapCell * cell,hero * eventHero)#1": {
     "body_sha256": "e4137145b380761d4f5247ef456020ed7c341560e41d63724db3c2702fe1573b",

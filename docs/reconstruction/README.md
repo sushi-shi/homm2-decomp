@@ -207,8 +207,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - C14: retain both recruitment filename casts for the required C++98
   annotation dialect. The [native-equivalent removal experiment](C14.md)
   fails that parser even though the modern interface accepts const text.
-- U06: army-group duplicate type/count union aliases need all-consumer review;
-  the unsigned troop-count view must not silently change serialized meaning.
+- U06: consolidated army-group type/count owners and removed two compensating
+  signed casts, with [all-consumer, layout and complete native proof](U06.md).
+  Unsigned serialized map counts remain unchanged.
 - S18-S21: unread morale/recruitment/swap scalars and unknown interior strip/
   recruitment class gaps require native frame/layout evidence. Real snapshot
   arrays and generic swap temporaries are not artificial stack aggregation.
