@@ -7397,7 +7397,7 @@ CombatResult advManager::DoCombat(
     hero* receivedSecondHero;
     hero* receivedFirstHero;
     town* receivedTown;
-    char* packet;
+    char* receivedPacket;
     i32 remotePlayer;
     tag_message message;
     i8 combatResult;
@@ -7466,12 +7466,12 @@ CombatResult advManager::DoCombat(
                         COMBAT_NETWORK_POLL_HEIGHT,
                         0
                     );
-                    packet = CheckHandleNet();
-                    if (packet) {
-                        switch (EVENTS_REMOTE_MESSAGE(packet)->command) {
+                    receivedPacket = CheckHandleNet();
+                    if (receivedPacket) {
+                        switch (EVENTS_REMOTE_MESSAGE(receivedPacket)->command) {
                             case REMOTE_COMMAND:
                                 ReceiveHeroTownData(
-                                    packet,
+                                    receivedPacket,
                                     &remotePlayer,
                                     &x,
                                     &y,
