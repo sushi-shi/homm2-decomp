@@ -30,8 +30,8 @@ DATA(0x00536114) static i32 s_pitch = 0;
 
 VA(0x004c0ca0, 0x7cf)
 void IconToBitmapColorTable(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -44,10 +44,10 @@ void IconToBitmapColorTable(
     u8* colorTable,
     i32 dimGate
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
+    s_src = sourceIcon->m_data + s_entry->srcOffset;
     s_left = x + s_entry->x;
-    s_pitch = dest->m_width;
+    s_pitch = destination->m_width;
     s_x = s_left;
     s_y = y + s_entry->y;
 
@@ -61,7 +61,7 @@ void IconToBitmapColorTable(
         }
     }
 
-    s_row = dest->m_pixels + s_y * s_pitch;
+    s_row = destination->m_pixels + s_y * s_pitch;
 
     for (;;) {
         s_run = *s_src;

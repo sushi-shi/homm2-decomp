@@ -30,8 +30,8 @@ DATA(0x00539874) static i32 s_pitch = 0;
 
 VA(0x004d5a50, 0x683)
 void IconToBitmapYModify(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -43,15 +43,15 @@ void IconToBitmapYModify(
     i32 color,
     i8* shear
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
+    s_src = sourceIcon->m_data + s_entry->srcOffset;
     s_left = x + s_entry->x;
-    s_pitch = dest->m_width;
+    s_pitch = destination->m_width;
     s_y = y + s_entry->y;
     s_x = s_left + shear[s_y];
     s_clipR = clipX + clipW - 1;
     s_clipB = clipY + clipH - 1;
-    s_row = dest->m_pixels + s_y * s_pitch;
+    s_row = destination->m_pixels + s_y * s_pitch;
 
     for (;;) {
         s_run = *s_src;

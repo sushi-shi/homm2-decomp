@@ -628,7 +628,7 @@ public:
     void CombatMessage(CombatMessageCommand messageType);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
-    void SetupGridForArmy(class army* armyPtr);
+    void SetupGridForArmy(class army* armyPointer);
     i32 UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid);
     void DrawBackground(void);
     void UpdateMouseGrid(i32 hexIndex, i32 forceUpdate);

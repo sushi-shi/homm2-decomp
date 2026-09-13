@@ -24,18 +24,23 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 
+#if H2_RETAIL_COMPILER
+#define height h
+#define widgetId e
+#define width w
+#endif
 VA(0x004cb120, 0xa8)
 border::border(
     i16 x,
     i16 y,
-    i16 w,
-    i16 h,
-    i16 e,
+    i16 width,
+    i16 height,
+    i16 widgetId,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 fillColor,
     H2_CONST char* name
 )
-    : widget(x, y, w, h, e, kind) {
+    : widget(x, y, width, height, widgetId, kind) {
     if (name != NULL)
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
     else
@@ -43,6 +48,11 @@ border::border(
     m_backgroundIcon = NULL;
     m_fillColor = fillColor;
 }
+#if H2_RETAIL_COMPILER
+#undef height
+#undef widgetId
+#undef width
+#endif
 
 VA(0x004cb1d0, 0x7f)
 H2_RETAIL_INLINE border::~border() {
@@ -79,28 +89,28 @@ void border::Read(void) {
 }
 
 VA(0x004cb390, 0x1de)
-MessageDispatchResult border::Main(struct tag_message& msg) {
+MessageDispatchResult border::Main(struct tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
-        if (msg.type == MESSAGE_WIDGET)
-            return widget::Main(msg);
+        if (message.type == MESSAGE_WIDGET)
+            return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    switch (msg.type) {
+    switch (message.type) {
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            i16 x = msg.payload.mouse.x - m_owner->m_posX;
-            i16 y = msg.payload.mouse.y - m_owner->m_posY;
+            i16 x = message.payload.mouse.x - m_owner->m_posX;
+            i16 y = message.payload.mouse.y - m_owner->m_posY;
             if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                    msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 } else {
                     m_flags |= WIDGET_FLAG_SELECTED;
-                    msg.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
                 }
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
+                message.type = MESSAGE_WIDGET;
+                message.payload.widget.id = m_id;
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
@@ -110,13 +120,13 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    return widget::Main(msg);
+    return widget::Main(message);
 }
 
 VA(0x004cb570, 0xec)

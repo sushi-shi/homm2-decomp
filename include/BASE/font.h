@@ -39,16 +39,16 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(H2_CONST char* str, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
+    void DrawStringExecute(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
     void PolishBoundedTextLayout(H2_CONST char*, char*, u32*, i32, i32*, char);
 
 public:
-    void DrawString(H2_CONST char* s, i32 x, i32 y, FontDrawMode mode);
-    i32 GetCharacterWidth(u8 c);
+    void DrawString(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode);
+    i32 GetCharacterWidth(u8 character);
     void ExtractLine(H2_CONST char* text, char* line, i32* position, i32 maxWidth, i32* lineWidth, u8 lastLine);
-    void DrawBoundedString(H2_CONST char* str, i32 x, i32 y, i32 w, i32 h, FontDrawMode mode, FontAlignment align);
-    i32 LineLength(H2_CONST char* str, i32 maxW);
-    i32 LineWidth(H2_CONST char* str);
+    void DrawBoundedString(H2_CONST char* text, i32 x, i32 y, i32 width, i32 height, FontDrawMode mode, FontAlignment align);
+    i32 LineLength(H2_CONST char* text, i32 maxW);
+    i32 LineWidth(H2_CONST char* text);
 };
 #pragma pack(pop)
 SIZE(font, 0x20);
