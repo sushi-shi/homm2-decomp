@@ -92,6 +92,19 @@ namespace {
         return capital;
     }
 
+    inline char ToLowerCp1251(u8 letter) {
+        char lowerFirst;
+        if (letter >= 'A' && letter <= 'Z')
+            lowerFirst = letter + ('a' - 'A');
+        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
+            lowerFirst = letter + (CP1251_SMALL_A - CP1251_CAPITAL_A);
+        else if (letter == CP1251_CAPITAL_YO)
+            lowerFirst = CP1251_SMALL_YO;
+        else
+            lowerFirst = letter;
+        return lowerFirst;
+    }
+
 } // namespace
 
 H2_ENUM_BEGIN(GameSaveFormatConstant)
@@ -6453,7 +6466,7 @@ void game::CheckHeroConsistency(void) {
                     || (all < HERO_CONSISTENCY_POOL_THRESHOLD
                         && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
-                        static_cast<i8>(GetNewHeroId(player, FACTION_ANY, 0));
+                        GetNewHeroId(player, FACTION_ANY, 0);
                     m_availableHeroes[m_players[player].m_availableHeroIds[slot]] =
                         WEEKLY_AVAILABLE_HERO;
                 }
@@ -7049,7 +7062,7 @@ i32 game::ReceiveSaveGame(
 VA(0x0045e8fe, 0x4fd)
 void game::DoNewTurn(void) {
     char musicFile18[NEW_TURN_MUSIC_FILENAME_CAPACITY];
-    u8 lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
+    char lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
     i32 musicTrack2;
 
     CheckForTimeEvent();
@@ -7107,26 +7120,16 @@ void game::DoNewTurn(void) {
                         gMonthNames[giMonthTypeExtra]
                     );
                 } else if (giMonthType == CALENDAR_PERIOD_CREATURE) {
-                    u8 lowerFirst;
                     strcpy(
-                        reinterpret_cast<char*>(lowerName19),
+                        lowerName19,
                         gArmyNamesPlural[giMonthTypeExtra]
                     );
-                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
-                        lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
-                    else
-                        lowerFirst = lowerName19[0];
-                    lowerName19[0] = lowerFirst;
+                    lowerName19[0] = ToLowerCp1251(lowerName19[0]);
                     sprintf(
                         gText,
                         cNewTurn[NEW_MONTH_CREATURE_TEXT],
                         gArmyNamesPlural[giMonthTypeExtra],
-                        reinterpret_cast<char*>(lowerName19)
+                        lowerName19
                     );
                 } else {
                     sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
@@ -7137,26 +7140,16 @@ void game::DoNewTurn(void) {
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
-                    u8 lowerFirst;
                     strcpy(
-                        reinterpret_cast<char*>(lowerName19),
+                        lowerName19,
                         gArmyNamesPlural[giWeekTypeExtra]
                     );
-                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
-                        lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
-                    else
-                        lowerFirst = lowerName19[0];
-                    lowerName19[0] = lowerFirst;
+                    lowerName19[0] = ToLowerCp1251(lowerName19[0]);
                     sprintf(
                         gText,
                         cNewTurn[NEW_WEEK_CREATURE_TEXT],
                         gArmyNamesPlural[giWeekTypeExtra],
-                        reinterpret_cast<char*>(lowerName19)
+                        lowerName19
                     );
                 }
             }

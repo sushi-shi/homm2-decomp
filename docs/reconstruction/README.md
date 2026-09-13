@@ -393,13 +393,15 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - C40-C43: [all ten sprite casts are removed](C34-C40-S41.md), with named
   sentinels and natural byte assignments. C41's logo upcast is removed;
   [C42 recovers three typed flag clears](C42-S42.md), plus four natural
-  assignments/API arguments. New-turn lowercase text ownership remains open.
+  assignments/API arguments. [C43 recovers new-turn text ownership](C43-S41-S42-B65.md)
+  with an unsigned-input CP1251 helper and removes four pointer casts.
 - S41/S44: dwelling-roll and rumour-order scratch now match ten entries and
   six players. [Hero initialization removes three casts](C34-C40-S41.md);
   its unused third army-table column stays after complete native-changing
   alternatives. Other setup storage remains open. S42 retains the unread
   NextPlayer count and PerDay income slot after all96 measured arms;
-  other turn-update and S43 transfer/compression locals remain open. R09 tracks indices
+  [four further S41/S42 deletions change native code](C43-S41-S42-B65.md)
+  and remain. Other turn-update and S43 transfer/compression locals remain open. R09 tracks indices
   reused across distinct player/hero/town roles.
 - G49-G54: random-monster bounds, transfer cleanup, score clamping, map-size
   setup, diff completion and rumour fallback joins need structural tests.

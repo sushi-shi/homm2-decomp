@@ -17466,10 +17466,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "Real tagged mapTownExtra cast and random FactionType boundary. S41 unused two-i32 array. B64 GetTownId>=0, map/extra payload, color mapping/race required. Four ConvertObject calls clip rectangles but initial direct GetCell is unchecked. No union/goto/unrelated role/manual varargs or owner recovery."
+    "note": "Real tagged mapTownExtra cast and random FactionType boundary retain. S41 two-arm deletion of unused two-i32 array keeps432 bytes but changes frame0x20 to0x18 and live stack operands, so retain. B64 GetTownId>=0,map/extra payload,color mapping/race required; four ConvertObject calls clip rectangles but initial GetCell is unchecked. No union,goto,unrelated role,manual varargs or owner recovery. C43-S41-S42-B65.md records complete product and unchanged whole-native/full ordinary retail proof."
   },
   "src/SOURCE/GAME.cpp:game::RandomizeMine(i32 x,i32 y)#1": {
     "body_sha256": "6d25a976553e8e699b7d0f4d05d335aa1c216037fd1cb5b0dd9fa4de7bd0471c",
@@ -17840,9 +17840,9 @@
     "note": "All three passes read. U10 real hero patrol owner differs from legitimate mapHeroExtra jail-class/patrol-radius union. C34 byte coordinates/IDs and signed troop-count cast; true Faction/Artifact/Skill boundaries retained. B64 signed custom heroId only tested<54 (negative can reach usedHeroes[-1]); both RandomScan calls can return-1. Player/faction/color/count<8 and extra/name/skill extents needed. Fixed54 flags/five troops/eight serialized skills fit; y-1 guarded. No goto/fake aggregate/manual varargs/owner arithmetic. U06 applied: 4 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged. Direct signed load removes one now-redundant i16 cast after complete2-arm native/retail proof."
   },
   "src/SOURCE/GAME.cpp:game::CheckHeroConsistency(void)#1": {
-    "body_sha256": "a403271b7b58e519632df196ef2679a5e666ee613775d82842ad481d87822f76",
+    "body_sha256": "14caf58289b3a9f03dca9c9126fcb17b29954edda3a0aeb799136ac240615ec2",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
       "gotos": "absent",
       "address": "absent",
@@ -17850,10 +17850,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "open",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C34 bounded replacement hero; S42 sane assigned unread. R09 player becomes hero then town index. B61 counts/list IDs/occupiedTown required; map metadata explicitly checked0..53 before hero access, invalid owner handled. Five troop slots fit all54/72 records. No goto, fake aggregate, union, raw owner pointer or manual varargs. U06 applied: 2 alternate army members consolidated as existing creature types/signed counts; packed15-byte owner and containing record sizes preserved. All98 native objects and both dialects pass; U06-functions.tsv retains full per-body retail result. Map-file u16 counts and prior runtime contracts unchanged."
+    "note": "C34 applies the natural replacement-hero assignment to the existing i8 destination; GetNewHeroId always returns0..53 after its positive retry loop. S42 complete4-arm product retains sane and its write-only owner-check loop: removal changes1225 to1118 bytes. R09 player/hero/town index reuse remains. B61 counts/list IDs/occupiedTown required; map metadata checked0..53 before hero access and invalid owner handled. Five troop slots fit54 heroes/72 towns. U06 existing15-byte army owner and containing layouts unchanged. No goto,fake aggregate,raw owner trick or manual varargs. See C43-S41-S42-B65.md: all98 native objects/full ordinary retail bytes,size,DIR32 sites and ordered targets pass without exceptions; both dialects pass."
   },
   "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 player,i32 useCurrentSave)#1": {
     "body_sha256": "60dc23611282f5e1988e7a88379a3483e41b051087057390419f0e79857ff503",
@@ -17888,9 +17888,9 @@
     "note": "C44 tagged RemoteMessage/i16 packet prefix and codec/CRC views; S43 unused2080 and overwritten initial locals. B62 whole1736-byte retail proof: ackBuffer256 gets100 bytes but sends200, remaining100 not initialized here; CRCs only logged, never compared. Signed packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 validations absent locally. Tagged payload reuse meaningful; no goto/fake aggregate/manual varargs/owner recovery. No hardening silently applied."
   },
   "src/SOURCE/GAME.cpp:game::DoNewTurn(void)#1": {
-    "body_sha256": "14183dbc402f635a9475f3c84583f16cf6dd778bf156db4d35103f1d5f73225f",
+    "body_sha256": "b52a02a8c91c86c6774fd0a277920839ac9755a3bba7585e60896a4d24ef2689",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17898,10 +17898,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C43 u8 lowercase text owner/four text casts; naive char replacement breaks high-byte Cyrillic comparisons, needs unsigned-character helper alternatives. C34 player truncation. S42 musicFile16 written never read; lowerName52 bound pending. B65 period/creature/player/terrain indices, terminated names and gText768 formats needed. lowerFirst remains byte fold, no union/goto/fake aggregate/manual varargs/owner arithmetic."
+    "note": "C43 recovers a char[52] text owner and ToLowerCp1251(u8) helper, removing all four text pointer casts. Complete20-arm product crosses five owner shapes, music-buffer removal and player-argument conversion: retain helper-char plus original music buffer/player cast. C34 player-cast deletion loses2 bytes; S42 write-only music storage/copies deletion loses38 bytes. B65 all66 plural names need at most22 bytes including NUL; all7 full retail format bounds are137,142,75,162,73,70,152 in gText768, conditional on valid indices and terminated player names<=20. Both256-byte signed/unsigned CP1251 input paths pass under C++98/20. Period/creature/player/terrain/lifetime contracts remain. No union,goto,fake aggregate,manual varargs or owner arithmetic. See C43-S41-S42-B65.md; all98 native objects and full ordinary retail bytes/size/DIR32 sites/ordered targets pass without exceptions."
   },
   "src/SOURCE/GAME.cpp:game::GetBoatsBuilt(void)#1": {
     "body_sha256": "dfcb77c50e658d5a2c6f9d322eb522c72ec8ffd0de1b2de277214a2847125831",
@@ -17946,10 +17946,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "absent"
     },
-    "note": "S42 unread notused; additive enum-comparison rating only. No buffer/index/cast/union/goto/reuse/pointer arithmetic/manual varargs."
+    "note": "S42 two-arm unused-notused deletion keeps255 bytes but changes frame0x0c to0x08 and live stack operands; retain. Additive enum-comparison rating only, no buffer,index,cast,union,goto,reuse,pointer arithmetic or manual varargs. C43-S41-S42-B65.md records complete product and unchanged whole-native/full ordinary retail proof."
   },
   "src/SOURCE/GAME.cpp:CalcBaseScore(i32 days)#1": {
     "body_sha256": "96623ac23f879555ae699778ccc6214c7665d717efd6b697b0c610abd7541ed8",
@@ -26478,5 +26478,21 @@
       "bounds": "retain"
     },
     "note": "S72 answer8 becomes prefix+1 (5). Real expected5 and answer5 arrays; strncpy4, expected[4]=0, then answer terminator0..4 are bounded. Trailing spaces trim until first nonspace; all-spaces prefix remains four spaces. Comparison intentionally ignores answer suffix beyond expected prefix. Source strings must be readable through NUL or four characters. No manual argument-slot varargs or enclosing-owner recovery. Full143 retail bytes; all sites/ordered targets pass. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
+  },
+  "src/SOURCE/GAME.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
+    "body_sha256": "40e035296080c82299308a35d9dfa8073eec3e5b62ab5ceba4096c3373f74821",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Unsigned-byte CP1251 first-character fold returning text char; covers all256 byte inputs without indexing or pointer access. ASCII capitals and basic Russian capitals including Ё map to lowercase; all other bytes remain unchanged. C43 recovered inline sibling of ToUpperCp1251; actual helper tested exhaustively under both C++98/20 and both call-site native sequences remain retail exact. No cast,union,goto,address/owner/outside trick,varargs,reuse,aggregate or unresolved buffer."
   }
 }
