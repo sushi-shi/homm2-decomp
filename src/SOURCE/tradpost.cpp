@@ -44,14 +44,6 @@ typedef enum TradingPostPrivateConstant {
     OFFER_NAME_SIZE = 52
 } TradingPostPrivateConstant;
 
-typedef enum Cp1251Case {
-    CP1251_CASE_DELTA  = 0x20,
-    CP1251_UPPER_FIRST = 0xc0,
-    CP1251_UPPER_LAST  = 0xdf,
-    CP1251_UPPER_YO    = 0xa8,
-    CP1251_LOWER_YO    = 0xb8
-} Cp1251Case;
-
 
 float fTradingPostEfficiency = 0.0f;
 i32 bLeftDenominated = 0;
@@ -126,69 +118,41 @@ void UpdateTradingPost(i32 draw) {
             offeredValue = 1;
         }
         strcpy(rightName, gResourceNames[rightResource]);
-        if (static_cast<u8>(rightName[0]) >= 'A' && static_cast<u8>(rightName[0]) <= 'Z')
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(rightName[0]) <= CP1251_UPPER_LAST)
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) == CP1251_UPPER_YO)
-            chr1 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr1 = rightName[0];
+        chr1 = CyrillicToLower(rightName[0]);
         rightName[0] = chr1;
 
         strcpy(leftName, gResourceNames[leftResource]);
-        if (static_cast<u8>(leftName[0]) >= 'A' && static_cast<u8>(leftName[0]) <= 'Z')
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(leftName[0]) <= CP1251_UPPER_LAST)
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) == CP1251_UPPER_YO)
-            chr2 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr2 = leftName[0];
+        chr2 = CyrillicToLower(leftName[0]);
         leftName[0] = chr2;
 
         sprintf(
             gText,
-            "{%s}\n\nНа моем рынке %s и %s "
-            "меняются из соотношения "
-            "%d %s к %d %s"  ,
+            "{%s}\n\nНа моем рынке %s и %s меняются из соотношения %d %s к %d %s",
             bIsMarketPlace != 0 ? "Рынок"
-                                : "Рынок"  ,
+                                : "Рынок",
             rightName,
             leftName,
             offeredValue,
-            offeredValue > 1 ? "ед."   : "ед."  ,
+            offeredValue > 1 ? "ед." : "ед.",
             requestedValue,
-            requestedValue > 1 ? "ед."   : "ед."
+            requestedValue > 1 ? "ед." : "ед."
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            "{%s}\n\nВам предложена "
-            "достойная сделка. Я не "
-            "пытаюсь нажиться на ней. "
-            "Вас интересует что-нибудь "
-            "из моих товаров?"  ,
+            "{%s}\n\nВам предложена достойная сделка. Я не пытаюсь нажиться на ней. Вас интересует что-нибудь из моих товаров?",
             bIsMarketPlace != 0 ? "Рынок"
                                 : "Рынок"
         );
     } else {
         sprintf(
             gText,
-            "{%s}\n\nПосмотрите на наши "
-            "товары. Если что-то вас "
-            "заинтересует, щелкните "
-            "по нужным вещам и выберите, "
-            "на что хотите поменять."  ,
+            "{%s}\n\nПосмотрите на наши товары. Если что-то вас заинтересует, щелкните по нужным вещам и выберите, на что хотите поменять.",
             bIsMarketPlace != 0 ? "Рынок"
                                 : "Рынок"
         );
     }
-    messageTemp.type = MESSAGE_WIDGET;
-    messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
-    messageTemp.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
@@ -238,7 +202,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
                     if (leftResource == idx) {
-                        sprintf(gText, "н/д"  );
+                        sprintf(gText, "н/д");
                     } else {
                         ComputeTradeRatios(
                             leftResource,

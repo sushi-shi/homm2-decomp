@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/armyGroup.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <stdio.h>
@@ -140,7 +141,7 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     sprintf(
         gText,
-          "Встречаются\x20\x25\x73\x20и\x20\x25\x73",
+         "Встречаются %s и %s",
         m_heroes[(SWAP_SIDE_LEFT)]->m_name,
         m_heroes[(SWAP_SIDE_RIGHT)]->m_name
     );
@@ -177,21 +178,11 @@ i32 swapManager::Open(i32 id) {
         }
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(
+        message,
+        gpAdvManager->m_adventureWindow,
+        WIDGET_COMMAND_CLEAR_FLAGS
+    );
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -215,21 +206,7 @@ void swapManager::Close(void) {
     gpAdvManager->Activate();
 
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(message, gpAdvManager->m_adventureWindow, WIDGET_COMMAND_SET_FLAGS);
 }
 
 void swapManager::DrawSelector(void) {
@@ -435,16 +412,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                      "Нельзя\x20передать\x20этот\x20предмет\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+
+                                    "Нельзя передать этот предмет.",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -510,16 +480,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                      "Нельзя\x20передать\x20этот\x20предмет\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+
+                                    "Нельзя передать этот предмет.",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -800,8 +763,7 @@ void swapManager::SwapArtifacts(void) {
 void swapManager::SwapMons(void) {
     i32 selectedArmyCount [[maybe_unused]] = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
-        if (m_heroes[(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
-            && m_heroes[(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
+        if (ARMY_GROUP_HAS_POSITIVE_STACK(m_heroes[(m_selectedSide)]->m_army, slot_1))
             ++selectedArmyCount;
     }
 
@@ -963,12 +925,12 @@ void swapManager::SplitMons(void) {
     if (m_selectedSide == m_targetSide) {
         sprintf(
             gText,
-              "Сколько\x20воинов\x20перенести\x3f"
+             "Сколько воинов перенести?"
         );
     } else {
         sprintf(
             gText,
-              "Сколько\x20\x25\x73\x20перенести\x20из\x20армии\x20\x25\x73\x20в\x20армию\x20\x25\x73\x3f",
+             "Сколько %s перенести из армии %s в армию %s?",
             gArmyNamesPlural[(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[(m_selectedSide)]->m_name,
             m_heroes[(m_targetSide)]->m_name

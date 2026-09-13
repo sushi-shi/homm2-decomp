@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Ints.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -68,20 +69,10 @@ void SetupRecruitWin(
     tag_message message;
 
     strcpy(monsterName, GetMonsterPluralName(creatureType));
-
-    if (static_cast<u8>(monsterName[0]) >= 'A' && static_cast<u8>(monsterName[0]) <= 'Z')
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) >= 0xc0 && static_cast<u8>(monsterName[0]) <= 0xdf)
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) == 0xa8)
-        ch = static_cast<char>(0xb8);
-    else
-        ch = monsterName[0];
+    ch = CyrillicToLower(monsterName[0]);
     monsterName[0] = ch;
-    sprintf(label, "%s %s", "Нанять"  , monsterName);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TITLE_CONTROL;
+    sprintf(label, "%s %s", "Нанять", monsterName);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = label;
     window->BroadcastMessage(message);
 
@@ -94,15 +85,13 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "Доступно: "  , available);
+    sprintf(gText, "%s%d", "Доступно: ", available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
     sprintf(gText, "monh%04d.icn", (creatureType));
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    message.payload.widget.id = CREATURE_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, CREATURE_CONTROL);
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {
@@ -186,8 +175,7 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "Для этой армии нет места "
-            "в гарнизоне."
+            "Для этой армии нет места в гарнизоне."
             ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
@@ -219,7 +207,7 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "Доступно: "  , *m_available);
+    sprintf(gText, "%s%d", "Доступно: ", *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);

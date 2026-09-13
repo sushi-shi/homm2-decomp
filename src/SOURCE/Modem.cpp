@@ -78,16 +78,11 @@ void ModemSetup(i32 mode) {
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
-            "Ожидание подключения "
-            "другого компьютера к "
-            "прямому "
-            "соединению.\n\nНажмите "
-            "'ОТМЕНА', чтобы прервать "
-            "ожидание."
+            "Ожидание подключения другого компьютера к прямому соединению.\n\nНажмите 'ОТМЕНА', чтобы прервать ожидание."
 
 
         );
-        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         LogStr("MS5");
@@ -100,9 +95,9 @@ i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, "%s %s", "Звоню..."  , numbuf);
+    sprintf(gText, "%s %s", "Звоню...", numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, "%s %s", "Звоню..."  , numbuf);
+    sprintf(gText, "%s %s", "Звоню...", numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
@@ -110,7 +105,7 @@ i32l Dial(void) {
 
 i32l Wait(void) {
     GUIModemResponse(
-        "Ожидание звонка..."  ,
+        "Ожидание звонка...",
         "RING"
     );
     GUIModemCommand(
@@ -133,7 +128,7 @@ void GUIModemCommand(const char* message, const char* command) {
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
     strcpy(cModemCommand, command);
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
 }
@@ -170,7 +165,7 @@ i8 GUIModemResponse(const char* message, const char* response) {
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
     giWaitType = DIALOG_WAIT_MODEM_RESPONSE;
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
     return 0;

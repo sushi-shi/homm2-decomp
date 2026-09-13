@@ -7,6 +7,15 @@
 
 struct tag_message;
 
+typedef enum InputLogicalExtent {
+    INPUT_GAME_WIDTH = 640,
+    INPUT_GAME_HEIGHT = 480
+} InputLogicalExtent;
+
+
+#define CLIENT_TO_GAME_X(x) (((x) * INPUT_GAME_WIDTH) / iMainWinScreenWidth)
+#define CLIENT_TO_GAME_Y(y) (((y) * INPUT_GAME_HEIGHT) / iMainWinScreenHeight)
+
 enum {
     INPUT_KEY_CODE_ASCII = 0,
     INPUT_KEY_CODE_SCAN  = 1

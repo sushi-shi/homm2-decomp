@@ -215,7 +215,7 @@ void searchArray::TestPossibleDirections(
             }
         }
 
-        gSearchTerrain = giGroundToTerrain[gSearchNextCell->m_terrainImageIndex];
+        gSearchTerrain = CELL_TERRAIN(gSearchNextCell);
         if (gSearchTerrain == TERRAIN_WATER) {
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType
@@ -223,19 +223,15 @@ void searchArray::TestPossibleDirections(
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
                 }
-                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex] == TERRAIN_WATER
+                if (CELL_TERRAIN(gSearchCurrentCell) == TERRAIN_WATER
                     && normalDirTable[gSearchDirection].x != 0
                     && normalDirTable[gSearchDirection].y != 0) {
-                    if (giGroundToTerrain
-                            [gpAdvManager
-                                 ->GetCell(x + normalDirTable[gSearchDirection].x, y)
-                                 ->m_terrainImageIndex]
-                            != TERRAIN_WATER
-                        || giGroundToTerrain
-                               [gpAdvManager
-                                    ->GetCell(x, y + normalDirTable[gSearchDirection].y)
-                                    ->m_terrainImageIndex]
-                               != TERRAIN_WATER) {
+                    if (CELL_TERRAIN(
+                            gpAdvManager->GetCell(x + normalDirTable[gSearchDirection].x, y)
+                        ) != TERRAIN_WATER
+                        || CELL_TERRAIN(
+                               gpAdvManager->GetCell(x, y + normalDirTable[gSearchDirection].y)
+                           ) != TERRAIN_WATER) {
                         gSearchTerrain = TERRAIN_INVALID;
                         goto storeDirection;
                     }
@@ -257,26 +253,20 @@ void searchArray::TestPossibleDirections(
         }
 
         if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
-            if (gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT
-                && gSearchCurrentCell->m_objectTileset != TILESET_DUMMY
-                && (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+            if (CELL_HAS_NON_SHADOW_OBJECT(gSearchCurrentCell)) {
                 gSearchTerrain = TERRAIN_INVALID;
                 goto storeDirection;
             }
             if (gSearchNextCell->m_overlayIndex != SEARCH_NO_OBJECT) {
                 mapCell* belowNext = gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
 
-                if (belowNext->m_objectIndex != SEARCH_NO_OBJECT
-                    && belowNext->m_objectTileset != TILESET_DUMMY
-                    && (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                if (CELL_HAS_NON_SHADOW_OBJECT(belowNext)) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
                 }
             }
         } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
-            if (gSearchNextCell->m_objectIndex != SEARCH_NO_OBJECT
-                && gSearchNextCell->m_objectTileset != TILESET_DUMMY
-                && (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+            if (CELL_HAS_NON_SHADOW_OBJECT(gSearchNextCell)) {
                 if ((((gSearchNextCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     gSearchTriggerType = gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
                     if (!StopOnTrigger(gSearchNextCell)) {
@@ -291,9 +281,7 @@ void searchArray::TestPossibleDirections(
             if (gSearchCurrentCell->m_overlayIndex != SEARCH_NO_OBJECT) {
                 mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
 
-                if (belowCurrent->m_objectIndex != SEARCH_NO_OBJECT
-                    && belowCurrent->m_objectTileset != TILESET_DUMMY
-                    && (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                if (CELL_HAS_NON_SHADOW_OBJECT(belowCurrent)) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
                 }

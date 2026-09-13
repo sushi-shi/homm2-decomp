@@ -168,6 +168,9 @@ enum {
     WIDGET_COMMAND_SET_WIDTH                  = 0x3d
 };
 typedef i32 BaseWidgetCommand;
+#define IS_WIDGET_SELECTION_COMMAND(command) \
+    ((command) == WIDGET_COMMAND_SELECT || (command) == WIDGET_COMMAND_ALTERNATE_SELECT)
+
 enum {
     MESSAGE_MODIFIER_NONE                   = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT            = 1,
@@ -272,4 +275,11 @@ struct tag_message {
     MessageType type;
     tag_messagePayload payload;
 };
+
+
+#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                    \
+    ((messageValue).type = MESSAGE_WIDGET,                                                         \
+     (messageValue).payload.widget.command = (commandValue),                                       \
+     (messageValue).payload.widget.id = (idValue))
+
 #endif

@@ -41,4 +41,10 @@ public:
     void DrawObstacle(void);
 };
 #pragma pack(pop)
+
+#define HEX_HAS_OCCUPANT(cell, side, index)                                                        \
+    ((cell).m_occupantSide == (side) && (cell).m_occupantIndex == (index))
+
+#define CLEAR_HEX_OCCUPANT(cell)                                                                   \
+    ((cell).m_occupantSide = COMBAT_SIDE_NONE, (cell).m_occupantIndex = -1)
 #endif

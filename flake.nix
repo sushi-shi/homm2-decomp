@@ -8,12 +8,13 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       mingw = pkgs.pkgsCross.mingw32;
-      game = mingw.clangStdenv.mkDerivation {
+      gameFor = locale: mingw.clangStdenv.mkDerivation {
         pname = "homm2-gold-buka";
         version = "2.1";
         src = ./.;
         nativeBuildInputs = [
           pkgs.ninja
+          pkgs.python3
           pkgs.llvmPackages.llvm
           pkgs.llvmPackages.lld
         ];
@@ -28,23 +29,37 @@
         dontConfigure = true;
         buildPhase = ''
           runHook preBuild
-          sed -i "s|^cxx = clang++$|cxx = $CXX|" build.ninja
-          sed -i "s|--target=i686-w64-windows-gnu ||g" build.ninja
-          ninja -k 0
+          for graph in build.ninja build-en.ninja; do
+            test -f "$graph" || continue
+            sed -i "s|^cxx = clang++$|cxx = $CXX|" "$graph"
+            sed -i "s|--target=i686-w64-windows-gnu ||g" "$graph"
+          done
+          if test -f build.py; then
+            python3 build.py --${locale}
+          else
+            ninja -k 0
+          fi
           runHook postBuild
         '';
         installPhase = ''
           runHook preInstall
           mkdir -p "$out"
-          cp build/HMM2PL.exe run-game.sh "$out/"
+          if test -f build.py; then
+            cp build/${locale}/HMM2PL.exe "$out/"
+          else
+            cp build/HMM2PL.exe "$out/"
+          fi
+          cp run-game.sh "$out/"
           chmod +x "$out/run-game.sh"
           runHook postInstall
         '';
       };
     in {
       packages.${system} = {
-        inherit game;
-        default = game;
+        game = gameFor "ru";
+        game-en = gameFor "en";
+        default = gameFor "ru";
       };
+      devShells.${system}.default = gameFor "ru";
     };
 }

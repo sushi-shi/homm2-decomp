@@ -4,6 +4,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/ARMY.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
@@ -407,20 +408,8 @@ void SetupCDRom(void) {
         gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
-                "Нет доступа к CD-ROM. Без "
-                "доступа к CD-ROM Герои 2 буду"
-                "т поддерживать только "
-                "сетевую игру в режиме "
-                    "гостя.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "Нет доступа к CD-ROM. Без доступа к CD-ROM Герои 2 будут поддерживать только сетевую игру в режиме гостя.",
+                NORMAL_DIALOG_INFO
             );
         gbNoCDRom = true;
     } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
@@ -432,45 +421,22 @@ void SetupCDRom(void) {
         gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
-                " Нет доступа к CD-ROM. Без "
-                "доступа к CD-ROM Герои 2 буду"
-                "т поддерживать только "
-                "сетевую игру в режиме "
-                "гостя. Если у вас есть "
-                "диск, закройте эту про"
-                "грамму и вставьте диск "
-                "в привод и попробуйте "
-                "запустить игру еще ра"
-                    "з.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                " Нет доступа к CD-ROM. Без доступа к CD-ROM Герои 2 будут поддерживать только сетевую игру в режиме гостя. Если у вас есть диск, закройте эту программу и вставьте диск в привод и попробуйте запустить игру еще раз.",
+                NORMAL_DIALOG_INFO
             );
         gbNoCDRom = true;
     }
     if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
             "Ошибка загрузки",
-            "Не могу переключиться в "
-                "директорию Героев II.  Зап"
-                "устите программу устан"
-                "овки."
+            "Не могу переключиться в директорию Героев II.  Запустите программу установки."
         );
         exit(0);
     }
     if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
             "Ошибка загрузки",
-            "Не могу найти файлы дан"
-                "ных Героев II.  Пожалуйст"
-                "а, запустите программу "
-                "установки."
+            "Не могу найти файлы данных Героев II.  Пожалуйста, запустите программу установки."
         );
         exit(0);
     }
@@ -529,13 +495,12 @@ i32 oldmain(void) {
         0,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    gpMouseManager->SetColorMice(gConfig.gfx[(giCurExe)].colorMouseCursor);
+    gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
     LogStr("OM4");
     SetupCDRom();
     LogStr("OM5");
     if (gpSoundManager->Open(-1))
-        ShutDown("Не могу инициализирова"
-            "ть звук.");
+        ShutDown("Не могу инициализировать звук.");
     if (giDebugLevel < OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL)
         CheckMem();
     LogStr("OM6");
@@ -757,8 +722,7 @@ i32 oldmain(void) {
                 goto game_setup_complete;
             case OLD_MAIN_HIGH_SCORES:
                 if (gpExec->AddManager(gpHighScoreManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("Не могу добавить менеджера!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 mainScreenLoaded_h = false;
@@ -853,9 +817,7 @@ i32 oldmain(void) {
                         player_h,
                         sizeof(OldMainNetSetup),
                         OLD_MAIN_NETWORK_PACKET,
-                        1,
-                        1,
-                        REMOTE_MESSAGE_DEFAULT
+                        1
                     );
                     if (!transmissionResult_d)
                         ShutDown(NULL);
@@ -874,17 +836,8 @@ i32 oldmain(void) {
                 LogStr("DWM 5");
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
-                    "Ожидаю получения игро"
-                        "вых данных.",
-                    OLD_MAIN_DIALOG_WAIT,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Ожидаю получения игровых данных.",
+                    OLD_MAIN_DIALOG_WAIT
                 );
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
@@ -942,8 +895,7 @@ i32 oldmain(void) {
                 goto game_over;
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("Не могу добавить менеджера!");
                 if (command_c == OLD_MAIN_NEW_GAME) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
@@ -970,15 +922,7 @@ i32 oldmain(void) {
             );
             sprintf(
                 gcWinText,
-                "Мои герои! Наши враги "
-                "были разбиты, а их за"
-                "мки преданы разорен"
-                "ию. Великий поход ок"
-                "ончен, и я предстаю п"
-                "еред вами как всеми "
-                "признанный Великий "
-                "Король!\n\nМы достигл"
-                    "и  победы за %d дней!",
+                "Мои герои! Наши враги были разбиты, а их замки преданы разорению. Великий поход окончен, и я предстаю перед вами как всеми признанный Великий Король!\n\nМы достигли  победы за %d дней!",
                 giCurTurn
             );
 
@@ -1019,9 +963,9 @@ i32 oldmain(void) {
                             gpGame->m_campaignScore,
                             0,
                             HIGH_SCORE_CAMPAIGN,
-                            gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                            const_cast<char*>(gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
                                 ? "Арчибальд"
-                                : "Роланд"
+                                : "Роланд")
                         );
                     }
                     if (campaignResult) {
@@ -1088,8 +1032,7 @@ i32 oldmain(void) {
             if (gbShowHighScore) {
                 gbShowHighScore = false;
                 if (gpExec->AddManager(gpHighScoreManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("Не могу добавить менеджера!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 giHighScoreRank = -1;
@@ -1278,8 +1221,7 @@ i32 InterpretCommandLine(void) {
     if (giTCPHostStatus != -1) {
         if (giTCPType == -1 || giTCPNumPlayers == -1
             || (giTCPHostStatus == LINE_TCP_CLIENT && strlen(gcTCPAddress) < 1)) {
-            ShutDown("Незавершенная TCP/IP ком"
-                "андная строка");
+            ShutDown("Незавершенная TCP/IP командная строка");
         }
         giShowIntro = 0;
     }
@@ -1316,18 +1258,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(
-                    gInitMenuHelp[helpIndex],
-                    MENU_HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
             }
         }
     } else {
@@ -1536,8 +1467,7 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(
             buf,
-            "%s увеличивает прирост %s "
-                "на 8 в неделю."  ,
+            "%s увеличивает прирост %s на 8 в неделю.",
             GetBuildingName(race, building),
             gArmyNamesPlural[(gDwellingType[(race)][0])]
         );
@@ -1548,8 +1478,7 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
     } else {
         sprintf(
             gText,
-            "В постройке '%s' можно "
-                "купить %s."  ,
+            "В постройке '%s' можно купить %s.",
             GetBuildingName(race, building),
             gArmyNamesPlural
                 [(gDwellingType[(race)][(building) - (BUILDING_SLOT_DWELLING_FIRST)])]
@@ -1655,7 +1584,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     i32 curMask;
     if (H2BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & (TOWN_BUILDING_CASTLE)))
+    if (building != BUILDING_SLOT_CASTLE && !(((t->m_buildings) & ((TOWN_BUILDING_CASTLE)))))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
         && t->m_type == FACTION_NECROMANCER)
@@ -1675,18 +1604,18 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
-         && (t->m_buildings & (KB_DWELLING_UPGRADE_FIRST_FLAG)))
+         && (((t->m_buildings) & ((KB_DWELLING_UPGRADE_FIRST_FLAG)))))
         || (building == BUILDING_SLOT_DWELLING_THIRD
-            && (t->m_buildings & (KB_DWELLING_UPGRADE_SECOND_FLAG)))
+            && (((t->m_buildings) & ((KB_DWELLING_UPGRADE_SECOND_FLAG)))))
         || (building == BUILDING_SLOT_DWELLING_FOURTH
-            && (t->m_buildings & (KB_DWELLING_UPGRADE_THIRD_FLAG)))
+            && (((t->m_buildings) & ((KB_DWELLING_UPGRADE_THIRD_FLAG)))))
         || (building == BUILDING_SLOT_DWELLING_FIFTH
-            && (t->m_buildings & (KB_DWELLING_UPGRADE_FOURTH_FLAG)))
+            && (((t->m_buildings) & ((KB_DWELLING_UPGRADE_FOURTH_FLAG)))))
         || (building == BUILDING_SLOT_DWELLING_SIXTH
-            && ((t->m_buildings & (KB_DWELLING_UPGRADE_FIFTH_FLAG))
-                || (t->m_buildings & (KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && ((((t->m_buildings) & ((KB_DWELLING_UPGRADE_FIFTH_FLAG))))
+                || (((t->m_buildings) & ((KB_DWELLING_UPGRADE_SIXTH_FLAG))))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
-            && (t->m_buildings & (KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && (((t->m_buildings) & ((KB_DWELLING_UPGRADE_SIXTH_FLAG))))))
         return 0;
     reqBits = gHierarchyMask[(t->m_type)][(building) - (BUILDING_SLOT_DWELLING_FIRST)];
     curMask = t->m_buildings;
@@ -1850,153 +1779,49 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     }
                     switch (resType) {
                         case EVENT_WINDOW_LUCK:
-                            NormalDialog(
-                                cLuckInfo[(LUCK_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_BAD_LUCK:
-                            NormalDialog(
-                                cLuckInfo[(LUCK_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_MORALE:
                             NormalDialog(
                                 cMoraleInfo[(MORALE_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_BAD_MORALE:
                             NormalDialog(
                                 cMoraleInfo[(MORALE_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
                             NormalDialog(
-                                "{Опыт}\n\nОпыт поз"
-                                "воляет повыша"
-                                "ть вашим героя"
-                                "м свои уровни, у"
-                                "величивать пе"
-                                "рвичные и втор"
-                                    "ичные навыки.",
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Опыт}\n\nОпыт позволяет повышать вашим героям свои уровни, увеличивать первичные и вторичные навыки.",
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
                             if (resExtra == (ARTIFACT_SPELL_SCROLL)) {
                                 sprintf(gText, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
-                                NormalDialog(
-                                    gText,
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             } else {
-                                NormalDialog(
-                                    gArtifactDesc[resExtra],
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gArtifactDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             }
                             break;
                         case NORMAL_DIALOG_SPELL:
-                            NormalDialog(
-                                gSpellDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gSpellDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
                                 cSecSkillDesc[resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
                                              [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case NORMAL_DIALOG_PRIMARY_SKILL:
-                            NormalDialog(
-                                gStatDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gStatDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_RESOURCE_WOOD:
                         case NORMAL_DIALOG_RESOURCE_MERCURY:
@@ -2006,42 +1831,8 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_RESOURCE_GEMS:
                         case NORMAL_DIALOG_RESOURCE_GOLD:
                             NormalDialog(
-                                "{Ресурсы}\n\nВ Геро"
-                                "ях II есть 7 типов "
-                                "ресурсов, испо"
-                                "льзуемых для в"
-                                "озведения пос"
-                                "троек, улучшен"
-                                "ий замков, поку"
-                                "пки воинов и ге"
-                                "роев. Самый рас"
-                                "пространенный "
-                                "ресурс - золото, "
-                                "требуем практ"
-                                "ически везде. Д"
-                                "ревесина и руд"
-                                "а используютс"
-                                "я для возведен"
-                                "ия большинств"
-                                "а построек. Сам"
-                                "оцветы, ртуть, с"
-                                "ера и кристалл"
-                                "ы - редкие магич"
-                                "еские ресурсы, "
-                                "нужные для воз"
-                                "ведения лучши"
-                                "х построек и по"
-                                "купки сильных "
-                                    "воинов.",
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Ресурсы}\n\nВ Героях II есть 7 типов ресурсов, используемых для возведения построек, улучшений замков, покупки воинов и героев. Самый распространенный ресурс - золото, требуем практически везде. Древесина и руда используются для возведения большинства построек. Самоцветы, ртуть, сера и кристаллы - редкие магические ресурсы, нужные для возведения лучших построек и покупки сильных воинов.",
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                     }
@@ -2170,7 +1961,7 @@ void CheckEndGame(
                 if (player == giThisGamePos) {
                     showedDialog_o = true;
                     sprintf(gText, "Вы были исключены из игры!!!");
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 } else {
                     sprintf(gText, "%s сокрушен!", cPlayerNames[player]);
                     NormalDialog(
@@ -2313,7 +2104,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2345,7 +2136,7 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2359,7 +2150,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "%s пал! Все потеряно.", lossTown->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2396,7 +2187,7 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 }
             }
         }
@@ -2414,7 +2205,7 @@ void CheckEndGame(
                     "%s - вражеский герой, у вас в плену! Ваше задание завершено.",
                     winningHeroEntry_g->m_name
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2427,20 +2218,18 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "%s - ваш герой, был повержен.  Вы провалили ваше задание.", lossHero_k->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
-        if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
-            > gpGame->m_mapHeader.lossConditionValue) {
+        if (GAME_DAY_NUMBER(*gpGame) > gpGame->m_mapHeader.lossConditionValue) {
             defeated_m = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "Вы не успели завершить ваше задание в срок. Все потеряно.");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2502,7 +2291,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2524,7 +2313,7 @@ void CheckEndGame(
                     gText,
                     "Все города гномов пали. Это сокрушительное поражение! Вы проиграли."
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2536,7 +2325,7 @@ void CheckEndGame(
         if (!showedDialog_o) {
             showedDialog_o = true;
             sprintf(gText, "Драконий город пал! Теперь вы Повелитель драконов.");
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
         }
     }
 
@@ -2556,7 +2345,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "Роланд пленен! Все потеряно.");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2577,7 +2366,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2808,11 +2597,11 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
 
     if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
-        && (h->GetOccupiedTown()->m_buildings & (TOWN_BUILDING_COLISEUM))) {
+        && (((h->GetOccupiedTown()->m_buildings) & ((TOWN_BUILDING_COLISEUM))))) {
         strcat(gText, cMoraleInfo[(INFO_COLISEUM)]);
     }
     if (h->GetOccupiedTown() != NULL
-        && (h->GetOccupiedTown()->m_buildings & (TOWN_BUILDING_TAVERN))) {
+        && (((h->GetOccupiedTown()->m_buildings) & ((TOWN_BUILDING_TAVERN))))) {
         strcat(gText, cMoraleInfo[(INFO_TAVERN)]);
     }
 
@@ -2861,7 +2650,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->m_secondarySkills[(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
         strcat(gText, cMoraleInfo[(INFO_EXPERT_LEADERSHIP)]);
     }
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (((h->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && h->IsEmbarked()) {
         strcat(gText, cMoraleInfo[(MORALE_INFO_MASTHEAD)]);
     }
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
@@ -2872,7 +2661,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
 
 showDialog:
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
@@ -2892,7 +2681,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     sprintf(gText, cLuckInfo[(LUCK_INFO_HEADER)], description4);
     modifierStart = strlen(gText);
     if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
-        && (h->GetOccupiedTown()->m_buildings & (TOWN_BUILDING_RAINBOW)))
+        && (((h->GetOccupiedTown()->m_buildings) & ((TOWN_BUILDING_RAINBOW)))))
         strcat(gText, cLuckInfo[(INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
         strcat(gText, cLuckInfo[(INFO_RABBIT_FOOT)]);
@@ -2916,7 +2705,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[(INFO_ADVANCED_SKILL)]);
     if (h->m_secondarySkills[(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
         strcat(gText, cLuckInfo[(INFO_EXPERT_SKILL)]);
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (((h->m_eventFlags) & (HERO_EVENT_EMBARKED))))
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && h->IsEmbarked())
         strcat(gText, cLuckInfo[(LUCK_INFO_MASTHEAD)]);
     if ((((h->m_eventFlags) & (HERO_EVENT_MERMAID))))
         strcat(gText, cLuckInfo[(INFO_MERMAID)]);
@@ -2925,7 +2714,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     if (modifierStart == static_cast<i32>(strlen(gText)))
         strcat(gText, cLuckInfo[(LUCK_INFO_NONE)]);
 
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 void ClearMapExtra(void) {
@@ -3040,7 +2829,7 @@ i32 AddScoreToHighScore(
         if (file_c == -1)
             FileError(filename_h);
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            write(file_c, &entries_a[entry_a], sizeof(HighScoreEntry));
+            WRITE_FILE_VALUE(file_c, entries_a[entry_a]);
         close(file_c);
     } else {
         gbShowHighScore = false;
@@ -3162,9 +2951,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
     if (netWindow_j == NULL)
         MemError();
 
-    updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-    updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
+    SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
     updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
     netWindow_j->BroadcastMessage(updateMessage_i);
     updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3307,9 +3094,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
                 BOX_PACKET_BUFFER_SIZE,
                 strlen(inputText_b) + 1,
                 BOX_REMOTE_CHAT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!result_p)
                 ShutDown(NULL);
@@ -3321,9 +3106,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
 
         if (redrawLines_l) {
             redrawLines_l = false;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
             updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
             netWindow_j->BroadcastMessage(updateMessage_i);
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3360,9 +3143,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
             else
                 inputText_b[inputLength_a] = BOX_CURSOR_GLYPH;
             inputText_b[inputLength_a + 1] = 0;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_INPUT_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_INPUT_ID);
             updateMessage_i.payload.widget.data.text = inputText_b;
             netWindow_j->BroadcastMessage(updateMessage_i);
             netWindow_j->DrawWindow();
@@ -3478,16 +3259,7 @@ void FileError(const char* filename) {
     char buf1[FILE_ERROR_BUFFER_SIZE];
     err = errno;
     sprintf(buf1, "File Error %s", strerror(err));
-    LogInt(
-        buf1,
-        err,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(buf1, err);
     sprintf(
         buf,
         "Ошибка открытия файла %s!",
@@ -3593,9 +3365,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: %d\n"
-                "Счет: %d\nСложность: %d\n\n"
-                "Очки: %d\n\nРейтинг:\n%s\n",
+            "Поздравляем!\n\nДней: %d\nСчет: %d\nСложность: %d\n\nОчки: %d\n\nРейтинг:\n%s\n",
             giCurTurn,
             baseScore,
             gpGame->m_difficultyRating,
@@ -3605,16 +3375,14 @@ void ShowCongrats(HighScoreType highScoreType) {
     } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: "
-                "%d\n\nРейтинг:\n%s\n",
+            "Поздравляем!\n\nДней: %d\n\nРейтинг:\n%s\n",
             xCampaign.Days(),
             ratingText
         );
     } else {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: "
-                "%d\n\nРейтинг:\n%s\n",
+            "Поздравляем!\n\nДней: %d\n\nРейтинг:\n%s\n",
             gpGame->m_campaignScore,
             ratingText
         );
@@ -3699,7 +3467,7 @@ void MemError(void) {
     sprintf(
         gText,
         cOutOfMemory,
-        "Недостаточно памяти."  ,
+        "Недостаточно памяти.",
         MEMORY_ERROR_REQUEST_SIZE
     );
     ShutDown(gText);
@@ -3783,7 +3551,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
                 if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
             }
@@ -4012,7 +3780,7 @@ void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
 
-    if (gConfig.gfx[(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     if (hmnuApp == NULL)
         return;
@@ -4529,7 +4297,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
                 sprintf(gText, "Вы были исключены из игры!!!");
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 gbGameOver = true;
                 giEndSequence = false;
                 return;
@@ -4556,7 +4324,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[hostNetPosition].name
             );
-            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 DropDownToOnePlayer();
             } else {
@@ -4668,7 +4436,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         }
-        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
         exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE;
     }
 
@@ -4680,9 +4448,7 @@ exitInfoProcessed:
                 1 - giThisNetPos,
                 sizeof(exitInfo),
                 ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
         }
         if (localPlayerLost_e)
@@ -4701,9 +4467,7 @@ exitInfoProcessed:
                     recipient,
                     sizeof(exitInfo),
                     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                    1,
-                    1,
-                    REMOTE_MESSAGE_DEFAULT
+                    1
                 );
             }
         }
@@ -4716,7 +4480,7 @@ playerExitHandled:
     if (localPlayerLost_e) {
         sprintf(gText, "Вы были исключены из игры!!!");
         RemoteCleanup();
-        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         gbGameOver = true;
         giEndSequence = false;
         return;
@@ -4766,9 +4530,7 @@ void SetWinText(heroWindow* j, i32 id) {
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
             a++;
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            msg.payload.widget.id = gWinSetup[i].widgetId;
+            SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
             msg.payload.widget.data.text = gWinSetup[i].text;
             j->BroadcastMessage(msg);
         }
@@ -5532,9 +5294,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(borderWidget_k, -1);
     }
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    SET_WIDGET_MESSAGE(message_b, NORMAL_DIALOG_SET_TEXT_COMMAND, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message_b.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message_b);
 
@@ -5595,9 +5355,7 @@ void NormalDialog(
 void UpdateNormalDialog(const char* text) {
     i16 show [[maybe_unused]] = 1;
     tag_message evt;
-    evt.type = MESSAGE_WIDGET;
-    evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    evt.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(evt, WIDGET_COMMAND_SET_TEXT, 1);
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
@@ -8255,214 +8013,214 @@ SCampaignChoice
 };
 char* congratsText = NULL;
 const char* gArtifactNames[(ARTIFACT_COUNT)] = {
-    "Книга\x20всезнания"  ,
-    "Меч\x20власти"  ,
-    "Защитная\x20накидка"  ,
-    "Жезл\x20магии"  ,
-    "Всемогущий\x20щит"  ,
-    "Всемогущий\x20посох"  ,
-    "Корона\x20всевластия"  ,
-    "Золотой\x20гусь"  ,
-    "Ожерелье\x20тайной\x20магии"  ,
-    "Магический\x20браслет"  ,
-    "Кольцо\x20мага"  ,
-    "Брошь\x20ведьмы"  ,
-    "Медаль\x20отваги"  ,
-    "Медаль\x20мужества"  ,
-    "Медаль\x20доблести"  ,
-    "Медаль\x20почета"  ,
-    "Символ\x20неудачи"  ,
-    "Громовая\x20палица"  ,
-    "Защитная\x20перчатка"  ,
-    "Шлем\x20защитника"  ,
-    "Гигантский\x20цеп"  ,
-    "Баллиста"  ,
-    "Незримый\x20щит"  ,
-    "Драконий\x20меч"  ,
-    "Топор\x20власти"  ,
-    "Божественный\x20доспех"  ,
-    "Малый\x20свиток\x20знания"  ,
-    "Большой\x20свиток\x20знания"  ,
-    "Могущественный\x20свиток\x20знания"  ,
-    "Свиток\x20высшего\x20знания"  ,
-    "Бездонный\x20мешок"  ,
-    "Бездонная\x20сума"  ,
-    "Бездонный\x20кошель"  ,
-    "Башмаки\x20кочевника"  ,
-    "Башмаки\x20путника"  ,
-    "Лапка\x20кролика"  ,
-    "Золотая\x20подкова"  ,
-    "Счастливая\x20монета"  ,
-    "Клевер"  ,
-    "Компас"  ,
-    "Астролябия"  ,
-    "Дурной\x20глаз"  ,
-    "Зачарованные\x20часы"  ,
-    "Золотые\x20часы"  ,
-    "Шапочка"  ,
-    "Ледяная\x20накидка"  ,
-    "Огненная\x20накидка"  ,
-    "Громовой\x20шлем"  ,
-    "Нетающий\x20лед"  ,
-    "Горячий\x20камень"  ,
-    "Жезл\x20молний"  ,
-    "Кольцо\x20змеи"  ,
-    "Символ\x20жизни"  ,
-    "Книга\x20стихий"  ,
-    "Кольцо\x20стихий"  ,
-    "Святой\x20кулон"  ,
-    "Подвеска\x20свободной\x20воли"  ,
-    "Кулон\x20жизни"  ,
-    "Подвеска\x20покоя"  ,
-    "Всевидящий\x20глаз"  ,
-    "Кулон\x20движения"  ,
-    "Кулон\x20смерти"  ,
-    "Посох\x20отрицания"  ,
-    "Золотой\x20лук"  ,
-    "Телескоп"  ,
-    "Перо\x20дипломата"  ,
-    "Шляпа\x20мага"  ,
-    "Кольцо\x20силы"  ,
-    "Обоз"  ,
-    "Подать"  ,
-    "Ужасная\x20маска"  ,
-    "Бездонная\x20сума\x20серы"  ,
-    "Бездонная\x20колба\x20ртути"  ,
-    "Бездонная\x20сума\x20самоцветов"  ,
-    "Нескончаемая\x20вязанка\x20дров"  ,
-    "Бездонная\x20вагонетка\x20руды"  ,
-    "Бездонная\x20сума\x20кристаллов"  ,
-    "Шлем\x20с\x20шипами"  ,
-    "Щит\x20с\x20шипами"  ,
-    "Белая\x20жемчужина"  ,
-    "Черная\x20жемчужина"  ,
-    "Волшебная\x20книга"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x32"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x33"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x34"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x35"  ,
-    "Свиток\x20заклинаний"  ,
-    "Рука\x20мученика"  ,
-    "Доспех\x20Андурана"  ,
-    "Защитная\x20брошь"  ,
-    "Боевое\x20одеяние\x20Андурана"  ,
-    "Кристальный\x20шар"  ,
-    "Сердце\x20огня"  ,
-    "Ледяное\x20сердце"  ,
-    "Шлем\x20Андурана"  ,
-    "Святой\x20молот"  ,
-    "Легендарный\x20скипетр"  ,
-    "Наконечник\x20мачты"  ,
-    "Сфера\x20антимагии"  ,
-    "Волшебный\x20посох"  ,
-    "Мечелом"  ,
-    "Меч\x20Андурана"  ,
-    "Лопата\x20могильщика"
+    "Книга всезнания",
+    "Меч власти",
+    "Защитная накидка",
+    "Жезл магии",
+    "Всемогущий щит",
+    "Всемогущий посох",
+    "Корона всевластия",
+    "Золотой гусь",
+    "Ожерелье тайной магии",
+    "Магический браслет",
+    "Кольцо мага",
+    "Брошь ведьмы",
+    "Медаль отваги",
+    "Медаль мужества",
+    "Медаль доблести",
+    "Медаль почета",
+    "Символ неудачи",
+    "Громовая палица",
+    "Защитная перчатка",
+    "Шлем защитника",
+    "Гигантский цеп",
+    "Баллиста",
+    "Незримый щит",
+    "Драконий меч",
+    "Топор власти",
+    "Божественный доспех",
+    "Малый свиток знания",
+    "Большой свиток знания",
+    "Могущественный свиток знания",
+    "Свиток высшего знания",
+    "Бездонный мешок",
+    "Бездонная сума",
+    "Бездонный кошель",
+    "Башмаки кочевника",
+    "Башмаки путника",
+    "Лапка кролика",
+    "Золотая подкова",
+    "Счастливая монета",
+    "Клевер",
+    "Компас",
+    "Астролябия",
+    "Дурной глаз",
+    "Зачарованные часы",
+    "Золотые часы",
+    "Шапочка",
+    "Ледяная накидка",
+    "Огненная накидка",
+    "Громовой шлем",
+    "Нетающий лед",
+    "Горячий камень",
+    "Жезл молний",
+    "Кольцо змеи",
+    "Символ жизни",
+    "Книга стихий",
+    "Кольцо стихий",
+    "Святой кулон",
+    "Подвеска свободной воли",
+    "Кулон жизни",
+    "Подвеска покоя",
+    "Всевидящий глаз",
+    "Кулон движения",
+    "Кулон смерти",
+    "Посох отрицания",
+    "Золотой лук",
+    "Телескоп",
+    "Перо дипломата",
+    "Шляпа мага",
+    "Кольцо силы",
+    "Обоз",
+    "Подать",
+    "Ужасная маска",
+    "Бездонная сума серы",
+    "Бездонная колба ртути",
+    "Бездонная сума самоцветов",
+    "Нескончаемая вязанка дров",
+    "Бездонная вагонетка руды",
+    "Бездонная сума кристаллов",
+    "Шлем с шипами",
+    "Щит с шипами",
+    "Белая жемчужина",
+    "Черная жемчужина",
+    "Волшебная книга",
+    "ERROR : Artifact 82"  ,
+    "ERROR : Artifact 83"  ,
+    "ERROR : Artifact 84"  ,
+    "ERROR : Artifact 85"  ,
+    "Свиток заклинаний",
+    "Рука мученика",
+    "Доспех Андурана",
+    "Защитная брошь",
+    "Боевое одеяние Андурана",
+    "Кристальный шар",
+    "Сердце огня",
+    "Ледяное сердце",
+    "Шлем Андурана",
+    "Святой молот",
+    "Легендарный скипетр",
+    "Наконечник мачты",
+    "Сфера антимагии",
+    "Волшебный посох",
+    "Мечелом",
+    "Меч Андурана",
+    "Лопата могильщика"
 };
 const char* gArtifactDesc[(ARTIFACT_COUNT)] = {
-    "\x7bКнига\x20всезнания\x7d\x0a\x28Знания\x20\x2b\x31\x32\x29\x0a\x0aКнига\x20всезнания\x20увеличивает\x20Знания\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bМеч\x20власти\x7d\x0a\x28Атака\x20\x2b\x31\x32\x29\x0a\x0aМеч\x20власти\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bЗащитная\x20накидка\x7d\x0a\x28Защита\x20\x2b\x31\x32\x29\x0a\x0aЗащитная\x20накидка\x20увеличивает\x20Защиту\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bЖезл\x20магии\x7d\x0a\x28Сила\x20магии\x20\x2b\x31\x32\x29\x0a\x0aЖезл\x20магии\x20увеличивает\x20Силу\x20заклинаний\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bВсемогущий\x20щит\x7d\x0a\x0aВсемогущий\x20щит\x20увеличивает\x20Атаку\x20и\x20Защиту\x20на\x20\x36\x20единиц\x20каждый\x2e"  ,
-    "\x7bВсемогущий\x20посох\x7d\x0a\x0aВсемогущий\x20посох\x20увеличивает\x20Силу\x20магии\x20и\x20Знания\x20на\x20\x36\x20единиц\x20каждый\x2e"  ,
-    "\x7bКорона\x20всевластия\x7d\x0a\x0aКорона\x20всевластия\x20увеличивает\x20каждый\x20из\x20базовых\x20навыков\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bЗолотой\x20гусь\x7d\x0a\x0aЗолотой\x20гусь\x20приносит\x20в\x20вашу\x20казну\x20по\x20\x31\x30\x2e\x30\x30\x30\x20золотых\x20каждый\x20день\x2e"  ,
-    "\x7bОжерелье\x20тайной\x20магии\x7d\x0a\x28Сила\x20магии\x20\x2b\x34\x29\x0a\x0aОжерелье\x20тайной\x20магии\x20увеличивает\x20Силу\x20магии\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bМагический\x20браслет\x7d\x0a\x28Сила\x20магии\x20\x2b\x32\x29\x0a\x0aМагический\x20браслет\x20увеличивает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bКольцо\x20мага\x7d\x0a\x28Сила\x20магии\x20\x2b\x32\x29\x0a\x0aКольцо\x20мага\x20увеличивает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБрошь\x20ведьмы\x7d\x0a\x28Сила\x20магии\x20\x2b\x33\x29\x0a\x0aБрошь\x20ведьмы\x20увеличивает\x20Силу\x20магии\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМедаль\x20отваги\x7d\x0a\x0aМедаль\x20отваги\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20мужества\x7d\x0a\x0aМедаль\x20мужества\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20доблести\x7d\x0a\x0aМедаль\x20доблести\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20почета\x7d\x0a\x0aМедаль\x20почета\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bСимвол\x20неудачи\x7d\x0a\x0aСимвол\x20неудачи\x20сильно\x20уменьшает\x20мораль\x2e"  ,
-    "\x7bГромовая\x20палица\x7d\x0a\x28Атака\x20\x2b\x31\x29\x0a\x0aГромовая\x20палица\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bЗащитная\x20перчатка\x7d\x0a\x28Защита\x20\x2b\x31\x29\x0a\x0aЗащитная\x20перчатка\x20увеличивает\x20навык\x20Защиты\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bШлем\x20защитника\x7d\x0a\x28Защита\x20\x2b\x31\x29\x0a\x0aШлем\x20защитника\x20увеличивает\x20навык\x20Защиты\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bГигантский\x20цеп\x7d\x0a\x28Атака\x20\x2b\x31\x29\x0a\x0aГигантский\x20цеп\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bБаллиста\x7d\x0a\x0aБаллиста\x20позволяет\x20вашей\x20катапульте\x20дважды\x20стрелять\x20в\x20один\x20ход\x20боя\x2e"  ,
-    "\x7bНезримый\x20щит\x7d\x0a\x28Защита\x20\x2b\x32\x29\x0a\x0aНезримый\x20щит\x20увеличивает\x20навык\x20Защиты\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bДраконий\x20меч\x7d\x0a\x28Атака\x20\x2b\x33\x29\x0a\x0aДраконий\x20меч\x20увеличивает\x20навык\x20Атаки\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bТопор\x20власти\x7d\x0a\x28Атака\x20\x2b\x32\x29\x0a\x0aТопор\x20власти\x20увеличивает\x20навык\x20Атаки\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБожественный\x20доспех\x7d\x0a\x28Защита\x20\x2b\x33\x29\x0a\x0aБожественный\x20доспех\x20увеличивает\x20навык\x20Защиты\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМалый\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x32\x29\x0a\x0aМалый\x20свиток\x20знания\x20увеличивает\x20Знания\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБольшой\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x33\x29\x0a\x0aБольшой\x20свиток\x20знания\x20увеличивает\x20Знания\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМогущественный\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x34\x29\x0a\x0aМогущественный\x20свиток\x20Знания\x20увеличивает\x20Знания\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bСвиток\x20высшего\x20знания\x7d\x0a\x28Знания\x20\x2b\x35\x29\x0a\x0aСвиток\x20высшего\x20знания\x20увеличивает\x20Знания\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bБездонный\x20мешок\x7d\x0a\x0aБездонный\x20мешок\x20приносит\x20вам\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x7d\x0a\x0aБездонная\x20сума\x20приносит\x20вам\x20\x37\x35\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБездонный\x20кошель\x7d\x0a\x0aБездонный\x20кошель\x20приносит\x20вам\x20\x35\x30\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБашмаки\x20кочевника\x7d\x0a\x0aБашмаки\x20кочевника\x20увеличивают\x20дальность\x20передвижения\x20по\x20суше\x2e"  ,
-    "\x7bБашмаки\x20путника\x7d\x0a\x0aБашмаки\x20путника\x20увеличивают\x20подвижность\x20отряда\x20на\x20суше\x2e"  ,
-    "\x7bЛапка\x20кролика\x7d\x0a\x0aЛапка\x20кролика\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bЗолотая\x20подкова\x7d\x0a\x0aЗолотая\x20подкова\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bСчастливая\x20монета\x7d\x0a\x0aСчастливая\x20монета\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bКлевер\x7d\x0a\x0aКлевер\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bКомпас\x7d\x0a\x0aКомпас\x20увеличивает\x20подвижность\x20отряда\x20на\x20суше\x20и\x20на\x20море\x2e"  ,
-    "\x7bАстролябия\x7d\x0a\x0aАстролябия\x20увеличивает\x20подвижность\x20отряда\x20на\x20море\x2e"  ,
-    "\x7bДурной\x20глаз\x7d\x0a\x0aАртефакт\x20снижает\x20вполовину\x20количество\x20магической\x20энергии\x2c\x20требуемой\x20на\x20направление\x20заклинаний\x2dпроклятий\x2e"  ,
-    "\x7bЗачарованные\x20часы\x7d\x0a\x0aАртефакт\x20продлевает\x20действие\x20всех\x20ваших\x20заклинаний\x20на\x20\x32\x20хода\x2e"  ,
-    "\x7bЗолотые\x20часы\x7d\x0a\x0aАртефакт\x20удваивает\x20эффективность\x20использования\x20заклинания\x20гипноза\x2e"  ,
-    "\x7bШапочка\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20магической\x20энергии\x20на\x20все\x20заклинания\x20влияющие\x20на\x20разум\x2e"  ,
-    "\x7bЛедяная\x20накидка\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20холода\x2e"  ,
-    "\x7bОгненная\x20накидка\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20огня\x2e"  ,
-    "\x7bГромовой\x20шлем\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20молний\x2e"  ,
-    "\x7bНетающий\x20лед\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20холода\x2e"  ,
-    "\x7bГорячий\x20камень\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20огня\x2e"  ,
-    "\x7bЖезл\x20молний\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20молний\x2e"  ,
-    "\x7bКольцо\x20змеи\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20магической\x20энергии\x20на\x20заклинания\x2dблагословения\x2e"  ,
-    "\x7bСимвол\x20жизни\x7d\x0a\x0aУвеличивает\x20вдвое\x20эффективность\x20всех\x20заклинаний\x20связанных\x20с\x20воскрешением\x20и\x20оживлением\x20существ\x2e"  ,
-    "\x7bКнига\x20стихий\x7d\x0a\x0aУвеличивает\x20вдвое\x20эффективность\x20всех\x20заклинаний\x2c\x20связанных\x20с\x20призывом\x20существ\x2e"  ,
-    "\x7bКольцо\x20стихий\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20на\x20все\x20заклинания\x2c\x20связанные\x20с\x20вызовом\x20существ\x2e"  ,
-    "\x7bСвятой\x20кулон\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинаниям\x2dпроклятиям\x2e"  ,
-    "\x7bПодвеска\x20свободной\x20воли\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинаниям\x2c\x20связанным\x20с\x20гипнозом\x2e"  ,
-    "\x7bКулон\x20жизни\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20заклинаниям\x20Смерти\x2e"  ,
-    "\x7bПодвеска\x20покоя\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинанию\x20Берсерк\x2e"  ,
-    "\x7bВсевидящий\x20глаз\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20заклинаниям\x20ослепления\x2e"  ,
-    "\x7bКулон\x20движения\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20парализующим\x20заклинаниям\x2e"  ,
-    "\x7bКулон\x20смерти\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20святым\x20заклинаниям\x2e"  ,
-    "\x7bПосох\x20отрицания\x7d\x0a\x0aАртефакт\x20защищает\x20ваших\x20воинов\x20от\x20заклинания\x20снятия\x20чар\x2e"  ,
-    "\x7bЗолотой\x20лук\x7d\x0a\x0aСнижает\x20вполовину\x20штраф\x20на\x20урон\x20для\x20ваших\x20воинов\x2c\x20стреляющих\x20через\x20препятствия\x20\x28например\x2c\x20стены\x20замка\x29\x2e"  ,
-    "\x7bТелескоп\x7d\x0a\x0aУвеличивает\x20радиус\x20обзора\x20странствующего\x20героя\x20на\x20\x31\x20клетку\x2e"  ,
-    "\x7bПеро\x20дипломата\x7d\x0a\x0aСнижает\x20стоимость\x20сдачи\x20на\x20\x31\x30\x25\x20от\x20общей\x20стоимости\x20армии\x20вашего\x20героя\x2e"  ,
-    "\x7bШляпа\x20мага\x7d\x0a\x0aАртефакт\x20продлевает\x20действие\x20ваших\x20заклинаний\x20на\x20\x31\x30\x20ходов\x21"  ,
-    "\x7bКольцо\x20силы\x7d\x0a\x0aАртефакт\x20возвращает\x20герою\x20\x32\x20дополнительных\x20очка\x20магии\x20за\x20ход\x2e"  ,
-    "\x7bОбоз\x7d\x0a\x0aОбеспечивает\x20ваших\x20воинов\x2dстрелков\x20нескончаемым\x20запасом\x20стрел\x2e"  ,
-    "\x7bПодать\x7d\x0a\x0aАртефакт\x20принуждает\x20вас\x20выплачивать\x20каждый\x20ход\x20\x32\x35\x30\x20золотых\x20налогов\x2e"  ,
-    "\x7bУжасная\x20маска\x7d\x0a\x0aЭтот\x20артефакт\x20не\x20позволяет\x20любым\x20воинам\x20и\x20существам\x20вступить\x20в\x20вашу\x20армию\x2e"  ,
-    "\x7bБездонная\x20сума\x20серы\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20серы\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20колба\x20ртути\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20ртути\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x20самоцветов\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20самоцветов\x20в\x20день\x2e"  ,
-    "\x7bНескончаемая\x20вязанка\x20дров\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20древесины\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20вагонетка\x20руды\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20руды\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x20кристаллов\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20кристаллов\x20в\x20день\x2e"  ,
-    "\x7bШлем\x20с\x20шипами\x7d\x0a\x0aАртефакт\x20увеличивает\x20параметры\x20Атаки\x20и\x20Защиты\x20на\x20\x31\x20единицу\x20каждый\x2e"  ,
-    "\x7bЩит\x20с\x20шипами\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Атаки\x20и\x20Защиты\x20на\x20\x32\x20единицы\x20каждый\x2e"  ,
-    "\x7bБелая\x20жемчужина\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Силы\x20магии\x20и\x20Знания\x20на\x20\x31\x20единицу\x20каждый\x2e"  ,
-    "\x7bЧерная\x20жемчужина\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Силы\x20магии\x20и\x20Знания\x20на\x20\x32\x20единицы\x20каждый\x2e"  ,
-    "\x7bВолшебная\x20книга\x7d\x0a\x0aВолшебная\x20книга\x20позволяет\x20направлять\x20заклинания\x2e"  ,
-    "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x32\x2e"  ,
-    "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x33\x2e"  ,
-    "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x34\x2e"  ,
-    "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x35\x2e"  ,
-    "\x7bСвиток\x20заклинаний\x7d\x0a\x0aЭтот\x20Свиток\x20заклинаний\x20позволяет\x20вам\x20направлять\x20заклинание\x20\x27\x25\x73\x27\x2e"  ,
-    "\x7bРука\x20мученика\x7d\x0a\x0aРука\x20мученика\x20увеличивает\x20Силу\x20заклинаний\x20вашего\x20героя\x20на\x20\x33\x20единицы\x2c\x20но\x20дает\x20штраф\x20к\x20морали\x20за\x20присутствия\x20нежити\x20в\x20армии\x2e"  ,
-    "\x7bДоспех\x20Андурана\x7d\x0a\x0aУвеличивает\x20Защиту\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЗащитная\x20брошь\x7d\x0a\x0aЗащитная\x20брошь\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20заклинаниями\x20Армагеддон\x20и\x20Буря\x20Стихий\x2e\x20При\x20этом\x2c\x20артефакт\x20снижает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБоевое\x20одеяние\x7d\x0a\x0aБоевое\x20одеяние\x20Андурана\x20сочетает\x20в\x20себе\x20силу\x20трех\x20артефактов\x20Андурана\x2e\x20Также\x2c\x20артефакт\x20повышает\x20до\x20максимума\x20удачу\x20и\x20мораль\x20вашей\x20армии\x20и\x20дает\x20возможность\x20направлять\x20заклинание\x20Портал\x20города\x2e"  ,
-    "\x7bКристальный\x20шар\x7d\x0a\x0aКристальный\x20шар\x20дает\x20вам\x20более\x20детальную\x20информацию\x20о\x20монстрах\x2c\x20вражеских\x20героях\x20и\x20том\x2c\x20кто\x20защищает\x20близлежащие\x20от\x20героя\x20замки\x2e"  ,
-    "\x7bСердце\x20огня\x7d\x0a\x0aСердце\x20огня\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20силами\x20огня\x2c\x20но\x20удваивает\x20урон\x2c\x20наносимый\x20вам\x20холодом\x2e"  ,
-    "\x7bЛедяное\x20сердце\x7d\x0a\x0aЛедяное\x20сердце\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20силами\x20холода\x2c\x20но\x20удваивает\x20урон\x2c\x20наносимый\x20вам\x20огнем\x2e"  ,
-    "\x7bШлем\x20Андурана\x7d\x0a\x0aУвеличивает\x20Силу\x20заклинаний\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bСвятой\x20молот\x7d\x0a\x0aУвеличивает\x20Атаку\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЛегендарный\x20скипетр\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20все\x20характеристики\x20героя\x2e"  ,
-    "\x7bНаконечник\x20мачты\x7d\x0a\x0aВ\x20сражении\x20на\x20море\x20увеличивает\x20удачу\x20и\x20мораль\x20вашей\x20армии\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bСфера\x20антимагии\x7d\x0a\x0aВ\x20бою\x20артефакт\x20не\x20позволяет\x20обеим\x20сторонам\x20направлять\x20заклинания\x2e"  ,
-    "\x7bВолшебный\x20посох\x7d\x0a\x0aУвеличивает\x20Силу\x20заклинаний\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bМечелом\x7d\x0a\x0aУвеличивает\x20Защиту\x20на\x20\x34\x20единицы\x20и\x20Атаку\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bМеч\x20Андурана\x7d\x0a\x0aУвеличивает\x20Атаку\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЛопата\x20могильщика\x7d\x0a\x0aУвеличивает\x20эффективность\x20использования\x20навыка\x20некромантии\x2e"  };
+    "{Книга всезнания}\n(Знания +12)\n\nКнига всезнания увеличивает Знания на 12 единиц.",
+    "{Меч власти}\n(Атака +12)\n\nМеч власти увеличивает навык Атаки на 12 единиц.",
+    "{Защитная накидка}\n(Защита +12)\n\nЗащитная накидка увеличивает Защиту на 12 единиц.",
+    "{Жезл магии}\n(Сила магии +12)\n\nЖезл магии увеличивает Силу заклинаний на 12 единиц.",
+    "{Всемогущий щит}\n\nВсемогущий щит увеличивает Атаку и Защиту на 6 единиц каждый.",
+    "{Всемогущий посох}\n\nВсемогущий посох увеличивает Силу магии и Знания на 6 единиц каждый.",
+    "{Корона всевластия}\n\nКорона всевластия увеличивает каждый из базовых навыков на 4 единицы.",
+    "{Золотой гусь}\n\nЗолотой гусь приносит в вашу казну по 10.000 золотых каждый день.",
+    "{Ожерелье тайной магии}\n(Сила магии +4)\n\nОжерелье тайной магии увеличивает Силу магии на 4 единицы.",
+    "{Магический браслет}\n(Сила магии +2)\n\nМагический браслет увеличивает Силу магии на 2 единицы.",
+    "{Кольцо мага}\n(Сила магии +2)\n\nКольцо мага увеличивает Силу магии на 2 единицы.",
+    "{Брошь ведьмы}\n(Сила магии +3)\n\nБрошь ведьмы увеличивает Силу магии на 3 единицы.",
+    "{Медаль отваги}\n\nМедаль отваги увеличивает мораль.",
+    "{Медаль мужества}\n\nМедаль мужества увеличивает мораль.",
+    "{Медаль доблести}\n\nМедаль доблести увеличивает мораль.",
+    "{Медаль почета}\n\nМедаль почета увеличивает мораль.",
+    "{Символ неудачи}\n\nСимвол неудачи сильно уменьшает мораль.",
+    "{Громовая палица}\n(Атака +1)\n\nГромовая палица увеличивает навык Атаки на 1 единицу.",
+    "{Защитная перчатка}\n(Защита +1)\n\nЗащитная перчатка увеличивает навык Защиты на 1 единицу.",
+    "{Шлем защитника}\n(Защита +1)\n\nШлем защитника увеличивает навык Защиты на 1 единицу.",
+    "{Гигантский цеп}\n(Атака +1)\n\nГигантский цеп увеличивает навык Атаки на 1 единицу.",
+    "{Баллиста}\n\nБаллиста позволяет вашей катапульте дважды стрелять в один ход боя.",
+    "{Незримый щит}\n(Защита +2)\n\nНезримый щит увеличивает навык Защиты на 2 единицы.",
+    "{Драконий меч}\n(Атака +3)\n\nДраконий меч увеличивает навык Атаки на 3 единицы.",
+    "{Топор власти}\n(Атака +2)\n\nТопор власти увеличивает навык Атаки на 2 единицы.",
+    "{Божественный доспех}\n(Защита +3)\n\nБожественный доспех увеличивает навык Защиты на 3 единицы.",
+    "{Малый свиток знания}\n(Знания +2)\n\nМалый свиток знания увеличивает Знания на 2 единицы.",
+    "{Большой свиток знания}\n(Знания +3)\n\nБольшой свиток знания увеличивает Знания на 3 единицы.",
+    "{Могущественный свиток знания}\n(Знания +4)\n\nМогущественный свиток Знания увеличивает Знания на 4 единицы.",
+    "{Свиток высшего знания}\n(Знания +5)\n\nСвиток высшего знания увеличивает Знания на 5 единиц.",
+    "{Бездонный мешок}\n\nБездонный мешок приносит вам 1000 золотых в день.",
+    "{Бездонная сума}\n\nБездонная сума приносит вам 750 золотых в день.",
+    "{Бездонный кошель}\n\nБездонный кошель приносит вам 500 золотых в день.",
+    "{Башмаки кочевника}\n\nБашмаки кочевника увеличивают дальность передвижения по суше.",
+    "{Башмаки путника}\n\nБашмаки путника увеличивают подвижность отряда на суше.",
+    "{Лапка кролика}\n\nЛапка кролика увеличивает удачу в бою.",
+    "{Золотая подкова}\n\nЗолотая подкова увеличивает удачу в бою.",
+    "{Счастливая монета}\n\nСчастливая монета увеличивает удачу в бою.",
+    "{Клевер}\n\nКлевер увеличивает удачу в бою.",
+    "{Компас}\n\nКомпас увеличивает подвижность отряда на суше и на море.",
+    "{Астролябия}\n\nАстролябия увеличивает подвижность отряда на море.",
+    "{Дурной глаз}\n\nАртефакт снижает вполовину количество магической энергии, требуемой на направление заклинаний-проклятий.",
+    "{Зачарованные часы}\n\nАртефакт продлевает действие всех ваших заклинаний на 2 хода.",
+    "{Золотые часы}\n\nАртефакт удваивает эффективность использования заклинания гипноза.",
+    "{Шапочка}\n\nСнижает вполовину затраты магической энергии на все заклинания влияющие на разум.",
+    "{Ледяная накидка}\n\nСнижает вполовину урон, наносимый вашим воинам заклинаниями холода.",
+    "{Огненная накидка}\n\nСнижает вполовину урон, наносимый вашим воинам заклинаниями огня.",
+    "{Громовой шлем}\n\nСнижает вполовину урон, наносимый вашим воинам заклинаниями молний.",
+    "{Нетающий лед}\n\nУвеличивает на 50% урон, наносимый врагу вашими заклинаниями холода.",
+    "{Горячий камень}\n\nУвеличивает на 50% урон, наносимый врагу вашими заклинаниями огня.",
+    "{Жезл молний}\n\nУвеличивает на 50% урон, наносимый врагу вашими заклинаниями молний.",
+    "{Кольцо змеи}\n\nСнижает вполовину затраты магической энергии на заклинания-благословения.",
+    "{Символ жизни}\n\nУвеличивает вдвое эффективность всех заклинаний связанных с воскрешением и оживлением существ.",
+    "{Книга стихий}\n\nУвеличивает вдвое эффективность всех заклинаний, связанных с призывом существ.",
+    "{Кольцо стихий}\n\nСнижает вполовину затраты на все заклинания, связанные с вызовом существ.",
+    "{Святой кулон}\n\nНаделяет ваших воинов иммунитетом к заклинаниям-проклятиям.",
+    "{Подвеска свободной воли}\n\nНаделяет ваших воинов иммунитетом к заклинаниям, связанным с гипнозом.",
+    "{Кулон жизни}\n\nНаделяет ваших воинов иммунитетом ко всем заклинаниям Смерти.",
+    "{Подвеска покоя}\n\nНаделяет ваших воинов иммунитетом к заклинанию Берсерк.",
+    "{Всевидящий глаз}\n\nНаделяет ваших воинов иммунитетом ко всем заклинаниям ослепления.",
+    "{Кулон движения}\n\nНаделяет ваших воинов иммунитетом ко всем парализующим заклинаниям.",
+    "{Кулон смерти}\n\nНаделяет ваших воинов иммунитетом ко всем святым заклинаниям.",
+    "{Посох отрицания}\n\nАртефакт защищает ваших воинов от заклинания снятия чар.",
+    "{Золотой лук}\n\nСнижает вполовину штраф на урон для ваших воинов, стреляющих через препятствия (например, стены замка).",
+    "{Телескоп}\n\nУвеличивает радиус обзора странствующего героя на 1 клетку.",
+    "{Перо дипломата}\n\nСнижает стоимость сдачи на 10% от общей стоимости армии вашего героя.",
+    "{Шляпа мага}\n\nАртефакт продлевает действие ваших заклинаний на 10 ходов!",
+    "{Кольцо силы}\n\nАртефакт возвращает герою 2 дополнительных очка магии за ход.",
+    "{Обоз}\n\nОбеспечивает ваших воинов-стрелков нескончаемым запасом стрел.",
+    "{Подать}\n\nАртефакт принуждает вас выплачивать каждый ход 250 золотых налогов.",
+    "{Ужасная маска}\n\nЭтот артефакт не позволяет любым воинам и существам вступить в вашу армию.",
+    "{Бездонная сума серы}\n\nАртефакт приносит вам 1 единицу серы в день.",
+    "{Бездонная колба ртути}\n\nАртефакт приносит вам 1 единицу ртути в день.",
+    "{Бездонная сума самоцветов}\n\nАртефакт приносит вам 1 единицу самоцветов в день.",
+    "{Нескончаемая вязанка дров}\n\nАртефакт приносит вам 1 единицу древесины в день.",
+    "{Бездонная вагонетка руды}\n\nАртефакт приносит вам 1 единицу руды в день.",
+    "{Бездонная сума кристаллов}\n\nАртефакт приносит вам 1 единицу кристаллов в день.",
+    "{Шлем с шипами}\n\nАртефакт увеличивает параметры Атаки и Защиты на 1 единицу каждый.",
+    "{Щит с шипами}\n\n Артефакт увеличивает параметры Атаки и Защиты на 2 единицы каждый.",
+    "{Белая жемчужина}\n\n Артефакт увеличивает параметры Силы магии и Знания на 1 единицу каждый.",
+    "{Черная жемчужина}\n\n Артефакт увеличивает параметры Силы магии и Знания на 2 единицы каждый.",
+    "{Волшебная книга}\n\nВолшебная книга позволяет направлять заклинания.",
+    "{ERROR}\n\nArtifact 82."  ,
+    "{ERROR}\n\nArtifact 83."  ,
+    "{ERROR}\n\nArtifact 84."  ,
+    "{ERROR}\n\nArtifact 85."  ,
+    "{Свиток заклинаний}\n\nЭтот Свиток заклинаний позволяет вам направлять заклинание '%s'.",
+    "{Рука мученика}\n\nРука мученика увеличивает Силу заклинаний вашего героя на 3 единицы, но дает штраф к морали за присутствия нежити в армии.",
+    "{Доспех Андурана}\n\nУвеличивает Защиту на 5 единиц.",
+    "{Защитная брошь}\n\nЗащитная брошь снижает на 50 процентов урон, наносимый заклинаниями Армагеддон и Буря Стихий. При этом, артефакт снижает Силу магии на 2 единицы.",
+    "{Боевое одеяние}\n\nБоевое одеяние Андурана сочетает в себе силу трех артефактов Андурана. Также, артефакт повышает до максимума удачу и мораль вашей армии и дает возможность направлять заклинание Портал города.",
+    "{Кристальный шар}\n\nКристальный шар дает вам более детальную информацию о монстрах, вражеских героях и том, кто защищает близлежащие от героя замки.",
+    "{Сердце огня}\n\nСердце огня снижает на 50 процентов урон, наносимый силами огня, но удваивает урон, наносимый вам холодом.",
+    "{Ледяное сердце}\n\nЛедяное сердце снижает на 50 процентов урон, наносимый силами холода, но удваивает урон, наносимый вам огнем.",
+    "{Шлем Андурана}\n\nУвеличивает Силу заклинаний на 5 единиц.",
+    "{Святой молот}\n\nУвеличивает Атаку на 5 единиц.",
+    "{Легендарный скипетр}\n\nУвеличивает на 2 все характеристики героя.",
+    "{Наконечник мачты}\n\nВ сражении на море увеличивает удачу и мораль вашей армии на 1 единицу.",
+    "{Сфера антимагии}\n\nВ бою артефакт не позволяет обеим сторонам направлять заклинания.",
+    "{Волшебный посох}\n\nУвеличивает Силу заклинаний на 5 единиц.",
+    "{Мечелом}\n\nУвеличивает Защиту на 4 единицы и Атаку на 1 единицу.",
+    "{Меч Андурана}\n\nУвеличивает Атаку на 5 единиц.",
+    "{Лопата могильщика}\n\nУвеличивает эффективность использования навыка некромантии."};
 const char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     ""  ,
     ""  ,
@@ -8472,121 +8230,121 @@ const char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     ""  ,
     ""  ,
     ""  ,
-    "Вы\x20вызволяете\x20волшебницу\x2c\x20заточенную\x20в\x20проклятой\x20гробнице\x2c\x20и\x20в\x20награду\x20она\x20вручает\x20вам\x20изысканное\x20алмазное\x20ожерелье\x2e"  ,
-    "Изучая\x20завалы\x20в\x20заброшенной\x20шахте\x2c\x20вы\x20спасаете\x20артель\x20гномов\x2dстарателей\x2e\x20В\x20знак\x20благодарности\x20их\x20старшина\x20дарит\x20вам\x20золотой\x20браслет\x2e"  ,
-    "Вы\x20спешите\x20на\x20звук\x20отчаянного\x20вопля\x20боли\x20и\x20видите\x20кентавра\x2c\x20попавшего\x20в\x20западню\x2e\x20Вы\x20помогаете\x20ему\x20освободиться\x2c\x20и\x20он\x20вручает\x20вам\x20кожаный\x20мешочек\x2e\x20Заглянув\x20внутрь\x2c\x20вы\x20видите\x20ослепительное\x20бриллиантовое\x20кольцо\x2e"  ,
-    "Рядом\x20с\x20останками\x20сожженной\x20колдуньи\x20лежит\x20изящная\x20брошь\x20прекрасной\x20работы\x2e\x20Осторожно\x20приблизившись\x20к\x20обугленному\x20трупу\x2c\x20вы\x20забираете\x20брошь\x20себе\x2e"  ,
-    "В\x20награду\x20за\x20спасение\x20прекрасной\x20девы\x20от\x20посягательств\x20ненавистного\x20барона\x20королевский\x20герольд\x20вручает\x20вам\x20Медаль\x20отваги\x2e"  ,
-    "Вы\x20спасаете\x20маленького\x20мальчика\x20от\x20стаи\x20кровожадных\x20волков\x20и\x20провожаете\x20в\x20имение\x20родителей\x2e\x20Счастливый\x20отец\x20награждает\x20вас\x20Медалью\x20мужества\x2e"  ,
-    "Вы\x20вырываете\x20принцессу\x20соседнего\x20королевства\x20из\x20мерзких\x20лап\x20презренных\x20работорговцев\x20и\x20в\x20награду\x20за\x20подвиг\x20получаете\x20Медаль\x20доблести\x2e"  ,
-    "Вы\x20избавляете\x20округу\x20от\x20ужасного\x20минотавра\x2c\x20добычей\x20которому\x20служили\x20благородные\x20рыцари\x2c\x20и\x20становитесь\x20кавалером\x20Медали\x20почета\x2e"  ,
-    "На\x20обочине\x20пустынной\x20дороги\x20вы\x20находите\x20медаль\x2e\x20Вы\x20подобрали\x20ее\x20и\x20обнаружили\x2c\x20что\x20стали\x20несчастным\x20обладателем\x20Символа\x20неудачи\x2c\x20который\x20понижает\x20боевой\x20дух\x20вашей\x20армии\x2e"  ,
-    "Во\x20время\x20жуткой\x20грозы\x20молния\x20бьет\x20в\x20дерево\x2c\x20разнося\x20его\x20на\x20мелкие\x20щепки\x2e\x20Среди\x20обломков\x20вы\x20обнаруживаете\x20таинственную\x20палицу\x2e"  ,
-    "Вы\x20повстречали\x20печально\x20известного\x20Черного\x20Рыцаря\x21\x20Ваш\x20поединок\x20заканчивается\x20вничью\x2c\x20и\x20рыцарь\x20в\x20знак\x20уважения\x20дарит\x20вам\x20пару\x20латных\x20перчаток\x2e"  ,
-    "Краем\x20глаза\x20вы\x20замечаете\x20золотистый\x20блеск\x20среди\x20пышной\x20зелени\x2e\x20Приглядевшись\x20внимательнее\x2c\x20вы\x20находите\x20под\x20кустами\x20великолепный\x20золотой\x20шлем\x2e"  ,
-    "Неуклюжий\x20гигант\x20нанес\x20себе\x20смертельную\x20рану\x20собственным\x20боевым\x20цепом\x2e\x20Вы\x20прекрасно\x20владеете\x20этим\x20оружием\x20и\x20с\x20уверенностью\x20вынимаете\x20цеп\x20из\x20мертвых\x20рук\x20гиганта\x2e"  ,
-    "Пробираясь\x20через\x20развалины\x20древней\x20крепости\x2c\x20вы\x20находите\x20орудие\x2c\x20которое\x20превратило\x20ее\x20в\x20руины\x2c\x20удивительную\x20баллисту\x20замысловатой\x20конструкции\x2e"  ,
-    "В\x20руках\x20у\x20каменной\x20статуи\x20воина\x20\x2d\x20великолепный\x20серебряный\x20щит\x2e\x20Как\x20только\x20вы\x20забираете\x20щит\x20себе\x2c\x20статуя\x20рассыпается\x20в\x20прах\x2e"  ,
-    "Вы\x20пробираетесь\x20узкой\x20тропой\x2c\x20как\x20вдруг\x20ближайший\x20куст\x20загорается\x20ярким\x20пламенем\x2e\x20В\x20огненном\x20смерче\x20появляется\x20прекрасная\x20дама\x2c\x20которая\x20протягивает\x20вам\x20волшебный\x20меч\x2e"  ,
-    "Вы\x20видите\x20серебряный\x20топор\x2c\x20вогнанный\x20в\x20землю\x20по\x20самую\x20рукоять\x2e\x20Ваши\x20воины\x20пытаются\x20выдернуть\x20его\x2c\x20но\x20усилия\x20их\x20тщетны\x2e\x20Вам\x20же\x20хватило\x20одного\x20усилия\x20и\x20топор\x20у\x20вас\x20в\x20руках\x21"  ,
-    "Шайка\x20разбойников\x20обыскивает\x20тела\x20мертвых\x20воинов\x2e\x20Вы\x20разгоняете\x20мародеров\x20и\x20вдруг\x20замечаете\x2c\x20что\x20в\x20спешке\x20они\x20потеряли\x20великолепный\x20доспех\x2e"  ,
-    "Перед\x20вами\x20возникает\x20парящий\x20в\x20воздухе\x20стеклянный\x20ларец\x20со\x20свитком\x20внутри\x2c\x20лежащем\x20на\x20подушке\x20из\x20пурпурного\x20бархата\x2e\x20От\x20прикосновения\x2c\x20крышка\x20ларца\x20открывается\x2c\x20и\x20свиток\x20оказывается\x20у\x20вас\x20в\x20руках\x2e"  ,
-    "Вы\x20навещаете\x20местного\x20мудреца\x20и\x20рассказываете\x20о\x20цели\x20вашего\x20путешествия\x2e\x20Он\x20достает\x20из\x20мешка\x20пожелтевший\x20свиток\x20и\x20передает\x20его\x20вам\x2e"  ,
-    "Вы\x20стоите\x20перед\x20останками\x20давно\x20умершей\x20жрицы\x20друидов\x2e\x20Пожелтевшие\x20от\x20времени\x20кости\x20проглядывают\x20через\x20прорехи\x20истлевшего\x20одеяния\x2e\x20Пошевелив\x20груду\x20ветоши\x2c\x20вы\x20находите\x20древний\x20свиток\x2e"  ,
-    "Груда\x20пожелтевших\x20костей\x20и\x20обрывки\x20истлевшей\x20материи\x20\x2d\x20вот\x20все\x2c\x20что\x20осталось\x20от\x20жрицы\x20друидов\x2e\x20Среди\x20этих\x20останков\x20вы\x20замечаете\x20таинственный\x20свиток\x2e"  ,
-    "Маленький\x20лепрекон\x20пританцовывает\x20у\x20волшебного\x20мешка\x2e\x20Завидев\x20вас\x2c\x20он\x20замирает\x20на\x20месте\x2c\x20затем\x20издает\x20возмущенный\x20возглас\x2c\x20топает\x20ножкой\x20и\x20растворяется\x20в\x20воздухе\x2e\x20Вы\x20забираете\x20мешок\x20себе\x2e"  ,
-    "Благородная\x20путешественница\x2c\x20отбившаяся\x20от\x20спутников\x2c\x20просит\x20вас\x20о\x20помощи\x2e\x20Проводив\x20ее\x20до\x20дома\x2c\x20вы\x20получаете\x20в\x20награду\x20суму\x2c\x20полную\x20золота\x2e"  ,
-    "Однажды\x20вам\x20в\x20руки\x20попадает\x20наполненный\x20золотом\x20кожаный\x20кошель\x2c\x20принадлежавший\x20великому\x20королю\x2c\x20который\x20умел\x20превращать\x20любой\x20предмет\x20в\x20золото\x2e"  ,
-    "Бродячий\x20торговец\x20просит\x20вас\x20защитить\x20его\x20от\x20банды\x20гоблинов\x2e\x20В\x20награду\x20он\x20дарит\x20вам\x20пару\x20изящных\x20башмаков\x2c\x20испещренных\x20загадочными\x20древними\x20письменами\x2e"  ,
-    "Обнаружив\x20пару\x20замечательных\x20башмаков\x20украшенных\x20бисером\x2c\x20вы\x20благодарите\x20загадочного\x20благодетеля\x20и\x20оставляете\x20их\x20себе\x2e"  ,
-    "В\x20уплату\x20за\x20охрану\x20в\x20пути\x20странствующий\x20торговец\x20предлагает\x20вам\x20лапку\x20кролика\x2e\x20По\x20его\x20словам\x2c\x20она\x20принесет\x20вам\x20удачу\x20в\x20бою\x2e"  ,
-    "Попавший\x20в\x20ловушку\x20единорог\x20испуганно\x20кричит\x2e\x20Вы\x20успокаиваете\x20его\x20и\x20освобождаете\x20от\x20пут\x2e\x20Всхрапнув\x20и\x20ударив\x20копытом\x2c\x20он\x20уносится\x20прочь\x2e\x20Там\x2c\x20где\x20он\x20только\x20что\x20стоял\x2c\x20осталась\x20лежать\x20золотая\x20подкова\x2e"  ,
-    "Вы\x20поймали\x20озорного\x20бесенка\x2c\x20который\x20не\x20давал\x20покоя\x20всей\x20округе\x2e\x20В\x20обмен\x20на\x20свободу\x20он\x20предлагает\x20вам\x20волшебную\x20монету\x2e"  ,
-    "Посреди\x20мертвой\x20лощины\x2c\x20заполненной\x20иссохшей\x20растительностью\x2c\x20вы\x2c\x20к\x20своему\x20удивлению\x2c\x20замечете\x20веселый\x20зеленый\x20побег\x20четырехлистного\x20клевера\x2e"  ,
-    "Странноватый\x20старикашка\x20утверждает\x2c\x20что\x20он\x20\x2d\x20великий\x20изобретатель\x2c\x20и\x20просит\x20вас\x20испытать\x20его\x20новое\x20творение\x2e\x20Надувшись\x20от\x20важности\x2c\x20он\x20вручает\x20вам\x20компас\x2e"  ,
-    "Старый\x20мореход\x20стал\x20добычей\x20людоедов\x2e\x20Вы\x20спасаете\x20его\x2c\x20и\x20в\x20знак\x20благодарности\x20он\x20дарит\x20вам\x20чудесный\x20инструмент\x2c\x20позволяющий\x20измерять\x20расстояния\x20по\x20звездам\x2e"  ,
-    "В\x20заброшенной\x20хижине\x20вы\x20находите\x20скелет\x20давно\x20почившей\x20колдуньи\x2e\x20Приглядевшись\x2c\x20вы\x20замечаете\x2c\x20что\x20в\x20глазнице\x20пожелтевшего\x20черепа\x20зловеще\x20вращается\x20стеклянный\x20глаз\x2e"  ,
-    "За\x20невысоким\x20холмом\x20перед\x20вами\x20открывается\x20зловещая\x20картина\x20\x2d\x20стаи\x20стервятников\x20пируют\x20на\x20поле\x20недавней\x20битвы\x2e\x20Среди\x20тел\x20поверженных\x20воинов\x20вы\x20находите\x20волшебные\x20песочные\x20часы\x2e"  ,
-    "Вы\x20помогаете\x20бродячему\x20торговцу\x20снадобьями\x20вытащить\x20повозку\x20из\x20придорожной\x20канавы\x2e\x20В\x20знак\x20благодарности\x20он\x20вручает\x20вам\x20золотые\x20часы\x2e\x20Он\x20и\x20не\x20подозревал\x2c\x20что\x20часы\x20волшебные\x21"  ,
-    "Вы\x20делаете\x20короткую\x20остановку\x20в\x20маленькой\x20придорожной\x20харчевне\x2e\x20Под\x20звон\x20монет\x20происходит\x20обмен\x20новостями\x2c\x20а\x20то\x20и\x20редкими\x20вещицами\x2e\x20Вот\x20таким\x2dто\x20образом\x20в\x20вашем\x20багаже\x20и\x20оказывается\x20волшебная\x20шапочка\x2e"  ,
-    "Вы\x20спешите\x20на\x20отчаянные\x20крики\x20и\x20видите\x20очаровательную\x20девушку\x2c\x20за\x20которой\x20гонится\x20разъяренный\x20медведь\x2e\x20Через\x20мгновение\x20зверь\x20повержен\x2c\x20и\x20благодарная\x20волшебница\x20шьет\x20вам\x20из\x20его\x20шкуры\x20волшебный\x20плащ\x2e"  ,
-    "За\x20поворотом\x20дороги\x20вы\x20видите\x20сражающихся\x20некроманта\x20и\x20паладина\x2e\x20Некромант\x20атакует\x20паладина\x2c\x20и\x20тот\x20падает\x20на\x20колени\x2e\x20Вы\x20спасаете\x20жизнь\x20паладину\x2c\x20убивая\x20его\x20врага\x2e\x20Паладин\x20дарит\x20вам\x20свою\x20огненную\x20накидку\x2e"  ,
-    "Бродячий\x20медник\x2c\x20у\x20которого\x20кончилась\x20провизия\x2c\x20предлагает\x20вам\x20шлем\x20с\x20гребнем\x20в\x20виде\x20молнии\x20в\x20обмен\x20на\x20еду\x20и\x20питье\x2e\x20Вы\x20соглашаетесь\x20на\x20обмен\x2c\x20а\x20вскоре\x20обнаруживаете\x2c\x20что\x20шлем\x20обладает\x20еще\x20и\x20магическими\x20свойствами\x2e"  ,
-    "Ваше\x20внимание\x20привлекает\x20ледяная\x20сосулька\x2c\x20которая\x20не\x20тает\x2c\x20несмотря\x20на\x20полуденный\x20зной\x2e\x20Вы\x20отламываете\x20ее\x20от\x20карниза\x20и\x20с\x20удивлением\x20обнаруживаете\x2c\x20что\x20даже\x20тепло\x20ваших\x20рук\x20ей\x20нипочем\x2e"  ,
-    "В\x20дальней\x20стране\x20вы\x20встречаете\x20племя\x20приматов\x2e\x20Они\x20разжигают\x20костры\x20при\x20помощи\x20волшебного\x20куска\x20лавы\x2e\x20Вы\x20научили\x20их\x20добывать\x20огонь\x20обычным\x20способом\x2e\x20Обезьяны\x20считают\x20вас\x20богом\x20и\x20дарят\x20свой\x20заветный\x20кусок\x20лавы\x2e"  ,
-    "Во\x20время\x20ужасной\x20грозы\x20на\x20ваших\x20глазах\x20в\x20громоотвод\x20дома\x20бьет\x20молния\x2e\x20Расплавленный\x20громоотвод\x20падает\x20на\x20землю\x2c\x20но\x20его\x20наконечник\x20остается\x20целым\x20и\x20невредимым\x2e\x20Вы\x20подобрали\x20его\x20\x2d\x20оказалось\x2c\x20это\x20магический\x20предмет\x21"  ,
-    "На\x20пальце\x20мертвого\x20странника\x20вы\x20видите\x20необычное\x20кольцо\x2e\x20Оно\x20имеет\x20форму\x20змеи\x2c\x20вцепившейся\x20зубами\x20в\x20собственный\x20хвост\x2e"  ,
-    "Песчаная\x20буря\x20обнажила\x20вход\x20в\x20подземную\x20гробницу\x2e\x20Вы\x20спускаетесь\x20внутрь\x20и\x20обнаруживаете\x2c\x20что\x20здесь\x20уже\x20побывали\x20грабители\x2c\x20однако\x20в\x20темноте\x20они\x20не\x20заметили\x20символ\x20вечной\x20жизни\x2c\x20висящий\x20на\x20серебряной\x20цепи\x2e"  ,
-    "Вы\x20встречаете\x20заклинателя\x2c\x20который\x20просит\x20разрешить\x20ему\x20воспользоваться\x20вашим\x20покровительством\x20на\x20опасном\x20участке\x20пути\x2e\x20Вы\x20соглашаетесь\x2c\x20и\x20в\x20награду\x20он\x20дарит\x20вам\x20Книгу\x20Стихий\x2e"  ,
-    "Расположившись\x20на\x20отдых\x20под\x20невысоким\x20деревом\x2c\x20вы\x20замечаете\x20дикого\x20кота\x2c\x20который\x20подбирается\x20к\x20вороньему\x20гнезду\x2e\x20Вы\x20прогоняете\x20кота\x2c\x20и\x20сами\x20залезаете\x20на\x20дерево\x2e\x20В\x20гнезде\x20вы\x20находите\x20кольцо\x20тонкой\x20работы\x2e"  ,
-    "Странствуя\x20по\x20дальним\x20землям\x2c\x20вы\x20встречаете\x20отшельника\x2c\x20живущего\x20в\x20маленькой\x20аккуратной\x20хижине\x2e\x20Узнав\x20о\x20цели\x20ваших\x20скитаний\x2c\x20он\x20прерывает\x20свои\x20размышления\x2c\x20благословляет\x20вас\x20и\x20дарит\x20амулет\x2c\x20защищающий\x20от\x20злых\x20чар\x2e"  ,
-    "Вы\x20слышите\x20крики\x20о\x20помощи\x20и\x2c\x20поспешив\x20на\x20берег\x20реки\x2c\x20видите\x20фей\x2c\x20потешающихся\x20над\x20стариком\x2c\x20окуная\x20его\x20в\x20воду\x2e\x20Вы\x20выручаете\x20старика\x20из\x20беды\x20и\x20вытаскиваете\x20одну\x20фею\x20на\x20берег\x2e\x20В\x20обмен\x20на\x20свободу\x20она\x20отдает\x20вам\x20подвеску\x2e"  ,
-    "В\x20дороге\x20вы\x20встречаете\x20небольшой\x20караван\x2e\x20Сыграв\x20с\x20хозяином\x20каравана\x20в\x20кости\x2c\x20вы\x20выигрываете\x20волшебную\x20подвеску\x2e\x20Ее\x20прежний\x20владелец\x20утверждает\x2c\x20что\x20она\x20может\x20противостоять\x20чарам\x20смерти\x20некромантов\x2e"  ,
-    "Вы\x20спешите\x20на\x20шум\x20сражения\x20и\x20видите\x20старика\x2dварвара\x2c\x20который\x20с\x20трудом\x20отбивается\x20от\x20гидры\x2e\x20В\x20награду\x20за\x20помощь\x20варвар\x20дарит\x20вам\x20волшебный\x20кулон\x2e"  ,
-    "В\x20хижине\x20у\x20дороги\x20вы\x20находите\x20слепую\x20старуху\x2c\x20умирающую\x20в\x20полном\x20одиночестве\x2e\x20Вы\x20обещаете\x20устроить\x20ей\x20достойные\x20похороны\x2e\x20В\x20знак\x20благодарности\x20она\x20дарит\x20вам\x20волшебную\x20подвеску\x2e"  ,
-    "Дорогу\x20вам\x20преграждает\x20голем\x2c\x20на\x20шее\x20которого\x20сверкает\x20кулон\x2e\x20Вы\x20перерезаете\x20шнурок\x2c\x20и\x20он\x20падает\x20на\x20землю\x2e\x20Голем\x20рассыпается\x20у\x20вас\x20на\x20глазах\x2c\x20а\x20кулон\x20достается\x20вам\x2e"  ,
-    "После\x20короткой\x20ожесточенной\x20схватки\x20с\x20некромантом\x20у\x20вас\x20в\x20руках\x20остается\x20его\x20волшебный\x20кулон\x2e\x20Знакомый\x20чародей\x20объясняет\x20вам\x2c\x20что\x20этот\x20кулон\x20защищает\x20нежить\x2c\x20состоящую\x20в\x20вашей\x20армии\x2c\x20от\x20святого\x20слова\x2e"  ,
-    "Навстречу\x20вам\x20попадается\x20старый\x20друг\x2dчародей\x2e\x20Он\x20вручает\x20вам\x20подарок\x20\x2d\x20волшебный\x20жезл\x2c\x20который\x20делает\x20невозможным\x20применение\x20заклинания\x20снятие\x20чар\x20против\x20ваших\x20соратников\x2e"  ,
-    "Вы\x20случайно\x20встречаете\x20знаменитого\x20стрелка\x20и\x20предлагаете\x20ему\x20сыграть\x20в\x20кости\x2e\x20Он\x20соглашается\x20и\x20ставит\x20свой\x20лук\x20против\x20вашего\x20коня\x2e\x20Вы\x20выигрываете\x2e"  ,
-    "Торговец\x20из\x20далеких\x20земель\x20предлагает\x20вам\x20новейшее\x20изобретение\x20своего\x20народа\x20в\x20обмен\x20на\x20съестные\x20припасы\x2e\x20Эта\x20штука\x2c\x20благодаря\x20которой\x20удаленные\x20предметы\x20кажутся\x20ближе\x2c\x20называется\x20телескопом\x2e"  ,
-    "Вы\x20помогаете\x20дипломату\x20починить\x20сломанную\x20ось\x20в\x20его\x20экипаже\x2c\x20и\x20в\x20знак\x20благодарности\x20он\x20дарит\x20вам\x20перо\x2e\x20Он\x20говорит\x2c\x20что\x20это\x20перо\x20заставляет\x20людей\x20смотреть\x20на\x20вещи\x20глазами\x20его\x20обладателя\x2e"  ,
-    "Вы\x20видите\x20чародея\x2c\x20который\x20удирает\x20от\x20грифона\x2e\x20Вот\x20он\x20распахнул\x20портал\x20и\x20ринулся\x20внутрь\x2c\x20но\x20при\x20этом\x20зацепился\x20шляпой\x2c\x20и\x20она\x20упала\x20она\x20на\x20землю\x2e\x20Вы\x20поднимаете\x20шляпу\x2c\x20отряхиваете\x20ее\x20от\x20пыли\x20и\x20оставляете\x20себе\x2e"  ,
-    "Вы\x20замечаете\x20дерево\x2c\x20похожее\x20на\x20чернокнижника\x20Карнота\x2e\x20На\x20одной\x20из\x20его\x20веток\x20сверкает\x20кольцо\x2e\x20Вы\x20все\x20равно\x20ничем\x20не\x20можете\x20ему\x20помочь\x2c\x20и\x20поэтому\x20забираете\x20кольцо\x20себе\x2e"  ,
-    "Ваше\x20внимание\x20привлекает\x20повозка\x20с\x20боеприпасами\x2c\x20стоящая\x20посреди\x20поля\x2c\x20где\x20когда\x2dто\x20гремела\x20битва\x2e\x20Убедившись\x2c\x20что\x20она\x20в\x20хорошем\x20состоянии\x2c\x20вы\x20присоединяете\x20ее\x20к\x20своему\x20обозу\x2e"  ,
-    "Ваша\x20налоговая\x20декларация\x20превысила\x20приделы\x2e\x20Мытарь\x20сжалился\x20над\x20вами\x20и\x20согласился\x20ежедневно\x20получать\x20от\x20вас\x20всего\x20по\x20\x32\x35\x30\x20золотых\x2e"  ,
-    "Вы\x20вскрыли\x20могилу\x20Синфилия\x20Гардолада\x2c\x20знаменитого\x20чернокнижника\x2c\x20и\x20находите\x20в\x20ней\x20маску\x2e\x20Надев\x20ее\x2c\x20ваше\x20лицо\x20искажает\x20гримаса\x20ужаса\x2e\x20Видимо\x20вам\x20достался\x20маска\x20Громлака\x20Грина\x2e\x20Теперь\x20от\x20нее\x20не\x20избавиться\x21"  ,
-    "Вы\x20посещаете\x20алхимика\x2c\x20который\x20при\x20виде\x20вашей\x20армии\x20незамедлительно\x20признает\x20вас\x20достойнейшим\x20из\x20достойных\x2e\x20Новый\x20подданный\x20дарит\x20вам\x20бездонную\x20сумку\x20серы\x2c\x20которая\x20вам\x20очень\x20даже\x20пригодится\x2e"  ,
-    "Вы\x20делаете\x20короткий\x20привал\x20в\x20башне\x20чародея\x2c\x20покинутой\x20хозяином\x2c\x20и\x20находите\x20волшебный\x20сосуд\x20с\x20ртутью\x2c\x20содержимое\x20которого\x20никогда\x20не\x20кончается\x2e\x20Это\x20же\x20настоящее\x20сокровище\x21"  ,
-    "После\x20короткого\x20ливня\x20на\x20небе\x20появляется\x20радуга\x2e\x20Заметив\x20место\x2c\x20где\x20она\x20упирается\x20в\x20землю\x2c\x20вы\x20находите\x20там\x20горшок\x20золота\x2e\x20Его\x20хозяин\x2c\x20маленький\x20эльф\x2c\x20предлагает\x20взамен\x20бездонную\x20суму\x20самоцветов\x2e"  ,
-    "Вы\x20останавливаетесь\x20на\x20отдых\x20и\x20разводите\x20костер\x2e\x20Неподалеку\x20лежит\x20куча\x20дров\x2e\x20Вы\x20берете\x20одно\x20полено\x20за\x20другим\x2c\x20но\x20куча\x20не\x20уменьшается\x2e\x20Вы\x20с\x20радостью\x20понимаете\x2c\x20что\x20дрова\x20зачарованы\x2c\x20и\x20забираете\x20их\x20себе\x2e"  ,
-    "Вы\x20находите\x20кузницу\x20гоблинов\x2c\x20где\x20они\x20куют\x20оружие\x2e\x20С\x20воинственным\x20кличем\x2c\x20ваши\x20воины\x20нападают\x20на\x20их\x20лагерь\x20и\x20убивают\x20всех\x20врагов\x2e\x20Осмотрев\x20трофеи\x2c\x20вы\x20обнаруживаете\x20волшебную\x20вагонетку\x20с\x20рудой\x2e"  ,
-    "Укрывшись\x20от\x20бури\x20в\x20небольшой\x20пещерке\x2c\x20вы\x20замечаете\x20в\x20углу\x20друзу\x20кристаллов\x2e\x20Вы\x20отламываете\x20кусок\x2c\x20а\x20на\x20его\x20месте\x20вырастает\x20новый\x20кристалл\x2e\x20Вы\x20забераете\x20это\x20сокровище\x20с\x20собой\x2e"  ,
-    "Небольшой\x20отряд\x20орков\x20нападает\x20на\x20вашу\x20армию\x2e\x20Вы\x20без\x20труда\x20отбиваете\x20атаку\x2e\x20На\x20теле\x20одного\x20из\x20нападавших\x20вы\x20видите\x20блестящий\x20шлем\x20с\x20шипами\x2e"  ,
-    "Вы\x20приближаетесь\x20к\x20мосту\x20через\x20глубокий\x20овраг\x2e\x20Неожиданно\x20из\x2dпод\x20моста\x20появляется\x20тролль\x20и\x20требует\x20плату\x20за\x20проход\x2e\x20После\x20отказа\x2c\x20тролль\x20нападает\x20на\x20вас\x2e\x20Убив\x20его\x2c\x20вы\x20забираете\x20себе\x20его\x20шит\x20с\x20шипами\x2e"  ,
-    "Вы\x20пересекаете\x20пересохшее\x20соляное\x20озеро\x2c\x20и\x20вдруг\x20среди\x20обломков\x20ракушек\x20и\x20кусков\x20коралла\x20замечаете\x20великолепную\x20белую\x20жемчужину\x2e"  ,
-    "Слухи\x20об\x20огромном\x20грифоне\x2c\x20нагоняющем\x20ужас\x20на\x20всю\x20округу\x2c\x20приводят\x20вас\x20в\x20его\x20логово\x2e\x20Жестокая\x20схватка\x20заканчивается\x20вашей\x20победой\x2c\x20и\x20в\x20опустевшем\x20гнезде\x20вы\x20находите\x20черную\x20жемчужину\x2e"  ,
+    "Вы вызволяете волшебницу, заточенную в проклятой гробнице, и в награду она вручает вам изысканное алмазное ожерелье.",
+    "Изучая завалы в заброшенной шахте, вы спасаете артель гномов-старателей. В знак благодарности их старшина дарит вам золотой браслет.",
+    "Вы спешите на звук отчаянного вопля боли и видите кентавра, попавшего в западню. Вы помогаете ему освободиться, и он вручает вам кожаный мешочек. Заглянув внутрь, вы видите ослепительное бриллиантовое кольцо.",
+    "Рядом с останками сожженной колдуньи лежит изящная брошь прекрасной работы. Осторожно приблизившись к обугленному трупу, вы забираете брошь себе.",
+    "В награду за спасение прекрасной девы от посягательств ненавистного барона королевский герольд вручает вам Медаль отваги.",
+    "Вы спасаете маленького мальчика от стаи кровожадных волков и провожаете в имение родителей. Счастливый отец награждает вас Медалью мужества.",
+    "Вы вырываете принцессу соседнего королевства из мерзких лап презренных работорговцев и в награду за подвиг получаете Медаль доблести.",
+    "Вы избавляете округу от ужасного минотавра, добычей которому служили благородные рыцари, и становитесь кавалером Медали почета.",
+    "На обочине пустынной дороги вы находите медаль. Вы подобрали ее и обнаружили, что стали несчастным обладателем Символа неудачи, который понижает боевой дух вашей армии.",
+    "Во время жуткой грозы молния бьет в дерево, разнося его на мелкие щепки. Среди обломков вы обнаруживаете таинственную палицу.",
+    "Вы повстречали печально известного Черного Рыцаря! Ваш поединок заканчивается вничью, и рыцарь в знак уважения дарит вам пару латных перчаток.",
+    "Краем глаза вы замечаете золотистый блеск среди пышной зелени. Приглядевшись внимательнее, вы находите под кустами великолепный золотой шлем.",
+    "Неуклюжий гигант нанес себе смертельную рану собственным боевым цепом. Вы прекрасно владеете этим оружием и с уверенностью вынимаете цеп из мертвых рук гиганта.",
+    "Пробираясь через развалины древней крепости, вы находите орудие, которое превратило ее в руины, удивительную баллисту замысловатой конструкции.",
+    "В руках у каменной статуи воина - великолепный серебряный щит. Как только вы забираете щит себе, статуя рассыпается в прах.",
+    "Вы пробираетесь узкой тропой, как вдруг ближайший куст загорается ярким пламенем. В огненном смерче появляется прекрасная дама, которая протягивает вам волшебный меч.",
+    "Вы видите серебряный топор, вогнанный в землю по самую рукоять. Ваши воины пытаются выдернуть его, но усилия их тщетны. Вам же хватило одного усилия и топор у вас в руках!",
+    "Шайка разбойников обыскивает тела мертвых воинов. Вы разгоняете мародеров и вдруг замечаете, что в спешке они потеряли великолепный доспех.",
+    "Перед вами возникает парящий в воздухе стеклянный ларец со свитком внутри, лежащем на подушке из пурпурного бархата. От прикосновения, крышка ларца открывается, и свиток оказывается у вас в руках.",
+    "Вы навещаете местного мудреца и рассказываете о цели вашего путешествия. Он достает из мешка пожелтевший свиток и передает его вам.",
+    "Вы стоите перед останками давно умершей жрицы друидов. Пожелтевшие от времени кости проглядывают через прорехи истлевшего одеяния. Пошевелив груду ветоши, вы находите древний свиток.",
+    "Груда пожелтевших костей и обрывки истлевшей материи - вот все, что осталось от жрицы друидов. Среди этих останков вы замечаете таинственный свиток.",
+    "Маленький лепрекон пританцовывает у волшебного мешка. Завидев вас, он замирает на месте, затем издает возмущенный возглас, топает ножкой и растворяется в воздухе. Вы забираете мешок себе.",
+    "Благородная путешественница, отбившаяся от спутников, просит вас о помощи. Проводив ее до дома, вы получаете в награду суму, полную золота.",
+    "Однажды вам в руки попадает наполненный золотом кожаный кошель, принадлежавший великому королю, который умел превращать любой предмет в золото.",
+    "Бродячий торговец просит вас защитить его от банды гоблинов. В награду он дарит вам пару изящных башмаков, испещренных загадочными древними письменами.",
+    "Обнаружив пару замечательных башмаков украшенных бисером, вы благодарите загадочного благодетеля и оставляете их себе.",
+    "В уплату за охрану в пути странствующий торговец предлагает вам лапку кролика. По его словам, она принесет вам удачу в бою.",
+    "Попавший в ловушку единорог испуганно кричит. Вы успокаиваете его и освобождаете от пут. Всхрапнув и ударив копытом, он уносится прочь. Там, где он только что стоял, осталась лежать золотая подкова.",
+    "Вы поймали озорного бесенка, который не давал покоя всей округе. В обмен на свободу он предлагает вам волшебную монету.",
+    "Посреди мертвой лощины, заполненной иссохшей растительностью, вы, к своему удивлению, замечете веселый зеленый побег четырехлистного клевера.",
+    "Странноватый старикашка утверждает, что он - великий изобретатель, и просит вас испытать его новое творение. Надувшись от важности, он вручает вам компас.",
+    "Старый мореход стал добычей людоедов. Вы спасаете его, и в знак благодарности он дарит вам чудесный инструмент, позволяющий измерять расстояния по звездам.",
+    "В заброшенной хижине вы находите скелет давно почившей колдуньи. Приглядевшись, вы замечаете, что в глазнице пожелтевшего черепа зловеще вращается стеклянный глаз.",
+    "За невысоким холмом перед вами открывается зловещая картина - стаи стервятников пируют на поле недавней битвы. Среди тел поверженных воинов вы находите волшебные песочные часы.",
+    "Вы помогаете бродячему торговцу снадобьями вытащить повозку из придорожной канавы. В знак благодарности он вручает вам золотые часы. Он и не подозревал, что часы волшебные!",
+    "Вы делаете короткую остановку в маленькой придорожной харчевне. Под звон монет происходит обмен новостями, а то и редкими вещицами. Вот таким-то образом в вашем багаже и оказывается волшебная шапочка.",
+    "Вы спешите на отчаянные крики и видите очаровательную девушку, за которой гонится разъяренный медведь. Через мгновение зверь повержен, и благодарная волшебница шьет вам из его шкуры волшебный плащ.",
+    "За поворотом дороги вы видите сражающихся некроманта и паладина. Некромант атакует паладина, и тот падает на колени. Вы спасаете жизнь паладину, убивая его врага. Паладин дарит вам свою огненную накидку.",
+    "Бродячий медник, у которого кончилась провизия, предлагает вам шлем с гребнем в виде молнии в обмен на еду и питье. Вы соглашаетесь на обмен, а вскоре обнаруживаете, что шлем обладает еще и магическими свойствами.",
+    "Ваше внимание привлекает ледяная сосулька, которая не тает, несмотря на полуденный зной. Вы отламываете ее от карниза и с удивлением обнаруживаете, что даже тепло ваших рук ей нипочем.",
+    "В дальней стране вы встречаете племя приматов. Они разжигают костры при помощи волшебного куска лавы. Вы научили их добывать огонь обычным способом. Обезьяны считают вас богом и дарят свой заветный кусок лавы.",
+    "Во время ужасной грозы на ваших глазах в громоотвод дома бьет молния. Расплавленный громоотвод падает на землю, но его наконечник остается целым и невредимым. Вы подобрали его - оказалось, это магический предмет!",
+    "На пальце мертвого странника вы видите необычное кольцо. Оно имеет форму змеи, вцепившейся зубами в собственный хвост.",
+    "Песчаная буря обнажила вход в подземную гробницу. Вы спускаетесь внутрь и обнаруживаете, что здесь уже побывали грабители, однако в темноте они не заметили символ вечной жизни, висящий на серебряной цепи.",
+    "Вы встречаете заклинателя, который просит разрешить ему воспользоваться вашим покровительством на опасном участке пути. Вы соглашаетесь, и в награду он дарит вам Книгу Стихий.",
+    "Расположившись на отдых под невысоким деревом, вы замечаете дикого кота, который подбирается к вороньему гнезду. Вы прогоняете кота, и сами залезаете на дерево. В гнезде вы находите кольцо тонкой работы.",
+    "Странствуя по дальним землям, вы встречаете отшельника, живущего в маленькой аккуратной хижине. Узнав о цели ваших скитаний, он прерывает свои размышления, благословляет вас и дарит амулет, защищающий от злых чар.",
+    "Вы слышите крики о помощи и, поспешив на берег реки, видите фей, потешающихся над стариком, окуная его в воду. Вы выручаете старика из беды и вытаскиваете одну фею на берег. В обмен на свободу она отдает вам подвеску.",
+    "В дороге вы встречаете небольшой караван. Сыграв с хозяином каравана в кости, вы выигрываете волшебную подвеску. Ее прежний владелец утверждает, что она может противостоять чарам смерти некромантов.",
+    "Вы спешите на шум сражения и видите старика-варвара, который с трудом отбивается от гидры. В награду за помощь варвар дарит вам волшебный кулон.",
+    "В хижине у дороги вы находите слепую старуху, умирающую в полном одиночестве. Вы обещаете устроить ей достойные похороны. В знак благодарности она дарит вам волшебную подвеску.",
+    "Дорогу вам преграждает голем, на шее которого сверкает кулон. Вы перерезаете шнурок, и он падает на землю. Голем рассыпается у вас на глазах, а кулон достается вам.",
+    "После короткой ожесточенной схватки с некромантом у вас в руках остается его волшебный кулон. Знакомый чародей объясняет вам, что этот кулон защищает нежить, состоящую в вашей армии, от святого слова.",
+    "Навстречу вам попадается старый друг-чародей. Он вручает вам подарок - волшебный жезл, который делает невозможным применение заклинания снятие чар против ваших соратников.",
+    "Вы случайно встречаете знаменитого стрелка и предлагаете ему сыграть в кости. Он соглашается и ставит свой лук против вашего коня. Вы выигрываете.",
+    "Торговец из далеких земель предлагает вам новейшее изобретение своего народа в обмен на съестные припасы. Эта штука, благодаря которой удаленные предметы кажутся ближе, называется телескопом.",
+    "Вы помогаете дипломату починить сломанную ось в его экипаже, и в знак благодарности он дарит вам перо. Он говорит, что это перо заставляет людей смотреть на вещи глазами его обладателя.",
+    "Вы видите чародея, который удирает от грифона. Вот он распахнул портал и ринулся внутрь, но при этом зацепился шляпой, и она упала она на землю. Вы поднимаете шляпу, отряхиваете ее от пыли и оставляете себе.",
+    "Вы замечаете дерево, похожее на чернокнижника Карнота. На одной из его веток сверкает кольцо. Вы все равно ничем не можете ему помочь, и поэтому забираете кольцо себе.",
+    "Ваше внимание привлекает повозка с боеприпасами, стоящая посреди поля, где когда-то гремела битва. Убедившись, что она в хорошем состоянии, вы присоединяете ее к своему обозу.",
+    "Ваша налоговая декларация превысила приделы. Мытарь сжалился над вами и согласился ежедневно получать от вас всего по 250 золотых.",
+    "Вы вскрыли могилу Синфилия Гардолада, знаменитого чернокнижника, и находите в ней маску. Надев ее, ваше лицо искажает гримаса ужаса. Видимо вам достался маска Громлака Грина. Теперь от нее не избавиться!",
+    "Вы посещаете алхимика, который при виде вашей армии незамедлительно признает вас достойнейшим из достойных. Новый подданный дарит вам бездонную сумку серы, которая вам очень даже пригодится.",
+    "Вы делаете короткий привал в башне чародея, покинутой хозяином, и находите волшебный сосуд с ртутью, содержимое которого никогда не кончается. Это же настоящее сокровище!",
+    "После короткого ливня на небе появляется радуга. Заметив место, где она упирается в землю, вы находите там горшок золота. Его хозяин, маленький эльф, предлагает взамен бездонную суму самоцветов.",
+    "Вы останавливаетесь на отдых и разводите костер. Неподалеку лежит куча дров. Вы берете одно полено за другим, но куча не уменьшается. Вы с радостью понимаете, что дрова зачарованы, и забираете их себе.",
+    "Вы находите кузницу гоблинов, где они куют оружие. С воинственным кличем, ваши воины нападают на их лагерь и убивают всех врагов. Осмотрев трофеи, вы обнаруживаете волшебную вагонетку с рудой.",
+    "Укрывшись от бури в небольшой пещерке, вы замечаете в углу друзу кристаллов. Вы отламываете кусок, а на его месте вырастает новый кристалл. Вы забераете это сокровище с собой.",
+    "Небольшой отряд орков нападает на вашу армию. Вы без труда отбиваете атаку. На теле одного из нападавших вы видите блестящий шлем с шипами.",
+    "Вы приближаетесь к мосту через глубокий овраг. Неожиданно из-под моста появляется тролль и требует плату за проход. После отказа, тролль нападает на вас. Убив его, вы забираете себе его шит с шипами.",
+    "Вы пересекаете пересохшее соляное озеро, и вдруг среди обломков ракушек и кусков коралла замечаете великолепную белую жемчужину.",
+    "Слухи об огромном грифоне, нагоняющем ужас на всю округу, приводят вас в его логово. Жестокая схватка заканчивается вашей победой, и в опустевшем гнезде вы находите черную жемчужину.",
     ""  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x32\x2e"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x33\x2e"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x34\x2e"  ,
-    "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x35\x2e"  ,
-    "Вы\x20нашли\x20резной\x20ларец\x2c\x20в\x20котором\x20хранился\x20древний\x20свиток\x2e\x20Руны\x20на\x20ларце\x20очень\x20древние\x2e\x20Развернув\x20свиток\x2c\x20вы\x20почувствовали\x20пульсацию\x20магических\x20сил\x2e"  ,
-    "Один\x20из\x20ваших\x20воинов\x20подобрал\x20с\x20земли\x20оторванную\x20руку\x2e\x20Несмотря\x20на\x20то\x2c\x20что\x20рука\x20была\x20оторвана\x20от\x20тела\x2c\x20она\x20все\x20еще\x20продолжала\x20шевелиться\x2e\x20Ваши\x20воины\x20испытали\x20великое\x20отвращение\x20к\x20этому\x20предмету\x2c\x20но\x20вы\x20не\x20смогли\x20заставить\x20себя\x20выкинуть\x20ее\x2e"  ,
-    "Вы\x20обнаружили\x20указатель\x2c\x20на\x20котором\x20было\x20написано\x2c\x20что\x20здесь\x20покоится\x20великий\x20Андуран\x2e\x20Надпись\x20молвила\x2c\x20что\x20преклонивший\x20чело\x20перед\x20могилой\x20будет\x20вознагражден\x2e\x20Вы\x20поступили\x2c\x20как\x20того\x20требовалось\x2c\x20и\x20получили\x20в\x20награду\x20волшебный\x20доспех\x2e"  ,
-    "Добрая\x20колдунья\x20сочла\x2c\x20что\x20ваша\x20армия\x20плохо\x20защищена\x20и\x20даровала\x20вам\x20свою\x20волшебную\x20брошь\x2e"  ,
-    "Вы\x20купили\x20у\x20бедняка\x20ящик\x20со\x20всяким\x20барахлом\x20и\x20на\x20свое\x20удивление\x20нашли\x20в\x20нем\x20три\x20вещи\x20из\x20боевого\x20одеяния\x20Андурана\x21\x20Вот\x20это\x20удача\x21"  ,
-    "Вы\x20проходили\x20мимо\x20труппы\x20бродячих\x20актеров\x2e\x20Они\x20попросили\x20вас\x20станцевать\x20рума\x2dбуту\x2e\x20Вы\x20исполнили\x20несколько\x20произвольных\x20движений\x2c\x20и\x20они\x20за\x20храбрость\x20даровали\x20вам\x20кристальный\x20шар\x2e"  ,
-    "Вы\x20попали\x20на\x20недавно\x20сгоревшую\x20поляну\x2e\x20Посреди\x20поляны\x2c\x20на\x20камне\x20стоял\x20сосуд\x2c\x20в\x20котором\x20сидел\x20огненный\x20элементал\x2e\x20Вы\x20решили\x20взять\x20с\x20собой\x20эту\x20диковинную\x20находку\x2e"  ,
-    "Неожиданно\x20вас\x20сковал\x20пронзительный\x20холод\x2e\x20От\x20неожиданного\x20шока\x20вы\x20упали\x20с\x20коня\x20на\x20землю\x2e\x20Мимо\x20вас\x20промчался\x20огромный\x20ледяной\x20гигант\x2e\x20В\x20спешке\x20он\x20обронил\x20одну\x20ценную\x20вещь\x21"  ,
-    "Вы\x20заметили\x20сверкающий\x20объект\x20невдалеке\x2e\x20Вы\x20послали\x20одного\x20из\x20ваших\x20воинов\x20посмотреть\x2c\x20что\x20это\x20там\x2e\x20Он\x20вернулся\x20с\x20золотым\x20шлемом\x20в\x20руках\x2c\x20который\x20оказался\x20ни\x20чем\x20иным\x2c\x20как\x20шлемом\x20легендарного\x20Андурана\x21"  ,
-    "Вы\x20стали\x20свидетелем\x20поединка\x2c\x20в\x20котором\x20паладин\x20был\x20смертельно\x20ранен\x20отрядом\x20зомби\x2e\x20Он\x20попросил\x20вас\x20взять\x20его\x20молот\x20и\x20завершить\x20начатое\x20им\x20дело\x2e\x20Убив\x20зомби\x20вы\x20повесили\x20молот\x20на\x20свой\x20пояс\x20и\x20удалились\x2e"  ,
-    "Минуя\x20небольшой\x20холм\x2c\x20вы\x20увидели\x2c\x20как\x20маленькая\x20фея\x20тащит\x20огромный\x20скипетр\x2e\x20Улыбнувшись\x2c\x20вы\x20спросили\x2c\x20не\x20нужна\x20ли\x20ей\x20помощь\x2e\x20Фея\x20обиженно\x20спросила\x2c\x20мол\x2c\x20думаешь\x2c\x20это\x20смешно\x3f\x20Вспорхнула\x20и\x20улетела\x2c\x20а\x20скипетр\x20остался\x20вам\x2e"  ,
-    "Старый\x20моряк\x20рассказал\x20вам\x2c\x20что\x20в\x20былые\x20времена\x2c\x20на\x20его\x20ботике\x20стояла\x20мачта\x2c\x20приносящая\x20ему\x20удачу\x2e\x20Он\x20бал\x20вам\x20схему\x2c\x20где\x20ее\x20можно\x20будет\x20найти\x2e\x20Через\x20несколько\x20часов\x20поиска\x2c\x20вы\x20нашли\x20мачту\x20в\x20старом\x20доке\x2e"  ,
-    "На\x20вас\x20налетел\x20торопыга\x2dкрестьянин\x2e\x20Он\x20хотел\x20убежать\x2c\x20но\x20вы\x20остановили\x20его\x2e\x20Извинившись\x2c\x20крестьянин\x20вручил\x20вам\x20необычную\x20сферу\x2e\x20Едва\x20вы\x20дотронулись\x20до\x20нее\x2c\x20как\x20почувствовали\x2c\x20что\x20сфера\x20втягивает\x20в\x20себя\x20магию\x2e\x2e\x2e"  ,
-    "Ваши\x20солдаты\x20нашли\x20необычную\x20вещь\x20и\x20решили\x20принести\x20ее\x20вам\x2e\x20Вы\x20отчистили\x20ее\x20от\x20грязи\x20и\x20смогли\x20прочитать\x20на\x20ней\x20необычные\x20слова\x3a\x20\x22Ум\x20\x2d\x20лучшая\x20сила\x2c\x20а\x20магия\x20сильнее\x20грубой\x20силы\x2e\x20Помни\x20мои\x20слова\x2c\x20и\x20ты\x20всегда\x20будешь\x20побеждать\x2e\x22"  ,
-    "Отставной\x20капитан\x20городской\x20стражи\x20узнал\x20о\x20вашем\x20походе\x20и\x20даровал\x20вам\x20свой\x20меч\x2c\x20сослуживший\x20ему\x20добрую\x20службу\x20в\x20былые\x20времена\x2e"  ,
-    "Тролль\x20остановил\x20вас\x2c\x20сказав\x3a\x20\x22Плати\x20мне\x20\x35\x30\x30\x30\x20золотых\x20или\x20я\x20убью\x20тебя\x20мечом\x20Анудрана\x21\x22\x20Вы\x20отказались\x20платить\x2e\x20Тролль\x20схватился\x20за\x20клинок\x20меча\x2c\x20взвыл\x20от\x20боли\x20и\x20бросив\x20меч\x20убежал\x2e\x20Хорошо\x2c\x20что\x20он\x20был\x20настолько\x20глуп\x2c\x20что\x20не\x20знал\x2c\x20как\x20правильно\x20держать\x20острые\x20предметы\x2e"  ,
-    "В\x20грязи\x20вы\x20подобрали\x20старую\x20лопату\x2e\x20Присмотревшись\x2c\x20вы\x20поняли\x2c\x20что\x20вам\x20посчастливилось\x20найти\x20зачарованную\x20лопату\x20грабителей\x20могил\x2e"  };
+    "ERROR : Artifact event 82."  ,
+    "ERROR : Artifact event 83."  ,
+    "ERROR : Artifact event 84."  ,
+    "ERROR : Artifact event 85."  ,
+    "Вы нашли резной ларец, в котором хранился древний свиток. Руны на ларце очень древние. Развернув свиток, вы почувствовали пульсацию магических сил.",
+    "Один из ваших воинов подобрал с земли оторванную руку. Несмотря на то, что рука была оторвана от тела, она все еще продолжала шевелиться. Ваши воины испытали великое отвращение к этому предмету, но вы не смогли заставить себя выкинуть ее.",
+    "Вы обнаружили указатель, на котором было написано, что здесь покоится великий Андуран. Надпись молвила, что преклонивший чело перед могилой будет вознагражден. Вы поступили, как того требовалось, и получили в награду волшебный доспех.",
+    "Добрая колдунья сочла, что ваша армия плохо защищена и даровала вам свою волшебную брошь.",
+    "Вы купили у бедняка ящик со всяким барахлом и на свое удивление нашли в нем три вещи из боевого одеяния Андурана! Вот это удача!",
+    "Вы проходили мимо труппы бродячих актеров. Они попросили вас станцевать рума-буту. Вы исполнили несколько произвольных движений, и они за храбрость даровали вам кристальный шар.",
+    "Вы попали на недавно сгоревшую поляну. Посреди поляны, на камне стоял сосуд, в котором сидел огненный элементал. Вы решили взять с собой эту диковинную находку.",
+    "Неожиданно вас сковал пронзительный холод. От неожиданного шока вы упали с коня на землю. Мимо вас промчался огромный ледяной гигант. В спешке он обронил одну ценную вещь!",
+    "Вы заметили сверкающий объект невдалеке. Вы послали одного из ваших воинов посмотреть, что это там. Он вернулся с золотым шлемом в руках, который оказался ни чем иным, как шлемом легендарного Андурана!",
+    "Вы стали свидетелем поединка, в котором паладин был смертельно ранен отрядом зомби. Он попросил вас взять его молот и завершить начатое им дело. Убив зомби вы повесили молот на свой пояс и удалились.",
+    "Минуя небольшой холм, вы увидели, как маленькая фея тащит огромный скипетр. Улыбнувшись, вы спросили, не нужна ли ей помощь. Фея обиженно спросила, мол, думаешь, это смешно? Вспорхнула и улетела, а скипетр остался вам.",
+    "Старый моряк рассказал вам, что в былые времена, на его ботике стояла мачта, приносящая ему удачу. Он бал вам схему, где ее можно будет найти. Через несколько часов поиска, вы нашли мачту в старом доке.",
+    "На вас налетел торопыга-крестьянин. Он хотел убежать, но вы остановили его. Извинившись, крестьянин вручил вам необычную сферу. Едва вы дотронулись до нее, как почувствовали, что сфера втягивает в себя магию...",
+    "Ваши солдаты нашли необычную вещь и решили принести ее вам. Вы отчистили ее от грязи и смогли прочитать на ней необычные слова: \"Ум - лучшая сила, а магия сильнее грубой силы. Помни мои слова, и ты всегда будешь побеждать.\"",
+    "Отставной капитан городской стражи узнал о вашем походе и даровал вам свой меч, сослуживший ему добрую службу в былые времена.",
+    "Тролль остановил вас, сказав: \"Плати мне 5000 золотых или я убью тебя мечом Анудрана!\" Вы отказались платить. Тролль схватился за клинок меча, взвыл от боли и бросив меч убежал. Хорошо, что он был настолько глуп, что не знал, как правильно держать острые предметы.",
+    "В грязи вы подобрали старую лопату. Присмотревшись, вы поняли, что вам посчастливилось найти зачарованную лопату грабителей могил."};
 const char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
-    "Атака"  ,
-    "Защита"  ,
-    "Сила\x20магии"  ,
+    "Атака",
+    "Защита",
+    "Сила магии",
     "Знания"
 };
 const char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
-    "\x7bАтака\x7d\x0a\x0aВаш\x20навык\x20атаки\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20атаки\x20каждого\x20воина\x2e"  ,
-    "\x7bЗащита\x7d\x0a\x0aВаш\x20навык\x20защиты\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20защиты\x20каждого\x20воина\x2e"  ,
-    "\x7bСила\x20магии\x7d\x0a\x0aВаш\x20уровень\x20силы\x20магии\x20определяет\x20длительность\x20действия\x20или\x20силу\x20заклинания\x2e"  ,
-    "\x7bЗнания\x7d\x0a\x0aУровень\x20знаний\x20определяет\x20количество\x20очков\x20магии\x20героя\x2e"
+    "{Атака}\n\nВаш навык атаки - бонус, добавляемый к навыку атаки каждого воина.",
+    "{Защита}\n\nВаш навык защиты - бонус, добавляемый к навыку защиты каждого воина.",
+    "{Сила магии}\n\nВаш уровень силы магии определяет длительность действия или силу заклинания.",
+    "{Знания}\n\nУровень знаний определяет количество очков магии героя."
 };
 const char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
-    "Рыцарь"  ,
-    "Варвар"  ,
-    "Колдунья"  ,
-    "Чернокнижник"  ,
-    "Чародей"  ,
-    "Некромант"  ,
-    "Мульти"  ,
+    "Рыцарь",
+    "Варвар",
+    "Колдунья",
+    "Чернокнижник",
+    "Чародей",
+    "Некромант",
+    "Мульти",
     "Случайно"
 };
 const char* gArmyShortNames[(CREATURE_COUNT)] = {
@@ -8658,320 +8416,309 @@ const char* gArmyShortNames[(CREATURE_COUNT)] = {
     "elemw"
 };
 const char* gArmyNames[(CREATURE_COUNT)] = {
-    "Крестьянин"  ,
-    "Стрелок"  ,
-    "Рейнджер"  ,
-    "Копейщик"  ,
-    "Копейщик\x20ветеран"  ,
-    "Мечник"  ,
-    "Мечник\x20мастер"  ,
-    "Всадник"  ,
-    "Чемпион"  ,
-    "Паладин"  ,
-    "Крестоносец"  ,
-    "Гоблин"  ,
-    "Орк"  ,
-    "Вождь\x20орков"  ,
-    "Волк"  ,
-    "Огр"  ,
-    "Лорд\x20огров"  ,
-    "Тролль"  ,
-    "Боевой\x20тролль"  ,
-    "Циклоп"  ,
-    "Фея"  ,
-    "Гном"  ,
-    "Боевой\x20гном"  ,
-    "Эльф"  ,
-    "Высокий\x20эльф"  ,
-    "Друид"  ,
-    "Старший\x20друид"  ,
-    "Единорог"  ,
-    "Феникс"  ,
-    "Кентавр"  ,
-    "Горгулья"  ,
-    "Грифон"  ,
-    "Минотавр"  ,
-    "Царь\x20минотавров"  ,
-    "Гидра"  ,
-    "Зеленый\x20дракон"  ,
-    "Красный\x20дракон"  ,
-    "Черный\x20дракон"  ,
-    "Полурослик"  ,
-    "Боров"  ,
-    "Железный\x20голем"  ,
-    "Стальной\x20голем"  ,
-    "Рух"  ,
-    "Маг"  ,
-    "Архимаг"  ,
-    "Гигант"  ,
-    "Титан"  ,
-    "Скелет"  ,
-    "Зомби"  ,
-    "Зомби\x20мутант"  ,
-    "Мумия"  ,
-    "Королевская\x20мумия"  ,
-    "Вампир"  ,
-    "Лорд\x20вампиров"  ,
-    "Лич"  ,
-    "Могучий\x20лич"  ,
-    "Костяной\x20дракон"  ,
-    "Разбойник"  ,
-    "Кочевник"  ,
-    "Призрак"  ,
-    "Джинн"  ,
-    "Медуза"  ,
-    "Земной\x20элементал"  ,
-    "Воздушный\x20элементал"  ,
-    "Огненный\x20элементал"  ,
-    "Водяной\x20элементал"
+    "Крестьянин",
+    "Стрелок",
+    "Рейнджер",
+    "Копейщик",
+    "Копейщик ветеран",
+    "Мечник",
+    "Мечник мастер",
+    "Всадник",
+    "Чемпион",
+    "Паладин",
+    "Крестоносец",
+    "Гоблин",
+    "Орк",
+    "Вождь орков",
+    "Волк",
+    "Огр",
+    "Лорд огров",
+    "Тролль",
+    "Боевой тролль",
+    "Циклоп",
+    "Фея",
+    "Гном",
+    "Боевой гном",
+    "Эльф",
+    "Высокий эльф",
+    "Друид",
+    "Старший друид",
+    "Единорог",
+    "Феникс",
+    "Кентавр",
+    "Горгулья",
+    "Грифон",
+    "Минотавр",
+    "Царь минотавров",
+    "Гидра",
+    "Зеленый дракон",
+    "Красный дракон",
+    "Черный дракон",
+    "Полурослик",
+    "Боров",
+    "Железный голем",
+    "Стальной голем",
+    "Рух",
+    "Маг",
+    "Архимаг",
+    "Гигант",
+    "Титан",
+    "Скелет",
+    "Зомби",
+    "Зомби мутант",
+    "Мумия",
+    "Королевская мумия",
+    "Вампир",
+    "Лорд вампиров",
+    "Лич",
+    "Могучий лич",
+    "Костяной дракон",
+    "Разбойник",
+    "Кочевник",
+    "Призрак",
+    "Джинн",
+    "Медуза",
+    "Земной элементал",
+    "Воздушный элементал",
+    "Огненный элементал",
+    "Водяной элементал"
 };
 const char* gArmyNamesPlural[(CREATURE_COUNT)] = {
-    "крестьян"  ,
-    "стрелков"  ,
-    "рейнджеров"  ,
-    "копейщиков"  ,
-    "копейщиков\x20ветеранов"  ,
-    "мечников"  ,
-    "мечников\x20мастеров"  ,
-    "всадников"  ,
-    "чемпионов"  ,
-    "паладинов"  ,
-    "крестоносцев"  ,
-    "гоблинов"  ,
-    "орков"  ,
-    "вождей\x20орков"  ,
-    "волков"  ,
-    "огров"  ,
-    "лордов\x20огров"  ,
-    "троллей"  ,
-    "боевых\x20троллей"  ,
-    "циклопов"  ,
-    "фей"  ,
-    "гномов"  ,
-    "боевых\x20гномов"  ,
-    "эльфов"  ,
-    "высоких\x20эльфов"  ,
-    "друидов"  ,
-    "старших\x20друидов"  ,
-    "единорогов"  ,
-    "фениксов"  ,
-    "кентавров"  ,
-    "горгулий"  ,
-    "грифонов"  ,
-    "минотавров"  ,
-    "царей\x20минотавров"  ,
-    "гидр"  ,
-    "зеленых\x20драконов"  ,
-    "красных\x20драконов"  ,
-    "черных\x20драконов"  ,
-    "полуросликов"  ,
-    "боровов"  ,
-    "железных\x20големов"  ,
-    "стальных\x20големов"  ,
-    "рухов"  ,
-    "магов"  ,
-    "архимагов"  ,
-    "гигантов"  ,
-    "титанов"  ,
-    "скелетов"  ,
-    "зомби"  ,
-    "зомби\x20мутантов"  ,
-    "мумий"  ,
-    "королевских\x20мумий"  ,
-    "вампиров"  ,
-    "лордов\x20вампиров"  ,
-    "личей"  ,
-    "могучих\x20личей"  ,
-    "костяных\x20драконов"  ,
-    "разбойников"  ,
-    "кочевников"  ,
-    "призраков"  ,
-    "джиннов"  ,
-    "медуз"  ,
-    "земных\x20элементалов"  ,
-    "воздушных\x20элементалов"  ,
-    "огненных\x20элементалов"  ,
-    "водных\x20элементалов"
+    "крестьян",
+    "стрелков",
+    "рейнджеров",
+    "копейщиков",
+    "копейщиков ветеранов",
+    "мечников",
+    "мечников мастеров",
+    "всадников",
+    "чемпионов",
+    "паладинов",
+    "крестоносцев",
+    "гоблинов",
+    "орков",
+    "вождей орков",
+    "волков",
+    "огров",
+    "лордов огров",
+    "троллей",
+    "боевых троллей",
+    "циклопов",
+    "фей",
+    "гномов",
+    "боевых гномов",
+    "эльфов",
+    "высоких эльфов",
+    "друидов",
+    "старших друидов",
+    "единорогов",
+    "фениксов",
+    "кентавров",
+    "горгулий",
+    "грифонов",
+    "минотавров",
+    "царей минотавров",
+    "гидр",
+    "зеленых драконов",
+    "красных драконов",
+    "черных драконов",
+    "полуросликов",
+    "боровов",
+    "железных големов",
+    "стальных големов",
+    "рухов",
+    "магов",
+    "архимагов",
+    "гигантов",
+    "титанов",
+    "скелетов",
+    "зомби",
+    "зомби мутантов",
+    "мумий",
+    "королевских мумий",
+    "вампиров",
+    "лордов вампиров",
+    "личей",
+    "могучих личей",
+    "костяных драконов",
+    "разбойников",
+    "кочевников",
+    "призраков",
+    "джиннов",
+    "медуз",
+    "земных элементалов",
+    "воздушных элементалов",
+    "огненных элементалов",
+    "водных элементалов"
 };
 const char* gTerrainNames[(TERRAIN_COUNT)] = {
-    "Вода"  ,
-    "Трава"  ,
-    "Снег"  ,
-    "Болото"  ,
-    "Лава"  ,
-    "Пустыня"  ,
-    "Грязь"  ,
-    "Пустошь"  ,
+    "Вода",
+    "Трава",
+    "Снег",
+    "Болото",
+    "Лава",
+    "Пустыня",
+    "Грязь",
+    "Пустошь",
     "Побережье"
 };
 const char* gResourceNames[RESOURCE_VALUE_COUNT] = {
-    "Древесина"  ,
-    "Ртуть"  ,
-    "Руда"  ,
-    "Сера"  ,
-    "Кристаллы"  ,
-    "Самоцветы"  ,
+    "Древесина",
+    "Ртуть",
+    "Руда",
+    "Сера",
+    "Кристаллы",
+    "Самоцветы",
     "Золото"
 };
 
 
 const char* gMineNames[KB_MINE_NAME_COUNT] = {
-    "Лесопилка"  ,
-    "Лаборатория\x20алхимика"  ,
-    "Рудная\x20шахта"  ,
-    "Серная\x20шахта"  ,
-    "Кристальная\x20шахта"  ,
-    "Самоцветная\x20шахта"  ,
-    "Золотая\x20шахта"
+    "Лесопилка",
+    "Лаборатория алхимика",
+    "Рудная шахта",
+    "Серная шахта",
+    "Кристальная шахта",
+    "Самоцветная шахта",
+    "Золотая шахта"
 };
 const char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     ""  ,
-    "Лаборатория\x20алхимика"  ,
-    "Указатель"  ,
-    "Буй"  ,
-    "Скелет"  ,
-    "Пещера\x20демона"  ,
-    "Ларец\x20с\x20сокровищами"  ,
-    "Кольцо\x20фейри"  ,
-    "Костер"  ,
-    "Фонтан"  ,
-    "Беседка"  ,
-    "Древняя\x20лампа"  ,
-    "Кладбище"  ,
-    "Дом\x20стрелков"  ,
-    "Хибара\x20гоблина"  ,
-    "Избушка\x20гномов"  ,
-    "Хижина\x20крестьян"  ,
-    "Хижина"  ,
-    "Дорога"  ,
-    "Событие"  ,
-    "Драконий\x20город"  ,
-    "Маяк"  ,
-    "Водяная\x20мельница"  ,
-    "Шахта"  ,
-    "Бивуак"  ,
-    "Обелиск"  ,
-    "Оазис"  ,
-    "Ресурсы"  ,
+    "Лаборатория алхимика",
+    "Указатель",
+    "Буй",
+    "Скелет",
+    "Пещера демона",
+    "Ларец с сокровищами",
+    "Кольцо фейри",
+    "Костер",
+    "Фонтан",
+    "Беседка",
+    "Древняя лампа",
+    "Кладбище",
+    "Дом стрелков",
+    "Хибара гоблина",
+    "Избушка гномов",
+    "Хижина крестьян",
+    "Хижина",
+    "Дорога",
+    "Событие",
+    "Драконий город",
+    "Маяк",
+    "Водяная мельница",
+    "Шахта",
+    "Бивуак",
+    "Обелиск",
+    "Оазис",
+    "Ресурсы",
     ""  ,
-    "Лесопилка"  ,
-    "Оракул"  ,
-    "Святилище\x20\x31\x2dго\x20Круга"  ,
-    "Кораблекрушение"  ,
-    "Сундук"  ,
-    "Шатер"  ,
-    "Город"  ,
-    "Менгир"  ,
-    "Фургоны"  ,
-    "Колодец"  ,
-    "Водоворот"  ,
-    "Ветряная\x20мельница"  ,
-    "Артефакт"  ,
-    "Герой"  ,
-    "Корабль"  ,
-    "Могущественный\x20артефакт"  ,
-    "Случайный\x20артефакт"  ,
-    "Случайный\x20ресурс"  ,
-    "Случайный\x20монстр"  ,
-    "Случайный\x20город"  ,
-    "Случайный\x20замок"  ,
+    "Лесопилка",
+    "Оракул",
+    "Святилище 1-го Круга",
+    "Кораблекрушение",
+    "Сундук",
+    "Шатер",
+    "Город",
+    "Менгир",
+    "Фургоны",
+    "Колодец",
+    "Водоворот",
+    "Ветряная мельница",
+    "Артефакт",
+    "Герой",
+    "Корабль",
+    "Могущественный артефакт",
+    "Случайный артефакт",
+    "Случайный ресурс",
+    "Случайный монстр",
+    "Случайный город",
+    "Случайный замок",
     ""  ,
-    "Случайный\x20монстр\x20\x2d\x20слабый"  ,
-    "Случайный\x20монстр\x20\x2d\x20средний"  ,
-    "Случайный\x20монстр\x20\x2d\x20сильный"  ,
-    "Случайный\x20монстр\x20\x2d\x20очень\x20сильный"  ,
-    "Случайный\x20герой"  ,
-    "Ничего\x20особенного"  ,
+    "Случайный монстр - слабый",
+    "Случайный монстр - средний",
+    "Случайный монстр - сильный",
+    "Случайный монстр - очень сильный",
+    "Случайный герой",
+    "Ничего особенного",
     ""  ,
-    "Сторожевая\x20вышка"  ,
-    "Древо\x2dгород"  ,
-    "Древо\x2dгород"  ,
-    "Руины"  ,
-    "Форт"  ,
-    "Базар"  ,
-    "Заброшенная\x20шахта"  ,
-    "Лачуга\x20гномов"  ,
-    "Стоячие\x20камни"  ,
-    "Идол"  ,
-    "Древо\x20знания"  ,
-    "Хижина\x20ведьмы"  ,
-    "Храм"  ,
-    "Форт\x20на\x20холме"  ,
-    "Нора\x20полурослика"  ,
-    "Лагерь\x20наемников"  ,
-    "Святилище\x20\x32\x2dго\x20Круга"  ,
-    "Святилище\x20\x33\x2dго\x20Круга"  ,
-    "Пирамида"  ,
-    "Город\x20мертвых"  ,
-    "Котлован"  ,
-    "Сфинкс"  ,
-    "Тележка"  ,
-    "Смоляная\x20яма"  ,
-    "Артезианский\x20источник"  ,
-    "Мост\x20троллей"  ,
-    "Промоина"  ,
-    "Хижина\x20ведьмы"  ,
-    "Ксанаду"  ,
-    "Пещера"  ,
-    "Навес"  ,
-    "Карты\x20Магеллана"  ,
-    "Обломки"  ,
-    "Заброшенный\x20корабль"  ,
-    "Потерпевший\x20кораблекрушение"  ,
-    "Бутылка"  ,
-    "Волшебный\x20колодец"  ,
-    "Волшебный\x20сад"  ,
-    "Обзорная\x20башня"  ,
-    "Литейный\x20цех"  ,
-    "Потоки"  ,
-    "Деревья"  ,
-    "Горы"  ,
-    "Вулкан"  ,
-    "Цветы"  ,
-    "Камень"  ,
-    "Озеро"  ,
-    "Мандрагора"  ,
-    "Мертвое\x20дерево"  ,
-    "Пень"  ,
-    "Кратер"  ,
-    "Кактус"  ,
-    "Курган"  ,
-    "Дюна"  ,
-    "Лавовый\x20бассейн"  ,
-    "Куст"  ,
-    "Дыра"  ,
-    "Пласт"  ,
-    "Случайный\x20артефакт\x20\x2d\x20сокровище"  ,
-    "Случайный\x20артефакт\x20\x2d\x20обычный"  ,
-    "Случайный\x20артефакт\x20\x2d\x20ценный"  ,
-    "\x25\x73\x20Барьер"  ,
-    "\x25\x73\x20Шатер\x20путника"  ,
-    "\x25\x73"  ,
-    "\x25\x73"  ,
+    "Сторожевая вышка",
+    "Древо-город",
+    "Древо-город",
+    "Руины",
+    "Форт",
+    "Базар",
+    "Заброшенная шахта",
+    "Лачуга гномов",
+    "Стоячие камни",
+    "Идол",
+    "Древо знания",
+    "Хижина ведьмы",
+    "Храм",
+    "Форт на холме",
+    "Нора полурослика",
+    "Лагерь наемников",
+    "Святилище 2-го Круга",
+    "Святилище 3-го Круга",
+    "Пирамида",
+    "Город мертвых",
+    "Котлован",
+    "Сфинкс",
+    "Тележка",
+    "Смоляная яма",
+    "Артезианский источник",
+    "Мост троллей",
+    "Промоина",
+    "Хижина ведьмы",
+    "Ксанаду",
+    "Пещера",
+    "Навес",
+    "Карты Магеллана",
+    "Обломки",
+    "Заброшенный корабль",
+    "Потерпевший кораблекрушение",
+    "Бутылка",
+    "Волшебный колодец",
+    "Волшебный сад",
+    "Обзорная башня",
+    "Литейный цех",
+    "Потоки",
+    "Деревья",
+    "Горы",
+    "Вулкан",
+    "Цветы",
+    "Камень",
+    "Озеро",
+    "Мандрагора",
+    "Мертвое дерево",
+    "Пень",
+    "Кратер",
+    "Кактус",
+    "Курган",
+    "Дюна",
+    "Лавовый бассейн",
+    "Куст",
+    "Дыра",
+    "Пласт",
+    "Случайный артефакт - сокровище",
+    "Случайный артефакт - обычный",
+    "Случайный артефакт - ценный",
+    "%s Барьер",
+    "%s Шатер путника",
+    "%s"  ,
+    "%s"  ,
     "Темница"
 };
 const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
 
 
-    "Алхимик\x0a\x0aВы\x20стали\x20хозяин"
-        "ом\x20лаборатории\x20местного\x20"
-        "алхимика\x2e\x20Она\x20будет\x20прин"
-        "осить\x20вам\x20по\x20одной\x20едини"
-        "це\x20ртути\x20в\x20день\x2e",
+    "Алхимик\n\nВы стали хозяином лаборатории местного алхимика. Она будет приносить вам по одной единице ртути в день.",
 
-    "Указатель\x0a\x0aНа\x20указателе\x20"
-        "написано\x3a\x0a\x0a\x25\x73\x20находится\x20"
-        "неподалеку\x20отсюда\x2e",
+    "Указатель\n\nНа указателе написано:\n\n%s находится неподалеку отсюда.",
 
-    "Буй\x0a\x0aВаши\x20спутники\x20замеч"
-        "ают\x20морской\x20буй\x2e\x20Он\x20указ"
-        "ывает\x20верный\x20курс\x2e",
+    "Буй\n\nВаши спутники замечают морской буй. Он указывает верный курс.",
 
 
-    "Буй\x0a\x0aВаши\x20спутники\x20замеч"
-        "ают\x20морской\x20буй\x2e\x20Он\x20указ"
-        "ывает\x20верный\x20курс\x2c\x20и\x20это"
-        "\x20повышает\x20их\x20боевой\x20дух\x2e",
+    "Буй\n\nВаши спутники замечают морской буй. Он указывает верный курс, и это повышает их боевой дух.",
     "",
     "",
     "",
@@ -8981,338 +8728,147 @@ const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "",
     "",
 
-    "Кольцо\x20фейри\x0a\x0aВаше\x20войск"
-        "о\x20вступает\x20внутрь\x20кольца"
-        "\x20фейри\x2c\x20но\x20ничего\x20не\x20про"
-        "исходит\x2e",
+    "Кольцо фейри\n\nВаше войско вступает внутрь кольца фейри, но ничего не происходит.",
 
 
-    "Кольцо\x20фейри\x0a\x0aВаше\x20войск"
-        "о\x20вступает\x20внутрь\x20кольца"
-        "\x20фейри\x2c\x20чары\x20которого\x20пр"
-        "инесут\x20вам\x20удачу\x20в\x20гряду"
-        "щем\x20сражении\x2e",
+    "Кольцо фейри\n\nВаше войско вступает внутрь кольца фейри, чары которого принесут вам удачу в грядущем сражении.",
 
-    "Костер\x0a\x0aОбыскав\x20вражески"
-        "й\x20лагерь\x2c\x20вы\x20находите\x20сп"
-        "рятанный\x20клад\x2e",
+    "Костер\n\nОбыскав вражеский лагерь, вы находите спрятанный клад.",
 
-    "Фонтан\x0a\x0aВы\x20припадаете\x20к\x20"
-        "струям\x20волшебного\x20фонтан"
-        "а\x2c\x20но\x20ничего\x20не\x20происход"
-        "ит\x2e",
+    "Фонтан\n\nВы припадаете к струям волшебного фонтана, но ничего не происходит.",
 
-    "Фонтан\x0a\x0aБлагоуханная\x20вла"
-        "га\x20волшебного\x20фонтана\x20пр"
-        "инесет\x20вам\x20удачу\x20в\x20гряду"
-        "щем\x20сражении\x2e",
+    "Фонтан\n\nБлагоуханная влага волшебного фонтана принесет вам удачу в грядущем сражении.",
 
 
-    "Беседка\x0a\x0aНа\x20ступенях\x20бес"
-        "едки\x20появляется\x20старый\x20р"
-        "ыцарь\x2e\x20\x22Мне\x20жаль\x2c\x20храбры"
-        "й\x20воин\x2c\x20но\x20я\x20уже\x20научил\x20"
-        "тебя\x20всему\x2c\x20что\x20знаю\x20сам"
-        "\x2e\x22",
+    "Беседка\n\nНа ступенях беседки появляется старый рыцарь. \"Мне жаль, храбрый воин, но я уже научил тебя всему, что знаю сам.\"",
 
 
-    "Беседка\x0a\x0aНа\x20ступенях\x20бес"
-        "едки\x20появляется\x20старый\x20р"
-        "ыцарь\x2e\x20\x22О\x20храбрый\x20воин\x2c\x20"
-        "я\x20научу\x20тебя\x20всему\x2c\x20что\x20"
-        "знаю\x20сам\x3b\x20пусть\x20мой\x20опыт"
-        "\x20поможет\x20тебе\x20в\x20твоих\x20ст"
-        "ранствиях\x2e\x22",
+    "Беседка\n\nНа ступенях беседки появляется старый рыцарь. \"О храбрый воин, я научу тебя всему, что знаю сам; пусть мой опыт поможет тебе в твоих странствиях.\"",
 
-    "Лампа\x20джинна\x0a\x0aВы\x20находит"
-        "е\x20засыпанную\x20землей\x20помя"
-        "тую\x20и\x20закопченную\x20лампа\x2e"
-        "\x20Хотите\x20ее\x20потереть\x3f",
+    "Лампа джинна\n\nВы находите засыпанную землей помятую и закопченную лампа. Хотите ее потереть?",
 
-    "Кладбище\x0a\x0aВы\x20осторожно\x20п"
-        "риближаетесь\x20к\x20захоронен"
-        "ию\x20древних\x20воинов\x2e\x20Хотит"
-        "е\x20вскрыть\x20их\x20могилы\x3f",
+    "Кладбище\n\nВы осторожно приближаетесь к захоронению древних воинов. Хотите вскрыть их могилы?",
 
 
-    "Одержав\x20победу\x20над\x20зомби"
-        "\x2c\x20вы\x20несколько\x20часов\x20под"
-        "ряд\x20обыскиваете\x20могилы\x2c\x20"
-        "но\x20ничего\x20не\x20находите\x2e\x20В"
-        "аш\x20недостойный\x20поступок\x20"
-        "отрицательно\x20влияет\x20на\x20б"
-        "оевой\x20дух\x20войска\x2e",
+    "Одержав победу над зомби, вы несколько часов подряд обыскиваете могилы, но ничего не находите. Ваш недостойный поступок отрицательно влияет на боевой дух войска.",
 
-    "Одержав\x20победу\x20над\x20зомби"
-        "\x2c\x20вы\x20обыскиваете\x20могилы\x20"
-        "и\x20удаляетесь\x20с\x20находкой\x21",
+    "Одержав победу над зомби, вы обыскиваете могилы и удаляетесь с находкой!",
 
 
-    "\x7bДом\x20стрелков\x7d\x0a\x0aГруппа\x20с"
-        "трелков\x20в\x20поисках\x20славы\x20"
-        "желает\x20примкнуть\x20к\x20вашем"
-        "у\x20войску\x2e\x20Согласны\x20ли\x20вы"
-        "\x20принять\x20их\x3f",
+    "{Дом стрелков}\n\nГруппа стрелков в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "В\x20вашем\x20войске\x20нет\x20места"
-        "\x20для\x20новых\x20рекрутов\x2e",
+    "В вашем войске нет места для новых рекрутов.",
 
-    "\x7bДом\x20стрелков\x7d\x0a\x0aПриблизи"
-        "вшись\x20к\x20жилищу\x2c\x20вы\x20обнар"
-        "уживаете\x2c\x20что\x20оно\x20пустуе"
-        "т\x2e",
+    "{Дом стрелков}\n\nПриблизившись к жилищу, вы обнаруживаете, что оно пустует.",
 
 
-    "Хибара\x20гоблинов\x0a\x0aГруппа\x20"
-        "гоблинов\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
+    "Хибара гоблинов\n\nГруппа гоблинов в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "Хибара\x20гоблинов\x0a\x0aПриблиз"
-        "ившись\x20к\x20жилищу\x20гоблинов"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
+    "Хибара гоблинов\n\nПриблизившись к жилищу гоблинов, вы обнаруживаете, что оно пустует.",
 
 
-    "Хижина\x20крестьян\x0a\x0aГруппа\x20"
-        "крестьян\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
+    "Хижина крестьян\n\nГруппа крестьян в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "Хижина\x20крестьян\x0a\x0aПриблиз"
-        "ившись\x20к\x20жилищу\x20крестьян"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
+    "Хижина крестьян\n\nПриблизившись к жилищу крестьян, вы обнаруживаете, что оно пустует.",
 
 
-    "Избушка\x20гномов\x0a\x0aГруппа\x20с"
-        "трелков\x20в\x20поисках\x20славы\x20"
-        "желает\x20примкнуть\x20к\x20вашем"
-        "у\x20войску\x2e\x20Согласны\x20ли\x20вы"
-        "\x20принять\x20их\x3f",
+    "Избушка гномов\n\nГруппа стрелков в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "Избушка\x20гномов\x0a\x0aПриблизи"
-        "вшись\x20к\x20жилищу\x20стрелков\x2c"
-        "\x20вы\x20обнаруживаете\x2c\x20что\x20о"
-        "но\x20пустует\x2e",
+    "Избушка гномов\n\nПриблизившись к жилищу стрелков, вы обнаруживаете, что оно пустует.",
 
 
-    "\x7bМазанка\x7d\x0a\x0aГруппа\x20кресть"
-        "ян\x20в\x20поисках\x20славы\x20желае"
-        "т\x20примкнуть\x20к\x20вашему\x20вой"
-        "ску\x2e\x20Согласны\x20ли\x20вы\x20прин"
-        "ять\x20их\x3f",
+    "{Мазанка}\n\nГруппа крестьян в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bМазанка\x7d\x0a\x0aПриблизившись"
-        "\x20к\x20жилищу\x20Крестьян\x2c\x20вы\x20о"
-        "бнаруживаете\x2c\x20что\x20оно\x20пу"
-        "стует\x2e",
+    "{Мазанка}\n\nПриблизившись к жилищу Крестьян, вы обнаруживаете, что оно пустует.",
 
 
-    "\x7bДрево\x2dдом\x7d\x0a\x0aГруппа\x20фей\x20"
-        "в\x20поисках\x20славы\x20желает\x20п"
-        "римкнуть\x20к\x20вашему\x20войску"
-        "\x2e\x20Согласны\x20ли\x20вы\x20принять"
-        "\x20их\x3f",
+    "{Древо-дом}\n\nГруппа фей в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bДрево\x2dдом\x7d\x0a\x0aПриблизивши"
-        "сь\x20к\x20древесному\x20дому\x20Фей"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "он\x20пустует\x2e",
+    "{Древо-дом}\n\nПриблизившись к древесному дому Фей, вы обнаруживаете, что он пустует.",
 
 
-    "\x7bНора\x20полуросликов\x7d\x0a\x0aГру"
-        "ппа\x20полуросликов\x20в\x20поиск"
-        "ах\x20славы\x20желает\x20примкнут"
-        "ь\x20к\x20вашему\x20войску\x2e\x20Согла"
-        "сны\x20ли\x20вы\x20принять\x20их\x3f",
+    "{Нора полуросликов}\n\nГруппа полуросликов в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bНора\x20полуросликов\x7d\x0a\x0aПри"
-        "близившись\x20к\x20норе\x20полуро"
-        "сликов\x2c\x20вы\x20обнаруживаете"
-        "\x2c\x20что\x20она\x20пустует\x2e",
+    "{Нора полуросликов}\n\nПриблизившись к норе полуросликов, вы обнаруживаете, что она пустует.",
 
 
-    "\x7bСторожевая\x20вышка\x7d\x0a\x0aГруп"
-        "па\x20орков\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
+    "{Сторожевая вышка}\n\nГруппа орков в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bСторожевая\x20вышка\x7d\x0a\x0aПриб"
-        "лизившись\x20к\x20сторожевой\x20в"
-        "ышке\x20орков\x2c\x20вы\x20обнаружив"
-        "аете\x2c\x20что\x20она\x20пустует\x2e",
+    "{Сторожевая вышка}\n\nПриблизившись к сторожевой вышке орков, вы обнаруживаете, что она пустует.",
 
 
-    "\x7bСнежная\x20пещера\x7d\x0a\x0aГруппа"
-        "\x20кентавров\x20в\x20поисках\x20сла"
-        "вы\x20желает\x20примкнуть\x20к\x20ва"
-        "шему\x20войску\x2e\x20Согласны\x20ли"
-        "\x20вы\x20принять\x20их\x3f",
+    "{Снежная пещера}\n\nГруппа кентавров в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bПещера\x7d\x0a\x0aПриблизившись\x20"
-        "к\x20пещере\x20кентавров\x2c\x20вы\x20о"
-        "бнаруживаете\x2c\x20что\x20она\x20пу"
-        "стует\x2e",
+    "{Пещера}\n\nПриблизившись к пещере кентавров, вы обнаруживаете, что она пустует.",
 
 
-    "\x7bРаскопки\x7d\x0a\x0aГруппа\x20скеле"
-        "тов\x20в\x20поисках\x20славы\x20жела"
-        "ет\x20примкнуть\x20к\x20вашему\x20во"
-        "йску\x2e\x20Согласны\x20ли\x20вы\x20при"
-        "нять\x20их\x3f",
+    "{Раскопки}\n\nГруппа скелетов в поисках славы желает примкнуть к вашему войску. Согласны ли вы принять их?",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Вы не можете принять новых рекрутов в свое войско, его ряды полны.",
 
-    "\x7bРаскопки\x7d\x0a\x0aПриблизившис"
-        "ь\x20к\x20захоронению\x20скелетов"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
+    "{Раскопки}\n\nПриблизившись к захоронению скелетов, вы обнаруживаете, что оно пустует.",
     "",
     "",
     "",
     "",
     "",
 
-    "Маяк\x0a\x0aТеперь\x20маяк\x20ваш\x2c\x20и"
-        "\x20все\x20ваши\x20корабли\x20будут\x20"
-        "преодолевать\x20большее\x20рас"
-        "стояние\x20за\x20один\x20ход\x2e",
+    "Маяк\n\nТеперь маяк ваш, и все ваши корабли будут преодолевать большее расстояние за один ход.",
 
 
-    "Водяная\x20мельница\x0a\x0aМельни"
-        "к\x20обращается\x20к\x20вам\x20со\x20сл"
-        "овами\x3a\x20\x22Сожалею\x2c\x20господи"
-        "н\x2c\x20но\x20сегодня\x20золота\x20у\x20м"
-        "еня\x20нет\x2e\x20Приходите\x20на\x20сл"
-        "едующей\x20неделе\x2e\x22",
+    "Водяная мельница\n\nМельник обращается к вам со словами: \"Сожалею, господин, но сегодня золота у меня нет. Приходите на следующей неделе.\"",
 
 
-    "Водяная\x20мельница\x0a\x0aМельни"
-        "к\x20обращается\x20к\x20вам\x20со\x20сл"
-        "овами\x3a\x20\x22Господин\x2c\x20я\x20труд"
-        "ился\x20в\x20поте\x20лица\x20и\x20прошу"
-        "\x20вас\x20принять\x20мою\x20скромну"
-        "ю\x20лепту\x2e\x20Приходите\x20на\x20сл"
-        "едующей\x20неделе\x2c\x20и\x20вы\x20пол"
-        "учите\x20еще\x20столько\x20же\x2e\x22",
+    "Водяная мельница\n\nМельник обращается к вам со словами: \"Господин, я трудился в поте лица и прошу вас принять мою скромную лепту. Приходите на следующей неделе, и вы получите еще столько же.\"",
 
-    "Рудная\x20шахта\x0a\x0aВы\x20стали\x20х"
-        "озяином\x20рудной\x20шахты\x2e\x20Он"
-        "а\x20будет\x20приносить\x20вам\x20по"
-        "\x20две\x20меры\x20руды\x20в\x20день\x2e",
+    "Рудная шахта\n\nВы стали хозяином рудной шахты. Она будет приносить вам по две меры руды в день.",
 
 
-    "Серная\x20шахта\x0a\x0aВы\x20стали\x20х"
-        "озяином\x20серной\x20шахты\x2e\x20Он"
-        "а\x20будут\x20приносить\x20вам\x20по"
-        "\x20\x31\x20единице\x20серы\x20в\x20день\x2e",
+    "Серная шахта\n\nВы стали хозяином серной шахты. Она будут приносить вам по 1 единице серы в день.",
 
 
-    "Кристальная\x20шахта\x0a\x0aВы\x20ст"
-        "али\x20хозяином\x20кристальной"
-        "\x20шахты\x2e\x20Она\x20будет\x20принос"
-        "ить\x20вам\x20по\x20одной\x20мере\x20кр"
-        "исталлов\x20в\x20день\x2e",
+    "Кристальная шахта\n\nВы стали хозяином кристальной шахты. Она будет приносить вам по одной мере кристаллов в день.",
 
 
-    "Самоцветная\x20шахта\x0a\x0aВы\x20ст"
-        "али\x20хозяином\x20самоцветной"
-        "\x20шахты\x2e\x20Она\x20будет\x20принос"
-        "ить\x20вам\x20по\x20\x31\x20единице\x20сам"
-        "оцветов\x20в\x20день\x2e",
+    "Самоцветная шахта\n\nВы стали хозяином самоцветной шахты. Она будет приносить вам по 1 единице самоцветов в день.",
 
 
-    "Золотая\x20шахта\x0a\x0aВы\x20стали\x20"
-        "хозяином\x20золотой\x20шахты\x2e\x20"
-        "Она\x20будет\x20приносить\x20вам\x20"
-        "по\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e",
+    "Золотая шахта\n\nВы стали хозяином золотой шахты. Она будет приносить вам по 1000 золотых в день.",
 
 
-    "Последователи\x0a\x0aГруппа\x20\x25\x73"
-        "\x20в\x20поисках\x20славы\x20желает\x20"
-        "примкнуть\x20к\x20вашему\x20войск"
-        "у\x2e\x20Вы\x20согласны\x20принять\x20и"
-        "х\x3f",
+    "Последователи\n\nГруппа %s в поисках славы желает примкнуть к вашему войску. Вы согласны принять их?",
 
-    "Оскорбленные\x20отказом\x20быт"
-        "ь\x20принятыми\x20в\x20ваши\x20ряды\x2c"
-        "\x20они\x20нападают\x20на\x20вас\x21",
+    "Оскорбленные отказом быть принятыми в ваши ряды, они нападают на вас!",
 
 
-    "Обелиск\x0a\x0aПеред\x20вами\x20обел"
-        "иск\x2c\x20высеченный\x20из\x20невид"
-        "анного\x20камня\x2e\x20Вы\x20вглядыв"
-        "аетесь\x20в\x20его\x20гладкую\x20пов"
-        "ерхность\x20и\x20вдруг\x20замечае"
-        "те\x2c\x20что\x20на\x20ней\x20начинают\x20"
-        "проступать\x20таинственные\x20"
-        "знаки\x2e\x20Знаки\x20складываютс"
-        "я\x20во\x20фрагмент\x20древней\x20ка"
-        "рты\x2e\x20Вы\x20торопливо\x20срисов"
-        "ываете\x20его\x2c\x20и\x20знаки\x20исче"
-        "зают\x20так\x20же\x20внезапно\x2c\x20ка"
-        "к\x20и\x20появились\x2e",
+    "Обелиск\n\nПеред вами обелиск, высеченный из невиданного камня. Вы вглядываетесь в его гладкую поверхность и вдруг замечаете, что на ней начинают проступать таинственные знаки. Знаки складываются во фрагмент древней карты. Вы торопливо срисовываете его, и знаки исчезают так же внезапно, как и появились.",
 
-    "Обелиск\x0a\x0aВы\x20уже\x20посещали"
-        "\x20этот\x20обелиск\x2e",
+    "Обелиск\n\nВы уже посещали этот обелиск.",
     "",
     "",
 
-    "Вы\x20нашли\x20ресурс\x20\x28\x25\x73\x29\x2e",
+    "Вы нашли ресурс (%s).",
 
-    "Лесопилка\x0a\x0aВы\x20стали\x20хозя"
-        "ином\x20лесопилки\x2e\x20Она\x20буде"
-        "т\x20приносить\x20вам\x20по\x20\x32\x20еди"
-        "ницы\x20древесины\x20в\x20день\x2e",
+    "Лесопилка\n\nВы стали хозяином лесопилки. Она будет приносить вам по 2 единицы древесины в день.",
 
 
-    "\x7bОракул\x7d\x0a\x0aНа\x20поляне\x20в\x20ок"
-        "ружении\x20деревьев\x20восседа"
-        "ет\x20слепой\x20оракул\x2e\x20Вы\x20рас"
-        "сказываете\x20ему\x20о\x20целях\x20в"
-        "ашего\x20похода\x2c\x20и\x20он\x20показ"
-        "ывает\x20вам\x20сильные\x20и\x20слаб"
-        "ые\x20стороны\x20ваших\x20противн"
-        "иков\x20в\x20магическом\x20хруста"
-        "льном\x20шаре\x2e",
+    "{Оракул}\n\nНа поляне в окружении деревьев восседает слепой оракул. Вы рассказываете ему о целях вашего похода, и он показывает вам сильные и слабые стороны ваших противников в магическом хрустальном шаре.",
     "",
     "",
     "",
@@ -9321,62 +8877,24 @@ const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "",
 
 
-    "\x7bШатер\x7d\x0a\x0aВаше\x20внимание\x20п"
-        "ривлекает\x20шатер\x2c\x20пологи\x20"
-        "которых\x20трепещут\x20на\x20жарк"
-        "ом\x20ветру\x20пустыни\x2e\x20В\x20нем\x20"
-        "никого\x20нет\x2e\x20Пройдет\x20врем"
-        "я\x2c\x20и\x2c\x20быть\x20может\x2c\x20сюда\x20п"
-        "ридет\x20новый\x20отряд\x20кочевн"
-        "иков\x2e",
+    "{Шатер}\n\nВаше внимание привлекает шатер, пологи которых трепещут на жарком ветру пустыни. В нем никого нет. Пройдет время, и, быть может, сюда придет новый отряд кочевников.",
 
 
-    "\x7bШатер\x7d\x0a\x0aВаше\x20внимание\x20п"
-        "ривлекают\x20шатер\x2c\x20пологи\x20"
-        "которого\x20трепещут\x20на\x20жар"
-        "ком\x20ветру\x20пустыни\x2e\x20Вы\x20хо"
-        "тите\x20принять\x20в\x20ваше\x20войс"
-        "ко\x20отряд\x20кочевников\x3f",
+    "{Шатер}\n\nВаше внимание привлекают шатер, пологи которого трепещут на жарком ветру пустыни. Вы хотите принять в ваше войско отряд кочевников?",
 
 
-    "\x7bПовозка\x7d\x0a\x0aЦветастая\x20пов"
-        "озка\x20разбойников\x20пуста\x2e\x20"
-        "Пройдет\x20время\x2c\x20и\x2c\x20быть\x20м"
-        "ожет\x2c\x20здесь\x20обоснуется\x20н"
-        "овая\x20шайка\x2e",
+    "{Повозка}\n\nЦветастая повозка разбойников пуста. Пройдет время, и, быть может, здесь обоснуется новая шайка.",
 
 
-    "\x7bПовозка\x7d\x0a\x0aВдалеке\x20слыши"
-        "тся\x20музыка\x20и\x20смех\x2e\x20Вы\x20ид"
-        "ете\x20на\x20звуки\x20и\x20видите\x20цв"
-        "етастую\x20повозку\x2c\x20в\x20котор"
-        "ой\x20живут\x20разбойники\x2e\x20Вы\x20"
-        "хотите\x20принять\x20в\x20ваше\x20во"
-        "йско\x20шайку\x20разбойников\x3f",
+    "{Повозка}\n\nВдалеке слышится музыка и смех. Вы идете на звуки и видите цветастую повозку, в которой живут разбойники. Вы хотите принять в ваше войско шайку разбойников?",
 
-    "\x7bВодоворот\x7d\x0a\x0aВаш\x20корабль"
-        "\x20попадает\x20в\x20водоворот\x2e\x20Ч"
-        "асть\x20вашего\x20войска\x20исчез"
-        "ает\x20в\x20пучине\x2e",
+    "{Водоворот}\n\nВаш корабль попадает в водоворот. Часть вашего войска исчезает в пучине.",
 
 
-    "\x7bВетряная\x20мельница\x7d\x0a\x0aМел"
-        "ьник\x20обращается\x20к\x20вам\x20со"
-        "\x20словами\x3a\x20\x22Сожалею\x2c\x20госп"
-        "один\x2c\x20но\x20сегодня\x20у\x20меня\x20"
-        "ничего\x20нет\x2e\x20Приходите\x20на"
-        "\x20следующей\x20неделе\x2e\x22",
+    "{Ветряная мельница}\n\nМельник обращается к вам со словами: \"Сожалею, господин, но сегодня у меня ничего нет. Приходите на следующей неделе.\"",
 
 
-    "\x7bВетряная\x20мельница\x7d\x0a\x0aМел"
-        "ьник\x20обращается\x20к\x20вам\x20со"
-        "\x20словами\x3a\x20\x22Господин\x2c\x20я\x20р"
-        "аботал\x20не\x20покладая\x20рук\x2c\x20"
-        "и\x20прошу\x20вас\x20принять\x20мой\x20"
-        "скромный\x20дар\x2e\x20Приходите\x20"
-        "на\x20следующей\x20неделе\x2c\x20у\x20м"
-        "еня\x20опять\x20найдется\x2c\x20чем\x20"
-        "вас\x20порадовать\x2e\x22",
+    "{Ветряная мельница}\n\nМельник обращается к вам со словами: \"Господин, я работал не покладая рук, и прошу вас принять мой скромный дар. Приходите на следующей неделе, у меня опять найдется, чем вас порадовать.\"",
     "",
     "",
     "",
@@ -9384,150 +8902,84 @@ const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "",
 
 
-    "\x7bСкелет\x7d\x0a\x0aВы\x20находите\x20ос"
-        "танки\x20незадачливого\x20иска"
-        "теля\x20приключений\x2e\x20Пошари"
-        "в\x20в\x20груде\x20лохмотьев\x2c\x20вы\x20"
-        "ничего\x20не\x20находите\x2e",
+    "{Скелет}\n\nВы находите останки незадачливого искателя приключений. Пошарив в груде лохмотьев, вы ничего не находите.",
 
 
-    "\x7bСкелет\x7d\x0a\x0aВы\x20находите\x20ос"
-        "танки\x20незадачливого\x20иска"
-        "теля\x20приключений\x2e\x20Пошари"
-        "в\x20в\x20груде\x20лохмотьев\x2c\x20вы\x20"
-        "находите\x2e"
+    "{Скелет}\n\nВы находите останки незадачливого искателя приключений. Пошарив в груде лохмотьев, вы находите."
 };
 const char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
 
-    "Начать\x20одиночную\x20или\x20сет"
-        "евую\x20игру\x2e",
+    "Начать одиночную или сетевую игру.",
 
-    "Загрузить\x20сохраненную\x20иг"
-        "ру\x2e",
+    "Загрузить сохраненную игру.",
 
-    "Сохранить\x20игру\x2e",
+    "Сохранить игру.",
 
-    "Выйти\x20из\x20Героев\x20Меча\x20и\x20М"
-        "агии\x20\x49\x49\x2e",
+    "Выйти из Героев Меча и Магии II.",
 
-    "Закрыть\x20меню\x2c\x20ничего\x20не\x20"
-        "делая\x2e"
+    "Закрыть меню, ничего не делая."
 };
 const char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
 
-    "\x7bОК\x7d\x0a\x0aЗакрыть\x20это\x20меню\x2e",
+    "{ОК}\n\nЗакрыть это меню.",
 
-    "\x7bСкорость\x7d\x0a\x0aУстановить\x20с"
-        "корость\x20действий\x20и\x20анима"
-        "ции\x20воинов\x20в\x20бою\x2e",
+    "{Скорость}\n\nУстановить скорость действий и анимации воинов в бою.",
 
 
-    "\x7bИнформация\x20о\x20воине\x7d\x0a\x0aВк"
-        "лючить\x20или\x20выключить\x20ото"
-        "бражение\x20окна\x20с\x20информац"
-        "ией\x20о\x20выбранном\x20и\x20атакуе"
-        "мом\x20воине\x2e",
+    "{Информация о воине}\n\nВключить или выключить отображение окна с информацией о выбранном и атакуемом воине.",
 
 
-    "\x7bМагия\x20в\x20автобое\x7d\x0a\x0aЕсли\x20"
-        "эта\x20опция\x20включена\x2c\x20ваш\x20"
-        "герой\x20будет\x20использовать"
-        "\x20заклинания\x20во\x20время\x20авт"
-        "обоя\x2e\x20\x28Примечание\x3a\x20Эта\x20о"
-        "пция\x20не\x20влияет\x20на\x20исполь"
-        "зование\x20заклинаний\x20компь"
-        "ютерными\x20игроками\x2c\x20и\x20на\x20"
-        "быстрый\x20бой\x2e\x29",
+    "{Магия в автобое}\n\nЕсли эта опция включена, ваш герой будет использовать заклинания во время автобоя. (Примечание: Эта опция не влияет на использование заклинаний компьютерными игроками, и на быстрый бой.)",
 
 
-    "\x7bСетка\x7d\x0a\x0aВключает\x20или\x20вы"
-        "ключает\x20отображение\x20сетк"
-        "и\x2e\x20Все\x20перемещения\x20на\x20по"
-        "ле\x20боя\x20происходят\x20по\x20гек"
-        "сагональной\x20сетке\x2c\x20даже\x20"
-        "если\x20ее\x20отображение\x20откл"
-        "ючено\x2e",
+    "{Сетка}\n\nВключает или выключает отображение сетки. Все перемещения на поле боя происходят по гексагональной сетке, даже если ее отображение отключено.",
 
 
-    "\x7bЗатенение\x20сетки\x7d\x0a\x0aВключ"
-        "ает\x20или\x20выключает\x20режим\x20"
-        "обозначения\x20возможной\x20да"
-        "льности\x20передвижения\x20выб"
-        "ранного\x20отряда\x20воинов\x2e",
+    "{Затенение сетки}\n\nВключает или выключает режим обозначения возможной дальности передвижения выбранного отряда воинов.",
 
-    "\x7bКурсор\x20с\x20тенью\x7d\x0a\x0aВключа"
-        "ет\x20или\x20выключает\x20отрисов"
-        "ку\x20тени\x20от\x20курсора\x20на\x20се"
-        "тке\x20координат\x2e"
+    "{Курсор с тенью}\n\nВключает или выключает отрисовку тени от курсора на сетке координат."
 };
 const char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
 
-    "Осмотреть\x20весь\x20мир\x2e",
+    "Осмотреть весь мир.",
 
-    "Посмотреть\x20головоломку\x2e",
+    "Посмотреть головоломку.",
 
-    "Показать\x20информацию\x20о\x20сц"
-        "енарии\x2c\x20на\x20котором\x20идет\x20"
-        "игра\x2e",
+    "Показать информацию о сценарии, на котором идет игра.",
 
-    ("Копать\x20в\x20поисках\x20Великог"
-     "о\x20артефакта\x2e"),
+    ("Копать в поисках Великого артефакта."),
 
-    "Закрыть\x20это\x20меню\x2e"
+    "Закрыть это меню."
 };
 const char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
 
-    "\x7bНовая\x20игра\x7d\x0a\x0aНачать\x20отд"
-        "ельный\x20сценарий\x20или\x20сете"
-        "вую\x20игру\x2e",
+    "{Новая игра}\n\nНачать отдельный сценарий или сетевую игру.",
 
-    "\x7bИгры\x7d\x0a\x0aЗагрузить\x20ранее\x20"
-        "сохраненную\x20игру\x2e",
+    "{Игры}\n\nЗагрузить ранее сохраненную игру.",
 
-    "\x7bРекорды\x7d\x0a\x0aПоказать\x20табл"
-        "ицу\x20рекордов\x2e",
+    "{Рекорды}\n\nПоказать таблицу рекордов.",
 
-    "\x7bАвторы\x7d\x0a\x0aПоказать\x20переч"
-        "ень\x20авторов\x20игры\x2e",
+    "{Авторы}\n\nПоказать перечень авторов игры.",
 
-    "\x7bВыйти\x7d\x0a\x0aВыйти\x20из\x20героев"
-        "\x20Меча\x20и\x20Магии\x20\x49\x49\x20и\x20верну"
-        "ться\x20в\x20операционную\x20сист"
-        "ему\x2e"
+    "{Выйти}\n\nВыйти из героев Меча и Магии II и вернуться в операционную систему."
 };
 const char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
 
-    "\x7bСледующий\x20герой\x7d\x0a\x0aВыбра"
-        "ть\x20следующего\x20героя\x2e",
+    "{Следующий герой}\n\nВыбрать следующего героя.",
 
-    "\x7bПродолжить\x20движение\x7d\x0a\x0aП"
-        "родолжить\x20движение\x20героя"
-        "\x20по\x20намеченному\x20пути\x2e",
+    "{Продолжить движение}\n\nПродолжить движение героя по намеченному пути.",
 
-    "\x7bОбзор\x20королевства\x7d\x0a\x0aОсм"
-        "отреть\x20ваши\x20владения\x2e",
+    "{Обзор королевства}\n\nОсмотреть ваши владения.",
 
-    "\x7bОкончить\x20ход\x7d\x0a\x0aОкончить"
-        "\x20ход\x20и\x20передать\x20управлен"
-        "ие\x20компьютеру\x2e",
+    "{Окончить ход}\n\nОкончить ход и передать управление компьютеру.",
 
-    "\x7bИгровые\x20действия\x7d\x0a\x0aОткр"
-        "ыть\x20окно\x20доступных\x20игров"
-        "ых\x20действий\x2e",
+    "{Игровые действия}\n\nОткрыть окно доступных игровых действий.",
 
-    "\x7bОкно\x20файлов\x7d\x0a\x0aОткрывает"
-        "\x20меню\x2c\x20где\x20вы\x20можете\x20заг"
-        "ружать\x20или\x20сохранять\x20игр"
-        "ы\x2e",
+    "{Окно файлов}\n\nОткрывает меню, где вы можете загружать или сохранять игры.",
 
-    "\x7bСистемные\x20настройки\x7d\x0a\x0aО"
-        "ткрывает\x20окно\x20системных\x20"
-        "настроек\x2c\x20позволяющих\x20на"
-        "строить\x20игру\x2e",
+    "{Системные настройки}\n\nОткрывает окно системных настроек, позволяющих настроить игру.",
 
-    "\x7bНаправить\x20заклинание\x7d\x0a\x0a"
-        "Направить\x20заклинание\x20на\x20"
-        "стратегической\x20карте\x2e"
+    "{Направить заклинание}\n\nНаправить заклинание на стратегической карте."
 };
 const char* gLuckText[KB_LUCK_TEXT_COUNT] = {
 
@@ -9559,31 +9011,31 @@ const char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
 
     "Отличная",
 
-    "Кровавая\x21"
+    "Кровавая!"
 };
 const char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
 
-    "Выкл\x2e",
+    "Выкл.",
 
-    "Вкл\x2e",
+    "Вкл.",
 
-    "Вкл\x2e\x0aГромкость\x20\x39",
+    "Вкл.\nГромкость 9",
 
-    "Вкл\x2e\x0aГромкость\x20\x38",
+    "Вкл.\nГромкость 8",
 
-    "Вкл\x2e\x0aГромкость\x20\x37",
+    "Вкл.\nГромкость 7",
 
-    "Вкл\x2e\x0aГромкость\x20\x36",
+    "Вкл.\nГромкость 6",
 
-    "Вкл\x2e\x0aГромкость\x20\x35",
+    "Вкл.\nГромкость 5",
 
-    "Вкл\x2e\x0aГромкость\x20\x34",
+    "Вкл.\nГромкость 4",
 
-    "Вкл\x2e\x0aГромкость\x20\x33",
+    "Вкл.\nГромкость 3",
 
-    "Вкл\x2e\x0aГромкость\x20\x32",
+    "Вкл.\nГромкость 2",
 
-    "Вкл\x2e\x0aГромкость\x20\x31"
+    "Вкл.\nГромкость 1"
 };
 const char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
 
@@ -9598,19 +9050,19 @@ const char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
     "Прыжками"
 };
 const char* gColors[(FACTION_COUNT)] = {
-    "синий"  ,
-    "зеленый"  ,
-    "красный"  ,
-    "желтый"  ,
-    "оранжевый"  ,
+    "синий",
+    "зеленый",
+    "красный",
+    "желтый",
+    "оранжевый",
     "фиолетовый"
 };
 static const char* gColorAbbreviations [[maybe_unused]][(FACTION_COUNT)] = {
-    "син."  ,
-    "зел."  ,
-    "кр."  ,
-    "жел."  ,
-    "ор."  ,
+    "син.",
+    "зел.",
+    "кр.",
+    "жел.",
+    "ор.",
     "фиол."
 };
 const char* gMonthNames[KB_MONTH_NAME_COUNT] = {
@@ -9629,7 +9081,7 @@ const char* gMonthNames[KB_MONTH_NAME_COUNT] = {
 
     "Цикады",
 
-    "Земляного\x20червя",
+    "Земляного червя",
 
     "Шершня",
 
@@ -9669,174 +9121,136 @@ const char* gWeekNames[KB_WEEK_NAME_COUNT] = {
 };
 const char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
 
-    "Обзор\x20королевства",
+    "Обзор королевства",
 
-    "\x25\x73\x20\x2d\x20информация",
+    "%s - информация",
 
-    "Дополнительная\x20статистик"
-        "а\x20героя",
+    "Дополнительная статистика героя",
 
-    "Информация\x20о\x20высокой\x20мор"
-        "али",
+    "Информация о высокой морали",
 
-    "Информация\x20об\x20обычной\x20мо"
-        "рали",
+    "Информация об обычной морали",
 
-    "Информация\x20о\x20плохой\x20мора"
-        "ли",
+    "Информация о плохой морали",
 
-    "Информация\x20о\x20хорошей\x20уда"
-        "че",
+    "Информация о хорошей удаче",
 
-    "Информация\x20об\x20обычной\x20уд"
-        "аче",
+    "Информация об обычной удаче",
 
-    "Информация\x20о\x20плохой\x20удач"
-        "е",
+    "Информация о плохой удаче",
 
-    "Показать\x20опыт",
+    "Показать опыт",
 
-    "Выбрать\x20\x25\x73",
+    "Выбрать %s",
 
     "Пусто",
 
-    "Перенести\x20сюда\x20отряд\x20\x25\x73",
+    "Перенести сюда отряд %s",
 
-    "Отряды\x20\x25\x73\x20и\x20\x25\x73\x20меняются\x20"
-        "местами",
+    "Отряды %s и %s меняются местами",
 
-    "Показать\x20заклинания",
+    "Показать заклинания",
 
-    "Посмотреть\x20информацию\x20об"
-        "\x3a\x20\x25\x73",
+    "Посмотреть информацию об: %s",
 
-    "\x25\x73\x20\x25\x73\x20\x2d\x20уволить",
+    "%s %s - уволить",
 
-    "Закрыть\x20экран\x20героя",
+    "Закрыть экран героя",
 
-    "Экран\x20героя",
+    "Экран героя",
 
-    "\x25\x73\x20в\x20один\x20отряд",
+    "%s в один отряд",
 
-    "Разделить\x20отряд\x20\x25\x73",
+    "Разделить отряд %s",
 
-    "\x25\x73\x20\x25\x73\x20\x2d\x20информация",
+    "%s %s - информация",
 
-    "Информация\x20об\x20очках\x20маги"
-        "и",
+    "Информация об очках магии",
 
-    "Выбрать\x20широкие\x20ряды\x20в\x20б"
-        "ою",
+    "Выбрать широкие ряды в бою",
 
-    "Сгруппировать\x20воинов"
+    "Сгруппировать воинов"
 };
 const char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
 
-    "Построить\x20Гильдию\x20магов",
+    "Построить Гильдию магов",
 
-    "Построены\x20все\x20этажи\x20Гиль"
-        "дии\x20магов\x2e",
+    "Построены все этажи Гильдии магов.",
 
-    "Нельзя\x20построить\x20следующ"
-        "ий\x20этаж\x2e",
+    "Нельзя построить следующий этаж.",
 
-    "Построить\x20следующий\x20этаж"
-        "\x20Гильдии\x20магов\x20",
+    "Построить следующий этаж Гильдии магов ",
 
-    "Постройка\x20\x27\x25\x73\x27\x20уже\x20возве"
-        "дена",
+    "Постройка '%s' уже возведена",
 
-    "Нельзя\x20возвести\x20постройк"
-        "у\x20\x27\x25\x73\x27",
+    "Нельзя возвести постройку '%s'",
 
-    "Нельзя\x20возвести\x20постройк"
-        "у\x20\x27\x25\x73\x27",
+    "Нельзя возвести постройку '%s'",
 
-    "Возвести\x20постройку\x20\x27\x25\x73\x27",
+    "Возвести постройку '%s'",
 
-    "Герой\x20вам\x20не\x20по\x20карману\x2e",
+    "Герой вам не по карману.",
 
-    "Нельзя\x20нанять\x20\x2d\x20у\x20вас\x20уж"
-        "е\x20\x25\x64\x20героев\x2e",
+    "Нельзя нанять - у вас уже %d героев.",
 
-    "Нельзя\x20нанять\x20\x2d\x20в\x20этом\x20г"
-        "ороде\x20у\x20вас\x20уже\x20есть\x20гер"
-        "ой\x2e",
+    "Нельзя нанять - в этом городе у вас уже есть герой.",
 
-    "Нанять\x20нового\x20героя",
+    "Нанять нового героя",
 
-    "Выйти\x20из\x20замка",
+    "Выйти из замка",
 
-    "Возможности\x20замка",
+    "Возможности замка",
 
-    "Сгруппировать\x20гарнизон",
+    "Сгруппировать гарнизон",
 
-    "Выбрать\x20широкие\x20ряды\x20для"
-        "\x20гарнизона"
+    "Выбрать широкие ряды для гарнизона"
 };
 const char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
 
 
-    "\x7bХорошая\x20удача\x7d\x0a\x0aЕсли\x20уд"
-        "ача\x20вашего\x20войска\x20выше\x20о"
-        "бычной\x2c\x20атаки\x20отдельных\x20"
-        "отрядов\x20на\x20поле\x20боя\x20иног"
-        "да\x20оказываются\x20более\x20рез"
-        "ультативными\x20\x28их\x20сила\x20уд"
-        "ваивается\x29\x2e",
+    "{Хорошая удача}\n\nЕсли удача вашего войска выше обычной, атаки отдельных отрядов на поле боя иногда оказываются более результативными (их сила удваивается).",
 
 
-    "\x7bОбычная\x20удача\x7d\x0a\x0aС\x20обычн"
-        "ой\x20удачей\x20ваше\x20войско\x20не"
-        "\x20имеет\x20ни\x20преимуществ\x2c\x20н"
-        "и\x20недостатков\x20на\x20поле\x20бо"
-        "я\x2e",
+    "{Обычная удача}\n\nС обычной удачей ваше войско не имеет ни преимуществ, ни недостатков на поле боя.",
 
 
-    "\x7bПлохая\x20удача\x7d\x0a\x0aЕсли\x20ваш"
-        "ему\x20войску\x20не\x20везет\x2c\x20уро"
-        "н\x2c\x20наносимый\x20\x20отдельными"
-        "\x20отрядами\x20на\x20поле\x20боя\x2c\x20м"
-        "ожет\x20оказаться\x20вдвое\x20мен"
-        "ьше\x20обычного\x2e",
+    "{Плохая удача}\n\nЕсли вашему войску не везет, урон, наносимый  отдельными отрядами на поле боя, может оказаться вдвое меньше обычного.",
 
-    "\x25\x73\x0a\x0a\x0aМодификаторы\x20удачи\x3a",
+    "%s\n\n\nМодификаторы удачи:",
 
-    "\x0aЛапка\x20кролика\x20\x2b\x31",
+    "\nЛапка кролика +1",
 
-    "\x0aЗолотая\x20подкова\x20\x2b\x31",
+    "\nЗолотая подкова +1",
 
-    "\x0aМонета\x20\x2b\x31",
+    "\nМонета +1",
 
-    "\x0aКлевер\x20\x2b\x31",
+    "\nКлевер +1",
 
-    "\x0aПосещен\x20Круг\x20фейри\x20\x2b\x31",
+    "\nПосещен Круг фейри +1",
 
-    "\x0aПосещен\x20фонтан\x20\x2b\x31",
+    "\nПосещен фонтан +1",
 
-    "\x0aНет",
+    "\nНет",
 
-    "\x0aГрабитель\x20могил\x20\x2d\x31",
+    "\nГрабитель могил -1",
 
-    "\x0aРадуга\x20магов\x20\x2b\x32",
+    "\nРадуга магов +2",
 
-    "\x0aПосещен\x20идол\x20\x2b\x31",
+    "\nПосещен идол +1",
 
-    "\x0aОграблена\x20пирамида\x20\x2d\x32",
+    "\nОграблена пирамида -2",
 
-    "\x0aБазовая\x20удача\x20\x2b\x31",
+    "\nБазовая удача +1",
 
-    "\x0aВысокая\x20удача\x20\x2b\x32",
+    "\nВысокая удача +2",
 
-    "\x0aЭксперт\x20удачи\x20\x2b\x33",
+    "\nЭксперт удачи +3",
 
-    "\x0aБонус\x20мачты\x20на\x20море\x20\x2b\x31",
+    "\nБонус мачты на море +1",
 
-    "\x0aПосещена\x20русалка\x20\x2b\x31",
+    "\nПосещена русалка +1",
 
-    "\x0aБоевое\x20одеяние\x20Андурана"
-        "\x20дает\x20максимальную\x20удачу"
-        "\x2e"
+    "\nБоевое одеяние Андурана дает максимальную удачу."
 };
 const char* IQnames[KB_IQ_NAME_COUNT] = {
 
@@ -9852,1399 +9266,911 @@ const char* IQnames[KB_IQ_NAME_COUNT] = {
 };
 const char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
 
-    "Предыдущая\x20страница\x20",
+    "Предыдущая страница ",
 
-    "Следующая\x20страница",
+    "Следующая страница",
 
-    "Небоевые\x20заклинания",
+    "Небоевые заклинания",
 
-    "Боевые\x20заклинания",
+    "Боевые заклинания",
 
-    "Закрыть\x20волшебную\x20книгу",
+    "Закрыть волшебную книгу",
 
     "Заклинания",
 
-    "Выбрать\x20заклинание",
+    "Выбрать заклинание",
 
-    "Боевые\x20заклинания",
+    "Боевые заклинания",
 
-    ("У\x20вашего\x20героя\x20осталось\x20"
-     "\x25\x64\x20оч\x2e\x20магии")
+    ("У вашего героя осталось %d оч. магии")
 };
 const char* speedText[KB_SPEED_TEXT_COUNT] = {
       "",
-      "Ползает",
-      "Оч\x2e\x20низкая",
-      "Низкая",
-      "Средняя",
-      "Высокая",
-      "Оч\x2e\x20высокая",
-      "Ультра\x20высокая",
-      "Молниеносная",
-      "Абсолютная"
+     "Ползает",
+     "Оч. низкая",
+     "Низкая",
+     "Средняя",
+     "Высокая",
+     "Оч. высокая",
+     "Ультра высокая",
+     "Молниеносная",
+     "Абсолютная"
 };
 const char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Выстрелов\x3a\x20",
-      "Урон\x3a\x20",
-      "Здоровье\x3a\x20",
-      "Скорость\x3a\x20",
-      "Мораль\x3a\x20",
-      "Удача\x3a\x20",
-      "Выстрелов\x3a\x20"
+     "Атака: ",
+     "Защита: ",
+      "Выстрелов: ",
+      "Урон: ",
+      "Здоровье: ",
+      "Скорость: ",
+      "Мораль: ",
+      "Удача: ",
+      "Выстрелов: "
 };
 const char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Выстр\x2e\x3a\x20",
-      "Урон\x3a\x20",
-      "ЗД\x3a\x20",
-      "Скор\x2e\x3a\x20",
-      "Всего\x3a\x20",
-      "\x0a\x0aСкорость\x3a\x0a\x25\x73",
-      "\x0a\x0aПрирост\x0a\x20\x2b\x20\x25\x64\x2fнед\x2e"
+     "Атака: ",
+     "Защита: ",
+      "Выстр.: ",
+      "Урон: ",
+      "ЗД: ",
+      "Скор.: ",
+      "Всего: ",
+     "\n\nСкорость:\n%s",
+     "\n\nПрирост\n + %d/нед."
 };
 const char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
 
-    ("Обзор\x20королевства\x20\x20\x20Месяц\x3a\x20\x25\x64\x2c\x20Неделя\x3a\x20\x25\x64\x2c\x20День\x3a"
-     "\x20\x25\x64"),
-      "Ваш\x20Драконий\x20город\x2e",
-      "Ваш\x20маяк\x2e"
+    ("Обзор королевства   Месяц: %d, Неделя: %d, День: %d"),
+     "Ваш Драконий город.",
+     "Ваш маяк."
 };
 const char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
-      "\x25\x73\x2c\x20у\x20вас\x20осталось\x20всего\x20\x25\x64\x20дней\x20на\x20то\x2c\x20чтобы\x20за"
-        "воевать\x20хотя\x20бы\x20один\x20город\x3b\x20иначе\x20вы\x20будете\x20наве"
-        "ки\x20изгнаны\x20из\x20страны\x2e",
-      "\x25\x73\x2c\x20настал\x20последний\x20день\x2c\x20когда\x20вы\x20еще\x20можете\x20з"
-        "авоевать\x20себе\x20город\x3b\x20в\x20противном\x20случае\x20вы\x20будет"
-        "е\x20навеки\x20изгнаны\x20из\x20страны\x2e",
-      "Астрологи\x20объявляют\x20месяц\x20\x25\x73\x2e\x0a\x0aНаселение\x20всех\x20жи"
-        "лищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x2c\x20что\x20этому\x20месяцу\x20покровител"
-        "ьствует\x20сила\x20\x25\x73\x2e\x0a\x0aПопуляция\x20\x25\x73\x20удваивается\x21\x0a\x0aНас"
-        "еление\x20всех\x20жилищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x20месяц\x20ЧУМЫ\x21\x0a\x0aНаселение\x20всех\x20"
-        "жилищ\x20уменьшилось\x20вдвое\x2e",
-      "Астрологи\x20объявляют\x20неделю\x20\x25\x73\x2e\x0a\x0aНаселение\x20всех\x20ж"
-        "илищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x2c\x20что\x20этой\x20неделе\x20покровитель"
-        "ствует\x20сила\x20\x25\x73\x2e\x0a\x0aПопуляция\x20\x25\x73\x20\x2b\x35\x2e\x0a\x0aНаселение\x20все"
-        "х\x20жилищ\x20возросло\x2e"
+     "%s, у вас осталось всего %d дней на то, чтобы завоевать хотя бы один город; иначе вы будете навеки изгнаны из страны.",
+     "%s, настал последний день, когда вы еще можете завоевать себе город; в противном случае вы будете навеки изгнаны из страны.",
+     "Астрологи объявляют месяц %s.\n\nНаселение всех жилищ возросло.",
+     "Астрологи объявляют, что этому месяцу покровительствует сила %s.\n\nПопуляция %s удваивается!\n\nНаселение всех жилищ возросло.",
+     "Астрологи объявляют месяц ЧУМЫ!\n\nНаселение всех жилищ уменьшилось вдвое.",
+     "Астрологи объявляют неделю %s.\n\nНаселение всех жилищ возросло.",
+     "Астрологи объявляют, что этой неделе покровительствует сила %s.\n\nПопуляция %s +5.\n\nНаселение всех жилищ возросло."
 };
 const char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Сила\x20магии\x3a\x20",
-      "Знания\x3a\x20",
-      "Мораль\x3a\x20",
-      "Удача\x3a\x20",
-      "Очки\x20магии\x3a\x20"
+     "Атака: ",
+     "Защита: ",
+     "Сила магии: ",
+     "Знания: ",
+      "Мораль: ",
+      "Удача: ",
+     "Очки магии: "
 };
 const char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
-      "Остановить\x20катапульту",
-      "Направить\x20заклинание",
-      "Отступить",
-      "Сдаться",
-      "Отменить",
-      "Возможности\x20героя",
-      "Возможности\x20капитана"
+     "Остановить катапульту",
+     "Направить заклинание",
+     "Отступить",
+     "Сдаться",
+     "Отменить",
+     "Возможности героя",
+     "Возможности капитана"
 };
 const char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
-      "\x7bНаправить\x20заклинание\x7d\x0a\x0aНаправить\x20заклинание\x2e\x20В\x20"
-        "течение\x20каждого\x20раунда\x20боя\x20можно\x20направить\x20лишь\x20"
-        "одно\x20заклинание\x2e\x20Новый\x20раунд\x20начинается\x20после\x20то"
-        "го\x2c\x20как\x20все\x20отряды\x20на\x20поле\x20боя\x20завершили\x20свой\x20хо"
-        "д\x2e",
-      "\x7bОтступить\x7d\x0a\x0aГерой\x20отступает\x20с\x20поля\x20боя\x2c\x20бросив\x20"
-        "свое\x20войско\x20на\x20произвол\x20судьбы\x2e\x20Отступившего\x20гер"
-        "оя\x20можно\x20будет\x20снова\x20нанять\x20на\x20службу\x2c\x20но\x20при\x20эт"
-        "ом\x20сопровождать\x20его\x20будет\x20лишь\x20очень\x20небольшая\x20а"
-        "рмия\x2c\x20как\x20если\x20бы\x20ваш\x20герой\x20был\x20зеленым\x20новичком"
-        "\x2e",
-      "\x7bСдаться\x7d\x0a\x0aКапитуляция\x20стоит\x20денег\x2e\x20Тем\x20не\x20менее"
-        "\x2c\x20если\x20выкуп\x20будет\x20уплачен\x2c\x20героя\x20можно\x20будет\x20сн"
-        "ова\x20нанять\x20на\x20службу\x20вместе\x20со\x20всеми\x20уцелевшими\x20"
-        "в\x20битве\x20войсками\x2e",
-      "\x7bОтмена\x7d\x0a\x0aВернуться\x20в\x20бой\x2e"
+     "{Направить заклинание}\n\nНаправить заклинание. В течение каждого раунда боя можно направить лишь одно заклинание. Новый раунд начинается после того, как все отряды на поле боя завершили свой ход.",
+     "{Отступить}\n\nГерой отступает с поля боя, бросив свое войско на произвол судьбы. Отступившего героя можно будет снова нанять на службу, но при этом сопровождать его будет лишь очень небольшая армия, как если бы ваш герой был зеленым новичком.",
+     "{Сдаться}\n\nКапитуляция стоит денег. Тем не менее, если выкуп будет уплачен, героя можно будет снова нанять на службу вместе со всеми уцелевшими в битве войсками.",
+     "{Отмена}\n\nВернуться в бой."
 };
 const char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
       "",
-      "\x25\x73\x3a\x20Идти\x20сюда\x2e",
-      "\x25\x73\x3a\x20Перелететь\x20сюда\x2e",
-      "Атаковать\x20\x25\x73",
-      "Стрелять\x20в\x20\x25\x73\x20\x28осталось\x20\x25\x64\x20выстр\x2e\x29",
-      "Возможности\x20героя",
-      "Вражеский\x20герой",
-      "\x25\x73\x3a\x20Показать\x20информацию\x2e",
-      "Нет\x20стрел\x21",
-      "Возможности\x20капитана",
-      "Показать\x20вражеского\x20капитана",
-      "Информация\x20о\x20баллисте"
+     "%s: Идти сюда.",
+     "%s: Перелететь сюда.",
+     "Атаковать %s",
+     "Стрелять в %s (осталось %d выстр.)",
+     "Возможности героя",
+     "Вражеский герой",
+     "%s: Показать информацию.",
+     "Нет стрел!",
+     "Возможности капитана",
+     "Показать вражеского капитана",
+     "Информация о баллисте"
 };
 const char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
-    {  "\x25\x73\x20получает",   "\x20уровень\x20опыта\x2e\x0a",   "\x20\x25\x64\x20уровней\x20опыта\x2e\x0a"};
+    { "%s получает",   " уровень опыта.\n",   " %d уровней опыта.\n"};
 const char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
-      "Подождать\x2c\x20пока\x20походят\x20другие",
-      "Пропустить\x20ход\x20этого\x20воина",
-      "Автобой",
-      "Системные\x20настройки",
+     "Подождать, пока походят другие",
+     "Пропустить ход этого воина",
+     "Автобой",
+     "Системные настройки",
       ""
 };
 const char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
-      "\x7bЖдать\x7d\x0a\x0aДанный\x20отряд\x20откладывает\x20свой\x20ход\x20и\x20сов"
-        "ершает\x20действие\x20после\x20того\x2c\x20как\x20все\x20остальные\x20от"
-        "ряды\x20походили\x2e",
-      "\x7bПропустить\x20ход\x7d\x0a\x0aОтряд\x20пропускает\x20свой\x20ход\x20в\x20эт"
-        "ом\x20раунде\x2e",
-      "\x7bАвтобой\x7d\x0a\x0aКомпьютер\x20вместо\x20вас\x20управляет\x20вашими"
-        "\x20войсками\x20во\x20время\x20боя\x2e",
-      "\x7bНастройки\x7d\x0a\x0aПозволяет\x20изменять\x20настройки\x20боя\x2e",
-      "\x7bИнформационная\x20строка\x7d\x0a\x0aЗдесь\x20отображаются\x20резу"
-        "льтаты\x20действий\x20отдельных\x20отрядов\x2e"
+     "{Ждать}\n\nДанный отряд откладывает свой ход и совершает действие после того, как все остальные отряды походили.",
+     "{Пропустить ход}\n\nОтряд пропускает свой ход в этом раунде.",
+     "{Автобой}\n\nКомпьютер вместо вас управляет вашими войсками во время боя.",
+     "{Настройки}\n\nПозволяет изменять настройки боя.",
+     "{Информационная строка}\n\nЗдесь отображаются результаты действий отдельных отрядов."
 };
 const char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
-      "Разделить\x20отряд\x20\x25\x73",
-      "Нельзя\x20отнять\x20последних\x20воинов\x20у\x20героя\x20",
-      "Соединить\x20отряды\x20\x25\x73",
-      "Разделить\x20отряд\x20\x25\x73",
-      "Посмотреть\x20на\x20\x25\x73",
-      "Нельзя\x20перенести\x20в\x20гарнизон\x20последний\x20отряд\x2e",
-      "Передвинуть\x20сюда\x20отряд\x20\x25\x73",
-      "Отряды\x20\x25\x73\x20и\x20\x25\x73\x20меняются\x20местами",
-      "Выйти\x20из\x20города",
+     "Разделить отряд %s",
+      "Нельзя отнять последних воинов у героя ",
+     "Соединить отряды %s",
+     "Разделить отряд %s",
+     "Посмотреть на %s",
+     "Нельзя перенести в гарнизон последний отряд.",
+     "Передвинуть сюда отряд %s",
+     "Отряды %s и %s меняются местами",
+     "Выйти из города",
       "",
-      "Обзор\x20королевства",
-      "Пусто",
-      "\x25\x73",
-      "Показать\x20героя",
-      "Гильдия\x20магов",
-      "Гильдия\x20воров",
-      "Таверна",
-      "Верфь",
-      "Колодец",
-      "Шатер",
-      "Замок",
-      "Нанять\x20\x25\x73",
-      "Статуя",
-      "Левая\x20башня",
-      "Правая\x20башня",
-      "Ров",
-      "Рынок",
-      "Дом\x20капитана"
+     "Обзор королевства",
+     "Пусто",
+      "%s",
+     "Показать героя",
+     "Гильдия магов",
+     "Гильдия воров",
+     "Таверна",
+     "Верфь",
+     "Колодец",
+     "Шатер",
+     "Замок",
+     "Нанять %s",
+     "Статуя",
+     "Левая башня",
+     "Правая башня",
+     "Ров",
+     "Рынок",
+     "Дом капитана"
 };
 const char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
-      "Лорд\x20Килбурн",   "Сэр\x20Галлант",   "Эктор",      "Гвеннет",   "Тиро",      "Амброзий",     "Руби",
-      "Максимус",        "Димитри",       "Сундакс",    "Финеоз",    "Джоджош",    "Крэг\x20Хак",   "Джезебель",
-      "Жаклин",         "Эргон",         "Тсабу",      "Атлас",      "Астра",     "Наташа",     "Троян",
-      "Ватавна",        "Ребекка",       "Гем",        "Ариэль",      "Карлавн",   "Луна",        "Арий",
-      "Аламар",         "Виспер",        "Кродо",      "Барок",      "Кастор",   "Агар",        "Фалагар",
-      "Расмонт",      "Мира",          "Флинт",      "Давн",       "Галон",     "Мирини",      "Вилфрей",
-      "Саракин",        "Калиндра",      "Мандигал",   "Зом",        "Дарлана",   "Зам",         "Ранлу",
-      "Чарити",        "Риалдо",        "Роксана",     "Сандро",     "Келия"
+     "Лорд Килбурн", "Сэр Галлант", "Эктор", "Гвеннет", "Тиро", "Амброзий", "Руби",
+     "Максимус", "Димитри", "Сундакс", "Финеоз", "Джоджош", "Крэг Хак", "Джезебель",
+     "Жаклин", "Эргон", "Тсабу", "Атлас", "Астра", "Наташа", "Троян",
+     "Ватавна", "Ребекка", "Гем", "Ариэль", "Карлавн", "Луна", "Арий",
+     "Аламар", "Виспер", "Кродо", "Барок", "Кастор", "Агар", "Фалагар",
+     "Расмонт", "Мира", "Флинт", "Давн", "Галон", "Мирини", "Вилфрей",
+     "Саракин", "Калиндра", "Мандигал", "Зом", "Дарлана", "Зам", "Ранлу",
+     "Чарити", "Риалдо", "Роксана", "Сандро", "Келия"
 };
 const char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
-      "\x7bУровень\x20сложности\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20устанав"
-        "ливать\x20стартовый\x20уровень\x20сложности\x20игры\x2e\x20Чем\x20выш"
-        "е\x20уровень\x20сложности\x2c\x20тем\x20с\x20меньшим\x20количеством\x20р"
-        "есурсов\x20вы\x20начинаете\x20игру\x2c\x20и\x20тем\x20больше\x20ресурсов"
-        "\x20получают\x20ваши\x20компьютерные\x20противники\x2e",
-      "\x7bФора\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20задавать\x20тому\x20или\x20ин"
-        "ому\x20игроку\x2dчеловеку\x20дать\x20фору\x20другим\x20игрокам\x2e\x20Ес"
-        "ли\x20игрок\x20дает\x20другим\x20фору\x2c\x20он\x20начинает\x20игру\x20с\x20ме"
-        "ньшим\x20количеством\x20ресурсов\x20и\x20каждый\x20ход\x20получает"
-        "\x20на\x20\x31\x35\x20или\x20\x33\x30\x20процентов\x20меньше\x20ресурсов\x20в\x20зависи"
-        "мости\x20от\x20того\x2c\x20насколько\x20большую\x20фору\x20он\x20дает\x2e",
-      "\x7bОппоненты\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20вам\x20задать\x20цвет"
-        "\x20игрока\x20и\x20его\x20стартовую\x20позицию\x2e\x20Каждому\x20цвету\x20с"
-        "оответствует\x20определенная\x20стартовая\x20позиция\x2e\x20Нек"
-        "оторые\x20цвета\x20жестко\x20закреплены\x20либо\x20за\x20компьютер"
-        "ными\x2c\x20либо\x20за\x20живыми\x20игроками\x2e",
-      "\x7bКласс\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20задавать\x20класс\x20игро"
-        "ка\x2e\x20Классы\x20не\x20всегда\x20можно\x20изменять\x2e\x20В\x20зависимос"
-        "ти\x20от\x20сценария\x20игрок\x20может\x20получать\x20дополнительн"
-        "ые\x20города\x20и\x2fили\x20героев\x2c\x20направленность\x20которых\x20н"
-        "е\x20совпадает\x20с\x20изначальной\x20направленностью\x20игрока"
-        "\x2e",
-      "\x7bСценарий\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20выбрать\x20игровой\x20"
-        "сценарий\x2e",
-      "\x7bРейтинг\x7d\x0a\x0aРейтинг\x20отражает\x20сочетание\x20различных\x20"
-        "игровых\x20установок\x2e\x20Он\x20используется\x20при\x20расчете\x20к"
-        "онечного\x20результата\x2c\x20достигнутого\x20игроком\x2e",
-      "\x7bОК\x7d\x0a\x0aПодтверждает\x20заданные\x20установки\x20и\x20начинает"
-        "\x20новую\x20игру\x2e",
-      "\x7bОтмена\x7d\x0a\x0aНажмите\x2c\x20чтобы\x20вернуться\x20в\x20главное\x20мен"
-        "ю\x2e"
+     "{Уровень сложности}\n\nЭта опция позволяет устанавливать стартовый уровень сложности игры. Чем выше уровень сложности, тем с меньшим количеством ресурсов вы начинаете игру, и тем больше ресурсов получают ваши компьютерные противники.",
+     "{Фора}\n\nЭта опция позволяет задавать тому или иному игроку-человеку дать фору другим игрокам. Если игрок дает другим фору, он начинает игру с меньшим количеством ресурсов и каждый ход получает на 15 или 30 процентов меньше ресурсов в зависимости от того, насколько большую фору он дает.",
+     "{Оппоненты}\n\nЭта опция позволяет вам задать цвет игрока и его стартовую позицию. Каждому цвету соответствует определенная стартовая позиция. Некоторые цвета жестко закреплены либо за компьютерными, либо за живыми игроками.",
+     "{Класс}\n\nЭта опция позволяет задавать класс игрока. Классы не всегда можно изменять. В зависимости от сценария игрок может получать дополнительные города и/или героев, направленность которых не совпадает с изначальной направленностью игрока.",
+     "{Сценарий}\n\nЭта опция позволяет выбрать игровой сценарий.",
+     "{Рейтинг}\n\nРейтинг отражает сочетание различных игровых установок. Он используется при расчете конечного результата, достигнутого игроком.",
+     "{ОК}\n\nПодтверждает заданные установки и начинает новую игру.",
+     "{Отмена}\n\nНажмите, чтобы вернуться в главное меню."
 };
 const char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
-      "\x7b\x32\x34\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости\x20"
-        "\x32\x34\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20испо"
-        "льзуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20модем"
-        "ов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорости\x20"
-        "\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x39\x36\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости\x20"
-        "\x39\x36\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20испо"
-        "льзуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20модем"
-        "ов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорости\x20"
-        "\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x31\x39\x32\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости"
-        "\x20\x31\x39\x32\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20ис"
-        "пользуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20мод"
-        "емов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорост"
-        "и\x20\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x33\x38\x34\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости"
-        "\x20\x33\x38\x34\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20ис"
-        "пользуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20мод"
-        "емов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорост"
-        "и\x20\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{2400 бод}\n\nИспользовать соединение на скорости 2400 бод.\n\nЗамечание: Для модемов 14400 бод используйте соединение на скорости 19200.  Для модемов 28800 бод используйте соединение на скорости 38400 бод.",
+     "{9600 бод}\n\nИспользовать соединение на скорости 9600 бод.\n\nЗамечание: Для модемов 14400 бод используйте соединение на скорости 19200.  Для модемов 28800 бод используйте соединение на скорости 38400 бод.",
+     "{19200 бод}\n\nИспользовать соединение на скорости 19200 бод.\n\nЗамечание: Для модемов 14400 бод используйте соединение на скорости 19200.  Для модемов 28800 бод используйте соединение на скорости 38400 бод.",
+     "{38400 бод}\n\nИспользовать соединение на скорости 38400 бод.\n\nЗамечание: Для модемов 14400 бод используйте соединение на скорости 19200.  Для модемов 28800 бод используйте соединение на скорости 38400 бод.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
-      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x31\x2e",
-      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x32\x2e",
-      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x33\x2e",
-      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x34\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{COM 1}\n\nИспользовать для модемного соединения порт COM 1.",
+     "{COM 2}\n\nИспользовать для модемного соединения порт COM 2.",
+     "{COM 3}\n\nИспользовать для модемного соединения порт COM 3.",
+     "{COM 4}\n\nИспользовать для модемного соединения порт COM 4.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
-      "\x7bСкорость\x20соединения\x20\x32\x34\x30\x30\x20бод\x2e\x7d\x0a\x0aДля\x20компьютеров"
-        "\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использова"
-        "ть\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20более"
-        "\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30\x20б"
-        "од\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начните"
-        "\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компьют"
-        "еров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20испол"
-        "ьзуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x39\x36\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютеро"
-        "в\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использов"
-        "ать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20боле"
-        "е\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30\x20"
-        "бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начнит"
-        "е\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компью"
-        "теров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20испо"
-        "льзуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x31\x39\x32\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютер"
-        "ов\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использо"
-        "вать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20бол"
-        "ее\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30"
-        "\x20бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начни"
-        "те\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компь"
-        "ютеров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20исп"
-        "ользуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x33\x38\x34\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютер"
-        "ов\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использо"
-        "вать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20бол"
-        "ее\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30"
-        "\x20бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начни"
-        "те\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компь"
-        "ютеров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20исп"
-        "ользуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{Скорость соединения 2400 бод.}\n\nДля компьютеров с устаревшим чипом UART 8250 следует использовать скорость 19200 бод, а для компьютеров с более современным чипом UART 16550 - скорость 38400 бод. Если вы не уверены, какой у вас чип, начните с более низких скоростей. В большинстве компьютеров, произведенных в 1994 году и позднее, используется чип UART 16550.",
+     "{Скорость соединения 9600 бод.}\n\n Для компьютеров с устаревшим чипом UART 8250 следует использовать скорость 19200 бод, а для компьютеров с более современным чипом UART 16550 - скорость 38400 бод. Если вы не уверены, какой у вас чип, начните с более низких скоростей. В большинстве компьютеров, произведенных в 1994 году и позднее, используется чип UART 16550.",
+     "{Скорость соединения 19200 бод.}\n\n Для компьютеров с устаревшим чипом UART 8250 следует использовать скорость 19200 бод, а для компьютеров с более современным чипом UART 16550 - скорость 38400 бод. Если вы не уверены, какой у вас чип, начните с более низких скоростей. В большинстве компьютеров, произведенных в 1994 году и позднее, используется чип UART 16550.",
+     "{Скорость соединения 38400 бод.}\n\n Для компьютеров с устаревшим чипом UART 8250 следует использовать скорость 19200 бод, а для компьютеров с более современным чипом UART 16550 - скорость 38400 бод. Если вы не уверены, какой у вас чип, начните с более низких скоростей. В большинстве компьютеров, произведенных в 1994 году и позднее, используется чип UART 16550.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
-      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x31\x2e",
-      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x32\x2e",
-      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x33\x2e",
-      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x34\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{COM 1}\n\nИспользовать для прямого соединения порт COM 1.",
+     "{COM 2}\n\nИспользовать для прямого соединения порт COM 2.",
+     "{COM 3}\n\nИспользовать для прямого соединения порт COM 3.",
+     "{COM 4}\n\nИспользовать для прямого соединения порт COM 4.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
-      "\x7b\x32\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x32\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x34\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x33\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x33\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x33\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x34\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x34\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x32\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x35\x20игроков\x7d\x0a\x0a\x20Играть\x20с\x20\x35\x20людьми\x20и\x2c\x20опционально\x2c\x20"
-        "с\x20\x31\x20компьютерным\x20игроком\x2e",
-      "\x7b\x36\x20игроков\x7d\x0a\x0a\x20Играть\x20с\x20\x36\x20людьми\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{2 игрока}\n\nИграть с 2 людьми и, опционально, до 4 дополнительных компьютерных игроков.",
+     "{3 игрока}\n\nИграть с 3 людьми и, опционально, до 3 дополнительных компьютерных игроков.",
+     "{4 игрока}\n\nИграть с 4 людьми и, опционально, до 2 дополнительных компьютерных игроков.",
+     "{5 игроков}\n\n Играть с 5 людьми и, опционально, с 1 компьютерным игроком.",
+     "{6 игроков}\n\n Играть с 6 людьми.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e\x20Может\x20бы"
-        "ть\x2c\x20только\x20один\x20хост\x20в\x20одном\x20сетевом\x20соединении\x2e",
+     "{Сервер}\n\nСервер задает настройки игры. Может быть, только один хост в одном сетевом соединении.",
 
-    ("\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-     "ойки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20в"
-     "\x20игру\x2e"),
-      "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+    ("{Гость}\n\nГость ожидает, пока сервер задаст настройки игры, после чего он автоматически вступит в игру."),
+     "{Настройки}\n\nИзменить конфигурацию модема.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e",
+     "{Сервер}\n\nСервер задает настройки игры.",
 
-    ("\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-     "ойки\x20игры\x2e"),
-      "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+    ("{Гость}\n\nГость ожидает, пока сервер задаст настройки игры."),
+     "{Настройки}\n\nИзменить конфигурацию модема.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
-      "\x7bЗа\x20одной\x20машиной\x7d\x0a\x0aИграть\x20за\x20одной\x20машиной\x2c\x20где"
-        "\x20от\x20\x32\x20до\x20\x34\x20игроков\x20людей\x2e",
-      "\x7bЛокальная\x20сеть\x7d\x0a\x0aИграть\x20по\x20сети\x2c\x20где\x20двое\x20игрок"
-        "ов\x20играют\x20по\x20локальной\x20сети\x2c\x20сидя\x20за\x20своими\x20комп"
-        "ьютерами\x2e",
-      "\x7bМодем\x7d\x0a\x0aДвое\x20игроков\x20играют\x20через\x20модемы\x20сидя\x20з"
-        "а\x20своими\x20компьютерами\x2e",
-      "\x7bПрямое\x20соединение\x7d\x0a\x0aДвое\x20игроков\x20играют\x20через\x20н"
-        "оль\x2dмодем\x20сидя\x20за\x20своими\x20компьютерами\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{За одной машиной}\n\nИграть за одной машиной, где от 2 до 4 игроков людей.",
+     "{Локальная сеть}\n\nИграть по сети, где двое игроков играют по локальной сети, сидя за своими компьютерами.",
+     "{Модем}\n\nДвое игроков играют через модемы сидя за своими компьютерами.",
+     "{Прямое соединение}\n\nДвое игроков играют через ноль-модем сидя за своими компьютерами.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aОпределяет\x20настройки\x20игры\x2e\x20Может\x20быть\x20"
-        "только\x20один\x20сервер\x20в\x20одном\x20соединении\x2e",
-      "\x7bГость\x7d\x0a\x0a\x20Гость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20наст"
-        "ройки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20"
-        "в\x20игру\x2e\x20В\x20игре\x20через\x20\x54\x43\x50\x2f\x49\x50\x20и\x20\x49\x50\x58\x20может\x20быть\x20нес"
-        "колько\x20гостей\x2e\x20В\x20игре\x20через\x20\x4e\x65\x74\x42\x49\x4f\x53\x20\x2d\x20только\x20\x31\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{Сервер}\n\nОпределяет настройки игры. Может быть только один сервер в одном соединении.",
+     "{Гость}\n\n Гость ожидает, пока сервер задаст настройки игры, после чего он автоматически вступит в игру. В игре через TCP/IP и IPX может быть несколько гостей. В игре через NetBIOS - только 1.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
-      "\x7b\x49\x50\x58\x7d\x0a\x0a\x49\x50\x58\x20является\x20часто\x20используемым\x20сетевым\x20п"
-        "ротоколом\x20для\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e\x20По\x20\x49\x50\x58\x20могут\x20играть\x20до\x20\x36\x20"
-        "человек\x20одновременно\x2e\x20Протокол\x20\x49\x50\x58\x20поддерживает\x20"
-        "только\x20версия\x20игры\x2c\x20работающая\x20под\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e",
-      "\x7b\x54\x43\x50\x2f\x49\x50\x7d\x0a\x0aПротокол\x20\x54\x43\x50\x2f\x49\x50\x20наиболее\x20часто\x20использ"
-        "уется\x20для\x20соединения\x20компьютеров\x20через\x20Интернет\x2e"
-        "\x20По\x20\x54\x43\x50\x2f\x49\x50\x20могут\x20играть\x20до\x20\x36\x20человек\x20одновременн"
-        "о\x2e\x20Протокол\x20\x54\x43\x50\x2f\x49\x50\x20поддерживает\x20только\x20версия\x20иг"
-        "ры\x2c\x20работающая\x20под\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e",
-      "\x7b\x4e\x45\x54\x42\x69\x6f\x73\x7d\x0a\x0aПротокол\x20\x4e\x45\x54\x42\x69\x6f\x73\x20является\x20единственно"
-        "\x20возможным\x20для\x20компьютеров\x2c\x20работающим\x20под\x20\x44\x4f\x53\x2c\x20"
-        "но\x20может\x20быть\x20использован\x20и\x20с\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e\x20\x20Этот\x20"
-        "протокол\x20обеспечивает\x20соединение\x20не\x20более\x20двух\x20и"
-        "гроков\x2e\x20Мы\x20рекомендуем\x20использовать\x20протокол\x20\x49\x50\x58"
-        "\x2e",
-      "\x7bОтмена\x7d\x0a\x0aЗакрыть\x20меню\x2e"
+     "{IPX}\n\nIPX является часто используемым сетевым протоколом для Windows. По IPX могут играть до 6 человек одновременно. Протокол IPX поддерживает только версия игры, работающая под Windows 95.",
+     "{TCP/IP}\n\nПротокол TCP/IP наиболее часто используется для соединения компьютеров через Интернет. По TCP/IP могут играть до 6 человек одновременно. Протокол TCP/IP поддерживает только версия игры, работающая под Windows.",
+     "{NETBios}\n\nПротокол NETBios является единственно возможным для компьютеров, работающим под DOS, но может быть использован и с Windows 95.  Этот протокол обеспечивает соединение не более двух игроков. Мы рекомендуем использовать протокол IPX.",
+     "{Отмена}\n\nЗакрыть меню."
 };
 const char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
-      "\x7bОбычная\x20игра\x7d\x0a\x0aОдиночная\x20игра\x20на\x20отдельной\x20карт"
-        "е\x2e",
-      "\x7bКампания\x7d\x0a\x0aОдиночная\x20игра\x20на\x20серии\x20карт\x2e",
-      "\x7bСетевая\x20игра\x7d\x0a\x0aСетевая\x20игра\x2c\x20где\x20несколько\x20игро"
-        "ков\x2dлюдей\x20сражаются\x20друг\x20против\x20друга\x20на\x20одной\x20к"
-        "арте\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+     "{Обычная игра}\n\nОдиночная игра на отдельной карте.",
+     "{Кампания}\n\nОдиночная игра на серии карт.",
+     "{Сетевая игра}\n\nСетевая игра, где несколько игроков-людей сражаются друг против друга на одной карте.",
+     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
 const char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
-      "Враг\x20сдался\x21",
-      "Враг\x20повержен\x21",
-      "Великая\x20победа\x21",
-      "\x0a\x0aЗа\x20мужество\x2c\x20проявленное\x20в\x20бою\x2c\x20\x25\x73\x20получает\x20\x25\x64"
-        "\x20оч\x2e\x20опыта\x2e",
-      "\x25\x73\x20сдается\x20врагу\x20и\x20отступает\x20с\x20позором\x2e",
-      "\x25\x73\x20трусливо\x20бежит\x20с\x20поля\x20боя\x2e",
-      "Ваши\x20войска\x20потерпели\x20поражение\x20и\x20\x25\x73\x20покидает\x20ва"
-        "с\x2e",
-      "Ваши\x20силы\x20сдались\x20врагу\x20и\x20отступили\x20с\x20позором\x2e",
-      "Ваши\x20трусливые\x20войска\x20бежали\x20с\x20поля\x20боя\x2e",
-      "Ваши\x20войска\x20потерпели\x20поражение\x2e",
-      "\x0a\x0aЗа\x20мужество\x2c\x20проявленное\x20в\x20бою\x2c\x20\x25\x73\x20получает\x20\x25\x64"
-        "\x20оч\x2e\x20опыта\x2c\x20и\x20получает\x20\x25\x64\x20уровень\x28я\x29\x2e"
+     "Враг сдался!",
+     "Враг повержен!",
+     "Великая победа!",
+     "\n\nЗа мужество, проявленное в бою, %s получает %d оч. опыта.",
+     "%s сдается врагу и отступает с позором.",
+     "%s трусливо бежит с поля боя.",
+     "Ваши войска потерпели поражение и %s покидает вас.",
+     "Ваши силы сдались врагу и отступили с позором.",
+     "Ваши трусливые войска бежали с поля боя.",
+     "Ваши войска потерпели поражение.",
+     "\n\nЗа мужество, проявленное в бою, %s получает %d оч. опыта, и получает %d уровень(я)."
 };
 const char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
-      "\x7bВысокая\x20мораль\x7d\x0a\x0aВысокая\x20мораль\x20может\x20дать\x20в\x20бо"
-        "ю\x20вашим\x20бойцам\x20дополнительную\x20атаку\x2e",
-      "\x7bОбычная\x20мораль\x7d\x0a\x0aС\x20обычной\x20моралью\x20ваши\x20армии\x20н"
-        "икогда\x20не\x20получат\x20дополнительную\x20атаку\x20и\x20не\x20буду"
-        "т\x20прокляты\x2e",
-      "\x7bПлохая\x20мораль\x7d\x0a\x0aПлохая\x20мораль\x20может\x20привести\x20к\x20"
-        "потере\x20хода\x20в\x20бою\x20вашими\x20бойцами\x2e",
-      "\x25\x73\x0a\x0a\x0aМодификаторы\x20морали\x3a",
-      "\x0aБонус\x20рыцаря\x20\x2b\x31",
-      "\x0a\x25\x73\x20со\x20своей\x20армией\x20\x2b\x31",
-      "\x0aВоины\x20\x33\x20рас\x20\x2d\x31",
-      "\x0aВоины\x20\x34\x20рас\x20\x2d\x32",
-      "\x0aМедаль\x20отваги\x20\x2b\x31",
-      "\x0aМедаль\x20мужества\x20\x2b\x31",
-      "\x0aМедаль\x20доблести\x20\x2b\x31",
-      "\x0aМедаль\x20почета\x20\x2b\x31",
-      "\x0aСимвол\x20неудачи\x20\x2d\x32",
-      "\x0aПосещен\x20буй\x20\x2b\x31",
-      "\x0aПосещен\x20оазис\x20\x2b\x31",
-      "\x0aПосещен\x20храм\x20\x2b\x32",
-      "\x0aРасхититель\x20гробниц\x20\x2d\x31",
-      "\x0aРасхититель\x20обломков\x20\x2d\x31",
-      "\x0aТрусость\x20в\x20бою\x20\x25\x64",
-      "\x0aНет",
-      "\x0aВоины\x20\x35\x20рас\x20\x2d\x33",
-      "\x0aВся\x20армия\x20одна\x20нежить\x2c\x20мораль\x20не\x20важна\x2e",
-      "\x0aВ\x20армии\x20нежить\x20\x2d\x31",
-      "\x0aПосещена\x20промоина\x20\x2b\x31",
-      "\x0aРасхититель\x20кораблей\x20\x2d\x31",
-      "\x0aКолизей\x20варваров\x20\x2b\x32",
-      "\x0aТаверна\x20\x2b\x31",
-      "\x0aЛидерство\x20\x31\x2dй\x20ступени\x20\x2b\x31",
-      "\x0aЛидерство\x20\x32\x2dй\x20ступени\x20\x2b\x32",
-      "\x0aЛидерство\x20\x33\x2dй\x20ступени\x20\x2b\x33",
-      "\x0aБонус\x20мачты\x20на\x20море\x20\x2b\x31",
-      "\x0aБоевое\x20одеяние\x20Андурана\x20дает\x20максимальную\x20морал"
-        "ь\x2e"
+     "{Высокая мораль}\n\nВысокая мораль может дать в бою вашим бойцам дополнительную атаку.",
+     "{Обычная мораль}\n\nС обычной моралью ваши армии никогда не получат дополнительную атаку и не будут прокляты.",
+     "{Плохая мораль}\n\nПлохая мораль может привести к потере хода в бою вашими бойцами.",
+     "%s\n\n\nМодификаторы морали:",
+     "\nБонус рыцаря +1",
+     "\n%s со своей армией +1",
+     "\nВоины 3 рас -1",
+     "\nВоины 4 рас -2",
+     "\nМедаль отваги +1",
+     "\nМедаль мужества +1",
+     "\nМедаль доблести +1",
+     "\nМедаль почета +1",
+     "\nСимвол неудачи -2",
+     "\nПосещен буй +1",
+     "\nПосещен оазис +1",
+     "\nПосещен храм +2",
+     "\nРасхититель гробниц -1",
+     "\nРасхититель обломков -1",
+     "\nТрусость в бою %d",
+     "\nНет",
+     "\nВоины 5 рас -3",
+     "\nВся армия одна нежить, мораль не важна.",
+     "\nВ армии нежить -1",
+     "\nПосещена промоина +1",
+     "\nРасхититель кораблей -1",
+     "\nКолизей варваров +2",
+     "\nТаверна +1",
+     "\nЛидерство 1-й ступени +1",
+     "\nЛидерство 2-й ступени +2",
+     "\nЛидерство 3-й ступени +3",
+     "\nБонус мачты на море +1",
+     "\nБоевое одеяние Андурана дает максимальную мораль."
 };
-const char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {  "Маленькая",   "Средняя",   "Большая",   "Огромная"};
+const char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = { "Маленькая", "Средняя", "Большая", "Огромная"};
 const char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
-    {  "Легкая",   "Обычная",   "Высокая",   "Эксперт",   "Невозможно\x21"};
-const char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {  "Легкая",   "Обычная",   "Тяжелая",   "Эксперт"};
+    { "Легкая", "Обычная", "Высокая", "Эксперт", "Невозможно!"};
+const char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = { "Легкая", "Обычная", "Тяжелая", "Эксперт"};
 const char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
-    {  "Лорд\x20Айронфист",   "Лорд\x20Слэйер",   "Королева\x20Ламанда",   "Лорд\x20Аламар"};
+    { "Лорд Айронфист", "Лорд Слэйер", "Королева Ламанда", "Лорд Аламар"};
 const char* cWinText[KB_WIN_TEXT_COUNT] =
-    {  "Дней\x3a",   "Очки\x3a",   "Сложность\x3a",   "Счет\x3a",   "Ранг\x3a"};
+    { "Дней:", "Очки:", "Сложность:", "Счет:", "Ранг:"};
 const char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
-    {  "Человек\x0a",   "Человек\x0aЛегкая\x20игра",   "Человек\x0aОбычная\x20игра",   "Человек\x0aТяжелая\x20игра",   "Человек\x0aЭксперт"};
+    { "Человек\n", "Человек\nЛегкая игра", "Человек\nОбычная игра", "Человек\nТяжелая игра", "Человек\nЭксперт"};
 const char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
-    {  "Чел\x2e\x2d",   "Чел\x2e\x2dЛегкая\x20игра",   "Чел\x2e\x2dОбычная\x20игра",   "Чел\x2e\x2dТяжелая\x20игра",   "Чел\x2e\x2dЭксперт"};
+    { "Чел.-", "Чел.-Легкая игра", "Чел.-Обычная игра", "Чел.-Тяжелая игра", "Чел.-Эксперт"};
 const char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
-    {  "\x4d\x49\x44\x49",   "\x43\x44\x2dстерео\x20без\x20вокала",   "\x43\x44\x2dстерео\x20с\x20вокалом"};
+    {  "MIDI", "CD-стерео без вокала", "CD-стерео с вокалом"};
 const char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
-      "\x7bОгненный\x20шар\x7d\x0a\x0aОгромный\x20огненный\x20шар\x20взрывается"
-        "\x20над\x20выбранным\x20участком\x20поля\x20боя\x2c\x20поражая\x20все\x20на"
-        "ходящиеся\x20поблизости\x20отряды\x2e",
-      "\x7bОгненный\x20удар\x7d\x0a\x0aУсовершенствованный\x20вариант\x20огн"
-        "енного\x20шара\x2e\x20Огненный\x20удар\x20поражает\x20отряды\x2c\x20нахо"
-        "дящиеся\x20в\x20радиусе\x20не\x20одного\x2c\x20а\x20двух\x20полей\x20от\x20эпи"
-        "центра\x2e",
-      "\x7bМолния\x7d\x0a\x0aМощный\x20электрический\x20разряд\x20поражает\x20в"
-        "ыбранный\x20отряд\x20противника\x2e",
-      "\x7bЦепь\x20молний\x7d\x0a\x0aЭлектрический\x20разряд\x20поражает\x20выб"
-        "ранный\x20отряд\x20противника\x2c\x20затем\x20ближайший\x20к\x20нему\x20"
-        "отряд\x20с\x20половинной\x20силой\x2c\x20затем\x20следующий\x20отряд\x20"
-        "\x63\x20еще\x20вдвое\x20меньшей\x20силой\x2c\x20и\x20так\x20далее\x20до\x20тех\x20по"
-        "р\x2c\x20пока\x20не\x20уходит\x20в\x20землю\x2e\x20Будьте\x20осторожны\x3a\x20это"
-        "\x20заклинание\x20может\x20поразить\x20и\x20ваши\x20собственные\x20от"
-        "ряды\x21",
-      "\x7bТелепорт\x7d\x0a\x0aМгновенно\x20перемещает\x20выбранный\x20отряд"
-        "\x20в\x20любую\x20свободную\x20точку\x20на\x20поле\x20боя\x2e",
-      "\x7bЛечение\x7d\x0a\x0aНейтрализует\x20все\x20враждебные\x20заклинани"
-        "я\x2c\x20примененные\x20против\x20одного\x20из\x20ваших\x20отрядов\x20и\x20"
-        "восстанавливает\x20по\x20\x35\x20единиц\x20здоровья\x20в\x20расчете\x20н"
-        "а\x20каждый\x20уровень\x20магических\x20способностей\x20героя\x2e",
-      "\x7bОбщее\x20лечение\x7d\x0a\x0aНейтрализует\x20враждебные\x20заклина"
-        "ния\x2c\x20примененные\x20против\x20всех\x20ваших\x20отрядов\x20и\x20вос"
-        "станавливает\x20по\x20\x35\x20единиц\x20здоровья\x20у\x20каждого\x20суще"
-        "ства\x20за\x20каждый\x20уровень\x20магических\x20способностей\x20г"
-        "ероя\x2e",
-      "\x7bВоскрешение\x7d\x0a\x0aДо\x20конца\x20сражения\x20воскрешает\x20воин"
-        "ов\x20в\x20отряде\x2c\x20которому\x20был\x20нанесен\x20урон\x2e",
-      "\x7bИстинное\x20воскрешение\x7d\x0a\x0aНавсегда\x20воскрешает\x20воин"
-        "ов\x20в\x20отряде\x2c\x20которому\x20был\x20нанесен\x20урон\x2e",
-      "\x7bУскорение\x7d\x0a\x0aУвеличивает\x20дальность\x20передвижения\x20"
-        "любого\x20отряда\x20на\x20\x32\x20единицы\x2e",
-      "\x7bОбщее\x20ускорение\x7d\x0a\x0aУвеличивает\x20дальность\x20передви"
-        "жения\x20всех\x20ваших\x20отрядов\x20на\x20\x32\x20единицы\x2e",
-      "\x7bЗамедление\x7d\x0a\x0aВдвое\x20уменьшает\x20дальность\x20передвиж"
-        "ения\x20выбранного\x20отряда\x20противника\x2e",
-      "\x7bОбщее\x20замедление\x7d\x0a\x0aВдвое\x20снижает\x20дальность\x20пере"
-        "мещения\x20всех\x20отрядов\x20противника\x2e",
-      "\x7bОслепление\x7d\x0a\x0aЗатуманивает\x20взоры\x20воинов\x20выбранно"
-        "го\x20отряда\x20и\x20тем\x20самым\x20не\x20позволяет\x20им\x20перемещать"
-        "ся\x20по\x20полю\x20боя\x2e",
-      "\x7bБлагословение\x7d\x0a\x0aУвеличивает\x20до\x20максимума\x20урон\x2c\x20"
-        "наносимый\x20выбранным\x20отрядом\x2e",
-      "\x7bОбщее\x20благословение\x7d\x0a\x0aУвеличивает\x20до\x20максимума\x20"
-        "урон\x2c\x20наносимый\x20всеми\x20вашими\x20отрядами\x2e",
-      "\x7bКаменная\x20кожа\x7d\x0a\x0aВолшебным\x20образом\x20повышает\x20защи"
-        "щенность\x20выбранного\x20отряда\x2e",
-      "\x7bСтальная\x20кожа\x7d\x0a\x0aПовышает\x20защищенность\x20выбранног"
-        "о\x20отряда\x2e\x20Усовершенствованный\x20вариант\x20заклинания"
-        "\x20Каменная\x20кожа\x2e",
-      "\x7bПроклятие\x7d\x0a\x0aУменьшает\x20до\x20минимума\x20урон\x2c\x20причиня"
-        "емый\x20выбранным\x20отрядом\x20противника\x2e",
-      "\x7bОбщее\x20проклятие\x7d\x0a\x0aУменьшает\x20до\x20минимума\x20урон\x2c\x20п"
-        "ричиняемый\x20всеми\x20отрядами\x20противника\x2e",
-      "\x7bСвятое\x20слово\x7d\x0a\x0aНаносит\x20урон\x20всей\x20нежити\x20на\x20поле"
-        "\x20боя\x2e",
-      "\x7bСвятой\x20глас\x7d\x0a\x0aНаносит\x20урон\x20всей\x20нежити\x20на\x20поле\x20"
-        "боя\x2e\x20Усовершенствованный\x20вариант\x20заклинания\x20Свят"
-        "ое\x20слово\x2e",
-      "\x7bАнтимагия\x7d\x0a\x0aЗащищает\x20выбранный\x20отряд\x20от\x20враждеб"
-        "ных\x20заклинаний\x2e",
-      "\x7bСнятие\x20чар\x7d\x0a\x0aСнимает\x20все\x20чары\x20с\x20выбранного\x20отря"
-        "да\x2e",
-      "\x7bОбщее\x20снятие\x20чар\x7d\x0a\x0aСнимает\x20все\x20чары\x20со\x20всех\x20отр"
-        "ядов\x2e",
-      "\x7bВолшебная\x20стрела\x7d\x0a\x0aВолшебная\x20стрела\x20поражает\x20вы"
-        "бранный\x20отряд\x20противника\x2e",
-      "\x7bБерсерк\x7d\x0a\x0aЗаставляет\x20выбранный\x20отряд\x20противника"
-        "\x20нападать\x20на\x20ближайший\x20к\x20нему\x20отряд\x2e",
-      "\x7bАрмагеддон\x7d\x0a\x0aУжасный\x20катаклизм\x20обрушивается\x20на\x20"
-        "поле\x20боя\x2c\x20нанося\x20жестокий\x20урон\x20всем\x20участникам\x20с"
-        "ражения\x2e",
-      "\x7bБуря\x20стихий\x7d\x0a\x0aСилы\x20стихий\x20обрушиваются\x20на\x20поле\x20"
-        "боя\x2c\x20нанося\x20урон\x20всем\x20участникам\x20сражения\x2e",
-      "\x7bЗвездопад\x7d\x0a\x0aЗвездопад\x20поражает\x20выбранный\x20участо"
-        "к\x20поля\x20боя\x2c\x20нанося\x20урон\x20всем\x20находящимся\x20поблизо"
-        "сти\x20участникам\x20сражения\x2e",
-      "\x7bПаралич\x7d\x0a\x0aОтряд\x2c\x20против\x20которого\x20направлено\x20это"
-        "\x20заклинание\x2c\x20поражает\x20паралич\x2c\x20и\x20он\x20теряет\x20спосо"
-        "бность\x20передвигаться\x20или\x20отвечать\x20на\x20удары\x2e",
-      "\x7bГипноз\x7d\x0a\x0aВыбранный\x20отряд\x20противника\x20переходит\x20п"
-        "од\x20контроль\x20вашего\x20героя\x20на\x20один\x20ход\x2c\x20если\x20его\x20с"
-        "уммарное\x20здоровье\x20не\x20превышает\x20магических\x20способ"
-        "ностей\x20героя\x2c\x20умноженных\x20на\x20\x32\x35\x2e",
-      "\x7bХладный\x20луч\x7d\x0a\x0aВысасывает\x20тепло\x20жизни\x20из\x20выбранн"
-        "ого\x20отряда\x20противника\x2e",
-      "\x7bКольцо\x20стужи\x7d\x0a\x0aВысасывает\x20тепло\x20жизни\x20из\x20всех\x20о"
-        "трядов\x20вокруг\x20эпицентра\x20заклинания\x2c\x20за\x20исключени"
-        "ем\x20находящегося\x20в\x20самом\x20эпицентре\x2e",
-      "\x7bРазрушительный\x20луч\x7d\x0a\x0aПонижает\x20защиту\x20выбранного"
-        "\x20отряда\x20противника\x20на\x20\x33\x20единицы\x2e",
-      "\x7bДрожь\x20смерти\x7d\x0a\x0aНаносит\x20урон\x20всем\x20отрядам\x20живых\x20"
-        "воинов\x20в\x20сражении\x2c\x20но\x20не\x20действует\x20на\x20нежить\x2e",
-      "\x7bВолна\x20смерти\x7d\x0a\x0aНаносит\x20урон\x20всем\x20отрядам\x20живых\x20"
-        "воинов\x20в\x20сражении\x2c\x20но\x20не\x20действует\x20на\x20нежить\x2e\x20Ус"
-        "овершенствованный\x20вариант\x20заклинания\x20Дрожь\x20смерт"
-        "и\x2e",
-      "\x7bУбийца\x20драконов\x7d\x0a\x0aЗначительно\x20увеличивает\x20урон\x2c"
-        "\x20наносимый\x20выбранным\x20отрядом\x20в\x20бою\x20против\x20дракон"
-        "ов\x2e",
-      "\x7bЖажда\x20крови\x7d\x0a\x0aУвеличивает\x20урон\x2c\x20наносимый\x20выбра"
-        "нным\x20отрядом\x2e",
-      "\x7bПоднять\x20мертвых\x7d\x0a\x0aНавсегда\x20\x22воскрешает\x22\x20из\x20ране"
-        "нных\x20или\x20уничтоженных\x20отрядов\x20нежити\x2e",
-      "\x7bФантом\x7d\x0a\x0aЗаклинание\x20создает\x20призрачный\x20отряд\x2c\x20к"
-        "оторый\x20является\x20двойником\x20существующего\x20отряда\x2e\x20"
-        "Призрачный\x20отряд\x20наносит\x20противнику\x20такой\x20же\x20уро"
-        "н\x2c\x20как\x20и\x20настоящий\x2c\x20но\x20исчезает\x2c\x20если\x20ему\x20был\x20на"
-        "несен\x20хотя\x20бы\x20минимальный\x20урон\x2e",
-      "\x7bЩит\x7d\x0a\x0aВдвое\x20уменьшает\x20урон\x2c\x20получаемый\x20выбранны"
-        "м\x20отрядом\x20от\x20стрелковых\x20атак\x20противника\x2e",
-      "\x7bОбщий\x20щит\x7d\x0a\x0aВдвое\x20уменьшает\x20урон\x2c\x20получаемый\x20вс"
-        "еми\x20отрядами\x20от\x20стрелковых\x20атак\x20противника\x2e",
-      "\x7bЗемной\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20эл"
-        "ементалов\x20земли\x2c\x20которые\x20присоединяются\x20к\x20вашей\x20"
-        "армии\x2e",
-      "\x7bВоздушный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд"
-        "\x20элементалов\x20воздуха\x2c\x20которые\x20присоединяются\x20к\x20в"
-        "ашей\x20армии\x2e",
-      "\x7bОгненный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20"
-        "элементалов\x20огня\x2c\x20которые\x20присоединяются\x20к\x20вашей"
-        "\x20армии\x2e",
-      "\x7bВодный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20эл"
-        "еманталов\x20воздуха\x2c\x20которей\x20присоединяются\x20к\x20ваше"
-        "й\x20армии\x2e",
-      "\x7bЗемлетрясение\x7d\x0a\x0aНаносит\x20ущерб\x20крепостным\x20стенам"
-        "\x2e",
-      "\x7bПоказать\x20шахты\x7d\x0a\x0aДелает\x20видимыми\x20все\x20шахты\x20на\x20и"
-        "гровой\x20карте\x2e",
-      "\x7bПоказать\x20ресурсы\x7d\x0a\x0aПоказывает\x20все\x20ресурсы\x20на\x20иг"
-        "ровой\x20карте\x2e",
-      "\x7bПоказать\x20артефакты\x7d\x0a\x0aДелает\x20видимыми\x20все\x20артефа"
-        "кты\x20на\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20города\x7d\x0a\x0aДелает\x20видимыми\x20все\x20города\x20и\x20"
-        "замки\x20на\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20героев\x7d\x0a\x0aДелает\x20видимыми\x20всех\x20героев\x20н"
-        "а\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20все\x7d\x0a\x0aДелает\x20видимыми\x20все\x20объекты\x20на\x20и"
-        "гровой\x20карте\x2e",
-      "\x7bОпознать\x20героев\x7d\x0a\x0aПозволяет\x20получить\x20подробную\x20"
-        "информацию\x20о\x20героях\x20противника\x2e",
-      "\x7bПризвать\x20корабль\x7d\x0a\x0aПеремещает\x20ваш\x20ближайший\x20нез"
-        "анятый\x20корабль\x20в\x20ближайшую\x20к\x20вам\x20точку\x20побережья"
-        "\x2e\x20Вашим\x20считается\x20корабль\x2c\x20который\x20вы\x20только\x20что"
-        "\x20построили\x2c\x20либо\x20тот\x2c\x20на\x20котором\x20вы\x20плавали\x20посл"
-        "едним\x2e",
-      "\x7bПортал\x7d\x0a\x0aПереносит\x20героя\x20в\x20расположенную\x20поблиз"
-        "ости\x20точку\x20на\x20карте\x2e",
-      "\x7bВрата\x20города\x7d\x0a\x0aПереносит\x20героя\x20в\x20ближайший\x20прин"
-        "адлежащий\x20игроку\x20город\x20или\x20замок\x2e",
-      "\x7bПортал\x20города\x7d\x0a\x0aПереносит\x20героя\x20в\x20принадлежащий"
-        "\x20игроку\x20город\x20или\x20замок\x20по\x20его\x20выбору\x2e",
-      "\x7bВиденье\x7d\x0a\x0aЭто\x20заклинание\x20позволяет\x20предсказать\x20"
-        "вероятный\x20исход\x20встречи\x20с\x20нейтральной\x20армией\x2e",
-      "\x7bЗапустение\x7d\x0a\x0aНаводняет\x20принадлежащую\x20игроку\x20шах"
-        "ту\x20призраками\x2c\x20после\x20чего\x20она\x20перестает\x20производ"
-        "ить\x20ресурсы\x2e\x20\x28Не\x20доставайся\x20же\x20ты\x20никому\x21\x29",
-      "\x7bСтража\x20земли\x7d\x0a\x0aОтряд\x20земных\x20элементалов\x20охраняе"
-        "т\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20воздуха\x7d\x0a\x0aОтряд\x20воздушных\x20элементалов\x20ох"
-        "раняет\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20огня\x7d\x0a\x0aОтряд\x20огненных\x20элементалов\x20охраня"
-        "ет\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20воды\x7d\x0a\x0aОтряд\x20водных\x20элементалов\x20охраняет"
-        "\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e"
+     "{Огненный шар}\n\nОгромный огненный шар взрывается над выбранным участком поля боя, поражая все находящиеся поблизости отряды.",
+     "{Огненный удар}\n\nУсовершенствованный вариант огненного шара. Огненный удар поражает отряды, находящиеся в радиусе не одного, а двух полей от эпицентра.",
+     "{Молния}\n\nМощный электрический разряд поражает выбранный отряд противника.",
+     "{Цепь молний}\n\nЭлектрический разряд поражает выбранный отряд противника, затем ближайший к нему отряд с половинной силой, затем следующий отряд c еще вдвое меньшей силой, и так далее до тех пор, пока не уходит в землю. Будьте осторожны: это заклинание может поразить и ваши собственные отряды!",
+     "{Телепорт}\n\nМгновенно перемещает выбранный отряд в любую свободную точку на поле боя.",
+     "{Лечение}\n\nНейтрализует все враждебные заклинания, примененные против одного из ваших отрядов и восстанавливает по 5 единиц здоровья в расчете на каждый уровень магических способностей героя.",
+     "{Общее лечение}\n\nНейтрализует враждебные заклинания, примененные против всех ваших отрядов и восстанавливает по 5 единиц здоровья у каждого существа за каждый уровень магических способностей героя.",
+     "{Воскрешение}\n\nДо конца сражения воскрешает воинов в отряде, которому был нанесен урон.",
+     "{Истинное воскрешение}\n\nНавсегда воскрешает воинов в отряде, которому был нанесен урон.",
+     "{Ускорение}\n\nУвеличивает дальность передвижения любого отряда на 2 единицы.",
+     "{Общее ускорение}\n\nУвеличивает дальность передвижения всех ваших отрядов на 2 единицы.",
+     "{Замедление}\n\nВдвое уменьшает дальность передвижения выбранного отряда противника.",
+     "{Общее замедление}\n\nВдвое снижает дальность перемещения всех отрядов противника.",
+     "{Ослепление}\n\nЗатуманивает взоры воинов выбранного отряда и тем самым не позволяет им перемещаться по полю боя.",
+     "{Благословение}\n\nУвеличивает до максимума урон, наносимый выбранным отрядом.",
+     "{Общее благословение}\n\nУвеличивает до максимума урон, наносимый всеми вашими отрядами.",
+     "{Каменная кожа}\n\nВолшебным образом повышает защищенность выбранного отряда.",
+     "{Стальная кожа}\n\nПовышает защищенность выбранного отряда. Усовершенствованный вариант заклинания Каменная кожа.",
+     "{Проклятие}\n\nУменьшает до минимума урон, причиняемый выбранным отрядом противника.",
+     "{Общее проклятие}\n\nУменьшает до минимума урон, причиняемый всеми отрядами противника.",
+     "{Святое слово}\n\nНаносит урон всей нежити на поле боя.",
+     "{Святой глас}\n\nНаносит урон всей нежити на поле боя. Усовершенствованный вариант заклинания Святое слово.",
+     "{Антимагия}\n\nЗащищает выбранный отряд от враждебных заклинаний.",
+     "{Снятие чар}\n\nСнимает все чары с выбранного отряда.",
+     "{Общее снятие чар}\n\nСнимает все чары со всех отрядов.",
+     "{Волшебная стрела}\n\nВолшебная стрела поражает выбранный отряд противника.",
+     "{Берсерк}\n\nЗаставляет выбранный отряд противника нападать на ближайший к нему отряд.",
+     "{Армагеддон}\n\nУжасный катаклизм обрушивается на поле боя, нанося жестокий урон всем участникам сражения.",
+     "{Буря стихий}\n\nСилы стихий обрушиваются на поле боя, нанося урон всем участникам сражения.",
+     "{Звездопад}\n\nЗвездопад поражает выбранный участок поля боя, нанося урон всем находящимся поблизости участникам сражения.",
+     "{Паралич}\n\nОтряд, против которого направлено это заклинание, поражает паралич, и он теряет способность передвигаться или отвечать на удары.",
+     "{Гипноз}\n\nВыбранный отряд противника переходит под контроль вашего героя на один ход, если его суммарное здоровье не превышает магических способностей героя, умноженных на 25.",
+     "{Хладный луч}\n\nВысасывает тепло жизни из выбранного отряда противника.",
+     "{Кольцо стужи}\n\nВысасывает тепло жизни из всех отрядов вокруг эпицентра заклинания, за исключением находящегося в самом эпицентре.",
+     "{Разрушительный луч}\n\nПонижает защиту выбранного отряда противника на 3 единицы.",
+     "{Дрожь смерти}\n\nНаносит урон всем отрядам живых воинов в сражении, но не действует на нежить.",
+     "{Волна смерти}\n\nНаносит урон всем отрядам живых воинов в сражении, но не действует на нежить. Усовершенствованный вариант заклинания Дрожь смерти.",
+     "{Убийца драконов}\n\nЗначительно увеличивает урон, наносимый выбранным отрядом в бою против драконов.",
+     "{Жажда крови}\n\nУвеличивает урон, наносимый выбранным отрядом.",
+     "{Поднять мертвых}\n\nНавсегда \"воскрешает\" из раненных или уничтоженных отрядов нежити.",
+     "{Фантом}\n\nЗаклинание создает призрачный отряд, который является двойником существующего отряда. Призрачный отряд наносит противнику такой же урон, как и настоящий, но исчезает, если ему был нанесен хотя бы минимальный урон.",
+     "{Щит}\n\nВдвое уменьшает урон, получаемый выбранным отрядом от стрелковых атак противника.",
+     "{Общий щит}\n\nВдвое уменьшает урон, получаемый всеми отрядами от стрелковых атак противника.",
+     "{Земной элементал}\n\nЗаклинание вызывает отряд элементалов земли, которые присоединяются к вашей армии.",
+     "{Воздушный элементал}\n\nЗаклинание вызывает отряд элементалов воздуха, которые присоединяются к вашей армии.",
+     "{Огненный элементал}\n\nЗаклинание вызывает отряд элементалов огня, которые присоединяются к вашей армии.",
+     "{Водный элементал}\n\nЗаклинание вызывает отряд элеманталов воздуха, которей присоединяются к вашей армии.",
+     "{Землетрясение}\n\nНаносит ущерб крепостным стенам.",
+     "{Показать шахты}\n\nДелает видимыми все шахты на игровой карте.",
+     "{Показать ресурсы}\n\nПоказывает все ресурсы на игровой карте.",
+     "{Показать артефакты}\n\nДелает видимыми все артефакты на игровой карте.",
+     "{Показать города}\n\nДелает видимыми все города и замки на игровой карте.",
+     "{Показать героев}\n\nДелает видимыми всех героев на игровой карте.",
+     "{Показать все}\n\nДелает видимыми все объекты на игровой карте.",
+     "{Опознать героев}\n\nПозволяет получить подробную информацию о героях противника.",
+     "{Призвать корабль}\n\nПеремещает ваш ближайший незанятый корабль в ближайшую к вам точку побережья. Вашим считается корабль, который вы только что построили, либо тот, на котором вы плавали последним.",
+     "{Портал}\n\nПереносит героя в расположенную поблизости точку на карте.",
+     "{Врата города}\n\nПереносит героя в ближайший принадлежащий игроку город или замок.",
+     "{Портал города}\n\nПереносит героя в принадлежащий игроку город или замок по его выбору.",
+     "{Виденье}\n\nЭто заклинание позволяет предсказать вероятный исход встречи с нейтральной армией.",
+     "{Запустение}\n\nНаводняет принадлежащую игроку шахту призраками, после чего она перестает производить ресурсы. (Не доставайся же ты никому!)",
+     "{Стража земли}\n\nОтряд земных элементалов охраняет шахту от нападения армий противника.",
+     "{Стража воздуха}\n\nОтряд воздушных элементалов охраняет шахту от нападения армий противника.",
+     "{Стража огня}\n\nОтряд огненных элементалов охраняет шахту от нападения армий противника.",
+     "{Стража воды}\n\nОтряд водных элементалов охраняет шахту от нападения армий противника."
 };
 const char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
-      "Огненный\x20шар",
-      "Огненный\x20взрыв",
-      "Молния",
-      "Цепь\x20молний",
-      "Телепорт",
-      "Лечение",
-      "Общее\x20лечение",
-      "Воскрешение",
-      "Истинное\x20воскрешение",
-      "Ускорение",
-      "Общее\x20ускорение",
-      "Замедление",
-      "Общее\x20замедление",
-      "Ослепление",
-      "Благословение",
-      "Общее\x20благословение",
-      "Каменная\x20кожа",
-      "Стальная\x20кожа",
-      "Проклятие",
-      "Общее\x20проклятие",
-      "Святое\x20слово",
-      "Святой\x20глас",
-      "Антимагия",
-      "Снятие\x20чар",
-      "Общее\x20снятие\x20чар",
-      "Волшебная\x20стрела",
-      "Берсерк",
-      "Армагеддон",
-      "Буря\x20стихий",
-      "Звездопад",
-      "Паралич",
-      "Гипноз",
-      "Хладный\x20луч",
-      "Кольцо\x20стужи",
-      "Разрушительный\x20луч",
-      "Дрожь\x20смерти",
-      "Волна\x20смерти",
-      "Убийца\x20драконов",
-      "Жажда\x20крови",
-      "Поднять\x20мертвых",
-      "Фантом",
-      "Щит",
-      "Общий\x20щит",
-      "Земной\x20элементал",
-      "Воздушный\x20элементал",
-      "Огненный\x20элементал",
-      "Водный\x20элементал",
-      "Землетрясение",
-      "Показать\x20шахты",
-      "Показать\x20ресурсы",
-      "Показать\x20артефакты",
-      "Показать\x20города",
-      "Показать\x20героев",
-      "Показать\x20все",
-      "Опознать\x20героев",
-      "Призвать\x20корабль",
-      "Портал",
-      "Врата\x20города",
-      "Портал\x20города",
-      "Виденье",
-      "Запустение",
-      "Страж\x20земли",
-      "Страж\x20воздуха",
-      "Страж\x20огня",
-      "Страж\x20воды"
+     "Огненный шар",
+     "Огненный взрыв",
+     "Молния",
+     "Цепь молний",
+     "Телепорт",
+     "Лечение",
+     "Общее лечение",
+     "Воскрешение",
+     "Истинное воскрешение",
+     "Ускорение",
+     "Общее ускорение",
+     "Замедление",
+     "Общее замедление",
+     "Ослепление",
+     "Благословение",
+     "Общее благословение",
+     "Каменная кожа",
+     "Стальная кожа",
+     "Проклятие",
+     "Общее проклятие",
+     "Святое слово",
+     "Святой глас",
+     "Антимагия",
+     "Снятие чар",
+     "Общее снятие чар",
+     "Волшебная стрела",
+     "Берсерк",
+     "Армагеддон",
+     "Буря стихий",
+     "Звездопад",
+     "Паралич",
+     "Гипноз",
+     "Хладный луч",
+     "Кольцо стужи",
+     "Разрушительный луч",
+     "Дрожь смерти",
+     "Волна смерти",
+     "Убийца драконов",
+     "Жажда крови",
+     "Поднять мертвых",
+     "Фантом",
+     "Щит",
+     "Общий щит",
+     "Земной элементал",
+     "Воздушный элементал",
+     "Огненный элементал",
+     "Водный элементал",
+     "Землетрясение",
+     "Показать шахты",
+     "Показать ресурсы",
+     "Показать артефакты",
+     "Показать города",
+     "Показать героев",
+     "Показать все",
+     "Опознать героев",
+     "Призвать корабль",
+     "Портал",
+     "Врата города",
+     "Портал города",
+     "Виденье",
+     "Запустение",
+     "Страж земли",
+     "Страж воздуха",
+     "Страж огня",
+     "Страж воды"
 };
 const char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
-    {  "\x31\x20ступени",   "\x32\x20ступени",   "\x33\x20ступени"};
+    { "1 ступени", "2 ступени", "3 ступени"};
 const char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
-      "Следопыт",
-      "Стрелок",
-      "Логистика",
-      "Разведка",
-      "Дипломатия",
-      "Навигация",
-      "Лидерство",
-      "Мудрость",
-      "Мистицизм",
-      "Удача",
-      "Баллистика",
-      "Орлиный\x20взор",
-      "Некромантия",
-      "Казначей"
+     "Следопыт",
+     "Стрелок",
+     "Логистика",
+     "Разведка",
+     "Дипломатия",
+     "Навигация",
+     "Лидерство",
+     "Мудрость",
+     "Мистицизм",
+     "Удача",
+     "Баллистика",
+     "Орлиный взор",
+     "Некромантия",
+     "Казначей"
 };
 const char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
-      "Гильдия\x20магов",
-      "Гильдия\x20воров",
-      "Таверна",
-      "Верфь",
-      "Колодец",
-      "Шатер",
-      "Замок",
-      "Статуя",
-      "Левая\x20башня",
-      "Правая\x20башня",
-      "Рынок",
+     "Гильдия магов",
+     "Гильдия воров",
+     "Таверна",
+     "Верфь",
+     "Колодец",
+     "Шатер",
+     "Замок",
+     "Статуя",
+     "Левая башня",
+     "Правая башня",
+     "Рынок",
       "",
-      "Ров",
+     "Ров",
       "",
-      "Док\x20с\x20кораблем",
-      "Дом\x20капитана",
+     "Док с кораблем",
+     "Дом капитана",
       "",
       "",
       ""
 };
 const char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
-      "Ферма",
-      "Свалка\x20истории",
-      "Хрустальный\x20сад",
-      "Водопад",
-      "Фруктовый\x20сад",
-      "Груда\x20черепов",
-      "Прирост\x20воинов\x20\x31\x20ур\x2e"
+     "Ферма",
+     "Свалка истории",
+     "Хрустальный сад",
+     "Водопад",
+     "Фруктовый сад",
+     "Груда черепов",
+     "Прирост воинов 1 ур."
 };
 const char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
-    {  "Укрепления",   "Колизей",   "Радуга",   "Подземелье",   "Библиотека",   "Шторм",   "Специальная"};
+    { "Укрепления", "Колизей", "Радуга", "Подземелье", "Библиотека", "Шторм", "Специальная"};
 const char* gDwellingNames[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
-    {  "Мазанка",
-       "Стрельбище",
-       "Кузница",
-       "Оружейная",
-       "Ристалище",
-       "Собор",
-       "Полигон",
-       "Ковальня",
-       "Арсенал",
-       "Арена",
-       "Храм",
+    { "Мазанка",
+      "Стрельбище",
+      "Кузница",
+      "Оружейная",
+      "Ристалище",
+      "Собор",
+      "Полигон",
+      "Ковальня",
+      "Арсенал",
+      "Арена",
+      "Храм",
        ""},
-    {  "Хижина",
-       "Халупа",
-       "Логово",
-       "Дом\x20огров",
-       "Мост",
-       "Пирамида",
-       "Хибара",
+    { "Хижина",
+      "Халупа",
+      "Логово",
+      "Дом огров",
+      "Мост",
+      "Пирамида",
+      "Хибара",
        "",
-       "Логово\x20огров",
-       "Царь\x2dмост",
-       "",
-       ""},
-    {  "Древо\x2dдом",
-       "Избушка",
-       "Стрельбище",
-       "Стоунхендж",
-       "Загон",
-       "Алая\x20башня",
-       "Хоромы",
-       "Полигон",
-       "Менгиры",
-       "",
+      "Логово огров",
+      "Царь-мост",
        "",
        ""},
-    {  "Пещера",
-       "Крипта",
-       "Гнездо",
-       "Лабиринт",
-       "Болото",
-       "Зеленая\x20башня",
+    { "Древо-дом",
+      "Избушка",
+      "Стрельбище",
+      "Стоунхендж",
+      "Загон",
+      "Алая башня",
+      "Хоромы",
+      "Полигон",
+      "Менгиры",
        "",
        "",
-       "Большой\x20лабиринт",
-       "",
-       "Красная\x20башня",
-       "Черная\x20башня"},
-    {  "Нора",
-       "Хлев",
-       "Литейный\x20цех",
-       "Гнездовье",
-       "Башня\x20магов",
-       "Небесный\x20замок",
-       "",
-       "Фабрика",
-       "",
-       "Обитель\x20магов",
-       "Небесный\x20чертог",
        ""},
-    {  "Могильник",
-       "Кладбище",
-       "Пирамида",
-       "Особняк",
-       "Мавзолей",
-       "Лаборатория",
-       "Погост",
-       "Великая\x20пирамида",
-       "Цитадель",
-       "Некрополь",
+    { "Пещера",
+      "Крипта",
+      "Гнездо",
+      "Лабиринт",
+      "Болото",
+      "Зеленая башня",
+       "",
+       "",
+      "Большой лабиринт",
+       "",
+      "Красная башня",
+      "Черная башня"},
+    { "Нора",
+      "Хлев",
+      "Литейный цех",
+      "Гнездовье",
+      "Башня магов",
+      "Небесный замок",
+       "",
+      "Фабрика",
+       "",
+      "Обитель магов",
+      "Небесный чертог",
+       ""},
+    { "Могильник",
+      "Кладбище",
+      "Пирамида",
+      "Особняк",
+      "Мавзолей",
+      "Лаборатория",
+      "Погост",
+      "Великая пирамида",
+      "Цитадель",
+      "Некрополь",
        "",
        ""}
 };
 const char* cSecSkillDesc[(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
-    {  "\x7bСледопыт\x20\x31\x20ступени\x7d\x0a\x0aУменьшает\x20замедление\x20при\x20п"
-        "ередвижении\x20по\x20пересеченной\x20местности\x20на\x20\x32\x35\x20проц"
-        "ентов\x2e",
-       "\x7bСледопыт\x20\x32\x20ступени\x7d\x0a\x0aУменьшает\x20замедление\x20при\x20п"
-         "ередвижении\x20по\x20пересеченной\x20местности\x20на\x20\x35\x30\x20проц"
-         "ентов\x2e",
-       "\x7bСледопыт\x20\x33\x20ступени\x7d\x0a\x0aПолностью\x20нейтрализует\x20зам"
-         "едление\x20при\x20передвижении\x20по\x20пересеченной\x20местнос"
-         "ти\x2e"},
-    {  "\x7bСтрелок\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x30\x20процентов"
-        "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e",
-       "\x7bСтрелок\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x35\x20процентов"
-         "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e",
-       "\x7bСтрелок\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x20процентов"
-         "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e"},
-    {  "\x7bЛогистика\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-        "я\x20героя\x20на\x20\x31\x30\x20процентов\x2e",
-       "\x7bЛогистика\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-         "я\x20героя\x20на\x20\x32\x30\x20процентов\x2e",
-       "\x7bЛогистика\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-         "я\x20героя\x20на\x20\x33\x30\x20процентов\x2e"},
-    {  "\x7bРазведка\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20клетку\x20ра"
-        "диус\x20обзора\x20героя\x2e",
-       "\x7bРазведка\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20клетки\x20ра"
-         "диус\x20обзора\x20героя\x2e",
-       "\x7bРазведка\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20клетки\x20ра"
-         "диус\x20обзора\x20героя\x2e"},
-    {  "\x7bДипломатия\x20\x31\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-        "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-        "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-        "исоединиться\x20до\x20\x31\x2f\x34\x20отряда\x20монстров\x2e",
-       "\x7bДипломатия\x20\x32\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-         "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-         "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-         "исоединиться\x20до\x20\x31\x2f\x32\x20отряда\x20монстров\x2e",
-       "\x7bДипломатия\x20\x33\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-         "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-         "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-         "исоединиться\x20весь\x20отряд\x20монстров\x2e"},
-    {  "\x7bНавигация\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x2f\x33\x20запас\x20"
-        "движения\x20героя\x20при\x20передвижении\x20по\x20воде\x2e",
-       "\x7bНавигация\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x2f\x33\x20запас\x20"
-         "движения\x20героя\x20при\x20передвижении\x20по\x20воде\x2e",
-       "\x7bНавигация\x20\x33\x20ступени\x7d\x0a\x0aУдваивает\x20запас\x20движения\x20"
-         "героя\x20при\x20передвижении\x20по\x20воде\x2e"},
-    {  "\x7bЛидерство\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20единицу\x20"
-        "мораль\x20войск\x20вашего\x20героя\x2e",
-       "\x7bЛидерство\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20единицы\x20"
-         "мораль\x20войск\x20вашего\x20героя\x2e",
-       "\x7bЛидерство\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20единицы\x20"
-         "мораль\x20войск\x20вашего\x20героя\x2e"},
-    {  "\x7bМудрость\x20\x31\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-        "чать\x20заклинания\x20третьего\x20уровня\x2e",
-       "\x7bМудрость\x20\x32\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-         "чать\x20заклинания\x20четвертого\x20уровня\x2e",
-       "\x7bМудрость\x20\x33\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-         "чать\x20заклинания\x20пятого\x20уровня\x2e"},
-    {  "\x7bМистицизм\x20\x31\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-        "\x20по\x20\x32\x20очка\x20магии\x20в\x20день\x2e",
-       "\x7bМистицизм\x20\x32\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-         "\x20по\x20\x33\x20очка\x20магии\x20в\x20день\x2e",
-       "\x7bМистицизм\x20\x33\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-         "\x20по\x20\x34\x20очка\x20магии\x20в\x20день\x2e"},
-    {  "\x7bУдача\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20удачу\x20вашего"
-        "\x20героя\x2e",
-       "\x7bУдача\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20удачу\x20вашего"
-         "\x20героя\x2e",
-       "\x7bУдача\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20удачу\x20вашего"
-         "\x20героя\x2e"},
-    {  "\x7bБаллистика\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20точность\x20стр"
-        "ельбы\x20\x20катапульты\x20вашего\x20героя\x20и\x20урон\x2c\x20наносимый"
-        "\x20крепостным\x20стенам\x2e",
-       "\x7bБаллистика\x20\x32\x20ступени\x7d\x0a\x0aКатапульта\x20вашего\x20героя\x20"
-         "делает\x20дополнительный\x20выстрел\x3b\x20при\x20этом\x20увеличив"
-         "ается\x20точность\x20ее\x20стрельбы\x20и\x20урон\x2c\x20наносимый\x20кре"
-         "постным\x20стенам\x2e",
-       "\x7bБаллистика\x20\x33\x20ступени\x7d\x0a\x0aКатапульта\x20вашего\x20героя\x20"
-         "делает\x20дополнительный\x20выстрел\x3b\x20при\x20этом\x20каждый\x20в"
-         "ыстрел\x20разрушает\x20любую\x20стену\x2c\x20за\x20исключением\x20укр"
-         "епленных\x20стен\x20рыцарского\x20замка\x2e"},
-    {  "\x7bОрлиный\x20взор\x20\x31\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x32\x30\x2dп"
-        "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20первого\x20"
-        "или\x20второго\x20уровней\x2c\x20примененное\x20против\x20него\x20в\x20б"
-        "ою\x2e",
-       "\x7bОрлиный\x20взор\x20\x32\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x33\x30\x2dп"
-         "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20третьего"
-         "\x20или\x20более\x20низких\x20уровней\x2c\x20примененное\x20против\x20не"
-         "го\x20в\x20бою\x2e",
-       "\x7bОрлиный\x20глаз\x20\x33\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x34\x30\x2dп"
-         "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20четверто"
-         "го\x20или\x20более\x20низких\x20уровней\x2c\x20примененное\x20против\x20"
-         "него\x20в\x20бою\x2e"},
-    {  "\x7bНекромантия\x20\x31\x20ступени\x7d\x0a\x0aВоскрешает\x20\x31\x30\x20процентов"
-        "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-        "скелеты\x20для\x20вашей\x20армии\x2e",
-       "\x7bНекромантия\x20\x32\x20ступени\x7d\x0a\x0aВоскрешает\x20\x32\x30\x20процентов"
-         "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-         "скелеты\x20для\x20вашей\x20армии\x2e",
-       "\x7bНекромантия\x20\x33\x20ступени\x7d\x0a\x0aВоскрешает\x20\x33\x30\x20процентов"
-         "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-         "скелеты\x20для\x20вашей\x20армии\x2e"},
-    {  "\x7bКазначей\x20\x31\x20ступени\x7d\x0a\x0aВаш\x20герой\x20ежедневно\x20собира"
-        "ет\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x31\x30\x30\x20золоты"
-        "х\x2e",
-       "\x7bКазанчей\x20\x32\x20ступени\x7d\x0a\x0aВаш\x20герой\x20ежедневно\x20собира"
-         "ет\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x32\x35\x30\x20золоты"
-         "х\x2e",
-       "\x7bКазначей\x20\x33\x20ступени\x7d\x0a\x0a\x20Ваш\x20герой\x20ежедневно\x20собир"
-         "ает\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x35\x30\x30\x20золот"
-         "ых\x2e"}
+    { "{Следопыт 1 ступени}\n\nУменьшает замедление при передвижении по пересеченной местности на 25 процентов.",
+      "{Следопыт 2 ступени}\n\nУменьшает замедление при передвижении по пересеченной местности на 50 процентов.",
+      "{Следопыт 3 ступени}\n\nПолностью нейтрализует замедление при передвижении по пересеченной местности."},
+    { "{Стрелок 1 ступени}\n\nУвеличивает на 10 процентов урон, наносимый стреляющими отрядами.",
+      "{Стрелок 2 ступени}\n\nУвеличивает на 25 процентов урон, наносимый стреляющими отрядами.",
+      "{Стрелок 3 ступени}\n\nУвеличивает на 50 процентов урон, наносимый стреляющими отрядами."},
+    { "{Логистика 1 ступени}\n\nУвеличивает запас движения героя на 10 процентов.",
+      "{Логистика 2 ступени}\n\nУвеличивает запас движения героя на 20 процентов.",
+      "{Логистика 3 ступени}\n\nУвеличивает запас движения героя на 30 процентов."},
+    { "{Разведка 1 ступени}\n\nУвеличивает на 1 клетку радиус обзора героя.",
+      "{Разведка 2 ступени}\n\nУвеличивает на 2 клетки радиус обзора героя.",
+      "{Разведка 3 ступени}\n\nУвеличивает на 3 клетки радиус обзора героя."},
+    { "{Дипломатия 1 ступени}\n\nПозволяет вести переговоры с отрядами монстров, более слабыми, чем ваша армия. На таком уровне дипломатии к вам может присоединиться до 1/4 отряда монстров.",
+      "{Дипломатия 2 ступени}\n\nПозволяет вести переговоры с отрядами монстров, более слабыми, чем ваша армия. На таком уровне дипломатии к вам может присоединиться до 1/2 отряда монстров.",
+      "{Дипломатия 3 ступени}\n\nПозволяет вести переговоры с отрядами монстров, более слабыми, чем ваша армия. На таком уровне дипломатии к вам может присоединиться весь отряд монстров."},
+    { "{Навигация 1 ступени}\n\nУвеличивает на 1/3 запас движения героя при передвижении по воде.",
+      "{Навигация 2 ступени}\n\nУвеличивает на 2/3 запас движения героя при передвижении по воде.",
+      "{Навигация 3 ступени}\n\nУдваивает запас движения героя при передвижении по воде."},
+    { "{Лидерство 1 ступени}\n\nУвеличивает на 1 единицу мораль войск вашего героя.",
+      "{Лидерство 2 ступени}\n\nУвеличивает на 2 единицы мораль войск вашего героя.",
+      "{Лидерство 3 ступени}\n\nУвеличивает на 3 единицы мораль войск вашего героя."},
+    { "{Мудрость 1 ступени}\n\nПозволяет вашему герою изучать заклинания третьего уровня.",
+      "{Мудрость 2 ступени}\n\nПозволяет вашему герою изучать заклинания четвертого уровня.",
+      "{Мудрость 3 ступени}\n\nПозволяет вашему герою изучать заклинания пятого уровня."},
+    { "{Мистицизм 1 ступени}\n\nВаш герой восстанавливает по 2 очка магии в день.",
+      "{Мистицизм 2 ступени}\n\nВаш герой восстанавливает по 3 очка магии в день.",
+      "{Мистицизм 3 ступени}\n\nВаш герой восстанавливает по 4 очка магии в день."},
+    { "{Удача 1 ступени}\n\nУвеличивает на 1 удачу вашего героя.",
+      "{Удача 2 ступени}\n\nУвеличивает на 2 удачу вашего героя.",
+      "{Удача 3 ступени}\n\nУвеличивает на 3 удачу вашего героя."},
+    { "{Баллистика 1 ступени}\n\nУвеличивает точность стрельбы  катапульты вашего героя и урон, наносимый крепостным стенам.",
+      "{Баллистика 2 ступени}\n\nКатапульта вашего героя делает дополнительный выстрел; при этом увеличивается точность ее стрельбы и урон, наносимый крепостным стенам.",
+      "{Баллистика 3 ступени}\n\nКатапульта вашего героя делает дополнительный выстрел; при этом каждый выстрел разрушает любую стену, за исключением укрепленных стен рыцарского замка."},
+    { "{Орлиный взор 1 ступени}\n\nДает вашему герою 20-процентный шанс выучить любое заклинание первого или второго уровней, примененное против него в бою.",
+      "{Орлиный взор 2 ступени}\n\nДает вашему герою 30-процентный шанс выучить любое заклинание третьего или более низких уровней, примененное против него в бою.",
+      "{Орлиный глаз 3 ступени}\n\nДает вашему герою 40-процентный шанс выучить любое заклинание четвертого или более низких уровней, примененное против него в бою."},
+    { "{Некромантия 1 ступени}\n\nВоскрешает 10 процентов существ, павших на поле боя, и превращает их в скелеты для вашей армии.",
+      "{Некромантия 2 ступени}\n\nВоскрешает 20 процентов существ, павших на поле боя, и превращает их в скелеты для вашей армии.",
+      "{Некромантия 3 ступени}\n\nВоскрешает 30 процентов существ, павших на поле боя, и превращает их в скелеты для вашей армии."},
+    { "{Казначей 1 ступени}\n\nВаш герой ежедневно собирает со своих владений налоги в размере 100 золотых.",
+      "{Казанчей 2 ступени}\n\nВаш герой ежедневно собирает со своих владений налоги в размере 250 золотых.",
+      "{Казначей 3 ступени}\n\n Ваш герой ежедневно собирает со своих владений налоги в размере 500 золотых."}
 };
 const char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
-      "Гильдия\x20магов\x20позволяет\x20разучивать\x20новые\x20заклина"
-        "ния\x20и\x20восстанавливает\x20запас\x20очков\x20магии\x2e",
-      "Гильдия\x20воров\x20дает\x20информацию\x20о\x20врагах\x2e\x20Также\x2c\x20Г"
-        "ильдия\x20воров\x20дает\x20разведывательную\x20информацию\x20о\x20"
-        "вражеских\x20городах\x2e\x20Дополнительные\x20гильдии\x20дают\x20д"
-        "ополнительную\x20информацию\x2e",
-      "Таверна\x20увеличивает\x20мораль\x20бойцов\x2c\x20защищающих\x20за"
-        "мок\x2e",
-      "Верфь\x20позволяет\x20строить\x20корабли\x2e",
-      "Колодец\x20увеличивает\x20прирост\x20всех\x20воинов\x20на\x20\x32\x20в\x20н"
-        "еделю\x2e",
-      "Шатер\x20дает\x20рабочих\x2c\x20которые\x20могут\x20возвести\x20замок"
-        "\x2e",
-      "Замок\x20улучшает\x20защиту\x20города\x20и\x20увеличивает\x20доход"
-        "\x20до\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e",
-      "Статуя\x20увеличивает\x20доход\x20города\x20на\x20\x32\x35\x30\x20золотых\x20в"
-        "\x20день\x2e",
-      "Левая\x20башня\x20обеспечивает\x20в\x20бою\x20дополнительную\x20ог"
-        "невую\x20мощь\x20замку\x2e",
-      "Правая\x20башня\x20обеспечивает\x20в\x20бою\x20дополнительную\x20о"
-        "гневую\x20мощь\x20замку\x2e",
-      "Рынок\x20можно\x20использовать\x20для\x20перевода\x20одного\x20тип"
-        "а\x20ресурсов\x20в\x20другой\x2e\x20Чем\x20больше\x20рынков\x20вы\x20контро"
-        "лируете\x2c\x20тем\x20выгодней\x20цена\x2e",
+     "Гильдия магов позволяет разучивать новые заклинания и восстанавливает запас очков магии.",
+     "Гильдия воров дает информацию о врагах. Также, Гильдия воров дает разведывательную информацию о вражеских городах. Дополнительные гильдии дают дополнительную информацию.",
+     "Таверна увеличивает мораль бойцов, защищающих замок.",
+     "Верфь позволяет строить корабли.",
+     "Колодец увеличивает прирост всех воинов на 2 в неделю.",
+     "Шатер дает рабочих, которые могут возвести замок.",
+     "Замок улучшает защиту города и увеличивает доход до 1000 золотых в день.",
+     "Статуя увеличивает доход города на 250 золотых в день.",
+     "Левая башня обеспечивает в бою дополнительную огневую мощь замку.",
+     "Правая башня обеспечивает в бою дополнительную огневую мощь замку.",
+     "Рынок можно использовать для перевода одного типа ресурсов в другой. Чем больше рынков вы контролируете, тем выгодней цена.",
       "",
-      "Ров\x20замедляет\x20атаку\x20вражеских\x20воинов\x2e\x20Любой\x20воин"
-        "\x2c\x20вошедший\x20в\x20ров\x2c\x20окончит\x20тут\x20свое\x20движение\x20и\x20ст"
-        "анет\x20более\x20уязвимым\x20для\x20атаки\x2e",
+     "Ров замедляет атаку вражеских воинов. Любой воин, вошедший в ров, окончит тут свое движение и станет более уязвимым для атаки.",
       "",
-      "Верфь\x20позволяет\x20строить\x20корабли\x2e",
-      "Дом\x20капитана\x20позволяет\x20капитану\x20городской\x20стражи"
-        "\x20организовать\x20защиту\x20замка\x20в\x20отсутствии\x20героя\x2e",
+     "Верфь позволяет строить корабли.",
+     "Дом капитана позволяет капитану городской стражи организовать защиту замка в отсутствии героя.",
       "",
       "",
       ""
 };
 const char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
-      "Укрепления\x20увеличивают\x20прочность\x20стен\x2c\x20увеличива"
-        "я\x20число\x20раундов\x2c\x20необходимых\x20для\x20полного\x20их\x20разр"
-        "ушения\x2e",
-      "Представления\x2c\x20проходимые\x20в\x20Колизее\x2c\x20увеличивают"
-        "\x20мораль\x20защитников\x20замка\x20на\x20\x32\x20единицы\x2e",
-      "Радуга\x20увеличивает\x20удачу\x20защитников\x20замка\x20на\x20\x32\x20е"
-        "диницы\x2e",
-      "Подземелье\x20увеличивает\x20доход\x20города\x20на\x20\x35\x30\x30\x20золот"
-        "ых\x20в\x20день\x2e",
-      "Библиотека\x20увеличивает\x20число\x20заклинаний\x2c\x20доступн"
-        "ых\x20в\x20Гильдии\x20на\x20\x31\x20на\x20каждый\x20ее\x20этаж\x2e",
-      "Шторм\x20добавляет\x20\x2b\x32\x20единицы\x20к\x20силе\x20заклинаний\x20защ"
-        "итников\x20замка\x2e"
+     "Укрепления увеличивают прочность стен, увеличивая число раундов, необходимых для полного их разрушения.",
+     "Представления, проходимые в Колизее, увеличивают мораль защитников замка на 2 единицы.",
+     "Радуга увеличивает удачу защитников замка на 2 единицы.",
+     "Подземелье увеличивает доход города на 500 золотых в день.",
+     "Библиотека увеличивает число заклинаний, доступных в Гильдии на 1 на каждый ее этаж.",
+     "Шторм добавляет +2 единицы к силе заклинаний защитников замка."
 };
 const char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
-      "севернее",
-      "северо\x2dвосточнее",
-      "восточнее",
-      "юго\x2dвосточнее",
-      "южнее",
-      "юго\x2dвосточнее",
-      "западнее",
-      "северо\x2dзападнее",
-      "в\x20центре"
+     "севернее",
+     "северо-восточнее",
+     "восточнее",
+     "юго-восточнее",
+     "южнее",
+     "юго-восточнее",
+     "западнее",
+     "северо-западнее",
+     "в центре"
 };
 const char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
-      "Темные\x20пучины\x20океана",
-      "Зеленые\x20равнины",
-      "Глубокие\x20снега",
-      "Топкие\x20болота",
-      "Застывшая\x20лава",
-      "Бескрайние\x20пески",
-      "Грязь",
-      "Бесплодная\x20пустошь",
-      "Побережье"
+     "Темные пучины океана",
+     "Зеленые равнины",
+     "Глубокие снега",
+     "Топкие болота",
+     "Застывшая лава",
+     "Бескрайние пески",
+     "Грязь",
+     "Бесплодная пустошь",
+     "Побережье"
 };
-const char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {  "Разный",   "\x27Добрый\x27",   "\x27Злой\x27"};
-const char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {  "Монохром",   "Цветной"};
-const char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {  "Обычная",   "Высокая",   "Оч\x2e\x20высокая"};
-const char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {  "Нет",   "Только\x20чары",   "Полная"};
+const char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = { "Разный", "'Добрый'", "'Злой'"};
+const char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = { "Монохром", "Цветной"};
+const char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = { "Обычная", "Высокая", "Оч. высокая"};
+const char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = { "Нет", "Только чары", "Полная"};
 const char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
-      "\x0a\x0a\x0a\x2a\x2a\x2a\x43\x6f\x6d\x6d\x61\x6e\x64\x20\x4c\x69\x6e\x65\x20\x48\x65\x6c\x70\x2a\x2a\x2a\x0a",
-      "\x0a",
-      "\x2f\x44\x30\x20\x2d\x20отключить\x20цифровой\x20звук\x0a",
-      "\x2f\x4d\x30\x20\x2d\x20отключить\x20\x4d\x49\x44\x49\x20музыку\x0a",
-      "\x2f\x52\x30\x20\x2d\x20отключить\x20музыку\x0a",
-      "\x2f\x49\x30\x20\x2d\x20пропустить\x20интро\x0a",
-      "\x0a",
-      "\x0a",
-      "Пример\x3a\x0a",
-      "\x0a",
-      "\x48\x45\x52\x4f\x45\x53\x32\x44\x20\x2f\x52\x30\x20\x2f\x49\x30\x0a",
-      "\x0a",
-      "Загрузить\x20\x44\x4f\x53\x20версию\x20Героев\x20\x32\x2e\x0a",
-      "Звук\x20отключен\x20и\x20интро\x20пропущено\x2e\x0a"
+      "\n\n\n***Command Line Help***\n",
+      "\n",
+     "/D0 - отключить цифровой звук\n",
+     "/M0 - отключить MIDI музыку\n",
+     "/R0 - отключить музыку\n",
+     "/I0 - пропустить интро\n",
+      "\n",
+      "\n",
+     "Пример:\n",
+      "\n",
+      "HEROES2D /R0 /I0\n",
+      "\n",
+     "Загрузить DOS версию Героев 2.\n",
+     "Звук отключен и интро пропущено.\n"
 };
 const char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
-    {  "Герой\x2fПараметры",   "Навыки",   "Артефакты",   "Города\x2fЗамки",   "Гарнизон",   "Доступно"};
+    { "Герой/Параметры", "Навыки", "Артефакты", "Города/Замки", "Гарнизон", "Доступно"};
 const char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
-      "Ошибка\x20передачи\x20данных\x20при\x20выполнении\x20функции\x20\x25\x73"
-        "\x0a\x0aКод\x20ошибки\x3a\x20\x25\x64\x0aЗначение\x20ошибки\x3a\x20\x25\x73\x0a\x0a",
-      "Предлагаемые\x20меры\x20устранения\x20ошибки\x3a",
-      "\x0a\x31\x29\x20Убедитесь\x20в\x20надежности\x20подсоединения\x20кабелей"
-        "\x2e",
-      "\x0a\x32\x29\x20Перезагрузите\x20компьютер\x2e",
-      "\x0a\x33\x29\x20Убедитесь\x20в\x20том\x2c\x20что\x20в\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20задан\x20правил"
-        "ьный\x20\x43\x4f\x4d\x20порт\x2e\x20\x28Третья\x20кнопка\x20на\x20экране\x2c\x20где\x20вы\x20"
-        "выбираете\x20Хозяина\x20или\x20Гостя\x2e\x29",
-      "\x0a\x34\x29\x20Попробуйте\x20уменьшить\x20скорость\x20передачи\x20данны"
-        "х\x20в\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20до\x20\x31\x39\x32\x30\x30\x20или\x20до\x20\x39\x36\x30\x30\x2e"
+     "Ошибка передачи данных при выполнении функции %s\n\nКод ошибки: %d\nЗначение ошибки: %s\n\n",
+     "Предлагаемые меры устранения ошибки:",
+     "\n1) Убедитесь в надежности подсоединения кабелей.",
+     "\n2) Перезагрузите компьютер.",
+     "\n3) Убедитесь в том, что в 'CONFIG' задан правильный COM порт. (Третья кнопка на экране, где вы выбираете Хозяина или Гостя.)",
+     "\n4) Попробуйте уменьшить скорость передачи данных в 'CONFIG' до 19200 или до 9600."
 };
 const char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
-    {  "\x25\x64\x20воинов",   "\x25\x64\x20воин",   "Атака",   "Защита",   "ЗД",   "Урон",   "МР",   "УЧ",   "Выстр\x2e"};
+    { "%d воинов", "%d воин", "Атака", "Защита", "ЗД", "Урон", "МР", "УЧ", "Выстр."};
 const char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
-      "\x7bМаленькие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20маленьких\x20кар"
-        "т\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2e",
-      "\x7bСредние\x20карты\x7d\x0a\x0aПросмотр\x20только\x20средних\x20карт\x20\x28\x37"
-        "\x32\x20\x78\x20\x37\x32\x29\x2e",
-      "\x7bБольшие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20больших\x20карт\x20\x28\x31"
-        "\x30\x38\x20\x78\x20\x31\x30\x38\x29\x2e",
-      "\x7bОчень\x20большие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20очень\x20бол"
-        "ьших\x20карт\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
-      "\x7bВсе\x20карты\x7d\x0a\x0aПросмотр\x20всех\x20карт\x2e",
-      "\x7bВвод\x20имени\x7d\x0a\x0aВведите\x20имя\x20файла\x2c\x20под\x20которым\x20вых"
-        "отите\x20сохранить\x20игру\x2e",
-      "\x7bОК\x7d\x0a\x0aПодтверждение\x20выбора\x2e",
-      "\x7bОтмена\x7d\x0a\x0aОтмена\x20без\x20подтверждения\x20выбора\x2e",
-      "\x7bЗначок\x20размера\x7d\x0a\x0aОбозначает\x20размер\x20карты\x3a\x20мален"
-        "ькая\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2c\x20средняя\x20\x28\x37\x32\x20\x78\x20\x37\x32\x29\x2c\x20большая\x20\x28\x31\x30\x38\x20"
-        "\x78\x20\x31\x30\x38\x29\x20или\x20очень\x20большая\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
-      "\x7bЗначок\x20игроков\x7d\x0a\x0aОбозначает\x20количество\x20игроков\x20"
-        "в\x20данном\x20сценарии\x2e\x20При\x20отсутствии\x20игроков\x2dлюдей\x20"
-        "их\x20места\x20занимает\x20компьютер\x2e",
-      "\x7bУсловия\x20победы\x7d\x0aПредусмотрено\x20\x36\x20возможных\x20вариа"
-        "нтов\x3a\x0a\x7bНадгробный\x20камень\x7d\x20\x2d\x20Разгромить\x20всех\x20геро"
-        "ев\x20противника\x20и\x20захватить\x20его\x20замки\x2e\x0a\x7bГород\x7d\x20\x2d\x20З"
-        "ахватить\x20определенный\x20замок\x2e\x0a\x7bПортрет\x20героя\x7d\x20\x2d\x20Р"
-        "азгромить\x20определенного\x20героя\x2e\x0a\x7bМедаль\x7d\x20\x2d\x20Найти\x20"
-        "определенный\x20артефакт\x2e\x0a\x7bРукопожатие\x7d\x20\x2d\x20Ваш\x20альян"
-        "с\x20должен\x20разгромить\x20альянс\x20противника\x2e\x0a\x7bМонеты\x7d\x20"
-        "\x2d\x20Накопить\x20нужное\x20количество\x20золота\x2e",
-      "\x7bУссловия\x20поражения\x7d\x0a\x0aПредусмотрено\x20\x34\x20возможных\x20"
-        "условия\x3a\x0a\x7bНадгробный\x20камень\x7d\x20\x2d\x20Потеря\x20всех\x20ваших"
-        "\x20героев\x20и\x20городов\x2e\x0a\x7bГород\x7d\x20\x2d\x20Потеря\x20определенног"
-        "о\x20замка\x2e\x0a\x7bПортрет\x20героя\x7d\x20\x2d\x20Потеря\x20указанного\x20гер"
-        "оя\x2e\x0a\x7bПесочные\x20часы\x7d\x20\x2d\x20Победа\x20не\x20была\x20достигнута\x20"
-        "до\x20указанного\x20срока\x2e\x29",
-      "\x7bНазвание\x7d\x0a\x0aНазвание\x20карты\x2e",
-      "\x7bОписание\x7d\x0a\x0aОписание\x20карты\x2e",
-      "\x7bТрудность\x20карты\x7d\x0a\x0aСтепень\x20сложности\x20игры\x20на\x20это"
-        "й\x20карте\x2e\x20Трудность\x20карты\x20определяется\x20разработчи"
-        "ком\x20сценария\x2e\x20Более\x20сложные\x20карты\x20характеризуютс"
-        "я\x20большим\x20числом\x20сильных\x20противников\x2c\x20меньшим\x20ко"
-        "личеством\x20ресурсов\x20или\x20специальными\x20условиями\x2c\x20з"
-        "атрудняющими\x20достижение\x20победы\x2e"
+     "{Маленькие карты}\n\nПросмотр только маленьких карт (36 x 36).",
+     "{Средние карты}\n\nПросмотр только средних карт (72 x 72).",
+     "{Большие карты}\n\nПросмотр только больших карт (108 x 108).",
+     "{Очень большие карты}\n\nПросмотр только очень больших карт (144 x 144).",
+     "{Все карты}\n\nПросмотр всех карт.",
+     "{Ввод имени}\n\nВведите имя файла, под которым выхотите сохранить игру.",
+     "{ОК}\n\nПодтверждение выбора.",
+     "{Отмена}\n\nОтмена без подтверждения выбора.",
+     "{Значок размера}\n\nОбозначает размер карты: маленькая (36 x 36), средняя (72 x 72), большая (108 x 108) или очень большая (144 x 144).",
+     "{Значок игроков}\n\nОбозначает количество игроков в данном сценарии. При отсутствии игроков-людей их места занимает компьютер.",
+     "{Условия победы}\nПредусмотрено 6 возможных вариантов:\n{Надгробный камень} - Разгромить всех героев противника и захватить его замки.\n{Город} - Захватить определенный замок.\n{Портрет героя} - Разгромить определенного героя.\n{Медаль} - Найти определенный артефакт.\n{Рукопожатие} - Ваш альянс должен разгромить альянс противника.\n{Монеты} - Накопить нужное количество золота.",
+     "{Уссловия поражения}\n\nПредусмотрено 4 возможных условия:\n{Надгробный камень} - Потеря всех ваших героев и городов.\n{Город} - Потеря определенного замка.\n{Портрет героя} - Потеря указанного героя.\n{Песочные часы} - Победа не была достигнута до указанного срока.)",
+     "{Название}\n\nНазвание карты.",
+     "{Описание}\n\nОписание карты.",
+     "{Трудность карты}\n\nСтепень сложности игры на этой карте. Трудность карты определяется разработчиком сценария. Более сложные карты характеризуются большим числом сильных противников, меньшим количеством ресурсов или специальными условиями, затрудняющими достижение победы."
 };
-const char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {  "Воин",   "Строитель",   "Исследователь",   "Человек"};
+const char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = { "Воин", "Строитель", "Исследователь", "Человек"};
 const char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
-    {  "Мало",   "Мало",   "мало"},
-    {  "Немного",   "Немного",   "немного"},
-    {  "Стая",   "Стая",   "стая"},
-    {  "Много",   "Много",   "много"},
-    {  "Орда",   "Орда",   "орда"},
-    {  "Толпа",   "Толпа",   "толпа"},
-    {  "Свора",   "Свора",   "свора"},
-    {  "Тысячи",   "Тысячи\x2e\x2e\x2e",   "тысячи"},
-    {  "Легион",   "Легион",   "легион"}
+    { "Мало", "Мало", "мало"},
+    { "Немного", "Немного", "немного"},
+    { "Стая", "Стая", "стая"},
+    { "Много", "Много", "много"},
+    { "Орда", "Орда", "орда"},
+    { "Толпа", "Толпа", "толпа"},
+    { "Свора", "Свора", "свора"},
+    { "Тысячи", "Тысячи...", "тысячи"},
+    { "Легион", "Легион", "легион"}
 };
 const char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
-      "Истина\x20где\x2dто\x20рядом\x2e",
-      "Темная\x20сторона\x20сильнее\x2e",
-      "Конец\x20Света\x20близок\x2e",
-      "Прах\x20Лорда\x20Слэйера\x20захоронен\x20в\x20основании\x20арены\x2e",
-      "Он\x20невиновен\x2e",
-      "Черный\x20дракон\x20сделает\x20Титана\x20в\x20любой\x20день\x20недели"
-        "\x2e",
-      "Он\x20сказал\x20ей\x2c\x20\x22Я\x2dда\x2dда\x2dяда\x2dда\x22\x2e\x2e\x2e\x20а\x20она\x20сказала\x2c"
-        "\x20\x22Ля\x2dля\x2dля\x2c\x20ля\x2dля\x2dля\x2e\x2e\x2e\x22",
-      "Тут\x20бывал\x20человек\x20из\x20Нунтукета\x2e\x2e\x2e"
+     "Истина где-то рядом.",
+     "Темная сторона сильнее.",
+     "Конец Света близок.",
+     "Прах Лорда Слэйера захоронен в основании арены.",
+     "Он невиновен.",
+     "Черный дракон сделает Титана в любой день недели.",
+     "Он сказал ей, \"Я-да-да-яда-да\"... а она сказала, \"Ля-ля-ля, ля-ля-ля...\"",
+     "Тут бывал человек из Нунтукета..."
 };
 const char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
-    {  "Прямо\x20пойдешь\x20\x2d\x20коня\x20потеряешь\x2e",   "Сдается\x20в\x20аренду\x2e",   "До\x20следующего\x20знака\x20\x35\x30\x20миль\x2e",   "Кто\x20идет\x20за\x20Блинским\x3f"};
+    { "Прямо пойдешь - коня потеряешь.", "Сдается в аренду.", "До следующего знака 50 миль.", "Кто идет за Блинским?"};
 const char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
-      "Альянс\x20гномов",
-      "Гильдия\x20колдуний",
-      "Роланд\x20становится\x20сильнее",
-      "Перенос\x20войск",
-      "Корлагон\x20побежден",
-      "Корона\x20всевластия",
-      "Гильдия\x20некромантов",
-      "Смерть\x20гномам",
-      "Союз\x20огров",
-      "Союз\x20драконов",
-      "Корона\x20всевластия",
-      "Перенос\x20войск"
+     "Альянс гномов",
+     "Гильдия колдуний",
+     "Роланд становится сильнее",
+     "Перенос войск",
+     "Корлагон побежден",
+     "Корона всевластия",
+     "Гильдия некромантов",
+     "Смерть гномам",
+     "Союз огров",
+     "Союз драконов",
+     "Корона всевластия",
+     "Перенос войск"
 };
 const char* cCampaignName[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
-    {  "Сила\x20оружия",
-       "Аннексия",
-       "Спасти\x20гномов",
-       "Копи\x20Каратора",
-       "Переломный\x20момент",
-       "Защитник",
-       "Вызов\x20брошен\x21",
-       "Корона",
-       "Акт\x20отчаяния",
-       "Час\x20нашей\x20славы",
+    { "Сила оружия",
+      "Аннексия",
+      "Спасти гномов",
+      "Копи Каратора",
+      "Переломный момент",
+      "Защитник",
+      "Вызов брошен!",
+      "Корона",
+      "Акт отчаяния",
+      "Час нашей славы",
        "",
-       "Предательство"},
-    {  "Первая\x20кровь",
-       "Войны\x20с\x20варварами",
-       "Некроманты\x21",
-       "Смерть\x20гномам",
-       "Переломный\x20момент\x20",
-       "Крестьяне\x21",
-       "Владыка\x20драконов",
-       "Лорды\x20провинций",
-       "Корона",
-       "К\x20вящей\x20славе",
-       "Апокалипсис",
-       "Предательство\x21"}
+      "Предательство"},
+    { "Первая кровь",
+      "Войны с варварами",
+      "Некроманты!",
+      "Смерть гномам",
+      "Переломный момент ",
+      "Крестьяне!",
+      "Владыка драконов",
+      "Лорды провинций",
+      "Корона",
+      "К вящей славе",
+      "Апокалипсис",
+      "Предательство!"}
 };
 const char* cCampaignDescription[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
-    {  "Прежде\x20чем\x20поднять\x20восстание\x20против\x20брата\x2c\x20Ролан"
-        "д\x20хочет\x2c\x20чтобы\x20вы\x20одержали\x20победу\x20над\x20соседними\x20"
-        "властителями\x2e\x20Между\x20ними\x20нет\x20единства\x2c\x20поэтому\x20б"
-        "ольшую\x20часть\x20времени\x20они\x20будут\x20заняты\x20стычками\x20д"
-        "руг\x20с\x20другом\x2e\x20Победа\x20будет\x20вашей\x2c\x20когда\x20вы\x20захва"
-        "тите\x20все\x20города\x2e",
-       "Властители\x20сопредельных\x20земель\x20отказываются\x20прин"
-         "ести\x20клятву\x20верности\x20Роланду\x2c\x20и\x20поэтому\x20должны\x20б"
-         "ыть\x20повержены\x2e\x20Богатства\x20и\x20власти\x20им\x20не\x20занимать"
-         "\x2c\x20поэтому\x20будьте\x20готовы\x20к\x20нелегкой\x20борьбе\x2e\x20Чтобы"
-         "\x20победить\x2c\x20захватите\x20все\x20вражеские\x20замки\x2e",
-       "Вам\x20следует\x20защитить\x20гномов\x20от\x20армий\x20Арчибальда\x2e"
-         "\x20Чтобы\x20победить\x2c\x20захватите\x20все\x20города\x20и\x20замки\x20пр"
-         "отивника\x2e\x20Следите\x20за\x20тем\x2c\x20чтобы\x20враг\x20не\x20захватил"
-         "\x20все\x20города\x20гномов\x2c\x20иначе\x20победа\x20достанется\x20ему\x2e",
-       "В\x20борьбе\x20за\x20ресурсы\x20и\x20сокровища\x20вам\x20противостоят"
-         "\x20четыре\x20противника\x2c\x20объединившихся\x20в\x20союз\x2e\x20Чтобы"
-         "\x20победить\x2c\x20захватите\x20все\x20вражеские\x20замки\x2e",
-       "Ваши\x20враги\x20заключили\x20против\x20вас\x20союз\x2e\x20Они\x20где\x2dто"
-         "\x20рядом\x2c\x20поэтому\x20в\x20любой\x20момент\x20будьте\x20готовы\x20к\x20б"
-         "итве\x2e\x20Вы\x20победите\x2c\x20когда\x20завладеете\x20всеми\x20четырь"
-         "мя\x20замками\x2c\x20находящимися\x20в\x20этой\x20небольшой\x20долине"
-         "\x2e",
-       "Гильдия\x20колдунов\x20славного\x20города\x20Норастона\x20попро"
-         "сила\x20Роланда\x20помочь\x20ей\x20отбиться\x20от\x20союзников\x20Арч"
-         "ибальда\x2e\x20Чтобы\x20победить\x2c\x20вы\x20должны\x20захватить\x20все"
-         "\x20вражеские\x20замки\x2e\x20Не\x20потеряйте\x20Норастон\x2c\x20иначе\x20в"
-         "ы\x20проиграли\x2e\x20\x28Один\x20из\x20вражеских\x20замков\x20на\x20остров"
-         "е\x20в\x20океане\x29\x2e",
-       "Соберите\x20армию\x20побольше\x20и\x20захватите\x20замок\x20против"
-         "ника\x20не\x20позднее\x2c\x20чем\x20через\x20\x38\x20недель\x2e\x20Вам\x20противо"
-         "стоит\x20всего\x20один\x20противник\x2c\x20но\x20до\x20его\x20замка\x20скак"
-         "ать\x20и\x20скакать\x2e\x20Все\x20войска\x2c\x20которые\x20останутся\x20у\x20в"
-         "ас\x20к\x20концу\x20этого\x20сценария\x2c\x20примут\x20участие\x20в\x20закл"
-         "ючительной\x20битве\x2e",
-       "Найдите\x20корону\x2c\x20прежде\x20чем\x20это\x20сделают\x20герои\x20Арч"
-         "ибальда\x2e\x20Корона\x20понадобится\x20Роланду\x20для\x20победы\x20в"
-         "\x20заключительной\x20битве\x2e",
-       "Три\x20противника\x2c\x20и\x20среди\x20них\x20сам\x20лорд\x20Корлагон\x2c\x20з"
-         "аключили\x20союз\x20и\x20стоят\x20между\x20вами\x20и\x20великой\x20побед"
-         "ой\x2e\x20Роланд\x20обосновался\x20в\x20замке\x20на\x20северо\x2dзападе\x2c"
-         "\x20и\x20если\x20этот\x20замок\x20падет\x2c\x20вы\x20проиграете\x2e\x20Если\x20вы"
-         "\x20захватите\x20Корлагона\x20сейчас\x2c\x20он\x20не\x20будет\x20драться"
-         "\x20против\x20вас\x20в\x20последней\x20битве\x2e",
-       "Итак\x2c\x20пробил\x20час\x20последнего\x20и\x20решительного\x20боя\x2e\x20"
-         "И\x20вы\x2c\x20и\x20ваши\x20противники\x20вооружены\x20до\x20зубов\x2c\x20и\x20вс"
-         "е\x20кругом\x20объединились\x20против\x20вас\x2e\x20Война\x20будет\x20за"
-         "кончена\x2c\x20когда\x20вы\x20захватите\x20в\x20плен\x20Арчибальда\x21",
+    { "Прежде чем поднять восстание против брата, Роланд хочет, чтобы вы одержали победу над соседними властителями. Между ними нет единства, поэтому большую часть времени они будут заняты стычками друг с другом. Победа будет вашей, когда вы захватите все города.",
+      "Властители сопредельных земель отказываются принести клятву верности Роланду, и поэтому должны быть повержены. Богатства и власти им не занимать, поэтому будьте готовы к нелегкой борьбе. Чтобы победить, захватите все вражеские замки.",
+      "Вам следует защитить гномов от армий Арчибальда. Чтобы победить, захватите все города и замки противника. Следите за тем, чтобы враг не захватил все города гномов, иначе победа достанется ему.",
+      "В борьбе за ресурсы и сокровища вам противостоят четыре противника, объединившихся в союз. Чтобы победить, захватите все вражеские замки.",
+      "Ваши враги заключили против вас союз. Они где-то рядом, поэтому в любой момент будьте готовы к битве. Вы победите, когда завладеете всеми четырьмя замками, находящимися в этой небольшой долине.",
+      "Гильдия колдунов славного города Норастона попросила Роланда помочь ей отбиться от союзников Арчибальда. Чтобы победить, вы должны захватить все вражеские замки. Не потеряйте Норастон, иначе вы проиграли. (Один из вражеских замков на острове в океане).",
+      "Соберите армию побольше и захватите замок противника не позднее, чем через 8 недель. Вам противостоит всего один противник, но до его замка скакать и скакать. Все войска, которые останутся у вас к концу этого сценария, примут участие в заключительной битве.",
+      "Найдите корону, прежде чем это сделают герои Арчибальда. Корона понадобится Роланду для победы в заключительной битве.",
+      "Три противника, и среди них сам лорд Корлагон, заключили союз и стоят между вами и великой победой. Роланд обосновался в замке на северо-западе, и если этот замок падет, вы проиграете. Если вы захватите Корлагона сейчас, он не будет драться против вас в последней битве.",
+      "Итак, пробил час последнего и решительного боя. И вы, и ваши противники вооружены до зубов, и все кругом объединились против вас. Война будет закончена, когда вы захватите в плен Арчибальда!",
        "",
-       "Вы\x20сменили\x20сюзерена\x2c\x20и\x20теперь\x20у\x20вас\x20три\x20замка\x20пр"
-         "отив\x20одного\x20у\x20противника\x2e\x20Эта\x20миссия\x20будет\x20для\x20в"
-         "ас\x20самой\x20легкой\x20во\x20всей\x20войне\x2e\x2e\x2e\x20Предатель\x21"},
-    {  "Король\x20Арчибальд\x20требует\x2c\x20чтобы\x20вы\x20разгромили\x20тр"
-        "ех\x20противников\x2c\x20которые\x20обосновались\x20в\x20этих\x20земл"
-        "ях\x2e\x20Они\x20не\x20связаны\x20между\x20собой\x20союзным\x20договором"
-        "\x2c\x20поэтому\x20по\x20большей\x20части\x20они\x20будут\x20тратить\x20сил"
-        "ы\x20на\x20вражду\x20друг\x20с\x20другом\x2e\x20Вы\x20победите\x2c\x20когда\x20вс"
-        "е\x20их\x20замки\x20окажутся\x20в\x20ваших\x20руках\x2e",
-       "Вам\x20предстоит\x20объединить\x20племена\x20северных\x20варвар"
-         "ов\x2c\x20предварительно\x20усмирив\x20их\x2e\x20Как\x20и\x20в\x20предыдуще"
-         "й\x20миссии\x2c\x20противники\x20не\x20состоят\x20в\x20союзе\x20друг\x20с\x20д"
-         "ругом\x2c\x20но\x20у\x20них\x20больше\x20ресурсов\x2e\x20Победа\x20будет\x20ва"
-         "шей\x2c\x20когда\x20вы\x20захватите\x20все\x20вражеские\x20замки\x20и\x20пе"
-         "ребьете\x20всех\x20героев\x20противника\x2e",
-       "Добрые\x20волшебники\x20захватили\x20замок\x20некромантов\x2e\x20Ч"
-         "тобы\x20победить\x2c\x20вы\x20должны\x20отобрать\x20его\x20обратно\x2e\x20П"
-         "омните\x2c\x20что\x20хотя\x20вы\x20и\x20начинаете\x20с\x20сильной\x20армией"
-         "\x2c\x20в\x20самом\x20начале\x20у\x20вас\x20нет\x20своего\x20замка\x2e\x20Вы\x20долж"
-         "ны\x20заиметь\x20его\x20за\x20\x37\x20дней\x2c\x20иначе\x20все\x20потеряно\x2e\x20\x28Б"
-         "лижайший\x20замок\x20на\x20юго\x2dвостоке\x29\x2e",
-       "Гномов\x20следует\x20привести\x20к\x20покорности\x2c\x20прежде\x20чем"
-         "\x20они\x20смогут\x20помешать\x20планам\x20короля\x20Арчибальда\x2e\x20П"
-         "од\x20знаменами\x20Роланда\x20много\x20героев\x2c\x20у\x20него\x20нескол"
-         "ько\x20замков\x2c\x20поэтому\x20будьте\x20готовы\x20к\x20нападению\x20ср"
-         "азу\x20с\x20нескольких\x20сторон\x2e\x20Вам\x20надо\x20захватить\x20все\x20"
-         "города\x20противника\x2e",
-       "Ваши\x20противники\x20объединились\x20против\x20вас\x20и\x20притаи"
-         "лись\x20неподалеку\x2c\x20поэтому\x20будьте\x20начеку\x2e\x20Победа\x20б"
-         "удет\x20вашей\x2c\x20когда\x20вы\x20завладеете\x20всеми\x20четырьмя\x20з"
-         "амками\x2c\x20находящимися\x20в\x20этой\x20небольшой\x20долине\x2e",
-       "Вам\x20предстоит\x20подавить\x20крестьянский\x20бунт\x2c\x20во\x20гла"
-         "ве\x20которого\x20стоят\x20агенты\x20Роланда\x2e\x20Все\x20ваши\x20сосед"
-         "и\x20объединились\x20против\x20вас\x2c\x20но\x20на\x20вашей\x20стороне\x20л"
-         "орд\x20Корлагон\x20\x2d\x20опытный\x20и\x20сильный\x20боец\x2e\x20Чтобы\x20поб"
-         "едить\x2c\x20вы\x20должны\x20захватить\x20все\x20замки\x20противника\x2e",
-       "В\x20этой\x20миссии\x20вам\x20противостоят\x20два\x20противника\x2e\x20О"
-         "ба\x20хорошо\x20вооружены\x20и\x20полны\x20решимости\x20выставить\x20"
-         "вас\x20со\x20своего\x20острова\x2e\x20Избегая\x20встречи\x20с\x20ними\x2c\x20з"
-         "ахватите\x20Драконий\x20город\x20\x2d\x20тогда\x20победа\x20будет\x20за\x20"
-         "вами\x2e",
-       "Вам\x20приказано\x20разгромить\x20удельных\x20властителей\x2c\x20к"
-         "оторые\x20присягнули\x20на\x20верность\x20Роланду\x2e\x20Все\x20враже"
-         "ские\x20замки\x20объединились\x20и\x20выступают\x20против\x20вас\x2e\x20"
-         "Вы\x20начинаете\x20игру\x20без\x20замка\x2e\x20Вам\x20надо\x20захватить\x20"
-         "замок\x20за\x20\x37\x20дней\x2e\x20Победа\x20будет\x20вашей\x2c\x20когда\x20все\x20з"
-         "амки\x20противника\x20падут\x2e",
-       "Найдите\x20корону\x2c\x20пока\x20ею\x20не\x20завладели\x20герои\x20Ролан"
-         "да\x2e\x20Корона\x20понадобится\x20Арчибальду\x20для\x20победы\x20в\x20з"
-         "аключительной\x20битве\x20с\x20Роландом\x2e",
-       "Соберите\x20армию\x20побольше\x20и\x20захватите\x20замок\x20против"
-         "ника\x20не\x20позднее\x2c\x20чем\x20через\x20\x38\x20недель\x2e\x20Вам\x20противо"
-         "стоит\x20всего\x20один\x20противник\x2c\x20но\x20до\x20его\x20замка\x20скак"
-         "ать\x20и\x20скакать\x2e\x20Все\x20войска\x2c\x20которые\x20останутся\x20у\x20в"
-         "ас\x20к\x20концу\x20этого\x20сценария\x2c\x20будут\x20с\x20вами\x20в\x20заключ"
-         "ительной\x20битве\x2e",
-       "Итак\x2c\x20пробил\x20час\x20последней\x20битвы\x2e\x20И\x20вы\x2c\x20и\x20ваши\x20п"
-         "ротивники\x20вооружены\x20до\x20зубов\x2c\x20и\x20все\x20объединились"
-         "\x20против\x20вас\x2e\x20Война\x20закончится\x2c\x20когда\x20вы\x20захватит"
-         "е\x20в\x20плен\x20Роланда\x2c\x20и\x20смотрите\x2c\x20не\x20потеряйте\x20Арчиб"
-         "альда\x20в\x20пылу\x20битвы\x21",
-       "Вы\x20сменили\x20сюзерена\x2c\x20и\x20теперь\x20у\x20вас\x20три\x20замка\x20пр"
-         "отив\x20одного\x20у\x20противника\x2e\x20Эта\x20миссия\x20будет\x20для\x20в"
-         "ас\x20самой\x20легкой\x20во\x20всей\x20войне\x2e\x2e\x2e\x20Предатель\x21"}
+      "Вы сменили сюзерена, и теперь у вас три замка против одного у противника. Эта миссия будет для вас самой легкой во всей войне... Предатель!"},
+    { "Король Арчибальд требует, чтобы вы разгромили трех противников, которые обосновались в этих землях. Они не связаны между собой союзным договором, поэтому по большей части они будут тратить силы на вражду друг с другом. Вы победите, когда все их замки окажутся в ваших руках.",
+      "Вам предстоит объединить племена северных варваров, предварительно усмирив их. Как и в предыдущей миссии, противники не состоят в союзе друг с другом, но у них больше ресурсов. Победа будет вашей, когда вы захватите все вражеские замки и перебьете всех героев противника.",
+      "Добрые волшебники захватили замок некромантов. Чтобы победить, вы должны отобрать его обратно. Помните, что хотя вы и начинаете с сильной армией, в самом начале у вас нет своего замка. Вы должны заиметь его за 7 дней, иначе все потеряно. (Ближайший замок на юго-востоке).",
+      "Гномов следует привести к покорности, прежде чем они смогут помешать планам короля Арчибальда. Под знаменами Роланда много героев, у него несколько замков, поэтому будьте готовы к нападению сразу с нескольких сторон. Вам надо захватить все города противника.",
+      "Ваши противники объединились против вас и притаились неподалеку, поэтому будьте начеку. Победа будет вашей, когда вы завладеете всеми четырьмя замками, находящимися в этой небольшой долине.",
+      "Вам предстоит подавить крестьянский бунт, во главе которого стоят агенты Роланда. Все ваши соседи объединились против вас, но на вашей стороне лорд Корлагон - опытный и сильный боец. Чтобы победить, вы должны захватить все замки противника.",
+      "В этой миссии вам противостоят два противника. Оба хорошо вооружены и полны решимости выставить вас со своего острова. Избегая встречи с ними, захватите Драконий город - тогда победа будет за вами.",
+      "Вам приказано разгромить удельных властителей, которые присягнули на верность Роланду. Все вражеские замки объединились и выступают против вас. Вы начинаете игру без замка. Вам надо захватить замок за 7 дней. Победа будет вашей, когда все замки противника падут.",
+      "Найдите корону, пока ею не завладели герои Роланда. Корона понадобится Арчибальду для победы в заключительной битве с Роландом.",
+      "Соберите армию побольше и захватите замок противника не позднее, чем через 8 недель. Вам противостоит всего один противник, но до его замка скакать и скакать. Все войска, которые останутся у вас к концу этого сценария, будут с вами в заключительной битве.",
+      "Итак, пробил час последней битвы. И вы, и ваши противники вооружены до зубов, и все объединились против вас. Война закончится, когда вы захватите в плен Роланда, и смотрите, не потеряйте Арчибальда в пылу битвы!",
+      "Вы сменили сюзерена, и теперь у вас три замка против одного у противника. Эта миссия будет для вас самой легкой во всей войне... Предатель!"}
 };
 const char* cOutOfMemory =
-      "\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x25\x73\x0aГероям\x20\x49\x49\x20требуется\x20минимум\x20\x0a\x25\x64"
-        "\x4b\x20Расширенной\x20\x20памяти\x20\x28\x58\x4d\x53\x29\x20и\x0a\x34\x38\x30\x4b\x20общей\x20памяти\x2e"
-        "\x0a\x0a";
-const char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {  "Обычное",   "Черес\x2d\x0aстрочное"};
+     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nГероям II требуется минимум \n%dK Расширенной  памяти (XMS) и\n480K общей памяти.\n\n";
+const char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = { "Обычное", "Черес-\nстрочное"};
 const char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
-      "\x7bОК\x7d\x0a\x0aЗакрыть\x20меню\x2e",
-      "\x7bМузыка\x7d\x0a\x0aВключить\x20или\x20выключить\x20фоновую\x20музыку\x2e",
-      "\x7bЭффекты\x7d\x0a\x0aВключить\x20или\x20выключить\x20звуковые\x20эффек"
-        "ты\x2e",
-      "\x7bСкорость\x7d\x0a\x0aВыбрать\x20скорость\x20передвижения\x20героев"
-        "\x20по\x20карте\x2e",
-      "\x7bКачество\x20звука\x7d\x0a\x0aВыбрать\x20формат\x20музыки\x2e\x20Как\x20пра"
-        "вило\x2c\x20музыка\x20в\x20формате\x20\x4d\x49\x44\x49\x20не\x20отличается\x20качест"
-        "вом\x2c\x20но\x20она\x20предъявляет\x20меньшие\x20требования\x20к\x20про"
-        "изводительности\x20системы\x2c\x20чем\x20формат\x20Стерео\x20\x43\x44\x2e\x20Ф"
-        "ормат\x20Стерео\x20\x43\x44\x20дает\x20\x20возможность\x20воспроизводить"
-        "\x20оперную\x20музыку\x2e",
-      "\x7bПоказывать\x20путь\x7d\x0a\x0aВключить\x20или\x20выключить\x20отобра"
-        "жение\x20пути\x20героя\x20на\x20карте\x2e\x20\x20Если\x20опция\x20включена\x2c"
-        "\x20первое\x20нажатие\x20по\x20объекту\x20на\x20карте\x20показывает\x20п"
-        "уть\x20к\x20этому\x20объекту\x2c\x20а\x20по\x20второму\x20нажатию\x20левой\x20"
-        "кнпоки\x20мыши\x20начинается\x20движение\x2e\x20Если\x20эта\x20опция\x20"
-        "отключена\x2c\x20движение\x20начинается\x20по\x20первому\x20нажати"
-        "ю\x2e",
-      "\x7bСкорость\x20врага\x7d\x0a\x0aВыбрать\x20скорости\x20перемещения\x20г"
-        "ероев\x2c\x20управляемых\x20компьютером\x2e\x20При\x20этом\x20можно\x20в"
-        "ыбрать\x20режим\x2c\x20в\x20котором\x20не\x20будет\x20отображаться\x20пе"
-        "редвижение\x20противника\x2e",
-      "\x7bИнтерфейс\x7d\x0a\x0aВыбор\x20желаемого\x20типа\x20интерфейса\x2e\x20По"
-        "\x20умолчанию\x20задан\x20динамический\x20интерфейс\x2c\x20в\x20котор"
-        "ом\x20\x27злое\x27\x20графическое\x20оформление\x20используется\x20дл"
-        "я\x20трех\x20\x27злых\x27\x20классов\x20героев\x20\x28варвара\x2c\x20чернокниж"
-        "ника\x20и\x20некроманта\x29\x2e",
-      "\x7bБыстрый\x20бой\x7d\x0a\x0aПри\x20включении\x20этой\x20опции\x20перед\x20ка"
-        "ждым\x20сражением\x20компьютер\x20будет\x20делать\x20запрос\x20о\x20п"
-        "роведении\x20этого\x20сражения\x20в\x20режиме\x20быстрого\x20боя\x2e\x20"
-        "Сражение\x20протекает\x20автоматически\x2c\x20и\x20компьютер\x20де"
-        "монстрирует\x20вам\x20только\x20его\x20результат\x2e",
-      "\x7bКурсор\x7d\x0a\x0aПереключение\x20курсора\x20с\x20черно\x2dбелого\x20на"
-        "\x20цветной\x20и\x20обратно\x2e\x20Цветной\x20курсор\x20выглядит\x20симп"
-        "атичнее\x2c\x20но\x20иногда\x20он\x20перемещается\x20по\x20экрану\x20не\x20"
-        "так\x20плавно\x2c\x20как\x20черно\x2dбелый\x2e"
+     "{ОК}\n\nЗакрыть меню.",
+     "{Музыка}\n\nВключить или выключить фоновую музыку.",
+     "{Эффекты}\n\nВключить или выключить звуковые эффекты.",
+     "{Скорость}\n\nВыбрать скорость передвижения героев по карте.",
+     "{Качество звука}\n\nВыбрать формат музыки. Как правило, музыка в формате MIDI не отличается качеством, но она предъявляет меньшие требования к производительности системы, чем формат Стерео CD. Формат Стерео CD дает  возможность воспроизводить оперную музыку.",
+     "{Показывать путь}\n\nВключить или выключить отображение пути героя на карте.  Если опция включена, первое нажатие по объекту на карте показывает путь к этому объекту, а по второму нажатию левой кнпоки мыши начинается движение. Если эта опция отключена, движение начинается по первому нажатию.",
+     "{Скорость врага}\n\nВыбрать скорости перемещения героев, управляемых компьютером. При этом можно выбрать режим, в котором не будет отображаться передвижение противника.",
+     "{Интерфейс}\n\nВыбор желаемого типа интерфейса. По умолчанию задан динамический интерфейс, в котором 'злое' графическое оформление используется для трех 'злых' классов героев (варвара, чернокнижника и некроманта).",
+     "{Быстрый бой}\n\nПри включении этой опции перед каждым сражением компьютер будет делать запрос о проведении этого сражения в режиме быстрого боя. Сражение протекает автоматически, и компьютер демонстрирует вам только его результат.",
+     "{Курсор}\n\nПереключение курсора с черно-белого на цветной и обратно. Цветной курсор выглядит симпатичнее, но иногда он перемещается по экрану не так плавно, как черно-белый."
 };
 const char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
-    {  "Сизый",   "Синий",   "Коричневый",   "Золотой",   "Зеленый",   "Оранжевый",   "Фиолетовый",   "Красный"};
+    { "Сизый", "Синий", "Коричневый", "Золотой", "Зеленый", "Оранжевый", "Фиолетовый", "Красный"};
 const char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
-      "Башня\x20алхимика",
-      "Арена",
-      "Лачуга\x20волхва",
-      "Око\x20волхва",
-      "Конюшни",
-      "Русалка",
-      "Сирены"
+     "Башня алхимика",
+     "Арена",
+     "Лачуга волхва",
+     "Око волхва",
+     "Конюшни",
+     "Русалка",
+     "Сирены"
 };
 const char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
-      "Земляные\x20холмы",
-      "Алтарь\x20Земли",
-      "Алтарь\x20Воздуха",
-      "Алтарь\x20Огня",
-      "Алтарь\x20Воды"
+     "Земляные холмы",
+     "Алтарь Земли",
+     "Алтарь Воздуха",
+     "Алтарь Огня",
+     "Алтарь Воды"
 };
 SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
-    {0, 100,   "Построить\x3a"},
-    {1, 100,   "Скорость"},
-    {1, 101,   "Информация\x0aо\x20враге"},
-    {1, 102,   "Магия\x0aв\x20автобое"},
-    {1, 103,   "Сетка"},
-    {1, 104,   "Курсор\x0aс\x20тенью"},
-    {1, 105,   "Затенение\x0aсетки"},
-    {2, 100,   "Музыка"},
-    {2, 101,   "Эффекты"},
-    {2, 102,   "Тип\x20музыки"},
-    {2, 103,   "Скорость"},
-    {2, 104,   "Путь"},
-    {2, 105,   "Враг"},
-    {2, 106,   "Интерфейс"},
-    {2, 107,   "Видео"},
-    {2, 108,   "Тип\x20курсора"},
-    {6, 300,   "Атака"},
-    {6, 301,   "Защита"},
-    {6, 302,   "Сила\x20магии"},
-    {6, 303,   "Знания"},
-    {7, 600,   "Сложность\x20игры\x3a"},
-    {7, 57,   "Легкая"},
-    {7, 58,   "Обычная"},
-    {7, 59,   "Тяжелая"},
-    {7, 60,   "Эксперт"},
-    {7, 61,   "Невозможная"},
-    {7, 62,   "Оппоненты\x3a"},
-    {7, 84,   "Класс\x3a"},
-    {9, 41,   "Золота\x20в\x20день\x3a"},
-    {12, 0,   "Строить\x20корабль\x3a"},
-    {12, 1,   "Цена\x3a"},
-    {14, 800,   "\x31\x2dй"},
-    {14, 801,   "\x32\x2dй"},
-    {14, 802,   "\x33\x2dй"},
-    {14, 803,   "\x34\x2dй"},
-    {14, 804,   "\x35\x2dй"},
-    {14, 805,   "\x36\x2dй"},
-    {14, 604,   "Городов\x3a"},
-    {14, 605,   "Замков\x3a"},
-    {14, 606,   "Героев\x3a"},
-    {14, 607,   "Золота\x20в\x20казне\x3a"},
-    {14, 608,   "Дерево\x20и\x20руда\x3a"},
-    {14, 609,   "Прочие\x20ресурсы\x3a"},
-    {14, 610,   "Найдено\x20обелисков\x3a"},
-    {14, 611,   "Артефакты\x3a"},
-    {14, 612,   "Общая\x20сила\x20армии\x3a"},
-    {14, 613,   "Доход\x3a"},
-    {14, 620,   "Лучший\x20герой\x3a"},
-    {14, 621,   "Лучшие\x20параметры\x3a"},
-    {14, 622,   "Характер\x3a"},
-    {14, 623,   "Лучший\x20воин\x3a"},
-    {14, 0,   "Гильдия\x20воров\x3a\x20достижения\x20игроков"},
-    {17, 110,   "Доступные\x20заклинания\x20были\x20записаны\x20в\x20книгу\x2e"},
-    {18, 600,   "Атака\x3a"},
-    {18, 601,   "Защита\x3a"},
-    {18, 602,   "Сила\x20магии\x3a"},
-    {18, 603,   "Знания\x3a"},
-    {18, 604,   "Очки\x20магии\x3a"},
-    {19, 600,   "Оборона\x3a"},
-    {20, 600,   "Нанять\x20героя"},
-    {21, 600,   "Атака"},
-    {21, 601,   "Защита"},
-    {21, 602,   "Сила\x20магии"},
-    {21, 603,   "Знания"},
-    {22, 0,   "Таверна"},
-    {23, 600,   "Сложность\x0aкарты"},
-    {23, 601,   "Сложность\x0aигры"},
-    {23, 602,   "\x0aРейтинг"},
-    {23, 603,   "Размер\x0aкарты"},
-    {23, 604,   "Оппоненты"},
-    {23, 605,   "Классы"},
-    {23, 606,   "Условия\x0aпобеды"},
-    {23, 607,   "Условия\x0aпоражения"}
+    {0, 100, "Построить:"},
+    {1, 100, "Скорость"},
+    {1, 101, "Информация\nо враге"},
+    {1, 102, "Магия\nв автобое"},
+    {1, 103, "Сетка"},
+    {1, 104, "Курсор\nс тенью"},
+    {1, 105, "Затенение\nсетки"},
+    {2, 100, "Музыка"},
+    {2, 101, "Эффекты"},
+    {2, 102, "Тип музыки"},
+    {2, 103, "Скорость"},
+    {2, 104, "Путь"},
+    {2, 105, "Враг"},
+    {2, 106, "Интерфейс"},
+    {2, 107, "Видео"},
+    {2, 108, "Тип курсора"},
+    {6, 300, "Атака"},
+    {6, 301, "Защита"},
+    {6, 302, "Сила магии"},
+    {6, 303, "Знания"},
+    {7, 600, "Сложность игры:"},
+    {7, 57, "Легкая"},
+    {7, 58, "Обычная"},
+    {7, 59, "Тяжелая"},
+    {7, 60, "Эксперт"},
+    {7, 61, "Невозможная"},
+    {7, 62, "Оппоненты:"},
+    {7, 84, "Класс:"},
+    {9, 41, "Золота в день:"},
+    {12, 0, "Строить корабль:"},
+    {12, 1, "Цена:"},
+    {14, 800, "1-й"},
+    {14, 801, "2-й"},
+    {14, 802, "3-й"},
+    {14, 803, "4-й"},
+    {14, 804, "5-й"},
+    {14, 805, "6-й"},
+    {14, 604, "Городов:"},
+    {14, 605, "Замков:"},
+    {14, 606, "Героев:"},
+    {14, 607, "Золота в казне:"},
+    {14, 608, "Дерево и руда:"},
+    {14, 609, "Прочие ресурсы:"},
+    {14, 610, "Найдено обелисков:"},
+    {14, 611, "Артефакты:"},
+    {14, 612, "Общая сила армии:"},
+    {14, 613, "Доход:"},
+    {14, 620, "Лучший герой:"},
+    {14, 621, "Лучшие параметры:"},
+    {14, 622, "Характер:"},
+    {14, 623, "Лучший воин:"},
+    {14, 0, "Гильдия воров: достижения игроков"},
+    {17, 110, "Доступные заклинания были записаны в книгу."},
+    {18, 600, "Атака:"},
+    {18, 601, "Защита:"},
+    {18, 602, "Сила магии:"},
+    {18, 603, "Знания:"},
+    {18, 604, "Очки магии:"},
+    {19, 600, "Оборона:"},
+    {20, 600, "Нанять героя"},
+    {21, 600, "Атака"},
+    {21, 601, "Защита"},
+    {21, 602, "Сила магии"},
+    {21, 603, "Знания"},
+    {22, 0, "Таверна"},
+    {23, 600, "Сложность\nкарты"},
+    {23, 601, "Сложность\nигры"},
+    {23, 602, "\nРейтинг"},
+    {23, 603, "Размер\nкарты"},
+    {23, 604, "Оппоненты"},
+    {23, 605, "Классы"},
+    {23, 606, "Условия\nпобеды"},
+    {23, 607, "Условия\nпоражения"}
 };
 b32 gbHeroWindShowing = false;
 b32 gbFullCombatScreenDrawn = true;

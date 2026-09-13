@@ -322,6 +322,10 @@ public:
     i32 GetSideDesc(char*, i32, i32);
 };
 #pragma pack(pop)
+
+#define GAME_DAY_NUMBER(g)                                                                         \
+    ((g).m_day + ((g).m_week - 1) * CALENDAR_DAYS_PER_WEEK                                         \
+     + ((g).m_month - 1) * CALENDAR_DAYS_PER_MONTH)
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;

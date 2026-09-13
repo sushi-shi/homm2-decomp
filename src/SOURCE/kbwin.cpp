@@ -25,19 +25,19 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
-        "Герои\x20\x49\x49"
+        "Герои II"
     );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
-            "Только\x20одна\x20копия\x20\x25\x73\x20может\x20быть\x20запущена\x20одновременно",
-            "Герои\x20Меча\x20и\x20Магии\x20\x49\x49"
+            "Только одна копия %s может быть запущена одновременно",
+            "Герои Меча и Магии II"
         );
         MessageBoxA(
             NULL,
             gText,
-            "Ошибка\x20загрузки",
+            "Ошибка загрузки",
             MB_ICONHAND
         );
         return 0;
@@ -75,16 +75,7 @@ i32 AppInit(
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt(
-        "hInstApp",
-        reinterpret_cast<i32>(hInstApp),
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp));
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
     bProcessMessage[WM_KEYDOWN] = 1;
@@ -114,7 +105,7 @@ i32 AppInit(
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
-            "Герои\x20\x49\x49"
+            "Герои II"
         );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
@@ -128,25 +119,25 @@ i32 AppInit(
             return 0;
     }
 
-    if (gConfig.gfx[(giCurExe)].showMenu != 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu != 0)
         giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
     else
         giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
     windowRect.left = windowRect.top = 0;
-    windowRect.right = gConfig.gfx[(giCurExe)].width - 1;
-    windowRect.bottom = gConfig.gfx[(giCurExe)].height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[(giCurExe)].showMenu);
+    windowRect.right = CURRENT_GRAPHICS_CONFIG.width - 1;
+    windowRect.bottom = CURRENT_GRAPHICS_CONFIG.height - 1;
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     hwndApp = CreateWindowExA(
         0,
         szAppName,
         szTitle,
         giCurWindowsStyleFlags,
-        gConfig.gfx[(giCurExe)].x,
-        gConfig.gfx[(giCurExe)].y,
+        CURRENT_GRAPHICS_CONFIG.x,
+        CURRENT_GRAPHICS_CONFIG.y,
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
         NULL,
-        (gConfig.gfx[(giCurExe)].showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
+        (CURRENT_GRAPHICS_CONFIG.showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
         instance,
         NULL
     );
@@ -162,7 +153,7 @@ i32 AppInit(
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
-        if (gConfig.gfx[(giCurExe)].showMenu == 0)
+        if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
             SetMenuStatus(0);
         InitGraphics();
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
@@ -222,10 +213,10 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 return 0;
             lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
             if ((lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0 && gbClosingApp == 0
-                && gConfig.gfx[(giCurExe)].fullScreen == 0) {
+                && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
                 GetWindowRect(window, &rcTemp);
-                gConfig.gfx[(giCurExe)].x = rcTemp.left;
-                gConfig.gfx[(giCurExe)].y = rcTemp.top;
+                CURRENT_GRAPHICS_CONFIG.x = rcTemp.left;
+                CURRENT_GRAPHICS_CONFIG.y = rcTemp.top;
                 WritePrefs();
             }
             return 0;
@@ -253,9 +244,9 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (iMainWinScreenHeight < 1)
                 iMainWinScreenHeight = 1;
             if (hwndApp != NULL && (lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0
-                && gbClosingApp == 0 && gConfig.gfx[(giCurExe)].fullScreen == 0) {
-                gConfig.gfx[(giCurExe)].width = iMainWinScreenWidth;
-                gConfig.gfx[(giCurExe)].height = iMainWinScreenHeight;
+                && gbClosingApp == 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
+                CURRENT_GRAPHICS_CONFIG.width = iMainWinScreenWidth;
+                CURRENT_GRAPHICS_CONFIG.height = iMainWinScreenHeight;
                 WritePrefs();
             }
             return 0;
@@ -274,15 +265,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 if (GameUnsaved() != 0) {
                     NormalDialog(
                         "Вы действительно хотите выйти?",
-                        NORMAL_DIALOG_CONFIRM,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
+                        NORMAL_DIALOG_CONFIRM
                     );
                     if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
                         DestroyWindow(window);
@@ -351,7 +334,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     RECT windowRect;
     i32 targetY;
 
-    if (gConfig.gfx[(giCurExe)].fullScreen != 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
         return;
     GetWindowRect(hwndApp, &windowRect);
     windowX = (x == -1 ? windowRect.left : x);
@@ -360,7 +343,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     windowRect.top = 0;
     windowRect.right = width - 1;
     windowRect.bottom = height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[(giCurExe)].showMenu);
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);
     MoveWindow(
         hwndApp,
         windowX,
@@ -369,10 +352,10 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
         windowRect.bottom - windowRect.top + 1,
         1
     );
-    gConfig.gfx[(giCurExe)].x = windowX;
-    gConfig.gfx[(giCurExe)].y = targetY;
-    gConfig.gfx[(giCurExe)].width = width;
-    gConfig.gfx[(giCurExe)].height = height;
+    CURRENT_GRAPHICS_CONFIG.x = windowX;
+    CURRENT_GRAPHICS_CONFIG.y = targetY;
+    CURRENT_GRAPHICS_CONFIG.width = width;
+    CURRENT_GRAPHICS_CONFIG.height = height;
     WritePrefs();
 }
 
@@ -418,7 +401,7 @@ LRESULT AppCommand(
             ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
             break;
         case KBWIN_MENU_FULLSCREEN:
-            SetFullScreenStatus(1 - gConfig.gfx[(giCurExe)].fullScreen);
+            SetFullScreenStatus(1 - CURRENT_GRAPHICS_CONFIG.fullScreen);
             break;
         default:
             return HandleAppSpecificMenuCommands(command);
@@ -430,7 +413,7 @@ void UpdateDfltMenu(HMENU menu) {
     i32 result [[maybe_unused]];
     i32 value [[maybe_unused]];
 
-    if (gConfig.gfx[(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
         EnableMenuItem(menu, (KBWIN_MENU_SIZE_640_480), MF_GRAYED);
@@ -450,7 +433,7 @@ void KBChangeMenu(HMENU menu) {
     else
         hmnuCurrent = menu;
     hmnuApp = menu;
-    if (gConfig.gfx[(giCurExe)].showMenu) {
+    if (CURRENT_GRAPHICS_CONFIG.showMenu) {
         if (menu != NULL) {
             SetMenu(hwndApp, menu);
             UpdateDfltMenu(menu);
@@ -469,24 +452,24 @@ void SetMenuStatus(i32 showMenu) {
     i32l windowStyle [[maybe_unused]];
     i32l replacedStyle [[maybe_unused]];
 
-    if (gConfig.gfx[(giCurExe)].fullScreen && showMenu)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen && showMenu)
         return;
     {
-        winWidth = gConfig.gfx[(giCurExe)].width;
-        height = gConfig.gfx[(giCurExe)].height;
-        gConfig.gfx[(giCurExe)].showMenu = showMenu;
+        winWidth = CURRENT_GRAPHICS_CONFIG.width;
+        height = CURRENT_GRAPHICS_CONFIG.height;
+        CURRENT_GRAPHICS_CONFIG.showMenu = showMenu;
         KBChangeMenu(NULL);
-        gConfig.gfx[(giCurExe)].width = winWidth;
-        gConfig.gfx[(giCurExe)].height = height;
+        CURRENT_GRAPHICS_CONFIG.width = winWidth;
+        CURRENT_GRAPHICS_CONFIG.height = height;
         WritePrefs();
         windowStyle = GetWindowLongA(hwndApp, GWL_STYLE);
-        if (gConfig.gfx[(giCurExe)].showMenu)
+        if (CURRENT_GRAPHICS_CONFIG.showMenu)
             giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
         else
             giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
         replacedStyle = SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         ShowWindow(hwndApp, SW_SHOWNA);
-        ResizeWindow(-1, -1, gConfig.gfx[(giCurExe)].width, gConfig.gfx[(giCurExe)].height);
+        ResizeWindow(-1, -1, CURRENT_GRAPHICS_CONFIG.width, CURRENT_GRAPHICS_CONFIG.height);
     }
 }
 

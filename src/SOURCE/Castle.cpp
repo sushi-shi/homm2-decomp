@@ -144,18 +144,17 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
         if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
             && castleSlotsBase[slotNum] <= BUILDING_SLOT_DWELLING_SIXTH
-            && ((m_town->m_buildings & (1L << (castleSlotsBase[slotNum])))
-                || (m_town->m_buildings
-                    & (1L << ((castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))
+            && ((((m_town->m_buildings) & ((1L << (castleSlotsBase[slotNum])))))
+                || (((m_town->m_buildings) & ((1L << ((castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))))
                 || (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
-                    && (m_town->m_buildings & (TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
+                    && (((m_town->m_buildings) & ((TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
             && (gTownEligibleBuildMask[(m_town->m_type)]
                 & (1L << ((castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
-                && ((m_town->m_buildings & (TOWN_BUILDING_UPGRADED_DWELLING_6))
-                    || (m_town->m_buildings & (TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
+                && ((((m_town->m_buildings) & ((TOWN_BUILDING_UPGRADED_DWELLING_6))))
+                    || (((m_town->m_buildings) & ((TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))))) {
                 castleSlotsUse[slotNum] = BUILDING_SLOT_DWELLING_LAST;
             } else {
                 castleSlotsUse[slotNum] = castleSlotsBase[slotNum] + CASTLE_UPGRADE_OFFSET;
@@ -198,9 +197,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             sprintf(
                 gText,
                 "%d этаж Гильдии магов"
-                     ,
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
-                                                                     : TOWN_MAGE_GUILD_MAX_LEVEL
+                ,
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
             );
             msg.payload.widget.data.text = gText;
         } else {
@@ -214,9 +212,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         stateFrame = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << (castleSlotsUse[slotNum])))
-            && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+        if (TOWN_BUILDING_COMPLETE(*m_town, castleSlotsUse[slotNum])) {
             stateFrame = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << (castleSlotsUse[slotNum]))))
@@ -389,11 +385,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     tileX = BACKGROUND_LEFT;
     tileY = BACKGROUND_TOP;
-    terrainIconFrame = ((giGroundToTerrain
-                                  [gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)
-                                       ->m_terrainImageIndex])
-                          - 1)
-                         * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
+    terrainIconFrame = ((CELL_TERRAIN(gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y))) - 1)
+                       * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
     raceBase = (m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backFrame = 0;
@@ -581,11 +574,10 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
-                        "Нельзя построить. Вы уже "
-                            "строили здесь в этом ходу."
+                        "Нельзя построить. Вы уже строили здесь в этом ходу."
 
                     );
-                } else if (gpTownManager->m_town->m_buildings & (1 << (whichBuilding))) {
+                } else if ((((gpTownManager->m_town->m_buildings) & ((1 << (whichBuilding)))))) {
                     sprintf(
                         gText,
                         cCastleInfo[(INFO_ALREADY_BUILT)],
@@ -669,9 +661,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = CASTLE_WIDGET_TEXT;
-        message.payload.widget.id = CONTROL_STATUS_TEXT;
+        SET_WIDGET_MESSAGE(message, CASTLE_WIDGET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
@@ -694,26 +684,10 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case CONTROL_CAPTAIN_FORMATION_SPREAD:
                         if (quickFlag) {
                             NormalDialog(
-                                "{Широкие ряды}\n\nП"
-                                    "ри таком боевом "
-                                    "порядке ваше вой"
-                                    "ско занимает поз"
-                                    "иции по всей шир"
-                                    "ине поля боя и ме"
-                                    "жду соседними от"
-                                    "рядами имеется х"
-                                    "отя бы одна пуст"
-                                    "ая клетка."
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка."
+
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         }
@@ -725,24 +699,10 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case CONTROL_CAPTAIN_FORMATION_GROUPED:
                         if (quickFlag) {
                             NormalDialog(
-                                "{Плотные ряды}\n\nП"
-                                    "ри таком боевом "
-                                    "порядке ряды ваш"
-                                    "ей армии смыкают"
-                                    "ся вокруг центра"
-                                    "льного отряда на"
-                                    " вашем краю поля "
-                                    "боя."
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя."
+
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         }
@@ -784,7 +744,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case (BUILDING_SLOT_SPECIAL_TWENTY_NINE):
                     case (BUILDING_SLOT_SPECIAL_THIRTY):
                         if (!quickFlag) {
-                            if ((gpTownManager->m_town->m_buildings & (1 << (whichBuilding)))
+                            if ((((gpTownManager->m_town->m_buildings) & ((1 << (whichBuilding)))))
                                 || !(gpTownManager->m_buildableBuildings & (1 << (whichBuilding))))
                                 break;
                         }

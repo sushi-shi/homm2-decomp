@@ -247,22 +247,8 @@ void game::GetMap(void) {
     );
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
-            "Как минимум у одног"
-            "о игрока нет Героев "
-            "II: Цена Верности. Вы м"
-            "ожете выбрать карт"
-            "у только стандартн"
-            "ого формата Героев "
-            "II.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "Как минимум у одного игрока нет Героев II: Цена Верности. Вы можете выбрать карту только стандартного формата Героев II.",
+            NORMAL_DIALOG_INFO
         );
         sprintf(fileMask, "*.%s", "MP2");
     } else if (xIsExpansionMap) {
@@ -568,9 +554,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_CHANNEL,
                 GAME_MAP_PACKET_SIZE,
                 GAME_REMOTE_MAP_HEADER,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -580,9 +564,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_CHANNEL,
                 GAME_PLAYER_INFO_PACKET_SIZE,
                 GAME_REMOTE_PLAYER_INFO,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -884,9 +866,7 @@ cleanup:
         i32 unusedPlayer17 [[maybe_unused]];
 
         strcpy(gText, m_mapHeader.name);
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        message.payload.widget.id = NEW_GAME_SCENARIO_NAME;
+        SET_WIDGET_MESSAGE(message, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
 
@@ -1028,9 +1008,7 @@ cleanup:
 
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
-            windowMessage.type = MESSAGE_WIDGET;
-            windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-            windowMessage.payload.widget.id = NEW_GAME_SHADOW;
+            SET_WIDGET_MESSAGE(windowMessage, NEW_GAME_WIDGET_DISABLE, NEW_GAME_SHADOW);
             windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
             gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
         }
@@ -1051,17 +1029,8 @@ cleanup:
 
                     case GAME_REMOTE_CANCEL:
                         NormalDialog(
-                            "Сервер прекрат"
-                            "ил игру.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            "Сервер прекратил игру.",
+                            NORMAL_DIALOG_INFO
                         );
                         ShutDown(NULL);
                         break;
@@ -1143,9 +1112,7 @@ cleanup:
                 GAME_REMOTE_CHANNEL,
                 strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
                 GAME_REMOTE_CHAT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!sendResult)
                 ShutDown(NULL);
@@ -1153,8 +1120,7 @@ cleanup:
 
         if (message.type == MESSAGE_WIDGET) {
             if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
-                if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
-                    || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
+                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
                     if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
                          && message.payload.widget.id
@@ -1201,18 +1167,7 @@ cleanup:
                     if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
-                        NormalDialog(
-                            gNewGameHelp[helpDialogIndexLocal],
-                            NEW_GAME_HELP_DIALOG_TYPE,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
                 }
             } else {
                 switch (message.payload.widget.command) {
@@ -1225,9 +1180,7 @@ cleanup:
                                         GAME_REMOTE_CHANNEL,
                                         0,
                                         GAME_REMOTE_START,
-                                        1,
-                                        1,
-                                        REMOTE_MESSAGE_DEFAULT
+                                        1
                                     );
                                 }
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1243,9 +1196,7 @@ cleanup:
                                         GAME_REMOTE_CHANNEL,
                                         0,
                                         GAME_REMOTE_CANCEL,
-                                        1,
-                                        1,
-                                        REMOTE_MESSAGE_DEFAULT
+                                        1
                                     );
                                     ShutDown(NULL);
                                 }
@@ -1416,19 +1367,8 @@ cleanup:
                                                 static_cast<i8>(swapPlayerTemp);
                                         } else {
                                             NormalDialog(
-                                                "Две выбранны"
-                                                "х позиции не м"
-                                                "огут поменят"
-                                                "ься местами.",
-                                                NORMAL_DIALOG_INFO,
-                                                -1,
-                                                -1,
-                                                -1,
-                                                0,
-                                                -1,
-                                                0,
-                                                -1,
-                                                0
+                                                "Две выбранных позиции не могут поменяться местами.",
+                                                NORMAL_DIALOG_INFO
                                             );
                                         }
                                         gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
@@ -1508,9 +1448,7 @@ cleanup:
                                             GAME_REMOTE_CHANNEL,
                                             GAME_MAP_PACKET_SIZE,
                                             GAME_REMOTE_MAP_HEADER,
-                                            1,
-                                            1,
-                                            REMOTE_MESSAGE_DEFAULT
+                                            1
                                         );
                                     }
                                 }
@@ -1539,9 +1477,7 @@ cleanup:
             GAME_REMOTE_CHANNEL,
             GAME_SETUP_PACKET_SIZE,
             GAME_REMOTE_SETUP,
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
+            1
         );
         if (!sendResult)
             ShutDown(NULL);
@@ -1745,9 +1681,7 @@ void game::ShowScenInfo(void) {
         MemError();
     SetWinText(window, GAME_SCENARIO_WINDOW_TEXT_ID);
 
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    msg.payload.widget.id = NEW_GAME_SCENARIO_NAME;
+    SET_WIDGET_MESSAGE(msg, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
     msg.payload.widget.data.text = m_mapHeader.name;
     window->BroadcastMessage(msg);
 
@@ -2079,9 +2013,8 @@ void game::GetLossConditionText(char* text) {
                 sprintf(
                     text,
                     "Потерять %s '%s'.",
-                    (city2->m_buildings & (TOWN_BUILDING_CASTLE))
-                        ? "замок"
-                        : "город",
+                    (((city2->m_buildings) & ((TOWN_BUILDING_CASTLE)))) ? "замок"
+                                                                       : "город",
                     city2->m_name
                 );
                 break;
@@ -2105,9 +2038,7 @@ void game::GetLossConditionText(char* text) {
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
-                    "Не одержать побе"
-                    "ду до конца %d месяц"
-                    "а, %d недели, %d дня.",
+                    "Не одержать победу до конца %d месяца, %d недели, %d дня.",
                     month19,
                     week2,
                     day26
@@ -2117,8 +2048,7 @@ void game::GetLossConditionText(char* text) {
     } else {
         sprintf(
             text,
-            "Потерять всех геро"
-            "ев, города и замки."
+            "Потерять всех героев, города и замки."
         );
     }
 }
@@ -2139,7 +2069,7 @@ void game::GetVictoryConditionText(char* text) {
                 sprintf(
                     text,
                     "Захватить %s '%s'",
-                    (targetTown->m_buildings & (TOWN_BUILDING_CASTLE))
+                    (((targetTown->m_buildings) & ((TOWN_BUILDING_CASTLE))))
                         ? "замок"
                         : "город",
                     targetTown->m_name
@@ -2159,8 +2089,7 @@ void game::GetVictoryConditionText(char* text) {
                 if (m_mapHeader.victoryConditionValue == 0)
                     sprintf(
                         text,
-                        "Найти могуществ"
-                        "енный артефакт"
+                        "Найти могущественный артефакт"
                     );
                 else
                     sprintf(
@@ -2189,16 +2118,14 @@ void game::GetVictoryConditionText(char* text) {
                 if (localPlayerFirst)
                     sprintf(
                         text,
-                        "%s и %s должны срази"
-                        "ться",
+                        "%s и %s должны сразиться",
                         firstSide,
                         secondSideValue
                     );
                 else
                     sprintf(
                         text,
-                        "%s и %s должны срази"
-                        "ться",
+                        "%s и %s должны сразиться",
                         secondSideValue,
                         firstSide
                     );
@@ -2208,22 +2135,14 @@ void game::GetVictoryConditionText(char* text) {
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,
-                ", или вы можете выи"
-                "грать, уничтожив "
-                "всех вражеских ге"
-                "роев и захватив вс"
-                "е вражеские город"
-                "а и замки."
+                ", или вы можете выиграть, уничтожив всех вражеских героев и захватив все вражеские города и замки."
             );
         else
             strcat(text, ".");
     } else {
         strcpy(
             text,
-            "Уничтожить всех вр"
-            "ажеских героев  и за"
-            "хватить все вражес"
-            "кие города и замки."
+            "Уничтожить всех вражеских героев  и захватить все вражеские города и замки."
         );
     }
 }

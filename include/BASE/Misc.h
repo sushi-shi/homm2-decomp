@@ -21,6 +21,15 @@ typedef enum LogConstant {
     LOG_UNUSED_VALUE = -999
 } LogConstant;
 
+
+#define READ_FILE_VALUE(fd, value) read((fd), &(value), sizeof(value))
+#define WRITE_FILE_VALUE(fd, value) write((fd), &(value), sizeof(value))
+
+
+#define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
+#define INTEGER_VECTOR_LENGTH(dx, dy) \
+    (static_cast<i32>(sqrt(static_cast<double>((dx) * (dx) + (dy) * (dy)))))
+
 struct indexArray {
     u16 key;
     u16 value;
@@ -90,6 +99,12 @@ constexpr const char* H2SourceName(const char* path) {
 #define H2_FREE(ptr) BaseFree(ptr, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
 #define H2_ASSERT(condition)                                                                       \
     ProcessAssert(condition, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+
+#define ALLOC_COPY_STRING(destination, source)                                                     \
+    ((destination) = static_cast<char*>(H2_ALLOC(strlen(source) + 1)),                             \
+     strcpy((destination), (source)))
+
+#define LOG_SUMMARY_VALUE(format, value) (sprintf(gText, (format), (value)), LogStr(gText))
 char* FindStringInString(char* text, const char* pattern);
 char* FindToken(char* text, char token);
 const char* FindToken(const char* text, char token);
@@ -111,10 +126,27 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32)
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(const char*);
-void LogInt(const char*, i32, i32, i32, i32, i32, i32, i32);
-template <typename Enum>
-    requires __is_enum(Enum)
-inline void LogInt(const char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+void LogInt(
+    const char* text,
+    i32 value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+);
+template<typename Enum>
+requires __is_enum(Enum) inline void LogInt(
+    const char* text,
+    Enum value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
 void AiPrint(const char*);

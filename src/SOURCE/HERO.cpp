@@ -244,7 +244,7 @@ i32 hero::CalcMobility(void) {
     i32 slowestSpeedValue;
     i32 creatureIndex;
 
-    if ((((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+    if (IsEmbarked()) {
         movePoints = seaBaseMobility;
         movePoints = static_cast<i32>(
             movePoints * gfSSNavigationMod[(m_secondarySkills[(HERO_SKILL_NAVIGATION)])]
@@ -373,9 +373,7 @@ void HeroMessageUpdate(const char* text) {
     if (gheroWin == NULL)
         return;
 
-    message.type = HERO_UI_MESSAGE;
-    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
-    message.payload.widget.id = UI_STATUS_TEXT_WIDGET;
+    SET_WIDGET_MESSAGE(message, HERO_UI_WIDGET_TEXT, UI_STATUS_TEXT_WIDGET);
     message.payload.widget.data.text = text;
     gheroWin->BroadcastMessage(message);
     gheroWin->DrawWindow(0, UI_PREVIOUS_HERO, UI_STATUS_TEXT_WIDGET);
@@ -454,18 +452,7 @@ void hero::UpdateArmies(void) {
 }
 
 void hero::ViewStat(i32 stat, i32 quickView) {
-    NormalDialog(
-        gStatDesc[stat],
-        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
-    );
+    NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
@@ -501,18 +488,9 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
 
 i32 hero::Dismiss(void) {
     NormalDialog(
-        "Вы действительно хотите "
-        "уволить героя?"
+        "Вы действительно хотите уволить героя?"
         ,
-        NORMAL_DIALOG_CONFIRM,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
+        NORMAL_DIALOG_CONFIRM
     );
     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
         Deallocate(1);
@@ -549,7 +527,7 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         gpAdvManager->HideRoute(0, 0, 0);
 
-    if ((((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+    if (IsEmbarked()) {
         for (i = 0; i < GAME_BOAT_COUNT; i++) {
             if (gpGame->m_boats[i].heroId == m_id) {
                 gpGame->m_boats[i].heroId = -1;
@@ -850,12 +828,11 @@ void hero::CheckLevel(void) {
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[(m_owner)]) {
             samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
             if (choices[0] == HERO_SKILL_NONE) {
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (choices[1] == HERO_SKILL_NONE) {
                 sprintf(
                     text,
-                    "\n\nВаш герой изучил "
-                    "%s %s."  ,
+                    "\n\nВаш герой изучил %s %s.",
                     gSecondarySkillLevels[(m_secondarySkills[(choices[0])])],
                     gSecondarySkills[(choices[0])]
                 );
@@ -877,9 +854,8 @@ void hero::CheckLevel(void) {
             } else {
                 sprintf(
                     text,
-                    "\n\nВы также можете "
-                    "выучить %s %s или %s %s."
-                     ,
+                    "\n\nВы также можете выучить %s %s или %s %s."
+                    ,
                     gSecondarySkills[(choices[0])],
                     gSecondarySkillLevels[(m_secondarySkills[(choices[0])])],
                     gSecondarySkills[(choices[1])],
@@ -921,7 +897,7 @@ void hero::CheckLevel(void) {
         }
     }
     m_level = static_cast<i16>(newLevel);
-    WaitEndSample(&samp, -1);
+    WaitEndSample(&samp);
 }
 
 i32 hero::NumArtifacts(void) {
@@ -1249,26 +1225,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_SPREAD:
                         if (quickView) {
                             NormalDialog(
-                                "{Широкие ряды}\n\nП"
-                                "ри таком боевом "
-                                "порядке ваше вой"
-                                "ско занимает поз"
-                                "иции по всей шир"
-                                "ине поля боя и ме"
-                                "жду соседними от"
-                                "рядами имеется х"
-                                "отя бы одна пуст"
-                                "ая клетка."
-                                 ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка."
+
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
@@ -1283,24 +1243,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_GROUPED:
                         if (quickView) {
                             NormalDialog(
-                                "{Плотные ряды}\n\nП"
-                                "ри таком боевом "
-                                "порядке ряды ваш"
-                                "ей армии смыкают"
-                                "ся вокруг центра"
-                                "льного отряда на"
-                                " вашем краю поля "
-                                "боя."
-                                 ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя."
+
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
@@ -1316,36 +1262,16 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_SPELL_POINTS_LAST:
                         sprintf(
                             gText,
-                            "{Очки магии}\n\n%s сейч"
-                            "ас располагает %d о"
-                            "чками магии из во"
-                            "зможных %d оч. Макси"
-                            "мально возможное "
-                            "число очков магии"
-                            " равно уровню зна"
-                            "ний помноженному "
-                            "на 10. Но иногда, в ос"
-                            "обых случаях, кол"
-                            "ичество очков маг"
-                            "ии может превышат"
-                            "ь обычный лимит."
-                             ,
+                            "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит."
+
+                            ,
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
-                            gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                                * HERO_SPELL_POINTS_PER_KNOWLEDGE
+                            HERO_NORMAL_SPELL_POINTS(*gpHVHero)
                         );
                         NormalDialog(
                             gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
 
@@ -1355,25 +1281,15 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         nextExperience = gpHVHero->GetExperience(heroLevel + 1);
                         sprintf(
                             gText,
-                            "{%d уровень}\n\nТекущи"
-                            "й опыт: %d\nСледующи"
-                            "й уровень: %d"
-                             ,
+                            "{%d уровень}\n\nТекущий опыт: %d\nСледующий уровень: %d"
+                            ,
                             heroLevel,
                             gpHVHero->m_experience,
                             nextExperience
                         );
                         NormalDialog(
                             gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
                     }
@@ -1531,9 +1447,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     }
 
     if (bExit) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(UI_DIALOG_CLOSE_COMMAND);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1735,12 +1649,7 @@ void SetupHeroView(void) {
     msg.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(
-        gText,
-        "%d/%d",
-        gpHVHero->m_spellPoints,
-        gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
-    );
+    sprintf(gText, "%d/%d", gpHVHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*gpHVHero));
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_SPELL_POINTS_LAST;
     msg.payload.widget.data.text = gText;
@@ -2015,11 +1924,8 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
         skillText = gSecondarySkillLevels[(m_secondarySkills[(skill)]) - 1];
         sprintf(
             gText,
-            "{%s Некромантия (+%d)}\n\n%s "
-                "Некромантия (+%d) позволяет вернуть "
-                "%d процентов погибших в бою воинов в "
-                "вашу армию в виде скелетов."
-                 ,
+            "{%s Некромантия (+%d)}\n\n%s Некромантия (+%d) позволяет вернуть %d процентов погибших в бою воинов в вашу армию в виде скелетов."
+                ,
             skillText,
             skillBonusValue,
             skillText,
@@ -2057,7 +1963,7 @@ void hero::CheckAnduranPieces(b32 showDialog) {
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, (ARTIFACT_NONE));
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog);
         if (gbThisNetHumanPlayer[(m_owner)]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(

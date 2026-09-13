@@ -16,6 +16,7 @@ enum {
     SCAN_CODE_MASK          = 0xff,
     WINDOWS_HIGH_WORD_SHIFT = 16,
     ENCODED_SCAN_CODE_SHIFT = 8,
+    ASCII_ESCAPE_CODE       = 0x1b,
     ASCII_DELETE_CODE       = 0x7f
 };
 typedef i32 InputManagerScanCodeEncoding;
@@ -134,7 +135,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 AppCommand(hwndApp, 0, (KBWIN_MENU_HELP), 0);
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(1 - gConfig.gfx[(giCurExe)].fullScreen);
+                SetFullScreenStatus(1 - CURRENT_GRAPHICS_CONFIG.fullScreen);
         }
     }
     return event->type == MESSAGE_NONE;
@@ -192,16 +193,13 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
                     "ReleaseCapture Failed"
                 );
         mouseCoordinates:
-            event->payload.mouse.x =
-                (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-            event->payload.mouse.y =
-                (static_cast<i16>(HIWORD(messageData)) * MOUSE_SCREEN_HEIGHT)
-                / iMainWinScreenHeight;
+            event->payload.mouse.x = CLIENT_TO_GAME_X(static_cast<i16>(messageData));
+            event->payload.mouse.y = CLIENT_TO_GAME_Y(static_cast<i16>(HIWORD(messageData)));
             event->payload.mouse.screenX = event->payload.mouse.x;
             event->payload.mouse.screenY = event->payload.mouse.y;
 
-            if (gConfig.gfx[(giCurExe)].fullScreen == 0
-                && gConfig.gfx[(giCurExe)].colorMouseCursor == 0
+            if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0
+                && CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0
                 && iLastBWOnScreenCheck < KBTickCount()
                 && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
                 && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
@@ -422,7 +420,7 @@ void inputManager::MakeScanCodeTable(void) {
         m_keyState[scanCode] = EncodeScanCode(scanCode);
 
     m_keyState[(INPUT_SCAN_NONE)] = 0;
-    m_keyState[(INPUT_SCAN_ESCAPE)] = '\x1b';
+    m_keyState[(INPUT_SCAN_ESCAPE)] = (ASCII_ESCAPE_CODE);
     m_keyState[(INPUT_SCAN_1)] = '1';
     m_keyState[(INPUT_SCAN_2)] = '2';
     m_keyState[(INPUT_SCAN_3)] = '3';
@@ -515,9 +513,9 @@ void inputManager::MakeScanCodeTable(void) {
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
-    if (gConfig.gfx[(giCurExe)].fullScreen != 0 && force == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0 && force == 0)
         return;
-    if (gConfig.gfx[(giCurExe)].colorMouseCursor == 0)
+    if (CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0)
         return;
 
     bInCheckChangeCursor = true;

@@ -465,24 +465,11 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
             "Вы действительно хотите начать сначала сценарий?",
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
+            CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitCampaignMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -790,19 +777,10 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 }
                             } else {
                                 NormalDialog(
-                                    "Выбранная карта - "
-                                        "плохой выбор для вашего "
-                                        "следующего сценария."
-                                         ,
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    "Выбранная карта - плохой выбор для вашего следующего сценария."
+
+                                    ,
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -947,8 +925,7 @@ void game::InitCampaignMap(void) {
                 GiveArtifact(
                     gpGame->GetHero(m_players[0].m_heroIds[0]),
                     choiceBest1->artifact,
-                    false,
-                    -1
+                    false
                 );
             break;
         case CAMPAIGN_CHOICE_SPELL:
@@ -982,8 +959,10 @@ void game::InitCampaignMap(void) {
             savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (m_players[0].m_heroCount > 0) {
-                gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += choiceBest1->value;
-                gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(m_players[0].m_heroIds[0]),
+                    choiceBest1->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -996,7 +975,7 @@ void game::InitCampaignMap(void) {
          || (m_campaignAwards[(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)]
              && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1))
         && m_players[0].m_heroCount > 0) {
-        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, false, -1);
+        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, false);
     }
     gbRetreatWin = true;
 
@@ -1049,8 +1028,10 @@ void game::InitCampaignMap(void) {
                     .Add(CREATURE_VAMPIRE_LORD, NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
-        gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-        gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
+        ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+            *gpGame->GetHero(m_players[0].m_heroIds[0]),
+            CAMPAIGN_EXPERIENCE_BONUS
+        );
         gbInNewGameSetup = savedNewGame;
     }
 

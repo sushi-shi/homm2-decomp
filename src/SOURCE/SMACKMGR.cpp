@@ -245,18 +245,9 @@ void SmackManagerMain(void) {
             if (!smk1) {
                 gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
                 NormalDialog(
-                    "Ошибка чтения диска "
-                        "Героев 2. Повторить?"
-                     ,
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Ошибка чтения диска Героев 2. Повторить?"
+                    ,
+                    NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SIX)
                     ShutDown("CDROM drive error.  Exiting.");
@@ -678,15 +669,10 @@ i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
 }
 
 void PrintSummaryInfo(SmackSum* summary) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "                                              Name - %s",
         SmackOptions[bSmackNum].fileName
     );
-    LogStr(gText);
-#define LOG_SUMMARY_VALUE(format, value)                                                           \
-    sprintf(gText, format, value);                                                                 \
-    LogStr(gText)
     LOG_SUMMARY_VALUE(
         "                                        total time - %8d",
         summary->TotalTime
@@ -747,7 +733,6 @@ void PrintSummaryInfo(SmackSum* summary) {
         "                Highest amount of memory allocated - %8d",
         summary->HighestExtraUsed
     );
-#undef LOG_SUMMARY_VALUE
 }
 
 icon* backImage = NULL;

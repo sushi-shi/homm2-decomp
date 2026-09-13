@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -382,7 +383,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "Сохранить\x20файл\x3a"
+             "Сохранить файл:"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -412,15 +413,13 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "Загрузить\x20файл\x3a"
+             "Загрузить файл:"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
-    message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
     m_window->BroadcastMessage(message);
     Update(0);
@@ -434,7 +433,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-                 "НОВАЯ\x20ИГРА"
+                "НОВАЯ ИГРА"
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -450,9 +449,11 @@ i32 fileRequester::Open(i32 id) {
 
 void fileRequester::SetOK(i32 enabled) {
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.id = FILE_REQUESTER_OK;
+    SET_WIDGET_MESSAGE(
+        message,
+        enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
+        FILE_REQUESTER_OK
+    );
     message.payload.widget.data.value = m_active == 1 ? (WIDGET_FLAG_DIMMED) : (WIDGET_FLAG_GRAYED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -544,20 +545,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
-                                    "Выберите из списк"
-                                    "а или нажмите кно"
-                                    "пку отмены."
+                                    "Выберите из списка или нажмите кнопку отмены."
 
                                     ,
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -653,15 +644,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (helpIndexMouse >= REQUESTER_HELP_VALID_BEGIN) {
                             NormalDialog(
                                 gFileRequestHelp[(helpIndexMouse)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         }
                     } else {
@@ -678,9 +661,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
-                                            "Нет карт такого"
-                                            " размера для %d иг"
-                                            "роков-людей."
+                                            "Нет карт такого размера для %d игроков-людей."
 
                                             ,
                                             giNumHumanPlayers
@@ -688,26 +669,13 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     } else {
                                         sprintf(
                                             gText,
-                                            "Нет карты этого"
-                                            " размера для %d иг"
-                                            "роков-людей."
+                                            "Нет карты этого размера для %d игроков-людей."
 
                                             ,
                                             giNumHumanPlayers
                                         );
                                     }
-                                    NormalDialog(
-                                        gText,
-                                        NORMAL_DIALOG_INFO,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        NORMAL_DIALOG_NO_VALUE,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0,
-                                        NORMAL_DIALOG_NO_RESOURCE,
-                                        0
-                                    );
+                                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                                     break;
                                 }
                                 giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(iResult);
@@ -732,9 +700,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             case FILE_REQUESTER_FILENAME_ENTRY: {
-                                broadcastMessage.type = MESSAGE_WIDGET;
-                                broadcastMessage.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
-                                broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+                                SET_WIDGET_MESSAGE(
+                                    broadcastMessage,
+                                    WIDGET_COMMAND_GET_TEXT,
+                                    FILE_REQUESTER_FILENAME_ENTRY
+                                );
                                 m_window->BroadcastMessage(broadcastMessage);
 
                                 memset(newNameData, 0, FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE);
@@ -882,58 +852,27 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "Выбранная вами игра р"
-                    "ассчитана только на %d ч"
-                    "еловек.  А вам нужна кар"
-                    "та, как минимум на %d чел"
-                    "овек."
+                    "Выбранная вами игра рассчитана только на %d человек.  А вам нужна карта, как минимум на %d человек."
 
 
                     ,
                     iResult,
                     giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "Выбранная игра начнет"
-                    "ся с %d игроками-людьми. "
-                    "Можно ли компьютеру в"
-                    "зять под свое управле"
-                    "ние оставшиеся %d мест л"
-                    "юдей?"
+                    "Выбранная игра начнется с %d игроками-людьми. Можно ли компьютеру взять под свое управление оставшиеся %d мест людей?"
 
 
                     ,
                     iResult,
                     iResult - giNumHumanPlayers
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_CONFIRM,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
                     acceptStep = false;
                 }

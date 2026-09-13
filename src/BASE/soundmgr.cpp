@@ -80,9 +80,7 @@ bool soundManager::StartupMilesBackend(void) {
         MessageBoxA(
             hwndApp,
 
-            "Ошибка инициализации "
-                "звука!  Не найдено "
-                "устройство.",
+            "Ошибка инициализации звука!  Не найдено устройство.",
 
             "Ошибка загрузки",
             0
@@ -108,8 +106,7 @@ bool soundManager::StartupMilesBackend(void) {
             hwndApp,
             AIL_last_error(),
 
-            "Ошибка инициализации "
-                "звука!",
+            "Ошибка инициализации звука!",
             0
         );
         m_digitalDriver = NULL;

@@ -1,8 +1,10 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bmap2.h>
@@ -308,29 +310,6 @@ typedef i32 EventSoundVariant;
         MINE_CENTER_GOLD_FRAME = 4
     } AbandonedMineConversionConstant;
 
-    typedef enum Cp1251Letter {
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO = 0xb8,
-        CP1251_CAPITAL_A = 0xc0,
-        CP1251_CAPITAL_YA = 0xdf,
-        CP1251_CASE_STEP = 0x20
-    } Cp1251Letter;
-
-
-    inline char ToLowerCp1251(u8 letter) {
-        char smallLetter;
-
-        if (letter >= 'A' && letter <= 'Z')
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter == CP1251_CAPITAL_YO)
-            smallLetter = CP1251_SMALL_YO;
-        else
-            smallLetter = letter;
-        return smallLetter;
-    }
-
 }
 
 #define TRADING_POST_EFFICIENCY 0.2f
@@ -409,12 +388,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Волшебный сад}\n\nВы забрели "
-                        "в волшебный сад, из тех, где "
-                        "так обожают резвиться лепреконы "
-                        "с феями, но сегодня здесь никого."
-                        " Может, на следующей неделе "
-                        "вам повезет больше.",
+                    "{Волшебный сад}\n\nВы забрели в волшебный сад, из тех, где так обожают резвиться лепреконы с феями, но сегодня здесь никого. Может, на следующей неделе вам повезет больше.",
                     -1,
                     0,
                     -1,
@@ -426,12 +400,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Волшебный сад}\n\nВы поймали "
-                        "лепрекона, так беспечно заснувшего "
-                        "под шляпкой волшебного гриба."
-                        " В обмен на свободу он рассказал "
-                        "вам, где лежит горшочек со "
-                        "всякими ценными вещицами.",
+                    "{Волшебный сад}\n\nВы поймали лепрекона, так беспечно заснувшего под шляпкой волшебного гриба. В обмен на свободу он рассказал вам, где лежит горшочек со всякими ценными вещицами.",
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
                     static_cast<ResourceType>(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
@@ -462,34 +431,20 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra_o->active) {
                 NormalDialog(
-                    "{Сфинкс}\n\nВы подошли к огромному "
-                        "Сфинксу, но он даже не шелохнулся.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Сфинкс}\n\nВы подошли к огромному Сфинксу, но он даже не шелохнулся.",
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             } else {
                 sprintf(
                     gText,
-                    "\"Есть у меня загадка для тебя,"
-                        "\"сказал Сфинкс. \"Ответишь "
-                        "верно - получишь награду. Ошибешься "
-                        "- я сожру тебя. Принимаешь ли "
-                        "ты мой вызов?\""
+                    "\"Есть у меня загадка для тебя,\"сказал Сфинкс. \"Ответишь верно - получишь награду. Ошибешься - я сожру тебя. Принимаешь ли ты мой вызов?\""
                 );
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
-                        "Сфинкс загадал вам следующую "
-                            "загадку::\n\n'%s'\n\nВаш ответ?",
+                        "Сфинкс загадал вам следующую загадку::\n\n'%s'\n\nВаш ответ?",
                         eventExtra_o->riddle
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
@@ -522,7 +477,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                         if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true, -1);
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true);
                             if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_k = primaryReward_e;
                                 secondaryAmount_j = primaryAmount_j;
@@ -532,10 +487,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
 
                         NormalDialog(
-                            "Несколько разочарованно "
-                                "Сфинкс промолвил. Ты дал верный "
-                                "ответ, вот твоя награда. А теперь "
-                                "убирайся.",
+                            "Несколько разочарованно Сфинкс промолвил. Ты дал верный ответ, вот твоя награда. А теперь убирайся.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -549,20 +501,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventExtra_o->active = 0;
                     } else {
                         NormalDialog(
-                            "\"Твоя догадка ошибочна,\" сказал,"
-                                " улыбаясь, Сфинкс. Ухмыляющийся "
-                                "Сфинкс повалил тебя на землю "
-                                "и мир окутала непроглядная "
-                                "тьма.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            "\"Твоя догадка ошибочна,\" сказал, улыбаясь, Сфинкс. Ухмыляющийся Сфинкс повалил тебя на землю и мир окутала непроглядная тьма.",
+                            NORMAL_DIALOG_INFO
                         );
                         HeroLoses(eventHero2);
                     }
@@ -573,18 +513,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{Обзорная башня}\n\nС вершины "
-                    "обзорной башни вы смогли "
-                    "разглядеть дальние земли.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "{Обзорная башня}\n\nС вершины обзорной башни вы смогли разглядеть дальние земли.",
+                NORMAL_DIALOG_INFO
             );
             gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
             CompleteDraw(0);
@@ -618,12 +548,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Форт на холме}\n\nДля всех %s, %s"
-                            " и %s вашего войска проходят "
-                            "обучение у мастеров боя из "
-                            "этого форта. Теперь в вашей "
-                            "армии имеются отряды %s, %s, и "
-                            "%s",
+                        "{Форт на холме}\n\nДля всех %s, %s и %s вашего войска проходят обучение у мастеров боя из этого форта. Теперь в вашей армии имеются отряды %s, %s, и %s",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(secondUpgrade1)],
                         gArmyNamesPlural[(thirdUpgrade_f)],
@@ -634,11 +559,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Форт на холме}\n\nВсе отряды "
-                            "%s и %s вашего войска прошли обучение "
-                            "у наставников этого форта."
-                            " Теперь в вашей армии появились "
-                            "отряды %s и %s.",
+                        "{Форт на холме}\n\nВсе отряды %s и %s вашего войска прошли обучение у наставников этого форта. Теперь в вашей армии появились отряды %s и %s.",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(secondUpgrade1)],
                         gArmyNamesPlural[(firstUpgrade_e) + 1],
@@ -647,11 +568,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Форт на холме}\n\nВсе отряды "
-                            "%s вашего войска проходят обучение "
-                            "у боевых наставников этого "
-                            "форта. Теперь в вашей армии "
-                            "есть отряд %s.",
+                        "{Форт на холме}\n\nВсе отряды %s вашего войска проходят обучение у боевых наставников этого форта. Теперь в вашей армии есть отряд %s.",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(firstUpgrade_e) + 1]
                     );
@@ -670,12 +587,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Форт на холме}\n\nНеобычный "
-                        "союз огров и гномов предлагает "
-                        "вам потренировать (улучшить)"
-                        " любые подобные им войска."
-                        " К сожалению, у вас таких при "
-                        "себе нет.",
+                    "{Форт на холме}\n\nНеобычный союз огров и гномов предлагает вам потренировать (улучшить) любые подобные им войска. К сожалению, у вас таких при себе нет.",
                     -1,
                     0,
                     -1,
@@ -715,9 +627,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Вольная литейная}\n\nВсе ваши "
-                            "отряды %s, %s и %s теперь стали отрядами "
-                            "%s, %s, и %s",
+                        "{Вольная литейная}\n\nВсе ваши отряды %s, %s и %s теперь стали отрядами %s, %s, и %s",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(secondUpgrade1)],
                         gArmyNamesPlural[(thirdUpgrade_f)],
@@ -728,9 +638,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Вольная литейная}\n\nВсе ваши "
-                            "отряды %s и %s теперь стали отрядами "
-                            "%s и %s",
+                        "{Вольная литейная}\n\nВсе ваши отряды %s и %s теперь стали отрядами %s и %s",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(secondUpgrade1)],
                         gArmyNamesPlural[(firstUpgrade_e) + 1],
@@ -739,9 +647,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Вольная литейная}\n\nВсе ваши "
-                            "отряды %s теперь стали отрядами "
-                            "%s.",
+                        "{Вольная литейная}\n\nВсе ваши отряды %s теперь стали отрядами %s.",
                         gArmyNamesPlural[(firstUpgrade_e)],
                         gArmyNamesPlural[(firstUpgrade_e) + 1]
                     );
@@ -760,16 +666,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Вольная литейная}\n\nКузнец "
-                        "при этой литейной предлагает "
-                        "заменить оружие копейщиков "
-                        "и мечников с железного на "
-                        "стальное. Он также сказал,"
-                        " что владеет технологией "
-                        "повышения железных големов "
-                        "до стальных. К сожалению, никого "
-                        "из них нет в вашей армии, и "
-                        "он не могут помочь вам.",
+                    "{Вольная литейная}\n\nКузнец при этой литейной предлагает заменить оружие копейщиков и мечников с железного на стальное. Он также сказал, что владеет технологией повышения железных големов до стальных. К сожалению, никого из них нет в вашей армии, и он не могут помочь вам.",
                     -1,
                     0,
                     -1,
@@ -784,10 +681,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{Сундук}\n\nПроведя часы, пытаясь "
-                        "выловить сундук из воды, вы "
-                        "наконец открыли его. Внутри "
-                        "были %s и 1000 золотых.",
+                    "{Сундук}\n\nПроведя часы, пытаясь выловить сундук из воды, вы наконец открыли его. Внутри были %s и 1000 золотых.",
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
@@ -805,16 +699,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
                 NormalDialog(
-                    "{Сундук}\n\nПроведя часы, пытаясь "
-                        "выловить сундук из воды, вы "
-                        "наконец открыли его и нашли "
-                        "внутри 1500 золотых.",
+                    "{Сундук}\n\nПроведя часы, пытаясь выловить сундук из воды, вы наконец открыли его и нашли внутри 1500 золотых.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -828,20 +718,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
             } else {
                 NormalDialog(
-                    "{Сундук}\n\nПотратив часы на "
-                        "то, чтобы выловить сундук "
-                        "из моря, вы наконец открыли "
-                        "его лишь за тем, чтобы увидеть:"
-                        " внутри пусто.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Сундук}\n\nПотратив часы на то, чтобы выловить сундук из моря, вы наконец открыли его лишь за тем, чтобы увидеть: внутри пусто.",
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -852,25 +730,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{Обломки}\n\nВы исследовали "
-                            "плавающие обломки, но ничего "
-                            "не нашли.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Обломки}\n\nВы исследовали плавающие обломки, но ничего не нашли.",
+                        NORMAL_DIALOG_INFO
                     );
                     break;
                 case FLOTSAM_WOOD:
                     NormalDialog(
-                        "{Обломки}\n\nВы исследовали "
-                            "плавающие обломки и добыли "
-                            "немного древесины.",
+                        "{Обломки}\n\nВы исследовали плавающие обломки и добыли немного древесины.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -885,9 +751,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
                     NormalDialog(
-                        "{Обломки}\n\nВы исследовали "
-                            "плавающие обломки и нашли "
-                            "немного золота и древесины.",
+                        "{Обломки}\n\nВы исследовали плавающие обломки и нашли немного золота и древесины.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -903,9 +767,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_LARGE_TREASURE:
                     NormalDialog(
-                        "{Обломки}\n\nВы исследовали "
-                            "плавающие обломки и нашли "
-                            "немного древесины и золота.",
+                        "{Обломки}\n\nВы исследовали плавающие обломки и нашли немного древесины и золота.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -929,11 +791,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{Потерпевший кораблекрушение}"
-                        "\n\nВы спасли жертву кораблекрушения "
-                        "от неминуемой смерти в безжалостном "
-                        "океане. Награда за вашу доброту "
-                        "- %s.",
+                    "{Потерпевший кораблекрушение}\n\nВы спасли жертву кораблекрушения от неминуемой смерти в безжалостном океане. Награда за вашу доброту - %s.",
                     gArtifactNames[cell->m_objectMetadata]
                 );
                 NormalDialog(
@@ -948,25 +806,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true);
             } else {
                 NormalDialog(
-                    "{Потерпевший кораблекрушение}"
-                        "\n\nВы спасли жертву кораблекрушения "
-                        "от неминуемой смерти в безжалостном "
-                        "океане. Исполненный благодарности,"
-                        " бедняга сказал: \"Я бы наградил "
-                        "вас артефактом, но у вас нет "
-                        "для него места.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Потерпевший кораблекрушение}\n\nВы спасли жертву кораблекрушения от неминуемой смерти в безжалостном океане. Исполненный благодарности, бедняга сказал: \"Я бы наградил вас артефактом, но у вас нет для него места.\"",
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -976,39 +820,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{Карты Магеллана}\n\nКапитан "
-                        "вздыхает. \"Что, деньжат не "
-                        "хватает, да? Ты же не думаешь,"
-                        " будто я отдам тебе свои карты "
-                        "бесплатно!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Карты Магеллана}\n\nКапитан вздыхает. \"Что, деньжат не хватает, да? Ты же не думаешь, будто я отдам тебе свои карты бесплатно!\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Карты Магеллана}\n\nБывший "
-                        "капитан, живущий на этом подновленном "
-                        "рыболовном причале, предлагает "
-                        "вам карты, составленные в "
-                        "прежние дни, за 1000 золотых. Желаете "
-                        "их купить?",
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Карты Магеллана}\n\nБывший капитан, живущий на этом подновленном рыболовном причале, предлагает вам карты, составленные в прежние дни, за 1000 золотых. Желаете их купить?",
+                    NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     gpCurPlayer->m_resources[(RES_GOLD)] -= MAGELLAN_MAP_COST;
@@ -1023,42 +842,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->m_secondarySkills[cell->m_objectMetadata] != HERO_SKILL_LEVEL_NONE) {
                 sprintf(
                     gText,
-                    "{Хижина ведьмы}\n\nПодойдя к "
-                        "хижине и заглянув в окно, вы "
-                        "увидели ведьму, склонившуюся "
-                        "над древней книгой под названием "
-                        "%s. Когда вы вошли, она обернулась "
-                        "и молвила: \"Вы уже знаете то,"
-                        " чему я могла бы научить. Больше "
-                        "ничем помочь не смогу.\"",
+                    "{Хижина ведьмы}\n\nПодойдя к хижине и заглянув в окно, вы увидели ведьму, склонившуюся над древней книгой под названием %s. Когда вы вошли, она обернулась и молвила: \"Вы уже знаете то, чему я могла бы научить. Больше ничем помочь не смогу.\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 sprintf(
                     gText,
-                    "{Хижина ведьмы}\n\nПодойдя к "
-                        "хижине и заглянув в окно, вы "
-                        "увидели ведьму, склонившуюся "
-                        "над древней книгой под названием "
-                        "%s. Когда вы вошли, она обернулась "
-                        "и наставила на вас свой стеклянный "
-                        "глаз. \"Ты уже и так знаешь все,"
-                        " чего заслуживаешь!\" - завопила "
-                        "ведьма. \"- А теперь убирайся "
-                        "из моего дома!\"",
+                    "{Хижина ведьмы}\n\nПодойдя к хижине и заглянув в окно, вы увидели ведьму, склонившуюся над древней книгой под названием %s. Когда вы вошли, она обернулась и наставила на вас свой стеклянный глаз. \"Ты уже и так знаешь все, чего заслуживаешь!\" - завопила ведьма. \"- А теперь убирайся из моего дома!\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(
                     gText,
-                    "{Хижина ведьмы}\n\nДряхлая, но "
-                        "бессмертная ведьма, живущая "
-                        "в этой хижине на курьих ножках,"
-                        " по каким-то непонятным соображениям "
-                        "решила, что %s вам пригодится.",
+                    "{Хижина ведьмы}\n\nДряхлая, но бессмертная ведьма, живущая в этой хижине на курьих ножках, по каким-то непонятным соображениям решила, что %s вам пригодится.",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 EventWindow(
@@ -1081,59 +880,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Артезианский источник}\n\nЭтот "
-                        "родник восполняется раз в "
-                        "неделю, а кто-то уже прикладывался "
-                        "к нему на этой неделе.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Артезианский источник}\n\nЭтот родник восполняется раз в неделю, а кто-то уже прикладывался к нему на этой неделе.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints_j =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{Артезианский источник}\n\nГлоток "
-                            "из родника обычно вдвое повышает "
-                            "вашу магическую энергию, "
-                            "но вы уже прибываете в подобном "
-                            "состоянии.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Артезианский источник}\n\nГлоток из родника обычно вдвое повышает вашу магическую энергию, но вы уже прибываете в подобном состоянии.",
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{Артезианский источник}\n\nГлоток "
-                            "из родника наполняет вашу "
-                            "кровь магией! Теперь у вас "
-                            "в запасе вдвое больше обычного "
-                            "магической энергии.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Артезианский источник}\n\nГлоток из родника наполняет вашу кровь магией! Теперь у вас в запасе вдвое больше обычного магической энергии.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_spellPoints = springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 }
@@ -1143,54 +906,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if ((((eventHero2->m_eventFlags) & (HERO_EVENT_MAGIC_WELL)))) {
                 NormalDialog(
-                    "{Волшебный колодец}\n\nВолшебный "
-                        "колодец}\n\nВторой глоток из "
-                        "колодца за день вам не поможет.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Волшебный колодец}\n\nВолшебный колодец}\n\nВторой глоток из колодца за день вам не поможет.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints_o =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
-                        "{Волшебный колодец}\n\nГлоток "
-                            "из колодца обычно восстанавливает "
-                            "магическую энергию, но сейчас "
-                            "она у вас и так на пределе.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Волшебный колодец}\n\nГлоток из колодца обычно восстанавливает магическую энергию, но сейчас она у вас и так на пределе.",
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{Волшебный колодец}\n\nГлоток "
-                            "из колодца полностью восстановил "
-                            "вашу магическую энергию.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Волшебный колодец}\n\nГлоток из колодца полностью восстановил вашу магическую энергию.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_MAGIC_WELL)
@@ -1201,7 +932,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_COAST:
-            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+            if (eventHero2->IsEmbarked()) {
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) & ~(HERO_EVENT_EMBARKED)
                 );
@@ -1227,7 +958,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL,
                     NULL
                 );
-                WaitEndSample(&playedSample3, -1);
+                WaitEndSample(&playedSample3);
                 CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
@@ -1363,10 +1094,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
                 sprintf(
                     gText,
-                    "{Ларец}\n\nИсследуя окрестности,"
-                        " вы наткнулись на зарытый "
-                        "ларец, а в нем - древний артефакт "
-                        "'%s'",
+                    "{Ларец}\n\nИсследуя окрестности, вы наткнулись на зарытый ларец, а в нем - древний артефакт '%s'",
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
@@ -1384,20 +1112,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGold:
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Ларец}\n\nИсследуя окрестности,"
-                        " вы наткнулись на древний "
-                        "ларец. Золото можно оставить "
-                        "себе или раздать крестьянам "
-                        "в обмен на опыт. Оставите себе "
-                        "золото?",
+                    "{Ларец}\n\nИсследуя окрестности, вы наткнулись на древний ларец. Золото можно оставить себе или раздать крестьянам в обмен на опыт. Оставите себе золото?",
                     (RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     NORMAL_DIALOG_EXPERIENCE,
@@ -1491,12 +1213,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Идол}\n\nВы нашли древнего идола."
-                        " Говорят, он приносит удачу "
-                        "тем, кто его навещает, но поскольку "
-                        "звезды и так покровительствуют "
-                        "вам, идол ничего нового вам "
-                        "не дал.",
+                    "{Идол}\n\nВы нашли древнего идола. Говорят, он приносит удачу тем, кто его навещает, но поскольку звезды и так покровительствуют вам, идол ничего нового вам не дал.",
                     -1,
                     0,
                     -1,
@@ -1512,11 +1229,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Идол}\n\nВы нашли древнего идола."
-                        " Говорят, если его поцеловать,"
-                        " это принесет удачу - вы так "
-                        "и поступили. Камень оказался "
-                        "очень холоден для губ.",
+                    "{Идол}\n\nВы нашли древнего идола. Говорят, если его поцеловать, это принесет удачу - вы так и поступили. Камень оказался очень холоден для губ.",
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1562,10 +1275,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Промоина}\n\nВыпивка освежает,"
-                        " но иных благ не приносит. Источник "
-                        "снова поможет вам после следующей "
-                        "битвы.",
+                    "{Промоина}\n\nВыпивка освежает, но иных благ не приносит. Источник снова поможет вам после следующей битвы.",
                     -1,
                     0,
                     -1,
@@ -1583,10 +1293,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Промоина}\n\nДобрый глоток "
-                        "исполнил ваши войска силы "
-                        "и поднял дух. Сегодня вы сможете "
-                        "пройти чуть дальше.",
+                    "{Промоина}\n\nДобрый глоток исполнил ваши войска силы и поднял дух. Сегодня вы сможете пройти чуть дальше.",
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1601,11 +1308,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Оазис}\n\nГлоток влаги в оазисе "
-                        "освежает, но иной пользы не "
-                        "приносит. Этот оазис, возможно,"
-                        " пригодится вам после следующей "
-                        "битвы.",
+                    "{Оазис}\n\nГлоток влаги в оазисе освежает, но иной пользы не приносит. Этот оазис, возможно, пригодится вам после следующей битвы.",
                     -1,
                     0,
                     -1,
@@ -1623,10 +1326,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Оазис}\n\nГлоток воды в оазисе "
-                        "наполняет ваших воинов силой "
-                        "и поднимает дух. Сегодня вы "
-                        "сможете пройти чуть больше.",
+                    "{Оазис}\n\nГлоток воды в оазисе наполняет ваших воинов силой и поднимает дух. Сегодня вы сможете пройти чуть больше.",
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1639,18 +1339,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_TEMPLE:
             if ((((eventHero2->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
                 NormalDialog(
-                    "{Храм}\n\nДвойная молитва войне "
-                        "не подспорье. Заходите после "
-                        "битвы.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Храм}\n\nДвойная молитва войне не подспорье. Заходите после битвы.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1659,8 +1349,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
-                    "{Храм}\n\nПосещение храма и молитва "
-                        "подняли мораль ваших войск.",
+                    "{Храм}\n\nПосещение храма и молитва подняли мораль ваших войск.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1677,26 +1366,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Навес}\n\nЭто сооружение давно "
-                        "брошено. Ничего ценного тут "
-                        "нет.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Навес}\n\nЭто сооружение давно брошено. Ничего ценного тут нет.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Навес}\n\nВы нашли брошенный "
-                        "навес. Поискав вокруг, вы обнаружили "
-                        "кое-какие ресурсы, припрятанные "
-                        "поблизости.",
+                    "{Навес}\n\nВы нашли брошенный навес. Поискав вокруг, вы обнаружили кое-какие ресурсы, припрятанные поблизости.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1724,11 +1400,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Повозка}\n\nВы набрели на старую "
-                        "повозку, не доехавшую до торной "
-                        "дороги и брошенную купцом."
-                        " К сожалению, кто-то нашел ее "
-                        "до вас, повозка пуста.",
+                    "{Повозка}\n\nВы набрели на старую повозку, не доехавшую до торной дороги и брошенную купцом. К сожалению, кто-то нашел ее до вас, повозка пуста.",
                     -1,
                     0,
                     -1,
@@ -1745,10 +1417,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{Повозка}\n\nВы набрели на старую "
-                        "повозку, не доехавшую до торной "
-                        "дороги и брошенную купцом."
-                        " В ней вы нашли %s.",
+                    "{Повозка}\n\nВы набрели на старую повозку, не доехавшую до торной дороги и брошенную купцом. В ней вы нашли %s.",
                     gArtifactNames[eventValue1]
                 );
                 EventWindow(
@@ -1761,18 +1430,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                 cell->m_objectMetadata = 0;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Повозка}\n\nВы набрели на старую "
-                        "повозку, не доехавшую до торной "
-                        "дороги и брошенную купцом."
-                        " В ней же вы нашли до сих пор "
-                        "не тронутый груз.",
+                    "{Повозка}\n\nВы набрели на старую повозку, не доехавшую до торной дороги и брошенную купцом. В ней же вы нашли до сих пор не тронутый груз.",
                     (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
                     -1,
@@ -1831,7 +1496,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
                         );
-                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1882,20 +1547,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Ксанаду}\n\nУзнав вас, лакей "
-                        "отказался пустить внутрь."
-                        " \"Наставник,\" - сказал он, - \"не "
-                        "принимает одного и того же "
-                        "студента дважды.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Ксанаду}\n\nУзнав вас, лакей отказался пустить внутрь. \"Наставник,\" - сказал он, - \"не принимает одного и того же студента дважды.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 if (eventHero2->m_level
@@ -1904,20 +1557,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     >= XANADU_ADMISSION_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     NormalDialog(
-                        "{Ксанаду}\n\nЛакей допустил "
-                            "вас до аудиенции с хозяином "
-                            "дома. Занятия с ним повысили "
-                            "четыре умения, необходимые "
-                            "каждому герою.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Ксанаду}\n\nЛакей допустил вас до аудиенции с хозяином дома. Занятия с ним повысили четыре умения, необходимые каждому герою.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_primaryStats[(HERO_PRIMARY_ATTACK)]++;
                     eventHero2->m_primaryStats[(HERO_PRIMARY_DEFENSE)]++;
@@ -1926,22 +1567,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
                 } else {
                     NormalDialog(
-                        "{Ксанаду}\n\nЛакей открыл дверь "
-                            "и оглядел вас с ног до головы."
-                            " \"Вы не так знамениты и не такой "
-                            "уж дипломат, чтобы мой хозяин "
-                            "принял вас,\" - фыркнул он. - \"Возвращайтесь,"
-                            " когда сочтете себя достойным."
-                            "\"",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Ксанаду}\n\nЛакей открыл дверь и оглядел вас с ног до головы. \"Вы не так знамениты и не такой уж дипломат, чтобы мой хозяин принял вас,\" - фыркнул он. - \"Возвращайтесь, когда сочтете себя достойным.\"",
+                        NORMAL_DIALOG_INFO
                     );
                 }
             }
@@ -1950,26 +1577,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FORT:
             if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Форт}\n\n \"Просите, сэр,\" - Сказал "
-                        "предводитель воинов, - \"но "
-                        "вы уже знаете все, чему мы способны "
-                        "научить.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Форт}\n\n \"Просите, сэр,\" - Сказал предводитель воинов, - \"но вы уже знаете все, чему мы способны научить.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Форт}\n\n Воины, живущие в этом "
-                        "форте, научили вас паре новых "
-                        "защитных приемов.",
+                    "{Форт}\n\n Воины, живущие в этом форте, научили вас паре новых защитных приемов.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1988,31 +1602,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_STANDING_STONES:
             if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Менгир}\n\nВы застали группу "
-                        "друидов за обрядом в одном "
-                        "из их диковинных каменных "
-                        "сооружений. Друиды, не нарушая "
-                        "безмолвия, показали жестами,"
-                        " что им больше нечему вас учить.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Менгир}\n\nВы застали группу друидов за обрядом в одном из их диковинных каменных сооружений. Друиды, не нарушая безмолвия, показали жестами, что им больше нечему вас учить.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Менгир}\n\nВы застали группу "
-                        "друидов за обрядом в одном "
-                        "из их диковинных каменных "
-                        "сооружений. Не нарушая безмолвия,"
-                        " они все же научили вас новым "
-                        "способам колдовства.",
+                    "{Менгир}\n\nВы застали группу друидов за обрядом в одном из их диковинных каменных сооружений. Не нарушая безмолвия, они все же научили вас новым способам колдовства.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2031,29 +1627,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Хижина ведьмы}\n\n\"Убирайся!"
-                        "\" -  рявкнула ведьма, \"ты знаешь "
-                        "все, что знаю я.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Хижина ведьмы}\n\n\"Убирайся!\" -  рявкнула ведьма, \"ты знаешь все, что знаю я.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Хижина ведьмы}\n\nОрчая ведьма,"
-                        " живущая в этой хижине, обогатила "
-                        "ваши познания в магии, показав,"
-                        " как гадать на камнях, читать "
-                        "знамения и извлекать сущность "
-                        "бытия из сложного переплетения "
-                        "цыплячьих потрохов.",
+                    "{Хижина ведьмы}\n\nОрчая ведьма, живущая в этой хижине, обогатила ваши познания в магии, показав, как гадать на камнях, читать знамения и извлекать сущность бытия из сложного переплетения цыплячьих потрохов.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2072,32 +1652,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MERCENARY_CAMP:
             if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Лагерь наемников}\n\nВы пришли "
-                        "в лагерь наемников, где воины "
-                        "отрабатывают тактику. \"Для "
-                        "нас вы слишком умелый боец,"
-                        "\" -сказал капитан наемников."
-                        " - \"Больше мы ничему вас научить "
-                        "не можем.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Лагерь наемников}\n\nВы пришли в лагерь наемников, где воины отрабатывают тактику. \"Для нас вы слишком умелый боец,\" -сказал капитан наемников. - \"Больше мы ничему вас научить не можем.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Лагерь наемников}\n\nВы пришли "
-                        "в лагерь наемников, отрабатывающих "
-                        "свою тактику. Наемники поприветствовали "
-                        "вас и пригласили вместе с "
-                        "вашим отрядом позаниматься "
-                        "вместе с ними.",
+                    "{Лагерь наемников}\n\nВы пришли в лагерь наемников, отрабатывающих свою тактику. Наемники поприветствовали вас и пригласили вместе с вашим отрядом позаниматься вместе с ними.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2181,7 +1742,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[(resourceType_a)]);
-            sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+            sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
@@ -2252,11 +1813,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Древо-город}\n\nВы нашли древесный "
-                        "город фей. К сожалению, ни одна "
-                        "фея не захотела присоединиться "
-                        "к вашей армии. Может быть на "
-                        "следующей неделе они передумают.",
+                    "{Древо-город}\n\nВы нашли древесный город фей. К сожалению, ни одна фея не захотела присоединиться к вашей армии. Может быть на следующей неделе они передумают.",
                     -1,
                     0,
                     -1,
@@ -2268,11 +1825,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Древо-город}\n\nНекоторые феи "
-                        "из этого города на деревьях "
-                        "желают вступить в вашу армию "
-                        "за некоторое вознаграждение."
-                        " Желаете нанять фей?",
+                    "{Древо-город}\n\nНекоторые феи из этого города на деревьях желают вступить в вашу армию за некоторое вознаграждение. Желаете нанять фей?",
                     -1,
                     0,
                     -1,
@@ -2289,11 +1842,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Руины}\n\nВы обыскали руины,"
-                    " но убедились лишь, что жившие "
-                    "тут медузы ушли. Может быть "
-                    "вам повезет больше на следующей "
-                        "неделе.",
+                    "{Руины}\n\nВы обыскали руины, но убедились лишь, что жившие тут медузы ушли. Может быть вам повезет больше на следующей неделе.",
                     -1,
                     0,
                     -1,
@@ -2305,11 +1854,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Руины}\n\nВы обыскали руины "
-                    "и нашли нескольких медуз,"
-                    " обитающих тут. Они согласны "
-                    "вступить в вашу армию за вознаграждение."
-                        " Желаете нанять медуз?",
+                    "{Руины}\n\nВы обыскали руины и нашли нескольких медуз, обитающих тут. Они согласны вступить в вашу армию за вознаграждение. Желаете нанять медуз?",
                     -1,
                     0,
                     -1,
@@ -2326,11 +1871,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Мост троллей}\n\nВы нашли один "
-                    "из тех мостов, под которыми "
-                    "так любят селиться тролли,"
-                    " но сейчас тут никого нет. Может,"
-                        " на следующей неделе появятся.",
+                    "{Мост троллей}\n\nВы нашли один из тех мостов, под которыми так любят селиться тролли, но сейчас тут никого нет. Может, на следующей неделе появятся.",
                     -1,
                     0,
                     -1,
@@ -2341,9 +1882,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Мост троллей}\n\nТролли, живущие "
-                    "под этим мостом бросают вам "
-                        "вызов. Сразитесь с ними?",
+                    "{Мост троллей}\n\nТролли, живущие под этим мостом бросают вам вызов. Сразитесь с ними?",
                     -1,
                     0,
                     -1,
@@ -2375,12 +1914,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "{Мост троллей}\n\nОсталось лишь "
-                        "несколько троллей, в страхе "
-                        "забившихся под мост. Осмелев,"
-                        " они предложили свои услуги "
-                        "в качестве наемников. Желаете "
-                            "нанять троллей?",
+                        "{Мост троллей}\n\nОсталось лишь несколько троллей, в страхе забившихся под мост. Осмелев, они предложили свои услуги в качестве наемников. Желаете нанять троллей?",
                         -1,
                         0,
                         -1,
@@ -2396,11 +1930,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Мост троллей}\n\nКое-кто из троллей,"
-                    " живущих под мостом, желает "
-                    "присоединиться к вашей армии,"
-                    " но за плату.  Желаете нанять "
-                        "троллей?",
+                    "{Мост троллей}\n\nКое-кто из троллей, живущих под мостом, желает присоединиться к вашей армии, но за плату.  Желаете нанять троллей?",
                     -1,
                     0,
                     -1,
@@ -2419,11 +1949,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Град мертвых}\n\nВ этом городе "
-                    "мертвецов жизни не наблюдается,"
-                    " нежити тоже. Может, на следующей "
-                    "неделе кто-то из нежити забредет "
-                        "сюда.",
+                    "{Град мертвых}\n\nВ этом городе мертвецов жизни не наблюдается, нежити тоже. Может, на следующей неделе кто-то из нежити забредет сюда.",
                     -1,
                     0,
                     -1,
@@ -2434,10 +1960,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Град мертвых}\n\nВы нашли руины "
-                    "древнего города, ныне населенного "
-                    "лишь нежитью. Обследовать "
-                        "город?",
+                    "{Град мертвых}\n\nВы нашли руины древнего города, ныне населенного лишь нежитью. Обследовать город?",
                     -1,
                     0,
                     -1,
@@ -2469,11 +1992,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Град мертвых}\n\nУцелевшие "
-                    "личи прониклись вашей победой "
-                    "над их собратьями и предложили "
-                    "свои услуги за плату. Желаете "
-                        "нанять личей?",
+                    "{Град мертвых}\n\nУцелевшие личи прониклись вашей победой над их собратьями и предложили свои услуги за плату. Желаете нанять личей?",
                     -1,
                     0,
                     -1,
@@ -2490,10 +2009,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Град мертвых}\n\nКое-кто из личей,"
-                    " обитающих здесь, желает вступить "
-                    "в вашу армию за плату. Нанять "
-                        "личей?",
+                    "{Град мертвых}\n\nКое-кто из личей, обитающих здесь, желает вступить в вашу армию за плату. Нанять личей?",
                     -1,
                     0,
                     -1,
@@ -2512,10 +2028,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Драконий город}\n\nНа этой неделе "
-                    "в городе нет драконов, желающих "
-                    "примкнуть к вам. На следующей "
-                        "неделе, возможно, кто-то появится.",
+                    "{Драконий город}\n\nНа этой неделе в городе нет драконов, желающих примкнуть к вам. На следующей неделе, возможно, кто-то появится.",
                     -1,
                     0,
                     -1,
@@ -2526,12 +2039,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Драконий город}\n\nВы стоите "
-                    "пред драконьим городом, местом,"
-                    " запретным для простых смертных."
-                    " Соблаговолите ли вы нарушить "
-                    "это правило и бросить вызов "
-                        "драконам?",
+                    "{Драконий город}\n\nВы стоите пред драконьим городом, местом, запретным для простых смертных. Соблаговолите ли вы нарушить это правило и бросить вызов драконам?",
                     -1,
                     0,
                     -1,
@@ -2570,12 +2078,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Драконий город}\n\nПосле вашей "
-                    "победы над лучшими драконьими "
-                    "воинами отцы города согласились "
-                    "за плату предоставить вашему "
-                    "войску драконов. Желаете "
-                        "нанять драконов?",
+                    "{Драконий город}\n\nПосле вашей победы над лучшими драконьими воинами отцы города согласились за плату предоставить вашему войску драконов. Желаете нанять драконов?",
                     -1,
                     0,
                     -1,
@@ -2592,10 +2095,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Драконий город}\n\nДраконий "
-                    "город готов предложить вашему "
-                    "войску драконов, не бесплатно."
-                        " Желаете нанять драконов?",
+                    "{Драконий город}\n\nДраконий город готов предложить вашему войску драконов, не бесплатно. Желаете нанять драконов?",
                     -1,
                     0,
                     -1,
@@ -2722,21 +2222,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                  & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
                 != 0) {
                 NormalDialog(
-                    "{Древо познания}\n\nПри вашем "
-                    "приближении древесные глаза "
-                    "засияли восторгом.  \"Рад видеть "
-                    "тебя, мой ученик.  Надеюсь, "
-                    "моя наука пошла тебе на пользу."
-                        "\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{Древо познания}\n\nПри вашем приближении древесные глаза засияли восторгом.  \"Рад видеть тебя, мой ученик.  Надеюсь, моя наука пошла тебе на пользу.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2746,12 +2233,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
                         NormalDialog(
-                            "{Древо познания}\n\nПри вашем "
-                            "приближении древесные глаза "
-                            "засветились восторгом. \"А,"
-                            " странник! Позволь преподать "
-                            "тебе малую толику того, что "
-                                "я выучил за годы.\"",
+                            "{Древо познания}\n\nПри вашем приближении древесные глаза засветились восторгом. \"А, странник! Позволь преподать тебе малую толику того, что я выучил за годы.\"",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -2770,14 +2252,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GOLD:
                         if (gpCurPlayer->m_resources[(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
                             NormalDialog(
-                                "{Древо познания}\n\nПри вашем "
-                                "приближении древесные глаза "
-                                "засияли восторгом. \"А, путник!"
-                                " Я с радостью научу тебя хотя "
-                                "бы малой части того, что усвоил "
-                                "за годы, всего за 2000 золотых."
-                                "\" (Просто зарой их у моих корней)"
-                                    ".",
+                                "{Древо познания}\n\nПри вашем приближении древесные глаза засияли восторгом. \"А, путник! Я с радостью научу тебя хотя бы малой части того, что усвоил за годы, всего за 2000 золотых.\" (Просто зарой их у моих корней).",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2796,20 +2271,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{Древо познания}\n\nГлаза дерева "
-                                "наполнились слезами. \"Мне "
-                                "нужно 2000 золотых.\" - прошептало "
-                                "оно. (вздох) - \"Возвращайся, когда "
-                                    "сможешь внести плату.\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Древо познания}\n\nГлаза дерева наполнились слезами. \"Мне нужно 2000 золотых.\" - прошептало оно. (вздох) - \"Возвращайся, когда сможешь внести плату.\"",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2817,12 +2280,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GEMS:
                         if (gpCurPlayer->m_resources[(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
                             NormalDialog(
-                                "{Древо познания}\n\nА, путник!"
-                                " Я с радостью преподам тебе "
-                                "хоть малую часть того, что "
-                                "выучил за годы, всего за 10 самоцветов."
-                                "\" (Просто зарой их у моих корней)"
-                                    ".",
+                                "{Древо познания}\n\nА, путник! Я с радостью преподам тебе хоть малую часть того, что выучил за годы, всего за 10 самоцветов.\" (Просто зарой их у моих корней).",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2841,21 +2299,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{Древо познания}\n\nСлезы переполняют "
-                                "древесные глаза. \"Мне нужно "
-                                "10 самоцветов.\" - прошептало "
-                                "оно. (Вздох). \"Что ж, приходи,"
-                                " когда сможешь заплатить."
-                                    "\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{Древо познания}\n\nСлезы переполняют древесные глаза. \"Мне нужно 10 самоцветов.\" - прошептало оно. (Вздох). \"Что ж, приходи, когда сможешь заплатить.\"",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2888,12 +2333,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
             strcpy(
                 gText,
-                "Святилище - информация об "
-                    "игроках"
+                "Святилище - информация об игроках"
             );
-            oracleMessage_o.type = MESSAGE_WIDGET;
-            oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            oracleMessage_o.payload.widget.id = 0;
+            SET_WIDGET_MESSAGE(oracleMessage_o, WIDGET_COMMAND_SET_TEXT, 0);
             oracleMessage_o.payload.widget.data.text = gText;
             oracleWindow_o->BroadcastMessage(oracleMessage_o);
             gpWindowManager->DoDialog(oracleWindow_o, TrueFalseDialogHandler, 0);
@@ -2905,12 +2347,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Святилище 1-го Круга}\n\nВы набрели "
-                "на маленькое святилище, где "
-                "служат молодые послушники."
-                "  В обмен на защиту они согласились "
-                "научить вас простому заклинанию "
-                    "- ",
+                "{Святилище 1-го Круга}\n\nВы набрели на маленькое святилище, где служат молодые послушники.  В обмен на защиту они согласились научить вас простому заклинанию - ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2919,12 +2356,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Святилище 2-го Круга}\n\nВы набрели "
-                "на богато расписанное святилище,"
-                " где служат полноправные "
-                "братья веры.  В обмен на защиту "
-                "они согласились научить вас "
-                    "новому заклинанию - ",
+                "{Святилище 2-го Круга}\n\nВы набрели на богато расписанное святилище, где служат полноправные братья веры.  В обмен на защиту они согласились научить вас новому заклинанию - ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2933,12 +2365,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Святилище 3-го Круга}\n\nВы набрели "
-                "на роскошное святилище, где "
-                "служат высшие жрецы.  В обмен "
-                "на защиту они согласились "
-                "научить вас премудрому заклинанию "
-                    "- ",
+                "{Святилище 3-го Круга}\n\nВы набрели на роскошное святилище, где служат высшие жрецы.  В обмен на защиту они согласились научить вас премудрому заклинанию - ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
@@ -2964,18 +2391,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     strcat(
                         gText,
-                        "К сожалению, у вас не хватает "
-                            "мудрости, чтобы понять заклинание,"
-                            " и вы не можете выучить его."
+                        "К сожалению, у вас не хватает мудрости, чтобы понять заклинание, и вы не можете выучить его."
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
                 strcat(
                     gText,
-                    "К сожалению, у вас нет Волшебной "
-                        "книги, чтобы записать заклинание "
-                        "в нее."
+                    "К сожалению, у вас нет Волшебной книги, чтобы записать заклинание в нее."
                 );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
@@ -2996,11 +2419,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             teleportCount_e = 0;
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                    if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value()
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                    if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value() == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX_e - x) + abs(teleportY_e - y)
+                        && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
                         teleportCount_e++;
@@ -3012,12 +2434,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount_e = Random(1, teleportCount_e);
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                        if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType).value()
+                        if (((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))
+                                            ->m_triggerType).value()
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
-                            && abs(teleportX_e - x) + abs(teleportY_e - y)
+                            && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
@@ -3040,17 +2463,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "Вы не можете подобрать этот "
-                        "артефакт, у вас нет места!",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Вы не можете подобрать этот артефакт, у вас нет места!",
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             }
@@ -3059,14 +2473,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 strcpy(
                     gText,
-                    "Сказочный золотой лук эльфов "
-                    "просто валяется здесь, в грязи."
-                    " Вы подобрали его и отвезли "
-                    "в эльфийский город. В благодарность "
-                    "за этот подвиг король эльфов "
-                    "пообещал вам помощь своего "
-                    "народа в любую минуту, когда "
-                        "вам это понадобится."
+                    "Сказочный золотой лук эльфов просто валяется здесь, в грязи. Вы подобрали его и отвезли в эльфийский город. В благодарность за этот подвиг король эльфов пообещал вам помощь своего народа в любую минуту, когда вам это понадобится."
                 );
                 EventWindow(
                     -1,
@@ -3107,20 +2514,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
                     NormalDialog(
-                        "{Артефакт}\n\nВы заметили древний "
-                        "артефакт. Но едва вы подошли "
-                        "к нему, из кустов выскочила "
-                        "шайка разбойников, охраняющих "
-                            "свое награбленное добро.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{Артефакт}\n\nВы заметили древний артефакт. Но едва вы подошли к нему, из кустов выскочила шайка разбойников, охраняющих свое награбленное добро.",
+                        NORMAL_DIALOG_INFO
                     );
                     guardedCount_i = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
                     goto artifactFight;
@@ -3128,16 +2523,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     guardedCount_i = 1;
                     sprintf(
                         gText,
-                        "{Артефакт}\n\nНа прогалине вы "
-                        "приметили древний артефакт."
-                        " К сожалению, его сторожит "
-                        "отряд %s. Не пугает ли вас сила "
-                        "%s, и будете ли вы сражаться "
-                            "за артефакт?",
+                        "{Артефакт}\n\nНа прогалине вы приметили древний артефакт. К сожалению, его сторожит отряд %s. Не пугает ли вас сила %s, и будете ли вы сражаться за артефакт?",
                         gArmyNamesPlural[(guardedMonster_c)],
                         gArmyNamesPlural[(guardedMonster_c)]
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 artifactFight:
@@ -3162,8 +2552,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventHero2->CheckLevel();
                         sprintf(
                             gText,
-                            "Одержав победу, вы получили "
-                                "свой трофей - %s.",
+                            "Одержав победу, вы получили свой трофей - %s.",
                             gArtifactNames[(artifact_g)]
                         );
                         NormalDialog(
@@ -3182,18 +2571,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     }
                 } else {
                     NormalDialog(
-                        "Главное в доблести - благоразумие,"
-                            " поэтому вы решили пока что "
-                            "воздержаться от этой битвы.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "Главное в доблести - благоразумие, поэтому вы решили пока что воздержаться от этой битвы.",
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 break;
@@ -3205,14 +2584,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{Аретфакт}\n\nВы нашли убогий "
-                            "скит изможденного отшельника."
-                            " Тот поведал вам, что его %s достанется "
-                            "первому же встречному великому "
-                                "мудрецу.",
+                            "{Аретфакт}\n\nВы нашли убогий скит изможденного отшельника. Тот поведал вам, что его %s достанется первому же встречному великому мудрецу.",
                             gArtifactNames[(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
@@ -3221,14 +2596,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{Артефакт}\n\nВы навестили старого "
-                            "солдата в его скромном жилище."
-                            " Солдат поведал вам, что его "
-                            "%s достанется первому настоящему "
-                                "лидеру, которого он встретит.",
+                            "{Артефакт}\n\nВы навестили старого солдата в его скромном жилище. Солдат поведал вам, что его %s достанется первому настоящему лидеру, которого он встретит.",
                             gArtifactNames[(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_PICKUP:
@@ -3245,7 +2616,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1
                         );
                     giveArtifact:
-                        GiveArtifact(eventHero2, artifact_g, true, -1);
+                        GiveArtifact(eventHero2, artifact_g, true);
                         eraseObject_l = 1;
                         fizzleType_k = true;
                         break;
@@ -3254,9 +2625,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(
                             gText,
-                            "{Артефакт}\n\nЛепрекон предлагает "
-                                "вам артефакт - %s, всего за 2000 золотых."
-                                " Купите его?",
+                            "{Артефакт}\n\nЛепрекон предлагает вам артефакт - %s, всего за 2000 золотых. Купите его?",
                             gArtifactNames[(artifact_g)]
                         );
                         EventWindow(
@@ -3277,36 +2646,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "Вы и хотели бы расплатиться "
-                                    "с лепреконом, но поняли, что "
-                                    "сделка вам не по карману. Лепрекон "
-                                    "затопал ногами и обиженно "
-                                    "надулся.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Вы и хотели бы расплатиться с лепреконом, но поняли, что сделка вам не по карману. Лепрекон затопал ногами и обиженно надулся.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "Оскорбленный вашим отказом "
-                                    "от его щедрого предложения,"
-                                    " лекреком притопнул ногой "
-                                    "и отвернулся от вас.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Оскорбленный вашим отказом от его щедрого предложения, лекреком притопнул ногой и отвернулся от вас.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3314,13 +2660,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{Артефакт}\n\nЛепрекон предлагает "
-                                "вам артефакт - %s за 2500 золотых "
-                                "и просит %s - 3 единицы. Желаете "
-                                "купить предмет?",
+                            "{Артефакт}\n\nЛепрекон предлагает вам артефакт - %s за 2500 золотых и просит %s - 3 единицы. Желаете купить предмет?",
                             gArtifactNames[(artifact_g)],
                             sphinxAnswer_a
                         );
@@ -3350,36 +2693,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "Вы и хотели бы расплатиться "
-                                    "с лепреконом, но поняли, что "
-                                    "сделка вам не по карману. Лепрекон "
-                                    "затопал ногами и обиженно "
-                                    "надулся.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Вы и хотели бы расплатиться с лепреконом, но поняли, что сделка вам не по карману. Лепрекон затопал ногами и обиженно надулся.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "Оскорбленный вашим отказом "
-                                    "от его щедрого предложения,"
-                                    " лекреком притопнул ногой "
-                                    "и отвернулся от вас.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Оскорбленный вашим отказом от его щедрого предложения, лекреком притопнул ногой и отвернулся от вас.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3387,13 +2707,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{Артефакт}\n\nЛепрекон предлагает "
-                                "вам артефакт - %s за 3000 золотых "
-                                "и просит %s - 5 единиц. Желаете "
-                                "купить предмет?",
+                            "{Артефакт}\n\nЛепрекон предлагает вам артефакт - %s за 3000 золотых и просит %s - 5 единиц. Желаете купить предмет?",
                             gArtifactNames[(artifact_g)],
                             sphinxAnswer_a
                         );
@@ -3423,36 +2740,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "Вы и хотели бы расплатиться "
-                                    "с лепреконом, но поняли, что "
-                                    "сделка вам не по карману. Лепрекон "
-                                    "затопал ногами и обиженно "
-                                    "надулся.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Вы и хотели бы расплатиться с лепреконом, но поняли, что сделка вам не по карману. Лепрекон затопал ногами и обиженно надулся.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "Оскорбленный вашим отказом "
-                                    "от его щедрого предложения,"
-                                    " лекреком притопнул ногой "
-                                    "и отвернулся от вас.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "Оскорбленный вашим отказом от его щедрого предложения, лекреком притопнул ногой и отвернулся от вас.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3537,11 +2831,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Пещера демона}\n\nВход в пещеру "
-                    "зияет черной дырой, из которой "
-                    "тянет тошнотворным сернистым "
-                    "зловонием. Отважитесь ли "
-                    "вы войти?",
+                "{Пещера демона}\n\nВход в пещеру зияет черной дырой, из которой тянет тошнотворным сернистым зловонием. Отважитесь ли вы войти?",
                 -1,
                 0,
                 -1,
@@ -3554,8 +2844,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "Если не считать следов ужасной "
-                        "битвы, пещера пуста.",
+                    "Если не считать следов ужасной битвы, пещера пуста.",
                     -1,
                     0,
                     -1,
@@ -3571,14 +2860,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             sprintf(
                 gText,
-                "В пещере вы обнаружили грозного "
-                    "до нелепости демона. \"Сегодня,"
-                    "\" - прорычал он, - \"тебя ждут бой "
-                    "и верная смерть. Но я позволю "
-                    "тебе выбрать смерть. Ты можешь "
-                    "драться со мной или же с моими "
-                    "слугами. Предпочитаешь сразиться "
-                    "с моими слугами?\""
+                "В пещере вы обнаружили грозного до нелепости демона. \"Сегодня,\" - прорычал он, - \"тебя ждут бой и верная смерть. Но я позволю тебе выбрать смерть. Ты можешь драться со мной или же с моими слугами. Предпочитаешь сразиться с моими слугами?\""
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -3602,8 +2884,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
-                        "Одолев слуг демона, вы нашли "
-                            "клад в размере 2500 золотых.",
+                        "Одолев слуг демона, вы нашли клад в размере 2500 золотых.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3626,11 +2907,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "Демон выкрикнул свой вызов "
-                            "и бросился в бой! После краткой,"
-                            " но отчаянной схватки вы прикончили "
-                            "чудовище и получили 1000 очков "
-                            "опыта.",
+                        "Демон выкрикнул свой вызов и бросился в бой! После краткой, но отчаянной схватки вы прикончили чудовище и получили 1000 очков опыта.",
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
                         -1,
@@ -3650,11 +2927,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventValue1 = (GiveRandomArtifact(eventHero2));
                     sprintf(
                         gText,
-                        "Демон выкрикнул свой вызов "
-                            "и бросился в бой! После непродолжительной,"
-                            " но отчаянной битвы вы прикончили "
-                            "чудовище, а в глубине пещеры "
-                            "нашли %s.",
+                        "Демон выкрикнул свой вызов и бросился в бой! После непродолжительной, но отчаянной битвы вы прикончили чудовище, а в глубине пещеры нашли %s.",
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -3676,11 +2949,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "Демон выкрикнул свой вызов "
-                            "и бросился в бой! После непродолжительной,"
-                            " но отчаянной схватки вы прикончили "
-                            "чудовище, получив 1000 очков "
-                            "опыта и 2500 золотых.",
+                        "Демон выкрикнул свой вызов и бросился в бой! После непродолжительной, но отчаянной схватки вы прикончили чудовище, получив 1000 очков опыта и 2500 золотых.",
                         (RES_GOLD),
                         DAEMON_GOLD,
                         NORMAL_DIALOG_EXPERIENCE,
@@ -3697,12 +2966,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "Демон набросился на вас и "
-                            "вцепился когтями в горло "
-                            "прежде, чем вы обнажили меч."
-                            " \"Твоя жизнь в моих руках,\" -"
-                            " прорычал он. - \"Я верну ее тебе "
-                            "за 2500 золотых.\"",
+                        "Демон набросился на вас и вцепился когтями в горло прежде, чем вы обнажили меч. \"Твоя жизнь в моих руках,\" - прорычал он. - \"Я верну ее тебе за 2500 золотых.\"",
                         -1,
                         0,
                         -1,
@@ -3715,11 +2979,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                "Поняв, что у вас нет 2500 золотых,"
-                                    " демон растерзал вас своими "
-                                    "клыками, и последнее, что вы "
-                                    "видели, была алая пелена перед "
-                                    "глазами.",
+                                "Поняв, что у вас нет 2500 золотых, демон растерзал вас своими клыками, и последнее, что вы видели, была алая пелена перед глазами.",
                                 -1,
                                 0,
                                 -1,
@@ -3745,12 +3005,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Кораблекрушение}\n\nГниющий "
-                    "остов огромного пиратского "
-                    "корабля зловеще поскрипывает,"
-                    " покачиваемый прибоем на "
-                    "скалах. Желаете обыскать "
-                    "обломки?",
+                "{Кораблекрушение}\n\nГниющий остов огромного пиратского корабля зловеще поскрипывает, покачиваемый прибоем на скалах. Желаете обыскать обломки?",
                 -1,
                 0,
                 -1,
@@ -3763,12 +3018,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Совладав с призраками, вы "
-                                "потратили несколько часов "
-                                "на рытье в мусоре, но так ничего "
-                                "и не нашли. Столь неблаговидное "
-                                "занятие снизило маораль вашей "
-                                "армии.",
+                            "Совладав с призраками, вы потратили несколько часов на рытье в мусоре, но так ничего и не нашли. Столь неблаговидное занятие снизило маораль вашей армии.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3785,9 +3035,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (GhostEvent(
                                 eventHero2,
                                 cell,
-                                "Одолев призраков, вы обыскали "
-                                    "останки корабля и кое-что "
-                                    "нашли!",
+                                "Одолев призраков, вы обыскали останки корабля и кое-что нашли!",
                                 x,
                                 y
                             ))
@@ -3853,11 +3101,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Брошенный корабль}\n\nГниющий "
-                    "остов огромного пиратского "
-                    "корабля зловеще скрипит, "
-                    "покачиваемый волнами на скалах."
-                    " Желаете обыскать корабль?",
+                "{Брошенный корабль}\n\nГниющий остов огромного пиратского корабля зловеще скрипит, покачиваемый волнами на скалах. Желаете обыскать корабль?",
                 -1,
                 0,
                 -1,
@@ -3870,12 +3114,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Усмирив скелетов, вы потратили "
-                                "несколько часов на поиски "
-                                "среди гнилых обломков - и впустую."
-                                " Столь грязная работа плохо "
-                                "сказалась на морали вашей "
-                                "армии.",
+                            "Усмирив скелетов, вы потратили несколько часов на поиски среди гнилых обломков - и впустую. Столь грязная работа плохо сказалась на морали вашей армии.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3896,9 +3135,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (SkeletonEvent(
                                 eventHero2,
                                 skeletonCell_e,
-                                "Совладав со скелетами, вы "
-                                    "обыскали обломки и кое-что "
-                                    "нашли!",
+                                "Совладав со скелетами, вы обыскали обломки и кое-что нашли!",
                                 x,
                                 y
                             ))
@@ -3914,13 +3151,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "Вы нашли пирамиду древнего "
-                    "великого царя. Искушение "
-                    "поискать в ней сокровища "
-                    "велико, но вы слышали все эти "
-                    "сказки об ужасных проклятиях "
-                    "и неупокоенных стражей. Хотите "
-                    "обследовать пирамиду?",
+                "Вы нашли пирамиду древнего великого царя. Искушение поискать в ней сокровища велико, но вы слышали все эти сказки об ужасных проклятиях и неупокоенных стражей. Хотите обследовать пирамиду?",
                 -1,
                 0,
                 -1,
@@ -3930,10 +3161,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
-                        "Вы нашли пирамиду древнего "
-                            "великого царя. Первое же обследование "
-                            "пирамиды показало, что в ней "
-                            "абсолютно ничего нет.",
+                        "Вы нашли пирамиду древнего великого царя. Первое же обследование пирамиды показало, что в ней абсолютно ничего нет.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3974,17 +3202,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     sprintf(
                             eventText_b,
                             "%s'%s'.  ",
-                            "Одолев чудовищ, вы расшифровали "
-                                "иероглифы на стене, сообщающие "
-                                "секрет заклинания - ",
+                            "Одолев чудовищ, вы расшифровали иероглифы на стене, сообщающие секрет заклинания - ",
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
                                 eventText_b,
-                                "  К сожалению, у вас нет Волшебной "
-                                    "книги, чтобы записать в нее "
-                                    "это заклинание."
+                                "  К сожалению, у вас нет Волшебной книги, чтобы записать в нее это заклинание."
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[(HERO_SKILL_WISDOM)]
@@ -4006,9 +3230,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         } else {
                             strcat(
                                 eventText_b,
-                                "  К сожалению, у вас недостаточно "
-                                    "мудрости, чтобы понять заклинание,"
-                                    " ивы не можете выучить его."
+                                "  К сожалению, у вас недостаточно мудрости, чтобы понять заклинание, ивы не можете выучить его."
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         }
@@ -4023,10 +3245,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "Вы обнаружили заброшенную "
-                    "золотую шахту. Кажется, она "
-                    "населена призраками. Желаете "
-                    "войти внутрь?",
+                "Вы обнаружили заброшенную золотую шахту. Кажется, она населена призраками. Желаете войти внутрь?",
                 -1,
                 0,
                 -1,
@@ -4056,8 +3275,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "Вы разбили призраков и смогли "
-                            "наладить добычу золота.",
+                        "Вы разбили призраков и смогли наладить добычу золота.",
                         -1,
                         0,
                         -1,
@@ -4169,7 +3387,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     }
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
-    WaitEndSample(&eventSample_f, -1);
+    WaitEndSample(&eventSample_f);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -4392,44 +3610,22 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 
     sprintf(
         gText,
-        "Дорогу вам преграждает %s "
-            "магический барьер. Руны "
-            "на нем гласят: \"Скажи слово "
-            "и сможешь пройти.\"",
+        "Дорогу вам преграждает %s магический барьер. Руны на нем гласят: \"Скажи слово и сможешь пройти.\"",
         xBarrierColor[colorIndex]
     );
     GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
     if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+        && PLAYER_HAS_VISITED_TENT(*gpCurPlayer, colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
-            "Едва вы произнесли "
-                "волшебное слово, как "
-                "сверкающий барьер исчез "
-                "в пустоте.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "Едва вы произнесли волшебное слово, как сверкающий барьер исчез в пустоте.",
+            NORMAL_DIALOG_INFO
         );
         return 1;
     } else {
         NormalDialog(
             "Вы произнесли слово, но ничего не произошло.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            NORMAL_DIALOG_INFO
         );
         return 0;
     }
@@ -4475,7 +3671,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
         xBarrierColor[color],
         xPasswordStrings[passwordIndex]
     );
-    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
@@ -4527,7 +3723,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         cursedArtifactCount2
                     );
                 }
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
@@ -4542,30 +3738,14 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     } else {
                         NormalDialog(
                             "Вы слышите голос из-за запертой двери: \"У вас недостаточно золота для моих услуг.\"",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            NORMAL_DIALOG_INFO
                         );
                     }
                 }
             } else {
                 NormalDialog(
                     "Вы слышите голос с вершины башни: \"Убирайтесь! Я не могу вам помочь!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    NORMAL_DIALOG_INFO
                 );
             }
             break;
@@ -4574,15 +3754,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             if ((((eventHero->m_eventFlags) & (HERO_EVENT_ARENA)))) {
                 NormalDialog(
                     "Стража Арены преградила вам дорогу и не пустила внутрь.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4600,15 +3772,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             if ((((eventHero->m_eventFlags) & (HERO_EVENT_MERMAID)))) {
                 NormalDialog(
                     "Русалки молчаливо дали вам понять, чтобы вы приходили в другой раз, тогда они благословят вас.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4635,15 +3799,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9);
             NormalDialog(
                 "Вы зашли в ветхую хибару и заговорили с магом, живущим тут. Он поведал вам о местах, которые ему доводилось видеть. Это может пригодиться вам в ваших путешествиях.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                NORMAL_DIALOG_INFO
             );
             for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
                 for (mapY14 = 0; mapY14 < MAP_HEIGHT; mapY14++) {
@@ -4664,15 +3820,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
                 "Кажется, этот глаз внимательно изучает окрестности.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                NORMAL_DIALOG_INFO
             );
             break;
 
@@ -4680,15 +3828,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             if ((((eventHero->m_eventFlags) & (HERO_EVENT_SIRENS)))) {
                 NormalDialog(
                     "Вы приказали своей команде залить уши воском, прежде чем подплыть к сиренам, чтобы послушать их пение, которое запросто может погубить всех в морской пучине.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 experience11 = 0;
@@ -4716,20 +3856,12 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         "Над камнями раздалась жуткая песня сирен. Многие из вашей команды росились в воду действием этих чар и утонули в морской пучине. Для вас это был хороший урок, давший %d очков опыта.",
                         experience11
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
                     NormalDialog(
                         "Едва сирены затянули свою ужасную песню, как ваша команда посильнее налегла на весла и увела подальше корабль в открыто море.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 eventHero->m_eventFlags = HeroEventFlag(
@@ -4843,19 +3975,8 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     heroId = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
         NormalDialog(
-            "Тюремщик сказал вам, "
-                "что герой, томившийся "
-                "тут в плену был освобожден "
-                "его королем.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "Тюремщик сказал вам, что герой, томившийся тут в плену был освобожден его королем.",
+            NORMAL_DIALOG_INFO
         );
         EraseObj(cell, x, y);
         return;
@@ -4863,44 +3984,16 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
-            "У вас уже 8 героев. "
-                "К сожалению, вам придется "
-                "оставить томиться "
-                "этого героя в темнице "
-                "еще неопределенное "
-                "время.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "У вас уже 8 героев. К сожалению, вам придется оставить томиться этого героя в темнице еще неопределенное время.",
+            NORMAL_DIALOG_INFO
         );
         return;
     }
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
     NormalDialog(
-        "С ослепительной отвагой "
-            "вы ворвались в местную "
-            "темницу и освободили "
-            "героя, томящегося "
-            "здесь в плену. "
-            "В благодарность "
-            "он поклялся служить "
-            "вам.",
-        NORMAL_DIALOG_INFO,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
+        "С ослепительной отвагой вы ворвались в местную темницу и освободили героя, томящегося здесь в плену. В благодарность он поклялся служить вам.",
+        NORMAL_DIALOG_INFO
     );
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
     gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
@@ -5246,7 +4339,7 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, artifactId, true, -1);
+        GiveArtifact(eventHero, artifactId, true);
     return artifactId;
 }
 
@@ -5899,8 +4992,7 @@ CombatResult advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, (CREATURE_NONE), MONSTER_ARMY_SLOTS);
-    memset(gpMonGroup->m_creatureCounts, 0, MONSTER_ARMY_SLOTS * sizeof(i16));
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
@@ -6310,8 +5402,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
         if (i == (HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
-            maxSpellPoints =
-                targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
+            maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*targetHero);
             if (targetHero->m_spellPoints > maxSpellPoints)
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
@@ -6336,10 +5427,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             || gbThisNetHumanPlayer[(destinationHero->m_owner)]) {
                             sprintf(
                                 gText,
-                                "Это %s! Едва вы добрались до "
-                                    "артефакта, как предмет "
-                                    "мистическим образом исчез."
-                                     ,
+                                "Это %s! Едва вы добрались до артефакта, как предмет мистическим образом исчез."
+                                    ,
                                 gArtifactNames[(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
                             NormalDialog(
@@ -6473,7 +5562,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
             NULL
         );
         gpMouseManager->ShowColorPointer();
-        WaitEndSample(&fizzleSample, -1);
+        WaitEndSample(&fizzleSample);
     }
 }
 
@@ -6539,7 +5628,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
-            if ((((eventHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+            if (eventHero->IsEmbarked()) {
                 eventHero->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero->m_eventFlags) & ~(HERO_EVENT_EMBARKED)
                 );
@@ -6629,8 +5718,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGoldOrExperience:
@@ -6732,8 +5820,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveArtifact(
                         eventHero,
                         ArtifactType(cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET),
-                        true,
-                        -1
+                        true
                     );
                     cell->m_objectMetadata = SKELETON_EMPTY;
                     break;
@@ -6776,7 +5863,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT) {
                         index_h = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                        GiveArtifact(eventHero, ArtifactType(index_h), true, -1);
+                        GiveArtifact(eventHero, ArtifactType(index_h), true);
                     }
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 } else {
@@ -6797,8 +5884,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
@@ -7116,7 +6202,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(exitX - x) + abs(exitY_d - y)
+                        && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
                                       ? EVENT_TELEPORT_STONE_DISTANCE
                                       : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
@@ -7133,7 +6219,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
-                            && abs(exitX - x) + abs(exitY_d - y)
+                            && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
@@ -7197,7 +6283,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         if (gpCurPlayer->m_resources[index_h] < 0)
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
-                    GiveArtifact(eventHero, artifact_g, true, -1);
+                    GiveArtifact(eventHero, artifact_g, true);
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
@@ -7507,7 +6593,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true);
             eraseObject_l = 1;
             break;
 
@@ -7515,8 +6601,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata == 0)
                 break;
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-            springSpellPoints_j =
-                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero);
             if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
                 eventHero->m_spellPoints =
                     static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
@@ -7525,8 +6610,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if ((((eventHero->m_eventFlags) & (HERO_EVENT_MAGIC_WELL))) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                wellSpellPoints_o =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero);
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_MAGIC_WELL)
@@ -7564,7 +6648,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 }
                 if (eventExtra_o->artifact != -1
                     && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
-                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true, -1);
+                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true);
                 }
                 eventExtra_o->active = 0;
             } else {
@@ -7607,7 +6691,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 1;
     else
         return 0;
@@ -7853,12 +6937,9 @@ void advManager::PlayerMonsterInteract(
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
-                / static_cast<double>(
-                    creatureCount * gMonsterDatabase[(monsterType)].fightValue
-                );
+    armyRatio =
+        static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
+        / static_cast<double>(creatureCount * gMonsterDatabase[(monsterType)].fightValue);
 
     if (gbInCampaign
         && ((gpGame->m_campaignAwards[(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
@@ -7871,105 +6952,35 @@ void advManager::PlayerMonsterInteract(
         if (!eventHero->m_army.CanJoin(monsterType)) {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "Гномы приветствую "
-                        "вас: \"Друг Роланда "
-                        "- наш друг. Вы можете "
-                        "пройти.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Гномы приветствую вас: \"Друг Роланда - наш друг. Вы можете пройти.\"",
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "Огры признали вас: "
-                        "\"Союзники Арчибальда "
-                        "могут пройти.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Огры признали вас: \"Союзники Арчибальда могут пройти.\"",
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
-                    "Драконы, посмотрев "
-                        "на вас, промолвили: "
-                        "\"Наш альянс с Арчибальдом "
-                        "вынуждает нас присоединиться "
-                        "к вам.  К несчастью, "
-                        "у вас нет для нас места. "
-                        "Какая жалость!\"  И "
-                        "быстро улетели.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Драконы, посмотрев на вас, промолвили: \"Наш альянс с Арчибальдом вынуждает нас присоединиться к вам.  К несчастью, у вас нет для нас места. Какая жалость!\"  И быстро улетели.",
+                    NORMAL_DIALOG_INFO
                 );
             *handled = 1;
         } else {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "Гномы признали своих "
-                        "союзников и рады "
-                        "присоединиться к "
-                        "ним.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Гномы признали своих союзников и рады присоединиться к ним.",
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "Огры признали нас, "
-                        "как врагов гномов "
-                        "и рады присоединиться "
-                        "к вам. ",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Огры признали нас, как врагов гномов и рады присоединиться к вам. ",
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
-                    "Горделивые драконы "
-                        "вынуждены были признать "
-                        "в вас своих 'союзников' "
-                        "и присоединиться "
-                        "к вам.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "Горделивые драконы вынуждены были признать в вас своих 'союзников' и присоединиться к вам.",
+                    NORMAL_DIALOG_INFO
                 );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
             *handled = 1;
@@ -7980,17 +6991,8 @@ void advManager::PlayerMonsterInteract(
     if (gbInCampaign && gpGame->m_campaignAwards[(CAMPAIGN_AWARD_DWARFBANE)]
         && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
-            "\"Враги гномов! Бегите, "
-                "если жизнь дорога.\"",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\"Враги гномов! Бегите, если жизнь дорога.\"",
+            NORMAL_DIALOG_INFO
         );
         *handled = 1;
         return;
@@ -8001,59 +7003,22 @@ void advManager::PlayerMonsterInteract(
         *handled = 1;
         if (eventHero->m_army.CanJoin(monsterType)) {
             NormalDialog(
-                "Едва вы подошли к "
-                    "отряду эльфов, как "
-                    "их вожак призвал "
-                    "свой отряд к оружию. "
-                    "Он сказал им: \"Кто "
-                    "из вас достаточно "
-                    "смел, чтобы вступить "
-                    "в армию нашего мужественного "
-                    "союзника?\" Весь отряд "
-                    "единодушно вступил "
-                    "в вашу армию.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "Едва вы подошли к отряду эльфов, как их вожак призвал свой отряд к оружию. Он сказал им: \"Кто из вас достаточно смел, чтобы вступить в армию нашего мужественного союзника?\" Весь отряд единодушно вступил в вашу армию.",
+                NORMAL_DIALOG_INFO
             );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
             NormalDialog(
-                "Эльфы насторожились "
-                    "при вашем приближении. "
-                    "Их вожак обратился "
-                    "к вам со словами: \"Мы "
-                    "не можем принять "
-                    "участие в ваших делах, "
-                    "союзник! Проходи, "
-                    "наша победа будет "
-                    "вашей.\"",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "Эльфы насторожились при вашем приближении. Их вожак обратился к вам со словами: \"Мы не можем принять участие в ваших делах, союзник! Проходи, наша победа будет вашей.\"",
+                NORMAL_DIALOG_INFO
             );
         }
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && armyRatio
-            > 2.0
+    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > 2.0
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -8099,28 +7064,19 @@ void advManager::PlayerMonsterInteract(
             if (creatureCount == 1) {
                 sprintf(
                     gText,
-                    "%s находится под впечатлением "
-                        "вашей дипломатичности, "
-                        "и предлагает свои "
-                        "услуги вашему войску "
-                        "за %d золотых. Вы согласны?",
+                    "%s находится под впечатлением вашей дипломатичности, и предлагает свои услуги вашему войску за %d золотых. Вы согласны?",
                     gArmyNames[(monsterType)],
                     joiningCost
                 );
             } else {
                 sprintf(
                     gText,
-                    "Воины покорены вашим "
-                        "шармом и выдвинули "
-                        "предложение:\n\n"
+                    "Воины покорены вашим шармом и выдвинули предложение:\n\n"
                 );
                 if (numJoining == creatureCount)
                     sprintf(
                         monsterText,
-                        "Отряд из %d %s вступят "
-                            "в ряды вашей армии "
-                            "за %d золотых. Вы согласны "
-                            "принять их?",
+                        "Отряд из %d %s вступят в ряды вашей армии за %d золотых. Вы согласны принять их?",
                         creatureCount,
                         gArmyNamesPlural[(monsterType)],
                         joiningCost
@@ -8128,10 +7084,7 @@ void advManager::PlayerMonsterInteract(
                 else
                     sprintf(
                         monsterText,
-                        "%d из %d %s вступят в ряды "
-                            "вашей армии, а оставшиеся "
-                            "оставят вас в покое "
-                            "за %d золотых. Вы согласны?",
+                        "%d из %d %s вступят в ряды вашей армии, а оставшиеся оставят вас в покое за %d золотых. Вы согласны?",
                         numJoining,
                         creatureCount,
                         gArmyNamesPlural[(monsterType)],
@@ -8177,11 +7130,7 @@ void advManager::PlayerMonsterInteract(
     monstersFlee:
         sprintf(
             gText,
-            "Группа %s, страшась "
-                "мощи вашего воинства, "
-                "бросилась врассыпную. "
-                "Соизволите изловить "
-                "их и заставить драться?",
+            "Группа %s, страшась мощи вашего воинства, бросилась врассыпную. Соизволите изловить их и заставить драться?",
             gArmyNamesPlural[(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -8227,19 +7176,15 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
+    armyRatio = static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
                 / static_cast<double>(
                     creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                     * gMonsterDatabase[(monsterType)].fightValue
                 );
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
-        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-        && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+        && armyRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
@@ -8577,7 +7522,7 @@ CombatResult advManager::DoCombat(
             sprintf(
                 gText,
                 "%s, ваш %s атакован!"
-                     ,
+                    ,
                 cPlayerNames[secondPlayer8],
                 combatTown
                     ? "город"
@@ -8719,9 +7664,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8736,9 +7679,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8751,9 +7692,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8768,9 +7707,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8850,9 +7787,7 @@ void advManager::ReceiveHeroTownData(
         *remotePlayer,
         0,
         REMOTE_CONFIRM_COMMAND,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        REMOTE_MESSAGE_DEFAULT
+        COMBAT_REMOTE_FRAGMENT_TYPE
     );
     if (!result7)
         ShutDown(NULL);
@@ -8879,15 +7814,7 @@ void advManager::ReceiveHeroTownData(
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 const_cast<char*>("Ошибка получения информации. Продолжать?"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();

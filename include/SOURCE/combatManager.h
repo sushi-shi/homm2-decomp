@@ -857,7 +857,26 @@ extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
 extern i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern i32 giNextAction;
+
+#define SET_NEXT_COMBAT_MOVE(hex) (giNextAction = ACTION_MOVE, giNextActionGridIndex = (hex))
+
+#define COMBAT_DEADLINE(delay)                                                                     \
+    (static_cast<i32>(KBTickCount() + (delay) * gfCombatSpeedMod[gConfig.combatSpeed]))
 extern i32 giNextActionGridIndex2;
+
+#define IS_INTERIOR_COMBAT_HEX(hex)                                                                \
+    ((hex) >= 0 && (hex) < COMBAT_HEX_COUNT && (hex) % COMBAT_GRID_ROW_LENGTH != 0                 \
+     && (hex) % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1)
+
+#define CAN_PASS_CASTLE_GATE(hex)                                                                  \
+    (gpCombatManager->m_inCastleCombat                                                             \
+     && ((hex) == COMBAT_CASTLE_GATE_APPROACH_HEX || (hex) == (COMBAT_CASTLE_HEX_GATE))         \
+     && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED                            \
+         || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE                                \
+             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide        \
+                    == COMBAT_SIDE_NONE                                                            \
+             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_deadOccupantCount   \
+                    == 0)))
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;

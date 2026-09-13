@@ -184,18 +184,14 @@ i32 nbnet_init(void) {
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
-            sprintf(gText, "Инициализация сети.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            sprintf(gText, "Инициализация сети.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
-            sprintf(gText, "Ожидание гостя.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
+            sprintf(gText, "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
             LogStr("GUON2");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             LogStr("GUON3");
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
@@ -203,17 +199,13 @@ i32 nbnet_init(void) {
             break;
         case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
-            sprintf(gText, "Инициализация сети.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            sprintf(gText, "Инициализация сети.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
-            sprintf(gText, "Ожидание хоста.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            sprintf(gText, "Ожидание хоста.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             break;

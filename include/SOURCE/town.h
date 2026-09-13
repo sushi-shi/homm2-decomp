@@ -67,6 +67,13 @@ typedef enum TownConstant {
     TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
 } TownConstant;
 
+
+#define NEXT_MAGE_GUILD_LEVEL(level)                                                               \
+    ((level) + 1 < TOWN_MAGE_GUILD_LEVEL_COUNT ? (level) + 1 : TOWN_MAGE_GUILD_LEVEL_COUNT)
+#define TOWN_BUILDING_COMPLETE(t, slot)                                                            \
+    (((((t).m_buildings) & ((1 << (slot)))))                                                               \
+     && ((slot) != BUILDING_SLOT_MAGE_GUILD || (t).m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT))
+
 #pragma pack(push, 1)
 class town {
 public:

@@ -123,7 +123,7 @@ void RemoteMain(RemoteGameMode gameMode) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
         sprintf(
             gsNetPlayerInfo[player].name,
-              "Игрок\x20\x25\x64",
+             "Игрок %d",
             player + 1
         );
     }
@@ -252,9 +252,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 0,
                 sizeof(SNetPlayerInfo),
                 (SETUP_PLAYER_INFO),
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             LogStr("RM 6");
         }
@@ -265,12 +263,8 @@ void RemoteMain(RemoteGameMode gameMode) {
             NULL,
             REMOTE_BROADCAST_PLAYER,
             0,
-            static_cast<i8>(
-                giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME
-            ),
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
+            static_cast<i8>(giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME),
+            1
         );
     } else {
         while (bGotGameType == 0) {
@@ -425,16 +419,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                         nb_snd(static_cast<i16>(destination), static_cast<i16>(size), PacketSend)
                     );
                     if (sendStatus != 0) {
-                        LogInt(
-                            "Bad return on Send Data",
-                            destination,
-                            sendStatus,
-                            size,
-                            0,
-                            0,
-                            LOG_UNUSED_VALUE,
-                            LOG_UNUSED_VALUE
-                        );
+                        LogInt("Bad return on Send Data", destination, sendStatus, size, 0, 0);
                         out = false;
                         goto finished;
                     }
@@ -542,16 +527,9 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && tries == REMOTE_RETRY_COUNT && rv == 0) {
             NormalDialog(
-                  "Ошибка\x20пересылки\x20данных\x2e\x20Продолжить\x3f",
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+
+                "Ошибка пересылки данных. Продолжить?",
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 tries = -1;
@@ -650,12 +628,10 @@ void PollRemote(void) {
                 sprintf(
                     gText,
 
-                    "Компьютер\x20\x27\x25\x73\x27\x20не\x20отвечает\x20на\x20запросы\x2e\x20Желаете\x20продолжить\x20ожидание\x20ответа\x3f",
+                    "Компьютер '%s' не отвечает на запросы. Желаете продолжить ожидание ответа?",
                     gsNetPlayerInfo[queueIndex].name
                 );
-                NormalDialog(
-                    gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                     lLastHeartbeatReceive[queueIndex] = KBTickCount();
                 } else {
@@ -681,19 +657,17 @@ void PollRemote(void) {
                 sprintf(
                     gText,
 
-                    "Компьютер\x20\x27\x25\x73\x27\x20не\x20отвечает\x20на\x20запросы\x2e\x20Желаете\x20продолжить\x20ожидание\x20ответа\x3f",
+                    "Компьютер '%s' не отвечает на запросы. Желаете продолжить ожидание ответа?",
                     gsNetPlayerInfo[0].name
                 );
             } else {
                 sprintf(
                     gText,
 
-                    "Удаленное\x20соединение\x20с\x20другими\x20игроками\x20прервано\x2e\x20Желаете\x20продолжить\x20ожидание\x20ответа\x3f"
+                    "Удаленное соединение с другими игроками прервано. Желаете продолжить ожидание ответа?"
                 );
             }
-            NormalDialog(
-                gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-            );
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 lLastHeartbeatReceive[0] = KBTickCount();
             } else if (giThisNetPos == 1) {
@@ -705,18 +679,16 @@ void PollRemote(void) {
                 ReceiveRemotePlayerExit(guestExit);
             } else {
                 gpGame->SaveGame(
-                      "Игрок\x20Вышел",
+                     "Игрок Вышел",
                     1,
                     0
                 );
                 sprintf(
                     gText,
 
-                    "Данная\x20игра\x20сохранена\x20под\x20названием\x20\x27Игрок\x20вышел\x27\x2e\x20Желаете\x20продолжить\x20игру\x2c\x20где\x20компьютер\x20займет\x20место\x20выбывших\x20игроков\x3f"
+                    "Данная игра сохранена под названием 'Игрок вышел'. Желаете продолжить игру, где компьютер займет место выбывших игроков?"
                 );
-                NormalDialog(
-                    gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                     DropDownToOnePlayer();
                 else
@@ -811,15 +783,7 @@ i32 TransmitAndWait(
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
     receivedData = NULL;
-    result = TransmitRemoteData(
-        bytes,
-        destination,
-        length,
-        command,
-        1,
-        1,
-        REMOTE_MESSAGE_DEFAULT
-    );
+    result = TransmitRemoteData(bytes, destination, length, command, 1);
     if (result == 0)
         goto transmitComplete;
     clock = KBTickCount();
@@ -827,16 +791,9 @@ i32 TransmitAndWait(
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                  "Ошибка\x20пересылки\x20данных\x2e\x20Продолжить\x3f",
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+
+                "Ошибка пересылки данных. Продолжить?",
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 clock = KBTickCount();

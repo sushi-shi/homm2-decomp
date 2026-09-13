@@ -340,12 +340,7 @@ void ExpCampaign::InitMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
-                GiveArtifact(
-                    gpGame->GetHero(player->m_heroIds[0]),
-                    bonus->artifact,
-                    false,
-                    -1
-                );
+                GiveArtifact(gpGame->GetHero(player->m_heroIds[0]), bonus->artifact, false);
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
@@ -388,8 +383,10 @@ void ExpCampaign::InitMap(void) {
             b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
-                gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
-                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(player->m_heroIds[0]),
+                    bonus->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -434,8 +431,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WOOD_BONUS:
@@ -445,8 +441,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_DEFEAT_KRAEGER:
@@ -461,8 +456,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WAYWARD_SON:
@@ -473,8 +467,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_SET_GUARDIAN:
@@ -487,8 +480,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
-                            false,
-                            -1
+                            false
                         );
                     break;
             }
@@ -562,27 +554,12 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
 
-            "Вы действительно "
-            "хотите начать "
-            "сначала сценарий?",
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
+            "Вы действительно хотите начать сначала сценарий?",
+            CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -647,7 +624,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "Нет"  );
+        sprintf(gText, "Нет");
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
@@ -678,7 +655,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "Топор силы"  );
+                        strcpy(gText, "Топор силы");
                         break;
                     case ARTIFACT_DRAGON_SWORD:
                         strcpy(
@@ -687,7 +664,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "Доспехи"  );
+                        strcpy(gText, "Доспехи");
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
@@ -704,7 +681,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "Перчатки"  );
+                        strcpy(gText, "Перчатки");
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
                         strcpy(
@@ -720,7 +697,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "Баллиста"  );
+                        strcpy(gText, "Баллиста");
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
                         strcpy(
@@ -753,8 +730,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(
                         gText,
-                        "Призвать земляных э"
-                        "л."
+                        "Призвать земляных эл."
                     );
                 else
                     sprintf(gText, "%s", gSpellNames[(choice->spell)]);
@@ -792,10 +768,10 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "Опыт"  );
+                sprintf(gText, "%d %s", choice->value, "Опыт");
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "н/д"  );
+                sprintf(gText, "н/д");
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[(choice->faction)]);
@@ -1231,21 +1207,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 NormalDialog(
 
 
-                                    "Выбранная "
-                                    "карта - плохой "
-                                    "выбор для "
-                                    "вашего "
-                                    "следующего "
-                                    "сценария.",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    "Выбранная карта - плохой выбор для вашего следующего сценария.",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }

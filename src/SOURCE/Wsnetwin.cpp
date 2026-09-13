@@ -31,25 +31,18 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 plr;
 
-    if (gConfig.gfx[(giCurExe)].fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         sprintf(
             gText,
 
 
-            "Об инициировании TCP/IP соединения. "
-                "Герои II переключатся в оконный режим, чтобы вы "
-                "получили доступ к диалоговым окнам Windows.\n\n"
-                "Когда соединение будет установлено, вы сможете вернуться в "
-                "полноэкранный режим нажав 'F4'."
+            "Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы получили доступ к диалоговым окнам Windows.\n\nКогда соединение будет установлено, вы сможете вернуться в полноэкранный режим нажав 'F4'."
         );
-        NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, 1);
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;
-    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
-    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
-    memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
-    memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+    INIT_TRANSPORT_RECEIVE_STORAGE();
 
     wVer = MAKEWORD(1, 1);
     iRc = WSAStartup(wVer, &wsadata);
@@ -94,26 +87,21 @@ i16 wsnet_init(void) {
                 cWSTextBuffer,
 
 
-                "Создание игры по адресу %s.\n\n"
-                    "У вас %d гостей из ожидавшихся %d гостей. "
-                    "Нажмите 'ОТМЕНА', чтобы продолжить игру, не дожидаясь  "
-                    "остальных гостей.",
+                "Создание игры по адресу %s.\n\nУ вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить игру, не дожидаясь  остальных гостей.",
                 inet_ntoa(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         } else {
             sprintf(
                 cWSTextBuffer,
 
 
-                "Открытие игры на %s\n\n"
-                    "Ожидание гостя(ей).\n\n  "
-                    "Нажмите 'ОТМЕНА', чтобы прервать соединение.",
+                "Открытие игры на %s\n\nОжидание гостя(ей).\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.",
                 inet_ntoa(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -125,28 +113,23 @@ i16 wsnet_init(void) {
                     cWSTextBuffer,
 
 
-                    "Создание игры по адресу %s.\n\n"
-                        "У вас %d гостей из ожидавшихся %d гостей. "
-                        "Нажмите 'ОТМЕНА', чтобы продолжить игру, не дожидаясь  "
-                        "остальных гостей.",
+                    "Создание игры по адресу %s.\n\nУ вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить игру, не дожидаясь  остальных гостей.",
                     inet_ntoa(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
             }
         } else {
             sprintf(
                 cWSTextBuffer,
 
 
-                "Создание игры на %s.\n\n"
-                    "У вас %d гостей. Нажмите 'ОК', чтобы продолжить "
-                    "или подождите других игроков.",
+                "Создание игры на %s.\n\nУ вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков.",
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
@@ -172,8 +155,7 @@ i16 wsnet_init(void) {
             GetDataEntry(
 
 
-                "Введите IP адрес сервера.\n"
-                    "(Например: 220.415.119.223)",
+                "Введите IP адрес сервера.\n(Например: 220.415.119.223)",
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
@@ -185,26 +167,17 @@ i16 wsnet_init(void) {
         if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
             NormalDialog(
 
-                "Неправильный IP адрес. "
-                    "Попробуйте еще раз.",
-                NORMAL_DIALOG_WAIT_FIRST,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "Неправильный IP адрес. Попробуйте еще раз.",
+                NORMAL_DIALOG_WAIT_FIRST
             );
             goto retryAddress;
         }
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         sprintf(
             cWSTextBuffer,
-              "Поиск сервера."
+             "Поиск сервера."
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -214,12 +187,7 @@ i16 wsnet_init(void) {
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
-    if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer);
-    ppDPRcvBuffer = NULL;
-    if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize);
-    piDPRcvBufferSize = NULL;
+    DisposeTransportReceiveStorage();
     WSACleanup();
     bHostFound = false;
     sd_dg = INVALID_SOCKET;
@@ -269,7 +237,7 @@ void wsSendMessage(
                     goto sendPacket;
                 }
                 sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
                 return;
             }
         }
@@ -285,7 +253,7 @@ void wsSendMessage(
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
             return;
         }
     }
@@ -357,10 +325,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
-            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-            piDPRcvBufferSize[iDPRcvBufferHead] = size;
-            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
+            ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
@@ -379,16 +344,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         }
                     }
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                    LogInt(
-                        "Got HereIAm from ",
-                        sender,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
-                    );
+                    LogInt("Got HereIAm from ", sender);
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(message);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
@@ -408,16 +364,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = *(message + offsetof(WinsockStartupMessage, playerCount));
             giThisNetPos = *(message + offsetof(WinsockStartupMessage, netPosition));
-            LogInt(
-                "WSMSGSTARTUP",
-                giThisNetPos,
-                sender,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("WSMSGSTARTUP", giThisNetPos, sender);
             memcpy(
                 giNetPosToDCOPos,
                 message + offsetof(WinsockStartupMessage, playerAddresses),
@@ -428,22 +375,17 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
                 cWSTextBuffer,
-                "Сервер уже создал игру "
-                "и не принимает новых "
-                "игроков."
+                "Сервер уже создал игру и не принимает новых игроков."
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
             sprintf(
                 cWSTextBuffer,
-                "Ожидаю игрока для "
-                "начала игры."
+                "Ожидаю игрока для начала игры."
             );
-            windowMessage.type = MESSAGE_WIDGET;
-            windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            windowMessage.payload.widget.id = 1;
+            SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, 1);
             windowMessage.payload.widget.data.text = cWSTextBuffer;
             pNormalDialogWindow->BroadcastMessage(windowMessage);
             pNormalDialogWindow->DrawWindow();
@@ -453,7 +395,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             sprintf(cWSTextBuffer, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
             if (giDebugLevel > 0) {
                 sprintf(gText, cWSTextBuffer);
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
             LogStr(cWSTextBuffer);
             break;
@@ -479,15 +421,11 @@ i32 wsWaitForExtraGuests(void) {
             cWSTextBuffer,
 
 
-            "Создание игры на %s.\n\n"
-                "У вас %d гостей. Нажмите 'ОК', чтобы продолжить "
-                "или подождите других игроков.",
+            "Создание игры на %s.\n\nУ вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков.",
             inet_ntoa(gIn_addrIP),
             giNumHumanPlayers - 1
         );
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = 1;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
         message.payload.widget.data.text = cWSTextBuffer;
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();
@@ -516,10 +454,9 @@ i32 wsWaitForHost(void) {
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(
                     cWSTextBuffer,
-                      "Сервер не отвечает. "
-                        "Продолжить ожидание? "
+                      "Сервер не отвечает. Продолжить ожидание? "
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(NULL);
                 iWSAttempts = 0;

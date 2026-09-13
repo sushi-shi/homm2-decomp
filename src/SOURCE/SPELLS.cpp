@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -183,22 +184,9 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_EARTHQUAKE:
                 if (m_combatTowns[(COMBAT_DEFENDER_SIDE)] == NULL) {
                     NormalDialog(
-                        "От землетрясения "
-                        "нет никакого прока, "
-                        "если только на карте "
-                        "есть городские "
-                        "стены, которые можно "
-                        "разрушить."
+                        "От землетрясения нет никакого прока, если только на карте есть городские стены, которые можно разрушить."
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     break;
                 } else
@@ -220,67 +208,28 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_summonedCreatureType[(m_currentSide)] != CREATURE_SUMMONED_NONE
                     && m_summonedCreatureType[(m_currentSide)] != elementalType) {
                     NormalDialog(
-                        "Вы можете призвать "
-                        "элементалов только "
-                        "одного типа во время "
-                        "одного боя."
+                        "Вы можете призвать элементалов только одного типа во время одного боя."
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
                 if (m_armyCount[(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "У вас уже есть %d групп "
-                        "воинов в бою и больше "
-                        "добавить нельзя."
+                        "У вас уже есть %d групп воинов в бою и больше добавить нельзя."
                         ,
                         m_armyCount[(m_currentSide)]
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
                 if (!SpaceForElementalExists()) {
                     sprintf(
                         gText,
-                        "Рядом с вашим героем "
-                        "нет достаточного "
-                        "свободного места, "
-                        "чтобы призвать "
-                        "элементалов туда."
+                        "Рядом с вашим героем нет достаточного свободного места, чтобы призвать элементалов туда."
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
                 goto set_action;
@@ -300,18 +249,9 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_MASS_SHIELD:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "Заклинание ни на "
-                        "кого не подействует!"
+                        "Заклинание ни на кого не подействует!"
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
@@ -324,41 +264,19 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "У вас уже есть %d групп "
-                        "воинов в бою и больше "
-                        "добавить нельзя."
+                        "У вас уже есть %d групп воинов в бою и больше добавить нельзя."
                         ,
                         m_armyCount[(m_currentSide)]
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "Заклинание ни на "
-                        "кого не подействует!"
+                        "Заклинание ни на кого не подействует!"
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
@@ -423,12 +341,12 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
                         gpCombatManager->CombatMessage(
-                              "Недопустимое\x20место\x20для\x20телепортации\x20",
+                              "Недопустимое место для телепортации ",
                             1, 0, 0
                         );
                     } else {
                         gpCombatManager->CombatMessage(
-                              "Выберите\x20цель\x20для\x20заклинания",
+                             "Выберите цель для заклинания",
                             1, 0, 0
                         );
                     }
@@ -456,7 +374,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage(
-                              "Выберите\x20место\x20назначения\x20телепортации\x2e",
+                             "Выберите место назначения телепортации.",
                             1, 0, 0
                         );
                         return MESSAGE_DISPATCH_CONSUME;
@@ -643,7 +561,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_COLD_RING:
             sprintf(
                 gText,
-                  "Направить\x20\x27\x25\x73\x27",
+                 "Направить '%s'",
                 gSpellNames[(spell)]
             );
             break;
@@ -651,7 +569,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             if (bInTeleportGetDest) {
                 sprintf(
                     gText,
-                      "Перенестись\x20сюда"
+                     "Перенестись сюда"
                 );
                 break;
             }
@@ -669,7 +587,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         format_target:
             sprintf(
                 gText,
-                  "Направить\x20\x27\x25\x73\x27\x20на\x20\x25\x73",
+                 "Направить '%s' на %s",
                 gSpellNames[(spell)],
                 target->m_quantity == 1 ? gArmyNames[(target->m_monsterType)]
                                         : gArmyNamesPlural[(target->m_monsterType)]
@@ -855,17 +773,14 @@ void combatManager::CastSpell(
                 teleportArmy6->m_index,
                 COMBAT_RIPPLE_DEATH_RIPPLE
             );
-            m_hexCells[teleportArmy6->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-            m_hexCells[teleportArmy6->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
+            CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex]);
             if (m_hexCells[teleportArmy6->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
-                m_hexCells[teleportArmy6->m_hex + 1].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[teleportArmy6->m_hex + 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+                CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex + 1]);
             } else if (m_hexCells[teleportArmy6->m_hex].m_occupantFrame == ARMY_FACING_RIGHT) {
-                m_hexCells[teleportArmy6->m_hex - 1].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[teleportArmy6->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+                CLEAR_HEX_OCCUPANT(m_hexCells[teleportArmy6->m_hex - 1]);
             }
             if (gbNoShowCombat == 0)
-                WaitEndSample(&spellSample6, -1);
+                WaitEndSample(&spellSample6);
             if (gbNoShowCombat == 0) {
                 sprintf(gText, "telptin.82m");
                 spellSample6 = LoadPlaySample(gText);
@@ -943,7 +858,7 @@ void combatManager::CastSpell(
                 target3->m_monster.defense = SPELL_MINIMUM_DEFENSE;
             sprintf(
                 gText,
-                "Разрушительный\x20луч\x20уменьшает\x20защиту\x20на\x20\x25\x64\x20ед\x2e",
+                "Разрушительный луч уменьшает защиту на %d ед.",
                 oldDefense - target3->m_monster.defense
             );
             CombatMessage(gText, 1, 1, 0);
@@ -957,8 +872,7 @@ void combatManager::CastSpell(
             damage1 = spellPower6 * SPELL_COLD_RAY_DAMAGE_PER_POWER;
             if (target3->m_monsterType == CREATURE_FIRE_ELEMENTAL)
                 damage1 <<= 1;
-            if (target3->m_monsterType == CREATURE_IRON_GOLEM
-                || target3->m_monsterType == CREATURE_STEEL_GOLEM)
+            if (IS_GOLEM_CREATURE(target3->m_monsterType))
                 damage1 = static_cast<i32l>(damage1 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(
                 &damage1,
@@ -968,11 +882,9 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "Хладный\x20луч\x20наносит\x20\x25\x64\x0a\x20ед\x2e\x20урона\x20отряду\x20\x25\x73\x2e",
+                "Хладный луч наносит %d\n ед. урона отряду %s.",
                 static_cast<i32>(damage1),
-                target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                    ? gArmyNames[(target3->m_monsterType)]
-                    : gArmyNamesPlural[(target3->m_monsterType)]
+                CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
             CombatMessage(gText, 1, 1, 0);
             DoBlast(targetHex, spell);
@@ -997,11 +909,9 @@ void combatManager::CastSpell(
                 );
                 sprintf(
                     gText,
-                    "Волшебная\x20стрела\x20наносит\x20\x25\x64\x0a\x20ед\x2e\x20урона\x20отряду\x20\x25\x73\x2e",
+                    "Волшебная стрела наносит %d\n ед. урона отряду %s.",
                     static_cast<i32>(damage1),
-                    target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                        ? gArmyNames[(target3->m_monsterType)]
-                        : gArmyNamesPlural[(target3->m_monsterType)]
+                    CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
                 );
                 CombatMessage(gText, 1, 1, 0);
                 missileIcon6 = gpResourceManager->GetIcon("keep.icn");
@@ -1031,8 +941,7 @@ void combatManager::CastSpell(
             damage1 = spellPower6 * SPELL_LIGHTNING_DAMAGE_PER_POWER;
             if (target3->m_monsterType == CREATURE_AIR_ELEMENTAL)
                 damage1 <<= 1;
-            if (target3->m_monsterType == CREATURE_IRON_GOLEM
-                || target3->m_monsterType == CREATURE_STEEL_GOLEM)
+            if (IS_GOLEM_CREATURE(target3->m_monsterType))
                 damage1 = static_cast<i32l>(damage1 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(
                 &damage1,
@@ -1042,11 +951,9 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "Разряд\x20молнии\x20наносит\x20\x25\x64\x0a\x20ед\x2e\x20урона\x20отряду\x20\x25\x73\x2e",
+                "Разряд молнии наносит %d\n ед. урона отряду %s.",
                 static_cast<i32>(damage1),
-                target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
-                    ? gArmyNames[(target3->m_monsterType)]
-                    : gArmyNamesPlural[(target3->m_monsterType)]
+                CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
             CombatMessage(gText, 1, 1, 0);
             DoBolt(
@@ -1251,7 +1158,7 @@ cast_done:
         m_heroAnimationFrame[(m_currentSide)] = 0;
         DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
     }
-    WaitEndSample(&spellSample6, -1);
+    WaitEndSample(&spellSample6);
     CheckChangeSelector();
 }
 
@@ -1293,9 +1200,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
         }
 
         for (frame = 0; frame < frameCount7; ++frame) {
-            glTimers[0] = static_cast<i32>(
-                KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
             IconToBitmap(
                 spellIcon4,
                 gpWindowManager->m_screen,
@@ -1391,16 +1296,10 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             target = &m_armies[(m_hexCells[affectedHexes[frame]].m_occupantSide)]
                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex];
             if (target->SpellCastWorks(spell)
-                && !*(
-                    gArmyEffected[0]
-                    + (m_hexCells[affectedHexes[frame]].m_occupantSide)
-                          * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[affectedHexes[frame]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + (m_hexCells[affectedHexes[frame]].m_occupantSide)
-                        * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[affectedHexes[frame]].m_occupantIndex) = 1;
+                && !gArmyEffected[(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex]) {
+                gArmyEffected[(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                             [m_hexCells[affectedHexes[frame]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (spell == SPELL_COLD_RING
@@ -1409,8 +1308,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                     if ((spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
                         && target->m_monsterType == CREATURE_WATER_ELEMENTAL)
                         damage *= ELEMENTAL_WEAKNESS_MULTIPLIER;
-                    if (target->m_monsterType == CREATURE_IRON_GOLEM
-                        || target->m_monsterType == CREATURE_STEEL_GOLEM) {
+                    if (IS_GOLEM_CREATURE(target->m_monsterType)) {
                         damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
                     target->Damage(damage, spell);
@@ -1469,10 +1367,7 @@ void combatManager::MeteorShower(i32 targetHex) {
                     m_hexCells[targetHex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET,
                     frame,
                     NULL,
-                    ICON_DRAW_NORMAL,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_NORMAL
                 );
                 UpdateCombatArea();
                 DelayTil(&glTimers[0]);
@@ -1490,14 +1385,10 @@ void combatManager::MeteorShower(i32 targetHex) {
             target = &m_armies[(m_hexCells[hexes[direction]].m_occupantSide)]
                               [m_hexCells[hexes[direction]].m_occupantIndex];
             if (target->SpellCastWorks(SPELL_METEOR_SHOWER)
-                && !*(
-                    gArmyEffected[0]
-                    + (m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[hexes[direction]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + (m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[hexes[direction]].m_occupantIndex) = 1;
+                && !gArmyEffected[(m_hexCells[hexes[direction]].m_occupantSide)]
+                                 [m_hexCells[hexes[direction]].m_occupantIndex]) {
+                gArmyEffected[(m_hexCells[hexes[direction]].m_occupantSide)]
+                             [m_hexCells[hexes[direction]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (target->m_monsterType == CREATURE_EARTH_ELEMENTAL)
@@ -1533,10 +1424,7 @@ void combatManager::ElementalStorm(void) {
         stormIcon_i = gpResourceManager->GetIcon("storm.icn");
         for (iter = 0; iter < SPELL_STORM_PASS_COUNT; ++iter) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
-                glTimers[0] = static_cast<i32>(
-                    KBTickCount()
-                    + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-                );
+                glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 for (row_b = 0; row_b < SPELL_STORM_ROW_COUNT; ++row_b) {
                     for (c = 0; c < SPELL_STORM_COLUMN_COUNT; ++c) {
@@ -1546,10 +1434,7 @@ void combatManager::ElementalStorm(void) {
                             (frame_i + c * SPELL_STORM_FRAME_COLUMN_STEP + row_b)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits_n,
-                            ICON_DRAW_NORMAL,
-                            0,
-                            NULL,
-                            NULL
+                            ICON_DRAW_NORMAL
                         );
                     }
                 }
@@ -1570,8 +1455,7 @@ void combatManager::ElementalStorm(void) {
                 dmg2 = baseDam;
                 if (stack->m_monsterType == CREATURE_AIR_ELEMENTAL)
                     dmg2 <<= 1;
-                if (stack->m_monsterType == CREATURE_IRON_GOLEM
-                    || stack->m_monsterType == CREATURE_STEEL_GOLEM) {
+                if (IS_GOLEM_CREATURE(stack->m_monsterType)) {
                     dmg2 = static_cast<i32l>(dmg2 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[whichSide] && m_heroes[whichSide]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
@@ -1585,7 +1469,7 @@ void combatManager::ElementalStorm(void) {
     if (hit) {
         sprintf(
             gText,
-            "Буря\x20стихий\x20наносит\x20\x25\x64\x20ед\x2e\x20урона\x2e",
+            "Буря стихий наносит %d ед. урона.",
             baseDam
         );
         CombatMessage(gText, 1, 1, 0);
@@ -1614,8 +1498,7 @@ void combatManager::Armageddon(void) {
             target1 = &m_armies[side6][armyIndex8];
             if (target1->SpellCastWorks(SPELL_ARMAGEDDON)) {
                 damage = baseDamage;
-                if (target1->m_monsterType == CREATURE_IRON_GOLEM
-                    || target1->m_monsterType == CREATURE_STEEL_GOLEM) {
+                if (IS_GOLEM_CREATURE(target1->m_monsterType)) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side6] && m_heroes[side6]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
@@ -1645,9 +1528,7 @@ void combatManager::Armageddon(void) {
             MemError();
         memcpy(effectPalette->Data(), originalPalette9->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
 
-        glTimers[0] = static_cast<i32>(
-            KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
         effectData28 = effectPalette->Data();
         for (pass1 = 0; pass1 < SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT; ++pass1) {
             for (color9 = 0; color9 < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color9) {
@@ -1663,10 +1544,7 @@ void combatManager::Armageddon(void) {
             }
             DelayTil(&glTimers[0]);
             SetPalette(effectData28, 1);
-            glTimers[0] = static_cast<i32>(
-                KBTickCount()
-                + SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            glTimers[0] = COMBAT_DEADLINE(SPELL_ARMAGEDDON_PALETTE_DELAY);
         }
 
         i32 shakeOffsets15[SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT][(COORDINATE_AXIS_COUNT)] = {
@@ -1731,10 +1609,7 @@ void combatManager::Armageddon(void) {
                 offsetX18 =
                     static_cast<i32>(shakeOffsets15[frame8][(COORDINATE_AXIS_X)] * scale1);
                 offsetY9 = static_cast<i32>(shakeOffsets15[frame8][(COORDINATE_AXIS_Y)] * scale1);
-                timer0 = static_cast<i32>(
-                    KBTickCount()
-                    + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-                );
+                timer0 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
                 PollSound();
                 copyWidth =
                     COMBAT_SCREEN_WIDTH
@@ -1922,7 +1797,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
 
     deltaX5 = abs(bolt->endX - bolt->pixelX);
     deltaY3 = abs(bolt->endY - bolt->pixelY);
-    distance2 = static_cast<i32>(sqrt(static_cast<double>(deltaX5 * deltaX5 + deltaY3 * deltaY3)));
+    distance2 = INTEGER_VECTOR_LENGTH(deltaX5, deltaY3);
     if (distance2 > bolt->totalDistance)
         bolt->distanceRatio = 0;
     else
@@ -2083,7 +1958,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                 }
             }
 
-            distance15 = abs(bolt->endX - bolt->pixelX) + abs(bolt->endY - bolt->pixelY);
+            distance15 = MANHATTAN_LENGTH(bolt->endX - bolt->pixelX, bolt->endY - bolt->pixelY);
             if (bolt->nearTarget != 0) {
                 if (distance15 > bolt->nearestDistance + 1
                     || distance15 <= BOLT_FINISHED_DISTANCE_MAX) {
@@ -2167,8 +2042,7 @@ void combatManager::AddBolt(
 
     i32 deltaX = abs(endX - startX);
     i32 deltaY = abs(endY - startY);
-    bolt->totalDistance =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+    bolt->totalDistance = INTEGER_VECTOR_LENGTH(deltaX, deltaY);
     ResetBoltAngle(bolt);
 }
 
@@ -2342,17 +2216,19 @@ void combatManager::DoBolt(
                 oldBoltCount18 = boltCount6;
                 for (index8 = 0; index8 < oldBoltCount18; ++index8) {
                     if (bolts10[index8].finished == 0) {
-                        remainingDistance36 =
-                            abs(bolts10[index8].endX - bolts10[index8].pixelX)
-                            + abs(bolts10[index8].endY - bolts10[index8].pixelY);
+                        remainingDistance36 = MANHATTAN_LENGTH(
+                            bolts10[index8].endX - bolts10[index8].pixelX,
+                            bolts10[index8].endY - bolts10[index8].pixelY
+                        );
                         if (boltCount6 < BOLT_MAX_COUNT
                             && remainingDistance36
                                    > angleDistance * BRANCH_MIN_REMAINING_DISTANCE_MULTIPLIER
                             && Random(0, branchChance5) < BOLT_BRANCH_PERCENT_LIMIT) {
                             if (bolts10[index8].lastBranchX != 0) {
-                                branchSeparation4 =
-                                    abs(bolts10[index8].lastBranchX - bolts10[index8].pixelX)
-                                    + abs(bolts10[index8].lastBranchY - bolts10[index8].pixelY);
+                                branchSeparation4 = MANHATTAN_LENGTH(
+                                    bolts10[index8].lastBranchX - bolts10[index8].pixelX,
+                                    bolts10[index8].lastBranchY - bolts10[index8].pixelY
+                                );
                                 if (branchSeparation4 < branchDistance * BOLT_BRANCH_COOLDOWN_FACTOR)
                                     continue;
                             }
@@ -2452,9 +2328,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
                         && candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) != 0.0f)) {
                     xDelta = abs(candidate->MidX() - sourceX);
                     y = abs(candidate->MidY() - fromY);
-                    len = static_cast<i32>(
-                        sqrt(static_cast<double>(xDelta * xDelta + y * y))
-                    );
+                    len = INTEGER_VECTOR_LENGTH(xDelta, y);
                     if (len < closest) {
                         closest = len;
                         closestCell = candidate->m_hex;
@@ -2504,8 +2378,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetDamage9 = damage;
         if (target1->m_monsterType == CREATURE_AIR_ELEMENTAL)
             targetDamage9 *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
-        if (target1->m_monsterType == CREATURE_IRON_GOLEM
-            || target1->m_monsterType == CREATURE_STEEL_GOLEM)
+        if (IS_GOLEM_CREATURE(target1->m_monsterType))
             targetDamage9 = static_cast<i32>(targetDamage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
         target1->Damage(targetDamage9, SPELL_NONE);
         damage >>= 1;
@@ -2515,8 +2388,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetY = target1->MidY();
         deltaX3 = abs(targetX9 - startX0);
         deltaY5 = abs(targetY - startY1);
-        distance7 =
-            static_cast<i32>(sqrt(static_cast<double>(deltaX3 * deltaX3 + deltaY5 * deltaY5)));
+        distance7 = INTEGER_VECTOR_LENGTH(deltaX3, deltaY5);
         branchDistance6 = distance7 / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
         if (branchDistance6 > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
             branchDistance6 = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
@@ -2557,9 +2429,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetHex = nextTarget10;
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline4);
-        deadline4 = static_cast<i32>(
-            KBTickCount() + CHAIN_LIGHTNING_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        deadline4 = COMBAT_DEADLINE(CHAIN_LIGHTNING_FRAME_DELAY);
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -3121,9 +2991,7 @@ void combatManager::MirrorImage(i32 targetHex) {
                 candidateHex = searchHex10;
                 for (step3 = 0; step3 < distance0; ++step3) {
                     candidateHex = GetAdjacentCellIndexNoArmy(candidateHex, searchDirection9);
-                    if (candidateHex < 0 || candidateHex >= COMBAT_HEX_COUNT
-                        || candidateHex % HEX_COLUMN_COUNT == 0
-                        || candidateHex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
+                    if (!IS_INTERIOR_COMBAT_HEX(candidateHex))
                         continue;
                     if (source2->CanFit(candidateHex, 0, NULL))
                         goto mirror_found;
@@ -3133,18 +3001,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         ++distance0;
     }
     sprintf(gText, "Сорвалось заклинание сотворения фантомов!");
-    NormalDialog(
-        gText,
-        NORMAL_DIALOG_INFO,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_VALUE,
-        0
-    );
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     return;
 
 mirror_found:
@@ -3176,26 +3033,17 @@ mirror_found:
     m_limitCreatureCount[(m_hexCells[targetHex].m_occupantSide)]
                         [m_hexCells[targetHex].m_occupantIndex]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    deadline1 = static_cast<i32>(
-        KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-    );
+    deadline1 = COMBAT_DEADLINE(MIRROR_SLIDE_FRAME_DELAY);
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image0->m_xOffset =
             xOffset3 * (MIRROR_SLIDE_FRAME_COUNT - frame) / MIRROR_SLIDE_FRAME_COUNT;
         image0->m_yOffset = yOffset6 * (MIRROR_SLIDE_FRAME_COUNT - frame) / MIRROR_SLIDE_FRAME_COUNT;
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(0, 0, 0, 0, 0, 1, 0);
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
         gbLimitToExtent = false;
         DelayTil(&deadline1);
-        deadline1 = static_cast<i32>(
-            KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
+        deadline1 = COMBAT_DEADLINE(MIRROR_SLIDE_FRAME_DELAY);
     }
     image0->m_xOffset = 0;
     image0->m_yOffset = 0;
@@ -3344,8 +3192,7 @@ void combatManager::DoBlast(i32 targetHex, SpellType spell) {
     startY_d = castY;
     deltaX_a = targetX_a - startX_n;
     deltaY_g = targetY9 - startY_d;
-    distance8 =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_g * deltaY_g)));
+    distance8 = INTEGER_VECTOR_LENGTH(deltaX_a, deltaY_g);
     segmentCount9 = distance8 / frameSpacing4;
     currentX_i = static_cast<float>(startX_n);
     currentY9 = static_cast<float>(startY_d);
@@ -3364,10 +3211,7 @@ void combatManager::DoBlast(i32 targetHex, SpellType spell) {
             static_cast<i32>(currentY9),
             frame_j,
             &limits,
-            stepX_e < 0.0f ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
-            0,
-            NULL,
-            NULL
+            stepX_e < 0.0f ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL
         );
         if (giMinExtentX < 0)
             giMinExtentX = 0;
@@ -3378,15 +3222,8 @@ void combatManager::DoBlast(i32 targetHex, SpellType spell) {
         if (COMBAT_AREA_HEIGHT - 1 < giMaxExtentY)
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_k);
-        deadline_k = static_cast<i32>(
-            KBTickCount() + BLAST_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-        );
-        gpWindowManager->UpdateScreenRegion(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
+        deadline_k = COMBAT_DEADLINE(BLAST_FRAME_DELAY);
+        UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
     }
     gbComputeExtent = false;
     gbSaveBiggestExtent = false;
@@ -3555,8 +3392,7 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 fizzleSample = LoadPlaySample("rsbryfzl.82m");
     sprintf(
         gText,
-        "%s%s сопротивляется "
-        "этому заклинанию!",
+        "%s%s сопротивляется этому заклинанию!",
         target->m_quantity == 1
             ? ""
             : "Отряд ",
@@ -3564,7 +3400,7 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
                                 : gArmyNamesPlural[(target->m_monsterType)]
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
-    WaitEndSample(&fizzleSample, -1);
+    WaitEndSample(&fizzleSample);
 }
 
 void combatManager::ModifyDamageForArtifacts(
@@ -3656,9 +3492,7 @@ void combatManager::Earthquake(void) {
     );
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
         for (frame8 = 0; frame8 < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame8) {
-            deadline7 = static_cast<i32>(
-                KBTickCount() + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
-            );
+            deadline7 = COMBAT_DEADLINE(SPELL_ARMAGEDDON_SHAKE_DELAY);
             PollSound();
             width0 = COMBAT_SCREEN_WIDTH - abs(shakeOffsets17[frame8][(COORDINATE_AXIS_X)]);
             height9 = COMBAT_AREA_HEIGHT - abs(shakeOffsets17[frame8][(COORDINATE_AXIS_Y)]) - 1;
@@ -3785,12 +3619,7 @@ void combatManager::Earthquake(void) {
                     );
                 }
             }
-            gpWindowManager->UpdateScreenRegion(
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1
-            );
+            UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
             DelayTil(&glTimers[1]);
             if (index7 == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
                 for (impact = 0; impact < EARTHQUAKE_STRUCTURE_COUNT; ++impact) {
@@ -3818,15 +3647,15 @@ void combatManager::ShowSpellMessage(
         sprintf(targetName, gArmyNamesPlural[(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, "\x25\x73\x20парализованы\x20циклопами\x21", targetName);
+            sprintf(message, "%s парализованы циклопами!", targetName);
         else if (spell == SPELL_BLIND)
-            sprintf(message, "\x25\x73\x20ослеплены\x20атакой\x20единорогов\x21", targetName);
+            sprintf(message, "%s ослеплены атакой единорогов!", targetName);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message, "\x25\x73\x20обращены\x20взором\x20медузы\x20в\x20камень\x21", targetName);
+            sprintf(message, "%s обращены взором медузы в камень!", targetName);
         else if (spell == SPELL_CURSE)
-            sprintf(message, "\x25\x73\x20прокляты\x20мумиями\x21", targetName);
+            sprintf(message, "%s прокляты мумиями!", targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message, "\x25\x73\x20лишились\x20наложенных\x20на\x20них\x20чар\x0aиз\x2dза\x20архимагов\x21", targetName);
+            sprintf(message, "%s лишились наложенных на них чар\nиз-за архимагов!", targetName);
         else {
             unhandledSpell5 = 0;
             ++unhandledSpell5;
@@ -3836,25 +3665,25 @@ void combatManager::ShowSpellMessage(
             if (m_heroes[(m_currentSide)]->m_isCaptain != 0)
                 sprintf(
                     message,
-                    "Капитан\x20направляет\x20\x0aзаклинание\x20\x27\x25\x73\x27\x20на\x20отряд\x20\x25\x73\x2e",
+                    "Капитан направляет \nзаклинание '%s' на отряд %s.",
                     gSpellNames[(spell)],
                     targetName
                 );
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20направляет\x20\x27\x25\x73\x27\x20на\x20\x25\x73",
+                    "%s направляет '%s' на %s",
                     m_heroes[(m_currentSide)]->m_name,
                     gSpellNames[(spell)],
                     targetName
                 );
         } else {
             if (m_heroes[(m_currentSide)]->m_isCaptain != 0)
-                sprintf(message, "Капитан\x20направляет\x20заклинание\x20\x27\x25\x73\x27", gSpellNames[(spell)]);
+                sprintf(message, "Капитан направляет заклинание '%s'", gSpellNames[(spell)]);
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20направляет\x20заклинание\x20\x27\x25\x73\x27",
+                    "%s направляет заклинание '%s'",
                     m_heroes[(m_currentSide)]->m_name,
                     gSpellNames[(spell)]
                 );

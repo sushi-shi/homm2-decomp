@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include <BASE/baseManager.h>
+#include <BASE/widget.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
 
@@ -45,6 +46,22 @@ typedef enum AdventureManagerStorageConstant {
     ADVMGR_ARMY_SIZE_NAME_SIZE           = 12,
     ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
 } AdventureManagerStorageConstant;
+
+typedef enum AdventurePanelButtonConstant {
+    ADVMGR_PANEL_BUTTON_FIRST = 1,
+    ADVMGR_PANEL_BUTTON_LAST = 6
+} AdventurePanelButtonConstant;
+
+
+#define SET_ADVENTURE_BUTTON_FLAGS(msg, window, cmd) \
+    ((msg).type = MESSAGE_WIDGET, (msg).payload.widget.command = (cmd), \
+     (msg).payload.widget.data.value = (WIDGET_FLAG_ENABLED), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST, (window)->BroadcastMessage(msg), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 1, (window)->BroadcastMessage(msg), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 2, (window)->BroadcastMessage(msg), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 3, (window)->BroadcastMessage(msg), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 4, (window)->BroadcastMessage(msg), \
+     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_LAST, (window)->BroadcastMessage(msg))
 
 enum {
     ARMY_SIZE_NAME_TITLE    = 0,
