@@ -868,7 +868,7 @@ void combatManager::LoadIcons(void) {
                 "herofl%02d.icn",
                 m_playerId[index] == -1
                     ? H2EnumIndex(COMBAT_NEUTRAL_HERO_COLOR)
-                    : gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color
+                    : gpGame->m_players[m_playerId[index]].m_color
             );
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
         }
@@ -1839,6 +1839,10 @@ void combatManager::SetupAndLoadObstacles(void) {
             blocked = false;
             for (cellIndex = 0; cellIndex < sCmbtObstacles[obstacleType].cellCount; cellIndex++) {
                 obstacleHex = site + sCmbtObstacles[obstacleType].cellOffsets[cellIndex];
+                if (obstacleHex < 0 || obstacleHex >= COMBAT_HEX_COUNT) {
+                    blocked = true;
+                    continue;
+                }
                 if (obstacleHex % COMBAT_GRID_ROW_LENGTH <= COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1
                     || obstacleHex % COMBAT_GRID_ROW_LENGTH >= COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
                     blocked = true;

@@ -238,6 +238,9 @@ void font::ExtractLine(
         i32 width;
     };
 
+    if (maxWidth < 0)
+        maxWidth = 0;
+
     const std::size_t start = static_cast<std::size_t>(*position);
     std::size_t cursor = start;
     i32 width = 0;

@@ -4,6 +4,8 @@
 #include <Ints.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
+#include <cstring>
+#include <type_traits>
 
 typedef enum RemoteConstant {
     REMOTE_PLAYER_COUNT                  = H2EnumIndex(GAME_PLAYER_COUNT),
@@ -44,7 +46,7 @@ struct RemotePacketHeader {
     char source;
     char destination;
     char reserved;
-    char payloadSize;
+    u8 payloadSize;
     u16 crc;
 };
 
@@ -55,8 +57,37 @@ struct RemoteMessage {
     i8 command;
     i16 payloadSize;
     char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
+    u8* UnsignedBytes() { return reinterpret_cast<u8*>(this); }
 };
+
+struct RemotePacket {
+    RemotePacketHeader header;
+    char payload[REMOTE_TRANSPORT_BUFFER_SIZE - REMOTE_PACKET_HEADER_SIZE];
+    char* Bytes() { return reinterpret_cast<char*>(this); }
+    u8* UnsignedBytes() { return reinterpret_cast<u8*>(this); }
+};
+static_assert(sizeof(RemotePacketHeader) == REMOTE_PACKET_HEADER_SIZE);
+static_assert(sizeof(RemotePacket) == REMOTE_TRANSPORT_BUFFER_SIZE);
 #pragma pack(pop)
+
+// Queue entries own a complete 256-byte message. Copy wire representations
+// into live objects instead of treating byte storage as a packed struct lvalue.
+inline RemoteMessage ReadRemoteMessage(const char* bytes) {
+    RemoteMessage message;
+    std::memcpy(&message, bytes, sizeof(message));
+    return message;
+}
+template<class T>
+inline T ReadRemotePayload(const RemoteMessage& message) {
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(sizeof(T) <= sizeof(message.payload));
+    T value;
+    std::memcpy(&value, message.payload, sizeof(value));
+    return value;
+}
+inline SNetPlayerInfo ReadRemotePlayerInfo(const RemoteMessage& message) {
+    return ReadRemotePayload<SNetPlayerInfo>(message);
+}
 
 void RemoteCleanup(void);
 void RemoteMain(RemoteGameMode);
@@ -101,12 +132,12 @@ extern i32 iBaud[REMOTE_BAUD_RATE_COUNT];
 extern i32 iIRQ[REMOTE_IRQ_COUNT];
 extern char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern i32 iLastIds[REMOTE_RECENT_ID_COUNT];
-extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
+extern RemotePacket PacketSend;
 extern i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
-extern char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
+extern RemoteMessage sndBuf;
 extern char gcThisNetName[REMOTE_NET_NAME_SIZE];
 extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
-extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
+extern RemotePacket packet;
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 extern b32 bGotGameType;

@@ -431,7 +431,6 @@ typedef enum AdventureSearchConstant {
 typedef enum AdventureComboDrawConstant {
     COMBO_VIEW_CELLS = VIEW_CELL_COUNT,
     COMBO_GRID_CELLS = 18,
-    COMBO_CLEAR_BYTES = 256,
     COMBO_CLOUD_MARK = 10,
     COMBO_FRAME_LIMIT = 12,
     COMBO_HERO_PANEL_LEFT = 5,
@@ -977,7 +976,6 @@ using enum AdventureMusicQuality;
     static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
 #define ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE \
     static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
-#define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 
 #define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
@@ -2607,6 +2605,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     char special;
 
     sample = NULL;
+    if (gpCurPlayer->m_currentHero < 0 || gpCurPlayer->m_currentHero >= GAME_HERO_COUNT)
+        return 0;
     hero = GetHeroSlot(gpCurPlayer->m_currentHero);
 
     if (hero->m_remainingMobility != hero->m_mobility) {
@@ -4088,8 +4088,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                 && i < MAP_WIDTH - 1
                                 && m_mapData->GetCell(i - 1, j)->m_triggerType
                                        == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                            || m_mapData->GetCell(i + 1, j)->m_triggerType
-                                   == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
+                            || (i + 1 < MAP_WIDTH && m_mapData->GetCell(i + 1, j)->m_triggerType
+                                   == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))) {
                             setId = TILESET_OBJNTOWN;
                         }
 
@@ -5734,9 +5734,7 @@ i32 advManager::UpdBottomViewHero(void) {
                 iconX = iconPositions[layoutPos * BOTTOM_HERO_POSITION_COMPONENT_COUNT];
                 iconY = iconPositions[layoutPos * BOTTOM_HERO_POSITION_COMPONENT_COUNT + 1];
                 labelY = iconY + BOTTOM_HERO_LABEL_Y_OFFSET;
-                iconEntryValue = reinterpret_cast<IconEntry*>(
-                    creature * sizeof(IconEntry) + creatureIcons->m_data
-                );
+                iconEntryValue = GetIconEntry(creatureIcons, creature);
                 if (layoutPos == 0 || layoutPos == 1) {
                     labelY -= BOTTOM_HERO_TOP_LABEL_SHIFT;
                     if (iconEntryValue->h < BOTTOM_HERO_TOP_MIN_HEIGHT) {
@@ -7108,7 +7106,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
 
     m_previousOriginX = m_mapOriginX;
     m_previousOriginY = m_mapOriginY;
-    memset(bComboDraw, 0, COMBO_CLEAR_BYTES);
+    memset(bComboDraw, 0, sizeof(bComboDraw));
     m_comboHeroDrawn = false;
 
     for (drawY = 0; drawY < COMBO_VIEW_CELLS; ++drawY) {
@@ -7165,7 +7163,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                                 bComboDraw[drawX - COMBO_FAR_NEIGHBOR_OFFSET][drawY] +=
                                     COMBO_CLOUD_MARK;
                             }
-                            if (drawY >= 1) {
+                            if (drawX >= COMBO_FAR_NEIGHBOR_OFFSET && drawY >= 1) {
                                 ++bComboDraw[drawX - COMBO_FAR_NEIGHBOR_OFFSET][drawY - 1];
                             }
                         }
@@ -7183,7 +7181,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                             if (drawX >= COMBO_FAR_NEIGHBOR_OFFSET) {
                                 ++bComboDraw[drawX - COMBO_FAR_NEIGHBOR_OFFSET][drawY];
                             }
-                            if (drawY >= 1) {
+                            if (drawX >= COMBO_FAR_NEIGHBOR_OFFSET && drawY >= 1) {
                                 ++bComboDraw[drawX - COMBO_FAR_NEIGHBOR_OFFSET][drawY - 1];
                             }
                         }
@@ -8674,28 +8672,29 @@ void advManager::LoadRemote(void) {
 }
 
 char* advManager::CheckHandleNet(void) {
-    RemoteMessage* packet9;
     i32 playerExited5;
     SPlayerExit exitInfo4;
 
-    packet9 = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
-    if (packet9
-        && (packet9->type == REMOTE_MESSAGE_RELIABLE
-            || packet9->type == REMOTE_MESSAGE_UNRELIABLE)) {
-        switch (packet9->command) {
-            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-                playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;
+    char* packetBytes = GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST);
+    if (packetBytes == nullptr)
+        return nullptr;
+    RemoteMessage incomingMessage = ReadRemoteMessage(packetBytes);
+    if (incomingMessage.type == REMOTE_MESSAGE_RELIABLE || incomingMessage.type == REMOTE_MESSAGE_UNRELIABLE) {
+        switch (incomingMessage.command) {
+            case ADVMGR_REMOTE_COMMAND_SAVE_GAME: {
+                const auto save = ReadRemotePayload<AdventureRemoteSave>(incomingMessage);
+                playerExited5 = save.savePlayerExited;
                 if (!gpGame->ReceiveSaveGame(
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveDataSize,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveCrc,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveTransmitCrc,
-                        packet9->sender
+                        save.saveDataSize,
+                        save.saveCrc,
+                        save.saveTransmitCrc,
+                        incomingMessage.sender
                     )) {
                     ShutDown(NULL);
                 }
                 if (playerExited5) {
-                    exitInfo4.netPosition = packet9->sender;
-                    exitInfo4.gamePosition = static_cast<i8>(NetPosToGamePos(packet9->sender));
+                    exitInfo4.netPosition = incomingMessage.sender;
+                    exitInfo4.gamePosition = NetPosToGamePos(incomingMessage.sender);
                     exitInfo4.updateNetworkControl = false;
                     exitInfo4.eliminated = true;
                     exitInfo4.hostReported = true;
@@ -8704,39 +8703,40 @@ char* advManager::CheckHandleNet(void) {
                 }
                 LoadRemote();
                 break;
+            }
 
             case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
-                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes, packet9->sender);
+                PopNetBox(incomingMessage.payload, incomingMessage.sender);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
-                    return reinterpret_cast<char*>(packet9);
+                    return packetBytes;
                 } else {
-                    DoNetCombat(reinterpret_cast<char*>(packet9));
+                    DoNetCombat(packetBytes);
                 }
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
-                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
+                ReceiveRemotePlayerExit(ReadRemotePayload<SPlayerExit>(incomingMessage));
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
-                    packet9->sender,
-                    ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
+                    incomingMessage.sender,
+                    ReadRemotePayload<SPlayerExit>(incomingMessage),
                     0
                 );
                 break;
 
             case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
-                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes);
+                ProcessIncomingGroupMapChange(incomingMessage.payload);
                 break;
 
             default:
-                return reinterpret_cast<char*>(packet9);
+                return packetBytes;
         }
     }
     return NULL;
@@ -8996,6 +8996,7 @@ void ComputeAdvNetControl(void) {
                     gbThisNetGotAdventureControl = gbThisNetHumanPlayer[player];
                     return;
                 }
+                player = (player + 1) % GAME_PLAYER_COUNT;
             }
         }
 
@@ -9006,11 +9007,13 @@ void ComputeAdvNetControl(void) {
                 selected = player;
             }
         }
-        gbThisNetGotAdventureControl = gbThisNetHumanPlayer[selected];
+        gbThisNetGotAdventureControl = selected >= 0 && gbThisNetHumanPlayer[selected];
     }
 }
 
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
+        return 0;
     if (MAP_EXTRA_AT_WFIRST(x, y) & mask) {
         return 1;
     }
@@ -9496,7 +9499,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     msg.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME);
-    msg.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
+    msg.payload.widget.data.value = (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
                                     + ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_HERO_SPEED);
@@ -9516,7 +9519,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE);
     msg.payload.widget.data.value =
-        static_cast<i32>(gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
+        (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer != 0) {
@@ -9532,7 +9535,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO);
     msg.payload.widget.data.value =
-        static_cast<i32>(gConfig.slowVideo != 0) + ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE;
+        (gConfig.slowVideo != 0) + ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR);
     msg.payload.widget.data.value = gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor

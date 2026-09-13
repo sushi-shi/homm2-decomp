@@ -6104,7 +6104,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             abandonedMineValue_f = static_cast<i32>(
                 gMineCharacteristics[H2EnumIndex(RES_GOLD)] * gafAITurnCostResource[H2EnumIndex(RES_GOLD)]
-                * *(gaiTurnValueOfMine + x + y * MAP_WIDTH)
+                * gaiTurnValueOfMine[y * MAP_WIDTH + x]
             );
             gpPhilAI->ChooseEvaluateBattle(
                 &eventHero->m_army,

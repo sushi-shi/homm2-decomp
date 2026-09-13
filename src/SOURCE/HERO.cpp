@@ -502,6 +502,19 @@ void hero::Deallocate(i32 updateMap) {
     i32 availSlot;
     fullMap* map;
 
+    if (m_owner < 0 || m_owner >= GAME_PLAYER_COUNT || m_id >= GAME_HERO_COUNT)
+        return;
+    playerPtr = &gpGame->m_players[m_owner];
+    if (playerPtr->m_heroCount <= 0 || playerPtr->m_heroCount > PLAYER_HERO_CAPACITY)
+        return;
+    heroNum = -1;
+    for (i = 0; i < playerPtr->m_heroCount; ++i) {
+        if (playerPtr->m_heroIds[i] == m_id)
+            heroNum = i;
+    }
+    if (heroNum < 0)
+        return;
+
     if (updateMap)
         SendMapChange(
             MAP_CHANGE_DEAD_HERO,
@@ -546,11 +559,6 @@ void hero::Deallocate(i32 updateMap) {
             m_army.Dismiss(i);
     }
 
-    heroNum = -1;
-    for (i = 0; i < playerPtr->m_heroCount; i++) {
-        if (playerPtr->m_heroIds[i] == m_id)
-            heroNum = i;
-    }
     for (i = heroNum; i < playerPtr->m_heroCount - 1; i++)
         playerPtr->m_heroIds[i] = playerPtr->m_heroIds[i + 1];
     playerPtr->m_heroIds[playerPtr->m_heroCount - 1] = -1;
@@ -573,14 +581,15 @@ void hero::Deallocate(i32 updateMap) {
 
     if (gbRetreatWin) {
         availSlot = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
-        if ((H2EnumIndex((gpGame->m_heroRecs[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
-                    .m_eventFlags) & (HERO_EVENT_WEEKLY_VISIT)))) {
+        i32 availableId = playerPtr->m_availableHeroIds[availSlot];
+        if (availableId >= 0 && availableId < GAME_HERO_COUNT
+            && H2EnumIndex(gpGame->m_heroRecs[availableId].m_eventFlags & HERO_EVENT_WEEKLY_VISIT)) {
             availSlot = 1 - availSlot;
         }
-        if (gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
-            == HERO_AVAILABILITY_RETREATED) {
-            gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]] =
-                HERO_AVAILABILITY_UNAVAILABLE;
+        availableId = playerPtr->m_availableHeroIds[availSlot];
+        if (availableId >= 0 && availableId < GAME_HERO_COUNT
+            && gpGame->m_availableHeroes[availableId] == HERO_AVAILABILITY_RETREATED) {
+            gpGame->m_availableHeroes[availableId] = HERO_AVAILABILITY_UNAVAILABLE;
         }
         gpGame->m_players[m_owner].m_availableHeroIds[availSlot] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;

@@ -1297,11 +1297,10 @@ i8 ExpCampaign::IsSpecialUA(void) {
 }
 
 i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
-    playerData* player = &gpGame->m_players[playerIndex];
-
     if (playerIndex == EXPANSION_CAMPAIGN_MAIN_PLAYER
         && m_campaignId == EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY
-        && m_currentMap == MAP_POL_ABYSS && player->m_heroCount == 0)
+        && m_currentMap == MAP_POL_ABYSS
+        && gpGame->m_players[EXPANSION_CAMPAIGN_MAIN_PLAYER].m_heroCount == 0)
         return 1;
     return 0;
 }

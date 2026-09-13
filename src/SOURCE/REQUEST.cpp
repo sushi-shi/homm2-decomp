@@ -244,8 +244,8 @@ fileRequester::fileRequester(
     const char* directory,
     const char* defaultExtension
 ) {
-    strcpy(m_filePattern, pattern);
-    strcpy(m_directory, directory);
+    utf8::Copy(m_filePattern, sizeof(m_filePattern), pattern);
+    utf8::Copy(m_directory, sizeof(m_directory), directory);
     m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
     m_fileCount = 0;
     m_topIndex = 0;
@@ -255,7 +255,7 @@ fileRequester::fileRequester(
     m_x = x;
     m_y = y;
     m_mode = mode;
-    strcpy(m_defaultExtension, defaultExtension);
+    utf8::Copy(m_defaultExtension, sizeof(m_defaultExtension), defaultExtension);
     if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
         fGutterTravelLength = MAP_LIST_GUTTER_TRAVEL;
         fGutterMinY = GUTTER_MIN_Y;
