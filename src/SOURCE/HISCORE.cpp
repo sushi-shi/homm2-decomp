@@ -147,16 +147,14 @@ void highScoreManager::Update(void) {
         m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_TITLE_FRAME : HIGH_SCORE_STANDARD_TITLE_FRAME;
     m_window->BroadcastMessage(hsMessage);
 
-    hsMessage.payload.widget.id = static_cast<i16>(
-        m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_BUTTON : HIGH_SCORE_STANDARD_BUTTON
-    );
+    hsMessage.payload.widget.id =
+        m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_BUTTON : HIGH_SCORE_STANDARD_BUTTON;
     hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_SHOW;
     hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
     m_window->BroadcastMessage(hsMessage);
 
-    hsMessage.payload.widget.id = static_cast<i16>(
-        m_showCampaignScores ? HIGH_SCORE_STANDARD_BUTTON : HIGH_SCORE_CAMPAIGN_BUTTON
-    );
+    hsMessage.payload.widget.id =
+        m_showCampaignScores ? HIGH_SCORE_STANDARD_BUTTON : HIGH_SCORE_CAMPAIGN_BUTTON;
     hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_HIDE;
     hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
     m_window->BroadcastMessage(hsMessage);

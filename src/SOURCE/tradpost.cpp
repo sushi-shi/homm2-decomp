@@ -249,6 +249,13 @@ void ComputeTradeRatios(
     i32* leftDenominated,
     i32* maxTrade
 ) {
+    *ratio = 1;
+    *leftDenominated = 0;
+    *maxTrade = 0;
+    if (sourceResource < 0 || sourceResource >= TRADING_POST_RESOURCE_COUNT
+        || destinationResource < 0 || destinationResource >= TRADING_POST_RESOURCE_COUNT
+        || fTradingPostEfficiency <= 0.0f)
+        return;
     float srcVal = coreRatio[sourceResource] * fTradingPostEfficiency;
     float dstVal = coreRatio[destinationResource];
     float tRatio = dstVal / srcVal;
@@ -366,7 +373,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         exitFlag = true;
                         break;
                     case POST_EXECUTE:
-                        if (qtyToTrade == 0)
+                        if (qtyToTrade == 0 || leftResource < 0 || rightResource < 0)
                             break;
                         if (bLeftDenominated != 0) {
                             gpCurPlayer->m_resources[leftResource] -= qtyToTrade;
@@ -378,6 +385,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         bTradeMade = true;
                         rightResource = -1;
                         leftResource = rightResource;
+                        SetupNewTrade();
                         redraw = true;
                         break;
                     case POST_DECREMENT:

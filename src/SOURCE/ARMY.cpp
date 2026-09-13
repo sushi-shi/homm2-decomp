@@ -633,7 +633,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             spellY + m_spellEffectYOffset,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            IconDrawOrientationFromOrdinal(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
+            m_facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
             0,
             NULL,
             NULL
@@ -1354,13 +1354,9 @@ void army::DoHydraAttack(i32) {
     totDamage = totKilled;
     gpCombatManager->ResetHitByCreature();
     if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        attackMask = static_cast<i16>(
-            GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID)
-        );
+        attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     } else {
-        attackMask = static_cast<i16>(
-            GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
-        );
+        attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
     }
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
@@ -2713,7 +2709,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     switch (influence) {
         case ARMY_SPELL_INFLUENCE_HASTE:
         case ARMY_SPELL_INFLUENCE_SLOW:
-            m_monster.speed = static_cast<i8>(m_speed);
+            m_monster.speed = m_speed;
             m_frameInfo.walkDuration = m_walkDuration;
             m_monster.attributes |=
                 gMonsterDatabase[H2EnumIndex(m_monsterType)].attributes & MONSTER_ATTRIBUTE_FLYING;
@@ -2757,7 +2753,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
 
     if (m_spellInfluence[H2EnumIndex(influence)]) {
         if (rounds > m_spellInfluence[H2EnumIndex(influence)]) {
-            m_spellInfluence[H2EnumIndex(influence)] = static_cast<u8>(rounds);
+            m_spellInfluence[H2EnumIndex(influence)] = rounds;
         }
         return 0;
     }
@@ -2770,7 +2766,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             break;
         case ARMY_SPELL_INFLUENCE_SLOW:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
-            m_monster.speed = static_cast<i8>((m_monster.speed + 1) / SLOW_SPEED_DIVISOR);
+            m_monster.speed = (m_monster.speed + 1) / SLOW_SPEED_DIVISOR;
             if (H2EnumIndex((m_monster.attributes) & (MONSTER_ATTRIBUTE_FLYING))) {
                 ((m_monster.attributes) &= ~(MONSTER_ATTRIBUTE_FLYING));
             }
@@ -2821,7 +2817,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             break;
     }
     m_spellCount++;
-    m_spellInfluence[H2EnumIndex(influence)] = static_cast<u8>(rounds);
+    m_spellInfluence[H2EnumIndex(influence)] = rounds;
     return 1;
 }
 
@@ -3255,108 +3251,6 @@ i32 army::SpellCastWorks(SpellType spell) {
     return SRandom(1, RANDOM_SPELL_ROLL_MAX) <= chance;
 }
 
-void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing) {
-    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] = 0;
-    if (!skipDrawing && finishStanding) {
-        if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)];
-        }
-    } else {
-        if (!skipDrawing) {
-            if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)] > 0) {
-                memcpy(
-                    &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)]
-                );
-                memcpy(
-                    &frameInfo
-                         ->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)]
-                );
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)];
-            }
-        } else if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)];
-        }
-        if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)];
-        }
-        if (finishStanding) {
-            if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)] > 0) {
-                memcpy(
-                    &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)]
-                );
-                memcpy(
-                    &frameInfo
-                         ->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)]
-                );
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)];
-            }
-        } else if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_END)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_END)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)];
-        }
-    }
-}
 
 void army::DispelGood(void) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);

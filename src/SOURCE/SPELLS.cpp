@@ -26,6 +26,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
+#include <SOURCE/SpellMask.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
 
@@ -849,23 +850,23 @@ void combatManager::CastSpell(
                     case ARMY_FACING_RIGHT:
                         m_hexCells[teleportArmy6->m_hex].m_occupantSide = teleportArmy6->m_side;
                         m_hexCells[teleportArmy6->m_hex].m_occupantIndex =
-                            static_cast<i8>(teleportArmy6->m_index);
+                            teleportArmy6->m_index;
                         m_hexCells[teleportArmy6->m_hex].m_occupantFrame = ARMY_FACING_LEFT;
                         m_hexCells[teleportArmy6->m_hex + 1].m_occupantSide =
                             teleportArmy6->m_side;
                         m_hexCells[teleportArmy6->m_hex + 1].m_occupantIndex =
-                            static_cast<i8>(teleportArmy6->m_index);
+                            teleportArmy6->m_index;
                         m_hexCells[teleportArmy6->m_hex + 1].m_occupantFrame = ARMY_FACING_RIGHT;
                         break;
                     case ARMY_FACING_LEFT:
                         m_hexCells[teleportArmy6->m_hex].m_occupantSide = teleportArmy6->m_side;
                         m_hexCells[teleportArmy6->m_hex].m_occupantIndex =
-                            static_cast<i8>(teleportArmy6->m_index);
+                            teleportArmy6->m_index;
                         m_hexCells[teleportArmy6->m_hex].m_occupantFrame = ARMY_FACING_RIGHT;
                         m_hexCells[teleportArmy6->m_hex - 1].m_occupantSide =
                             teleportArmy6->m_side;
                         m_hexCells[teleportArmy6->m_hex - 1].m_occupantIndex =
-                            static_cast<i8>(teleportArmy6->m_index);
+                            teleportArmy6->m_index;
                         m_hexCells[teleportArmy6->m_hex - 1].m_occupantFrame = ARMY_FACING_LEFT;
                         break;
                     default:
@@ -880,7 +881,7 @@ void combatManager::CastSpell(
                 teleportArmy6->m_hex = targetHex;
                 m_hexCells[teleportArmy6->m_hex].m_occupantSide = teleportArmy6->m_side;
                 m_hexCells[teleportArmy6->m_hex].m_occupantIndex =
-                    static_cast<i8>(teleportArmy6->m_index);
+                    teleportArmy6->m_index;
                 m_hexCells[teleportArmy6->m_hex].m_occupantFrame = ARMY_FACING_NONE;
                 RippleCreature(
                     teleportArmy6->m_side,
@@ -1288,48 +1289,46 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     for (frame = 0; frame < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame)
         affectedHexes[frame] = COMBAT_HEX_EMPTY;
     if (spell != SPELL_COLD_RING)
-        affectedHexes[0] = static_cast<i16>(targetHex);
+        affectedHexes[0] = targetHex;
 
     for (frame = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); frame < SPELL_ADJACENT_DIRECTION_COUNT;
          ++frame) {
-        affectedHexes[frame + 1] = static_cast<i16>(
-            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame))
-        );
+        affectedHexes[frame + 1] = GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame));
         if (spell == SPELL_FIREBLAST) {
             affectedHexes[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
-                static_cast<i16>(target->GetAdjacentCellIndex(
+                target->GetAdjacentCellIndex(
                     affectedHexes[frame + 1],
                     CombatHexDirectionFromOrdinal(frame)
-                ));
+                );
         }
     }
     if (spell == SPELL_FIREBLAST) {
         affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] =
-            static_cast<i16>(targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE);
+            targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE;
         if (affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
             affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
         affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] =
-            static_cast<i16>(targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE);
+            targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE;
         if (affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
             affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<i16>(GetAdjacentCellIndexNoArmy(
+        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST] = GetAdjacentCellIndexNoArmy(
             affectedHexes[FIREBLAST_EAST_FIRST_RING],
             COMBAT_DIRECTION_NORTHEAST
-        ));
+        );
         affectedHexes[SPELL_FIREBLAST_CORNER_SECOND] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+            GetAdjacentCellIndexNoArmy(
                 affectedHexes[FIREBLAST_EAST_FIRST_RING],
                 COMBAT_DIRECTION_SOUTHEAST
-            ));
-        affectedHexes[SPELL_FIREBLAST_CORNER_THIRD] = static_cast<i16>(GetAdjacentCellIndexNoArmy(
+            );
+        affectedHexes[SPELL_FIREBLAST_CORNER_THIRD] = GetAdjacentCellIndexNoArmy(
             affectedHexes[FIREBLAST_WEST_FIRST_RING],
             COMBAT_DIRECTION_NORTHWEST
-        ));
+        );
         affectedHexes[SPELL_FIREBLAST_CORNER_FOURTH] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+            GetAdjacentCellIndexNoArmy(
                 affectedHexes[FIREBLAST_WEST_FIRST_RING],
                 COMBAT_DIRECTION_SOUTHWEST
-            ));
+            );
     }
 
     baseDamage = m_spellPower[H2EnumIndex(m_currentSide)] * SPELL_FIREBALL_DAMAGE_PER_POWER;
@@ -1532,8 +1531,8 @@ void combatManager::Armageddon(void) {
     i32l damage;
     palette* originalPalette9;
     palette* effectPalette;
-    i8* effectDataRestore9;
-    i8* originalData3;
+    u8* effectDataRestore9;
+    u8* originalData3;
     i32 restorePass9;
     i32 component;
 
@@ -1630,9 +1629,7 @@ void combatManager::Armageddon(void) {
         );
 
         for (shakePass5 = 0; shakePass5 < SPELL_ARMAGEDDON_SHAKE_PASS_COUNT; ++shakePass5) {
-            scale1 = static_cast<float>(
-                (SPELL_ARMAGEDDON_SHAKE_PASS_COUNT - shakePass5) * SPELL_ARMAGEDDON_SHAKE_SCALE
-            );
+            scale1 = (SPELL_ARMAGEDDON_SHAKE_PASS_COUNT - shakePass5) * SPELL_ARMAGEDDON_SHAKE_SCALE;
             for (frame8 = 0; frame8 < SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT; ++frame8) {
                 if (shakePass5 == 0) {
                     for (color9 = 0; color9 < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color9) {
@@ -1696,31 +1693,31 @@ void combatManager::Armageddon(void) {
     if (gbNoShowCombat)
         return;
 
-    effectDataRestore9 = effectPalette->Data();
-    originalData3 = originalPalette9->Data();
+    effectDataRestore9 = effectPalette->UnsignedData();
+    originalData3 = originalPalette9->UnsignedData();
     for (restorePass9 = 0; restorePass9 < SPELL_ARMAGEDDON_RESTORE_PASS_COUNT; ++restorePass9) {
         for (component = 0; component < SPELL_ARMAGEDDON_PALETTE_SIZE; ++component) {
-            if (static_cast<u8>(effectDataRestore9[component])
-                == static_cast<u8>(originalData3[component]))
+            if (effectDataRestore9[component]
+                == originalData3[component])
                 continue;
 
-            if (static_cast<u8>(effectDataRestore9[component])
-                > static_cast<u8>(originalData3[component])) {
-                if (static_cast<u8>(effectDataRestore9[component])
+            if (effectDataRestore9[component]
+                > originalData3[component]) {
+                if (effectDataRestore9[component]
                         - SPELL_ARMAGEDDON_CHANNEL_STEP
-                    > static_cast<u8>(originalData3[component]))
+                    > originalData3[component])
                     effectDataRestore9[component] -= SPELL_ARMAGEDDON_CHANNEL_STEP;
                 else
                     effectDataRestore9[component] = originalData3[component];
-            } else if (static_cast<u8>(effectDataRestore9[component])
+            } else if (effectDataRestore9[component]
                            + SPELL_ARMAGEDDON_CHANNEL_STEP
-                       < static_cast<u8>(originalData3[component])) {
+                       < originalData3[component]) {
                 effectDataRestore9[component] += SPELL_ARMAGEDDON_CHANNEL_STEP;
             } else {
                 effectDataRestore9[component] = originalData3[component];
             }
         }
-        SetPalette(effectDataRestore9, 1);
+        SetPalette(effectPalette->Data(), 1);
         DelayMilli(
             static_cast<i32l>(
                 SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
@@ -1960,21 +1957,27 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                         case BOLT_COLOR_RED_TABLE:
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
-                                gColorTableRed[static_cast<i8>(
+                                gColorTableRed[
                                     (gpWindowManager->m_screen->m_pixels
                                      + drawY * COMBAT_SCREEN_WIDTH)[drawX6]
-                                )];
+                                ];
                             break;
                         case BOLT_COLOR_RED_BEAM:
+                            if (edgeShade29 < 0 || edgeShade29 >= static_cast<i32>(sizeof(uRedBeam)))
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * COMBAT_SCREEN_WIDTH)[drawX6] = uRedBeam[edgeShade29];
                             break;
                         case BOLT_COLOR_RAINBOW_FORWARD:
+                            if (beamOffset0 - widthFirst >= static_cast<i32>(sizeof(uRainbow)))
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
                                 uRainbow[beamOffset0 - widthFirst];
                             break;
                         case BOLT_COLOR_RAINBOW_REVERSE:
+                            if (beamOffset0 - widthFirst > BOLT_RAINBOW_LAST_INDEX)
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * COMBAT_SCREEN_WIDTH)[drawX6] =
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (beamOffset0 - widthFirst)];
@@ -2526,8 +2529,10 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
         if (phase == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         for (row9 = 0; row9 < rowCount; ++row9) {
-            *(row9 * VAPORIZE_STRIPE_WIDTH + gyModify + topOffset5 + firstY_j) = VAPORIZE_MASKED;
-            *(gyModify - row9 * VAPORIZE_STRIPE_WIDTH - bottomOffset + lastY) = VAPORIZE_MASKED;
+            SetSpellMaskRow({gyModify, SPELL_MODIFIER_ROW_COUNT},
+                firstY_j + row9 * VAPORIZE_STRIPE_WIDTH + topOffset5, VAPORIZE_MASKED);
+            SetSpellMaskRow({gyModify, SPELL_MODIFIER_ROW_COUNT},
+                lastY - row9 * VAPORIZE_STRIPE_WIDTH - bottomOffset, VAPORIZE_MASKED);
             gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
@@ -2633,7 +2638,7 @@ void combatManager::RippleCreature(
                 || skipDistance5 == RIPPLE_SKIP_DISTANCE_4))
             continue;
         amplitude5 = skipDistance5 * (amplitudeIndex5 * amplitudeStep7 + amplitudeBase6);
-        memset(gyModify + giMinExtentY, 0, extentHeight2);
+        FillSpellMask({gyModify, SPELL_MODIFIER_ROW_COUNT}, giMinExtentY, giMaxExtentY, 0);
         for (row_i = giMinExtentY; row_i < giMaxExtentY; ++row_i) {
             if (mode == COMBAT_RIPPLE_DEATH_WAVE)
                 waveIndex = -giMaxExtentY + row_i
@@ -2643,7 +2648,8 @@ void combatManager::RippleCreature(
                             + (phase - RIPPLE_PHASE_START) * RIPPLE_WAVE_PHASE_MULTIPLIER;
             waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
             if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
-                gyModify[row_i] = static_cast<i8>((wave[waveIndex]) * amplitude5);
+                SetSpellMaskRow({gyModify, SPELL_MODIFIER_ROW_COUNT}, row_i,
+                    static_cast<i8>((wave[waveIndex]) * amplitude5));
         }
         if (mode == COMBAT_RIPPLE_DEATH_RIPPLE && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
             start = giMinExtentY - 1;
@@ -2651,13 +2657,13 @@ void combatManager::RippleCreature(
                    + (RIPPLE_DEATH_RIPPLE_FADE_BASE - (RIPPLE_PHASE_END - phase)) * extentHeight2
                          / RIPPLE_FADE_DIVISOR
                    + 1;
-            memset(gyModify + start, VAPORIZE_MASKED, end2 - start + 1);
+            FillSpellMask({gyModify, SPELL_MODIFIER_ROW_COUNT}, start, end2, VAPORIZE_MASKED);
         }
         if (mode == COMBAT_RIPPLE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
             start = giMinExtentY - 1;
             end2 = giMaxExtentY - 1
                    - (phase - RIPPLE_DEATH_WAVE_FADE_BASE) * extentHeight2 / RIPPLE_FADE_DIVISOR;
-            memset(gyModify + start, VAPORIZE_MASKED, end2 - start + 1);
+            FillSpellMask({gyModify, SPELL_MODIFIER_ROW_COUNT}, start, end2, VAPORIZE_MASKED);
         }
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay_e, 1, 1);

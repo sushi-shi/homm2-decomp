@@ -1017,7 +1017,8 @@ void game::InitCampaignMap(void) {
         }
     }
 
-    if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]) {
+    if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
+        && m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroCount > 0) {
         hero* armyHero = gpGame->GetHero(m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
@@ -1028,7 +1029,7 @@ void game::InitCampaignMap(void) {
     }
 
     if (m_campaignScenario + 1 == SCENARIO_SEVEN
-        && m_campaignType == CAMPAIGN_ARCHIBALD) {
+        && m_campaignType == CAMPAIGN_ARCHIBALD && m_players[0].m_heroCount > 0) {
         b32 savedNewGame = gbInNewGameSetup;
         hero* armyHero;
         gbInNewGameSetup = true;
@@ -1068,9 +1069,10 @@ void game::InitCampaignMap(void) {
         gbInNewGameSetup = savedNewGame;
     }
 
-    if ((m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)]
-         && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)
-        || m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)]) {
+    if (m_players[0].m_heroCount > 0
+        && ((m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)]
+          && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)
+        || m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)])) {
         hero* armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {

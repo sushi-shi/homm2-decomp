@@ -2033,8 +2033,8 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(xShrineBuildingCost[index_h]);
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = xShrineBuildingCost[index_h];
                 ++costCount_o;
             }
         }
@@ -2042,39 +2042,33 @@ i32 townManager::BuyBuild(
         mageLevel_k = gpTownManager->m_town->m_buildState;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h];
                 ++costCount_o;
             }
         }
     } else if (building == BUILDING_SLOT_SPECIAL) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index_h];
                 ++costCount_o;
             }
         }
     } else if (building <= BUILDING_SLOT_NEUTRAL_LAST) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gNeutralBuildingCosts[H2EnumIndex(building)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                resourceTypes_o[costCount_o] = index_h;
                 costs_e[costCount_o] =
-                    static_cast<i16>(gNeutralBuildingCosts[H2EnumIndex(building)][index_h]);
+                    gNeutralBuildingCosts[H2EnumIndex(building)][index_h];
                 ++costCount_o;
             }
         }
     } else {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling_k][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling_k][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling_k][index_h];
                 ++costCount_o;
             }
         }
@@ -3303,7 +3297,7 @@ void GetCategoryStats(
     for (player = 0; player < gpGame->m_playerCount; ++player) {
         townCount_k = 0;
         castleCount_p = 0;
-        order[player] = static_cast<i8>(player);
+        order[player] = player;
         if (gpGame->m_playerDead[player]) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {
@@ -3389,7 +3383,7 @@ void GetCategoryStats(
 }
 
 void SortStats(i32l* const stats, i8* const order) {
-    i32 temporaryOrder;
+    i8 temporaryOrder;
     i32 secondPlayer;
     i32 firstPlayer;
     i32l tempStat;
@@ -3402,7 +3396,7 @@ void SortStats(i32l* const stats, i8* const order) {
                 stats[secondPlayer] = tempStat;
                 temporaryOrder = order[firstPlayer];
                 order[firstPlayer] = order[secondPlayer];
-                order[secondPlayer] = static_cast<i8>(temporaryOrder);
+                order[secondPlayer] = temporaryOrder;
             }
         }
     }

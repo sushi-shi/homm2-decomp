@@ -6,16 +6,13 @@
 #include <SOURCE/KB.h>
 
 #pragma pack(push, 1)
-union AdventureRemotePayload {
-    char bytes[ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE];
-    struct {
-        i32 saveDataSize;
-        i32 saveCrc;
-        i32 saveTransmitCrc;
-        i32 savePlayerExited;
-    };
-    SPlayerExit playerExit;
+struct AdventureRemoteSave {
+    i32 saveDataSize;
+    i32 saveCrc;
+    i32 saveTransmitCrc;
+    i32 savePlayerExited;
 };
+static_assert(sizeof(AdventureRemoteSave) == ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE);
 #pragma pack(pop)
 
 

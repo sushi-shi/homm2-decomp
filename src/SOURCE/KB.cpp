@@ -1948,7 +1948,7 @@ void CheckEndGame(
                         -1,
                         -1,
                         END_GAME_PLAYER_DIALOG_ICON,
-                        gpGame->m_players[static_cast<i8>(player)].m_color,
+                        gpGame->m_players[player].m_color,
                         -1,
                         -1,
                         -1,
@@ -1963,7 +1963,7 @@ void CheckEndGame(
                             localization::Tr("player.last_town_warning"),
                             cPlayerNames[player]
                         );
-                        NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
+                        NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[player].m_color);
                     }
                     rec_n->m_daysLeft = END_GAME_GRACE_DAYS;
                 } else if (rec_n->m_daysLeft == 0) {
@@ -1984,7 +1984,7 @@ void CheckEndGame(
                             cPlayerNames[player]
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
+                    NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[player].m_color);
                 }
             } else {
                 rec_n->m_daysLeft = -1;
