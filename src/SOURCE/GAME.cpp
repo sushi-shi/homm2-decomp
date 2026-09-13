@@ -5363,9 +5363,9 @@ void game::ProcessRandomObjects(void) {
             cell = WORLDMAP->GetCell(x, y);
             switch (cell->m_triggerType) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT):
-                    giUABaseX = static_cast<i16>(x);
-                    giUABaseY = static_cast<i16>(y);
-                    giUARadius = static_cast<i16>(cell->m_objectMetadata);
+                    giUABaseX = x;
+                    giUABaseY = y;
+                    giUARadius = cell->m_objectMetadata;
                     cell->m_triggerType = MAP_OBJECT_NONE;
                     cell->m_objectTileset = TILESET_NONE;
                     cell->m_objectIndex = -1;
@@ -5424,10 +5424,10 @@ void game::ProcessRandomObjects(void) {
                     }
                 monsterBoundsReady:
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
-                    cell->m_objectIndex = static_cast<u8>(Random(0, 65));
+                    cell->m_objectIndex = Random(0, 65);
                     while (gMonsterDatabase[cell->m_objectIndex].fightValue <= minValue
                            || gMonsterDatabase[cell->m_objectIndex].fightValue >= maxValue)
-                        cell->m_objectIndex = static_cast<u8>(Random(0, 65));
+                        cell->m_objectIndex = Random(0, 65);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE);
@@ -7608,7 +7608,7 @@ void game::SetupNewRumour(void) {
     i32l categoryStats[GAME_PLAYER_COUNT];
     i32 direction;
     i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
-    if (m_rumourEventCount != 0 && Random(0, 9) < static_cast<i32>(m_rumourEventCount)) {
+    if (m_rumourEventCount != 0 && Random(0, 9) < m_rumourEventCount) {
         attempts8 = 0;
         while (attempts8++ < 200) {
             if (m_rumourEventCount > 1)

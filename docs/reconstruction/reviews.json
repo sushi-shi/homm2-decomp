@@ -17568,11 +17568,11 @@
     "note": "C34/S41 complete8-arm table/cast product removes two creature/count assignment casts while retaining real6x3 six-byte table. Third column unselected by loop2, but two-column source changes834-to642 bytes under all cast combinations. selected[2] genuinely controls selected[1] and stays. Five slots initialized, at most two filled; first-two-column counts2..50 including strong-army rounding, valid creature IDs fit i8-backed domain. B61 hero0..53/faction0..5 and lifecycle required. No union/goto/fake address/manual varargs or unrelated reuse. Full834 retail bytes/size/DIR32/ordered targets pass; all98 native objects and both dialects pass. C34-C40-S41.md."
   },
   "src/SOURCE/GAME.cpp:game::ProcessRandomObjects(void)#1": {
-    "body_sha256": "43564bfc49c94e44790d4e5beac172a427c924db331b49c97d266d2a9ff2607c",
+    "body_sha256": "62c9a63757ca79e89f2e03c17cb72ae8ee9d1eabe7c0bde2a301e4d4590d2bbe",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -17581,7 +17581,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full switch read. G49 five randomMonster/four monsterBoundsReady joins need structural families. C34 coordinates/13-bit radius and random0..65 creature stores; real trigger conversion. MonsterDatabase randomValue is real fightValue union view. B58 map/terrain/extra contracts, fixed66 creature index fits; chosen value interval must contain a creature for rejection termination. Random resource0..6 and converted rectangles clipped by callee. No fake aggregate/manual varargs/owner recovery/arbitrary offsets. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "Full switch read. G49 five randomMonster/four monsterBoundsReady joins need structural families. C34 coordinates/13-bit radius and random0..65 creature stores; real trigger conversion. MonsterDatabase randomValue is real fightValue union view. B58 map/terrain/extra contracts, fixed66 creature index fits; chosen value interval must contain a creature for rejection termination. Random resource0..6 and converted rectangles clipped by callee. No fake aggregate/manual varargs/owner recovery/arbitrary offsets. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. Follow-up: C34 removes five assignment casts after all 32 combinations preserve size/text; selected arm additionally passes complete 1780-byte retail and all-object resolved relocation proof. Counter-named local labels explain raw signature differences, not changed destinations. G49 complete six-arm outer/inner structural family changes native sizes to 1770/1742/1732/1794/1754 vs 1780; original nine joins remain. Real trigger conversion and signed coordinate narrowing remain; no input hardening. See C34-C39-G49-G51-G54.md; all 98 native objects and both source dialects pass."
   },
   "src/SOURCE/GAME.cpp:game::SetVisibility(i32 x,i32 y,i32 player,i32 radius)#1": {
     "body_sha256": "fac13142f7956c7ff0da8a8d76650eb68f42af111a9acb6e1d3a9a907cac7857",
@@ -17924,7 +17924,7 @@
     "patterns": {
       "casts": "retain",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -17933,7 +17933,7 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "G51 three clampScore joins need structural matrix. Real floating day/tier conversions preserve truncation including unit-factor cases; days evolves to size-adjusted days, same role. No arrays, union, owner tricks, manual varargs or fake stack; extreme numeric range is caller contract, not buffer defect."
+    "note": "G51 three clampScore joins need structural matrix. Real floating day/tier conversions preserve truncation including unit-factor cases; days evolves to size-adjusted days, same role. No arrays, union, owner tricks, manual varargs or fake stack; extreme numeric range is caller contract, not buffer defect. Follow-up: G51 complete three-arm family retains original joins: scoped breaks give 374 bytes and nested tiers 364 vs 375. All floating arithmetic/conversions remain. The narrow supplement proves all nine fixed private double sites/destinations/payloads, closing the general checker gaps without relaxing it; complete 375-byte retail proof passes. See C34-C39-G49-G51-G54.md; all 98 native objects and both source dialects pass."
   },
   "src/SOURCE/GAME.cpp:game::RestoreCell(i32 x,i32 y,MapTriggerCode objectType,i32 barrier,mapCell * passedCell,i32 p6)#1": {
     "body_sha256": "e47b3f2a8b0d1dae68fba9e4a1d3be58519b6d4c3e14d75a4db381baef04404f",
@@ -18064,11 +18064,11 @@
     "note": "List-position lookup or-1; B61 live pd and townCount<=72. Target compared, no casts/union/goto/fake aggregate/manual arguments/owner arithmetic."
   },
   "src/SOURCE/GAME.cpp:game::SetupNewRumour(void)#1": {
-    "body_sha256": "7366a14cc61f37c3052cec885fb5d8793ebd7366964fc804bbdb3b64ac45ae9d",
+    "body_sha256": "55e37590d739265ca6755a8f0e46b7f814454b93882eb83ae3ac283b08138038",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -18077,7 +18077,7 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "S44 order8->GAME_PLAYER_COUNT6 applied with complete2/2 matrix/all102 GAME native proof; both stats callees process count<=6. C39 u16 count promotion, real typed rumour/category boundaries. G54 ultimateRumour join. B65 variable text into301-byte rumour, player/category/terrain/artifact/direction domains and at least two initialized stats needed. Direction conditions use artifactX for both dimensions, not silently corrected. Twelve private floats unresolved in general retail checker; ordinary1613 bytes/DIR32 agree. No fake stack/manual varargs/owner recovery."
+    "note": "S44 order8->GAME_PLAYER_COUNT6 applied with complete2/2 matrix/all102 GAME native proof; both stats callees process count<=6. C39 u16 count promotion, real typed rumour/category boundaries. G54 ultimateRumour join. B65 variable text into301-byte rumour, player/category/terrain/artifact/direction domains and at least two initialized stats needed. Direction conditions use artifactX for both dimensions, not silently corrected. Twelve private floats unresolved in general retail checker; ordinary1613 bytes/DIR32 agree. No fake stack/manual varargs/owner recovery. Follow-up: C39 removes the u16 count cast through ordinary integer promotion. G54 complete four-arm count/shared-tail product retains original goto: both shared-tail arms give 1601 vs 1613 bytes. The twelve fixed private doubles are checked together with every other byte/site/target for complete retail proof. Existing text, player-count, coordinate and category contracts remain unchanged. See C34-C39-G49-G51-G54.md; all 98 native objects and both source dialects pass."
   },
   "src/SOURCE/GAME.cpp:GetMapEvent(i32 x,i32 y)#1": {
     "body_sha256": "2c8b599cbb008e0d263355d1fb20d14eefa752a062e98fcbfdf7ae1dc85544db",

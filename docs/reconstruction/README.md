@@ -413,7 +413,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   role splits change native code and are retained as negative alternatives.
 - G49-G54: [G50 transfer cleanup retains its measured join](C44-G50-S43.md).
   [G52 map-size and G53 diff-completion joins remain after measured alternatives changed native code](C44-G52-G53-S43-B63.md).
-  Random-monster bounds, score clamping and rumour fallback joins still need tests.
+  [G49 random-monster bounds, G51 score clamping and G54 rumour fallback
+  also retain their joins after complete structural tests](C34-C39-G49-G51-G54.md).
+  That batch removes six further C34/C39 casts and proves the score/rumour
+  private floating operands without weakening the general retail checker.
 - B61/B64/B65: turn-state, town/hero setup, rumour/event and compression
   domains remain function-specific contracts. [C44 removes 24 transfer casts
   and recovers the exit-flag name](C44-G50-S43.md). [U14 recovers typed packet
