@@ -786,5 +786,9 @@
   "src/SOURCE/PATH.cpp": {
     "sha256": "32ab668c3b5ba57b6c56e92e0050ab51a13da4456e5e4585950a60b5ded830c8",
     "note": "Full638-line TU read, all12 physical functions reconciled with private CombatPathConstant enum and final compiler-generated markers; no data/format/owner macro hidden outside bodies. C66 sole written cast removed after2-arm native/retail proof; S60 unused scalar measured2/2 and retained. B81 real117x6 adjacency, sentinel/direction/facing/placement contracts documented; no fake buffer, goto, manual varargs or unrelated variable roles. All15 emitted functions and allocated native sections unchanged; all12 source functions independently match complete retail bytes/sites/targets."
+  },
+  "src/SOURCE/FLY.cpp": {
+    "sha256": "5bb8e709115b06f114845c41d561a12fe850e7f46fa937cb78d0045a2c0afef1",
+    "note": "Full476-line source read, all4 physical functions reconciled with private enum, double1.3 duration macro, includes and EOF; no separate FLY header. C67 six casts removed, ten real numeric boundary casts retained; S61 six unused scalars/one overwritten store measured in complete8/8/2 products and retained. B82 adjacency producer rules out apparent CanFit null case under initialization; animation/placement/timing contracts explicit. All7 emitted functions and allocated sections unchanged; four full retail bodies plus fixed private-double supplement pass."
   }
 }

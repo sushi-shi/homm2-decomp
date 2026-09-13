@@ -434,6 +434,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   ownership and sentinel/direction/placement contracts are documented in
   [the function-by-function report](C66-S60-B81.md).
 
+- C67/S61/B82: all four FLY functions reviewed. Six assignment casts removed
+  with full native proof and a fixed retail double-operand supplement. Unused
+  scalar/store deletions were measured and retained. The adjacency producer
+  excludes the apparent `CanFit` null case under initialized-table contracts;
+  [animation, geometry and timing limits remain explicit](C67-S61-B82.md).
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

@@ -22910,5 +22910,69 @@
       "bounds": "open"
     },
     "note": "Entire ordered preference tree read. Explicitly validates both endpoints, then bounded row/column arithmetic and fixed eight mask bits; all-blocked returns-1, equal endpoints use existing no-horizontal fallback. B81 callers must handle invalid returned direction. No goto, local lookup array, pointer, casts or unrelated roles. Independent1918-byte retail proof excludes four generated-helper blocks overincluded by ordinary sema."
+  },
+  "src/SOURCE/FLY.cpp:army::CanFit(i32 hex,i32 tryOtherSide,i32 * fittingHex)#1": {
+    "body_sha256": "61640439866189152ea6b3bb16c5d0f76f4a10b25063979c7a33338300016794",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete front/rear/alternate fit and optional output read. B82 apparent cell_9 NULL edge case is excluded by initialized adjacency: full447-byte producer proof and all702 geometry positions show every valid neighbor is interior-column, so pointer assignment executes. Success/output and current-army occupancy contracts retained; output is initialized even before failure. U05 width flag real. No cast, goto, fake owner/aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/FLY.cpp:army::ValidFlight(i32 destination,ArmyPathTarget pathMode)#1": {
+    "body_sha256": "5a5638ad67f5d569eb60eefc47b177d8257bab88d7afd847777a69c5e46d9ee4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full target validation, immediate attack and both landing loops read. Real two-side20-slot target owner; U05 wide flags retained. S61 all8 unused-local subsets measured, every deletion changes918-byte native text, original retained. B82 valid own/wide rear hex, facing, mode, initialized adjacency and attack-direction result required; low8/low6 mask termination fits valid endpoints. Wide attack scan stores last enabled direction, not first; no new initialization if none. No cast/goto/fake aggregate/varargs or unrelated roles."
+  },
+  "src/SOURCE/FLY.cpp:army::FlyTo(void)#1": {
+    "body_sha256": "d05f212235dafa481199cc0b581aa1fde784e6f1439f1a3d0aae2f87c07a0817",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Direct FlyTo(m_moveTargetHex) forwarding. No casts, unions, goto, stack owner, varargs, pointer arithmetic or unrelated roles. B82 live this and approved landing/placement contract delegated to full movement body."
+  },
+  "src/SOURCE/FLY.cpp:army::FlyTo(i32 destination)#1": {
+    "body_sha256": "1822091a7314ea8319453180f238fcb3c8888ad21549603de35a9ed32e082ad6",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire270-line movement/animation/facing tail read. C67 six assignment casts removed in complete4/16-arm phase products and combined whole-TU native proof. True sqrt, x87 ratio and float-to-integer boundaries retained. S61 unused locals all8 subsets and overwritten frameCount addition2-arm test change code, originals retained. U05 wide flags real. B82 adjusted front/rear placement, arithmetic/animation16-frame capacity, timing/frameCount divisor and rectangle/resource domains remain; positive step clamp does not prove timer frameCount positive. Sole private double1.3 at+73e independently fixed-operand checked; all2530 bytes/sites and other targets pass. No goto, fake aggregate, manual varargs or unrelated variable roles."
   }
 }

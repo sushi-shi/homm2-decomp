@@ -266,8 +266,8 @@ i32 army::FlyTo(i32 destination) {
     endY = gpCombatManager->m_hexCells[destination].m_y;
     fromX = gpCombatManager->m_hexCells[m_hex].m_x;
     sourceY = gpCombatManager->m_hexCells[m_hex].m_y;
-    xPos = static_cast<float>(fromX);
-    yPos = static_cast<float>(sourceY);
+    xPos = fromX;
+    yPos = sourceY;
     xDistance = endX - fromX;
     ySpan0 = endY - sourceY;
     length =
@@ -439,16 +439,16 @@ i32 army::FlyTo(i32 destination) {
 
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
     gpCombatManager->m_hexCells[destination].m_occupantSide =
-        static_cast<i8>(gpCombatManager->m_currentArmySide);
+        gpCombatManager->m_currentArmySide;
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
-        static_cast<i8>(gpCombatManager->m_currentArmyIndex);
+        gpCombatManager->m_currentArmyIndex;
     gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         endRearHex = destination + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
-            static_cast<i8>(gpCombatManager->m_currentArmySide);
+            gpCombatManager->m_currentArmySide;
         gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
-            static_cast<i8>(gpCombatManager->m_currentArmyIndex);
+            gpCombatManager->m_currentArmyIndex;
         gpCombatManager->m_hexCells[endRearHex].m_occupantFrame =
             endRearHex >= destination ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
         gpCombatManager->m_hexCells[destination].m_occupantFrame =
