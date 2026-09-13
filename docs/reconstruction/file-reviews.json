@@ -1,4 +1,16 @@
 {
+  "include/va.h": {
+    "sha256": "613ae23bdf9a6f3e6d0b74217e62c4bd1008b2661ae0cdc861d253246bcb3278",
+    "note": "Full 55-line annotation header read. VA/DATA/COMPGEN/vtable/layout and legacy macros reconciled in data-and-metadata.md; no physical function, manual varargs or allocated stand-in storage. VC6 metadata remains byte-neutral."
+  },
+  "src/SOURCE/KB.cpp": {
+    "sha256": "24a20f39b9718376b33e99e78ae58f3c1e91f4352368ff9b82ac574e4ff3ba82",
+    "note": "Full 11510-line file covered: all 75 physical definitions previously reviewed individually; complete preamble, every non-function complement span, initializer macros and full data tail now read/reconciled in data-and-metadata.md. Real terrain/palette/monster/spell/cost/animation/UI/campaign tables and distinct global buffers retained. All CP1251 catalogs read; per-consumer format/capacity and tag/domain contracts remain explicit. No missed executable macro or artificial aggregate found. Latest full 98-object native and data/build gates pass; this final file review changes no source."
+  },
+  "src/SOURCE/X_GLOBAL.cpp": {
+    "sha256": "776d73bf4ceeb3aa6bb9b214061048192227ff3f7c45c91a5689513b27aabf27",
+    "note": "Full 665-line data-only TU read, including every expansion help/award/scenario/name/recruit/stable/site/password literal, twelve hero alignments, seven costs and runtime globals. Zero physical function definitions; compiler-generated global initialization is not extra source-body credit. Real table extents, separate O08 name owners and constructed campaign/spell objects retained; normal-domain versus malformed-input contracts and B93/B94 catalog evidence reconciled in data-and-metadata.md."
+  },
   "include/SOURCE/HERO.h": {
     "sha256": "40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6",
     "note": "Full17-line hero UI declarations header read. Real const text input/event references and function prototypes; no aggregate, function definition or hidden macro body."
