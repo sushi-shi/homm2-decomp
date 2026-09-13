@@ -345,8 +345,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   with complete native KB equivalence. C30/C31 [apply unsigned text lengths and
   a direct palette-index assignment](C30-C31.md), removing three more casts.
   C29 scalar index conversions remain for measurement.
-  U11 records startup's 212/256-byte union;
-  S33 covers KB unused locals and reserved scratch space. G43-G46 track startup,
+  U11 [retains startup's buffer after the 212-byte record changes its frame](U11-S33.md).
+  S33 reduces both local player-match arrays to six bytes after all32 combinations;
+  its three unused scalar slots change bytes when removed and remain.
+  Other KB unused locals remain separate. G43-G46 track startup,
   morale, menu and player-exit joins.
 - B52: [selected KB formatter bounds](B52.md) account for complete morale/luck
   append chains, command-line help, ranking/congratulations and memory-error text.

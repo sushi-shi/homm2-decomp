@@ -514,8 +514,8 @@ i32 oldmain(void) {
     i32 gamePlayer_m;
     i32 result_i;
     i32 transmissionResult_d;
-    char matchedNetPlayers_d[OLD_MAIN_MATCH_BUFFER_SIZE];
-    char matchedGamePlayers_c[OLD_MAIN_MATCH_BUFFER_SIZE];
+    char matchedNetPlayers_d[OLD_MAIN_PLAYER_COUNT];
+    char matchedGamePlayers_c[OLD_MAIN_PLAYER_COUNT];
     OldMainNetBuffer netBuffer_f;
 
     if (bKBDone)

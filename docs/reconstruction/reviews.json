@@ -15536,20 +15536,20 @@
     "note": "Guarded startup calls initialization/preferences/parser/CD setup and logs fixed strings. No indexed storage or local buffer, cast, union, goto or scratch aggregate. bEarlySetupDone publication is outside this function."
   },
   "src/SOURCE/KB.cpp:oldmain(void)#1": {
-    "body_sha256": "b0a46056c7b103f298fdcead5f2b678f84bf78b6b82a0d3a4559088b12a400cc",
+    "body_sha256": "4636430b6bab0e923d0b722b9791419dcfb46f337c79375955b47fe17a8f342c",
     "patterns": {
       "casts": "retain",
-      "unions": "open",
+      "unions": "retain",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "applied",
       "bounds": "open"
     },
-    "note": "Full621-line startup/menu/network/game/campaign loop reviewed. G43 menu/setup/initialization/game-over joins; S33 three unread locals and eight-byte match arrays with only six bytes used. U11 OldMainNetBuffer overlays a212-byte setup and256-byte byte view. Real six-player pairing scans, byte-width casts and phase-local player iterators. B51 mapping orientation, player/count/campaign/current-watch domains and B52 fixed/name-based format/copy capacities require proof; no manual varargs or fake owner recovery."
+    "note": "Full621-line startup/menu/network/game/campaign loop reviewed again. U11 two-arm typed212-byte setup alternative reduces frame0x174 to0x148 despite unchanged5329-byte code size; retain256-byte buffer, with no filler added. S33 complete32-arm matrix removes both unused flag-array tails (8 to6) but retains all three unused scalar slots because their deletion changes bytes. All98 native objects, actualVC6 layout and both dialects pass; all5329 ordinary retail bytes exact with four existing EH/FS identity gaps. See U11-S33.md. G43 menu/setup/initialization/game-over joins and B51 mapping orientation, player/count/campaign/current-watch domains plus B52 formatting/name capacities remain. Real six-player pairing scans, byte-width casts and phase-local iterators; no manual varargs or fake owner recovery."
   },
   "src/SOURCE/KB.cpp:toupper(char c)#1": {
     "body_sha256": "6eabc2acb3d463f765c341beb7db2bdacfba9b4545db3d09ad81741b8b3e1365",
