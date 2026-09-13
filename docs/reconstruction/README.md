@@ -490,6 +490,15 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   are distinguished from configuration/resource/input contracts and one
   unchanged private EH/FS model gap.
 
+- U18/O07/C76/S69/R27/G95–G102/B91: all sixteen New Game functions and header
+  reviewed. Incoming256-byte and outgoing300-byte packet owners recovered;
+  71 numeric casts removed, one enum cast becomes a constructor, and one
+  retry goto becomes a structured loop. All46 products/256 arms completed;
+  unsupported storage/role/flow changes retained. All98 native objects are
+  unchanged. [Packet, text and cursor evidence](U18-O07-C76-S69-R27-G95-G102-B91.md)
+  distinguishes bounded default-data cases from unchecked format/index
+  contracts and four unchanged private EH/FS model gaps.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

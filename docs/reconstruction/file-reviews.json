@@ -862,5 +862,13 @@
   "include/BASE/IconShear.h": {
     "sha256": "d5e75c40d24efe8ffcc7efd8a8dd6ac2f198923f130b968f3fe5c8685862fa97",
     "note": "Full8lines read: semantic ICON_SHEAR_SKIP_ROW0x7f constant shared by previously reviewed shear decoders. No functions, unions, array/storage, casts, gotos, varargs or owner recovery. Skip sentinel isnot fabricatedpadding; unchanged declaration."
+  },
+  "src/SOURCE/Newgame.cpp": {
+    "sha256": "de7628b5f12b248e1c07f51e79c1dd86cdbdf2c7bc438131cdc800be9d5c91cc",
+    "note": "Full parent source read, all16functions/private domains/eightDATAowners reconciled. U18incoming256-byte transport view andO07outgoing300-byte wholeowner;71redundantnumeric casts removed plus enum constructor preservingi16truncation; G97structuredmapretry. All46complete256arm products preserve unsupported S69/R27/G95-G102 alternatives. Full98native1826instances/allallocated orderedrelocations, dualdialect16externaldiagnostics andfullbuild pass; all16retailbytes,twelvefulltargets, fourEH/FSgapexplicit andthreeCRTaliasoperands pinned. B91map116zeroedheader,player204,setup125,text95/100and210/768bounds; uncheckedformats/cursor/filename/playerdomain/resource contracts documented. No manualargvarargs/artificialaddress/enclosingowner subtraction."
+  },
+  "include/SOURCE/Newgame.h": {
+    "sha256": "ed1e540173b1a19c14e39550ef45915914d376f3ac2d001c939f5bd47fdfe93f",
+    "note": "Fullheader read: real widgetIDfamilies and recovered256-byte command-tagged incoming transport view, senderi8/id32/typei8/commandi8/payloadSizei16/payload247; no fake one-byte flexible tail. SharedRemote producer/GetRemoteData and bothNewgame consumers reviewed; all98nativeobjects unchanged; C++98/C++20 packet/map/game offsets pinned. No functionbodies/manualvarargs/owner subtraction. Realmessageunion remains elsewhere; sender/length/termination validity not fabricated by the widened view."
   }
 }

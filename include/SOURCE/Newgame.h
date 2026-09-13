@@ -28,22 +28,21 @@ H2_ENUM_BEGIN(NewGameControlConstant)
 H2_ENUM_END(NewGameControlConstant)
 
 H2_ENUM_BEGIN(NewGameRemotePacketConstant)
-    NEW_GAME_REMOTE_RESERVED_SIZE     = 4,
-    NEW_GAME_REMOTE_SEQUENCE_SIZE     = 2,
-    NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE = 1
+    NEW_GAME_REMOTE_PAYLOAD_CAPACITY = 247
 H2_ENUM_END(NewGameRemotePacketConstant)
 
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
     i8 sender;
-    u8 reserved[NEW_GAME_REMOTE_RESERVED_SIZE];
+    i32 id;
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
-    u8 sequence[NEW_GAME_REMOTE_SEQUENCE_SIZE];
-    char payload[NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE];
+    i16 payloadSize;
+    char payload[NEW_GAME_REMOTE_PAYLOAD_CAPACITY];
 };
 
 #pragma pack(pop)
+SIZE(NewGameRemotePacket, 0x100);
 
 MessageDispatchResult NewGameHandler(struct tag_message&);
 
