@@ -216,33 +216,33 @@ void swapManager::Close(void) {
 }
 
 void swapManager::DrawSelector(void) {
-    const char selectorFrame_6 = 10;
-    const i16 leftArmyX_3 = 37;
-    const i16 rightArmyX_3 = 382;
-    const i16 armyY_9 = 268;
-    const i16 armySpacing_2 = 45;
-    const i16 leftArtifactX_7 = 24;
-    const i16 rightArtifactX_6 = 368;
-    const i16 artifactY_7 = 348;
-    const i16 artifactSpacing_11 = 36;
-    i32 selectorX_2 = 0;
-    i32 selectorY_11 = 0;
+    const char selectorFrame = 10;
+    const i16 leftArmyX = 37;
+    const i16 rightArmyX = 382;
+    const i16 armyY = 268;
+    const i16 armySpacing = 45;
+    const i16 leftArtifactX = 24;
+    const i16 rightArtifactX = 368;
+    const i16 artifactY = 348;
+    const i16 artifactSpacing = 36;
+    i32 selectorX = 0;
+    i32 selectorY = 0;
 
     if (m_selectedSide != SWAP_SIDE_NONE && m_selectedSlot != SLOT_NONE) {
         switch (m_selectedSide) {
             case SWAP_SIDE_LEFT:
                 switch (m_itemType) {
                     case SWAP_ITEM_ARMY:
-                        selectorX_2 = m_selectedSlot * armySpacing_2 + leftArmyX_3 - 1;
-                        selectorY_11 = armyY_9 - 1;
+                        selectorX = m_selectedSlot * armySpacing + leftArmyX - 1;
+                        selectorY = armyY - 1;
                         break;
                     case SWAP_ITEM_ARTIFACT:
-                        selectorX_2 =
-                            (m_selectedSlot % ARTIFACT_COLUMN_COUNT) * artifactSpacing_11
-                            + leftArtifactX_7 - 1;
-                        selectorY_11 =
-                            artifactY_7
-                            + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing_11 : 0)
+                        selectorX =
+                            (m_selectedSlot % ARTIFACT_COLUMN_COUNT) * artifactSpacing
+                            + leftArtifactX - 1;
+                        selectorY =
+                            artifactY
+                            + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing : 0)
                             - 1;
                         break;
                     default:
@@ -252,16 +252,16 @@ void swapManager::DrawSelector(void) {
             case SWAP_SIDE_RIGHT:
                 switch (m_itemType) {
                     case SWAP_ITEM_ARMY:
-                        selectorX_2 = m_selectedSlot * armySpacing_2 + rightArmyX_3 - 1;
-                        selectorY_11 = armyY_9 - 1;
+                        selectorX = m_selectedSlot * armySpacing + rightArmyX - 1;
+                        selectorY = armyY - 1;
                         break;
                     case SWAP_ITEM_ARTIFACT:
-                        selectorX_2 =
-                            (m_selectedSlot % ARTIFACT_COLUMN_COUNT) * artifactSpacing_11
-                            + rightArtifactX_6 - 1;
-                        selectorY_11 =
-                            artifactY_7
-                            + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing_11 : 0)
+                        selectorX =
+                            (m_selectedSlot % ARTIFACT_COLUMN_COUNT) * artifactSpacing
+                            + rightArtifactX - 1;
+                        selectorY =
+                            artifactY
+                            + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing : 0)
                             - 1;
                         break;
                     default:
@@ -273,16 +273,16 @@ void swapManager::DrawSelector(void) {
         }
 
         m_selectorIcon->FillToBuffer(
-            selectorX_2,
-            selectorY_11,
+            selectorX,
+            selectorY,
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
-            selectorFrame_6,
+            selectorFrame,
             ICON_DRAW_NORMAL,
             NULL
         );
         gpWindowManager->UpdateScreenRegion(
-            selectorX_2,
-            selectorY_11,
+            selectorX,
+            selectorY,
             SELECTOR_WIDTH,
             SELECTOR_HEIGHT
         );
@@ -290,21 +290,21 @@ void swapManager::DrawSelector(void) {
 }
 
 MessageDispatchResult swapManager::Main(tag_message& message) {
-    b32 closeRequested_5 = false;
-    b32 quickView_9;
-    SwapManagerSide side_6;
-    i32 slotIndex_2;
-    i32 artifactSlot_2;
-    HeroSecondarySkill secondarySkill_1;
+    b32 closeRequested = false;
+    b32 quickView;
+    SwapManagerSide side;
+    i32 slotIndex;
+    i32 artifactSlot;
+    HeroSecondarySkill secondarySkill;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView_9 = true;
+        quickView = true;
     else
-        quickView_9 = false;
+        quickView = false;
 
     switch (message.type) {
         case MESSAGE_RIGHT_BUTTON_DOWN:
-            if (quickView_9)
+            if (quickView)
                 break;
             Reset();
             Update();
@@ -314,10 +314,10 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DESELECT:
-                    if (quickView_9)
+                    if (quickView)
                         break;
                     if (message.payload.widget.id == CONTROL_CLOSE)
-                        closeRequested_5 = true;
+                        closeRequested = true;
                     break;
 
                 case WIDGET_COMMAND_SELECT:
@@ -331,8 +331,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_LEFT_SKILL_FIRST + 5:
                         case CONTROL_LEFT_SKILL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LAST:
-                            side_6 = SWAP_SIDE_LEFT;
-                            slotIndex_2 = message.payload.widget.id - CONTROL_LEFT_SKILL_FIRST;
+                            side = SWAP_SIDE_LEFT;
+                            slotIndex = message.payload.widget.id - CONTROL_LEFT_SKILL_FIRST;
                             goto showSecondarySkill;
                             break;
 
@@ -344,8 +344,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_LEFT_SKILL_LEVEL_FIRST + 5:
                         case CONTROL_LEFT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LEVEL_LAST:
-                            side_6 = SWAP_SIDE_LEFT;
-                            slotIndex_2 =
+                            side = SWAP_SIDE_LEFT;
+                            slotIndex =
                                 message.payload.widget.id - CONTROL_LEFT_SKILL_LEVEL_FIRST;
                             goto showSecondarySkill;
                             break;
@@ -358,8 +358,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_RIGHT_SKILL_FIRST + 5:
                         case CONTROL_RIGHT_SKILL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LAST:
-                            side_6 = SWAP_SIDE_RIGHT;
-                            slotIndex_2 =
+                            side = SWAP_SIDE_RIGHT;
+                            slotIndex =
                                 message.payload.widget.id - CONTROL_RIGHT_SKILL_FIRST;
                             goto showSecondarySkill;
                             break;
@@ -372,18 +372,18 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 5:
                         case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LEVEL_LAST:
-                            side_6 = SWAP_SIDE_RIGHT;
-                            slotIndex_2 =
+                            side = SWAP_SIDE_RIGHT;
+                            slotIndex =
                                 message.payload.widget.id - CONTROL_RIGHT_SKILL_LEVEL_FIRST;
                         showSecondarySkill:
-                            if (slotIndex_2 >= m_heroes[H2EnumIndex(side_6)]->m_secondarySkillCount)
+                            if (slotIndex >= m_heroes[H2EnumIndex(side)]->m_secondarySkillCount)
                                 break;
-                            secondarySkill_1 = m_heroes[H2EnumIndex(side_6)]->GetNthSS(slotIndex_2);
-                            m_heroes[H2EnumIndex(side_6)]->DoSSLevelDialog(secondarySkill_1, quickView_9);
+                            secondarySkill = m_heroes[H2EnumIndex(side)]->GetNthSS(slotIndex);
+                            m_heroes[H2EnumIndex(side)]->DoSSLevelDialog(secondarySkill, quickView);
                             break;
 
                         case CONTROL_LEFT_HERO:
-                            if (quickView_9)
+                            if (quickView)
                                 break;
                             HeroView(m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_id, true, false);
                             gpAdvManager->RedrawAdvScreen(1, 0);
@@ -394,7 +394,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_HERO:
-                            if (quickView_9)
+                            if (quickView)
                                 break;
                             HeroView(m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_id, true, false);
                             gpAdvManager->RedrawAdvScreen(1, 0);
@@ -418,47 +418,47 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_LEFT_ARTIFACT_FIRST + 11:
                         case CONTROL_LEFT_ARTIFACT_FIRST + 12:
                         case CONTROL_LEFT_ARTIFACT_LAST:
-                            artifactSlot_2 =
+                            artifactSlot =
                                 message.payload.widget.id - CONTROL_LEFT_ARTIFACT_FIRST;
-                            if (!quickView_9
-                                && m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
+                            if (!quickView
+                                && m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(localization::Tr("swap.artifact.cannot_trade"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_VALUE);
                                 break;
                             }
-                            if (quickView_9) {
-                                if (m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
+                            if (quickView) {
+                                if (m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot]
                                     == ARTIFACT_NONE)
                                     break;
                                 m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->ViewArtifact(
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2],
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot_2]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot]
                                 );
                                 break;
                             }
                             if (m_itemType != SWAP_ITEM_ARTIFACT) {
-                                if (m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_LEFT;
                                     m_targetSide = SWAP_SIDE_NONE;
                                     m_itemType = SWAP_ITEM_ARTIFACT;
-                                    m_selectedSlot = artifactSlot_2;
+                                    m_selectedSlot = artifactSlot;
                                     m_targetSlot = SLOT_NONE;
                                 } else {
                                     Reset();
                                 }
                             } else {
                                 m_targetSide = SWAP_SIDE_LEFT;
-                                m_targetSlot = artifactSlot_2;
+                                m_targetSlot = artifactSlot;
                                 if (m_selectedSide == SWAP_SIDE_LEFT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->ViewArtifact(
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]
-                                            ->m_artifacts[artifactSlot_2],
+                                            ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]
-                                            ->m_artifactExtra[artifactSlot_2]
+                                            ->m_artifactExtra[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -482,47 +482,47 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_RIGHT_ARTIFACT_FIRST + 11:
                         case CONTROL_RIGHT_ARTIFACT_FIRST + 12:
                         case CONTROL_RIGHT_ARTIFACT_LAST:
-                            artifactSlot_2 =
+                            artifactSlot =
                                 message.payload.widget.id - CONTROL_RIGHT_ARTIFACT_FIRST;
-                            if (!quickView_9
-                                && m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
+                            if (!quickView
+                                && m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(localization::Tr("swap.artifact.cannot_trade"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_VALUE);
                                 break;
                             }
-                            if (quickView_9) {
-                                if (m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
+                            if (quickView) {
+                                if (m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot]
                                     == ARTIFACT_NONE)
                                     break;
                                 m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->ViewArtifact(
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2],
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot_2]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot]
                                 );
                                 break;
                             }
                             if (m_itemType != SWAP_ITEM_ARTIFACT) {
-                                if (m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_RIGHT;
                                     m_targetSide = SWAP_SIDE_NONE;
                                     m_itemType = SWAP_ITEM_ARTIFACT;
-                                    m_selectedSlot = artifactSlot_2;
+                                    m_selectedSlot = artifactSlot;
                                     m_targetSlot = SLOT_NONE;
                                 } else {
                                     Reset();
                                 }
                             } else {
                                 m_targetSide = SWAP_SIDE_RIGHT;
-                                m_targetSlot = artifactSlot_2;
+                                m_targetSlot = artifactSlot;
                                 if (m_selectedSide == SWAP_SIDE_RIGHT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->ViewArtifact(
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]
-                                            ->m_artifacts[artifactSlot_2],
+                                            ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]
-                                            ->m_artifactExtra[artifactSlot_2]
+                                            ->m_artifactExtra[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -537,7 +537,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_LEFT_ARMY_FIRST + 2:
                         case CONTROL_LEFT_ARMY_FIRST + 3:
                         case CONTROL_LEFT_ARMY_LAST:
-                            if (quickView_9) {
+                            if (quickView) {
                                 if (m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
@@ -608,7 +608,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_RIGHT_ARMY_FIRST + 2:
                         case CONTROL_RIGHT_ARMY_FIRST + 3:
                         case CONTROL_RIGHT_ARMY_LAST:
-                            if (quickView_9) {
+                            if (quickView) {
                                 if (m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
@@ -678,7 +678,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
                     }
 
-                    if (!quickView_9) {
+                    if (!quickView) {
                         Update();
                         DrawSwapWin();
                         DrawSelector();
@@ -694,7 +694,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
             break;
     }
 
-    if (closeRequested_5 == CLOSE_REQUESTED) {
+    if (closeRequested == CLOSE_REQUESTED) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = SWAP_COMMAND_EXIT;
         return MESSAGE_DISPATCH_FORWARD;
@@ -722,12 +722,12 @@ void swapManager::ViewMon(void) {
 void swapManager::SwapArtifacts(void) {
     H2EnumStorage<ArtifactType, i32> selectedArtifact =
         m_heroes[H2EnumIndex(m_selectedSide)]->m_artifacts[m_selectedSlot];
-    H2EnumStorage<ArtifactType, i32> targetArtifact_2 =
+    H2EnumStorage<ArtifactType, i32> targetArtifact =
         m_heroes[H2EnumIndex(m_targetSide)]->m_artifacts[m_targetSlot];
 
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_selectedSide)], selectedArtifact, true);
-    GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_targetSide)], targetArtifact_2, true);
-    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact_2;
+    GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_targetSide)], targetArtifact, true);
+    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact;
     m_heroes[H2EnumIndex(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
     i8 extra = m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
@@ -735,13 +735,13 @@ void swapManager::SwapArtifacts(void) {
         m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot];
     m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
 
-    GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_selectedSide)], targetArtifact_2, false);
+    GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_selectedSide)], targetArtifact, false);
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_targetSide)], selectedArtifact, false);
     m_heroes[H2EnumIndex(m_selectedSide)]->CheckAnduranPieces(true);
     m_heroes[H2EnumIndex(m_targetSide)]->CheckAnduranPieces(true);
 
     if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
-        || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
+        || targetArtifact == ARTIFACT_SPADE_NECROMANCY) {
         tag_message message;
         i32 slotSkill;
         message.type = MESSAGE_WIDGET;
@@ -765,22 +765,22 @@ void swapManager::SwapArtifacts(void) {
 }
 
 void swapManager::SwapMons(void) {
-    armyGroup* selectedArmy_1 = &m_heroes[H2EnumIndex(m_selectedSide)]->m_army;
-    armyGroup* targetArmy_6 = &m_heroes[H2EnumIndex(m_targetSide)]->m_army;
-    if (targetArmy_6->m_creatureTypes[m_targetSlot]
-        == selectedArmy_1->m_creatureTypes[m_selectedSlot]) {
-        if (selectedArmy_1->GetNumArmies() == 1)
+    armyGroup* selectedArmy = &m_heroes[H2EnumIndex(m_selectedSide)]->m_army;
+    armyGroup* targetArmy = &m_heroes[H2EnumIndex(m_targetSide)]->m_army;
+    if (targetArmy->m_creatureTypes[m_targetSlot]
+        == selectedArmy->m_creatureTypes[m_selectedSlot]) {
+        if (selectedArmy->GetNumArmies() == 1)
             return;
-        targetArmy_6->m_creatureCounts[m_targetSlot] +=
-            selectedArmy_1->m_creatureCounts[m_selectedSlot];
-        selectedArmy_1->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
-        selectedArmy_1->m_creatureCounts[m_selectedSlot] = 0;
+        targetArmy->m_creatureCounts[m_targetSlot] +=
+            selectedArmy->m_creatureCounts[m_selectedSlot];
+        selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
+        selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
         return;
     }
-    if (selectedArmy_1 != targetArmy_6 && selectedArmy_1->GetNumArmies() == 1
-        && targetArmy_6->m_creatureTypes[m_targetSlot] == CREATURE_NONE)
+    if (selectedArmy != targetArmy && selectedArmy->GetNumArmies() == 1
+        && targetArmy->m_creatureTypes[m_targetSlot] == CREATURE_NONE)
         return;
-    selectedArmy_1->Swap(m_selectedSlot, targetArmy_6, m_targetSlot);
+    selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);
 }
 
 void swapManager::Update(void) {

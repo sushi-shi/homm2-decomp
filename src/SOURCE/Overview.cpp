@@ -997,7 +997,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 }
 
 void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
-    i32 col;
+    i32 column;
     tag_message message;
     char* titleText;
 
@@ -1031,28 +1031,28 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         {140, 199, 239}
     };
 
-    for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        if (textWidgetTitle[col] != NULL) {
-            overWin->RemoveWidget(textWidgetTitle[col]);
-            delete textWidgetTitle[col];
-            textWidgetTitle[col] = NULL;
+    for (column = 0; column < OVERVIEW_TITLE_COUNT; column++) {
+        if (textWidgetTitle[column] != NULL) {
+            overWin->RemoveWidget(textWidgetTitle[column]);
+            delete textWidgetTitle[column];
+            textWidgetTitle[column] = NULL;
         }
     }
-    for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        ALLOC_COPY_STRING(titleText, cOverviewText[col + H2EnumIndex(giOverviewType) * OVERVIEW_TITLE_COUNT]);
-        textWidgetTitle[col] = new textWidget(
-            titleX[H2EnumIndex(giOverviewType)][col],
+    for (column = 0; column < OVERVIEW_TITLE_COUNT; column++) {
+        ALLOC_COPY_STRING(titleText, cOverviewText[column + H2EnumIndex(giOverviewType) * OVERVIEW_TITLE_COUNT]);
+        textWidgetTitle[column] = new textWidget(
+            titleX[H2EnumIndex(giOverviewType)][column],
             OVERVIEW_TITLE_Y,
-            titleWidths[H2EnumIndex(giOverviewType)][col],
+            titleWidths[H2EnumIndex(giOverviewType)][column],
             OVERVIEW_TITLE_HEIGHT,
             titleText,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
-            static_cast<i16>(col + OVERVIEW_COLUMN_TITLE_FIRST),
+            static_cast<i16>(column + OVERVIEW_COLUMN_TITLE_FIRST),
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        overWin->AddWidget(textWidgetTitle[col], -1);
+        overWin->AddWidget(textWidgetTitle[column], -1);
     }
     SetupDynamicStuff(0, 1, 0);
     if (redrawFrom != 0) {
@@ -1061,16 +1061,16 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
 }
 
 void game::SetupResources(void) {
-    H2SteppedEnumStorage<ResourceType, i32> resourceIdx;
-    tag_message msg;
+    H2SteppedEnumStorage<ResourceType, i32> resourceIndex;
+    tag_message message;
 
-    msg.type = MESSAGE_WIDGET;
-    for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
-        msg.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
-        msg.payload.widget.data.text = gText;
-        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[H2EnumIndex(resourceIdx)]);
-        msg.payload.widget.id = H2EnumIndex(resourceIdx) + RESOURCE_FIRST_WIDGET;
-        overWin->BroadcastMessage(msg);
+    message.type = MESSAGE_WIDGET;
+    for (resourceIndex = RES_WOOD; resourceIndex < RES_COUNT; resourceIndex++) {
+        message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
+        message.payload.widget.data.text = gText;
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[H2EnumIndex(resourceIndex)]);
+        message.payload.widget.id = H2EnumIndex(resourceIndex) + RESOURCE_FIRST_WIDGET;
+        overWin->BroadcastMessage(message);
     }
 }
 
@@ -1181,8 +1181,8 @@ void game::DoKnob(void) {
     double itemPixels;
     float scrollRange;
     tag_message widgetMessage;
-    i32 ptX;
-    i32 ptY;
+    i32 pointerX;
+    i32 pointerY;
     i32 topNow;
     float topValue;
     tag_message pendingMessage;
@@ -1197,7 +1197,7 @@ void game::DoKnob(void) {
         topBefore = giOverviewTop[H2EnumIndex(giOverviewType)];
         itemPixels =
             scrollRange / (giOverviewItems[H2EnumIndex(giOverviewType)] - (OVERVIEW_VISIBLE_ROWS - 1));
-        gpMouseManager->MouseCoords(ptX, ptY);
+        gpMouseManager->MouseCoords(pointerX, pointerY);
         gpInputManager->Flush();
         widgetMessage = gpInputManager->GetEvent();
         while (widgetMessage.type != MESSAGE_LEFT_BUTTON_UP
@@ -1449,9 +1449,9 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
-                HeroSecondarySkill secondarySkill12 =
+                HeroSecondarySkill secondarySkill =
                     curHero->GetNthSS(widgetId - HERO_SKILL_FIRST);
-                curHero->DoSSLevelDialog(secondarySkill12, quickView);
+                curHero->DoSSLevelDialog(secondarySkill, quickView);
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {

@@ -231,19 +231,19 @@ i32 game::SetupNetworkGame(void) {
 }
 
 i32 game::SetupNetworkGame2(void) {
-    tag_message msg;
+    tag_message message;
 
     heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
     if (dialogWindow == NULL)
         MemError();
 
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    msg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-    msg.payload.widget.id = CHOICE_ONE;
-    dialogWindow->BroadcastMessage(msg);
-    msg.payload.widget.id = CHOICE_THREE;
-    dialogWindow->BroadcastMessage(msg);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
+    message.payload.widget.id = CHOICE_ONE;
+    dialogWindow->BroadcastMessage(message);
+    message.payload.widget.id = CHOICE_THREE;
+    dialogWindow->BroadcastMessage(message);
 
     gpWindowManager->DoDialog(dialogWindow, SetupNetworkGame2Handler, 0);
     delete dialogWindow;

@@ -53,13 +53,13 @@ public:
     widget* m_widgetListHead;
     bitmap* m_savedBackground;
     heroWindow(void);
-    heroWindow(i32 x, i32 y, i32 w, i32 h, WindowFlag flags);
+    heroWindow(i32 x, i32 y, i32 width, i32 height, WindowFlag flags);
     heroWindow(i32 x, i32 y, const char* resourceName);
     i32 Open(i32 x, i32 flags);
     void RemoveAndDeleteWidget(i32 id);
     void Close(void);
     void AddWidget(class widget* newWidget, i32 zOrder);
-    void RemoveWidget(class widget* w);
+    void RemoveWidget(class widget* currentWidget);
     MessageDispatchResult BroadcastMessage(struct tag_message& message);
     void DrawWindow(void);
     void DrawWindow(i32 flags);

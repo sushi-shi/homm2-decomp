@@ -151,9 +151,9 @@ typedef enum GameHeroPoolConstant {
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32 playerIndex);
 void GenerateStandardFileName(char* source, char* destination);
-MessageDispatchResult ViewSpellsHandler(struct tag_message& msg);
-MessageDispatchResult ViewSpecialHandler(struct tag_message& msg);
-MessageDispatchResult ViewArmyHandler(struct tag_message& msg);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
+MessageDispatchResult ViewArmyHandler(struct tag_message& message);
 i32 CalcBaseScore(i32 days);
 void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
 void CreateJoinFile(char* oldName, char* diffName, char* joinName);

@@ -50,10 +50,10 @@ public:
     );
     virtual inline ~button() override;
     virtual void Draw(void) override;
-    virtual MessageDispatchResult Main(struct tag_message& msg) override;
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Read(void);
-    MessageDispatchResult Select(struct tag_message& msg);
-    MessageDispatchResult Deselect(struct tag_message& msg);
+    MessageDispatchResult Select(struct tag_message& message);
+    MessageDispatchResult Deselect(struct tag_message& message);
 };
 #pragma pack(pop)
 extern MessageModifier iLeftRightSave;

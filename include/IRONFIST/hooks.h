@@ -29,7 +29,7 @@ void TownOpened(town* t);
 void UnitRecruited(i32 creatureType);
 i32 ModifyMobility(hero* h, i32 points);
 i32 ModifyLuck(hero* h, army* stack, town* castle, i32 luck);
-i32 ModifyMorale(hero* h, town* twn, i32 morale);
+i32 ModifyMorale(hero* h, town* currentTown, i32 morale);
 i32 ModifyManaCost(hero* h, i32 spell, i32 cost);
 float ModifySpellChance(army* stack, SpellType spell, float chance);
 void MeleeAttackStarted(army* attacker, i32 retaliation);

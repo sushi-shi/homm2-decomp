@@ -54,15 +54,15 @@ typedef enum AdventurePanelButtonConstant {
 } AdventurePanelButtonConstant;
 
 
-#define SET_ADVENTURE_BUTTON_FLAGS(msg, window, cmd) \
-    ((msg).type = MESSAGE_WIDGET, (msg).payload.widget.command = (cmd), \
-     (msg).payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST, (window)->BroadcastMessage(msg), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 1, (window)->BroadcastMessage(msg), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 2, (window)->BroadcastMessage(msg), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 3, (window)->BroadcastMessage(msg), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 4, (window)->BroadcastMessage(msg), \
-     (msg).payload.widget.id = ADVMGR_PANEL_BUTTON_LAST, (window)->BroadcastMessage(msg))
+#define SET_ADVENTURE_BUTTON_FLAGS(message, window, cmd) \
+    ((message).type = MESSAGE_WIDGET, (message).payload.widget.command = (cmd), \
+     (message).payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST, (window)->BroadcastMessage(message), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 1, (window)->BroadcastMessage(message), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 2, (window)->BroadcastMessage(message), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 3, (window)->BroadcastMessage(message), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_FIRST + 4, (window)->BroadcastMessage(message), \
+     (message).payload.widget.id = ADVMGR_PANEL_BUTTON_LAST, (window)->BroadcastMessage(message))
 
 enum class ArmySizeNameVariant : i32 {
     ARMY_SIZE_NAME_TITLE    = 0,

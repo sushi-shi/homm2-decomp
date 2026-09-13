@@ -1686,7 +1686,7 @@ void game::ShowScenInfo(void) {
     char* name;
     i32 yExtra;
     i32 raceNameWidth;
-    tag_message msg;
+    tag_message message;
     i32 multiplayerYOffset;
     widget* nameWidget;
     widget* iconControl;
@@ -1704,22 +1704,22 @@ void game::ShowScenInfo(void) {
         MemError();
     SetWinText(window, GAME_SCENARIO_WINDOW_TEXT_ID);
 
-    SET_WIDGET_MESSAGE(msg, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
-    msg.payload.widget.data.text = mapName.c_str();
-    window->BroadcastMessage(msg);
+    SET_WIDGET_MESSAGE(message, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
+    message.payload.widget.data.text = mapName.c_str();
+    window->BroadcastMessage(message);
 
-    msg.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
-    msg.payload.widget.data.text = cDifficulty[H2EnumIndex(m_mapHeader.difficulty)];
-    window->BroadcastMessage(msg);
-    msg.payload.widget.id = GAME_SCENARIO_SELECTED_DIFFICULTY;
-    msg.payload.widget.data.text = cDifficulty[H2EnumIndex(m_difficulty)];
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
+    message.payload.widget.data.text = cDifficulty[H2EnumIndex(m_mapHeader.difficulty)];
+    window->BroadcastMessage(message);
+    message.payload.widget.id = GAME_SCENARIO_SELECTED_DIFFICULTY;
+    message.payload.widget.data.text = cDifficulty[H2EnumIndex(m_difficulty)];
+    window->BroadcastMessage(message);
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", CalcDifficultyRating());
     strcat(gText, "%");
-    msg.payload.widget.id = GAME_SCENARIO_RATING;
-    msg.payload.widget.data.text = gText;
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_RATING;
+    message.payload.widget.data.text = gText;
+    window->BroadcastMessage(message);
 
     mapSize = MAP_SIZE_SMALL_INDEX;
     if (m_mapHeader.width == MAP_DIMENSION_MEDIUM)
@@ -1728,21 +1728,21 @@ void game::ShowScenInfo(void) {
         mapSize = MAP_SIZE_LARGE_INDEX;
     else if (m_mapHeader.width == MAP_DIMENSION_XLARGE)
         mapSize = MAP_SIZE_XLARGE_INDEX;
-    msg.payload.widget.id = GAME_SCENARIO_MAP_SIZE;
-    msg.payload.widget.data.text = cMapSize[mapSize];
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_MAP_SIZE;
+    message.payload.widget.data.text = cMapSize[mapSize];
+    window->BroadcastMessage(message);
 
-    msg.payload.widget.id = GAME_SCENARIO_DESCRIPTION;
-    msg.payload.widget.data.text = mapDescription.c_str();
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_DESCRIPTION;
+    message.payload.widget.data.text = mapDescription.c_str();
+    window->BroadcastMessage(message);
     GetVictoryConditionText(gText);
-    msg.payload.widget.id = GAME_SCENARIO_VICTORY;
-    msg.payload.widget.data.text = gText;
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_VICTORY;
+    message.payload.widget.data.text = gText;
+    window->BroadcastMessage(message);
     GetLossConditionText(gText);
-    msg.payload.widget.id = GAME_SCENARIO_LOSS;
-    msg.payload.widget.data.text = gText;
-    window->BroadcastMessage(msg);
+    message.payload.widget.id = GAME_SCENARIO_LOSS;
+    message.payload.widget.data.text = gText;
+    window->BroadcastMessage(message);
 
     iconControl = NULL;
     nameWidget = NULL;
@@ -1940,19 +1940,19 @@ void game::ShowScenInfo(void) {
         } else {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        msg.payload.widget.id =
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        message.payload.widget.id =
             NEW_GAME_PLAYER_NAME_FIRST + playerCounter;
-        msg.payload.widget.data.text = gText;
-        window->BroadcastMessage(msg);
+        message.payload.widget.data.text = gText;
+        window->BroadcastMessage(message);
 
-        msg.payload.widget.command = playerCounter != m_selectedSetupPlayer
+        message.payload.widget.command = playerCounter != m_selectedSetupPlayer
                                                          ? NEW_GAME_WIDGET_DISABLE
                                                          : NEW_GAME_WIDGET_ENABLE;
-        msg.payload.widget.id =
+        message.payload.widget.id =
             NEW_GAME_PLAYER_SELECT_FIRST + playerCounter;
-        msg.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
-        window->BroadcastMessage(msg);
+        message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+        window->BroadcastMessage(message);
 
         if (m_setupPlayerType[playerCounter] != GAME_PLAYER_DEFAULT
             || (giNumHumanPlayers > 1
@@ -1960,57 +1960,57 @@ void game::ShowScenInfo(void) {
             locked = false;
         else
             locked = true;
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        msg.payload.widget.id =
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        message.payload.widget.id =
             NEW_GAME_COLOR_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
-            msg.payload.widget.data.value =
+            message.payload.widget.data.value =
                 (locked ? GAME_COMPUTER_COLOR_LOCKED_FRAME
                                    : GAME_COMPUTER_COLOR_UNLOCKED_FRAME)
                 + m_setupPlayerColor[playerCounter];
         else
-            msg.payload.widget.data.value =
+            message.payload.widget.data.value =
                 (locked ? GAME_HUMAN_COLOR_LOCKED_FRAME
                                    : GAME_HUMAN_COLOR_UNLOCKED_FRAME)
                 + m_setupPlayerColor[playerCounter];
         if (giNumHumanPlayers > 1)
-            msg.payload.widget.data.value +=
+            message.payload.widget.data.value +=
                 GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
-        window->BroadcastMessage(msg);
+        window->BroadcastMessage(message);
 
-        msg.payload.widget.command =
+        message.payload.widget.command =
             locked ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
-        msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        window->BroadcastMessage(msg);
+        message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+        window->BroadcastMessage(message);
 
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        msg.payload.widget.id =
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        message.payload.widget.id =
             NEW_GAME_HANDICAP_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
-            msg.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
+            message.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
-            msg.payload.widget.data.value = H2EnumIndex(m_playerHandicap[playerCounter]);
-        window->BroadcastMessage(msg);
-        msg.payload.widget.command =
+            message.payload.widget.data.value = H2EnumIndex(m_playerHandicap[playerCounter]);
+        window->BroadcastMessage(message);
+        message.payload.widget.command =
             m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
                                                                           : NEW_GAME_WIDGET_ENABLE;
-        msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        window->BroadcastMessage(msg);
+        message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+        window->BroadcastMessage(message);
 
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        msg.payload.widget.id =
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+        message.payload.widget.id =
             NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
-        msg.payload.widget.data.value =
+        message.payload.widget.data.value =
             factionPortraitIconIdx[H2EnumIndex(m_setupPlayerRace[playerCounter])]
                                   [locked ? 1 : 0];
-        window->BroadcastMessage(msg);
+        window->BroadcastMessage(message);
 
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerCounter])]);
-        msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        msg.payload.widget.id =
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        message.payload.widget.id =
             NEW_GAME_RACE_NAME_FIRST + playerCounter;
-        msg.payload.widget.data.text = gText;
-        window->BroadcastMessage(msg);
+        message.payload.widget.data.text = gText;
+        window->BroadcastMessage(message);
     }
 
     gpWindowManager->DoDialog(window, EventWindowHandler, 0);
@@ -2018,55 +2018,55 @@ void game::ShowScenInfo(void) {
 }
 
 void game::GetLossConditionText(char* text) {
-    i32 week2;
-    hero* lossHero11;
-    i32 day26;
-    i32 month19;
-    town* city2;
-    i32 townId12;
+    i32 week;
+    hero* lossHero;
+    i32 dayOfWeek;
+    i32 month;
+    town* city;
+    i32 townId;
 
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
             case MAP_LOSS_TOWN:
-                townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
-                city2 = GetTown(townId12);
+                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
+                city = GetTown(townId);
                 utf8::Format(
                     text,
                     GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr(
-                        (city2->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
+                        (city->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
                             ? "scenario.loss.castle"
                             : "scenario.loss.town"
                     ),
-                    city2->m_name
+                    city->m_name
                 );
                 break;
 
             case MAP_LOSS_HERO:
-                lossHero11 = GetHero(m_mapHeader.lossConditionValue);
+                lossHero = GetHero(m_mapHeader.lossConditionValue);
                 utf8::Format(
                     text,
                     GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.loss.hero"),
-                    lossHero11->m_name
+                    lossHero->m_name
                 );
                 break;
 
             case MAP_LOSS_TIME:
-                month19 =
+                month =
                     (gpGame->m_mapHeader.lossConditionValue - 1) / GAME_DAYS_PER_MONTH + 1;
-                week2 = (gpGame->m_mapHeader.lossConditionValue
-                         - (month19 - 1) * GAME_DAYS_PER_MONTH - 1)
+                week = (gpGame->m_mapHeader.lossConditionValue
+                         - (month - 1) * GAME_DAYS_PER_MONTH - 1)
                             / GAME_DAYS_PER_WEEK
                         + 1;
-                day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
+                dayOfWeek = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 utf8::Format(
                     text,
                     GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.loss.time"),
-                    month19,
-                    week2,
-                    day26
+                    month,
+                    week,
+                    dayOfWeek
                 );
                 break;
             default:

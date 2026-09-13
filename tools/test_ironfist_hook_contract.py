@@ -50,7 +50,7 @@ class IronfistHookContractTest(unittest.TestCase):
         assert_order(
             self,
             body,
-            "eventSample_f = NULL;",
+            "eventSample = NULL;",
             "if (ironfist::hooks::LocationVisit(cell, x, y))",
             "goto event_done;",
             "event_done:",
@@ -78,12 +78,12 @@ class IronfistHookContractTest(unittest.TestCase):
 
     def test_script_info_text_precedes_none_fallback(self):
         body = function_body(
-            "src/SOURCE/KB.cpp", "void game::ShowMoraleInfo(hero* h, i32 dialogType)"
+            "src/SOURCE/KB.cpp", "void game::ShowMoraleInfo(hero* heroPointer, i32 dialogType)"
         )
         assert_order(
             self,
             body,
-            "ironfist::hooks::AppendMoraleInfo(h);",
+            "ironfist::hooks::AppendMoraleInfo(heroPointer);",
             "MORALE_INFO_NONE",
             "NormalDialog(",
         )
@@ -156,11 +156,11 @@ class IronfistHookContractTest(unittest.TestCase):
         assert_order(
             self,
             body,
-            "growth2 += CASTLE_GROWTH_SPECIAL_BONUS;",
+            "creatureGrowth += CASTLE_GROWTH_SPECIAL_BONUS;",
             "WEEKLY_HARD_GROWTH_FACTOR",
             "if (ironfist::IsWellDisabled()",
-            "growth2 -= castle5->m_owner >= 0",
-            "m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] += growth2;",
+            "creatureGrowth -= castle->m_owner >= 0",
+            "m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] += creatureGrowth;",
         )
 
     def test_source_uses_explicit_integration_namespace(self):
