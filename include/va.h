@@ -26,13 +26,11 @@
 #define VTBL2(cls, base, addr)                                                                     \
     __attribute__((annotate("vtbl2:" #cls " " #base " " #addr))) extern const char cls##_vt_##base;
 #define OVERRIDE override
-#define SIZE(type, bytes) static_assert(sizeof(type) == (bytes), "sizeof(" #type ") != " #bytes)
 
 // Where the same thing sits in the Buka target. Gold 2.1 moved code, data and
 // at least one struct's fields, so the 2.1 fact is recorded beside the 2.0 one
 // rather than replacing it.
 #define NEW_VA(addr, size) __attribute__((annotate("new_va:" #addr " size:" #size)))
-#define NEW_SIZE(type, bytes)
 
 #else
 
@@ -45,10 +43,7 @@
 #define VTBL2(cls, base, addr)
 #define OVERRIDE
 
-#define SIZE(type, bytes)
-
 #define NEW_VA(addr, size)
-#define NEW_SIZE(type, bytes)
 
 #endif
 

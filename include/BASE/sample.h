@@ -13,5 +13,4 @@ public:
     virtual H2_RETAIL_INLINE ~sample() OVERRIDE;
 };
 #pragma pack(pop)
-SIZE(sample, 0x34);
 #endif

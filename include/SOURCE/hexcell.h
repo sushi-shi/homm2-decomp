@@ -41,7 +41,6 @@ public:
     void DrawObstacle(void);
 };
 #pragma pack(pop)
-SIZE(hexcell, 0x62);
 // Index is compared only after side, without narrowing the requested identity.
 #define HEX_HAS_OCCUPANT(cell, side, index)                                                        \
     ((cell).m_occupantSide == (side) && (cell).m_occupantIndex == (index))

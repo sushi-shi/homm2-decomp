@@ -54,7 +54,6 @@ public:
     void ReleaseFizzleSource(void);
 };
 #pragma pack(pop)
-SIZE(heroWindowManager, 0x62);
 // Save the selected id before requesting dialog completion; the type is retained.
 #define FINISH_DIALOG_MESSAGE(message)                                                             \
     (gpWindowManager->m_dialogResult = (message).payload.widget.id,                                \

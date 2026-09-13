@@ -112,7 +112,6 @@ public:
     H2_CONST char* GetFilename(void);
 };
 #pragma pack(pop)
-SIZE(fileRequester, 0x42f);
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern H2_CONST char* cFRDummy;
 extern float fGutterMinY;

@@ -21,7 +21,7 @@ subobject's ctor is called on `this + offset`. So disassembling each `??0Class@@
 This is decisive where the naive "first ctor call = base" heuristic gives false positives — e.g.
 `hero`/`town` call `armyGroup::armyGroup` on `this+0x65`/`this+0x8` (a *member* armyGroup), and
 `bankBox` stores `heroWindow`'s ctor result into `this->0x8` (a *member* pointer). Cross-check with the
-`SIZE()` asserts: a derived class can't be smaller than its base (this is what caught `townObject`
+recovered object extents: a derived class can't be smaller than its base (this is what caught `townObject`
 0x18 vs `border` 0x2a — not a base).
 
 ## Recovered hierarchy

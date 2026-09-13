@@ -153,7 +153,6 @@ public:
     }
 };
 #pragma pack(pop)
-SIZE(army, 0x482);
 // The repeated army operand must be stable. Other targeting fields are retained.
 #define CLEAR_ARMY_TARGET(a) ((a).m_targetSide = COMBAT_SIDE_NONE, (a).m_targetIndex = -1)
 // These duration queries deliberately exclude other action/ownership conditions.

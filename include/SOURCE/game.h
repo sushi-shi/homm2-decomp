@@ -54,7 +54,6 @@ struct boatRecord {
     i8 owner;
 };
 #pragma pack(pop)
-SIZE(boatRecord, 8);
 
 H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
@@ -323,7 +322,6 @@ public:
     i32 GetSideDesc(char*, i32, i32);
 };
 #pragma pack(pop)
-SIZE(game, 0x660f);
 // Current map only; day-first signed arithmetic, including before calendar rollover.
 #define GAME_DAY_NUMBER(g)                                                                         \
     ((g).m_day + ((g).m_week - 1) * CALENDAR_DAYS_PER_WEEK                                         \

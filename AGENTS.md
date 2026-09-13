@@ -258,8 +258,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   exactly one TU is private and lives in that `.cpp`. For known serialized numeric
   domains, prefer a `typedef enum` with explicit values while preserving storage width
   and packed layout.
-- Preserve proven layouts with packed records and `SIZE` evidence. The retail MSVC build
-  keeps `SIZE` byte-neutral; do not turn it into emitted declarations.
+- Preserve proven layouts with packed records, fixed-width storage and retail
+  byte/relocation evidence. Do not add declarations solely to assert a size.
 - Use inline accessors where retail `/Ob1` traces prove them. Do not replace modeled fields
   with `reinterpret_cast<unsigned char *>(this)[offset]` merely for a local score gain.
 - In the optimized icon-decoder family, begin from the

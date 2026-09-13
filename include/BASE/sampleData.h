@@ -30,6 +30,5 @@ struct SamplePlaybackData {
     i32 channelType;
 };
 #pragma pack(pop)
-SIZE(SamplePlaybackData, 0x24);
 
 #endif

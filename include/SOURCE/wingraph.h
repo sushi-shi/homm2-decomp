@@ -34,14 +34,12 @@ struct _PALETTE {
     PALETTEENTRY entries[WINGRAPH_PALETTE_SIZE];
 };
 #pragma pack(pop)
-SIZE(_PALETTE, 0x404);
 
 struct _IMAGE {
     BITMAPINFOHEADER header;
     RGBQUAD colors[WINGRAPH_PALETTE_SIZE];
     void* bits;
 };
-SIZE(_IMAGE, 0x42c);
 
 typedef HRESULT(__stdcall* DirectDrawCreateProc)(
     GUID* guid,

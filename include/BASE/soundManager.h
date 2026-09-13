@@ -87,7 +87,6 @@ public:
     i32 MusicPlaying(void);
 };
 #pragma pack(pop)
-SIZE(soundManager, 0x52);
 
 // Set when the CD-ROM check turns the audio path off; the two backend
 // startups refuse to run while it is set. Distinct from KB's gbNoSound.

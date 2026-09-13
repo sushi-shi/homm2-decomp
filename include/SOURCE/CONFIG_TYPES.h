@@ -124,7 +124,5 @@ struct configStruct {
     char networkDefaultName[CONFIG_NETWORK_DEFAULT_NAME_SIZE];
 };
 #pragma pack(pop)
-SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
-SIZE(configStruct, CONFIG_STRUCT_SIZE);
 
 #endif

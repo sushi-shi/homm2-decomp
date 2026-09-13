@@ -222,15 +222,6 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
             "ENABLE_ENUM_INDEX_OFFSETS(ExpansionCampaignMap)",
         )
 
-    def test_size_annotations_are_removed(self):
-        self.assertEqual(
-            clean_source.clean(
-                "struct Record { int value; };\n"
-                'SIZE(Record, 4);\n'
-            ),
-            "struct Record { int value; };\n",
-        )
-
     def test_decode_masked_expands_to_typed_assignment(self):
         result = clean_source.rewrite(
             "H2_ENUM_DECODE_MASKED(Kind, value, packed.field, KIND_MASK)"

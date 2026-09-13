@@ -201,7 +201,6 @@ struct tag_messageKeyboardPayload {
     i32 unknown0x14;
     i32 unknown0x18;
 };
-SIZE(tag_messageKeyboardPayload, 0x18);
 
 struct tag_messageMousePayload {
     i32 x;
@@ -211,7 +210,6 @@ struct tag_messageMousePayload {
     i32 screenY;
     i32 unknown0x18;
 };
-SIZE(tag_messageMousePayload, 0x18);
 
 struct tag_messageHoverPayload {
     i32 x;
@@ -221,13 +219,11 @@ struct tag_messageHoverPayload {
     i32 screenY;
     i32 unknown0x18;
 };
-SIZE(tag_messageHoverPayload, 0x18);
 
 union tag_messageWidgetData {
     i32 value;
     H2_CONST char* text;
 };
-SIZE(tag_messageWidgetData, 0x4);
 
 struct tag_messageWidgetPayload {
     BaseWidgetCommand command;
@@ -240,7 +236,6 @@ struct tag_messageWidgetPayload {
     i32 screenY;
     tag_messageWidgetData data;
 };
-SIZE(tag_messageWidgetPayload, 0x18);
 
 H2_ENUM_CLASS_BEGIN(ExecutiveCommand)
     EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
@@ -258,7 +253,6 @@ struct tag_messageExecutivePayload {
     i32 unknown0x14;
     i32 result;
 };
-SIZE(tag_messageExecutivePayload, 0x18);
 
 struct tag_messageUnknownPayload {
     i32 unknown0x04;
@@ -268,7 +262,6 @@ struct tag_messageUnknownPayload {
     i32 unknown0x14;
     i32 unknown0x18;
 };
-SIZE(tag_messageUnknownPayload, 0x18);
 
 union tag_messagePayload {
     tag_messageKeyboardPayload keyboard;
@@ -278,13 +271,11 @@ union tag_messagePayload {
     tag_messageExecutivePayload executive;
     tag_messageUnknownPayload unknown;
 };
-SIZE(tag_messagePayload, 0x18);
 
 struct tag_message {
     MessageType type;
     tag_messagePayload payload;
 };
-SIZE(tag_message, 0x1c);
 
 // Retype the event without clearing its payload or surviving mouse modifiers.
 // Arguments must be stable expressions: messageValue is evaluated three times.

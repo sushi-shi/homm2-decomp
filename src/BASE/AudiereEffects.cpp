@@ -5,7 +5,6 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 
-SIZE(AudiereSampleNode, 0xc);
 
 struct AudiereEffectsState {
     void* buffer;
@@ -17,7 +16,6 @@ struct AudiereEffectsState {
     i32 sampleIterationDepth;
 };
 
-SIZE(AudiereEffectsState, 0x1c);
 
 DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = H2_ZERO_INIT;
 

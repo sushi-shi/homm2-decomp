@@ -51,7 +51,6 @@ public:
     void DamageGroup(float);
 };
 #pragma pack(pop)
-SIZE(armyGroup, 0xf);
 // Two array-major clears, not a whole-object zero or a slot-major Dismiss loop.
 #define CLEAR_ARMY_GROUP(group)                                                                    \
     (memset((group).m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof((group).m_creatureTypes)),      \

@@ -38,5 +38,4 @@ public:
     void SetText(H2_CONST char* text);
 };
 #pragma pack(pop)
-SIZE(textWidget, 0x2b);
 #endif

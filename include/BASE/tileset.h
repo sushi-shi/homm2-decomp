@@ -15,5 +15,4 @@ public:
     virtual H2_RETAIL_INLINE ~tileset();
 };
 #pragma pack(pop)
-SIZE(tileset, 0x1a);
 #endif

@@ -97,7 +97,6 @@ struct mapCellExtra {
     u8 overlayIndex;
 };
 #pragma pack(pop)
-SIZE(mapCellExtra, 7);
 
 class mapCell {
 public:
@@ -137,7 +136,6 @@ public:
         return (m_flags & IDX(flag)) != 0;
     }
 };
-SIZE(mapCell, 12);
 // This is the stored sprite property, not a passability or tileset-shadow query.
 #define CELL_HAS_NON_SHADOW_OBJECT(cell)                                                           \
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \

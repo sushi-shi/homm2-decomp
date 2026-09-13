@@ -80,7 +80,6 @@ valid output target.
 | `DATA_COMPGEN(addr, name, value)` | `value` |
 | `IDX(x)`, `HAS(f,b)`, `BIT(x)` | the typed expression |
 | `VA(...)`, `DATA(...)`, `VTBL(...)` | deleted |
-| `SIZE(type, bytes)` | deleted |
 | `H2_ENUM_*` declarations and helpers | typed declarations and compact shared operator macros |
 | `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
 | `H2_CONST` | `const` (empty only for the exact retail compiler view) |

@@ -31,8 +31,8 @@ REVIEWS = Path("docs/readability/reviews.json")
 VA = re.compile(r"^\s*VA\(\s*(0x[0-9a-fA-F]+)\s*,[^\n]*\)\s*$", re.M)
 PROC = re.compile(r"^(\w+)\s+PROC\b", re.M | re.I)
 IGNORES = (
-    "VA+,DATA+,VTBL+,VTBL2+,SIZE+,VA_COMPGEN+,DATA_COMPGEN_GUARD+,"
-    "NEW_VA+,NEW_SIZE+,H2_RETAIL_INLINE,OVERRIDE,H2_CONST,H2_FINAL,"
+    "VA+,DATA+,VTBL+,VTBL2+,VA_COMPGEN+,DATA_COMPGEN_GUARD+,"
+    "NEW_VA+,H2_RETAIL_INLINE,OVERRIDE,H2_CONST,H2_FINAL,"
     "requires+,__is_enum+,__is_integral+"
 )
 DEFINES = [

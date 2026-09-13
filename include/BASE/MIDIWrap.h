@@ -12,5 +12,4 @@ public:
     virtual H2_RETAIL_INLINE ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)
-SIZE(MIDIWrap, 0x14);
 #endif

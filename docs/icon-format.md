@@ -41,7 +41,7 @@ Retail proof (`??0icon@@QAE@K@Z`, RVA `0xc7a20`):
     call ReadBlock     ; (m_data, length)
 ```
 
-`class icon` (`include/BASE/icon.h`, `SIZE 0x16`, `#pragma pack(1)`):
+`class icon` (`include/BASE/icon.h`, 0x16 bytes, `#pragma pack(1)`):
 
 ```
     off  size  member

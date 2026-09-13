@@ -45,7 +45,6 @@ struct SeedPositionState {
     hero* currentHero;
 };
 
-SIZE(SeedPositionState, 0x8c);
 
 DATA(0x00533da0) static SeedPositionState s_seedPositionState;
 

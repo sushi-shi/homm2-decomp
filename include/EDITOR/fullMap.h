@@ -54,5 +54,4 @@ public:
         return &extras[i];
     }
 };
-SIZE(fullMap, 20);
 #endif

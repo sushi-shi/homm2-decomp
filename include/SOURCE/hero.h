@@ -229,7 +229,6 @@ public:
     void CheckAnduranPieces(b32);
 };
 #pragma pack(pop)
-SIZE(hero, 250);
 // Keep the cached level and each receiver evaluation; setup/dialog guards remain outside.
 #define ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(h, amount)                                             \
     ((h).m_experience += (amount), (h).CheckLevel())

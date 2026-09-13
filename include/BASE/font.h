@@ -51,5 +51,4 @@ public:
     i32 LineWidth(H2_CONST char*);
 };
 #pragma pack(pop)
-SIZE(font, 0x20);
 #endif

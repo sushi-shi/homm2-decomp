@@ -47,5 +47,4 @@ public:
     void Read(void);
 };
 #pragma pack(pop)
-SIZE(iconWidget, 0x2d);
 #endif

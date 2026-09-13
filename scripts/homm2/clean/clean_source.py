@@ -392,8 +392,6 @@ CALL_RULES = {
     "H2_ENUM_CLEAR_FLAG": _clear_flag,
     "H2_ENUM_RAW": _enum_raw,
 
-    "SIZE": _drop,
-
     "__declspec": _declspec,
 }
 

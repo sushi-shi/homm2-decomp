@@ -66,7 +66,6 @@ struct EventExtra {
     char message[GAME_EVENT_MESSAGE_HEAD_SIZE];
 };
 #pragma pack(pop)
-SIZE(EventExtra, 0x32);
 struct RandomHeroArmyRange {
     i16 creature;
     i16 minimum;

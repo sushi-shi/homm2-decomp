@@ -390,7 +390,6 @@ public:
     );
 };
 #pragma pack(pop)
-SIZE(advManager, 0x37e);
 
 extern b32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];

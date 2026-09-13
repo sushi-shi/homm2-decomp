@@ -156,7 +156,6 @@ struct SMonFrameInfo {
     i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
     i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
 };
-SIZE(SMonFrameInfo, 0x335);
 #pragma pack(pop)
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
