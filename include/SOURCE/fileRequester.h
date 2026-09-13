@@ -100,17 +100,17 @@ public:
     i32 m_result;
     char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
-    fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
-    virtual i32 Open(i32) override;
+    fileRequester(i32 x, i32 y, FileRequesterMode mode, char* pattern, char* directory, char* defaultExtension);
+    virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
-    i32 InitializeFiles(char*, char*, i32);
-    i32 MapExistsForFilter(FileRequesterMapSizeFilter);
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
+    i32 InitializeFiles(char* directory, char* pattern, i32 countOnly);
+    i32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
     void SetupFiles(void);
     void CleanUpData(void);
-    void SetOK(i32);
+    void SetOK(i32 enabled);
     void DoKnob(void);
-    void Update(i32);
+    void Update(i32 drawWindow);
     const char* GetFilename(void);
 };
 #pragma pack(pop)

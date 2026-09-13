@@ -160,12 +160,12 @@ public:
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
-    void SetupDynamicStuff(i32, i32, i32);
-    void SetupNewOverviewType(OverviewType, i32);
+    void SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate);
+    void SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom);
     void SetupResources(void);
     void Overview(void);
     void DoKnob(void);
-    i32 ProcessIconSelect(i32, b32);
+    i32 ProcessIconSelect(i32 widgetId, b32 quickView);
     i32 SetupCampaignGame(void);
     i32 SetupBaud(void);
     i32 SetupComPort(void);
@@ -177,20 +177,20 @@ public:
     i32 SetupGame(void);
     i32 PickLoadGame(void);
     i32 HandleCampaignWin(void);
-    void PlayPreScenarioSmacker(CampaignSide, i32);
-    void ShowCampaignInfo(i32, i32);
-    void CampaignInfoUpdate(i32);
-    void InitEntireCampaign(CampaignSide);
+    void PlayPreScenarioSmacker(CampaignSide side, i32 map);
+    void ShowCampaignInfo(i32 viewOnly, i32);
+    void CampaignInfoUpdate(i32 redraw);
+    void InitEntireCampaign(CampaignSide side);
     void InitCampaignMap(void);
-    i32 MineTypesOwned(i32, MineType);
-    i32 SetupPuzzlePieces(i32, i32);
-    i32 IsMobile(i32);
+    i32 MineTypesOwned(i32 owner, MineType mineType);
+    i32 SetupPuzzlePieces(i32 player, i32 justCount);
+    i32 IsMobile(i32 heroId);
     class fullMap* GetWorldMapData(void);
-    i32 CreateBoat(i32, i32, i32);
-    i32 Scan(i8*, i32, i32);
-    i32 RandomScan(i8*, i32, i32, i32, i8);
-    i32 GetNewHeroId(i32, FactionType, i32);
-    i32 GetTownId(i32, i32);
+    i32 CreateBoat(i32 x, i32 y, i32 notify);
+    i32 Scan(i8* array, i32 start, i32 length);
+    i32 RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target);
+    i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
+    i32 GetTownId(i32 col, i32 row);
     hero* GetHero(i32 id) {
         return &m_heroRecs[id];
     }
@@ -206,121 +206,121 @@ public:
     i32 GetPlayerColor(i32 player) {
         return m_players[player].m_color;
     }
-    i32 GetMineId(i32, i32);
-    i32 SaveGame(const char*, i32, i8);
+    i32 GetMineId(i32 col, i32 row);
+    i32 SaveGame(const char* filename, i32 generateName, i8 expansionFormat);
     void SetupOrigData(void);
-    void LoadGame(const char*, i32, i32);
-    void GiveTroopsToNeutralTown(i32);
+    void LoadGame(const char* filename, i32 loadFromFile, i32);
+    void GiveTroopsToNeutralTown(i32 townId);
     void GiveTroopsToNeutralTowns(void);
-    void NewMap(char*);
+    void NewMap(char* filename);
     void RandomizeEvents(void);
     void InitializePasswords(void);
-    void RandomizeBarrier(class mapCell*);
-    void RandomizePassword(class mapCell*);
-    i32 LoadMap(char*);
-    void ClaimTown(i32, i32, i32);
-    void ClaimMine(i32, i32);
-    SpellType ViewSpells(class hero*, HeroSpellType, MessageDispatchHandler, i32);
+    void RandomizeBarrier(class mapCell* cell);
+    void RandomizePassword(class mapCell* cell);
+    i32 LoadMap(char* filename);
+    void ClaimTown(i32 townId, i32 player, i32 suppressVisibility);
+    void ClaimMine(i32 mineId, i32 player);
+    SpellType ViewSpells(class hero* spellHero, HeroSpellType spellType, MessageDispatchHandler callback, i32 readOnly);
     void UpdateSpellWidgets(void);
     void ViewArmy(
-        i32,
-        i32,
-        CreatureType,
-        i32,
-        class town*,
-        i32,
-        ArmyFacing,
-        i32,
-        class hero*,
-        class army*,
-        class armyGroup*,
-        i32
+        i32 x,
+        i32 y,
+        CreatureType monsterType,
+        i32 numTroops,
+        class town* castle,
+        i32 disableUpgrade,
+        ArmyFacing facing,
+        i32 quickView,
+        class hero* theHero,
+        class army* theArmy,
+        class armyGroup* theGroup,
+        i32 groupIndex
     );
-    i32 GetRandomNumTroops(CreatureType);
+    i32 GetRandomNumTroops(CreatureType monsterType);
     void TurnOnAIMusic(void);
     void TurnOffAIMusic(void);
     void NextPlayer(void);
-    i32 ComputeDailyGold(i32);
+    i32 ComputeDailyGold(i32 player);
     void PerDay(void);
     void PerWeek(void);
-    void WeeklyRecruitSite(class mapCell*);
-    void WeeklyGenericSite(class mapCell*);
+    void WeeklyRecruitSite(class mapCell* cell);
+    void WeeklyGenericSite(class mapCell* cell);
     void PerMonth(void);
     void ConvertObject(
-        i32,
-        i32,
-        i32,
-        i32,
-        TilesetId,
-        i32,
-        i32,
-        TilesetId,
-        i32,
-        MapObjectType,
-        MapObjectType
+        i32 left,
+        i32 top,
+        i32 right,
+        i32 bottom,
+        TilesetId oldTileset,
+        i32 oldFirstIndex,
+        i32 oldLastIndex,
+        TilesetId newTileset,
+        i32 newFirstIndex,
+        MapObjectType oldTrigger,
+        MapObjectType newTrigger
     );
-    void RandomizeTown(i32, i32, i32);
-    void RandomizeMine(i32, i32);
+    void RandomizeTown(i32 x, i32 y, i32);
+    void RandomizeMine(i32 x, i32 y);
     void InitRandomArtifacts(void);
-    i32 GetRandomArtifactId(ArtifactLevelMask, b32);
+    i32 GetRandomArtifactId(ArtifactLevelMask levelMask, b32 allowCursed);
     void RandomizeHeroPool(void);
-    void SetRandomHeroArmies(i32, i32);
+    void SetRandomHeroArmies(i32 heroId, i32 strongArmy);
     void ProcessRandomObjects(void);
-    void SetVisibility(i32, i32, i32, i32);
-    void MakeAllWaterVisible(i32);
-    void GiveArmy(class armyGroup*, CreatureType, i32, i32);
-    i32 ExperienceValueOfStack(class armyGroup*, class hero*);
-    i32 GetLuck(class hero*, class army*, class town*);
+    void SetVisibility(i32 x, i32 y, i32 player, i32 radius);
+    void MakeAllWaterVisible(i32 player);
+    void GiveArmy(class armyGroup* group, CreatureType type, i32 count, i32 slot);
+    i32 ExperienceValueOfStack(class armyGroup* group, class hero* h);
+    i32 GetLuck(class hero* h, class army*, class town* castle);
     void SetupAdjacentMons(void);
     void CancelComputerScreen(void);
     void ShowComputerScreen(void);
     void ShowHeroesLogo(void);
-    void WaitForPlayer(char*, i32);
-    i32 HasLateOverlay(i32, i32);
-    void ConvertFlagToLateOverlay(i32, i32);
-    i32 HasObjectTilesetIndex(i32, i32, TilesetId, i32);
-    void ConvertAllToLateOverlay(i32, i32);
+    void WaitForPlayer(char* text, i32 player);
+    i32 HasLateOverlay(i32 col, i32 row);
+    void ConvertFlagToLateOverlay(i32 col, i32 row);
+    i32 HasObjectTilesetIndex(i32 col, i32 row, TilesetId tileset, i32 index);
+    void ConvertAllToLateOverlay(i32 col, i32 row);
     void ProcessMapExtra(void);
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
     void CheckHeroConsistency(void);
-    i32 TransmitSaveGame(i32, i32, i32);
-    i32 ReceiveSaveGame(i32, i32, i32, i32);
+    i32 TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave);
+    i32 ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc, i32 remotePlayer);
     void DoNewTurn(void);
     i32 GetBoatsBuilt(void);
-    i32 GetNumThievesGuilds(i32);
+    i32 GetNumThievesGuilds(i32 color);
     i32 CalcDifficultyRating(void);
     void RestoreCell(
-        i32,
-        i32,
-        MapTriggerCode,
-        i32,
-        class mapCell*,
-        i32
+        i32 x,
+        i32 y,
+        MapTriggerCode objectType,
+        i32 barrier,
+        class mapCell* passedCell,
+        i32 p6
     );
-    void SetMapSize(i32, i32);
-    i32 HeroIDToHeroPos(class playerData*, i32);
-    i32 TownIDToTownPos(class playerData*, i32);
+    void SetMapSize(i32 w, i32 h);
+    i32 HeroIDToHeroPos(class playerData* pd, i32 heroId);
+    i32 TownIDToTownPos(class playerData* pd, i32 townId);
     void SetupNewRumour(void);
     void CheckForTimeEvent(void);
-    i32 CountShrines(i32);
-    void ShowMoraleInfo(class hero*, i32);
-    void ShowLuckInfo(class hero*, i32);
+    i32 CountShrines(i32 player);
+    void ShowMoraleInfo(class hero* h, i32 dialogType);
+    void ShowLuckInfo(class hero* h, i32 dialogType);
     void GetMap(void);
-    void ProcessNewMap(struct SMapHeader*);
-    void InitNewGame(struct SMapHeader*);
+    void ProcessNewMap(struct SMapHeader* header);
+    void InitNewGame(struct SMapHeader* header);
     void SetupNetPlayerNames(void);
     i32 NewGame(void);
     void CleanUpNewGameWindow(void);
     void InitNewGameWindow(void);
     void UpdateNewGameWindow(void);
-    i32 ProcessNGKeyPress(struct tag_message&);
-    void NGKPSetupDisplayString(char*, u16);
-    void DrawNGKPDisplayString(i32);
+    i32 ProcessNGKeyPress(struct tag_message& message);
+    void NGKPSetupDisplayString(char* text, u16 cursor);
+    void DrawNGKPDisplayString(i32 updateScreen);
     void ShowScenInfo(void);
-    void GetLossConditionText(char*);
-    void GetVictoryConditionText(char*);
-    i32 GetSideDesc(char*, i32, i32);
+    void GetLossConditionText(char* text);
+    void GetVictoryConditionText(char* text);
+    i32 GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer);
 };
 #pragma pack(pop)
 

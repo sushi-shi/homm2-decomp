@@ -43,13 +43,13 @@ public:
     b32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);
-    virtual i32 Open(i32) override;
+    virtual i32 Open(i32 priority) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void SetPointer(const char*, i32, MouseCursorType);
-    void SetPointer(i32);
-    void NewUpdate(i32);
-    void MouseCoords(i32&, i32&);
+    void SetPointer(const char* name, i32 frame, MouseCursorType cursorType);
+    void SetPointer(i32 frame);
+    void NewUpdate(i32 force);
+    void MouseCoords(i32& x, i32& y);
     void SaveAndDraw(void);
     void RestoreUnderlying(void);
     void ReallyHidePointer(void);
@@ -58,7 +58,7 @@ public:
     void ShowColorPointer(void);
     i32 IsVis(void);
     void CheckUpdateMousePos(void);
-    void SetColorMice(b32);
+    void SetColorMice(b32 enabled);
 };
 #pragma pack(pop)
 typedef enum MouseManagerConstant {

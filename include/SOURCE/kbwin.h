@@ -42,20 +42,20 @@ enum class KbWinMenuCommand : i32 {
 };
 using enum KbWinMenuCommand;
 
-extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char*, i32);
-i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);
+extern "C" i32 __stdcall WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand);
+i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine);
 i32 AppIdle(void);
-LRESULT CALLBACK AppWndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK AppAbout(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData);
+BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData);
 void AppExit(void);
 void Process1WindowsMessage(void);
-void ResizeWindow(i32, i32, i32, i32);
-LRESULT AppCommand(HWND, UINT, WPARAM, LPARAM);
-void UpdateDfltMenu(HMENU);
-void KBChangeMenu(HMENU);
-void SetMenuStatus(i32);
-void SetNoDialogMenus(b32);
-void SetMenus(HMENU, b32);
+void ResizeWindow(i32 x, i32 y, i32 width, i32 height);
+LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData);
+void UpdateDfltMenu(HMENU menu);
+void KBChangeMenu(HMENU menu);
+void SetMenuStatus(i32 showMenu);
+void SetNoDialogMenus(b32 menusEnabled);
+void SetMenus(HMENU menu, b32 enabled);
 i32l KBTickCount(void);
 void InitVideo(void);
 

@@ -81,6 +81,6 @@ typedef enum CampaignDisplayConstant {
      gpAdvManager->SetInitialMapOrigin(), gpAdvManager->RedrawAdvScreen(1, 0), \
      gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette))
 
-MessageDispatchResult CampaignHandler(struct tag_message&);
+MessageDispatchResult CampaignHandler(struct tag_message& message);
 
 #endif
