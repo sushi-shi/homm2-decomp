@@ -24158,5 +24158,261 @@
       "bounds": "open"
     },
     "note": "B88 non-save selectionnegative/outofrangerejected; savemode needs-1orvalidindex. Recombinesreal351names/5extensions intogText768 thencopiesintom_filename351. Win32fullfilename<=259 ornewtypedbase<=200+suffix4 fits, arbitrary350basename+suffixneeds355notfit351. Existingm_saveName/SET_TEXT notboundedbyentry201. Unselectedsave appends suffixagainonrepeatedcalls becausewritesbackname; solein-treeClose call. Realmemberreturnnotownerarithmetic/artificialbuffer/union/manualvarargs/cast/reuse/goto. Full299bytes/sites/ordered12targets pass;4extrahelpers outsideactualboundary."
+  },
+  "src/SOURCE/kbwin.cpp:WinMain(HINSTANCE instance,HINSTANCE previousInstance,char * commandLine,i32 showCommand)#1": {
+    "body_sha256": "acdf0e53361ab00b0af5ca01a097b1b61148bd53c7a56ae2b95863ff0a1d05ee",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real `MSG` and named event. Clears 61 then copies at most 60 into the actual 64-byte command-line owner, guaranteeing NUL at index 60. Fixed startup `%s` needs 73/768 bytes including NUL. Early setup/init failure returns without normal explicit event cleanup; normal shutdown owns cleanup. Input command-line pointer must be valid. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 274 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppInit(HINSTANCE instance,HINSTANCE previousInstance,i32 showCommand,char * commandLine)#1": {
+    "body_sha256": "b1798ae824f0d525f728fe63e16446604ffe6e06dbc2385654c4df6edac045b7",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C74 handle cast removed. Clears the full 1024-byte message owner and makes 23 bounded enable writes. All ten `WNDCLASSA` fields initialized on registration path; all four rectangle fields initialized before adjustment. Configuration has two graphics entries, requiring `giCurExe` 0/1, valid dimensions, handles/resources and lifecycle. Adjustment/API results and dimension arithmetic remain unchecked. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 748 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppIdle(void)#1": {
+    "body_sha256": "d448da7d7be3b03ab703a612f3d680db30f3f234f3550d8a4cf4c71613258c7b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Both branches return 1; no listed pattern applies. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 26 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppWndProc(HWND window,UINT message,WPARAM messageParam,LPARAM messageData)#1": {
+    "body_sha256": "9ce93e70177408a2bd0bfb835ae0ee71140bd77e0a93444e02f00a2129db3f12",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Unsigned `message > 0x3ff` short-circuits before lookup, covering every `UINT`. Custom CD message 953 is admitted but falls through without a dedicated case. Real shared timer/style scratch; signed tick arithmetic can overflow. Valid graphics index and initialized managers/window resources required. WM_SIZE null-window path short-circuits later scratch reads. WM_CLOSE/DESTROY/QUIT fallthrough preserved; normal ShutDown exits, so no demonstrated quit-loop hang. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 1595 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppAbout(HWND dialog,UINT message,WPARAM messageParam,LPARAM messageData)#1": {
+    "body_sha256": "b7a8e2f3190a0bedc67a2b42a30ae36d6a04878c9aef69b5e16b2e6d4301dc1c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S67 retains two unread decoded fields after complete product. WM_INITDIALOG returns immediately; other paths call PollSound. Valid dialog/sound lifecycle required. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 103 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppExit(void)#1": {
+    "body_sha256": "ae952cddfdc1ca8f66350ecd3afcbf456f5af041ba66bfbe7b233baa64e108e7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Graphics then menu cleanup; real external owner lifecycle, no artificial local storage. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 15 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:Process1WindowsMessage(void)#1": {
+    "body_sha256": "a7c695cc8f8174a62423f7af9b98cb42fb0abb04145db38365b5e0890f956e06",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real SDK message record; drains without special WM_QUIT handling. Periodic GetMessage tests nonzero, so API -1 can enter dispatch using stale message state. No API failure/quit-propagation fix inferred. Signed tick differences can overflow; initialized sound manager required. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 161 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:ResizeWindow(i32 x,i32 y,i32 width,i32 height)#1": {
+    "body_sha256": "a26ed3919ba663b0c25a026d6fbe0593fd5c5ca860f6742f84dca73b80255592",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Same rectangle carries related window-position then adjusted-size phases. Ignored GetWindowRect failure can leave position fields uninitialized before -1-coordinate fallback. Index, dimensions, arithmetic and API/window contracts remain open. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 293 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:AppCommand(HWND window,UINT message,WPARAM messageParam,LPARAM messageData)#1": {
+    "body_sha256": "fa2e3cfe3cc2ebe98777b82b177673a8b28c923ce662f1537f9386e86b9ae28d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Enum-domain and SDK callback casts retained. LOWORD command delegates unknown IDs. Boolean fullscreen domain required for `1 - fullScreen`; dialog/help/window lifecycle remains caller-owned. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 353 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:UpdateDfltMenu(HMENU menu)#1": {
+    "body_sha256": "f86d2957036abc60940848e0740c813080f2ac7be3a0e07e81e6208a3c8ec39a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S67 retains unused scalar pair; real width/resource policy and menu handle, no buffer or fabricated aggregate. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 177 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:KBChangeMenu(HMENU menu)#1": {
+    "body_sha256": "4578e55dfc83c8e573372cfd6fc63f7944a627c80bda22beec50e25c929a73cc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "NULL reuses current menu; non-NULL updates owner. Guarded menu updates and redraw depend on initialized configuration/window/menu resources. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 143 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:SetMenuStatus(i32 showMenu)#1": {
+    "body_sha256": "29e3b3e4fd1d52292d4911231445c3afba5c550ab9ba7aed041692bbeabcdc43",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S67 retains style-result slots/stores. Saved dimensions intentionally survive KBChangeMenu callbacks. Boolean menu/fullscreen domain and resize/API contracts remain. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 279 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:SetNoDialogMenus(b32 menusEnabled)#1": {
+    "body_sha256": "b677734e43f854b7c24ab5f02e0f5da9ec6e19497c62510abb299767e686f49b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "State guards and null-menu guard precede mutation. `1 - enabled` needs boolean input; valid menu lifecycle. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 83 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:SetMenus(HMENU menu,b32 enabled)#1": {
+    "body_sha256": "376a182e45a966d195c87b75475c3ebcf14914210dce5db34ee3b4dc65997a07",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C74 unsigned sentinel cast removed. Actual 70x7 table with boolean flags and all-zero row 0. Initializes match to 0 and searches 0..69, retaining the last match; unknown IDs are bounded fallback, not uninitialized index. Count -1 skips loop; submenu recursion requires valid acyclic menu tree, unchecked GetSubMenu failure remains. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 302 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:KBTickCount(void)#1": {
+    "body_sha256": "77ef253c6cf0e3fb60c737f7d3c43ffd1c29e93e81430f5848344fb0e362937e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "SDK DWORD result returned as proven retail long bit pattern; signed consumers' overflow contracts are not repaired here. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 11 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
+  },
+  "src/SOURCE/kbwin.cpp:InitVideo(void)#1": {
+    "body_sha256": "98b66d7f4a7c4c7c1b5e522457da0d0f565ef098d018f78961d16c049d150f7d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty return; no listed pattern applies. No goto/manual varargs/artificial address/enclosing-owner subtraction/fake union or stack aggregate. Full 5 retail bytes/sites/ordered targets pass, no exceptions. C74/S67/B89 report; combined all98 native objects unchanged."
   }
 }

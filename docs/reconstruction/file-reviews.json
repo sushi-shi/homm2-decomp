@@ -842,5 +842,13 @@
   "include/SOURCE/fileRequester.h": {
     "sha256": "77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b",
     "note": "Full122lines read: genuine0x42f packedbaseManagerderived owner, pattern300/directory300, name351/ext5 records/pointers/map420 pointer and UI/indexmembers. defaultExt5 at2ae followedfilename351 at2b3 isfixedretailboundary; actualmap/loadcallerpatternNULcrossing documentedB88 notwidened. Unaccessedm_listState9 semanticunknownretainedknob42b; unused208/372 constants notproofofauthenticlocaltypes. No methodbodies/union; all16consumerreview/full98nativeproof."
+  },
+  "src/SOURCE/kbwin.cpp": {
+    "sha256": "17603f6de6314303009205371e7fae333200659a7bf0df8bdacfa5ec64519016",
+    "note": "Full587lines including16functions/privateconstant/all21DATAowners read. C74removes same-HMENU and unsigned-sentinel casts; S67all3complete4-arm unusedslot/store products rejected. Full5families16arms, all98native/fullbuild, all16retailbytes/sites/orderedtargets pass without exceptions; dualdialect diagnostics unchanged. B89commandline64 clear61copy60/1024messageguard23stores/70x7menu boundedfallback/fixedstartup73of768 proved. Genuine lTemp sharedtimer/style scratch retainedopen; API/config/lifecycle/signedtick contracts open. No gotos/manualvarargs/artificialowner/arithmetic/fakeunion/stackaggregate."
+  },
+  "include/SOURCE/kbwin.h": {
+    "sha256": "d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561",
+    "note": "Full86lines read, nofunctionbodies/unions. ActualSDKrecord/handle andcallingconventionowners preserved; 1024messagecapacity,61/60copyconstants,70menutablebound,style/timer/commanddomains reconciled with all16 consumers/retail. Real long tick identity and taggedcommandenum retained; no padding/storage shrink fromunusedexterns. B89actualgraphics2owner/configboolean/APIlife contracts retained."
   }
 }

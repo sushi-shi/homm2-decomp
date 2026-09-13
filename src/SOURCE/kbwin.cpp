@@ -148,7 +148,7 @@ i32 AppInit(
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
         NULL,
-        (gConfig.gfx[IDX(giCurExe)].showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
+        (gConfig.gfx[IDX(giCurExe)].showMenu != 0 ? hmnuDflt : NULL),
         instance,
         NULL
     );
@@ -526,7 +526,7 @@ void SetMenus(HMENU menu, b32 enabled) {
     count = GetMenuItemCount(menu);
     for (index = 0; index < count; index++) {
         id = GetMenuItemID(menu, index);
-        if (id == static_cast<u32>(-1)) {
+        if (id == -1) {
             SetMenus(GetSubMenu(menu, index), enabled);
             disabled = 0;
         } else {

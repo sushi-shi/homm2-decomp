@@ -474,6 +474,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   bounds proved, with lifecycle and one EH model gap
   [explicit in the full report](C69-S63-R22-G82-G84-B84.md).
 
+- C74/S67/B89: all sixteen kbwin functions and header reviewed. Two redundant
+  handle/sentinel casts removed; five complete products retain unsupported
+  unused-slot/store deletions. All98 native objects and all sixteen retail
+  byte/site/ordered-target checks pass without exceptions. Command-line,
+  message-table and menu-table bounds are proved; API failure, configuration,
+  shared scratch and signed-timer contracts remain
+  [explicit in the full report](C74-S67-B89.md).
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
