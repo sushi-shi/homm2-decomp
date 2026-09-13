@@ -6874,7 +6874,7 @@ void game::CheckHeroConsistency(void) {
 #define filename filename18
 #define header header2
 #define oldTrack oldTrack6
-#define packet packet0
+#define packetIndex packet0
 #define packetCount packetCount4
 #define packetsInBatch packetsInBatch7
 #define reply reply36
@@ -6903,7 +6903,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     char* reply;
     b32 success;
     i32 fileSize;
-    i32 packet;
+    i32 packetIndex;
     u8* transmitData;
     i32 file;
     i32 H2_UNUSED(unusedValue2);
@@ -7010,20 +7010,20 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
             done = false;
             while (!done) {
-                for (packet = batch * REMOTE_PACKET_BATCH_SIZE;
-                     packet < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
-                     packet++) {
+                for (packetIndex = batch * REMOTE_PACKET_BATCH_SIZE;
+                     packetIndex < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
+                     packetIndex++) {
                     PollSound();
                     CheckDoMain(0, 1);
-                    if (!acknowledged[packet]) {
-                        if (packet + 1 == packetCount)
-                            chunkSize = fileSize - packet * REMOTE_PACKET_PAYLOAD_SIZE;
+                    if (!acknowledged[packetIndex]) {
+                        if (packetIndex + 1 == packetCount)
+                            chunkSize = fileSize - packetIndex * REMOTE_PACKET_PAYLOAD_SIZE;
                         else
                             chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
-                        *reinterpret_cast<i16*>(header) = static_cast<i16>(packet);
+                        *reinterpret_cast<i16*>(header) = static_cast<i16>(packetIndex);
                         memcpy(
                             reinterpret_cast<char*>(header) + REMOTE_PACKET_INDEX_SIZE,
-                            transmitData + packet * REMOTE_PACKET_PAYLOAD_SIZE,
+                            transmitData + packetIndex * REMOTE_PACKET_PAYLOAD_SIZE,
                             chunkSize
                         );
                         result = TransmitRemoteData(
@@ -7051,15 +7051,15 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                 LogStr(const_cast<char*>("PostWait"));
                 if (!result)
                     ShutDown(NULL);
-                for (packet = 0; packet < packetsInBatch; packet++) {
-                    if (reinterpret_cast<RemoteMessage*>(reply)->payload[packet] > 0)
-                        *(acknowledged + packet + batch * REMOTE_PACKET_BATCH_SIZE) = 1;
+                for (packetIndex = 0; packetIndex < packetsInBatch; packetIndex++) {
+                    if (reinterpret_cast<RemoteMessage*>(reply)->payload[packetIndex] > 0)
+                        *(acknowledged + packetIndex + batch * REMOTE_PACKET_BATCH_SIZE) = 1;
                 }
                 done = true;
-                for (packet = batch * REMOTE_PACKET_BATCH_SIZE;
-                     packet < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
-                     packet++) {
-                    if (!acknowledged[packet])
+                for (packetIndex = batch * REMOTE_PACKET_BATCH_SIZE;
+                     packetIndex < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
+                     packetIndex++) {
+                    if (!acknowledged[packetIndex])
                         done = false;
                 }
             }
@@ -7104,7 +7104,7 @@ transmitCleanup:
 #undef filename
 #undef header
 #undef oldTrack
-#undef packet
+#undef packetIndex
 #undef packetCount
 #undef packetsInBatch
 #undef reply
@@ -7129,7 +7129,7 @@ transmitCleanup:
 #define index index27
 #define lastPacketTime lastPacketTime9
 #define oldTrack oldTrack6
-#define packet packet15
+#define receivedPacket packet15
 #define packetStart packetStart0
 #define result result9
 #define samplesReady samplesReady0
@@ -7149,7 +7149,7 @@ i32 game::ReceiveSaveGame(
     i32 oldTrack;
     i32 result;
     char* received;
-    RemoteMessage* packet;
+    RemoteMessage* receivedPacket;
     i32 computedCrc;
     b32 success;
     i32 index;
@@ -7170,7 +7170,7 @@ i32 game::ReceiveSaveGame(
     ackBuffer = NULL;
     incomingData = NULL;
     decodedData = NULL;
-    packet = NULL;
+    receivedPacket = NULL;
     file = 0;
     finished = false;
     unusedValue = 0;
@@ -7217,23 +7217,23 @@ i32 game::ReceiveSaveGame(
                 ShutDown(NULL);
         }
 
-        packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(1));
-        if (packet
-            && (packet->type == REMOTE_MESSAGE_RELIABLE
-                || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
+        receivedPacket = reinterpret_cast<RemoteMessage*>(GetRemoteData(1));
+        if (receivedPacket
+            && (receivedPacket->type == REMOTE_MESSAGE_RELIABLE
+                || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = KBTickCount();
-            switch (packet->command) {
+            switch (receivedPacket->command) {
                 case REMOTE_SAVE_DATA_COMMAND:
-                    packetStart = *reinterpret_cast<i16*>(packet->payload);
+                    packetStart = *reinterpret_cast<i16*>(receivedPacket->payload);
                     received[packetStart] = 1;
                     memcpy(
                         incomingData + packetStart * REMOTE_PACKET_PAYLOAD_SIZE,
-                        packet->payload + REMOTE_PACKET_INDEX_SIZE,
-                        packet->payloadSize - REMOTE_PACKET_INDEX_SIZE
+                        receivedPacket->payload + REMOTE_PACKET_INDEX_SIZE,
+                        receivedPacket->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
                     break;
                 case REMOTE_SAVE_ACK_REQUEST_COMMAND:
-                    packetStart = *reinterpret_cast<i16*>(packet->payload);
+                    packetStart = *reinterpret_cast<i16*>(receivedPacket->payload);
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
@@ -7312,7 +7312,7 @@ i32 game::ReceiveSaveGame(
 #undef index
 #undef lastPacketTime
 #undef oldTrack
-#undef packet
+#undef receivedPacket
 #undef packetStart
 #undef result
 #undef samplesReady
