@@ -4624,11 +4624,11 @@ void game::PerWeek(void) {
                 if (innerIndex == 1 && !gbHumanPlayer[outerIndex])
                     desiredClass = FACTION_ANY;
                 gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex] =
-                    static_cast<i8>(gpGame->GetNewHeroId(
+                    gpGame->GetNewHeroId(
                         outerIndex,
                         desiredClass,
                         !gbHumanPlayer[outerIndex] && gpGame->m_difficulty > DIFFICULTY_EASY
-                    ));
+                    );
                 m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = WEEKLY_AVAILABLE_HERO;
             }
         }
@@ -4642,7 +4642,7 @@ void game::PerWeek(void) {
                                      & IDX(MAP_MONSTER_COUNT_MASK);
                     monsterIncrease8 = monsterCount / EVENT_DAYS_PER_WEEK;
                     if (Random(1, EVENT_DAYS_PER_WEEK)
-                        <= static_cast<i32>(monsterCount % EVENT_DAYS_PER_WEEK))
+                        <= (monsterCount % EVENT_DAYS_PER_WEEK))
                         monsterIncrease8++;
                     monsterCount += monsterIncrease8;
                     if (monsterCount > WEEKLY_MONSTER_LIMIT)

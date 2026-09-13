@@ -389,7 +389,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   live widget/spell-index/resource domains remain separate contracts.
 - C38/C39: [army-view name storage is now text](C38-C41-S41-S44.md), and five variadic numeric
   arguments use normal promotions. B60 covers the complete198-byte detail
-  chain in550 bytes. S40 records unread army-dialog locals.
+  chain in550 bytes. [PerWeek loses two more scalar casts](C34-C39-R09.md).
+  S40 records unread army-dialog locals.
 - C40-C43: [all ten sprite casts are removed](C34-C40-S41.md), with named
   sentinels and natural byte assignments. C41's logo upcast is removed;
   [C42 recovers three typed flag clears](C42-S42.md), plus four natural
@@ -401,8 +402,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   alternatives. Other setup storage remains open. S42 retains the unread
   NextPlayer count and PerDay income slot after all96 measured arms;
   [four further S41/S42 deletions change native code](C43-S41-S42-B65.md)
-  and remain. Other turn-update and S43 transfer/compression locals remain open. R09 tracks indices
-  reused across distinct player/hero/town roles.
+  and remain. Other turn-update and S43 transfer/compression locals remain open.
+  [R09 tests 22 counter-role/cast variants](C34-C39-R09.md); the measured
+  role splits change native code and are retained as negative alternatives.
 - G49-G54: random-monster bounds, transfer cleanup, score clamping, map-size
   setup, diff completion and rumour fallback joins need structural tests.
 - B61/B64/B65: turn-state, town/hero setup, rumour/event and compression

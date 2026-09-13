@@ -17369,27 +17369,27 @@
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "open",
+      "reuse": "retain",
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C42 applies the typed weekly-flag compound clear and two natural i16 mana assignments; the handicap float-to-i32 conversion retains real truncation-before-subtraction semantics. S42 complete24-arm product retains unread income8: deletion preserves2576-byte size and graph but changes the frame0x38 to0x34 and stack operands. R09 still tracks player reused across player/mine/town/hero phases. U12/U13 retain the single signed town-owner table and unsigned daily-construction bitset, complete consumer/layout proof in U12-U13.md. B61 mine owner/resource domains (upper bound alone permits negative type), playerCount<=6, fixed54 heroes/72 towns, occupant IDs and mana arithmetic require valid game state. Day guard1..6 maps to resources0..5 safely. No goto, fake aggregate, artificial address or manual varargs. C42-S42.md: all98 native objects/1826 functions and full ordinary retail bytes,size,DIR32 sites,ordered targets pass without exceptions; both dialects pass. No protocol, lifecycle or bounds hardening."
+    "note": "C42 applies the typed weekly-flag compound clear and two natural i16 mana assignments; the handicap float-to-i32 conversion retains real truncation-before-subtraction semantics. S42 complete24-arm product retains unread income8: deletion preserves2576-byte size and graph but changes the frame0x38 to0x34 and stack operands. R09 still tracks player reused across player/mine/town/hero phases. U12/U13 retain the single signed town-owner table and unsigned daily-construction bitset, complete consumer/layout proof in U12-U13.md. B61 mine owner/resource domains (upper bound alone permits negative type), playerCount<=6, fixed54 heroes/72 towns, occupant IDs and mana arithmetic require valid game state. Day guard1..6 maps to resources0..5 safely. No goto, fake aggregate, artificial address or manual varargs. C42-S42.md: all98 native objects/1826 functions and full ordinary retail bytes,size,DIR32 sites,ordered targets pass without exceptions; both dialects pass. No protocol, lifecycle or bounds hardening. R09 measured follow-up: complete3-arm product compares existing reuse with separate top-level and phase-scoped semantic indices. Both retain2576-byte length but grow the frame0x38 to0x44/0x4c and change stack operands; retain original locals. See C34-C39-R09.md: all98 native objects and this full ordinary-retail check still pass; this scoped negative does not rule out later structural recovery."
   },
   "src/SOURCE/GAME.cpp:game::PerWeek(void)#1": {
-    "body_sha256": "3520f2fc276abb2187b55f6a72e4786859c1c2afdeb6230611e1a5e17037e342",
+    "body_sha256": "c080e4cf635f77b252e79dd283d418b52175b028c37df62069c352905d07ae22",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "open",
+      "reuse": "retain",
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C34 bounded replacement hero byte; C39 cast of already-i32 remainder candidate; real faction/floating growth conversions retained. R09 outerIndex begins as random roll then traversal index. Dwelling19..30 maps to12 entries, fixed towns72/heroes54 fit. B61 faction/owner and all six player mappings needed: available-hero loop uses GAME_PLAYER_COUNT, not m_playerCount, so unused player color-1 can reach mapping lookup. Monster metadata masked/clamped; no goto, fake aggregate or varargs."
+    "note": "C34 replacement-hero i8 assignment and C39 already-i32 remainder casts removed. Real FactionType and floating growth conversions retained. R09 complete16-arm product crosses four role structures with both casts: roll-scoped grows6824 to6833 bytes; separate top/scoped roll/town/player/hero locals grow to6851, so original reuse retained. Dwelling19..30 maps to12 entries; towns72/heroes54 fit. B61 faction/owner and all six player mappings required: available-hero loop uses GAME_PLAYER_COUNT, not m_playerCount, so unused color-1 can reach mapping lookup. All8192 metadata values x7 rolls prove remainder0..6, preserved guard and final count<=4000 fitting13 bits. No goto,fake aggregate,unused local or manual varargs. C34-C39-R09.md: all98 native objects unchanged and full6824 retail bytes/sites/ordered-target proof, with three fixed double destinations independently proven;16 dialect checks pass."
   },
   "src/SOURCE/GAME.cpp:game::WeeklyRecruitSite(mapCell * cell)#1": {
     "body_sha256": "e46b3b41838ed6744300305582ba6f888737f2686932a9d80319faef62066e51",
@@ -17849,11 +17849,11 @@
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "open",
+      "reuse": "retain",
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C34 applies the natural replacement-hero assignment to the existing i8 destination; GetNewHeroId always returns0..53 after its positive retry loop. S42 complete4-arm product retains sane and its write-only owner-check loop: removal changes1225 to1118 bytes. R09 player/hero/town index reuse remains. B61 counts/list IDs/occupiedTown required; map metadata checked0..53 before hero access and invalid owner handled. Five troop slots fit54 heroes/72 towns. U06 existing15-byte army owner and containing layouts unchanged. No goto,fake aggregate,raw owner trick or manual varargs. See C43-S41-S42-B65.md: all98 native objects/full ordinary retail bytes,size,DIR32 sites and ordered targets pass without exceptions; both dialects pass."
+    "note": "C34 applies the natural replacement-hero assignment to the existing i8 destination; GetNewHeroId always returns0..53 after its positive retry loop. S42 complete4-arm product retains sane and its write-only owner-check loop: removal changes1225 to1118 bytes. R09 player/hero/town index reuse remains. B61 counts/list IDs/occupiedTown required; map metadata checked0..53 before hero access and invalid owner handled. Five troop slots fit54 heroes/72 towns. U06 existing15-byte army owner and containing layouts unchanged. No goto,fake aggregate,raw owner trick or manual varargs. See C43-S41-S42-B65.md: all98 native objects/full ordinary retail bytes,size,DIR32 sites and ordered targets pass without exceptions; both dialects pass. R09 measured follow-up: complete3-arm product compares existing reuse with separate top-level and phase-scoped semantic indices. Both retain1225-byte length but grow the frame0x28 to0x30 and change stack operands; retain original locals. See C34-C39-R09.md: all98 native objects and this full ordinary-retail check still pass; this scoped negative does not rule out later structural recovery."
   },
   "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 player,i32 useCurrentSave)#1": {
     "body_sha256": "60dc23611282f5e1988e7a88379a3483e41b051087057390419f0e79857ff503",
