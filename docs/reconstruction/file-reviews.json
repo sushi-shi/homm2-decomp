@@ -798,5 +798,13 @@
   "include/SOURCE/COMMAND.h": {
     "sha256": "5e56b46fea0a207684f62e055e6dbea0d91f67d8309246ac83fcf392053be277",
     "note": "Complete48-line recovered header, enums, declarations, packed layout and SIZE read. U17 replaces false25-byte packet/member text view with actual256-byte RemoteMessage-compatible owner: sender0,id1,type5,command6,payloadSize7, tagged action/text payload9 of247 bytes. Real command-gated union; no fake reserved bytes. Entire producers TransmitRemoteData/GetRemoteData and PopNetBox sender role checked; only pointer view, no new allocation growth. All98 native objects unchanged; network validation not asserted."
+  },
+  "src/SOURCE/Castle.cpp": {
+    "sha256": "759e4072d259966726027f15823269411915cd80eea589badfee3395413cf6f7",
+    "note": "Full850-line parent TU read, final846 after C69 cast removal;3 physical definitions include actual private inline CannotRecruitHero plus2 VA bodies. All private enums/includes/namespace and3 EOF globals reconciled. Nine casts removed; all9 source families72 arms complete. Three gotos, six unread scalars/result-unused search and separate counter-role candidates measured/retained. B84 retail tables/formatter capacities and initialized eighteen-slot domains checked. All5 emitted TU functions and all98 native objects/allocated sections/ordered relocs unchanged. SetupCastle EH model gap remains explicit; full CastleHandler including inline helper/switch targets passes."
+  },
+  "include/SOURCE/Castle.h": {
+    "sha256": "f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510",
+    "note": "Complete22-line owner header read: eighteen-slot capacity and five-slot upgrade offset, CastleHandler declaration, base/use byte-valued BuildingSlotType arrays and window pointer. Arrays are genuine initialized/live building-slot owners, not overlapping/fabricated storage; producer/access ranges reconciled with full Castle.cpp. No function definitions or manual varargs."
   }
 }

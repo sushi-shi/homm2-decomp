@@ -403,14 +403,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         for (rowPos = BACKGROUND_TERRAIN_FIRST_ROW; rowPos <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPos) {
             for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
                 backgroundWidget = new iconWidget(
-                    static_cast<i16>(
-                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
-                    ),
-                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT,
+                    (rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntwba.icn",
-                    static_cast<i16>(terrainIconFrame + backFrame),
+                    terrainIconFrame + backFrame,
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
@@ -429,14 +427,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     continue;
                 }
                 backgroundWidget = new iconWidget(
-                    static_cast<i16>(
-                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
-                    ),
-                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT,
+                    (rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntown.icn",
-                    static_cast<i16>(raceBase + backFrame),
+                    raceBase + backFrame,
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
@@ -497,15 +493,15 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
-                       < CONTROL_BUILDING_NAME_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                       < CONTROL_BUILDING_NAME_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_ICON_FIRST
                      && message.payload.widget.id
-                            < CONTROL_BUILDING_ICON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                            < CONTROL_BUILDING_ICON_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_BUTTON_FIRST
                      && message.payload.widget.id
-                            < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
+                            < CONTROL_BUILDING_BUTTON_FIRST + CASTLE_SLOT_COUNT)
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
             if (whichBuilding != IDX(BUILDING_SLOT_NONE))
                 whichBuilding = IDX(castleSlotsUse[whichBuilding]);

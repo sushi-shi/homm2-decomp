@@ -446,6 +446,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   unused-scalar/store and role splits retained. Combined all98 native objects
   unchanged; twenty fixed numerical operands and selected text bounds checked.
   [Quantity/network contracts and seven existing EH model gaps remain explicit](U17-C68-A03-S62-R21-B83.md).
+- C69/S63/R22/G82-G84/B84: both Castle bodies, the private inline recruit
+  helper and owner header reviewed. Nine redundant casts removed; all72 arms
+  of nine source families completed, with unsupported joins/storage/role
+  changes retained. Native objects unchanged; retail formatter and slot-table
+  bounds proved, with lifecycle and one EH model gap
+  [explicit in the full report](C69-S63-R22-G82-G84-B84.md).
 
 ## Build setup observations
 

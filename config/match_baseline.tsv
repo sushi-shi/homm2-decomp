@@ -722,8 +722,8 @@ SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	100.0000	084b561d55c0
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	7b252f8765d3
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	08fd006208a0
-SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	cc49b4519c6f
-SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	d215625afee8
+SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	42af6d1e62be
+SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	5baea0a09320
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	7f30eec552d5
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	cd1aaf115aac
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	6874ea4612d3

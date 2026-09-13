@@ -23550,5 +23550,53 @@
       "bounds": "open"
     },
     "note": "Whole ballista/left/right tower formatter read. Real300-byte description repeatedly replaced then appended at most3 times to gText; retail literals prove max101-byte part and conservative313-byte total for arbitrary i32 numeric values, within768. B83 valid defender town and wall/building/resource state required. No casts/goto/manual varargs/fake aggregate/unrelated roles. Full686 bytes/sites/45 ordered targets pass; helper-inclusive sema view adds4 trailing blocks not part of function."
+  },
+  "src/SOURCE/Castle.cpp:(anonymous)::CannotRecruitHero(void)#1": {
+    "body_sha256": "acada5820624c2ab870ba6687722424dc2dd48ca70a88e188c43e758496b197b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete private inline helper read; computes one real boolean from recruit-result/gold/roster/occupancy predicates, no unread scratch or fake aggregate. B84 rejects hero count>=8 (SetupCastle display and hover use==8); valid player/town lifecycle required, malformed-count divergence not silently fixed. Its sole inlined invocation is covered inside the full2925-byte CastleHandler proof. No casts/union/goto/owner arithmetic/manual varargs/unrelated roles."
+  },
+  "src/SOURCE/Castle.cpp:townManager::SetupCastle(heroWindow * window,i32 updateOnly)#1": {
+    "body_sha256": "c450db01e42e1df81883ecc94cac8f9416f4918388aaee941ca0d5af65daf9bf",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full347-line owner setup, eighteen slot mappings, building masks, captain/hero panels and both background tile loops read. C69 six redundant i16 parameter casts removed in two complete8-arm constructor products, combined all98 native proof. S63 all32 five-unused-local subsets and R22 all4 building/stat/hero counter splits change3856-byte native text, originals retained. U01 tagged widget message real. B84 initialized slots remain0..30, real18 and6x12 owners; filenames13 fit16; captain scratch13 fits200 and global lists32/49 fit768. Valid faction/available hero/world-map/terrain/resource/window domains remain; no fake aggregate/outside pointer/manual varargs. Existing EH handler/__except_list retail-model gap explicitly retained."
+  },
+  "src/SOURCE/Castle.cpp:CastleHandler(tag_message & message)#1": {
+    "body_sha256": "d423409d486fb32a6f3313c7431aee4a5d14e97be486983f149c0c68121a00f6",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full374-line hover/select/captain/build/recruit dispatch read. C69 three redundant i32 slot-count casts removed in complete8 subsets; seven casts from mixed slot/control selector to genuine BuildingSlotType retained. G82/G83 all4 hero-join combinations and G84 shared build guard2 arms change2925-byte original, gotos retained. S63 all4 status scalar/unused-result object-search deletions and R22 info/object index split change text, originals retained. U01 ConvertToHover then widget payload role is real. B84 ID intervals bound castleSlotsUse0..17; selected building cases constrain bit shifts, other owner/count domains remain. All16 retail status templates max52 bytes; recruit text has no directives although hero/alignment arguments still evaluated. Full2925 bytes/sites/ordered targets including switch tables pass; helper/data decoding explains block-view extras."
   }
 }
