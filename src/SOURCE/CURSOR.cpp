@@ -309,16 +309,16 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowPic = frame;
-            if (shadowPic == CURSOR_HERO_UP_STEP_5)
-                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_5;
-            if (shadowPic == CURSOR_HERO_UP_STEP_4)
-                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_4;
-            if (shadowPic == CURSOR_HERO_UP_STEP_3)
-                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_3;
-            if (shadowPic == CURSOR_HERO_UP_STEP_2)
-                shadowPic = CURSOR_HERO_UP_SHADOW_WIDE;
-            if (shadowPic == CURSOR_HERO_UP_STEP_1)
-                shadowPic = CURSOR_HERO_UP_SHADOW_WIDE;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_51)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_56;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_50)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_57;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_49)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_58;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_47)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_55;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_46)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_55;
             DRAW_ADVENTURE_ICON(
                 m_shadowIcon,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
@@ -829,7 +829,7 @@ adjacentDone:
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;
                 }
-                primaryType = IDX(RES_COUNT);
+                primaryType = NORMAL_DIALOG_ARTIFACT;
                 primaryAmount = mapEvent->artifact;
             }
             if (mapEvent->cancelAfterVisit)

@@ -486,7 +486,7 @@ SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	100.0000	11fa5ebebb36
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	100.0000	621aa27eb5ec
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	73dd3516abcb
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	0eb2708bd905
-SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	5b2571007dcb
+SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	30be455f26fc
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	100.0000	7cb520ad4b43
 SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	100.0000	6dd2baf471bd
 SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	d9cfdeec4012
@@ -699,10 +699,10 @@ SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	100.0000	d2992392a7f1
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	e3e06e020d6c
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	e6a7b3727aa5
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	11a094a80b00
-SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	5f2668b034fa
+SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	f9aab6633027
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	4ce608d23410
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	37a8324d9dba
-SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	b701dd419e97
+SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	d82ef96ec3fb
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	100.0000	ac67c5c52d99
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	82f73544474e
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	07a79ac95434

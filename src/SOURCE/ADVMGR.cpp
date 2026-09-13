@@ -3743,20 +3743,20 @@ void advManager::DrawCell(
                         if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
-                                if (cursorFrame == CURSOR_HERO_UP_STEP_5) {
-                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_5;
+                                if (cursorFrame == CURSOR_HERO_TURN_FRAME_51) {
+                                    cursorFrame = CURSOR_HERO_TURN_SHADOW_FRAME_56;
                                 }
-                                if (cursorFrame == CURSOR_HERO_UP_STEP_4) {
-                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_4;
+                                if (cursorFrame == CURSOR_HERO_TURN_FRAME_50) {
+                                    cursorFrame = CURSOR_HERO_TURN_SHADOW_FRAME_57;
                                 }
-                                if (cursorFrame == CURSOR_HERO_UP_STEP_3) {
-                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_3;
+                                if (cursorFrame == CURSOR_HERO_TURN_FRAME_49) {
+                                    cursorFrame = CURSOR_HERO_TURN_SHADOW_FRAME_58;
                                 }
-                                if (cursorFrame == CURSOR_HERO_UP_STEP_2) {
-                                    cursorFrame = CURSOR_HERO_UP_SHADOW_WIDE;
+                                if (cursorFrame == CURSOR_HERO_TURN_FRAME_47) {
+                                    cursorFrame = CURSOR_HERO_TURN_SHADOW_FRAME_55;
                                 }
-                                if (cursorFrame == CURSOR_HERO_UP_STEP_1) {
-                                    cursorFrame = CURSOR_HERO_UP_SHADOW_WIDE;
+                                if (cursorFrame == CURSOR_HERO_TURN_FRAME_46) {
+                                    cursorFrame = CURSOR_HERO_TURN_SHADOW_FRAME_55;
                                 }
                                 DRAW_ADVENTURE_ICON(
                                     m_shadowIcon,

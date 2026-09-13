@@ -5,6 +5,7 @@
 #include <BASE/font.h>
 #include <BASE/widget.h>
 #include <SOURCE/Campaign.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/highScoreManager.h>
 #include <SOURCE/fileRequester.h>
 #include <EDITOR/mapcell.h>
@@ -40,6 +41,16 @@ i32 __cdecl main() {
         return 20;
     }
     printf("Enum contracts: notifications, dialog slots, payloads and gameplay flags pass\n");
+    // Lock the dialog discriminator and asset IDs; these checks do not infer semantics.
+    if (NORMAL_DIALOG_ARTIFACT != 7
+        || CURSOR_HERO_TURN_FRAME_46 != 46 || CURSOR_HERO_TURN_FRAME_47 != 47
+        || CURSOR_HERO_TURN_FRAME_49 != 49 || CURSOR_HERO_TURN_FRAME_50 != 50
+        || CURSOR_HERO_TURN_FRAME_51 != 51 || CURSOR_HERO_TURN_SHADOW_FRAME_55 != 55
+        || CURSOR_HERO_TURN_SHADOW_FRAME_56 != 56 || CURSOR_HERO_TURN_SHADOW_FRAME_57 != 57
+        || CURSOR_HERO_TURN_SHADOW_FRAME_58 != 58) {
+        printf("artifact dialog / turning shadow frame contract mismatch\n");
+        return 21;
+    }
     for (i32 value = 0; value < 256; ++value) {
         const char input = static_cast<char>(value);
         const i32 upper = ((value >= 'a' && value <= 'z') || value >= 0xe0)
