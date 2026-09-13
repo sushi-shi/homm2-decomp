@@ -3758,7 +3758,7 @@ void combatManager::Earthquake(void) {
             ++impactCount;
             if (newWallStates1[index7] == COMBAT_WALL_STATE_DESTROYED
                 || newWallStates1[index7] == COMBAT_WALL_STATE_SECTION_DESTROYED)
-                m_hexCells[iWallToHexCell[index7]].m_blocked = 0;
+                m_hexCells[IDX(iWallToHexCell[index7])].m_blocked = 0;
         }
 
         newTowerStates0[index7] = m_wallStates[index7];

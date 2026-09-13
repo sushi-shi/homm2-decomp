@@ -39,3 +39,43 @@ This recovers a credible domain, not the unknowable original declaration.
 Review every consumer and representation boundary before applying it to
 another table. Evidence and the separate four-cast product are in
 [C60/C61](../reconstruction/C60-C61-S57-B77.md) and the fixed operand checker.
+
+## Castle hexes: second measured owner
+
+C63 applies the same domain/width recovery to iWallToHexCell and
+iTowerToHexCell. The shared CombatCastleHex enum moves intact to combatTypes.h;
+both four-entry definitions/externs become
+`H2_ENUM_STORAGE(CombatCastleHex, u8)`. CatAttack's two functional casts are
+removed; all array-index/comparison consumers use the standard IDX boundary.
+
+```cpp
+// Before
+targetHex4 = CombatCastleHex(iWallToHexCell[wallIndex]);
+// After, with the recovered byte-enum table owner
+targetHex4 = iWallToHexCell[wallIndex];
+```
+
+CatAttack RVA0x28bb8, offsets relative to its entry:
+
+```text
+offset  retail PE                         old u8 + cast / new byte enum COFF
++363    33 d2 xor edx,edx                  33 d2 xor edx,edx
++365    8a 91 04 d4 4f 00                 8a 91 00 00 00 00
+        mov dl,[ecx+0x4fd404]             mov dl,[ecx+DIR32 iWallToHexCell]
++36b    89 95 78 ff ff ff                 89 95 78 ff ff ff
+        mov [ebp-0x88],edx                mov [ebp-0x88],edx
++39a    33 d2 xor edx,edx                  33 d2 xor edx,edx
++39c    8a 91 08 d4 4f 00                 8a 91 00 00 00 00
+        mov dl,[ecx+0x4fd408]             mov dl,[ecx+DIR32 iTowerToHexCell]
++3a2    89 95 78 ff ff ff                 89 95 78 ff ff ff
+        mov [ebp-0x88],edx                mov [ebp-0x88],edx
+```
+
+Both native operands have zero addends and the unchanged `PAEA` symbol
+spelling. All8 bytes match retail at0x004fd404/408. Existing names are kept:
+the wall-named table stores9/34/86/113 and the tower-named one22/47/73/100;
+the enum's wall/tower names are not grounds for swapping the table contents.
+Every consumer in CatAttack, ShotIsThroughWall and Earthquake was read.
+All98 native objects and1826 emitted function instances, allocated sections
+and ordered relocation identities are unchanged. See
+[C62/C63](../reconstruction/C62-C63-S58-B78.md) for scope and residuals.

@@ -413,6 +413,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   operand checks distinguish verified retail scoring quirks from bounds and
   lifecycle contracts still requiring caller guarantees.
 
+- C62/C63/S58/G72-G74/R19/C64/B78/B79: [combat-manager review](C62-C63-S58-B78.md)
+  reconciles all38 CMBTMGR functions and both headers. Thirty-eight casts are
+  removed, including two following one-byte castle-hex table recovery. All98
+  native objects/1826 emitted functions and allocated sections are unchanged.
+  Complete source products retain the original goto and unused-local forms;
+  verified retail boundary violations are distinguished from default-data
+  short circuits, bounded text and caller contracts that remain open.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
