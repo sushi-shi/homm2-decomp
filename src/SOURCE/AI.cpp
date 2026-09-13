@@ -846,7 +846,6 @@ i32 combatManager::AttemptAttack(
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationHex destHex
 #endif
 VA(0x004180ba, 0x144)

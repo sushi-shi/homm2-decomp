@@ -1137,7 +1137,6 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define newMessage newMsg
 #endif
 VA(0x00462ef8, 0x9ba)
@@ -1544,7 +1543,6 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #define statusMessage statusMsg
 #endif

@@ -1992,7 +1992,6 @@ i32 combatManager::InCastle(i32 hex) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceLine srcLine
 #define targetLine tgtLine
 #endif

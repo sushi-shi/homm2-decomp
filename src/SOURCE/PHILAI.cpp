@@ -995,7 +995,6 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationX destX
 #define destinationY destY
 #endif
@@ -4217,7 +4216,6 @@ void philAI::HeroInteractionAtHero(
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationStrength dstStrength
 #endif
 VA(0x00486ed0, 0x7b7)
@@ -4433,7 +4431,6 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
 #endif
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationIndex dstI
 #endif
 VA(0x00487687, 0x3d1)

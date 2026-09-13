@@ -444,7 +444,6 @@ i32 combatManager::FindResurrectArmyIndex(
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationHex destHex
 #endif
 VA(0x0049912f, 0x379)

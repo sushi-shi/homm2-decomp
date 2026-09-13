@@ -120,7 +120,6 @@ namespace {
 } // namespace
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x00424320, 0xf10)

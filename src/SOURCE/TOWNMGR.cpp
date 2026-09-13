@@ -1949,7 +1949,6 @@ void townManager::RedrawTownScreen(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define messageId msgId
 #endif
 VA(0x004a84b7, 0x376)

@@ -2196,7 +2196,6 @@ void advManager::Reseed(i32, i32) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define inputMessage msg
 #define radarMessage radMsg
 #endif
@@ -5174,7 +5173,6 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0040a85c, 0x292)
@@ -5334,7 +5332,6 @@ void advManager::ClearBottomView(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0040ad72, 0x53b)
@@ -5994,7 +5991,6 @@ i32 advManager::UpdBottomViewHero(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0040c322, 0xdfb)
@@ -9113,7 +9109,6 @@ disposeSamples:
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x004132d4, 0xc8)
@@ -9129,7 +9124,6 @@ void advManager::DisableButtons(void) {
 #endif
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0041339c, 0xc8)
@@ -9815,7 +9809,6 @@ void advManager::SystemOptions(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x00414b62, 0x320)
@@ -10167,7 +10160,6 @@ i32 GetManaFrame(i32 mana) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x004154ac, 0x43d)

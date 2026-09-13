@@ -7168,7 +7168,6 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationFile destFile
 #endif
 VA(0x0045f47a, 0x553)
@@ -7664,7 +7663,6 @@ i32 CalcFileCRC(char* file) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceCrc srcCrc
 #define sourceCrcCheck srcCrcCheck
 #endif
@@ -7711,7 +7709,6 @@ void CompressTest2(void) {
 #endif
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceCrc srcCrc
 #define sourceCrcCheck srcCrcCheck
 #endif

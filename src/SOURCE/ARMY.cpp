@@ -612,7 +612,6 @@ void army::Wince(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationHex destHex
 #endif
 VA(0x004197b2, 0xa27)
@@ -863,7 +862,6 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
 #endif
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define combatMessage combatMsg
 #endif
 VA(0x0041a1d9, 0x165f)

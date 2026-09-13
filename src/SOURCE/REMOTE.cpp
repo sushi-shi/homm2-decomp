@@ -107,7 +107,6 @@ void RemoteCleanup(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define gameMessage gameMsg
 #endif
 VA(0x0048d1ac, 0x5ff)
@@ -490,7 +489,6 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0048dcc0, 0x1d2)

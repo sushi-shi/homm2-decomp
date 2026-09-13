@@ -213,7 +213,6 @@ i32 army::FlyTo(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceRearHex srcRearHex0
 #endif
 VA(0x0044b5ce, 0x9e2)

@@ -12,7 +12,6 @@ H2_ENUM_BEGIN(IconScaleConstant)
 H2_ENUM_END(IconScaleConstant)
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationOrigin dstOrg
 #define destinationPixel destPix
 #define sourceBase srcBase

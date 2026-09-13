@@ -236,7 +236,6 @@ i32 game::SetupNetworkGame(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define dimMessage dimMsg
 #define message msg
 #endif

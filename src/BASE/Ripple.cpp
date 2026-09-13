@@ -23,7 +23,6 @@ H2_ENUM_BEGIN(RippleConstant)
 H2_ENUM_END(RippleConstant)
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceRow srcRow
 #endif
 VA(0x004cb6b0, 0x35e)

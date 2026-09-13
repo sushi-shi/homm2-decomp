@@ -52,7 +52,6 @@ bitmap::~bitmap() {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationX destX
 #define destinationY destY
 #endif

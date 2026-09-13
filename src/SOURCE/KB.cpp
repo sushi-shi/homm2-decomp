@@ -1077,7 +1077,6 @@ char toupper(char c) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationIndex dstIndex
 #define sourceIndex srcIndex
 #endif
@@ -2791,7 +2790,6 @@ i32 GetMonType(i32 score, HighScoreType highScoreType) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationIndex dest_o
 #endif
 VA(0x0046bb0e, 0x405)
@@ -3470,7 +3468,6 @@ void ShowCongrats(HighScoreType highScoreType) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0046d4bb, 0x79)
@@ -4617,7 +4614,6 @@ i32 GetManaCost(SpellType spell, hero* h) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x0046f4ca, 0x88)

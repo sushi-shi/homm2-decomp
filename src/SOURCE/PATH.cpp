@@ -121,7 +121,6 @@ i32 army::ValidMove(CombatHexDirection direction) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationHexNext destHexNext
 #endif
 VA(0x0047d13b, 0x226)
@@ -404,7 +403,6 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define sourceRow srcRow
 #endif
 VA(0x0047d9ec, 0x77e)

@@ -343,7 +343,6 @@ MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& mess
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x004b7270, 0x36)

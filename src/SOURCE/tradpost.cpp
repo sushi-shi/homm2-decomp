@@ -256,7 +256,6 @@ void UpdateTradingPost(i32 draw) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationValue dstVal
 #define sourceValue srcVal
 #endif

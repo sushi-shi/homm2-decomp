@@ -73,7 +73,6 @@ H2_ENUM_BEGIN(ViewGeneralHoverHelp)
 H2_ENUM_END(ViewGeneralHoverHelp)
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define messageConst1 msgConst1
 #define messageConst10 msgConst10
 #define messageConst15 msgConst15
@@ -278,7 +277,6 @@ i32 combatManager::ViewGeneral(
 #endif
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define messageConst0 msgConst0
 #define messageConst1 msgConst1
 #define messageConst15 msgConst15

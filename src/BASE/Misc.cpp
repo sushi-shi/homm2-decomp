@@ -1972,7 +1972,6 @@ i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define message msg
 #endif
 VA(0x004c05e0, 0x464)

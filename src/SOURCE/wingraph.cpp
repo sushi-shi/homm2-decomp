@@ -850,7 +850,6 @@ void WGInitializePalette(void) {
 }
 
 #if !H2_STRICT_ENUMS
-// Preserve VC6's name-dependent stack layout.
 #define destinationHeight destHeight3
 #define destinationWidth destW
 #define destinationX destX7
