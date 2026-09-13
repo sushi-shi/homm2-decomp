@@ -456,25 +456,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra_o->active) {
-                NormalDialog(
-                    localization::Tr("event.inline.1553297e35c659a6"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.1553297e35c659a6"), NORMAL_DIALOG_INFO);
                 break;
             } else {
                 utf8::Copy(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.c15ae0e09ee99d18")
                 );
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     const std::string riddle =
                         localization::DecodeExternalText(eventExtra_o->riddle);
@@ -528,32 +517,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             primaryAmount_j = eventExtra_o->artifact;
                         }
 
-                        NormalDialog(
-                            localization::Tr("event.inline.b34883b51b1f43be"),
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            primaryReward_e,
-                            primaryAmount_j,
-                            secondaryReward_k,
-                            secondaryAmount_j,
-                            -1,
-                            0
-                        );
+                        NormalDialog(localization::Tr("event.inline.b34883b51b1f43be"), NORMAL_DIALOG_INFO, -1, -1, primaryReward_e, primaryAmount_j, secondaryReward_k, secondaryAmount_j);
                         eventExtra_o->active = 0;
                     } else {
-                        NormalDialog(
-                            localization::Tr("event.inline.da87bc41bfb2530c"),
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(localization::Tr("event.inline.da87bc41bfb2530c"), NORMAL_DIALOG_INFO);
                         HeroLoses(eventHero2);
                     }
                 }
@@ -562,18 +529,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            NormalDialog(
-                localization::Tr("event.inline.fff2b25d391ab29d"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.fff2b25d391ab29d"), NORMAL_DIALOG_INFO);
             gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
             CompleteDraw(0);
             UpdateScreen(0, 0);
@@ -742,18 +698,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.c96f2e927c9e47ef"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    MAP_EVENT_REWARD_ARTIFACT,
-                    cell->m_objectMetadata & CHEST_ARTIFACT_MASK,
-                    H2EnumIndex(RES_GOLD),
-                    SEA_CHEST_ARTIFACT_GOLD,
-                    -1,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, MAP_EVENT_REWARD_ARTIFACT, cell->m_objectMetadata & CHEST_ARTIFACT_MASK, H2EnumIndex(RES_GOLD), SEA_CHEST_ARTIFACT_GOLD);
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
@@ -762,32 +707,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
-                NormalDialog(
-                    localization::Tr("event.inline.333bff0ee2591ce7"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    H2EnumIndex(RES_GOLD),
-                    SEA_CHEST_GOLD,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.333bff0ee2591ce7"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_GOLD), SEA_CHEST_GOLD);
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
             } else {
-                NormalDialog(
-                    localization::Tr("event.inline.d2a7adee0f4b9a8a"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.d2a7adee0f4b9a8a"), NORMAL_DIALOG_INFO);
             }
             fizzleType_k = true;
             eraseObject_l = 1;
@@ -796,63 +719,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FLOTSAM: {
             switch (FlotsamRewardFromCode(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
-                    NormalDialog(
-                        localization::Tr("event.inline.fafa7917b1fb1445"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.fafa7917b1fb1445"), NORMAL_DIALOG_INFO);
                     break;
                 case FLOTSAM_WOOD:
-                    NormalDialog(
-                        localization::Tr("event.inline.021d355fcf4f31af"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        H2EnumIndex(RES_WOOD),
-                        FLOTSAM_WOOD_AMOUNT,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.021d355fcf4f31af"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_WOOD), FLOTSAM_WOOD_AMOUNT);
                     GiveResource(eventHero2, RES_WOOD, FLOTSAM_WOOD_AMOUNT);
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
-                    NormalDialog(
-                        localization::Tr("event.inline.d19251bcd8000e2e"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        H2EnumIndex(RES_WOOD),
-                        FLOTSAM_WOOD_AMOUNT,
-                        H2EnumIndex(RES_GOLD),
-                        FLOTSAM_GOLD_AMOUNT,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.d19251bcd8000e2e"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_WOOD), FLOTSAM_WOOD_AMOUNT, H2EnumIndex(RES_GOLD), FLOTSAM_GOLD_AMOUNT);
                     GiveResource(eventHero2, RES_WOOD, FLOTSAM_WOOD_AMOUNT);
                     GiveResource(eventHero2, RES_GOLD, FLOTSAM_GOLD_AMOUNT);
                     break;
                 case FLOTSAM_LARGE_TREASURE:
-                    NormalDialog(
-                        localization::Tr("event.inline.bd36cf6691ab88e7"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        H2EnumIndex(RES_WOOD),
-                        FLOTSAM_LARGE_WOOD_AMOUNT,
-                        H2EnumIndex(RES_GOLD),
-                        FLOTSAM_LARGE_GOLD_AMOUNT,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.bd36cf6691ab88e7"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_WOOD), FLOTSAM_LARGE_WOOD_AMOUNT, H2EnumIndex(RES_GOLD), FLOTSAM_LARGE_GOLD_AMOUNT);
                     GiveResource(eventHero2, RES_WOOD, FLOTSAM_LARGE_WOOD_AMOUNT);
                     GiveResource(eventHero2, RES_GOLD, FLOTSAM_LARGE_GOLD_AMOUNT);
                     break;
@@ -869,32 +748,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.4967a4ae1966d928"),
                     gArtifactNames[cell->m_objectMetadata]
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    MAP_EVENT_REWARD_ARTIFACT,
-                    cell->m_objectMetadata,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, MAP_EVENT_REWARD_ARTIFACT, cell->m_objectMetadata);
                 GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true, -1);
             } else {
-                NormalDialog(
-                    localization::Tr("event.inline.12821ba5d6cffff7"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.12821ba5d6cffff7"), NORMAL_DIALOG_INFO);
             }
             fizzleType_k = true;
             eraseObject_l = 1;
@@ -902,32 +759,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] < MAGELLAN_MAP_COST) {
-                NormalDialog(
-                    localization::Tr("event.inline.e81b091ba4b1417f"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.e81b091ba4b1417f"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.19dbe84af3193778"),
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.19dbe84af3193778"), NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= MAGELLAN_MAP_COST;
                     gpGame->MakeAllWaterVisible(giCurPlayer);
@@ -944,14 +779,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.68e1e92f9a9d12d5"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 utf8::Format(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.8432c04b1a757522"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 utf8::Format(
@@ -978,50 +813,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
-                NormalDialog(
-                    localization::Tr("event.inline.87ca55017c24c23b"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.87ca55017c24c23b"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
                 springSpellPoints_j =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                    HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
-                    NormalDialog(
-                        localization::Tr("event.inline.ee47b77e069dbc64"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.ee47b77e069dbc64"), NORMAL_DIALOG_INFO);
                 } else {
-                    NormalDialog(
-                        localization::Tr("event.inline.db769672add76670"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.db769672add76670"), NORMAL_DIALOG_INFO);
                     eventHero2->m_spellPoints = springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 }
             }
@@ -1029,49 +831,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_MAGIC_WELL:
             if ((H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_MAGIC_WELL)))) {
-                NormalDialog(
-                    localization::Tr("event.inline.6e512f3b213f3c96"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.6e512f3b213f3c96"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
                 wellSpellPoints_o =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                    HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
-                    NormalDialog(
-                        localization::Tr("event.inline.fa57992068d990d5"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.fa57992068d990d5"), NORMAL_DIALOG_INFO);
                 } else {
-                    NormalDialog(
-                        localization::Tr("event.inline.0ec7b47d176de1a3"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.0ec7b47d176de1a3"), NORMAL_DIALOG_INFO);
                     eventHero2->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero2->m_eventFlags) | H2EnumIndex(HERO_EVENT_MAGIC_WELL)
                     );
@@ -1107,7 +876,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL,
                     NULL
                 );
-                WaitEndSample(&playedSample3, -1);
+                WaitEndSample(&playedSample3);
                 CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
@@ -1246,18 +1015,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.5ad75e9e7fadd1a6"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    MAP_EVENT_REWARD_ARTIFACT,
-                    cell->m_objectMetadata & CHEST_ARTIFACT_MASK,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, MAP_EVENT_REWARD_ARTIFACT, cell->m_objectMetadata & CHEST_ARTIFACT_MASK);
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
@@ -1488,67 +1246,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_TEMPLE:
             if ((H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
-                NormalDialog(
-                    localization::Tr("event.inline.9824059f04898b92"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.9824059f04898b92"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | H2EnumIndex(HERO_EVENT_TEMPLE)
                 );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
-                NormalDialog(
-                    localization::Tr("event.inline.229894cb0c595023"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_MORALE_BONUS,
-                    0,
-                    NORMAL_DIALOG_MORALE_BONUS,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.229894cb0c595023"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_MORALE_BONUS, 0, NORMAL_DIALOG_MORALE_BONUS);
             }
             break;
 
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
-                NormalDialog(
-                    localization::Tr("event.inline.74555e8e4156f4be"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.74555e8e4156f4be"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.c451cfe18d2f7330"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
-                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.c451cfe18d2f7330"), NORMAL_DIALOG_INFO, -1, -1, (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1, (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT);
                 GiveResource(
                     eventHero2,
                     ResourceTypeFromCode(
@@ -1708,86 +1422,31 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    localization::Tr("event.inline.da378498c0963c83"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.da378498c0963c83"), NORMAL_DIALOG_INFO);
             } else {
                 if (eventHero2->m_level
                         + H2EnumIndex(eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)])
                               * XANADU_DIPLOMACY_MULTIPLIER
                     >= XANADU_ADMISSION_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                    NormalDialog(
-                        localization::Tr("event.inline.6e67be895f4b2e0b"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.6e67be895f4b2e0b"), NORMAL_DIALOG_INFO);
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_ATTACK)]++;
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_DEFENSE)]++;
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)]++;
                     eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]++;
                     eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
                 } else {
-                    NormalDialog(
-                        localization::Tr("event.inline.cfee7ef6dc2dfe29"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.cfee7ef6dc2dfe29"), NORMAL_DIALOG_INFO);
                 }
             }
             break;
 
         case MAP_OBJECT_FORT:
             if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    localization::Tr("event.inline.41d63febc86c9f57"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.41d63febc86c9f57"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.2ba84ac8f84d579f"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_PRIMARY_SKILL,
-                    PRIMARY_BONUS_DEFENSE,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.2ba84ac8f84d579f"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_PRIMARY_SKILL, PRIMARY_BONUS_DEFENSE);
                 eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_DEFENSE)]++;
                 eventHero2->m_fortVisits |= 1 << cell->m_objectMetadata;
             }
@@ -1795,32 +1454,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_STANDING_STONES:
             if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    localization::Tr("event.inline.abd64140cf81cf64"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.abd64140cf81cf64"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.21050646fbb7b09b"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_PRIMARY_SKILL,
-                    PRIMARY_BONUS_SPELL_POWER,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.21050646fbb7b09b"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_PRIMARY_SKILL, PRIMARY_BONUS_SPELL_POWER);
                 eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]++;
                 eventHero2->m_standingStoneVisits |= 1 << cell->m_objectMetadata;
             }
@@ -1828,32 +1465,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    localization::Tr("event.inline.adb07f262cb5a288"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.adb07f262cb5a288"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.d0681d4d11aa03cd"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_PRIMARY_SKILL,
-                    PRIMARY_BONUS_KNOWLEDGE,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.d0681d4d11aa03cd"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_PRIMARY_SKILL, PRIMARY_BONUS_KNOWLEDGE);
                 eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)]++;
                 eventHero2->m_witchDoctorVisits |= 1 << cell->m_objectMetadata;
             }
@@ -1861,32 +1476,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_MERCENARY_CAMP:
             if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    localization::Tr("event.inline.66fa174294ad02d5"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.66fa174294ad02d5"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                NormalDialog(
-                    localization::Tr("event.inline.412b3e9f25bdd6fb"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_PRIMARY_SKILL,
-                    PRIMARY_BONUS_ATTACK,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.412b3e9f25bdd6fb"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_PRIMARY_SKILL, PRIMARY_BONUS_ATTACK);
                 eventHero2->m_primaryStats[H2EnumIndex(HERO_PRIMARY_ATTACK)]++;
                 eventHero2->m_mercenaryCampVisits |= 1 << cell->m_objectMetadata;
             }
@@ -2439,18 +2032,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if ((eventHero2->m_treeKnowledgeVisits
                  & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
                 != 0) {
-                NormalDialog(
-                    localization::Tr("event.inline.87d5d0b84d168064"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.87d5d0b84d168064"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 heroLevel_e = eventHero2->GetLevel(eventHero2->m_experience);
@@ -2458,18 +2040,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                    - eventHero2->GetExperience(heroLevel_e);
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
-                        NormalDialog(
-                            localization::Tr("event.inline.51b8add2648e9e2f"),
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            NORMAL_DIALOG_EXPERIENCE,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(localization::Tr("event.inline.51b8add2648e9e2f"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_EXPERIENCE, -1);
                         GiveExperience(eventHero2, levelExperience_g, 0);
                         eventHero2->m_treeKnowledgeVisits |=
                             1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
@@ -2477,18 +2048,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                     case TREE_KNOWLEDGE_GOLD:
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
-                            NormalDialog(
-                                localization::Tr("event.inline.ce98145109683d0e"),
-                                NORMAL_DIALOG_CONFIRM,
-                                -1,
-                                -1,
-                                NORMAL_DIALOG_EXPERIENCE,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.ce98145109683d0e"), NORMAL_DIALOG_CONFIRM, -1, -1, NORMAL_DIALOG_EXPERIENCE, -1);
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
@@ -2496,35 +2056,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
                         } else {
-                            NormalDialog(
-                                localization::Tr("event.inline.924f82c98b13def7"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.924f82c98b13def7"), NORMAL_DIALOG_INFO);
                         }
                         break;
 
                     case TREE_KNOWLEDGE_GEMS:
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
-                            NormalDialog(
-                                localization::Tr("event.inline.e5ffff5a51e4796f"),
-                                NORMAL_DIALOG_CONFIRM,
-                                -1,
-                                -1,
-                                NORMAL_DIALOG_EXPERIENCE,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.e5ffff5a51e4796f"), NORMAL_DIALOG_CONFIRM, -1, -1, NORMAL_DIALOG_EXPERIENCE, -1);
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[H2EnumIndex(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
@@ -2532,18 +2070,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
                         } else {
-                            NormalDialog(
-                                localization::Tr("event.inline.ee1576513fcb95bc"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.ee1576513fcb95bc"), NORMAL_DIALOG_INFO);
                         }
                         break;
                 }
@@ -2578,9 +2105,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("event.inline.bec395b49e2bdfa9")
             );
-            oracleMessage_o.type = MESSAGE_WIDGET;
-            oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            oracleMessage_o.payload.widget.id = 0;
+            SET_WIDGET_MESSAGE(oracleMessage_o, WIDGET_COMMAND_SET_TEXT, 0);
             oracleMessage_o.payload.widget.data.text = gText;
             oracleWindow_o->BroadcastMessage(oracleMessage_o);
             gpWindowManager->DoDialog(oracleWindow_o, TrueFalseDialogHandler, 0);
@@ -2671,7 +2196,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX_e - x) + abs(teleportY_e - y)
+                        && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
                         teleportCount_e++;
@@ -2688,7 +2213,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
-                            && abs(teleportX_e - x) + abs(teleportY_e - y)
+                            && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
@@ -2710,18 +2235,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             guardedMonster_c =
                 CreatureTypeFromCode(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
-                NormalDialog(
-                    localization::Tr("event.inline.b880ecbc34dcdb8b"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.b880ecbc34dcdb8b"), NORMAL_DIALOG_INFO);
                 break;
             }
 
@@ -2770,18 +2284,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
-                    NormalDialog(
-                        localization::Tr("event.inline.47fbd3f75db6688a"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.47fbd3f75db6688a"), NORMAL_DIALOG_INFO);
                     guardedCount_i = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
                     goto artifactFight;
                 } else {
@@ -2792,7 +2295,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)],
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)]
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 artifactFight:
@@ -2820,33 +2323,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             localization::Tr("event.inline.db0baf49ee252efe"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
-                        NormalDialog(
-                            gText,
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            MAP_EVENT_REWARD_ARTIFACT,
-                            cell->m_objectIndex / 2,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, MAP_EVENT_REWARD_ARTIFACT, cell->m_objectIndex / 2);
                         goto giveArtifact;
                     }
                 } else {
-                    NormalDialog(
-                        localization::Tr("event.inline.29ceb4fc2c520780"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.29ceb4fc2c520780"), NORMAL_DIALOG_INFO);
                 }
                 break;
             } else {
@@ -2860,7 +2341,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             localization::Tr("event.inline.114341b70ac61964"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
@@ -2872,7 +2353,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             localization::Tr("event.inline.85b58cafd168a4e6"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_PICKUP:
@@ -2918,31 +2399,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     ARTIFACT_EVENT_GOLD_COST;
                                 goto giveArtifact;
                             }
-                            NormalDialog(
-                                localization::Tr("event.inline.eb595f1324302ad8"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.eb595f1324302ad8"), NORMAL_DIALOG_INFO);
                         } else {
-                            NormalDialog(
-                                localization::Tr("event.inline.d2d604b822f6a317"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.d2d604b822f6a317"), NORMAL_DIALOG_INFO);
                         }
                         break;
 
@@ -2956,18 +2415,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
                         );
-                        NormalDialog(
-                            gText,
-                            NORMAL_DIALOG_CONFIRM,
-                            -1,
-                            -1,
-                            MAP_EVENT_REWARD_ARTIFACT,
-                            H2EnumIndex(artifact_g),
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, MAP_EVENT_REWARD_ARTIFACT, H2EnumIndex(artifact_g));
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[H2EnumIndex(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
@@ -2981,31 +2429,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     ARTIFACT_EVENT_RESOURCE_3_AMOUNT;
                                 goto giveArtifact;
                             }
-                            NormalDialog(
-                                localization::Tr("event.inline.eb595f1324302ad8"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.eb595f1324302ad8"), NORMAL_DIALOG_INFO);
                         } else {
-                            NormalDialog(
-                                localization::Tr("event.inline.d2d604b822f6a317"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.d2d604b822f6a317"), NORMAL_DIALOG_INFO);
                         }
                         break;
 
@@ -3019,18 +2445,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
                         );
-                        NormalDialog(
-                            gText,
-                            NORMAL_DIALOG_CONFIRM,
-                            -1,
-                            -1,
-                            MAP_EVENT_REWARD_ARTIFACT,
-                            H2EnumIndex(artifact_g),
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, MAP_EVENT_REWARD_ARTIFACT, H2EnumIndex(artifact_g));
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[H2EnumIndex(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
@@ -3044,31 +2459,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     ARTIFACT_EVENT_RESOURCE_5_AMOUNT;
                                 goto giveArtifact;
                             }
-                            NormalDialog(
-                                localization::Tr("event.inline.eb595f1324302ad8"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.eb595f1324302ad8"), NORMAL_DIALOG_INFO);
                         } else {
-                            NormalDialog(
-                                localization::Tr("event.inline.d2d604b822f6a317"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("event.inline.d2d604b822f6a317"), NORMAL_DIALOG_INFO);
                         }
                         break;
                 }
@@ -3228,18 +2621,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     )
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
-                    NormalDialog(
-                        localization::Tr("event.inline.cb3ce775e0c55740"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        H2EnumIndex(RES_GOLD),
-                        DAEMON_GOLD,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.cb3ce775e0c55740"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_GOLD), DAEMON_GOLD);
                     GiveResource(eventHero2, RES_GOLD, DAEMON_GOLD);
                     cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
                 }
@@ -3505,18 +2887,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
-                    NormalDialog(
-                        localization::Tr("event.inline.414c8dd999ff1206"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        NORMAL_DIALOG_LUCK_PENALTY,
-                        0,
-                        NORMAL_DIALOG_LUCK_PENALTY,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.414c8dd999ff1206"), NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_LUCK_PENALTY, 0, NORMAL_DIALOG_LUCK_PENALTY);
                     if (!(H2EnumIndex((eventHero2->m_eventFlags) & (HERO_EVENT_PYRAMID)))) {
                         eventHero2->m_eventFlags = HeroEventFlag(
                             static_cast<i32>(eventHero2->m_eventFlags) | H2EnumIndex(HERO_EVENT_PYRAMID)
@@ -3742,7 +3113,7 @@ event_done:
     }
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
-    WaitEndSample(&eventSample_f, -1);
+    WaitEndSample(&eventSample_f);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -4045,7 +3416,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         cursedArtifactCount2
                     );
                 }
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
@@ -4058,50 +3429,17 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         }
                         gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
-                        NormalDialog(
-                            localization::Tr("event.inline.35891c3b946b11c8"),
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(localization::Tr("event.inline.35891c3b946b11c8"), NORMAL_DIALOG_INFO);
                     }
                 }
             } else {
-                NormalDialog(
-                    localization::Tr("event.inline.4be252d59fc6debb"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.4be252d59fc6debb"), NORMAL_DIALOG_INFO);
             }
             break;
 
         case GENERIC_SITE_ARENA:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_ARENA)))) {
-                NormalDialog(
-                    localization::Tr("event.inline.5e4d96b705906aad"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.5e4d96b705906aad"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(
                     cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, H2EnumIndex(siteType4), &eventSample9
@@ -4116,18 +3454,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_MERMAID:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_MERMAID)))) {
-                NormalDialog(
-                    localization::Tr("event.inline.87faaee8cff00588"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.87faaee8cff00588"), NORMAL_DIALOG_INFO);
             } else {
                 EventSound(
                     cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, H2EnumIndex(siteType4), &eventSample9
@@ -4151,18 +3478,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_HUT_OF_MAGI:
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, H2EnumIndex(siteType4), &eventSample9);
-            NormalDialog(
-                localization::Tr("event.inline.fd826cb8b8a55aeb"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.fd826cb8b8a55aeb"), NORMAL_DIALOG_INFO);
             for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
                 for (mapY14 = 0; mapY14 < MAP_HEIGHT; mapY14++) {
                     currentCell36 = gpGame->m_worldMap.GetCell(mapX37, mapY14);
@@ -4180,34 +3496,12 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             break;
 
         case GENERIC_SITE_EYE_OF_MAGI:
-            NormalDialog(
-                localization::Tr("event.inline.90cd00d12dc7f24b"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.90cd00d12dc7f24b"), NORMAL_DIALOG_INFO);
             break;
 
         case GENERIC_SITE_SIRENS:
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_SIRENS)))) {
-                NormalDialog(
-                    localization::Tr("event.inline.acc859e4d069b705"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.acc859e4d069b705"), NORMAL_DIALOG_INFO);
             } else {
                 experience11 = 0;
                 for (index8 = 0; index8 < ARMY_GROUP_SLOT_COUNT; index8++) {
@@ -4234,21 +3528,10 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         localization::Tr("event.inline.d211349fcd9060a7"),
                         experience11
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
-                    NormalDialog(
-                        localization::Tr("event.inline.ee7fce7250a9d986"),
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(localization::Tr("event.inline.ee7fce7250a9d986"), NORMAL_DIALOG_INFO);
                 }
                 eventHero->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero->m_eventFlags) | H2EnumIndex(HERO_EVENT_SIRENS)
@@ -4381,7 +3664,7 @@ void advManager::ShipyardEvent(i32 x, i32 y) {
         boatX = x + offset[0];
         boatY = y + offset[1];
         mapCell* boatCell = GetCell(boatX, boatY);
-        if (giGroundToTerrain[boatCell->m_terrainImageIndex] == TERRAIN_WATER
+        if (CELL_TERRAIN(boatCell) == TERRAIN_WATER
             && boatCell->m_triggerType == MAP_OBJECT_NONE) {
             boatPossible = true;
             break;
@@ -4389,10 +3672,7 @@ void advManager::ShipyardEvent(i32 x, i32 y) {
     }
 
     if (gpGame->GetBoatsBuilt() >= TOWN_MAX_BOATS || !boatPossible) {
-        NormalDialog(
-            localization::Tr("event.shipyard.cannot_build_boat"),
-            1, 208, 40, -1, 0, -1, 0, -1, 0
-        );
+        NormalDialog(localization::Tr("event.shipyard.cannot_build_boat"), 1, 208, 40);
         return;
     }
 
@@ -4403,9 +3683,7 @@ void advManager::ShipyardEvent(i32 x, i32 y) {
     if (gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_GOLD)] < TOWN_BOAT_GOLD_COST
         || gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_WOOD)]
                < TOWN_BOAT_WOOD_COST) {
-        boatMessage.type = MESSAGE_WIDGET;
-        boatMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        boatMessage.payload.widget.id = DIALOG_BUILD_BOAT;
+        SET_WIDGET_MESSAGE(boatMessage, WIDGET_COMMAND_SET_FLAGS, DIALOG_BUILD_BOAT);
         boatMessage.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_GRAYED);
         shipWindow->BroadcastMessage(boatMessage);
         boatMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -4441,51 +3719,18 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     heroId = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
-        NormalDialog(
-            localization::Tr("event.inline.dd448d43b4794460"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(localization::Tr("event.inline.dd448d43b4794460"), NORMAL_DIALOG_INFO);
         EraseObj(cell, x, y);
         return;
     }
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
-        NormalDialog(
-            localization::Tr("event.inline.30d6f33566016021"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(localization::Tr("event.inline.30d6f33566016021"), NORMAL_DIALOG_INFO);
         return;
     }
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
-    NormalDialog(
-        localization::Tr("event.inline.5aa1a1227a3f148e"),
-        NORMAL_DIALOG_INFO,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
-    );
+    NormalDialog(localization::Tr("event.inline.5aa1a1227a3f148e"), NORMAL_DIALOG_INFO);
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
     gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
     freedHero = &gpGame->m_heroRecs[heroId];
@@ -4789,7 +4034,7 @@ void advManager::EventWindow(
             eventId
         );
 
-    NormalDialog(eventText, buttons, -1, -1, H2EnumIndex(type1), value1, type2, value2, type3, 0);
+    NormalDialog(eventText, buttons, -1, -1, H2EnumIndex(type1), value1, type2, value2, type3);
 }
 
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
@@ -5481,8 +4726,7 @@ CombatResult advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, H2EnumIndex(CREATURE_NONE), MONSTER_ARMY_SLOTS);
-    memset(gpMonGroup->m_creatureCounts, 0, MONSTER_ARMY_SLOTS * sizeof(i16));
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
@@ -5925,18 +5169,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                                      ,
                                 gArtifactNames[H2EnumIndex(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
-                            NormalDialog(
-                                gText,
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                NORMAL_DIALOG_ARTIFACT,
-                                H2EnumIndex(sourceHero->m_artifacts[sourceArtifactSlot]),
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_ARTIFACT, H2EnumIndex(sourceHero->m_artifacts[sourceArtifactSlot]));
                         }
                     } else {
                         GiveTakeArtifactStat(
@@ -6056,7 +5289,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
             NULL
         );
         gpMouseManager->ShowColorPointer();
-        WaitEndSample(&fizzleSample, -1);
+        WaitEndSample(&fizzleSample);
     }
 }
 
@@ -6696,7 +5929,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(exitX - x) + abs(exitY_d - y)
+                        && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
                                       ? EVENT_TELEPORT_STONE_DISTANCE
                                       : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
@@ -6713,7 +5946,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                 == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
-                            && abs(exitX - x) + abs(exitY_d - y)
+                            && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
@@ -7096,7 +6329,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 break;
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             springSpellPoints_j =
-                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                HERO_NORMAL_SPELL_POINTS(*eventHero);
             if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
                 eventHero->m_spellPoints =
                     static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
@@ -7106,7 +6339,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if ((H2EnumIndex((eventHero->m_eventFlags) & (HERO_EVENT_MAGIC_WELL))) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 wellSpellPoints_o =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                    HERO_NORMAL_SPELL_POINTS(*eventHero);
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | H2EnumIndex(HERO_EVENT_MAGIC_WELL)
@@ -7184,7 +6417,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 1;
     else
         return 0;
@@ -7447,85 +6680,19 @@ void advManager::PlayerMonsterInteract(
                     || monsterType == CREATURE_BLACK_DRAGON)))) {
         if (!eventHero->m_army.CanJoin(monsterType)) {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
-                NormalDialog(
-                    localization::Tr("event.inline.bc81eedbd225f1cc"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.bc81eedbd225f1cc"), NORMAL_DIALOG_INFO);
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
-                NormalDialog(
-                    localization::Tr("event.inline.cf9fdd5bf3abd972"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.cf9fdd5bf3abd972"), NORMAL_DIALOG_INFO);
             else
-                NormalDialog(
-                    localization::Tr("event.inline.f68d63dd41307454"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.f68d63dd41307454"), NORMAL_DIALOG_INFO);
             *handled = 1;
         } else {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
-                NormalDialog(
-                    localization::Tr("event.inline.ca210d925c2d4171"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.ca210d925c2d4171"), NORMAL_DIALOG_INFO);
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
-                NormalDialog(
-                    localization::Tr("event.inline.7e5ecd33e75d57cd"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.7e5ecd33e75d57cd"), NORMAL_DIALOG_INFO);
             else
-                NormalDialog(
-                    localization::Tr("event.inline.f0128914e00d4e7f"),
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("event.inline.f0128914e00d4e7f"), NORMAL_DIALOG_INFO);
             eventHero->m_army.Add(monsterType, creatureCount, -1);
             *handled = 1;
         }
@@ -7534,18 +6701,7 @@ void advManager::PlayerMonsterInteract(
 
     if (gbInCampaign && gpGame->m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DWARFBANE)]
         && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
-        NormalDialog(
-            localization::Tr("event.inline.53220bf577626eb3"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(localization::Tr("event.inline.53220bf577626eb3"), NORMAL_DIALOG_INFO);
         *handled = 1;
         return;
     }
@@ -7554,32 +6710,10 @@ void advManager::PlayerMonsterInteract(
         && (monsterType == CREATURE_ELF || monsterType == CREATURE_GRAND_ELF)) {
         *handled = 1;
         if (eventHero->m_army.CanJoin(monsterType)) {
-            NormalDialog(
-                localization::Tr("event.inline.4a9a02fcd852e2b3"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.4a9a02fcd852e2b3"), NORMAL_DIALOG_INFO);
             eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
-            NormalDialog(
-                localization::Tr("event.inline.b957bcfea39c68b5"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.b957bcfea39c68b5"), NORMAL_DIALOG_INFO);
         }
         return;
     }
@@ -7607,8 +6741,7 @@ void advManager::PlayerMonsterInteract(
         && armyRatio
             > MONSTER_STRENGTH_JOIN
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[H2EnumIndex(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -7683,18 +6816,7 @@ void advManager::PlayerMonsterInteract(
                 strcat(gText, monsterText);
             }
 
-            NormalDialog(
-                gText,
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                H2EnumIndex(RES_GOLD),
-                joiningCost,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, H2EnumIndex(RES_GOLD), joiningCost);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
@@ -7775,11 +6897,9 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     * gMonsterDatabase[H2EnumIndex(monsterType)].fightValue
                 );
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
-        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-        && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+        && armyRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
@@ -8412,18 +7532,7 @@ void advManager::ReceiveHeroTownData(
            || !gotSecondHeroSecond2) {
         PollSound();
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < platform::Ticks()) {
-            NormalDialog(
-                localization::Tr("event.inline.2b436715930a57ee"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("event.inline.2b436715930a57ee"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = platform::Ticks();
             else

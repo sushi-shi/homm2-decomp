@@ -10,7 +10,7 @@ namespace ironfist {
 
 void H2MessageBox(char* msg) {
     if (msg) {
-        NormalDialog(msg, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(msg, NORMAL_DIALOG_INFO);
     }
 }
 
@@ -21,7 +21,7 @@ void H2MessageBox(std::string& msg) {
 }
 
 bool H2QuestionBox(char* msg) {
-    NormalDialog(msg, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(msg, NORMAL_DIALOG_CONFIRM);
     return gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_SIX;
 }
 

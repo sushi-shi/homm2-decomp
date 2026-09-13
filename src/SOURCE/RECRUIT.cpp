@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Ints.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
 #include <IRONFIST/hooks.h>
@@ -73,9 +74,7 @@ void SetupRecruitWin(
     utf8::Copy(recruitName, sizeof(recruitName), GetMonsterName(creatureType));
     utf8::UppercaseFirst(recruitName);
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("recruit.title"), recruitName);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TITLE_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
@@ -94,9 +93,7 @@ void SetupRecruitWin(
     window->BroadcastMessage(message);
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "monh%04d.icn", H2EnumIndex(creatureType));
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    message.payload.widget.id = CREATURE_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, CREATURE_CONTROL);
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {
@@ -181,19 +178,7 @@ void recruitUnit::Close(void) {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     if (m_noRoom != 0) {
-        NormalDialog(
-            localization::Tr("recruit.garrison_full")
-            ,
-            NORMAL_DIALOG_INFO,
-            NO_ROOM_DIALOG_X,
-            NO_ROOM_DIALOG_Y,
-            NORMAL_DIALOG_NO_RESOURCE,
-            0,
-            NORMAL_DIALOG_NO_RESOURCE,
-            0,
-            NORMAL_DIALOG_NO_RESOURCE,
-            0
-        );
+        NormalDialog(localization::Tr("recruit.garrison_full"), NORMAL_DIALOG_INFO, NO_ROOM_DIALOG_X, NO_ROOM_DIALOG_Y);
     }
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,

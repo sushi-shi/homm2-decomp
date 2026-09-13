@@ -203,8 +203,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     m_town->m_type == FACTION_CYBORG ? "castle.cybernetics_lab.level"
                                                      : "castle.mage_guild.level"
                 ),
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
-                                                                     : TOWN_MAGE_GUILD_MAX_LEVEL
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
             );
             msg.payload.widget.data.text = gText;
         } else {
@@ -687,9 +686,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = CASTLE_WIDGET_TEXT;
-        message.payload.widget.id = CONTROL_STATUS_TEXT;
+        SET_WIDGET_MESSAGE(message, CASTLE_WIDGET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
@@ -711,19 +708,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case CONTROL_CAPTAIN_FORMATION_SPREAD:
                         if (quickFlag) {
-                            NormalDialog(
-                                localization::Tr("formation.spread.help")
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.spread.help"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
@@ -733,19 +718,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case CONTROL_CAPTAIN_FORMATION_GROUPED:
                         if (quickFlag) {
-                            NormalDialog(
-                                localization::Tr("formation.grouped.help")
-                                     ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.grouped.help"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;

@@ -237,6 +237,15 @@ public:
     void CheckAnduranPieces(b32);
 };
 #pragma pack(pop)
+
+#define ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(h, amount)                                             \
+    ((h).m_experience += (amount), (h).CheckLevel())
+
+#define HERO_SCOUTING_VISIBILITY_RADIUS(h)                                                         \
+    (giVisRange[H2EnumIndex((h).m_secondarySkills[H2EnumIndex(HERO_SKILL_SCOUTING)])]                              \
+     + ((h).HasArtifact(ARTIFACT_TELESCOPE) != 0))
+#define HERO_NORMAL_SPELL_POINTS(h)                                                                \
+    ((h).Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE)
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];

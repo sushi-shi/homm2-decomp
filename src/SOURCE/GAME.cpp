@@ -887,8 +887,7 @@ void ComputeUALoc(i32 playerIndex) {
                   && gpGame->m_worldMap.GetCell(x, y)->m_triggerType == MAP_OBJECT_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE
-                  && giGroundToTerrain[gpGame->m_worldMap.GetCell(x, y)->m_terrainImageIndex]
-                         != TERRAIN_WATER)
+                  && CELL_TERRAIN(gpGame->m_worldMap.GetCell(x, y)) != TERRAIN_WATER)
             ) {
                 triesCount++;
                 heading = 0;
@@ -985,7 +984,7 @@ i32 game::IsMobile(i32 heroId) {
     mapCell* cell = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
     return mobileHero->m_remainingMobility
            >= CalcTerrainCost(
-               giGroundToTerrain[cell->m_terrainImageIndex],
+               CELL_TERRAIN(cell),
                1,
                mobileHero->m_remainingMobility,
                H2EnumIndex(mobileHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
@@ -1197,8 +1196,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_destinationX = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_level = HERO_INITIAL_LEVEL;
-        m_heroRecs[i].m_spellPoints =
-            m_heroRecs[i].Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+        m_heroRecs[i].m_spellPoints = HERO_NORMAL_SPELL_POINTS(m_heroRecs[i]);
         m_heroRecs[i].m_secondarySkillCount = 0;
         for (j = 0; j < H2EnumIndex(HERO_SKILL_COUNT); j++) {
             m_heroRecs[i].m_secondarySkills[j] = HERO_SKILL_LEVEL_NONE;
@@ -1400,8 +1398,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, &m_day, sizeof(m_day));
     ReadGameData(fd, &m_week, sizeof(m_week));
     ReadGameData(fd, &m_month, sizeof(m_month));
-    giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    giCurTurn = GAME_DAY_NUMBER(*this);
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
         m_players[ndx].Read(fd);
 
@@ -1728,8 +1725,7 @@ void game::NewMap(const char* filename) {
             }
             if (awardHero < GAME_HERO_COUNT) {
                 if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
-                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[awardHero].CheckLevel();
+                    ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(m_heroRecs[awardHero], CAMPAIGN_EXPERIENCE_BONUS);
                     utf8::Copy(
                         m_heroRecs[awardHero].m_name,
                         sizeof(m_heroRecs[awardHero].m_name),
@@ -1737,8 +1733,7 @@ void game::NewMap(const char* filename) {
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
-                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[awardHero].CheckLevel();
+                    ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(m_heroRecs[awardHero], CAMPAIGN_EXPERIENCE_BONUS);
                     utf8::Copy(
                         m_heroRecs[awardHero].m_name,
                         sizeof(m_heroRecs[awardHero].m_name),
@@ -1837,13 +1832,12 @@ void game::NewMap(const char* filename) {
            || nTown > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || m_worldMap.GetCell(player, nTown)->m_objectIndex != MAPCELL_SPRITE_NONE
            || m_worldMap.GetCell(player, nTown)->m_overlayIndex != MAPCELL_SPRITE_NONE
-           || giGroundToTerrain[m_worldMap.GetCell(player, nTown)->m_terrainImageIndex]
-                  == TERRAIN_WATER
-           || (giNumHumanPlayers == 1
-               && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
-               && ultimateDistance
-                      >= abs(player - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
-                             + abs(nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
+           || CELL_TERRAIN(m_worldMap.GetCell(player, nTown)) == TERRAIN_WATER
+           || (giNumHumanPlayers == 1 && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
+               && ultimateDistance >= MANHATTAN_LENGTH(
+                      player - m_heroRecs[m_players[0].m_heroIds[0]].m_x,
+                      nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y
+                  ))) {
         if (ultimateTries < ULTIMATE_SEARCH_REGION_RETRY_LIMIT && giUABaseX > 0) {
             player = giUABaseX + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
             nTown = giUABaseY + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
@@ -2160,7 +2154,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREASURE_CHEST):
-                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
+                    if (CELL_TERRAIN(cell2) == TERRAIN_WATER) {
                         cell2->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_SEA_CHEST);
                         randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                         if (randomValue5 < SEA_CHEST_EMPTY_CUTOFF)
@@ -2446,7 +2440,7 @@ void game::RandomizeEvents(void) {
                             xPos - CASTLE_BOAT_X_OFFSET,
                             yPos + CASTLE_BOAT_Y_OFFSET
                         );
-                        if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
+                        if (CELL_TERRAIN(townEntrance2)
                             == TERRAIN_WATER) {
                             townRec->m_boatX = static_cast<i8>(xPos - CASTLE_BOAT_X_OFFSET);
                             townRec->m_boatY = static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
@@ -2455,7 +2449,7 @@ void game::RandomizeEvents(void) {
                                 xPos + CASTLE_BOAT_X_OFFSET,
                                 yPos + CASTLE_BOAT_Y_OFFSET
                             );
-                            if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
+                            if (CELL_TERRAIN(townEntrance2)
                                 == TERRAIN_WATER) {
                                 townRec->m_boatX =
                                     static_cast<i8>(xPos + CASTLE_BOAT_X_OFFSET);
@@ -2927,7 +2921,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(localization::Tr("spell.none_to_cast"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(localization::Tr("spell.none_to_cast"), 1);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -2996,9 +2990,7 @@ void game::UpdateSpellWidgets(void) {
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_HUNDREDS_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
@@ -3007,37 +2999,27 @@ void game::UpdateSpellWidgets(void) {
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_TENS_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_ONES_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
     for (i = 0; i < VIEW_SPELL_PAGE_SIZE; i++) {
         if (m_viewSpellsTop[H2EnumIndex(m_viewSpellsType)] + i
             >= m_viewSpellsCount[H2EnumIndex(m_viewSpellsType)]) {
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
         } else {
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
             m_viewSpellsWindow->BroadcastMessage(message);
 
@@ -3045,9 +3027,7 @@ void game::UpdateSpellWidgets(void) {
                 m_viewSpellsType,
                 m_viewSpellsTop[H2EnumIndex(m_viewSpellsType)] + i + 1
             );
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FILL_COLOR, i + VIEW_SPELL_TEXT_ID_BASE);
             if (GetManaCost(spell1, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
                 message.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
             else
@@ -3070,33 +3050,23 @@ void game::UpdateSpellWidgets(void) {
                     GetManaCost(spell1, m_viewSpellsHero)
                 );
             }
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.text = gText;
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = gsSpellInfo[H2EnumIndex(spell1)].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
         }
@@ -3131,9 +3101,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
-                            NormalDialog(
-                                gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
-                            );
+                            NormalDialog(gText, NORMAL_DIALOG_INFO);
                             break;
                         case VIEW_SPELL_PREVIOUS_ID:
                             if (gpGame->m_viewSpellsTop[H2EnumIndex(gpGame->m_viewSpellsType)] == 0) {
@@ -3195,74 +3163,19 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 gpGame->m_viewSpellsTop[H2EnumIndex(gpGame->m_viewSpellsType)]
                                     + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
-                            NormalDialog(
-                                gSpellDesc[H2EnumIndex(spell)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                NORMAL_DIALOG_SPELL,
-                                H2EnumIndex(spell),
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gSpellDesc[H2EnumIndex(spell)], NORMAL_DIALOG_QUICK_VIEW, -1, -1, NORMAL_DIALOG_SPELL, H2EnumIndex(spell));
                             break;
                         case VIEW_SPELL_PREVIOUS_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_PREVIOUS],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cSpellHelp[VIEW_SPELL_HELP_PREVIOUS], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case VIEW_SPELL_NEXT_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_NEXT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cSpellHelp[VIEW_SPELL_HELP_NEXT], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case VIEW_SPELL_COMBAT_TAB_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cSpellHelp[VIEW_SPELL_HELP_COMBAT], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cSpellHelp[VIEW_SPELL_HELP_ADVENTURE], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case VIEW_SPELL_MANA_LABEL_ID:
                         case VIEW_SPELL_MANA_HUNDREDS_ID:
@@ -3273,9 +3186,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
-                            NormalDialog(
-                                gText, NORMAL_DIALOG_QUICK_VIEW, -1, -1, -1, 0, -1, 0, -1, 0
-                            );
+                            NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
                 } else {
@@ -3298,18 +3209,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                     + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
-                                NormalDialog(
-                                    gSpellDesc[H2EnumIndex(spell)],
-                                    NORMAL_DIALOG_INFO,
-                                    -1,
-                                    -1,
-                                    NORMAL_DIALOG_SPELL,
-                                    H2EnumIndex(spell),
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gSpellDesc[H2EnumIndex(spell)], NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_SPELL, H2EnumIndex(spell));
                                 return MESSAGE_DISPATCH_CONSUME;
                             }
                             if (GetManaCost(spell, viewSpellsHero)
@@ -3321,9 +3221,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
-                                NormalDialog(
-                                    gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_INFO);
                                 return MESSAGE_DISPATCH_CONTINUE;
                             }
                             gpGame->m_viewSpell = spell;
@@ -3722,18 +3620,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
-                        NormalDialog(
-                            localization::Tr("army.confirm.dismiss"),
-                            NORMAL_DIALOG_CONFIRM,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(localization::Tr("army.confirm.dismiss"), NORMAL_DIALOG_CONFIRM);
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
                             msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
@@ -3760,18 +3647,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= goldCost
                             && (resourceType7 == RES_NONE
                                 || gpCurPlayer->m_resources[H2EnumIndex(resourceType7)] >= resourceCost)) {
-                            NormalDialog(
-                                localization::Tr("army.upgrade.confirm"),
-                                NORMAL_DIALOG_CONFIRM,
-                                -1,
-                                -1,
-                                H2EnumIndex(RES_GOLD),
-                                goldCost,
-                                H2EnumIndex(resourceType7),
-                                resourceCost,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("army.upgrade.confirm"), NORMAL_DIALOG_CONFIRM, -1, -1, H2EnumIndex(RES_GOLD), goldCost, H2EnumIndex(resourceType7), resourceCost);
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                                 gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= goldCost;
                                 if (resourceType7 != RES_NONE)
@@ -3783,18 +3659,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
-                            NormalDialog(
-                                localization::Tr("army.upgrade.cannot_afford"),
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                H2EnumIndex(RES_GOLD),
-                                goldCost,
-                                H2EnumIndex(resourceType7),
-                                resourceCost,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("army.upgrade.cannot_afford"), NORMAL_DIALOG_INFO, -1, -1, H2EnumIndex(RES_GOLD), goldCost, H2EnumIndex(resourceType7), resourceCost);
                         }
                         break;
                     default:
@@ -3807,9 +3672,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     }
 
     if (glTimers[0] < platform::Ticks()) {
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        msg.payload.widget.id = VIEW_ARMY_MONSTER_WIDGET_ID;
+        SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_FRAME, VIEW_ARMY_MONSTER_WIDGET_ID);
         iViewArmyFrame = (iViewArmyFrame + 1)
                          % sViewArmyMonFrameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)];
         msg.payload.widget.data.value =
@@ -4103,8 +3966,7 @@ void game::PerDay(void) {
     }
 
     m_day++;
-    giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    giCurTurn = GAME_DAY_NUMBER(*this);
     if (!gbGameOver) {
         if (m_day > EVENT_DAYS_PER_WEEK) {
             m_day = 1;
@@ -4144,7 +4006,7 @@ void game::PerDay(void) {
         currentHero7 = &m_heroRecs[player];
         restoredSpellPoints14 = currentHero7->m_spellPoints;
         maxSpellPoints9 =
-            currentHero7->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            HERO_NORMAL_SPELL_POINTS(*currentHero7);
         restoredSpellPoints14 +=
             H2EnumIndex(currentHero7->m_secondarySkills[H2EnumIndex(HERO_SKILL_MYSTICISM)]) + 1;
         if (currentHero7->HasArtifact(ARTIFACT_POWER_RING))
@@ -4164,7 +4026,7 @@ void game::PerDay(void) {
         if (currentTown1->m_occupyingHeroId != -1) {
             townHero6 = GetHero(currentTown1->m_occupyingHeroId);
             maxSpellPoints9 =
-                townHero6->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                HERO_NORMAL_SPELL_POINTS(*townHero6);
             if (maxSpellPoints9 > townHero6->m_spellPoints)
                 townHero6->m_spellPoints = static_cast<i16>(maxSpellPoints9);
         }
@@ -4517,7 +4379,7 @@ void game::PerMonth(void) {
                 spot = gpAdvManager->GetCell(x, y);
                 if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
                     && !spot->m_objectLayerBit0
-                    && giGroundToTerrain[spot->m_terrainImageIndex] != TERRAIN_WATER) {
+                    && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
@@ -4712,7 +4574,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     H2EnumStorage<TerrainType, i32> terrain;
     u8 mineFrame;
 
-    terrain = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
+    terrain = CELL_TERRAIN(WORLDMAP->GetCell(x, y));
     for (count = 0; count < RANDOM_MINE_RETRY_LIMIT; count++) {
         switch (terrain) {
             case TERRAIN_GRASS:
@@ -5547,18 +5409,7 @@ void game::WaitForPlayer(const char* text, i32 player) {
         gpAdvManager->UpdateScreen(0, 1);
         ShowHeroesLogo();
         gbAllBlack = false;
-        NormalDialog(
-            text,
-            1,
-            -1,
-            -1,
-            WAIT_DIALOG_TYPE,
-            gpGame->m_players[player].m_color,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(text, 1, -1, -1, WAIT_DIALOG_TYPE, gpGame->m_players[player].m_color);
         gpSoundManager->SwitchAmbientMusic(-1);
     }
 }
@@ -6336,16 +6187,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     );
     utf8::Format(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
-    LogInt(
-        "PostDiffFileSize",
-        fileSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("PostDiffFileSize", fileSize);
 
     if (fileSize <= 0)
         goto transmitCleanup;
@@ -6395,16 +6237,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
-        LogInt(
-            "Send",
-            fileSize,
-            transmitCrc,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("Send", fileSize, transmitCrc);
 
         header[REMOTE_SAVE_HEADER_FILE_SIZE] = fileSize;
         header[REMOTE_SAVE_HEADER_FILE_CRC] = fileCrc;
@@ -6594,16 +6427,7 @@ i32 game::ReceiveSaveGame(
 
     i32l lastPacketTime;
 
-    LogInt(
-        "FW1",
-        remotePlayer,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("FW1", remotePlayer);
     LogStr("RSG1");
     AiPrint("Receive Start - Getting Data");
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
@@ -6657,32 +6481,12 @@ i32 game::ReceiveSaveGame(
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize));
 
     lastPacketTime = platform::Ticks();
-    LogInt(
-        "FW2",
-        remotePlayer,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("FW2", remotePlayer);
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < platform::Ticks()) {
-            NormalDialog(
-                localization::Tr("network.receive.retry"),
-                REMOTE_RECEIVE_DIALOG_BUTTONS,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("network.receive.retry"), REMOTE_RECEIVE_DIALOG_BUTTONS);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 lastPacketTime = platform::Ticks();
             else
@@ -6742,16 +6546,7 @@ i32 game::ReceiveSaveGame(
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
-                    LogInt(
-                        "FW3",
-                        remotePlayer,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
-                    );
+                    LogInt("FW3", remotePlayer);
                     result = TransmitRemoteData(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
@@ -6774,16 +6569,7 @@ i32 game::ReceiveSaveGame(
 
     AiPrint("Receive Start - Decompressing Data");
     receivedCrc = calc_crc_long(incomingData, dataSize);
-    LogInt(
-        "Receive",
-        dataSize,
-        receivedCrc,
-        expectedTransmitCrc,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Receive", dataSize, receivedCrc, expectedTransmitCrc);
     if (gbUseBzip2Compression) {
         if (!compression::Bzip2Decompress(
                 decodedData,
@@ -6801,16 +6587,7 @@ i32 game::ReceiveSaveGame(
         decodedData = incomingData;
         computedCrc = receivedCrc;
     }
-    LogInt(
-        "Receive",
-        dataSize,
-        computedCrc,
-        expectedCrc,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Receive", dataSize, computedCrc, expectedCrc);
 
     utf8::Format(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
     file = platform::FileOpen(filename, platform::FileMode::Write);
@@ -6885,18 +6662,7 @@ void game::DoNewTurn(void) {
         } else {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[0], cPlayerNames[giCurPlayer], gpCurPlayer->m_daysLeft);
         }
-        NormalDialog(
-            gText,
-            1,
-            -1,
-            -1,
-            NEW_TURN_DIALOG_TYPE,
-            gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)),
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(gText, 1, -1, -1, NEW_TURN_DIALOG_TYPE, gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)));
     }
 
     if (gpCurPlayer->m_heroCount > 0) {
@@ -6958,7 +6724,7 @@ void game::DoNewTurn(void) {
             }
             gpSoundManager->PlayAmbientMusic(musicTrack2);
             gpMouseManager->SetPointer(0);
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
             );
@@ -7227,16 +6993,7 @@ void CreateDiffFile(
         FileError(gText);
     ReadGameData(readFile, fullData, joinSize);
     platform::FileClose(readFile);
-    LogInt(
-        "Orig Join CRC",
-        calc_crc_long(fullData, joinSize),
-        joinSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Orig Join CRC", calc_crc_long(fullData, joinSize), joinSize);
 
     if (!forceWhole) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
@@ -7409,16 +7166,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         FileError(gText);
     WriteGameData(joinFile, outData, outSize);
     platform::FileClose(joinFile);
-    LogInt(
-        "New Join CRC",
-        calc_crc_long(outData, outSize),
-        outSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("New Join CRC", calc_crc_long(outData, outSize), outSize);
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
     joinFile = platform::FileOpen(gText, platform::FileMode::Write);
@@ -7606,8 +7354,7 @@ void game::CheckForTimeEvent(void) {
     i32 secondaryAmount;
     i32 resourceAmount;
 
-    dayNumber4 = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                 + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    dayNumber4 = GAME_DAY_NUMBER(*this);
     for (eventIndex5 = 0; eventIndex5 < m_timeEventCount; eventIndex5++) {
         event0 = static_cast<timeEventExtra*>(ppMapExtra[m_timeEventIndices[eventIndex5]]);
         if (((gbHumanPlayer[giCurPlayer] && event0->appliesToHuman)
@@ -7651,18 +7398,7 @@ void game::CheckForTimeEvent(void) {
             if (gbThisNetHumanPlayer[giCurPlayer]) {
                 const std::string eventMessage =
                     localization::DecodeExternalText(event0->message);
-                NormalDialog(
-                    eventMessage.c_str(),
-                    1,
-                    -1,
-                    -1,
-                    primaryType9,
-                    primaryAmount2,
-                    secondaryType4,
-                    secondaryAmount,
-                    -1,
-                    0
-                );
+                NormalDialog(eventMessage.c_str(), 1, -1, -1, primaryType9, primaryAmount2, secondaryType4, secondaryAmount);
             }
         }
     }

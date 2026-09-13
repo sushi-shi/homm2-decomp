@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <SOURCE/army.h>
+#include <SOURCE/KB_TYPES.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
@@ -260,9 +262,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             if (targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                 || targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)])
                 isMindEffect_13 = true;
-            if (targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)]
-                || targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                || targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)])
+            if (ARMY_HAS_INCAPACITATING_SPELL(*targetCreature))
                 hasDamageReductionResult = true;
         } else {
             targetCreature = NULL;
@@ -870,10 +870,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             dragonCounter = adjacent;
             for (cnt = 0; cnt < m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]; cnt++) {
                 other = &m_armies[H2EnumIndex(target->m_side)][cnt];
-                if (other->m_monsterType == CREATURE_GREEN_DRAGON
-                    || other->m_monsterType == CREATURE_RED_DRAGON
-                    || other->m_monsterType == CREATURE_BLACK_DRAGON
-                    || other->m_monsterType == CREATURE_BONE_DRAGON) {
+                if (IS_DRAGON_CREATURE(other->m_monsterType)) {
                     dragonCounter++;
                     if (target->OtherArmyAdjacent(other->m_side, other->m_index))
                         adjacent = true;
@@ -910,9 +907,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     }
 
     effect = static_cast<i32>(effect * castChance);
-    if ((target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
-         || target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
-        && influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
+    if (ARMY_HAS_BERSERK_OR_HYPNOTIZE(*target) && influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
         effect = 0;
     return effect;
 }
@@ -922,7 +917,7 @@ void combatManager::ClearEffects(void) {
     i32 idx;
     for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
         for (idx = 0; idx < COMBAT_ARMY_SLOT_COUNT; idx++)
-            *(gArmyEffected[0] + H2EnumIndex(side) * COMBAT_ARMY_SLOT_COUNT + idx) = 0;
+            gArmyEffected[H2EnumIndex(side)][idx] = 0;
     }
 }
 
@@ -1335,16 +1330,14 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     monsterTotal = targetCreature_18->m_monsterType;
                     switch (spell) {
                         case SPELL_ARMAGEDDON:
-                            if (monsterTotal == CREATURE_IRON_GOLEM
-                                || monsterTotal == CREATURE_STEEL_GOLEM)
+                            if (IS_GOLEM_CREATURE(monsterTotal))
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
                             break;
                         case SPELL_FIREBALL:
                         case SPELL_FIREBLAST:
-                            if (monsterTotal == CREATURE_IRON_GOLEM
-                                || monsterTotal == CREATURE_STEEL_GOLEM)
+                            if (IS_GOLEM_CREATURE(monsterTotal))
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
@@ -1352,8 +1345,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                                 spellDamageWork <<= 1;
                             break;
                         case SPELL_METEOR_SHOWER:
-                            if (monsterTotal == CREATURE_IRON_GOLEM
-                                || monsterTotal == CREATURE_STEEL_GOLEM)
+                            if (IS_GOLEM_CREATURE(monsterTotal))
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
@@ -1363,8 +1355,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                         case SPELL_LIGHTNING_BOLT:
                         case SPELL_CHAIN_LIGHTNING:
                         case SPELL_ELEMENTAL_STORM:
-                            if (monsterTotal == CREATURE_IRON_GOLEM
-                                || monsterTotal == CREATURE_STEEL_GOLEM)
+                            if (IS_GOLEM_CREATURE(monsterTotal))
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
@@ -1373,8 +1364,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                             break;
                         case SPELL_COLD_RAY:
                         case SPELL_COLD_RING:
-                            if (monsterTotal == CREATURE_IRON_GOLEM
-                                || monsterTotal == CREATURE_STEEL_GOLEM)
+                            if (IS_GOLEM_CREATURE(monsterTotal))
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
