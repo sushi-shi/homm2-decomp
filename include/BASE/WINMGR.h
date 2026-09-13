@@ -14,7 +14,7 @@ typedef enum WindowManagerConstant {
     WINDOW_CYCLE_PALETTE_BYTES = 0x60
 } WindowManagerConstant;
 
-void CycleColors(i32);
+void CycleColors(i32 forceUpdate);
 void CreateFizzleTables(void);
 void CreateColorTables(void);
 void CreateColorLookupTables(void);

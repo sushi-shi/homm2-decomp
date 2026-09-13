@@ -47,20 +47,20 @@ struct ComPortState {
     tag_Anchor priorityQueue;
 };
 
-void add_node(struct tag_Anchor*, struct tag_Node*);
-struct tag_Node* pop_node(struct tag_Anchor*);
-void init_anchor(struct tag_Anchor*, i32, i32);
+void add_node(struct tag_Anchor* anchor, struct tag_Node* node);
+struct tag_Node* pop_node(struct tag_Anchor* anchor);
+void init_anchor(struct tag_Anchor* anchor, i32, i32);
 
 #define FREE_NODE_QUEUE(node, anchor)                                                              \
     while (((node) = pop_node(anchor)) != NULL)                                                    \
     H2_FREE(node)
-void ShutdownComError(const char*);
-i16 com_init(u8, ComBaudRate, i32);
-void com_term(i16);
-i16 com_rcv(i16, u16, void*);
-i16 com_snd(i16, u16, u16, const void*, i32);
+void ShutdownComError(const char* function);
+i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr);
+void com_term(i16 portIndex);
+i16 com_rcv(i16 portIndex, u16 requested, void* buffer);
+i16 com_snd(i16 portIndex, u16, u16 length, const void* data, i32 priority);
 i16 __cdecl com_sess(i32, i32, ...);
-u8 com_stat(i16, u16);
+u8 com_stat(i16 portIndex, u16);
 void comm_wrt_task(void);
 
 #endif

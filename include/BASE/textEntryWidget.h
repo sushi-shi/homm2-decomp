@@ -62,9 +62,9 @@ public:
     );
     virtual  ~textEntryWidget() override;
     virtual void Draw(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
-    void Read(TextEntryReadMode);
-    void SetupDisplayString(char*, u16);
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
+    void Read(TextEntryReadMode type);
+    void SetupDisplayString(char* source, u16 cursor);
 };
 #pragma pack(pop)
 #endif

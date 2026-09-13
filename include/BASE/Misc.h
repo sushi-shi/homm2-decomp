@@ -73,14 +73,14 @@ struct PCXHeader {
 #pragma pack(pop)
 
 void InitMemEntry(void);
-void* BaseAlloc(u32, const char*, i32);
-void BaseFree(void*, const char*, i32);
+void* BaseAlloc(u32 size, const char* originalFile, i32 originalLine);
+void BaseFree(void* ptr, const char* originalFile, i32 originalLine);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
 u32l MAKEFILEID(const char* text);
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key);
-void FadeIn(i32);
-void FadeOut(i32);
+void FadeIn(i32 increment);
+void FadeOut(i32 increment);
 i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, const char* file, i32 line);
 
@@ -117,24 +117,24 @@ void ReadPrefs(void);
 void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
-i32 IsCDDrive(i32);
-bool DriveSupportsFreeSpaceQuery(char);
+i32 IsCDDrive(i32 driveIndex);
+bool DriveSupportsFreeSpaceQuery(char driveLetter);
 CDRomSetupResult SetupCDDrive(void);
-void BitmapToScreen(class bitmap*);
-void SetPalette(i8*, i32);
-void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
-void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
+void BitmapToScreen(class bitmap* bmp);
+void SetPalette(i8* paletteData, i32 updateDisplay);
+void BlitBitmapToScreenNoMouseCheck(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
+void BlitBitmapToScreen(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
 void LogTruncate(void);
-void LogStr(const char*);
+void LogStr(const char* text);
 void LogInt(
-    const char* text,
-    i32 value,
-    i32 b = LOG_UNUSED_VALUE,
-    i32 c = LOG_UNUSED_VALUE,
-    i32 d = LOG_UNUSED_VALUE,
-    i32 e = LOG_UNUSED_VALUE,
-    i32 f = LOG_UNUSED_VALUE,
-    i32 g = LOG_UNUSED_VALUE
+    const char* label,
+    i32 value1,
+    i32 value2 = LOG_UNUSED_VALUE,
+    i32 value3 = LOG_UNUSED_VALUE,
+    i32 value4 = LOG_UNUSED_VALUE,
+    i32 value5 = LOG_UNUSED_VALUE,
+    i32 value6 = LOG_UNUSED_VALUE,
+    i32 value7 = LOG_UNUSED_VALUE
 );
 template<typename Enum>
 requires __is_enum(Enum) inline void LogInt(
@@ -149,12 +149,12 @@ requires __is_enum(Enum) inline void LogInt(
 ) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
-void AiPrint(const char*);
-void AbsAiPrint(const char*);
-void FadeTo(u8*, u8*, i32);
-void FadeToColorTable(u8*, i32);
+void AiPrint(const char* text);
+void AbsAiPrint(const char* text);
+void FadeTo(u8* source, u8* destination, i32 increment);
+void FadeToColorTable(u8* colorTable, i32 increment);
 i32 IsCycleColor(i32 color);
-void CreatePCXFile(char*, u8*, i32, i32, u8*);
+void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData);
 i32l FileSize(char* filename);
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index);
 i32 SRandom(i32 low, i32 high);
@@ -162,7 +162,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(const char*, char*, i32, const char*, i32, i32);
+void GetDataEntry(const char* prompt, char* destination, i32 maximumLength, const char* initialText, i32 showCancel, i32 useImmediateHandler);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 enum {

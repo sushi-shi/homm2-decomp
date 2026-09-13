@@ -3,21 +3,21 @@
 
 #include <Ints.h>
 
-void ModemSetup(i32);
+void ModemSetup(i32 mode);
 i32l Dial(void);
 i32l Wait(void);
-void GUIModemCommand(const char*, const char*);
+void GUIModemCommand(const char* message, const char* command);
 i8 GUIModemCommandExec(void);
-void ModemCommand(const char*);
-i8 GUIModemResponse(const char*, const char*);
+void ModemCommand(const char* command);
+i8 GUIModemResponse(const char* message, const char* response);
 i8 GUIModemResponseExec(void);
-i32 write_buffer(const char*, i32);
+i32 write_buffer(const char* buffer, i32 length);
 i32 read_byte(void);
-void write_byte(i32);
+void write_byte(i32 value);
 void Connect(void);
 i32 WaitForDirectConnect(void);
 char ReadPacket(void);
-void WriteModemPacket(const char*, i32);
+void WriteModemPacket(const char* buffer, i32 length);
 
 typedef enum ModemConstant {
     MODEM_MODE_DIAL                  = 3,

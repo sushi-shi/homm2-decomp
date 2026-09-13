@@ -40,15 +40,15 @@ public:
     void View(i32);
     i32 HasAllUndead(void);
     i32 HasSomeUndead(void);
-    i32 GetMorale(class hero*, class town*, class armyGroup*);
-    void Dismiss(i32);
-    i32 IsMember(CreatureType);
-    ArmyGroupAlignmentResult IsHomogeneous(i32);
-    i32 CanJoin(CreatureType);
+    i32 GetMorale(class hero* armyHero, class town* occupiedTown, class armyGroup* enemyGroup);
+    void Dismiss(i32 slot);
+    i32 IsMember(CreatureType creatureType);
+    ArmyGroupAlignmentResult IsHomogeneous(i32 countRaces);
+    i32 CanJoin(CreatureType creatureType);
     i32 GetNumArmies(void);
-    i32 Add(CreatureType, i32, i32);
-    void Swap(i32, class armyGroup*, i32);
-    void DamageGroup(float);
+    i32 Add(CreatureType creatureType, i32 quantity, i32 slot);
+    void Swap(i32 slot, class armyGroup* otherGroup, i32 otherSlot);
+    void DamageGroup(float damagePercent);
 };
 #pragma pack(pop)
 

@@ -7,17 +7,17 @@ class bitmap;
 class icon;
 
 void IconToBitmap(
-    class icon*,
-    class bitmap*,
-    i32,
-    i32,
-    i32,
-    IconDrawClipMode,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    IconDrawClipMode clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH,
+    i32 color
 );
 
 #endif

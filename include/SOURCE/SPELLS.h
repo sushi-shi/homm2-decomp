@@ -178,7 +178,7 @@ typedef enum SpellCastConstant {
 
 #define SPELL_GOLEM_DAMAGE_MULTIPLIER 0.5
 
-MessageDispatchResult CombatSpecialHandler(struct tag_message&);
-MessageDispatchResult HandleCastSpell(struct tag_message&);
+MessageDispatchResult CombatSpecialHandler(struct tag_message& message);
+MessageDispatchResult HandleCastSpell(struct tag_message& message);
 
 #endif

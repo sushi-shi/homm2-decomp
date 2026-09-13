@@ -12,6 +12,6 @@ enum {
     VIEW_WORLD_SCALE_NEAR   = 12
 };
 typedef i32 ViewWorldScale;
-MessageDispatchResult ViewWorldDialogHandler(struct tag_message&);
+MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message);
 
 #endif

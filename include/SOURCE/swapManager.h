@@ -35,10 +35,10 @@ public:
     i32 m_targetSlot;
     SwapManagerItemType m_itemType;
     swapManager(void);
-    swapManager(class hero*, class hero*);
-    virtual i32 Open(i32) override;
+    swapManager(class hero* leftHero, class hero* rightHero);
+    virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Reset(void);
     i32 DrawSwapWin(void);
     void DrawSelector(void);

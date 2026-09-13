@@ -59,14 +59,14 @@ struct RemoteMessage {
 #pragma pack(pop)
 
 void RemoteCleanup(void);
-void RemoteMain(RemoteGameMode);
-void UnloadRemoteDriver(i16);
-i32 calc_crc_long(u8*, i32);
-void calc_crc(u16*, u8*, i32);
-i32 EncodePacket(u8*, char, char, i32);
-i32 DecodePacket(u8*, i32);
-i32 SendRemoteData(u8*, u8*, i32, i32);
-i32 ReceiveRemoteData(u8*, u8*, i32);
+void RemoteMain(RemoteGameMode gameMode);
+void UnloadRemoteDriver(i16 networkDriver);
+i32 calc_crc_long(u8* data, i32 length);
+void calc_crc(u16* crc, u8* data, i32 length);
+i32 EncodePacket(u8* data, char source, char destination, i32 length);
+i32 DecodePacket(u8* data, i32);
+i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length);
+i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType);
 i32 TransmitRemoteData(
     char* data,
     i32 destination,
@@ -76,9 +76,9 @@ i32 TransmitRemoteData(
     i8 allowRetryDialog = 1,
     RemoteMessageType messageType = REMOTE_MESSAGE_DEFAULT
 );
-char* GetRemoteData(i8);
+char* GetRemoteData(i8 remove);
 void PollRemote(void);
-i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
+i32 TransmitAndWait(char* bytes, i32 destination, i32 length, i8 command, i8 responseCommand, char** response);
 
 extern bchar gbUseDiffCompression;
 extern bchar gbUseRegularCompression;

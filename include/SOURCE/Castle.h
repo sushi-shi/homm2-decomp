@@ -13,7 +13,7 @@ typedef enum CastleBuildingConstant {
     CASTLE_UPGRADE_OFFSET = 5
 } CastleBuildingConstant;
 
-MessageDispatchResult CastleHandler(struct tag_message&);
+MessageDispatchResult CastleHandler(struct tag_message& message);
 
 extern u8 castleSlotsBase[CASTLE_SLOT_COUNT];
 extern class heroWindow* casWin;

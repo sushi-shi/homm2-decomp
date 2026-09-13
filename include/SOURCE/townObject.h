@@ -16,9 +16,9 @@ public:
     i32 m_buildingId;
     icon* m_icon;
     border* m_border;
-    townObject(FactionType, BuildingSlotType, char*);
+    townObject(FactionType townType, BuildingSlotType buildingId, char* iconBaseName);
     ~townObject();
-    void Draw(i32);
+    void Draw(i32 advanceAnimation);
 };
 #pragma pack(pop)
 #endif
