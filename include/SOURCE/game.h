@@ -76,6 +76,12 @@ H2_ENUM_BEGIN(GameStateStorageConstant)
 H2_ENUM_END(GameStateStorageConstant)
 
 #pragma pack(push, 1)
+template <i32 Capacity>
+struct GameEventList {
+    u16 count;
+    u16 indices[Capacity];
+};
+
 class game {
 public:
     i16 m_difficultyRating;
@@ -137,12 +143,9 @@ public:
     b8 m_cheated;
     char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
     char m_rumour[GAME_RUMOUR_TEXT_SIZE];
-    u16 m_rumourEventCount;
-    u16 m_rumourEventIndices[GAME_RUMOUR_EVENT_CAPACITY];
-    u16 m_timeEventCount;
-    u16 m_timeEventIndices[GAME_TIME_EVENT_CAPACITY];
-    u16 m_mapEventCount;
-    u16 m_mapEventIndices[GAME_MAP_EVENT_CAPACITY];
+    GameEventList<GAME_RUMOUR_EVENT_CAPACITY> m_rumourEvents;
+    GameEventList<GAME_TIME_EVENT_CAPACITY> m_timeEvents;
+    GameEventList<GAME_MAP_EVENT_CAPACITY> m_mapEvents;
     class heroWindow* m_viewArmyWindow;
     i32 m_viewArmyResult;
     class heroWindow* m_viewSpellsWindow;

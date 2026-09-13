@@ -1,0 +1,149 @@
+id	path	va	casts	address	outside	reviewed_body_sha256	evidence	baseline_body_sha256
+include/EDITOR/fullMap.h:fullMap::Cell(mapCell * & cell,i32 x,i32 y)#1	include/EDITOR/fullMap.h				pending			7e2015e93cadc463046169cb27bc35c8a16459ba729db75240c326e05ac36688
+include/EDITOR/fullMap.h:fullMap::Column(i32 x)#1	include/EDITOR/fullMap.h				pending			60a45cd78b262cedf30f29b4d38ac76cedbc4c9d0af64133c8296dd445f39516
+include/EDITOR/fullMap.h:fullMap::Extra(i32 i)#1	include/EDITOR/fullMap.h				pending			05e5053b5e91af49d9e24d84bf41a149e1342ec0137c3968046ddf143ac11952
+include/EDITOR/fullMap.h:fullMap::GetCell(i32 x,i32 y)#1	include/EDITOR/fullMap.h				pending			06a03f26252f1f0ae5d446d3635db7e3cb7a67d08fc945783188c7d7d8369c4e
+include/EDITOR/fullMap.h:fullMap::Row(i32 y)#1	include/EDITOR/fullMap.h				pending			3231871e1127acd5a3963569a4942f796eb63a67cc56ef41eb7bf2264442b188
+src/BASE/BITS.asm:BitClear#1	src/BASE/BITS.asm				pending			44e9f68553676bafa582a486ec350b5cac668886b849f42010285566cd363688
+src/BASE/BITS.asm:BitSet#1	src/BASE/BITS.asm				pending			26178166c24abf96439e5b21c58f33bff94d5f22a90e139598df559f58178b5e
+src/BASE/BITS.asm:BitTest#1	src/BASE/BITS.asm				pending			0167e29540f04f0f50638c57ed56fe5a06ce9880456ce780facce8300fd612bf
+src/BASE/Bzip.cpp:DecodeData(char * dst,char * src,u32l srcLen)#1	src/BASE/Bzip.cpp	0x004cabe0	pending					0d72f61d81c07b34986085e780b8640ba2eb5e378b45783e582fe1e2035dbaf7
+src/BASE/Bzip.cpp:EncodeData(char * dst,char * src,u32l srcLen)#1	src/BASE/Bzip.cpp	0x004ca980	pending					6365c38cc0b0b493a67bee1ca5cb364d3b1c57982937a9e4dc37ab3d68f02ea7
+src/BASE/Bzip.cpp:SETFIRST16(Int32 a,UInt32 w)#1	src/BASE/Bzip.cpp	0x004c81f0	pending					da21667b6b8ac2ed8f29b66d1911dd7d0b628f46c893168ad32fe436f206343b
+src/BASE/Bzip.cpp:SETFOURTH(Int32 a,UChar c)#1	src/BASE/Bzip.cpp	0x004c8330	pending					8e7b84af8325a461cae5f317cd7844ae6fb015032132c4458c67119d708c107d
+src/BASE/Bzip.cpp:SETREST(Int32 a,UInt32 w)#1	src/BASE/Bzip.cpp	0x004c8230	pending					2295183775f4069ba2816358f1c848a05f264cc1197385554c7517d4d2baf77b
+src/BASE/Bzip.cpp:SETREST16(Int32 a,UInt32 w)#1	src/BASE/Bzip.cpp	0x004c81b0	pending					7c3f2c4cb8e2c323546ed71ec5993c41c4c7ad9b2e7004e82d1f50b7d58e6ffe
+src/BASE/Bzip.cpp:allocateCompressStructures(void)#1	src/BASE/Bzip.cpp	0x004c7f80	pending					7524d73e8a6184dee5c8ecf8bcaf9fa594a7fb3cb024c90f6fb0c19abb09f224
+src/BASE/Bzip.cpp:arithCodeSymbol(BitStream * bs,Model * m,Int32 symbol)#1	src/BASE/Bzip.cpp	0x004c7450	pending					2489d2678fab0ae8209b7f9eb8f1f7f74640287a47825c3a9f36e90c3f176cfc
+src/BASE/Bzip.cpp:bsClose(BitStream * bs)#1	src/BASE/Bzip.cpp	0x004c7170	pending					7d1c129cc17ac541c4e0ae1054011a84c2425f5a716cafa959cad8dc6d38ba41
+src/BASE/Bzip.cpp:bsOpenReadStream(FILE * f)#1	src/BASE/Bzip.cpp	0x004c6ef0	pending					373f8ea02f6ccfd911fce9d9c9cd20a6468d6af58bae44836684997f2c983d11
+src/BASE/Bzip.cpp:bsOpenWriteStream(FILE * f)#1	src/BASE/Bzip.cpp	0x004c6f50	pending					6b6f33712f3b26be5e759d7e7647b34cd1fa4ccb06ccdcc634f2c93418c365a8
+src/BASE/Bzip.cpp:doReversibleTransformation(void)#1	src/BASE/Bzip.cpp	0x004c9750	pending					d66482e7add670796887e7f54cacfe7a8deea6900694579166cd5b0aa9d163a7
+src/BASE/Bzip.cpp:getAndMoveToFrontDecode(BitStream * inStream)#1	src/BASE/Bzip.cpp	0x004c86c0	pending					1c50d2773fba55d718f886566f86e5b885734f936bbf101639303bbc5a40b577
+src/BASE/Bzip.cpp:getInt32(BitStream * bs)#1	src/BASE/Bzip.cpp	0x004c7970	pending					ae4e3c138d2ffb5409091494ecbee3fe8d8c4ea4e1517d466bce1994389f5fca
+src/BASE/Bzip.cpp:getUInt32(BitStream * bs)#1	src/BASE/Bzip.cpp	0x004c79f0	pending					41673bd13c610268387d40cd81b7385931aea6d0749b04032dbce872390c52a7
+src/BASE/Bzip.cpp:initBogusModel(void)#1	src/BASE/Bzip.cpp	0x004c7840	pending					f512c2fe09f47176970d3e1da1b75509e589d4b23ed929e495dcf0c3339a62fa
+src/BASE/Bzip.cpp:initModels(void)#1	src/BASE/Bzip.cpp	0x004c7a70	pending					332255a90f3905da0703090b6d3df9800799d32737c71a5eeba675139eb6e7d5
+src/BASE/Bzip.cpp:putUChar(BitStream * bs,UChar c)#1	src/BASE/Bzip.cpp	0x004c7860	pending					03d44666d2429d78da07e2713bfe311c2cfea3b323f5a3cc9491eece44a26fba
+src/BASE/Bzip.cpp:sendMTFVal(BitStream * bs,Int32 n)#1	src/BASE/Bzip.cpp	0x004c7cd0	pending					d983b7b1e81863ba87796ab8fcac84622ac19f9d8a045342626bbef739ac770b
+src/BASE/Bzip.cpp:setDecompressStructureSizes(Int32 newSize100k)#1	src/BASE/Bzip.cpp	0x004c80c0	pending					d00437e46b01d1cb9c76481932752a94dd6a16e506f3d563f4bffc650f9fa0dd
+src/BASE/Bzip.cpp:sortIt(void)#1	src/BASE/Bzip.cpp	0x004c9320	pending					f6f5dd72e235cae34f8dc63ba45644e820aa44397116f9c06fd7d0a2c1d41805
+src/BASE/Bzip.cpp:spotBlock(Bool weAreCompressing)#1	src/BASE/Bzip.cpp	0x004c99a0	pending					2d53073183b4a4a1e8ecef64e99a144d4a89b2c52c99e423c2fabb381e01f903
+src/BASE/Bzip.cpp:uncompressStream(FILE * zStream,FILE * stream)#1	src/BASE/Bzip.cpp	0x004ca250	pending					2c6a2a2266232fd6e053589537a0cfcc130e02b546bd9154ff0020f861dc22a8
+src/BASE/FONT.cpp:font::ExtractLine(char * text,char * line,i32 * position,i32 maxWidth,i32 * lineWidth,u8 lastLine)#1	src/BASE/FONT.cpp	0x004c3b20			pending			5688213c071fa8d05c57a14b426587a1be50ade187d1ca43e50377420252502b
+src/BASE/Icon2b.cpp:IconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color)#1	src/BASE/Icon2b.cpp	0x004c14c0	pending	pending	pending			ecc5be0a1b0e7a23046bcb73d595ed0b452e08f36a4074473ce5f8192aed7e64
+src/BASE/Icond2b.cpp:DimIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,i32 color,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH)#1	src/BASE/Icond2b.cpp	0x004c6af0			pending			de95b2422b47d63a79afceeb396c284ad78ea737d98291b12649a122f6be0e03
+src/BASE/Icondf2b.cpp:FlipDimIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,i32 color,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH)#1	src/BASE/Icondf2b.cpp	0x004d64b0			pending			59b3d9d08088523a00dc69142d379222ed92eb63cf0cf6e497b3b3dcdd557407
+src/BASE/Iconf2b.cpp:FlipIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color)#1	src/BASE/Iconf2b.cpp	0x004c1c60	pending	pending	pending			4b71569ac7773da93fb008494e2922bbdd8f205cbadbc3641e2a8590154f183a
+src/BASE/Iconm2b.cpp:MonoIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,i32 color,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH)#1	src/BASE/Iconm2b.cpp	0x004c67b0			pending			269b6bf35b30608e6633b5cc33bbafd272bd608136a5f1134b6c865058581670
+src/BASE/Iconmf2b.cpp:FlipMonoIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,i32 color,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH)#1	src/BASE/Iconmf2b.cpp	0x004d6130			pending			0f7822b222d79b9c93c9ec162a2a6268dad96218bd50b43262d9d2ea4095c40d
+src/BASE/Misc.cpp:ReadPrefsFromRegistry(void)#1	src/BASE/Misc.cpp	0x004be410			pending			63b61606e8ab5255d0d934f72908beb37212cdcd5897838976481cd3068f1944
+src/BASE/Misc.cpp:WritePrefsToRegistry(void)#1	src/BASE/Misc.cpp	0x004bedd0			pending			e4da9242ea0817c5241e0f7c10a08aa68b2b0ecf37bdea2e137c1addd1ec4c63
+src/BASE/Ripple.cpp:DoRipple(bitmap * source,bitmap * destination,i32 height,i32 strength)#1	src/BASE/Ripple.cpp	0x004cb6b0			pending			5bb322a9b1eae44e239fdebac3bcd56aea636fd5786db65e108cda8280ae4aa6
+src/BASE/TILE.asm:TileToBitmap#1	src/BASE/TILE.asm				pending			d0a6774b276075b8348d5c711b690e181f9df430f19cf30ada2a525797b5c014
+src/BASE/bmap2.cpp:BlitBitmap(class bitmap * src,i32 sx,i32 sy,i32 w,i32 h,class bitmap * dst,i32 dx,i32 dy)#1	src/BASE/bmap2.cpp	0x004c65d0			pending			b0c37ea11f1857bfa688f5735f23f8d9ad471017c2fd6ad7127ec0ecdaf7d975
+src/BASE/bmap2.cpp:DimBitmapArea(class bitmap * bmp,i32 x,i32 y,i32 w,i32 h,i32 level)#1	src/BASE/bmap2.cpp	0x004c6690			pending			80c287e985b026f0d634ecf54161caaad61c24bf797fbfd0da95003f7db4ecf3
+src/BASE/bmap2.cpp:FillBitmapArea(class bitmap * bmp,i32 x,i32 y,i32 w,i32 h,i32 color)#1	src/BASE/bmap2.cpp	0x004c6450			pending			afc39853bf89933d3ae92de6f3c6b5547ee26200cb0817160f1042f25df5aa1e
+src/BASE/icon2bc.cpp:IconToBitmapColorTable(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,u8 * colorTable,i32 dimGate)#1	src/BASE/icon2bc.cpp	0x004c0ca0	pending	pending	pending			00997f592ffa836a9bb93cd3ec83cbd35e8be58f93fd445ff5e97da6000d35eb
+src/BASE/icon2bs.cpp:IconToBitmapScale(class icon * srcIcon,class bitmap * dest,i32 destX,i32 destY,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 scale)#1	src/BASE/icon2bs.cpp	0x004cc4e0			pending			1bf3b5c0367312a168cbd911f2677eb5396724e47d12ebae016bb6949ea844a9
+src/BASE/icon2by.cpp:IconToBitmapYModify(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,i8 * shear)#1	src/BASE/icon2by.cpp	0x004d5a50	pending	pending	pending			d79415b20935aff32c480f9925a80328d898e3bc1f6bd079e82c3004e6b306ed
+src/BASE/iconf2bc.cpp:FlipIconToBitmapColorTable(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,u8 * colorTable)#1	src/BASE/iconf2bc.cpp	0x004d4960	pending	pending	pending			82848ebb8d12c2202666ea5c993c5451eeef3642706a4aea7d7bb358f57ce96b
+src/BASE/iconf2by.cpp:FlipIconToBitmapYModify(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,i8 * shear)#1	src/BASE/iconf2by.cpp	0x004d5270	pending	pending	pending			3747a1e500fde0ac5894568cc7ee68f7e57e0b03006135fdf4b2ad3d89f92030
+src/SOURCE/ADVMGR.cpp:ComputeAdvNetControl(void)#1	src/SOURCE/ADVMGR.cpp	0x00413a54			pending			103187fc0000506013688534a5875738de1014d4646d9f86fd952b09c52679f8
+src/SOURCE/ADVMGR.cpp:GetHeroSlot(i32 i)#1	src/SOURCE/ADVMGR.cpp				pending			406167259f5cdc97a041bc3efeba24297945e180b3c30619b7b4085c6bed9931
+src/SOURCE/ADVMGR.cpp:MapExtraPosAndAdjacentsSet(i32 x,i32 y,u8 mask)#1	src/SOURCE/ADVMGR.cpp	0x00413b4d			pending			dc65e9e5138381740e9adab143dd11f4b3e16ab5c44de0e400c5d12b8d95a651
+src/SOURCE/ADVMGR.cpp:SystemOptionsHandler(struct tag_message & message)#1	src/SOURCE/ADVMGR.cpp	0x00414e82	pending					2071aad61ff2b1d24939dead5e430400862ebd1caa16d40fe9bf3bf73639f233
+src/SOURCE/ADVMGR.cpp:UpdateSystemOptions(i32 initialDraw)#1	src/SOURCE/ADVMGR.cpp	0x00414b62	pending					21968059c80bbb278dc86af323e63c2983e60bf426d2412bc3b23caf852f7c07
+src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNet(void)#1	src/SOURCE/ADVMGR.cpp	0x00412e8c	pending					dee86928b74d26ebc92f8e89dcbe6bcfd355138cd2427c8c77ab476e6bbe8e26
+src/SOURCE/ADVMGR.cpp:advManager::ComboDraw(i32 originX,i32 originY,i32 animate)#1	src/SOURCE/ADVMGR.cpp	0x0040f30a			pending			c8dc08b71644dd874b861b234211624423295568c0e08e0ee16b781e80370c66
+src/SOURCE/ADVMGR.cpp:advManager::ProcessDeSelect(struct tag_message * message,i32 * result,class mapCell ** eventCell)#1	src/SOURCE/ADVMGR.cpp	0x00404308	pending					38cd13a8d32275394379beac49ae84144ced1a926686bed4187c0f6d1341ccfb
+src/SOURCE/ADVMGR.cpp:advManager::QuickInfo(i32 cellX,i32 cellY)#1	src/SOURCE/ADVMGR.cpp	0x00409363	pending					6b49adb067feaf21ac320c06c6aa5313b770fef83b4ff0f07fd1660016042762
+src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewEnemyTurn(void)#1	src/SOURCE/ADVMGR.cpp	0x0040ad72	pending					f5e391a15665b4da40f9f9b3779e95bf9624dc46cb812e51f824233a79a83a1e
+src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewHero(void)#1	src/SOURCE/ADVMGR.cpp	0x0040bd33	pending					b8b3b9d712a0229e9ec1d7db6b9546578006546f1b821839420eb1e41054499e
+src/SOURCE/ADVMGR.cpp:advManager::UpdateRadar(i32 updateScreen,i32 partial)#1	src/SOURCE/ADVMGR.cpp	0x004084ac			pending			93f7e8ed1e537fbaa44b4518a5c21cda8289139e2fdfb06443ad0890a157df8c
+src/SOURCE/ARMY.cpp:BuildTempWalkSeq(struct SMonFrameInfo * frameInfo,i32 finishStanding,i32 skipDrawing)#1	src/SOURCE/ARMY.cpp	0x00420d33			pending			fc463ca8df95a2c5cde8d7c98eac1eb72698635bfd2b4075012d50193757876e
+src/SOURCE/ARMY.cpp:army::CancelIndividualSpell(ArmySpellInfluence influence)#1	src/SOURCE/ARMY.cpp	0x0041f943	pending					1e3630e69af19d00343a25a250d2610c46900ee702de32a25af65fac4f1e647a
+src/SOURCE/ARMY.cpp:army::Damage(i32l damage,SpellType spell)#1	src/SOURCE/ARMY.cpp	0x0041dd32	pending					b7c87673ea44ae8895ec4d991f8aed5ed081070a22f7f296e7bf96320c30c373
+src/SOURCE/ARMY.cpp:army::DoHydraAttack(i32)#1	src/SOURCE/ARMY.cpp	0x0041b858	pending					461a2c625fa39fd202b7fffe2eeb84d1fdd5b2b756ce199bd9238cb4b6ff173f
+src/SOURCE/ARMY.cpp:army::DrawToBuffer(i32 x,i32 y,i32 effectsOnly)#1	src/SOURCE/ARMY.cpp	0x00419095	pending					bd0ed60050221a2c0064473338674e1626077e50e47944f5d7a223829e7917d3
+src/SOURCE/ARMY.cpp:army::Init(CreatureType monsterType,i32 quantity,CombatSide side,i32 index,i32 hex,i32 unknown)#1	src/SOURCE/ARMY.cpp	0x004187f1	pending					ad5b9721891113ed5addde99a8ebbd5bde6adcdc50bc7f9a1d44de6dcfef2918
+src/SOURCE/ARMY.cpp:army::SetSpellInfluence(ArmySpellInfluence influence,i32 rounds)#1	src/SOURCE/ARMY.cpp	0x0041fa5f	pending					fa5692b1e595e06bd38562931aa2658d62634138f9d7be764ee3b98862d5fbf7
+src/SOURCE/CMBTMGR.cpp:combatManager::LoadIcons(void)#1	src/SOURCE/CMBTMGR.cpp	0x00427a8b	pending					f4305cda8cb00b5dfb91c9fdcdce53f4cbf028956e627ce687ee3513ead2fbaa
+src/SOURCE/CMBTMGR.cpp:combatManager::SetupAndLoadObstacles(void)#1	src/SOURCE/CMBTMGR.cpp	0x0042a1c4			pending			f58a91d3503b01011d01b9968ba59e06581ac9d861f72b2fbda00e24b3d39913
+src/SOURCE/CMBTMGR.cpp:combatManager::SetupCombat(i32 mapX,i32 mapY,hero * attackerHero,armyGroup * attackerGroup,town * defenderTown,hero * defenderHero,armyGroup * defenderGroup,i32 combatX,i32 combatY,i32 randomSeed)#1	src/SOURCE/CMBTMGR.cpp	0x00426089	pending					789894b017b02a20dbc0e7c721cccf5d830478b7dd8d65125e5bc38be001b09e
+src/SOURCE/Campaign.cpp:CampaignHandler(struct tag_message & message)#1	src/SOURCE/Campaign.cpp	0x004233b8			pending			2dc4e77ca47616770a0830d1442368b528369d47976ceeb35d4e4824d59de925
+src/SOURCE/Campaign.cpp:game::CampaignInfoUpdate(i32 redraw)#1	src/SOURCE/Campaign.cpp	0x00422adc			pending			54354137dafba20dbcea2800cfdd54e265065a8f33f6fe7dc2f99bdd70f9ecfd
+src/SOURCE/Campaign.cpp:game::InitCampaignMap(void)#1	src/SOURCE/Campaign.cpp	0x0042387e			pending			bd664a352bb14b066f26763503db95f322a45d639a31b4b06ae4460b50f43219
+src/SOURCE/Campaign.cpp:game::InitEntireCampaign(CampaignSide side)#1	src/SOURCE/Campaign.cpp	0x00423842			pending			2094baa2c10e6fb1b749874e871b631ffa98dff208530d72e1e038deff9699b0
+src/SOURCE/EVENTS.cpp:advManager::DoAIEvent(mapCell * cell,hero * eventHero,i32 x,i32 y)#1	src/SOURCE/EVENTS.cpp	0x00444d73		pending				a1c90ff3bc802f2ffef1bb770822dac1ddfab0e38593f949da3c10268c4fcff7
+src/SOURCE/GAME.cpp:CheckValidAvailableHeroes(void)#1	src/SOURCE/GAME.cpp	0x004607ea	pending					bf7e3ec63a9d4ff8b124c1832999fe801f00116392fa5b9fe9c78f476c8cfb11
+src/SOURCE/GAME.cpp:CreateDiffFile(char * oldName,char * joinName,char * diffName,i32 remotePlayer,i32 forceWhole)#1	src/SOURCE/GAME.cpp	0x0045f47a			pending			6dc8ed35a5ed6a1807b011e68c4943c741f2e8b7d4718421926d1add627d8b3d
+src/SOURCE/GAME.cpp:CreateJoinFile(char * oldName,char * diffName,char * joinName)#1	src/SOURCE/GAME.cpp	0x0045f9cd			pending			4e7772572104e9d1abeccb4aae297cd6789ea2232cf3af885e4aaf4966a523b7
+src/SOURCE/GAME.cpp:GetMapEvent(i32 x,i32 y)#1	src/SOURCE/GAME.cpp	0x00460424	pending					2c8b599cbb008e0d263355d1fb20d14eefa752a062e98fcbfdf7ae1dc85544db
+src/SOURCE/GAME.cpp:ViewArmyHandler(tag_message & msg)#1	src/SOURCE/GAME.cpp	0x00456231	pending					519b463a1b2ffdd342c7cfc19cd30b666a0efd862ce3d734daaf6e395046ef41
+src/SOURCE/GAME.cpp:game::CheckForTimeEvent(void)#1	src/SOURCE/GAME.cpp	0x004604d2	pending					c4af3b0be311ac8eb48d95aca826ba3bd88edf118f98d3411f555ec7d818c707
+src/SOURCE/GAME.cpp:game::LoadGame(char * filename,i32 loadFromFile,i32)#1	src/SOURCE/GAME.cpp	0x0044e8d9			partial	c0a23c0053a1a4969398d7624b757cce9c80ce7d74a4533ed21bffeb2bb347ad	CP02.md	e02e22cea24add301828ac3bd6400fdd9f7f899941ab3d499691baa9ec3d4f6c
+src/SOURCE/GAME.cpp:game::MakeAllWaterVisible(i32 player)#1	src/SOURCE/GAME.cpp	0x0045b944	pending					9a42c5f152635abf887d8722a5a3152fbafdceb687ecbe0ffb5639f5987d4ca8
+src/SOURCE/GAME.cpp:game::PerMonth(void)#1	src/SOURCE/GAME.cpp	0x00459b19	pending					fecb6416b3f81bb39984aa1696443654cdcbc72e6305842859a72541ec13d9d1
+src/SOURCE/GAME.cpp:game::SaveGame(char * filename,i32 generateName,i8 expansionFormat)#1	src/SOURCE/GAME.cpp	0x0044d3ae			partial	5486ac731451bbeb9dfdee6ef8f9bc9e3651c1f51cb12f8646154c1bdad5c864	CP02.md	c6ce69bedddbc4b3218c6678ec62e843b7d21b474664c0ad635ce099b991f6ad
+src/SOURCE/GAME.cpp:game::SetVisibility(i32 x,i32 y,i32 player,i32 radius)#1	src/SOURCE/GAME.cpp	0x0045b736	pending					fac13142f7956c7ff0da8a8d76650eb68f42af111a9acb6e1d3a9a907cac7857
+src/SOURCE/GAME.cpp:game::SetupPuzzlePieces(i32 player,i32 justCount)#1	src/SOURCE/GAME.cpp	0x0044cb1e			pending			05339fcc8537380a6f33472dfe2c4fbe5fbeaec2b8b8c2cefd9bcd061cec8ccd
+src/SOURCE/HERO.cpp:hero::Deallocate(i32 updateMap)#1	src/SOURCE/HERO.cpp	0x004617f2			pending			7574ada711c4257bdb074036154ff0c04a188e3008b131c0043682f4b5938c2b
+src/SOURCE/HISCORE.cpp:highScoreManager::Update(void)#1	src/SOURCE/HISCORE.cpp	0x004654ef	pending					5ce8f1bb34ece3c8009680f73e6f7bafb98ced50f5e99d5168c42a7ac18ced26
+src/SOURCE/KB.cpp:AddScoreToHighScore(i32 score,i32 days,i32 scenario,HighScoreType highScoreType,char * scenarioName)#1	src/SOURCE/KB.cpp	0x0046bb0e			pending			118e47f25e683731b22436c40836ec58639158b590aae495b39120f6db6cc6dd
+src/SOURCE/KB.cpp:CheckEndGame(CheckEndGameForcedResult forcedResult,b32 dragonCityCaptured)#1	src/SOURCE/KB.cpp	0x00469899	pending					c84365fec6965c112607aac0cf2dd87aea174bc33a6a1ab81f831be6dbceaf0b
+src/SOURCE/Overview.cpp:game::Overview(void)#1	src/SOURCE/Overview.cpp	0x0047bda1		pending			CP03.md	b719a2993245069a194eff654d20cbdefa17a05bc4f0f3b0db68e662dccd13a3
+src/SOURCE/Overview.cpp:game::SetupDynamicStuff(i32 redraw,i32 updateKnob,i32 forceUpdate)#1	src/SOURCE/Overview.cpp	0x00479ba0		pending			CP03.md	f7335508caa1ccf31c116cc13a56f4265e87b5a61874e4e18801670bcf7254a1
+src/SOURCE/PHILAI.cpp:GetHeroSlot(i32 id)#1	src/SOURCE/PHILAI.cpp				pending			4e844a0ed0759391c7f18aa8e2c23168dd89fcee7aaa40b88dd6acc8134b04a2
+src/SOURCE/PHILAI.cpp:philAI::BuildHero(town * townPtr,i32 availableHeroIndex)#1	src/SOURCE/PHILAI.cpp	0x00487cf6	pending					ceeadd5ca43c32d8c311722ff5b0beb27692a84df6daf3ac39ddcbf34d5c6c2e
+src/SOURCE/PHILAI.cpp:philAI::CanBuyBHC(BHC & bhc)#1	src/SOURCE/PHILAI.cpp	0x00488284	pending					0e631a254f27ed0cdccdb762107d764ba4ac7e7c9e034b68e9b24ef3eb81119c
+src/SOURCE/PHILAI.cpp:philAI::ChooseToFightForArtifact(ArtifactType artifact,CreatureType monster,i32 quantity)#1	src/SOURCE/PHILAI.cpp	0x00487b1f	pending					e915b4351fc28f2617f8b35843dc77f79da0d65f1e3c62810a033bb7d365f024
+src/SOURCE/PHILAI.cpp:philAI::CombatMonsterEvent(hero * h,CreatureType monType,i32 * pCount,mapCell * cell)#1	src/SOURCE/PHILAI.cpp	0x0048839b	pending					06f5f3b718fd95eef10c7d0024dd02567524ce5332d383b17481e4e61641889d
+src/SOURCE/PHILAI.cpp:philAI::ComputeUpgradeValue(CreatureType a1,CreatureType a2)#1	src/SOURCE/PHILAI.cpp	0x00488e2b	pending					7bc3e8e6bc20449e7377806d00d33baa2d8f01f4a9be563a0fd0e96d0aa02e9f
+src/SOURCE/PHILAI.cpp:philAI::ComputeValueOfSS(hero * h,HeroSecondarySkill skill,HeroSkillLevel level)#1	src/SOURCE/PHILAI.cpp	0x00488eb5	pending					3a35451d4d573bf255ea8e82ebd031c729c4842a444dfef8a21113f2177011d1
+src/SOURCE/PHILAI.cpp:philAI::DetermineTargetPosition(i32 & targetX,i32 & targetY,i32 mobility,MapDirection & direction)#1	src/SOURCE/PHILAI.cpp	0x00481c03	pending					a6c3224acc384646f81ead07e7c0afc7e9649811311badb968b65e854dd80733
+src/SOURCE/PHILAI.cpp:philAI::DoAI(i32 player)#1	src/SOURCE/PHILAI.cpp	0x0047fd23	pending					52dbfcf6ee5cd0cc7784f2b2d92d9ed5bda23425e33fc34308a73782beb0b974
+src/SOURCE/PHILAI.cpp:philAI::DoAnywhereDDoorTownGate(i32 targetValue)#1	src/SOURCE/PHILAI.cpp	0x0047f72a			pending			e61d1500b5f4344afb0164bdb94e8442ed20351a62b6fdf51e51ffbdfa2bf2ef
+src/SOURCE/PHILAI.cpp:philAI::EvaluateArtifactEvent(ArtifactType artifact,i32 eventData)#1	src/SOURCE/PHILAI.cpp	0x0048b270	pending					536a97dbd562f8a6354e08f077c3a09102d18df7078c1bfb3ef27b2794303f6d
+src/SOURCE/PHILAI.cpp:philAI::EvaluateGenericSite(mapCell * cell)#1	src/SOURCE/PHILAI.cpp	0x0048aacf	pending					4c509275b973fbda3a6814175009441a147655c53723018e5b33ac02a27ae4d3
+src/SOURCE/PHILAI.cpp:philAI::EvaluateHeroEvent(i32 heroId,i32 x,i32 y,i32 mode,i32 * liveChance)#1	src/SOURCE/PHILAI.cpp	0x0048ba5e	pending					b2dd5f1d2ecd82c622bd82c5acc70699a911416e775a0327456cc68ae6bd517e
+src/SOURCE/PHILAI.cpp:philAI::EvaluateMonsterEvent(CreatureType monsterType,i32 eventData,i32 * liveChance)#1	src/SOURCE/PHILAI.cpp	0x0048b77b	pending					24356f975bc8269a214970bf6511d2dd9ec4cf73a9c9f9e29bdad8cf90805499
+src/SOURCE/PHILAI.cpp:philAI::EvaluateRecruitSite(mapCell * cell)#1	src/SOURCE/PHILAI.cpp	0x0048adef	pending					7ca925faf28a80850f0d8a9a4f033fbebb863fdd8e296621725b9838025512f2
+src/SOURCE/PHILAI.cpp:philAI::FightEvent(hero * h,mapCell * cell,i32 evaluateOnly)#1	src/SOURCE/PHILAI.cpp	0x004884f1	pending					5e60873d3eae8a52357302f65b7efb289ef2186e7802362e01c8178c14237205
+src/SOURCE/PHILAI.cpp:philAI::FightValueOfStack(armyGroup * group,hero * heroPtr,i32 useHero,i32 useTown,i32 townId,i32 useEnemyMods)#1	src/SOURCE/PHILAI.cpp	0x004859c8	pending					7b206bd45afa390dc7f18b2f3e0b5298b1cda199bad3f46b7077b07b919c168b
+src/SOURCE/PHILAI.cpp:philAI::GetTurnAIVars(i32 player)#1	src/SOURCE/PHILAI.cpp	0x004808a1	pending		pending			c88b9efe7cac444b4f29845236b059e348d4a9bbdca6dfe682bfccc4137210df
+src/SOURCE/PHILAI.cpp:philAI::HeroInteractionAtHero(hero * firstHero,hero * secondHero,i32 evaluateOnly,i32 * value)#1	src/SOURCE/PHILAI.cpp	0x00486b43	pending					9215c5fbefcaf0374cc238a550a0fc8c9ae590a885abbdf1dc0554df1fd00d00
+src/SOURCE/PHILAI.cpp:philAI::HeroInteractionAtTown(hero * heroPtr,town * townPtr,i32 doInteraction,i32 * value)#1	src/SOURCE/PHILAI.cpp	0x00486ed0	pending					bb56b4c799114ac728d496739ef14befe6119d58fe93b25908741c7689c7d590
+src/SOURCE/PHILAI.cpp:philAI::QuickCombat(armyGroup * attacker,hero * attackerHero,armyGroup * defender,hero * defenderHero,i32 townBattle,i32 townId,float & attackerDamage,float & defenderDamage)#1	src/SOURCE/PHILAI.cpp	0x004864fe	pending					b07e3600f11da1aa70cca0c34812c247c742338cdfd170ac7e16bccc29e9ab6c
+src/SOURCE/PHILAI.cpp:philAI::StrategicValueOfPosition(i32 targetX,i32 targetY,i32 immediate,i32 checkEnemies,i32 * liveChance,i32 extraDistance)#1	src/SOURCE/PHILAI.cpp	0x00484b78	pending					3b642e089ff3cde6338c57e9648228d920ffc52164d26e075b1119d8aac9308a
+src/SOURCE/PHILAI.cpp:philAI::TurnValueOfObelisk(i32 player)#1	src/SOURCE/PHILAI.cpp	0x0048584e			pending			31cb79fbcc02c898e8b11e88e75417d4fad49b27b3714415639ca31942852aee
+src/SOURCE/PHILAI.cpp:philAI::ValueOfBuyingBuilding(town * townPtr,BuildingSlotType building,i32 & resourceValue,float & benefitCost)#1	src/SOURCE/PHILAI.cpp	0x00483019	pending					b0cf7ace93d10ca89f830762b3159b54a85e9ad5c5748227ab3b69f56e214a63
+src/SOURCE/PHILAI.cpp:philAI::ValueOfEventAtPosition(i32 x,i32 y,i32 immediate,i32 * liveChance)#1	src/SOURCE/PHILAI.cpp	0x0048911d	pending					17ceead73b0a6835fa88f77a76f41f58f27e02880955295d197a8850ab49cc52
+src/SOURCE/REMOTE.cpp:DecodePacket(u8 * data,i32)#1	src/SOURCE/REMOTE.cpp	0x0048d93c	pending					aa79e3750d7e270bcf5c9c3356afacdd473284be4d75fe70187d288c570a4775
+src/SOURCE/REMOTE.cpp:EncodePacket(u8 * data,char source,char destination,i32 length)#1	src/SOURCE/REMOTE.cpp	0x0048d8bf	pending					097f5570d50a34d30d391d3c66d1b9d8cb8896343a28af4d2c97b54e4650d20a
+src/SOURCE/REMOTE.cpp:PollRemote(void)#1	src/SOURCE/REMOTE.cpp	0x0048df6f	pending					5b3d449b72a89fcd2e25473030c5c81513ba32a6296578e55921f6e21468bdb1
+src/SOURCE/REMOTE.cpp:RemoteMain(RemoteGameMode gameMode)#1	src/SOURCE/REMOTE.cpp	0x0048d1ac	pending					f72b86a178909eb0539043958964b54dc9a8736b0976f711e23abd37246122f1
+src/SOURCE/REQUEST.cpp:fileRequester::fileRequester(i32 x,i32 y,FileRequesterMode mode,char * pattern,char * directory,char * defaultExtension)#1	src/SOURCE/REQUEST.cpp	0x0048ef59			pending			71f7e9f36003763414ee6ae482d56113757bcc82de463ec87fb7b088b376f62e
+src/SOURCE/SPELLS.cpp:combatManager::Armageddon(void)#1	src/SOURCE/SPELLS.cpp	0x0049bdf2	pending					61c7a6746cea1a7d66de9a7eedc934c3f96476ea3096264344c22edcc0a7a3e5
+src/SOURCE/SPELLS.cpp:combatManager::CastSpell(SpellType spell,i32 targetHex,i32 castByCreature,i32 teleportDestination)#1	src/SOURCE/SPELLS.cpp	0x00499653	pending					8935b8e549fb05fd59d7adae8f7af3a4f55a03170df7c435c3a72b6970d569f4
+src/SOURCE/SPELLS.cpp:combatManager::DrawBolt(SBolt * bolt,i32 stepCount)#1	src/SOURCE/SPELLS.cpp	0x0049ce89			pending			e789775dc7552e8ac08345b7748b43755b9a99b3929fc5291cfe084a2fa1a261
+src/SOURCE/SPELLS.cpp:combatManager::Fireball(i32 targetHex,SpellType spell)#1	src/SOURCE/SPELLS.cpp	0x0049b2bd	pending					f1b096a184d9f95574cd3218fdc1a779b51cb0bdd3d0342282d94ef4a7d57eb3
+src/SOURCE/SPELLS.cpp:combatManager::RippleCreature(CombatSide side,i32 armyIndex,CombatRippleMode mode)#1	src/SOURCE/SPELLS.cpp	0x0049e51a			pending			7f0bac346f8139194d2cd2b71648661fa0ee5823332b0539d430af0d34049d1c
+src/SOURCE/SPELLS.cpp:combatManager::VaporizeCreature(CombatSide side,i32 armyIndex)#1	src/SOURCE/SPELLS.cpp	0x0049e2b3			pending			095b901a7168ee0a1e73761ddaa58dc3012ea21e163703e5b24491ecfdb1317c
+src/SOURCE/TOWN.cpp:town::Deallocate(void)#1	src/SOURCE/TOWN.cpp	0x004a42d0			pending			3122b167ec9aa3eacc5ec7d61dfc76ff1d70c05f2e327c84e49be86ed66466fb
+src/SOURCE/TOWNMGR.cpp:GetCategoryStats(TownThievesGuildCategory category,i32l * const stats,i8 * const order)#1	src/SOURCE/TOWNMGR.cpp	0x004ac127	fixed			0cdd261f77abd771c2c6cf150b2c02079db6ac44dd2ff8c7bb729e6dbce6cbf1	CP01.md	e2aa7b180accd50fdce38dbb44c47639ea2a599e785f2f911e111cd1285e5000
+src/SOURCE/TOWNMGR.cpp:SortStats(i32l * const stats,i8 * const order)#1	src/SOURCE/TOWNMGR.cpp	0x004ac5c7	fixed			2eb03c40ad7b9b68ff6541e57704f23f2c103524e52e2350ad8c5acbeb375bad	CP01.md	dc6013ab17130553c6275200d3fdf3b8516e20900d1939dbca20e82b27426117
+src/SOURCE/TOWNMGR.cpp:townManager::BuyBuild(BuildingSlotType building,i32 cannotBuy,i32 quickView)#1	src/SOURCE/TOWNMGR.cpp	0x004a89fe	fixed			b18650561af90d181a8965b724b9d9ab3603260f5dd2ba97014a52d4239acc82	CP01.md	96e3f334702b709c917383bd23337008d83fd0963db544bfe911ac7457d821cd
+src/SOURCE/TOWNMGR.cpp:townManager::SetupThievesGuild(heroWindow * window,i32 informationLevel)#1	src/SOURCE/TOWNMGR.cpp	0x004ab344	pending					3b8605caf7681ce66982fc4e25736c63a4a67170315f12882c6e490106cfc0ca
+src/SOURCE/X_CAMPGN.cpp:ExpCampaign::InitMap(void)#1	src/SOURCE/X_CAMPGN.cpp	0x004b3427			pending			fe94363490bc83b05914cc48cd568a61ef768129116ef519bc705b4e08196698
+src/SOURCE/X_CAMPGN.cpp:ExpCampaign::IsSpecialLossCondition(i32 playerIndex)#1	src/SOURCE/X_CAMPGN.cpp	0x004b5285			pending			f4c193b078118b4796895241317312897cd148973a4cc48f63bffe05d478bc67
+src/SOURCE/comwin.cpp:com_snd(i16 portIndex,u16,u16 length,void * data,i32 priority)#1	src/SOURCE/comwin.cpp	0x00433048			pending			4c4e172715418b152d1cf8b909b23b25ee9e34b33ad13da9e4438311db6f3029
+src/SOURCE/comwin.cpp:comm_wrt_task(void)#1	src/SOURCE/comwin.cpp	0x004331c7			pending			b57afe15197c47e4f2614294d7e830f8521b45d49c6d9d147d88d209c0cf760d
+src/SOURCE/netwin.cpp:nb_listen(i32 session,void * name)#1	src/SOURCE/netwin.cpp	0x00474f38			pending			cdfbacd2a0869e9e7d01e3b171d4a6798fdf54998965950159a11f20106c3c35
+src/SOURCE/netwin.cpp:nb_rcv(i16 session,void * buf)#1	src/SOURCE/netwin.cpp	0x0047421c			pending			09969f57544d09ad87e2f182dd65a415bda400be1b347568812d1ea5774d3db9
+src/SOURCE/netwin.cpp:nb_recv_complete(i32 session)#1	src/SOURCE/netwin.cpp	0x004752c3			pending			1157c3b1896d63a0ab2759a5a286cbf2f604a5af51c14ff4ba1151406133d6f0
+src/SOURCE/netwin.cpp:nb_snd(i16 session,i16 len,void * data)#1	src/SOURCE/netwin.cpp	0x004742b2			pending			76f6327487db1595034b5e3c1e8325adc4429993bbcf495cd839742846ff18dd
+src/SOURCE/netwin.cpp:nb_thr_ctl(void)#1	src/SOURCE/netwin.cpp	0x00474848			pending			5a7a390172f4729dc44c643488c7bd801303f6004ffa733156e46c278fd116cd
+src/SOURCE/tradpost.cpp:ComputeTradeRatios(i32 sourceResource,i32 destinationResource,i32 * ratio,i32 * leftDenominated,i32 * maxTrade)#1	src/SOURCE/tradpost.cpp	0x004aceac			pending			323a59fe60b56d4df8183de0af423438cdc58a20a2fa39f3f7412f1b39701f2a
+src/SOURCE/tradpost.cpp:SetupNewTrade(void)#1	src/SOURCE/tradpost.cpp	0x004ad0a5			pending			b1e8ce167fb4f690756d44770694338a9427a2e2d0f1d2b27b39545e98610dc5
+src/SOURCE/tradpost.cpp:TradingPostHandler(struct tag_message & message)#1	src/SOURCE/tradpost.cpp	0x004ad0d4			pending			4711ed593b1334baa2f4c89fe125b6d3a233cafaf01e0befd743cf3c03a3bb56

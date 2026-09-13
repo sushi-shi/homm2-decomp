@@ -1288,16 +1288,16 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     WRITE_FILE_VALUE(outFile, m_ultimateArtifactId);
     write(outFile, m_rumour, sizeof(m_rumour));
     write(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    write(outFile, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(outFile, &m_rumourEvents, SAVE_EVENT_HEADER_SIZE);
     write(
         outFile,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_rumourEvents.count * sizeof(m_rumourEvents.indices[0])
     );
-    write(outFile, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(outFile, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    write(outFile, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(outFile, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    write(outFile, &m_timeEvents, SAVE_EVENT_HEADER_SIZE);
+    write(outFile, m_timeEvents.indices, m_timeEvents.count * sizeof(m_timeEvents.indices[0]));
+    write(outFile, &m_mapEvents, SAVE_EVENT_HEADER_SIZE);
+    write(outFile, m_mapEvents.indices, m_mapEvents.count * sizeof(m_mapEvents.indices[0]));
 
     chunkTag = GAME_FILE_MARKER;
     lastTag = GAME_UNUSED_FILE_MARKER;
@@ -1590,16 +1590,16 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     READ_FILE_VALUE(fd, m_ultimateArtifactId);
     read(fd, m_rumour, sizeof(m_rumour));
     read(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    read(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(fd, &m_rumourEvents, SAVE_EVENT_HEADER_SIZE);
     read(
         fd,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_rumourEvents.count * sizeof(m_rumourEvents.indices[0])
     );
-    read(fd, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(fd, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    read(fd, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    read(fd, &m_timeEvents, SAVE_EVENT_HEADER_SIZE);
+    read(fd, m_timeEvents.indices, m_timeEvents.count * sizeof(m_timeEvents.indices[0]));
+    read(fd, &m_mapEvents, SAVE_EVENT_HEADER_SIZE);
+    read(fd, m_mapEvents.indices, m_mapEvents.count * sizeof(m_mapEvents.indices[0]));
 
     read(fd, chunkTag, sizeof(i32));
     READ_FILE_VALUE(fd, iMaxMapExtra);
@@ -2235,8 +2235,8 @@ void game::RandomizeEvents(void) {
     i32 upperIndexes8[LAYER_SCAN_CAPACITY];
     i32 lowerIndexes28[LAYER_SCAN_CAPACITY];
 
-    m_mapEventCount = 0;
-    memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
+    m_mapEvents.count = 0;
+    memset(m_mapEvents.indices, 0, sizeof(m_mapEvents.indices));
 
     for (yPos = 0; yPos < MAP_HEIGHT; yPos++) {
         for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
@@ -2266,7 +2266,7 @@ void game::RandomizeEvents(void) {
                         eventData4->active = 0;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
-                    m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
+                    m_mapEvents.indices[m_mapEvents.count] = cell2->m_objectMetadata;
                     mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     mapEvent0->x = xPos;
                     mapEvent0->y = yPos;
@@ -2275,7 +2275,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectTileset = TILESET_NONE;
-                    m_mapEventCount++;
+                    m_mapEvents.count++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_GAZEBO):
                     cell2->m_objectMetadata = bottleId++;
@@ -2942,16 +2942,16 @@ i32 game::LoadMap(char* filename) {
     READ_FILE_VALUE(handle, m_obeliskCount);
     read(
         handle,
-        m_rumourEventIndices,
-        m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_mapHeader.rumourCount * sizeof(m_rumourEvents.indices[0])
     );
-    m_rumourEventCount = m_mapHeader.rumourCount;
+    m_rumourEvents.count = m_mapHeader.rumourCount;
     read(
         handle,
-        m_timeEventIndices,
-        m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
+        m_timeEvents.indices,
+        m_mapHeader.timeEventCount * sizeof(m_timeEvents.indices[0])
     );
-    m_timeEventCount = m_mapHeader.timeEventCount;
+    m_timeEvents.count = m_mapHeader.timeEventCount;
     READ_FILE_VALUE(handle, iMaxMapExtra);
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
@@ -7421,15 +7421,15 @@ void game::SetupNewRumour(void) {
     i32l categoryStats[GAME_PLAYER_COUNT];
     i32 direction;
     i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
-    if (m_rumourEventCount != 0 && Random(0, 9) < m_rumourEventCount) {
+    if (m_rumourEvents.count != 0 && Random(0, 9) < m_rumourEvents.count) {
         attempts8 = 0;
         while (attempts8++ < 200) {
-            if (m_rumourEventCount > 1)
-                eventIndex = Random(0, m_rumourEventCount - 1);
+            if (m_rumourEvents.count > 1)
+                eventIndex = Random(0, m_rumourEvents.count - 1);
             else
                 eventIndex = 0;
             event0 =
-                reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex]]);
+                reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEvents.indices[eventIndex]]);
             if (strlen(event0->text) > 2 && event0->text[0] != '@') {
                 strcpy(m_rumour, event0->text);
                 event0->text[0] = '@';
@@ -7546,8 +7546,8 @@ VA(0x00460424, 0xae)
 EventExtra* GetMapEvent(i32 x, i32 y) {
     EventExtra* ev;
     i32 i;
-    for (i = 0; i < gpGame->m_mapEventCount; i++) {
-        ev = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEventIndices[i]]);
+    for (i = 0; i < gpGame->m_mapEvents.count; i++) {
+        ev = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEvents.indices[i]]);
         if (ev->x == x && ev->y == y && ev->active != 0
             && ev->players[gpGame->m_players[static_cast<i8>(giCurPlayer)].m_color] != 0)
             return ev;
@@ -7568,8 +7568,8 @@ void game::CheckForTimeEvent(void) {
     i32 resourceAmount;
 
     dayNumber4 = GAME_DAY_NUMBER(*this);
-    for (eventIndex5 = 0; eventIndex5 < m_timeEventCount; eventIndex5++) {
-        event0 = static_cast<timeEventExtra*>(ppMapExtra[m_timeEventIndices[eventIndex5]]);
+    for (eventIndex5 = 0; eventIndex5 < m_timeEvents.count; eventIndex5++) {
+        event0 = static_cast<timeEventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex5]]);
         if (((gbHumanPlayer[giCurPlayer] && event0->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event0->appliesToComputer))
             && event0->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]

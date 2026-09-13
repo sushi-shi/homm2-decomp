@@ -2117,8 +2117,8 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(xShrineBuildingCost[index_h]);
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = xShrineBuildingCost[index_h];
                 ++costCount_o;
             }
         }
@@ -2126,39 +2126,33 @@ i32 townManager::BuyBuild(
         mageLevel_k = gpTownManager->m_town->m_buildState;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h];
                 ++costCount_o;
             }
         }
     } else if (building == BUILDING_SLOT_SPECIAL) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h];
                 ++costCount_o;
             }
         }
     } else if (building <= BUILDING_SLOT_NEUTRAL_LAST) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gNeutralBuildingCosts[IDX(building)][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                resourceTypes_o[costCount_o] = index_h;
                 costs_e[costCount_o] =
-                    static_cast<i16>(gNeutralBuildingCosts[IDX(building)][index_h]);
+                    gNeutralBuildingCosts[IDX(building)][index_h];
                 ++costCount_o;
             }
         }
     } else {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gDwellingCosts[IDX(gpTownManager->m_town->m_type)][dwelling_k][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(
-                    gDwellingCosts[IDX(gpTownManager->m_town->m_type)][dwelling_k][index_h]
-                );
+                resourceTypes_o[costCount_o] = index_h;
+                costs_e[costCount_o] = gDwellingCosts[IDX(gpTownManager->m_town->m_type)][dwelling_k][index_h];
                 ++costCount_o;
             }
         }
@@ -2260,9 +2254,9 @@ i32 townManager::BuyBuild(
 
     descriptionWidget_g = new textWidget(
         BUILD_DESCRIPTION_X,
-        static_cast<i16>(windowY_m + BUILD_DESCRIPTION_Y_OFFSET),
+        windowY_m + BUILD_DESCRIPTION_Y_OFFSET,
         BUILD_DESCRIPTION_WIDTH,
-        static_cast<i16>(lineCount_j << BUILD_TEXT_LINE_SHIFT),
+        lineCount_j << BUILD_TEXT_LINE_SHIFT,
         description_b,
         "bigfont.fnt",
         FONT_DRAW_DEFAULT,
@@ -2306,9 +2300,9 @@ i32 townManager::BuyBuild(
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
                 i32 widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
-                    static_cast<i16>(x_d + widgetXOffset),
-                    static_cast<i16>(rowY_o + BUILD_AMOUNT_Y_OFFSET),
-                    static_cast<i16>(entryWidth_o),
+                    x_d + widgetXOffset,
+                    rowY_o + BUILD_AMOUNT_Y_OFFSET,
+                    entryWidth_o,
                     BUILD_RESOURCE_WIDGET_HEIGHT,
                     amountText_n[widgetIndex_f],
                     "smalfont.fnt",
@@ -2320,12 +2314,10 @@ i32 townManager::BuyBuild(
                 if (amountWidgets_b[widgetIndex_f] == NULL)
                     MemError();
                 resourceWidgets_m[widgetIndex_f] = new iconWidget(
-                    static_cast<i16>(
-                        x_d + widgetXOffset
-                        - GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->x
-                    ),
-                    static_cast<i16>(rowY_o),
-                    static_cast<i16>(entryWidth_o),
+                    x_d + widgetXOffset
+                        - GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->x,
+                    rowY_o,
+                    entryWidth_o,
                     BUILD_RESOURCE_WIDGET_HEIGHT,
                     "resource.icn",
                     resourceTypes_o[widgetIndex_f],
@@ -3449,7 +3441,7 @@ void GetCategoryStats(
     for (player = 0; player < gpGame->m_playerCount; ++player) {
         townCount_k = 0;
         castleCount_p = 0;
-        order[player] = static_cast<i8>(player);
+        order[player] = player;
         if (gpGame->m_playerDead[player]) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {
@@ -3555,7 +3547,7 @@ void SortStats(i32l* const stats, i8* const order) {
                 stats[secondPlayer] = tempStat;
                 temporaryOrder = order[firstPlayer];
                 order[firstPlayer] = order[secondPlayer];
-                order[secondPlayer] = static_cast<i8>(temporaryOrder);
+                order[secondPlayer] = temporaryOrder;
             }
         }
     }
