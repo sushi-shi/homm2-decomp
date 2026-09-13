@@ -5394,9 +5394,9 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     if (deficit <= 0)
         return 0;
     /* Parenthesised divisor cast: see the same idiom in ValueOfBuyingCreature. */
-    frac = (float)deficit / ((float)sp);
+    frac = deficit / (static_cast<float>(sp));
     if (deficit > 0)
-        v = (i32)(deficit * 5 * frac);
+        v = static_cast<i32>(deficit * 5 * frac);
     return v;
 }
 

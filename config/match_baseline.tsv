@@ -1132,7 +1132,7 @@ SOURCE/PHILAI	?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z	100.00
 SOURCE/PHILAI	?IncrementHourGlass@philAI@@QAEXXZ	100.0000	a22cdb0fe751
 SOURCE/PHILAI	?InitAIMapVars@@YIXXZ	100.0000	7ababc37a5ab
 SOURCE/PHILAI	?LikelihoodOfEnemyAttacking@philAI@@QAEXPAVtown@@PAVhero@@AAM2AAH332@Z	100.0000	47c9c2dbe186
-SOURCE/PHILAI	?ManaRefreshValue@philAI@@QAEHPAVhero@@H@Z	100.0000	5a65c2b4974a
+SOURCE/PHILAI	?ManaRefreshValue@philAI@@QAEHPAVhero@@H@Z	100.0000	a5413182b3d5
 SOURCE/PHILAI	?MaxBuyableCreatures@philAI@@QAEHH@Z	100.0000	3a07ec4dceb8
 SOURCE/PHILAI	?MeanRVOfUnexploredTerritory@philAI@@QAEHH@Z	100.0000	0f596eebe1fb
 SOURCE/PHILAI	?NetValueOfArtifact@philAI@@QAEHHHHH@Z	100.0000	f5c6a31bbef4

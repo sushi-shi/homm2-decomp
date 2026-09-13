@@ -19950,5 +19950,357 @@
       "bounds": "open"
     },
     "note": "Clears actual five-element type/count arrays, splits quotient/remainder across them, calls QuickCombat and sums survivors. C52 quotient-to-i16 quantity cast needs valid total domain; U06 aliases retained. B71 nonnegative representable count, valid creature/live hero/group required. For nonnegative count remainder loop visits0..3 safely, negative count invalid not masked by padding. No goto, fake aggregate, manual varargs, unrelated role reuse or artificial pointer."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::FightEvent(hero * h,mapCell * cell,i32 evaluateOnly)#1": {
+    "body_sha256": "2f69da23b8e7f9e6bb3bb985f78c59e33248d4df621109798f51b1a35f058aea",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete encounter dispatch, evaluation and combat tail read. C54 bounded encounter counts narrowed to i16; real casualty/value truncations retained. U06 army quantity alias remains. Three four-entry quantity tables are real, indexed by metadata minus2: only metadata1 is guarded, so callers must supply2..5 otherwise. B72 live hero/cell/army, valid monster/artifact/map domains and representable scores required. S53 unusedValue10 unread. No goto, fake owner, manual varargs or unrelated role reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::DamageGroup(armyGroup * ag,hero * loser,hero *,float dmg)#1": {
+    "body_sha256": "06480fda372f177cc71e247349a130049edb9028d9f5c058d4fa08c085ce60b1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full damage/defeat dispatch read. Army is a real required owner; loser optional and checked; third hero is unused ABI input. Real float threshold is not an avoidable conversion. B72 compatible live army/hero and valid damage fraction required. No casts, unions, goto, stack aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::IncrementHourGlass(void)#1": {
+    "body_sha256": "82279ac0a403a70349324338827cf35a3bcdef04c76abdbd6189e1983d2a7aa4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full prospective-hero adjustment, phase skipping and upper cap9 read. Only fixed gold resource index; phase is scalar, not a hidden array subscript. B72 live player and valid nonnegative hero/phase arithmetic required. No explicit casts, unions, goto, fake aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::TownEvent(mapCell * cell,hero * h,i32 x,i32 y)#1": {
+    "body_sha256": "62c99cd0f6e5c30aa320b39dba5b1ee128f3e49c6463a768bea22b3ed2b3f34f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full town combat/claim, hero entry, remobilization and spell tail read. Occupying hero sentinel correctly guards GetHeroSlot. S53 quickResult and saved owner unread; loss temporaries are genuine output arguments. B72 valid cell-town mapping/player/coordinates and live postcombat town/hero required. No cast, union, goto, artificial owner, fake aggregate, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::ComputeUpgradeValue(CreatureType a1,CreatureType a2)#1": {
+    "body_sha256": "7bc3e8e6bc20449e7377806d00d33baa2d8f01f4a9be563a0fd0e96d0aa02e9f",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full two-creature count/value and existing-stack discount read. C54 inner explicit float conversion may be redundant; final i32 truncations are real. B72 valid creature IDs/live hero/player and representable count times value delta required. No union, goto, stack aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::ComputeValueOfSS(hero * h,HeroSecondarySkill skill,HeroSkillLevel level)#1": {
+    "body_sha256": "a88f27c0e2b968ac5b7a58fdb6390543ee6997785539ea22dec41718f2e488d9",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full skill table, army weighting and navigation/archery/wisdom/mysticism dispatch read. C54 numerator promotion candidate; real float division and i32 truncations retained, parenthesized divisor kept. U06 army count view. B72 skill0..13/level1..3, live hero/player, nonzero upgrade weight and archery totalValue required; empty army can make latter0. Five-stack traversal is bounded. No goto, fake aggregate, artificial owner, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::ComputeValueOfFreeSS(hero * h,HeroSecondarySkill skill)#1": {
+    "body_sha256": "8f355d72e538a6f4b45715311cde7bd1441cb2473c15d55991b31656f20b9453",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire skill ownership/capacity gate and basic-level delegation read. Skill array indexed before any skill-domain validation, requiring valid skill0..13. Capacity guard is not skill-index validation. Inherits ComputeValueOfSS numeric contracts. No cast, union, goto, stack aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::ManaRefreshValue(hero * h,i32 level)#1": {
+    "body_sha256": "7a2ef45664e372920aab52405ebac8b2d86e67699ba499ad9a99f7572220058b",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C53 removes redundant numerator float conversion and modernizes divisor/result casts while preserving parenthesized float divisor. Complete16/16 family; twelve strict112-byte exact arms, four implicit-divisor arms110 bytes rejected. Retained arm and full89-function native TU comparison plus independent retail sites/targets pass. B72 valid hero/knowledge/level, nonnegative spell points and representable capacity/score required. Under normal nonnegative inputs deficit>0 implies positive capacity, so not labeled an unconditional zero-divisor bug. No other pattern instance."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::ValueOfEventAtPosition(i32 x,i32 y,i32 immediate,i32 * liveChance)#1": {
+    "body_sha256": "c1a98a3077a526a20bf982056277629adf395119c61f4be802792f214f9698fd",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire674-line event switch, travel recursion, purchase shared tail and cache writeback read. C54 domain/count/enum casts; cache clamp to +/-32000 proves final i16 range. U06 army and real mapcell metadata/tent tag views retained. G62 sixteen creature_purchase joins untried. R15 i spans spell IDs then army slots. S53 four unread arrays3/3/3/9 tested complete16/16 keep/remove product: every removal changes size, none retained; other unused scalars/selected exit coordinates and unconsumed purchase outputs remain. B72 cached return precedes liveChance=100 and reload/berserk initialization; cache lacks those outputs. Valid grids/player, event metadata/resource/visit-shift domains, recursion and finite arithmetic required. Default masked-object diagnostic fits text768; flotsam gold assignment is overwritten by wood expression. No behavior correction, fake owner, manual varargs or artificial address."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateGenericSite(mapCell * cell)#1": {
+    "body_sha256": "848e55b61408743aa5d55d02cd4da3cb3a03eec12f14da17d0e4fca6e2f68804",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete generic-site switch read. C54 enum-mask-enum roundtrip candidate; genuine float truncations retained. U06 army quantity alias. R15 slot spans fourteen artifacts then five army stacks. S53 decoded level and unusedValue unread. B72 live metadata/hero/player, valid artifact/creature/day domains and representable hitpoint/value arithmetic required. No goto, fake aggregate, artificial owner or manual varargs."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateBarrier(mapCell * cell)#1": {
+    "body_sha256": "d50e66d0e1e7764b8f94d75be851d89413865226bea72de2a52ca799aa147597",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Full masked-color bit test read. color&7 proves shift0..7; actual tent-color metadata view and barrier bitfield are real tagged owner storage. Requires live cell/player, but no unresolved local buffer extent. No cast, goto, scratch aggregate, artificial owner, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluatePassword(mapCell * cell)#1": {
+    "body_sha256": "d397cde7010246a98bfd9f12d880e7951097e9e4285afa957989f3edcf4f387f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Full inverted masked-color bit test read. color&7 bounds shift0..7. Actual tent-color metadata view and player barrier bitfield retained, not fake alternate ownership. Live cell/player required; no unresolved local extent, cast, goto, scratch aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateRecruitSite(mapCell * cell)#1": {
+    "body_sha256": "7ca925faf28a80850f0d8a9a4f033fbebb863fdd8e296621725b9838025512f2",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire five-case recruitment decode and one-time-purchase delegation read. C54 mask/recast and integer nb to CreatureType roundtrip candidates. Real13-bit tent metadata fits i16 before shift3, producing count0..1023; masked type0..7, five mapped cases, other cases retain nb0/PEASANT. U06/mapcell aliases genuine. S53 jb29 unused and actual idx/kn output arguments unconsumed. B72 inherits live hero, creature valuation and arithmetic contracts. No goto, fake aggregate, owner arithmetic, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateJail(mapCell *)#1": {
+    "body_sha256": "b40e4f87ac518cc2b90507b0d60083876edc4e7ed650d28aa8725fe20ccbf55e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Entire constant10000 return read; mapcell argument unused. No ten-pattern instance."
+  },
+  "src/SOURCE/PHILAI.cpp:InitAIMapVars(void)#1": {
+    "body_sha256": "c2116ee9b121879379e8dbdd2730addcb4400fa19bd4afb351bd78945a3bdc77",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full close/search-init/five-allocation sequence read. Five casts convert genuine void allocator results to three i16 and two i8 grid owners, not recovered-member pointer tricks. B72 positive valid dimensions, representable products and successful allocation required; no null/overflow check. Values are not initialized here: GetTurnAIVars/ResetHeroRVs establish later cache state. No union, goto, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:CloseAIMapVars(void)#1": {
+    "body_sha256": "3388ac89ced344cb6be6c50860110ce6acb8ccdf1f315b55a076a651a1099b41",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full optional-free sequence for five actual grid owners, NULL reset and search Close read. Null-safe repeated close supports early DoAI cleanup even before allocation, provided globals obey ownership lifecycle. B72 no double ownership/stale alias use. No cast, union, goto, fake stack aggregate, artificial owner pointer, manual varargs or unrelated local reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:OnMySide(i32 player)#1": {
+    "body_sha256": "66cd03b87dc7b306ea6878a4bbae0173d344f1c35133b626be33cc59b2462430",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire campaign/scenario/victory-side predicate read. NO_PLAYER(-1) short-circuits first; other player IDs and current player must be0..5 before color indexing. Genuine campaign and map-header fields, not alternate fake owner. No cast, union, goto, scratch aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateArtifactEvent(ArtifactType artifact,i32 eventData)#1": {
+    "body_sha256": "66fb616bfe57a2af99b8377fc8f4264125736202ab49e80b8e90f224abf1b02c",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full artifact, guardian/resource gate, army and scroll valuation read. C54 bounded first-slot boolean count conversion candidate; real floating truncations retained. U06 counts. S53 extraValue/junkVal/unusedRV unused. B72 valid artifact/scroll/low-byte creature and high-nibble resource0..6 required; nibble extraction alone allows0..15. Artifact count equality14 assumes valid inventory capacity. Real guardian quantity is rogue10 otherwise first slot1. No goto, fake aggregate, artificial owner, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateMineEvent(i32 mineIndex,i32 x,i32 y,i32 * liveChance)#1": {
+    "body_sha256": "be776f14aed12afaeb5c949e069039c6bacd5d9008f847e6c882c91bcf55b9d2",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire ownership/threat/guardian battle/resource valuation read. B72 winChance is stored through i32 truncation without *100, unlike sibling event evaluators; full696-byte retail and ordered sites/targets confirm this. Early friendly return also leaves liveChance unchanged, relying on caller initialization. No corrective percentage scaling added. Valid mine/grid/resource/player/guardian domains and nonzero battle denominators required. S53 battle loss/remain outputs not consumed. Real numeric casts retained; no goto, union, fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateMonsterEvent(CreatureType monsterType,i32 eventData,i32 * liveChance)#1": {
+    "body_sha256": "e7ecabd25e7436556853817a79995bc10ca6a84869bb9526aedbfe37ff04bb7f",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full count split, joining/hiring, combat ratio and chance valuation read. C54 eventData&0xfff gives quantity0..4095, per-stack quotient fits i16; real float/probability truncations retained. U06 counts. R15 attackerLoss6 reused as purchase-value output after casualty role. S53 unusedPurchaseValue7 replacement-slot output and purchaseCost9 count output unconsumed. B72 zero total count can produce zero strength divisor; valid creature/army/player required. ratio>5 return leaves chance to caller; joining sets100 then weighted result overwrites it. No goto, fake aggregate, varargs or artificial owner pointer."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateHeroEvent(i32 heroId,i32 x,i32 y,i32 mode,i32 * liveChance)#1": {
+    "body_sha256": "b2dd5f1d2ecd82c622bd82c5acc70699a911416e775a0327456cc68ae6bd517e",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full side/owner, cached threat, battle and weighted-score evaluation read. C54 hero chance i8 storage is bounded0..100 for valid winChance0..1; enum/numeric role conversions otherwise retained pending proof. S53 scratch unused; real scalar output slots retained. B72 valid hero/player/grid/cache lifecycle, nonzero army values and representable scores required; early friendly/allied returns leave chance to caller initialization. No goto, union, fake aggregate, artificial pointer, varargs or unrelated reuse."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::EvaluateTownEvent(i32 townId,i32 x,i32 y,i32 mode,i32 * liveChance)#1": {
+    "body_sha256": "6bfd00dcff82b9520b87ca91c8137d7cc636c96ea3882dab0672bda46ab972b5",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete ownership/alliance, cached hero visit, guarded garrison hero and weighted battle valuation read. Occupying hero -1 guard is present, unlike GetTurnAIVars threat setup. U12 town/castle owner views remain pending full-consumer simplification. Real numeric truncations retained. B72 town/player/hero/grid/cache domains, live armies and finite representable values required; early friendly/allied returns depend on caller chance initialization. No goto, fake aggregate, artificial pointer, manual varargs or unrelated local reuse."
   }
 }

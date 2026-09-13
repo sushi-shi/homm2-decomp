@@ -380,6 +380,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   artifact read, duplicated hero-role pointer and slot-based replacement value
   are confirmed retail sequences and preserved, with reachability limits stated.
 
+- C53/S53/B72/C54/G62/R15: [final PHILAI event review](C53-S53-B72.md)
+  adds22 bodies and reconciles all84 physical definitions in the full source
+  file. Mana evaluation loses one redundant cast with complete16-arm and
+  native/retail proof. All16 unused-event-array combinations were measured;
+  none was retained. Cache output ordering and mine probability truncation
+  are documented separately from reconstruction changes.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
