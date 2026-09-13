@@ -6,6 +6,7 @@
 #include <BASE/widget.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
+#include <SOURCE/GAME.h>
 
 class armyGroup;
 class hero;
@@ -28,15 +29,15 @@ struct adventureSoundCell {
 };
 
 typedef enum AdventureManagerStorageConstant {
-    ADVMGR_LOCATOR_STATE_COUNT           = 12,
-    ADVMGR_BOTTOM_VIEW_ITEM_COUNT        = 5,
-    ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE = 0x14,
-    ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE = 0x18,
+    ADVMGR_BOTTOM_VIEW_WIDGET_COUNT      = 12,
+    ADVMGR_BOTTOM_VIEW_BACKGROUND        = 0,
+    ADVMGR_BOTTOM_VIEW_FOREGROUND        = 1,
+    ADVMGR_BOTTOM_VIEW_ICON_FIRST        = 2,
+    ADVMGR_BOTTOM_VIEW_HERO_TEXT_FIRST   = 1,
     ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
     ADVMGR_OBJECT_ICON_COUNT             = 64,
     ADVMGR_ANIMATION_PHASE_COUNT         = 4,
     ADVMGR_HERO_ICON_COUNT               = H2EnumIndex(FACTION_COUNT) + 2,
-    ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
     ADVMGR_STEP_PIXEL_COUNT              = 5,
@@ -74,26 +75,8 @@ using enum ArmySizeNameVariant;
 class advManager H2_FINAL : public baseManager {
 public:
     AdventureCommand m_selectedCell;
-    union {
-        i32 m_heroLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
-        class widget* m_bottomViewPrimaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
-        struct {
-            class iconWidget* m_bottomViewBackground;
-            class iconWidget* m_bottomViewHourglassBackground;
-            class iconWidget* m_bottomViewIcons[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
-            char m_bottomViewIconPadding[ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE];
-        };
-    };
-    union {
-        i32 m_townLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
-        class widget* m_bottomViewSecondaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
-        class textWidget* m_bottomViewAllTexts[ADVMGR_LOCATOR_STATE_COUNT];
-        struct {
-            i32 m_bottomViewTextReserved;
-            class textWidget* m_bottomViewTexts[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
-            char m_bottomViewTextPadding[ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE];
-        };
-    };
+    class widget* m_bottomViewPrimaryWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
+    class widget* m_bottomViewSecondaryWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
     class heroWindow* m_adventureWindow;
     u16* m_visibilityMap;
     b32 m_visibilityMapValid;
@@ -127,8 +110,8 @@ public:
     class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
     class icon* m_shadowIcon;
     class icon* m_boatShadowIcon;
-    class icon* m_flagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
-    class icon* m_boatFlagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
+    class icon* m_flagIcons[GAME_PLAYER_COUNT];
+    class icon* m_boatFlagIcons[GAME_PLAYER_COUNT];
     b32 m_cursorActive;
     i32 m_drawHeroShadows;
     H2EnumStorage<HeroCursorType, i32> m_cursorType;

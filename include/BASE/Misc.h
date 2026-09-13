@@ -11,11 +11,14 @@ class heroWindow;
 class icon;
 struct tag_message;
 
-typedef enum MiscRecordConstant {
-    MEM_ENTRY_FILE_CAPACITY    = 0x3d,
+typedef enum MemoryDebugRecordConstant {
+    MEM_ENTRY_FILE_CAPACITY = 0x3d,
+} MemoryDebugRecordConstant;
+
+typedef enum PcxHeaderConstant {
     PCX_HEADER_PALETTE16_BYTES = 48,
-    PCX_HEADER_FILLER_BYTES    = 54
-} MiscRecordConstant;
+    PCX_HEADER_FILLER_BYTES    = 54,
+} PcxHeaderConstant;
 
 typedef enum LogConstant {
     LOG_UNUSED_VALUE = -999
@@ -28,7 +31,7 @@ typedef enum LogConstant {
 
 #define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
 #define INTEGER_VECTOR_LENGTH(dx, dy) \
-    (static_cast<i32>(sqrt(static_cast<double>((dx) * (dx) + (dy) * (dy)))))
+    (static_cast<i32>(sqrt((dx) * (dx) + (dy) * (dy))))
 
 struct indexArray {
     u16 key;

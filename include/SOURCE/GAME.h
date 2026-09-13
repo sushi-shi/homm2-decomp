@@ -83,24 +83,17 @@ typedef enum GameWeeklyConstant {
     WEEKLY_WATER_WHEEL_EMPTY        = 0xff,
     WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
     WEEKLY_DWELLING_NO_GROWTH_FLAG  = 0x80,
-    WEEKLY_FIRST_DWELLING           = 19,
-    WEEKLY_LAST_DWELLING            = 30,
     WEEKLY_GROWTH_LIMIT             = 0x1feb,
     WEEKLY_DRAGON_CITY_LIMIT        = 220,
     WEEKLY_MONSTER_LIMIT            = 4000,
-    WEEKLY_RECRUIT_TYPE_MASK        = 7,
-    WEEKLY_RECRUIT_COUNT_SHIFT      = 3,
     WEEKLY_RECRUIT_MIN_GROWTH       = 2,
     WEEKLY_RECRUIT_MAX_GROWTH       = 5,
     WEEKLY_RECRUIT_LIMIT            = 1000,
-    WEEKLY_SITE_TYPE_MASK           = 0x3f,
     WEEKLY_AVAILABLE_HERO           = 64
 } GameWeeklyConstant;
 
 typedef enum GameRandomTownConstant {
     RANDOM_TOWN_UNOWNED_COLOR        = -1,
-    RANDOM_TOWN_RACE_MIN             = 0,
-    RANDOM_TOWN_RACE_MAX             = 5,
     RANDOM_TOWN_AGE                  = 10,
     RANDOM_TOWN_LEFT                 = -5,
     RANDOM_TOWN_TOP                  = -3,
@@ -114,7 +107,6 @@ typedef enum GameRandomTownConstant {
 } GameRandomTownConstant;
 
 typedef enum GameRandomHeroConstant {
-    RANDOM_HERO_COUNT                     = 54,
     RANDOM_HERO_NORMAL_ARMY               = 0,
     RANDOM_HERO_EXPERIENCE_MIN            = 0,
     RANDOM_HERO_EXPERIENCE_MAX            = 50,
@@ -129,7 +121,6 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_SECOND_STACK_BONUS_CHANCE = 40,
     RANDOM_HERO_PERCENT_MIN               = 0,
     RANDOM_HERO_PERCENT_MAX               = 99,
-    RANDOM_HERO_ARMY_SLOT_COUNT           = 5,
     RANDOM_HERO_ARMY_SELECTION_COUNT      = 2,
     RANDOM_HERO_ARMY_OPTION_COUNT         = 3,
     RANDOM_HERO_COUNT_SCALE               = 10,
@@ -142,10 +133,6 @@ typedef enum GameWaitConstant {
     WAIT_AMBIENT_MUSIC       = 21,
     WAIT_DIALOG_TYPE         = 9
 } GameWaitConstant;
-
-typedef enum GameHeroPoolConstant {
-    AVAILABLE_HERO_SLOTS = 2
-} GameHeroPoolConstant;
 
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32 playerIndex);

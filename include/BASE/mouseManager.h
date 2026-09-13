@@ -67,8 +67,6 @@ typedef enum MouseManagerConstant {
     MOUSE_CURSOR_HORIZONTAL            = 0,
     MOUSE_CURSOR_VERTICAL              = 1,
     MOUSE_CURSOR_AXIS_COUNT            = 2,
-    MOUSE_SCREEN_WIDTH                 = 640,
-    MOUSE_SCREEN_HEIGHT                = 480,
     MOUSE_SCREEN_CENTER_X              = 320,
     MOUSE_SCREEN_CENTER_Y              = 240,
     MOUSE_SAVED_BITMAP_WIDTH           = 0x42,
@@ -98,8 +96,8 @@ extern b32 gbInSetPointer;
 extern b32 bInNewMouseUpdate;
 extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-extern void* cAndBits[MOUSE_CURSOR_COUNT];
-extern void* cColorBits[MOUSE_CURSOR_COUNT];
+extern u8* cAndBits[MOUSE_CURSOR_COUNT];
+extern u8* cColorBits[MOUSE_CURSOR_COUNT];
 extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 

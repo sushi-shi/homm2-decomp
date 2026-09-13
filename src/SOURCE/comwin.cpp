@@ -6,6 +6,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
+#include <SOURCE/CONFIG_TYPES.h>
 
 typedef enum ComConstant {
     PORT_COUNT           = 2,
@@ -28,12 +29,8 @@ typedef enum ComErrorText {
 } ComErrorText;
 
 typedef enum ComSerialConstant {
-    BAUD_VALUE_2400        = 2400,
     BAUD_VALUE_4800        = 4800,
-    BAUD_VALUE_9600        = 9600,
-    BAUD_VALUE_19200       = 19200,
-    BAUD_VALUE_38400       = 38400,
-    READ_RESULT_WORD_COUNT = 2
+
 } ComSerialConstant;
 
 
@@ -174,19 +171,19 @@ i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
 
     switch (baudRate) {
         case COM_BAUD_2400:
-            state.BaudRate = BAUD_VALUE_2400;
+            state.BaudRate = H2EnumIndex(CONFIG_BAUD_2400);
             break;
         case COM_BAUD_4800:
             state.BaudRate = BAUD_VALUE_4800;
             break;
         case COM_BAUD_9600:
-            state.BaudRate = BAUD_VALUE_9600;
+            state.BaudRate = H2EnumIndex(CONFIG_BAUD_9600);
             break;
         case COM_BAUD_19200:
-            state.BaudRate = BAUD_VALUE_19200;
+            state.BaudRate = H2EnumIndex(CONFIG_BAUD_19200);
             break;
         case COM_BAUD_38400:
-            state.BaudRate = BAUD_VALUE_38400;
+            state.BaudRate = H2EnumIndex(CONFIG_BAUD_38400);
             break;
         default:
             state.BaudRate = H2EnumIndex(baudRate);
@@ -240,7 +237,7 @@ void com_term(i16 portIndex) {
 
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     DWORD currentError;
-    i16 bytesRead[READ_RESULT_WORD_COUNT];
+    DWORD bytesRead;
     COMSTAT status;
     BOOL success;
     u32 currentBytesRead;
@@ -255,12 +252,12 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
                 s_comPorts[portIndex].handle,
                 buffer,
                 currentBytesRead,
-                reinterpret_cast<LPDWORD>(bytesRead),
+                &bytesRead,
                 NULL
             );
             if (success == 0)
                 ShutdownComError("Read communications data");
-            return bytesRead[0];
+            return static_cast<i16>(bytesRead);
         }
     }
     return 0;

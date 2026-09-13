@@ -74,7 +74,8 @@ MessageDispatchResult widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_SET_FLAGS:
                     if (message.payload.widget.id == m_id) {
-                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value
+                            == H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
@@ -102,7 +103,8 @@ MessageDispatchResult widget::Main(tag_message& message) {
                     if (message.payload.widget.id == m_id) {
                         H2EnumStorage<WidgetFlag, i16> flags =
                             message.payload.widget.data.value & WIDGET_FLAG_MASK;
-                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value
+                            == H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED)) {
                             flags = WIDGET_FLAG_DIMMED;
                             m_flags &= ~flags;
                             return MESSAGE_DISPATCH_CONSUME;

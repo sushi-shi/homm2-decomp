@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/KB_TYPES.h>
 
 
 const char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
@@ -403,7 +404,7 @@ u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     H2EnumIndex(FACTION_KNIGHT)
 };
 i32
-    xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT] = {10, 0, 0, 0, 10, 0, 4000};
+    xShrineBuildingCost[H2EnumIndex(RES_COUNT)] = {10, 0, 0, 0, 10, 0, 4000};
 i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 b8 xIsExpansionMap;
 ExpansionCampaignId xLastChoice;

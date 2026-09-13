@@ -4,7 +4,7 @@
 #include <Ints.h>
 #include <SOURCE/GAME.h>
 
-typedef enum RequestConstant {
+typedef enum MapHeaderConstant {
     MAP_HEADER_SIZE                 = 0x1a4,
     MAP_HEADER_MAGIC_SIZE           = 4,
     MAP_HEADER_PLAYER_DATA_SIZE     = 0x12,
@@ -14,10 +14,9 @@ typedef enum RequestConstant {
     MAP_HEADER_NAME_SIZE            = 0x3c,
     MAP_HEADER_DESCRIPTION_OFFSET   = 0x76,
     MAP_HEADER_DESCRIPTION_SIZE     = 300,
-    MAP_HEADER_PLAYER_COUNT         = H2EnumIndex(GAME_PLAYER_COUNT),
     MAP_HEADER_MAGIC_BASE_GAME      = 90,
     MAP_HEADER_MAGIC_EXPANSION_GAME = 92
-} RequestConstant;
+} MapHeaderConstant;
 
 typedef enum MapDimensionConstant {
     MAP_DIMENSION_SMALL  = 36,
@@ -51,9 +50,9 @@ struct SMapHeader {
     u8 unknown5;
     u8 width;
     u8 height;
-    u8 playerEnabled[MAP_HEADER_PLAYER_COUNT];
-    u8 playerCanHuman[MAP_HEADER_PLAYER_COUNT];
-    u8 playerCanComputer[MAP_HEADER_PLAYER_COUNT];
+    u8 playerEnabled[GAME_PLAYER_COUNT];
+    u8 playerCanHuman[GAME_PLAYER_COUNT];
+    u8 playerCanComputer[GAME_PLAYER_COUNT];
     u8 playerCount;
     u8 minHumanPlayers;
     u8 maxHumanPlayers;
@@ -64,7 +63,7 @@ struct SMapHeader {
     MapLossCondition lossCondition;
     u16 lossConditionValue;
     u8 unknown25;
-    H2EnumStorage<FactionType, i8> playerRace[MAP_HEADER_PLAYER_COUNT];
+    H2EnumStorage<FactionType, i8> playerRace[GAME_PLAYER_COUNT];
     u16 victoryTownY;
     u16 lossTownY;
     u16 victorySideThreshold;

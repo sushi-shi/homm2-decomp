@@ -1,6 +1,7 @@
 #ifndef HOMM2_SOURCE_FILEREQUESTER_H
 #define HOMM2_SOURCE_FILEREQUESTER_H
 
+#include <BASE/dialog.h>
 #include <Ints.h>
 #include <windows.h>
 #include <BASE/baseManager.h>
@@ -19,6 +20,35 @@ enum class FileRequesterMode : i32 {
 using enum FileRequesterMode;
 
 typedef enum FileRequesterControlId {
+    FILE_REQUESTER_OK                     = DIALOG_BUTTON_2,
+    FILE_REQUESTER_CANCEL                 = DIALOG_BUTTON_1,
+    FILE_REQUESTER_SCROLL_UP              = 1,
+    FILE_REQUESTER_SCROLL_DOWN            = 2,
+    FILE_REQUESTER_SCROLL_GUTTER          = 3,
+    FILE_REQUESTER_SCROLL_KNOB            = 14,
+    FILE_REQUESTER_FILENAME_ENTRY         = 15,
+    FILE_REQUESTER_FILENAME_LABEL         = 16,
+    FILE_REQUESTER_LIST_TEXT_FIRST        = 20,
+    FILE_REQUESTER_MAP_NAME               = 0x50,
+    FILE_REQUESTER_MAP_PLAYER_COUNT       = 0x51,
+    FILE_REQUESTER_MAP_SIZE               = 0x52,
+    FILE_REQUESTER_MAP_DIFFICULTY_ICON    = 0x53,
+    FILE_REQUESTER_MAP_DIFFICULTY_TEXT    = 0x54,
+    FILE_REQUESTER_MAP_DESCRIPTION        = 0x55,
+    FILE_REQUESTER_MAP_VICTORY            = 0x56,
+    FILE_REQUESTER_MAP_LOSS               = 0x57,
+    FILE_REQUESTER_MAP_SIZE_ICON_FIRST    = 200,
+    FILE_REQUESTER_MAP_PLAYER_ICON_FIRST  = 220,
+    FILE_REQUESTER_MAP_VICTORY_ICON_FIRST = 240,
+    FILE_REQUESTER_MAP_LOSS_ICON_FIRST    = 260,
+    FILE_REQUESTER_FILTER_SMALL           = 100,
+    FILE_REQUESTER_FILTER_MEDIUM          = 101,
+    FILE_REQUESTER_FILTER_LARGE           = 102,
+    FILE_REQUESTER_FILTER_XLARGE          = 103,
+    FILE_REQUESTER_FILTER_ALL             = 104,
+} FileRequesterControlId;
+
+typedef enum FileRequesterStorageConstant {
     FILE_REQUESTER_PATH_SIZE                   = 300,
     FILE_REQUESTER_NAME_SIZE                   = 0x15f,
     FILE_REQUESTER_EXTENSION_SIZE              = 5,
@@ -28,38 +58,18 @@ typedef enum FileRequesterControlId {
     FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE = 9,
     FILE_REQUESTER_LIST_STATE_SIZE             = 9,
     FILE_REQUESTER_LIST_RANGE_SIZE             = 20,
-    FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT     = 9,
-    FILE_REQUESTER_GUTTER_SCALE                = 100,
+} FileRequesterStorageConstant;
+
+typedef enum FileRequesterScrollGeometry {
+    FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT = 9,
+    FILE_REQUESTER_GUTTER_SCALE            = 100,
+} FileRequesterScrollGeometry;
+
+typedef enum FileRequesterFileSelectionConstant {
     FILE_REQUESTER_EXTENSION_PLAYER_DIGIT      = 3,
     FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
     FILE_REQUESTER_SELECTION_NONE              = -1,
-    FILE_REQUESTER_SCROLL_UP                   = 1,
-    FILE_REQUESTER_SCROLL_DOWN                 = 2,
-    FILE_REQUESTER_SCROLL_GUTTER               = 3,
-    FILE_REQUESTER_SCROLL_KNOB                 = 14,
-    FILE_REQUESTER_FILENAME_ENTRY              = 15,
-    FILE_REQUESTER_FILENAME_LABEL              = 16,
-    FILE_REQUESTER_LIST_TEXT_FIRST             = 20,
-    FILE_REQUESTER_MAP_NAME                    = 0x50,
-    FILE_REQUESTER_MAP_PLAYER_COUNT            = 0x51,
-    FILE_REQUESTER_MAP_SIZE                    = 0x52,
-    FILE_REQUESTER_MAP_DIFFICULTY_ICON         = 0x53,
-    FILE_REQUESTER_MAP_DIFFICULTY_TEXT         = 0x54,
-    FILE_REQUESTER_MAP_DESCRIPTION             = 0x55,
-    FILE_REQUESTER_MAP_VICTORY                 = 0x56,
-    FILE_REQUESTER_MAP_LOSS                    = 0x57,
-    FILE_REQUESTER_MAP_SIZE_ICON_FIRST         = 200,
-    FILE_REQUESTER_MAP_PLAYER_ICON_FIRST       = 220,
-    FILE_REQUESTER_MAP_VICTORY_ICON_FIRST      = 240,
-    FILE_REQUESTER_MAP_LOSS_ICON_FIRST         = 260,
-    FILE_REQUESTER_CANCEL                      = 0x7801,
-    FILE_REQUESTER_OK                          = 0x7802,
-    FILE_REQUESTER_FILTER_SMALL                = 100,
-    FILE_REQUESTER_FILTER_MEDIUM               = 101,
-    FILE_REQUESTER_FILTER_LARGE                = 102,
-    FILE_REQUESTER_FILTER_XLARGE               = 103,
-    FILE_REQUESTER_FILTER_ALL                  = 104
-} FileRequesterControlId;
+} FileRequesterFileSelectionConstant;
 
 enum class FileRequesterMapSizeFilter : i32 {
     FILE_REQUESTER_MAP_SIZE_SMALL  = 0,

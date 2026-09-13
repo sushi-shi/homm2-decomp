@@ -16,16 +16,15 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <BASE/display.h>
 
 typedef enum ResourceConstant {
     INVALID_FILE            = -1,
     LOAD_SUCCESS            = 0,
     LOAD_ERROR              = 3,
     ENTRY_BYTES             = 0xc,
-    EVIL_TRANSLATION_COUNT  = 37,
-    BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
-    FILE_COUNT_BUFFER_WORDS = 2,
+
     POSITION_STACK_DEPTH    = 10
 } ResourceConstant;
 
@@ -57,7 +56,7 @@ void resourceManager::GetBackdrop(const char* name, class bitmap* backdrop, i32 
         ReadWord();
         ReadWord();
         ReadBlock(
-            reinterpret_cast<i8*>(backdrop->m_pixels),
+            backdrop->m_pixels,
             backdrop->m_width * backdrop->m_height
         );
     }
@@ -85,8 +84,8 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                (curRow * BACKDROP_ROW_BYTES)
-                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
+                (curRow * LOGICAL_SCREEN_WIDTH)
+                    + destination->m_pixels + destinationX,
                 width
             );
         }
@@ -288,7 +287,7 @@ void resourceManager::Close(void) {
 }
 
 i32 resourceManager::LoadAggregateHeader(const char* aggregateName) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i16 fpCountBuffer;
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -314,8 +313,8 @@ i32 resourceManager::LoadAggregateHeader(const char* aggregateName) {
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
-    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
+    read(m_aggregateFd[m_curAggregate], &fpCountBuffer, sizeof(i16));
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer;
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
@@ -424,7 +423,7 @@ i32l resourceManager::ReadLong(void) {
 u32l resourceManager::MakeId(const char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
@@ -435,11 +434,11 @@ u32l resourceManager::MakeId(const char* name, i32 translate) {
     return result;
 }
 
-void resourceManager::Read13(i8* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
-void resourceManager::ReadBlock(i8* destination, u32l size) {
+void resourceManager::ReadBlock(void* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);

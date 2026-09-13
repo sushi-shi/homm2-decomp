@@ -10,7 +10,7 @@
 
 typedef enum MilesSampleConstant {
     MILES_SAMPLE_HANDLE_COUNT         = 14,
-    MILES_SAMPLE_HANDLE_STORAGE_COUNT = 16,
+
     MILES_SAMPLE_VOLUME_COUNT         = 32,
     MILES_SAMPLE_STOP_WAIT_COUNT      = 10,
     MILES_STOP_ALL_WAIT_COUNT         = 5,
@@ -26,10 +26,9 @@ SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {
     {6, 16, 6}
 };
 
-static i32 gMilesSamplesReady = 0;
-static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT] =
-    {};
-static i32 gMilesSampleHandleCount = 0;
+static MilesSampleState gMilesSamples = {};
+
+
 static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT] = {};
 
 namespace {
@@ -53,16 +52,16 @@ namespace {
 void StartupMilesSamples(struct _DIG_DRIVER* driver) {
     for (i32 index = 0; index < MILES_SAMPLE_VOLUME_COUNT; ++index)
         gMilesSampleVolumes[index] = 0;
-    memset(&gMilesSamplesReady, 0, 0x48);
+    memset(&gMilesSamples, 0, sizeof(gMilesSamples));
     AllocateMilesSampleHandles(driver);
-    gMilesSamplesReady = true;
+    gMilesSamples.ready = true;
 }
 
 void StopMilesSampleHandle(struct _SAMPLE* sampleHandle) {
     if (sampleHandle == NULL)
         return;
     bool waitForStop = false;
-    if (gMilesSampleHandles[0] == sampleHandle)
+    if (gMilesSamples.handles[0] == sampleHandle)
         waitForStop = true;
     AIL_end_sample(sampleHandle);
     if (waitForStop) {
@@ -78,20 +77,20 @@ void AllocateMilesSampleHandles(struct _DIG_DRIVER* driver) {
         return;
     i32 index;
     for (index = 0; index < MILES_SAMPLE_HANDLE_COUNT; ++index) {
-        gMilesSampleHandles[index] = AIL_allocate_sample_handle(driver);
-        if (gMilesSampleHandles[index] == NULL)
+        gMilesSamples.handles[index] = AIL_allocate_sample_handle(driver);
+        if (gMilesSamples.handles[index] == NULL)
             break;
     }
-    gMilesSampleHandleCount = index;
+    gMilesSamples.handleCount = index;
 }
 
 void SetMilesSampleHandleVolume(struct _SAMPLE* sampleHandle, i32 volume) {
-    if (gMilesSamplesReady == 0)
+    if (gMilesSamples.ready == 0)
         return;
     i32 index = 0;
     i32 foundIndex = -1;
-    for (; index < gMilesSampleHandleCount; ++index) {
-        if (sampleHandle == gMilesSampleHandles[index])
+    for (; index < gMilesSamples.handleCount; ++index) {
+        if (sampleHandle == gMilesSamples.handles[index])
             foundIndex = index;
     }
     AIL_set_sample_volume(
@@ -104,9 +103,9 @@ void SetMilesSampleHandleVolume(struct _SAMPLE* sampleHandle, i32 volume) {
 }
 
 void StopAllMilesSamples(void) {
-    for (i32 index = 0; index < gMilesSampleHandleCount; ++index) {
-        if (AIL_sample_status(gMilesSampleHandles[index]) == MILES_SAMPLE_STATUS_PLAYING)
-            AIL_end_sample(gMilesSampleHandles[index]);
+    for (i32 index = 0; index < gMilesSamples.handleCount; ++index) {
+        if (AIL_sample_status(gMilesSamples.handles[index]) == MILES_SAMPLE_STATUS_PLAYING)
+            AIL_end_sample(gMilesSamples.handles[index]);
     }
     for (i32 waitIndex = 0; waitIndex < MILES_STOP_ALL_WAIT_COUNT; ++waitIndex) {
         ServiceMilesSamples();
@@ -135,7 +134,7 @@ void PlayMilesSample(class sample* sampleResource) {
     if (sampleResource == NULL)
         return;
     SamplePlaybackData* sampleData = &sampleResource->m_playbackData;
-    if (gMilesSamplesReady == 0 || sampleData->volume == 0)
+    if (gMilesSamples.ready == 0 || sampleData->volume == 0)
         return;
     {
         SampleChannelStruct* channelData = &SCS[sampleData->channelType];
@@ -143,7 +142,7 @@ void PlayMilesSample(class sample* sampleResource) {
         for (channelIndex = channelData->startChannel;
              channelIndex < channelData->endChannel;
              ++channelIndex) {
-            if (AIL_sample_status(gMilesSampleHandles[channelIndex])
+            if (AIL_sample_status(gMilesSamples.handles[channelIndex])
                 == MILES_SAMPLE_STATUS_DONE)
                 break;
         }
@@ -156,10 +155,10 @@ void PlayMilesSample(class sample* sampleResource) {
                 channelData->currentChannel = channelData->startChannel;
                 channelIndex = channelData->currentChannel;
             }
-            StopMilesSampleHandle(gMilesSampleHandles[channelIndex]);
+            StopMilesSampleHandle(gMilesSamples.handles[channelIndex]);
         }
 
-        struct _SAMPLE* handle = gMilesSampleHandles[channelIndex];
+        struct _SAMPLE* handle = gMilesSamples.handles[channelIndex];
         gMilesSampleVolumes[channelIndex] =
             static_cast<i16>(static_cast<i8>(sampleData->volume));
         AIL_init_sample(handle);
@@ -182,8 +181,8 @@ void ServiceMilesSamples(void) {
 }
 
 void AdjustMilesSampleVolumes(void) {
-    for (i32 index = 1; index < gMilesSampleHandleCount; ++index) {
-        struct _SAMPLE* sampleHandle = gMilesSampleHandles[index];
+    for (i32 index = 1; index < gMilesSamples.handleCount; ++index) {
+        struct _SAMPLE* sampleHandle = gMilesSamples.handles[index];
         if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
             if (AIL_sample_status(sampleHandle) == MILES_SAMPLE_STATUS_PLAYING)
                 SetMilesSampleHandleVolume(sampleHandle, gMilesSampleVolumes[index]);

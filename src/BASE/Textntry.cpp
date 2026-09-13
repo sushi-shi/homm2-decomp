@@ -108,14 +108,14 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     m_maxLength = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->ReadBlock(m_text, m_maxLength);
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & COLOR_MASK);
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & COLOR_MASK);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();
@@ -202,7 +202,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
             y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -356,7 +356,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
