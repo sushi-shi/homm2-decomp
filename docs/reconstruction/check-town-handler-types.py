@@ -5,6 +5,7 @@ from homm2.build.cc_wrap import run_compile
 from homm2.core.manifest import units, unit_flags
 from homm2.build.annotated_data import ClangMode, _clang_args, configure_libclang
 from homm2.build.source_symbols import unreviewed_diagnostics
+from homm2.build.catalog import Catalog
 
 root=Path.cwd()
 unit,=[u for u in units() if u['unit']=='SOURCE/TOWNMGR']
@@ -15,7 +16,7 @@ assert code==0 and not timed_out
 print('PASS VC6 signed int/long/tick widths, byte/count/timer owners and army size')
 configure_libclang()
 source=root/'src/SOURCE/TOWNMGR.cpp'
-body=source.read_text()+'\n'+probe.read_text()
+body=Catalog.load(root).render(source.read_text(), locale='ru')+'\n'+probe.read_text()
 for mode in ClangMode:
     tu=ci.Index.create().parse(str(source),args=_clang_args(root,source,mode=mode)+['-Dregister='],
                                 unsaved_files=[(str(source),body)])
