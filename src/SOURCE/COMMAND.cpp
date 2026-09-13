@@ -51,6 +51,7 @@
 namespace {
 
     H2_ENUM_BEGIN(CombatWinLoseConstant)
+        WIN_LOSE_NEXT_CONTROL = DIALOG_BUTTON_0,
         WIN_LOSE_TEXT_ID = 101,
         WIN_LOSE_RESOURCE_LOAD_ID = 200,
         WIN_LOSE_RESOURCE_DRAW_ID = 201,
@@ -803,7 +804,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+                if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     i32 helpIndex = -1;
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
                         case CONTROL_MAIN_BUTTON:
@@ -835,14 +836,14 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 break;
             }
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SELECT:
+                case WIDGET_NOTIFY_SELECT:
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
                         case CONTROL_MAIN_BUTTON:
                             DoCommand(m_currentCommand);
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
                         case CONTROL_DISABLE_SELECTION:
                             m_gridSelectionDisabled = true;
@@ -1187,7 +1188,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                        ourArmy_13->m_hex,
                                        ARMY_ATTACK_TARGET_ENEMY,
                                        ARMY_HEX_INVALID
-                                   ) == ARMY_ALL_ATTACK_DIRECTIONS) {
+                                   ) == COMBAT_ALL_DIRECTIONS_BLOCKED) {
                                 if (ShotIsThroughWall(
                                         ourArmy_13->m_side,
                                         ourArmy_13->m_hex,
@@ -1392,9 +1393,9 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case DIALOG_BUTTON_0:
+                    case WIN_LOSE_NEXT_CONTROL:
                         if (gbShowingLoseWindow != 0)
                             goto ExitDialog;
                         if (iCurTransferArtifact + 1 < iMaxTransferArtifacts) {
@@ -1511,7 +1512,8 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, WIN_LOSE_RESOURCE_DRAW_ID);
         message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
-        gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        gpCombatManager->m_winLoseWindow
+            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = KBTickCount() + iDelay_3;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -2497,7 +2499,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         case ACTION_MOVE:
             ResetCyclingCreatures();
             actingArmy_29->MoveAttack(giNextActionGridIndex, 0);
-            actingArmy_29->m_monster.attributes |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
             if (CheckWin(&message) != 0) {
                 dispatchResult_1 = MESSAGE_DISPATCH_FORWARD;
                 goto Finished;
@@ -2512,7 +2514,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 actingArmy_29->MoveAttack(giNextActionExtra, 1);
             }
             actingArmy_29->MoveAttack(giNextActionGridIndex, 0);
-            actingArmy_29->m_monster.attributes |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
             if (CheckWin(&message) != 0) {
                 dispatchResult_1 = MESSAGE_DISPATCH_FORWARD;
                 goto Finished;
@@ -2537,11 +2539,11 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             ResetCycleTimers();
             break;
         case ACTION_WAIT:
-            actingArmy_29->m_monster.attributes |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
             shouldAdvance = true;
             break;
         case ACTION_DEFEND:
-            actingArmy_29->m_monster.attributes |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
+            actingArmy_29->m_monster.attributes |= MONSTER_FLAGS_DEFERRED_TURN;
             shouldAdvance = true;
             break;
     }
@@ -2574,10 +2576,9 @@ void combatManager::ResetCyclingCreatures(void) {
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
-            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
-                    == 0
+            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
                 && currentTroop->m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-                && currentTroop->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
+                && currentTroop->m_animationSequence <= ARMY_ANIMATION_STANDING_LAST) {
                 ++rotateCount;
                 ++gpCombatManager->m_limitCreatureCount[IDX(sideIndex)][index];
             }
@@ -2590,7 +2591,7 @@ void combatManager::ResetCyclingCreatures(void) {
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
-            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
+            if (HAS(currentTroop->m_monster.attributes, MONSTER_FLAGS_DEAD)
                 == 0) {
                 currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
                 currentTroop->m_animationSequence = ARMY_ANIMATION_STAND;
@@ -2660,13 +2661,12 @@ void combatManager::CycleCombatScreen(void) {
     for (side_7 = COMBAT_ATTACKER_SIDE; IDX(side_7) < COMBAT_SIDE_COUNT; ++side_7) {
         for (index_0 = 0; index_0 < gpCombatManager->m_armyCount[IDX(side_7)]; ++index_0) {
             currentArmy_2 = gpCombatManager->m_armies[IDX(side_7)] + index_0;
-            if (HAS(currentArmy_2->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
-                    == 0
+            if (HAS(currentArmy_2->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
                 && currentArmy_2->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
                 && ((currentArmy_2->m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-                     && currentArmy_2->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)
+                     && currentArmy_2->m_animationSequence <= ARMY_ANIMATION_STANDING_LAST)
                     || (currentArmy_2->m_animationSequence == ARMY_ANIMATION_STAND
                         && currentArmy_2->m_lastAnimationTime
                                    + currentArmy_2->m_frameInfo.standStillDelay
@@ -2865,7 +2865,7 @@ void combatManager::AddArmy(
             break;
         }
         if (m_armies[IDX(side)][index].m_quantity == 0
-            && HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_DEAD) != 0
             && (HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE) != 0
                 || IS_ELEMENTAL_CREATURE(m_armies[IDX(side)][index].m_monsterType))) {
             armyIdx = index;

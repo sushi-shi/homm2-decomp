@@ -232,10 +232,10 @@ namespace {
         MONSTER_UPGRADE_CHANCE = 50
     H2_ENUM_END(CombatMonsterEventConstant)
 
-    H2_ENUM_BEGIN(FizzleCenterConstant)
+    H2_ENUM_BEGIN(ArtifactPickupSoundRange)
         ARTIFACT_PICKUP_SOUND_FIRST = 1,
         ARTIFACT_PICKUP_SOUND_LAST = 7
-    H2_ENUM_END(FizzleCenterConstant)
+    H2_ENUM_END(ArtifactPickupSoundRange)
 
     H2_ENUM_BEGIN(FlotsamConstant)
         FLOTSAM_WOOD_AMOUNT = 5,
@@ -425,7 +425,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.c15ae0e09ee99d18")
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
                         localization::Tr("event.inline.785dc53c14bdbc91"),
@@ -813,7 +813,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     localization::Tr("event.inline.19dbe84af3193778"),
                     NORMAL_DIALOG_CONFIRM
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     gpCurPlayer->m_resources[IDX(RES_GOLD)] -= MAGELLAN_MAP_COST;
                     gpGame->MakeAllWaterVisible(giCurPlayer);
                     CompleteDraw(0);
@@ -1105,7 +1105,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         * CHEST_EXPERIENCE_MULTIPLIER,
                     NORMAL_DIALOG_SHOW_OR_TEXT
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     GiveResource(
                         eventHero2,
                         RES_GOLD,
@@ -1763,7 +1763,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
                     eraseObject_l = 1;
@@ -1796,7 +1796,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_SPRITE, cell);
             }
             break;
@@ -1825,7 +1825,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_MEDUSA, cell);
             }
             break;
@@ -1853,7 +1853,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES
                     && CombatMonsterEvent(
                            eventHero2,
                            CREATURE_TROLL,
@@ -1870,8 +1870,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                            CREATURE_NONE,
                            0,
                            0
-                       )
-                           == COMBAT_RESULT_ATTACKER) {
+                       ) == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1885,7 +1884,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                    if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                         goto recruitTroll;
                 }
                 break;
@@ -1901,7 +1900,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 recruitTroll:
                     RecruitEvent(eventHero2, CREATURE_TROLL, cell);
                 }
@@ -1931,7 +1930,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (CombatMonsterEvent(
                             eventHero2,
                             CREATURE_VAMPIRE_LORD,
@@ -1963,7 +1962,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     goto recruitLich;
                     }
                 }
@@ -1980,7 +1979,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 recruitLich:
                     RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
                 }
@@ -2010,48 +2009,48 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
-                dragonFactor_i = DRAGON_CITY_BASE_FACTOR;
-                if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                    && gpGame->m_campaignScenario + 1 == DRAGON_CITY_ARCHIBALD_SCENARIO)
-                    dragonFactor_i = DRAGON_CITY_CAMPAIGN_FACTOR;
-                if (CombatMonsterEvent(
-                        eventHero2,
-                        CREATURE_GREEN_DRAGON,
-                        dragonFactor_i * DRAGON_CITY_GREEN_COUNT_FACTOR,
-                        cell,
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        CREATURE_RED_DRAGON,
-                        dragonFactor_i,
-                        DRAGON_CITY_DRAGON_STACKS,
-                        CREATURE_BLACK_DRAGON,
-                        dragonFactor_i,
-                        DRAGON_CITY_DRAGON_STACKS
-                    )
-                    == COMBAT_RESULT_ATTACKER) {
-                CheckEndGame(END_GAME_FORCE_NONE, true);
-                if (gbGameOver)
-                    break;
-                eventHero2->CheckLevel();
-                cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(
-                    -1,
-                    NORMAL_DIALOG_CONFIRM,
-                    localization::Tr("event.inline.5ae328bcb860b385"),
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
-                    goto recruitDragon;
-                }
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                    dragonFactor_i = DRAGON_CITY_BASE_FACTOR;
+                    if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                        && gpGame->m_campaignScenario + 1 == DRAGON_CITY_ARCHIBALD_SCENARIO)
+                        dragonFactor_i = DRAGON_CITY_CAMPAIGN_FACTOR;
+                    if (CombatMonsterEvent(
+                            eventHero2,
+                            CREATURE_GREEN_DRAGON,
+                            dragonFactor_i * DRAGON_CITY_GREEN_COUNT_FACTOR,
+                            cell,
+                            x,
+                            y,
+                            0,
+                            x,
+                            y,
+                            CREATURE_RED_DRAGON,
+                            dragonFactor_i,
+                            DRAGON_CITY_DRAGON_STACKS,
+                            CREATURE_BLACK_DRAGON,
+                            dragonFactor_i,
+                            DRAGON_CITY_DRAGON_STACKS
+                        )
+                        == COMBAT_RESULT_ATTACKER) {
+                        CheckEndGame(END_GAME_FORCE_NONE, true);
+                        if (gbGameOver)
+                            break;
+                        eventHero2->CheckLevel();
+                        cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
+                        EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                        EventWindow(
+                            -1,
+                            NORMAL_DIALOG_CONFIRM,
+                            localization::Tr("event.inline.5ae328bcb860b385"),
+                            -1,
+                            0,
+                            -1,
+                            0,
+                            -1
+                        );
+                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                            goto recruitDragon;
+                    }
                 }
                 break;
             } else {
@@ -2066,7 +2065,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 recruitDragon:
                     RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
                 }
@@ -2097,7 +2096,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
             }
             break;
@@ -2126,7 +2125,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_NOMAD, cell);
             }
             break;
@@ -2227,7 +2226,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1,
                                 0
                             );
-                            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
@@ -2255,7 +2254,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1,
                                 0
                             );
-                            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[IDX(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
@@ -2336,7 +2335,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 if (IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
                     <= IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                           + SHRINE_WISDOM_BONUS) {
+                           + HERO_BASE_LEARNABLE_SPELL_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     eventHero2->AddSpell(
                         static_cast<SpellType>(cell->m_objectMetadata - 1),
@@ -2495,7 +2494,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                     NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 artifactFight:
                     if (CombatMonsterEvent(
                             eventHero2,
@@ -2604,7 +2603,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0,
                             -1
                         );
-                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
                                 gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
@@ -2645,7 +2644,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             0
                         );
-                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
                                 && gpGame->m_players[IDX(eventHero2->m_owner)]
@@ -2692,7 +2691,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             0
                         );
-                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
                                 && gpGame->m_players[IDX(eventHero2->m_owner)]
@@ -2804,7 +2803,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6)
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_NO)
                 break;
             if (cell->m_objectMetadata == DAEMON_CAVE_EMPTY) {
                 EventWindow(
@@ -2829,7 +2828,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 localization::Tr("event.inline.bf2299125ded4930")
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
                         monsterType_f,
@@ -2939,7 +2938,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                    if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                         if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                             < DAEMON_GOLD) {
                             EventWindow(
@@ -2978,7 +2977,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3024,7 +3023,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3074,7 +3073,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
@@ -3124,7 +3123,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
                         localization::Tr("event.inline.414c8dd999ff1206"),
@@ -3216,7 +3215,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 0,
                 -1
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
                         gpGame->m_mines[cell->m_objectMetadata].guardianType,
@@ -3696,7 +3695,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     );
                 }
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
                             if (IsCursedItem(eventHero->m_artifacts[index8])) {
@@ -3912,7 +3911,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     } else {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, quantity, &recruitSample);
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, xRecruitBuy[index], -1, 0, -1, 0, -1);
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             ExpansionRecruitEvent(eventHero, creatureType1, &quantity);
             packedValue = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | IDX(recruitSiteType);
             cell->m_objectMetadata = packedValue;
@@ -4908,7 +4907,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             0,
             -1
         );
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
                 eventHero->m_army.Add(
                     creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1
@@ -6144,7 +6143,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
                 && IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
                        <= IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                              + WISDOM_SPELL_LEVEL_BONUS) {
+                              + HERO_BASE_LEARNABLE_SPELL_LEVEL) {
                 eventHero->AddSpell(
                     static_cast<SpellType>(cell->m_objectMetadata - 1),
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
@@ -6396,9 +6395,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             pyramidBattleValue_l = static_cast<i32>(
                 gsSpellInfo[index_h].aiValue
                 * (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)
-                       ? (eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= AI_BATTLE_STAT_MAX
+                       ? (eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= BATTLE_STAT_TABLE_MAX_INDEX
                               ? gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)]
-                              : gfBattleStat[AI_BATTLE_STAT_MAX])
+                              : gfBattleStat[BATTLE_STAT_TABLE_MAX_INDEX])
                        : 1.0f)
                 * gpCurPlayer->m_aiData.m_upgradeValueWeight
             );
@@ -6981,7 +6980,7 @@ void advManager::PlayerMonsterInteract(
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, creatureCount, -1);
                 *handled = 1;
                 return;
@@ -7064,7 +7063,7 @@ void advManager::PlayerMonsterInteract(
                 -1,
                 0
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
                 gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -= joiningCost;
@@ -7093,7 +7092,7 @@ void advManager::PlayerMonsterInteract(
             gArmyNamesPlural[IDX(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
             goto fightMonsters;
         *handled = 1;
         return;
@@ -7780,7 +7779,7 @@ void advManager::ReceiveHeroTownData(
                 localization::Tr("event.inline.2b436715930a57ee"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();
             else
                 ShutDown(localization::Tr("event.inline.d7ee33967c36bb8b"));

@@ -1,6 +1,7 @@
 #ifndef HOMM2_TOWNMGR_H
 #define HOMM2_TOWNMGR_H
 
+#include <BASE/dialog.h>
 #include <va.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
@@ -45,6 +46,7 @@ H2_ENUM_CLASS_END(TownThievesGuildCategory)
 H2_ENUM_STEPPED(TownThievesGuildCategory)
 
 H2_ENUM_BEGIN(TownManagerConstant)
+    TOWN_DIALOG_CONFIRM                      = DIALOG_BUTTON_2,
     TOWN_DEBUG_BUILD_ALL                     = 100,
     TOWN_OBJECT_FILENAME_SIZE                = 16,
     TOWN_MANAGER_EVENT_MASK                  = 0x800,
@@ -56,9 +58,8 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_MUSIC_STOP                          = -1,
     TOWN_POINTER_DEFAULT                     = -1,
     TOWN_WINDOW_TEXT_CONTROL                 = 0x89,
-    TOWN_WIDGET_ENABLED_VALUE                = 2,
-    TOWN_WINDOW_DRAW_WIDTH                   = 0x320,
-    TOWN_WINDOW_DRAW_RIGHT                   = 0x321,
+    TOWN_NAVIGATION_DRAW_FIRST_WIDGET        = 0x320,
+    TOWN_NAVIGATION_DRAW_LAST_WIDGET         = 0x321,
     TOWN_BANK_BOX_X                          = 0x222,
     TOWN_GARRISON_STRIP_Y                    = 0x100,
     TOWN_HERO_STRIP_Y                        = 0x163,
@@ -79,9 +80,8 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_ARMY_QUALIFIER_MASK                 = 3,
     TOWN_EMPTY_STATUS_CONTROL_FIRST          = 0x80,
     TOWN_EMPTY_STATUS_CONTROL_LAST           = 0x81,
-    TOWN_STATUS_DRAW_LEFT                    = 0,
-    TOWN_STATUS_DRAW_WIDTH                   = 0x384,
-    TOWN_STATUS_DRAW_RIGHT                   = 0x386,
+    TOWN_STATUS_DRAW_FIRST_WIDGET            = 0x384,
+    TOWN_STATUS_DRAW_LAST_WIDGET             = 0x386,
     TOWN_STATUS_REGION_X                     = 0x19,
     TOWN_STATUS_REGION_Y                     = 0x1d0,
     TOWN_STATUS_REGION_WIDTH                 = 0x24e,
@@ -91,7 +91,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_SPELL_BOOK_COST                     = 500,
     TOWN_BOAT_GOLD_COST                      = 1000,
     TOWN_BOAT_WOOD_COST                      = 10,
-    TOWN_INTERFACE_BROADCAST_FLAGS           = 0x4008,
     TOWN_CONTROL_STATUS_TEXT                 = 0x386,
     TOWN_MAGE_SPELL_UNAVAILABLE              = 999,
     TOWN_MAGE_FIRST_SPELL_CONTROL            = 10,

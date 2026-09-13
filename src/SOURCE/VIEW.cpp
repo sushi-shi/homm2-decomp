@@ -14,6 +14,7 @@
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 H2_ENUM_BEGIN(ViewGeneralConstant)
+    GENERAL_CAST_SPELL         = DIALOG_BUTTON_0,
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
     GENERAL_CLOSE              = 10,
@@ -199,7 +200,7 @@ i32 combatManager::ViewGeneral(
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
     if (allowActions == 0 || m_heroes[IDX(OppositeCombatSide(m_currentSide))] == NULL
@@ -210,7 +211,7 @@ i32 combatManager::ViewGeneral(
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
     if (allowActions == 0 || giCurGeneral != m_currentSide
@@ -223,7 +224,7 @@ i32 combatManager::ViewGeneral(
         message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
 
@@ -280,7 +281,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 helpIndex36 = -1;
-                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+                if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     switch (message.payload.widget.id) {
                         case GENERAL_CLOSE:
                             helpIndex36 = GENERAL_LONG_HELP_CLOSE;
@@ -291,7 +292,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                             helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
                             break;
-                        case DIALOG_BUTTON_0:
+                        case GENERAL_CAST_SPELL:
                             helpIndex36 = GENERAL_LONG_HELP_CAST;
                             break;
                     }
@@ -301,12 +302,12 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 break;
             }
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case GENERAL_CLOSE:
                         case GENERAL_RETREAT:
                         case GENERAL_SURRENDER:
-                        case DIALOG_BUTTON_0:
+                        case GENERAL_CAST_SPELL:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
                             handled28 = true;
                             break;
@@ -331,7 +332,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 case GENERAL_SURRENDER:
                     hintIndex11 = GENERAL_HOVER_HELP_SURRENDER;
                     break;
-                case DIALOG_BUTTON_0:
+                case GENERAL_CAST_SPELL:
                     hintIndex11 = GENERAL_HOVER_HELP_CAST;
                     break;
                 default:

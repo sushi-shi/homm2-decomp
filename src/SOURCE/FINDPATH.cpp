@@ -25,9 +25,9 @@ H2_ENUM_BEGIN(FindPathConstant)
     BINARY_SEARCH_MIDPOINT_DIVISOR = 2,
     DRAWBRIDGE_MOAT_INDEX          = 4,
     MOAT_MOVEMENT_PENALTY          = 2,
-    INITIAL_BEST_DISTANCE          = LOGICAL_SCREEN_WIDTH
+    // Initial pixel-distance search bound, independent of framebuffer dimensions.
+    INITIAL_BEST_DISTANCE          = 640
 H2_ENUM_END(FindPathConstant)
-
 }
 
 DATA(0x00524540) static i32 gSearchNextY = 0;
@@ -342,7 +342,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
 
         if (unit->m_monster.shots > 0
             && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
-                   == COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+                   == COMBAT_ALL_DIRECTIONS_BLOCKED) {
             gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
         } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
             gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
@@ -355,9 +355,8 @@ void searchArray::SeedCombatPosition(class army* unit) {
                                                        : COMBAT_DIRECTION_WEST
             );
             if (unit->m_monster.shots > 0
-                && unit->GetAttackMask(
-                       unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
-                   ) == COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+                && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
+                       == COMBAT_ALL_DIRECTIONS_BLOCKED) {
                 gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
             } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
                 gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
@@ -456,7 +455,7 @@ i32 searchArray::FindCombatPath(
                 ARMY_ATTACK_TARGET_ASSIGNED,
                 attackTargetHex_a
             );
-            if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+            if (attackMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
                 for (direction_a = 0; direction_a < IDX(MAP_DIRECTION_COUNT);
                      direction_a++) {
                     if ((attackMask & (1 << direction_a)) == 0) {

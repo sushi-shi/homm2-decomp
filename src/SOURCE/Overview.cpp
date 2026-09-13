@@ -563,7 +563,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 displayedTroops = 0;
-                for (i = 0; i < KB_DWELLING_TYPE_COUNT; i++) {
+                for (i = 0; i < DWELLING_TYPE_COUNT; i++) {
                     switch (i) {
                         case DWELLING_ORDER_LEVEL_1:
                             building = DWELLING_INDEX_LEVEL_1;
@@ -1173,7 +1173,7 @@ void game::DoKnob(void) {
                     SetupDynamicStuff(1, 0, 0);
                     topBefore = topNow;
                 } else {
-                    overWin->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    overWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             }
             Process1WindowsMessage();
@@ -1219,9 +1219,9 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     quickView = false;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 quickView = true;
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 if (HAS(
                         message.payload.widget.modifiers,
                         MESSAGE_MODIFIER_RIGHT_BUTTON
@@ -1283,7 +1283,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case HERO_TITLE_WIDGET:
                         goto selectHeroes;
@@ -1483,7 +1483,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             }
             if (widgetId >= TOWN_RECRUIT_ALT_FIRST
                 && widgetId <= TOWN_RECRUIT_ALT_LAST) {
-                widgetId -= KB_DWELLING_TYPE_COUNT;
+                widgetId -= DWELLING_TYPE_COUNT;
             }
             if (widgetId >= TOWN_RECRUIT_FIRST && widgetId <= TOWN_RECRUIT_LAST) {
                 item = widgetId - TOWN_RECRUIT_FIRST;

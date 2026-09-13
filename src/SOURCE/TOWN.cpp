@@ -54,7 +54,7 @@ void town::GiveSpells(hero* targetHero) {
         return;
 
     for (stage = 0; stage < IDX(pupil->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                                + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
+                                + HERO_BASE_LEARNABLE_SPELL_LEVEL;
          ++stage) {
         for (slotN = 0; slotN < m_spellCounts[stage]; ++slotN) {
             pupil->AddSpell(m_spells[stage][slotN], pupil->Stats(HERO_PRIMARY_KNOWLEDGE));

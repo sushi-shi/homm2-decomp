@@ -100,15 +100,15 @@ extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 void SendMapChange(MapChangeType, i8, u8, u8, i32, u8, u8);
 
 H2_ENUM_BEGIN(CursorHeroShadowFrame)
-    SPRITE_UP_STEP_1 = 46,
-    SPRITE_UP_STEP_2 = 47,
-    SPRITE_UP_STEP_3 = 49,
-    SPRITE_UP_STEP_4 = 50,
-    SPRITE_UP_STEP_5 = 51,
-    SPRITE_UP_SHADOW_WIDE = 55,
-    SPRITE_UP_SHADOW_STEP_5 = 56,
-    SPRITE_UP_SHADOW_STEP_4 = 57,
-    SPRITE_UP_SHADOW_STEP_3 = 58,
+    CURSOR_HERO_UP_STEP_1        = 46,
+    CURSOR_HERO_UP_STEP_2        = 47,
+    CURSOR_HERO_UP_STEP_3        = 49,
+    CURSOR_HERO_UP_STEP_4        = 50,
+    CURSOR_HERO_UP_STEP_5        = 51,
+    CURSOR_HERO_UP_SHADOW_WIDE   = 55,
+    CURSOR_HERO_UP_SHADOW_STEP_5 = 56,
+    CURSOR_HERO_UP_SHADOW_STEP_4 = 57,
+    CURSOR_HERO_UP_SHADOW_STEP_3 = 58,
 H2_ENUM_END(CursorHeroShadowFrame)
 
 #endif

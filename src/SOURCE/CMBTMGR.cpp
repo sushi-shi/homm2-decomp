@@ -50,18 +50,19 @@
 namespace {
 
 H2_ENUM_BEGIN(CombatSystemOptionWidget)
-    SYSTEM_OPTION_SPEED_BUTTON      = 10,
-    SYSTEM_OPTION_ARMY_INFO_BUTTON  = 11,
-    SYSTEM_OPTION_AUTO_SPELL_BUTTON = 12,
-    SYSTEM_OPTION_GRID_BUTTON       = 13,
-    SYSTEM_OPTION_SHADE_BUTTON      = 14,
-    SYSTEM_OPTION_MOUSE_HEX_BUTTON  = 15,
-    SYSTEM_OPTION_SPEED_TEXT        = 20,
-    SYSTEM_OPTION_ARMY_INFO_TEXT    = 21,
-    SYSTEM_OPTION_AUTO_SPELL_TEXT   = 22,
-    SYSTEM_OPTION_GRID_TEXT         = 23,
-    SYSTEM_OPTION_SHADE_TEXT        = 24,
-    SYSTEM_OPTION_MOUSE_HEX_TEXT    = 25,
+        SYSTEM_OPTION_CLOSE_BUTTON      = DIALOG_BUTTON_0,
+        SYSTEM_OPTION_SPEED_BUTTON      = 10,
+        SYSTEM_OPTION_ARMY_INFO_BUTTON  = 11,
+        SYSTEM_OPTION_AUTO_SPELL_BUTTON = 12,
+        SYSTEM_OPTION_GRID_BUTTON       = 13,
+        SYSTEM_OPTION_SHADE_BUTTON      = 14,
+        SYSTEM_OPTION_MOUSE_HEX_BUTTON  = 15,
+        SYSTEM_OPTION_SPEED_TEXT        = 20,
+        SYSTEM_OPTION_ARMY_INFO_TEXT    = 21,
+        SYSTEM_OPTION_AUTO_SPELL_TEXT   = 22,
+        SYSTEM_OPTION_GRID_TEXT         = 23,
+        SYSTEM_OPTION_SHADE_TEXT        = 24,
+        SYSTEM_OPTION_MOUSE_HEX_TEXT    = 25,
 H2_ENUM_END(CombatSystemOptionWidget)
 
 H2_ENUM_BEGIN(CombatSystemOptionConstant)
@@ -613,7 +614,7 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     }
 
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
-        if (!HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
+        if (!HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_DEAD)
             && m_armies[IDX(side)][index].m_quantity > 0
             && (m_playerId[IDX(side)] == -1
                 || ((!IS_ELEMENTAL_CREATURE(m_armies[IDX(side)][index].m_monsterType))
@@ -1069,11 +1070,11 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_BAD_MORALE)
+    if HAS (activeArmy->m_monster.attributes, MONSTER_FLAGS_BAD_MORALE)
         H2_ENUM_CLEAR_FLAG(
-            activeArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_BAD_MORALE
+            activeArmy->m_monster.attributes, MONSTER_FLAGS_BAD_MORALE
         );
-    activeArmy->m_monster.attributes |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
+    activeArmy->m_monster.attributes |= MONSTER_FLAGS_HIGH_MORALE;
 
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample);
@@ -1116,7 +1117,7 @@ i32 combatManager::CheckApplyBadMorale(
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
-    activeArmy->m_monster.attributes |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+    activeArmy->m_monster.attributes |= MONSTER_FLAGS_BAD_MORALE;
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample);
     return 1;
@@ -1144,25 +1145,25 @@ restart:
                 skipEnt = false;
                 curArmy = stackCounter + m_armies[IDX(stackSide)];
                 if (HAS(curArmy->m_monster.attributes,
-                        MONSTER_FLAGS_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
+                        MONSTER_FLAGS_DEAD | MONSTER_FLAGS_BAD_MORALE)
                     || IDX(curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
                     || (curArmy->m_monster.speed != m_currentSpeed
                         && !(
                             curArmy->m_monster.attributes
-                            & MONSTER_ABILITY_FLAG_HIGH_MORALE
+                            & MONSTER_FLAGS_HIGH_MORALE
                         )))
                     skipEnt = true;
 
                 if (!skipEnt && speedIter == 0
                     && !(
-                        curArmy->m_monster.attributes & MONSTER_ABILITY_FLAG_HIGH_MORALE
+                        curArmy->m_monster.attributes & MONSTER_FLAGS_HIGH_MORALE
                     ))
                     skipEnt = true;
 
                 if HAS (curArmy->m_monster.attributes,
-                        MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
+                        MONSTER_FLAGS_DEFERRED_TURN) {
                     skipEnt = true;
                     hasPending = true;
                 }
@@ -1198,7 +1199,7 @@ restart:
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             for (stackCounter = 0; stackCounter < m_armyCount[sideLoop]; stackCounter++) {
                 (m_armies[sideLoop] + stackCounter)->m_monster.attributes &=
-                    ~MONSTER_ABILITY_FLAG_DEFERRED_TURN;
+                    ~MONSTER_FLAGS_DEFERRED_TURN;
             }
         }
         goto restart;
@@ -1225,7 +1226,7 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     result = true;
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         if (!(m_armies[IDX(side)][index].m_monster.attributes
-              & MONSTER_FLAGS_AI_EXCLUDED))
+              & MONSTER_FLAGS_DEAD))
             result = false;
     }
     return result;
@@ -2288,7 +2289,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
     message.payload.widget.data.text = onOffText[gConfig.showCombatMouseHex];
     CSPanel->BroadcastMessage(message);
     if (!initialDraw)
-        CSPanel->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        CSPanel->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
 }
 
 VA(0x0042b527, 0x2b3)
@@ -2300,11 +2301,11 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                 message.payload.widget.modifiers,
                 MESSAGE_MODIFIER_RIGHT_BUTTON
             )) {
-            if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+            if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
+                || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
-                    case DIALOG_BUTTON_0:
+                    case SYSTEM_OPTION_CLOSE_BUTTON:
                         helpIndex = IDX(HELP_CLOSE);
                         break;
                     case SYSTEM_OPTION_SPEED_BUTTON:
@@ -2332,14 +2333,14 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case DIALOG_BUTTON_0:
+                        case SYSTEM_OPTION_CLOSE_BUTTON:
                             bDone = true;
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_SELECT:
+                case WIDGET_NOTIFY_SELECT:
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =

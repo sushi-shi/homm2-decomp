@@ -20,6 +20,11 @@
 #include <SOURCE/Campaign.h>
 #include <BASE/dialog.h>
 #include <SOURCE/GAME.h>
+// This screen activates replay/accept/cancel actions on the release notification.
+H2_ENUM_BEGIN(CampaignNotification)
+    CAMPAIGN_MESSAGE_ACTIVATE = IDX(WIDGET_NOTIFY_DESELECT)
+H2_ENUM_END(CampaignNotification)
+
 H2_ENUM_BEGIN(CampaignScenarioArmyCount)
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
     BARBARIAN_OGRE_COUNT       = 18,
@@ -272,9 +277,9 @@ i32 game::HandleCampaignWin(void) {
         }
         gpGame->ShowCampaignInfo(0, 0);
         switch (gpWindowManager->m_dialogResult) {
-            case DIALOG_BUTTON_2:
+            case CAMPAIGN_DIALOG_ACCEPT:
                 return 1;
-            case DIALOG_BUTTON_1:
+            case CAMPAIGN_DIALOG_CANCEL:
                 return 0;
         }
     }
@@ -683,7 +688,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         else
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = CAMPAIGN_WIDGET_REFRESH_FRAME;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         campWin->BroadcastMessage(message);
     }
     if (redraw)
@@ -708,8 +713,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_TRACK_WIDGET_FIRST:
                     case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
@@ -752,13 +757,13 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                 }
                 break;
 
-            case WIDGET_COMMAND_DESELECT:
+            case BaseWidgetCommand(CAMPAIGN_MESSAGE_ACTIVATE):
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_DIALOG_REPLAY:
                         gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
                         campWin->DrawWindow();
                         break;
-                    case DIALOG_BUTTON_2:
+                    case CAMPAIGN_DIALOG_ACCEPT:
                         if (!bCampaignViewOnly) {
                             if (gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
                                 if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
@@ -790,7 +795,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 break;
                             }
                         }
-                    case DIALOG_BUTTON_1:
+                    case CAMPAIGN_DIALOG_CANCEL:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);

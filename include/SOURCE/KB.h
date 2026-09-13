@@ -1,6 +1,7 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
 
+#include <BASE/dialog.h>
 #include <va.h>
 #include <windows.h>
 #include <SOURCE/armyGroup.h>
@@ -150,6 +151,7 @@ struct SPlayerExit {
 SIZE(SPlayerExit, 7);
 
 H2_ENUM_BEGIN(EventWindowConstant)
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
     EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
     EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
@@ -388,6 +390,7 @@ struct KbRemotePacket {
 SIZE(KbRemotePacket, REMOTE_MESSAGE_SIZE);
 
 H2_ENUM_BEGIN(AppMenuConstant)
+    APP_MENU_CONFIRM_OK          = DIALOG_BUTTON_5,
     APP_MENU_CHECKED             = 8,
     APP_MENU_UNCHECKED           = 0,
     APP_MENU_CONFIRM_DIALOG      = 2,
@@ -600,13 +603,13 @@ extern configStruct gConfig;
 // An lvalue selected afresh, including across callbacks that change executables.
 #define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[IDX(giCurExe)])
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
-extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
-extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][IDX(RES_COUNT)];
-extern H2_CONST char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
-extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][KB_DWELLING_TYPE_COUNT];
+extern i32 gDwellingBaseResourceValues[][DWELLING_TYPE_COUNT];
+extern i32 gDwellingCosts[][DWELLING_TYPE_COUNT][IDX(RES_COUNT)];
+extern H2_CONST char* gDwellingNames[][DWELLING_TYPE_COUNT];
+extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
-extern u32l gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
+extern u32l gHierarchyMask[][DWELLING_TYPE_COUNT];
 extern H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
 extern H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;

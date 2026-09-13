@@ -309,16 +309,16 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowPic = frame;
-            if (shadowPic == SPRITE_UP_STEP_5)
-                shadowPic = SPRITE_UP_SHADOW_STEP_5;
-            if (shadowPic == SPRITE_UP_STEP_4)
-                shadowPic = SPRITE_UP_SHADOW_STEP_4;
-            if (shadowPic == SPRITE_UP_STEP_3)
-                shadowPic = SPRITE_UP_SHADOW_STEP_3;
-            if (shadowPic == SPRITE_UP_STEP_2)
-                shadowPic = SPRITE_UP_SHADOW_WIDE;
-            if (shadowPic == SPRITE_UP_STEP_1)
-                shadowPic = SPRITE_UP_SHADOW_WIDE;
+            if (shadowPic == CURSOR_HERO_UP_STEP_5)
+                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_5;
+            if (shadowPic == CURSOR_HERO_UP_STEP_4)
+                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_4;
+            if (shadowPic == CURSOR_HERO_UP_STEP_3)
+                shadowPic = CURSOR_HERO_UP_SHADOW_STEP_3;
+            if (shadowPic == CURSOR_HERO_UP_STEP_2)
+                shadowPic = CURSOR_HERO_UP_SHADOW_WIDE;
+            if (shadowPic == CURSOR_HERO_UP_STEP_1)
+                shadowPic = CURSOR_HERO_UP_SHADOW_WIDE;
             DRAW_ADVENTURE_ICON(
                 m_shadowIcon,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,

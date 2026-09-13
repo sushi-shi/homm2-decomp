@@ -2741,7 +2741,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     numberToBuy = 0;
     bestRawValue0 = AI_PURCHASE_INITIAL_VALUE;
     bestRandomizedScore0 = AI_PURCHASE_INITIAL_VALUE;
-    for (dwelling = 0; dwelling < KB_DWELLING_TYPE_COUNT; dwelling++) {
+    for (dwelling = 0; dwelling < DWELLING_TYPE_COUNT; dwelling++) {
         candidateMonster = gDwellingType[IDX(townPtr->m_type)][dwelling];
         weakestArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
         if (HAS(townPtr->m_buildings, BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
@@ -4261,7 +4261,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         for (castLvl = 1;
              castLvl
              <= IDX(heroPtr->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                    + WISDOM_SPELL_LEVEL_BONUS;
+                    + HERO_BASE_LEARNABLE_SPELL_LEVEL;
              castLvl++) {
             for (whichSpell = 0;
                  whichSpell < townPtr->m_spellCounts[castLvl - TOWN_MAGE_GUILD_FIRST_LEVEL];
@@ -5435,16 +5435,16 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     && !gpCurAIHero->HasSpell(SpellType(theCell->m_objectMetadata - 1))) {
                     if (IDX(gsSpellInfo[theCell->m_objectMetadata - 1].level)
                         <= IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                               + WISDOM_SPELL_LEVEL_BONUS) {
+                               + HERO_BASE_LEARNABLE_SPELL_LEVEL) {
                         eventRV = gsSpellInfo[theCell->m_objectMetadata - 1].aiValue;
                         if (HAS(gsSpellInfo[theCell->m_objectMetadata - 1].attributes,
                                 SPELL_INFO_ATTRIBUTE_POWER)) {
                             eventRV = static_cast<i32>(
                                 eventRV
                                 * (gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                                           <= AI_BATTLE_STAT_MAX
+                                           <= BATTLE_STAT_TABLE_MAX_INDEX
                                        ? gfStatPower[gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE)]
-                                       : gfStatPower[AI_BATTLE_STAT_MAX])
+                                       : gfStatPower[BATTLE_STAT_TABLE_MAX_INDEX])
                             );
                         }
                     }
@@ -5679,9 +5679,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         gsSpellInfo[i].aiValue
                         * (HAS(gsSpellInfo[i].attributes, SPELL_INFO_ATTRIBUTE_POWER)
                                ? (gpCurAIHero->Stats(HERO_PRIMARY_SPELL_POWER)
-                                          <= AI_BATTLE_STAT_MAX
+                                          <= BATTLE_STAT_TABLE_MAX_INDEX
                                       ? gfBattleStat[gpCurAIHero->Stats(HERO_PRIMARY_SPELL_POWER)]
-                                      : gfBattleStat[AI_BATTLE_STAT_MAX])
+                                      : gfBattleStat[BATTLE_STAT_TABLE_MAX_INDEX])
                                : 1.0f)
                         * gpCurPlayer->m_aiData.m_upgradeValueWeight
                     );
@@ -6245,7 +6245,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
                 else
                     result = 0;
                 break;
-            case AI_ARTIFACT_EVENT_NO_VALUE:
+            case ARTIFACT_EVENT_MODE_UNKNOWN_2:
                 break;
             case ARTIFACT_EVENT_MODE_GOLD:
                 result = NetValueOfArtifact(IDX(artifact), ARTIFACT_EVENT_GOLD_COST, 0, 0);

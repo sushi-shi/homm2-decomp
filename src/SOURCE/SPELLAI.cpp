@@ -52,7 +52,7 @@ H2_ENUM_CLASS_BEGIN(CombatSpellAITargetMode)
     SPELL_AI_ANY_ARMY     = 7
 H2_ENUM_CLASS_END(CombatSpellAITargetMode)
 
-H2_ENUM_BEGIN(CombatLayoutConstant)
+H2_ENUM_BEGIN(CombatSpellEvaluationConstant)
     SPELL_AI_FIRST_HEX                  = 1,
     SPELL_AI_LAST_HEX                   = 0x73,
     SPELL_AI_AREA_LAST_HEX              = 0x2b,
@@ -64,7 +64,7 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_HEX_ROW_END_OFFSET         = 2,
     SPELL_AI_HEX_ROW_SKIP               = 3,
     SPELL_AI_MIRROR_VALUE_DIVISOR       = 2
-H2_ENUM_END(CombatLayoutConstant)
+H2_ENUM_END(CombatSpellEvaluationConstant)
 
 VA(0x00495da0, 0x214)
 i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted) {
@@ -810,7 +810,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                 return 0;
             attackMask =
                 target->GetAttackMask(target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
-            if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS)
+            if (attackMask != COMBAT_ALL_DIRECTIONS_BLOCKED)
                 return 0;
 
             columnIndex = target->m_hex % COMBAT_GRID_ROW_LENGTH;

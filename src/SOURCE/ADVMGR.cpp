@@ -59,18 +59,19 @@
 #include <BASE/display.h>
 
 H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
-    SYSTEM_OPTION_MUSIC_VOLUME = 10,
-    SYSTEM_OPTION_SOUND_VOLUME = 11,
-    SYSTEM_OPTION_HERO_SPEED = 12,
-    SYSTEM_OPTION_MUSIC_SOURCE = 13,
-    SYSTEM_OPTION_SHOW_ROUTE = 14,
+    SYSTEM_OPTIONS_DIALOG_ACCEPT = DIALOG_BUTTON_0,
+    SYSTEM_OPTION_MUSIC_VOLUME   = 10,
+    SYSTEM_OPTION_SOUND_VOLUME   = 11,
+    SYSTEM_OPTION_HERO_SPEED     = 12,
+    SYSTEM_OPTION_MUSIC_SOURCE   = 13,
+    SYSTEM_OPTION_SHOW_ROUTE     = 14,
     SYSTEM_OPTION_COMPUTER_SPEED = 15,
-    SYSTEM_OPTION_INTERFACE = 16,
-    SYSTEM_OPTION_VIDEO = 17,
-    SYSTEM_OPTION_COLOR_CURSOR = 18,
-    SYSTEM_OPTION_FIRST = SYSTEM_OPTION_MUSIC_VOLUME,
-    SYSTEM_OPTION_LAST = SYSTEM_OPTION_COLOR_CURSOR,
-    SYSTEM_OPTION_COUNT = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1,
+    SYSTEM_OPTION_INTERFACE      = 16,
+    SYSTEM_OPTION_VIDEO          = 17,
+    SYSTEM_OPTION_COLOR_CURSOR   = 18,
+    SYSTEM_OPTION_FIRST          = SYSTEM_OPTION_MUSIC_VOLUME,
+    SYSTEM_OPTION_LAST           = SYSTEM_OPTION_COLOR_CURSOR,
+    SYSTEM_OPTION_COUNT          = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1,
 H2_ENUM_CLASS_END(AdventureSystemOptionsWidgetId)
 
 H2_ENUM_BEGIN(AdventureScreenConstant)
@@ -183,17 +184,15 @@ H2_ENUM_BEGIN(AdventureScrollConstant)
 H2_ENUM_END(AdventureScrollConstant)
 
 H2_ENUM_BEGIN(AdventureButtonConstant)
-    BUTTON_FIRST = 1,
-    BUTTON_LAST = 6,
-    BUTTON_TARGET = 2,
-    BUTTON_SLOT_1 = 1,
-    BUTTON_SLOT_2 = 2,
-    BUTTON_SLOT_3 = 3,
-    BUTTON_SLOT_4 = 4,
-    BUTTON_SLOT_5 = 5,
-    BUTTON_SLOT_6 = 6,
+    BUTTON_FIRST         = 1,
+    BUTTON_LAST          = 6,
+    BUTTON_SLOT_1        = 1,
+    BUTTON_SLOT_2        = 2,
+    BUTTON_SLOT_3        = 3,
+    BUTTON_SLOT_4        = 4,
+    BUTTON_SLOT_5        = 5,
+    BUTTON_SLOT_6        = 6,
     BUTTON_BROADCAST_ARG = 1,
-    BUTTON_BROADCAST_FLAGS = 0x4008
 H2_ENUM_END(AdventureButtonConstant)
 
 H2_ENUM_BEGIN(AdventureTriggerConstant)
@@ -288,19 +287,22 @@ H2_ENUM_BEGIN(AdventureTeleportConstant)
 H2_ENUM_END(AdventureTeleportConstant)
 
 H2_ENUM_BEGIN(AdventureTravelSpellConstant)
-    TRAVEL_DIALOG_ACCEPT = 1,
-    TRAVEL_MUSIC = 1,
+    DIMENSION_DOOR_CLOSE_BUTTON = DIALOG_BUTTON_0,
+    TRAVEL_DIALOG_ACCEPT        = 1,
+    TRAVEL_MUSIC                = 1,
     DIMENSION_DOOR_FIRST_BUTTON = 10,
-    DIMENSION_DOOR_LAST_BUTTON = 11,
-    TOWN_PORTAL_WINDOW_X = 159,
-    TOWN_PORTAL_WINDOW_Y = 65,
-    TOWN_PORTAL_DISTANCE_LIMIT = 1000
+    DIMENSION_DOOR_LAST_BUTTON  = 11,
+    TOWN_PORTAL_WINDOW_X        = 159,
+    TOWN_PORTAL_WINDOW_Y        = 65,
+    TOWN_PORTAL_DISTANCE_LIMIT  = 1000
 H2_ENUM_END(AdventureTravelSpellConstant)
 
 H2_ENUM_BEGIN(AdventureTownPortalMessage)
-    TOWN_PORTAL_TITLE_WIDGET = 1,
+    TOWN_PORTAL_LAST_CHOICE   = DIALOG_BUTTON_2,
+    TOWN_PORTAL_FIRST_CHOICE  = DIALOG_BUTTON_1,
+    TOWN_PORTAL_TITLE_WIDGET  = 1,
     TOWN_PORTAL_CHOICE_WIDGET = 100,
-    TOWN_PORTAL_CLOSE_WIDGET = 10,
+    TOWN_PORTAL_CLOSE_WIDGET  = 10,
 H2_ENUM_END(AdventureTownPortalMessage)
 
 H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
@@ -537,54 +539,50 @@ H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
 H2_ENUM_END(AdventureBottomHeroViewConstant)
 
 H2_ENUM_BEGIN(AdventureLocatorConstant)
-    LOCATOR_VISIBLE_COUNT = 4,
-    LOCATOR_PAGE_THRESHOLD = 5,
-    LOCATOR_PAGE_DENOMINATOR_OFFSET = 4,
-    LOCATOR_HERO_WIDGET_BASE = 100,
-    LOCATOR_HERO_WIDGET_STRIDE = 7,
-    LOCATOR_HERO_MOBILITY_OFFSET = 1,
-    LOCATOR_HERO_PORTRAIT_OFFSET = 2,
-    LOCATOR_HERO_MANA_OFFSET = 3,
-    LOCATOR_HERO_IMAGE_OFFSET = 5,
-    LOCATOR_HERO_BORDER_OFFSET = 6,
-    LOCATOR_HERO_SELECT_BASE = LOCATOR_HERO_WIDGET_BASE + LOCATOR_HERO_IMAGE_OFFSET,
-    LOCATOR_HERO_SELECT_1 = LOCATOR_HERO_SELECT_BASE + LOCATOR_HERO_WIDGET_STRIDE,
-    LOCATOR_HERO_SELECT_2 = LOCATOR_HERO_SELECT_1 + LOCATOR_HERO_WIDGET_STRIDE,
-    LOCATOR_HERO_SELECT_3 = LOCATOR_HERO_SELECT_2 + LOCATOR_HERO_WIDGET_STRIDE,
-    LOCATOR_HERO_SCROLL_CONTROL = 22,
-    LOCATOR_TOWN_SCROLL_CONTROL = 25,
-    LOCATOR_HERO_KNOB_CONTROL = 26,
-    LOCATOR_TOWN_KNOB_CONTROL = 27,
-    LOCATOR_TOWN_IMAGE_BASE = 16,
-    LOCATOR_TOWN_IMAGE_1 = LOCATOR_TOWN_IMAGE_BASE + 1,
-    LOCATOR_TOWN_IMAGE_2 = LOCATOR_TOWN_IMAGE_1 + 1,
-    LOCATOR_TOWN_IMAGE_3 = LOCATOR_TOWN_IMAGE_2 + 1,
-    LOCATOR_TOWN_BORDER_BASE = 32,
-    LOCATOR_TOWN_FLAG_BASE = 300,
-    LOCATOR_SELECTED_COLOR = 0x99,
-    LOCATOR_NORMAL_COLOR = 0x24,
-    LOCATOR_HERO_EMPTY_FRAME_BASE = 1,
-    LOCATOR_HERO_DEFAULT_FRAME = 21,
-    LOCATOR_HERO_ENABLE_FLAGS = 6,
-    LOCATOR_HERO_DISABLE_FLAGS = 4,
-    LOCATOR_TOWN_EMPTY_FRAME_BASE = 5,
-    LOCATOR_TOWN_ENABLE_FLAGS = 2,
-    LOCATOR_TOWN_DISABLE_FLAGS = 4,
-    LOCATOR_TOWN_TYPE_FRAME_BASE = 9,
+    LOCATOR_VISIBLE_COUNT             = 4,
+    LOCATOR_PAGE_THRESHOLD            = 5,
+    LOCATOR_PAGE_DENOMINATOR_OFFSET   = 4,
+    LOCATOR_HERO_WIDGET_BASE          = 100,
+    LOCATOR_HERO_WIDGET_STRIDE        = 7,
+    LOCATOR_HERO_MOBILITY_OFFSET      = 1,
+    LOCATOR_HERO_PORTRAIT_OFFSET      = 2,
+    LOCATOR_HERO_MANA_OFFSET          = 3,
+    LOCATOR_HERO_IMAGE_OFFSET         = 5,
+    LOCATOR_HERO_BORDER_OFFSET        = 6,
+    LOCATOR_HERO_SELECT_BASE          = LOCATOR_HERO_WIDGET_BASE + LOCATOR_HERO_IMAGE_OFFSET,
+    LOCATOR_HERO_SELECT_1             = LOCATOR_HERO_SELECT_BASE + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SELECT_2             = LOCATOR_HERO_SELECT_1 + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SELECT_3             = LOCATOR_HERO_SELECT_2 + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SCROLL_CONTROL       = 22,
+    LOCATOR_TOWN_SCROLL_CONTROL       = 25,
+    LOCATOR_HERO_KNOB_CONTROL         = 26,
+    LOCATOR_TOWN_KNOB_CONTROL         = 27,
+    LOCATOR_TOWN_IMAGE_BASE           = 16,
+    LOCATOR_TOWN_IMAGE_1              = LOCATOR_TOWN_IMAGE_BASE + 1,
+    LOCATOR_TOWN_IMAGE_2              = LOCATOR_TOWN_IMAGE_1 + 1,
+    LOCATOR_TOWN_IMAGE_3              = LOCATOR_TOWN_IMAGE_2 + 1,
+    LOCATOR_TOWN_BORDER_BASE          = 32,
+    LOCATOR_TOWN_FLAG_BASE            = 300,
+    LOCATOR_SELECTED_COLOR            = 0x99,
+    LOCATOR_NORMAL_COLOR              = 0x24,
+    LOCATOR_HERO_EMPTY_FRAME_BASE     = 1,
+    LOCATOR_HERO_DEFAULT_FRAME        = 21,
+    LOCATOR_TOWN_EMPTY_FRAME_BASE     = 5,
+    LOCATOR_TOWN_TYPE_FRAME_BASE      = 9,
     LOCATOR_TOWN_VILLAGE_FRAME_OFFSET = 6,
-    LOCATOR_SCROLL_NO_PAGES_Y = 232,
-    LOCATOR_SCROLL_BASE_Y = 195,
-    LOCATOR_SCROLL_MOUSE_BASE_Y = LOCATOR_SCROLL_BASE_Y - 1,
-    LOCATOR_SCROLL_MOUSE_SPAN = 92,
-    LOCATOR_HERO_SCROLL_SPAN = 73,
-    LOCATOR_TOWN_SCROLL_SPAN = 74,
-    LOCATOR_KNOB_MAX_Y = LOCATOR_SCROLL_BASE_Y + LOCATOR_HERO_SCROLL_SPAN,
-    LOCATOR_HERO_DRAW_LEFT = 0,
-    LOCATOR_SCREEN_LEFT = 481,
-    LOCATOR_SCREEN_TOP = 177,
-    LOCATOR_SCREEN_ROW_HEIGHT = 32,
-    LOCATOR_SCREEN_WIDTH = 54,
-    LOCATOR_SCREEN_HEIGHT = 30
+    LOCATOR_SCROLL_NO_PAGES_Y         = 232,
+    LOCATOR_SCROLL_BASE_Y             = 195,
+    LOCATOR_SCROLL_MOUSE_BASE_Y       = LOCATOR_SCROLL_BASE_Y - 1,
+    LOCATOR_SCROLL_MOUSE_SPAN         = 92,
+    LOCATOR_HERO_SCROLL_SPAN          = 73,
+    LOCATOR_TOWN_SCROLL_SPAN          = 74,
+    LOCATOR_KNOB_MAX_Y                = LOCATOR_SCROLL_BASE_Y + LOCATOR_HERO_SCROLL_SPAN,
+    LOCATOR_HERO_DRAW_LEFT            = 0,
+    LOCATOR_SCREEN_LEFT               = 481,
+    LOCATOR_SCREEN_TOP                = 177,
+    LOCATOR_SCREEN_ROW_HEIGHT         = 32,
+    LOCATOR_SCREEN_WIDTH              = 54,
+    LOCATOR_SCREEN_HEIGHT             = 30
 H2_ENUM_END(AdventureLocatorConstant)
 
 H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
@@ -623,23 +621,22 @@ H2_ENUM_BEGIN(AdventureSaveConstant)
 H2_ENUM_END(AdventureSaveConstant)
 
 H2_ENUM_BEGIN(AdventureBottomViewConstant)
-    BOTTOM_VIEW_PANEL_X = 480,
-    BOTTOM_VIEW_PANEL_Y = 392,
-    BOTTOM_VIEW_PANEL_WIDTH = 143,
-    BOTTOM_VIEW_BACKGROUND_WIDTH = 159,
-    BOTTOM_VIEW_PANEL_HEIGHT = 71,
-    BOTTOM_VIEW_BACKGROUND_ID = 2000,
-    BOTTOM_VIEW_FOREGROUND_ID = 2001,
-    BOTTOM_VIEW_TEXT_ID = 2100,
-    BOTTOM_VIEW_TEXT_ID_2 = 2101,
-    BOTTOM_VIEW_DRAW_LEFT = 0,
-    BOTTOM_VIEW_DRAW_TOP = 2000,
-    BOTTOM_VIEW_DRAW_BOTTOM = 2200,
-    BOTTOM_VIEW_TEXT_BUFFER_SIZE = 30,
+    BOTTOM_VIEW_PANEL_X           = 480,
+    BOTTOM_VIEW_PANEL_Y           = 392,
+    BOTTOM_VIEW_PANEL_WIDTH       = 143,
+    BOTTOM_VIEW_BACKGROUND_WIDTH  = 159,
+    BOTTOM_VIEW_PANEL_HEIGHT      = 71,
+    BOTTOM_VIEW_BACKGROUND_ID     = 2000,
+    BOTTOM_VIEW_FOREGROUND_ID     = 2001,
+    BOTTOM_VIEW_TEXT_ID           = 2100,
+    BOTTOM_VIEW_TEXT_ID_2         = 2101,
+    BOTTOM_VIEW_DRAW_FIRST_WIDGET = 2000,
+    BOTTOM_VIEW_DRAW_LAST_WIDGET  = 2200,
+    BOTTOM_VIEW_TEXT_BUFFER_SIZE  = 30,
     BOTTOM_VIEW_COUNT_BUFFER_SIZE = 8,
-    BOTTOM_VIEW_CENTER_DIVISOR = 2,
-    BOTTOM_VIEW_NO_ENEMY = -1,
-    BOTTOM_VIEW_NO_ANIMATION = -1
+    BOTTOM_VIEW_CENTER_DIVISOR    = 2,
+    BOTTOM_VIEW_NO_ENEMY          = -1,
+    BOTTOM_VIEW_NO_ANIMATION      = -1
 H2_ENUM_END(AdventureBottomViewConstant)
 
 H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
@@ -749,25 +746,25 @@ H2_ENUM_BEGIN(AdventureCloudNeighbor)
 H2_ENUM_END(AdventureCloudNeighbor)
 
 H2_ENUM_BEGIN(AdventureQuickInfoObject)
-    OBELISK_INDEX_BASE = 1,
-    RESOURCE_FRAME_PAIR_MASK = ~1,
-    RESOURCE_FRAME_PAIR_STRIDE = 2,
-    CRYSTAL_BALL_RADIUS = 8,
-    ROUTE_BEYOND_MOBILITY_FLAG = 0x100,
-    HERO_FRAME_MIRROR_FLAG = 0x80,
-    HERO_FRAME_INDEX_MASK = 0x7f,
-    QUICK_INFO_TEXT_CAPACITY = 200,
+    OBELISK_INDEX_BASE             = 1,
+    RESOURCE_FRAME_PAIR_MASK       = ~1,
+    RESOURCE_FRAME_PAIR_STRIDE     = 2,
+    CRYSTAL_BALL_RADIUS            = 8,
+    ROUTE_BEYOND_MOBILITY_FLAG     = 0x100,
+    HERO_FRAME_MIRROR_FLAG         = 0x80,
+    HERO_FRAME_INDEX_MASK          = 0x7f,
+    QUICK_INFO_TEXT_CAPACITY       = 200,
     QUICK_INFO_SAVED_TEXT_CAPACITY = 800,
-    QUICK_INFO_X_OFFSET = 57,
-    QUICK_INFO_MIN_X = QUICK_VIEW_MIN_X,
-    QUICK_INFO_WIDTH = 160,
-    QUICK_INFO_RIGHT = QUICK_VIEW_BOTTOM,
-    QUICK_INFO_RIGHT_X = QUICK_INFO_RIGHT - QUICK_INFO_WIDTH,
-    QUICK_INFO_Y_OFFSET = 25,
-    QUICK_INFO_MIN_Y = QUICK_VIEW_MIN_Y,
-    QUICK_INFO_HEIGHT = 96,
-    QUICK_INFO_BOTTOM = QUICK_VIEW_RIGHT,
-    QUICK_INFO_BOTTOM_Y = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
+    QUICK_INFO_X_OFFSET            = 57,
+    QUICK_INFO_MIN_X               = QUICK_VIEW_MIN_X,
+    QUICK_INFO_WIDTH               = 160,
+    QUICK_INFO_RIGHT               = 464,
+    QUICK_INFO_RIGHT_X             = QUICK_INFO_RIGHT - QUICK_INFO_WIDTH,
+    QUICK_INFO_Y_OFFSET            = 25,
+    QUICK_INFO_MIN_Y               = QUICK_VIEW_MIN_Y,
+    QUICK_INFO_HEIGHT              = 96,
+    QUICK_INFO_BOTTOM              = 448,
+    QUICK_INFO_BOTTOM_Y            = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
 H2_ENUM_END(AdventureQuickInfoObject)
 
 H2_ENUM_BEGIN(AdventureCheatConstant)
@@ -807,25 +804,26 @@ H2_ENUM_BEGIN(AdventureSiteConstant)
 H2_ENUM_END(AdventureSiteConstant)
 
 H2_ENUM_BEGIN(AdventurePanelCommand)
-    PANEL_NEXT_HERO = 1,
-    PANEL_CONTINUE_ROUTE = 2,
-    PANEL_OVERVIEW = 3,
-    PANEL_END_TURN = 4,
-    PANEL_ADVENTURE_OPTIONS = 5,
-    PANEL_CONTROL_OPTIONS = 6,
-    PANEL_SYSTEM_OPTIONS = 7,
-    PANEL_CAST_SPELL = 8,
-    PANEL_RADAR = 9,
-    PANEL_MAP_VIEW = 10,
-    PANEL_HERO_PAGE_PREVIOUS = 20,
-    PANEL_HERO_PAGE_NEXT = 21,
-    PANEL_TOWN_PAGE_PREVIOUS = 23,
-    PANEL_TOWN_PAGE_NEXT = 24,
+    ADVENTURE_CONFIRM_NO          = DIALOG_BUTTON_6,
+    PANEL_NEXT_HERO           = 1,
+    PANEL_CONTINUE_ROUTE      = 2,
+    PANEL_OVERVIEW            = 3,
+    PANEL_END_TURN            = 4,
+    PANEL_ADVENTURE_OPTIONS   = 5,
+    PANEL_CONTROL_OPTIONS     = 6,
+    PANEL_SYSTEM_OPTIONS      = 7,
+    PANEL_CAST_SPELL          = 8,
+    PANEL_RADAR               = 9,
+    PANEL_MAP_VIEW            = 10,
+    PANEL_HERO_PAGE_PREVIOUS  = 20,
+    PANEL_HERO_PAGE_NEXT      = 21,
+    PANEL_TOWN_PAGE_PREVIOUS  = 23,
+    PANEL_TOWN_PAGE_NEXT      = 24,
     BOTTOM_VIEW_FIRST_MESSAGE = 2000,
-    BOTTOM_VIEW_LAST_MESSAGE = 2200,
-    BOTTOM_VIEW_DURATION = 3000,
-    LOCATORS_PER_PAGE = 5,
-    LOCATOR_PAGE_STEP = 4
+    BOTTOM_VIEW_LAST_MESSAGE  = 2200,
+    BOTTOM_VIEW_DURATION      = 3000,
+    LOCATORS_PER_PAGE         = 5,
+    LOCATOR_PAGE_STEP         = 4
 H2_ENUM_END(AdventurePanelCommand)
 
 H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
@@ -849,30 +847,31 @@ H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
 H2_ENUM_END(AdventurePuzzleViewConstant)
 
 H2_ENUM_BEGIN(AdventurePanelDialogConstant)
-    PANEL_NO_HELP = -1,
-    PANEL_WINDOW_X = 144,
-    PANEL_WINDOW_Y = 40,
-    PANEL_DISABLED_WIDGET = 4,
-    PANEL_FIRST_WIDGET = 1,
-    PANEL_LAST_WIDGET = 4,
-    PANEL_VIEW_WORLD_HELP = 0,
-    PANEL_VIEW_PUZZLE_HELP = 1,
-    PANEL_SCENARIO_INFO_HELP = 2,
-    PANEL_SEARCH_HELP = 3,
-    PANEL_CLOSE_HELP = 4,
-    PANEL_VIEW_WORLD = 1,
-    PANEL_VIEW_PUZZLE = 2,
-    PANEL_SCENARIO_INFO = 3,
-    PANEL_SEARCH = 4,
-    CONTROL_RESTART = 101,
-    CONTROL_NEW_GAME = 102,
-    CONTROL_MAIN_MENU = 105,
-    CONTROL_SAVE_GAME = 106,
-    CONTROL_RESTART_HELP = 0,
-    CONTROL_NEW_GAME_HELP = 1,
-    CONTROL_SAVE_GAME_HELP = 2,
-    CONTROL_MAIN_MENU_HELP = 3,
-    CONTROL_CLOSE_HELP = 4,
+    PANEL_CLOSE_WIDGET        = DIALOG_BUTTON_0,
+    PANEL_NO_HELP             = -1,
+    PANEL_WINDOW_X            = 144,
+    PANEL_WINDOW_Y            = 40,
+    PANEL_DISABLED_WIDGET     = 4,
+    PANEL_FIRST_WIDGET        = 1,
+    PANEL_LAST_WIDGET         = 4,
+    PANEL_VIEW_WORLD_HELP     = 0,
+    PANEL_VIEW_PUZZLE_HELP    = 1,
+    PANEL_SCENARIO_INFO_HELP  = 2,
+    PANEL_SEARCH_HELP         = 3,
+    PANEL_CLOSE_HELP          = 4,
+    PANEL_VIEW_WORLD          = 1,
+    PANEL_VIEW_PUZZLE         = 2,
+    PANEL_SCENARIO_INFO       = 3,
+    PANEL_SEARCH              = 4,
+    CONTROL_RESTART           = 101,
+    CONTROL_NEW_GAME          = 102,
+    CONTROL_MAIN_MENU         = 105,
+    CONTROL_SAVE_GAME         = 106,
+    CONTROL_RESTART_HELP      = 0,
+    CONTROL_NEW_GAME_HELP     = 1,
+    CONTROL_SAVE_GAME_HELP    = 2,
+    CONTROL_MAIN_MENU_HELP    = 3,
+    CONTROL_CLOSE_HELP        = 4,
     CONTROL_CONFIRMATION_SIZE = 200
 H2_ENUM_END(AdventurePanelDialogConstant)
 
@@ -1678,7 +1677,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         switch (message.type) {
             case MESSAGE_WIDGET:
                 switch (message.payload.widget.command) {
-                    case WIDGET_COMMAND_DESELECT:
+                    case WIDGET_NOTIFY_DESELECT:
                         if (!(
                                 HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)
                             )) {
@@ -1686,8 +1685,8 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                                 ProcessDeSelect(&message, &quit, &evtCell);
                         }
                         break;
-                    case WIDGET_COMMAND_SELECT:
-                    case WIDGET_COMMAND_ALTERNATE_SELECT:
+                    case WIDGET_NOTIFY_SELECT:
+                    case WIDGET_NOTIFY_RIGHT_CLICK:
                         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             helpId = -1;
                             switch (message.payload.widget.id) {
@@ -1994,7 +1993,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     confirm_game_command:
                         quit = 1;
                         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6) {
+                        if (gpWindowManager->m_dialogResult == ADVENTURE_CONFIRM_NO) {
                             quit = 0;
                         } else {
                             gGameCommand = c;
@@ -2503,7 +2502,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
                     localization::Tr("adventure.confirm.end_turn_with_mobile_heroes"),
                     NORMAL_DIALOG_CONFIRM
                 );
-                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6) {
+                if (gpWindowManager->m_dialogResult == ADVENTURE_CONFIRM_NO) {
                     break;
                 }
             }
@@ -3744,20 +3743,20 @@ void advManager::DrawCell(
                         if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
-                                if (cursorFrame == SPRITE_UP_STEP_5) {
-                                    cursorFrame = SPRITE_UP_SHADOW_STEP_5;
+                                if (cursorFrame == CURSOR_HERO_UP_STEP_5) {
+                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_5;
                                 }
-                                if (cursorFrame == SPRITE_UP_STEP_4) {
-                                    cursorFrame = SPRITE_UP_SHADOW_STEP_4;
+                                if (cursorFrame == CURSOR_HERO_UP_STEP_4) {
+                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_4;
                                 }
-                                if (cursorFrame == SPRITE_UP_STEP_3) {
-                                    cursorFrame = SPRITE_UP_SHADOW_STEP_3;
+                                if (cursorFrame == CURSOR_HERO_UP_STEP_3) {
+                                    cursorFrame = CURSOR_HERO_UP_SHADOW_STEP_3;
                                 }
-                                if (cursorFrame == SPRITE_UP_STEP_2) {
-                                    cursorFrame = SPRITE_UP_SHADOW_WIDE;
+                                if (cursorFrame == CURSOR_HERO_UP_STEP_2) {
+                                    cursorFrame = CURSOR_HERO_UP_SHADOW_WIDE;
                                 }
-                                if (cursorFrame == SPRITE_UP_STEP_1) {
-                                    cursorFrame = SPRITE_UP_SHADOW_WIDE;
+                                if (cursorFrame == CURSOR_HERO_UP_STEP_1) {
+                                    cursorFrame = CURSOR_HERO_UP_SHADOW_WIDE;
                                 }
                                 DRAW_ADVENTURE_ICON(
                                     m_shadowIcon,
@@ -4668,28 +4667,28 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_BUOY:
-                    visitedMaskValue = ADVMGR_VISIT_FORT;
+                    visitedMaskValue = HERO_EVENT_BUOY;
                     goto quick_info_default;
                 case MAP_OBJECT_FOUNTAIN:
-                    visitedMaskValue = ADVMGR_VISIT_GAZEBO;
+                    visitedMaskValue = HERO_EVENT_FOUNTAIN;
                     goto quick_info_default;
                 case MAP_OBJECT_OASIS:
-                    visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
+                    visitedMaskValue = HERO_EVENT_OASIS;
                     goto quick_info_default;
                 case MAP_OBJECT_FAERIE_RING:
-                    visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
+                    visitedMaskValue = HERO_EVENT_FAERIE_RING;
                     goto quick_info_default;
                 case MAP_OBJECT_TEMPLE:
-                    visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
+                    visitedMaskValue = HERO_EVENT_TEMPLE;
                     goto quick_info_default;
                 case MAP_OBJECT_WATERING_HOLE:
-                    visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
+                    visitedMaskValue = HERO_EVENT_WATERING_HOLE;
                     goto quick_info_default;
                 case MAP_OBJECT_MAGIC_WELL:
-                    visitedMaskValue = ADVMGR_VISIT_XANADU;
+                    visitedMaskValue = HERO_EVENT_MAGIC_WELL;
                     goto quick_info_default;
                 case MAP_OBJECT_IDOL:
-                    visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
+                    visitedMaskValue = HERO_EVENT_IDOL;
                     goto quick_info_default;
                 case MAP_OBJECT_NONE:
                 case MAP_OBJECT_MAP_EVENT:
@@ -4815,7 +4814,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                     expansionSite = IDX(GENERIC_SITE_ALCHEMIST_TOWER);
                                 } else if (iFrame < GENERIC_SITE_2_END) {
                                     expansionSite = IDX(GENERIC_SITE_ARENA);
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
+                                    visitedMaskValue = HERO_EVENT_ARENA;
                                 }
                             }
                             break;
@@ -4825,15 +4824,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             } else {
                                 if (iFrame < GENERIC_ALTAR_END) {
                                     expansionSite = IDX(GENERIC_SITE_STABLES);
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
+                                    visitedMaskValue = HERO_EVENT_STABLES;
                                 } else if (iFrame < GENERIC_UNUSED_END) {
                                     expansionSite = IDX(GENERIC_SITE_UNKNOWN);
                                 } else if (iFrame < GENERIC_TOWER_END) {
                                     expansionSite = IDX(GENERIC_SITE_MERMAID);
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
+                                    visitedMaskValue = HERO_EVENT_MERMAID;
                                 } else if (iFrame < GENERIC_SPRING_END) {
                                     expansionSite = IDX(GENERIC_SITE_SIRENS);
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
+                                    visitedMaskValue = HERO_EVENT_SIRENS;
                                 }
                             }
                             break;
@@ -5017,7 +5016,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
         m_adventureWindow->BroadcastMessage(message);
 
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = LOCATOR_HERO_DISABLE_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         for (i = 0; i <= LOCATOR_VISIBLE_COUNT - 1; ++i) {
             message.payload.widget.id = widgetBase + i;
             m_adventureWindow->BroadcastMessage(message);
@@ -5030,7 +5029,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
         m_adventureWindow->BroadcastMessage(message);
 
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = LOCATOR_HERO_ENABLE_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         for (i = 0; i <= LOCATOR_HERO_WIDGET_STRIDE - 1; ++i) {
             message.payload.widget.id = widgetBase + i;
             m_adventureWindow->BroadcastMessage(message);
@@ -5129,15 +5128,15 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
                 i + LOCATOR_TOWN_EMPTY_FRAME_BASE;
             m_adventureWindow->BroadcastMessage(msg);
             msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_adventureWindow->BroadcastMessage(msg);
             msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
             m_adventureWindow->BroadcastMessage(msg);
         } else {
             msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_adventureWindow->BroadcastMessage(msg);
             msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             msg.payload.widget.data.value =
@@ -5152,7 +5151,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             } else {
                 msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             }
-            msg.payload.widget.data.value = LOCATOR_TOWN_DISABLE_FLAGS;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             msg.payload.widget.id = i + LOCATOR_TOWN_FLAG_BASE;
             m_adventureWindow->BroadcastMessage(msg);
         }
@@ -5213,8 +5212,11 @@ void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen
 
 update_bottom_view:
     if (updated && drawWindow) {
-        m_adventureWindow
-            ->DrawWindow(BOTTOM_VIEW_DRAW_LEFT, BOTTOM_VIEW_DRAW_TOP, BOTTOM_VIEW_DRAW_BOTTOM);
+        m_adventureWindow->DrawWindow(
+            WINDOW_DRAW_BUFFER_ONLY,
+            BOTTOM_VIEW_DRAW_FIRST_WIDGET,
+            BOTTOM_VIEW_DRAW_LAST_WIDGET
+        );
         if (updateScreen) {
             gpWindowManager->UpdateScreenRegion(
                 BOTTOM_VIEW_PANEL_X,
@@ -6677,7 +6679,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     UpdateHeroLocators(0, 0);
     UpdateTownLocators(0, 0);
     UpdBottomView(true, false, false);
-    m_adventureWindow->DrawWindow(0);
+    m_adventureWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     if (update) {
         gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
     }
@@ -7097,7 +7099,7 @@ i32 SaveGame(void) {
         MemError();
     }
     i32 status = gpExec->DoDialog(req);
-    if (status == DIALOG_BUTTON_2) {
+    if (status == FILE_REQUESTER_OK) {
         ok = 1;
         bFreshSave = true;
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
@@ -7148,7 +7150,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SELECT:
+                case WIDGET_NOTIFY_SELECT:
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
@@ -7162,9 +7164,9 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case DIALOG_BUTTON_0:
+                        case DIMENSION_DOOR_CLOSE_BUTTON:
                             gpWindowManager->m_dialogResult = 0;
                             result = true;
                             break;
@@ -8082,10 +8084,10 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case DIALOG_BUTTON_1:
-                    case DIALOG_BUTTON_2:
+                    case TOWN_PORTAL_FIRST_CHOICE:
+                    case TOWN_PORTAL_LAST_CHOICE:
                         choiceMessage.type = MESSAGE_WIDGET;
                         choiceMessage.payload.widget.id = TOWN_PORTAL_CHOICE_WIDGET;
                         choiceMessage.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
@@ -8163,7 +8165,7 @@ void advManager::TownGate(SpellType spellId) {
         gpWindowManager->DoDialog(townPortalWin, TownPortalHandler, 0);
         selectedTown = giTownPortalChoice;
         delete townPortalWin;
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_1) {
+        if (gpWindowManager->m_dialogResult == TOWN_PORTAL_FIRST_CHOICE) {
             return;
         }
     } else {
@@ -8490,8 +8492,8 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             gpWindowManager->BroadcastMessage(
                 MESSAGE_WIDGET,
                 buttonFrame,
-                BUTTON_TARGET,
-                BUTTON_BROADCAST_FLAGS
+                PANEL_CONTINUE_ROUTE,
+                IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
             );
         }
     } else {
@@ -8516,8 +8518,8 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            BUTTON_TARGET,
-            BUTTON_BROADCAST_FLAGS
+            PANEL_CONTINUE_ROUTE,
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     }
 
@@ -8560,7 +8562,7 @@ void advManager::CheckDimNextHeroBut(void) {
         MESSAGE_WIDGET,
         frame,
         BUTTON_BROADCAST_ARG,
-        BUTTON_BROADCAST_FLAGS
+        IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
 }
 
@@ -8760,8 +8762,8 @@ void advManager::SetInitialMapOrigin(void) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_SET_FLAGS,
-        BUTTON_TARGET,
-        BUTTON_BROADCAST_FLAGS
+        PANEL_CONTINUE_ROUTE,
+        IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
     m_hoverCellY = 0;
     m_lastHoverCell = 0;
@@ -9399,11 +9401,11 @@ void advManager::AdvPanel(void) {
             message.type = MESSAGE_WIDGET;
             message.payload.widget.id = PANEL_DISABLED_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = BUTTON_TARGET;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             adventurePanel->BroadcastMessage(message);
             message.payload.widget.id = PANEL_DISABLED_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+            message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
             adventurePanel->BroadcastMessage(message);
         }
 
@@ -9461,7 +9463,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     b32 handled = false;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-            if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+            if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                 i32 helpIndex = PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                     case PANEL_VIEW_WORLD:
@@ -9476,7 +9478,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
                     case PANEL_SEARCH:
                         helpIndex = PANEL_SEARCH_HELP;
                         break;
-                    case DIALOG_BUTTON_0:
+                    case PANEL_CLOSE_WIDGET:
                         helpIndex = PANEL_CLOSE_HELP;
                         break;
                 }
@@ -9486,13 +9488,13 @@ MessageDispatchResult APanelHandler(tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case PANEL_VIEW_WORLD:
                         case PANEL_VIEW_PUZZLE:
                         case PANEL_SCENARIO_INFO:
                         case PANEL_SEARCH:
-                        case DIALOG_BUTTON_0:
+                        case PANEL_CLOSE_WIDGET:
                             handled = true;
                             break;
                     }
@@ -9536,17 +9538,17 @@ i32 advManager::ControlPanel(void) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.id = CONTROL_RESTART;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         panel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = BUTTON_TARGET;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         panel->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEW_GAME;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         panel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = BUTTON_TARGET;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         panel->BroadcastMessage(message);
     }
 
@@ -9580,7 +9582,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-            if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+            if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                 helpIndex = PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                     case CONTROL_RESTART:
@@ -9595,7 +9597,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                     case CONTROL_MAIN_MENU:
                         helpIndex = CONTROL_MAIN_MENU_HELP;
                         break;
-                    case DIALOG_BUTTON_0:
+                    case PANEL_CLOSE_WIDGET:
                         helpIndex = CONTROL_CLOSE_HELP;
                         break;
                 }
@@ -9605,7 +9607,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case CONTROL_RESTART:
                             strcpy(
@@ -9631,13 +9633,13 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                             handled = true;
                             if (!bFreshSave) {
                                 NormalDialog(question, NORMAL_DIALOG_CONFIRM);
-                                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6) {
+                                if (gpWindowManager->m_dialogResult == ADVENTURE_CONFIRM_NO) {
                                     handled = false;
                                 }
                             }
                             break;
                         case CONTROL_SAVE_GAME:
-                        case DIALOG_BUTTON_0:
+                        case PANEL_CLOSE_WIDGET:
                             handled = true;
                             break;
                         default:
@@ -9801,7 +9803,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(msg);
 
     if (initialDraw == 0) {
-        cPanel->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        cPanel->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
 
@@ -9823,12 +9825,12 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-            if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+            if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
+                || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
 
                 switch (message.payload.widget.id) {
-                    case DIALOG_BUTTON_0:
+                    case IDX(SYSTEM_OPTIONS_DIALOG_ACCEPT):
                         helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
                         break;
                     case IDX(SYSTEM_OPTION_MUSIC_VOLUME):
@@ -9866,17 +9868,17 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (
                         message.payload.widget.id
                     ) {
-                        case DIALOG_BUTTON_0:
+                        case IDX(SYSTEM_OPTIONS_DIALOG_ACCEPT):
                             accepted = true;
                             break;
                     }
                     break;
 
-                case WIDGET_COMMAND_SELECT: {
+                case WIDGET_NOTIFY_SELECT: {
                     switch (
                         message.payload.widget.id
                     ) {

@@ -247,7 +247,7 @@ void UpdateTradingPost(i32 draw) {
     else
         tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
-        tpWindow->DrawWindow(0);
+        tpWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             tpX + REDRAW_X_OFFSET,
             tpY,
@@ -330,7 +330,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case POST_TRACK:
                         if (iMaxUnitsToTrade == 0)
@@ -379,7 +379,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case DIALOG_BUTTON_2:
                         exitFlag = true;

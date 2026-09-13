@@ -756,10 +756,10 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-                if ((choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL
-                     && choice->value == EXPANSION_CAMPAIGN_SPECIAL_SKILL)
-                    || (choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT_LEVEL
-                        && choice->value == EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT)) {
+                if ((choice->amount == IDX(HERO_SKILL_LEVEL_BASIC)
+                     && choice->value == IDX(HERO_SKILL_NECROMANCY))
+                    || (choice->amount == IDX(HERO_SKILL_LEVEL_ADVANCED)
+                        && choice->value == IDX(HERO_SKILL_LOGISTICS))) {
                     sprintf(
                         gText,
                         "%s %s",
@@ -837,7 +837,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         else
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = CAMPAIGN_WIDGET_REFRESH_FRAME;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
     if (redraw != 0)
@@ -880,7 +880,7 @@ i32 ExpCampaign::HandleVictory(void) {
         }
     }
     ShowInfo(0, 0);
-    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2)
+    if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_ACCEPT)
         return 1;
     return 0;
 }
@@ -1191,8 +1191,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_TRACK_WIDGET_0:
                     case CAMPAIGN_TRACK_WIDGET_1:
@@ -1226,13 +1226,13 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                 }
                 break;
 
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_DIALOG_REPLAY:
                         xCampaign.ReplaySmacker();
                         xCampaign.m_window->DrawWindow();
                         break;
-                    case DIALOG_BUTTON_2:
+                    case CAMPAIGN_DIALOG_ACCEPT:
                         if (xCampaign.m_viewOnly == 0) {
                             if (xCampaign.m_mapChoices[IDX(xCampaign.m_viewMap)]) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
@@ -1246,7 +1246,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 break;
                             }
                         }
-                    case DIALOG_BUTTON_1:
+                    case CAMPAIGN_DIALOG_CANCEL:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);

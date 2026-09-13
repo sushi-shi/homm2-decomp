@@ -1,5 +1,11 @@
 #include <SOURCE/KB.h>
 #include <BASE/message.h>
+#include <BASE/dialog.h>
+#include <BASE/font.h>
+#include <BASE/widget.h>
+#include <SOURCE/Campaign.h>
+#include <SOURCE/highScoreManager.h>
+#include <SOURCE/fileRequester.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/playerData.h>
@@ -12,6 +18,22 @@
 #include <fcntl.h>
 
 i32 __cdecl main() {
+    // Notifications describe the widget protocol; screen actions alias its IDs.
+    if (IDX(WIDGET_NOTIFY_SELECT) != 12 || IDX(WIDGET_NOTIFY_DESELECT) != 13
+        || IDX(WIDGET_NOTIFY_RIGHT_CLICK) != 14 || CAMPAIGN_DIALOG_CANCEL != DIALOG_BUTTON_1
+        || CAMPAIGN_DIALOG_ACCEPT != DIALOG_BUTTON_2 || FILE_REQUESTER_CANCEL != DIALOG_BUTTON_1
+        || FILE_REQUESTER_OK != DIALOG_BUTTON_2 || HIGH_SCORE_CLOSE_BUTTON != DIALOG_BUTTON_0
+        || IDX(FONT_DRAW_DEFAULT) != 1 || IDX(FONT_DRAW_YELLOW) != 2 || IDX(FONT_DRAW_DIMMED) != 3
+        || IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW) != 6
+        || IDX(WIDGET_FLAG_DIMMED) != 8 || IDX(WIDGET_FLAGS_ARGUMENT_DIMMED) != 0x1000
+        || IDX(MONSTER_FLAGS_DEAD) != 0x10 || IDX(MONSTER_FLAGS_MIRROR_IMAGE) != 0x100
+        || IDX(HERO_EVENT_RESERVED_FOR_RECRUITMENT) != 0x10000
+        || HERO_BASE_LEARNABLE_SPELL_LEVEL != 2
+        || COMBAT_ALL_DIRECTIONS_BLOCKED != 0xff) {
+        printf("enum protocol contract mismatch\n");
+        return 20;
+    }
+    printf("Enum contracts: notifications, dialog slots, payloads and gameplay flags pass\n");
     for (i32 value = 0; value < 256; ++value) {
         const char input = static_cast<char>(value);
         const i32 upper = ((value >= 'a' && value <= 'z') || value >= 0xe0)
@@ -30,7 +52,7 @@ i32 __cdecl main() {
             || IS_LICH_CREATURE(type) != (type == 54 || type == 55)
             || IS_VAMPIRE_CREATURE(type) != (type == 52 || type == 53)
             || IS_TROLL_CREATURE(type) != (type == 17 || type == 18)
-            || IS_WIDGET_SELECTION_COMMAND(type) != (type == 12 || type == 14)) {
+            || IS_WIDGET_SELECTION_NOTIFICATION(type) != (type == 12 || type == 14)) {
             printf("classification mismatch at %d\n", type);
             return 2;
         }

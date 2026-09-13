@@ -1,6 +1,7 @@
 #ifndef HOMM2_EVENTS_H
 #define HOMM2_EVENTS_H
 
+#include <BASE/dialog.h>
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/GAME.h>
@@ -9,15 +10,15 @@
 
 class hero;
 
-H2_ENUM_BEGIN(EventConstant)
-    COMBAT_REMOTE_BUFFER_SIZE             = 0xFF,
-    COMBAT_REMOTE_HEADER_SIZE             = 0x9b,
-    COMBAT_REMOTE_HERO_FIRST_SIZE         = 200,
-    COMBAT_REMOTE_HERO_SECOND_SIZE        = 50,
-    COMBAT_REMOTE_PACKET_HEADER_SIZE      = 9,
-    COMBAT_REMOTE_FRAGMENT_TYPE           = 1,
-    COMBAT_REMOTE_TIMEOUT                 = 90000
-H2_ENUM_END(EventConstant)
+H2_ENUM_BEGIN(CombatRemoteTransferConstant)
+    COMBAT_REMOTE_BUFFER_SIZE        = 0xFF,
+    COMBAT_REMOTE_HEADER_SIZE        = 0x9b,
+    COMBAT_REMOTE_HERO_FIRST_SIZE    = 200,
+    COMBAT_REMOTE_HERO_SECOND_SIZE   = 50,
+    COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
+    COMBAT_REMOTE_FRAGMENT_TYPE      = 1,
+    COMBAT_REMOTE_TIMEOUT            = 90000
+H2_ENUM_END(CombatRemoteTransferConstant)
 
 H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_MAP_ANSWER_COUNT        = 8,
@@ -37,10 +38,11 @@ H2_ENUM_BEGIN(MapEventEncodingConstant)
     EVENT_RECRUIT_TYPE_MASK         = 7,
     EVENT_RECRUIT_COUNT_SHIFT       = 3,
     TREE_KNOWLEDGE_VISIT_INDEX_MASK = 31,
-    WISDOM_SPELL_LEVEL_BONUS        = 2,
-    PYRAMID_GUARD_STACK_QUANTITY    = 10,
-    AI_BATTLE_STAT_MAX              = 40
 H2_ENUM_END(MapEventEncodingConstant)
+
+H2_ENUM_BEGIN(MapEventGameplayConstant)
+    PYRAMID_GUARD_STACK_QUANTITY = 10,
+H2_ENUM_END(MapEventGameplayConstant)
 
 H2_ENUM_CLASS_BEGIN(GenericSiteType)
     GENERIC_SITE_UNKNOWN         = -1,
@@ -135,7 +137,7 @@ struct mapTownExtra {
 };
 #pragma pack(pop)
 
-H2_ENUM_BEGIN(MapEventConstant)
+H2_ENUM_BEGIN(MapObjectEncodingConstant)
     MAP_EVENT_DATA_EMPTY                 = 0,
     MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
@@ -145,15 +147,10 @@ H2_ENUM_BEGIN(MapEventConstant)
     MAP_EVENT_DATA_SHIFT                 = 3,
     MAP_EVENT_SPELL_OFFSET               = 1,
     MAP_EVENT_RESOURCE_OFFSET            = 1,
-    MAP_EVENT_RESOURCE_AMOUNT            = 5,
-    MAP_EVENT_GOLD_AMOUNT                = 500,
     CAMPFIRE_RESOURCE_MASK               = 0xf,
     CAMPFIRE_AMOUNT_SHIFT                = 4,
-    CAMPFIRE_GOLD_MULTIPLIER             = 100,
-    OASIS_MOBILITY_BONUS                 = 800,
     SKELETON_EMPTY                       = 1,
     SKELETON_ARTIFACT_OFFSET             = 2,
-    SKELETON_GOLD                        = 1000,
     CHEST_ARTIFACT_FLAG                  = 0x100,
     CHEST_ARTIFACT_MASK                  = 0xFF,
     SEA_CHEST_OUTCOME_EMPTY              = 0,
@@ -161,107 +158,126 @@ H2_ENUM_BEGIN(MapEventConstant)
     CHEST_REWARD_SMALL                   = 2,
     CHEST_REWARD_MEDIUM                  = 3,
     CHEST_REWARD_LARGE                   = 4,
-    CHEST_GOLD_MULTIPLIER                = 500,
-    CHEST_EXPERIENCE_MULTIPLIER          = 500,
     DAEMON_CAVE_EMPTY                    = 1,
     DAEMON_REWARD_EXPERIENCE             = 2,
     DAEMON_REWARD_ARTIFACT               = 3,
     DAEMON_REWARD_EXPERIENCE_GOLD        = 4,
     DAEMON_REWARD_RANSOM                 = 5,
     DAEMON_SERVANT_BASE                  = 0x3e,
-    DAEMON_SERVANT_COUNT                 = 8,
     DAEMON_REWARD_MASK                   = 0xf,
     DAEMON_SERVANT_MASK                  = 0xf0,
     DAEMON_SERVANT_SHIFT                 = 4,
-    DAEMON_EXPERIENCE                    = 1000,
-    DAEMON_GOLD                          = 2500,
-    EVENT_RANDOM_ARTIFACT_GOLD           = 1000,
-    GAZEBO_EXPERIENCE                    = 1000,
-    MINE_GOLD_INCOME                     = 1000,
-    MINE_ORE_INCOME                      = 2,
-    MINE_RESOURCE_ICON_OFFSET            = 59,
-    WINDMILL_RESOURCE_AMOUNT             = 2,
     WINDMILL_EMPTY                       = 99,
-    SEA_CHEST_GOLD                       = 1500,
-    SEA_CHEST_ARTIFACT_GOLD              = 1000,
-    MAGELLAN_MAP_COST                    = 1000,
-    WATERING_HOLE_MOBILITY_BONUS         = 400,
-    XANADU_ADMISSION_LEVEL               = 10,
     TREE_KNOWLEDGE_MODE_SHIFT            = 6,
     TREE_KNOWLEDGE_FREE                  = 1,
     TREE_KNOWLEDGE_GOLD                  = 2,
     TREE_KNOWLEDGE_GEMS                  = 3,
-    TREE_KNOWLEDGE_GOLD_COST             = 2000,
-    TREE_KNOWLEDGE_GEM_COST              = 10,
     DWELLING_GUARDED_FLAG                = 0x100,
-    PYRAMID_GUARD_COUNT                  = 50,
-    SHRINE_WISDOM_BONUS                  = 2,
-    EVENT_TEXT_BUFFER_SIZE               = 500,
-    EVENT_TEXT_ALCHEMIST_CAPTURED        = 0,
-    EVENT_TEXT_SIGNPOST                  = 1,
-    EVENT_TEXT_BUOY_VISITED              = 2,
-    EVENT_TEXT_BUOY_REWARD               = 3,
-    EVENT_TEXT_FAERIE_RING_VISITED       = 12,
-    EVENT_TEXT_FAERIE_RING_REWARD        = 13,
-    EVENT_TEXT_CAMPFIRE                  = 14,
-    EVENT_TEXT_FOUNTAIN_VISITED          = 15,
-    EVENT_TEXT_FOUNTAIN_REWARD           = 16,
-    EVENT_TEXT_GAZEBO_VISITED            = 17,
-    EVENT_TEXT_GAZEBO_REWARD             = 18,
-    EVENT_TEXT_GENIE_LAMP                = 19,
-    EVENT_TEXT_GRAVEYARD_PROMPT          = 20,
-    EVENT_TEXT_GRAVEYARD_EMPTY           = 21,
-    EVENT_TEXT_GRAVEYARD_REWARD          = 22,
-    EVENT_TEXT_LIGHTHOUSE_CAPTURED       = 58,
-    EVENT_TEXT_WATER_WHEEL_EMPTY         = 59,
-    EVENT_TEXT_WATER_WHEEL_REWARD        = 60,
-    EVENT_TEXT_FOLLOWERS                 = 66,
-    EVENT_TEXT_MONSTER_REFUSAL           = 67,
-    EVENT_TEXT_OBELISK_REWARD            = 68,
-    EVENT_TEXT_OBELISK_VISITED           = 69,
-    EVENT_TEXT_RESOURCE_PICKUP           = 72,
-    EVENT_TEXT_SAWMILL_CAPTURED          = 73,
-    EVENT_TEXT_ORACLE                    = 74,
-    EVENT_TEXT_DESERT_TENT_EMPTY         = 81,
-    EVENT_TEXT_DESERT_TENT_RECRUIT       = 82,
-    EVENT_TEXT_WAGON_EMPTY               = 83,
-    EVENT_TEXT_WAGON_RECRUIT             = 84,
-    EVENT_TEXT_WHIRLPOOL                 = 85,
-    EVENT_TEXT_WINDMILL_EMPTY            = 86,
-    EVENT_TEXT_WINDMILL_REWARD           = 87,
-    EVENT_TEXT_SKELETON_EMPTY            = 93,
-    EVENT_TEXT_SKELETON_REWARD           = 94,
     WAGON_ARTIFACT_FLAG                  = 0x80,
     WAGON_ARTIFACT_MASK                  = 0x7f,
     ARTIFACT_EVENT_MONSTER_MASK          = 0x7f,
     ARTIFACT_EVENT_MODE_MASK             = 0xf,
     ARTIFACT_EVENT_RESOURCE_MASK         = 0xf0,
     ARTIFACT_EVENT_RESOURCE_SHIFT        = 4,
-    ARTIFACT_EVENT_GOLD_COST             = 2000,
-    ARTIFACT_EVENT_RESOURCE_3_GOLD_COST  = 2500,
-    ARTIFACT_EVENT_RESOURCE_5_GOLD_COST  = 3000,
-    ARTIFACT_EVENT_RESOURCE_3_AMOUNT     = 3,
-    ARTIFACT_EVENT_RESOURCE_5_AMOUNT     = 5,
-    ARTIFACT_EVENT_GUARD_ROGUE_COUNT     = 50,
-    ABANDONED_MINE_X_MIN                 = -2,
-    ABANDONED_MINE_X_MAX                 = 1,
-    ABANDONED_MINE_Y_TOP                 = -1,
     MAP_EVENT_REWARD_NONE                = -1,
     MAP_EVENT_REWARD_ARTIFACT            = 7,
-    SPHINX_ANSWER_BUFFER_SIZE            = 52,
-    SPHINX_INPUT_LENGTH                  = 12,
-    SPHINX_RESOURCE_COUNT                = 7,
-    OBSERVATION_TOWER_RADIUS             = 20,
-    ORACLE_WINDOW_TEXT_ID                = 14,
-    ORACLE_THIEVES_GUILD_RANK            = 99,
-    STONE_LITHS_MIN_DISTANCE             = 1,
-    WHIRLPOOL_MIN_DISTANCE               = 3,
-    BOAT_RESTORE_MODE                    = 2,
-    COAST_FIZZLE_X                       = 192,
-    COAST_FIZZLE_Y                       = 192,
-    COAST_FIZZLE_WIDTH                   = 96,
-    COAST_FIZZLE_HEIGHT                  = 96
-H2_ENUM_END(MapEventConstant)
+H2_ENUM_END(MapObjectEncodingConstant)
+
+H2_ENUM_BEGIN(MapEventRewardConstant)
+    MAP_EVENT_RESOURCE_AMOUNT           = 5,
+    MAP_EVENT_GOLD_AMOUNT               = 500,
+    CAMPFIRE_GOLD_MULTIPLIER            = 100,
+    OASIS_MOBILITY_BONUS                = 800,
+    SKELETON_GOLD                       = 1000,
+    CHEST_GOLD_MULTIPLIER               = 500,
+    CHEST_EXPERIENCE_MULTIPLIER         = 500,
+    DAEMON_SERVANT_COUNT                = 8,
+    DAEMON_EXPERIENCE                   = 1000,
+    DAEMON_GOLD                         = 2500,
+    EVENT_RANDOM_ARTIFACT_GOLD          = 1000,
+    GAZEBO_EXPERIENCE                   = 1000,
+    MINE_GOLD_INCOME                    = 1000,
+    MINE_ORE_INCOME                     = 2,
+    WINDMILL_RESOURCE_AMOUNT            = 2,
+    SEA_CHEST_GOLD                      = 1500,
+    SEA_CHEST_ARTIFACT_GOLD             = 1000,
+    MAGELLAN_MAP_COST                   = 1000,
+    WATERING_HOLE_MOBILITY_BONUS        = 400,
+    XANADU_ADMISSION_LEVEL              = 10,
+    TREE_KNOWLEDGE_GOLD_COST            = 2000,
+    TREE_KNOWLEDGE_GEM_COST             = 10,
+    PYRAMID_GUARD_COUNT                 = 50,
+    ARTIFACT_EVENT_GOLD_COST            = 2000,
+    ARTIFACT_EVENT_RESOURCE_3_GOLD_COST = 2500,
+    ARTIFACT_EVENT_RESOURCE_5_GOLD_COST = 3000,
+    ARTIFACT_EVENT_RESOURCE_3_AMOUNT    = 3,
+    ARTIFACT_EVENT_RESOURCE_5_AMOUNT    = 5,
+    ARTIFACT_EVENT_GUARD_ROGUE_COUNT    = 50,
+    SPHINX_RESOURCE_COUNT               = 7,
+    ORACLE_THIEVES_GUILD_RANK           = 99,
+H2_ENUM_END(MapEventRewardConstant)
+
+H2_ENUM_BEGIN(MapEventStorageConstant)
+    EVENT_TEXT_BUFFER_SIZE    = 500,
+    SPHINX_ANSWER_BUFFER_SIZE = 52,
+    SPHINX_INPUT_LENGTH       = 12,
+H2_ENUM_END(MapEventStorageConstant)
+
+H2_ENUM_BEGIN(MapEventTextId)
+    EVENT_TEXT_ALCHEMIST_CAPTURED  = 0,
+    EVENT_TEXT_SIGNPOST            = 1,
+    EVENT_TEXT_BUOY_VISITED        = 2,
+    EVENT_TEXT_BUOY_REWARD         = 3,
+    EVENT_TEXT_FAERIE_RING_VISITED = 12,
+    EVENT_TEXT_FAERIE_RING_REWARD  = 13,
+    EVENT_TEXT_CAMPFIRE            = 14,
+    EVENT_TEXT_FOUNTAIN_VISITED    = 15,
+    EVENT_TEXT_FOUNTAIN_REWARD     = 16,
+    EVENT_TEXT_GAZEBO_VISITED      = 17,
+    EVENT_TEXT_GAZEBO_REWARD       = 18,
+    EVENT_TEXT_GENIE_LAMP          = 19,
+    EVENT_TEXT_GRAVEYARD_PROMPT    = 20,
+    EVENT_TEXT_GRAVEYARD_EMPTY     = 21,
+    EVENT_TEXT_GRAVEYARD_REWARD    = 22,
+    EVENT_TEXT_LIGHTHOUSE_CAPTURED = 58,
+    EVENT_TEXT_WATER_WHEEL_EMPTY   = 59,
+    EVENT_TEXT_WATER_WHEEL_REWARD  = 60,
+    EVENT_TEXT_FOLLOWERS           = 66,
+    EVENT_TEXT_MONSTER_REFUSAL     = 67,
+    EVENT_TEXT_OBELISK_REWARD      = 68,
+    EVENT_TEXT_OBELISK_VISITED     = 69,
+    EVENT_TEXT_RESOURCE_PICKUP     = 72,
+    EVENT_TEXT_SAWMILL_CAPTURED    = 73,
+    EVENT_TEXT_ORACLE              = 74,
+    EVENT_TEXT_DESERT_TENT_EMPTY   = 81,
+    EVENT_TEXT_DESERT_TENT_RECRUIT = 82,
+    EVENT_TEXT_WAGON_EMPTY         = 83,
+    EVENT_TEXT_WAGON_RECRUIT       = 84,
+    EVENT_TEXT_WHIRLPOOL           = 85,
+    EVENT_TEXT_WINDMILL_EMPTY      = 86,
+    EVENT_TEXT_WINDMILL_REWARD     = 87,
+    EVENT_TEXT_SKELETON_EMPTY      = 93,
+    EVENT_TEXT_SKELETON_REWARD     = 94,
+H2_ENUM_END(MapEventTextId)
+
+H2_ENUM_BEGIN(MapEventSpatialConstant)
+    ABANDONED_MINE_X_MIN     = -2,
+    ABANDONED_MINE_X_MAX     = 1,
+    ABANDONED_MINE_Y_TOP     = -1,
+    OBSERVATION_TOWER_RADIUS = 20,
+    STONE_LITHS_MIN_DISTANCE = 1,
+    WHIRLPOOL_MIN_DISTANCE   = 3,
+H2_ENUM_END(MapEventSpatialConstant)
+
+H2_ENUM_BEGIN(MapEventDisplayConstant)
+    MINE_RESOURCE_ICON_OFFSET = 59,
+    BOAT_RESTORE_MODE         = 2,
+    ORACLE_WINDOW_TEXT_ID     = 14,
+    COAST_FIZZLE_X            = 192,
+    COAST_FIZZLE_Y            = 192,
+    COAST_FIZZLE_WIDTH        = 96,
+    COAST_FIZZLE_HEIGHT       = 96,
+H2_ENUM_END(MapEventDisplayConstant)
 
 H2_ENUM_CLASS_BEGIN(UndeadEventLevel)
     EVENT_LEVEL_SMALL  = 2,
@@ -278,6 +294,8 @@ H2_ENUM_CLASS_BEGIN(FlotsamReward)
 H2_ENUM_CLASS_END(FlotsamReward)
 
 H2_ENUM_BEGIN(MonsterInteractionConstant)
+    MONSTER_DIALOG_NO                       = DIALOG_BUTTON_6,
+    MONSTER_DIALOG_YES                      = DIALOG_BUTTON_5,
     MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,
@@ -316,13 +334,14 @@ H2_ENUM_BEGIN(EventStatModifier)
 H2_ENUM_END(EventStatModifier)
 
 H2_ENUM_BEGIN(ArtifactEventMode)
-    ARTIFACT_EVENT_MODE_PICKUP = 1,
-    ARTIFACT_EVENT_MODE_GOLD = 3,
-    ARTIFACT_EVENT_MODE_WISDOM = 4,
+    ARTIFACT_EVENT_MODE_PICKUP     = 1,
+    ARTIFACT_EVENT_MODE_GOLD       = 3,
+    ARTIFACT_EVENT_MODE_WISDOM     = 4,
     ARTIFACT_EVENT_MODE_LEADERSHIP = 5,
     ARTIFACT_EVENT_MODE_RESOURCE_3 = 6,
     ARTIFACT_EVENT_MODE_RESOURCE_5 = 7,
-    AI_ARTIFACT_EVENT_NO_VALUE = 2,
+    // The AI leaves its valuation unchanged for this code; its event meaning is unknown.
+    ARTIFACT_EVENT_MODE_UNKNOWN_2  = 2,
 H2_ENUM_END(ArtifactEventMode)
 
 #endif

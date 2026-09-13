@@ -27,12 +27,10 @@
     0.05
 #define COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS                                      \
     0.04
-#define COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY                                  \
-    0.08
-#define COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY 0.06
-#define COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY 0.04
-#define COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY                                   \
-    0.02
+#define COMBAT_AI_RETREAT_TIER_4_PENALTY 0.08
+#define COMBAT_AI_RETREAT_TIER_3_PENALTY 0.06
+#define COMBAT_AI_RETREAT_TIER_2_PENALTY 0.04
+#define COMBAT_AI_RETREAT_TIER_1_PENALTY 0.02
 #define COMBAT_AI_DIFFICULTY_RETREAT_STEP 0.015
 #define COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE 0.03
 #define COMBAT_AI_MAX_EXPERIENCE_BONUS 0.03f
@@ -152,20 +150,16 @@ i32 combatManager::AICheckRetreat(void) {
     else if (artifactValue > 0)
         chance = chance + COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS;
 
-    if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_40000)
-        chance -= force[IDX(m_currentSide)] / COMBAT_AI_STRENGTH_20000;
-    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_30000)
-        chance =
-            chance - COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY;
-    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_15000)
-        chance =
-            chance - COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY;
-    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_5000)
-        chance =
-            chance - COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY;
-    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_2500)
-        chance =
-            chance - COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY;
+    if (force[IDX(m_currentSide)] > COMBAT_AI_RETREAT_SCALED_PENALTY_THRESHOLD)
+        chance -= force[IDX(m_currentSide)] / COMBAT_AI_RETREAT_STRENGTH_DIVISOR;
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_RETREAT_TIER_4_THRESHOLD)
+        chance = chance - COMBAT_AI_RETREAT_TIER_4_PENALTY;
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_RETREAT_TIER_3_THRESHOLD)
+        chance = chance - COMBAT_AI_RETREAT_TIER_3_PENALTY;
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_RETREAT_TIER_2_THRESHOLD)
+        chance = chance - COMBAT_AI_RETREAT_TIER_2_PENALTY;
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_RETREAT_TIER_1_THRESHOLD)
+        chance = chance - COMBAT_AI_RETREAT_TIER_1_PENALTY;
 
     chance = chance - (COMBAT_AI_MAX_DIFFICULTY - IDX(gpGame->m_difficulty))
                           * COMBAT_AI_DIFFICULTY_RETREAT_STEP;
@@ -523,7 +517,7 @@ void combatManager::DoLichShot(class army* lich) {
         score = 0;
         targetArmy = &m_armies[IDX(OppositeCombatSide(m_currentSide))][armyIndex];
         if (targetArmy == NULL
-            || HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            || HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) != 0
             || targetArmy->m_quantity <= 0)
             continue;
         score = GetModLichDamage(targetArmy, shotDamage);
@@ -569,7 +563,7 @@ i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = armyIndex + m_armies[IDX(side)];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
             && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) != 0
             && currentArmy->m_monster.shots > 0 && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
             && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
@@ -589,7 +583,7 @@ i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD)
                    == 0
             && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE) != 0)
             bits |= armyBit;
@@ -608,7 +602,7 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
             && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0
             && !ARMY_HAS_INCAPACITATING_SPELL(*currentArmy)
             && !ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
@@ -628,7 +622,7 @@ i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = &m_armies[IDX(side)][armyIndex];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD)
                    == 0
             && currentArmy->m_quantity > 0)
             bits |= armyBit;
@@ -647,7 +641,7 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = m_armies[IDX(side)] + armyIndex;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
             && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_FLYING) == 0
             && (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_SHOOTER) == 0
                 || currentArmy->m_monster.shots <= 0)
@@ -670,7 +664,7 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
         currentArmy =
             m_armies[IDX(side)] + idx;
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
             && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
             result |= bitMask;
         bitMask <<= 1;
@@ -688,7 +682,7 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         currentArmy = &m_armies[IDX(side)][armyIndex];
         if (currentArmy != NULL
-            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED) == 0
+            && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD) == 0
             && ARMY_HAS_BERSERK_OR_HYPNOTIZE(*currentArmy))
             bits |= armyBit;
         armyBit <<= 1;
@@ -786,7 +780,7 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
         if ((mask & bitMask) != 0) {
             currentArmy = &m_armies[IDX(side)][idx];
             if (currentArmy != NULL
-                && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
+                && HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_DEAD)
                        == 0)
                 totalStrength += currentArmy->Strength();
         }
@@ -968,7 +962,7 @@ i32 combatManager::WalkTowardArmy(
         currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
         );
-    if (atkMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+    if (atkMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
         giNextAction = ACTION_WAIT;
         return 1;
     }
@@ -979,7 +973,7 @@ i32 combatManager::WalkTowardArmy(
         currentArmy->m_hex,
         targetSquare,
         currentArmy,
-        COMBAT_AI_PATH_TO_TARGET,
+        ARMY_PATH_ASSIGNED_TARGET_HEX,
         0
     );
     if (routeGot == 0
@@ -997,7 +991,7 @@ i32 combatManager::WalkTowardArmy(
                 currentArmy->m_hex,
                 targetSquare,
                 currentArmy,
-                COMBAT_AI_PATH_TO_TARGET,
+                ARMY_PATH_ASSIGNED_TARGET_HEX,
                 0
             );
     }

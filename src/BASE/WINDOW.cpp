@@ -298,7 +298,7 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
 
 VA(0x004bb220, 0x15)
 void heroWindow::DrawWindow(void) {
-    DrawWindow(1);
+    DrawWindow(WINDOW_DRAW_UPDATE_SCREEN);
 }
 
 VA(0x004bb240, 0x23)
@@ -371,7 +371,7 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
     m_posX = toX;
     m_posY = toY;
     m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
-    DrawWindow(0);
+    DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     oldWidth = oldWidth + abs(m_posX - x);
     oldHgt = oldHgt + abs(m_posY - yPrev);
     if (m_posX < x)

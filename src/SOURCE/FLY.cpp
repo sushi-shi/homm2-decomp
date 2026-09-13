@@ -141,7 +141,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     }
 
     attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-    while (attackMask != ARMY_ALL_ATTACK_DIRECTIONS) {
+    while (attackMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
         moveDir = GetBestDirection(m_hex, enemyHex, attackMask);
         if (ValidAttack(
                 m_hex,

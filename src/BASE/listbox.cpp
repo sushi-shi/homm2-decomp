@@ -298,7 +298,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
             y = message.payload.mouse.y - m_owner->m_posY;
             if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -476,7 +476,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
             } else {
                 if (m_itemSelectionTracking) {
                     m_itemSelectionTracking = 0;
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                     message.payload.widget.data.value = m_selectedIndex;
                     message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
                     if (m_selectedIndex == m_lastSelectedIndex) {

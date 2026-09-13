@@ -1,5 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
+#include <BASE/dialog.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -41,6 +42,7 @@ H2_ENUM_BEGIN(DataEntryLayout)
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_BEGIN(DataEntryWidgetId)
+    ENTRY_CANCEL_BUTTON = DIALOG_BUTTON_2,
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
 H2_ENUM_END(DataEntryWidgetId)
@@ -335,7 +337,6 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 }
 
 #include <BASE/MiscGraphicsConstants.h>
-#include <BASE/dialog.h>
 #include <BASE/display.h>
 
 VA(0x004bdae0, 0x1af)
@@ -2032,7 +2033,7 @@ void GetDataEntry(
     msg.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(msg);
     if (showCancel == 0) {
-        msg.payload.widget.id = DIALOG_BUTTON_2;
+        msg.payload.widget.id = ENTRY_CANCEL_BUTTON;
         DataEntryWin->BroadcastMessage(msg);
     }
 
@@ -2094,15 +2095,15 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case DIALOG_BUTTON_2:
+                    case ENTRY_CANCEL_BUTTON:
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_TEXT_WIDGET:
                     gotText:

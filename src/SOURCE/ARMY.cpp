@@ -72,35 +72,35 @@ H2_ENUM_BEGIN(ArmySpellChanceConstant)
     CONTROL_EFFECT_Y_OFFSET         = 5
 H2_ENUM_END(ArmySpellChanceConstant)
 
-H2_ENUM_BEGIN(InitializationConstant)
-    INITIAL_UNKNOWN_D4 = 6
-H2_ENUM_END(InitializationConstant)
+H2_ENUM_BEGIN(ArmyInitialStateConstant)
+        INITIAL_UNKNOWN_D4 = 6
+H2_ENUM_END(ArmyInitialStateConstant)
 
-H2_ENUM_BEGIN(DrawingConstant)
-    SPELL_EFFECT_COLOR                  = 237,
-    SELECTED_CREATURE_COLOR             = 236,
-    WIDE_NEIGHBOR_HEX_OFFSET            = 2,
-    WIDE_RIGHT_QUANTITY_X_OFFSET        = 53,
-    WIDE_LEFT_QUANTITY_X_OFFSET         = 73,
-    RIGHT_QUANTITY_X_OFFSET             = 9,
-    LEFT_QUANTITY_X_OFFSET              = 29,
-    RIGHT_QUANTITY_Y_OFFSET             = 11,
-    LEFT_QUANTITY_Y_OFFSET              = 23,
-    QUANTITY_STATUS_FRAME               = 10,
-    SPELL_STATUS_FRAME                  = 11,
-    EFFECT_STATUS_MIXED_FRAME           = 3,
-    EFFECT_STATUS_BAD_FRAME             = 4,
-    EFFECT_STATUS_DEFAULT_FRAME         = 2,
-    EFFECT_STATUS_FRAME_OFFSET          = 10,
-    QUANTITY_TEXT_Y_OFFSET              = 2,
-    QUANTITY_TEXT_WIDTH                 = 20,
-    QUANTITY_TEXT_HEIGHT                = 12,
-    WINCE_SPELL_X_OFFSET                = 4,
-    ELEMENTAL_STORM_FACING_SCALE        = 2,
-    DRAWBRIDGE_WIDE_EXIT_HEX            = 60,
-    PROJECTILE_TARGET_Y_OFFSET          = 17,
-    POW_EFFECT_DWARF_OVERLAP_ADJUSTMENT = 2
-H2_ENUM_END(DrawingConstant)
+H2_ENUM_BEGIN(ArmyDrawingConstant)
+        SPELL_EFFECT_COLOR                  = 237,
+        SELECTED_CREATURE_COLOR             = 236,
+        WIDE_NEIGHBOR_HEX_OFFSET            = 2,
+        WIDE_RIGHT_QUANTITY_X_OFFSET        = 53,
+        WIDE_LEFT_QUANTITY_X_OFFSET         = 73,
+        RIGHT_QUANTITY_X_OFFSET             = 9,
+        LEFT_QUANTITY_X_OFFSET              = 29,
+        RIGHT_QUANTITY_Y_OFFSET             = 11,
+        LEFT_QUANTITY_Y_OFFSET              = 23,
+        QUANTITY_STATUS_FRAME               = 10,
+        SPELL_STATUS_FRAME                  = 11,
+        EFFECT_STATUS_MIXED_FRAME           = 3,
+        EFFECT_STATUS_BAD_FRAME             = 4,
+        EFFECT_STATUS_DEFAULT_FRAME         = 2,
+        EFFECT_STATUS_FRAME_OFFSET          = 10,
+        QUANTITY_TEXT_Y_OFFSET              = 2,
+        QUANTITY_TEXT_WIDTH                 = 20,
+        QUANTITY_TEXT_HEIGHT                = 12,
+        WINCE_SPELL_X_OFFSET                = 4,
+        ELEMENTAL_STORM_FACING_SCALE        = 2,
+        DRAWBRIDGE_WIDE_EXIT_HEX            = 60,
+        PROJECTILE_TARGET_Y_OFFSET          = 17,
+        POW_EFFECT_DWARF_OVERLAP_ADJUSTMENT = 2
+H2_ENUM_END(ArmyDrawingConstant)
 
 H2_ENUM_CLASS_BEGIN(ProjectileAttackDirection)
     PROJECTILE_ATTACK_UP      = 0,
@@ -401,7 +401,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     color = 0;
     if (m_animationSequence == ARMY_ANIMATION_STAND
         || (m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-            && m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)) {
+            && m_animationSequence <= ARMY_ANIMATION_STANDING_LAST)) {
         idle = true;
     } else {
         idle = false;
@@ -2869,7 +2869,7 @@ void army::GoBerserk(void) {
     m_quantity = savedQuantity_8;
     attackMask_29 =
         GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
-    if (attackMask_29 != ARMY_ALL_ATTACK_DIRECTIONS) {
+    if (attackMask_29 != COMBAT_ALL_DIRECTIONS_BLOCKED) {
         while (!targetFound_8) {
             direction_4 = static_cast<CombatHexDirection>(
                 Random(0, IDX(COMBAT_DIRECTION_COUNT) - 1)
@@ -3017,7 +3017,7 @@ again:
         m_moveTargetHex = destination;
         baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
         if (HAS(m_monster.attributes, MONSTER_FLAGS_FLYING)
-            && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
+            && baseAttackMask == COMBAT_ALL_DIRECTIONS_BLOCKED) {
             if (m_hex != m_moveTargetHex
                 && !ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
                 return;
@@ -3031,9 +3031,9 @@ again:
         } else {
             targetAttackMask_1 = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
         }
-        if (targetAttackMask_1 == ARMY_ALL_ATTACK_DIRECTIONS && m_monster.shots > 0) {
+        if (targetAttackMask_1 == COMBAT_ALL_DIRECTIONS_BLOCKED && m_monster.shots > 0) {
             SpecialAttack();
-        } else if (baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
+        } else if (baseAttackMask == COMBAT_ALL_DIRECTIONS_BLOCKED) {
             AttackTo();
         } else {
             for (direction_3 = COMBAT_DIRECTION_NORTHEAST;

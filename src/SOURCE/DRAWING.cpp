@@ -242,7 +242,11 @@ void combatManager::CombatMessage(
     oldLimit = gbLimitToExtent;
     gbLimitToExtent = false;
     gbComputeExtent = gbLimitToExtent;
-    m_combatWindow->DrawWindow(0, COMBAT_MESSAGE_DRAW_FIRST_WIDGET, COMBAT_MESSAGE_WIDGET_SECOND);
+    m_combatWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        COMBAT_MESSAGE_DRAW_FIRST_WIDGET,
+        COMBAT_MESSAGE_WIDGET_SECOND
+    );
     SaveCombatBorder();
     if (updateScreen != 0)
         gpWindowManager->UpdateScreenRegion(
@@ -361,7 +365,7 @@ void combatManager::ResetLimitCreature(void) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT; armySlotIndex++) {
             m_limitCreatureCount[IDX(side)][armySlotIndex]
                 = HAS(m_armies[IDX(side)][armySlotIndex].m_monster.attributes,
-                      COMBAT_ARMY_FLAG_MIRROR_IMAGE)
+                      MONSTER_FLAGS_DEAD)
                         != 0
                     ? -1
                     : 0;

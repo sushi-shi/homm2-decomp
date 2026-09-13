@@ -30,6 +30,11 @@ H2_ENUM_CLASS_BEGIN(WindowState)
 H2_ENUM_CLASS_END(WindowState)
 H2_ENUM_FLAGS(WindowState)
 
+H2_ENUM_BEGIN(WindowDrawUpdate)
+    WINDOW_DRAW_BUFFER_ONLY   = 0,
+    WINDOW_DRAW_UPDATE_SCREEN = 1
+H2_ENUM_END(WindowDrawUpdate)
+
 H2_ENUM_BEGIN(HeroWindowConstant)
     HERO_WINDOW_NAME_CAPACITY = 0x14
 H2_ENUM_END(HeroWindowConstant)
@@ -60,8 +65,8 @@ public:
     void RemoveWidget(class widget*);
     MessageDispatchResult BroadcastMessage(struct tag_message&);
     void DrawWindow(void);
-    void DrawWindow(i32);
-    void DrawWindow(i32, i32, i32);
+    void DrawWindow(i32 updateScreen);
+    void DrawWindow(i32 updateScreen, i32 firstWidgetId, i32 lastWidgetId);
     i32 SaveBackground(void);
     void RestoreBackground(void);
     void MoveWindow(i32, i32);

@@ -1246,8 +1246,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
 
     PollSound();
     if (msg.payload.widget.parameter & MENU_DISABLE_MASK) {
-        if (msg.payload.widget.command == WIDGET_COMMAND_SELECT
-            || msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+        if (msg.payload.widget.command == WIDGET_NOTIFY_SELECT
+            || msg.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
             helpIndex = -1;
             switch (msg.payload.widget.id) {
                 case MENU_NEW_GAME:
@@ -1300,7 +1300,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
             switch (msg.payload.widget.command) {
-                case WIDGET_COMMAND_SELECT:
+                case WIDGET_NOTIFY_SELECT:
                     if (msg.payload.widget.id == MENU_MOVIE)
                         break;
                     menu = msg.payload.widget.id - MENU_FIRST_COMMAND;
@@ -1310,7 +1310,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     msg.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
                     gpInitWin->BroadcastMessage(msg);
-                    gpInitWin->DrawWindow(0, idx, idx);
+                    gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, idx, idx);
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_X)],
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_Y)],
@@ -1318,7 +1318,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                     break;
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     if (msg.payload.widget.id == MENU_MOVIE) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop(
@@ -1326,7 +1326,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                             gpWindowManager->m_screen,
                             1
                         );
-                        gpInitWin->DrawWindow(0);
+                        gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                         gpWindowManager
                             ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                         gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
@@ -1341,7 +1341,11 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                                 (idx - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
                             gpInitWin->BroadcastMessage(msg);
                         }
-                        gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
+                        gpInitWin->DrawWindow(
+                            WINDOW_DRAW_BUFFER_ONLY,
+                            MENU_FIRST_WIDGET,
+                            MENU_LAST_WIDGET
+                        );
                         gpWindowManager->UpdateScreenRegion(
                             MENU_REDRAW_LEFT,
                             MENU_REDRAW_TOP,
@@ -1375,7 +1379,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         lastIMHoverID + MENU_WIDGET_OFFSET,
                         lastIMHoverID + MENU_WIDGET_OFFSET
                     );
@@ -1394,7 +1398,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         hoverIndex + MENU_WIDGET_OFFSET,
                         hoverIndex + MENU_WIDGET_OFFSET
                     );
@@ -1433,7 +1437,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     i32 H2_UNUSED(unusedResult);
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (msg.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
@@ -1446,7 +1450,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (msg.payload.widget.id) {
                     case DIALOG_BUTTON_1:
                         gpTownManager->m_recruitState = -1;
@@ -1697,7 +1701,7 @@ MessageDispatchResult WaitHandler(tag_message& msg) {
     PollSound();
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (msg.payload.widget.id) {
                     case DIALOG_BUTTON_0:
                     case DIALOG_BUTTON_1:
@@ -1784,8 +1788,8 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     }
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
                 if (msg.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
@@ -1860,7 +1864,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     }
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (msg.payload.widget.id) {
                     case DIALOG_BUTTON_0:
                     case DIALOG_BUTTON_1:
@@ -1875,7 +1879,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
-                    case DIALOG_BUTTON_4:
+                    case EVENT_WINDOW_IGNORED_BUTTON:
                     default:
                         break;
                 }
@@ -3601,7 +3605,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
                 NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
-                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5)
+                if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
             }
             giMenuCommand = command;
@@ -5425,9 +5429,13 @@ void UpdateNormalDialog(H2_CONST char* text) {
     SET_WIDGET_MESSAGE(evt, WIDGET_COMMAND_SET_TEXT, 1);
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
-    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
     pNormalDialogWindow
-        ->DrawWindow(1, WINDOW_ALL_WIDGETS_LOW, NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID);
+        ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
+    pNormalDialogWindow->DrawWindow(
+        WINDOW_DRAW_UPDATE_SCREEN,
+        WINDOW_ALL_WIDGETS_LOW,
+        NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
+    );
 }
 
 #define GROUND_REPEAT_2(value) value, value
@@ -7465,8 +7473,8 @@ DATA(0x004fbef8) H2_CONST char* gTownObjNames[IDX(BUILDING_SLOT_COUNT)] = {
     "up5b",
     "ext3"
 };
-DATA(0x004fbf78) H2_ENUM_STORAGE(CreatureType, i8)
-gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fbf78)
+H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {IDX(CREATURE_PEASANT),
      IDX(CREATURE_ARCHER),
      IDX(CREATURE_PIKEMAN),
@@ -7579,7 +7587,7 @@ DATA(0x004fc2e8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0
 };
 DATA(0x004fc334) i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
-DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
@@ -7587,7 +7595,7 @@ DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
-DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][IDX(RES_COUNT)] = {
+DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT][IDX(RES_COUNT)] = {
     {{0, 0, 0, 0, 0, 0, 200},
      {0, 0, 0, 0, 0, 0, 1000},
      {0, 0, 5, 0, 0, 0, 1000},
@@ -7661,7 +7669,7 @@ DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][
      {0, 0, 0, 0, 0, 0, 0},
      {0, 0, 0, 0, 0, 0, 0}}
 };
-DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -9840,77 +9848,77 @@ DATA(0x004fed98) H2_CONST char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
 };
 DATA(0x004fedb4) H2_CONST char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     { localization::Tr("table.gSpecialBuildingNames.0"), localization::Tr("table.gSpecialBuildingNames.1"), localization::Tr("table.gSpecialBuildingNames.2"), localization::Tr("table.gSpecialBuildingNames.3"), localization::Tr("table.gSpecialBuildingNames.4"), localization::Tr("table.gSpecialBuildingNames.5"), localization::Tr("table.gSpecialBuildingNames.6")};
-DATA(0x004fedd0) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
-    { localization::Tr("table.gDwellingNames.0.0"),
-      localization::Tr("table.gDwellingNames.0.1"),
-      localization::Tr("table.gDwellingNames.0.2"),
-      localization::Tr("table.gDwellingNames.0.3"),
-      localization::Tr("table.gDwellingNames.0.4"),
-      localization::Tr("table.gDwellingNames.0.5"),
-      localization::Tr("table.gDwellingNames.0.6"),
-      localization::Tr("table.gDwellingNames.0.7"),
-      localization::Tr("table.gDwellingNames.0.8"),
-      localization::Tr("table.gDwellingNames.0.9"),
-      localization::Tr("table.gDwellingNames.0.10"),
+DATA(0x004fedd0) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
+    {localization::Tr("table.gDwellingNames.0.0"),
+     localization::Tr("table.gDwellingNames.0.1"),
+     localization::Tr("table.gDwellingNames.0.2"),
+     localization::Tr("table.gDwellingNames.0.3"),
+     localization::Tr("table.gDwellingNames.0.4"),
+     localization::Tr("table.gDwellingNames.0.5"),
+     localization::Tr("table.gDwellingNames.0.6"),
+     localization::Tr("table.gDwellingNames.0.7"),
+     localization::Tr("table.gDwellingNames.0.8"),
+     localization::Tr("table.gDwellingNames.0.9"),
+     localization::Tr("table.gDwellingNames.0.10"),
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.1.0"),
-      localization::Tr("table.gDwellingNames.1.1"),
-      localization::Tr("table.gDwellingNames.1.2"),
-      localization::Tr("table.gDwellingNames.1.3"),
-      localization::Tr("table.gDwellingNames.1.4"),
-      localization::Tr("table.gDwellingNames.1.5"),
-      localization::Tr("table.gDwellingNames.1.6"),
+    {localization::Tr("table.gDwellingNames.1.0"),
+     localization::Tr("table.gDwellingNames.1.1"),
+     localization::Tr("table.gDwellingNames.1.2"),
+     localization::Tr("table.gDwellingNames.1.3"),
+     localization::Tr("table.gDwellingNames.1.4"),
+     localization::Tr("table.gDwellingNames.1.5"),
+     localization::Tr("table.gDwellingNames.1.6"),
      /*  */ "",
-      localization::Tr("table.gDwellingNames.1.8"),
-      localization::Tr("table.gDwellingNames.1.9"),
-     /*  */ "",
-     /*  */ ""},
-    { localization::Tr("table.gDwellingNames.2.0"),
-      localization::Tr("table.gDwellingNames.2.1"),
-      localization::Tr("table.gDwellingNames.2.2"),
-      localization::Tr("table.gDwellingNames.2.3"),
-      localization::Tr("table.gDwellingNames.2.4"),
-      localization::Tr("table.gDwellingNames.2.5"),
-      localization::Tr("table.gDwellingNames.2.6"),
-      localization::Tr("table.gDwellingNames.2.7"),
-      localization::Tr("table.gDwellingNames.2.8"),
-     /*  */ "",
+     localization::Tr("table.gDwellingNames.1.8"),
+     localization::Tr("table.gDwellingNames.1.9"),
      /*  */ "",
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.3.0"),
-      localization::Tr("table.gDwellingNames.3.1"),
-      localization::Tr("table.gDwellingNames.3.2"),
-      localization::Tr("table.gDwellingNames.3.3"),
-      localization::Tr("table.gDwellingNames.3.4"),
-      localization::Tr("table.gDwellingNames.3.5"),
+    {localization::Tr("table.gDwellingNames.2.0"),
+     localization::Tr("table.gDwellingNames.2.1"),
+     localization::Tr("table.gDwellingNames.2.2"),
+     localization::Tr("table.gDwellingNames.2.3"),
+     localization::Tr("table.gDwellingNames.2.4"),
+     localization::Tr("table.gDwellingNames.2.5"),
+     localization::Tr("table.gDwellingNames.2.6"),
+     localization::Tr("table.gDwellingNames.2.7"),
+     localization::Tr("table.gDwellingNames.2.8"),
      /*  */ "",
      /*  */ "",
-      localization::Tr("table.gDwellingNames.3.8"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.3.10"),
-      localization::Tr("table.gDwellingNames.3.11")},
-    { localization::Tr("table.gDwellingNames.4.0"),
-      localization::Tr("table.gDwellingNames.4.1"),
-      localization::Tr("table.gDwellingNames.4.2"),
-      localization::Tr("table.gDwellingNames.4.3"),
-      localization::Tr("table.gDwellingNames.4.4"),
-      localization::Tr("table.gDwellingNames.4.5"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.4.7"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.4.9"),
-      localization::Tr("table.gDwellingNames.4.10"),
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.5.0"),
-      localization::Tr("table.gDwellingNames.5.1"),
-      localization::Tr("table.gDwellingNames.5.2"),
-      localization::Tr("table.gDwellingNames.5.3"),
-      localization::Tr("table.gDwellingNames.5.4"),
-      localization::Tr("table.gDwellingNames.5.5"),
-      localization::Tr("table.gDwellingNames.5.6"),
-      localization::Tr("table.gDwellingNames.5.7"),
-      localization::Tr("table.gDwellingNames.5.8"),
-      localization::Tr("table.gDwellingNames.5.9"),
+    {localization::Tr("table.gDwellingNames.3.0"),
+     localization::Tr("table.gDwellingNames.3.1"),
+     localization::Tr("table.gDwellingNames.3.2"),
+     localization::Tr("table.gDwellingNames.3.3"),
+     localization::Tr("table.gDwellingNames.3.4"),
+     localization::Tr("table.gDwellingNames.3.5"),
+     /*  */ "",
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.8"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.10"),
+     localization::Tr("table.gDwellingNames.3.11")},
+    {localization::Tr("table.gDwellingNames.4.0"),
+     localization::Tr("table.gDwellingNames.4.1"),
+     localization::Tr("table.gDwellingNames.4.2"),
+     localization::Tr("table.gDwellingNames.4.3"),
+     localization::Tr("table.gDwellingNames.4.4"),
+     localization::Tr("table.gDwellingNames.4.5"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.7"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.9"),
+     localization::Tr("table.gDwellingNames.4.10"),
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.5.0"),
+     localization::Tr("table.gDwellingNames.5.1"),
+     localization::Tr("table.gDwellingNames.5.2"),
+     localization::Tr("table.gDwellingNames.5.3"),
+     localization::Tr("table.gDwellingNames.5.4"),
+     localization::Tr("table.gDwellingNames.5.5"),
+     localization::Tr("table.gDwellingNames.5.6"),
+     localization::Tr("table.gDwellingNames.5.7"),
+     localization::Tr("table.gDwellingNames.5.8"),
+     localization::Tr("table.gDwellingNames.5.9"),
      /*  */ "",
      /*  */ ""}
 };

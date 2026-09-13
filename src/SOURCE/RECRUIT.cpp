@@ -22,34 +22,36 @@
 #include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
-    RESOURCE_COUNT = 6,
-    GOLD_RESOURCE = 6,
-    WINDOW_X = 0x8f,
-    WINDOW_Y = 0x10,
-    QUICK_WINDOW_X = 0xa0,
-    QUICK_WINDOW_Y = 0x10,
-    NAME_SIZE = 40,
-    LABEL_SIZE = 40,
-    BROADCAST_FLAGS = 0x4008,
-    DRAW_DEPTH = 0x7fff,
-    VIEW_ARMY_X = 0x77,
-    VIEW_ARMY_Y = 0x20,
-    NO_ROOM_DIALOG_X = 177,
-    NO_ROOM_DIALOG_Y = 100
+    RESOURCE_COUNT              = 6,
+    GOLD_RESOURCE               = 6,
+    WINDOW_X                    = 0x8f,
+    WINDOW_Y                    = 0x10,
+    QUICK_WINDOW_X              = 0xa0,
+    QUICK_WINDOW_Y              = 0x10,
+    NAME_SIZE                   = 40,
+    LABEL_SIZE                  = 40,
+    RECRUIT_DRAW_LAST_WIDGET_ID = 0x7fff,
+    VIEW_ARMY_X                 = 0x77,
+    VIEW_ARMY_Y                 = 0x20,
+    NO_ROOM_DIALOG_X            = 177,
+    NO_ROOM_DIALOG_Y            = 100
 H2_ENUM_END(RecruitConstant)
 
 H2_ENUM_BEGIN(RecruitControl)
-    TITLE_CONTROL = 0x40,
-    CREATURE_CONTROL = 0x42,
-    AVAILABLE_CONTROL = 0x43,
-    QUANTITY_CONTROL = 0x44,
-    INCREASE_CONTROL = 0x45,
-    DECREASE_CONTROL = 0x46,
-    MAXIMUM_CONTROL = 0x47,
-    GOLD_ICON_CONTROL = 0x49,
-    RESOURCE_ICON_CONTROL = 0x4a,
-    RESOURCE_COST_CONTROL = 0x4b,
-    GOLD_TOTAL_CONTROL = 0x4d,
+    CONFIRM_CONTROL        = DIALOG_BUTTON_2,
+    CANCEL_CONTROL         = DIALOG_BUTTON_1,
+    CLOSE_CONTROL          = DIALOG_BUTTON_0,
+    TITLE_CONTROL          = 0x40,
+    CREATURE_CONTROL       = 0x42,
+    AVAILABLE_CONTROL      = 0x43,
+    QUANTITY_CONTROL       = 0x44,
+    INCREASE_CONTROL       = 0x45,
+    DECREASE_CONTROL       = 0x46,
+    MAXIMUM_CONTROL        = 0x47,
+    GOLD_ICON_CONTROL      = 0x49,
+    RESOURCE_ICON_CONTROL  = 0x4a,
+    RESOURCE_COST_CONTROL  = 0x4b,
+    GOLD_TOTAL_CONTROL     = 0x4d,
     RESOURCE_IMAGE_CONTROL = 0x4e,
     RESOURCE_TOTAL_CONTROL = 0x4f,
 H2_ENUM_END(RecruitControl)
@@ -133,8 +135,8 @@ i32 recruitUnit::Open(i32 priority) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_SET_FLAGS,
-        IDX(DIALOG_BUTTON_0),
-        BROADCAST_FLAGS
+        IDX(CLOSE_CONTROL),
+        IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
 
@@ -152,14 +154,14 @@ i32 recruitUnit::Open(i32 priority) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            DIALOG_BUTTON_2,
+            CONFIRM_CONTROL,
             IDX(WIDGET_FLAG_ENABLED)
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            DIALOG_BUTTON_2,
-            BROADCAST_FLAGS
+            CONFIRM_CONTROL,
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     }
     hmnuRecruitSave = hmnuCurrent;
@@ -193,8 +195,8 @@ void recruitUnit::Close(void) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        IDX(DIALOG_BUTTON_0),
-        BROADCAST_FLAGS
+        IDX(CLOSE_CONTROL),
+        IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
     if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
         gpTownManager->ResetStrips();
@@ -241,8 +243,8 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
         quickView = false;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 switch (message.payload.widget.id) {
                     case QUANTITY_CONTROL:
                         if (quickView != 0)
@@ -275,9 +277,9 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         break;
                 }
                 Update();
-                m_window->DrawWindow(1, 0, DRAW_DEPTH);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case INCREASE_CONTROL:
                         if (quickView != 0)
@@ -286,7 +288,8 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         if (m_quantity > m_maximum)
                             m_quantity = m_maximum;
                         Update();
-                        m_window->DrawWindow(1, 0, DRAW_DEPTH);
+                        m_window
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
                         break;
                     case DECREASE_CONTROL:
                         if (quickView != 0)
@@ -295,22 +298,24 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         if (m_quantity < 0)
                             m_quantity = 0;
                         Update();
-                        m_window->DrawWindow(1, 0, DRAW_DEPTH);
+                        m_window
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
                         break;
                     case MAXIMUM_CONTROL:
                         if (quickView != 0)
                             break;
                         m_quantity = m_maximum;
                         Update();
-                        m_window->DrawWindow(1, 0, DRAW_DEPTH);
+                        m_window
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
                         break;
-                    case DIALOG_BUTTON_1:
+                    case CANCEL_CONTROL:
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
                         done = true;
                         break;
-                    case DIALOG_BUTTON_2:
+                    case CONFIRM_CONTROL:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {

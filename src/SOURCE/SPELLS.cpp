@@ -62,6 +62,7 @@
 namespace {
 
     H2_ENUM_BEGIN(CombatSpellUiConstant)
+        CONTROL_CLOSE = DIALOG_BUTTON_0,
         COMMAND_CANCEL = 1,
         CONTROL_PREVIOUS_PAGE = 2,
         CONTROL_NEXT_PAGE = 3,
@@ -312,7 +313,7 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
             case CONTROL_NEXT_PAGE:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_NEXT_PAGE], 1, 0, 0);
                 break;
-            case DIALOG_BUTTON_0:
+            case CONTROL_CLOSE:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_CLOSE], 1, 0, 0);
                 break;
             case CONTROL_FIRST_MANA:
@@ -1103,7 +1104,7 @@ void combatManager::CastSpell(
             break;
         case SPELL_BLOOD_LUST:
             ShowSpellMessage(castByCreature, spell, target3);
-            BloodLustEffect(target3, MONSTER_ABILITY_FLAG_BLOOD_LUST);
+            BloodLustEffect(target3, MONSTER_FLAGS_BLOOD_LUST);
             target3->SetSpellInfluence(ARMY_SPELL_INFLUENCE_BLOODLUST, SPELL_BLOOD_LUST_DURATION);
             break;
         case SPELL_ANTI_MAGIC:

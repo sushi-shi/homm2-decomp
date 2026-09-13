@@ -29,6 +29,8 @@
 #include <BASE/widget.h>
 
 H2_ENUM_BEGIN(NewGameConstant)
+    GAME_DIALOG_OK                        = DIALOG_BUTTON_2,
+    GAME_DIALOG_CANCEL                    = DIALOG_BUTTON_1,
     GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
     GAME_KEY_BUFFER_SIZE                  = 0x69,
@@ -48,9 +50,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
-    GAME_WIDGET_INACTIVE_FRAME            = 2,
-    GAME_WIDGET_REFRESH_FRAME             = 4,
-    GAME_SHADOW_FRAME                     = 6,
     GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
@@ -130,6 +129,7 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
 H2_ENUM_END(NewGameDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
+    MAP_CHOICE_CANCEL    = DIALOG_BUTTON_1,
     MAP_CHOICE_STANDARD  = 1,
     MAP_CHOICE_EXPANSION = 2,
 H2_ENUM_CLASS_END(NewGameMapChoice)
@@ -254,7 +254,7 @@ void game::GetMap(void) {
     if (requesterResult == NULL)
         MemError();
     loadResult = gpExec->DoDialog(requesterResult);
-    if (loadResult == DIALOG_BUTTON_2) {
+    if (loadResult == FILE_REQUESTER_OK) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
         if (stricmp(savedName, gMapName) != 0) {
@@ -418,7 +418,7 @@ i32 game::NewGame(void) {
             case IDX(MAP_CHOICE_EXPANSION):
                 xIsExpansionMap = true;
                 break;
-            case DIALOG_BUTTON_1:
+            case IDX(MAP_CHOICE_CANCEL):
                 return 0;
         }
     }
@@ -473,30 +473,30 @@ i32 game::NewGame(void) {
                     windowMessage.type = MESSAGE_WIDGET;
                     windowMessage.payload.widget.id = GAME_MAP_OPTIONS_CONTROL;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.id = DIALOG_BUTTON_2;
+                    windowMessage.payload.widget.id = GAME_DIALOG_OK;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
-                    windowMessage.payload.widget.id = DIALOG_BUTTON_1;
+                    windowMessage.payload.widget.id = GAME_DIALOG_CANCEL;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                    windowMessage.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
                     windowMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                    windowMessage.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+                    windowMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
 
                     gbNewGameDialogOver = false;
                     gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
                     delete m_newGameWindow;
-                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_1) {
+                    if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
                         result = false;
                         goto cleanup;
                     }
@@ -585,7 +585,7 @@ i32 game::NewGame(void) {
         gbNewGameDialogOver = false;
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
         delete m_newGameWindow;
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_1) {
+        if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
             result = false;
         } else {
             m_playerCount = m_mapHeader.playerCount;
@@ -833,7 +833,7 @@ VA(0x00476e3b, 0x50f)
         m_newGameWindow->BroadcastMessage(message);
 
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         for (playerIndex = 0; playerIndex < IDX(DIFFICULTY_COUNT); ++playerIndex) {
             message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
             m_newGameWindow->BroadcastMessage(message);
@@ -872,7 +872,7 @@ VA(0x00476e3b, 0x50f)
                                                  ? WIDGET_COMMAND_SET_FLAGS
                                                  : WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = NEW_GAME_PLAYER_SELECT_FIRST + playerIndex;
-            message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_newGameWindow->BroadcastMessage(message);
 
             if (m_setupPlayerType[playerIndex] != GAME_PLAYER_DEFAULT
@@ -899,7 +899,7 @@ VA(0x00476e3b, 0x50f)
 
             message.payload.widget.command =
                 playerLockedValue ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_newGameWindow->BroadcastMessage(message);
 
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -913,7 +913,7 @@ VA(0x00476e3b, 0x50f)
                 m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER
                     ? WIDGET_COMMAND_CLEAR_FLAGS
                     : WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_newGameWindow->BroadcastMessage(message);
 
             if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex]] == FACTION_RANDOM)
@@ -921,7 +921,7 @@ VA(0x00476e3b, 0x50f)
             else
                 playerLockedValue = true;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_newGameWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = NEW_GAME_RACE_CYCLE_FIRST + playerIndex;
@@ -937,7 +937,7 @@ VA(0x00476e3b, 0x50f)
             m_newGameWindow->BroadcastMessage(message);
             message.payload.widget.command =
                 playerLockedValue ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_newGameWindow->BroadcastMessage(message);
         }
 
@@ -971,7 +971,7 @@ VA(0x0047734a, 0xdd1)
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
             SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_CLEAR_FLAGS, NEW_GAME_SHADOW);
-            windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
+            windowMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
         }
 
@@ -983,7 +983,7 @@ VA(0x0047734a, 0xdd1)
                 switch (remotePacketResult->command) {
                     case GAME_REMOTE_START:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        gpWindowManager->m_dialogResult = DIALOG_BUTTON_2;
+                        gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
@@ -1082,7 +1082,7 @@ VA(0x0047734a, 0xdd1)
 
         if (message.type == MESSAGE_WIDGET) {
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+                if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
                     if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
                          && message.payload.widget.id
@@ -1124,18 +1124,18 @@ VA(0x0047734a, 0xdd1)
                         helpDialogIndexLocal = GAME_HELP_MAP;
                     if (message.payload.widget.id == NEW_GAME_RATING)
                         helpDialogIndexLocal = GAME_HELP_RATING;
-                    if (message.payload.widget.id == DIALOG_BUTTON_2)
+                    if (message.payload.widget.id == GAME_DIALOG_OK)
                         helpDialogIndexLocal = GAME_HELP_OK;
-                    if (message.payload.widget.id == DIALOG_BUTTON_1)
+                    if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
                         NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
                 }
             } else {
                 switch (message.payload.widget.command) {
-                    case WIDGET_COMMAND_DESELECT:
+                    case WIDGET_NOTIFY_DESELECT:
                         switch (message.payload.widget.id) {
-                            case DIALOG_BUTTON_2:
+                            case GAME_DIALOG_OK:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
@@ -1151,7 +1151,7 @@ VA(0x0047734a, 0xdd1)
                                 gbNewGameDialogOver = true;
                                 return MESSAGE_DISPATCH_FORWARD;
 
-                            case DIALOG_BUTTON_1:
+                            case GAME_DIALOG_CANCEL:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
@@ -1176,7 +1176,7 @@ VA(0x0047734a, 0xdd1)
                         }
                         break;
 
-                    case WIDGET_COMMAND_SELECT:
+                    case WIDGET_NOTIFY_SELECT:
                         switch (message.payload.widget.id) {
                             case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
                             case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
@@ -1387,17 +1387,17 @@ VA(0x0047734a, 0xdd1)
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
                                         WIDGET_COMMAND_CLEAR_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = DIALOG_BUTTON_1;
+                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
                                     mapWindowMessageTemp.payload.widget.data.value =
-                                        GAME_WIDGET_INACTIVE_FRAME;
+                                        IDX(WIDGET_FLAG_ENABLED);
                                     gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
                                     gpGame->GetMap();
                                     mapWindowMessageTemp.type = MESSAGE_WIDGET;
                                     mapWindowMessageTemp.payload.widget.command =
                                         WIDGET_COMMAND_SET_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = DIALOG_BUTTON_1;
+                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
                                     mapWindowMessageTemp.payload.widget.data.value =
-                                        GAME_WIDGET_INACTIVE_FRAME;
+                                        IDX(WIDGET_FLAG_ENABLED);
                                     gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
                                     if (gbRemoteOn) {
                                         memcpy(
@@ -1869,7 +1869,7 @@ void game::ShowScenInfo(void) {
                                                          : WIDGET_COMMAND_SET_FLAGS;
         msg.payload.widget.id =
             NEW_GAME_PLAYER_SELECT_FIRST + playerCounter;
-        msg.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(msg);
 
         if (m_setupPlayerType[playerCounter] != GAME_PLAYER_DEFAULT
@@ -1898,7 +1898,7 @@ void game::ShowScenInfo(void) {
 
         msg.payload.widget.command =
             locked ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         window->BroadcastMessage(msg);
 
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -1912,7 +1912,7 @@ void game::ShowScenInfo(void) {
         msg.payload.widget.command =
             m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? WIDGET_COMMAND_CLEAR_FLAGS
                                                                           : WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         window->BroadcastMessage(msg);
 
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;

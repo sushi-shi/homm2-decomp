@@ -711,7 +711,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 if (message.payload.widget.id == WORLD_RADAR_WIDGET) {
                     if ((giViewWorldScale == VIEW_WORLD_SCALE_NEAR
                          && MAP_WIDTH <= MAP_DIMENSION_SMALL)
@@ -799,7 +799,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                     }
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case WORLD_SCALE_CONTROL:
                         gpAdvManager->VWCleanup();

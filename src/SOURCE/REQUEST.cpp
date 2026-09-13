@@ -18,6 +18,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
+#include <BASE/font.h>
 #include <BASE/dialog.h>
 
 H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
@@ -67,7 +68,6 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
     FILENAME_ENTRY_LIMIT        = 201,
     FILTER_FRAME_STEP           = 2,
     FILTER_FRAME_BASE           = 9,
-    SELECTED_FILL_COLOR         = 2,
     SCROLL_CENTER_DIVISOR       = 2,
 H2_ENUM_END(FileRequesterPrivateConstant)
 
@@ -459,9 +459,9 @@ void fileRequester::SetOK(i32 enabled) {
     SET_WIDGET_MESSAGE(
         message,
         enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
-        DIALOG_BUTTON_2
+        FILE_REQUESTER_OK
     );
-    message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAG_GRAYED);
+    message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
@@ -532,7 +532,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             break;
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case FILE_REQUESTER_SCROLL_UP:
                             if (m_topIndex > 0) {
@@ -549,7 +549,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 Update(1);
                             }
                             break;
-                        case DIALOG_BUTTON_2:
+                        case FILE_REQUESTER_OK:
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
@@ -563,14 +563,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             message.payload.widget.data.value = message.payload.widget.id;
                             acceptStep = true;
                             break;
-                        case DIALOG_BUTTON_1:
+                        case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
                             acceptStep = true;
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
                     if (HAS(
                             message.payload.widget.modifiers,
                             MESSAGE_MODIFIER_RIGHT_BUTTON
@@ -595,10 +595,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             case FILE_REQUESTER_FILENAME_ENTRY:
                                 helpIndexMouse = REQUESTER_HELP_FILENAME;
                                 break;
-                            case DIALOG_BUTTON_2:
+                            case FILE_REQUESTER_OK:
                                 helpIndexMouse = REQUESTER_HELP_OK;
                                 break;
-                            case DIALOG_BUTTON_1:
+                            case FILE_REQUESTER_CANCEL:
                                 helpIndexMouse = REQUESTER_HELP_CANCEL;
                                 break;
                             case FILE_REQUESTER_MAP_SIZE:
@@ -829,8 +829,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             SelectListItem:
                                 if (iResult + m_topIndex == m_selectedIndex) {
-                                    message.payload.widget.data.value = DIALOG_BUTTON_2;
-                                    message.payload.widget.id = DIALOG_BUTTON_2;
+                                    message.payload.widget.data.value = FILE_REQUESTER_OK;
+                                    message.payload.widget.id = FILE_REQUESTER_OK;
                                     acceptStep = true;
                                     break;
                                 }
@@ -850,7 +850,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
 
     if (acceptStep == 1) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
-            && message.payload.widget.data.value != DIALOG_BUTTON_1
+            && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
             && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
             && strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
             iResult =
@@ -935,13 +935,13 @@ void fileRequester::DoKnob(void) {
                     m_topIndex = topIndex;
                     Update(0);
                     m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                     oldTopIndex = topIndex;
                 } else {
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             } else {
-                m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
         Process1WindowsMessage();
@@ -1096,9 +1096,9 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_selectedIndex == m_topIndex + i) {
-            message.payload.widget.data.value = SELECTED_FILL_COLOR;
+            message.payload.widget.data.value = IDX(FONT_DRAW_YELLOW);
         } else {
-            message.payload.widget.data.value = 1;
+            message.payload.widget.data.value = IDX(FONT_DRAW_DEFAULT);
         }
         m_window->BroadcastMessage(message);
     }
@@ -1132,7 +1132,7 @@ void fileRequester::Update(i32 drawWindow) {
         m_scrollKnob->m_y = (fGutterMinY + m_topIndex * gutterStepCount1);
     }
     if (drawWindow) {
-        m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
 

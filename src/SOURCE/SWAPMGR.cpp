@@ -45,37 +45,36 @@ H2_ENUM_BEGIN(SwapManagerControl)
 H2_ENUM_END(SwapManagerControl)
 
 H2_ENUM_BEGIN(SwapManagerConstant)
-    WINDOW_TEXT_ID               = 0x15,
-    SPLIT_MODIFIER_MASK          = 3,
-    TITLE_WIDGET                 = 0x4d,
-    ADVENTURE_WIDGET_FIRST       = 1,
-    ADVENTURE_WIDGET_LAST        = 6,
-    ADVENTURE_DISABLE_VALUE      = 2,
-    EMPTY_SKILL_VALUE            = 4,
-    MONO_ICON_SKIP               = 2,
-    MONO_ICON_DEFAULT            = -1,
-    MANAGER_MESSAGE              = 0x100,
-    SLOT_NONE                    = -1,
-    ARTIFACT_COLUMN_COUNT        = 7,
-    FADE_STEPS                   = 8,
-    VIEW_FULL                    = 0,
-    VIEW_QUICK                   = 1,
-    CLOSE_REQUESTED              = 1,
-    SELECTOR_WIDTH               = 0x2e,
-    SELECTOR_HEIGHT              = 0x2e,
-    ARMY_SELECTOR_FRAME          = 3,
-    ARTIFACT_SELECTOR_FRAME      = 2,
-    EMPTY_ITEM_VALUE             = 4,
-    ARTIFACT_FIRST_ROW_LAST      = 6,
-    LEFT_PRIMARY_SKILL_FIRST     = 0x43,
-    RIGHT_PRIMARY_SKILL_FIRST    = 0x48,
-    LEFT_ARMY_COUNT_FIRST        = 0x74,
-    RIGHT_ARMY_COUNT_FIRST       = 0x79,
-    ARMY_VIEW_X                  = 0x77,
-    ARMY_VIEW_Y                  = 0x14,
-    SPLIT_WINDOW_X               = 0xb1,
-    SPLIT_WINDOW_Y               = 0x14,
-    SPLIT_TEXT_CONTROL           = 1,
+    SPLIT_CONFIRM             = DIALOG_BUTTON_2,
+    CONTROL_CLOSE             = DIALOG_BUTTON_0,
+    WINDOW_TEXT_ID            = 0x15,
+    SPLIT_MODIFIER_MASK       = 3,
+    TITLE_WIDGET              = 0x4d,
+    ADVENTURE_WIDGET_FIRST    = 1,
+    ADVENTURE_WIDGET_LAST     = 6,
+    MONO_ICON_SKIP            = 2,
+    MONO_ICON_DEFAULT         = -1,
+    MANAGER_MESSAGE           = 0x100,
+    SLOT_NONE                 = -1,
+    ARTIFACT_COLUMN_COUNT     = 7,
+    FADE_STEPS                = 8,
+    VIEW_FULL                 = 0,
+    VIEW_QUICK                = 1,
+    CLOSE_REQUESTED           = 1,
+    SELECTOR_WIDTH            = 0x2e,
+    SELECTOR_HEIGHT           = 0x2e,
+    ARMY_SELECTOR_FRAME       = 3,
+    ARTIFACT_SELECTOR_FRAME   = 2,
+    ARTIFACT_FIRST_ROW_LAST   = 6,
+    LEFT_PRIMARY_SKILL_FIRST  = 0x43,
+    RIGHT_PRIMARY_SKILL_FIRST = 0x48,
+    LEFT_ARMY_COUNT_FIRST     = 0x74,
+    RIGHT_ARMY_COUNT_FIRST    = 0x79,
+    ARMY_VIEW_X               = 0x77,
+    ARMY_VIEW_Y               = 0x14,
+    SPLIT_WINDOW_X            = 0xb1,
+    SPLIT_WINDOW_Y            = 0x14,
+    SPLIT_TEXT_CONTROL        = 1,
 H2_ENUM_END(SwapManagerConstant)
 
 VA(0x004a2260, 0x79)
@@ -106,7 +105,7 @@ void swapManager::Reset(void) {
 
 VA(0x004a2349, 0x25)
 i32 swapManager::DrawSwapWin(void) {
-    m_window->DrawWindow(0);
+    m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     gpWindowManager->UpdateScreen();
     return 0;
 }
@@ -167,7 +166,7 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                 message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = EMPTY_SKILL_VALUE;
+                message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                 m_window->BroadcastMessage(message);
             }
         }
@@ -299,15 +298,15 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     if (quickView_9)
                         break;
-                    if (message.payload.widget.id == DIALOG_BUTTON_0)
+                    if (message.payload.widget.id == CONTROL_CLOSE)
                         closeRequested_5 = true;
                     break;
 
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
                     switch (message.payload.widget.id) {
                         case CONTROL_LEFT_SKILL_FIRST:
                         case CONTROL_LEFT_SKILL_FIRST + 1:
@@ -807,10 +806,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_LEFT_ARMY_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -823,10 +822,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + LEFT_ARMY_COUNT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
@@ -839,10 +838,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_RIGHT_ARMY_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -855,10 +854,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + RIGHT_ARMY_COUNT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
@@ -871,10 +870,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_LEFT_ARTIFACT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -887,10 +886,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_RIGHT_ARTIFACT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -950,7 +949,7 @@ void swapManager::SplitMons(void) {
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
     delete gpTownManager->m_heroWindow1;
 
-    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
+    if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
         if (targetTroops->m_creatureTypes[m_targetSlot]
             == selectedArmy->m_creatureTypes[m_selectedSlot]) {
             selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;

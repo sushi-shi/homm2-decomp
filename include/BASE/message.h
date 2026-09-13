@@ -28,35 +28,40 @@ H2_ENUM_CLASS_END(MessageType)
 H2_ENUM_FLAGS(MessageType)
 
 H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
-    WIDGET_COMMAND_DRAW                       = 2,
-    WIDGET_COMMAND_SET_TEXT                   = 3,
-    WIDGET_COMMAND_SET_FRAME                  = 4,
-    WIDGET_COMMAND_SET_FLAGS                  = 5,
-    WIDGET_COMMAND_CLEAR_FLAGS                = 6,
-    WIDGET_COMMAND_GET_TEXT                   = 7,
-    WIDGET_COMMAND_SET_FILL_COLOR             = 8,
-    WIDGET_COMMAND_SET_ICON                   = 9,
-    WIDGET_COMMAND_DIALOG_SELECT              = 10,
-    WIDGET_COMMAND_SELECT                     = 12,
-    WIDGET_COMMAND_DESELECT                   = 13,
-    WIDGET_COMMAND_ALTERNATE_SELECT           = 14,
-    WIDGET_COMMAND_REMOTE_WAIT_EXIT           = 16,
-    WIDGET_COMMAND_SET_MAX_LENGTH             = 0x33,
-    WIDGET_COMMAND_SET_X                      = 0x34,
-    WIDGET_COMMAND_SET_Y                      = 0x35,
-    WIDGET_COMMAND_SET_SELECTION              = 0x36,
-    WIDGET_COMMAND_GET_SELECTION              = 0x37,
-    WIDGET_COMMAND_APPEND_ITEM                = 0x38,
-    WIDGET_COMMAND_REPLACE_ITEM               = 0x39,
-    WIDGET_COMMAND_DELETE_ITEM                = 0x3a,
-    WIDGET_COMMAND_CLEAR_ITEMS                = 0x3b,
-    WIDGET_COMMAND_REPLACE_ICON               = 0x3c,
-    WIDGET_COMMAND_SET_WIDTH                  = 0x3d
+    WIDGET_COMMAND_DRAW             = 2,
+    WIDGET_COMMAND_SET_TEXT         = 3,
+    WIDGET_COMMAND_SET_FRAME        = 4,
+    WIDGET_COMMAND_SET_FLAGS        = 5,
+    WIDGET_COMMAND_CLEAR_FLAGS      = 6,
+    WIDGET_COMMAND_GET_TEXT         = 7,
+    // Icon widgets use a palette index; text widgets use FontDrawMode.
+    WIDGET_COMMAND_SET_FILL_COLOR   = 8,
+    WIDGET_COMMAND_SET_ICON         = 9,
+    WIDGET_COMMAND_DIALOG_SELECT    = 10,
+    // Notifications forwarded by widgets, not commands sent to change their state.
+    // SELECT covers button selection, list selection and completed text editing.
+    WIDGET_NOTIFY_SELECT            = 12,
+    // DESELECT includes pointer departure and repeat timing, not just button-up.
+    WIDGET_NOTIFY_DESELECT          = 13,
+    // Emitted on right-button-down; the receiving screen decides whether to show help.
+    WIDGET_NOTIFY_RIGHT_CLICK       = 14,
+    WIDGET_COMMAND_REMOTE_WAIT_EXIT = 16,
+    WIDGET_COMMAND_SET_MAX_LENGTH   = 0x33,
+    WIDGET_COMMAND_SET_X            = 0x34,
+    WIDGET_COMMAND_SET_Y            = 0x35,
+    WIDGET_COMMAND_SET_SELECTION    = 0x36,
+    WIDGET_COMMAND_GET_SELECTION    = 0x37,
+    WIDGET_COMMAND_APPEND_ITEM      = 0x38,
+    WIDGET_COMMAND_REPLACE_ITEM     = 0x39,
+    WIDGET_COMMAND_DELETE_ITEM      = 0x3a,
+    WIDGET_COMMAND_CLEAR_ITEMS      = 0x3b,
+    WIDGET_COMMAND_REPLACE_ICON     = 0x3c,
+    WIDGET_COMMAND_SET_WIDTH        = 0x3d
 H2_ENUM_CLASS_END(BaseWidgetCommand)
 
-// Command only: callers retain type, button and routing policy checks.
-#define IS_WIDGET_SELECTION_COMMAND(command) \
-    ((command) == WIDGET_COMMAND_SELECT || (command) == WIDGET_COMMAND_ALTERNATE_SELECT)
+// Notification only: callers retain type, button and routing policy checks.
+#define IS_WIDGET_SELECTION_NOTIFICATION(command) \
+    ((command) == WIDGET_NOTIFY_SELECT || (command) == WIDGET_NOTIFY_RIGHT_CLICK)
 
 H2_ENUM_CLASS_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_NONE                   = 0,

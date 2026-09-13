@@ -5,35 +5,44 @@
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-H2_ENUM_BEGIN(RemoteConstant)
-    REMOTE_QUEUE_CAPACITY                = 128,
-    REMOTE_QUEUE_STORAGE_COUNT           = 138,
-    REMOTE_RECENT_ID_COUNT               = 30,
-    REMOTE_NET_NAME_SIZE                 = 32,
-    REMOTE_ENCODED_BUFFER_SIZE           = 268,
-    REMOTE_RECEIVE_BUFFER_SIZE           = 266,
-    REMOTE_TRANSPORT_BUFFER_SIZE         = 268,
-    REMOTE_PACKET_HEADER_SIZE            = 6,
-    REMOTE_BROADCAST_PLAYER              = 0x7f,
+H2_ENUM_BEGIN(RemoteStorageConstant)
+    REMOTE_QUEUE_CAPACITY        = 128,
+    REMOTE_QUEUE_STORAGE_COUNT   = 138,
+    REMOTE_RECENT_ID_COUNT       = 30,
+    REMOTE_NET_NAME_SIZE         = 32,
+    REMOTE_ENCODED_BUFFER_SIZE   = 268,
+    REMOTE_RECEIVE_BUFFER_SIZE   = 266,
+    REMOTE_TRANSPORT_BUFFER_SIZE = 268,
+    REMOTE_BAUD_RATE_COUNT       = 7,
+    REMOTE_IRQ_COUNT             = 7,
+    REMOTE_ERROR_TEXT_SIZE       = 200,
+H2_ENUM_END(RemoteStorageConstant)
+
+H2_ENUM_BEGIN(RemotePacketEncodingConstant)
+    REMOTE_PACKET_HEADER_SIZE     = 6,
+    REMOTE_BROADCAST_PLAYER       = 0x7f,
+    REMOTE_HEARTBEAT_MESSAGE_SIZE = 10,
+    REMOTE_HEARTBEAT_CONTROL_FLAG = 0x80,
+    REMOTE_HEARTBEAT_PLAYER_SHIFT = 4,
+    REMOTE_HEARTBEAT_PHASE_MASK   = 0x0f,
+H2_ENUM_END(RemotePacketEncodingConstant)
+
+H2_ENUM_BEGIN(RemoteTransportTimingConstant)
     REMOTE_RETRY_COUNT                   = 25,
     REMOTE_CONFIRM_POLL_COUNT            = 50,
-    REMOTE_BAUD_RATE_COUNT               = 7,
-    REMOTE_IRQ_COUNT                     = 7,
     REMOTE_CONFIRM_POLL_DELAY            = 20,
     REMOTE_SEND_RETRY_DELAY              = 1000,
     REMOTE_HEARTBEAT_INTERVAL            = 5000,
-    REMOTE_HEARTBEAT_MESSAGE_SIZE        = 10,
-    REMOTE_HEARTBEAT_CONTROL_FLAG        = 0x80,
-    REMOTE_HEARTBEAT_PLAYER_SHIFT        = 4,
-    REMOTE_HEARTBEAT_PHASE_MASK          = 0x0f,
-    REMOTE_ERROR_TEXT_SIZE               = 200,
     REMOTE_HOST_TIMEOUT                  = 60000,
     REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT = 30000,
     REMOTE_GUEST_TIMEOUT                 = 60000,
     REMOTE_CHAIN_TIMEOUT                 = 90000,
     REMOTE_INITIAL_HEARTBEAT             = 1999999999,
-    REMOTE_ORDER_SENTINEL                = 999999999
-H2_ENUM_END(RemoteConstant)
+H2_ENUM_END(RemoteTransportTimingConstant)
+
+H2_ENUM_BEGIN(RemoteQueueSentinel)
+    REMOTE_ORDER_SENTINEL = 999999999,
+H2_ENUM_END(RemoteQueueSentinel)
 
 #pragma pack(push, 1)
 struct RemotePacketHeader {

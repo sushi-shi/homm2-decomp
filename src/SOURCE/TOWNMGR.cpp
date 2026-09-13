@@ -50,7 +50,14 @@
 
 namespace {
 
+    H2_ENUM_BEGIN(TownDialogResult)
+        DIALOG_CANCEL_ID = DIALOG_BUTTON_1,
+    H2_ENUM_END(TownDialogResult)
+
     H2_ENUM_BEGIN(TownManagerInputCode)
+        DIALOG_BUY_SPELL_BOOK = DIALOG_BUTTON_5,
+        DIALOG_BUILD_BOAT = DIALOG_BUTTON_2,
+        CONTROL_CLOSE = DIALOG_BUTTON_0,
         CONTROL_PREVIOUS_TOWN = 0x387,
         CONTROL_NEXT_TOWN = 0x388,
     H2_ENUM_END(TownManagerInputCode)
@@ -713,17 +720,21 @@ void townManager::SetupTown(void) {
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(0, TOWN_WINDOW_DRAW_WIDTH, TOWN_WINDOW_DRAW_RIGHT);
+    m_townWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        TOWN_NAVIGATION_DRAW_FIRST_WIDGET,
+        TOWN_NAVIGATION_DRAW_LAST_WIDGET
+    );
 
     if (gpCurPlayer->m_townCount == 1) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEXT_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = TOWN_WIDGET_ENABLED_VALUE;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEXT_TOWN;
@@ -997,7 +1008,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
 
     m_command = ARMY_COMMAND_NONE;
     switch (objectId) {
-        case DIALOG_BUTTON_0:
+        case CONTROL_CLOSE:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
             break;
         case TOWN_WIDGET_ID_NONE:
@@ -1154,7 +1165,11 @@ void townManager::ShowText(char*) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(TOWN_STATUS_DRAW_LEFT, TOWN_STATUS_DRAW_WIDTH, TOWN_STATUS_DRAW_RIGHT);
+    m_townWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        TOWN_STATUS_DRAW_FIRST_WIDGET,
+        TOWN_STATUS_DRAW_LAST_WIDGET
+    );
     gpWindowManager->UpdateScreenRegion(
         TOWN_STATUS_REGION_X,
         TOWN_STATUS_REGION_Y,
@@ -1206,8 +1221,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT: {
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK: {
                     switch (message.payload.widget.id) {
                         case IDX(TOWN_OBJECT_DWELLING_1):
                         case IDX(TOWN_OBJECT_DWELLING_2):
@@ -1284,7 +1299,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     hero* H2_UNUSED(townHero) =
                                         gpGame->GetHero(m_town->m_occupyingHeroId);
                                     i32 width = TOWN_VIEW_FIZZLE_WIDTH;
-                                    m_townWindow->DrawWindow(0);
+                                    m_townWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
                                     gpWindowManager->FizzleForward(
@@ -1375,7 +1390,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             0
                                         );
                                         if (gpWindowManager->m_dialogResult
-                                            == DIALOG_BUTTON_5) {
+                                            == DIALOG_BUY_SPELL_BOOK) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
@@ -1497,8 +1512,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_SET_FLAGS,
-                                    DIALOG_BUTTON_0,
-                                    TOWN_INTERFACE_BROADCAST_FLAGS
+                                    CONTROL_CLOSE,
+                                    IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
                                 );
                                 if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
                                     && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)
@@ -1519,9 +1534,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         SET_WIDGET_MESSAGE(
                                             message,
                                             WIDGET_COMMAND_SET_FLAGS,
-                                            DIALOG_BUTTON_2
+                                            DIALOG_BUILD_BOAT
                                         );
-                                        message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
+                                        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                                         message.payload.widget.data.value =
@@ -1531,7 +1546,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     gpWindowManager
                                         ->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
                                     delete m_heroWindow0;
-                                    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
+                                    if (gpWindowManager->m_dialogResult == DIALOG_BUILD_BOAT) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(BUILDING_SLOT_DISABLED_FIRST);
@@ -1562,8 +1577,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_CLEAR_FLAGS,
-                                    DIALOG_BUTTON_0,
-                                    TOWN_INTERFACE_BROADCAST_FLAGS
+                                    CONTROL_CLOSE,
+                                    IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
                                 );
                             }
                             break;
@@ -1642,7 +1657,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case DIALOG_BUTTON_0:
+                        case CONTROL_CLOSE:
                             if (!quickView)
                                 SetCommandAndText(message);
                             break;
@@ -1710,9 +1725,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                     break;
                 }
 
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case DIALOG_BUTTON_0:
+                        case CONTROL_CLOSE:
                             if (quickView)
                                 break;
                             ++leaveTown;
@@ -1817,7 +1832,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
                 m_selectedArmySlot
             );
             m_bankBox->Update(1);
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
+            if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
                 m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot] = CREATURE_NONE;
                 m_selectedStrip->m_army->m_creatureCounts[m_selectedArmySlot] = 0;
             }
@@ -1878,7 +1893,7 @@ void townManager::RedrawTownScreen(void) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(0);
+    m_townWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     m_garrisonStrip->DrawIcons(0);
     m_heroStrip->DrawIcons(0);
     m_bankBox->Update(0);
@@ -1919,7 +1934,7 @@ void townManager::SplitArmy(void) {
     m_heroWindow1->BroadcastMessage(message);
     gpWindowManager->DoDialog(m_heroWindow1, SplitArmyHandler, 0);
     delete m_heroWindow1;
-    if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
+    if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
         sameType = false;
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
@@ -1975,7 +1990,8 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
         m_townObjects[index]->Draw(drawFlags);
         PollSound();
     }
-    m_townWindow->DrawWindow(0, TOWN_REDRAW_FIRST_CONTROL, TOWN_REDRAW_LAST_CONTROL);
+    m_townWindow
+        ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, TOWN_REDRAW_FIRST_CONTROL, TOWN_REDRAW_LAST_CONTROL);
     PollSound();
     if (updateScreen != 0)
         BlitBitmapToScreen(
@@ -2287,18 +2303,18 @@ i32 townManager::BuyBuild(
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            DIALOG_BUTTON_0,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            CONTROL_CLOSE,
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     m_selectedBuilding = BUILDING_SLOT_NONE;
     if (quickView != 0) {
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message_m.payload.widget.id = DIALOG_BUTTON_2;
+        message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message_m.payload.widget.id = IDX(DIALOG_BUTTON_1);
+        message_m.payload.widget.id = IDX(DIALOG_CANCEL_ID);
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
@@ -2310,16 +2326,16 @@ i32 townManager::BuyBuild(
     } else {
         if (cannotBuy != 0) {
             message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message_m.payload.widget.id = DIALOG_BUTTON_2;
+            message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
             message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             window_a->BroadcastMessage(message_m);
             message_m.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message_m.payload.widget.id = DIALOG_BUTTON_2;
-            message_m.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
+            message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
+            message_m.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
             window_a->BroadcastMessage(message_m);
         }
         gpWindowManager->DoDialog(window_a, TrueFalseDialogHandler, 0);
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_2) {
+        if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
             m_selectedBuilding = building;
             for (index_h = 0; index_h < resourceCount_a; ++index_h)
                 gpCurPlayer->m_resources[resourceTypes_o[index_h]] -= costs_e[index_h];
@@ -2329,14 +2345,14 @@ i32 townManager::BuyBuild(
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            DIALOG_BUTTON_0,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            CONTROL_CLOSE,
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     delete window_a;
     if (quickView != 0) {
         return 0;
     } else {
-        return gpWindowManager->m_dialogResult == DIALOG_BUTTON_2;
+        return gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM;
     }
 }
 
@@ -2430,8 +2446,8 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            DIALOG_BUTTON_0,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            CONTROL_CLOSE,
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
         RedrawTownScreen();
     }
@@ -2560,8 +2576,8 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 quickView_i = HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON);
                 spellSlot_b = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
@@ -2633,15 +2649,15 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_heroWindow1->BroadcastMessage(message_e);
         message_e.payload.widget.id = RECRUIT_BUTTON_ICON_CONTROL;
         m_heroWindow1->BroadcastMessage(message_e);
-        message_e.payload.widget.id = DIALOG_BUTTON_2;
+        message_e.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(message_e);
         message_e.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message_e.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
+        message_e.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         message_e.payload.widget.id = RECRUIT_BUTTON_TEXT_CONTROL;
         m_heroWindow1->BroadcastMessage(message_e);
         message_e.payload.widget.id = RECRUIT_BUTTON_ICON_CONTROL;
         m_heroWindow1->BroadcastMessage(message_e);
-        message_e.payload.widget.id = DIALOG_BUTTON_2;
+        message_e.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(message_e);
     }
 
@@ -2735,8 +2751,8 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        DIALOG_BUTTON_0,
-        TOWN_INTERFACE_BROADCAST_FLAGS
+        CONTROL_CLOSE,
+        IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
     m_recruitHero->m_owner = -1;
     if (m_recruitState != -1)
@@ -2751,11 +2767,11 @@ MessageDispatchResult TavernHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case DIALOG_BUTTON_0:
                     case DIALOG_BUTTON_1:
-                    case DIALOG_BUTTON_2:
+                    case TOWN_DIALOG_CONFIRM:
                         FINISH_DIALOG_MESSAGE(message);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
@@ -2813,7 +2829,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_AMOUNT_CONTROL:
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -2826,7 +2842,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                         goto update_amount;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_INCREASE_CONTROL:
                         ++gpTownManager->m_splitAmount;
@@ -2844,11 +2860,11 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         handled_c = true;
                         break;
-                    case DIALOG_BUTTON_2:
+                    case TOWN_DIALOG_CONFIRM:
                         if (gpTownManager->m_splitAmount == 0)
-                            gpWindowManager->m_dialogResult = IDX(DIALOG_BUTTON_1);
+                            gpWindowManager->m_dialogResult = IDX(DIALOG_CANCEL_ID);
                         else
-                            gpWindowManager->m_dialogResult = IDX(DIALOG_BUTTON_2);
+                            gpWindowManager->m_dialogResult = IDX(TOWN_DIALOG_CONFIRM);
                         handled_c = true;
                         break;
                     default:
@@ -2870,8 +2886,11 @@ update_amount:
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_SPLIT_AMOUNT_CONTROL);
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpTownManager->m_heroWindow1
-        ->DrawWindow(1, TOWN_SPLIT_AMOUNT_CONTROL, TOWN_SPLIT_AMOUNT_CONTROL);
+    gpTownManager->m_heroWindow1->DrawWindow(
+        WINDOW_DRAW_UPDATE_SCREEN,
+        TOWN_SPLIT_AMOUNT_CONTROL,
+        TOWN_SPLIT_AMOUNT_CONTROL
+    );
     return MESSAGE_DISPATCH_CONSUME;
 }
 

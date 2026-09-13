@@ -26,6 +26,7 @@
 #include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(CastleControl)
+    CONTROL_CLOSE                              = DIALOG_BUTTON_0,
     CONTROL_BUILDING_OVERLAY_FIRST             = 400,
     CONTROL_STATUS_FIRST                       = 500,
     CONTROL_BUILDING_NAME_FIRST                = 600,
@@ -658,7 +659,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             );
                         }
                         break;
-                    case DIALOG_BUTTON_0:
+                    case CONTROL_CLOSE:
                         strcpy(gText, cCastleInfo[IDX(INFO_EXIT)]);
                         break;
                     default:
@@ -671,7 +672,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
-        gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
+        gpTownManager->m_heroWindow0
+            ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
         gpWindowManager
             ->UpdateScreenRegion(INTERFACE_X, INTERFACE_Y, INTERFACE_WIDTH, INTERFACE_HEIGHT);
         return MESSAGE_DISPATCH_CONSUME;
@@ -679,12 +681,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
-                if (message.payload.widget.id == DIALOG_BUTTON_0)
+            case WIDGET_NOTIFY_DESELECT:
+                if (message.payload.widget.id == CONTROL_CLOSE)
                     ret = 1;
                 break;
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 quickFlag = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
                 switch (whichBuilding) {
 

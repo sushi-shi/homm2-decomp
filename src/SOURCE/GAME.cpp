@@ -61,6 +61,11 @@
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
     0.66
 
+H2_ENUM_BEGIN(ViewArmyControlId)
+    VIEW_ARMY_UPGRADE_ID    = DIALOG_BUTTON_3,
+    VIEW_ARMY_QUICK_VIEW_ID = DIALOG_BUTTON_0,
+H2_ENUM_END(ViewArmyControlId)
+
 H2_ENUM_BEGIN(MapTilesetConstant)
     WAGON_CAMP_ACTIVE_FRAME = 129
 H2_ENUM_END(MapTilesetConstant)
@@ -564,8 +569,6 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_ICON_ID_10              = 110,
     VIEW_SPELL_ICON_ID_11              = 111,
     VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_AVAILABLE_COLOR         = 1,
-    VIEW_SPELL_UNAVAILABLE_COLOR       = 3,
     VIEW_SPELL_NAME_WIDTH              = 78,
     VIEW_SPELL_MANA_MAX                = 999,
     VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
@@ -3205,9 +3208,9 @@ void game::UpdateSpellWidgets(void) {
             );
             SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FILL_COLOR, i + VIEW_SPELL_TEXT_ID_BASE);
             if (GetManaCost(spell1, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
-                message.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
+                message.payload.widget.data.value = IDX(FONT_DRAW_DIMMED);
             else
-                message.payload.widget.data.value = VIEW_SPELL_AVAILABLE_COLOR;
+                message.payload.widget.data.value = IDX(FONT_DRAW_DEFAULT);
             m_viewSpellsWindow->BroadcastMessage(message);
 
             lines = smallFont->LineLength(gSpellNames[IDX(spell1)], VIEW_SPELL_NAME_WIDTH);
@@ -3263,8 +3266,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     }
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
-                if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+            case WIDGET_NOTIFY_DESELECT:
+                if (msg.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK
                     || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
                     break;
                 {
@@ -3318,9 +3321,9 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                     }
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
-                if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
+                if (msg.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK
                     || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
                     switch (msg.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
@@ -3742,13 +3745,13 @@ void game::ViewArmy(
     if (disableUpgrade) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = DIALOG_BUTTON_3;
+        message.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (quickView) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = DIALOG_BUTTON_0;
+        message.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (numTroops < 1) {
@@ -3840,7 +3843,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
 
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (msg.payload.widget.id) {
                     case DIALOG_BUTTON_0:
                     case DIALOG_BUTTON_1:
@@ -3941,7 +3944,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
             viewArmyBaseX
             + viewArmyFacingWIPXMod * sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        gpGame->m_viewArmyWindow->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
@@ -4109,8 +4112,8 @@ void game::NextPlayer(void) {
     i32 index;
     i32 H2_UNUSED(humansAlive);
 
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
@@ -4368,7 +4371,7 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
-        m_heroRecs[player].m_eventFlags &= ~WEEKLY_HERO_RESERVED_FLAG;
+        m_heroRecs[player].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_GOLD; resource8++) {
@@ -4499,7 +4502,7 @@ void game::PerWeek(void) {
                 if (HAS(gpGame
                             ->m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                             .m_eventFlags,
-                        WEEKLY_HERO_RESERVED_FLAG))
+                        HERO_EVENT_RESERVED_FOR_RECRUITMENT))
                     continue;
             }
             {
@@ -4648,8 +4651,8 @@ void game::PerWeek(void) {
 
     for (outerIndex = 0; outerIndex < GAME_HERO_COUNT; outerIndex++) {
         weeklyHero = &m_heroRecs[outerIndex];
-        if (HAS(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
-            H2_ENUM_CLEAR_FLAG(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG);
+        if (HAS(weeklyHero->m_eventFlags, HERO_EVENT_STABLES))
+            H2_ENUM_CLEAR_FLAG(weeklyHero->m_eventFlags, HERO_EVENT_STABLES);
     }
 
     m_week++;

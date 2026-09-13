@@ -17,35 +17,34 @@
 #include <BASE/display.h>
 
 H2_ENUM_BEGIN(ArenaConstant)
-    CHOICE_COUNT            = 3,
-    WINDOW_RESOURCE         = 5,
-    WINDOW_WIDTH            = 306,
-    WINDOW_BASE_HEIGHT      = 180,
-    WINDOW_ROW_HEIGHT       = 45,
-    WINDOW_X                = 159,
-    WINDOW_MAX_Y            = 28,
-    WINDOW_CENTER_DIVISOR   = 2,
-    WINDOW_NAME_SIZE        = 16,
-    TEXT_WIDTH              = 244,
-    TEXT_LINE_HEIGHT        = 16,
-    TEXT_LINE_SHIFT         = 4,
-    ICON_FIRST_X            = 84,
-    TEXT_FIRST_X            = 79,
-    WIDGET_X_STEP           = 60,
-    ICON_Y                  = 244,
-    ICON_WIDTH              = 39,
-    ICON_HEIGHT             = 34,
-    TEXT_Y                  = 282,
-    TEXT_WIDTH_PIXELS       = 49,
-    TEXT_HEIGHT             = 24,
-    WIDGET_FIRST_ID         = 100,
-    WIDGET_LAST_ID          = 102,
-    SELECTED_FRAME_OFFSET   = 4,
-    TEXT_BACKGROUND         = -1,
-    CYCLE_KEY               = 15,
-    BROADCAST_TEXT_ID       = 1,
-    BROADCAST_CONTROL_VALUE = 6,
-    DRAW_MODE               = 1
+    CHOICE_COUNT          = 3,
+    WINDOW_RESOURCE       = 5,
+    WINDOW_WIDTH          = 306,
+    WINDOW_BASE_HEIGHT    = 180,
+    WINDOW_ROW_HEIGHT     = 45,
+    WINDOW_X              = 159,
+    WINDOW_MAX_Y          = 28,
+    WINDOW_CENTER_DIVISOR = 2,
+    WINDOW_NAME_SIZE      = 16,
+    TEXT_WIDTH            = 244,
+    TEXT_LINE_HEIGHT      = 16,
+    TEXT_LINE_SHIFT       = 4,
+    ICON_FIRST_X          = 84,
+    TEXT_FIRST_X          = 79,
+    WIDGET_X_STEP         = 60,
+    ICON_Y                = 244,
+    ICON_WIDTH            = 39,
+    ICON_HEIGHT           = 34,
+    TEXT_Y                = 282,
+    TEXT_WIDTH_PIXELS     = 49,
+    TEXT_HEIGHT           = 24,
+    WIDGET_FIRST_ID       = 100,
+    WIDGET_LAST_ID        = 102,
+    SELECTED_FRAME_OFFSET = 4,
+    TEXT_BACKGROUND       = -1,
+    CYCLE_KEY             = 15,
+    BROADCAST_TEXT_ID     = 1,
+    DRAW_MODE             = 1
 H2_ENUM_END(ArenaConstant)
 
 VA(0x004b2ba0, 0x3bb)
@@ -125,7 +124,7 @@ i32 DoArenaDialog(void) {
 
     message14.type = MESSAGE_WIDGET;
     message14.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message14.payload.widget.data.value = BROADCAST_CONTROL_VALUE;
+    message14.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     message14.payload.widget.id = DIALOG_BUTTON_7;
     arenaWinPtr->BroadcastMessage(message14);
     message14.payload.widget.id = DIALOG_BUTTON_8;
@@ -171,8 +170,8 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         }
     } else if (message_1.type == MESSAGE_WIDGET) {
         switch (message_1.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 extra_18 = NORMAL_DIALOG_NO_VALUE;
                 type_13 = NORMAL_DIALOG_NO_RESOURCE;
                 if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
@@ -187,7 +186,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
                 }
                 break;
 
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message_1.payload.widget.id) {
                     case WIDGET_FIRST_ID:
                     case WIDGET_FIRST_ID + 1:

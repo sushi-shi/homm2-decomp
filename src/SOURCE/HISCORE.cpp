@@ -4,6 +4,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/highScoreManager.h>
+#include <BASE/font.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
 #include <BASE/widget.h>
@@ -81,7 +82,11 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
                 + HIGH_SCORE_MONSTER_ACTIVE_FRAME_OFFSET;
             m_window->BroadcastMessage(windowMessage);
         }
-        m_window->DrawWindow(HIGH_SCORE_DRAW_X, HIGH_SCORE_DRAW_Y, HIGH_SCORE_DRAW_HEIGHT);
+        m_window->DrawWindow(
+            WINDOW_DRAW_BUFFER_ONLY,
+            HIGH_SCORE_ANIMATED_WIDGET_FIRST,
+            HIGH_SCORE_ANIMATED_WIDGET_LAST
+        );
         gpWindowManager->UpdateScreenRegion(
             HIGH_SCORE_UPDATE_X,
             HIGH_SCORE_UPDATE_Y,
@@ -96,15 +101,15 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case HIGH_SCORE_STANDARD_BUTTON:
                         case HIGH_SCORE_CAMPAIGN_BUTTON:
                             m_showCampaignScores = 1 - m_showCampaignScores;
                             Update();
-                            m_window->DrawWindow(1);
+                            m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN);
                             break;
-                        case DIALOG_BUTTON_0:
+                        case HIGH_SCORE_CLOSE_BUTTON:
                             message.payload.widget.data.value = message.payload.widget.id;
                             result = true;
                             break;
@@ -156,14 +161,14 @@ void highScoreManager::Update(void) {
         m_showCampaignScores ? HIGH_SCORE_CAMPAIGN_BUTTON : HIGH_SCORE_STANDARD_BUTTON
     );
     hsMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
+    hsMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_window->BroadcastMessage(hsMessage);
 
     hsMessage.payload.widget.id = static_cast<i16>(
         m_showCampaignScores ? HIGH_SCORE_STANDARD_BUTTON : HIGH_SCORE_CAMPAIGN_BUTTON
     );
     hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
+    hsMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_window->BroadcastMessage(hsMessage);
 
     for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
@@ -189,10 +194,10 @@ void highScoreManager::Update(void) {
             highScore.score == HIGH_SCORE_EMPTY ? WIDGET_COMMAND_CLEAR_FLAGS
                                                  : WIDGET_COMMAND_SET_FLAGS;
         hsMessage.payload.widget.id = rank + HIGH_SCORE_FIRST_MONSTER_WIDGET;
-        hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
+        hsMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(hsMessage);
         hsMessage.payload.widget.id = rank + HIGH_SCORE_FIRST_SHADOW_WIDGET;
-        hsMessage.payload.widget.data.value = HIGH_SCORE_WIDGET_DEFAULT_VALUE;
+        hsMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(hsMessage);
 
         if (highScore.score != HIGH_SCORE_EMPTY) {
@@ -275,27 +280,27 @@ void highScoreManager::Update(void) {
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCENARIO_OFFSET;
         if (m_showCampaignScores)
-            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_SCENARIO_RESIZE;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_SCENARIO_X;
         else
-            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_SCENARIO_RESIZE;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_SCENARIO_X;
         m_window->BroadcastMessage(hsMessage);
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_RATING_OFFSET;
         if (m_showCampaignScores)
-            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_RATING_RESIZE;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_RATING_X;
         else
-            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_RATING_RESIZE;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_RATING_X;
         m_window->BroadcastMessage(hsMessage);
 
         if (giHighScoreRank == rank) {
             if (!((!m_showCampaignScores || giHighScoreType == HIGH_SCORE_STANDARD)
                   && (m_showCampaignScores || giHighScoreType != HIGH_SCORE_STANDARD))) {
                 hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-                hsMessage.payload.widget.data.value = HIGH_SCORE_SECONDARY_SELECTION_FRAME;
+                hsMessage.payload.widget.data.value = IDX(FONT_DRAW_YELLOW);
             } else {
                 hsMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-                hsMessage.payload.widget.data.value = HIGH_SCORE_PRIMARY_SELECTION_FRAME;
+                hsMessage.payload.widget.data.value = IDX(FONT_DRAW_DEFAULT);
             }
             hsMessage.payload.widget.id =
                 rank * HIGH_SCORE_TEXT_WIDGET_STRIDE + HIGH_SCORE_FIRST_TEXT_WIDGET;

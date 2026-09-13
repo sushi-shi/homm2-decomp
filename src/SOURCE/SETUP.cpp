@@ -20,21 +20,23 @@
 #include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(SetupConstant)
-    WINDOW_X = 405,
-    WINDOW_Y = 8,
-    PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
-    PLAYER_NAME_LENGTH = GLOBAL_PLAYER_NAME_SIZE - 1,
+    DIALOG_YES                   = DIALOG_BUTTON_5,
+    DIALOG_CANCEL                = DIALOG_BUTTON_1,
+    WINDOW_X                     = 405,
+    WINDOW_Y                     = 8,
+    PLAYER_COUNT                 = IDX(GAME_PLAYER_COUNT),
+    PLAYER_NAME_LENGTH           = GLOBAL_PLAYER_NAME_SIZE - 1,
     DEFAULT_PLAYER_NAME_CAPACITY = 24,
-    MODEM_INIT_ENTRY_LENGTH = 40,
-    TELEPHONE_ENTRY_LENGTH = MODEM_NUMBER_BUFFER_SIZE - 1,
-    FILE_PATTERN_CAPACITY = 12,
-    FILE_REQUESTER_X = 200,
-    FILE_REQUESTER_Y = 58,
-    DISABLED_WIDGET_ID = 1,
-    CAMPAIGN_INTRO = 4,
-    CAMPAIGN_SELECTION = 35,
-    HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
-    DIALOG_RESULT_MAX = 1000,
+    MODEM_INIT_ENTRY_LENGTH      = 40,
+    TELEPHONE_ENTRY_LENGTH       = MODEM_NUMBER_BUFFER_SIZE - 1,
+    FILE_PATTERN_CAPACITY        = 12,
+    FILE_REQUESTER_X             = 200,
+    FILE_REQUESTER_Y             = 58,
+    DISABLED_WIDGET_ID           = 1,
+    CAMPAIGN_INTRO               = 4,
+    CAMPAIGN_SELECTION           = 35,
+    HELP_DIALOG                  = NORMAL_DIALOG_QUICK_VIEW,
+    DIALOG_RESULT_MAX            = 1000,
 H2_ENUM_END(SetupConstant)
 
 H2_ENUM_BEGIN(SetupDialogChoice)
@@ -86,7 +88,7 @@ i32 game::SetupBaud(void) {
         case CHOICE_FOUR:
             gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_38400;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
     return 1;
@@ -118,7 +120,7 @@ i32 game::SetupComPort(void) {
         case CHOICE_FOUR:
             gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_4;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
 
@@ -171,7 +173,7 @@ i32 game::SetupHotSeatGame(void) {
         case CHOICE_FIVE:
             giNumHumanPlayers = SIX_PLAYERS;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
 
@@ -187,7 +189,7 @@ i32 game::SetupHotSeatGame(void) {
              localization::Tr("network.hotseat.enter_names_prompt")
         );
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
                 strcpy(
                     name,
@@ -214,7 +216,7 @@ i32 game::SetupNetworkGame(void) {
 
     if (gbNoCDRom != 0) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
 
@@ -228,7 +230,7 @@ i32 game::SetupNetworkGame(void) {
         case CHOICE_TWO:
             iMPExtendedType = REMOTE_GAME_NETWORK_GUEST;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
     return 1;
@@ -252,7 +254,7 @@ i32 game::SetupNetworkGame2(void) {
     if (gotVersion != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        msg.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         msg.payload.widget.id = CHOICE_THREE;
         dialogWindow->BroadcastMessage(msg);
     }
@@ -264,7 +266,7 @@ i32 game::SetupNetworkGame2(void) {
 
         dimMsg.type = MESSAGE_WIDGET;
         dimMsg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        dimMsg.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        dimMsg.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         dimMsg.payload.widget.id = CHOICE_ONE;
         dialogWindow->BroadcastMessage(dimMsg);
     }
@@ -285,7 +287,7 @@ i32 game::SetupNetworkGame2(void) {
         case CHOICE_FOUR:
             iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_CONNECT;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
     if (!SetupNetworkGame())
@@ -317,7 +319,7 @@ i32 game::SetupModemGame(void) {
     LogStr("SMC 2");
     if (gbNoCDRom != 0) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
     LogStr("SMC 3");
@@ -358,7 +360,7 @@ i32 game::SetupModemGame(void) {
         case CHOICE_THREE:
             gbDoModemConfig = true;
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
     return 1;
@@ -375,7 +377,7 @@ i32 game::SetupMultiPlayerGame(void) {
 
     if (gbNoCDRom != 0) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
     gpWindowManager->DoDialog(window, SetupMultiPlayerGameHandler, 0);
@@ -420,7 +422,7 @@ i32 game::SetupMultiPlayerGame(void) {
             }
             LogStr("Common Modem 7");
             break;
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             return 0;
     }
     return 1;
@@ -521,7 +523,7 @@ i32 game::SetupGame(void) {
         tag_message message;
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         message.payload.widget.id = CHOICE_ONE;
         window->BroadcastMessage(message);
         message.payload.widget.id = CHOICE_TWO;
@@ -551,7 +553,7 @@ i32 game::SetupGame(void) {
                         xIsPlayingExpansionCampaign = 1;
                         xIsExpansionMap = true;
                         break;
-                    case DIALOG_BUTTON_1:
+                    case DIALOG_CANCEL:
                         result = false;
                         goto done;
                 }
@@ -575,7 +577,7 @@ i32 game::SetupGame(void) {
                         xIsExpansionMap = true;
                         xCampaign.InitNewCampaign(xCampaign.Choose());
                         break;
-                    case DIALOG_BUTTON_1:
+                    case DIALOG_CANCEL:
                         result = false;
                         goto done;
                 }
@@ -589,7 +591,7 @@ i32 game::SetupGame(void) {
             }
             break;
 
-        case DIALOG_BUTTON_1:
+        case DIALOG_CANCEL:
             result = false;
             goto done;
     }
@@ -644,7 +646,7 @@ i32 game::PickLoadGame(void) {
             case CHOICE_TWO:
                 xIsExpansionMap = true;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 return 0;
         }
 
@@ -665,7 +667,7 @@ i32 game::PickLoadGame(void) {
     if (fileReq == NULL)
         MemError();
     dialogResult = gpExec->DoDialog(fileReq);
-    if (dialogResult == DIALOG_BUTTON_2) {
+    if (dialogResult == FILE_REQUESTER_OK) {
         gpGame->LoadGame(gLastFilename, 0, 0);
         delete fileReq;
         return 1;
@@ -685,7 +687,7 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -700,7 +702,7 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 4;
                 break;
         }
@@ -719,7 +721,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -734,7 +736,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 4;
                 break;
         }
@@ -753,7 +755,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -771,7 +773,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
             case CHOICE_FIVE:
                 helpIndex = 4;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 5;
                 break;
         }
@@ -786,7 +788,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -798,7 +800,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
             case CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 3;
                 break;
         }
@@ -817,7 +819,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -832,7 +834,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
             case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 4;
                 break;
         }
@@ -847,7 +849,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -856,7 +858,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 2;
                 break;
         }
@@ -871,7 +873,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -883,7 +885,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
             case CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 3;
                 break;
         }
@@ -898,7 +900,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
-        if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
             helpIndex = NO_HELP;
             switch (message.payload.widget.id) {
                 case CHOICE_ONE:
@@ -910,7 +912,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
                 case CHOICE_THREE:
                     helpIndex = 2;
                     break;
-                case DIALOG_BUTTON_1:
+                case DIALOG_CANCEL:
                     helpIndex = 3;
                     break;
             }
@@ -919,7 +921,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
         }
     } else if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case CHOICE_ONE:
                     case CHOICE_TWO:
@@ -936,7 +938,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -945,7 +947,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 2;
                 break;
         }
@@ -960,7 +962,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -969,7 +971,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 2;
                 break;
         }
@@ -984,7 +986,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
-        && IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
+        && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
             case CHOICE_ONE:
@@ -993,7 +995,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
             case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case DIALOG_BUTTON_1:
+            case DIALOG_CANCEL:
                 helpIndex = 2;
                 break;
         }
@@ -1010,10 +1012,10 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     PollSound();
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
-                    || message.payload.widget.id == DIALOG_BUTTON_1)
+                    || message.payload.widget.id == DIALOG_CANCEL)
                     handled = true;
         }
     }
@@ -1021,7 +1023,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     if (handled || giMenuCommand != -1) {
         FINISH_DIALOG_MESSAGE(message);
         if (giMenuCommand != -1)
-            gpWindowManager->m_dialogResult = DIALOG_BUTTON_1;
+            gpWindowManager->m_dialogResult = DIALOG_CANCEL;
         return MESSAGE_DISPATCH_FORWARD;
     }
 

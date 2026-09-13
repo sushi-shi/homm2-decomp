@@ -178,6 +178,7 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_MUSIC_TRACK_COUNT                = 0x3c,
     KB_ARTIFACT_LEVEL_COUNT             = IDX(ARTIFACT_COUNT) + 1,
     KB_STAT_POWER_COUNT                 = 41,
+    BATTLE_STAT_TABLE_MAX_INDEX         = KB_STAT_POWER_COUNT - 1,
     KB_SPELL_LIMIT_COUNT                = 5,
     KB_SPELL_MOD_COUNT                  = 11,
     KB_QUICK_COMBAT_SPELL_TYPE_COUNT    = 7,
