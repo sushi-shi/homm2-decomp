@@ -17040,20 +17040,20 @@
     "note": "Fixed72 town scan and repeated reinforcement calls; array extent matches bound. Random0..99 percentage choice does not index a table. Callee retains faction/state contracts documented separately. No cast, union, goto, unrelated local role, aggregate or manual varargs."
   },
   "src/SOURCE/GAME.cpp:game::NewMap(char * filename)#1": {
-    "body_sha256": "6e62685309b44082883acc68306fc34c3591b252a3d20543cf3ab98b9991c136",
+    "body_sha256": "0ad4f2d3eac8685eefa6b55a05255f58f76981eeae58d22a4607bfeb4d0dab2e",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
-      "reuse": "open",
-      "stack": "open",
+      "reuse": "retain",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "Whole body read through final return. C34 bounded player/hero/award/victory byte stores versus true Faction/Artifact/Personality and floating handicap conversions. G48 two campaign-award jumps join secondHero. R07 player and nTown loop counters become ultimate-artifact x/y then counters again. S36 padNum/junkVal/heroIndex unread (heroIndex assigned0). B55 six-player mapping/count/color bijection, town72/hero54/list8 IDs, primary hero availability, terrain/skill/difficulty domains and loss/victory y-1 reads require valid map. Artifact short-circuit bounds precede cell access, but retry has no final cap and single-human distance reads heroIds[0] even without local hero-count guard. B56 map filename and 13-byte hero name copies require lengths; literal campaign names fit13, expansion owner names pending. Typed owner pointers, no union/member recovery/artificial arithmetic/manual varargs."
+    "note": "C34 applies14 natural assignment conversions: five setup/victory stores, seven starting/available hero IDs/owners, two artifact coordinates; FactionType,ArtifactType,PlayerPersonality and float-truncation boundaries remain. G48/R07/S36 complete72-arm structural product retains both secondHero jumps, coordinate/counter reuse and all three unread locals: scoped-break/selected-flag joins, top/scoped coordinate locals and independent padNum/junkVal/heroIndex deletions all change native bytes, including every combination. Three complete cast-family products32+128+4 arms start at the same parent and all match; full combined source preserves all98 native objects and full7290 retail bytes,size,DIR32 sites,ordered targets. B55 six-player mappings,count/color bijection,town72/hero54/list8 IDs,initial hero availability,terrain/skill/difficulty domains and loss/victory y-1 accesses remain valid-map requirements. Artifact short-circuit bounds precede cell access, but retry is unbounded and single-human distance reads heroIds[0] without a local count guard. The144-map search can yield134, beyond signed i8 storage; natural assignment preserves existing narrowing, not a domain fix. B56 every campaign name fits13: two retail literals and all12 expansion table names proven; expansion name indexing requires map<4 or4..9. External filename must fit gMapName16. Typed pointers, no union/member recovery/artificial arithmetic/manual varargs. C34-G48-R07-S36.md records exact source products, complete proofs and the tested dispositions."
   },
   "src/SOURCE/GAME.cpp:GetCastleSlot(game * instance,i32 index)#1": {
     "body_sha256": "ca429745b1b37b519bc04ea926e66380ee68a949abf17afd332c499c891ae695",

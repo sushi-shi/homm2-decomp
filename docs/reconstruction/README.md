@@ -366,7 +366,7 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   color-lookup argument casts remain after their alternatives change bytes.
   C34's other functions remain separate. C35 covers the
   puzzle interpolator's [applied constant-conversion cleanup](S34-C35.md).
-  S36 tracks unread selection locals.
+  S36 [retains NewMap's three unread locals after complete experiments](C34-G48-R07-S36.md).
   B56 tracks standard-filename mutation, capacity, aliasing and loop-limit contracts.
 - B57: save/load uses cross-member serialized prefixes, duplicated two-byte count
   headers and unchecked file-supplied lengths. S37 tracks save/load/map scratch
@@ -375,8 +375,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   all136 measured arms; unused slots and work buffers retain native-changing
   alternatives. Filename output is not bounded by its14-byte serialized write.
   Map scratch remains separate; no padding is silently removed.
-- G48/R07: new-map award joins and player/town counters reused as artifact
-  coordinates need structural recovery. R08 tracks event random-roll/layer-index
+- G48/R07: [72 complete NewMap structural variants](C34-G48-R07-S36.md)
+  retain the award joins and coordinate/counter reuse. C34 removes14
+  NewMap assignment casts after164 complete cast-family variants; B56 proves
+  all campaign names fit while filename and signed-coordinate contracts remain.
+  R08 tracks event random-roll/layer-index
   and town/mine-ID reuse; [its scoped alternatives and S38's write-only array
   deletions change bytes and remain](C36-S37-S38.md).
 - B58: map-event allocation, terrain, layer-chain and town/mine-edge contracts

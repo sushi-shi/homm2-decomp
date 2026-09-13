@@ -1823,7 +1823,7 @@ void game::NewMap(char* filename) {
     gbInNewGameSetup = true;
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
-    giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
+    giCurPlayerBit = 1 << giCurPlayer;
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
     race = static_cast<FactionType>(Random(0, GAME_PLAYER_COUNT - 1));
@@ -1834,7 +1834,7 @@ void game::NewMap(char* filename) {
             gbSetupGamePosToRealGamePos[player] = -1;
         } else {
             if (m_setupPlayerNetworkId[player] == GAME_COMPUTER_PLAYER)
-                gbSetupGamePosToRealGamePos[player] = static_cast<i8>(humanPos++);
+                gbSetupGamePosToRealGamePos[player] = humanPos++;
             else
                 gbSetupGamePosToRealGamePos[player] = m_setupPlayerNetworkId[player];
         }
@@ -1848,11 +1848,11 @@ void game::NewMap(char* filename) {
         race = (race + 1) % GAME_PLAYER_COUNT;
     }
     for (player = 0; player < m_playerCount; player++)
-        gcColorToSetupPos[m_setupPlayerColor[player]] = static_cast<i8>(player);
+        gcColorToSetupPos[m_setupPlayerColor[player]] = player;
     for (player = 0; player < m_playerCount; player++)
         m_players[gbSetupGamePosToRealGamePos[player]].m_color = m_setupPlayerColor[player];
     for (player = 0; player < m_playerCount; player++)
-        gcColorToPlayerPos[m_players[player].m_color] = static_cast<i8>(player);
+        gcColorToPlayerPos[m_players[player].m_color] = player;
     for (player = 0; player < m_playerCount; player++) {
         m_players[player].m_townCount = 0;
         m_players[player].m_townLocatorPage = 0;
@@ -1889,7 +1889,7 @@ void game::NewMap(char* filename) {
             if (m_mapHeader.playerEnabled[player] != 0)
                 nTown++;
             if (nTown == m_mapHeader.victoryConditionValue + 1) {
-                m_mapHeader.victorySideThreshold = static_cast<u16>(player);
+                m_mapHeader.victorySideThreshold = player;
                 player = VICTORY_SIDE_SEARCH_DONE;
             }
         }
@@ -1920,15 +1920,15 @@ void game::NewMap(char* filename) {
         }
         if (selectedTown != -1) {
             m_players[player].m_heroIds[m_players[player].m_heroCount] =
-                static_cast<i8>(GetNewHeroId(
+                GetNewHeroId(
                     player,
                     m_castleRecs[m_players[player].m_townIds[selectedTown]].m_type,
                     0
-                ));
+                );
             m_availableHeroes[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
-                static_cast<i8>(player);
+                player;
             m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_owner =
-                static_cast<i8>(player);
+                player;
             m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_x =
                 m_castleRecs[m_players[player].m_townIds[selectedTown]].m_x;
             m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_y =
@@ -1976,7 +1976,7 @@ void game::NewMap(char* filename) {
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
-                m_players[player].m_availableHeroIds[0] = static_cast<char>(awardHero);
+                m_players[player].m_availableHeroIds[0] = awardHero;
                 m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                     WEEKLY_AVAILABLE_HERO;
                 startClass = m_heroRecs[awardHero].m_cursorType;
@@ -2007,7 +2007,7 @@ void game::NewMap(char* filename) {
                         strcpy(m_heroRecs[awardHero].m_name, heroName);
                         m_heroRecs[awardHero].m_portrait = curPic;
                         m_players[player].m_availableHeroIds[0] =
-                            static_cast<char>(awardHero);
+                            awardHero;
                         m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                             WEEKLY_AVAILABLE_HERO;
                         startClass = m_heroRecs[awardHero].m_cursorType;
@@ -2020,13 +2020,13 @@ void game::NewMap(char* filename) {
                 < FACTION_COUNT)
                 startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
             m_players[player].m_availableHeroIds[0] =
-                static_cast<char>(GetNewHeroId(player, startClass, 0));
+                GetNewHeroId(player, startClass, 0);
             m_availableHeroes[m_players[player].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
         }
     secondHero:
         startClass = (startClass + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
         m_players[player].m_availableHeroIds[1] =
-            static_cast<char>(GetNewHeroId(player, startClass, 0));
+            GetNewHeroId(player, startClass, 0);
         m_availableHeroes[m_players[player].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
     }
 
@@ -2089,8 +2089,8 @@ void game::NewMap(char* filename) {
             + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
         ultimateTries++;
     }
-    m_ultimateArtifactX = static_cast<i8>(player);
-    m_ultimateArtifactY = static_cast<i8>(nTown);
+    m_ultimateArtifactX = player;
+    m_ultimateArtifactY = nTown;
     m_ultimateArtifactId =
         static_cast<ArtifactType>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
