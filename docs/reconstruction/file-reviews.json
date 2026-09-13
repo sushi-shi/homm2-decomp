@@ -870,5 +870,13 @@
   "include/SOURCE/Newgame.h": {
     "sha256": "ed1e540173b1a19c14e39550ef45915914d376f3ac2d001c939f5bd47fdfe93f",
     "note": "Fullheader read: real widgetIDfamilies and recovered256-byte command-tagged incoming transport view, senderi8/id32/typei8/commandi8/payloadSizei16/payload247; no fake one-byte flexible tail. SharedRemote producer/GetRemoteData and bothNewgame consumers reviewed; all98nativeobjects unchanged; C++98/C++20 packet/map/game offsets pinned. No functionbodies/manualvarargs/owner subtraction. Realmessageunion remains elsewhere; sender/length/termination validity not fabricated by the widened view."
+  },
+  "src/SOURCE/SETUP.cpp": {
+    "sha256": "7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b0e962",
+    "note": "Full1184lines read:23functions/fourprivateenumdomains/onebooleanDATAowner. EarlierSetupComPortB37reconciled. Ninecomplete24arm18.080395s products retain fourrealwordtruncations, sharedG103-G105tails, S70libraryinitializer/emptyname24/mask12/emptydispatch. No source edits survive. All98native1826functions/fullallocatedorderedrelocations andfullbuildpass;23retailbytes,14fullsites/targets,nineEH/FSgapexplicit. B92entrycalleeproof maximum40->39/20->19/35->34 into40/21/36;56helpentries13catalogs boundschecked. B88downstreamext5/sixbytepattern remains; state/config/API/window domains explicit."
+  },
+  "include/SOURCE/SETUP.h": {
+    "sha256": "6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b",
+    "note": "Full26lines read:13actual handler declarations sharing tag_message reference/MessageDispatchResult ABI andboolean configuration flag declaration. No functions, unions, arrays, padding, explicit casts, gotos, manualvarargs or address/owner arithmetic. Declaration signatures reconciled with all23implementationfunctions and already reviewed Newgame consumers; header unchanged."
   }
 }

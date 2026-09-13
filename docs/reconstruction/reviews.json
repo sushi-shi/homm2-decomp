@@ -3531,9 +3531,9 @@
       "varargs": "absent",
       "reuse": "absent",
       "stack": "absent",
-      "bounds": "retain"
+      "bounds": "open"
     },
-    "note": "Full body reviewed: COM choices1..4 and positive baud helper; modem init entry has40-byte local, GetDataEntry(max40) zeroes40/copies39 and gConfig.modemInitString100 fits. Dynamic window is real owner; future use as printf format remains B37 in ModemSetup."
+    "note": "B37 reconciled: real40-byte local, initialized input ATZ, GetDataEntry capacity40 returns at most39 chars, then copy to config100 fits. COM choices and baud cancellation preserve their order; config slot needs direct-connect0/1. Later interpretation of modem initialization as a format string remains B37, not an overrun invented here. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full476 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
   },
   "src/SOURCE/comwin.cpp:add_node(struct tag_Anchor * anchor,struct tag_Node * node)#1": {
     "body_sha256": "0991718304d1638a032669006eb1ede91aaabb440ff786ade493c5fbfa1a8224",
@@ -24862,5 +24862,357 @@
       "bounds": "open"
     },
     "note": "Real100-byte color scratch and actual side-list construction. Six valid color strings, prefix and separators conservatively need<=95/100 including NUL, even with repeated colors. Requires0<=first<=last<playerCount<=6, valid color IDs and initialized network IDs. Local-player search keeps last matching slot; no match is -1. Empty/negative/out-of-range sides are not made safe by that sentinel. Fixed default color catalogs contain no percent formats. No manual varargs/enclosing-owner subtraction/artificial address. Full902 retail bytes; all sites/ordered targets pass. U18/O07/C76/S69/R27/G95-G102/B91 report and all98 native objects unchanged."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupCampaignGame(void)#1": {
+    "body_sha256": "d0dfda60dde55a4b8bfac6654d87cd1f1a1a667930d3b11ce5f80b3c6f91d0e8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Plays actual intro4 and selection35, ignores both playback return values and returns1. Requires media/executive lifecycle; no local storage or pointer arithmetic. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full36 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupBaud(void)#1": {
+    "body_sha256": "ff7094d9caf3a9cef85581538985f6cffd26b74660936b0a87a18ded12ac7f00",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real window creation/dialog/deletion; four baud choices update the selected two-entry configuration slot. gbDirectConnect must be0/1, not merely nonzero. Cancel returns0; an unknown choice returns1 with the old baud unchanged. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full311 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupHotSeatGame(void)#1": {
+    "body_sha256": "f71b2f07def289e7a0b6a69f0dea24da0b79a9c54d9351873aa1703287da2339",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S70 keeps24-byte empty initial-name reservation. Five choices establish2..6 humans; fixed six-name clear is bounded. Name entry capacity20 returns at most19 chars into actual21-byte slots. Initial text is empty, not arbitrary caller text. Variable-count entry loop requires human count<=6; unrecognized choice leaves prior count. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full557 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupNetworkGame(void)#1": {
+    "body_sha256": "5ef28cfc1f88f68ec46fccd3ef56ea2fadb5bcd7fccbe752a02cda022b7cdbbe",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual widget payload disables host control when no-CD flag is set. Choice1/2 selects network host/guest, cancel returns0, unknown choice leaves mode unchanged. This is UI disabling, not independent input authorization/validation; window/resource lifecycle remains. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full288 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupNetworkGame2(void)#1": {
+    "body_sha256": "a8734d583aadbef346ea100e9338d5a9c7bda2eed6bde24a702538ca3a900e58",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real OSVERSIONINFO is fully zeroed, size field set and API return checked before NT-specific disable. LoadLibraryA probes DPLAYX.DLL; successful reference is not freed in this function, deliberately retained. S70 overwritten handle initializer remains. Four protocol choices plus host/guest dialog; failed API/library calls do not validate every possible choice. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full641 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupModemGame(void)#1": {
+    "body_sha256": "10c789f90587de340a6e417c34ec320340785551a79ead3002aaa4a092a503af",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real config0/1 connection slots choose configured/unconfigured window. Host phone entry has capacity35 into36-byte numbuf, empty initial text and at most34 returned chars. Direct connect skips phone entry; modem/COM cancellation and configuration flag transitions retained. Resource and initialized config domains required. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full816 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupMultiPlayerGame(void)#1": {
+    "body_sha256": "031f5b16b6611fae01091f81a272931ceab836f625cd63153e2a16ac8c7e3716",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G103 shared modem/direct-connect join retained. Hot-seat/network/modem dispatch uses actual enum modes. Boolean continuation and config request are real related loop state; configuration can repeat until no request remains. Cancellation returns without inventing retries or cleanup effects. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full551 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupGame(void)#1": {
+    "body_sha256": "d2f44dcb18da609f4a1714a14d0eecd5fec1c876f22f6ab002731f365a60f867",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C77 three real word truncations and G104/G105 shared remote/flag-cleanup paths retained. Initializes global setup mode, supports explicit restart/load mappings, then normal or campaign/multiplayer dialogs. Common cleanup clears gbInSetupDialog on normal/cancel/menu paths. Media, remote and campaign-choice validity/side effects remain contracts; successful-looking return does not independently prove connection success. Window pointer reuse is the same dialog-owner role. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full1433 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:game::PickLoadGame(void)#1": {
+    "body_sha256": "0127a6cec590c06f0c7f9b3a6b9ba127545ecaef20f790fe77748c7e34b1d3a4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C77 word conversion and S70 twelve-byte mask retained. Campaign masks and player counts1..6 need6 bytes including NUL; arbitrary signed human count can need16. The downstream requester still copies that six-byte pattern into its five-byte extension field (B88). Wait-for-remote bypass and file requester/load/delete order preserved. Filename termination, paths/resources and serialized load validation remain contracts. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full651 retail bytes; unchanged EH/FS gaps, ordinary targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupCampaignGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "2dd186e9aec93e29f23aa548dc07d839893439b4eb01041c4bafaa452af60272",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Pure dispatcher to BaseSetupHandler with unchanged event reference/result. No cast, local buffer, goto or fake aggregate; inherits event/window lifecycle. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full19 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupComPortHandler(struct tag_message & message)#1": {
+    "body_sha256": "7927f3383317334db746b7c36a53c783dee846b2d1e43b12dbba48a82bd6d351",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..4/cancel maps to0..4 in one of two five-entry modem/direct-connect COM help catalogs. Negative sentinel skips lookup; raw event-view behavior and base dispatch retained. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full254 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupBaudHandler(struct tag_message & message)#1": {
+    "body_sha256": "21df3e4765a5da936f4a332b6454b93f99458bbfb5933e3ad8e40fd463c83e72",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..4/cancel maps to0..4 in one of two five-entry baud help catalogs. Conditional owner selection is real and bounded, not an overlaid array. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full254 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupHotSeatGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "aa7913fe34b0841710048eda6d2d1ed316e2b87589990fd11891bcb3771a9aa3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..5/cancel maps to0..5 in actual six-entry help catalog; default -1 skips lookup. Embedded switch table is data, not a fake stack table. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full238 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupModemGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "842422386f170991daf76f7fc17453b1e24a1af4c04a9561ad7bce76069d2681",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..3/cancel maps to0..3 in one of two four-entry modem/direct-connect help catalogs. Flag controls table owner, not an unchecked numeric index. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full239 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupMultiPlayerGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "882e763b275503b41900eec5ebfa767240907a51b1886b4ffe83d90c2ecc8368",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..4/cancel maps to0..4 in five-entry help catalog. No local storage debt beyond actual scalar index and event reference. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full207 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupNetworkGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "dd5d3bd5a2caca864bd048df55bae9d4f87ff734ad74829877beb11e3d6b59a6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1/2/cancel maps to0..2 in three-entry host/guest help catalog; bounded sentinel dispatch retained. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full161 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupNetworkGame2Handler(struct tag_message & message)#1": {
+    "body_sha256": "81b661f367fc7fdda3b185273b4665409495cfb863c034f49430331e82279e3a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..3/cancel maps to0..3 in four-entry protocol help catalog. The fourth selectable protocol deliberately has no help case; not silently added. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full192 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:SetupGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "0c6a27f282904f8d5fa919a13741d49999e65c2943ed6fb770cc10dbb0e595c2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1..3/cancel maps to0..3 in four-entry main help catalog. S70 no-effect nested non-right-button widget dispatch retained after measured deletion changes code. It still delegates to the base handler. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full231 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:ExpNewCampaignHandler(struct tag_message & message)#1": {
+    "body_sha256": "79fba93fa743f48ab600f73c30624418b981508eba25e6b1a13d30b37c57b784",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1/2/cancel maps to0..2 in actual three-entry expansion campaign catalog. Same real event/reference domain and base dispatch, not a reason to deduplicate source. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full161 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:ExpLoadCampaignHandler(struct tag_message & message)#1": {
+    "body_sha256": "a312d20580789aa07a584508d7968ae6b718ff910ca7a75e05b82bedf83cb46a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1/2/cancel maps to0..2 in the same campaign catalog. Distinct retail function kept; no copied stack aggregate or owner cast. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full161 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:ExpStdGameHandler(struct tag_message & message)#1": {
+    "body_sha256": "bf8e869f761bf04ad725b3506210c163ca6eaea0a5427e8e419e003e9c8b4c20",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Choice1/2/cancel maps to0..2 in actual standard/expansion map catalog. The New Game and load callers use this same ABI and retain their separate word-choice conversions. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full161 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
+  },
+  "src/SOURCE/SETUP.cpp:BaseSetupHandler(struct tag_message & message)#1": {
+    "body_sha256": "22e1207ee7a20b604281e617aa5f30dff952fed651b3442bf4fd4a6a7a20e151",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Polls sound; widget DESELECT accepts IDs1..1000 or cancel. A pending menu command overrides the type/handled test and forces cancel result. Mutates actual widget ID/command to close-dialog values and forwards; otherwise updates shingle animation. Does not validate every widget ID against each caller's smaller choice set; no fake local state. No manual varargs/enclosing-owner subtraction/artificial address or out-of-object local pointer. Full181 retail bytes; all sites/ordered targets pass. C77/S70/G103-G105/B92 report, all98 native objects unchanged; no source edits retained."
   }
 }

@@ -499,6 +499,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   distinguishes bounded default-data cases from unchecked format/index
   contracts and four unchanged private EH/FS model gaps.
 
+- C77/S70/G103–G105/B92: all23 SETUP functions and header reviewed, including
+  the earlier modem-entry check. All nine products/24 arms completed; four
+  real word conversions, storage reservations and shared tails remain after
+  measured alternatives change code. [Entry-capacity and help-table evidence](C77-S70-G103-G105-B92.md)
+  proves bounded normal cases while retaining B88's downstream extension
+  boundary and nine existing EH/FS model gaps. All98 native objects unchanged.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
