@@ -39,6 +39,6 @@ typedef enum OverviewLayoutConstant {
 typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
-MessageDispatchResult OverviewHandler(struct tag_message&);
+MessageDispatchResult OverviewHandler(struct tag_message& message);
 
 #endif

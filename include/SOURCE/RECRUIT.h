@@ -8,13 +8,13 @@ class heroWindow;
 class town;
 
 void SetupRecruitWin(
-    class heroWindow*,
-    CreatureType,
-    i32,
-    ResourceType,
-    i32,
-    i32
+    class heroWindow* window,
+    CreatureType creatureType,
+    i32 goldCost,
+    ResourceType resourceType,
+    i32 resourceCost,
+    i32 available
 );
-void QuickViewRecruit(class town*, i32);
+void QuickViewRecruit(class town* townData, i32 dwelling);
 
 #endif

@@ -71,12 +71,12 @@ public:
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
     playerAIData m_aiData;
-    void Write(i32);
-    void Read(i32);
+    void Write(i32 file);
+    void Read(i32 file);
     i32 NextHero(i32);
     i32 HasMobileHero(void);
-    i32 BuildingsOwned(FactionType, BuildingSlotType, i32);
-    i32 NumOfGivenArtifact(ArtifactType);
+    i32 BuildingsOwned(FactionType townType, BuildingSlotType buildingIndex, i32 buildState);
+    i32 NumOfGivenArtifact(ArtifactType artifact);
     i32 CurrentHero(void) {
         return m_currentHero;
     }

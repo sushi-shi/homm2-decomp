@@ -149,20 +149,20 @@ typedef enum GameHeroPoolConstant {
 } GameHeroPoolConstant;
 
 i32 GetNumObelisks(i32 color);
-void ComputeUALoc(i32);
-void GenerateStandardFileName(char*, char*);
-MessageDispatchResult ViewSpellsHandler(struct tag_message&);
-MessageDispatchResult ViewSpecialHandler(struct tag_message&);
-MessageDispatchResult ViewArmyHandler(struct tag_message&);
+void ComputeUALoc(i32 playerIndex);
+void GenerateStandardFileName(char* source, char* destination);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& msg);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& msg);
+MessageDispatchResult ViewArmyHandler(struct tag_message& msg);
 i32 IsCursedItem(ArtifactType item);
-i32 CalcBaseScore(i32);
+i32 CalcBaseScore(i32 days);
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
 i32 GetSkipCopyLen(u8* buf, i32* pos);
-void CreateDiffFile(char*, char*, char*, i32, i32);
-void CreateJoinFile(char*, char*, char*);
+void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
+void CreateJoinFile(char* oldName, char* diffName, char* joinName);
 EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
-i32 CalcFileCRC(char* filename);
+i32 CalcFileCRC(char* file);
 
 extern bchar bMapInitialized;
 

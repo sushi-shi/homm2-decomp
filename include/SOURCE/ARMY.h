@@ -186,9 +186,9 @@ struct SMonFrameInfo {
 #pragma pack(pop)
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
-void BuildTempWalkSeq(struct SMonFrameInfo*, i32, i32);
-void BuildTeleporterTempWalkSeq(struct SMonFrameInfo*, i32, i32, bool);
-void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
+void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing);
+void BuildTeleporterTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing, bool closeMove);
+void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType);
 
 // Ironfist movement state threading through the attack path.
 extern bool gCloseMove;
