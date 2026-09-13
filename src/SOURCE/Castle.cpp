@@ -119,7 +119,7 @@ namespace {
 
 } // namespace
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x00424320, 0xf10)
@@ -469,7 +469,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         }
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 

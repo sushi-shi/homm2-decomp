@@ -1971,7 +1971,7 @@ VA(0x004c05d0, 0x10)
 i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x004c05e0, 0x464)
@@ -2095,7 +2095,7 @@ void GetDataEntry(
     );
     gbAllowTextEntryEscape = true;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 

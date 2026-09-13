@@ -705,31 +705,41 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return bits;
 }
 
+#if H2_RETAIL_COMPILER
+#define armyIndex armyIndex2
+#define bestStrength bestStrength8
+#define strength strength8
+#endif
 VA(0x00417b4a, 0x184)
 i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
-    i32 armyIndex2 = 0;
+    i32 armyIndex = 0;
     u32 armyBit = COMBAT_AI_MASK_FIRST_BIT;
-    u32l bestStrength8 = 0;
+    u32l bestStrength = 0;
     i32 best = COMBAT_AI_NO_ARMY;
-    u32l strength8;
+    u32l strength;
 
-    for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
+    for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         if ((mask & armyBit) != 0) {
-            strength8 =
-                (m_armies[IDX(side)] + armyIndex2)
+            strength =
+                (m_armies[IDX(side)] + armyIndex)
                     ->Strength();
-            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[IDX(side)] + armyIndex2))
-                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[IDX(side)] + armyIndex2)))
-                strength8 >>= 1;
-            if (strength8 > bestStrength8) {
-                best = armyIndex2;
-                bestStrength8 = strength8;
+            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[IDX(side)] + armyIndex))
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[IDX(side)] + armyIndex)))
+                strength >>= 1;
+            if (strength > bestStrength) {
+                best = armyIndex;
+                bestStrength = strength;
             }
         }
         armyBit <<= 1;
     }
     return best;
 }
+#if H2_RETAIL_COMPILER
+#undef armyIndex
+#undef bestStrength
+#undef strength
+#endif
 
 VA(0x00417cce, 0xa0)
 i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
@@ -845,12 +855,13 @@ i32 combatManager::AttemptAttack(
     return 0;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
+#define availableMask availableMask4
 #define destinationHex destHex
 #endif
 VA(0x004180ba, 0x144)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
-    u32 availableMask4 =
+    u32 availableMask =
         ~currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
         );
@@ -861,7 +872,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     i32 enemyArmy;
     i32 destinationHex;
 
-    if (availableMask4 == 0)
+    if (availableMask == 0)
         return 0;
 
     oneBit = COMBAT_AI_MASK_FIRST_BIT;
@@ -869,7 +880,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     for (direction = COMBAT_DIRECTION_NORTHEAST;
          IDX(direction) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
          direction++) {
-        if ((availableMask4 & oneBit) != 0
+        if ((availableMask & oneBit) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
                 direction,
@@ -892,7 +903,8 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         return 0;
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
+#undef availableMask
 #undef destinationHex
 #endif
 

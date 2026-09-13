@@ -158,6 +158,10 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+#if H2_RETAIL_COMPILER
+#define cursorResourceName local_10
+#define wasCursorReady saved82
+#endif
 VA(0x004b9430, 0x1a2)
 void mouseManager::SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
@@ -177,40 +181,44 @@ void mouseManager::SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cu
             type = cursorType;
         }
         if (type != m_cursorType && (m_cursorType = type, gbColorMice != 0)) {
-            b32 saved82 = m_cursorReady;
+            b32 wasCursorReady = m_cursorReady;
             m_cursorReady = false;
             if (m_cursorIcon != NULL)
                 gpResourceManager->Dispose(m_cursorIcon);
-            char local_10[RESOURCE_NAME_CAPACITY];
+            char cursorResourceName[RESOURCE_NAME_CAPACITY];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_ADVENTURE_ICON
                 );
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 sprintf(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_SPELL_ICON
                 );
             else
                 sprintf(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_COMBAT_ICON
                 );
-            m_cursorIcon = gpResourceManager->GetIcon(local_10);
+            m_cursorIcon = gpResourceManager->GetIcon(cursorResourceName);
             H2_ASSERT(
                 frame != MOUSE_KEEP_CURRENT_FRAME,
                 MOUSE_MANAGER_SOURCE_FILE,
                 398
             );
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
-            m_cursorReady = saved82;
+            m_cursorReady = wasCursorReady;
         }
         SetPointer(frame);
         gpResourceManager->RestorePosition();
         gbPutzingWithMouseCtr--;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef cursorResourceName
+#undef wasCursorReady
+#endif
 
 VA(0x004b95e0, 0x560)
 void mouseManager::SetPointer(i32 frame) {
@@ -610,12 +618,16 @@ void mouseManager::CheckUpdateMousePos(void) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define savedForcePointerUpdate saved7e
+#define savedWindowUpdateFlags savedWM56
+#endif
 VA(0x004ba460, 0x106)
 void mouseManager::SetColorMice(b32 enabled) {
     if (enabled == gbColorMice)
         return;
     {
-        i32 savedWM56 = gpWindowManager->m_updateFlags;
+        i32 savedWindowUpdateFlags = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         gbPutzingWithMouseCtr++;
         b32 wasInNew = bInNewMouseUpdate;
@@ -624,7 +636,7 @@ void mouseManager::SetColorMice(b32 enabled) {
         m_cursorReady = false;
         i32 savedX = m_cursorFrame;
         MouseCursorType oldType = m_cursorType;
-        b32 saved7e = m_forcePointerUpdate;
+        b32 savedForcePointerUpdate = m_forcePointerUpdate;
         gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
@@ -634,14 +646,18 @@ void mouseManager::SetColorMice(b32 enabled) {
             savedX,
             oldType
         );
-        m_forcePointerUpdate = saved7e;
+        m_forcePointerUpdate = savedForcePointerUpdate;
         m_cursorReady = true;
         ReallyShowPointer();
         bInNewMouseUpdate = wasInNew;
         gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
-        gpWindowManager->m_updateFlags = savedWM56;
+        gpWindowManager->m_updateFlags = savedWindowUpdateFlags;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef savedForcePointerUpdate
+#undef savedWindowUpdateFlags
+#endif
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(mouseManager, 0x004ea978)

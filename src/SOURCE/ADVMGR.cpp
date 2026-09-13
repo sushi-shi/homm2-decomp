@@ -1684,6 +1684,9 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define currentHero hero2
+#endif
 VA(0x004027cf, 0xe03)
 MessageDispatchResult advManager::Main(struct tag_message& message) {
     MessageDispatchResult result;
@@ -1694,7 +1697,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     i32 town;
     mapCell* evtCell;
     MapDirection direction;
-    hero* hero2;
+    hero* currentHero;
     i32 helpId;
     hero* curHero;
     i32 bMoved;
@@ -1868,21 +1871,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 9;
                         goto process_cheat_digit;
                     process_cheat_digit:
-                        hero2 = NULL;
+                        currentHero = NULL;
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
-                            hero2 = gpGame->GetHero(gpCurPlayer->m_currentHero);
+                            currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
                         }
                         giCheatSeq =
                             giCheatSeq * CHEAT_SEQUENCE_RADIX % CHEAT_SEQUENCE_MODULUS + c;
                         if (!gbRemoteOn) {
                             if (giCheatSeq % CHEAT_CREATURES_MODULUS == CHEAT_CREATURES
-                                && hero2 != NULL) {
+                                && currentHero != NULL) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
                                 gpGame->GiveArmy(
-                                    &hero2->m_army,
+                                    &currentHero->m_army,
                                     CREATURE_BLACK_DRAGON,
                                     CHEAT_BLACK_DRAGON_COUNT,
                                     -1
@@ -2189,13 +2192,16 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     }
     return result;
 }
+#if H2_RETAIL_COMPILER
+#undef currentHero
+#endif
 
 VA(0x004035d2, 0x17)
 void advManager::Reseed(i32, i32) {
     giSeedingValid = false;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define inputMessage msg
 #define radarMessage radMsg
 #endif
@@ -2527,7 +2533,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef inputMessage
 #undef radarMessage
 #endif
@@ -5172,7 +5178,7 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0040a85c, 0x292)
@@ -5248,7 +5254,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         m_adventureWindow->DrawWindow(updateScreen);
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -5331,7 +5337,7 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0040ad72, 0x53b)
@@ -5492,7 +5498,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     }
     return updated;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -5990,8 +5996,9 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
+#define rowCreatureCount row2
 #endif
 VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
@@ -6168,7 +6175,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     } else if (creatureCount != 0) {
         i32 rowY = HERO_QUICK_VAGUE_FIRST_ROW_Y;
         i32 topRow;
-        i32 row2;
+        i32 rowCreatureCount;
         i32 monster;
         switch (creatureCount) {
             case 1:
@@ -6176,15 +6183,15 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             case ARMY_QUICK_TOP_ROW_MAX:
                 rowY += ARMY_QUICK_FIRST_ROW_SHIFT;
                 topRow = creatureCount;
-                row2 = 0;
+                rowCreatureCount = 0;
                 break;
             case ARMY_QUICK_FOUR_STACK_COUNT:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_FIRST_ROW_COUNT;
+                rowCreatureCount = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_TOP_ROW_MAX;
+                rowCreatureCount = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
@@ -6249,12 +6256,12 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             ++idx;
         }
 
-        if (row2 != 0) {
-            stride = HERO_QUICK_ARMY_AREA_WIDTH / row2;
+        if (rowCreatureCount != 0) {
+            stride = HERO_QUICK_ARMY_AREA_WIDTH / rowCreatureCount;
             armyStart = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
                                 + ARMY_QUICK_AREA_LEFT;
             rowY += ARMY_QUICK_SECOND_ROW_SHIFT;
-            for (ii = topRow; ii < topRow + row2;
+            for (ii = topRow; ii < topRow + rowCreatureCount;
                  ++ii) {
                 while (targetHero->m_army.m_creatureTypes[idx] == CREATURE_NONE) {
                     ++idx;
@@ -6338,8 +6345,9 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     }
     gpResourceManager->Dispose(iconRef);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
+#undef rowCreatureCount
 #endif
 
 VA(0x0040d11d, 0xdc)
@@ -6381,6 +6389,9 @@ H2_CONST char* advManager::GetArmySizeName(
     return gArmySizeNames[ARMY_SIZE_LEGION][IDX(grammar)];
 }
 
+#if H2_RETAIL_COMPILER
+#define rowCreatureCount row2
+#endif
 VA(0x0040d1f9, 0xcd1)
 void advManager::TownQuickView(
     i32 townId,
@@ -6530,7 +6541,7 @@ void advManager::TownQuickView(
         textWidget* sizeWidgets[ARMY_QUICK_SLOT_COUNT];
         i32 monster;
         iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
-        i32 row2;
+        i32 rowCreatureCount;
         i32 stride;
         i32 H2_UNUSED(armySlot);
         char* troopNames[ARMY_QUICK_SLOT_COUNT];
@@ -6547,15 +6558,15 @@ void advManager::TownQuickView(
             case ARMY_QUICK_TOP_ROW_MAX:
                 curY += ARMY_QUICK_FIRST_ROW_SHIFT;
                 topRow = creatureCount;
-                row2 = 0;
+                rowCreatureCount = 0;
                 break;
             case ARMY_QUICK_FOUR_STACK_COUNT:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_FIRST_ROW_COUNT;
+                rowCreatureCount = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
                 topRow = ARMY_QUICK_FIRST_ROW_COUNT;
-                row2 = ARMY_QUICK_TOP_ROW_MAX;
+                rowCreatureCount = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
@@ -6645,13 +6656,13 @@ void advManager::TownQuickView(
             ++creatureSlot;
         }
 
-        if (row2 != 0) {
-            stride = TOWN_QUICK_ARMY_AREA_WIDTH / row2;
+        if (rowCreatureCount != 0) {
+            stride = TOWN_QUICK_ARMY_AREA_WIDTH / rowCreatureCount;
             basePos = (stride - ARMY_QUICK_ICON_SIZE) / ARMY_QUICK_CENTER_DIVISOR
                              + ARMY_QUICK_AREA_LEFT;
             curY += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = topRow;
-                 armyIndex < topRow + row2;
+                 armyIndex < topRow + rowCreatureCount;
                  ++armyIndex) {
                 while (townPtr->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
                     ++creatureSlot;
@@ -6748,6 +6759,9 @@ void advManager::TownQuickView(
     }
     gpResourceManager->Dispose(creatureIcon);
 }
+#if H2_RETAIL_COMPILER
+#undef rowCreatureCount
+#endif
 
 VA(0x0040deca, 0x100)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
@@ -7980,6 +7994,13 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define cellOld cellOld2
+#define destinationCell destinationCell29
+#define fizzleTime fizzleTime36
+#define occupiedTown occupiedTown47
+#define oldCellFlag oldCellFlag26
+#endif
 VA(0x00410f50, 0x3c3)
 void advManager::TeleportTo(
     hero* mapHero,
@@ -7990,12 +8011,12 @@ void advManager::TeleportTo(
 ) {
     b32 savedShow;
     H2_ENUM_STORAGE(TerrainType, i32) terrain;
-    mapCell* cellOld2;
-    b32 oldCellFlag26;
+    mapCell* cellOld;
+    b32 oldCellFlag;
     i32 H2_UNUSED(unused);
-    mapCell* destinationCell29;
-    i32 H2_UNUSED(fizzleTime36);
-    town* occupiedTown47;
+    mapCell* destinationCell;
+    i32 H2_UNUSED(fizzleTime);
+    town* occupiedTown;
 
     savedShow = bShowIt;
     if (skipMapChange == 0) {
@@ -8010,17 +8031,17 @@ void advManager::TeleportTo(
         );
     }
 
-    destinationCell29 = GetCell(destinationX, destinationY);
-    cellOld2 = GetCell(mapHero->m_x, mapHero->m_y);
+    destinationCell = GetCell(destinationX, destinationY);
+    cellOld = GetCell(mapHero->m_x, mapHero->m_y);
     if (mapHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-        occupiedTown47 = gpGame->GetTown(mapHero->m_occupiedTown);
-        occupiedTown47->m_occupyingHeroId = INVALID_HERO;
+        occupiedTown = gpGame->GetTown(mapHero->m_occupiedTown);
+        occupiedTown->m_occupyingHeroId = INVALID_HERO;
     }
 
-    oldCellFlag26 = false;
-    if (cellOld2->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
-        cellOld2->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
-        oldCellFlag26 = true;
+    oldCellFlag = false;
+    if (cellOld->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
+        cellOld->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
+        oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
             mapHero->m_x,
@@ -8063,7 +8084,7 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell29->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
         gpWindowManager->SaveFizzleSource(
             UPDATE_VIEWPORT_ORIGIN,
             UPDATE_VIEWPORT_ORIGIN,
@@ -8072,9 +8093,9 @@ void advManager::TeleportTo(
         );
         CompleteDraw(0);
         PollSound();
-        fizzleTime36 = TELEPORT_FIZZLE_TIME;
+        fizzleTime = TELEPORT_FIZZLE_TIME;
         if (gbThisNetHumanPlayer[giCurPlayer] == 0) {
-            fizzleTime36 -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
+            fizzleTime -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
         }
         gpWindowManager->FizzleForward(
             UPDATE_VIEWPORT_ORIGIN,
@@ -8087,14 +8108,14 @@ void advManager::TeleportTo(
         );
         PollSound();
     } else {
-        mapHero->m_locationType = destinationCell29->m_triggerType;
-        mapHero->m_occupiedTown = destinationCell29->m_objectMetadata;
-        if (oldCellFlag26 != 0) {
-            destinationCell29->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        mapHero->m_locationType = destinationCell->m_triggerType;
+        mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
+        if (oldCellFlag != 0) {
+            destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
         } else {
-            destinationCell29->m_triggerType =
+            destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
-            destinationCell29->m_objectMetadata = mapHero->m_id;
+            destinationCell->m_objectMetadata = mapHero->m_id;
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags =
@@ -8108,7 +8129,7 @@ void advManager::TeleportTo(
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         1
     );
-    terrain = CELL_TERRAIN(destinationCell29);
+    terrain = CELL_TERRAIN(destinationCell);
     if (terrain != m_currentTerrain) {
         m_currentTerrain = terrain;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
@@ -8118,6 +8139,13 @@ void advManager::TeleportTo(
     CompleteDraw(0);
     ForceNewHover();
 }
+#if H2_RETAIL_COMPILER
+#undef cellOld
+#undef destinationCell
+#undef fizzleTime
+#undef occupiedTown
+#undef oldCellFlag
+#endif
 
 VA(0x00411313, 0x202)
 void advManager::DimensionDoor(void) {
@@ -8840,13 +8868,19 @@ i32 advManager::MouseInScrollZone(void) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define currentTown currentTown9
+#define initialHero initialHero5
+#define initialPlayer initialPlayer8
+#define initialTown initialTown9
+#endif
 VA(0x00412a12, 0x268)
 void advManager::SetInitialMapOrigin(void) {
     game* H2_UNUSED(gameState);
-    town* currentTown9;
-    playerData* initialPlayer8;
-    hero* initialHero5;
-    town* initialTown9;
+    town* currentTown;
+    playerData* initialPlayer;
+    hero* initialHero;
+    town* initialTown;
 
     gpWindowManager->BroadcastMessage(
         ADVMGR_BUTTON_MESSAGE,
@@ -8860,26 +8894,26 @@ void advManager::SetInitialMapOrigin(void) {
     gbHeroMoving = false;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->m_currentTown != TOWN_ID_NONE) {
-        currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->m_currentTown];
-        m_mapOriginX = currentTown9->m_x - VIEW_CENTER_OFFSET;
-        m_mapOriginY = currentTown9->m_y - VIEW_CENTER_OFFSET;
+        currentTown = &gpGame->m_castleRecs[gpCurPlayer->m_currentTown];
+        m_mapOriginX = currentTown->m_x - VIEW_CENTER_OFFSET;
+        m_mapOriginY = currentTown->m_y - VIEW_CENTER_OFFSET;
     } else if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->m_currentHero != INVALID_HERO) {
         MobilizeCurrHero(0);
     } else {
         if (gbThisNetHumanPlayer[giCurPlayer]) {
-            initialPlayer8 = gpCurPlayer;
+            initialPlayer = gpCurPlayer;
         } else {
-            initialPlayer8 = &gpGame->m_players[giThisGamePos];
+            initialPlayer = &gpGame->m_players[giThisGamePos];
         }
 
-        if (initialPlayer8->m_heroCount > 0) {
-            initialHero5 = &gpGame->m_heroRecs[initialPlayer8->m_heroIds[0]];
-            m_mapOriginX = initialHero5->m_x - VIEW_CENTER_OFFSET;
-            m_mapOriginY = initialHero5->m_y - VIEW_CENTER_OFFSET;
-        } else if (initialPlayer8->m_townCount > 0) {
-            initialTown9 = &gpGame->m_castleRecs[initialPlayer8->m_townIds[0]];
-            m_mapOriginX = initialTown9->m_x - VIEW_CENTER_OFFSET;
-            m_mapOriginY = initialTown9->m_y - VIEW_CENTER_OFFSET;
+        if (initialPlayer->m_heroCount > 0) {
+            initialHero = &gpGame->m_heroRecs[initialPlayer->m_heroIds[0]];
+            m_mapOriginX = initialHero->m_x - VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialHero->m_y - VIEW_CENTER_OFFSET;
+        } else if (initialPlayer->m_townCount > 0) {
+            initialTown = &gpGame->m_castleRecs[initialPlayer->m_townIds[0]];
+            m_mapOriginX = initialTown->m_x - VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialTown->m_y - VIEW_CENTER_OFFSET;
         } else {
             m_mapOriginX = 0;
             m_mapOriginY = 0;
@@ -8893,6 +8927,12 @@ void advManager::SetInitialMapOrigin(void) {
     Reseed(0, 0);
     CheckDimNextHeroBut();
 }
+#if H2_RETAIL_COMPILER
+#undef currentTown
+#undef initialHero
+#undef initialPlayer
+#undef initialTown
+#endif
 
 VA(0x00412c7a, 0x212)
 void advManager::LoadRemote(void) {
@@ -8956,75 +8996,85 @@ void advManager::LoadRemote(void) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define exitInfo exitInfo4
+#define packet packet9
+#define playerExited playerExited5
+#endif
 VA(0x00412e8c, 0x1f5)
 char* advManager::CheckHandleNet(void) {
-    RemoteMessage* packet9;
-    i32 playerExited5;
-    SPlayerExit exitInfo4;
+    RemoteMessage* packet;
+    i32 playerExited;
+    SPlayerExit exitInfo;
 
-    packet9 = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
-    if (packet9
-        && (packet9->type == REMOTE_MESSAGE_RELIABLE
-            || packet9->type == REMOTE_MESSAGE_UNRELIABLE)) {
-        switch (packet9->command) {
+    packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
+    if (packet
+        && (packet->type == REMOTE_MESSAGE_RELIABLE
+            || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
+        switch (packet->command) {
             case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-                playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;
+                playerExited = ADVMGR_REMOTE_PAYLOAD(packet)->savePlayerExited;
                 if (!gpGame->ReceiveSaveGame(
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveDataSize,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveCrc,
-                        ADVMGR_REMOTE_PAYLOAD(packet9)->saveTransmitCrc,
-                        packet9->sender
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveDataSize,
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveCrc,
+                        ADVMGR_REMOTE_PAYLOAD(packet)->saveTransmitCrc,
+                        packet->sender
                     )) {
                     ShutDown(NULL);
                 }
-                if (playerExited5) {
-                    exitInfo4.netPosition = packet9->sender;
-                    exitInfo4.gamePosition = static_cast<i8>(NetPosToGamePos(packet9->sender));
-                    exitInfo4.updateNetworkControl = false;
-                    exitInfo4.eliminated = true;
-                    exitInfo4.hostReported = true;
-                    exitInfo4.timedOut = true;
-                    ReceiveRemotePlayerExit(exitInfo4);
+                if (playerExited) {
+                    exitInfo.netPosition = packet->sender;
+                    exitInfo.gamePosition = static_cast<i8>(NetPosToGamePos(packet->sender));
+                    exitInfo.updateNetworkControl = false;
+                    exitInfo.eliminated = true;
+                    exitInfo.hostReported = true;
+                    exitInfo.timedOut = true;
+                    ReceiveRemotePlayerExit(exitInfo);
                 }
                 LoadRemote();
                 break;
 
             case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
-                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes, packet9->sender);
+                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet)->bytes, packet->sender);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
-                    return reinterpret_cast<char*>(packet9);
+                    return reinterpret_cast<char*>(packet);
                 } else {
-                    DoNetCombat(reinterpret_cast<char*>(packet9));
+                    DoNetCombat(reinterpret_cast<char*>(packet));
                 }
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
-                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
+                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
-                    packet9->sender,
-                    ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
+                    packet->sender,
+                    ADVMGR_REMOTE_PAYLOAD(packet)->playerExit,
                     0
                 );
                 break;
 
             case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
-                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes);
+                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet)->bytes);
                 break;
 
             default:
-                return reinterpret_cast<char*>(packet9);
+                return reinterpret_cast<char*>(packet);
         }
     }
     return NULL;
 }
+#if H2_RETAIL_COMPILER
+#undef exitInfo
+#undef packet
+#undef playerExited
+#endif
 
 VA(0x00413081, 0x9b)
 MessageDispatchResult
@@ -9108,7 +9158,7 @@ disposeSamples:
     }
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x004132d4, 0xc8)
@@ -9119,11 +9169,11 @@ void advManager::DisableButtons(void) {
     tag_message message;
     SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_DISABLE);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0041339c, 0xc8)
@@ -9134,7 +9184,7 @@ void advManager::EnableButtons(void) {
     tag_message message;
     SET_ADVENTURE_BUTTON_FLAGS(message, m_adventureWindow, ADVMGR_BUTTON_ENABLE);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -9455,14 +9505,22 @@ void advManager::ViewPuzzle(void) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
 }
 
+#if H2_RETAIL_COMPILER
+#define unusedPuzzle unusedPuzzle0
+#define unusedValue1 unused1
+#define unusedValue2 unused2
+#define unusedValue3 unused3
+#define unusedValue4 unused4
+#define unusedValue5 unused6
+#endif
 VA(0x004140fa, 0x79)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    i32 H2_UNUSED(unusedPuzzle0);
-    i32 H2_UNUSED(unused1);
-    i32 H2_UNUSED(unused2);
-    i32 H2_UNUSED(unused3);
-    i32 H2_UNUSED(unused4);
-    i32 H2_UNUSED(unused6);
+    i32 H2_UNUSED(unusedPuzzle);
+    i32 H2_UNUSED(unusedValue1);
+    i32 H2_UNUSED(unusedValue2);
+    i32 H2_UNUSED(unusedValue3);
+    i32 H2_UNUSED(unusedValue4);
+    i32 H2_UNUSED(unusedValue5);
 
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
@@ -9475,6 +9533,14 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
         ICON_DRAW_CLIP
     );
 }
+#if H2_RETAIL_COMPILER
+#undef unusedPuzzle
+#undef unusedValue1
+#undef unusedValue2
+#undef unusedValue3
+#undef unusedValue4
+#undef unusedValue5
+#endif
 
 VA(0x00414173, 0x2a4)
 void advManager::AdvPanel(void) {
@@ -9808,7 +9874,7 @@ void advManager::SystemOptions(void) {
     }
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x00414b62, 0x320)
@@ -9910,7 +9976,7 @@ void UpdateSystemOptions(i32 initialDraw) {
         cPanel->DrawWindow(1, 0, ADVMGR_SYSTEM_OPTIONS_DRAW_MASK);
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -10159,7 +10225,7 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x004154ac, 0x43d)
@@ -10305,7 +10371,7 @@ showVision:
     NormalDialog(gText, 1);
     return 1;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 

@@ -342,7 +342,7 @@ MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& mess
     return Main(message);
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x004b7270, 0x36)
@@ -355,7 +355,7 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command,
     message.payload.widget.data.value = value;
     return Main(message);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -532,12 +532,15 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
     PollSound();
 }
 
+#if H2_RETAIL_COMPILER
+#define filename local_10
+#endif
 VA(0x004b77d0, 0x63)
 void heroWindowManager::ScreenShot(void) {
-    char local_10[SCREENSHOT_FILENAME_CAPACITY];
-    sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
+    char filename[SCREENSHOT_FILENAME_CAPACITY];
+    sprintf(filename, "SHOT%04d.PCX", m_screenshotIndex);
     CreatePCXFile(
-        local_10,
+        filename,
         m_screen->m_pixels,
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
@@ -546,6 +549,9 @@ void heroWindowManager::ScreenShot(void) {
     m_screenshotIndex++;
     gpInputManager->Flush();
 }
+#if H2_RETAIL_COMPILER
+#undef filename
+#endif
 
 VA(0x004b7840, 0x159)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {

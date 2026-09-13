@@ -97,6 +97,10 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
+#if H2_RETAIL_COMPILER
+#define leftInitial chr2
+#define rightInitial chr1
+#endif
 VA(0x004ac873, 0x639)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
@@ -107,8 +111,8 @@ void UpdateTradingPost(i32 draw) {
     i32 leftDenominatedLocal;
     i32 nMax;
     i32 ratioLocal;
-    char chr1;
-    char chr2;
+    char rightInitial;
+    char leftInitial;
 
     messageTemp.type = MESSAGE_WIDGET;
     if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
@@ -120,12 +124,12 @@ void UpdateTradingPost(i32 draw) {
             offeredValue = 1;
         }
         strcpy(rightName, gResourceNames[rightResource]);
-        chr1 = CyrillicToLower(rightName[0]);
-        rightName[0] = chr1;
+        rightInitial = CyrillicToLower(rightName[0]);
+        rightName[0] = rightInitial;
 
         strcpy(leftName, gResourceNames[leftResource]);
-        chr2 = CyrillicToLower(leftName[0]);
-        leftName[0] = chr2;
+        leftInitial = CyrillicToLower(leftName[0]);
+        leftName[0] = leftInitial;
 
         sprintf(
             gText,
@@ -254,8 +258,12 @@ void UpdateTradingPost(i32 draw) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef leftInitial
+#undef rightInitial
+#endif
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define destinationValue dstVal
 #define sourceValue srcVal
 #endif
@@ -281,7 +289,7 @@ void ComputeTradeRatios(
         *maxTrade = gpCurPlayer->m_resources[sourceResource];
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef destinationValue
 #undef sourceValue
 #endif

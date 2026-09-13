@@ -151,23 +151,27 @@ void fullMap::Write(i32 handle) {
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
+#if H2_RETAIL_COMPILER
+#define oldCells tmp1
+#define oldExtras tmp2
+#endif
 VA(0x004726f9, 0x258)
 void fullMap::Read(i32 handle, i32 convert) {
     i32 nb;
-    oldMapCell* tmp1;
+    oldMapCell* oldCells;
     i32 x, y;
-    oldMapCellExtra* tmp2;
+    oldMapCellExtra* oldExtras;
 
     READ_FILE_VALUE(handle, width);
     READ_FILE_VALUE(handle, height);
     Init(width, height);
     if (convert) {
-        tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
-        read(handle, tmp1, width * height * sizeof(oldMapCell));
+        oldCells = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        read(handle, oldCells, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
-        delete tmp1;
+                memcpy(cells + x + y * width, oldCells + x + y * width, sizeof(mapCell));
+        delete oldCells;
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
     }
@@ -176,15 +180,19 @@ void fullMap::Read(i32 handle, i32 convert) {
         delete extras;
     extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
     if (convert) {
-        tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
-        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
+        oldExtras = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
+        read(handle, oldExtras, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
-            memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
-        delete tmp2;
+            memcpy(extras + nb, oldExtras + nb, sizeof(mapCellExtra));
+        delete oldExtras;
     } else {
         read(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
+#if H2_RETAIL_COMPILER
+#undef oldCells
+#undef oldExtras
+#endif
 
 VA(0x00472951, 0x314)
 void fullMap::ChangeTilesetIndex(

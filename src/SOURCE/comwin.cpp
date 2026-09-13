@@ -273,37 +273,45 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define result result2
+#define sendNode sendNode2
+#endif
 VA(0x00433048, 0x11c)
 i16 com_snd(i16 portIndex, u16, u16 length, H2_CONST void* data, i32 priority) {
-    BOOL result2;
-    tag_Node* sendNode2;
+    BOOL result;
+    tag_Node* sendNode;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
         if (length == 0) {
-            result2 = SetCommBreak(s_comPorts[portIndex].handle);
-            if (result2 == 0)
+            result = SetCommBreak(s_comPorts[portIndex].handle);
+            if (result == 0)
                 ShutdownComError("Set communications break");
             Sleep(BREAK_DELAY);
-            result2 = ClearCommBreak(s_comPorts[portIndex].handle);
-            if (result2 == 0)
+            result = ClearCommBreak(s_comPorts[portIndex].handle);
+            if (result == 0)
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode2 = static_cast<tag_Node*>(
+        sendNode = static_cast<tag_Node*>(
             H2_ALLOC(length + NODE_HEADER_SIZE)
         );
-        if (sendNode2 != NULL) {
-            sendNode2->len = length;
-            memcpy(sendNode2->comData, data, length);
+        if (sendNode != NULL) {
+            sendNode->len = length;
+            memcpy(sendNode->comData, data, length);
             if (priority != 0)
-                add_node(&s_comPorts[portIndex].priorityQueue, sendNode2);
+                add_node(&s_comPorts[portIndex].priorityQueue, sendNode);
             else
-                add_node(&s_comPorts[portIndex].normalQueue, sendNode2);
+                add_node(&s_comPorts[portIndex].normalQueue, sendNode);
             return 0;
         }
     }
     return 1;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#undef sendNode
+#endif
 
 VA(0x00433164, 0x8)
 i16 __cdecl com_sess(i32, i32, ...) {

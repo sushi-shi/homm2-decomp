@@ -866,12 +866,15 @@ cleanup:
         }
     }
 
+#if H2_RETAIL_COMPILER
+#define unusedPlayer unusedPlayer17
+#endif
     VA(0x00476e3b, 0x50f)
     void game::UpdateNewGameWindow(void) {
         b32 playerLockedValue;
         tag_message message;
         i32 playerIndex;
-        i32 H2_UNUSED(unusedPlayer17);
+        i32 H2_UNUSED(unusedPlayer);
 
         strcpy(gText, m_mapHeader.name);
         SET_WIDGET_MESSAGE(message, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
@@ -995,6 +998,9 @@ cleanup:
         m_newGameWindow->BroadcastMessage(message);
         DrawNGKPDisplayString(0);
     }
+#if H2_RETAIL_COMPILER
+#undef unusedPlayer
+#endif
 
     VA(0x0047734a, 0xdd1)
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
@@ -1670,7 +1676,7 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
         );
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0047869f, 0xc36)
@@ -2012,56 +2018,64 @@ void game::ShowScenInfo(void) {
     gpWindowManager->DoDialog(window, EventWindowHandler, 0);
     delete window;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
+#if H2_RETAIL_COMPILER
+#define city city2
+#define dayOfWeek day26
+#define lossHero lossHero11
+#define month month19
+#define townId townId12
+#define week week2
+#endif
 VA(0x004792d5, 0x19c)
 void game::GetLossConditionText(char* text) {
-    i32 week2;
-    hero* lossHero11;
-    i32 day26;
-    i32 month19;
-    town* city2;
-    i32 townId12;
+    i32 week;
+    hero* lossHero;
+    i32 dayOfWeek;
+    i32 month;
+    town* city;
+    i32 townId;
 
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
             case MAP_LOSS_TOWN:
-                townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
-                city2 = GetTown(townId12);
+                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
+                city = GetTown(townId);
                 sprintf(
                     text,
                     localization::Tr("scenario.loss.settlement.buka"),
-                    HAS(city2->m_buildings, IDX(TOWN_BUILDING_CASTLE)) ? localization::Tr("scenario.fragment.castle")
+                    HAS(city->m_buildings, IDX(TOWN_BUILDING_CASTLE)) ? localization::Tr("scenario.fragment.castle")
                                                                        : localization::Tr("scenario.fragment.town"),
-                    city2->m_name
+                    city->m_name
                 );
                 break;
 
             case MAP_LOSS_HERO:
-                lossHero11 = GetHero(m_mapHeader.lossConditionValue);
+                lossHero = GetHero(m_mapHeader.lossConditionValue);
                 sprintf(
                     text,
                     localization::Tr("scenario.loss.hero"),
-                    lossHero11->m_name
+                    lossHero->m_name
                 );
                 break;
 
             case MAP_LOSS_TIME:
-                month19 =
+                month =
                     (gpGame->m_mapHeader.lossConditionValue - 1) / GAME_DAYS_PER_MONTH + 1;
-                week2 = (gpGame->m_mapHeader.lossConditionValue
-                         - (month19 - 1) * GAME_DAYS_PER_MONTH - 1)
+                week = (gpGame->m_mapHeader.lossConditionValue
+                         - (month - 1) * GAME_DAYS_PER_MONTH - 1)
                             / GAME_DAYS_PER_WEEK
                         + 1;
-                day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
+                dayOfWeek = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
                     localization::Tr("scenario.loss.time"),
-                    month19,
-                    week2,
-                    day26
+                    month,
+                    week,
+                    dayOfWeek
                 );
                 break;
         }
@@ -2072,6 +2086,14 @@ void game::GetLossConditionText(char* text) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef city
+#undef dayOfWeek
+#undef lossHero
+#undef month
+#undef townId
+#undef week
+#endif
 
 VA(0x00479471, 0x2cb)
 void game::GetVictoryConditionText(char* text) {

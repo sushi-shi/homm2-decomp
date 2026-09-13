@@ -121,11 +121,14 @@ void strip::Draw(void) {
     gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT);
 }
 
+#if H2_RETAIL_COMPILER
+#define iconsCurrent iconsCurrent_8
+#endif
 VA(0x004a1cb0, 0x37d)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
     CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
-    b32 iconsCurrent_8;
+    b32 iconsCurrent;
     i32 slot;
     CreatureType creatureType;
 
@@ -139,14 +142,14 @@ void strip::DrawIcons(i32 drawWindow) {
         m_window->DrawWindow(drawWindow);
         return;
     }
-    iconsCurrent_8 = true;
+    iconsCurrent = true;
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         if (m_army->m_creatureTypes[slot] != CREATURE_NONE
             && m_cachedCreatureTypes[slot] != m_army->m_creatureTypes[slot])
-            iconsCurrent_8 = false;
+            iconsCurrent = false;
     }
 
-    if (iconsCurrent_8 == 0) {
+    if (iconsCurrent == 0) {
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
@@ -209,6 +212,9 @@ void strip::DrawIcons(i32 drawWindow) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef iconsCurrent
+#endif
 
 VA(0x004a202d, 0x28)
 void strip::DrawFrame(void) {

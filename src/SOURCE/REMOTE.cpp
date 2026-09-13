@@ -106,7 +106,7 @@ void RemoteCleanup(void) {
     gbInRemoteCleanup = false;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define gameMessage gameMsg
 #endif
 VA(0x0048d1ac, 0x5ff)
@@ -300,7 +300,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("Out Remote Main");
     gbInRemoteMain = false;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef gameMessage
 #endif
 
@@ -366,15 +366,18 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
+#if H2_RETAIL_COMPILER
+#define computedCrc crc2
+#endif
 VA(0x0048d93c, 0x10d)
 i32 DecodePacket(u8* data, i32) {
     u16 crc;
     i32 H2_UNUSED(res);
-    u16 crc2[CRC_STORAGE_WORD_COUNT];
+    u16 computedCrc[CRC_STORAGE_WORD_COUNT];
     char text[REMOTE_ERROR_TEXT_SIZE];
     u32 len;
 
-    crc2[0] = 0;
+    computedCrc[0] = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
         sprintf(
@@ -388,13 +391,13 @@ i32 DecodePacket(u8* data, i32) {
     len = static_cast<u8>(REMOTE_PACKET(packet)->payloadSize);
     crc = REMOTE_PACKET(packet)->crc;
     REMOTE_PACKET(packet)->crc = 0;
-    calc_crc(crc2, reinterpret_cast<u8*>(packet), len + REMOTE_PACKET_HEADER_SIZE);
-    if (crc != crc2[0]) {
+    calc_crc(computedCrc, reinterpret_cast<u8*>(packet), len + REMOTE_PACKET_HEADER_SIZE);
+    if (crc != computedCrc[0]) {
         sprintf(
             text,
             "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             crc,
-            crc2[0]
+            computedCrc[0]
         );
         LogStr(text);
         return 0;
@@ -402,6 +405,9 @@ i32 DecodePacket(u8* data, i32) {
     memcpy(data, packet + REMOTE_PACKET_HEADER_SIZE, len);
     return 1;
 }
+#if H2_RETAIL_COMPILER
+#undef computedCrc
+#endif
 
 VA(0x0048da49, 0x158)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
@@ -488,7 +494,7 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0048dcc0, 0x1d2)
@@ -558,7 +564,7 @@ i32 TransmitRemoteData(
     }
     return rv;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 

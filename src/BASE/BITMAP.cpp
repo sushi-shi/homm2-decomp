@@ -51,7 +51,7 @@ bitmap::~bitmap() {
     m_pixels = NULL;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define destinationX destX
 #define destinationY destY
 #endif
@@ -89,7 +89,7 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
         return;
     BlitBitmap(this, 0, 0, clipWidth, clipHeight, gpWindowManager->m_screen, destinationX, destinationY);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef destinationX
 #undef destinationY
 #endif

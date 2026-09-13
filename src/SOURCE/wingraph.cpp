@@ -147,14 +147,21 @@ void DDInitGraphics(void) {
     InitializePalette();
 }
 
+#if H2_RETAIL_COMPILER
+#define paint paint7
+#define point point1
+#define sourceHeight sourceHeight5
+#define sourceLeft sourceLeft6
+#define sourceTop sourceTop8
+#endif
 VA(0x004afe8f, 0x4da)
 i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
     i32 sourceWidth;
-    i32 sourceHeight5;
-    i32 sourceTop8;
-    i32 sourceLeft6;
-    PAINTSTRUCT paint7;
-    POINT point1;
+    i32 sourceHeight;
+    i32 sourceTop;
+    i32 sourceLeft;
+    PAINTSTRUCT paint;
+    POINT point;
 
     if (gbWinGraphBusy != 0)
         return 1;
@@ -164,39 +171,39 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
         return 1;
     {
         gbWinGraphBusy = true;
-        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint7);
+        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint);
         GetClientRect(reinterpret_cast<HWND>(window), &gDDClientRect);
-        if (paint7.rcPaint.right == 0 || paint7.rcPaint.bottom == 0)
-            paint7.rcPaint = gDDClientRect;
-        if (paint7.rcPaint.right < WINGRAPH_WIDTH)
-            paint7.rcPaint.right++;
-        if (paint7.rcPaint.bottom < WINGRAPH_HEIGHT)
-            paint7.rcPaint.bottom++;
+        if (paint.rcPaint.right == 0 || paint.rcPaint.bottom == 0)
+            paint.rcPaint = gDDClientRect;
+        if (paint.rcPaint.right < WINGRAPH_WIDTH)
+            paint.rcPaint.right++;
+        if (paint.rcPaint.bottom < WINGRAPH_HEIGHT)
+            paint.rcPaint.bottom++;
 
-        gDDDestinationRect = paint7.rcPaint;
+        gDDDestinationRect = paint.rcPaint;
         sourceWidth = ((gDDDestinationRect.right - gDDDestinationRect.left + 1) * WINGRAPH_WIDTH)
                        / iMainWinScreenWidth;
-        sourceHeight5 = ((gDDDestinationRect.bottom - gDDDestinationRect.top + 1) * WINGRAPH_HEIGHT)
+        sourceHeight = ((gDDDestinationRect.bottom - gDDDestinationRect.top + 1) * WINGRAPH_HEIGHT)
                         / iMainWinScreenHeight;
-        sourceLeft6 = CLIENT_TO_GAME_X(gDDDestinationRect.left);
-        sourceTop8 = CLIENT_TO_GAME_Y(gDDDestinationRect.top);
+        sourceLeft = CLIENT_TO_GAME_X(gDDDestinationRect.left);
+        sourceTop = CLIENT_TO_GAME_Y(gDDDestinationRect.top);
         if (giScrollX != 0) {
-            sourceLeft6 = giScrollX + WINGRAPH_SCROLL_MARGIN;
+            sourceLeft = giScrollX + WINGRAPH_SCROLL_MARGIN;
             sourceWidth = WINGRAPH_SCROLL_SIZE;
         }
         if (giScrollY != 0) {
-            sourceTop8 = giScrollY + WINGRAPH_SCROLL_MARGIN;
-            sourceHeight5 = WINGRAPH_SCROLL_SIZE;
+            sourceTop = giScrollY + WINGRAPH_SCROLL_MARGIN;
+            sourceHeight = WINGRAPH_SCROLL_SIZE;
         }
-        gDDSourceRect.left = sourceLeft6;
-        gDDSourceRect.right = sourceLeft6 + sourceWidth - 1;
-        gDDSourceRect.top = sourceTop8;
-        gDDSourceRect.bottom = sourceTop8 + sourceHeight5 - 1;
+        gDDSourceRect.left = sourceLeft;
+        gDDSourceRect.right = sourceLeft + sourceWidth - 1;
+        gDDSourceRect.top = sourceTop;
+        gDDSourceRect.bottom = sourceTop + sourceHeight - 1;
 
-        point1.y = 0;
-        point1.x = point1.y;
-        ClientToScreen(hwndApp, &point1);
-        OffsetRect(&gDDDestinationRect, point1.x, point1.y);
+        point.y = 0;
+        point.x = point.y;
+        ClientToScreen(hwndApp, &point);
+        OffsetRect(&gDDDestinationRect, point.x, point.y);
         gDDResult = lpDDSOne->Unlock(NULL);
         if (gDDResult != DD_OK)
             DDSD(
@@ -280,16 +287,26 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
                 RETAIL_FILE,
                 286
             );
-        EndPaint(reinterpret_cast<HWND>(window), &paint7);
+        EndPaint(reinterpret_cast<HWND>(window), &paint);
         gbWinGraphBusy = false;
     }
     return 1;
 }
+#if H2_RETAIL_COMPILER
+#undef paint
+#undef point
+#undef sourceHeight
+#undef sourceLeft
+#undef sourceTop
+#endif
 
+#if H2_RETAIL_COMPILER
+#define entry entry0
+#endif
 VA(0x004b0369, 0x111)
 void DDInitializePalette(void) {
     HDC winDC;
-    i32 entry0;
+    i32 entry;
     HRESULT rr;
 
     if (gbWinGraphBusy != 0)
@@ -304,18 +321,18 @@ void DDInitializePalette(void) {
             &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
         );
         ReleaseDC(NULL, winDC);
-        for (entry0 = 0; entry0 < WINGRAPH_SYSTEM_PALETTE_SIZE; entry0++) {
-            LogicalPalette.entries[entry0].peFlags = 0;
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+        for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
+            LogicalPalette.entries[entry].peFlags = 0;
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
                 .peFlags = 0;
         }
-        for (entry0 = WINGRAPH_SYSTEM_PALETTE_SIZE;
-             entry0 < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
-             entry0++) {
-            LogicalPalette.entries[entry0].peRed = 0;
-            LogicalPalette.entries[entry0].peGreen = 0;
-            LogicalPalette.entries[entry0].peBlue = 0;
-            LogicalPalette.entries[entry0].peFlags = PC_NOCOLLAPSE;
+        for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
+             entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
+             entry++) {
+            LogicalPalette.entries[entry].peRed = 0;
+            LogicalPalette.entries[entry].peGreen = 0;
+            LogicalPalette.entries[entry].peBlue = 0;
+            LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
         }
         rr = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
         if (rr != DD_OK)
@@ -327,6 +344,9 @@ void DDInitializePalette(void) {
         SetPalette();
     }
 }
+#if H2_RETAIL_COMPILER
+#undef entry
+#endif
 
 VA(0x004b047a, 0x7e)
 i32 DDSetPalette(void) {
@@ -509,10 +529,13 @@ void DDSD(i32 error, H2_CONST char* file, i32 line) {
     ShutDown(gText);
 }
 
+#if H2_RETAIL_COMPILER
+#define result result0
+#endif
 VA(0x004b0c15, 0xee)
 void __cdecl DDUpdatePalette(i8* paletteData) {
     i32 entry;
-    HRESULT result0;
+    HRESULT result;
 
     if (gbWinGraphBusy != 0)
         return;
@@ -537,19 +560,22 @@ void __cdecl DDUpdatePalette(i8* paletteData) {
         RETAIL_FILE,
         518
     );
-    result0 = lpDDPal->SetEntries(
+    result = lpDDPal->SetEntries(
         0,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
         WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
         &LogicalPalette.entries[WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
-    if (result0 != DD_OK)
+    if (result != DD_OK)
         DDSD(
-            result0,
+            result,
             RETAIL_FILE,
             522
         );
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
 
 VA(0x004b0d03, 0x14a)
 void DDCleanUpWinGraphics(void) {
@@ -730,9 +756,12 @@ void WGInitGraphics(void) {
     PatBlt(hdcImage, 0, 0, iMainWinScreenWidth, iMainWinScreenHeight, BLACKNESS);
 }
 
+#if H2_RETAIL_COMPILER
+#define deviceContext dc0
+#endif
 VA(0x004b1273, 0x1c1)
 void __cdecl WGUpdatePalette(i8* paletteData) {
-    HDC dc0;
+    HDC deviceContext;
     i32 H2_UNUSED(result);
     i32 idx;
 
@@ -767,11 +796,11 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
     if (hpalApp != NULL)
         DeleteObject(hpalApp);
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
-    dc0 = GetDC(hwndApp);
+    deviceContext = GetDC(hwndApp);
     if (hpalApp != NULL)
-        SelectPalette(dc0, hpalApp, 0);
-    result = RealizePalette(dc0);
-    ReleaseDC(hwndApp, dc0);
+        SelectPalette(deviceContext, hpalApp, 0);
+    result = RealizePalette(deviceContext);
+    ReleaseDC(hwndApp, deviceContext);
     if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != NULL) {
         if (gbLimitedCombatUpdatePalette != 0) {
             if (gbFullCombatScreenDrawn != 0)
@@ -797,101 +826,118 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef deviceContext
+#endif
 
+#if H2_RETAIL_COMPILER
+#define deviceContext dc0
+#define entry entry0
+#endif
 VA(0x004b1434, 0x1a2)
 void WGInitializePalette(void) {
-    HDC dc0;
-    i32 entry0;
+    HDC deviceContext;
+    i32 entry;
 
     if (hpalApp != NULL)
         return;
-    dc0 = GetDC(NULL);
-    GetSystemPaletteEntries(dc0, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
+    deviceContext = GetDC(NULL);
+    GetSystemPaletteEntries(deviceContext, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
     GetSystemPaletteEntries(
-        dc0,
+        deviceContext,
         WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
         &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
-    ReleaseDC(NULL, dc0);
-    for (entry0 = 0; entry0 < WINGRAPH_SYSTEM_PALETTE_SIZE; entry0++) {
-        screenImage.colors[entry0].rgbRed = LogicalPalette.entries[entry0].peRed;
-        screenImage.colors[entry0].rgbGreen = LogicalPalette.entries[entry0].peGreen;
-        screenImage.colors[entry0].rgbBlue = LogicalPalette.entries[entry0].peBlue;
-        screenImage.colors[entry0].rgbReserved = 0;
-        LogicalPalette.entries[entry0].peFlags = 0;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbRed =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+    ReleaseDC(NULL, deviceContext);
+    for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
+        screenImage.colors[entry].rgbRed = LogicalPalette.entries[entry].peRed;
+        screenImage.colors[entry].rgbGreen = LogicalPalette.entries[entry].peGreen;
+        screenImage.colors[entry].rgbBlue = LogicalPalette.entries[entry].peBlue;
+        screenImage.colors[entry].rgbReserved = 0;
+        LogicalPalette.entries[entry].peFlags = 0;
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbRed =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
                 .peRed;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbGreen =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbGreen =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
                 .peGreen;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbBlue =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbBlue =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
                 .peBlue;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
             .rgbReserved = 0;
-        LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
+        LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
             .peFlags = 0;
     }
-    for (entry0 = WINGRAPH_SYSTEM_PALETTE_SIZE;
-         entry0 < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
-         entry0++) {
-        LogicalPalette.entries[entry0].peRed = 0;
-        screenImage.colors[entry0].rgbRed = 0;
-        LogicalPalette.entries[entry0].peGreen = 0;
-        screenImage.colors[entry0].rgbGreen = 0;
-        LogicalPalette.entries[entry0].peBlue = 0;
-        screenImage.colors[entry0].rgbBlue = 0;
-        screenImage.colors[entry0].rgbReserved = 0;
-        LogicalPalette.entries[entry0].peFlags = PC_NOCOLLAPSE;
+    for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
+         entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
+         entry++) {
+        LogicalPalette.entries[entry].peRed = 0;
+        screenImage.colors[entry].rgbRed = 0;
+        LogicalPalette.entries[entry].peGreen = 0;
+        screenImage.colors[entry].rgbGreen = 0;
+        LogicalPalette.entries[entry].peBlue = 0;
+        screenImage.colors[entry].rgbBlue = 0;
+        screenImage.colors[entry].rgbReserved = 0;
+        LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
     }
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
 }
+#if H2_RETAIL_COMPILER
+#undef deviceContext
+#undef entry
+#endif
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
+#define clientRectangle clientRect16
 #define destinationHeight destHeight3
 #define destinationWidth destW
 #define destinationX destX7
 #define destinationY destY0
+#define padding padding8
+#define paintInfo paint5
+#define sourceX xSource
+#define sourceY fromY
+#define unusedByte unusedByte0
 #endif
 VA(0x004b15d6, 0x1bd)
 i32 WGAppPaint(void* window, void* paintDC) {
-    i32 H2_UNUSED(padding8);
-    char H2_UNUSED(unusedByte0);
-    RECT clientRect16;
+    i32 H2_UNUSED(padding);
+    char H2_UNUSED(unusedByte);
+    RECT clientRectangle;
     i32 destinationY;
-    i32 xSource;
-    PAINTSTRUCT paint5;
+    i32 sourceX;
+    PAINTSTRUCT paintInfo;
     i32 destinationHeight;
     i32 destinationWidth;
     i32 destinationX;
-    i32 fromY;
+    i32 sourceY;
 
-    unusedByte0 = 0;
+    unusedByte = 0;
     if (screenImage.bits != NULL) {
-        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint5);
+        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paintInfo);
         SelectPalette(static_cast<HDC>(paintDC), hpalApp, 0);
         RealizePalette(static_cast<HDC>(paintDC));
-        GetClientRect(reinterpret_cast<HWND>(window), &clientRect16);
+        GetClientRect(reinterpret_cast<HWND>(window), &clientRectangle);
         destinationX = 0;
-        xSource = destinationX;
+        sourceX = destinationX;
         destinationY = 0;
-        fromY = destinationY;
-        destinationWidth = clientRect16.right - clientRect16.left;
-        destinationHeight = clientRect16.bottom - clientRect16.top;
-        xSource = CLIENT_TO_GAME_X(destinationX);
-        fromY = CLIENT_TO_GAME_Y(destinationY);
+        sourceY = destinationY;
+        destinationWidth = clientRectangle.right - clientRectangle.left;
+        destinationHeight = clientRectangle.bottom - clientRectangle.top;
+        sourceX = CLIENT_TO_GAME_X(destinationX);
+        sourceY = CLIENT_TO_GAME_Y(destinationY);
         if (giScrollX != 0)
-            xSource += giScrollX;
+            sourceX += giScrollX;
         if (giScrollY != 0)
-            fromY += giScrollY;
+            sourceY += giScrollY;
         giTtlBlts++;
         if (iMainWinScreenWidth == WINGRAPH_WIDTH && iMainWinScreenHeight == WINGRAPH_HEIGHT) {
-            destinationX = paint5.rcPaint.left & WINGRAPH_PAINT_ALIGN_MASK;
-            destinationWidth = paint5.rcPaint.right - destinationX + 1;
-            destinationY = paint5.rcPaint.top;
-            destinationHeight = paint5.rcPaint.bottom - destinationY + 1;
+            destinationX = paintInfo.rcPaint.left & WINGRAPH_PAINT_ALIGN_MASK;
+            destinationWidth = paintInfo.rcPaint.right - destinationX + 1;
+            destinationY = paintInfo.rcPaint.top;
+            destinationHeight = paintInfo.rcPaint.bottom - destinationY + 1;
             WinGBitBlt(
                 static_cast<HDC>(paintDC),
                 destinationX,
@@ -910,21 +956,27 @@ i32 WGAppPaint(void* window, void* paintDC) {
                 destinationWidth,
                 destinationHeight,
                 hdcImage,
-                xSource,
-                fromY,
+                sourceX,
+                sourceY,
                 (destinationWidth * WINGRAPH_WIDTH) / iMainWinScreenWidth,
                 (destinationHeight * WINGRAPH_HEIGHT) / iMainWinScreenHeight
             );
         }
-        EndPaint(reinterpret_cast<HWND>(window), &paint5);
+        EndPaint(reinterpret_cast<HWND>(window), &paintInfo);
     }
     return 1;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
+#undef clientRectangle
 #undef destinationHeight
 #undef destinationWidth
 #undef destinationX
 #undef destinationY
+#undef padding
+#undef paintInfo
+#undef sourceX
+#undef sourceY
+#undef unusedByte
 #endif
 
 VA(0x004b1793, 0x67)

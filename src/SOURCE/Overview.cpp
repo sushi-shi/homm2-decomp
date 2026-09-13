@@ -1038,7 +1038,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #endif
 VA(0x0047bd2a, 0x77)
@@ -1055,7 +1055,7 @@ void game::SetupResources(void) {
         overWin->BroadcastMessage(message);
     }
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #endif
 
@@ -1391,6 +1391,9 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+#if H2_RETAIL_COMPILER
+#define secondarySkill secondarySkill12
+#endif
 VA(0x0047c9b3, 0x4a3)
 i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
     i32 item;
@@ -1441,9 +1444,9 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
 #if H2_STRICT_ENUMS
-                HeroSecondarySkill secondarySkill12 =
+                HeroSecondarySkill secondarySkill =
                     curHero->GetNthSS(widgetId - HERO_SKILL_FIRST);
-                curHero->DoSSLevelDialog(secondarySkill12, quickView);
+                curHero->DoSSLevelDialog(secondarySkill, quickView);
 #else
                 item = curHero->GetNthSS(widgetId - HERO_SKILL_FIRST);
                 curHero->DoSSLevelDialog(item, quickView);
@@ -1553,6 +1556,9 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef secondarySkill
+#endif
 
 DATA(0x005309b0) class heroWindow* overWin = NULL;
 DATA(0x005309b4) class textWidget** textWidgetDynamic = NULL;

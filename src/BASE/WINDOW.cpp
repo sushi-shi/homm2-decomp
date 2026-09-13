@@ -219,38 +219,44 @@ void heroWindow::Close(void) {
     m_winState = WINDOW_STATE_CLOSED;
 }
 
+#if H2_RETAIL_COMPILER
+#define currentWidget local_8
+#endif
 VA(0x004bafc0, 0x109)
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
-    widget* local_8 = m_widgetListHead;
+    widget* currentWidget = m_widgetListHead;
     if (zOrder == -1) {
-        if (local_8 == NULL)
+        if (currentWidget == NULL)
             zOrder = 0;
         else
-            zOrder = local_8->m_zOrder + 1;
+            zOrder = currentWidget->m_zOrder + 1;
     }
     if (newWidget->Open(zOrder, this) != 0)
         return;
-    while (local_8 != NULL && local_8->m_zOrder > zOrder) {
-        local_8 = local_8->m_next;
+    while (currentWidget != NULL && currentWidget->m_zOrder > zOrder) {
+        currentWidget = currentWidget->m_next;
     }
-    if (local_8 == NULL) {
+    if (currentWidget == NULL) {
         newWidget->m_prev = m_widgetListTail;
         newWidget->m_next = NULL;
         m_widgetListTail = newWidget;
         if (m_widgetListHead == NULL)
             m_widgetListHead = newWidget;
-    } else if (local_8->m_prev == NULL) {
+    } else if (currentWidget->m_prev == NULL) {
         newWidget->m_next = m_widgetListHead;
         newWidget->m_prev = NULL;
         m_widgetListHead->m_prev = newWidget;
         m_widgetListHead = newWidget;
     } else {
-        newWidget->m_next = local_8;
-        newWidget->m_prev = local_8->m_prev;
-        local_8->m_prev->m_next = newWidget;
-        local_8->m_prev = newWidget;
+        newWidget->m_next = currentWidget;
+        newWidget->m_prev = currentWidget->m_prev;
+        currentWidget->m_prev->m_next = newWidget;
+        currentWidget->m_prev = newWidget;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef currentWidget
+#endif
 
 VA(0x004bb0d0, 0xe7)
 void heroWindow::RemoveWidget(class widget* w) {
@@ -280,22 +286,30 @@ void heroWindow::RemoveWidget(class widget* w) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define currentWidget local_c
+#define dispatchResult local_8
+#endif
 VA(0x004bb1c0, 0x5e)
 MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) {
-    MessageDispatchResult local_8 = MESSAGE_DISPATCH_CONTINUE;
-    widget* local_c = m_widgetListHead;
-    while (local_c != NULL) {
-        switch (local_8 = local_c->Main(message)) {
+    MessageDispatchResult dispatchResult = MESSAGE_DISPATCH_CONTINUE;
+    widget* currentWidget = m_widgetListHead;
+    while (currentWidget != NULL) {
+        switch (dispatchResult = currentWidget->Main(message)) {
             case MESSAGE_DISPATCH_CONTINUE:
                 break;
             case MESSAGE_DISPATCH_CONSUME:
             case MESSAGE_DISPATCH_FORWARD:
-                return local_8;
+                return dispatchResult;
         }
-        local_c = local_c->m_next;
+        currentWidget = currentWidget->m_next;
     }
-    return local_8;
+    return dispatchResult;
 }
+#if H2_RETAIL_COMPILER
+#undef currentWidget
+#undef dispatchResult
+#endif
 
 VA(0x004bb220, 0x15)
 void heroWindow::DrawWindow(void) {
@@ -307,22 +321,26 @@ void heroWindow::DrawWindow(i32 flags) {
     DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
 }
 
+#if H2_RETAIL_COMPILER
+#define currentWidget local_8
+#define message local_24
+#endif
 VA(0x004bb270, 0xed)
 void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
-    tag_message local_24;
-    widget* local_8;
+    tag_message message;
+    widget* currentWidget;
     gpMouseManager->m_cursorReady = false;
-    local_8 = m_widgetListTail;
-    local_24.type = MESSAGE_WIDGET;
-    local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
-    while (local_8 != NULL) {
+    currentWidget = m_widgetListTail;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_DRAW;
+    while (currentWidget != NULL) {
         PollSound();
         if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
-            if (local_8->m_id >= firstId && local_8->m_id <= lastId)
-                local_8->Main(local_24);
+            if (currentWidget->m_id >= firstId && currentWidget->m_id <= lastId)
+                currentWidget->Main(message);
         } else
-            local_8->Main(local_24);
-        local_8 = local_8->m_prev;
+            currentWidget->Main(message);
+        currentWidget = currentWidget->m_prev;
     }
     PollSound();
     if (update != 0
@@ -332,6 +350,10 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     }
     gpMouseManager->m_cursorReady = true;
 }
+#if H2_RETAIL_COMPILER
+#undef currentWidget
+#undef message
+#endif
 
 VA(0x004bb360, 0xa9)
 i32 heroWindow::SaveBackground(void) {

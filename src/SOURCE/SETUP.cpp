@@ -235,7 +235,7 @@ i32 game::SetupNetworkGame(void) {
     return 1;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define dimMessage dimMsg
 #define message msg
 #endif
@@ -298,7 +298,7 @@ i32 game::SetupNetworkGame2(void) {
     else
         return 1;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef dimMessage
 #undef message
 #endif

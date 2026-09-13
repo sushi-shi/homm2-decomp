@@ -117,6 +117,9 @@ i32 ShowThisMap(char*) {
     return 1;
 }
 
+#if H2_RETAIL_COMPILER
+#define indexData indexData5
+#endif
 VA(0x0048e836, 0x723)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     HANDLE findHandleWork;
@@ -127,7 +130,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     char* dotPtr;
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
     WIN32_FIND_DATA findFileData;
-    i32 indexData5;
+    i32 indexData;
     i32 moveValue;
     char fullPath[FILE_REQUESTER_PATH_SIZE];
 
@@ -181,13 +184,13 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         }
     }
 
-    for (indexData5 = 0; indexData5 < m_fileCount; ++indexData5) {
+    for (indexData = 0; indexData < m_fileCount; ++indexData) {
         strcpy(
-            m_fileNames[indexData5].text,
+            m_fileNames[indexData].text,
             ""
         );
         strcpy(
-            m_extensions[indexData5].text,
+            m_extensions[indexData].text,
             ""
         );
     }
@@ -224,9 +227,9 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 *dotPtr = 0;
             }
 
-            for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-                if (strcmpi(nameBuffer, m_fileNames[indexData5].text) < 0) {
-                    for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
+            for (indexData = 0; indexData < insertCount; ++indexData) {
+                if (strcmpi(nameBuffer, m_fileNames[indexData].text) < 0) {
+                    for (moveValue = insertCount; moveValue > indexData; --moveValue) {
                         strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
                         strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
                     }
@@ -234,8 +237,8 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 }
             }
         InsertName:
-            strcpy(m_fileNames[indexData5].text, nameBuffer);
-            strcpy(m_extensions[indexData5].text, extension);
+            strcpy(m_fileNames[indexData].text, nameBuffer);
+            strcpy(m_extensions[indexData].text, extension);
             ++insertCount;
         InsertNextFile:
             haveMore = FindNextFile(findHandleWork, &findFileData);
@@ -244,13 +247,16 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            sprintf(fullPath, "%s%s", m_fileNames[indexData5].text, m_extensions[indexData5].text);
-            GetMapHeader(fullPath, &m_mapHeaders[indexData5]);
+        for (indexData = 0; indexData < insertCount; ++indexData) {
+            sprintf(fullPath, "%s%s", m_fileNames[indexData].text, m_extensions[indexData].text);
+            GetMapHeader(fullPath, &m_mapHeaders[indexData]);
         }
     }
     return m_fileCount;
 }
+#if H2_RETAIL_COMPILER
+#undef indexData
+#endif
 
 VA(0x0048ef59, 0x156)
 fileRequester::fileRequester(
@@ -903,20 +909,25 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+#if H2_RETAIL_COMPILER
+#define gutterStep gutterStep7
+#define mouseX mouseX7
+#define mouseY mouseY7
+#endif
 VA(0x0049085b, 0x25b)
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex;
-    double gutterStep7;
-    i32 mouseX7;
+    double gutterStep;
+    i32 mouseX;
     i32 knobOffset;
-    i32 mouseY7;
+    i32 mouseY;
     tag_message knobMessage;
     i32 topIndex;
 
     oldTopIndex = m_topIndex;
-    gutterStep7 = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
-    gpMouseManager->MouseCoords(mouseX7, mouseY7);
-    knobOffset = mouseY7 - m_scrollKnob->m_y;
+    gutterStep = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
+    gpMouseManager->MouseCoords(mouseX, mouseY);
+    knobOffset = mouseY - m_scrollKnob->m_y;
     gpInputManager->Flush();
     knobMessage = gpInputManager->GetEvent();
     while (knobMessage.type != MESSAGE_LEFT_BUTTON_UP
@@ -933,7 +944,7 @@ void fileRequester::DoKnob(void) {
             gpMouseManager->Main(knobMessage);
             m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
             if (m_fileCount > iMaxListSize) {
-                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep7);
+                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep);
                 if (topIndex != oldTopIndex) {
                     if (topIndex > m_fileCount - iMaxListSize) {
                         topIndex = m_fileCount - iMaxListSize;
@@ -959,17 +970,27 @@ void fileRequester::DoKnob(void) {
     m_scrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
     Update(1);
 }
+#if H2_RETAIL_COMPILER
+#undef gutterStep
+#undef mouseX
+#undef mouseY
+#endif
 
+#if H2_RETAIL_COMPILER
+#define gutterStepCount gutterStepCount1
+#define localStorage localStorage1
+#define unusedValue unusedState7
+#endif
 VA(0x00490ab6, 0xa9e)
 void fileRequester::Update(i32 drawWindow) {
     i32 H2_UNUSED(unusedState);
     double H2_UNUSED(gutterSpan);
     i32 H2_UNUSED(localState);
     tag_message message;
-    char H2_UNUSED(localStorage1)[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
+    char H2_UNUSED(localStorage)[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
     i32 i;
-    double gutterStepCount1;
-    i32 H2_UNUSED(unusedState7);
+    double gutterStepCount;
+    i32 H2_UNUSED(unusedValue);
 
     message.type = MESSAGE_WIDGET;
     localState = 0;
@@ -1141,13 +1162,18 @@ void fileRequester::Update(i32 drawWindow) {
                 + fGutterMinY
             );
     } else {
-        gutterStepCount1 = fGutterTravelLength / (m_fileCount - iMaxListSize);
-        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount1);
+        gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
+        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount);
     }
     if (drawWindow) {
         m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef gutterStepCount
+#undef localStorage
+#undef unusedValue
+#endif
 
 VA(0x00491554, 0x12b)
 H2_CONST char* fileRequester::GetFilename(void) {

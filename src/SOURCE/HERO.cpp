@@ -333,33 +333,43 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     return SPELL_NONE;
 }
 
+#if H2_RETAIL_COMPILER
+#define numAdventureSpells numAdventureSpells2
+#define numCombatSpells numCombatSpells2
+#define spell spell2
+#endif
 VA(0x004612f3, 0x9e)
 i32 hero::GetNumSpells(HeroSpellType type) {
-    i32 numAdventureSpells2;
-    i32 numCombatSpells2;
-    SpellType spell2;
+    i32 numAdventureSpells;
+    i32 numCombatSpells;
+    SpellType spell;
 
-    numCombatSpells2 = 0;
-    numAdventureSpells2 = 0;
-    for (spell2 = SPELL_FIREBALL; spell2 < SPELL_COUNT; spell2++) {
-        if (HasSpell(spell2)) {
-            if (HAS(gsSpellInfo[IDX(spell2)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
-                numCombatSpells2++;
+    numCombatSpells = 0;
+    numAdventureSpells = 0;
+    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+        if (HasSpell(spell)) {
+            if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+                numCombatSpells++;
             else
-                numAdventureSpells2++;
+                numAdventureSpells++;
         }
     }
 
     switch (type) {
         case SPELL_TYPE_COMBAT:
-            return numCombatSpells2;
+            return numCombatSpells;
         case SPELL_TYPE_ADVENTURE:
-            return numAdventureSpells2;
+            return numAdventureSpells;
         case SPELL_TYPE_ALL:
-            return numCombatSpells2 + numAdventureSpells2;
+            return numCombatSpells + numAdventureSpells;
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef numAdventureSpells
+#undef numCombatSpells
+#undef spell
+#endif
 
 VA(0x00461391, 0x6f)
 void hero::UseSpell(SpellType spell) {
@@ -632,9 +642,12 @@ void hero::Deallocate(i32 updateMap) {
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+#if H2_RETAIL_COMPILER
+#define experience experience2
+#endif
 VA(0x00461cd6, 0x8a)
 i32 hero::GetExperience(i32 level) {
-    i32 experience2;
+    i32 experience;
     i32 stage;
     i32 incr;
 
@@ -648,14 +661,17 @@ i32 hero::GetExperience(i32 level) {
              [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
-    experience2 = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + incr;
+    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + incr;
     while (stage < level) {
         incr = static_cast<i32>(incr * HERO_EXPERIENCE_GROWTH_FACTOR);
-        experience2 += incr;
+        experience += incr;
         stage++;
     }
-    return experience2;
+    return experience;
 }
+#if H2_RETAIL_COMPILER
+#undef experience
+#endif
 
 VA(0x00461d60, 0xac)
 i32 hero::GetLevel(i32 experienceValue) {
@@ -1136,7 +1152,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     HeroMessageUpdate(gText);
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define newMessage newMsg
 #endif
 VA(0x00462ef8, 0x9ba)
@@ -1487,7 +1503,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef newMessage
 #endif
 
@@ -1542,7 +1558,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     return UI_VIEW_CLOSED;
 }
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define message msg
 #define statusMessage statusMsg
 #endif
@@ -1789,7 +1805,7 @@ void SetupHeroView(void) {
     statusMessage.payload.widget.id = UI_ARMY_SELECTION_NONE;
     UpdateHeroScreenStatusBar(statusMessage);
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef message
 #undef statusMessage
 #endif

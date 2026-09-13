@@ -286,19 +286,23 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
+#if H2_RETAIL_COMPILER
+#define commandWindow commandWindow2
+#define notificationType notificationType1
+#endif
 VA(0x00471883, 0x67)
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
-    HWND H2_UNUSED(commandWindow2);
-    u16 H2_UNUSED(notificationType1);
+    HWND H2_UNUSED(commandWindow);
+    u16 H2_UNUSED(notificationType);
 
     switch (message) {
         case WM_INITDIALOG:
             return 1;
         case WM_COMMAND:
             command = LOWORD(messageParam);
-            commandWindow2 = reinterpret_cast<HWND>(messageData);
-            notificationType1 = HIWORD(messageParam);
+            commandWindow = reinterpret_cast<HWND>(messageData);
+            notificationType = HIWORD(messageParam);
             if (command == IDOK)
                 EndDialog(dialog, 1);
             break;
@@ -306,6 +310,10 @@ BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM me
     PollSound();
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef commandWindow
+#undef notificationType
+#endif
 
 VA(0x004718ea, 0xf)
 void AppExit(void) {

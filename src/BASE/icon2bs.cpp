@@ -11,7 +11,7 @@ H2_ENUM_BEGIN(IconScaleConstant)
     SCALE_WORK_BITMAP_SIZE = 0x40
 H2_ENUM_END(IconScaleConstant)
 
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #define destinationOrigin dstOrg
 #define destinationPixel destPix
 #define sourceBase srcBase
@@ -81,7 +81,7 @@ void IconToBitmapScale(
     }
     delete temp;
 }
-#if !H2_STRICT_ENUMS
+#if H2_RETAIL_COMPILER
 #undef destinationOrigin
 #undef destinationPixel
 #undef sourceBase
