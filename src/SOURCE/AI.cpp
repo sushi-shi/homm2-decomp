@@ -95,25 +95,21 @@ i32 combatManager::AICheckRetreat(void) {
         groupIndex = 0;
         for (armyIndex = 0; armyIndex < COMBAT_AI_ARMY_SLOT_COUNT; armyIndex++) {
             if ((m_armies[sideNum] + armyIndex)->IsAlive()) {
-                armies->m_creatureTypes[groupIndex] = static_cast<i8>(
-                    (m_armies[sideNum] + armyIndex)
-                        ->m_monsterType
-                );
+                armies->m_creatureTypes[groupIndex] =
+                    (m_armies[sideNum] + armyIndex)->m_monsterType;
                 if (HAS((m_armies[sideNum] + armyIndex)
                             ->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY)
                     != 0) {
-                    armies->m_creatureCounts[groupIndex] = static_cast<i16>(
-                        (m_armies[sideNum] + armyIndex)
-                            ->m_quantity
-                    );
+                    armies->m_creatureCounts[groupIndex] =
+                        (m_armies[sideNum] + armyIndex)->m_quantity;
                 } else {
                     armies->m_creatureCounts[groupIndex] =
-                        static_cast<i16>(static_cast<i32>(
+                        static_cast<i32>(
                             (m_armies[sideNum] + armyIndex)
                                 ->m_quantity
                             * COMBAT_AI_QUANTITY_ESTIMATE
-                        ));
+                        );
                 }
                 groupIndex++;
             }
@@ -149,40 +145,37 @@ i32 combatManager::AICheckRetreat(void) {
 
     chance = COMBAT_AI_BASE_RETREAT_CHANCE;
     if (artifactValue > COMBAT_AI_HIGH_ARTIFACT_VALUE)
-        chance = static_cast<float>(chance + COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS);
+        chance = chance + COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS;
     else if (artifactValue > COMBAT_AI_MEDIUM_ARTIFACT_VALUE)
         chance =
-            static_cast<float>(chance + COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS);
+            chance + COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS;
     else if (artifactValue > 0)
-        chance = static_cast<float>(chance + COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS);
+        chance = chance + COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS;
 
     if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_40000)
-        chance -= static_cast<float>(force[IDX(m_currentSide)] / COMBAT_AI_STRENGTH_20000);
+        chance -= force[IDX(m_currentSide)] / COMBAT_AI_STRENGTH_20000;
     else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_30000)
         chance =
-            static_cast<float>(chance - COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY);
+            chance - COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY;
     else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_15000)
         chance =
-            static_cast<float>(chance - COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY);
+            chance - COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY;
     else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_5000)
         chance =
-            static_cast<float>(chance - COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY);
+            chance - COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY;
     else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_2500)
         chance =
-            static_cast<float>(chance - COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY);
+            chance - COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY;
 
-    chance = static_cast<float>(
-        chance
-        - (COMBAT_AI_MAX_DIFFICULTY - IDX(gpGame->m_difficulty))
-              * COMBAT_AI_DIFFICULTY_RETREAT_STEP
-    );
+    chance = chance - (COMBAT_AI_MAX_DIFFICULTY - IDX(gpGame->m_difficulty))
+                          * COMBAT_AI_DIFFICULTY_RETREAT_STEP;
     bonus =
-        static_cast<float>(m_heroes[IDX(m_currentSide)]->m_experience / COMBAT_AI_EXPERIENCE_DIVISOR);
+        m_heroes[IDX(m_currentSide)]->m_experience / COMBAT_AI_EXPERIENCE_DIVISOR;
     if (bonus > COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE)
         bonus = COMBAT_AI_MAX_EXPERIENCE_BONUS;
     chance += bonus;
     if (m_currentSide == COMBAT_ATTACKER_SIDE)
-        chance = static_cast<float>(chance - COMBAT_AI_ATTACKER_RETREAT_PENALTY);
+        chance = chance - COMBAT_AI_ATTACKER_RETREAT_PENALTY;
     if (chance > COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE)
         chance = COMBAT_AI_MAX_RETREAT_CHANCE;
 
@@ -516,16 +509,15 @@ finish:
 VA(0x0041722b, 0xab)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
-    float remainingHitPoints = static_cast<float>(
-        target->m_quantity * target->m_monster.hitPoints - target->m_hitPointsLost
-    );
+    float remainingHitPoints =
+        target->m_quantity * target->m_monster.hitPoints - target->m_hitPointsLost;
 
     if (modifiedDamage > remainingHitPoints)
         modifiedDamage = remainingHitPoints;
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0)
-        modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
+        modifiedDamage = modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER;
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0)
-        modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
+        modifiedDamage = modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER;
     modifiedDamage = ((target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
         / COMBAT_AI_LICH_HIT_POINT_SCALE);
     return modifiedDamage;
@@ -537,12 +529,12 @@ void combatManager::DoLichShot(class army* lich) {
     i32 armyIndex;
     i32 bestIndex = COMBAT_AI_NO_ARMY;
     float bestTotal = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
-    float shotDamage = static_cast<float>(lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
+    float shotDamage = lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE;
     i32 sideHex;
     float score;
     CombatHexDirection iDir;
     army* targetArmy;
-    u8 marked[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
+    u8 marked[COMBAT_SIDE_COUNT][COMBAT_AI_ARMY_SLOT_COUNT];
     i32 targetHex;
 
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(OppositeCombatSide(m_currentSide))];
@@ -555,7 +547,7 @@ void combatManager::DoLichShot(class army* lich) {
             || targetArmy->m_quantity <= 0)
             continue;
         score = GetModLichDamage(targetArmy, shotDamage);
-        *(marked + IDX(targetArmy->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + targetArmy->m_index) =
+        marked[IDX(targetArmy->m_side)][targetArmy->m_index] =
             1;
         targetHex = targetArmy->m_hex;
         for (iDir = COMBAT_DIRECTION_NORTHEAST;
@@ -565,16 +557,14 @@ void combatManager::DoLichShot(class army* lich) {
             if (sideHex >= 0 && sideHex < COMBAT_HEX_COUNT
                 && m_hexCells[sideHex].m_occupantSide != COMBAT_SIDE_NONE
                 && m_hexCells[sideHex].m_occupantIndex != -1
-                && *(marked + IDX(m_hexCells[sideHex].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
-                     + m_hexCells[sideHex].m_occupantIndex)
+                && marked[IDX(m_hexCells[sideHex].m_occupantSide)][m_hexCells[sideHex].m_occupantIndex]
                        == 0) {
                 splashDamage = GetModLichDamage(
                     &m_armies[IDX(m_hexCells[sideHex].m_occupantSide)]
                              [m_hexCells[sideHex].m_occupantIndex],
                     shotDamage
                 );
-                *(marked + IDX(m_hexCells[sideHex].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
-                  + m_hexCells[sideHex].m_occupantIndex) = 1;
+                marked[IDX(m_hexCells[sideHex].m_occupantSide)][m_hexCells[sideHex].m_occupantIndex] = 1;
                 if (m_hexCells[sideHex].m_occupantSide == m_currentSide)
                     score -= splashDamage;
                 else
@@ -874,17 +864,17 @@ i32 combatManager::AttemptAttack(
 
         currentArmy->m_targetSide = side;
         currentArmy->m_targetIndex = targetArmy;
-        targetHex = targetArmy[m_armies[IDX(side)]].m_hex;
+        targetHex = m_armies[IDX(side)][targetArmy].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
             giNextAction = ACTION_MOVE;
             giNextActionGridIndex = targetHex;
             return 1;
         }
-        if (HAS(targetArmy[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
+        if (HAS(m_armies[IDX(side)][targetArmy].m_monster.flags.abilityFlags,
                 MONSTER_ABILITY_FLAG_WIDE)
             != 0) {
-            if (targetArmy[m_armies[IDX(side)]].m_facing == ARMY_FACING_LEFT)
+            if (m_armies[IDX(side)][targetArmy].m_facing == ARMY_FACING_LEFT)
                 targetHex--;
             else
                 targetHex++;
@@ -965,8 +955,8 @@ i32 combatManager::WalkTowardArmyFront(
         return 0;
 
     frontDelta = SINGLE_HEX_FRONT_OFFSET;
-    frontHex = armyIndex[m_armies[IDX(side)]].m_hex;
-    if (HAS(armyIndex[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
+    frontHex = m_armies[IDX(side)][armyIndex].m_hex;
+    if (HAS(m_armies[IDX(side)][armyIndex].m_monster.flags.abilityFlags,
             MONSTER_ABILITY_FLAG_WIDE)
         != 0)
         frontDelta = WIDE_CREATURE_FRONT_OFFSET;
@@ -983,7 +973,7 @@ i32 combatManager::WalkTowardArmyFront(
         COMBAT_AI_PATH_TO_FRONT,
         0
     );
-    currentArmy->m_monster.speed = static_cast<i8>(oldSpeed);
+    currentArmy->m_monster.speed = oldSpeed;
     if (gpSearchArray->m_pathLength > 0) {
         giNextAction = ACTION_MOVE;
         left = currentArmy->m_monster.speed;
@@ -1066,7 +1056,7 @@ i32 combatManager::WalkTowardArmy(
                 0
             );
     }
-    currentArmy->m_monster.speed = static_cast<i8>(prevSpeed);
+    currentArmy->m_monster.speed = prevSpeed;
     if (gpSearchArray->m_pathLength > 1) {
         giNextAction = ACTION_MOVE;
         movement = currentArmy->m_monster.speed;

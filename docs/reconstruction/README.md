@@ -421,6 +421,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   verified retail boundary violations are distinguished from default-data
   short circuits, bounded text and caller contracts that remain open.
 
+- C65/A02/S59/G75/R20/B80: [combat-AI review](C65-A02-S59-B80.md) reconciles
+  all19 AI functions and PATH's declaration header. Twenty casts and eight
+  manual/reversed array expressions are removed; the boundary owner now has
+  nine observed entries. Complete native98-object and fixed retail operand
+  checks pass. Nineteen source products retain unsupported goto, unused-local
+  and role-split rewrites as measured residuals, not silent gameplay changes.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

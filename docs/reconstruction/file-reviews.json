@@ -772,7 +772,15 @@
     "note": "Full18-line owner header read: real four-byte u16 x/y tower origin record, three free-function declarations and message dependency. No function/macro body or fabricated aggregate."
   },
   "include/SOURCE/combatManager.h": {
-    "sha256": "8b03e2f665cd38c54beafdcfcd63b080afe7ebcbb2e1bbe46ca90163cb287f91",
-    "note": "Full original868-line header and updated851-line owner reconciled. Shared enum moved intact to combatTypes under C63; native0xf877 manager layout unchanged. Real117 hexcell/two21-army rows backed by constructor count and stride; other arrays/declarations read. S58 unknown4/100/8/16-byte gaps remain unproven, not deleted as fake stack padding. B78 text/screen/index/lifecycle contracts persist in individual consumers, including still-pending command/drawing bodies."
+    "sha256": "7facfb674224546e3fccacabca3b5a1ccb9e8f96d82fbe452c94b0c85fb7dfcd",
+    "note": "Full original868-line header and updated851-line owner reconciled. Shared enum moved intact to combatTypes under C63; native0xf877 manager layout unchanged. Real117 hexcell/two21-army rows backed by constructor count and stride; other arrays/declarations read. S58 unknown4/100/8/16-byte gaps remain unproven, not deleted as fake stack padding. B78 text/screen/index/lifecycle contracts persist in individual consumers, including still-pending command/drawing bodies. S59 follow-up: sole COMBAT_AI_CASTLE_BOUNDARY_COUNT consumer read completely; extent12->9 from nine actual initialized/used rows with unchanged full native layout and all98-object proof. Adjacency remains117x6, not117x8; no adjacency layout change."
+  },
+  "src/SOURCE/AI.cpp": {
+    "sha256": "e442735a668d8a07f823d7cd60970c59e88b6b61d3630b5a08c46ef32e1f67e2",
+    "note": "Full1090-line parent source and final1080-line TU read; all19 physical functions reconciled with prolog macros/private front-offset enum and no trailing data definitions. C65 twenty casts removed; A02 real2x20 marker plus five actual-base index expressions; S59 nine boundary bytes recovered with all-consumer/98-native-object proof. G75/S59/R20 measured residuals and B80 arithmetic/ownership/input contracts remain explicit. No formatter, manual varargs or fabricated owner macro hidden outside bodies."
+  },
+  "include/SOURCE/PATH.h": {
+    "sha256": "c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2",
+    "note": "Full9-line header read: combatTypes dependency and two direction/adjacent-hex free-function declarations; no function/macro body, aggregate or address helper. PATH.cpp functions remain a separate pending review."
   }
 }

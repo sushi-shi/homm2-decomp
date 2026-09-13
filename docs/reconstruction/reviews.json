@@ -21885,7 +21885,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C62 removes one redundant signed-byte result cast; direction and row-edge guards yield-1 or0..116 within117x8 actual adjacency storage. Complete two-arm text equivalence and final ordered private-label/native proof. Direction switch and unused direction positions preserve their original sentinel behavior; no goto or artificial owner."
+    "note": "C62 removes one redundant signed-byte result cast; direction and row-edge guards yield-1 or0..116 within117x6 actual adjacency storage. Complete two-arm text equivalence and final ordered private-label/native proof. All six direction cases and invalid row-edge neighbors preserve their original sentinel behavior; no goto or artificial owner."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::Open(i32 openFlags)#1": {
     "body_sha256": "f4376a1dc61798aec0e5de5464468ace126a46c241e59df68f5a08a59b27c966",
@@ -22414,5 +22414,309 @@
       "bounds": "open"
     },
     "note": "C62 replaces widget-ID cast with real dialog-select command constant, both encoded10 but distinct domains. U01 message tag/modifier/command/payload transitions preserve completion ID forwarding. Help index initialized-1 and guarded; B78 valid starting config values for modulo/toggles and live dialog globals remain. No artificial owner arithmetic or manual argument access."
+  },
+  "src/SOURCE/AI.cpp:combatManager::AICheckRetreat(void)#1": {
+    "body_sha256": "c7dfc37b027a59685b7d37c7e33ef7dd85954925ccefd488e6839c52b4f52a93",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C65 fourteen casts removed across complete group/artifact/force/policy products, then combined native proof. Real hero copy and fallback armyGroup isolate five-slot input; force/artifact two-side arrays are consumed, not fake stack owners. U05 flags/U06 group views retained. R20 army/artifact index separation measured3/3 changes native stack bytes. B80 integer force/20000 and experience/200000 remain, quantity narrowing and unguarded force-sum floating divisor preserved; valid owners/IDs/stat arithmetic and finite nonzero sum remain contracts."
+  },
+  "src/SOURCE/AI.cpp:combatManager::DoCompAI(CombatSide)#1": {
+    "body_sha256": "a5c5b1a5ffa8ce71a121e3a553d32ddbdcbdbc7ef6ba90950872c7a66fbbb722",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S59 boundary owner12->9 applied after4-arm extent/local product and all98-object proof; every initialized/read row and constant checked in retail. Remaining unused combat/fifth/castle/archery/shootStrengths owners measured but retained, with all GetStrength/HasArtifact calls preserved in experiments. G75 full switch-exit/single-pass forms and false-constant branch removal all change4000-byte retail code. U05 masks/flags real; sign-changing strength casts and actual float truncations retained. B80 unguarded castle attacker-hero archery read, source hex row domain, manager identity and current side/index/action lifecycle remain; incoming side parameter is genuinely unused."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetModLichDamage(class army * target,float damage)#1": {
+    "body_sha256": "f7a836e761d984216e9c97097154b2af05be1498ca8b538118d94f511583283d",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C65 three float destination casts removed after complete8-arm equality. Integer remaining-HP product precedes float assignment; sequential shooter/flyer1.3 factors and HP weighting retained. U05 flags meaningful, B80 valid live target/positiveHP and representable quantity product remain. No artificial stack aggregate, pointer recovery, format buffer or manual varargs."
+  },
+  "src/SOURCE/AI.cpp:combatManager::DoLichShot(class army * lich)#1": {
+    "body_sha256": "06ac63d534df8ed1802952465a0b12f69683ac58c5a549eb56f36f7919429904",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C65 one assignment cast removed. A02 three manual pointer expressions replaced by real2x20 marker rows; complete pointer/flat-index/row product retains659-byte rows, rejects656-byte flat-index spelling. Full40-byte clear per candidate and all three consumers have exact stack/retail proof. U05 exclusion flags and opponent/friendly scoring remain; B80 valid side/index occupants, quantity/HP arithmetic and stale-action precondition when no candidate exists remain. Original flat object covered valid inputs; no false prior first-row-overrun claim."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetShooterMask(CombatSide side)#1": {
+    "body_sha256": "d045104bc7a24cd308f36a5b61c2f8bbedcbad9c00d987d233c51b3c0db19082",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U05 shooter/excluded flags plus positive shots and five disabling influences define the actual category. One unsigned bit advances per active slot; valid count<=20 keeps every bit within low20. B80 side/count/initialized influence data remain caller contracts; pointer-plus-index is ordinary array traversal, not owner recovery. No cast, unused aggregate, goto or manual argument access."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetMirrorImageMask(CombatSide side)#1": {
+    "body_sha256": "988fd7e71d9d1e91bc3cd697bc5712e9ec9855dd27ed9c96e7e4dcefdb568d07",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U05 all/ability flag views jointly require mirror and not excluded. Actual unsigned bit mask is returned through the existing i32 ABI; low20 valid bits make that harmless without changing declaration domains. B80 side/count/live army flags remain; no fake array or out-of-object owner claim."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetFlyerMask(CombatSide side)#1": {
+    "body_sha256": "a234da574c671de76ba89fbed8a0ab690b48fdc59e8c29276b811bb602893b8b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U05 flying/exclusion flags and five disabling spell bytes distinguish active flyers. Bits advance for all slots rather than packing selected indices. B80 count<=20 and two-side/initialized army state required; no avoidable explicit cast or unrelated variable role."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetAllMask(CombatSide side)#1": {
+    "body_sha256": "915e165be538371f03e7cf5b31e9a6342d12647b80d309aee42221997ff5f9ca",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Scans active row, checks excluded flag and positive quantity before setting the original slot bit. U05 flag view retained. B80 valid side/count remains despite the nonnull test on an array-derived pointer; that test is not an upper-bound validator. No stack buffer, goto or manual varargs."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetWalkerMask(CombatSide side)#1": {
+    "body_sha256": "3a73d9070f8ca1c8df279fa2e7671143fe4f8d6a097b7a1369cd7a31bf20d424",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual nonflying category includes nonshooters and shooters without ammunition, then excludes five disabling influences. U05 fields are meaningful, not alternate-owner recovery. B80 side/count/initialized flags and spell bytes required; unsigned single-bit traversal stays within20 active slots."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetOutOfItMask(CombatSide side)#1": {
+    "body_sha256": "15aa08245a67b9f3d56eb8a74aa27ecb1320399e3e2d9bc213572d91d50c410e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Selects nonexcluded armies with blind/paralyze/petrify; not the berserk/hypnotize traitor category. U05 flags and real influence array retained. B80 active side/count valid-domain requirements remain. idx and bitMask evolve together as ordinary slot traversal, not unrelated reuse; no fake local aggregate."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetTraitorMask(CombatSide side)#1": {
+    "body_sha256": "ef4ed3563b0020cf1a255d605c9aa75233282c90bef6e20123843e081abcce89",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Selects nonexcluded berserk or hypnotized armies, preserving their original row/index bits. U05 meaningful flag/influence owners; B80 valid side/count/initialized state. No casts, goto, pointer-owner recovery, buffer formatter or unused stack owner."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetBestArmy(CombatSide side,i32 mask)#1": {
+    "body_sha256": "0e9c3bdb0aa3c0ec6320956e90e80d76e10d15b1d4416df246ff35f757d6f745",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual unsigned-long Strength result and logical right shift halve five disabling conditions; no signed-owner rewrite is justified. Strict strength>zero initial best can leave-1 for a nonempty all-zero mask. B80 valid side/count/creature/stats and mask selection remain. Integer mask and unsigned bit are ordinary bit-domain interaction, not a compensating cast or fake aggregate."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetWorstArmy(CombatSide side,i32 mask)#1": {
+    "body_sha256": "328ecff15bcce58e3c5d799a06a9ce0b85f7a047ad9db0fd43f3ca2513540a0a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Unsigned strength is compared strictly below999999999; no selected value below that sentinel returns-1 even with a nonempty mask. Preserve this exact source/retail policy. B80 side/count/Strength data domains remain, no artificial array owner, cast or unrelated reuse."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetClosestArmy(class army * currentArmy,CombatSide side,i32 mask)#1": {
+    "body_sha256": "37c32b3624027fbe3c69dc17c575ea32bdfd12cc090343e2affb2b054db4583d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Score is QuickDistance*1000 minus quantity*HP, not plain closest distance; its9999999 initial cutoff may leave-1. Reusing val from distance to derived score is related computation. B80 valid current/target hexes, side/count and representable arithmetic required. No temporary buffer, fake owner or manual varargs."
+  },
+  "src/SOURCE/AI.cpp:combatManager::GetStrength(CombatSide side,i32 mask)#1": {
+    "body_sha256": "57970c31ca6ae1494d6e103cd1f532f39872436e9b474e46a80e48e082217477",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Sums selected nonexcluded army::Strength results in the real unsigned-long domain. U05 exclusion view retained. B80 valid side/count and army/type/stat contracts remain; unsigned aggregate overflow behavior is not silently replaced with signed arithmetic. No explicit cast or fabricated stack owner."
+  },
+  "src/SOURCE/AI.cpp:combatManager::AttemptAttack(class army * currentArmy,CombatSide side,i32 mask)#1": {
+    "body_sha256": "697afaf0768571daf869044dcc64b4f0dfdf66b780d278064427f6aa18c20371",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "A02 three reversed index[array] expressions now use actual m_armies[side][targetArmy], complete2-arm376-byte/relocation proof. Ghost chooses weakest, others strongest; failed target removes precisely its bit, and wide facing tries rear hex. U05 wide flag retained. B80 valid side/count/target bit index, path target and live unit required; targetHex adjustment remains a related coordinate role."
+  },
+  "src/SOURCE/AI.cpp:combatManager::AttemptAdjacentAttack(class army * currentArmy)#1": {
+    "body_sha256": "88aa0e0a2c4af38e1fc2f8f86f34458f697ce2003623095a987cad88d73b1b51",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S59 unused hexes removal measured2/2 keeps324-byte size but changes stack operands, original retained. Real unsigned available/oneBit/enemyMask roles remain. B80 ValidAttack must supply an upper-bounded destHex and occupant index0..19 before signed1<<index; only nonnegative destination is checked locally. Selected army becomes global action; no new fake owner or return-buffer wrapper."
+  },
+  "src/SOURCE/AI.cpp:combatManager::WalkTowardArmyFront(class army * currentArmy,CombatSide side,i32 mask)#1": {
+    "body_sha256": "4d53a2694e128c41c53ce601f088dfc4b41da3b92034da25d931091b72071768",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "A02 two reversed index[array] expressions recovered with2-arm proof; C65 signed-byte speed restoration cast removed with2-arm proof. U05 wide flag and U02 raw path-byte enum conversion remain genuine boundaries. S59 pathFound result-store removal changes519 to516 bytes while preserving FindCombatPath call, original retained. B80 valid closest target/facing, stable search storage, capped path length/directions and next moat hex domain remain; no new return-value guard invented."
+  },
+  "src/SOURCE/AI.cpp:combatManager::WalkTowardArmy(class army * currentArmy,CombatSide side,i32 mask)#1": {
+    "body_sha256": "605789e83f265c19df45dd8506ed1aa2f7fea4d662f1a9c0558855a510c2b63c",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions."
   }
 }

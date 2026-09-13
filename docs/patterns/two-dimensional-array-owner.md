@@ -36,3 +36,45 @@ numeric-operand proof: [O05/C58/S56](../reconstruction/O05-C58-S56-B75.md).
 This establishes a sufficient clean spelling, not the original source text.
 It does not justify flattening arbitrary neighboring scalar objects or
 removing guards for invalid side/slot indices.
+
+## A flat stack marker can also expose two real dimensions
+
+AI's DoLichShot RVA0x172d6 originally owns a flat40-byte marker and manually
+computes `side*20+index`. This is **not** the previous first-row overrun: the
+original pointer stays inside its declared flat object for valid inputs.
+Recovering its two semantic dimensions nevertheless removes three manual
+pointer expressions without changing the owner size or native code:
+
+```cpp
+// Before
+u8 marked[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
+*(marked + IDX(targetArmy->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + targetArmy->m_index) = 1;
+// After
+u8 marked[COMBAT_SIDE_COUNT][COMBAT_AI_ARMY_SLOT_COUNT];
+marked[IDX(targetArmy->m_side)][targetArmy->m_index] = 1;
+```
+
+The complete three-arm A02 product tests original pointers, ordinary flat
+indexing and two-dimensional rows. Original and rows have659 identical bytes,
+all six ordered relocation identities and24 exact blocks. Flat indexing
+instead produces656 bytes; semantic equivalence alone does not close that arm.
+
+The first marker store has no relocation; retail and the retained source emit
+these exact bytes, offsets relative to DoLichShot:
+
+```text
+offset  retail                                  recovered rows
++dc     8b 45 dc    mov eax,[ebp-0x24]           same
++df     8b 88 e6 00 00 00 mov ecx,[eax+0xe6]     same  (army side)
++e5     6b c9 14    imul ecx,ecx,20              same
++e8     8d 54 0d b4 lea edx,[ebp+ecx-0x4c]       same  (actual marker base)
++ec     8b 45 dc    mov eax,[ebp-0x24]           same
++ef     8b 88 ea 00 00 00 mov ecx,[eax+0xea]     same  (army index)
++f5     c6 04 0a 01 mov byte [edx+ecx],1         same
+```
+
+The adjacent-cell marker read/write retain the same row stride and stack
+base. `check-ai-evidence.py` checks all three sequences against raw COFF and
+retail bytes; complete native verification covers all98 objects,1826 emitted
+function instances and allocated sections. Valid side0..1 and index0..19
+remain caller/occupancy contracts. See [C65/A02/S59](../reconstruction/C65-A02-S59-B80.md).
