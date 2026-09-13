@@ -18,6 +18,12 @@ fragment or `.buka` ID represents the original calling convention. Do not silent
 substitute a master translation: matching also covers string bytes and storage.
 Packed text storage keeps its explicit `"\0"` separators outside the IDs.
 
+English should reuse the original 2.0 wording wherever the corresponding message
+exists, adapting only to Buka's argument order or sentence composition where
+necessary. The [English provenance review](localization-english-provenance.md)
+records all 91 newly introduced IDs and the correction of 55 English entries;
+their Russian translations and generated compiler literals are unchanged.
+
 ## Validation
 
 `homm2 build` always runs the localization source/catalog gate, independently of

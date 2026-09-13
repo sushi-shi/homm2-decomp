@@ -80,7 +80,7 @@ msgid "Try searching on clear ground."
 msgstr "Попробуйте искать на чистой земле."
 
 msgctxt "adventure.search.found_artifact.prefix"
-msgid "Congratulations! After spending many hours digging here, you have uncovered the artifact: "
+msgid "Congratulations! After spending many hours digging here, you have uncovered the "
 msgstr "Поздравляем! Проведя многие часы в раскопках, вы разыскали артефакт: "
 
 msgctxt "adventure.search.inventory_full"
@@ -364,7 +364,7 @@ msgid "Through eagle-eyed observation, %s is able to learn the magic spell '%s'.
 msgstr "С помощью искусства орлиного взора, %s смог(ла) подглядеть и выучить заклинание '%s'."
 
 msgctxt "combat.fragment.attack"
-msgid "Attack"
+msgid "The"
 msgstr "Атака"
 
 msgctxt "combat.fragment.damage_points"
@@ -380,23 +380,23 @@ msgid "destroys"
 msgstr "уничтожает"
 
 msgctxt "combat.fragment.dies"
-msgid "dies"
+msgid "perishes"
 msgstr "умирает"
 
 msgctxt "combat.fragment.does_damage"
-msgid "does"
+msgid "do"
 msgstr "наносит"
 
 msgctxt "combat.fragment.killed"
-msgid "killed"
+msgid "perish"
 msgstr "убито"
 
 msgctxt "combat.fragment.troop"
-msgid "troop"
+msgid "creature"
 msgstr "воин"
 
 msgctxt "combat.fragment.troops"
-msgid "troops"
+msgid "creatures"
 msgstr "воинов"
 
 msgctxt "combat.genie.half_army.buka"
@@ -404,11 +404,11 @@ msgid "%s %s half the enemy troops!"
 msgstr "%s %s половину вражеских войск!"
 
 msgctxt "combat.luck.bad.buka"
-msgid "Bad luck falls upon the %s!"
+msgid "Bad luck descends on the %s"
 msgstr "Плохая удача была ниспослана на %s!"
 
 msgctxt "combat.luck.good.buka"
-msgid "Luck is on the side of the %s!"
+msgid "Good luck shines on the %s"
 msgstr "Удача на стороне отряда %s!"
 
 msgctxt "combat.mirror_image.destroyed"
@@ -424,11 +424,11 @@ msgid "Low morale causes the \n%s to freeze in panic."
 msgstr "Низкая мораль %s привела к тому, что \nони застыли в панике."
 
 msgctxt "combat.necromancy.multiple.buka"
-msgid "Your dark necromancy allows you to return %d fallen enemies to your service as skeletons."
+msgid "Practicing the dark arts of necromancy, you are able to raise %d of the enemy's dead to return under your service as Skeletons."
 msgstr "Использование черной магии некромантии позволило вам вернуть на службу %d поверженных врагов в виде скелетов."
 
 msgctxt "combat.necromancy.one.buka"
-msgid "Your dark necromancy allows you to return a fallen enemy to your service as a skeleton."
+msgid "Practicing the dark arts of necromancy, you are able to raise one of the enemy's dead to return under your service as a Skeleton."
 msgstr "Использование черной магии некромантии позволило вам вернуть на службу поверженного врага в виде скелета."
 
 msgctxt "combat.reward.enemy_artifact"
@@ -440,15 +440,15 @@ msgid "Ballista"
 msgstr "Баллиста"
 
 msgctxt "combat.siege.destroyed.buka"
-msgid "\n\n%s is destroyed."
+msgid "\n\nThe %s is destroyed."
 msgstr "\n\n%s уничтожена."
 
 msgctxt "combat.siege.strength.buka"
-msgid "\n\n%s shoots with the strength of %d archers."
+msgid "\n\nThe %s fires with the strength of %d Archers."
 msgstr "\n\n%s стреляет с силой %d стрелков."
 
 msgctxt "combat.siege.strength_bonus.buka"
-msgid "\n\n%s shoots with the strength of %d archers, each with a +%d attack bonus."
+msgid "\n\nThe %s fires with the strength of %d Archers, each with a +%d bonus to their attack skill."
 msgstr "\n\n%s стреляет с силой %d стрелков, каждая +%d бонусом к их уровню атаки."
 
 msgctxt "combat.spell.already_cast"
@@ -512,11 +512,11 @@ msgid "You have no hero to cast a spell."
 msgstr "У вас нет героев, чтобы направлять заклинания."
 
 msgctxt "combat.spell.resist.buka"
-msgid "%s%s resists this spell!"
+msgid "The %s%s resists the spell!"
 msgstr "%s%s сопротивляется этому заклинанию!"
 
 msgctxt "combat.spell.resist.troop_prefix"
-msgid "Troop "
+msgid "troop of "
 msgstr "Отряд "
 
 msgctxt "combat.spell.resurrect.multiple.buka"
@@ -544,11 +544,11 @@ msgid "%s states:\n\n\"I will accept your surrender and grant you and your troop
 msgstr "%s говорит:\n\n\"Я приму вашу капитуляцию и позволю вам и вашим воинам уйти с миром за %d золотых.\""
 
 msgctxt "combat.tower.garrison.damage.prefix"
-msgid "The garrison does"
+msgid "Garrison does"
 msgstr "Гарнизон наносит"
 
 msgctxt "combat.tower.keep.damage.prefix"
-msgid "The tower does"
+msgid "Tower does"
 msgstr "Башня наносит"
 
 msgctxt "common.none"
@@ -1280,7 +1280,7 @@ msgid "{Spell Points}\n\n%s currently has %d spell points out of a maximum of %d
 msgstr "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит."
 
 msgctxt "hero.summary.buka"
-msgid "%s level %d %s. Artifacts: %d."
+msgid "%s is a level %d %s with %d artifacts."
 msgstr "%s %d уровня %s. Артефактов: %d."
 
 msgctxt "high_score.cheater_rating"
@@ -1320,7 +1320,7 @@ msgid "Chaos"
 msgstr "Хаос"
 
 msgctxt "network.attack.owner.buka"
-msgid "%s, your %s is under attack!"
+msgid "%s's %s is under attack!"
 msgstr "%s, ваш %s атакован!"
 
 msgctxt "network.data.receiving"
@@ -1336,11 +1336,11 @@ msgid "Waiting to receive game data."
 msgstr "Ожидаю получения игровых данных."
 
 msgctxt "network.directplay.guests_ready.buka"
-msgid "%d guests have joined. Press 'OK' to continue or wait for more players."
+msgid "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests."
 msgstr "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков."
 
 msgctxt "network.directplay.load_failed"
-msgid "Unable to load 'DPLAYX.DLL'"
+msgid "Can't load 'DPLAYX.DLL'"
 msgstr "Невозможно загрузить 'DPLAYX.DLL'"
 
 msgctxt "network.host.canceled_game"
@@ -1360,7 +1360,7 @@ msgid "[ Incoming data, must exit... ]"
 msgstr "[ Входящая информация, необходимо выйти... ]"
 
 msgctxt "network.initialization_failed"
-msgid "Network initialization error."
+msgid "Network initialization failed"
 msgstr "Ошибка инициализации сети."
 
 msgctxt "network.load.expansion_unavailable"
@@ -1396,7 +1396,7 @@ msgid "Waiting for ring..."
 msgstr "Ожидание звонка..."
 
 msgctxt "network.netbios.initializing"
-msgid "Initializing network.\n\n  Press 'CANCEL' to abort the connection."
+msgid "Initializing network.\n\n  Press 'CANCEL' to abort."
 msgstr "Инициализация сети.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение."
 
 msgctxt "network.netbios.not_loaded"
@@ -1404,7 +1404,7 @@ msgid "NETBIOS is not loaded."
 msgstr "NETBIOS не загружена."
 
 msgctxt "network.netbios.waiting_host"
-msgid "Waiting for the host.\n\n  Press 'CANCEL' to abort the connection."
+msgid "Waiting On Host.\n\n  Press 'CANCEL' to abort."
 msgstr "Ожидание хоста.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение."
 
 msgctxt "network.player.handle_prompt"
@@ -1412,11 +1412,11 @@ msgid "Please enter a 'handle' by which you will be known."
 msgstr "Пожалуйста, введите имя, под которым вы будете известны."
 
 msgctxt "network.player_exit.continue_alone.buka"
-msgid "The game has been saved as 'Player Exit'. Do you wish to continue with the computer taking over the departing players?"
+msgid "The current game has been saved as 'PLYREXIT'. Do you wish to keep playing with the computer filling in for the other humans?"
 msgstr "Данная игра сохранена под названием 'Игрок вышел'. Желаете продолжить игру, где компьютер займет место выбывших игроков?"
 
 msgctxt "network.player_exit.exiting_confirm.buka"
-msgid "%s is leaving the game. The game has been saved as 'PLAYER EXIT'. Do you wish to continue with the computer taking over for %s?"
+msgid "%s is exiting the game.  The current game has been saved as 'PLYREXIT'.  Do you wish to continue playing with a computer player filling in for %s?"
 msgstr "%s покидает игру. Данная игра сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру, с компьютером, занявшим место %s?"
 
 msgctxt "network.player_exit.host_reports_exit"
@@ -1428,11 +1428,11 @@ msgid "Host player %s reports that player %s has been timed out of the game.  Th
 msgstr "Игрок-сервер %s сообщает, что игрок %s покинул игру. Игра будет продолжена, а компьютер займет место %s."
 
 msgctxt "network.player_exit.host_terminated.buka"
-msgid "%s is leaving the game, and %s has decided to terminate the game. The game has been saved as 'PLAYER EXIT'. Do you wish to continue alone, with the computer taking over the departing players?"
+msgid "%s left the game, and the %s decided to terminate the entire game.  The game has been saved as 'PLYREXIT'.  Do you wish to play on alone with the computer taking over for all human players?"
 msgstr "%s покидает игру, а %s решает прекратить всю игру. Игра была сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру самостоятельно, где компьютер займет места выбывших игроков?"
 
 msgctxt "network.player_exit.timed_out_confirm.buka"
-msgid "%s has left the game. The game has been saved as 'PLAYER EXIT'. Do you wish to continue with the computer taking over for %s?"
+msgid "%s has been timed out of the game.  The current game has been saved as 'PLYREXIT'.  Do you wish to continue playing with a computer player filling in for %s?"
 msgstr "%s вышел из игры. Данная игра сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру, с компьютером, занявшим место %s?"
 
 msgctxt "network.receive.retry"
@@ -1460,11 +1460,11 @@ msgid "About to initiate TCP/IP connection.  Heroes II will now drop from full s
 msgstr "Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы получили доступ к диалоговым окнам Windows.\n\nКогда соединение будет установлено, вы сможете вернуться в полноэкранный режим нажав 'F4'."
 
 msgctxt "network.tcp.host.guest_progress.buka"
-msgid "Hosting a game at %s.\n\nYou have %d guests out of %d expected. Press 'CANCEL' to continue without waiting for the remaining guests."
+msgid "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional guests."
 msgstr "Создание игры по адресу %s.\n\nУ вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить игру, не дожидаясь  остальных гостей."
 
 msgctxt "network.tcp.host.guests_ready.buka"
-msgid "Hosting a game at %s.\n\nYou have %d guests. Press 'OK' to continue or wait for more players."
+msgid "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests."
 msgstr "Создание игры на %s.\n\nУ вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков."
 
 msgctxt "network.tcp.host.not_responding"
@@ -1492,11 +1492,11 @@ msgid "Enter the host IP address.\n(e.g. 192.0.2.1)"
 msgstr "Введите IP адрес сервера.\n(Например: 220.415.119.223)"
 
 msgctxt "network.waiting_guest.buka"
-msgid "Waiting for a guest.\n\n  Press 'CANCEL' to abort the connection."
+msgid "Waiting On Guest.\n\n  Press 'CANCEL' to abort."
 msgstr "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение."
 
 msgctxt "network.waiting_player_start"
-msgid "Waiting for the player to start the game."
+msgid "Waiting for other remote player to set up game."
 msgstr "Ожидаю игрока для начала игры."
 
 msgctxt "new_game.positions.cannot_swap"
@@ -1568,11 +1568,11 @@ msgid "The game you have chosen was being played with %d humans. Is it OK if the
 msgstr "Выбранная игра начнется с %d игроками-людьми. Можно ли компьютеру взять под свое управление оставшиеся %d мест людей?"
 
 msgctxt "requester.map.size_mismatch.multiple.buka"
-msgid "There are no maps of this size for %d human players."
+msgid "No maps exist for %d human player at that size."
 msgstr "Нет карт такого размера для %d игроков-людей."
 
 msgctxt "requester.map.size_mismatch.one.buka"
-msgid "There is no map of this size for %d human players."
+msgid "No maps exist for %d human players at that size."
 msgstr "Нет карты этого размера для %d игроков-людей."
 
 msgctxt "requester.selection.required"
@@ -1624,11 +1624,11 @@ msgid "AUTOSAVE"
 msgstr "Автосохранение"
 
 msgctxt "save.filename.new_game"
-msgid "NEW GAME"
+msgid "NEWGAME"
 msgstr "НОВАЯ ИГРА"
 
 msgctxt "save.filename.player_exit"
-msgid "PLAYER EXIT"
+msgid "PLYREXIT"
 msgstr "Игрок Вышел"
 
 msgctxt "save.filename.victory_prefix"
@@ -1644,7 +1644,7 @@ msgid "castle"
 msgstr "замок"
 
 msgctxt "scenario.fragment.hero"
-msgid "hero"
+msgid "Hero"
 msgstr "герой"
 
 msgctxt "scenario.fragment.town"
@@ -1656,7 +1656,7 @@ msgid "Lose the hero '%s'."
 msgstr "Потерять героя '%s'."
 
 msgctxt "scenario.loss.settlement.buka"
-msgid "Lose %s '%s'."
+msgid "Lose the %s '%s'."
 msgstr "Потерять %s '%s'."
 
 msgctxt "scenario.loss.standard"
@@ -1676,7 +1676,7 @@ msgid "the enemy - "
 msgstr "враг - "
 
 msgctxt "scenario.side.enemy_alliance.prefix"
-msgid "the enemy alliance "
+msgid "the enemy alliance of "
 msgstr "вражеский союз "
 
 msgctxt "scenario.side.you"
@@ -1696,7 +1696,7 @@ msgid "Accumulate %d gold"
 msgstr "Собрать %d золота"
 
 msgctxt "scenario.victory.capture_settlement.buka"
-msgid "Capture %s '%s'"
+msgid "Capture the %s '%s'"
 msgstr "Захватить %s '%s'"
 
 msgctxt "scenario.victory.defeat_hero"
@@ -1720,7 +1720,7 @@ msgid "Defeat all enemy heroes and capture all enemy towns and castles."
 msgstr "Уничтожить всех вражеских героев  и захватить все вражеские города и замки."
 
 msgctxt "scenario.victory.standard_alternative.suffix"
-msgid ", or you can win by defeating all enemy heroes and capturing all enemy towns and castles."
+msgid ", or you may win by defeating all enemy heroes and capturing all enemy towns and castles."
 msgstr ", или вы можете выиграть, уничтожив всех вражеских героев и захватив все вражеские города и замки."
 
 msgctxt "site.necromancer_shrine.description"
@@ -1804,7 +1804,7 @@ msgid "Sound initialization error!"
 msgstr "Ошибка инициализации звука!"
 
 msgctxt "system.audio.initialization_no_device"
-msgid "Sound initialization error!  No device found."
+msgid "Sound initialization error!  No wave devices found."
 msgstr "Ошибка инициализации звука!  Не найдено устройство."
 
 msgctxt "system.audio.midi_unavailable"
@@ -1816,7 +1816,7 @@ msgid "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Ex
 msgstr " Нет доступа к CD-ROM. Без доступа к CD-ROM Герои 2 будут поддерживать только сетевую игру в режиме гостя. Если у вас есть диск, закройте эту программу и вставьте диск в привод и попробуйте запустить игру еще раз."
 
 msgctxt "system.cdrom.read_error.retry"
-msgid "Error reading the Heroes 2 disc. Retry?"
+msgid "Error reading the Heroes 2 Expansion CD.  Retry?"
 msgstr "Ошибка чтения диска Героев 2. Повторить?"
 
 msgctxt "system.cdrom.unavailable_guest_only"
@@ -1832,15 +1832,15 @@ msgid "/M0 - disable MIDI music\n"
 msgstr "/M0 - отключить MIDI музыку\n"
 
 msgctxt "system.command_line.disable_music"
-msgid "/R0 - disable music\n"
+msgid "/R0 - disable Redbook music\n"
 msgstr "/R0 - отключить музыку\n"
 
 msgctxt "system.command_line.disabled_example"
-msgid "Sound is disabled and the intro is skipped.\n"
+msgid "sound disabled and the intro skipped.\n"
 msgstr "Звук отключен и интро пропущено.\n"
 
 msgctxt "system.command_line.dos_example"
-msgid "Load the DOS version of Heroes 2.\n"
+msgid "Starts the DOS version of Heroes2 with redbook\n"
 msgstr "Загрузить DOS версию Героев 2.\n"
 
 msgctxt "system.command_line.example"
@@ -1848,11 +1848,11 @@ msgid "Example:\n"
 msgstr "Пример:\n"
 
 msgctxt "system.command_line.skip_intro"
-msgid "/I0 - skip intro\n"
+msgid "/I0 - skip the intro\n"
 msgstr "/I0 - пропустить интро\n"
 
 msgctxt "system.display.palette_required"
-msgid "Heroes II requires 256 colors or more.\n\nTo change the color mode, right-click the Windows desktop and select 'Properties'. Then choose the color depth in Settings."
+msgid "Heroes II requires 256 color mode or higher.\n\nTo change color mode, right click in an open area on the Windows 95 background, choose 'Properties', then the 'Settings' tab, then change the entry in the 'Color Palette Box'."
 msgstr "Для Героев II требуется режим в 256 цветов или больше.\n\nЧтобы изменить режим цветности, щелкните правой кнопкой по рабочему столу Windows и выберите 'Properties'/Свойства'. Затем в установках выберите глубину цвета."
 
 msgctxt "system.file.open_error"
@@ -1896,7 +1896,7 @@ msgid "Unable to initialize resources - possible disk problem."
 msgstr "не могу инициализировать ресурсы. Вероятно, ошибка диска."
 
 msgctxt "system.single_instance"
-msgid "Only one copy of %s can be running at a time"
+msgid "Only one copy of %s may run at a time"
 msgstr "Только одна копия %s может быть запущена одновременно"
 
 msgctxt "system.sound.initialization_failed"
@@ -9856,15 +9856,15 @@ msgid "Ivan VI"
 msgstr "Иван VI"
 
 msgctxt "town.army.owner.garrison"
-msgid "garrison"
+msgid "Garrison"
 msgstr "гарнизона"
 
 msgctxt "town.army.owner.hero"
-msgid "hero"
+msgid "Hero's Army"
 msgstr "героя"
 
 msgctxt "town.army.split.buka"
-msgid "How many %s should move from the army of the %s to the army of the %s?"
+msgid "Move how many %s troops from %s to %s?"
 msgstr "Как много %s перенести из армии %s в армию %s?"
 
 msgctxt "town.boat.creation_failed"
@@ -9908,7 +9908,7 @@ msgid "The above spells are available here."
 msgstr "Указанные заклинания доступны здесь."
 
 msgctxt "town.recruit.new_hero"
-msgid "Recruit a new hero"
+msgid "Recruit Hero"
 msgstr "Нанять нового героя"
 
 msgctxt "town.screen.title"
@@ -9936,7 +9936,7 @@ msgid "{%s}\n\nYou have received quite a bargain.  I expect to make no profit on
 msgstr "{%s}\n\nВам предложена достойная сделка. Я не пытаюсь нажиться на ней. Вас интересует что-нибудь из моих товаров?"
 
 msgctxt "trading.bargain.buka"
-msgid "{%s}\n\nIn my market, %s and %s trade at a ratio of %d %s to %d %s"
+msgid "{%s}\n\n%s for %s: I can offer you %d %s for %d %s."
 msgstr "{%s}\n\nНа моем рынке %s и %s меняются из соотношения %d %s к %d %s"
 
 msgctxt "trading.inspect_wares"
