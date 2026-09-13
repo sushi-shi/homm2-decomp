@@ -20,7 +20,7 @@ void H2MessageBox(std::string& msg) {
 
 bool H2QuestionBox(char* msg) {
     NormalDialog(msg, NORMAL_DIALOG_CONFIRM);
-    return gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_SIX;
+    return gpWindowManager->m_dialogResult != DIALOG_BUTTON_6;
 }
 
 char* H2InputBox(char* msg, i32 len) {

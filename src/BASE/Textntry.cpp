@@ -206,7 +206,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
             y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -345,7 +345,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

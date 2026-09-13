@@ -13,6 +13,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <EDITOR/mapcell.h>
 town::town(void) {
     m_type = FACTION_KNIGHT;
     m_id = 0;
@@ -52,9 +53,9 @@ void town::GiveSpells(hero* targetHero) {
         return;
 
     for (stage = 0; stage < H2EnumIndex(pupil->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)])
-                                + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
+                                + HERO_BASE_LEARNABLE_SPELL_LEVEL;
          ++stage) {
-        for (slotN = 0; slotN < m_spellCounts[stage + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slotN) {
+        for (slotN = 0; slotN < m_spellCounts[stage]; ++slotN) {
             pupil->AddSpell(m_spells[stage][slotN], pupil->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
     }
@@ -67,10 +68,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE
@@ -80,10 +81,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE
@@ -141,15 +142,15 @@ void town::BuildBuilding(BuildingSlotType building) {
             m_spellCounts[m_buildState] =
                 ironfistCyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         else
-            m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+            m_spellCounts[m_buildState- TOWN_MAGE_GUILD_FIRST_LEVEL ] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & H2EnumIndex(TOWN_BUILDING_LIBRARY)))
-            ++m_spellCounts[m_buildState];
+            ++m_spellCounts[m_buildState- TOWN_MAGE_GUILD_FIRST_LEVEL ];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
     if (building == BUILDING_SLOT_SPECIAL && m_type == FACTION_WIZARD) {
         for (level = 0; level < m_buildState; ++level)
-            ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
+            ++m_spellCounts[level];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
@@ -187,7 +188,7 @@ void town::BuildBuilding(BuildingSlotType building) {
         XformToCastle();
     }
     GiveSpells(NULL);
-    H2BitSet(gpGame->m_knownTowns, m_id);
+    H2BitSet(gpGame->m_townBuiltToday, m_id);
 }
 
 void town::SetFaction(FactionType faction) {
@@ -201,7 +202,7 @@ void town::SetFaction(FactionType faction) {
 
     // Raze what the new faction cannot build, downgrading upgraded
     // dwellings to the base ones it keeps.
-    for (i32 building = TOWN_BUILDING_COUNT - 1; building >= 0; building--) {
+    for (i32 building = H2EnumIndex(BUILDING_SLOT_COUNT) - 1; building >= 0; building--) {
         u32l eligibleMask = gTownEligibleBuildMask[H2EnumIndex(faction)];
         u32l buildingMask = 1L << building;
 

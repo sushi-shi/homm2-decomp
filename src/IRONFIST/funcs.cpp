@@ -131,11 +131,11 @@ static i32 l_AdvancedMessageBox(lua_State* L) {
     );
 
     if (dialogType == DIALOG_LEARN_CHOICE) { // learn dialog
-        lua_pushboolean(L, gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SEVEN);
+        lua_pushboolean(L, gpWindowManager->m_dialogResult == DIALOG_BUTTON_7);
     } else if (dialogType == DIALOG_CANCEL_ALT) {
         lua_pushboolean(L, gbFunctionComplete);
     } else if (dialogType == DIALOG_YES_NO) {
-        lua_pushboolean(L, gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE);
+        lua_pushboolean(L, gpWindowManager->m_dialogResult == DIALOG_BUTTON_5);
     } else {
         lua_pushboolean(L, true);
     }
@@ -243,7 +243,7 @@ static i32 l_getHero(lua_State* L) {
 static i32 l_getHeroForHire(lua_State* L) {
     playerData* p = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 n = CheckIndex(
-        L, 2, PLAYER_AVAILABLE_HERO_COUNT, "available hero index out of range"
+        L, 2, HERO_AVAILABLE_SLOT_COUNT, "available hero index out of range"
     );
     i32 heroId = CheckStoredIndex(
         L, p->m_availableHeroIds[n], H2EnumIndex(GAME_HERO_COUNT), "available hero id"
@@ -376,7 +376,7 @@ static i32 l_hasTroop(lua_State* L) {
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 3));
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (hro->m_army.m_creatureTypes[i].value() == creature
-            && hro->m_army.m_quantities[i] >= quantity) {
+            && hro->m_army.m_creatureCounts[i] >= quantity) {
             lua_pushboolean(L, true);
             return 1;
         }
@@ -392,7 +392,7 @@ static i32 l_getCreatureAmount(lua_State* L) {
 
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (hro->m_army.m_creatureTypes[i].value() == creature) {
-            quantity += hro->m_army.m_quantities[i];
+            quantity += hro->m_army.m_creatureCounts[i];
         }
     }
 
@@ -407,13 +407,13 @@ static i32 l_takeTroop(lua_State* L) {
 
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (hro->m_army.m_creatureTypes[i].value() == creature) {
-            if (hro->m_army.m_quantities[i] > quantity) {
-                hro->m_army.m_quantities[i] -= quantity;
+            if (hro->m_army.m_creatureCounts[i] > quantity) {
+                hro->m_army.m_creatureCounts[i] -= quantity;
                 break;
             } else {
-                quantity -= hro->m_army.m_quantities[i];
+                quantity -= hro->m_army.m_creatureCounts[i];
                 hro->m_army.m_creatureTypes[i] = CREATURE_NONE;
-                hro->m_army.m_quantities[i] = 0;
+                hro->m_army.m_creatureCounts[i] = 0;
             }
         }
     }
@@ -961,7 +961,7 @@ static i32 l_setNumGuildSpells(lua_State* L) {
     town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
-    twn->m_spellCounts[l + TOWN_MAGE_GUILD_FIRST_LEVEL] = n;
+    twn->m_spellCounts[l] = n;
     twn->GiveSpells(NULL);
     return 0;
 }

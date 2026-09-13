@@ -56,7 +56,7 @@ void InitializeCampaigns() {
                 expansionCampaignTrackXY[c][m][0],
                 expansionCampaignTrackXY[c][m][1]
             };
-            for (i32 n = 0; n < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; n++)
+            for (i32 n = 0; n < CAMPAIGN_BONUS_CHOICE_COUNT; n++)
                 ironfistCampaignChoices[c][m][n] = xCampaignChoices[c][m][n];
         }
     }
