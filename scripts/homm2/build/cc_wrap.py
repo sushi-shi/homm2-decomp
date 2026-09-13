@@ -77,7 +77,7 @@ def _prepare_compile_env():
     _COMPILE_ENV_READY = True
     return cl
 
-def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeout=None):
+def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeout=None, locale='ru'):
     """Compile one TU in-process; returns (rc, log, timed_out).
 
     Shares one resolved toolchain/INCLUDE per process, so a search engine can
@@ -85,16 +85,20 @@ def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeou
     wineserver spawn per trial. `depfile=False` skips the ninja header-dep
     emission for disposable probe objects.
     """
-    cl = _prepare_compile_env()
     src = Path(src).resolve(); out = Path(out).resolve()
+    if locale not in ('ru', 'en'):
+        raise ValueError(f'unsupported locale: {locale}')
+    if locale != 'ru' and out.is_relative_to(HOMM2_DIR / 'build/objdiff'):
+        raise ValueError('English objects must not overwrite matching objects')
+    cl = _prepare_compile_env()
     if not src.exists():
         return 1, f"source missing: {src}\n", False
     from homm2.build.localization import prepare
-    compiled, header, overlay, catalog_deps = prepare(HOMM2_DIR, src)
+    compiled, header, overlay, catalog_deps = prepare(HOMM2_DIR, src, locale=locale)
     if compiled != src:
         # Check the expanded literal view before invoking the retail compiler.
         from homm2.build.localization import check_formats
-        errors = check_formats(HOMM2_DIR, src)
+        errors = check_formats(HOMM2_DIR, src, locale=locale)
         if errors:
             return 1, '\n'.join(errors), False
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -123,13 +127,14 @@ def main():
     # the obj path AS ninja passed it (a.out); `deps=gcc` in build.ninja consumes it.
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True); ap.add_argument("--src", required=True)
+    ap.add_argument("--locale", choices=('ru', 'en'), default='ru')
     ap.add_argument("flags", nargs=argparse.REMAINDER)
     a = ap.parse_args()
     flags = a.flags[1:] if a.flags and a.flags[0] == "--" else a.flags
     src = Path(a.src); out = Path(a.out).resolve()
     try:
         rc, output, _timed_out = run_compile(
-            src, out, flags, depfile=True, depfile_target=a.out)
+            src, out, flags, depfile=True, depfile_target=a.out, locale=a.locale)
     except (RuntimeError, ValueError) as exc:
         die(str(exc))
     if rc:

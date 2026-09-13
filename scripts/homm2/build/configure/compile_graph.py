@@ -47,6 +47,7 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
             w.build(obj, "cl", inputs=u["source"],
                     implicit=["scripts/homm2/build/cc_wrap.py",
                               "scripts/homm2/build/localization.py",
+                              "scripts/homm2/build/catalog.py",
                               "locales/messages.def", "locales/ru.po"],
                     variables={"flags": " ".join(unit_flags),
                                "unit": u["unit"]})

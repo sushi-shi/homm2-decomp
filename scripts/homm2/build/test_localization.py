@@ -169,6 +169,26 @@ class LocalizationTests(unittest.TestCase):
             self.assertEqual(before.render(source, expanded=expanded),
                              after.render(source, expanded=expanded))
 
+    def test_locale_selects_header_and_expanded_literals(self):
+        catalog = loc.Catalog.load(self.root)
+        text = 'localization::Tr("resource.gold")'
+        self.assertEqual(catalog.render(text, expanded=True, locale='en'), '"Gold: %s %d"')
+        self.assertIn('"Gold: %s %d"', catalog.header('en'))
+        self.assertEqual(catalog.header(), catalog.header('ru'))
+        self.assertEqual(catalog.render(text, locale='en'), catalog.render(text))
+        with self.assertRaisesRegex(ValueError, 'unsupported locale'):
+            catalog.header('pl')
+
+    def test_english_prepare_cannot_replace_russian_compiler_view(self):
+        source = self.root / 'src/test.cpp'
+        source.write_text('char* text = localization::Tr("resource.gold");')
+        _, ru_header, _, _ = loc.prepare(self.root, source)
+        before = ru_header.read_bytes()
+        _, en_header, _, _ = loc.prepare(self.root, source, locale='en')
+        self.assertTrue(en_header.is_relative_to(self.root / 'build/ordinary/en'))
+        self.assertNotEqual(en_header.read_bytes(), before)
+        self.assertEqual(ru_header.read_bytes(), before)
+
     def test_original_english_wording_is_retained(self):
         # Pinned source-pol-2.0 provenance is in docs/localization-english-provenance.md.
         english = loc.Catalog.load(Path(__file__).resolve().parents[3]).english
@@ -264,9 +284,10 @@ class ClangLocalizationTests(unittest.TestCase):
             source.write_text('#include <stdio.h>\nvoid check() { char out[100]; '
                               'sprintf(out, localization::Tr("resource.gold"), '
                               + arguments + '); }\n')
-            errors = loc.check_formats(self.root, source)
-            with self.subTest(arguments=arguments):
-                self.assertEqual(bool(errors), must_fail, errors)
+            for locale in ('ru', 'en'):
+                errors = loc.check_formats(self.root, source, locale=locale)
+                with self.subTest(arguments=arguments, locale=locale):
+                    self.assertEqual(bool(errors), must_fail, errors)
 
     def test_clang_keeps_annotation_offsets_and_array_size(self):
         from homm2.build.annotated_data import definitions_for_file

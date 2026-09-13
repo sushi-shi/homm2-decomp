@@ -48,7 +48,7 @@ def configure_libclang() -> None:
             pass
 
 
-def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
+def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> list[str]:
     from homm2.build.localization import clang_args as localization_args
     database_path = repo / "build/clangd/compile_commands.json"
     database = json.loads(database_path.read_text()) if database_path.is_file() else []
@@ -94,7 +94,7 @@ def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
         elif value.startswith(("--target=", "-fms", "-fdelayed")):
             args.append(value)
         index += 1
-    return args + localization_args(repo, source)
+    return args + localization_args(repo, source, locale=locale)
 
 
 def _mask_lexical_noise(blob: bytes) -> bytes:

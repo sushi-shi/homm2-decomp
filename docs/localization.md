@@ -9,7 +9,33 @@ Unlike the portable master branch, this matching branch has **no runtime lookup*
 gettext dependency, UTF-8 runtime conversion, or added initialization. The build
 replaces each literal-ID expression with a generated literal macro before Clang
 and VC6 see it. The macro expands to the exact Windows-1251 bytes. Generated
-escapes belong only under `build/localization/`; authored text never contains them.
+escapes belong only under `build/`; authored text never contains them.
+
+## Locale builds and generated branches
+
+`homm2 build` / `homm2 build --ru` retain the Russian matching workflow.
+`homm2 build --no-match --ru` and `homm2 build --no-match --en` compile and link
+ordinary VC6 executables under `build/ordinary/<locale>/`. They use raw objects,
+source-backed import definitions and one LINK pass: no retail executable,
+delinking, COFF transforms, matching report or MAX updates. English requires
+`--no-match`; it must never populate the Russian matching-object directory.
+The [decomp README](../README.md#build-without-matching) covers initial setup.
+
+The generated source branch retains the authored IDs, English registry and
+Russian PO. Its standalone `./build.py --ru` / `./build.py --en` selects separate
+modern-compiler builds; `nix build` defaults to Russian and `nix build .#game-en`
+selects English. Only disposable compiler inputs expand IDs into byte literals.
+The catalog parser is shared with decomp builds, so validation cannot silently
+drift between these workflows. Catalog changes are Ninja dependencies.
+
+Classic is a terminal reading view: `--classic-russian` resolves IDs against
+the catalog from `--classic-from`, then materializes high-byte octal/hexadecimal
+escapes as Russian UTF-8. It does not inherit locale catalogs or build scripts.
+The generated source README documents building; classic's README identifies it
+as unsupported for building.
+
+Locale selection covers source catalog text only. Ordinary/generated builds omit
+Windows resources and the retail icon, and neither translates external assets.
 
 Existing table IDs remain `table.<symbol>.<index>`. Buka's original grammatical
 fragments, fixed save names, punctuation, spacing and even spelling mistakes are
@@ -54,6 +80,7 @@ are not newly format-gated (PHILAI has existing `% 18s` debug-format warnings).
 The legacy SDK's known parsing debt is handled with the source-inventory policy:
 game-source errors, fatal errors and format errors fail; recoverable SDK errors
 are not represented as a passing whole-project strict C++ build.
+The selected locale is passed to both compilers, including this format check.
 
 Clang's generated virtual-file view preserves authored byte offsets, line numbers
 and paths for source annotations and AST tooling. VC6 receives generated sources
@@ -90,3 +117,11 @@ baseline and the pinned VC6 toolchain:
 ```sh
 python3 -m homm2.audit.object_equivalence /path/to/baseline-objects build/objdiff/base
 ```
+
+The locale-build follow-up runs 949 tool tests (six existing skips), builds both
+VC6 locale executables and both generated-source Nix packages, and verifies the
+direct generated-source shell command. Repeating both ordinary builds leaves the
+matching graph, all objdiff state, retained scores and README unchanged. Russian
+matching still passes the same 98-object equivalence proof. Full classic export
+is checked for resolved IDs and readable Russian UTF-8. Follow-up evidence lives
+under `build/locale-*` and `build/ordinary-{ru,en}.log`.
