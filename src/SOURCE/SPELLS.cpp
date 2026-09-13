@@ -1482,6 +1482,7 @@ void combatManager::MeteorShower(i32 targetHex) {
 }
 
 #if H2_RETAIL_COMPILER
+#define column c
 #define damage dmg2
 #define frame frame_i
 #define limits limits_n
@@ -1491,7 +1492,7 @@ void combatManager::MeteorShower(i32 targetHex) {
 VA(0x0049bb35, 0x2bd)
 void combatManager::ElementalStorm(void) {
     i32 baseDam;
-    i32 c;
+    i32 column;
     army* stack;
     i32 member;
     i32 frame;
@@ -1510,11 +1511,11 @@ void combatManager::ElementalStorm(void) {
                 glTimers[0] = COMBAT_DEADLINE(SPELL_AREA_ANIMATION_DELAY);
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 for (tileRow = 0; tileRow < SPELL_STORM_ROW_COUNT; ++tileRow) {
-                    for (c = 0; c < SPELL_STORM_COLUMN_COUNT; ++c) {
+                    for (column = 0; column < SPELL_STORM_COLUMN_COUNT; ++column) {
                         stormIcon->CombatClipDrawToBuffer(
-                            c * SPELL_STORM_TILE_SIZE,
+                            column * SPELL_STORM_TILE_SIZE,
                             tileRow * SPELL_STORM_TILE_SIZE,
-                            (frame + c * SPELL_STORM_FRAME_COLUMN_STEP + tileRow)
+                            (frame + column * SPELL_STORM_FRAME_COLUMN_STEP + tileRow)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits,
                             ICON_DRAW_NORMAL
@@ -1560,6 +1561,7 @@ void combatManager::ElementalStorm(void) {
     }
 }
 #if H2_RETAIL_COMPILER
+#undef column
 #undef damage
 #undef frame
 #undef limits
@@ -2553,6 +2555,9 @@ boltsDone:
 #undef remainingDistance
 #endif
 
+#if H2_RETAIL_COMPILER
+#define length len
+#endif
 VA(0x0049de32, 0x164)
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     i32 xDelta;
@@ -2561,7 +2566,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     i32 sourceX;
     i32 armyIndex;
     i32 y;
-    i32 len;
+    i32 length;
     army* candidate;
     CombatSide sideIndex;
     i32 closest;
@@ -2578,9 +2583,9 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
                         && candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) != 0.0f)) {
                     xDelta = abs(candidate->MidX() - sourceX);
                     y = abs(candidate->MidY() - fromY);
-                    len = INTEGER_VECTOR_LENGTH(xDelta, y);
-                    if (len < closest) {
-                        closest = len;
+                    length = INTEGER_VECTOR_LENGTH(xDelta, y);
+                    if (length < closest) {
+                        closest = length;
                         closestCell = candidate->m_hex;
                     }
                 }
@@ -2589,6 +2594,9 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     }
     return closestCell;
 }
+#if H2_RETAIL_COMPILER
+#undef length
+#endif
 
 #if H2_RETAIL_COMPILER
 #define branchDistance branchDistance6

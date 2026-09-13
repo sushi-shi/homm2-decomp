@@ -383,15 +383,18 @@ i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define increment inc
+#endif
 VA(0x00433e2c, 0x213)
 void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
-    i32 inc = 1;
+    i32 increment = 1;
     i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
     if (directionDifference == 0)
         return;
     if ((directionDifference < 0 && directionDifference >= -DIRECTION_HALF_COUNT)
         || (directionDifference > 0 && directionDifference > DIRECTION_HALF_COUNT))
-        inc = -1;
+        increment = -1;
     m_cursorTurning = 1;
     i32 frameIndex = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
     i32 delayTime =
@@ -416,7 +419,7 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
             if (bShowIt)
                 DelayTil(&glTimers[1]);
         }
-        frameIndex += inc;
+        frameIndex += increment;
         if (frameIndex < 0)
             frameIndex = CURSOR_TURN_FRAME_COUNT - 1;
         frameIndex %= CURSOR_TURN_FRAME_COUNT;
@@ -429,6 +432,9 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
     if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
         UpdateScreen(0, 0);
 }
+#if H2_RETAIL_COMPILER
+#undef increment
+#endif
 
 VA(0x0043403f, 0x8b)
 b32 advManager::GetMoveShowIt(
@@ -1346,30 +1352,34 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
 }
 
 #if H2_RETAIL_COMPILER
+#define buffer buf
+#define index ix
 #define mapChange ptr0
 #endif
 VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     SMapChange* mapChange;
     i32 size;
-    SMapChange* buf;
-    i32 ix;
+    SMapChange* buffer;
+    i32 index;
     i32 H2_UNUSED(processed);
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(H2_ALLOC(size));
-    memcpy(buf, incomingData, size);
-    for (ix = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; ix >= 0; --ix) {
-        mapChange = &buf[ix];
+    buffer = static_cast<SMapChange*>(H2_ALLOC(size));
+    memcpy(buffer, incomingData, size);
+    for (index = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; index >= 0; --index) {
+        mapChange = &buffer[index];
         if (mapChange->type != MAP_CHANGE_NONE && mapChange->sequence >= giMapChangeCtr) {
             ProcessIncomingSingleMapChange(mapChange);
         } else {
             processed = 0;
         }
     }
-    H2_FREE(buf);
+    H2_FREE(buffer);
 }
 #if H2_RETAIL_COMPILER
+#undef buffer
+#undef index
 #undef mapChange
 #endif
 
@@ -1384,6 +1394,7 @@ void advManager::PurgeMapChangeQueue(void) {
 }
 
 #if H2_RETAIL_COMPILER
+#define index n
 #define queueIndex pos1
 #endif
 VA(0x0043646b, 0x1b5)
@@ -1393,7 +1404,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queueIndex;
     i32 lowestSequence;
     b32 continueUnwinding;
-    i32 n;
+    i32 index;
 
     queueCount = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
     unwoundChanges = 0;
@@ -1401,12 +1412,12 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
         queueIndex = -1;
         lowestSequence = CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL;
         queueCount = 0;
-        for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
-            if (sMapChangeQueue[n].type != MAP_CHANGE_NONE) {
+        for (index = 0; index < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++index) {
+            if (sMapChangeQueue[index].type != MAP_CHANGE_NONE) {
                 ++queueCount;
-                if (sMapChangeQueue[n].sequence < lowestSequence) {
-                    lowestSequence = sMapChangeQueue[n].sequence;
-                    queueIndex = n;
+                if (sMapChangeQueue[index].sequence < lowestSequence) {
+                    lowestSequence = sMapChangeQueue[index].sequence;
+                    queueIndex = index;
                 }
             }
         }
@@ -1422,18 +1433,19 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     continueUnwinding = true;
     while (continueUnwinding) {
         continueUnwinding = false;
-        for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
-            if (sMapChangeQueue[n].type != MAP_CHANGE_NONE
-                && sMapChangeQueue[n].sequence == giMapChangeCtr) {
+        for (index = 0; index < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++index) {
+            if (sMapChangeQueue[index].type != MAP_CHANGE_NONE
+                && sMapChangeQueue[index].sequence == giMapChangeCtr) {
                 if (processChanges)
-                    ProcessMapChange(sMapChangeQueue[n]);
-                sMapChangeQueue[n].type = MAP_CHANGE_NONE;
+                    ProcessMapChange(sMapChangeQueue[index]);
+                sMapChangeQueue[index].type = MAP_CHANGE_NONE;
                 continueUnwinding = true;
             }
         }
     }
 }
 #if H2_RETAIL_COMPILER
+#undef index
 #undef queueIndex
 #endif
 

@@ -603,10 +603,13 @@ void combatManager::Close(void) {
     m_combatWindowOpen = false;
 }
 
+#if H2_RETAIL_COMPILER
+#define position pos
+#endif
 VA(0x004271ad, 0x2c1)
 void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 index;
-    i32 H2_UNUSED(pos);
+    i32 H2_UNUSED(position);
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         m_armyGroups[IDX(side)]->m_creatureTypes[index] = CREATURE_NONE;
         m_armyGroups[IDX(side)]->m_creatureCounts[index] = 0;
@@ -632,6 +635,9 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     if (giSkeletonsCreated && CombatResultForSide(side) == m_combatResult)
         m_armyGroups[IDX(side)]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
+#if H2_RETAIL_COMPILER
+#undef position
+#endif
 
 #if H2_RETAIL_COMPILER
 #define gridX gridX4
@@ -2203,6 +2209,10 @@ i32 combatManager::ShotIsThroughWall(
 #undef targetLine
 #endif
 
+#if H2_RETAIL_COMPILER
+#define absXLength absXLen
+#define yLength yLen
+#endif
 VA(0x0042ad5a, 0x4e0)
 void combatManager::ShootMissile(
     i32 sourceX,
@@ -2214,7 +2224,7 @@ void combatManager::ShootMissile(
 ) {
     i32 angleFrame;
     i32 oldX;
-    i32 yLen;
+    i32 yLength;
     H2_ENUM_STORAGE(IconDrawOrientation, i8) reverseMissile;
     i32 missileSteps;
     i32 oldY;
@@ -2229,25 +2239,25 @@ void combatManager::ShootMissile(
     i32 xSize;
     i32 frame;
     i32 minY;
-    i32 absXLen;
+    i32 absXLength;
     i32 missileHalfHeight;
     i32 maxX;
     i32 slopeDy;
     i32 maxY;
 
     xSize = targetX - sourceX;
-    yLen = targetY - sourceY;
-    absXLen = targetX - sourceX;
+    yLength = targetY - sourceY;
+    absXLength = targetX - sourceX;
     reverseMissile = ICON_DRAW_NORMAL;
-    if (absXLen < 0) {
+    if (absXLength < 0) {
         reverseMissile = ICON_DRAW_FLIPPED;
-        absXLen = -absXLen;
+        absXLength = -absXLength;
     }
     slopeDy = targetY - sourceY;
-    if (absXLen == 0) {
+    if (absXLength == 0) {
         angleFrame = slopeDy > 0 ? COMBAT_MISSILE_LAST_DIRECTION : 0;
     } else {
-        float slope = static_cast<double>(-slopeDy) / (static_cast<double>(absXLen));
+        float slope = static_cast<double>(-slopeDy) / (static_cast<double>(absXLength));
         float degrees = static_cast<float>(
             atan(static_cast<double>(slope)) * COMBAT_MISSILE_DEGREES_PER_RADIAN
             / COMBAT_MISSILE_PI
@@ -2265,14 +2275,14 @@ void combatManager::ShootMissile(
             angleFrame = COMBAT_MISSILE_LAST_DIRECTION;
     }
 
-    total = INTEGER_VECTOR_LENGTH(xSize, yLen);
+    total = INTEGER_VECTOR_LENGTH(xSize, yLength);
     missileSteps = (total + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
     if (missileSteps > 1) {
         incX = xSize / (missileSteps - 1);
-        yStep = yLen / (missileSteps - 1);
+        yStep = yLength / (missileSteps - 1);
     } else {
         incX = xSize;
-        yStep = yLen;
+        yStep = yLength;
     }
     posX = sourceX;
     posY = sourceY;
@@ -2365,6 +2375,10 @@ void combatManager::ShootMissile(
     );
     delete missileBackground;
 }
+#if H2_RETAIL_COMPILER
+#undef absXLength
+#undef yLength
+#endif
 
 VA(0x0042b23a, 0x10c)
 void combatManager::CombatSystemOptions(void) {

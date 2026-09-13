@@ -530,6 +530,8 @@ DATA(0x00518be0) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_C
 };
 
 #if H2_RETAIL_COMPILER
+#define currentHeight h
+#define currentWidth w
 #define objectBuildingId id_h
 #endif
 VA(0x004a4740, 0x18d)
@@ -542,8 +544,8 @@ townObject::townObject(
     i32 x;
     i32 y;
     i32 H2_UNUSED(tempY);
-    i32 w;
-    i32 h;
+    i32 currentWidth;
+    i32 currentHeight;
     H2_ENUM_STORAGE(BuildingSlotType, i32) objectBuildingId;
 
     m_animationFrame = 0;
@@ -553,8 +555,8 @@ townObject::townObject(
     m_animationFrameCount = sBuildingInfo[IDX(townType)][IDX(buildingId)].animationFrameCount;
     x = sBuildingInfo[IDX(townType)][IDX(buildingId)].x;
     y = sBuildingInfo[IDX(townType)][IDX(buildingId)].y;
-    w = sBuildingInfo[IDX(townType)][IDX(buildingId)].width;
-    h = sBuildingInfo[IDX(townType)][IDX(buildingId)].height;
+    currentWidth = sBuildingInfo[IDX(townType)][IDX(buildingId)].width;
+    currentHeight = sBuildingInfo[IDX(townType)][IDX(buildingId)].height;
     objectBuildingId = buildingId;
     m_buildingId = objectBuildingId;
     sprintf(name, "%s.icn", iconBaseName);
@@ -563,8 +565,8 @@ townObject::townObject(
         m_border = new border(
             x,
             y,
-            w,
-            h,
+            currentWidth,
+            currentHeight,
             static_cast<i16>(IDX(objectBuildingId)),
             WIDGET_KIND_TRANSPARENT,
             0,
@@ -575,6 +577,8 @@ townObject::townObject(
     }
 }
 #if H2_RETAIL_COMPILER
+#undef currentHeight
+#undef currentWidth
 #undef objectBuildingId
 #endif
 

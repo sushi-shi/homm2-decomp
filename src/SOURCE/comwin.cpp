@@ -145,11 +145,15 @@ void ShutdownComError(H2_CONST char* function) {
     ShutDown(message);
 }
 
+#if H2_RETAIL_COMPILER
+#define error err
+#define result rv
+#endif
 VA(0x00432ba2, 0x2fc)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
-    i32 H2_UNUSED(err);
+    i32 H2_UNUSED(error);
     i32 slot;
-    BOOL rv;
+    BOOL result;
     DCB state;
     char portName[PORT_NAME_SIZE];
     COMMTIMEOUTS portTimeouts;
@@ -211,24 +215,28 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     state.Parity = NOPARITY;
     state.StopBits = ONESTOPBIT;
 
-    rv = SetupComm(s_comPorts[slot].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
-    if (rv == 0)
+    result = SetupComm(s_comPorts[slot].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
+    if (result == 0)
         ShutdownComError("Initialize communications paramaters");
-    rv = SetCommState(s_comPorts[slot].handle, &state);
-    if (rv == 0)
+    result = SetCommState(s_comPorts[slot].handle, &state);
+    if (result == 0)
         ShutdownComError("Configure communications device");
 
     portTimeouts.ReadIntervalTimeout = MAXDWORD;
     portTimeouts.ReadTotalTimeoutMultiplier = portTimeouts.ReadTotalTimeoutConstant = 0;
     portTimeouts.WriteTotalTimeoutMultiplier = portTimeouts.WriteTotalTimeoutConstant = 0;
-    rv = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
-    if (rv == 0)
+    result = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
+    if (result == 0)
         ShutdownComError("Set communications timeouts");
 
     init_anchor(&s_comPorts[slot].normalQueue, 1, 0);
     init_anchor(&s_comPorts[slot].priorityQueue, 1, 0);
     return static_cast<i16>(slot);
 }
+#if H2_RETAIL_COMPILER
+#undef error
+#undef result
+#endif
 
 VA(0x00432e9e, 0xe9)
 void com_term(i16 portIndex) {
@@ -244,24 +252,28 @@ void com_term(i16 portIndex) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define currentBytesRead n
+#define currentError err
+#endif
 VA(0x00432f87, 0xc1)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
-    DWORD err;
+    DWORD currentError;
     i16 bytesRead[READ_RESULT_WORD_COUNT];
     COMSTAT status;
     BOOL success;
-    u32 n;
+    u32 currentBytesRead;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
-        success = ClearCommError(s_comPorts[portIndex].handle, &err, &status);
+        success = ClearCommError(s_comPorts[portIndex].handle, &currentError, &status);
         if (success == 0)
             ShutdownComError("Clear communications error queue");
-        n = requested < status.cbInQue ? requested : status.cbInQue;
-        if (n != 0) {
+        currentBytesRead = requested < status.cbInQue ? requested : status.cbInQue;
+        if (currentBytesRead != 0) {
             success = ReadFile(
                 s_comPorts[portIndex].handle,
                 buffer,
-                n,
+                currentBytesRead,
                 reinterpret_cast<LPDWORD>(bytesRead),
                 NULL
             );
@@ -272,6 +284,10 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef currentBytesRead
+#undef currentError
+#endif
 
 #if H2_RETAIL_COMPILER
 #define result result2

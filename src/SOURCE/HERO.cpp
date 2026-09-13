@@ -526,11 +526,14 @@ i32 hero::Dismiss(void) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define playerPointer playerPtr
+#endif
 VA(0x004617f2, 0x4e4)
 void hero::Deallocate(i32 updateMap) {
     i32 oldOwner;
     i32 i;
-    playerData* playerPtr;
+    playerData* playerPointer;
     i32 heroNum;
     town* curTown;
     i32 availSlot;
@@ -548,7 +551,7 @@ void hero::Deallocate(i32 updateMap) {
         );
 
     oldOwner = m_owner;
-    playerPtr = &gpGame->m_players[IDX(m_owner)];
+    playerPointer = &gpGame->m_players[IDX(m_owner)];
 
     if (updateMap)
         gpAdvManager->MobilizeCurrHero(0);
@@ -581,16 +584,16 @@ void hero::Deallocate(i32 updateMap) {
     }
 
     heroNum = -1;
-    for (i = 0; i < playerPtr->m_heroCount; i++) {
-        if (playerPtr->m_heroIds[i] == m_id)
+    for (i = 0; i < playerPointer->m_heroCount; i++) {
+        if (playerPointer->m_heroIds[i] == m_id)
             heroNum = i;
     }
-    for (i = heroNum; i < playerPtr->m_heroCount - 1; i++)
-        playerPtr->m_heroIds[i] = playerPtr->m_heroIds[i + 1];
-    playerPtr->m_heroIds[playerPtr->m_heroCount - 1] = -1;
+    for (i = heroNum; i < playerPointer->m_heroCount - 1; i++)
+        playerPointer->m_heroIds[i] = playerPointer->m_heroIds[i + 1];
+    playerPointer->m_heroIds[playerPointer->m_heroCount - 1] = -1;
 
-    if (playerPtr->m_currentHero == m_id) {
-        playerPtr->m_currentHero = -1;
+    if (playerPointer->m_currentHero == m_id) {
+        playerPointer->m_currentHero = -1;
         if (giCurPlayer == m_owner) {
             gpAdvManager->m_cursorActive = false;
             map = &gpGame->m_worldMap;
@@ -601,8 +604,8 @@ void hero::Deallocate(i32 updateMap) {
             gpAdvManager->m_heroContextLocked = false;
     }
 
-    playerPtr->m_heroCount--;
-    playerPtr->m_heroLocatorPage = 0;
+    playerPointer->m_heroCount--;
+    playerPointer->m_heroLocatorPage = 0;
     gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
 
     if (gbRetreatWin) {
@@ -641,6 +644,9 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
+#if H2_RETAIL_COMPILER
+#undef playerPointer
+#endif
 
 #if H2_RETAIL_COMPILER
 #define experience experience2
@@ -760,6 +766,9 @@ void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
+#if H2_RETAIL_COMPILER
+#define randomValue rnd
+#endif
 VA(0x004620c8, 0x6a3)
 void hero::CheckLevel(void) {
     i32 nLevel;
@@ -772,7 +781,7 @@ void hero::CheckLevel(void) {
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
     char text[HERO_LEVEL_TEXT_BUFFER_SIZE];
     i32 weight;
-    i32 rnd;
+    i32 randomValue;
     HeroSecondarySkill skill;
     i32 tryCount;
 
@@ -797,20 +806,20 @@ void hero::CheckLevel(void) {
             highIndex = HERO_SKILL_PROBABILITY_HIGH;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
-        rnd = SRandom(1, HERO_LEVEL_RANDOM_MAX);
-        if (rnd
+        randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
+        if (randomValue
             < gHeroSkillBonus[IDX(m_cursorType)][highIndex][IDX(HERO_PRIMARY_ATTACK)]) {
             statBonuses[IDX(HERO_PRIMARY_ATTACK)]++;
         } else {
-            rnd -=
+            randomValue -=
                 gHeroSkillBonus[IDX(m_cursorType)][highIndex][IDX(HERO_PRIMARY_ATTACK)];
-            if (rnd < gHeroSkillBonus[IDX(m_cursorType)][highIndex]
+            if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highIndex]
                                              [IDX(HERO_PRIMARY_DEFENSE)]) {
                 statBonuses[IDX(HERO_PRIMARY_DEFENSE)]++;
             } else {
-                rnd -= gHeroSkillBonus[IDX(m_cursorType)][highIndex]
+                randomValue -= gHeroSkillBonus[IDX(m_cursorType)][highIndex]
                                               [IDX(HERO_PRIMARY_DEFENSE)];
-                if (rnd < gHeroSkillBonus[IDX(m_cursorType)][highIndex]
+                if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highIndex]
                                                  [IDX(HERO_PRIMARY_SPELL_POWER)]) {
                     statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)]++;
                 } else {
@@ -939,18 +948,27 @@ void hero::CheckLevel(void) {
     m_level = static_cast<i16>(newLevel);
     WaitEndSample(&samp);
 }
+#if H2_RETAIL_COMPILER
+#undef randomValue
+#endif
 
+#if H2_RETAIL_COMPILER
+#define count cnt
+#endif
 VA(0x0046276b, 0x4b)
 i32 hero::NumArtifacts(void) {
-    i32 cnt = 0;
+    i32 count = 0;
     i32 i;
 
     for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
         if (m_artifacts[i] >= ARTIFACT_VALID_BEGIN)
-            cnt++;
+            count++;
     }
-    return cnt;
+    return count;
 }
+#if H2_RETAIL_COMPILER
+#undef count
+#endif
 
 VA(0x004627b6, 0x742)
 void UpdateHeroScreenStatusBar(struct tag_message& message) {
@@ -1154,10 +1172,11 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 
 #if H2_RETAIL_COMPILER
 #define newMessage newMsg
+#define temporary tmp
 #endif
 VA(0x00462ef8, 0x9ba)
 MessageDispatchResult HeroHandler(struct tag_message& message) {
-    i32 tmp;
+    i32 temporary;
     b32 quickView;
     i32 armySlot;
     i32 H2_UNUSED(dummy);
@@ -1389,7 +1408,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->HeroScreenUpdate();
                                 }
                             } else if (quickView == 0) {
-                                tmp = IDX(gpHVHero->m_army.m_creatureTypes[armySlot]);
+                                temporary = IDX(gpHVHero->m_army.m_creatureTypes[armySlot]);
                                 if (HAS(
                                         message.payload.widget.modifiers,
                                         MESSAGE_MODIFIER_SHIFT_KEYS
@@ -1411,12 +1430,12 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->m_army.m_creatureTypes[armySlot] =
                                         gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
                                     gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                        static_cast<CreatureType>(tmp);
-                                    tmp = gpHVHero->m_army.m_creatureCounts[armySlot];
+                                        static_cast<CreatureType>(temporary);
+                                    temporary = gpHVHero->m_army.m_creatureCounts[armySlot];
                                     gpHVHero->m_army.m_creatureCounts[armySlot] =
                                         gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
                                     gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex] =
-                                        static_cast<i16>(tmp);
+                                        static_cast<i16>(temporary);
                                 }
                                 giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
                                 gpHVHero->HeroScreenUpdate();
@@ -1505,6 +1524,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 }
 #if H2_RETAIL_COMPILER
 #undef newMessage
+#undef temporary
 #endif
 
 VA(0x004638b2, 0x44)

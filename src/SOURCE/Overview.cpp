@@ -973,9 +973,12 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define column col
+#endif
 VA(0x0047b9e6, 0x344)
 void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
-    i32 col;
+    i32 column;
     tag_message message;
     char* titleText;
 
@@ -1009,54 +1012,59 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         {140, 199, 239}
     };
 
-    for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        if (textWidgetTitle[col] != NULL) {
-            overWin->RemoveWidget(textWidgetTitle[col]);
-            delete textWidgetTitle[col];
-            textWidgetTitle[col] = NULL;
+    for (column = 0; column < OVERVIEW_TITLE_COUNT; column++) {
+        if (textWidgetTitle[column] != NULL) {
+            overWin->RemoveWidget(textWidgetTitle[column]);
+            delete textWidgetTitle[column];
+            textWidgetTitle[column] = NULL;
         }
     }
-    for (col = 0; col < OVERVIEW_TITLE_COUNT; col++) {
-        ALLOC_COPY_STRING(titleText, cOverviewText[col + IDX(giOverviewType) * OVERVIEW_TITLE_COUNT]);
-        textWidgetTitle[col] = new textWidget(
-            titleX[IDX(giOverviewType)][col],
+    for (column = 0; column < OVERVIEW_TITLE_COUNT; column++) {
+        ALLOC_COPY_STRING(titleText, cOverviewText[column + IDX(giOverviewType) * OVERVIEW_TITLE_COUNT]);
+        textWidgetTitle[column] = new textWidget(
+            titleX[IDX(giOverviewType)][column],
             OVERVIEW_TITLE_Y,
-            titleWidths[IDX(giOverviewType)][col],
+            titleWidths[IDX(giOverviewType)][column],
             OVERVIEW_TITLE_HEIGHT,
             titleText,
             const_cast<char*>("smalfont.fnt"),
             FONT_DRAW_DEFAULT,
-            static_cast<i16>(col + OVERVIEW_COLUMN_TITLE_FIRST),
+            static_cast<i16>(column + OVERVIEW_COLUMN_TITLE_FIRST),
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        overWin->AddWidget(textWidgetTitle[col], -1);
+        overWin->AddWidget(textWidgetTitle[column], -1);
     }
     SetupDynamicStuff(0, 1, 0);
     if (redrawFrom != 0) {
         overWin->DrawWindow(redrawFrom, HERO_TAB_WIDGET, ICON_ROW_LIMIT - 1);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef column
+#endif
 
 #if H2_RETAIL_COMPILER
 #define message msg
+#define resourceIndex resourceIdx
 #endif
 VA(0x0047bd2a, 0x77)
 void game::SetupResources(void) {
-    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resourceIdx;
+    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resourceIndex;
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
-    for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
+    for (resourceIndex = RES_WOOD; resourceIndex < RES_COUNT; resourceIndex++) {
         message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message.payload.widget.data.text = gText;
-        sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resourceIdx)]);
-        message.payload.widget.id = IDX(resourceIdx) + RESOURCE_FIRST_WIDGET;
+        sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resourceIndex)]);
+        message.payload.widget.id = IDX(resourceIndex) + RESOURCE_FIRST_WIDGET;
         overWin->BroadcastMessage(message);
     }
 }
 #if H2_RETAIL_COMPILER
 #undef message
+#undef resourceIndex
 #endif
 
 VA(0x0047bda1, 0x4b2)
@@ -1162,14 +1170,18 @@ void game::Overview(void) {
     iconWidgetDynamic = NULL;
 }
 
+#if H2_RETAIL_COMPILER
+#define pointerX ptX
+#define pointerY ptY
+#endif
 VA(0x0047c253, 0x2ae)
 void game::DoKnob(void) {
     i32 topBefore;
     double itemPixels;
     float scrollRange;
     tag_message widgetMessage;
-    i32 ptX;
-    i32 ptY;
+    i32 pointerX;
+    i32 pointerY;
     i32 topNow;
     float topValue;
     tag_message pendingMessage;
@@ -1184,7 +1196,7 @@ void game::DoKnob(void) {
         topBefore = giOverviewTop[IDX(giOverviewType)];
         itemPixels =
             scrollRange / (giOverviewItems[IDX(giOverviewType)] - (OVERVIEW_VISIBLE_ROWS - 1));
-        gpMouseManager->MouseCoords(ptX, ptY);
+        gpMouseManager->MouseCoords(pointerX, pointerY);
         gpInputManager->Flush();
         widgetMessage = gpInputManager->GetEvent();
         while (widgetMessage.type != MESSAGE_LEFT_BUTTON_UP
@@ -1248,6 +1260,10 @@ void game::DoKnob(void) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef pointerX
+#undef pointerY
+#endif
 
 VA(0x0047c501, 0x4b2)
 MessageDispatchResult OverviewHandler(struct tag_message& message) {

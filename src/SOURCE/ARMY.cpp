@@ -373,6 +373,9 @@ void army::FreeResources(void) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define spellInfluence sp
+#endif
 VA(0x00419095, 0x6fb)
 void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     u8* palette;
@@ -384,7 +387,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 quantX;
     i32 spellX;
     i32 quantY;
-    H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) sp;
+    H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) spellInfluence;
     i32 spellY;
     i32 color;
     i32 badSpells;
@@ -503,9 +506,9 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         }
         goodEffects = 0;
         badSpells   = 0;
-        for (sp = ARMY_SPELL_INFLUENCE_HASTE; sp < ARMY_SPELL_INFLUENCE_COUNT; sp++) {
-            if (m_spellInfluence[IDX(sp)]) {
-                switch (sp) {
+        for (spellInfluence = ARMY_SPELL_INFLUENCE_HASTE; spellInfluence < ARMY_SPELL_INFLUENCE_COUNT; spellInfluence++) {
+            if (m_spellInfluence[IDX(spellInfluence)]) {
+                switch (spellInfluence) {
                     case ARMY_SPELL_INFLUENCE_HASTE:
                     case ARMY_SPELL_INFLUENCE_BLESS:
                     case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
@@ -604,6 +607,9 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         );
     }
 }
+#if H2_RETAIL_COMPILER
+#undef spellInfluence
+#endif
 
 VA(0x00419790, 0x22)
 void army::Wince(void) {
@@ -863,6 +869,8 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
 
 #if H2_RETAIL_COMPILER
 #define combatMessage combatMsg
+#define fullXLength fullXLen
+#define fullYLength fullYLen
 #endif
 VA(0x0041a1d9, 0x165f)
 void army::SpecialAttack(void) {
@@ -904,12 +912,12 @@ void army::SpecialAttack(void) {
     army* pEnemy;
     float incline;
     i32 pathDist;
-    i32 fullXLen;
+    i32 fullXLength;
     i32 arrowHalfH;
     i32 startX;
     i32 maxX;
     i32 killed;
-    i32 fullYLen;
+    i32 fullYLength;
     i32 startY;
     i32 maxY;
     i32 damageDone;
@@ -963,24 +971,24 @@ void army::SpecialAttack(void) {
         anchorX = gpCombatManager->m_hexCells[m_hex].m_x - m_frameInfo.missileOffsets[1].x;
     }
     anchorY = gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[1].y;
-    fullXLen = xCentre - anchorX;
+    fullXLength = xCentre - anchorX;
     bIconFlip = ICON_DRAW_NORMAL;
-    if (fullXLen < 0) {
+    if (fullXLength < 0) {
         bIconFlip = ICON_DRAW_FLIPPED;
-        fullXLen = -fullXLen;
+        fullXLength = -fullXLength;
     }
-    fullYLen = yCentre - anchorY;
-    if (fullXLen == 0) {
+    fullYLength = yCentre - anchorY;
+    if (fullXLength == 0) {
         frameIndex =
-            fullYLen > 0 ? m_frameInfo.projectileDirectionCount - 1 : 0;
+            fullYLength > 0 ? m_frameInfo.projectileDirectionCount - 1 : 0;
         fShotAngle = static_cast<float>(
-            fullYLen > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
+            fullYLength > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
         );
     } else {
         /* The parenthesised divisor cast keeps both operands on the x87 stack;
            without it VC6 folds the divisor into a single `fidiv`. */
-        incline = static_cast<float>(-fullYLen)
-                / (static_cast<float>(fullXLen));
+        incline = static_cast<float>(-fullYLength)
+                / (static_cast<float>(fullXLength));
         fShotAngle = static_cast<float>(
             atan(static_cast<double>(incline)) * PROJECTILE_HALF_TURN_DEGREES_FLOAT
             / ARMY_PROJECTILE_PI
@@ -1311,6 +1319,8 @@ void army::SpecialAttack(void) {
 }
 #if H2_RETAIL_COMPILER
 #undef combatMessage
+#undef fullXLength
+#undef fullYLength
 #endif
 
 VA(0x0041b838, 0x20)
@@ -1319,9 +1329,13 @@ void army::DirDoAttack(CombatHexDirection direction) {
     DoAttack(0);
 }
 
+#if H2_RETAIL_COMPILER
+#define direction dir
+#define textBuffer textBuf
+#endif
 VA(0x0041b858, 0x583)
 void army::DoHydraAttack(i32) {
-    CombatHexDirection dir;
+    CombatHexDirection direction;
     i32 hitHex;
     CombatSide occupantSide;
     i16 attackMask;
@@ -1331,7 +1345,7 @@ void army::DoHydraAttack(i32) {
     i32 damage;
     i32 totDamage;
     i32 killedNow;
-    char textBuf[ARMY_COMBAT_TEXT_SIZE];
+    char textBuffer[ARMY_COMBAT_TEXT_SIZE];
 
     totKilled = 0;
     totDamage = totKilled;
@@ -1348,24 +1362,24 @@ void army::DoHydraAttack(i32) {
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
     gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index]++;
-    for (dir = COMBAT_DIRECTION_NORTHEAST;
-         IDX(dir) < ARMY_COMBAT_DIRECTION_COUNT;
-         dir++) {
-        if (!(attackMask & BIT(dir))) {
+    for (direction = COMBAT_DIRECTION_NORTHEAST;
+         IDX(direction) < ARMY_COMBAT_DIRECTION_COUNT;
+         direction++) {
+        if (!(attackMask & BIT(direction))) {
             hitHex = m_hex;
             if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)
                 && ((m_facing == ARMY_FACING_LEFT
-                     && dir > COMBAT_DIRECTION_SOUTHEAST)
+                     && direction > COMBAT_DIRECTION_SOUTHEAST)
                     || (m_facing == ARMY_FACING_RIGHT
-                        && (dir < COMBAT_DIRECTION_SOUTHWEST
-                            || dir > COMBAT_DIRECTION_NORTHWEST)))) {
+                        && (direction < COMBAT_DIRECTION_SOUTHWEST
+                            || direction > COMBAT_DIRECTION_NORTHWEST)))) {
                 if (m_facing == ARMY_FACING_LEFT) {
                     hitHex = m_hex - 1;
                 } else {
                     hitHex = m_hex + 1;
                 }
             }
-            hitHex = GetAdjacentCellIndex(hitHex, dir);
+            hitHex = GetAdjacentCellIndex(hitHex, direction);
             if (ValidHex(hitHex)) {
                 occupantSide = gpCombatManager->m_hexCells[hitHex].m_occupantSide;
                 armyIndex = gpCombatManager->m_hexCells[hitHex].m_occupantIndex;
@@ -1412,11 +1426,15 @@ void army::DoHydraAttack(i32) {
         );
     }
     gText[0] = CyrillicToUpper(gText[0]);
-    strcpy(textBuf, gText);
+    strcpy(textBuffer, gText);
     PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
-    gpCombatManager->CombatMessage(textBuf, 1, 1, 0);
+    gpCombatManager->CombatMessage(textBuffer, 1, 1, 0);
     gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index] = 1;
 }
+#if H2_RETAIL_COMPILER
+#undef direction
+#undef textBuffer
+#endif
 
 #if H2_RETAIL_COMPILER
 #define adjacentHex adjacentHex_1

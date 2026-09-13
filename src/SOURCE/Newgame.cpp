@@ -1500,9 +1500,12 @@ cleanup:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+#if H2_RETAIL_COMPILER
+#define buffer buf
+#endif
 VA(0x0047811b, 0x3f3)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
-    char buf[GAME_KEY_BUFFER_SIZE];
+    char buffer[GAME_KEY_BUFFER_SIZE];
     char keyChar;
     i32 scanCode;
     i32 widthResult;
@@ -1553,7 +1556,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
             if (strlen(cNGKPCore) + 1 < GAME_CHAT_TEXT_LIMIT
                 && message.payload.keyboard.keyCode != 0) {
-                strcpy(buf, cNGKPCore);
+                strcpy(buffer, cNGKPCore);
                 keyChar = 0;
                 if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
                     scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
@@ -1608,7 +1611,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
                     widthResult = smallFont->LineLength(cNGKPDisplay, GAME_CHAT_DRAW_WIDTH);
                     if (widthResult > GAME_CHAT_MAX_LINES) {
-                        strcpy(cNGKPCore, buf);
+                        strcpy(cNGKPCore, buffer);
                         --NGKPcursorIndex;
                     }
                 }
@@ -1619,6 +1622,9 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
     DrawNGKPDisplayString(1);
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef buffer
+#endif
 
 VA(0x0047850e, 0x104)
 void game::NGKPSetupDisplayString(char* text, u16 cursor) {

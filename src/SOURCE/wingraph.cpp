@@ -302,12 +302,13 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
 
 #if H2_RETAIL_COMPILER
 #define entry entry0
+#define result rr
 #endif
 VA(0x004b0369, 0x111)
 void DDInitializePalette(void) {
     HDC winDC;
     i32 entry;
-    HRESULT rr;
+    HRESULT result;
 
     if (gbWinGraphBusy != 0)
         return;
@@ -334,10 +335,10 @@ void DDInitializePalette(void) {
             LogicalPalette.entries[entry].peBlue = 0;
             LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
         }
-        rr = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
-        if (rr != DD_OK)
+        result = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
+        if (result != DD_OK)
             DDSD(
-                rr,
+                result,
                 RETAIL_FILE,
                 359
             );
@@ -346,6 +347,7 @@ void DDInitializePalette(void) {
 }
 #if H2_RETAIL_COMPILER
 #undef entry
+#undef result
 #endif
 
 VA(0x004b047a, 0x7e)
@@ -368,13 +370,17 @@ i32 DDSetPalette(void) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define count cnt
+#define result rv
+#endif
 VA(0x004b04f8, 0x109)
 struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary) {
     DDSURFACEDESC ddsd;
     IDirectDrawSurface* lpSurface;
-    i32 H2_UNUSED(cnt);
+    i32 H2_UNUSED(count);
     i32 H2_UNUSED(unused);
-    HRESULT rv;
+    HRESULT result;
 
     memset(&ddsd, 0, sizeof(ddsd));
     ddsd.dwSize = sizeof(ddsd);
@@ -388,18 +394,18 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
         ddsd.dwHeight = height;
         ddsd.dwWidth = width;
     }
-    rv = lpDD->CreateSurface(&ddsd, &lpSurface, NULL);
-    if (rv != DD_OK)
+    result = lpDD->CreateSurface(&ddsd, &lpSurface, NULL);
+    if (result != DD_OK)
         DDSD(
-            rv,
+            result,
             RETAIL_FILE,
             421
         );
     if (primary == 0) {
-        rv = lpSurface->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL);
-        if (rv != DD_OK)
+        result = lpSurface->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL);
+        if (result != DD_OK)
             DDSD(
-                rv,
+                result,
                 RETAIL_FILE,
                 429
             );
@@ -412,6 +418,10 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     }
     return lpSurface;
 }
+#if H2_RETAIL_COMPILER
+#undef count
+#undef result
+#endif
 
 VA(0x004b0601, 0x614)
 void DDSD(i32 error, H2_CONST char* file, i32 line) {
@@ -758,28 +768,29 @@ void WGInitGraphics(void) {
 
 #if H2_RETAIL_COMPILER
 #define deviceContext dc0
+#define index idx
 #endif
 VA(0x004b1273, 0x1c1)
 void __cdecl WGUpdatePalette(i8* paletteData) {
     HDC deviceContext;
     i32 H2_UNUSED(result);
-    i32 idx;
+    i32 index;
 
-    for (idx = WINGRAPH_SYSTEM_PALETTE_SIZE;
-         idx < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
-         idx++) {
-        LogicalPalette.entries[idx].peRed =
-            paletteData[idx * PALETTE_COMPONENT_COUNT + PALETTE_RED_COMPONENT]
+    for (index = WINGRAPH_SYSTEM_PALETTE_SIZE;
+         index < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
+         index++) {
+        LogicalPalette.entries[index].peRed =
+            paletteData[index * PALETTE_COMPONENT_COUNT + PALETTE_RED_COMPONENT]
             << PALETTE_VALUE_SHIFT;
-        screenImage.colors[idx].rgbRed = LogicalPalette.entries[idx].peRed;
-        LogicalPalette.entries[idx].peGreen =
-            paletteData[idx * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_COMPONENT]
+        screenImage.colors[index].rgbRed = LogicalPalette.entries[index].peRed;
+        LogicalPalette.entries[index].peGreen =
+            paletteData[index * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_COMPONENT]
             << PALETTE_VALUE_SHIFT;
-        screenImage.colors[idx].rgbGreen = LogicalPalette.entries[idx].peGreen;
-        LogicalPalette.entries[idx].peBlue =
-            paletteData[idx * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_COMPONENT]
+        screenImage.colors[index].rgbGreen = LogicalPalette.entries[index].peGreen;
+        LogicalPalette.entries[index].peBlue =
+            paletteData[index * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_COMPONENT]
             << PALETTE_VALUE_SHIFT;
-        screenImage.colors[idx].rgbBlue = LogicalPalette.entries[idx].peBlue;
+        screenImage.colors[index].rgbBlue = LogicalPalette.entries[index].peBlue;
     }
     AnimatePalette(
         hpalApp,
@@ -828,6 +839,7 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
 }
 #if H2_RETAIL_COMPILER
 #undef deviceContext
+#undef index
 #endif
 
 #if H2_RETAIL_COMPILER
@@ -1140,13 +1152,16 @@ i32 QueryNewPalette(void) {
         return DDQueryNewPalette();
 }
 
+#if H2_RETAIL_COMPILER
+#define currentHeight hgt
+#endif
 VA(0x004b1ae0, 0x1ce)
 i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     b32 fullState;
     i32 x;
     i32 y;
     i32 width;
-    i32 hgt;
+    i32 currentHeight;
     void* buffer;
 
     if (giGraphicsType == graphicsType)
@@ -1160,7 +1175,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     x = CURRENT_GRAPHICS_CONFIG.x;
     y = CURRENT_GRAPHICS_CONFIG.y;
     width = CURRENT_GRAPHICS_CONFIG.width;
-    hgt = CURRENT_GRAPHICS_CONFIG.height;
+    currentHeight = CURRENT_GRAPHICS_CONFIG.height;
     buffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     memcpy(buffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
@@ -1179,12 +1194,15 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     H2_FREE(buffer);
     if (fullState != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
         SetMenuStatus(1);
-        ResizeWindow(x, y, width, hgt);
+        ResizeWindow(x, y, width, currentHeight);
     }
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0, 0);
     UpdatePalette(gpBufferPalette->m_data);
     return 1;
 }
+#if H2_RETAIL_COMPILER
+#undef currentHeight
+#endif
 
 DATA(0x00519bc0) b32 gbWinGAttached = true;
 DATA(0x00534498) b32 gbDDrawAttached = false;

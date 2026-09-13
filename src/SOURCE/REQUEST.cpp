@@ -93,17 +93,20 @@ i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
+#if H2_RETAIL_COMPILER
+#define index ix
+#endif
 VA(0x0048e7b0, 0x76)
 i32 ShowThisMapGame(char* filename) {
     return 1;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
-    i32 ix;
+    i32 index;
     strcpy(mapName, filename);
     mapName[LEGACY_MAP_BASENAME_SIZE] = 0;
-    for (ix = 0; ix < LEGACY_MAP_BASENAME_SIZE; ++ix) {
-        if (mapName[ix] == '.') {
-            mapName[ix] = 0;
+    for (index = 0; index < LEGACY_MAP_BASENAME_SIZE; ++index) {
+        if (mapName[index] == '.') {
+            mapName[index] = 0;
         }
     }
     if (strcmpi(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
@@ -111,6 +114,9 @@ i32 ShowThisMapGame(char* filename) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#endif
 
 VA(0x0048e826, 0x10)
 i32 ShowThisMap(char*) {
@@ -118,6 +124,7 @@ i32 ShowThisMap(char*) {
 }
 
 #if H2_RETAIL_COMPILER
+#define dotPointer dotPtr
 #define indexData indexData5
 #endif
 VA(0x0048e836, 0x723)
@@ -127,7 +134,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     i32 haveMore;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
-    char* dotPtr;
+    char* dotPointer;
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
     WIN32_FIND_DATA findFileData;
     i32 indexData;
@@ -221,10 +228,10 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             }
 
             strcpy(nameBuffer, findFileData.cFileName);
-            dotPtr = FindLastToken(nameBuffer, '.');
-            if (dotPtr != NULL) {
-                strcpy(extension, dotPtr);
-                *dotPtr = 0;
+            dotPointer = FindLastToken(nameBuffer, '.');
+            if (dotPointer != NULL) {
+                strcpy(extension, dotPointer);
+                *dotPointer = 0;
             }
 
             for (indexData = 0; indexData < insertCount; ++indexData) {
@@ -255,6 +262,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     return m_fileCount;
 }
 #if H2_RETAIL_COMPILER
+#undef dotPointer
 #undef indexData
 #endif
 

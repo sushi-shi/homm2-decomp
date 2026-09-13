@@ -3755,10 +3755,14 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     }
 }
 
+#if H2_RETAIL_COMPILER
+#define firstPointer firstPtr
+#define secondPointer secondPtr
+#endif
 VA(0x004420e1, 0x95)
 i8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString) {
-    H2_CONST char* firstPtr = firstString;
-    H2_CONST char* secondPtr = sndString;
+    H2_CONST char* firstPointer = firstString;
+    H2_CONST char* secondPointer = sndString;
     i32 chCount = 0;
     char fstUpper;
     char sndUpper;
@@ -3767,18 +3771,22 @@ i8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString) {
         chCount++;
         if (chCount == SITE_STRING_LIMIT)
             return 1;
-        fstUpper = static_cast<char>(toupper(static_cast<i32>(*firstPtr)));
-        sndUpper = static_cast<char>(toupper(static_cast<i32>(*secondPtr)));
+        fstUpper = static_cast<char>(toupper(static_cast<i32>(*firstPointer)));
+        sndUpper = static_cast<char>(toupper(static_cast<i32>(*secondPointer)));
         if (fstUpper == sndUpper) {
             if (fstUpper == 0)
                 return 1;
-            firstPtr++;
-            secondPtr++;
+            firstPointer++;
+            secondPointer++;
         } else {
             return 0;
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef firstPointer
+#undef secondPointer
+#endif
 
 VA(0x00442176, 0xe0)
 void advManager::PasswordEvent(mapCell* cell, hero*) {
@@ -5173,6 +5181,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 
 #if H2_RETAIL_COMPILER
 #define placement placement4
+#define stackIndex stackIdx
 #define unusedValue combatUnused0
 #endif
 VA(0x0044403b, 0x536)
@@ -5201,7 +5210,7 @@ CombatResult advManager::CombatMonsterEvent(
     CreatureType savedTypes[MONSTER_ARMY_SLOTS];
     CombatResult battleOutcome;
     i32 savedCounts[MONSTER_ARMY_SLOTS];
-    i32 stackIdx;
+    i32 stackIndex;
     i32 H2_UNUSED(unusedValue);
 
     DemobilizeCurrHero();
@@ -5232,8 +5241,8 @@ CombatResult advManager::CombatMonsterEvent(
             stackCount = MONSTER_FOUR_STACK_COUNT;
     }
 
-    for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
-        if (stackIdx == (stackCount >> 1)
+    for (stackIndex = 0; stackIndex < stackCount; stackIndex++) {
+        if (stackIndex == (stackCount >> 1)
             && (monsterType == CREATURE_ARCHER || monsterType == CREATURE_PIKEMAN
                 || monsterType == CREATURE_SWORDSMAN || monsterType == CREATURE_CAVALRY
                 || monsterType == CREATURE_PALADIN || monsterType == CREATURE_ORC
@@ -5247,24 +5256,24 @@ CombatResult advManager::CombatMonsterEvent(
                 || monsterType == CREATURE_LICH)
             && SRandom(0, MONSTER_RANDOM_MAX) < MONSTER_UPGRADE_CHANCE && secondaryCount == 0
             && tertiaryCount == 0)
-            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
+            gpMonGroup->m_creatureTypes[groupCount + stackIndex] =
                 NextCreatureType(monsterType);
         else
-            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
+            gpMonGroup->m_creatureTypes[groupCount + stackIndex] =
                 monsterType;
-        gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
-            static_cast<i16>(monsterCount / stackCount + (monsterCount % stackCount > stackIdx));
+        gpMonGroup->m_creatureCounts[groupCount + stackIndex] =
+            static_cast<i16>(monsterCount / stackCount + (monsterCount % stackCount > stackIndex));
     }
 
     groupCount += stackCount;
     if (secondaryStacks != 0) {
         stackCount = secondaryStacks;
-        for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
-            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
+        for (stackIndex = 0; stackIndex < stackCount; stackIndex++) {
+            gpMonGroup->m_creatureTypes[groupCount + stackIndex] =
                 secondaryType;
-            gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
+            gpMonGroup->m_creatureCounts[groupCount + stackIndex] =
                 static_cast<i16>(
-                    secondaryCount / stackCount + (secondaryCount % stackCount > stackIdx)
+                    secondaryCount / stackCount + (secondaryCount % stackCount > stackIndex)
                 );
         }
     }
@@ -5272,23 +5281,23 @@ CombatResult advManager::CombatMonsterEvent(
     groupCount += stackCount;
     if (tertiaryStacks != 0) {
         stackCount = tertiaryStacks;
-        for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
-            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
+        for (stackIndex = 0; stackIndex < stackCount; stackIndex++) {
+            gpMonGroup->m_creatureTypes[groupCount + stackIndex] =
                 tertiaryType;
-            gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
+            gpMonGroup->m_creatureCounts[groupCount + stackIndex] =
                 static_cast<i16>(
-                    tertiaryCount / stackCount + (secondaryCount % stackCount > stackIdx)
+                    tertiaryCount / stackCount + (secondaryCount % stackCount > stackIndex)
                 );
         }
     }
     lastCount = stackCount;
 
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
-        if (gpMonGroup->m_creatureCounts[stackIdx] <= 0)
-            gpMonGroup->m_creatureTypes[stackIdx] = CREATURE_NONE;
+    for (stackIndex = 0; stackIndex < MONSTER_ARMY_SLOTS; stackIndex++) {
+        if (gpMonGroup->m_creatureCounts[stackIndex] <= 0)
+            gpMonGroup->m_creatureTypes[stackIndex] = CREATURE_NONE;
     }
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++)
-        placement[stackIdx] = stackIdx;
+    for (stackIndex = 0; stackIndex < MONSTER_ARMY_SLOTS; stackIndex++)
+        placement[stackIndex] = stackIndex;
 
     if (lastCount == 1) {
         placement[2] = 0;
@@ -5315,14 +5324,14 @@ CombatResult advManager::CombatMonsterEvent(
         placement[4] = 1;
     }
 
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
-        savedTypes[stackIdx] = gpMonGroup->m_creatureTypes[stackIdx];
-        savedCounts[stackIdx] = gpMonGroup->m_creatureCounts[stackIdx];
+    for (stackIndex = 0; stackIndex < MONSTER_ARMY_SLOTS; stackIndex++) {
+        savedTypes[stackIndex] = gpMonGroup->m_creatureTypes[stackIndex];
+        savedCounts[stackIndex] = gpMonGroup->m_creatureCounts[stackIndex];
     }
-    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
-        gpMonGroup->m_creatureTypes[stackIdx] = savedTypes[placement[stackIdx]];
-        gpMonGroup->m_creatureCounts[stackIdx] =
-            static_cast<i16>(savedCounts[placement[stackIdx]]);
+    for (stackIndex = 0; stackIndex < MONSTER_ARMY_SLOTS; stackIndex++) {
+        gpMonGroup->m_creatureTypes[stackIndex] = savedTypes[placement[stackIndex]];
+        gpMonGroup->m_creatureCounts[stackIndex] =
+            static_cast<i16>(savedCounts[placement[stackIndex]]);
     }
 
     if (defender != 0)
@@ -5358,6 +5367,7 @@ CombatResult advManager::CombatMonsterEvent(
 }
 #if H2_RETAIL_COMPILER
 #undef placement
+#undef stackIndex
 #undef unusedValue
 #endif
 

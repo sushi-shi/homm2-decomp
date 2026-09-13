@@ -24,18 +24,23 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 
+#if H2_RETAIL_COMPILER
+#define height h
+#define widgetId e
+#define width w
+#endif
 VA(0x004cb120, 0xa8)
 border::border(
     i16 x,
     i16 y,
-    i16 w,
-    i16 h,
-    i16 e,
+    i16 width,
+    i16 height,
+    i16 widgetId,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 fillColor,
     H2_CONST char* name
 )
-    : widget(x, y, w, h, e, kind) {
+    : widget(x, y, width, height, widgetId, kind) {
     if (name != NULL)
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
     else
@@ -43,6 +48,11 @@ border::border(
     m_backgroundIcon = NULL;
     m_fillColor = fillColor;
 }
+#if H2_RETAIL_COMPILER
+#undef height
+#undef widgetId
+#undef width
+#endif
 
 VA(0x004cb1d0, 0x7f)
 H2_RETAIL_INLINE border::~border() {

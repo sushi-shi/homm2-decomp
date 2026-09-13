@@ -26,12 +26,13 @@ H2_ENUM_END(RippleConstant)
 #define blitX blitX3
 #define column column7
 #define deadline deadline7
+#define index idx
 #define sourceRow srcRow
 #define step step7
 #endif
 VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
-    i32 idx;
+    i32 index;
     u8 previous[SCREEN_WIDTH];
     i32 deadline;
     i32 blitWidth;
@@ -54,18 +55,18 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
         deadline =
             KBTickCount() + static_cast<i32>(9.0f * gfCombatSpeedMod[gConfig.combatSpeed]);
 
-        for (idx = 0; idx <= PROFILE_SIZE - 1; idx++) {
-            column = sweepPosition + idx - PROFILE_RADIUS;
+        for (index = 0; index <= PROFILE_SIZE - 1; index++) {
+            column = sweepPosition + index - PROFILE_RADIUS;
             if (column < 0 || column >= SCREEN_WIDTH)
                 continue;
-            if (rippleProfile[idx] == previous[column])
+            if (rippleProfile[index] == previous[column])
                 continue;
 
             u8* destinationPixel = destination->m_pixels + column;
             u8* sourcePixel =
-                source->m_pixels + column + rippleProfile[idx] * SCREEN_WIDTH * strength;
+                source->m_pixels + column + rippleProfile[index] * SCREEN_WIDTH * strength;
 
-            sourceRow = rippleProfile[idx] * strength;
+            sourceRow = rippleProfile[index] * strength;
             for (; sourceRow < height; sourceRow++) {
                 *destinationPixel = *sourcePixel;
                 if (sourceRow + 1 == height)
@@ -73,7 +74,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
                 destinationPixel += SCREEN_WIDTH;
                 sourcePixel += SCREEN_WIDTH;
             }
-            previous[column] = rippleProfile[idx];
+            previous[column] = rippleProfile[index];
         }
 
         blitX    = sweepPosition - REDRAW_RADIUS - step;
@@ -97,6 +98,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
 #undef blitX
 #undef column
 #undef deadline
+#undef index
 #undef sourceRow
 #undef step
 #endif

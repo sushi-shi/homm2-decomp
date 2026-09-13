@@ -98,13 +98,14 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
 }
 
 #if H2_RETAIL_COMPILER
+#define index idx
 #define leftInitial chr2
 #define rightInitial chr1
 #endif
 VA(0x004ac873, 0x639)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
-    i32 idx;
+    i32 index;
     OfferSide sideCurrent;
     i32 offeredValue;
     i32 requestedValue;
@@ -162,12 +163,12 @@ void UpdateTradingPost(i32 draw) {
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
-    for (idx = TRADING_POST_CONTROL_FIRST; idx <= TRADING_POST_CONTROL_LAST; idx++) {
+    for (index = TRADING_POST_CONTROL_FIRST; index <= TRADING_POST_CONTROL_LAST; index++) {
         messageTemp.payload.widget.command =
             leftResource != -1 && rightResource != -1 && leftResource != rightResource
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
-        messageTemp.payload.widget.id = idx;
+        messageTemp.payload.widget.id = index;
         messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         tpWindow->BroadcastMessage(messageTemp);
     }
@@ -198,21 +199,21 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
         }
 
-        for (idx = 0; idx < TRADING_POST_RESOURCE_COUNT; idx++) {
+        for (index = 0; index < TRADING_POST_RESOURCE_COUNT; index++) {
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + idx;
-                sprintf(gText, "%d", gpCurPlayer->m_resources[idx]);
+                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + index;
+                sprintf(gText, "%d", gpCurPlayer->m_resources[index]);
             } else {
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
+                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + index;
                 if (leftResource != -1) {
-                    if (leftResource == idx) {
+                    if (leftResource == index) {
                         sprintf(gText, localization::Tr("common.not_applicable"));
                     } else {
                         ComputeTradeRatios(
                             leftResource,
-                            idx,
+                            index,
                             &ratioLocal,
                             &leftDenominatedLocal,
                             &nMax
@@ -230,14 +231,14 @@ void UpdateTradingPost(i32 draw) {
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
-            if ((sideCurrent == OFFER_LEFT && leftResource == idx)
-                || (sideCurrent == OFFER_RIGHT && rightResource == idx))
+            if ((sideCurrent == OFFER_LEFT && leftResource == index)
+                || (sideCurrent == OFFER_RIGHT && rightResource == index))
                 messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             else
                 messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             messageTemp.payload.widget.id = sideCurrent == OFFER_LEFT
-                                                ? TRADING_POST_LEFT_ICON_FIRST + idx
-                                                : TRADING_POST_RIGHT_ICON_FIRST + idx;
+                                                ? TRADING_POST_LEFT_ICON_FIRST + index
+                                                : TRADING_POST_RIGHT_ICON_FIRST + index;
             messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             tpWindow->BroadcastMessage(messageTemp);
         }
@@ -259,6 +260,7 @@ void UpdateTradingPost(i32 draw) {
     }
 }
 #if H2_RETAIL_COMPILER
+#undef index
 #undef leftInitial
 #undef rightInitial
 #endif

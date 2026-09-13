@@ -793,6 +793,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 }
 
 #if H2_RETAIL_COMPILER
+#define count cnt
 #define unusedValue1 unused38_h
 #define unusedValue2 unused30_j
 #define unusedValue3 unused48_e
@@ -810,7 +811,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     if (castChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
-    i32 cnt;
+    i32 count;
     i32 worth = target->m_quantity * target->m_monster.fightValue;
     i32 columnIndex;
     float avgDmg;
@@ -908,8 +909,8 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
             adjacent = false;
             dragonCounter = adjacent;
-            for (cnt = 0; cnt < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; cnt++) {
-                other = &m_armies[IDX(target->m_side)][cnt];
+            for (count = 0; count < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; count++) {
+                other = &m_armies[IDX(target->m_side)][count];
                 if (IS_DRAGON_CREATURE(other->m_monsterType)) {
                     dragonCounter++;
                     if (target->OtherArmyAdjacent(other->m_side, other->m_index))
@@ -926,8 +927,8 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
             shooters = 0;
-            for (cnt = 0; cnt < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; cnt++) {
-                other = &m_armies[IDX(target->m_side)][cnt];
+            for (count = 0; count < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; count++) {
+                other = &m_armies[IDX(target->m_side)][count];
                 if (HAS(other->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                     shooters++;
             }
@@ -952,20 +953,27 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     return effect;
 }
 #if H2_RETAIL_COMPILER
+#undef count
 #undef unusedValue1
 #undef unusedValue2
 #undef unusedValue3
 #endif
 
+#if H2_RETAIL_COMPILER
+#define index idx
+#endif
 VA(0x00497724, 0x52)
 void combatManager::ClearEffects(void) {
     CombatSide side;
-    i32 idx;
+    i32 index;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        for (idx = 0; idx < COMBAT_ARMY_SLOT_COUNT; idx++)
-            gArmyEffected[IDX(side)][idx] = 0;
+        for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++)
+            gArmyEffected[IDX(side)][index] = 0;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#endif
 
 VA(0x00497776, 0x3d)
 void combatManager::NextPos(i32* hex) {

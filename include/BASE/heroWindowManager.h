@@ -41,13 +41,13 @@ public:
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     MessageDispatchResult ConvertToHover(struct tag_message& message);
     MessageDispatchResult BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value);
-    void AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags);
-    void RemoveWindow(class heroWindow* w);
+    void AddWindow(class heroWindow* window, i32 zOrder, i32 openFlags);
+    void RemoveWindow(class heroWindow* window);
     i32 DoDialog(class heroWindow* window, MessageDispatchHandler handler, i32 fade);
     void UpdateScreen(void);
-    void UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h);
+    void UpdateScreenRegion(i32 x, i32 y, i32 width, i32 height);
     void RedrawScreen(void);
-    void FadeScreen(WindowFadeMode direction, i32 steps, class palette* pal);
+    void FadeScreen(WindowFadeMode direction, i32 steps, class palette* currentPalette);
     void ScreenShot(void);
     void SaveFizzleSource(i32 x, i32 y, i32 width, i32 height);
     void FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 delay, i8* startPalette, i8* endPalette);

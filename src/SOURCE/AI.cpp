@@ -510,6 +510,9 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
     return modifiedDamage;
 }
 
+#if H2_RETAIL_COMPILER
+#define iDirection iDir
+#endif
 VA(0x004172d6, 0x293)
 void combatManager::DoLichShot(class army* lich) {
     float splashDamage;
@@ -519,7 +522,7 @@ void combatManager::DoLichShot(class army* lich) {
     float shotDamage = static_cast<float>(lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
     i32 sideHex;
     float score;
-    CombatHexDirection iDir;
+    CombatHexDirection iDirection;
     army* targetArmy;
     u8 marked[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
     i32 targetHex;
@@ -537,10 +540,10 @@ void combatManager::DoLichShot(class army* lich) {
         *(marked + IDX(targetArmy->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + targetArmy->m_index) =
             1;
         targetHex = targetArmy->m_hex;
-        for (iDir = COMBAT_DIRECTION_NORTHEAST;
-             IDX(iDir) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
-             iDir++) {
-            sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDir);
+        for (iDirection = COMBAT_DIRECTION_NORTHEAST;
+             IDX(iDirection) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             iDirection++) {
+            sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDirection);
             if (sideHex >= 0 && sideHex < COMBAT_HEX_COUNT
                 && m_hexCells[sideHex].m_occupantSide != COMBAT_SIDE_NONE
                 && m_hexCells[sideHex].m_occupantIndex != -1
@@ -567,6 +570,9 @@ void combatManager::DoLichShot(class army* lich) {
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef iDirection
+#endif
 
 VA(0x00417569, 0x109)
 i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
@@ -668,16 +674,19 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return bits;
 }
 
+#if H2_RETAIL_COMPILER
+#define index idx
+#endif
 VA(0x004179cf, 0xc5)
 i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
-    i32 idx = 0;
+    i32 index = 0;
     u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
     u32 result = 0;
     army* currentArmy;
 
-    for (idx = 0; idx < m_armyCount[IDX(side)]; idx++) {
+    for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         currentArmy =
-            m_armies[IDX(side)] + idx;
+            m_armies[IDX(side)] + index;
         if (currentArmy != NULL
             && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
@@ -686,6 +695,9 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     }
     return result;
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#endif
 
 VA(0x00417a94, 0xb6)
 i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
@@ -762,6 +774,9 @@ i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return weakestArmy;
 }
 
+#if H2_RETAIL_COMPILER
+#define value val
+#endif
 VA(0x00417d6e, 0x12e)
 i32 combatManager::GetClosestArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
@@ -771,39 +786,45 @@ i32 combatManager::GetClosestArmy(
     u32 bitFlag = COMBAT_AI_MASK_FIRST_BIT;
     i32 bestValue = COMBAT_AI_CLOSEST_ARMY_LIMIT;
     i32 armyFound = COMBAT_AI_NO_ARMY;
-    i32 val;
+    i32 value;
 
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         if ((mask & bitFlag) != 0) {
             target = &m_armies[IDX(side)][armyIndex];
-            val = gpSearchArray->QuickDistance(
+            value = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
                 m_hexCells[target->m_hex].m_x,
                 m_hexCells[target->m_hex].m_y
             );
-            val = val * COMBAT_AI_DISTANCE_WEIGHT
+            value = value * COMBAT_AI_DISTANCE_WEIGHT
                   - target->m_quantity * target->m_monster.hitPoints;
-            if (val < bestValue) {
+            if (value < bestValue) {
                 armyFound = armyIndex;
-                bestValue = val;
+                bestValue = value;
             }
         }
         bitFlag <<= 1;
     }
     return armyFound;
 }
+#if H2_RETAIL_COMPILER
+#undef value
+#endif
 
+#if H2_RETAIL_COMPILER
+#define index idx
+#endif
 VA(0x00417e9c, 0xa6)
 u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
-    i32 idx = 0;
+    i32 index = 0;
     u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
     u32l totalStrength = 0;
     army* currentArmy;
 
-    for (idx = 0; idx < m_armyCount[IDX(side)]; idx++) {
+    for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         if ((mask & bitMask) != 0) {
-            currentArmy = &m_armies[IDX(side)][idx];
+            currentArmy = &m_armies[IDX(side)][index];
             if (currentArmy != NULL
                 && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                        == 0)
@@ -813,6 +834,9 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     }
     return totalStrength;
 }
+#if H2_RETAIL_COMPILER
+#undef index
+#endif
 
 VA(0x00417f42, 0x178)
 i32 combatManager::AttemptAttack(
@@ -968,6 +992,9 @@ i32 combatManager::WalkTowardArmyFront(
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
+#if H2_RETAIL_COMPILER
+#define targetPointer targetPtr
+#endif
 VA(0x00418405, 0x204)
 i32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
@@ -978,7 +1005,7 @@ i32 combatManager::WalkTowardArmy(
     i32 atkMask;
     i32 movement;
     i32 pathNdx;
-    army* targetPtr;
+    army* targetPointer;
     i32 targetSquare;
     i32 H2_UNUSED(path);
 
@@ -987,8 +1014,8 @@ i32 combatManager::WalkTowardArmy(
     if (targetStack == COMBAT_AI_NO_ARMY)
         return 0;
 
-    targetPtr = &m_armies[IDX(side)][targetStack];
-    targetSquare = targetPtr->m_hex;
+    targetPointer = &m_armies[IDX(side)][targetStack];
+    targetSquare = targetPointer->m_hex;
     currentArmy->m_targetSide = side;
     currentArmy->m_targetIndex = targetStack;
     atkMask =
@@ -1010,8 +1037,8 @@ i32 combatManager::WalkTowardArmy(
         0
     );
     if (routeGot == 0
-        && HAS(targetPtr->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
-        switch (targetPtr->m_facing) {
+        && HAS(targetPointer->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
+        switch (targetPointer->m_facing) {
             case ARMY_FACING_LEFT:
                 targetSquare--;
                 break;
@@ -1050,3 +1077,6 @@ i32 combatManager::WalkTowardArmy(
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef targetPointer
+#endif

@@ -475,7 +475,7 @@ void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text);
 void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
-char toupper(char c);
+char toupper(char character);
 H2_ENUM_BEGIN(Cp1251CaseConstant)
     CYRILLIC_CASE_OFFSET = 0x20,
     CYRILLIC_CAPITAL_YO = 0xa8,
@@ -517,8 +517,8 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
 H2_CONST char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster);
 H2_CONST char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster);
 void GetMonsterCost(CreatureType monster, i32* const cost);
-i32 CanBuild(town* t, BuildingSlotType building);
-i32 CanBuy(town* t, BuildingSlotType type);
+i32 CanBuild(town* townPointer, BuildingSlotType building);
+i32 CanBuy(town* townPointer, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
 MessageDispatchResult WaitHandler(tag_message& message);
 MessageDispatchResult EventWindowHandler(struct tag_message& message);
@@ -530,19 +530,19 @@ void InitVars(void);
 void ClearMapExtra(void);
 i32 GetMonType(i32 score, HighScoreType highScoreType);
 i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, H2_CONST char* scenarioName);
-void BVResMsg(H2_CONST char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty);
-void GOut(H2_CONST char* str);
-i32 NetPosToGamePos(i32 netPos);
+void BVResMsg(H2_CONST char* text, H2_ENUM_PARAM(ResourceType, i32) resourceType, i32 quantity);
+void GOut(H2_CONST char* text);
+i32 NetPosToGamePos(i32 netPosition);
 i32 WaitForOtherPlayer(void);
 void PopNetBox(H2_CONST char* text, i32 netPlayer);
-void AddNetBoxLine(H2_CONST char* str, char color);
+void AddNetBoxLine(H2_CONST char* text, char color);
 void ShutDown(H2_CONST char* message);
 void FileError(H2_CONST char* filename);
 void SmackFade(u8* source, u8* destination);
 void ShowCongrats(HighScoreType highScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(H2_CONST char* name);
-void WaitEndSample(SAMPLE2* s, i32 waitTime = -1);
+void WaitEndSample(SAMPLE2* sample, i32 waitTime = -1);
 void MemError(void);
 H2_CONST char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
@@ -553,7 +553,7 @@ i32 HandleAppSpecificMenuCommands(i32 command);
 void UpdateSystemOptionsMenu(void);
 void CleanUpMenus(void);
 void UpdateAppSpecificMenus(void* hMenu);
-void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h);
+void EarlyResizeWindow(i32 x, i32 y, i32 width, i32 height);
 i32 InMapArea(i32 x, i32 y);
 void SetupDynamicWindow(
     i32 x,
@@ -572,15 +572,15 @@ void SetupDynamicWindow(
     class heroWindow** window,
     i32 windowType
 );
-void TestDynamicWindow(i32 p1, i32 p2);
-void HandleRemoteDeadPlayerExit(i32 pos);
+void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles);
+void HandleRemoteDeadPlayerExit(i32 position);
 void HandleRemoteSuddenExit(void);
 void DropDownToOnePlayer(void);
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, i32 forwardedReport);
 void ReceiveRemotePlayerExit(struct SPlayerExit exitInfo);
 i32 CheckMem(void);
-i32 GetManaCost(SpellType spell, hero* h);
-void SetWinText(heroWindow* j, i32 id);
+i32 GetManaCost(SpellType spell, hero* heroPointer);
+void SetWinText(heroWindow* window, i32 id);
 void CheckShingleUpdate(void);
 void NormalDialog(
     H2_CONST char* text,

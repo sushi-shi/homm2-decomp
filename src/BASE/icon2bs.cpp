@@ -14,6 +14,7 @@ H2_ENUM_END(IconScaleConstant)
 #if H2_RETAIL_COMPILER
 #define destinationOrigin dstOrg
 #define destinationPixel destPix
+#define increment inc
 #define sourceBase srcBase
 #define sourceOrigin srcOrg
 #endif
@@ -36,7 +37,7 @@ void IconToBitmapScale(
     i32 lineStep;
     u8* source;
     u8* destinationPixel;
-    i32 inc;
+    i32 increment;
     i32 x;
     i32 y;
     class bitmap* temp;
@@ -46,9 +47,9 @@ void IconToBitmapScale(
         IconToBitmap(sourceIcon, destination, destinationX, destinationY, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    inc = SCALE_NATIVE_SIZE / scale;
-    sourceBase = (SCALE_NATIVE_SIZE - (scale - 1) * inc) >> 1;
-    lineStep = inc * SCALE_WORK_BITMAP_SIZE;
+    increment = SCALE_NATIVE_SIZE / scale;
+    sourceBase = (SCALE_NATIVE_SIZE - (scale - 1) * increment) >> 1;
+    lineStep = increment * SCALE_WORK_BITMAP_SIZE;
     temp = new bitmap(BITMAP_TYPE_NONE, SCALE_WORK_BITMAP_SIZE, SCALE_WORK_BITMAP_SIZE);
     for (y = 0; y < SCALE_NATIVE_SIZE * SCALE_WORK_BITMAP_SIZE; y += SCALE_NATIVE_SIZE)
         memset(temp->m_pixels + y, 0, SCALE_NATIVE_SIZE);
@@ -74,7 +75,7 @@ void IconToBitmapScale(
             if (*source != 0)
                 *destinationPixel = *source;
             destinationPixel++;
-            source += inc;
+            source += increment;
         }
         sourceOrigin += lineStep;
         destinationOrigin += destination->m_width;
@@ -84,6 +85,7 @@ void IconToBitmapScale(
 #if H2_RETAIL_COMPILER
 #undef destinationOrigin
 #undef destinationPixel
+#undef increment
 #undef sourceBase
 #undef sourceOrigin
 #endif

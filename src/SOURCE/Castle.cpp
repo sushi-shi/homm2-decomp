@@ -121,6 +121,7 @@ namespace {
 
 #if H2_RETAIL_COMPILER
 #define message msg
+#define rowPosition rowPos
 #endif
 VA(0x00424320, 0xf10)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
@@ -129,7 +130,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     i32 H2_UNUSED(tileY);
     i32 terrainIconFrame;
     i32 column;
-    i32 rowPos;
+    i32 rowPosition;
     widget* backgroundWidget;
     i32 raceBase;
     i16 H2_UNUSED(builtFrame);
@@ -402,13 +403,13 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     raceBase = IDX(m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backFrame = 0;
-        for (rowPos = BACKGROUND_TERRAIN_FIRST_ROW; rowPos <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPos) {
+        for (rowPosition = BACKGROUND_TERRAIN_FIRST_ROW; rowPosition <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPosition) {
             for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
                 backgroundWidget = new iconWidget(
                     static_cast<i16>(
                         (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
                     ),
-                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    static_cast<i16>((rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntwba.icn",
@@ -425,16 +426,16 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             }
         }
         backFrame = 0;
-        for (rowPos = BACKGROUND_TOWN_FIRST_ROW; rowPos <= BACKGROUND_TOWN_LAST_ROW; ++rowPos) {
+        for (rowPosition = BACKGROUND_TOWN_FIRST_ROW; rowPosition <= BACKGROUND_TOWN_LAST_ROW; ++rowPosition) {
             for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
-                if (rowPos == BACKGROUND_TOWN_FIRST_ROW && column != BACKGROUND_TOP_CENTER_COLUMN) {
+                if (rowPosition == BACKGROUND_TOWN_FIRST_ROW && column != BACKGROUND_TOP_CENTER_COLUMN) {
                     continue;
                 }
                 backgroundWidget = new iconWidget(
                     static_cast<i16>(
                         (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
                     ),
-                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    static_cast<i16>((rowPosition - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntown.icn",
@@ -471,8 +472,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 }
 #if H2_RETAIL_COMPILER
 #undef message
+#undef rowPosition
 #endif
 
+#if H2_RETAIL_COMPILER
+#define result ret
+#endif
 VA(0x00425230, 0xb6d)
 MessageDispatchResult CastleHandler(tag_message& message) {
     i32 objIndex;
@@ -480,12 +485,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     i32 heroChoiceIndex;
     i32 whichBuilding;
     b32 quickFlag;
-    i32 ret;
+    i32 result;
     i16 H2_UNUSED(statusWidgetId);
 
     statusWidgetId = IDX(CONTROL_STATUS_TEXT);
     whichBuilding = IDX(BUILDING_SLOT_NONE);
-    ret = 0;
+    result = 0;
     hoverMessage = false;
 
     if (message.type == MESSAGE_MOUSE_MOVE || message.type == MESSAGE_WIDGET) {
@@ -690,7 +695,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 if (message.payload.widget.id == CONTROL_CLOSE)
-                    ret = 1;
+                    result = 1;
                 break;
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
@@ -771,7 +776,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 == whichBuilding)
                                 break;
                         }
-                        ret = gpTownManager->BuyBuild(
+                        result = gpTownManager->BuyBuild(
                             static_cast<BuildingSlotType>(whichBuilding),
                             (gpTownManager->m_affordableBuildings & BIT(whichBuilding)) == 0,
                             quickFlag
@@ -795,7 +800,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     gpWindowManager
                                         ->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
                                 } else {
-                                    ret = gpTownManager->RecruitHero(
+                                    result = gpTownManager->RecruitHero(
                                         heroChoiceIndex,
                                         CannotRecruitHero()
                                     );
@@ -808,13 +813,16 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         }
     }
 
-    if (ret != 0) {
+    if (result != 0) {
         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
 
 DATA(0x004f0a78) H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT] =
     {19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12};

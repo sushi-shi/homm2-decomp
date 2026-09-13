@@ -156,12 +156,15 @@ void combatManager::CheckUpdateCombatMessages(void) {
 // string literal cannot accept.
 DATA(0x005242fc) static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
 
+#if H2_RETAIL_COMPILER
+#define newlinePointer newlinePtr
+#endif
 VA(0x00437e48, 0x3a7)
 void combatManager::CombatMessage(
     H2_CONST char* message, i32 updateScreen, i32 retainPrevious, i32 clear
 ) {
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
-    char* newlinePtr;
+    char* newlinePointer;
     tag_message windowMessage;
     b32 oldLimit;
     b32 oldCompute;
@@ -210,22 +213,22 @@ void combatManager::CombatMessage(
             m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
         }
 
-        newlinePtr = FindToken(gCombatMessageText, '\n');
-        if (newlinePtr != NULL) {
-            *newlinePtr = 0;
+        newlinePointer = FindToken(gCombatMessageText, '\n');
+        if (newlinePointer != NULL) {
+            *newlinePointer = 0;
             strcpy(wrappedMessage, gCombatMessageText);
-            if (newlinePtr > gCombatMessageText && newlinePtr[-1] == '.')
+            if (newlinePointer > gCombatMessageText && newlinePointer[-1] == '.')
                 strcat(wrappedMessage, "  ");
             else
                 strcat(wrappedMessage, " ");
-            strcat(wrappedMessage, newlinePtr + 1);
+            strcat(wrappedMessage, newlinePointer + 1);
             if (bigFont->LineLength(wrappedMessage, COMBAT_MESSAGE_LINE_WIDTH) <= 1) {
                 strcpy(m_currentCombatMessage, wrappedMessage);
             } else {
                 strcpy(m_previousCombatMessage, gCombatMessageText);
-                strcpy(m_currentCombatMessage, newlinePtr + 1);
+                strcpy(m_currentCombatMessage, newlinePointer + 1);
             }
-            *newlinePtr = '\n';
+            *newlinePointer = '\n';
         } else {
             strcpy(m_currentCombatMessage, gCombatMessageText);
         }
@@ -254,6 +257,9 @@ void combatManager::CombatMessage(
     gbComputeExtent = oldCompute;
     gbLimitToExtent = oldLimit;
 }
+#if H2_RETAIL_COMPILER
+#undef newlinePointer
+#endif
 
 VA(0x004381ef, 0x377)
 void combatManager::CombatMessage(CombatMessageCommand messageType) {
@@ -389,8 +395,11 @@ void combatManager::UpdateCombatArea(void) {
     gbEnlargeScreenBlit = true;
 }
 
+#if H2_RETAIL_COMPILER
+#define armyPointer armyPtr
+#endif
 VA(0x00438696, 0x1a9)
-void combatManager::SetupGridForArmy(army* armyPtr) {
+void combatManager::SetupGridForArmy(army* armyPointer) {
     i32 attackMask;
     CombatSide oldSide;
     i32 oldIndex;
@@ -402,21 +411,21 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         return;
 
     attackMask =
-        armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
+        armyPointer->GetAttackMask(armyPointer->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
-    oldSide = armyPtr->m_targetSide;
-    oldIndex = armyPtr->m_targetIndex;
-    CLEAR_ARMY_TARGET(*armyPtr);
-    gpSearchArray->SeedCombatPosition(armyPtr);
-    armyPtr->m_targetSide = oldSide;
-    armyPtr->m_targetIndex = oldIndex;
+    oldSide = armyPointer->m_targetSide;
+    oldIndex = armyPointer->m_targetIndex;
+    CLEAR_ARMY_TARGET(*armyPointer);
+    gpSearchArray->SeedCombatPosition(armyPointer);
+    armyPointer->m_targetSide = oldSide;
+    armyPointer->m_targetIndex = oldIndex;
 
     for (j = 0; j < COMBAT_HEX_COUNT; j++) {
-        if (j == armyPtr->m_hex) {
+        if (j == armyPointer->m_hex) {
             m_gridState[j] = GRID_SHADE_REACHABLE;
         } else if (m_hexCells[j].m_pathReachable != 0) {
             if (m_hexCells[j].m_occupantSide != COMBAT_SIDE_NONE) {
-                if (m_hexCells[j].m_occupantSide != armyPtr->m_side)
+                if (m_hexCells[j].m_occupantSide != armyPointer->m_side)
                     m_gridState[j] = GRID_SHADE_REACHABLE;
             } else {
                 m_gridState[j] = GRID_SHADE_EMPTY_BLOCKED;
@@ -428,6 +437,9 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef armyPointer
+#endif
 
 VA(0x0043883f, 0x4d8)
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
@@ -866,6 +878,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
 
 #if H2_RETAIL_COMPILER
 #define armyIndex armyIndex7
+#define column col
 #define columnStep columnStep1
 #define extentChanged extentChanged1
 #define gridWasShowing gridWasShowing1
@@ -889,7 +902,7 @@ void combatManager::DrawFrame(
     i32 drawBackground,
     i32 waitForTimer
 ) {
-    i32 col;
+    i32 column;
     CombatDrawLayer row;
     i32 H2_UNUSED(unusedValue1);
     H2_ENUM_STORAGE_STEPPED(ArmyDrawState, i32) state;
@@ -1138,23 +1151,23 @@ void combatManager::DrawFrame(
             }
         }
 
-        for (col = startColumn; col != endColumn; col += columnStep)
-            m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + col].DrawLowerDeadOccupants();
+        for (column = startColumn; column != endColumn; column += columnStep)
+            m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column].DrawLowerDeadOccupants();
 
-        for (col = startColumn; col != endColumn; col += columnStep)
-            m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + col].DrawUpperDeadOccupant();
+        for (column = startColumn; column != endColumn; column += columnStep)
+            m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column].DrawUpperDeadOccupant();
 
         for (state = ARMY_DRAW_BEHIND; state < ARMY_DRAW_PHASE_COUNT; state++) {
             if (state == ARMY_DRAW_NORMAL) {
-                for (col = startColumn; col != endColumn; col += columnStep) {
-                    if (m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + col].m_obstacleIndex
+                for (column = startColumn; column != endColumn; column += columnStep) {
+                    if (m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column].m_obstacleIndex
                         != -1) {
-                        m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + col].DrawObstacle();
+                        m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column].DrawObstacle();
                     }
                 }
             }
 
-            for (col = startColumn; col != endColumn; col += columnStep) {
+            for (column = startColumn; column != endColumn; column += columnStep) {
                 u16 wallCoordinates[IDX(FACTION_COUNT)][WALL_COORDINATE_COUNT] = {
                     {443, 153, 399, 237, 399, 321, 443, 405},
                     {443, 153, 399, 237, 399, 321, 443, 405},
@@ -1170,7 +1183,7 @@ void combatManager::DrawFrame(
                 H2_ENUM_STORAGE(CombatCastleHex, i32) castleHex;
 
                 if (m_inCastleCombat != 0 && state == ARMY_DRAW_BEHIND) {
-                    castleHex = IDX(row) * COMBAT_GRID_ROW_LENGTH + col;
+                    castleHex = IDX(row) * COMBAT_GRID_ROW_LENGTH + column;
                     wallFrame = 0;
                     wallX = 0;
                     wallY = 0;
@@ -1260,11 +1273,11 @@ void combatManager::DrawFrame(
                 }
 
                 if (skipSpecialOccupants == 0
-                    || (IDX(row) * COMBAT_GRID_ROW_LENGTH + col
+                    || (IDX(row) * COMBAT_GRID_ROW_LENGTH + column
                             != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
-                        && IDX(row) * COMBAT_GRID_ROW_LENGTH + col
+                        && IDX(row) * COMBAT_GRID_ROW_LENGTH + column
                                != IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND))) {
-                    m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + col].DrawOccupant(
+                    m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column].DrawOccupant(
                         state,
                         0
                     );
@@ -1386,6 +1399,7 @@ finish:
 }
 #if H2_RETAIL_COMPILER
 #undef armyIndex
+#undef column
 #undef columnStep
 #undef extentChanged
 #undef gridWasShowing

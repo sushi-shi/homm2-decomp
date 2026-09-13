@@ -303,39 +303,55 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define previous prev
+#define window w
+#endif
 VA(0x004b7150, 0x91)
 void heroWindowManager::Close(void) {
     if (m_active != 1)
         return;
 
-    heroWindow* w = m_windowListTail;
-    while (w != NULL) {
-        heroWindow* prev = w->m_prevWindow;
-        RemoveWindow(w);
-        w = prev;
+    heroWindow* window = m_windowListTail;
+    while (window != NULL) {
+        heroWindow* previous = window->m_prevWindow;
+        RemoveWindow(window);
+        window = previous;
     }
     m_screen->m_pixels = NULL;
     if (m_screen != NULL)
         delete m_screen;
     m_active = false;
 }
+#if H2_RETAIL_COMPILER
+#undef previous
+#undef window
+#endif
 
+#if H2_RETAIL_COMPILER
+#define result ret
+#define window w
+#endif
 VA(0x004b71f0, 0x5b)
 MessageDispatchResult heroWindowManager::Main(struct tag_message& message) {
-    MessageDispatchResult ret = MESSAGE_DISPATCH_CONTINUE;
-    heroWindow* w = m_windowListTail;
-    while (w != NULL) {
-        switch (ret = w->BroadcastMessage(message)) {
+    MessageDispatchResult result = MESSAGE_DISPATCH_CONTINUE;
+    heroWindow* window = m_windowListTail;
+    while (window != NULL) {
+        switch (result = window->BroadcastMessage(message)) {
             case MESSAGE_DISPATCH_CONTINUE:
                 break;
             case MESSAGE_DISPATCH_CONSUME:
             case MESSAGE_DISPATCH_FORWARD:
-                return ret;
+                return result;
         }
-        w = w->m_prevWindow;
+        window = window->m_prevWindow;
     }
-    return ret;
+    return result;
 }
+#if H2_RETAIL_COMPILER
+#undef result
+#undef window
+#endif
 
 VA(0x004b7250, 0x1c)
 MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& message) {
@@ -359,67 +375,78 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command,
 #undef message
 #endif
 
+#if H2_RETAIL_COMPILER
+#define currentWindow cur
+#define window w
+#endif
 VA(0x004b72b0, 0x142)
-void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
-    heroWindow* cur = m_windowListTail;
-    if (HAS(w->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
+void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 openFlags) {
+    heroWindow* currentWindow = m_windowListTail;
+    if (HAS(window->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
         zOrder = 0;
     if (zOrder == -1) {
-        if (cur == NULL)
+        if (currentWindow == NULL)
             zOrder = 0;
         else
-            zOrder = cur->m_zOrder + 1;
+            zOrder = currentWindow->m_zOrder + 1;
     }
     if (zOrder != 0 && m_windowListHead == NULL)
         return;
-    if (w->Open(zOrder, openFlags) != 0)
+    if (window->Open(zOrder, openFlags) != 0)
         return;
-    while (cur != NULL && cur->m_zOrder > zOrder)
-        cur = cur->m_prevWindow;
-    if (cur == NULL) {
-        w->m_nextWindow = m_windowListHead;
-        w->m_prevWindow = NULL;
-        m_windowListHead = w;
+    while (currentWindow != NULL && currentWindow->m_zOrder > zOrder)
+        currentWindow = currentWindow->m_prevWindow;
+    if (currentWindow == NULL) {
+        window->m_nextWindow = m_windowListHead;
+        window->m_prevWindow = NULL;
+        m_windowListHead = window;
         if (m_windowListTail == NULL)
-            m_windowListTail = w;
-    } else if (cur->m_nextWindow == NULL) {
-        w->m_prevWindow = m_windowListTail;
-        w->m_nextWindow = NULL;
-        m_windowListTail->m_nextWindow = w;
-        m_windowListTail = w;
+            m_windowListTail = window;
+    } else if (currentWindow->m_nextWindow == NULL) {
+        window->m_prevWindow = m_windowListTail;
+        window->m_nextWindow = NULL;
+        m_windowListTail->m_nextWindow = window;
+        m_windowListTail = window;
     } else {
-        w->m_prevWindow = cur;
-        w->m_nextWindow = cur->m_nextWindow;
-        cur->m_nextWindow->m_prevWindow = w;
-        cur->m_nextWindow = w;
+        window->m_prevWindow = currentWindow;
+        window->m_nextWindow = currentWindow->m_nextWindow;
+        currentWindow->m_nextWindow->m_prevWindow = window;
+        currentWindow->m_nextWindow = window;
     }
     m_activeWindow = m_focusWindow;
-    m_focusWindow = w;
+    m_focusWindow = window;
 }
+#if H2_RETAIL_COMPILER
+#undef currentWindow
+#undef window
+#endif
 
+#if H2_RETAIL_COMPILER
+#define window w
+#endif
 VA(0x004b7400, 0xe9)
-void heroWindowManager::RemoveWindow(class heroWindow* w) {
-    if (w == NULL)
+void heroWindowManager::RemoveWindow(class heroWindow* window) {
+    if (window == NULL)
         return;
-    w->Close();
-    if (w == m_windowListHead) {
-        m_windowListHead = w->m_nextWindow;
+    window->Close();
+    if (window == m_windowListHead) {
+        m_windowListHead = window->m_nextWindow;
         if (m_windowListHead == NULL)
             m_windowListTail = NULL;
         else
             m_windowListHead->m_prevWindow = NULL;
     } else {
-        if (w == m_windowListTail) {
-            m_windowListTail = w->m_prevWindow;
+        if (window == m_windowListTail) {
+            m_windowListTail = window->m_prevWindow;
             m_windowListTail->m_nextWindow = NULL;
         } else {
-            if (w->m_prevWindow != NULL)
-                w->m_prevWindow->m_nextWindow = w->m_nextWindow;
-            if (w->m_nextWindow != NULL)
-                w->m_nextWindow->m_prevWindow = w->m_prevWindow;
+            if (window->m_prevWindow != NULL)
+                window->m_prevWindow->m_nextWindow = window->m_nextWindow;
+            if (window->m_nextWindow != NULL)
+                window->m_nextWindow->m_prevWindow = window->m_prevWindow;
         }
     }
-    if (m_activeWindow == w)
+    if (m_activeWindow == window)
         m_activeWindow = NULL;
     if (m_activeWindow == NULL) {
         m_focusWindow = m_windowListTail;
@@ -427,6 +454,9 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
     }
     m_focusWindow = m_activeWindow;
 }
+#if H2_RETAIL_COMPILER
+#undef window
+#endif
 
 VA(0x004b74f0, 0x199)
 i32 heroWindowManager::DoDialog(
@@ -491,28 +521,45 @@ void heroWindowManager::UpdateScreen(void) {
     PollSound();
 }
 
+#if H2_RETAIL_COMPILER
+#define height h
+#define width w
+#endif
 VA(0x004b76b0, 0x58)
-void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
+void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 width, i32 height) {
     gpMouseManager->m_cursorReady = false;
     PollSound();
-    BlitBitmapToScreen(m_screen, x, y, w, h, x, y);
+    BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
     gpMouseManager->m_cursorReady = true;
     PollSound();
 }
+#if H2_RETAIL_COMPILER
+#undef height
+#undef width
+#endif
 
+#if H2_RETAIL_COMPILER
+#define window w
+#endif
 VA(0x004b7710, 0x2f)
 void heroWindowManager::RedrawScreen(void) {
-    heroWindow* w = m_windowListHead;
-    while (w != NULL) {
-        w->DrawWindow();
-        w = w->m_nextWindow;
+    heroWindow* window = m_windowListHead;
+    while (window != NULL) {
+        window->DrawWindow();
+        window = window->m_nextWindow;
     }
 }
+#if H2_RETAIL_COMPILER
+#undef window
+#endif
 
+#if H2_RETAIL_COMPILER
+#define currentPalette pal
+#endif
 VA(0x004b7740, 0x8f)
-void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* pal) {
-    if (pal != NULL)
-        SetPalette(pal->m_data, 0);
+void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* currentPalette) {
+    if (currentPalette != NULL)
+        SetPalette(currentPalette->m_data, 0);
     switch (direction) {
         case FADE_IN: {
             u32 saved = m_updateFlags;
@@ -531,6 +578,9 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
     }
     PollSound();
 }
+#if H2_RETAIL_COMPILER
+#undef currentPalette
+#endif
 
 #if H2_RETAIL_COMPILER
 #define filename local_10
@@ -581,6 +631,10 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
 VA(0x004b79a0, 0x5)
 void CreateFizzleTables(void) {}
 
+#if H2_RETAIL_COMPILER
+#define colorCycleBuffer ccycleBuf
+#define paletteBuffer paletteBuf
+#endif
 VA(0x004b79b0, 0x46d)
 void heroWindowManager::FizzleForward(
     i32 x,
@@ -593,14 +647,14 @@ void heroWindowManager::FizzleForward(
 ) {
     u8* workPixel;
     u8* screenPixel;
-    i8* paletteBuf;
+    i8* paletteBuffer;
     u8* savePixel;
     i32l tickStart;
     i32 i;
     i32 frame;
     i32 sourceY;
     i32 sourceX;
-    i8* ccycleBuf;
+    i8* colorCycleBuffer;
     i32 saveFlags;
 
     if (bShowIt == 0)
@@ -626,21 +680,21 @@ void heroWindowManager::FizzleForward(
     m_updateFlags = 0;
     if (delay == -1)
         delay = FIZZLE_DEFAULT_DELAY;
-    paletteBuf = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
+    paletteBuffer = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
     m_fizzleWork = new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-    ccycleBuf = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
+    colorCycleBuffer = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
     BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
     for (frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
         sprintf(gText, "CCYCLE%02d.BIN", frame);
         gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
-        gpResourceManager->ReadBlock(ccycleBuf, FIZZLE_CYCLE_TABLE_BYTES);
+        gpResourceManager->ReadBlock(colorCycleBuffer, FIZZLE_CYCLE_TABLE_BYTES);
         for (sourceY = y; sourceY < y + height; sourceY++) {
             savePixel = m_fizzleSource->m_pixels + (sourceY - y) * m_fizzleSource->m_width;
             workPixel = m_fizzleWork->m_pixels + (sourceY - y) * width;
             screenPixel = m_screen->m_pixels + sourceY * SCREEN_WIDTH + x;
             for (sourceX = x; sourceX < x + width; sourceX++) {
-                *screenPixel = ccycleBuf[static_cast<u16>(
+                *screenPixel = colorCycleBuffer[static_cast<u16>(
                     *workPixel | (*savePixel << FIZZLE_LOOKUP_HIGH_BYTE_SHIFT)
                 )];
                 savePixel++;
@@ -653,11 +707,11 @@ void heroWindowManager::FizzleForward(
         tickStart = KBTickCount();
         BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
         if (startPalette != NULL) {
-            memcpy(paletteBuf, startPalette, PALETTE_BYTE_COUNT);
+            memcpy(paletteBuffer, startPalette, PALETTE_BYTE_COUNT);
             for (i = 0; i < PALETTE_BYTE_COUNT; i++)
-                paletteBuf[i] +=
+                paletteBuffer[i] +=
                     (frame + 1) * (endPalette[i] - startPalette[i]) / CYCLE_FRAME_COUNT;
-            UpdatePalette(paletteBuf);
+            UpdatePalette(paletteBuffer);
         }
         PollSound();
     }
@@ -670,9 +724,13 @@ void heroWindowManager::FizzleForward(
     m_fizzleSource = NULL;
     delete m_fizzleWork;
     m_fizzleWork = NULL;
-    H2_FREE(ccycleBuf);
-    H2_FREE(paletteBuf);
+    H2_FREE(colorCycleBuffer);
+    H2_FREE(paletteBuffer);
 }
+#if H2_RETAIL_COMPILER
+#undef colorCycleBuffer
+#undef paletteBuffer
+#endif
 
 VA(0x004b7e20, 0x4d)
 void heroWindowManager::ReleaseFizzleSource(void) {

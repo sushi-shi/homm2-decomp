@@ -1204,12 +1204,13 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 #if H2_RETAIL_COMPILER
 #define enemySide enemySide_27
 #define ourArmy ourArmy_13
+#define rowPosition rowPos
 #define showEnemy showEnemy_12
 #endif
 VA(0x0042d56e, 0x3f6)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 H2_UNUSED(column) = hexIndex % COMBAT_GRID_ROW_LENGTH;
-    i32 H2_UNUSED(rowPos) = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(rowPosition) = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
     b32 showEnemy = false;
     CombatSide enemySide;
@@ -1331,12 +1332,17 @@ smallView:
 #if H2_RETAIL_COMPILER
 #undef enemySide
 #undef ourArmy
+#undef rowPosition
 #undef showEnemy
 #endif
 
+#if H2_RETAIL_COMPILER
+#define armyIndex armyIdx
+#define column col
+#endif
 VA(0x0042d964, 0x1eb)
 i32 combatManager::RightClick(i32 hexIndex) {
-    i32 H2_UNUSED(col) = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(column) = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 H2_UNUSED(row) = hexIndex / COMBAT_GRID_ROW_LENGTH;
     if (hexIndex == INVALID_HEX)
         return 0;
@@ -1363,7 +1369,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 return 0;
 
             CombatSide side = m_hexCells[hexIndex].m_occupantSide;
-            i32 H2_UNUSED(armyIdx) = m_hexCells[hexIndex].m_occupantIndex;
+            i32 H2_UNUSED(armyIndex) = m_hexCells[hexIndex].m_occupantIndex;
             if (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex)) {
                 return 0;
             } else {
@@ -1387,6 +1393,10 @@ i32 combatManager::RightClick(i32 hexIndex) {
     }
     return 0;
 }
+#if H2_RETAIL_COMPILER
+#undef armyIndex
+#undef column
+#endif
 
 #if H2_RETAIL_COMPILER
 #define unusedValue1 unusedCommandWord2
@@ -2772,26 +2782,32 @@ void combatManager::ResetCyclingCreatures(void) {
     gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 }
 
+#if H2_RETAIL_COMPILER
+#define armyPointer ap
+#endif
 VA(0x004314da, 0xdf)
 void combatManager::ResetCycleTimers(void) {
     i32l now = KBTickCount();
     CombatSide which;
     i32 i;
-    army* ap;
+    army* armyPointer;
 
     m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
     m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
     for (which = COMBAT_ATTACKER_SIDE; IDX(which) < COMBAT_SIDE_COUNT; ++which) {
         for (i = 0; i < gpCombatManager->m_armyCount[IDX(which)]; ++i) {
-            ap = &gpCombatManager->m_armies[IDX(which)][i];
-            ap->m_lastAnimationTime = now;
-            if (ap->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
-                ap->m_lastAnimationTime -=
-                    Random(STAND_DELAY_RANDOM_MIN, ap->m_frameInfo.standStillDelay);
+            armyPointer = &gpCombatManager->m_armies[IDX(which)][i];
+            armyPointer->m_lastAnimationTime = now;
+            if (armyPointer->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
+                armyPointer->m_lastAnimationTime -=
+                    Random(STAND_DELAY_RANDOM_MIN, armyPointer->m_frameInfo.standStillDelay);
             }
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef armyPointer
+#endif
 
 VA(0x004315b9, 0x41)
 i32 InCombatArea(i32 x, i32 y) {
@@ -3032,6 +3048,9 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     WritePrefs();
 }
 
+#if H2_RETAIL_COMPILER
+#define armyIndex armyIdx
+#endif
 VA(0x00432015, 0x323)
 void combatManager::AddArmy(
     H2_ENUM_PARAM(CombatSide, i32) side,
@@ -3041,30 +3060,30 @@ void combatManager::AddArmy(
     H2_ENUM_PARAM(MonsterFlags, i32) flags,
     i32 animate
 ) {
-    i32 armyIdx = INVALID_ARMY_INDEX;
+    i32 armyIndex = INVALID_ARMY_INDEX;
     b32 reusedArmy = false;
     i32 index;
     army* newStack;
     for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
         if (m_armies[IDX(side)][index].m_monsterType == CREATURE_NONE) {
-            armyIdx = index;
+            armyIndex = index;
             break;
         }
         if (m_armies[IDX(side)][index].m_quantity == 0
             && HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
             && (HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
                 || IS_ELEMENTAL_CREATURE(m_armies[IDX(side)][index].m_monsterType))) {
-            armyIdx = index;
+            armyIndex = index;
             reusedArmy = true;
             break;
         }
     }
 
-    if (armyIdx == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+    if (armyIndex == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
-    newStack = &m_armies[IDX(side)][armyIdx];
-    newStack->Init(monsterType, quantity, side, armyIdx, hex, INVALID_HEX);
+    newStack = &m_armies[IDX(side)][armyIndex];
+    newStack->Init(monsterType, quantity, side, armyIndex, hex, INVALID_HEX);
     newStack->LoadResources();
     newStack->m_monster.flags.all |= flags;
     if (reusedArmy == 0)
@@ -3074,7 +3093,7 @@ void combatManager::AddArmy(
         return;
 
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(side)][armyIdx];
+    ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,
@@ -3094,6 +3113,9 @@ void combatManager::AddArmy(
         NULL
     );
 }
+#if H2_RETAIL_COMPILER
+#undef armyIndex
+#endif
 
 #if H2_RETAIL_COMPILER
 #define unusedValue1 unusedSmallViewWord1

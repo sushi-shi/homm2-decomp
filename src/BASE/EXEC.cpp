@@ -67,17 +67,20 @@ i32 executive::InitSystem(void) {
     return 0;
 }
 
+#if H2_RETAIL_COMPILER
+#define manager cur
+#endif
 VA(0x004c5010, 0xb8)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
     baseManager* next;
-    baseManager* cur = m_managerListHead;
-    while (cur != NULL) {
-        next = cur->m_next;
-        if (cur != gpWindowManager && cur != gpMouseManager)
-            RemoveManager(cur);
-        cur = next;
+    baseManager* manager = m_managerListHead;
+    while (manager != NULL) {
+        next = manager->m_next;
+        if (manager != gpWindowManager && manager != gpMouseManager)
+            RemoveManager(manager);
+        manager = next;
     }
     if (gpWindowManager->m_active == 1)
         RemoveManager(gpWindowManager);
@@ -86,42 +89,64 @@ void executive::ShutDownSystem(void) {
     gpInputManager->Close();
     gpResourceManager->Close();
 }
+#if H2_RETAIL_COMPILER
+#undef manager
+#endif
 
+#if H2_RETAIL_COMPILER
+#define currentManager p
+#define dialogExecutive ex
+#define index idx
+#define savedManagers saveMgr
+#define savedNextManagers saveNext
+#define savedPreviousManagers savePrev
+#endif
 VA(0x004c50d0, 0x170)
 i32 executive::DoDialog(class baseManager* manager) {
-    baseManager* savePrev[DIALOG_MANAGER_CAPACITY];
-    i32 idx;
-    baseManager* p;
-    baseManager* saveMgr[DIALOG_MANAGER_CAPACITY];
-    baseManager* saveNext[DIALOG_MANAGER_CAPACITY];
-    executive ex;
+    baseManager* savedPreviousManagers[DIALOG_MANAGER_CAPACITY];
+    i32 index;
+    baseManager* currentManager;
+    baseManager* savedManagers[DIALOG_MANAGER_CAPACITY];
+    baseManager* savedNextManagers[DIALOG_MANAGER_CAPACITY];
+    executive dialogExecutive;
     i32 count = 0;
 
-    p = m_managerListHead;
-    while (p != NULL) {
-        saveMgr[count] = p;
-        savePrev[count] = p->m_prev;
-        saveNext[count] = p->m_next;
-        p = p->m_next;
+    currentManager = m_managerListHead;
+    while (currentManager != NULL) {
+        savedManagers[count] = currentManager;
+        savedPreviousManagers[count] = currentManager->m_prev;
+        savedNextManagers[count] = currentManager->m_next;
+        currentManager = currentManager->m_next;
         count++;
     }
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError1);
-    if (ex.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError2);
-    if (ex.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError3);
-    if (ex.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError4);
-    ex.MainLoop();
+    dialogExecutive.MainLoop();
     RemoveManager(manager);
-    for (idx = 0; idx < count; idx++) {
-        saveMgr[idx]->m_prev = savePrev[idx];
-        saveMgr[idx]->m_next = saveNext[idx];
+    for (index = 0; index < count; index++) {
+        savedManagers[index]->m_prev = savedPreviousManagers[index];
+        savedManagers[index]->m_next = savedNextManagers[index];
     }
-    return ex.m_result;
+    return dialogExecutive.m_result;
 }
+#if H2_RETAIL_COMPILER
+#undef currentManager
+#undef dialogExecutive
+#undef index
+#undef savedManagers
+#undef savedNextManagers
+#undef savedPreviousManagers
+#endif
 
+#if H2_RETAIL_COMPILER
+#define currentManager m
+#endif
 VA(0x004c5240, 0xac)
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
@@ -129,18 +154,25 @@ void executive::PrintManagerList(void) {
     sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
-    baseManager* m = m_managerListHead;
-    while (m != NULL) {
-        sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
+    baseManager* currentManager = m_managerListHead;
+    while (currentManager != NULL) {
+        sprintf(gText, gExecutiveText.managerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
         LogStr(gText);
-        m = m->m_next;
+        currentManager = currentManager->m_next;
     }
     LogStr(gExecutiveText.managerListStop);
 }
+#if H2_RETAIL_COMPILER
+#undef currentManager
+#endif
 
+#if H2_RETAIL_COMPILER
+#define currentManager cur
+#define manager mgr
+#endif
 VA(0x004c52f0, 0x13c)
-i32 executive::AddManager(class baseManager* mgr, i32 priority) {
-    if (mgr == NULL)
+i32 executive::AddManager(class baseManager* manager, i32 priority) {
+    if (manager == NULL)
         return MANAGER_ERROR;
     if (priority == MANAGER_DEFAULT_PRIORITY) {
         if (m_managerListTail == NULL)
@@ -148,72 +180,90 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
         else
             priority = m_managerListTail->m_priority + 1;
     }
-    if (!mgr->m_active && mgr->Open(priority) != 0)
+    if (!manager->m_active && manager->Open(priority) != 0)
         return MANAGER_ERROR;
-    baseManager* cur = m_managerListTail;
-    while (cur != NULL && cur->m_priority > priority)
-        cur = cur->m_prev;
-    if (cur == NULL) {
-        mgr->m_next = m_managerListHead;
-        mgr->m_prev = NULL;
+    baseManager* currentManager = m_managerListTail;
+    while (currentManager != NULL && currentManager->m_priority > priority)
+        currentManager = currentManager->m_prev;
+    if (currentManager == NULL) {
+        manager->m_next = m_managerListHead;
+        manager->m_prev = NULL;
         if (m_managerListHead != NULL)
-            m_managerListHead->m_prev = mgr;
-        m_managerListHead = mgr;
+            m_managerListHead->m_prev = manager;
+        m_managerListHead = manager;
         if (m_managerListTail == NULL)
-            m_managerListTail = mgr;
-    } else if (cur->m_next == NULL) {
-        mgr->m_prev = m_managerListTail;
-        mgr->m_next = NULL;
-        m_managerListTail->m_next = mgr;
-        m_managerListTail = mgr;
+            m_managerListTail = manager;
+    } else if (currentManager->m_next == NULL) {
+        manager->m_prev = m_managerListTail;
+        manager->m_next = NULL;
+        m_managerListTail->m_next = manager;
+        m_managerListTail = manager;
     } else {
-        mgr->m_prev = cur;
-        mgr->m_next = cur->m_next;
-        cur->m_next->m_prev = mgr;
-        cur->m_next = mgr;
+        manager->m_prev = currentManager;
+        manager->m_next = currentManager->m_next;
+        currentManager->m_next->m_prev = manager;
+        currentManager->m_next = manager;
     }
     return MANAGER_SUCCESS;
 }
+#if H2_RETAIL_COMPILER
+#undef currentManager
+#undef manager
+#endif
 
+#if H2_RETAIL_COMPILER
+#define manager mgr
+#define previous prev
+#endif
 VA(0x004c5430, 0xc3)
-void executive::RemoveManager(class baseManager* mgr) {
-    if (mgr == NULL)
+void executive::RemoveManager(class baseManager* manager) {
+    if (manager == NULL)
         return;
-    mgr->Close();
-    baseManager* prev = mgr->m_prev;
-    if (prev == NULL) {
+    manager->Close();
+    baseManager* previous = manager->m_prev;
+    if (previous == NULL) {
         if (m_managerListHead == m_managerListTail) {
             m_managerListTail = NULL;
             m_managerListHead = NULL;
         } else {
-            m_managerListHead = mgr->m_next;
+            m_managerListHead = manager->m_next;
             m_managerListHead->m_prev = NULL;
         }
-        mgr->m_prev = NULL;
-        mgr->m_next = NULL;
+        manager->m_prev = NULL;
+        manager->m_next = NULL;
         return;
     }
-    prev->m_next = mgr->m_next;
-    if (prev->m_next == NULL)
-        m_managerListTail = prev;
+    previous->m_next = manager->m_next;
+    if (previous->m_next == NULL)
+        m_managerListTail = previous;
     else
-        prev->m_next->m_prev = prev;
-    mgr->m_prev = NULL;
-    mgr->m_next = NULL;
+        previous->m_next->m_prev = previous;
+    manager->m_prev = NULL;
+    manager->m_next = NULL;
 }
+#if H2_RETAIL_COMPILER
+#undef manager
+#undef previous
+#endif
 
+#if H2_RETAIL_COMPILER
+#define manager mgr
+#endif
 VA(0x004c5500, 0x7c)
-void executive::CallManager(class baseManager* mgr) {
+void executive::CallManager(class baseManager* manager) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
-    if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError1);
     MainLoop();
-    RemoveManager(mgr);
+    RemoveManager(manager);
     if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError2);
     m_activeManager = saved;
 }
+#if H2_RETAIL_COMPILER
+#undef manager
+#endif
 
 VA(0x004c5580, 0x179)
 void executive::MainLoop(void) {

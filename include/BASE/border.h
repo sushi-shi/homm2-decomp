@@ -18,9 +18,9 @@ public:
     border(
         i16 x,
         i16 y,
-        i16 w,
-        i16 h,
-        i16 e,
+        i16 width,
+        i16 height,
+        i16 widgetId,
         H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 fillColor,
         H2_CONST char* name
