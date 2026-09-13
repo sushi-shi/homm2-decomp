@@ -8493,7 +8493,7 @@
       "stack": "retain",
       "bounds": "absent"
     },
-    "note": "S13: unused scalar has no accesses; test deletion with native frame evidence. Busy/foreground early returns otherwise ordinary. S13 complete2-arm unused-slot deletion changes45 to42 bytes; retain original frame."
+    "note": "Busy/foreground early returns otherwise ordinary. S13 complete2-arm unused-slot deletion changes45 to42 bytes; retain original frame."
   },
   "src/SOURCE/wingraph.cpp:CreatePrimary(void)#1": {
     "body_sha256": "e7e17a66b8b6c6f1ab963fd56554cf9b23520b2ac4737b92edb194e508f50634",
@@ -10626,7 +10626,7 @@
   "src/BASE/BUTTON.cpp:button::Read(void)#1": {
     "body_sha256": "fa0308c24ab87633711b4aa195d09c65e58a86c2f0214bbdc267fdfd121cb3f6",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -10637,7 +10637,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: Read13 forces a char[16]-to-i8* cast. The 13-byte record fits; select-mode conversion decodes the serialized word and remains meaningful. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: Read13 accepts the actual char[16] name directly. The 13-byte record fits; select-mode conversion decodes the serialized word and remains meaningful. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/BUTTON.cpp:button::~button()#1": {
     "body_sha256": "b0ce5e3e652661771cece7ca20975317c26f13722aa05148f640c3f7e9c3f479",
@@ -10770,7 +10770,7 @@
   "src/BASE/ICONWDGT.cpp:iconWidget::Read(void)#1": {
     "body_sha256": "a5f94056c357fa124f770c9b13351dc7b8708e4f66e971963c37d8705364e91e",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -10781,7 +10781,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: Read13 casts the 16-byte character name to i8*. The 13-byte name fits; masked orientation conversion is a serialized enum boundary. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: Read13 consumes the16-byte character owner without a cast. The 13-byte name fits; masked orientation conversion is a serialized enum boundary. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/ICONWDGT.cpp:iconWidget::~iconWidget()#1": {
     "body_sha256": "7ce5cd0cda2c55c5776c39d48330bcc419fc384a6e979225e578826837d2af95",
@@ -10850,7 +10850,7 @@
   "src/BASE/RESMGR.cpp:resourceManager::GetBackdrop(char * name,class bitmap * backdrop,i32 useIcon)#1": {
     "body_sha256": "1bed8e14f7496edeb4da5870f1e0dca981cfe338e8fd015a85c04752c3c947aa",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -10861,12 +10861,12 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: pixel-buffer cast serves only the i8* ReadBlock signature. Bitmap mode consumes width*height bytes; icon mode retains acquire/draw/dispose ownership. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: ReadBlock(void*) accepts the pixel owner without a signed-byte view. Bitmap mode consumes width*height bytes; icon mode retains acquire/draw/dispose ownership. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/RESMGR.cpp:resourceManager::GetBackdropAtLoc(char * filename,class bitmap * destination,i32 destinationX,i32 destinationY,i32 useIcon)#1": {
     "body_sha256": "3f38ef5313e0ac693033d723b9bd3dfe7c225dc7a5b4ba1798b647ba7c330416",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "retain",
@@ -10877,7 +10877,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: byte-sized pixel owner can keep row*640 + pixels + x arithmetic without a signed-byte view. Fixed retail pitch is meaningful; destination rectangle validity is a caller contract. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: row*640 + pixels + x uses the actual byte owner and ReadBlock(void*). Fixed retail pitch is meaningful; destination rectangle validity is a caller contract. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/RESMGR.cpp:resourceManager::GetPalette(char * name)#1": {
     "body_sha256": "1324fd6064c49e20e521398f90e3ca4dcbabf4373fdf580f0da5251bf2de118f",
@@ -11298,7 +11298,7 @@
   "src/BASE/RESMGR.cpp:resourceManager::Read13(char * destination)#1": {
     "body_sha256": "cb0644710db486d224772222bcdddfb642345204d999febe3c859a99941fda80",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11309,12 +11309,12 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: every caller reads a resource name; char* is the candidate text boundary. Fixed 13-byte forwarding is meaningful and must not append an unevidenced byte. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: every caller reads a resource name and the interface is char*. Fixed 13-byte forwarding is meaningful and must not append an unevidenced byte. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/RESMGR.cpp:resourceManager::ReadBlock(void * destination,u32l size)#1": {
     "body_sha256": "9dbad564adde7b5f338cf7b2ad3ce8589474d73d5a9b07c9dd745d97b802b08f",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11325,7 +11325,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: destination is forwarded untouched to CRT read(void*); test void* API. Signed read-result conversion compares the requested unsigned count; %d formatting casts preserve diagnostic argument width. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: void* destination forwards untouched to CRT read(void*). Signed read-result conversion compares the requested unsigned count; %d formatting casts preserve diagnostic argument width. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/RESOURCE.cpp:resource::resource(void)#1": {
     "body_sha256": "a09cfdd32ebd65cda416f0736fbe1a27e91c8e6a3983d40bb797894260fd5957",
@@ -11410,7 +11410,7 @@
   "src/BASE/TEXTWDGT.cpp:textWidget::Read(void)#1": {
     "body_sha256": "34a43303742d43e08a31f5780a5f35b9a6667430c65a2472b74b4f956de6a992",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11421,7 +11421,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01: text/name buffers cast only for read APIs. Keep allocation cast and serialized draw/alignment/kind decoding; 16-byte name covers the 13-byte record. Text length/NUL validity follows the resource record. Candidate implementation now compiles; full build/relocation closure pending."
+    "note": "C01 applied: both text/name owners reach the read APIs without casts. Keep allocation cast and serialized draw/alignment/kind decoding; 16-byte name covers the 13-byte record. Text length/NUL validity follows the resource record. Complete98-object native graph proof, focused reader retail bytes/targets and the full verified-retail build pass (C01.md)."
   },
   "src/BASE/TEXTWDGT.cpp:textWidget::~textWidget()#1": {
     "body_sha256": "0744a4a3356dc4c98cbf61020375f1b7bb016065d515cc0ecdd20b2769c03f55",
@@ -11650,7 +11650,7 @@
   "src/BASE/BITMAP.cpp:bitmap::bitmap(u32l id)#1": {
     "body_sha256": "355f8a0c089e9eef24d9d7b64a59cb08309aae02ef530223cc714e65a3a3654b",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11661,7 +11661,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes the read-only signed-byte view of pixels; BitmapType conversion decodes the resource word; allocation/read sizes agree."
+    "note": "C01 removes the read-only signed-byte view of pixels; BitmapType conversion decodes the resource word; allocation/read sizes agree. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/BITMAP.cpp:bitmap::~bitmap()#1": {
     "body_sha256": "87c197f6682905f2a36d14e28f60da14a7d9fd3460f5bc4136f16b35e5634ee6",
@@ -11906,7 +11906,7 @@
   "src/BASE/BORDER.cpp:border::Read(void)#1": {
     "body_sha256": "75ef95e7aae8d0ea6b5674e7a4f96ed7e47b2325a4aa18931f68546ced0ae23b",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11917,7 +11917,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes both name-reader pointer casts; separate char[16] buffers each cover a 13-byte record."
+    "note": "C01 removes both name-reader pointer casts; separate char[16] buffers each cover a 13-byte record. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/BORDER.cpp:border::Main(struct tag_message & msg)#1": {
     "body_sha256": "0a4d97f0518c9978e01823a75266c38bdbc443f8bb54d65e5b08e04fc0a52f35",
@@ -11954,7 +11954,7 @@
   "src/BASE/Blur.cpp:DoBlur(bitmap * destination,bitmap * source,i32 height,i32 redAdjust,i32 greenAdjust,i32 blueAdjust)#1": {
     "body_sha256": "ce6dee6863aa48007be8f7c204a786abac30cd80ef3aac7143a6499477e744c8",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "retain",
@@ -11965,12 +11965,12 @@
       "stack": "retain",
       "bounds": "retain"
     },
-    "note": "C01 removes lookup-buffer read cast. Three 256-word channel tables are all consumed; radius-four interior loop bounds negative taps within the image. Palette unsigned loads and signed-byte narrowing are meaningful."
+    "note": "C01 removes lookup-buffer read cast. Three 256-word channel tables are all consumed; radius-four interior loop bounds negative taps within the image. Palette unsigned loads and signed-byte narrowing are meaningful. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/FONT.cpp:font::font(u32l id)#1": {
     "body_sha256": "d25f22848de499a14cd0dec0bf385d001469db9d4707b4709acdd557468ba585",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -11981,7 +11981,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes char[13] name cast. Unread ReadWord result still represents resource consumption; NUL must be in the fixed name record."
+    "note": "C01 removes char[13] name cast. Unread ReadWord result still represents resource consumption; NUL must be in the fixed name record. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/FONT.cpp:font::~font()#1": {
     "body_sha256": "341f70ab3da9c7485edce7af50fb6a0a9e4c052ebef13324ac07173f803dddf0",
@@ -12162,7 +12162,7 @@
   "src/BASE/ICON.cpp:icon::icon(u32l id)#1": {
     "body_sha256": "7ef1534384c92139b2dc9b03da6186fcb75c4469c090d80f0760a52d6b22f890",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12173,7 +12173,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes read cast; allocated byte count comes from the icon header. Keep allocator conversion to the byte owner."
+    "note": "C01 removes read cast; allocated byte count comes from the icon header. Keep allocator conversion to the byte owner. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/ICON.cpp:icon::~icon()#1": {
     "body_sha256": "3a9c6ffc14b4939dfd722d1d1ac73b42cf782a630b81730b0a6880bdc360cf13",
@@ -12338,7 +12338,7 @@
   "src/BASE/SAMPLE.cpp:sample::sample(char * name)#1": {
     "body_sha256": "0ecab1075cb7c4da2de1c462da96acce0ea3ff9c65fca46cf1fe3cc8dff7202a",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12349,7 +12349,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes sample read view; allocator conversion remains. char[32] filename and three-character reversed suffix assume a valid short resource name."
+    "note": "C01 removes sample read view; allocator conversion remains. char[32] filename and three-character reversed suffix assume a valid short resource name. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/SAMPLE.cpp:sample::~sample()#1": {
     "body_sha256": "4c6e154fef3d5182760d25ecd50bb25d53050efb3eb60788304de0a3c9ad0643",
@@ -12370,7 +12370,7 @@
   "src/BASE/SAMPLE.cpp:MIDIWrap::MIDIWrap(char * name)#1": {
     "body_sha256": "18c56fedff40a9973531114ca46694bfa604fc0e3159562a609f11592714fe39",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12381,7 +12381,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes MIDI byte-read view; buffer allocation/read extent comes from GetFileSize."
+    "note": "C01 removes MIDI byte-read view; buffer allocation/read extent comes from GetFileSize. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/SAMPLE.cpp:MIDIWrap::~MIDIWrap()#1": {
     "body_sha256": "d969e8c7ac96393444d64d06008ae7f2105d0c27aba582eefc34adfeb9420207",
@@ -12402,7 +12402,7 @@
   "src/BASE/TILESET.cpp:tileset::tileset(u32l id)#1": {
     "body_sha256": "3c5240b1665968cbafadc98375ccd987d6943b76e0ebca777416bfaa423dcf7e",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12413,7 +12413,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes tileset read view; data size is tileCount*tileWidth*tileHeight, shared by allocation/read."
+    "note": "C01 removes tileset read view; data size is tileCount*tileWidth*tileHeight, shared by allocation/read. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/TILESET.cpp:tileset::~tileset()#1": {
     "body_sha256": "9e6a5f54939c8b4d2f9a1b07ba418a48b542ea9a64e59387e1e7917a92549f4d",
@@ -12482,7 +12482,7 @@
   "src/BASE/Textntry.cpp:textEntryWidget::Read(TextEntryReadMode type)#1": {
     "body_sha256": "8d0bd7c8b2cc0dc2c2694c89ea1f3cb847381ab1d29bd54a74443ea43cf2410f",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12493,7 +12493,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 removes text/name reader casts. Resource names reserve exactly 13 bytes and text maxLength+5; enum casts decode serialized words."
+    "note": "C01 removes text/name reader casts. Resource names reserve exactly 13 bytes and text maxLength+5; enum casts decode serialized words. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/Textntry.cpp:textEntryWidget::Main(struct tag_message & message)#1": {
     "body_sha256": "e3cc9b9d028ae2cf03eb791cb1455a959c71e3704408384fd846a71673c6bb22",
@@ -12578,7 +12578,7 @@
   "src/BASE/droplist.cpp:dropListWidget::Read(void)#1": {
     "body_sha256": "a8757bcb8aeeed23947b29e90a6a3012b08e34296b61658ffc6e91bc1d92269c",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12589,7 +12589,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 changes two resource-name uses to char[16], removing casts. Keep icon-header views and enum decoding; m_unusedColor is a real serialized member, not stack padding."
+    "note": "C01 changes two resource-name uses to char[16], removing casts. Keep icon-header views and enum decoding; m_unusedColor is a real serialized member, not stack padding. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/droplist.cpp:dropListWidget::DeleteItem(i32 index)#1": {
     "body_sha256": "b6f5e5e801760b4c1b3be77064b62278e91f0f79db9d2bdbaacc02f02a32606e",
@@ -12738,7 +12738,7 @@
   "src/BASE/listbox.cpp:listBoxWidget::Read(void)#1": {
     "body_sha256": "b3497aa33b35e144862ae9d3f8a4d827d566f36319b1773355c21fc2ea4bcffe",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -12749,7 +12749,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "C01 changes char name owner and removes text casts; packed IconEntry views and serialized color/alignment conversions remain actual boundaries."
+    "note": "C01 changes char name owner and removes text casts; packed IconEntry views and serialized color/alignment conversions remain actual boundaries. C01 complete98-object native byte/relocation proof and full-build gate pass; see C01.md."
   },
   "src/BASE/listbox.cpp:listBoxWidget::DeleteItem(i32 index)#1": {
     "body_sha256": "9f45e4cbd7ecc57a9499374d13acb5c9f84f7b149f9522709abb177f64a3453b",
