@@ -5,12 +5,12 @@
 #include <SOURCE/KB_TYPES.h>
 
 i32 CalcTerrainCost(
-    H2_ENUM_PARAM(TerrainType, i32),
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    H2_ENUM_PARAM(TerrainType, i32) terrain,
+    i32 diagonal,
+    i32 mobility,
+    i32 pathfindingLevel,
+    i32 useRoad,
+    i32 usePathfinding
 );
 
 #endif

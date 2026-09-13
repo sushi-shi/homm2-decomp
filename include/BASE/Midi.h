@@ -8,7 +8,7 @@
 // reference instead of reading them off a manager instance.
 bool MIDIStartup(void);
 void MIDIShutdown(void);
-void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 track);
+void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack);
 void MIDIStop(i32& currentTrack);
 bool MIDIIsPlaying(void);
 void MIDISetVolume(i32& fadeSteps);

@@ -8,13 +8,13 @@ class heroWindow;
 class town;
 
 void SetupRecruitWin(
-    class heroWindow*,
-    H2_ENUM_PARAM(CreatureType, i32),
-    i32,
-    ResourceType,
-    i32,
-    i32
+    class heroWindow* window,
+    H2_ENUM_PARAM(CreatureType, i32) creatureType,
+    i32 goldCost,
+    ResourceType resourceType,
+    i32 resourceCost,
+    i32 available
 );
-void QuickViewRecruit(class town*, i32);
+void QuickViewRecruit(class town* townData, i32 dwelling);
 
 #endif

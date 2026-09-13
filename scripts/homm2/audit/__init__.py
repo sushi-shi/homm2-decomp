@@ -48,6 +48,8 @@ import runpy
 import sys
 
 TOOLS = {
+    "symbols": ("symbols", "census shipping PE directories and NB09 public-name evidence"),
+    "parameters": ("parameters", "inventory parameter domains and reconcile declaration names"),
     "ledger": ("ledger",
                "match_baseline rows banked against source that changed"),
     "historical-losses": ("historical_exact_losses",

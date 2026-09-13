@@ -8,9 +8,11 @@ MSVC object code and can be linked into a working executable.
 
 - Retail `HMM2PL.exe` is authoritative for code, data, resources, and linked
   addresses.
-- The image is STRIPPED: no debug stream, no export directory, and no
-  base-relocation directory (data directory 5 is 0/0). Nothing in the binary
-  names a symbol or lists a DIR32 site.
+- The image is STRIPPED: no embedded symbol stream, no export directory, and
+  no base-relocation directory (data directory 5 is 0/0). Its debug directory
+  retains an NB10 external PDB path, not symbol records. Nothing in the binary
+  names a symbol or lists a DIR32 site. See `docs/parameter-inventory.md` for
+  the measured PoL/Buka symbol census.
 - `config/retail_functions.csv` is Ghidra's function inventory (2,472 candidate
   boundaries): ANALYSIS OUTPUT, edited as understanding improves, never retail
   evidence. A boundary becomes a claim only when a source `VA(...)` marker

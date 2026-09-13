@@ -62,9 +62,9 @@ public:
     );
     virtual H2_RETAIL_INLINE ~textEntryWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void Read(H2_ENUM_PARAM(TextEntryReadMode, i32));
-    void SetupDisplayString(char*, u16);
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    void Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type);
+    void SetupDisplayString(char* source, u16 cursor);
 };
 #pragma pack(pop)
 SIZE(textEntryWidget, 0x4e);

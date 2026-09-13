@@ -35,20 +35,20 @@ public:
     b32 m_isLarge;
     b32 m_suppressDraw;
     icon* m_glyphIcon;
-    font(u32l);
+    font(u32l id);
     virtual ~font();
 
 protected:
-    void DrawStringExecute(H2_CONST char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void DrawStringExecute(H2_CONST char* str, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
     void PolishBoundedTextLayout(H2_CONST char*, char*, u32*, i32, i32*, char);
 
 public:
-    void DrawString(H2_CONST char*, i32, i32, FontDrawMode);
-    i32 GetCharacterWidth(u8);
-    void ExtractLine(H2_CONST char*, char*, i32*, i32, i32*, u8);
-    void DrawBoundedString(H2_CONST char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
-    i32 LineLength(H2_CONST char*, i32);
-    i32 LineWidth(H2_CONST char*);
+    void DrawString(H2_CONST char* s, i32 x, i32 y, FontDrawMode mode);
+    i32 GetCharacterWidth(u8 c);
+    void ExtractLine(H2_CONST char* text, char* line, i32* position, i32 maxWidth, i32* lineWidth, u8 lastLine);
+    void DrawBoundedString(H2_CONST char* str, i32 x, i32 y, i32 w, i32 h, FontDrawMode mode, FontAlignment align);
+    i32 LineLength(H2_CONST char* str, i32 maxW);
+    i32 LineWidth(H2_CONST char* str);
 };
 #pragma pack(pop)
 SIZE(font, 0x20);

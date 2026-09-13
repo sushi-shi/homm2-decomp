@@ -59,22 +59,22 @@ H2_ENUM_STEPPED(DirectPlayHostState)
 #pragma pack(pop)
 SIZE(DirectPlayStartupMessage, 0x1a);
 
-BOOL WINAPI dpEnumServiceProvider(struct _GUID*, char*, DWORD, DWORD, void*);
-BOOL WINAPI dpEnumSession(DPSESSIONDESC*, void*, LPDWORD, DWORD);
+BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*);
+BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags);
 i16 dpnet_init(void);
 void CleanupDPVars(void);
 void dpnet_term(void);
-void dpSendMessage(i32, H2_ENUM_PARAM(NetworkPacketType, u8), u16, void*);
-i32 dpnet_snd(i32, i32, void*);
-i16 dpnet_rcv(i16, u16, void*);
+void dpSendMessage(i32 destination, H2_ENUM_PARAM(NetworkPacketType, u8) type, u16 size, void* data);
+i32 dpnet_snd(i32 position, i32 size, void* data);
+i16 dpnet_rcv(i16, u16, void* data);
 u8 dpnet_stat(i16, u16);
 i16 __cdecl dpnet_sess(i32, i32, ...);
 void dpProcessMessages(void);
-void dpEvaluateMessage(u32l, i32);
+void dpEvaluateMessage(u32l size, i32 sender);
 i32 dpWaitForFirstGuest(void);
 i32 dpWaitForExtraGuests(void);
 i32 dpWaitForHost(void);
-void DPSD(i32, H2_CONST char*, i32);
+void DPSD(i32 result, H2_CONST char* file, i32 line);
 
 extern struct IDirectPlay* lpIDC;
 extern DPID dcoID;

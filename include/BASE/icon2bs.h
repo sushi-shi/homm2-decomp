@@ -7,17 +7,17 @@ class bitmap;
 class icon;
 
 void IconToBitmapScale(
-    class icon*,
-    class bitmap*,
-    i32,
-    i32,
-    i32,
-    H2_ENUM_PARAM(IconDrawClipMode, i32),
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 destX,
+    i32 destY,
+    i32 frame,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH,
+    i32 scale
 );
 
 #endif

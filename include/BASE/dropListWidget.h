@@ -88,9 +88,9 @@ public:
     dropListWidget(void);
     virtual ~dropListWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
-    void DeleteItem(i32);
+    void DeleteItem(i32 index);
     void DrawDropStuff(void);
     void SaveDropBackground(void);
     void RestoreDropBackground(void);

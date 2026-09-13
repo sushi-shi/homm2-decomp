@@ -105,6 +105,6 @@ SIZE(SMapChange, 11);
 
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
-void SendMapChange(MapChangeType, i8, u8, u8, i32, u8, u8);
+void SendMapChange(MapChangeType type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8 direction);
 
 #endif

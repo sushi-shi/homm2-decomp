@@ -9,7 +9,7 @@
 class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
-    sample(H2_CONST char*);
+    sample(H2_CONST char* name);
     virtual H2_RETAIL_INLINE ~sample() OVERRIDE;
 };
 #pragma pack(pop)

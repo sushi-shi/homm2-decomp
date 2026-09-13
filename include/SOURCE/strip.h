@@ -62,7 +62,7 @@ public:
     );
     ~strip();
     void Draw(void);
-    void DrawIcons(i32);
+    void DrawIcons(i32 drawWindow);
     void DrawFrame(void);
 };
 #pragma pack(pop)

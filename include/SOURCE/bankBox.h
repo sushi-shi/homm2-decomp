@@ -15,7 +15,7 @@ public:
     heroWindow* m_window;
     bankBox(i32 x, i32 y, class playerData* player);
     ~bankBox();
-    void Update(i32);
+    void Update(i32 drawWindow);
 };
 #pragma pack(pop)
 SIZE(bankBox, 0xc);
