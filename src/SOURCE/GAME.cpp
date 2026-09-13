@@ -6112,10 +6112,10 @@ void game::SetupTowns(void) {
         }
         if (castle8->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
             for (slot12 = 1; slot12 <= castle8->m_buildState; slot12++) {
-                castle8->m_spellCounts[slot12] = gSpellLimits[slot12 - 1];
+                castle8->m_spellCounts[slot12 - TOWN_MAGE_GUILD_FIRST_LEVEL] = gSpellLimits[slot12 - 1];
                 if (castle8->m_type == FACTION_WIZARD
                     && (castle8->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
-                    castle8->m_spellCounts[slot12]++;
+                    castle8->m_spellCounts[slot12 - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
         if (extra0->hasShrine)

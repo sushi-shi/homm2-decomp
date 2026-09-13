@@ -17808,10 +17808,10 @@
     "note": "S41 unused/cost locals unread. Three full sweeps; B64 GetTownId>=0 before extra-index storage. Alchemist y-1/y-2 and mine y-1 accesses guarded; extra-chain contracts remain B58. No casts, union, goto, manual varargs or unrelated role reuse."
   },
   "src/SOURCE/GAME.cpp:game::SetupTowns(void)#1": {
-    "body_sha256": "fb061d80f50af6d9af19130642d44149f7aa56a9c8fb073ecc1cee99f75bc5ba",
+    "body_sha256": "d36bbab77e2f4368fc82f78e4d6a305ab2680f7e662883b568c48ea385cd1e66",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17821,7 +17821,7 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "S41 dwelling-roll capacity12->10 applied: ten initialized entries, Random0..99/10 indexes0..9. Complete2/2 matrix/all102 GAME native and full2161-byte retail proof pass. Unused scalar remains S41. Real tagged mapTownExtra and flat/2D spell aliases; C34 owner byte and signed troop-count interpretation need owner review. B64 extra/color/faction/mage/name/lifetime domains; neutral owner may index gbHumanPlayer[-1] in default-building branch. attempts17++>500 forbids retry exit once reached until overflow, not a cap. Five levels/six slots and usedSpells are real local arrays. No goto, fake owner, manual varargs or artificial aggregate."
+    "note": "S41 dwelling-roll capacity12->10 applied: ten initialized entries, Random0..99/10 indexes0..9. Complete2/2 matrix/all102 GAME native and full2161-byte retail proof pass. Unused scalar remains S41. Real tagged mapTownExtra and flat/2D spell aliases; C34 owner byte and signed troop-count interpretation need owner review. B64 extra/color/faction/mage/name/lifetime domains; neutral owner may index gbHumanPlayer[-1] in default-building branch. attempts17++>500 forbids retry exit once reached until overflow, not a cap. Five levels/six slots and usedSpells are real local arrays. No goto, fake owner, manual varargs or artificial aggregate. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
   },
   "src/SOURCE/GAME.cpp:game::ProcessOnMapHeroes(void)#1": {
     "body_sha256": "c152ae548b9fa8b760ae2edf4b84fa7edc4c286b7b15bd1478d0249455612495",
@@ -18656,10 +18656,10 @@
     "note": "Real SLimitData output aggregate for extent query, not invented stack padding. B67 building0..31, buildState cap, object count and successful object lookup required: objectIndex=-1 is used if lookup fails. Borders dereferenced without null guard under SetupTown construction contract. Global extent mode/output and icon frames must be valid. No casts/unions/goto/manual varargs/unrelated local role or owner arithmetic."
   },
   "src/SOURCE/TOWNMGR.cpp:townManager::SetupMage(heroWindow * window)#1": {
-    "body_sha256": "9e636b5f085cb9705c55d43547fbdeb958a875ff1ec1e4be840d86448e8fee39",
+    "body_sha256": "f7379f655a5ca3f6a8777a217738e9aa55eed881014eddc767f6124d2616c6fc",
     "patterns": {
       "casts": "retain",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -18669,13 +18669,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C45 complete2/2 boolean-cast matrix: remove i16 conversion gives886 vs889bytes, deletes retail0f bf c8 movsx ecx,ax at+123; retained independent whole889-byte proof passes. U01 widget arms real; U15 town spell/count overlapping owner remains. S48 nine unread i16 UI locals plus unusedLocal; unusedGuildFrame IS consumed and not dead. B67 level0..4, slot0..3 fixed; valid spell/count/faction and icon/name bounds required. No goto/manual varargs/fake owner/unrelated role."
+    "note": "C45 complete2/2 boolean-cast matrix: remove i16 conversion gives886 vs889bytes, deletes retail0f bf c8 movsx ecx,ax at+123; retained independent whole889-byte proof passes. U01 widget arms real; U15 five adjacent count bytes now recovered. S48 nine unread i16 UI locals plus unusedLocal; unusedGuildFrame IS consumed and not dead. B67 level0..4, slot0..3 fixed; valid spell/count/faction and icon/name bounds required. No goto/manual varargs/fake owner/unrelated role. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
   },
   "src/SOURCE/TOWNMGR.cpp:MageGuildHandler(tag_message & message)#1": {
-    "body_sha256": "fcedbacee6959754131b05a90874ce2bcafc1c588b05911f2e678d764c8fcb96",
+    "body_sha256": "9fa487ce8110e724fe56dcef70acca4e2d2e86b8548009a9ebed406dc2057632",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "applied",
       "owner": "absent",
@@ -18685,7 +18685,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "A01 commuted level[array+1] now real m_spellCounts[level+1]; complete2/2 exact340-byte matrix and independent ordered-retail proof. Three control ranges map to levels0..4/slots0..3; count guard before spell use. U01 real message/U15 overlapping count owner. S48 three unread i16 control locals. B67 valid stored spell IDs/counts and live manager remain. No cast/goto/manual varargs/fake stack/owner recovery or unrelated reuse."
+    "note": "A01 commuted level[array+1] now real m_spellCounts[level+1]; complete2/2 exact340-byte matrix and independent ordered-retail proof. Three control ranges map to levels0..4/slots0..3; count guard before spell use. U01 real message/U15 adjacent count owner now recovered. S48 three unread i16 control locals. B67 valid stored spell IDs/counts and live manager remain. No cast/goto/manual varargs/fake stack/owner recovery or unrelated reuse. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
   },
   "src/SOURCE/TOWNMGR.cpp:townManager::RecruitHero(i32 availableHeroIndex,i32 cannotRecruit)#1": {
     "body_sha256": "ec25110671dd640d76f9fd08e59fa2efa3921ba0e9c390be314203cc62c9f3e3",
@@ -18816,10 +18816,10 @@
     "note": "Fixed five army type slots, compares NONE and returns first occupied type without reading quantity. No casts, union, goto, owner trick, local scratch/manual varargs or unrelated reuse."
   },
   "src/SOURCE/TOWN.cpp:town::GiveSpells(hero * targetHero)#1": {
-    "body_sha256": "51882c2a07a104706e69d0d6108557ce861effa45a17ba0bcf04cffe11f7a90c",
+    "body_sha256": "20f98914cbc002a12c519aaab551abe42a38a7a700f64cc04bda4e4216f67e70",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -18829,7 +18829,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U15 real spell/count owner currently overlaps last spell byte with unused count0. B67 wisdom0..3 gives at most five levels, counts<=4 and valid spells/pupil/occupant required. Book/guild guards precede traversal. No casts, goto, artificial addresses, manual varargs, unused aggregate or unrelated local roles."
+    "note": "U15 count overlay removed; five adjacent count bytes now use zero-based indices. B67 wisdom0..3 gives at most five levels, counts<=4 and valid spells/pupil/occupant required. Book/guild guards precede traversal. No casts, goto, artificial addresses, manual varargs, unused aggregate or unrelated local roles. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
   },
   "src/SOURCE/TOWN.cpp:town::XformToCastle(void)#1": {
     "body_sha256": "6c2259ea78b827f0be8bfa05513b0b800b89e3d4ee5f2161d207e7b39b2d830d",
@@ -18880,10 +18880,10 @@
     "note": "B67 owner0..5, nonempty town list<=72 and this ID present required. pos starts-1; absent ID makes compaction use negative index, empty list writes townIds[-1]. Real member array, not owner recovery or deliberate before-object base. No casts, unions, goto, fake scratch, manual varargs or unrelated roles; list index i remains compaction/search cursor."
   },
   "src/SOURCE/TOWN.cpp:town::BuildBuilding(BuildingSlotType building)#1": {
-    "body_sha256": "d22f1b84af8c0ec8289dad4bb803577cebc1df8123ec768478518361bca689a8",
+    "body_sha256": "07cf1f8bbe70e65a0ddf25ed0d2306c3ee15d85023b69abe4b8ee1b239dc7ba3",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -18893,7 +18893,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U15 actual one-based count accesses and20-spell owner; B67 buildState before guild increment<5, counts<=4, valid building/faction/creature/town ID required. Dwelling/garrison derived ranges0..11 guarded by building ranges; upgrades copy earlier real slots. No casts/goto/fake scratch/manual varargs/owner recovery/unrelated reuse."
+    "note": "U15 five adjacent count bytes and20-spell owner now recovered; B67 buildState before guild increment<5, counts<=4, valid building/faction/creature/town ID required. Dwelling/garrison derived ranges0..11 guarded by building ranges; upgrades copy earlier real slots. No casts/goto/fake scratch/manual varargs/owner recovery/unrelated reuse. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
   },
   "src/SOURCE/TOWN.cpp:town::CanBuildDock(void)#1": {
     "body_sha256": "4cddd8a95853142ca7d0ce9497b8b5e13bfc74eff772749d5ff9deae744e25f8",
@@ -18958,5 +18958,21 @@
       "bounds": "absent"
     },
     "note": "Assigns supplied typed town pointer to its actual owner field; no ten-pattern instance, cast or fabricated offset."
+  },
+  "src/SOURCE/PHILAI.cpp:philAI::HeroInteractionAtTown(hero * heroPtr,town * townPtr,i32 doInteraction,i32 * value)#1": {
+    "body_sha256": "bb034e6b61de1d9427e0e6c5bec17923a9da8c08f3eca0babfba9cc81d249bca",
+    "patterns": {
+      "casts": "open",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire211-line pre-edit body read including spell valuation and transfer branches. U15 adjacent five-count owner applied across all consumers; all98 native objects/1826 emitted instances/sections/ordered relocs identical.1975 ordinary retail bytes and DIR32 sites pass; fixed13-float supplement proves all remaining operands. C47 bounded town-ID/turn narrowing needs review; double/float and float-to-i32 conversions are real precision/truncation boundaries. R11 stackSlot begins as Manhattan distance then army-slot index. S49 scratchVal unread and initial statSum0 overwritten. B68 live hero/town/value/player, valid wisdom/count/spell/terrain/creature domains, nonzero townFV+battlePower and representable transfer arithmetic required. Five-slot loops fit actual army owner; quantity alias retained. No goto, fake stack aggregate, artificial owner pointer, outside pointer or manual varargs."
   }
 }

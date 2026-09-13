@@ -55,7 +55,7 @@ void town::GiveSpells(hero* targetHero) {
     for (stage = 0; stage < IDX(pupil->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                                 + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
          ++stage) {
-        for (slotN = 0; slotN < m_spellCounts[stage + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slotN) {
+        for (slotN = 0; slotN < m_spellCounts[stage]; ++slotN) {
             pupil->AddSpell(m_spells[stage][slotN], pupil->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
     }
@@ -142,15 +142,16 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 level;
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         ++m_buildState;
-        m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+        m_spellCounts[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL] =
+            gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
-            ++m_spellCounts[m_buildState];
+            ++m_spellCounts[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
     if (building == BUILDING_SLOT_SPECIAL && m_type == FACTION_WIZARD) {
         for (level = 0; level < m_buildState; ++level)
-            ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
+            ++m_spellCounts[level];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }

@@ -2590,7 +2590,7 @@ void townManager::SetupMage(heroWindow* window) {
                 spellState_c = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {
                 spellState_c =
-                    static_cast<i16>(slot_o >= m_town->m_spellCounts[level_f + 1]);
+                    static_cast<i16>(slot_o >= m_town->m_spellCounts[level_f]);
             }
 
             message_i.payload.widget.command =
@@ -2699,7 +2699,7 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
                 if (spellSlot_b != -1) {
                     level_d = spellSlot_b / TOWN_MAGE_SPELLS_PER_LEVEL;
                     slot_j = spellSlot_b % TOWN_MAGE_SPELLS_PER_LEVEL;
-                    if (slot_j >= gpTownManager->m_town->m_spellCounts[level_d + 1])
+                    if (slot_j >= gpTownManager->m_town->m_spellCounts[level_d])
                         return MESSAGE_DISPATCH_CONSUME;
                     spell_j = gpTownManager->m_town->m_spells[level_d][slot_j];
                     NormalDialog(

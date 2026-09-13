@@ -700,16 +700,16 @@
     "note": "Full170-line declarations/constants header read through EOF; no physical function bodies. Packed50-byte EventExtra has one-byte message head and runtime fields, requiring actual variable-tail allocation contracts rather than sizeof as message extent (B55). Real six-byte RandomHeroArmyRange record and domain/serialization constants retained; no manual varargs or fabricated stack aggregate."
   },
   "src/SOURCE/GAME.cpp": {
-    "sha256": "c29bbdfcb0e6d66f7cb8ccde6383f884409c35c8b0a6d98c7ecf57e072ce3c87",
-    "note": "Full8051-line TU read through final DATA definition; every helper/body, private enum, float factor, both temporary serialization identifier macro groups and undef pairs reconciled. All functions have ten manual pattern verdicts. C35/C38/C39/C41/S41/S44 source changes have complete matrices and102-function/all-allocated-section native equivalence. No probe declarations or fake padding retained. Full reading is not whole-retail exactness or resolution of open findings."
+    "sha256": "cb5fc47df40ceac3c631639237bd7ee3ab3dd465915fb11ed284e6ec1f64620d",
+    "note": "Full8051-line TU read through final DATA definition; every helper/body, private enum, float factor, both temporary serialization identifier macro groups and undef pairs reconciled. All functions have ten manual pattern verdicts. C35/C38/C39/C41/S41/S44 source changes have complete matrices and102-function/all-allocated-section native equivalence. No probe declarations or fake padding retained. Full reading is not whole-retail exactness or resolution of open findings. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step."
   },
   "src/SOURCE/TOWNMGR.cpp": {
-    "sha256": "090fb8904b4b1f623f19b38badf5cd9f0220e46e75b4124568313d9204a7be06",
-    "note": "Entire3635-line source through VTBL read, every function/inline helper, private enum and both6x32 DATA tables reconciled.32 newly reviewed bodies plus2 previously reviewed stats helpers; all have ten verdicts. A01/S45/S46/S47 applied with complete matrices and whole36-function/allocated-section/ordered-relocation native equivalence. C45 rejected boolean variant documented. Source has no active macro definitions or probes; unused UI declarations remain S48."
+    "sha256": "064e17219697c8d9b07298141d6e69bbbcbd705409112d3656347026eeb19093",
+    "note": "Entire3635-line source through VTBL read, every function/inline helper, private enum and both6x32 DATA tables reconciled.32 newly reviewed bodies plus2 previously reviewed stats helpers; all have ten verdicts. A01/S45/S46/S47 applied with complete matrices and whole36-function/allocated-section/ordered-relocation native equivalence. C45 rejected boolean variant documented. Source has no active macro definitions or probes; unused UI declarations remain S48. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step."
   },
   "src/SOURCE/TOWN.cpp": {
-    "sha256": "02549ee9cb7ea6a2360bbb612b089138609f9ce240f1e2f498211a233e87934c",
-    "note": "Entire218-line source through bEnteringTown DATA read; all9 physical functions have individual ten-pattern verdicts. Town spell/count consumers and serialized100-byte owner reviewed for U15; no source changes or fake storage introduced."
+    "sha256": "c6d60ba626a8170f5e793493326dec568942f1a1a2ead19037a9ed6f4209c7e8",
+    "note": "Entire218-line source through bEnteringTown DATA read; all9 physical functions have individual ten-pattern verdicts. Town spell/count consumers and serialized100-byte owner reviewed for U15; no source changes or fake storage introduced. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step."
   },
   "include/SOURCE/TOWNMGR.h": {
     "sha256": "e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2",
@@ -724,7 +724,7 @@
     "note": "Full packed378-byte derived-manager layout, all32 object pointers,80-byte status and inline SetTown read against whole implementation. m_unknownC6 lacks semantics but cannot be deleted from proven layout; no padding invented."
   },
   "include/SOURCE/town.h": {
-    "sha256": "152a21d536099dc905cd861822fec1a0c9b8bf097993b95a34d50853786f289b",
-    "note": "Full packed100-byte town layout, enums/prototypes/inline accessor read. U15 overlapping20-byte flat/2D spells and19-byte prefix+six counts has no observed count0 consumer; propose real20-byte spell union followed by five counts after all-consumer byte proof. Current source retained, not a claimed layout closure."
+    "sha256": "80eaf880f8d0cc72be7e82547467d4a2045af7758473d51bee1646edf92471cd",
+    "note": "Full packed100-byte town layout, enums/prototypes/accessor and every spell/count consumer reviewed. U15 removes19-byte overlay prefix and unused sixth overlapping count, retaining real20-byte flat/2D spell union followed by five counts. All98 native objects/1826 function instances/sections/ordered relocs identical; VC6 explicit layout assertions prove spells@0x3c,counts@0x50,turns@0x55,name@0x57,size100. No fake padding or before-array pointer."
   }
 }

@@ -353,9 +353,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   append chains, resource filenames and complete building descriptions for
   valid table indices. This resolves the selected B52 building-format question.
 - B67/U15: [town state and spell-owner contracts](B67-U15.md) remain separate
-  from text capacity. U15's count overlay needs all-consumer layout recovery.
+  from text capacity. [U15's count overlay is removed](U15.md) with all-consumer
+  review, all98-object native equivalence and explicit VC6 layout assertions.
   C46/R10/S48/G55–G57 track the remaining conversions, reused roles, unused
   locals and town-dialog joins, with per-function evidence in the ledger.
+- C47/R11/S49/B68: the fully reviewed AI town-interaction consumer retains
+  its real floating conversions; bounded ID/turn conversions, distance/slot
+  reuse, unread scratch and numeric/game-state domains remain separate findings.
 
 ## Build setup observations
 

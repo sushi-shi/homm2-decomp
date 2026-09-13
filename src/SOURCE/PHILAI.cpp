@@ -4383,7 +4383,8 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
              <= IDX(heroPtr->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                     + WISDOM_SPELL_LEVEL_BONUS;
              castLvl++) {
-            for (whichSpell = 0; whichSpell < townPtr->m_spellCounts[castLvl];
+            for (whichSpell = 0;
+                 whichSpell < townPtr->m_spellCounts[castLvl - TOWN_MAGE_GUILD_FIRST_LEVEL];
                  whichSpell++) {
                 if (!heroPtr->HasSpell(townPtr->m_spells[castLvl - 1][whichSpell])) {
                     *value +=
