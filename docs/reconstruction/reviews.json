@@ -22974,5 +22974,581 @@
       "bounds": "open"
     },
     "note": "Entire270-line movement/animation/facing tail read. C67 six assignment casts removed in complete4/16-arm phase products and combined whole-TU native proof. True sqrt, x87 ratio and float-to-integer boundaries retained. S61 unused locals all8 subsets and overwritten frameCount addition2-arm test change code, originals retained. U05 wide flags real. B82 adjusted front/rear placement, arithmetic/animation16-frame capacity, timing/frameCount divisor and rectangle/resource domains remain; positive step clamp does not prove timer frameCount positive. Sole private double1.3 at+73e independently fixed-operand checked; all2530 bytes/sites and other targets pass. No goto, fake aggregate, manual varargs or unrelated variable roles."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::Main(tag_message & message)#1": {
+    "body_sha256": "314ca133c743dc943373674f4da744592e4b3d3a8ebf60003fb0a4e38c533a37",
+    "patterns": {
+      "casts": "applied",
+      "unions": "applied",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full timer/remote/event/action dispatch read. U17 reconstructs actual256-byte RemoteMessage-compatible header and tagged247-byte text/16-byte action payload; sender replaces false messageLength, removing subfield text cast. Transport whole-owner reinterpretation and numeric/key boundaries retained. G76 single-pass structured arm changes702 to705, original shared dispatch retained. B83 sender range, text termination, payload length and action domains remain unchecked here; float75 operand pinned. No owner-from-member subtraction, manual varargs or fake stack aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ValidHexToStandOn(i32 hexIndex)#1": {
+    "body_sha256": "82cbb99e03b0807939ec7c2627a8d41244a15f89c0bb0e7397fb7873d15dc8c0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire sentinel/occupancy/wide fit predicate read. B83 -1 rejected and -2 accepted; column test compares hex%13 to global MAP_WIDTH-1, not combat constant12. Retail291 bytes/sites/targets confirms unusual logic; remaining hex and occupant side/index bounds are caller contracts, no invented range fix. No casts, unions, goto, fake owner, stack aggregate or varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::SetCombatDirections(i32 targetHex)#1": {
+    "body_sha256": "03099e0f45c42b9c1b56b78d2e677aeb0709b706bae6222d7d2489d2b41fb838",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "applied",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete208-line four8-element local arrays, eight-direction eligibility and24-sector ring fill read. C68 six assignment casts removed in all64 subsets. A03 replaces first-row flattened adjacency pointer with actual m_adjacency[targetHex][direction], full3-arm row-owner family native exact. Saved target pair and four arrays are meaningful owners. B83 target army pointer formed before validation requires selected target; adjusted front/rear hexes need placement contract. Forced wide-west seed ensures ring fill has a seed; no goto/unrelated reuse/varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CheckSetMouseDirection(i32 mouseX,i32 mouseY,i32 targetHex)#1": {
+    "body_sha256": "6649d417986e9460f46d0cee5ddeccf543d5ebd8251dcb79ed649fcd963939f6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full sector selection and adjusted wide attack hex read. Actual24-sector map and117x6 adjacency; ten fixed float/double operands checked individually. Retain explicit float ratio and enum-domain conversion: zero absY denominator is x87 floating division, not integer divide. S62 removing unread target pointer changes1397 to1358, retained. B83 current target, map initialization, direction0..7 and adjusted placement contracts remain. No fake stack aggregate, owner recovery, goto or manual varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::GetPointer(CombatMessageCommand command,i32 hexIndex)#1": {
+    "body_sha256": "5a57ab07e3eee1567387b70cd596e60d48dc334649fb92515688985159c14a73",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full command-to-cursor switch read. S62 complete8 subsets cover unread x/y calculations and unused result slot; every removal changes bytes (90 down to62). Original scalar slots retained, no synthetic owner. Default/move/attack command roles related; no casts/union/goto/varargs; coordinate arithmetic needs representable input domain."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ProcessCombatMsg(tag_message & message)#1": {
+    "body_sha256": "f5d2b04409b41ac334fec53e6bc1358281864b3574531e9551b4dbfe9067adcd",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire mouse/keyboard/widget dispatch and switch tails read. Four enum casts preserve tagged widget/key domains; actual tag_message views retained with type-specific reads. S62 unused result initialization removal changes2037 to2030. B83 mouse-selected hex, control IDs, current/player owners and downstream action validation remain contracts. Only RightClick caller passes m_selectedHex, establishing its dual-source coherence here. Apparent final block mismatch is embedded switch data decoding; full2037 bytes and ordered targets pass."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::IsNegationSphereInEffect(void)#1": {
+    "body_sha256": "14245ebd60bc6232f7d05d8e623d00e79a4588ed96f4076156c386ed47ed40b6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Checks exactly two hero pointers, each null-guarded, for sphere-negation artifact. Real side array and callee artifact owner retained; no local scratch buffer, casts, goto, manual varargs, artificial arithmetic or unrelated reuse."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ResetRound(void)#1": {
+    "body_sha256": "3413b538defcc42c292fe5a878dee8eea7be84fa60cd9ea0af746a5a48d25902",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "All reset fields, whole removed-army memset and2x20 army loop read. Real flag union and army pointer into actual row retained. S62 unused word removal changes452-byte text without size change; retained. B83 live manager, valid creature/lifecycle and spell-round owners required; no fabricated aggregate or manual varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CheckWin(struct tag_message * message)#1": {
+    "body_sha256": "bbd9c40fcbcb6ada9736df26ebad39a43650623f7ca8778ae819a22bcedf7a85",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full win/draw/retreat selection,20-slot surviving nonsummoned scan and optional message write read. Draw excluded before indexing result row; real flag and executive message views retained. S62 unread word removal changes517-byte text. B83 valid current side and writable message when visible combat ends are contracts; no new guard or fake storage."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::GetCommand(i32 hexIndex)#1": {
+    "body_sha256": "2992e6efe6b1e5343b341173a0152f92518b0ac194cf8b384d86b44bdebe07f4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete command selection and shared small-view tail read. C68 both removing two inner i8 casts and typed-enum conditional keep1014 bytes but change text; explicit enum/narrowing boundary retained. G77 if/else and guarded switch yield1010/1002; original goto retained. S62 all4 column/row removal subsets change code. B83 sentinel/hex/selected target coherence, side/index and wide placement contracts; no manual varargs or fake aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::RightClick(i32 hexIndex)#1": {
+    "body_sha256": "a585b742993e65915c8cadfdb5550f24d4cdb69e3c72d9abcfdde4f7155c700b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full right-click selection/dialog path read. Incoming hex chooses side but m_selectedHex chooses army index; only in-tree caller passes m_selectedHex, so no normal mismatch demonstrated. S62 all8 unused col/row/armyIdx subsets change491-byte body, retained. B83 caller coherence, live hero/army/resource and hex domains remain. No cast, union, goto, manual varargs or fake aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::DoCommand(CombatMessageCommand command)#1": {
+    "body_sha256": "45ad7bcce35ae615e6017b93af9834cbc1642d83fd0c41cf158019b0fa680993",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full command switch writes action/extra/grid globals from selection; related pending-action roles retained. S62 two unused words and assigned-unread currentArmy tested in complete8 subsets, all change814-byte original. B83 approved selected/current army/hex and spell/surrender parameter domains required; no casts/goto/manual varargs/fake aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:WinCombatHandler(struct tag_message & message)#1": {
+    "body_sha256": "fc1cc62c36b0b4bf32ba967803f07645503492a097fefb3c3e66b286e1eabb06",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Whole win/lose widget input, successive artifact/skeleton/spell panel dispatch and animation switch read. G78 structured next-control shared exit changes1267 to1259; S62 unread finalDelay changes1260, originals retained. Actual tag_message union and40-byte filename buffer retained; fixed strings need13 bytes with NUL. B83 transfer index/count, result-side, icon frames and window lifetime contracts; fixed names fit. No manual varargs, owner recovery or fake stack aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ClearWinLoseBottom(class heroWindow * window)#1": {
+    "body_sha256": "efab8c3b48ad26325d659c38bfcd396d055a1cf47c71aa13b9d2460cc1c99cf3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Two actual25-element widget-pointer arrays traversed, each nonnull owner removed and deleted then cleared. B83 valid window ownership required; no fake contiguous owner or text/member recovery. No casts, goto, manual varargs, stack aggregate or unrelated roles."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ShowWinLoseArtifact(class heroWindow * window,ArtifactType artifact)#1": {
+    "body_sha256": "1afa7296445af31792c249eeb6223e1a26a6b514455f1d115c3a318d8c784c9a",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Complete artifact result panel read. Typed allocator cast to char retained; U01 widget payload is real. B83 retail103-name table has no percent directives and max29 bytes with NUL, fitting60-byte allocation; artifact ID and allocation/window lifetime still required. S62 all4 unused geometry subsets change669-byte original. Existing private EH owner/site-model gap explicitly open; no byte-only closure claim."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ShowSkeletons(class heroWindow * window)#1": {
+    "body_sha256": "194e7412de1fe7dba97dc651a221f55bdd3d2a20cdf58f31093ef49d77195e3f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete skeleton panel read. Actual allocator char cast and widget payload retained. B83 nine-byte decimal buffer supports at most8 characters, not arbitrary signed32 value; DoVictory producer accumulates bodies and float-converts without proving that bound. Fixed global descriptive text and pickup filename fit768 under declared values. Existing EH model gap retained; no goto, fake aggregate or manual varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ShowEagleEyeSpell(class heroWindow * window)#1": {
+    "body_sha256": "9c05621536be55142e9a864a5a55af456d73e5d128448dc2105c9e6af1a0a398",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete Eagle Eye panel read. C68 removes u8 iconIndex-to-i16 parameter cast, two-arm text exact and combined native topology identical including EH sections. Actual allocator cast and message view retained. B83 all65 spell names max21 including NUL fit200, global description114 under terminated13-byte hero name; spell/result and resource/window lifetimes remain. No goto/manual varargs/fake aggregate; retail EH model gap not waived."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ShowDeadArmies(class heroWindow * window)#1": {
+    "body_sha256": "a4226bcdc003d0f8c1d8593553eaaf192db66c0b0d952bee210f7a0b551d0662",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire casualty owner: real2x20 type/count arrays and two side counts, initialization25 widget slots, display max7 per side. R21 separates widget index from side in2 arms, same2517 size but changed text; retained. S62 complete bounded13-shape family (not full512 subsets) changes all nonoriginal text. B83 9-byte decimal allocations still need quantity bound; headings fit30/10. Allocator casts real; private EH model gap retained, no fake stack aggregation or manual varargs."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::DoVictory(CombatResult winningSide)#1": {
+    "body_sha256": "dca92b580e933ee39dc8750eba135038492c02f8e60bf20819f7b7337dcd7cae",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "All239-line victory cleanup/necromancy/fades/artifact transfer/UI read. Actual flag/message views and double-to-i32 necromancy conversion retained; fixed double.1 operand pinned. R21 split fade/artifact counter and S62 unused cost each change2839-byte text, originals retained. B83 fourteen hero slots bound transfer count<=14 within16; valid artifact/spell IDs, bodies arithmetic and quantities remain contracts. Retail experience114 fits152, combined victory129 fits768 with terminated hero name. EH model gap open."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::DoLoseWindow(void)#1": {
+    "body_sha256": "62680105dbb11c508da63c29a90cbb36f98b141aa1f2dd57155981eb517b86c8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full loss-side selection, fixed13-byte animation filename in actual52-byte buffer, tagged resource/text message and dialog lifetime read. S62 unused initialized word removal899->892 retained. B83 first equality checks can index player -1 if giCurPlayer is also -1 before later sentinel guard; normal reachability unproved, no behavioral fix. Loss text max61 fits768 with terminated hero name. Existing EH model gap retained; no casts/goto/manual varargs/fake aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::DoSurrender(void)#1": {
+    "body_sha256": "16f3f2fcc0e6216b17b356a82254da9357f28a73dda36d7f159e49c10b1b4e2b",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full surrender cost20-slot accumulation, diplomacy scaling, portrait/message/dialog read. C68 u8 portrait cast removed through default vararg int promotion, two-arm and combined native proof; three real float truncations retained with four fixed operands checked. S62 all8 unused geometry/dialog scalar subsets change957 bytes, originals retained. B83 valid sides/heroes/player/monster/skill and arithmetic required; portrait filename and116-byte quoted cost text fit gText. EH model gap remains."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CheckChangeSelector(void)#1": {
+    "body_sha256": "9102635ffbf8ac3adc28b1812347c8ecebe27a599103c3294fb98f0f53fed528",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Visible-combat guard then actual current army selection/limit hex update/redraw/small view. B83 current side/index, manager and rendering lifecycle required. No casts, unions, goto, manual varargs, aggregate, owner recovery or unrelated variable roles."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CheckCastleAttack(void)#1": {
+    "body_sha256": "8aa2b26cdd1285781f848b9cfac7af6d7f25aa32ee45d08110cabf4c202cf4a8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Castle mode and concrete attacker/defender side guards drive positive counters down; catapult and three tower dispatches retained. Real two-side counters, no fabricated array or stale index role. B83 callbacks and castle/tower lifecycle required; no casts/union/goto/varargs/unread storage."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CheckGetAIMove(void)#1": {
+    "body_sha256": "b91cdd98d96f012f5fb63ba15699b19812ddc872a4434ab2a142085ff2dd1341",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Retreat queried before and after optional spell AI because spell processing can change state; same retreat role, not unrelated reuse. Side/player flags gate automation; successful spell returns before move. B83 current side/player and downstream AI lifecycle required. No casts/union/goto/varargs/fake stack owner."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::GetControl(void)#1": {
+    "body_sha256": "89c564faa2643ada0e5a51cab36e64616d1e7d308660a6aae0771ad314e0f143",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full network control predicate and shared setup_view tail read. G79 if/else restructuring335->328; S62 duplicate command-store removal335->323. Both originals retained, including contradictory nested human-player predicate actually in retail. B83 current and two player indices/sentinels require coherence. No casts/union/varargs/fake aggregate or member-to-owner arithmetic."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ResetMouse(void)#1": {
+    "body_sha256": "d4bbe2a9b49f8ef280eada394219bae6272cf64bc4b07e2b35712e7b873c91f9",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual mouse x/y outputs populate only MESSAGE_MOUSE_MOVE fields before dispatch; unrelated tag_message payload slots need no blanket initialization. Guards no-show/control/nonnegative player but upper ranges remain contracts. No casts/goto/manual varargs/fake aggregate or owner recovery."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ProcessNextAction(struct tag_message & message)#1": {
+    "body_sha256": "3a1bdfffd706550874ef1245f62cd7ffb94726b90196ae0c9bace263d20424df",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete network serialization/action dispatch/shared cleanup read. Real four-i32 actionData owner serialized for16 bytes; char reinterpretation retained. G80 do-single-pass cleanup alternative preserves1547 size but changes bytes/sites, original gotos retained. Pre-action win leaves CONSUME while post-action wins set FORWARD; cleanup always clears processing flag/resets mouse. Flag views genuine. B83 action/side/player/hex/amount inputs and network state remain contracts; no manual varargs/fake stack owner."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ResetCyclingCreatures(void)#1": {
+    "body_sha256": "6f641a1d8c1c5e1a7a9cf028bdfacab524d980ef79fcd49d47201e86cbdb9bbf",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Both two-side creature passes, rotate count, repeated currentTroop assignment and timers read. S62 complete8 products cover unused word, initial null and repeated pointer store; every nonoriginal changes529-byte body. Real row owners and flag view retained; B83 live count<=20 and animation/resource state contract. No goto/cast/manual varargs/fake aggregate/unrelated reuse."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ResetCycleTimers(void)#1": {
+    "body_sha256": "ea04fd7450ff3d625490014823aef11e3ca3af0ba963800aa1e252fd616920ba",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Full two-side cycle timer reset and per-army random stand offset read. Actual i32l tick ABI retained, real army row/count and delay domains required. No explicit cast, union, goto, manual varargs, fake aggregate, unrelated reuse or artificial owner arithmetic."
+  },
+  "src/SOURCE/COMMAND.cpp:InCombatArea(i32 x,i32 y)#1": {
+    "body_sha256": "62202979059d19b7fff0a56222e1e42db93e2245c24c0e834a9e70eb73670728",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Pure x/y rectangular predicate with fixed screen width and combat-area height; comparisons accept arbitrary signed inputs without buffer/index arithmetic. No occurrence of any of the ten debt patterns."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::CycleCombatScreen(void)#1": {
+    "body_sha256": "faa99eef73a60b0ab84b61eb41e7489a591cb05cefc7bcc6d7f5513cbcfe74dd",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire hero overlay/death/idle selection,2x20 cycle flags and creature animation processing read. C68 numerator float cast removed with real float100 denominator; two real timer truncations and enum construction retained. Four fixed numeric operands pinned. G81 guarded work2352->2347 and R21 separate hero/army indices same2352 changed text; originals retained. B83 count<=20, sprite/sequence/frame/standing-chance domains, positive standing count, coherent nextHeroAnimation and finite timers required. Actual2-slot and2x20 arrays are not fake stack owners."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::SetCombatViewArmySmallLevel(i32 level)#1": {
+    "body_sha256": "76b48f48358efcb73a8a642cf78fd692d3e16eb0f7e503aec402d7404a42c834",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Writes requested combat-army information preference, redraws and persists. B83 preference/render lifecycle domain delegated; no local array/cast/union/goto/varargs/storage aggregate/owner recovery or unrelated role."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::SetCombatGrid(i32 showGrid,i32 showMouseHex,i32 shadeLevel)#1": {
+    "body_sha256": "86780bc1e45cb75fdc4966db2ba605a6ada3e5a34d21bc8e7ddd277f37a07b13",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "No-change early return then clears mouse grid, writes three preferences, rebuilds current army grid/redraws/resets/persists. B83 current army and rendering/preference domains required. No cast/union/goto/manual varargs/fake aggregate/owner arithmetic or unrelated reuse."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::AddArmy(CombatSide side,CreatureType monsterType,i32 quantity,i32 hex,MonsterFlags flags,i32 animate)#1": {
+    "body_sha256": "857fac768023992854886352716133207ffbb8c699fd4d8eb911009496d2097a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete20-slot search prefers unused or eligible dead elemental/mirror stack, validates found index before Init/resources/count and optional fizzle. Real flag union and owner retained; no fake array or unrelated reusedArmy scalar role. B83 caller side/monster/quantity/hex/wide placement and resource/rectangle domains required; hex indexing itself lacks local bounds. No casts/goto/manual varargs/unread aggregate."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::SetupSmallView(void)#1": {
+    "body_sha256": "d41911354b2bd448a2ea4addfc2d8a0b0495ec9aeaba6c24f1f134129a614f84",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full two small-view slots and human control logic read. S62 complete4 unused-word subsets change317-byte original, retained. B83 side/player/army and display-coordinate lifecycle required; real slot arrays, no casts/union/goto/manual varargs/fake aggregate or unrelated role."
+  },
+  "src/SOURCE/COMMAND.cpp:combatManager::ViewBallista(i32 quickView)#1": {
+    "body_sha256": "6feb01b053d71d1898fdadeaa795feacf89cfa6ec18f4fdda91a6e35b514c06f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Whole ballista/left/right tower formatter read. Real300-byte description repeatedly replaced then appended at most3 times to gText; retail literals prove max101-byte part and conservative313-byte total for arbitrary i32 numeric values, within768. B83 valid defender town and wall/building/resource state required. No casts/goto/manual varargs/fake aggregate/unrelated roles. Full686 bytes/sites/45 ordered targets pass; helper-inclusive sema view adds4 trailing blocks not part of function."
   }
 }

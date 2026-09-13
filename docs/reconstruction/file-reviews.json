@@ -790,5 +790,13 @@
   "src/SOURCE/FLY.cpp": {
     "sha256": "5bb8e709115b06f114845c41d561a12fe850e7f46fa937cb78d0045a2c0afef1",
     "note": "Full476-line source read, all4 physical functions reconciled with private enum, double1.3 duration macro, includes and EOF; no separate FLY header. C67 six casts removed, ten real numeric boundary casts retained; S61 six unused scalars/one overwritten store measured in complete8/8/2 products and retained. B82 adjacency producer rules out apparent CanFit null case under initialization; animation/placement/timing contracts explicit. All7 emitted functions and allocated sections unchanged; four full retail bodies plus fixed private-double supplement pass."
+  },
+  "src/SOURCE/COMMAND.cpp": {
+    "sha256": "95bffe129f66f11dc34c6e7b89a82e86c411775e6819ff73621409dac6e3d4f8",
+    "note": "Full3263-line source read:36 physical functions, private enum/macro domains, includes and15 EOF data globals reconciled. U17 actual packet owner; C68 nine scalar casts removed; A03 actual adjacency row; six G76-G81 flow families, S62 storage and R21 role splits measured/retained. All32 matrices176 arms complete. B83 retail strings prove selected buffers, quantity/network/placement/state contracts explicit. Combined all98 native objects/1826 emitted instances and allocated sections/ordered relocs unchanged; full36 byte checks plus20 fixed numerical operands, seven existing EH model gaps explicitly remain."
+  },
+  "include/SOURCE/COMMAND.h": {
+    "sha256": "5e56b46fea0a207684f62e055e6dbea0d91f67d8309246ac83fcf392053be277",
+    "note": "Complete48-line recovered header, enums, declarations, packed layout and SIZE read. U17 replaces false25-byte packet/member text view with actual256-byte RemoteMessage-compatible owner: sender0,id1,type5,command6,payloadSize7, tagged action/text payload9 of247 bytes. Real command-gated union; no fake reserved bytes. Entire producers TransmitRemoteData/GetRemoteData and PopNetBox sender role checked; only pointer view, no new allocation growth. All98 native objects unchanged; network validation not asserted."
   }
 }

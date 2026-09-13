@@ -359,7 +359,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
                     giNextActionGridIndex2 = packet->nextActionGridIndex2;
                     goto ProcessAction;
                 case REMOTE_COMMAND_MESSAGE:
-                    PopNetBox(reinterpret_cast<char*>(&packet->nextAction), packet->messageLength);
+                    PopNetBox(packet->text, packet->sender);
                     break;
             }
         }
@@ -482,7 +482,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             }
         } else {
             directionHexes[direction_28] =
-                *(&m_adjacency[0][0] + targetHex * COMBAT_DIRECTION_ADJACENT_COUNT + direction_28);
+                m_adjacency[targetHex][direction_28];
         }
 
         if (HAS(currentArmy_1->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
@@ -597,18 +597,18 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                 );
             } else if (direction_28 == IDX(COMBAT_DIRECTION_WIDE_WEST)) {
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_START] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_CENTER] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_END] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
             } else {
                 m_directionMap[DIRECTION_SPECIAL_SECOND_SECTOR_CENTER] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
                 m_directionMap[DIRECTION_SPECIAL_SECOND_SECTOR_NEXT] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
                 m_directionMap[DIRECTION_SPECIAL_SECOND_SECTOR_PREVIOUS] =
-                    static_cast<i8>(outputDirection_7);
+                    outputDirection_7;
             }
         }
     }
@@ -1838,7 +1838,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         EAGLE_ICON_WIDTH,
         EAGLE_ICON_HEIGHT,
         "spells.icn",
-        static_cast<i16>(gsSpellInfo[IDX(newSpell)].iconIndex),
+        gsSpellInfo[IDX(newSpell)].iconIndex,
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
         WIDGET_KIND_ICON_CENTERED,
@@ -2429,7 +2429,7 @@ i32 combatManager::DoSurrender(void) {
     sprintf(
         gText,
         "port%04d.icn",
-        static_cast<i32>(m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_portrait)
+        m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_portrait
     );
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
@@ -2917,7 +2917,7 @@ void combatManager::CycleCombatScreen(void) {
             currentArmy_2 = gpCombatManager->m_armies[IDX(side_7)] + index_0;
             if (cycleArmy[IDX(side_7)][index_0] != 0) {
                 if (currentArmy_2->m_animationSequence == ARMY_ANIMATION_STAND) {
-                    roll_3 = static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
+                    roll_3 = Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX)
                            / COMBAT_IDLE_ROLL_DIVISOR;
                     accumulatedChance = 0.0f;
                     currentArmy_2->m_standingAnimation =

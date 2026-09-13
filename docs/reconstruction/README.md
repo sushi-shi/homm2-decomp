@@ -439,6 +439,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   scalar/store deletions were measured and retained. The adjacency producer
   excludes the apparent `CanFit` null case under initialized-table contracts;
   [animation, geometry and timing limits remain explicit](C67-S61-B82.md).
+- U17/C68/A03/S62/R21/G76-G81/B83: all36 COMMAND functions and header reviewed.
+  Recovered the256-byte command-tagged network packet, removed ten written
+  casts (nine scalar), and restored the actual adjacency row expression.
+  All32 measured families/176 arms completed; unsupported control-flow,
+  unused-scalar/store and role splits retained. Combined all98 native objects
+  unchanged; twenty fixed numerical operands and selected text bounds checked.
+  [Quantity/network contracts and seven existing EH model gaps remain explicit](U17-C68-A03-S62-R21-B83.md).
 
 ## Build setup observations
 

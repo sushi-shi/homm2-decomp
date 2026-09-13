@@ -8,8 +8,7 @@
 struct tag_message;
 
 H2_ENUM_BEGIN(CombatRemotePacketConstant)
-    COMBAT_REMOTE_PACKET_PREFIX_RESERVED_SIZE = 4,
-    COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE   = 2
+    COMBAT_REMOTE_PAYLOAD_CAPACITY = 247
 H2_ENUM_END(CombatRemotePacketConstant)
 
 H2_ENUM_CLASS_BEGIN(CombatAction)
@@ -25,18 +24,23 @@ H2_ENUM_CLASS_END(CombatAction)
 
 #pragma pack(push, 1)
 struct CombatRemotePacket {
-    i8 messageLength;
-    char reserved1[COMBAT_REMOTE_PACKET_PREFIX_RESERVED_SIZE];
+    i8 sender;
+    i32 id;
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
-    char reserved7[COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE];
-    CombatAction nextAction;
-    i32 nextActionExtra;
-    i32 nextActionGridIndex;
-    i32 nextActionGridIndex2;
+    i16 payloadSize;
+    union {
+        struct {
+            CombatAction nextAction;
+            i32 nextActionExtra;
+            i32 nextActionGridIndex;
+            i32 nextActionGridIndex2;
+        };
+        char text[COMBAT_REMOTE_PAYLOAD_CAPACITY];
+    };
 };
 #pragma pack(pop)
-SIZE(CombatRemotePacket, 0x19);
+SIZE(CombatRemotePacket, 0x100);
 
 MessageDispatchResult WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);
