@@ -17328,9 +17328,9 @@
     "note": "Single readiness assignment; no casts, unions, gotos, pointers, scratch, varargs or bounds regions."
   },
   "src/SOURCE/GAME.cpp:game::NextPlayer(void)#1": {
-    "body_sha256": "4fd94678e667645d37a7bd6c86bfb7b0692140e69a91cbe179f9814108dc567f",
+    "body_sha256": "37382f59ca43c4f682a0935e2567bd69ce3910bb21a36ab07a55f4434e9385b6",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -17338,10 +17338,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C42 event-flag integer views plus real enum rebuilds; C34 player mask and C37 autosave literal candidates. S42 humansAlive/count loop computed but unread. B61 availableHero IDs, six-player count/current/watch mappings, hero-list8/terrain/music domains and cPlayerNames termination required; skip-dead loop needs a survivor. No goto, fake aggregate, manual varargs or owner trick; state progression locals retain roles."
+    "note": "C42 applies two typed HeroEventFlag compound clears, removing integer views and enum rebuilds; C34 player mask uses its u8 destination and C37 autosave literal flows to the existing const-correct API. S42 complete 72-arm product retains humansAlive and its unread six-player count: removal changes1290 to1216 bytes. All flag/scalar alternatives with count retained have identical native bytes. B61 availableHero IDs, six-player count/current/watch mappings, hero-list8/terrain/music domains and cPlayerNames termination remain contracts; skip-dead loop requires a survivor. No goto, fake aggregate, manual varargs or owner trick. See C42-S42.md: all98 native objects/1826 functions and full ordinary retail bytes,size,DIR32 sites,ordered targets pass without exceptions; both dialects pass."
   },
   "src/SOURCE/GAME.cpp:game::ComputeDailyGold(i32 player)#1": {
     "body_sha256": "c917b20fcc4fd36252ecf043827379ccfee91fb228584ad7aa2f815848955dc2",
@@ -17360,9 +17360,9 @@
     "note": "Seven real floating-to-i32 difficulty/handicap conversions preserve truncation. Fixed144 mine/72 town scans fit; B61 player0..5, hero count<=8, IDs54 and Estates skill index needed. Income arithmetic requires representable values. No union/goto/fake aggregate/varargs/owner recovery; dailyGold always accumulator."
   },
   "src/SOURCE/GAME.cpp:game::PerDay(void)#1": {
-    "body_sha256": "3f4926e36ae021289e26d3192e1b3439869878b97aa2ee77fa9acdc63effbdb1",
+    "body_sha256": "ced0a93e67348994121c827bd6e0c6515c10ccfdafb58a6600909aead2621de3",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
       "gotos": "absent",
       "address": "absent",
@@ -17370,10 +17370,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "open",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "C42 flag scalar view, true handicap float-to-int and mana i16 narrowing. U13 daily-event view clears shared bytes. R09 player alternates player/mine/town/hero indices; S42 income8 unread. B61 mine owner/resource domain (upper bound alone permits negative type), playerCount<=6 and hero/town state required. Day guard1..6 maps to resource0..5 safely; fixed54/72 loops fit. No goto, fake stack, artificial address or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
+    "note": "C42 applies the typed weekly-flag compound clear and two natural i16 mana assignments; the handicap float-to-i32 conversion retains real truncation-before-subtraction semantics. S42 complete24-arm product retains unread income8: deletion preserves2576-byte size and graph but changes the frame0x38 to0x34 and stack operands. R09 still tracks player reused across player/mine/town/hero phases. U12/U13 retain the single signed town-owner table and unsigned daily-construction bitset, complete consumer/layout proof in U12-U13.md. B61 mine owner/resource domains (upper bound alone permits negative type), playerCount<=6, fixed54 heroes/72 towns, occupant IDs and mana arithmetic require valid game state. Day guard1..6 maps to resources0..5 safely. No goto, fake aggregate, artificial address or manual varargs. C42-S42.md: all98 native objects/1826 functions and full ordinary retail bytes,size,DIR32 sites,ordered targets pass without exceptions; both dialects pass. No protocol, lifecycle or bounds hardening."
   },
   "src/SOURCE/GAME.cpp:game::PerWeek(void)#1": {
     "body_sha256": "3520f2fc276abb2187b55f6a72e4786859c1c2afdeb6230611e1a5e17037e342",

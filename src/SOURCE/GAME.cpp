@@ -4208,14 +4208,8 @@ void game::NextPlayer(void) {
     i32 index;
     i32 H2_UNUSED(humansAlive);
 
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags = HeroEventFlag(
-        static_cast<i32>(m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags)
-        & ~IDX(HERO_EVENT_WEEKLY_VISIT)
-    );
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags = HeroEventFlag(
-        static_cast<i32>(m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags)
-        & ~IDX(HERO_EVENT_WEEKLY_VISIT)
-    );
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
@@ -4225,7 +4219,7 @@ void game::NextPlayer(void) {
                 humansAlive++;
         }
         SaveGame(
-            const_cast<char*>("\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */),
+            "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */,
             1,
             0
         );
@@ -4247,7 +4241,7 @@ void game::NextPlayer(void) {
     } while (gpGame->m_playerDead[giCurPlayer]);
 
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
-    giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
+    giCurPlayerBit = 1 << giCurPlayer;
     for (index = 0; index < m_players[giCurPlayer].m_heroCount; index++) {
         hero* currentHero = &m_heroRecs[m_players[giCurPlayer].m_heroIds[index]];
         currentHero->m_mobility = currentHero->CalcMobility();
@@ -4474,9 +4468,7 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
-        m_heroRecs[player].m_eventFlags = HeroEventFlag(
-            static_cast<i32>(m_heroRecs[player].m_eventFlags) & ~IDX(WEEKLY_HERO_RESERVED_FLAG)
-        );
+        m_heroRecs[player].m_eventFlags &= ~WEEKLY_HERO_RESERVED_FLAG;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_GOLD; resource8++) {
@@ -4509,7 +4501,7 @@ void game::PerDay(void) {
         if (restoredSpellPoints14 > maxSpellPoints9)
             restoredSpellPoints14 = maxSpellPoints9;
         if (restoredSpellPoints14 > currentHero7->m_spellPoints)
-            currentHero7->m_spellPoints = static_cast<i16>(restoredSpellPoints14);
+            currentHero7->m_spellPoints = restoredSpellPoints14;
         if (HAS(currentHero7->m_eventFlags, HERO_EVENT_MAGIC_WELL))
             H2_ENUM_CLEAR_FLAG(currentHero7->m_eventFlags, HERO_EVENT_MAGIC_WELL);
     }
@@ -4523,7 +4515,7 @@ void game::PerDay(void) {
             maxSpellPoints9 =
                 townHero6->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
             if (maxSpellPoints9 > townHero6->m_spellPoints)
-                townHero6->m_spellPoints = static_cast<i16>(maxSpellPoints9);
+                townHero6->m_spellPoints = maxSpellPoints9;
         }
     }
 }
