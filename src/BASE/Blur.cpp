@@ -87,7 +87,7 @@ void DoBlur(
         u8* input   = destination->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
         u8* outputPixel = source->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
 
-        for (x = BORDER_RADIUS; x < LOGICAL_SCREEN_WIDTH - BORDER_RADIUS; x++) {
+        for (x = BORDER_RADIUS; x < IDX(LOGICAL_SCREEN_WIDTH) - BORDER_RADIUS; x++) {
             blendIndex = BLUR_TAP_SUM(redTable, input) >> COMPONENT_SHIFT << RED_INDEX_SHIFT;
             blendIndex += BLUR_TAP_SUM(greenTable, input) >> COMPONENT_SHIFT
                           << GREEN_INDEX_SHIFT;

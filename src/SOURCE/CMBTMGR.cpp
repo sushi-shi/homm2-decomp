@@ -2167,8 +2167,8 @@ i32 combatManager::ShotIsThroughWall(
         rowStride = rowSpan > 0 ? 1 : -1;
         columnStride = static_cast<float>(columnDist) / abs(rowSpan);
     }
-    columnStride /= COMBAT_WALL_TRACE_SUBDIVISIONS;
-    rowStride /= COMBAT_WALL_TRACE_SUBDIVISIONS;
+    columnStride /= IDX(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    rowStride /= IDX(COMBAT_WALL_TRACE_SUBDIVISIONS);
     traceColumn = sourceColumn;
     traceRow = sourceLine;
     for (traceIx = 0; traceIx < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;

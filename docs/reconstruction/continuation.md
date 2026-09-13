@@ -1,9 +1,18 @@
 # Continuation after PRs #59 and #63
 
 These PRs are verified cleanup checkpoints, **not completion of the broader
-semantic/reconstruction audit**. Merge order is #59 into `decomp-gold-2.1-buka`,
-then #63 into decomp. If #59 is squash-merged, reconcile #63 with that new base
-before merging; do not import its historical base commits again.
+semantic/reconstruction audit**. Both were squash-merged into decomp: #59 as
+`8a44b8247`, then #63 as `cb73b3b84`. The second PR's ancestry was reconciled
+against the content-identical #59 squash without changing its validated tree.
+The full historical documentation is retained deliberately as checkpoint evidence.
+
+The subsequent generated-build compatibility pass adds explicit numeric-domain
+conversions and actual Win32 paint handle types. Russian/English generated builds,
+Russian/English VC6 builds, all 98 raw-object comparisons and 988 selftests (seven
+skips) pass. No enum values or runtime behavior change. Latest review-key counts
+after this pass: 802/1,654 matching hashes, **852 pending function reviews**
+(712 stale hashes, 140 missing keys), **138 orphaned historical keys**;
+33/231 file hashes match. These supersede the earlier checkpoint counts below.
 
 ## Integration checkpoint
 

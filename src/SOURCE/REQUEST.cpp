@@ -643,25 +643,25 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
                                            < FILE_REQUESTER_MAP_SIZE_ICON_FIRST
-                                                 + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                 + IDX(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + IDX(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + IDX(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_VICTORY;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_LOSS_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + IDX(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_LOSS;
                                 }
                                 break;
@@ -801,7 +801,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + IDX(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                                     goto SelectListItem;
@@ -810,7 +810,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + IDX(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                                     goto SelectListItem;
@@ -819,7 +819,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + IDX(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                                     goto SelectListItem;
@@ -827,7 +827,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + IDX(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                                     goto SelectListItem;
@@ -835,7 +835,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_LIST_TEXT_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_LIST_TEXT_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + IDX(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult =
                                         message.payload.widget.id - FILE_REQUESTER_LIST_TEXT_FIRST;
                                     goto SelectListItem;

@@ -1695,7 +1695,7 @@ void combatManager::Armageddon(void) {
         memcpy(
             m_backgroundBuffer->m_pixels,
             gpWindowManager->m_screen->m_pixels,
-            LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+            IDX(LOGICAL_SCREEN_WIDTH) * COMBAT_AREA_HEIGHT
         );
 
         for (shakePass = 0; shakePass < SPELL_ARMAGEDDON_SHAKE_PASS_COUNT; ++shakePass) {
@@ -1901,7 +1901,7 @@ void combatManager::Ripple(i32 strength) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        IDX(LOGICAL_SCREEN_WIDTH) * COMBAT_AREA_HEIGHT
     );
     DoRipple(m_backgroundBuffer, gpWindowManager->m_screen, COMBAT_AREA_HEIGHT, strength);
     m_backgroundDrawn = false;
@@ -1917,7 +1917,7 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        IDX(LOGICAL_SCREEN_WIDTH) * COMBAT_AREA_HEIGHT
     );
     DoBlur(
         m_backgroundBuffer,
@@ -3990,7 +3990,7 @@ void combatManager::Earthquake(void) {
     memcpy(
         m_backgroundBuffer->m_pixels,
         gpWindowManager->m_screen->m_pixels,
-        LOGICAL_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
+        IDX(LOGICAL_SCREEN_WIDTH) * COMBAT_AREA_HEIGHT
     );
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
         for (frame = 0; frame < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame) {

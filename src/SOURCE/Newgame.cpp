@@ -972,7 +972,7 @@ VA(0x0047734a, 0xdd1)
         tag_message mapWindowMessageTemp;
         i32 helpDialogIndexLocal;
         i32 H2_UNUSED(unusedSender);
-        char mapNamePacket[MAP_HEADER_NAME_SIZE + GAME_SETUP_BUFFER_SIZE];
+        char mapNamePacket[IDX(MAP_HEADER_NAME_SIZE) + GAME_SETUP_BUFFER_SIZE];
 
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
@@ -1477,7 +1477,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_DELETE:
-            if (NGKPcursorIndex < strlen(cNGKPCore)) {
+            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore)) {
                 strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
             }
@@ -1489,7 +1489,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (NGKPcursorIndex < strlen(cNGKPCore))
+            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore))
                 ++NGKPcursorIndex;
             break;
 

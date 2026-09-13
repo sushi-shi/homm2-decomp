@@ -535,7 +535,7 @@ void SetMenus(HMENU menu, b32 enabled) {
     count = GetMenuItemCount(menu);
     for (index = 0; index < count; index++) {
         id = GetMenuItemID(menu, index);
-        if (id == -1) {
+        if (id == static_cast<u32>(-1)) {
             SetMenus(GetSubMenu(menu, index), enabled);
             disabled = 0;
         } else {

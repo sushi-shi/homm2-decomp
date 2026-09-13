@@ -152,7 +152,7 @@ void searchArray::PushPoint(
             gSearchHigh = gSearchMiddle;
     }
 
-    if (gSearchMiddle < m_queueCount) {
+    if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
         memmove(
             gSearchQueueNode + 1,
             gSearchQueueNode,
@@ -615,7 +615,7 @@ void searchArray::PushCombatPoint(
             high = middle;
     }
 
-    if (middle < m_queueCount) {
+    if (static_cast<u32>(middle) < m_queueCount) {
         memmove(node + 1, node, (m_queueCount - middle) * sizeof(searchNode));
     }
     m_queueCount++;

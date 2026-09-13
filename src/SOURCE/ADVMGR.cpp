@@ -4198,10 +4198,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         pixelPointer = line + offX;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                line += LOGICAL_SCREEN_WIDTH * RADAR_SMALL_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                line += LOGICAL_SCREEN_WIDTH * RADAR_MEDIUM_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 ++ymod;
@@ -4211,7 +4211,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 if (ymod != 0) {
                     line += LOGICAL_SCREEN_WIDTH;
                 } else {
-                    line += LOGICAL_SCREEN_WIDTH * RADAR_MEDIUM_CELL_PIXELS;
+                    line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
                 }
                 break;
             case MAP_DIMENSION_XLARGE:
@@ -4342,7 +4342,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixelPointer + LOGICAL_SCREEN_WIDTH * RADAR_MEDIUM_CELL_PIXELS,
+                        pixelPointer + IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS,
                         color,
                         RADAR_SMALL_CELL_PIXELS
                     );
@@ -5384,13 +5384,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             }
             updated = true;
 
-            if (m_bottomViewPrimaryWidgets[ENEMY_TURN_SAND_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
+            if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_SAND_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id = ENEMY_TURN_SAND_ID;
                 message.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
                 m_adventureWindow->BroadcastMessage(message);
             } else {
-                m_bottomViewPrimaryWidgets[ENEMY_TURN_SAND_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
+                m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_SAND_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
                     ENEMY_TURN_ANIMATION_X,
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
@@ -5402,11 +5402,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     WIDGET_KIND_ICON_DIRECT,
                     1
                 );
-                if (m_bottomViewPrimaryWidgets[ENEMY_TURN_SAND_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
+                if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_SAND_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
                     MemError();
                 }
                 m_adventureWindow->AddWidget(
-                    m_bottomViewPrimaryWidgets[ENEMY_TURN_SAND_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
+                    m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_SAND_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
                     ENEMY_TURN_SAND_Z
                 );
             }
@@ -5419,14 +5419,14 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         if (iCurBottomViewEnemy != giCurPlayer) {
             iCurHourGlassPhase = 0;
         }
-        if (m_bottomViewPrimaryWidgets[ENEMY_TURN_CREST_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
+        if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_CREST_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = ENEMY_TURN_CREST_ID;
             message.payload.widget.data.value =
                 gpGame->m_players[IDX(static_cast<char>(giCurPlayer))].m_color;
             m_adventureWindow->BroadcastMessage(message);
         } else {
-            m_bottomViewPrimaryWidgets[ENEMY_TURN_CREST_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
+            m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_CREST_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
                 ENEMY_TURN_CREST_X,
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
@@ -5438,11 +5438,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (m_bottomViewPrimaryWidgets[ENEMY_TURN_CREST_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
+            if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_CREST_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
                 MemError();
             }
             m_adventureWindow->AddWidget(
-                m_bottomViewPrimaryWidgets[ENEMY_TURN_CREST_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
+                m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_CREST_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
                 ENEMY_TURN_CREST_Z
             );
         }
@@ -5454,13 +5454,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         updated = true;
         iLastHourGlassPhase = iCurHourGlassPhase;
         giLastHourGlassUpdateTime = KBTickCount();
-        if (m_bottomViewPrimaryWidgets[ENEMY_TURN_PHASE_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
+        if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_PHASE_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] != NULL) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = ENEMY_TURN_PHASE_ID;
             message.payload.widget.data.value = iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
             m_adventureWindow->BroadcastMessage(message);
         } else {
-            m_bottomViewPrimaryWidgets[ENEMY_TURN_PHASE_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
+            m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_PHASE_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] = new iconWidget(
                 ENEMY_TURN_ANIMATION_X,
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
@@ -5472,11 +5472,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (m_bottomViewPrimaryWidgets[ENEMY_TURN_PHASE_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
+            if (m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_PHASE_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST] == NULL) {
                 MemError();
             }
             m_adventureWindow->AddWidget(
-                m_bottomViewPrimaryWidgets[ENEMY_TURN_PHASE_SLOT + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
+                m_bottomViewPrimaryWidgets[IDX(ENEMY_TURN_PHASE_SLOT) + ADVMGR_BOTTOM_VIEW_ICON_FIRST],
                 ENEMY_TURN_PHASE_Z
             );
         }
@@ -8868,22 +8868,22 @@ void advManager::CheckScreenScroll(void) {
             if (mouseX < SCROLL_BORDER) {
                 if (mouseY < SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
-                } else if (mouseY > LOGICAL_SCREEN_HEIGHT - SCROLL_BORDER) {
+                } else if (mouseY > IDX(LOGICAL_SCREEN_HEIGHT) - SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
                 } else {
                     ScreenScroll(MAP_DIRECTION_WEST, 1);
                 }
-            } else if (mouseX > LOGICAL_SCREEN_WIDTH - SCROLL_BORDER - 1) {
+            } else if (mouseX > IDX(LOGICAL_SCREEN_WIDTH) - SCROLL_BORDER - 1) {
                 if (mouseY < SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
-                } else if (mouseY > LOGICAL_SCREEN_HEIGHT - SCROLL_BORDER) {
+                } else if (mouseY > IDX(LOGICAL_SCREEN_HEIGHT) - SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
                 } else {
                     ScreenScroll(MAP_DIRECTION_EAST, 1);
                 }
             } else if (mouseY < SCROLL_BORDER) {
                 ScreenScroll(MAP_DIRECTION_NORTH, 1);
-            } else if (mouseY > LOGICAL_SCREEN_HEIGHT - SCROLL_BORDER) {
+            } else if (mouseY > IDX(LOGICAL_SCREEN_HEIGHT) - SCROLL_BORDER) {
                 ScreenScroll(MAP_DIRECTION_SOUTH, 1);
             }
         }
@@ -8903,8 +8903,8 @@ i32 advManager::MouseInScrollZone(void) {
 
     gpMouseManager->MouseCoords(x, y);
     if (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT) {
-        if (x < SCROLL_BORDER || x > LOGICAL_SCREEN_WIDTH - SCROLL_BORDER - 1 || y < SCROLL_BORDER
-            || y > LOGICAL_SCREEN_HEIGHT - SCROLL_BORDER) {
+        if (x < SCROLL_BORDER || x > IDX(LOGICAL_SCREEN_WIDTH) - SCROLL_BORDER - 1 || y < SCROLL_BORDER
+            || y > IDX(LOGICAL_SCREEN_HEIGHT) - SCROLL_BORDER) {
             return 1;
         }
     }
