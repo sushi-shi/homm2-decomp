@@ -405,6 +405,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   retail behavior. O06's vaporization pointer issue and G67-G71/R17/C59/S56
   residuals remain explicit, not presented as closed.
 
+- C60/C61/S57/R18/B77: [spell-AI review](C60-C61-S57-B77.md) reconciles all11
+  SPELLAI functions. Four redundant float casts and one enum cast disappear;
+  the latter follows recovery of the lookup table's one-byte spell domain.
+  All98 native objects and1826 function instances remain unchanged. Complete
+  unused-local and side-role products retain their original source; explicit
+  operand checks distinguish verified retail scoring quirks from bounds and
+  lifecycle contracts still requiring caller guarantees.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

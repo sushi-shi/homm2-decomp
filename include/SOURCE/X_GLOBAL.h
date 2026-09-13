@@ -391,7 +391,7 @@ extern b32 gbProcessingCombatAction;
 extern RemoteNetworkProtocol iMPNetProtocol;
 extern i32 iLastDiffSendTo;
 extern u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
-extern u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
+extern H2_ENUM_STORAGE(SpellType, u8) giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT];
 extern SpellEffectDisplayType giSpellEffectShowType;
 extern i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT];

@@ -21646,5 +21646,165 @@
       "bounds": "retain"
     },
     "note": "Full two-side/twenty-slot clear loop read. O05 replaces first-row pointer flattening with the actual gArmyEffected[side][idx] owner after complete2/2 family and82-byte/full native/retail proof. Both loop ranges exactly match2x20 declared storage. No casts, union, goto, fake aggregate, manual varargs, unrelated reuse or before-owner pointer remains."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::DoSpellAI(CombatSide side,i32 restricted)#1": {
+    "body_sha256": "eb1e972a9598969e7929c82a82d6182d905fa8039c4ba4adb0188f9d75f7e28b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete hero/artifact eligibility, restricted spell list, mana weighting and action publication read. R18 spell local first indexes two sides then65 spells; all four real side/scope alternatives measured, none retained because frame/slot bytes differ despite532-byte sizes. Float effect truncation is real. B77 default combat IDs0..47 have positive mana costs even after the applicable artifact halving; eligibility and upper clamp prove modifier index1..10. Requires side0..1, matching m_currentSide and live hero; candidate hex is consumed only for positive effect. No union, goto, fake aggregate, manual varargs or artificial owner."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::DetermineEffectOfSpell(SpellType spell,i32 * bestEffect,i32 * bestHex)#1": {
+    "body_sha256": "091e3688deda9457c2a05ca02678ecfd413524905c0e97a45c188ff685bf3714",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire583-line mode selection, every spell score branch and scan transition read. Real effect truncations, U05 flags and creature pointer retained. S57 unused durMax removal changes3918 to3912 bytes; no arm retained. B77 duration index min(power-fullQuantityFlag,10) lacks lower clamp; requires positive effective power. CURE passes hex to a callee expecting army index; full retail call operands prove mismatch. Area search stops at43. bestHex remains unchanged on zero/default score; DoSpellAI guards use. All target side/slot/stat/table and representable numeric contracts remain explicit. No goto, fake aggregate, manual varargs, unrelated role reuse or fabricated owner."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellCreateCreature(i32 hex,SpellType spell)#1": {
+    "body_sha256": "ef7e16d1bc5109ff1401d352e9d91e74ced4d091af9788fa2f1ac13912a6e96f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full621-byte summon/mirror evaluation read. S57 computed spellPower, artifact doubling and mirrored quantity assignment are unread in final value; calls cannot be discarded as pure. R18 spellPower changes from hero power to creature quantity. B77 retail multiplies creature type ID by database fightValue, not computed quantity; mirror modifiers and cast chance follow. U05 shooter flag and float-result truncations are real. Summon capacity predicate checks hex space only; default mirror path requires valid occupied hex, side/slot and creature. No goto, fake aggregate, manual varargs or owner recovery."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::RawEffectSpellInfluence(army * target,ArmySpellInfluence influence)#1": {
+    "body_sha256": "b753f0c414beebb0af447a57faf161149f4b983383e51dabacb80ce082fc464a",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Entire fifteen-influence score switch read. C60 four redundant float casts removed after complete32-arm family; damageMin float conversion remains necessary and both dragon/shooter ratios remain integer division. C61 typed one-byte spell table removes one functional enum cast after all-consumer review,16-byte retail data and full98-object native proof. S57 all eight unused-three-word combinations measured; every removal changes native bytes, originals retained. U05 flags and actual numeric truncations retained. B77 enemy count bounds own-side array scan; dragon/shield scores truncate to zero for valid positive count. Valid influence0..14, side/count/creature, positive damage denominator and numeric domains required. No goto, fake aggregate, varargs, role reuse or artificial owner."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::NextPos(i32 * hex)#1": {
+    "body_sha256": "2eb117b0dba8f2fc8dce147519ac3a6088c5abe3219499be686d8ae40bd04ca1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Whole row-skip helper read: caller-owned scalar advances by3 at the penultimate-column test, otherwise by1. Valid pointer and representable integer addition required; interior callers start1 or prior hex+1. This is real hex traversal, not byte address arithmetic or owner recovery. No casts, union, goto, scratch aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::FirstArmy(i32 startHex,i32 side,i32 * hex)#1": {
+    "body_sha256": "b0fb8c1260f6a7016b0e956fb4e050b1190ed6bc07e98e3729a1d4cbe65a27b0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete scan and output paths read. Returns0 on found occupant,1 at end with output-1. B77 upper bound115 only: negative start is not guarded before m_hexCells access. Any-side mode accepts any nonnegative stored side, not only0..1; requires valid combat occupancy. Ordinary caller supplies1 or previous+1. No casts, union, goto, fake aggregate, manual varargs, unrelated reuse or artificial owner."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::FirstResurrectable(i32 startHex,i32 * hex,SpellType spell)#1": {
+    "body_sha256": "e37e79db1a88e3611fabea832503e3b35343b09c09b66da097cb1f06f8b1ffd8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire scan read, including successful and exhausted output conventions. Returns0 for found hex and1 with output-1 on exhaustion. B77 start<=115 is an upper-only guard; negative input reaches FindResurrectArmyIndex. Ordinary callers provide1 or prior+1. Valid current side/spell and corpse lifecycle inherit the reviewed selection helper contracts. No casts, union, goto, unused aggregate, manual varargs, unrelated reuse or artificial owner."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellCure(i32 * effect,i32 targetSide,i32 targetIndex,i32 cure)#1": {
+    "body_sha256": "572a7689786282ac2a9aaec000c002886100d322bc512fce464172a6fcac294d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete875-byte two-side/20-slot evaluation and all influence classes read. Real floating truncations and U05 mirror/full-quantity flags retained. B77 targetIndex is army slot, while Determine CURE passes hex. Positive/negative sums initialize per side, mirror assignment overwrites prior negative sum, and cure mode1 zeros positive sum including calculated healing before final combination; exact retail sequence preserved. Influence byte plus boolean and clamp10 proves cancel-duration index0..10. Valid target side/slot or documented sentinels, positive creature HP and representable power/value required. No goto, fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellResurrect(i32 * effect,i32 hex,SpellType spell)#1": {
+    "body_sha256": "4d0876cc8028960545bd98f02b52d0fb9736b2bb9422d798bf2bab4e064159d5",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full319-byte Ankh, corpse lookup, count cap, chance and temporary-resurrection discount read. Actual float-result truncations retained. S57 unused workChance removal preserves total size and normalized relocation sequence but changes native stack bytes, so not retained. B77 successful FindResurrectArmyIndex required before forming army pointer: -1 is not locally guarded. Positive HP, valid creature/current-side/corpse lifecycle and representable doubling/value required. No union, goto, fake aggregate, manual varargs or unrelated reuse."
+  },
+  "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellDamage(i32 * effect,SpellType spell,i32 targetHex)#1": {
+    "body_sha256": "52697a27e037a5130a147f6fa85493fa842dfe1a8ca5b7fad206db47318a6d9f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire354-line damage dispatch, nineteen-cell geometry, chain walk, victim scoring and final side comparison read. Three two-side arrays are genuine fully observed owners; effect mask already uses actual rows. Direction enum casts, damage ABI i32l and floating truncations are meaningful; U05 flags retained. B77 initial targetHex occupancy read precedes loop guard; unsupported non-damage spells can leave loop stationary forever. Normal dispatcher uses damage family. Loop checks0<=hex<116, trusts positive occupant side/index and chain source; valid neighbor sentinel, counts<=20, positive HP and representable damage/ratios required. Mirror branch halves accumulated side values, not only current victim. No goto, artificial owner, fake aggregate, manual varargs or unrelated reuse."
   }
 }

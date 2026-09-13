@@ -688,8 +688,8 @@
     "note": "Full header read through EOF including both inline bodies, actual campaign-choice/exit/setup/remote records, all declarations and map-extra macros. U11 setup212/raw256 union and S33 six-used/eight-reserved match arrays need native source proof; tagged KbRemotePacket setup/save/data all used, variable payload extent B41. HighScoreEntry100 with29 serialized reserved bytes is real, not fake padding. Explicit macro grouping has existing byte evidence and is not normalized for appearance."
   },
   "include/SOURCE/X_GLOBAL.h": {
-    "sha256": "63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d",
-    "note": "Full header and its one inline read. Real packed14-byte obstacle and17-byte elevation records; elevation table25 vs debug command range200 is B51. Global declarations and stated table extents inspected; remaining caller-domain obligations stay in the function ledger. Actual GLOBAL_TEXT_BUFFER_SIZE is768, correcting prior conservative500 wording. Globals, aliases, enum domains and source-owned arrays are not fake local aggregates."
+    "sha256": "e801be65a9f3059b68270eb5c325c4287348c6b1b286bf3c435236bf02d25963",
+    "note": "Full header and its one inline read. Real packed14-byte obstacle and17-byte elevation records; elevation table25 vs debug command range200 is B51. Global declarations and stated table extents inspected; remaining caller-domain obligations stay in the function ledger. Actual GLOBAL_TEXT_BUFFER_SIZE is768, correcting prior conservative500 wording. Globals, aliases, enum domains and source-owned arrays are not fake local aggregates. C61 follow-up: reviewed changed giSpellInfluenceToSpell definition/declaration and all consumers; H2_ENUM_STORAGE(SpellType,u8) preserves16 physical bytes, fifteen named influence entries and unused zero tail. Sole read is RawEffectSpellInfluence. Full98-object1826-function native/data/ordered-relocation proof passes. Prior complete file review retained; this follow-up does not claim a new whole-file read."
   },
   "include/SOURCE/game.h": {
     "sha256": "f094b31d7d1997a7aa3d66d672a9af081879ba086c00dd67e9e363930dcfe035",
@@ -758,5 +758,9 @@
   "include/SOURCE/SPELLS.h": {
     "sha256": "d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f",
     "note": "Full184-line spell header read through EOF: BoltColorMode tagged palette modes, spell/animation/geometry constants, real16-byte sample filename and9-angle domains, Damage multiplier macro, two message-handler declarations. No function body hidden; no struct/union definition or manual-varargs macro. Checked six summon positions,19 fireball cells,15 shake pairs,10 quake impacts,480 wave rows and real caller-domain limits against all37 SPELLS functions."
+  },
+  "src/SOURCE/SPELLAI.cpp": {
+    "sha256": "9224d27909f499ba6256d7b218fcd2f427add9dacf7980444d7be4a19d1bb925",
+    "note": "Complete1475-line TU read through EOF and all11 physical VA-marked definitions reconciled. ClearEffects already credited under O05; ten new full-body reviews here. Private target-mode/layout enums, numerical macros, eleven named float DATA modifiers, two real11-entry duration tables and spell-group global reviewed. C60/C61 remove five casts with full native98-object1826-function preservation; fixed numeric operands and16-byte enum map checked against genuine retail. S57/R18 measured negatives and B77 caller/numeric/retail scoring behavior recorded without hardening or fabricated padding. No manual varargs or owner-recovery macro hidden outside functions."
   }
 }

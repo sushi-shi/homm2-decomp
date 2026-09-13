@@ -777,7 +777,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     i32 H2_UNUSED(unused30_j);
     army* other = NULL;
     float castChance =
-        target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[IDX(influence)]));
+        target->SpellCastWorkChance(giSpellInfluenceToSpell[IDX(influence)]);
     if (castChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
@@ -838,7 +838,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             break;
         case ARMY_SPELL_INFLUENCE_BLESS:
         case ARMY_SPELL_INFLUENCE_CURSE:
-            avgDmg = (static_cast<float>(target->m_monster.damageMax)
+            avgDmg = (target->m_monster.damageMax
                       + (static_cast<float>(target->m_monster.damageMin)))
                    * COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
             damageDelta = static_cast<float>(
@@ -893,9 +893,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             if (adjacent)
                 factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
-                factor = static_cast<float>(
-                    dragonCounter / m_armyCount[IDX(OppositeCombatSide(target->m_side))]
-                );
+                factor = dragonCounter / m_armyCount[IDX(OppositeCombatSide(target->m_side))];
             effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * factor);
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
@@ -905,11 +903,9 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                 if (HAS(other->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                     shooters++;
             }
-            factor = static_cast<float>(
-                shooters / m_armyCount[IDX(OppositeCombatSide(target->m_side))]
-            );
+            factor = shooters / m_armyCount[IDX(OppositeCombatSide(target->m_side))];
             if (target->m_side == COMBAT_ATTACKER_SIDE && m_inCastleCombat) {
-                factor = static_cast<float>(factor + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
+                factor = factor + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS;
                 if (factor > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
                     factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             }

@@ -7581,23 +7581,23 @@ DATA(0x004fba58) u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x0a,
     0x00
 };
-DATA(0x004fba68) u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
-    0x09,
-    0x0b,
-    0x0d,
-    0x0e,
-    0x12,
-    0x1a,
-    0x1e,
-    0x1f,
-    0x25,
-    0x26,
-    0x29,
-    0x65,
-    0x16,
-    0x10,
-    0x11,
-    0x00
+DATA(0x004fba68) H2_ENUM_STORAGE(SpellType, u8) giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+    SPELL_HASTE,
+    SPELL_SLOW,
+    SPELL_BLIND,
+    SPELL_BLESS,
+    SPELL_CURSE,
+    SPELL_BERSERKER,
+    SPELL_PARALYZE,
+    SPELL_HYPNOTIZE,
+    SPELL_DRAGON_SLAYER,
+    SPELL_BLOOD_LUST,
+    SPELL_SHIELD,
+    CREATURE_SPELL_PETRIFY,
+    SPELL_ANTI_MAGIC,
+    SPELL_STONE_SKIN,
+    SPELL_STEEL_SKIN,
+    SPELL_FIREBALL
 };
 DATA(0x004fba78) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
                                             10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
