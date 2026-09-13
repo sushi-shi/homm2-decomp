@@ -584,7 +584,7 @@ townObject::townObject(
             y,
             w,
             h,
-            static_cast<i16>(IDX(id_h)),
+            IDX(id_h),
             WIDGET_KIND_TRANSPARENT,
             0,
             NULL
@@ -2740,7 +2740,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         MemError();
     SetWinText(m_heroWindow1, RECRUIT_WINDOW_TEXT_ID);
     m_recruitHero = &gpGame->m_heroRecs[gpCurPlayer->m_availableHeroIds[availableHeroIndex]];
-    m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+    m_recruitHero->m_owner = giCurPlayer;
     message_e.type = MESSAGE_WIDGET;
 
     if (cannotRecruit != 0) {
@@ -2828,7 +2828,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_recruitResult = true;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            static_cast<i8>(giCurPlayer);
+            giCurPlayer;
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(NULL);
@@ -2838,7 +2838,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         );
         newHeroClass = (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
+            gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
     } else {
@@ -2857,7 +2857,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     );
     m_recruitHero->m_owner = -1;
     if (m_recruitState != -1)
-        m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+        m_recruitHero->m_owner = giCurPlayer;
     return m_recruitState != -1;
 }
 
@@ -2895,7 +2895,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
             + TOWN_TAVERN_FIRST_ANIMATION_FRAME;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
-        glTimers[0] = static_cast<i32>(KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY);
+        glTimers[0] = KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
@@ -3028,9 +3028,9 @@ void townManager::SetupWell(heroWindow* window) {
                    && (m_town->m_buildings
                        & (1L << (dwellingResult_a + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
             dwellingTypes_c[dwellingResult_a] =
-                static_cast<u8>(dwellingResult_a + TOWN_WELL_FIRST_UPGRADE_OFFSET);
+                dwellingResult_a + TOWN_WELL_FIRST_UPGRADE_OFFSET;
         } else {
-            dwellingTypes_c[dwellingResult_a] = static_cast<u8>(dwellingResult_a);
+            dwellingTypes_c[dwellingResult_a] = dwellingResult_a;
         }
     }
 
