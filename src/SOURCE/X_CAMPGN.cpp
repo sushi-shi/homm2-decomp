@@ -396,7 +396,7 @@ void ExpCampaign::InitMap(void) {
                     ->m_army.Add(bonus->creature, bonus->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            player->m_cheatValue = static_cast<i8>(bonus->value);
+            player->m_cheatValue = bonus->value;
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             b32 savedNewGameSetup = gbInNewGameSetup;
@@ -431,7 +431,7 @@ void ExpCampaign::InitMap(void) {
                     gpGame->GetHero(player->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
                     false,
-                    static_cast<i8>(bonus->spell)
+                    IDX(bonus->spell)
                 );
             break;
     }
@@ -1334,14 +1334,14 @@ VA(0x004b51e3, 0x28)
 H2_CONST char* ExpCampaign::JosephName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xJosephName[0];
-    return xStableText[IDX(m_currentMap)];
+    return xJosephName[IDX(m_currentMap) - IDX(EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)];
 }
 
 VA(0x004b520b, 0x28)
 H2_CONST char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xUncleIvanName[0];
-    return xStableText[IDX(m_currentMap) + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
+    return xUncleIvanName[IDX(m_currentMap) - IDX(EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)];
 }
 
 VA(0x004b5233, 0x30)

@@ -878,5 +878,13 @@
   "include/SOURCE/SETUP.h": {
     "sha256": "6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b",
     "note": "Full26lines read:13actual handler declarations sharing tag_message reference/MessageDispatchResult ABI andboolean configuration flag declaration. No functions, unions, arrays, padding, explicit casts, gotos, manualvarargs or address/owner arithmetic. Declaration signatures reconciled with all23implementationfunctions and already reviewed Newgame consumers; header unchanged."
+  },
+  "src/SOURCE/X_CAMPGN.cpp": {
+    "sha256": "072eb9a37fae348c87d2e94daf9486f44b2d52617c2a840c679a6234b1750174",
+    "note": "Full1373lines/36functions/threeprivateenumdomains/fourdataarrays read. C78 removes2redundant bytecasts; O08 two actualsixentrynameowners replace beyond-four-entry stabletextlookups with map-4, same40bytecode/actualtargets. Eightcomplete23arm17.354004s products retain S71ignoredresult/twowidgetstores/name52 and R28map-award/globalhero counter reuse. All36retailbytes,35allsites/targets,ShowInfoEH/FSgapexplicit. All98native1826functions/allallocatedorderedrelocs equal except exactly2owner/addendrewrites independentlypinned;fullbuildpass. B93actual72validbonusrecords/name13/description256/awards146/army22bounds, invalidtrackIDs0..11versus8, Choosefailedmedia=-1, serializedfull79bytegap+windowptr and inheritedstate/lifecycle contracts documented."
+  },
+  "include/SOURCE/ExpCampaign.h": {
+    "sha256": "d7c9d144cd759deaeab9e984b7f9dd4bc6582355a6aab771a7d2a8df10322551",
+    "note": "Full153lineparent read; removes obsolete6-index Ivan offset, retained152lines. Fourshared domains and constants, actual packed79bytecampaign object incl8choices/8played/16daybytes/11awards/8bonus/fourbytegap/viewenum/windowptr/viewOnly. Save/load entire79bytes so opaquegap and runtimefields are not deleted or replaced with a fictional smaller prefix. Thirty-six declarations match implementation; real dimensions/domain and serializedvalidation contracts reviewed. C++98/20 actualfieldoffset/size checks PASS, all98native unchanged except two intentionally correct source-name-owner relocations."
   }
 }

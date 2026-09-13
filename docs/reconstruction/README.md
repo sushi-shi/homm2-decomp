@@ -506,6 +506,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   proves bounded normal cases while retaining B88's downstream extension
   boundary and nine existing EH/FS model gaps. All98 native objects unchanged.
 
+- C78/O08/S71/R28/B93: all 36 expansion-campaign functions and their header
+  reviewed. Two redundant byte casts are removed; two name lookups now index
+  their real six-entry owners instead of overrunning the adjacent stable-text
+  array. [Exact owner/addend, catalog and per-function evidence](C78-O08-S71-R28-B93.md)
+  preserves every retail destination. Eight products/23 arms retain measured
+  storage and counter residuals. All 36 byte spans pass; ShowInfo's existing
+  EH/FS model gap and invalid-state/serialized-window contracts remain explicit.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
