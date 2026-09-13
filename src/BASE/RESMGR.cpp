@@ -325,8 +325,8 @@ i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     if (aggregateFp == INVALID_FILE) {
         sprintf(
             gText,
-            /* Не могу открыть файл: %s */
-            "\xcd\xe5 \xec\xee\xe3\xf3 \xee\xf2\xea\xf0\xfb\xf2\xfc \xf4\xe0\xe9\xeb: %s",
+
+            localization::Tr("resource.file.open_failed"),
             aggregateName
         );
         ShutDown(gText);
@@ -433,7 +433,7 @@ i8 resourceManager::ReadByte(void) {
         675
     );
     i8 value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
@@ -445,7 +445,7 @@ i16 resourceManager::ReadWord(void) {
         700
     );
     i16 value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
@@ -457,7 +457,7 @@ i32l resourceManager::ReadLong(void) {
         723
     );
     i32l value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 

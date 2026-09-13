@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <dplay.h>
 #include <SOURCE/REMOTE_TYPES.h>
+#include <BASE/Misc.h>
+#include <string.h>
 
 H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_BUFFER_COUNT          = 200,
@@ -99,5 +101,28 @@ extern struct _GUID* g_lpGuid;
 extern i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 extern i32 iSessionToTry;
 extern i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
+
+// Shared with Winsock. These do not reset indices or validate allocations/lengths.
+#define INIT_TRANSPORT_RECEIVE_STORAGE()                                                           \
+    (ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*))),         \
+     piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32))),     \
+     memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*)),                            \
+     memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32)))
+// Stored size includes the omitted tag byte; preserve that legacy discrepancy.
+#define ENQUEUE_TRANSPORT_PACKET(input, size)                                                      \
+    (ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC((size) - 1)),                     \
+     memcpy(ppDPRcvBuffer[iDPRcvBufferHead], (input) + 1, (size) - 1),                             \
+     piDPRcvBufferSize[iDPRcvBufferHead] = (size),                                                 \
+     iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT)
+
+// Arrays only: backend-specific packet draining and index reset stay outside.
+inline void DisposeTransportReceiveStorage(void) {
+    if (ppDPRcvBuffer != NULL)
+        H2_FREE(ppDPRcvBuffer);
+    ppDPRcvBuffer = NULL;
+    if (piDPRcvBufferSize != NULL)
+        H2_FREE(piDPRcvBufferSize);
+    piDPRcvBufferSize = NULL;
+}
 
 #endif

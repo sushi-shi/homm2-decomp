@@ -1,4 +1,6 @@
 #include <va.h>
+#include <BASE/widget.h>
+#include <BASE/message.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -73,10 +75,7 @@ void dropListWidget::Read(void) {
     IconEntry* entry;
     char name[RESOURCE_NAME_CAPACITY];
 
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(name);
@@ -185,9 +184,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     text = message.payload.widget.data.text;
                     if (m_itemCount > message.payload.widget.parameter) {
                         H2_FREE(m_items[message.payload.widget.parameter]);
-                        m_items[message.payload.widget.parameter] =
-                            static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                        strcpy(m_items[message.payload.widget.parameter], text);
+                        ALLOC_COPY_STRING(m_items[message.payload.widget.parameter], text);
                     }
                     break;
 
@@ -199,8 +196,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                         static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
-                    newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                    strcpy(newItems[m_itemCount], text);
+                    ALLOC_COPY_STRING(newItems[m_itemCount], text);
                     m_itemCount++;
                     if (m_items != NULL)
                         H2_FREE(m_items);
@@ -228,10 +224,8 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
             i16 x = message.payload.mouse.x - m_owner->m_posX;
             i16 y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    message.payload.widget.id = m_id;
+                if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -241,9 +235,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     && x < m_dropButtonX + m_dropButtonWidth
                     && y < m_dropButtonY + m_dropButtonHeight) {
                     ProcessSelectDialog();
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONTINUE;

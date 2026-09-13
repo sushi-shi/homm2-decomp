@@ -20,23 +20,23 @@ H2_ENUM_BEGIN(ExecutiveManagerConstant)
     DIALOG_MANAGER_CAPACITY  = 20
 H2_ENUM_END(ExecutiveManagerConstant)
 
-DATA(0x51f2f4) static char gExecutiveResourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE] = "\xed\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf0\xe5\xf1\xf3\xf0\xf1\xfb. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0.";
-DATA(0x51f330) static char gExecutiveInputInitError[EXEC_TEXT_INPUT_INIT_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xe0 \xe2\xe2\xee\xe4\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xef\xf0\xee\xe1\xeb\xe5\xec\xe0 \xf1 \xea\xeb\xe0\xe2\xe8\xe0\xf2\xf3\xf0\xee\xe9 \xe8\xeb\xe8 \xec\xfb\xf8\xfc\xfe.";
-DATA(0x51f388) static char gExecutiveSoundInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xe7\xe2\xf3\xea.";
-DATA(0x51f3a8) static char gExecutiveMouseInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xec\xfb\xf8\xfc.";
-DATA(0x51f3c8) static char gExecutiveWindowInitError[EXEC_TEXT_WINDOW_INIT_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xee\xea\xed\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0 \xe8\xeb\xe8 \xef\xe0\xec\xff\xf2\xe8.";
-DATA(0x51f40c) static char gExecutiveDialogManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
-DATA(0x51f428) static char gExecutiveDialogManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
-DATA(0x51f444) static char gExecutiveDialogManagerError3[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
-DATA(0x51f460) static char gExecutiveDialogManagerError4[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
+DATA(0x51f2f4) static char gExecutiveResourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE] = localization::Tr("system.resources.initialization_failed");
+DATA(0x51f330) static char gExecutiveInputInitError[EXEC_TEXT_INPUT_INIT_SLOT_SIZE] = localization::Tr("system.input.initialization_failed");
+DATA(0x51f388) static char gExecutiveSoundInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = localization::Tr("system.sound.initialization_failed");
+DATA(0x51f3a8) static char gExecutiveMouseInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE] = localization::Tr("system.mouse.initialization_failed");
+DATA(0x51f3c8) static char gExecutiveWindowInitError[EXEC_TEXT_WINDOW_INIT_SLOT_SIZE] = localization::Tr("system.window.initialization_failed");
+DATA(0x51f40c) static char gExecutiveDialogManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f428) static char gExecutiveDialogManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f444) static char gExecutiveDialogManagerError3[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f460) static char gExecutiveDialogManagerError4[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
 DATA(0x51f47c) static char gExecutiveManagerListStart[EXEC_TEXT_LIST_START_SLOT_SIZE] = "-----Manager List Start-----";
 DATA(0x51f49c) static char gExecutiveManagerListDivider1[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE] = "-----";
 DATA(0x51f4a4) static char gExecutiveManagerListHeaderFormat[EXEC_TEXT_LIST_HEADER_SLOT_SIZE] = "Head %d   Tail %d";
 DATA(0x51f4b8) static char gExecutiveManagerListDivider2[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE] = "-----";
 DATA(0x51f4c0) static char gExecutiveManagerListEntryFormat[EXEC_TEXT_LIST_ENTRY_SLOT_SIZE] = "Manager %20s  this %d   prev %d  next %d";
 DATA(0x51f4ec) static char gExecutiveManagerListStop[EXEC_TEXT_LIST_STOP_SLOT_SIZE] = "--*--Manager List Stop --*--\n\n";
-DATA(0x51f50c) static char gExecutiveCallManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
-DATA(0x51f528) static char gExecutiveCallManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!";
+DATA(0x51f50c) static char gExecutiveCallManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
+DATA(0x51f528) static char gExecutiveCallManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE] = localization::Tr("system.manager.add_failed");
 DATA(0x51f544) static char gExecutiveTerminationMessage[EXEC_TEXT_TERMINATION_SLOT_SIZE] = "Terminated";
 
 VA(0x004c4f20, 0x35)

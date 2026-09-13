@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <va.h>
+#include <BASE/Misc.h>
 
 H2_ENUM_BEGIN(ComPortConstant)
     COM_PORT_FLEXIBLE_DATA_SIZE = 1,
@@ -50,6 +51,10 @@ SIZE(ComPortState, 0x60);
 void add_node(struct tag_Anchor*, struct tag_Node*);
 struct tag_Node* pop_node(struct tag_Anchor*);
 void init_anchor(struct tag_Anchor*, i32, i32);
+// One while statement; preserves the caller's final null node and each pop/free.
+#define FREE_NODE_QUEUE(node, anchor)                                                              \
+    while (((node) = pop_node(anchor)) != NULL)                                                    \
+    H2_FREE(node)
 void ShutdownComError(H2_CONST char*);
 i16 com_init(u8, H2_ENUM_PARAM(ComBaudRate, i32), i32);
 void com_term(i16);

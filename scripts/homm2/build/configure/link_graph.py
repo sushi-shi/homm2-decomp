@@ -159,10 +159,13 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
                 obj.removeprefix("build/objdiff/base/").removesuffix(".obj"),
                 sys.maxsize)))
     link_outputs = ["build/link/HMM2PL.exe", "build/link/HMM2PL.map"]
-    source_end = link_objects.index(
-        "build/objdiff/base/SOURCE/X_GLOBAL.obj") + 1
-    source_objects = link_objects[:source_end]
-    base_objects = link_objects[source_end:]
+    # Archive ownership comes from the unit tier, not an address-list cut.
+    # X_GLOBAL has data but no function anchor, and a fresh checkout has no
+    # symbol inventory at all. In either case it can sort after BASE/Midi;
+    # slicing there incorrectly consumes BASE objects as direct-link inputs.
+    base_prefix = "build/objdiff/base/BASE/"
+    source_objects = [obj for obj in link_objects if not obj.startswith(base_prefix)]
+    base_objects = [obj for obj in link_objects if obj.startswith(base_prefix)]
     omf_link_objects = {}
     configured = {entry["unit"]: entry["source"] for entry in units}
     for unit, assembly in FIXED_ASM_UNITS.items():

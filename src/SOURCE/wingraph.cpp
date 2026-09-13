@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <va.h>
+#include <BASE/inputManager.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
@@ -74,7 +75,7 @@ VA(0x004afcbd, 0xb2)
 void SetupClipper(void) {
     HRESULT result;
 
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
         result = lpDD->CreateClipper(0, &lpClipper, NULL);
         if (result != DD_OK)
             DDSD(
@@ -112,7 +113,7 @@ void DDInitGraphics(void) {
             RETAIL_FILE,
             118
         );
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         SetMenuStatus(0);
         result = lpDD->SetCooperativeLevel(
             hwndApp,
@@ -177,8 +178,8 @@ i32 DDAppPaint(void* window, void* H2_UNUSED(paintDC)) {
                        / iMainWinScreenWidth;
         sourceHeight5 = ((gDDDestinationRect.bottom - gDDDestinationRect.top + 1) * WINGRAPH_HEIGHT)
                         / iMainWinScreenHeight;
-        sourceLeft6 = (gDDDestinationRect.left * WINGRAPH_WIDTH) / iMainWinScreenWidth;
-        sourceTop8 = (gDDDestinationRect.top * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
+        sourceLeft6 = CLIENT_TO_GAME_X(gDDDestinationRect.left);
+        sourceTop8 = CLIENT_TO_GAME_Y(gDDDestinationRect.top);
         if (giScrollX != 0) {
             sourceLeft6 = giScrollX + WINGRAPH_SCROLL_MARGIN;
             sourceWidth = WINGRAPH_SCROLL_SIZE;
@@ -604,16 +605,16 @@ void DDSetFullScreenStatus(b32 fullScreen) {
 
     if (gbWinGraphBusy != 0)
         return;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == fullScreen)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == fullScreen)
         return;
     {
-        x = gConfig.gfx[IDX(giCurExe)].x;
-        y = gConfig.gfx[IDX(giCurExe)].y;
-        width = gConfig.gfx[IDX(giCurExe)].width;
-        windowHeight = gConfig.gfx[IDX(giCurExe)].height;
+        x = CURRENT_GRAPHICS_CONFIG.x;
+        y = CURRENT_GRAPHICS_CONFIG.y;
+        width = CURRENT_GRAPHICS_CONFIG.width;
+        windowHeight = CURRENT_GRAPHICS_CONFIG.height;
         gbWinGraphBusy = true;
-        gConfig.gfx[IDX(giCurExe)].fullScreen = fullScreen;
-        if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
+        CURRENT_GRAPHICS_CONFIG.fullScreen = fullScreen;
+        if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
             SetMenuStatus(0);
 
         hres = lpDD->SetCooperativeLevel(
@@ -626,7 +627,7 @@ void DDSetFullScreenStatus(b32 fullScreen) {
                 RETAIL_FILE,
                 593
             );
-        if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
+        if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
             hres = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
             if (hres != DD_OK)
                 DDSD(
@@ -664,14 +665,14 @@ void DDSetFullScreenStatus(b32 fullScreen) {
             );
         WritePrefs();
         gbWinGraphBusy = false;
-        if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
+        if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
             SetMenuStatus(1);
             ResizeWindow(x, y, width, windowHeight);
         } else {
-            gConfig.gfx[IDX(giCurExe)].x = x;
-            gConfig.gfx[IDX(giCurExe)].y = y;
-            gConfig.gfx[IDX(giCurExe)].width = width;
-            gConfig.gfx[IDX(giCurExe)].height = windowHeight;
+            CURRENT_GRAPHICS_CONFIG.x = x;
+            CURRENT_GRAPHICS_CONFIG.y = y;
+            CURRENT_GRAPHICS_CONFIG.width = width;
+            CURRENT_GRAPHICS_CONFIG.height = windowHeight;
         }
         SetupClipper();
     }
@@ -873,8 +874,8 @@ i32 WGAppPaint(void* window, void* paintDC) {
         fromY = destY0;
         destW = clientRect16.right - clientRect16.left;
         destHeight3 = clientRect16.bottom - clientRect16.top;
-        xSource = (destX7 * WINGRAPH_WIDTH) / iMainWinScreenWidth;
-        fromY = (destY0 * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
+        xSource = CLIENT_TO_GAME_X(destX7);
+        fromY = CLIENT_TO_GAME_Y(destY0);
         if (giScrollX != 0)
             xSource += giScrollX;
         if (giScrollY != 0)
@@ -944,7 +945,7 @@ void ConnectToDLLs(void) {
     if (lpDirectDrawCreate != NULL) {
         gbDDrawAttached = true;
     } else {
-        gConfig.gfx[IDX(giCurExe)].fullScreen = false;
+        CURRENT_GRAPHICS_CONFIG.fullScreen = false;
         SetMenuStatus(1);
     }
 }
@@ -985,17 +986,7 @@ void GetGraphicsInfo(void) {
         ReleaseDC(NULL, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
             ShutDown(
-                "\xc4\xeb\xff \xc3\xe5\xf0\xee\xe5\xe2 II \xf2\xf0\xe5\xe1\xf3\xe5\xf2\xf1\xff "
-                    "\xf0\xe5\xe6\xe8\xec \xe2 256 \xf6\xe2\xe5\xf2\xee\xe2 \xe8\xeb\xe8 "
-                    "\xe1\xee\xeb\xfc\xf8\xe5.\n\n\xd7\xf2\xee\xe1\xfb "
-                    "\xe8\xe7\xec\xe5\xed\xe8\xf2\xfc \xf0\xe5\xe6\xe8\xec "
-                    "\xf6\xe2\xe5\xf2\xed\xee\xf1\xf2\xe8, \xf9\xe5\xeb\xea\xed\xe8\xf2\xe5 "
-                    "\xef\xf0\xe0\xe2\xee\xe9 \xea\xed\xee\xef\xea\xee\xe9 \xef\xee "
-                    "\xf0\xe0\xe1\xee\xf7\xe5\xec\xf3 \xf1\xf2\xee\xeb\xf3 Windows \xe8 "
-                    "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 'Properties'/\xd1\xe2\xee\xe9\xf1\xf2\xe2\xe0'. "
-                    "\xc7\xe0\xf2\xe5\xec \xe2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0\xf5 "
-                    "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xeb\xf3\xe1\xe8\xed\xf3 "
-                    "\xf6\xe2\xe5\xf2\xe0." /* "Для Героев II требуется режим в 256 цветов или больше.
+                localization::Tr("system.display.palette_required") /* "Для Героев II требуется режим в 256 цветов или больше.
 
 Чтобы изменить режим цветности, щелкните правой кнопкой по рабочему столу Windows и выберите 'Properties'/Свойства'. Затем в установках выберите глубину цвета." */
             );
@@ -1007,7 +998,7 @@ void InitGraphics(void) {
     LogStr("IG1");
     ConnectToDLLs();
     LogStr("IG2");
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
         giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
     else
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
@@ -1059,12 +1050,12 @@ VA(0x004b1a25, 0xa1)
 void SetFullScreenStatus(b32 fullScreen) {
     if (gbInSmackMgr != 0)
         return;
-    if (fullScreen == gConfig.gfx[IDX(giCurExe)].fullScreen)
+    if (fullScreen == CURRENT_GRAPHICS_CONFIG.fullScreen)
         return;
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
         if (gbDDrawAttached == 0)
             return;
-        gConfig.gfx[IDX(giCurExe)].fullScreen = true;
+        CURRENT_GRAPHICS_CONFIG.fullScreen = true;
         if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
             DDSetFullScreenStatus(fullScreen);
     } else if (fullScreen == 0) {
@@ -1101,15 +1092,15 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     if (graphicsType == WINGRAPH_GRAPHICS_DIRECT_DRAW && gbDDrawAttached == 0)
         return 0;
 
-    fullState = gConfig.gfx[IDX(giCurExe)].fullScreen;
-    x = gConfig.gfx[IDX(giCurExe)].x;
-    y = gConfig.gfx[IDX(giCurExe)].y;
-    width = gConfig.gfx[IDX(giCurExe)].width;
-    hgt = gConfig.gfx[IDX(giCurExe)].height;
+    fullState = CURRENT_GRAPHICS_CONFIG.fullScreen;
+    x = CURRENT_GRAPHICS_CONFIG.x;
+    y = CURRENT_GRAPHICS_CONFIG.y;
+    width = CURRENT_GRAPHICS_CONFIG.width;
+    hgt = CURRENT_GRAPHICS_CONFIG.height;
     buffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     memcpy(buffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
-        gConfig.gfx[IDX(giCurExe)].fullScreen = false;
+        CURRENT_GRAPHICS_CONFIG.fullScreen = false;
         DDCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
         WGInitGraphics();

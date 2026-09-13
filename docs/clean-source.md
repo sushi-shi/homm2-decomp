@@ -93,6 +93,20 @@ valid output target.
 | `OVERRIDE` | `override` |
 | `__cdecl`, `__stdcall`, `__fastcall` | preserved |
 | `// ...`, `/* ... */` | deleted |
+| `localization::Tr("id")`, `locales/*` | preserved in source; Russian UTF-8 literals in classic |
+
+Source Gold retains build-time locale selection: `./build.py --ru` (default)
+or `./build.py --en`, with independent objects and executables under
+`build/<locale>/`. The root Ninja graph builds Russian; `build-en.ninja` builds
+English. Both regenerate disposable literal compiler inputs when source,
+headers, or catalogs change. `nix build` and `nix build .#game-en` package those
+same builds. No runtime lookup or matching tools are added to the source tree.
+
+For classic Gold, `--classic-russian` reads the catalog from the source worktree
+being exported, not the current decomp checkout. It resolves every ID and
+decodes high-byte octal as well as legacy hexadecimal escapes into UTF-8 Russian;
+controls and packed NUL separators remain escaped. Classic drops the locale
+catalog/build support and remains a terminal reading view.
 
 Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets

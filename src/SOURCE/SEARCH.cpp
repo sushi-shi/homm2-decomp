@@ -53,7 +53,7 @@ i32 searchArray::BuildPath(
     u8* pathDirection = m_storage.directions;
     m_pathLength = 0;
     while (destinationX != startX || destinationY != startY) {
-        searchNode* node = &GetColumn(destinationX)[MAP_WIDTH * destinationY];
+        searchNode* node = &GetNode(destinationX, destinationY);
         if (node->x != destinationX && node->y != destinationY)
             return 0;
         if (node->distance <= maximumCost) {
@@ -109,7 +109,7 @@ void searchArray::SeedPosition(
         if (s_targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
             return;
 
-        targetTerrain = giGroundToTerrain[s_targetCell->m_terrainImageIndex];
+        targetTerrain = CELL_TERRAIN(s_targetCell);
         if (targetTerrain == TERRAIN_WATER) {
             if (waterMode) {
                 if (s_targetCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT)))
@@ -237,8 +237,7 @@ void searchArray::SeedPosition(
                 1,
                 waterMode
             );
-            s_terrain = giGroundToTerrain[gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
-                                              ->m_terrainImageIndex];
+            s_terrain = CELL_TERRAIN(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y));
             s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
@@ -334,9 +333,7 @@ void searchArray::SeedPosition(
                                         gpAdvManager->GetCell(s_adjacentX, s_candidateY);
                                     s_directionBlocked = true;
                                     if (((1 << IDX(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
-                                        && s_neighborCell->m_objectIndex != SEARCH_NO_OBJECT
-                                        && s_neighborCell->m_objectTileset != TILESET_DUMMY
-                                        && !(s_neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
+                                        && CELL_HAS_NON_SHADOW_OBJECT(s_neighborCell)) {
                                         s_directionBlocked = false;
                                     }
 
@@ -346,7 +343,7 @@ void searchArray::SeedPosition(
                                         && !(s_neighborCell->m_triggerType
                                              & MAP_TRIGGER_ACTION_FLAG)) {
                                         s_terrain =
-                                            giGroundToTerrain[s_neighborCell->m_terrainImageIndex];
+                                            CELL_TERRAIN(s_neighborCell);
                                         s_adjacentCost =
                                             GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
                                                 .distance;

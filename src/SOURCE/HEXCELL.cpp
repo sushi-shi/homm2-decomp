@@ -84,45 +84,33 @@ void hexcell::DrawTower(i32 frame) {
     i32 level = 0;
     i32 row;
 
-    gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-        ->CombatClipDrawToBuffer(
-            level ? m_x : m_x + TOWER_X_OFFSET,
-            m_y,
-            frame,
-            m_limits,
-            ICON_DRAW_FLIPPED,
-            0,
-            NULL,
-            NULL
-        );
+    gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
+        level ? m_x : m_x + TOWER_X_OFFSET,
+        m_y,
+        frame,
+        m_limits,
+        ICON_DRAW_FLIPPED
+    );
 
     row = (m_y - TOWER_ROW_Y_ORIGIN) / COMBAT_HEX_VERTICAL_STEP;
     if (row == TOWER_EXCLUDED_ROW)
         return;
     if (row & 1) {
-        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-            ->CombatClipDrawToBuffer(
-                level ? m_x : m_x + TOWER_X_OFFSET,
-                m_y,
-                TOWER_OVERLAY_FRAME,
-                m_limits,
-                ICON_DRAW_FLIPPED,
-                0,
-                NULL,
-                NULL
-            );
+        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
+            level ? m_x : m_x + TOWER_X_OFFSET,
+            m_y,
+            TOWER_OVERLAY_FRAME,
+            m_limits,
+            ICON_DRAW_FLIPPED
+        );
     } else {
-        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-            ->CombatClipDrawToBuffer(
-                level ? m_x - TOWER_X_OFFSET : m_x,
-                m_y,
-                TOWER_OVERLAY_FRAME,
-                m_limits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
-            );
+        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
+            level ? m_x - TOWER_X_OFFSET : m_x,
+            m_y,
+            TOWER_OVERLAY_FRAME,
+            m_limits,
+            ICON_DRAW_NORMAL
+        );
     }
 }
 
@@ -134,5 +122,5 @@ void hexcell::DrawClouds(void) {
 VA(0x00465089, 0x44)
 void hexcell::DrawObstacle(void) {
     gpCombatManager->m_obstacleIcons[m_obstacleIndex]
-        ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL);
+        ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, ICON_DRAW_NORMAL);
 }

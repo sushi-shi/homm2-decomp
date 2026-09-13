@@ -132,32 +132,20 @@ void advManager::DrawCursor(void) {
                     ->m_flags
                 & CURSOR_CELL_UNCOVERED_FLAG
             )) {
-            FlipIconToBitmap(
+            DRAW_FLIPPED_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
-        FlipIconToBitmap(
+        DRAW_FLIPPED_ADVENTURE_ICON(
             m_heroIcons[IDX(m_cursorType)],
-            gpWindowManager->m_screen,
             drawX,
             drawY,
             drawFrame,
-            ICON_DRAW_CLIP,
-            0,
-            0,
-            CURSOR_CLIP_SIZE,
-            CURSOR_CLIP_SIZE,
-            0
+            ICON_DRAW_CLIP
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
             i32 H2_UNUSED(flagDrawn);
@@ -181,18 +169,12 @@ void advManager::DrawCursor(void) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
                             + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
-            FlipIconToBitmap(
+            DRAW_FLIPPED_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
             ++m_updatePending;
         }
@@ -207,32 +189,20 @@ void advManager::DrawCursor(void) {
                     ->m_flags
                 & CURSOR_CELL_UNCOVERED_FLAG
             )) {
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
-        IconToBitmap(
+        DRAW_ADVENTURE_ICON(
             m_heroIcons[IDX(m_cursorType)],
-            gpWindowManager->m_screen,
             drawX,
             drawY,
             drawFrame,
-            ICON_DRAW_CLIP,
-            0,
-            0,
-            CURSOR_CLIP_SIZE,
-            CURSOR_CLIP_SIZE,
-            0
+            ICON_DRAW_CLIP
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
             i32 H2_UNUSED(flagDrawn);
@@ -256,18 +226,12 @@ void advManager::DrawCursor(void) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
                             + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
             ++m_updatePending;
         }
@@ -299,13 +263,10 @@ void advManager::DrawCursor(void) {
             bMoveSoundMade = true;
             if (EveryOther == 0) {
                 gpSoundManager->MemorySample(
-                    m_cursorSamples[IDX(giGroundToTerrain[GetCell(
-                                                             m_mapOriginX
-                                                                 + CURSOR_MAP_DRAW_OFFSET,
-                                                             m_mapOriginY
-                                                                 + CURSOR_MAP_DRAW_OFFSET
-                                                         )
-                                                             ->m_terrainImageIndex])]
+                    m_cursorSamples[IDX(CELL_TERRAIN(GetCell(
+                        m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
+                        m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
+                    )))]
                 );
             }
         }
@@ -347,22 +308,15 @@ void advManager::DrawCursorShadow(void) {
         frame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             boatIndex = frame;
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_boatShadowIcon,
-                gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
                 boatIndex
-                    + (boatIndex >= CURSOR_SHADOW_ANIM_FIRST
-                               && boatIndex < CURSOR_SHADOW_ANIM_END
+                    + (boatIndex >= CURSOR_SHADOW_ANIM_FIRST && boatIndex < CURSOR_SHADOW_ANIM_END
                            ? CURSOR_BOAT_SHADOW_OFFSET
                            : 0),
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowPic = frame;
@@ -376,54 +330,23 @@ void advManager::DrawCursorShadow(void) {
                 shadowPic = SPRITE_UP_SHADOW_WIDE;
             if (shadowPic == SPRITE_UP_STEP_1)
                 shadowPic = SPRITE_UP_SHADOW_WIDE;
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_shadowIcon,
-                gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
                 shadowPic
-                    + (shadowPic >= CURSOR_SHADOW_ANIM_FIRST
-                               && shadowPic < CURSOR_SHADOW_ANIM_END
+                    + (shadowPic >= CURSOR_SHADOW_ANIM_FIRST && shadowPic < CURSOR_SHADOW_ANIM_END
                            ? CURSOR_HORSE_SHADOW_OFFSET
                            : 0),
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
     } else {
         frame = m_cursorFrame + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
-            IconToBitmap(
-                m_boatShadowIcon,
-                gpWindowManager->m_screen,
-                drawX,
-                drawY,
-                frame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
-            );
+            DRAW_ADVENTURE_ICON(m_boatShadowIcon, drawX, drawY, frame, ICON_DRAW_CLIP);
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
-            IconToBitmap(
-                m_shadowIcon,
-                gpWindowManager->m_screen,
-                drawX,
-                drawY,
-                frame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
-            );
+            DRAW_ADVENTURE_ICON(m_shadowIcon, drawX, drawY, frame, ICON_DRAW_CLIP);
         }
     }
 
@@ -568,7 +491,7 @@ mapCell* advManager::MoveHero(
         gbMoveShown = true;
 
     currentCell_g = GetCell(movingHero_g->m_x, movingHero_g->m_y);
-    currentTerrain_a = giGroundToTerrain[currentCell_g->m_terrainImageIndex];
+    currentTerrain_a = CELL_TERRAIN(currentCell_g);
     destinationCell = GetCell(movingHero_g->m_x + directionX_a, movingHero_g->m_y + directionY);
     terrainCost_h = CalcTerrainCost(
         currentTerrain_a,
@@ -579,7 +502,7 @@ mapCell* advManager::MoveHero(
         destinationCell->m_isRoad
     );
     nextTerrainCost_n = CalcTerrainCost(
-        giGroundToTerrain[destinationCell->m_terrainImageIndex],
+        CELL_TERRAIN(destinationCell),
         0,
         movingHero_g->m_remainingMobility - terrainCost_h,
         IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
@@ -610,8 +533,7 @@ mapCell* advManager::MoveHero(
         TurnTo(direction);
     movingHero_g->m_direction = direction;
 
-    if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
-        && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
+    if (movingHero_g->IsEmbarked() && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId == movingHero_g->m_id)
                 break;
@@ -636,7 +558,7 @@ mapCell* advManager::MoveHero(
         && gpAdvManager->ValidMoveWithEvent(movingHero_g, direction)) {
         switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_BOAT:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked())
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = false;
@@ -658,13 +580,12 @@ mapCell* advManager::MoveHero(
                     NULL,
                     NULL
                 );
-                WaitEndSample(&fizzleSample, -1);
+                WaitEndSample(&fizzleSample);
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                    if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                            HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked()) {
+                    if (gpGame->GetHero(destinationCell->m_objectMetadata)->IsEmbarked())
                         goto stoppingEvent;
                     else
                         goto movementDone;
@@ -723,8 +644,7 @@ mapCell* advManager::MoveHero(
         m_mapOriginX + directionX_a + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY + CURSOR_MAP_DRAW_OFFSET,
         giCurPlayer,
-        giVisRange[IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
-            + (movingHero_g->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
+        HERO_SCOUTING_VISIBILITY_RADIUS(*movingHero_g)
     );
     m_forceCompleteDraw = true;
 
@@ -825,8 +745,7 @@ mapCell* advManager::MoveHero(
     *eventX = m_mapOriginX + m_cursorMapX;
     *eventY = m_mapOriginY + m_cursorMapY;
     if (HAS(cursorCell_h->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-        || (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
-            && cursorCell_h->m_triggerType == MAP_OBJECT_COAST)) {
+        || (movingHero_g->IsEmbarked() && cursorCell_h->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_i = cursorCell_h;
         switch (cursorCell_h->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_NOTHING_SPECIAL:
@@ -862,7 +781,7 @@ movementDone:
         if (oldHeroX != movingHero_g->m_x || oldHeroY != movingHero_g->m_y) {
             if (*(mapExtra + movingHero_g->m_x + movingHero_g->m_y * MAP_WIDTH)
                 & IDX(MAP_EXTRA_ADJACENT_MONSTER)) {
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked())
                     goto adjacentDone;
                 if (eventCell_i
                     && (eventCell_i->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_BOAT)
@@ -888,7 +807,7 @@ adjacentDone:
                 }
                 if (mapEvent->artifact != -1
                     && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
-                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
+                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
                     mapEvent->active = false;
             }
@@ -916,7 +835,7 @@ adjacentDone:
             }
             if (mapEvent->artifact != -1
                 && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
-                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
+                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;
@@ -1018,9 +937,8 @@ i32 advManager::ValidMoveWithEvent(
     destinationCell = m_mapData->GetCell(newX, newY);
     switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
-            if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                        HERO_EVENT_EMBARKED))
+            if (movingHero->IsEmbarked()) {
+                if (gpGame->GetHero(destinationCell->m_objectMetadata)->IsEmbarked())
                     return 1;
                 else
                     return 0;
@@ -1069,18 +987,14 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     if (destinationCell->m_flags & CURSOR_CELL_BLOCKED_FLAG)
         return 0;
 
-    if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
+    if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
         if (m_cursorType != HERO_TYPE_BOAT
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
             return 0;
-        if (giGroundToTerrain[currentCell_c->m_terrainImageIndex] == TERRAIN_WATER
-            && directionX != 0 && directionY_c != 0) {
-            if (giGroundToTerrain[m_mapData->GetCell(centerX + directionX, centerY)
-                                      ->m_terrainImageIndex]
-                    != TERRAIN_WATER
-                || giGroundToTerrain[m_mapData->GetCell(centerX, centerY + directionY_c)
-                                         ->m_terrainImageIndex]
+        if (CELL_TERRAIN(currentCell_c) == TERRAIN_WATER && directionX != 0 && directionY_c != 0) {
+            if (CELL_TERRAIN(m_mapData->GetCell(centerX + directionX, centerY)) != TERRAIN_WATER
+                || CELL_TERRAIN(m_mapData->GetCell(centerX, centerY + directionY_c))
                        != TERRAIN_WATER)
                 return 0;
         }
@@ -1092,23 +1006,17 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     northDirection_a = (1 << IDX(direction)) & CURSOR_NORTH_DIRECTION_MASK;
     southDirection_a = (1 << IDX(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection_a) {
-        if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && currentCell_c->m_objectTileset != TILESET_DUMMY
-            && !(currentCell_c->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+        if (CELL_HAS_NON_SHADOW_OBJECT(currentCell_c)
             && currentCell_c->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
         if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             northNeighborCell_a = m_mapData->GetCell(destinationCellX, destinationCellY_f + 1);
-            if (northNeighborCell_a->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && northNeighborCell_a->m_objectTileset != TILESET_DUMMY
-                && !(northNeighborCell_a->m_flags & CURSOR_OBJECT_PASSABLE_FLAG))
+            if (CELL_HAS_NON_SHADOW_OBJECT(northNeighborCell_a))
                 return 0;
         }
     }
     if (southDirection_a) {
-        if (destinationCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && destinationCell->m_objectTileset != TILESET_DUMMY
-            && !(destinationCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+        if (CELL_HAS_NON_SHADOW_OBJECT(destinationCell)
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL))
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
@@ -1116,9 +1024,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         if (currentCell_c->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             southNeighborCell_i =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
-            if (southNeighborCell_i->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && southNeighborCell_i->m_objectTileset != TILESET_DUMMY
-                && !(southNeighborCell_i->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
+            if (CELL_HAS_NON_SHADOW_OBJECT(southNeighborCell_i)
                 && !(southNeighborCell_i->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
                 return 0;
         }
@@ -1230,92 +1136,38 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_MY_TURN:
-            LogInt(
-                "MC My Turn",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC My Turn", change.x, change.y);
             break;
 
         case MAP_CHANGE_TELEPORT_HERO:
-            LogInt(
-                "MC Teleport Hero",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC Teleport Hero", change.x, change.y);
             mapHero_b = gpGame->GetHero(change.id);
             TeleportTo(mapHero_b, change.x, change.y, 0, 1);
             break;
 
         case MAP_CHANGE_CLAIM_MINE:
-            LogInt(
-                "MC ClaimMine",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC ClaimMine", LOG_UNUSED_VALUE);
             gpGame->ClaimMine(change.id, change.player);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_CLAIM_TOWN:
-            LogInt(
-                "MC ClaimTown",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC ClaimTown", LOG_UNUSED_VALUE);
             gpGame->ClaimTown(change.id, change.player, 1);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_BUILD_BOAT:
-            LogInt(
-                "MC BuildBoat",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC BuildBoat", LOG_UNUSED_VALUE);
             gpGame->CreateBoat(change.x, change.y, 1);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_ERASE_OBJECT:
-            LogInt(
-                "MC Erase Object",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC Erase Object", change.x, change.y);
             eventCell_a = GetCell(change.x, change.y);
             EraseObj(eventCell_a, change.x, change.y);
             CompleteDraw(0);
@@ -1356,7 +1208,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!" /* "%s сокрушен!" */,
+                localization::Tr("player.vanquished"),
                 cPlayerNames[change.id]
             );
             NormalDialog(
@@ -1393,32 +1245,14 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == incoming->sequence) {
-                LogInt(
-                    "OQ",
-                    incoming->sequence,
-                    giMapChangeCtr,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE
-                );
+                LogInt("OQ", incoming->sequence, giMapChangeCtr);
                 goto duplicateChange;
             }
         }
 
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type == MAP_CHANGE_NONE) {
-                LogInt(
-                    "SQ",
-                    incoming->sequence,
-                    giMapChangeCtr,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE
-                );
+                LogInt("SQ", incoming->sequence, giMapChangeCtr);
                 sMapChangeQueue[slot] = *incoming;
                 goto duplicateChange;
             }
@@ -1531,16 +1365,7 @@ void SendMapChange(
         return;
     if (player == MAP_CHANGE_CURRENT_PLAYER)
         player = giCurPlayer;
-    LogInt(
-        "Send Map Change",
-        type,
-        id,
-        x,
-        y,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Send Map Change", type, id, x, y);
     memset(&change, 0, sizeof(change));
     change.type = type;
     change.id = id;
@@ -1562,9 +1387,7 @@ void SendMapChange(
         CURSOR_REMOTE_PLAYER_ALL,
         sizeof(sMapChangeLastFew),
         CURSOR_REMOTE_PACKET_TYPE,
-        0,
-        CURSOR_REMOTE_RELIABLE,
-        REMOTE_MESSAGE_DEFAULT
+        0
     );
 }
 

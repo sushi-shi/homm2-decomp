@@ -18,12 +18,15 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from homm2.clang_options import ClangMode
+from homm2.build.localization import clang_args as localization_args
 
 FLAGS = [
     "-fsyntax-only", ClangMode.STRICT.driver_flag, "--target=i386-pc-windows-msvc",
     "-fms-extensions", "-fms-compatibility", "-fms-compatibility-version=12.00",
     "-ferror-limit=5",
     "-Wall", "-Wextra", "-Dregister=",
+    "-Wformat=2", "-Werror=format",
+    "-Wno-error=format-security", "-Wno-error=format-nonliteral",
     "-Wno-writable-strings", "-Wno-nonportable-include-path",
     "-Wno-unused-parameter", "-Wno-missing-field-initializers",
 ]
@@ -57,7 +60,7 @@ def main(argv=None):
 
     def run(job):
         f, cmd = job
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = subprocess.run(cmd + localization_args(root, Path(f)), capture_output=True, text=True)
         return f, r.returncode, r.stderr
 
     failed = 0

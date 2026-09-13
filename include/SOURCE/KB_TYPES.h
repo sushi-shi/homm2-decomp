@@ -168,6 +168,18 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
 H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
 H2_ENUM_STEPPED(CreatureType)
 
+// Ordered membership tests; repeated type operands must be stable expressions.
+#define IS_ELEMENTAL_CREATURE(type)                                                                \
+    ((type) == CREATURE_EARTH_ELEMENTAL || (type) == CREATURE_AIR_ELEMENTAL                        \
+     || (type) == CREATURE_FIRE_ELEMENTAL || (type) == CREATURE_WATER_ELEMENTAL)
+#define IS_GOLEM_CREATURE(type) ((type) == CREATURE_IRON_GOLEM || (type) == CREATURE_STEEL_GOLEM)
+#define IS_DRAGON_CREATURE(type)                                                                   \
+    ((type) == CREATURE_GREEN_DRAGON || (type) == CREATURE_RED_DRAGON                              \
+     || (type) == CREATURE_BLACK_DRAGON || (type) == CREATURE_BONE_DRAGON)
+#define IS_LICH_CREATURE(type) ((type) == CREATURE_LICH || (type) == CREATURE_POWER_LICH)
+#define IS_VAMPIRE_CREATURE(type) ((type) == CREATURE_VAMPIRE || (type) == CREATURE_VAMPIRE_LORD)
+#define IS_TROLL_CREATURE(type) ((type) == CREATURE_TROLL || (type) == CREATURE_WAR_TROLL)
+
 #if H2_STRICT_ENUMS
 inline CreatureType NextCreatureType(CreatureType creatureType) {
     ++creatureType;

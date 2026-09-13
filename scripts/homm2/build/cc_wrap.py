@@ -77,7 +77,7 @@ def _prepare_compile_env():
     _COMPILE_ENV_READY = True
     return cl
 
-def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeout=None):
+def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeout=None, locale='ru'):
     """Compile one TU in-process; returns (rc, log, timed_out).
 
     Shares one resolved toolchain/INCLUDE per process, so a search engine can
@@ -85,18 +85,34 @@ def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeou
     wineserver spawn per trial. `depfile=False` skips the ninja header-dep
     emission for disposable probe objects.
     """
-    cl = _prepare_compile_env()
     src = Path(src).resolve(); out = Path(out).resolve()
+    if locale not in ('ru', 'en'):
+        raise ValueError(f'unsupported locale: {locale}')
+    if locale != 'ru' and out.is_relative_to(HOMM2_DIR / 'build/objdiff'):
+        raise ValueError('English objects must not overwrite matching objects')
+    cl = _prepare_compile_env()
     if not src.exists():
         return 1, f"source missing: {src}\n", False
+    from homm2.build.localization import prepare
+    compiled, header, overlay, catalog_deps = prepare(HOMM2_DIR, src, locale=locale)
+    if compiled != src:
+        # Check the expanded literal view before invoking the retail compiler.
+        from homm2.build.localization import check_formats
+        errors = check_formats(HOMM2_DIR, src, locale=locale)
+        if errors:
+            return 1, '\n'.join(errors), False
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists(): out.unlink()
-    cmd = ["wine", str(cl), *flags, f"/Fo{winepath_w(out)}", winepath_w(src)]
+    localization_flags = ([f'/FI{winepath_w(header)}',
+                           f'/I{winepath_w(header.parent / "include")}',
+                           f'/I{winepath_w(src.parent)}'] if header else [])
+    cmd = ["wine", str(cl), *flags, *localization_flags,
+           f"/Fo{winepath_w(out)}", winepath_w(compiled)]
     output, rc, timed_out = _run_cl(cmd, out, cl_timeout)
     if not out.exists():
         return (rc or 1), output, timed_out
     if depfile:
-        deps = scan_header_deps(src, HOMM2_DIR / "include")
+        deps = scan_header_deps(src, HOMM2_DIR / "include") + [str(p) for p in catalog_deps]
         dep_list = " ".join(d.replace(" ", "\\ ") for d in deps)
         Path(str(out) + ".d").write_text(f"{depfile_target or out}: {dep_list}\n")
     return 0, output, timed_out
@@ -111,14 +127,15 @@ def main():
     # the obj path AS ninja passed it (a.out); `deps=gcc` in build.ninja consumes it.
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True); ap.add_argument("--src", required=True)
+    ap.add_argument("--locale", choices=('ru', 'en'), default='ru')
     ap.add_argument("flags", nargs=argparse.REMAINDER)
     a = ap.parse_args()
     flags = a.flags[1:] if a.flags and a.flags[0] == "--" else a.flags
     src = Path(a.src); out = Path(a.out).resolve()
     try:
         rc, output, _timed_out = run_compile(
-            src, out, flags, depfile=True, depfile_target=a.out)
-    except RuntimeError as exc:
+            src, out, flags, depfile=True, depfile_target=a.out, locale=a.locale)
+    except (RuntimeError, ValueError) as exc:
         die(str(exc))
     if rc:
         sys.stderr.write(f"[cc_wrap] FAILED {src.name} -> {out}\n" + "\n".join(output.strip().splitlines()[-15:]) + "\n")

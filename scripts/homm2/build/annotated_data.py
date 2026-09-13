@@ -48,7 +48,8 @@ def configure_libclang() -> None:
             pass
 
 
-def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
+def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> list[str]:
+    from homm2.build.localization import clang_args as localization_args
     database_path = repo / "build/clangd/compile_commands.json"
     database = json.loads(database_path.read_text()) if database_path.is_file() else []
     source = source.resolve()
@@ -93,7 +94,7 @@ def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
         elif value.startswith(("--target=", "-fms", "-fdelayed")):
             args.append(value)
         index += 1
-    return args
+    return args + localization_args(repo, source, locale=locale)
 
 
 def _mask_lexical_noise(blob: bytes) -> bytes:
@@ -186,11 +187,9 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path,
         index = ci.Index.create()
         # libclang offsets are UTF-8 byte offsets. Decoding as latin-1 would
         # re-encode non-ASCII comments and shift every later cursor.
-        text = blob.decode("utf-8")
         tu = index.parse(
             str(path),
             args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
-                     unsaved_files=[(str(path), text)],
                      options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
     variables = []
     for cursor in tu.cursor.walk_preorder():
@@ -259,6 +258,10 @@ def _inventory_cache_key(path: Path, unit: str, object_root: Path,
     digest.update(Path(__file__).read_bytes())
     digest.update(compile_database)
     digest.update(path.read_bytes())
+    for name in ('messages.def', 'ru.po'):
+        catalog = path.parents[len(Path(unit).parts)] / 'locales' / name
+        if catalog.is_file():
+            digest.update(catalog.read_bytes())
     digest.update(object_path.read_bytes())
     for dependency in _source_dependencies(path, include_roots):
         digest.update(str(dependency).encode("utf-8"))

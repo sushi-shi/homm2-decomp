@@ -44,6 +44,10 @@ PUBLISHED_PATHS = (
     "LICENSE",
     "README.md",
     "build.ninja",
+    "build-en.ninja",
+    "build.py",
+    "tools",
+    "locales",
     "flake.lock",
     "flake.nix",
     "run-game.sh",
@@ -1151,7 +1155,7 @@ def classicize(
 def materialize_cp1251_literals(text: str) -> tuple[str, int]:
     """Render escaped retail CP1251 bytes as readable Unicode characters.
 
-    Only complete two-digit high-byte ``\\xNN`` escapes inside C/C++ string
+    Complete two-digit high-byte ``\\xNN`` and octal escapes inside C/C++ string
     and character literals are eligible. Escaped backslashes stay escaped and
     longer hexadecimal escapes retain their original C++ maximal-munch
     meaning. Encoding the returned literal text as CP1251 would reproduce the
@@ -1179,6 +1183,22 @@ def materialize_cp1251_literals(text: str) -> tuple[str, int]:
             if literal[i] != "\\" or i + 1 >= len(literal):
                 rewritten.append(literal[i])
                 i += 1
+                continue
+            if literal[i + 1] in '01234567':
+                j = i + 1
+                while j < min(i + 4, len(literal)) and literal[j] in '01234567':
+                    j += 1
+                byte = int(literal[i + 1:j], 8)
+                try:
+                    character = bytes((byte,)).decode('cp1251') if 128 <= byte <= 255 else None
+                except UnicodeDecodeError:
+                    character = None
+                controls = {7: r'\a', 8: r'\b', 9: r'\t', 10: r'\n',
+                            11: r'\v', 12: r'\f', 13: r'\r'}
+                rewritten.append(character if character is not None
+                                 else controls.get(byte, literal[i:j]))
+                replacements += character is not None
+                i = j
                 continue
             if literal[i + 1] != "x":
                 rewritten.append(literal[i:i + 2])
@@ -1251,10 +1271,11 @@ def validate_out_root(requested: Path) -> Path:
     return out_root
 
 
-def write_ninja(out_root: Path) -> None:
+def write_ninja(out_root: Path, locale: str = 'ru') -> None:
     sources = sorted((out_root / "src").rglob("*.cpp"))
+    localized = (out_root / 'locales/messages.def').is_file()
     include_flags = [
-        "-Iinclude",
+        f"-Ibuild/{locale}/localized/include" if localized else "-Iinclude",
         "-Ivendor/audiere-1.9.2",
         "-Ivendor/miles-3.6",
         "-Ivendor/smacker-3.0g",
@@ -1293,7 +1314,7 @@ def write_ninja(out_root: Path) -> None:
     ]
     lines = [
         "ninja_required_version = 1.10",
-        "builddir = build",
+        f"builddir = build/{locale}" if localized else "builddir = build",
         "cxx = clang++",
         "dlltool = llvm-dlltool",
         "cxxflags = " + " ".join(flags),
@@ -1310,7 +1331,7 @@ def write_ninja(out_root: Path) -> None:
         "  restat = 1",
         "",
         "rule cxx",
-        "  command = $cxx $cxxflags -MMD -MF $out.d -c $in -o $out",
+        "  command = $${CXX:-$cxx} $cxxflags -MMD -MF $out.d -c $in -o $out",
         "  depfile = $out.d",
         "  deps = gcc",
         "  description = CXX $in",
@@ -1320,18 +1341,33 @@ def write_ninja(out_root: Path) -> None:
         "  description = IMPLIB $in",
         "",
         "rule link",
-        "  command = $cxx $ldflags -o $out $in $system_libs $runtime_libs",
+        "  command = $${CXX:-$cxx} $ldflags -o $out $in $system_libs $runtime_libs",
         "  description = LINK $out",
         "",
         "build $builddir/obj: mkdir",
         "build $builddir/imports: mkdir",
     ]
+    if localized:
+        inputs = sorted(path.relative_to(out_root).as_posix()
+                        for directory in ('src', 'include')
+                        for path in (out_root / directory).rglob('*')
+                        if path.suffix in ('.cpp', '.h'))
+        outputs = [f'build/{locale}/localized/{path}' for path in inputs]
+        lines += [
+            'rule localize',
+            f'  command = python3 build.py --prepare --{locale}',
+            '  restat = 1',
+            f'  description = LOCALIZE {locale}',
+            'build ' + ' '.join(outputs) + ': localize ' + ' '.join(inputs)
+            + ' | build.py tools/catalog.py locales/messages.def locales/ru.po',
+        ]
     objects = []
     for source in sources:
         relative = source.relative_to(out_root).as_posix()
         name = relative.removeprefix("src/").removesuffix(".cpp").replace("/", "_")
         obj = f"$builddir/obj/{name}.o"
-        lines.append(f"build {obj}: cxx {relative} || $builddir/obj")
+        compiler_source = f'build/{locale}/localized/{relative}' if localized else relative
+        lines.append(f"build {obj}: cxx {compiler_source} || $builddir/obj")
         objects.append(obj)
     import_libraries = []
     for dll, dlltool_flags in (
@@ -1364,7 +1400,8 @@ def write_ninja(out_root: Path) -> None:
         "default game",
         "",
     ]
-    (out_root / "build.ninja").write_text("\n".join(lines))
+    filename = 'build-en.ninja' if localized and locale == 'en' else 'build.ninja'
+    (out_root / filename).write_text("\n".join(lines))
 
 
 MSS_IMPORTS = (
@@ -1529,8 +1566,19 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
         shutil.copyfile(REPO / source, out_root / target)
     (out_root / "run-game.sh").chmod(0o755)
 
+    if (REPO / 'locales/messages.def').is_file():
+        from homm2.build.catalog import Catalog
+        Catalog.load(REPO)  # Do not publish an invalid catalog.
+        shutil.copytree(REPO / 'locales', out_root / 'locales')
+        (out_root / 'tools').mkdir()
+        shutil.copyfile(REPO / 'scripts/homm2/build/catalog.py', out_root / 'tools/catalog.py')
+        shutil.copyfile(REPO / 'scripts/homm2/clean/project/build.py', out_root / 'build.py')
+        (out_root / 'build.py').chmod(0o755)
+
     write_import_defs(out_root)
     write_ninja(out_root)
+    if (out_root / 'locales/messages.def').is_file():
+        write_ninja(out_root, 'en')
 
     # A patch key that no file matched means the source moved and the patch is
     # now silently doing nothing.
@@ -1591,7 +1639,14 @@ def generate_classic(
     modern_enums = scoped_enums(source_root, set(domains))
     transformed = 0
     materialized = 0
+    from homm2.build.catalog import Catalog
+    catalog = (Catalog.load(source_root)
+               if readable_russian and (source_root / 'locales/messages.def').is_file()
+               else None)
     for relative in tracked:
+        if catalog and (relative.parts[0] in ('locales', 'tools') or
+                        relative.as_posix() in ('build.py', 'build-en.ninja', 'build.ninja')):
+            continue  # Classic is a terminal reading view, with no locale build.
         source = source_root / relative
         if not source.is_file():
             continue
@@ -1610,6 +1665,8 @@ def generate_classic(
                 modern_enums,
             )
             if readable_russian:
+                if catalog:
+                    text = catalog.render(text, expanded=True, locale='ru')
                 text, count = materialize_cp1251_literals(text)
                 materialized += count
             target.write_text(text, encoding="utf-8")

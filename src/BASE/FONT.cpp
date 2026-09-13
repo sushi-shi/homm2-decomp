@@ -41,7 +41,7 @@ font::~font() {
 
 // Maps a CP1251 byte onto the font's glyph range. Retail compares the
 // zero-extended byte, so the codes stay numeric: a signed char literal
-// ('\xa8' == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
+// (a signed CP1251 'Ё' byte == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
 VA(0x004c37a0, 0x52)
 i32 RemapCyrillicCharacter(i32 character) {
     if (character == 0xa8)              // 'Ё'
@@ -191,7 +191,7 @@ i32 font::GetCharacterWidth(u8 c) {
 
 // Buka's Cyrillic line breaker. Retail compares the zero-extended byte, so
 // like RemapCyrillicCharacter the CP1251 codes stay numeric: with a u8
-// parameter a '\xe0' literal would compare -32 against 224 and never match.
+// parameter a signed CP1251 'а' byte would compare -32 against 224 and never match.
 static inline bool IsVowel(u8 c) {
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y'
         || c == 0xe0 /* а */ || c == 0xe5 /* е */ || c == 0xb8 /* ё */

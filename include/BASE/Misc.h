@@ -21,6 +21,15 @@ H2_ENUM_BEGIN(LogConstant)
     LOG_UNUSED_VALUE = -999
 H2_ENUM_END(LogConstant)
 
+// Exact scalar/plain-record storage only. Keep the CRT result and partial-read effects.
+#define READ_FILE_VALUE(fd, value) read((fd), &(value), sizeof(value))
+#define WRITE_FILE_VALUE(fd, value) write((fd), &(value), sizeof(value))
+
+// Existing signed integer deltas; no widening or alternative distance metric.
+#define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
+#define INTEGER_VECTOR_LENGTH(dx, dy) \
+    (static_cast<i32>(sqrt((dx) * (dx) + (dy) * (dy))))
+
 struct indexArray {
     u16 key;
     u16 value;
@@ -81,6 +90,12 @@ void ProcessAssert(i32 condition, H2_CONST char* file, i32 line);
 // site lowers to plain operator new/delete (435/524 direct calls image-wide).
 #define H2_ALLOC(size) static_cast<void*>(new u8[size])
 #define H2_FREE(ptr) delete (ptr)
+// Both operands must be stable. Allocation does not free an old destination.
+#define ALLOC_COPY_STRING(destination, source)                                                     \
+    ((destination) = static_cast<char*>(H2_ALLOC(strlen(source) + 1)),                             \
+     strcpy((destination), (source)))
+// The shared buffer is formatted even when LogStr itself is disabled.
+#define LOG_SUMMARY_VALUE(format, value) (sprintf(gText, (format), (value)), LogStr(gText))
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, H2_CONST char* pattern);
@@ -106,11 +121,28 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32)
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(H2_CONST char*);
-void LogInt(H2_CONST char*, i32, i32, i32, i32, i32, i32, i32);
+void LogInt(
+    H2_CONST char* text,
+    i32 value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+);
 #if H2_STRICT_ENUMS
-template <typename Enum>
-    requires __is_enum(Enum)
-inline void LogInt(H2_CONST char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+template<typename Enum>
+requires __is_enum(Enum) inline void LogInt(
+    H2_CONST char* text,
+    Enum value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
 #endif

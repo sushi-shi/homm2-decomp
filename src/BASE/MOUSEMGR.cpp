@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
 #include <stdio.h>
@@ -502,8 +503,8 @@ VA(0x004ba100, 0x57)
 void mouseManager::MouseCoords(i32& x, i32& y) {
     GetCursorPos(&gMouseScreenPt);
     ScreenToClient(hwndApp, &gMouseScreenPt);
-    x = (gMouseScreenPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-    y = (gMouseScreenPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+    x = CLIENT_TO_GAME_X(gMouseScreenPt.x);
+    y = CLIENT_TO_GAME_Y(gMouseScreenPt.y);
 }
 
 VA(0x004ba160, 0x105)
@@ -603,8 +604,8 @@ void mouseManager::CheckUpdateMousePos(void) {
     if (gbColorMice != 0) {
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
-        m_mouseX = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-        m_mouseY = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+        m_mouseX = CLIENT_TO_GAME_X(gMouseCheckPt.x);
+        m_mouseY = CLIENT_TO_GAME_Y(gMouseCheckPt.y);
         CheckChangeCursor(m_mouseX, m_mouseY, 0);
     }
 }

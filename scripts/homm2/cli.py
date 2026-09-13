@@ -59,12 +59,28 @@ def main(argv=None):
         print("usage: homm2 data-topology census", file=sys.stderr)
         return 1
     if cmd == "build":
+        if '--ru' in rest and '--en' in rest:
+            print('choose only one locale: --ru or --en', file=sys.stderr)
+            return 1
+        if '--no-match' in rest:
+            return sh('python3', '-m', 'homm2.build.ordinary',
+                      *(arg for arg in rest if arg != '--no-match'))
+        if '--en' in rest:
+            print('English is not a matching target; use homm2 build --no-match --en',
+                  file=sys.stderr)
+            return 1
+        if '--help' in rest or '-h' in rest:
+            print('homm2 build [--ru] [Ninja options/targets] (Russian matching build)\n'
+                  'homm2 build --no-match [--ru|--en] [-j JOBS] [-v] (compile + link)')
+            return 0
+        rest = [arg for arg in rest if arg != '--ru']
         from homm2.core.retail import verify_retail
         try:
             verify_retail(REPO / "build/orig/HMM2PL.exe")
         except (OSError, ValueError) as error:
             print(f"[build] {error}", file=sys.stderr)
             return 1
+        if sh("python3", "-m", "homm2.build.localization"): return 1
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
         if sh("python3", "configure.py"): return 1

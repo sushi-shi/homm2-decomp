@@ -106,6 +106,38 @@ homm2 selftest            # tool test suite
 After changing a `VA`/`DATA`/`VTBL` claim, run `homm2 redelink` to rebuild the
 delinked target, then `homm2 build`.
 
+## Build without matching
+
+Russian is the default locale. `homm2 build` (or `homm2 build --ru`) is the
+Russian retail-comparison workflow; it compiles objects and refreshes matching
+reports, but linking is a separate command.
+
+For an ordinary executable, with no retail executable or delinked targets needed:
+
+```sh
+nix develop .#build
+python3 -m homm2.init.toolchain     # one-time compiler setup; no matching setup
+homm2 build --no-match --ru        # compile and link Russian (default)
+homm2 build --no-match --en        # compile and link English
+```
+
+Outputs are `build/ordinary/ru/HMM2PL.exe` and `build/ordinary/en/HMM2PL.exe`.
+Objects and Ninja state are separate for each locale. These commands do not
+update matching objects, scores, reports, or this README. `--en` requires
+`--no-match`: English is not the Buka matching target. Both modes accept `-j N`
+and `-v`.
+
+Like the generic link, these builds omit Windows resources and the retail icon;
+they select catalog text, not game assets. You still need a compatible installed
+game and its middleware DLLs. This does not translate text embedded in external
+maps, graphics, videos, or other assets. The existing `nix run` play workflow
+below still uses the Russian resource build, not these locale outputs.
+
+Generated `source-gold-2.1-buka` preserves the same IDs and catalogs, with its own
+modern build (`./build.py --ru` / `./build.py --en`). Generated
+`classic-gold-2.1-buka` instead resolves IDs into readable Russian UTF-8 literals
+and remains a reading-only view. See [localization](docs/localization.md).
+
 ## Build and play the game
 
 From nothing to a playable rebuilt executable:

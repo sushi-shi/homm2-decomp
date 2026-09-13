@@ -354,9 +354,15 @@ def source_hashes():
     emitted bytes and relocations.
     """
     sym = _rva_to_sym(); cmap = _class_members()
+    from homm2.build.localization import Catalog
+    catalog = Catalog.load(REPO) if (REPO / 'locales/messages.def').is_file() else None
     out = {}
     for cpp in sorted((REPO / "src").rglob("*.cpp")):
         text = cpp.read_text(errors="replace")
+        if catalog is not None:
+            # Retained evidence belongs to the compiled Russian text, not just
+            # the spelling of its stable ID. Translation edits invalidate it.
+            text = catalog.render(text, expanded=True)
         helpers = _static_inline_helpers(text)
         for absolute_va, block in _source_function_blocks(text):
             rva = absolute_va - RVA_BASE

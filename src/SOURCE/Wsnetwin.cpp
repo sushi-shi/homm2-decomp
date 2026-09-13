@@ -32,7 +32,7 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 plr;
 
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         sprintf(
             gText,
             /* Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы
@@ -40,20 +40,13 @@ i16 wsnet_init(void) {
 
                Когда соединение будет установлено, вы сможете вернуться в полноэкранный режим
                нажав 'F4'. */
-            "\xce\xe1 \xe8\xed\xe8\xf6\xe8\xe8\xf0\xee\xe2\xe0\xed\xe8\xe8 TCP/IP \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff. "
-                "\xc3\xe5\xf0\xee\xe8 II \xef\xe5\xf0\xe5\xea\xeb\xfe\xf7\xe0\xf2\xf1\xff \xe2 \xee\xea\xee\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec, \xf7\xf2\xee\xe1\xfb \xe2\xfb "
-                "\xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 \xe4\xee\xf1\xf2\xf3\xef \xea \xe4\xe8\xe0\xeb\xee\xe3\xee\xe2\xfb\xec \xee\xea\xed\xe0\xec Windows.\n\n"
-                "\xca\xee\xe3\xe4\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5 \xe1\xf3\xe4\xe5\xf2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xeb\xe5\xed\xee, \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
-                "\xef\xee\xeb\xed\xee\xfd\xea\xf0\xe0\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec \xed\xe0\xe6\xe0\xe2 'F4'."
+            localization::Tr("network.tcp.fullscreen_warning")
         );
-        NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, 1);
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;
-    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
-    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
-    memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
-    memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+    INIT_TRANSPORT_RECEIVE_STORAGE();
 
     wVer = MAKEWORD(1, 1);
     iRc = WSAStartup(wVer, &wsadata);
@@ -100,15 +93,12 @@ i16 wsnet_init(void) {
 
                    У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
                    игру, не дожидаясь  остальных гостей. */
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                    "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                localization::Tr("network.tcp.host.guest_progress.buka"),
                 inet_ntoa(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         } else {
             sprintf(
                 cWSTextBuffer,
@@ -117,12 +107,10 @@ i16 wsnet_init(void) {
                    Ожидание гостя(ей).
 
                      Нажмите 'ОТМЕНА', чтобы прервать соединение. */
-                "\xce\xf2\xea\xf0\xfb\xf2\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s\n\n"
-                    "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff(\xe5\xe9).\n\n  "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.",
+                localization::Tr("network.tcp.host.waiting_guests"),
                 inet_ntoa(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -136,15 +124,12 @@ i16 wsnet_init(void) {
 
                        У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
                        игру, не дожидаясь  остальных гостей. */
-                    "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                        "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                        "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                        "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                    localization::Tr("network.tcp.host.guest_progress.buka"),
                     inet_ntoa(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
             }
         } else {
             sprintf(
@@ -152,13 +137,11 @@ i16 wsnet_init(void) {
                 /* Создание игры на %s.
 
                    У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                    "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+                localization::Tr("network.tcp.host.guests_ready.buka"),
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = giNumHumanPlayers;
@@ -184,8 +167,7 @@ i16 wsnet_init(void) {
             GetDataEntry(
                 /* Введите IP адрес сервера.
                    (Например: 220.415.119.223) */
-                "\xc2\xe2\xe5\xe4\xe8\xf2\xe5 IP \xe0\xe4\xf0\xe5\xf1 \xf1\xe5\xf0\xe2\xe5\xf0\xe0.\n"
-                    "(\xcd\xe0\xef\xf0\xe8\xec\xe5\xf0: 220.415.119.223)",
+                localization::Tr("network.tcp.host_address.prompt"),
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
@@ -196,27 +178,18 @@ i16 wsnet_init(void) {
         giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
         if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
             NormalDialog(
-                /* Неправильный IP адрес. Попробуйте еще раз. */
-                "\xcd\xe5\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xfb\xe9 IP \xe0\xe4\xf0\xe5\xf1. "
-                    "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe5\xf9\xe5 \xf0\xe0\xe7.",
-                NORMAL_DIALOG_WAIT_FIRST,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+
+                localization::Tr("network.tcp.host_address.invalid"),
+                NORMAL_DIALOG_WAIT_FIRST
             );
             goto retryAddress;
         }
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         sprintf(
             cWSTextBuffer,
-            /* Поиск сервера. */ "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
+             localization::Tr("network.tcp.host.searching")
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -227,12 +200,7 @@ VA(0x004b2262, 0xb3)
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
-    if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer);
-    ppDPRcvBuffer = NULL;
-    if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize);
-    piDPRcvBufferSize = NULL;
+    DisposeTransportReceiveStorage();
     WSACleanup();
     bHostFound = false;
     sd_dg = INVALID_SOCKET;
@@ -283,7 +251,7 @@ void wsSendMessage(
                     goto sendPacket;
                 }
                 sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
                 return;
             }
         }
@@ -299,7 +267,7 @@ void wsSendMessage(
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
             return;
         }
     }
@@ -375,10 +343,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
-            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-            piDPRcvBufferSize[iDPRcvBufferHead] = size;
-            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
+            ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
@@ -397,16 +362,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         }
                     }
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                    LogInt(
-                        "Got HereIAm from ",
-                        sender,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
-                    );
+                    LogInt("Got HereIAm from ", sender);
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *static_cast<SNetPlayerInfo*>(message);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
@@ -426,16 +382,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = static_cast<WinsockStartupMessage*>(message)->playerCount;
             giThisNetPos = static_cast<WinsockStartupMessage*>(message)->netPosition;
-            LogInt(
-                "WSMSGSTARTUP",
-                giThisNetPos,
-                sender,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("WSMSGSTARTUP", giThisNetPos, sender);
             memcpy(
                 giNetPosToDCOPos,
                 static_cast<WinsockStartupMessage*>(message)->playerAddresses,
@@ -446,22 +393,17 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
                 cWSTextBuffer,
-                "\xd1\xe5\xf0\xe2\xe5\xf0 \xf3\xe6\xe5 \xf1\xee\xe7\xe4\xe0\xeb \xe8\xe3\xf0\xf3 "
-                "\xe8 \xed\xe5 \xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xed\xee\xe2\xfb\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Сервер уже создал игру и не принимает новых игроков." */
+                localization::Tr("network.tcp.host.rejected")
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
             sprintf(
                 cWSTextBuffer,
-                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff "
-                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb." /* "Ожидаю игрока для начала игры." */
+                localization::Tr("network.waiting_player_start")
             );
-            windowMessage.type = MESSAGE_WIDGET;
-            windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            windowMessage.payload.widget.id = 1;
+            SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, 1);
             windowMessage.payload.widget.data.text = cWSTextBuffer;
             pNormalDialogWindow->BroadcastMessage(windowMessage);
             pNormalDialogWindow->DrawWindow();
@@ -471,7 +413,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             sprintf(cWSTextBuffer, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
             if (giDebugLevel > 0) {
                 sprintf(gText, cWSTextBuffer);
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
             LogStr(cWSTextBuffer);
             break;
@@ -500,15 +442,11 @@ i32 wsWaitForExtraGuests(void) {
             /* Создание игры на %s.
 
                У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
-            "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+            localization::Tr("network.tcp.host.guests_ready.buka"),
             inet_ntoa(gIn_addrIP),
             giNumHumanPlayers - 1
         );
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = 1;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
         message.payload.widget.data.text = cWSTextBuffer;
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();
@@ -538,10 +476,9 @@ i32 wsWaitForHost(void) {
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(
                     cWSTextBuffer,
-                    /* Сервер не отвечает. Продолжить ожидание? */ "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
-                        "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xee\xe6\xe8\xe4\xe0\xed\xe8\xe5? "
+                    /* Сервер не отвечает. Продолжить ожидание? */ localization::Tr("network.tcp.host.not_responding")
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(NULL);
                 iWSAttempts = 0;

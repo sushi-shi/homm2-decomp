@@ -9759,22 +9759,6 @@
     },
     "note": "O02 applied: split 29 scratch objects out of a padding-bearing 140-byte global record, preserving all original field addresses; removed two unobserved padding arrays. Five emitted functions have equivalent before/after instructions and ordered field relocations. Both game functions and two compiler helpers match verified retail bytes, complete absolute operand sites and all ordered relocation destinations. Genuine searchNode tagged views retained. U03/U04 queue/target-coordinate aliases, G09 shared tail and B18 map/queue/caller domains remain open. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
-  "include/BASE/Misc.h:LogInt(char * text,Enum value,i32 b,i32 c,i32 d,i32 e,i32 f,i32 g)#1": {
-    "body_sha256": "45a82f6d5a1283c75f6e8fc8dabb12e8dddbf9c009ceb72153889d904c784ee6",
-    "patterns": {
-      "casts": "retain",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "absent",
-      "bounds": "absent"
-    },
-    "note": "Strict-enum overload explicitly converts enum to the logger's numeric i32 ABI; all seven arguments remain explicit, with no manual varargs or scratch storage."
-  },
   "src/BASE/Misc.cpp:InitMemEntry(void)#1": {
     "body_sha256": "df0442404a73153ca3db66a32bde9387402e122108de6e0d5b4d436e1a82e8bc",
     "patterns": {
@@ -18239,22 +18223,6 @@
     },
     "note": "Whole sort read for S44: indices0..count-1 only, six buffers cover valid count. C34 temporaryOrder contains i8 then casts back, lossless candidate. Separate stat/order temps are related swap roles; no unrelated reuse/goto/union/fake stack/manual varargs/arbitrary pointer."
   },
-  "src/SOURCE/TOWNMGR.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
-    "body_sha256": "ef31a709743e4bf00b21d2b6ed2ef268b8175261972cbb6c60cdeac1c736c0f7",
-    "patterns": {
-      "casts": "absent",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "absent",
-      "bounds": "retain"
-    },
-    "note": "Unsigned input preserves the high CP1251 ranges; returned char preserves one byte and length. Actual ASCII/Cyrillic/yo mapping, no explicit casts, arrays, unions, gotos, pointer arithmetic, reused roles or unused scratch."
-  },
   "src/SOURCE/TOWNMGR.cpp:townObject::townObject(FactionType townType,BuildingSlotType buildingId,char * iconBaseName)#1": {
     "body_sha256": "67c265c1255936dc78122b517e950f745b387451fb4eb850a69be49f94b15f75",
     "patterns": {
@@ -20270,38 +20238,6 @@
       "bounds": "open"
     },
     "note": "Complete ownership/alliance, cached hero visit, guarded garrison hero and weighted battle valuation read. Occupying hero -1 guard is present, unlike GetTurnAIVars threat setup. U12 town/castle owner views remain pending full-consumer simplification. Real numeric truncations retained. B72 town/player/hero/grid/cache domains, live armies and finite representable values required; early friendly/allied returns depend on caller chance initialization. No goto, fake aggregate, artificial pointer, manual varargs or unrelated local reuse. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
-  },
-  "src/SOURCE/ARMY.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
-    "body_sha256": "4100f0663a204c0c4a7b1ef53b2a7898e1d0a48b322239505ef031c019026721",
-    "patterns": {
-      "casts": "retain",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "absent",
-      "bounds": "absent"
-    },
-    "note": "Complete ASCII/CP1251 including YO case mapping read. Unsigned input and char result express byte-preserving text conversion, including high-bit values; no widening buffer or Unicode substitution. No union, goto, scratch aggregate, varargs, role reuse or pointer arithmetic."
-  },
-  "src/SOURCE/ARMY.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
-    "body_sha256": "e77627defca7ff7d27e6a84cfa8579f93f7adbe6018aecaa58cff99582257518",
-    "patterns": {
-      "casts": "retain",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "absent",
-      "bounds": "absent"
-    },
-    "note": "Complete reverse ASCII/CP1251/YO mapping read. Real u8-to-char text boundary preserves one-byte encoding; retained rather than imposing ASCII-only conversion. No union, goto, scratch aggregate, varargs, role reuse or artificial pointer."
   },
   "src/SOURCE/ARMY.cpp:army::army(void)#1": {
     "body_sha256": "8fee73cacbf772d23a09fcae64b581dd3adb905c4e0d8762f4e46649fbc66d45",
@@ -25759,22 +25695,6 @@
     },
     "note": "Forms players[playerIndex] before player0/campaign/map guard, so valid player0..5 is a pointer-formation precondition. CheckEndGame's caller enumerates actual playerCount slots; count validity remains inherited. Only main-player Abyss heroCount==0 triggers loss. No executed invalid-pointer claim. No source goto, manual argument-slot varargs or enclosing-owner recovery. Full80 retail bytes; all sites/ordered targets pass. C78/O08/S71/R28/B93 full report; all98 native objects equal except exactly two verified name-owner/addend rewrites."
   },
-  "src/SOURCE/EVENTS.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
-    "body_sha256": "427e91ff76a6f81b09fd40fd2c584daf538ede55d3617fc7398136b61e6e57fc",
-    "patterns": {
-      "casts": "absent",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "absent",
-      "bounds": "absent"
-    },
-    "note": "Actual unsigned-byte helper: ASCII A..Z, CP1251 c0..df and special A8 are mapped; other bytes preserved. No buffer, alternate owner, unrelated reuse or argument-slot varargs. Its inlined consumers are covered by DoEvent's full retail span. No manual argument-slot varargs or enclosing-owner recovery. Inlined code covered by the DoEvent retail/native comparison. C79/C80/O09/S72/S73/R29/G106-G108/A05/B94 report; strict all98 native objects/1826 functions/allocated sections/ordered relocations unchanged."
-  },
   "src/SOURCE/EVENTS.cpp:advManager::DoEvent(mapCell * cell,i32 x,i32 y)#1": {
     "body_sha256": "c8145692fdc006e6a5c995776963b05c7b843ddc5ed63588934a50d585edb8f8",
     "patterns": {
@@ -26494,5 +26414,21 @@
       "bounds": "open"
     },
     "note": "C44 removes13 literal const_casts through existing text APIs. Tagged RemoteMessage/i16 prefix, char/u8 codec/CRC interfaces and acknowledgement owner recovery remain open with U14. S43 complete16-arm unused2080/file/packet/oldTrack product and32-arm ackBuffer/incomingData/decodedData/received/success initialization product retain original: every individual deletion loses10 bytes, all tested nonbaseline subsets differ. B62 filenames fit19/452 with terminated config name13; packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 remain unchecked. Retail allocates ackBuffer256, fills100 and sends200; CRCs are logged, not compared; sender not locally checked. Alias-aware cleanup retained. All1736 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. No goto/fake aggregate/manual varargs/member recovery. See C44-G50-S43.md; no hardening. U14 follow-up recovers RemoteSaveMessage256 at GetRemoteData boundary and reads its typed chunk index/data directly, removing two primitive-prefix casts and the byte-offset expression. Payload247/index2/data245 preserve the complete physical receive extent independently of sender chunk limit200. The one transport-boundary cast and codec/acknowledgement interfaces remain; no malformed-length validation added. Full1736 ordinary retail bytes/sites/ordered targets and all98 native objects unchanged. U09-U14.md resolves typed packet ownership; earlier S43 and B62 defects remain."
+  },
+  "include/BASE/Misc.h:LogInt(char * text,Enum value,i32 b=LOG_UNUSED_VALUE,i32 c=LOG_UNUSED_VALUE,i32 d=LOG_UNUSED_VALUE,i32 e=LOG_UNUSED_VALUE,i32 f=LOG_UNUSED_VALUE,i32 g=LOG_UNUSED_VALUE)#1": {
+    "body_sha256": "45a82f6d5a1283c75f6e8fc8dabb12e8dddbf9c009ceb72153889d904c784ee6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Strict-enum overload explicitly converts enum to the logger's numeric i32 ABI; all seven arguments remain explicit, with no manual varargs or scratch storage. PR59 base merge: signature spelling/default arguments changed; this is the preserved pre-merge review, not a new-body certification. See pr59-base-merge.md."
   }
 }

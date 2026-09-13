@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/IconRle.h>
 #include <BASE/Iconm2b.h>
 #include <BASE/IconDraw.h>
 #include <BASE/icon.h>
@@ -41,8 +42,7 @@ void MonoIconToBitmap(
     s_y = y + s_entry->y;
 
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (s_left >= clipX && s_left + s_entry->w <= clipX + clipW && s_y >= clipY
-            && s_y + s_entry->h <= clipY + clipH) {
+        if (ICON_FITS_CLIP(s_left, s_y, s_entry->w, s_entry->h, clipX, clipY, clipW, clipH)) {
             clip = ICON_DRAW_NO_CLIP;
         } else {
             clip = ICON_DRAW_CLIP;

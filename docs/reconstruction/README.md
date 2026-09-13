@@ -5,6 +5,11 @@ Base: `decomp-gold-2.1-buka` at `ca2904a91`. Work branch:
 claim. [Progress](progress.md), [every function](functions.tsv), and
 [file coverage](files.tsv) distinguish inspected source from pending work.
 
+PR59 now incorporates the base's common-helper and localization changes. The
+completed 1,656-function/229-file reading below describes the pre-merge revision;
+changed bodies are honestly marked pending in the current hash-bound inventory.
+See [merge resolutions, validation, and the review revision boundary](pr59-base-merge.md).
+
 The supplied checklist is the scope: casts, unions, gotos, artificial address
 arithmetic, recovering owners from member pointers, out-of-object pointers,
 manual varargs, unrelated variable reuse, stack aggregates/unused members, and
@@ -59,8 +64,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 - [Global data and annotation reconciliation](data-and-metadata.md): complete
   KB data tail, X_GLOBAL catalogs/runtime owners and va.h metadata read.
-  All 1,656 physical functions and all 229 project files now have manual
-  reviews; remaining findings retain their individual dispositions.
+  All 1,656 physical functions and all 229 project files had manual reviews
+  before the base merge; remaining findings retain their individual dispositions.
 
 - C79/C80/O09/S72/S73/R29/G106-G108/A05/B94: all43 EVENTS definitions
   reviewed; 99 gross written conversions removed (95 net), four void-owner
