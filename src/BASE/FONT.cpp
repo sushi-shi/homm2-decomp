@@ -9,11 +9,10 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <BASE/display.h>
 
 typedef enum FontConstant {
     LARGE_FONT_HEIGHT_THRESHOLD = 14,
-    FONT_DRAW_SCREEN_WIDTH      = 640,
-    FONT_DRAW_SCREEN_HEIGHT     = 480,
     CENTER_DIVISOR              = 2,
     WRAP_HEIGHT_LINE_COUNT      = 2
 } FontConstant;
@@ -185,7 +184,7 @@ void font::DrawStringExecute(
 VA(0x004c3a30, 0x3d)
 void font::DrawString(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = false;
-    DrawStringExecute(text, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
+    DrawStringExecute(text, x, y, mode, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 #if H2_RETAIL_COMPILER
 #undef text

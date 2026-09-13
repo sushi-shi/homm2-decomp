@@ -57,6 +57,12 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
+#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/armyGroup.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(CampaignChoiceValue)
     CHOICE_VALUE_NONE = -1
@@ -231,18 +237,10 @@ H2_ENUM_BEGIN(InitMenuConstant)
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_KEY_EXIT = 0x10,
-    MENU_KEY_HIGH_SCORES = 0x23,
-    MENU_KEY_LOAD = 0x26,
-    MENU_KEY_CREDITS = 0x2e,
-    MENU_KEY_NEW = 0x31,
     MENU_DISABLE_MASK = 0x200,
-    MENU_CLOSE_COMMAND = 10,
     MENU_HELP_DIALOG = 4,
     MENU_MOVIE_SMACKER = 0x26,
     MENU_MAIN_MUSIC = 0x2a,
-    MENU_SCREEN_WIDTH = 640,
-    MENU_SCREEN_HEIGHT = 480,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
     MENU_IDLE_FRAME = 1,
@@ -496,8 +494,8 @@ i32 oldmain(void) {
     i32 gamePlayer;
     i32 result;
     i32 transmissionResult;
-    char matchedNetPlayers[OLD_MAIN_PLAYER_COUNT];
-    char matchedGamePlayers[OLD_MAIN_PLAYER_COUNT];
+    char matchedNetPlayers[GAME_PLAYER_COUNT];
+    char matchedGamePlayers[GAME_PLAYER_COUNT];
     OldMainNetBuffer netBuffer;
 
     if (bKBDone)
@@ -534,16 +532,16 @@ i32 oldmain(void) {
             gpWindowManager->m_screen,
             0,
             0,
-            OLD_MAIN_SCREEN_WIDTH,
-            OLD_MAIN_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            OLD_MAIN_SCREEN_WIDTH,
-            OLD_MAIN_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );
@@ -559,7 +557,7 @@ i32 oldmain(void) {
     }
 
     LoadSystemwideIcons();
-    memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+    memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
     quit = false;
     mainScreenLoaded = false;
@@ -582,7 +580,7 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 if (firstMainScreen)
                     SetPalette(gPalette->m_data, 1);
                 else
@@ -603,7 +601,7 @@ i32 oldmain(void) {
             gbTCPFirstTime = false;
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-            iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
+            iMPNetProtocol = REMOTE_PROTOCOL_WINSOCK;
             if (giTCPHostStatus)
                 iMPExtendedType = REMOTE_GAME_NETWORK_HOST;
             else
@@ -695,7 +693,7 @@ i32 oldmain(void) {
                 giSetupGameType = OLD_MAIN_SETUP_NEW;
 
             setup_selected:
-                for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+                for (player = 0; player < GAME_PLAYER_COUNT; player++)
                     sprintf(
                         cPlayerNames[player],
                         ""
@@ -772,12 +770,12 @@ i32 oldmain(void) {
             LogStr("DWM 2");
             if (gbRemoteOn && giThisNetPos == 0) {
                 LogStr("DWM 3");
-                memset(matchedGamePlayers, 0, OLD_MAIN_PLAYER_COUNT);
-                memset(matchedNetPlayers, 0, OLD_MAIN_PLAYER_COUNT);
-                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
+                memset(matchedGamePlayers, 0, GAME_PLAYER_COUNT);
+                memset(matchedNetPlayers, 0, GAME_PLAYER_COUNT);
+                for (netPlayer = 0; netPlayer < GAME_PLAYER_COUNT; netPlayer++) {
                     if (!gbHumanPlayer[netPlayer])
                         continue;
-                    for (gamePlayer = 0; gamePlayer < OLD_MAIN_PLAYER_COUNT; gamePlayer++) {
+                    for (gamePlayer = 0; gamePlayer < GAME_PLAYER_COUNT; gamePlayer++) {
                         if (strlen(&gpGame->m_defaultPlayerNames
                                         [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE])
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
@@ -796,9 +794,9 @@ i32 oldmain(void) {
                     }
                 }
                 gamePlayer = 0;
-                while (gamePlayer < OLD_MAIN_PLAYER_COUNT && matchedGamePlayers[gamePlayer])
+                while (gamePlayer < GAME_PLAYER_COUNT && matchedGamePlayers[gamePlayer])
                     gamePlayer++;
-                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
+                for (netPlayer = 0; netPlayer < GAME_PLAYER_COUNT; netPlayer++) {
                     if (matchedNetPlayers[netPlayer])
                         continue;
                     if (gbHumanPlayer[netPlayer]) {
@@ -809,7 +807,7 @@ i32 oldmain(void) {
                             gsNetPlayerInfo[netPlayer].uniqueSystemID
                         );
                         gamePlayer++;
-                        while (gamePlayer < OLD_MAIN_PLAYER_COUNT
+                        while (gamePlayer < GAME_PLAYER_COUNT
                                && matchedGamePlayers[gamePlayer])
                             gamePlayer++;
                     } else {
@@ -817,7 +815,7 @@ i32 oldmain(void) {
                     }
                 }
 
-                memcpy(netBuffer.setup.gamePosToNetPos, gbGamePosToNetPos, OLD_MAIN_PLAYER_COUNT);
+                memcpy(netBuffer.setup.gamePosToNetPos, gbGamePosToNetPos, GAME_PLAYER_COUNT);
                 memcpy(
                     netBuffer.setup.players,
                     gsNetPlayerInfo,
@@ -850,7 +848,7 @@ i32 oldmain(void) {
                     if (!gpGame->TransmitSaveGame(player, 0, 1))
                         ShutDown(NULL);
                 }
-                memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+                memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
@@ -963,7 +961,7 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
                 mainScreenLoaded = true;
@@ -993,7 +991,7 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+                        for (player = 0; player < GAME_PLAYER_COUNT; player++)
                             sprintf(
                                 cPlayerNames[player],
                                 ""
@@ -1017,7 +1015,7 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+                        for (player = 0; player < GAME_PLAYER_COUNT; player++)
                             sprintf(
                                 cPlayerNames[player],
                                 ""
@@ -1039,8 +1037,8 @@ i32 oldmain(void) {
                         gpWindowManager->UpdateScreenRegion(
                             0,
                             0,
-                            OLD_MAIN_SCREEN_WIDTH,
-                            OLD_MAIN_SCREEN_HEIGHT
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT
                         );
                         gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                         gpWindowManager->m_updateFlags = 1;
@@ -1067,7 +1065,7 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 mainScreenLoaded = true;
             }
@@ -1297,8 +1295,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
 
     PollSound();
     if (message.payload.widget.parameter & MENU_DISABLE_MASK) {
-        if (message.payload.widget.command == INIT_MENU_HOVER_COMMAND
-            || message.payload.widget.command == INIT_MENU_HELP_COMMAND) {
+        if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
+            || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
             helpIndex = -1;
             switch (message.payload.widget.id) {
                 case MENU_NEW_GAME:
@@ -1322,46 +1320,46 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
         }
     } else {
-        if (message.type == INIT_MENU_KEY_PRESS) {
+        if (message.type == MESSAGE_KEY_DOWN) {
             switch (message.payload.keyboard.keyCode) {
-                case MENU_KEY_NEW:
+                case IDX(INPUT_SCAN_N):
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
                     handled = true;
                     break;
-                case MENU_KEY_LOAD:
+                case IDX(INPUT_SCAN_L):
                     gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
                     handled = true;
                     break;
-                case MENU_KEY_CREDITS:
+                case IDX(INPUT_SCAN_C):
                     gpWindowManager->m_dialogResult = MENU_CREDITS;
                     handled = true;
                     break;
-                case MENU_KEY_HIGH_SCORES:
+                case IDX(INPUT_SCAN_H):
                     gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
                     handled = true;
                     break;
-                case MENU_KEY_EXIT:
+                case IDX(INPUT_SCAN_Q):
                     gpWindowManager->m_dialogResult = MENU_EXIT;
                     handled = true;
                     break;
             }
-        } else if (message.type == INIT_MENU_MESSAGE) {
+        } else if (message.type == MESSAGE_WIDGET) {
             if (message.payload.widget.id < MENU_FIRST_COMMAND
                 || message.payload.widget.id > MENU_LAST_ACTION) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
             switch (message.payload.widget.command) {
-                case INIT_MENU_HOVER_COMMAND:
+                case WIDGET_NOTIFY_SELECT:
                     if (message.payload.widget.id == MENU_MOVIE)
                         break;
                     menu = message.payload.widget.id - MENU_FIRST_COMMAND;
                     index = menu + MENU_WIDGET_OFFSET;
-                    message.type = INIT_MENU_MESSAGE;
+                    message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = index;
-                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     message.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
                     gpInitWin->BroadcastMessage(message);
-                    gpInitWin->DrawWindow(0, index, index);
+                    gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, index, index);
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_X)],
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_Y)],
@@ -1369,7 +1367,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                         IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                     break;
-                case INIT_MENU_CLICK_COMMAND:
+                case WIDGET_NOTIFY_DESELECT:
                     if (message.payload.widget.id == MENU_MOVIE) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop(
@@ -1377,22 +1375,26 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                             gpWindowManager->m_screen,
                             1
                         );
-                        gpInitWin->DrawWindow(0);
+                        gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                         gpWindowManager
-                            ->UpdateScreenRegion(0, 0, MENU_SCREEN_WIDTH, MENU_SCREEN_HEIGHT);
+                            ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                         gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
                         break;
                     } else {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         for (index = MENU_FIRST_WIDGET; index <= MENU_LAST_WIDGET; index++) {
-                            message.type = INIT_MENU_MESSAGE;
+                            message.type = MESSAGE_WIDGET;
                             message.payload.widget.id = index;
-                            message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                             message.payload.widget.data.value =
                                 (index - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
                             gpInitWin->BroadcastMessage(message);
                         }
-                        gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
+                        gpInitWin->DrawWindow(
+                            WINDOW_DRAW_BUFFER_ONLY,
+                            MENU_FIRST_WIDGET,
+                            MENU_LAST_WIDGET
+                        );
                         gpWindowManager->UpdateScreenRegion(
                             MENU_REDRAW_LEFT,
                             MENU_REDRAW_TOP,
@@ -1403,7 +1405,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                     }
                     break;
             }
-        } else if (message.type == INIT_MENU_MOUSE_MOVE) {
+        } else if (message.type == MESSAGE_MOUSE_MOVE) {
             hoverIndex = -1;
             for (index = 0; index < MENU_HOTSPOT_COUNT; index++) {
                 if (message.payload.mouse.screenX >= IMHotSpots[index][IDX(INIT_MENU_HOTSPOT_X)]
@@ -1419,14 +1421,14 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
             if (hoverIndex != lastIMHoverID) {
                 if (lastIMHoverID != -1) {
-                    message.type = INIT_MENU_MESSAGE;
+                    message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
-                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     message.payload.widget.data.value =
                         lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
                     gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         lastIMHoverID + MENU_WIDGET_OFFSET,
                         lastIMHoverID + MENU_WIDGET_OFFSET
                     );
@@ -1438,14 +1440,14 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                     );
                 }
                 if (hoverIndex != -1) {
-                    message.type = INIT_MENU_MESSAGE;
+                    message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
-                    message.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                     message.payload.widget.data.value =
                         hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
                     gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         hoverIndex + MENU_WIDGET_OFFSET,
                         hoverIndex + MENU_WIDGET_OFFSET
                     );
@@ -1462,8 +1464,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
     }
 
     if (handled || giMenuCommand != -1) {
-        message.type = INIT_MENU_MESSAGE;
-        message.payload.widget.id = MENU_CLOSE_COMMAND;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1487,7 +1489,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
     i32 H2_UNUSED(unusedResult);
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
@@ -1500,13 +1502,13 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case EVENT_WINDOW_SECOND_BUTTON:
+                    case DIALOG_BUTTON_1:
                         gpTownManager->m_recruitState = -1;
                         shouldClose = true;
                         break;
-                    case EVENT_WINDOW_THIRD_BUTTON:
+                    case DIALOG_BUTTON_2:
                         gpTownManager->m_recruitState = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
@@ -1518,7 +1520,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
         }
     }
     if (shouldClose == 1) {
-        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1588,28 +1590,28 @@ VA(0x00468beb, 0xf0)
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel) {
     i32 level;
     if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
-        memcpy(destination, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, xShrineBuildingCost, IDX(RES_COUNT) * sizeof(i32));
     } else if (building >= BUILDING_SLOT_DWELLING_FIRST
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
             destination,
             gDwellingCosts[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)],
-            KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
+            IDX(RES_COUNT) * sizeof(i32)
         );
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         level = mageLevel + 1;
-        if (level > KB_MAGE_GUILD_MAX_LEVEL)
-            level = KB_MAGE_GUILD_MAX_LEVEL;
-        memcpy(destination, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        if (level > TOWN_MAGE_GUILD_LEVEL_COUNT)
+            level = TOWN_MAGE_GUILD_LEVEL_COUNT;
+        memcpy(destination, gMageBuildingCosts[mageLevel + 1], IDX(RES_COUNT) * sizeof(i32));
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        memcpy(destination, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, gSpecialBuildingCosts[IDX(race)], IDX(RES_COUNT) * sizeof(i32));
     } else {
         if (building >= BUILDING_SLOT_DISABLED_SECOND)
             return;
         memcpy(
             destination,
             gNeutralBuildingCosts[IDX(building)],
-            KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
+            IDX(RES_COUNT) * sizeof(i32)
         );
     }
 }
@@ -1630,7 +1632,7 @@ H2_CONST char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster) {
 VA(0x00468d05, 0x10d)
 void GetMonsterCost(CreatureType monster, i32* const cost) {
     i32 index;
-    for (index = 0; index < KB_BUILDING_RESOURCE_COUNT; index++)
+    for (index = 0; index < IDX(RES_COUNT); index++)
         cost[index] = 0;
     cost[IDX(RES_GOLD)] = gMonsterDatabase[IDX(monster)].cost;
     switch (monster) {
@@ -1682,7 +1684,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         else
             return 0;
     }
-    if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
+    if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_buildState >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
     if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
@@ -1691,33 +1693,33 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
-         && HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_FIRST_FLAG)))
+         && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_2)))
         || (building == BUILDING_SLOT_DWELLING_THIRD
-            && HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_SECOND_FLAG)))
+            && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_3)))
         || (building == BUILDING_SLOT_DWELLING_FOURTH
-            && HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_THIRD_FLAG)))
+            && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_4)))
         || (building == BUILDING_SLOT_DWELLING_FIFTH
-            && HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG)))
+            && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_5)))
         || (building == BUILDING_SLOT_DWELLING_SIXTH
-            && (HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-                || HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && (HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
+                || HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
-            && HAS(townPointer->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
         return 0;
     reqBits = gHierarchyMask[IDX(townPointer->m_type)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     curMask = townPointer->m_buildings;
-    if (curMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
-        curMask |= IDX(KB_DWELLING_FIRST_FLAG);
-    if (curMask & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG))
-        curMask |= IDX(KB_DWELLING_SECOND_FLAG);
-    if (curMask & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG))
-        curMask |= IDX(KB_DWELLING_THIRD_FLAG);
-    if (curMask & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG))
-        curMask |= IDX(KB_DWELLING_FOURTH_FLAG);
-    if (curMask & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))
-        curMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
-    if (curMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-        curMask |= IDX(KB_DWELLING_FIFTH_FLAG);
+    if (curMask & IDX(TOWN_BUILDING_UPGRADED_DWELLING_2))
+        curMask |= IDX(TOWN_BUILDING_DWELLING_2);
+    if (curMask & IDX(TOWN_BUILDING_UPGRADED_DWELLING_3))
+        curMask |= IDX(TOWN_BUILDING_DWELLING_3);
+    if (curMask & IDX(TOWN_BUILDING_UPGRADED_DWELLING_4))
+        curMask |= IDX(TOWN_BUILDING_DWELLING_4);
+    if (curMask & IDX(TOWN_BUILDING_UPGRADED_DWELLING_5))
+        curMask |= IDX(TOWN_BUILDING_DWELLING_5);
+    if (curMask & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))
+        curMask |= IDX(TOWN_BUILDING_UPGRADED_DWELLING_6);
+    if (curMask & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
+        curMask |= IDX(TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_buildState <= 1)
@@ -1738,12 +1740,12 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
 #endif
 VA(0x00469085, 0x80)
 i32 CanBuy(town* townPointer, BuildingSlotType type) {
-    i32 buffer[KB_BUILDING_RESOURCE_COUNT];
+    i32 buffer[IDX(RES_COUNT)];
     playerData* player;
     i32 resourceIndex;
     GetBuildingCost(townPointer->m_type, type, buffer, townPointer->m_buildState);
     player = &gpGame->m_players[giCurPlayer];
-    for (resourceIndex = 0; resourceIndex < KB_BUILDING_RESOURCE_COUNT; resourceIndex++)
+    for (resourceIndex = 0; resourceIndex < IDX(RES_COUNT); resourceIndex++)
         if (player->m_resources[resourceIndex] < buffer[resourceIndex])
             return 0;
     return 1;
@@ -1781,11 +1783,11 @@ MessageDispatchResult WaitHandler(tag_message& message) {
     PollSound();
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
-                    case EVENT_WINDOW_THIRD_BUTTON:
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
+                    case DIALOG_BUTTON_2:
                         gbFunctionComplete = false;
                         result = 1;
                         break;
@@ -1840,9 +1842,9 @@ MessageDispatchResult WaitHandler(tag_message& message) {
     }
     CheckShingleUpdate();
     if (result != 0) {
-        gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
+        gpWindowManager->m_dialogResult = DIALOG_BUTTON_1;
         message.type = MESSAGE_WIDGET;
-        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1861,15 +1863,15 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
                 if (message.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
@@ -1944,18 +1946,18 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
                     }
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
-                    case EVENT_WINDOW_THIRD_BUTTON:
-                    case EVENT_WINDOW_FOURTH_BUTTON:
-                    case EVENT_WINDOW_FIFTH_BUTTON:
-                    case EVENT_WINDOW_SIXTH_BUTTON:
-                    case EVENT_WINDOW_SEVENTH_BUTTON:
-                    case EVENT_WINDOW_EIGHTH_BUTTON:
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
+                    case DIALOG_BUTTON_2:
+                    case DIALOG_BUTTON_3:
+                    case DIALOG_BUTTON_5:
+                    case DIALOG_BUTTON_6:
+                    case DIALOG_BUTTON_7:
+                    case DIALOG_BUTTON_8:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
@@ -1994,7 +1996,7 @@ void PlayerDead(i32 player) {
     for (i = currentPlayer->m_heroCount - 1; i >= 0; i--) {
         GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
     }
-    for (i = 0; i < AVAILABLE_HERO_SLOTS; i++) {
+    for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
         if (gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
             gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] = -1;
     }
@@ -2572,7 +2574,7 @@ void CheckEndGame(
         }
 
         if (carryoverHeroId != static_cast<u32>(END_GAME_NO_PLAYER)) {
-            for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+            for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
@@ -2591,7 +2593,7 @@ void CheckEndGame(
                 gpGame->m_campaignCarryoverCreatureTypes[0] = CREATURE_PEASANT;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+                for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];
@@ -3099,7 +3101,7 @@ i32 WaitForOtherPlayer(void) {
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
-                    OLD_MAIN_PLAYER_COUNT
+                    GAME_PLAYER_COUNT
                 );
                 gbUseRegularCompression = data->payload.setup.useRegularCompression;
                 gbUseDiffCompression = data->payload.setup.useDiffCompression;
@@ -3207,7 +3209,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     if (netWindow == NULL)
         MemError();
 
-    SET_WIDGET_MESSAGE(updateMessage, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
+    SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
     updateMessage.payload.widget.data.text = cNetBoxLine[0];
     netWindow->BroadcastMessage(updateMessage);
     updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3219,7 +3221,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 3;
     updateMessage.payload.widget.data.text = cNetBoxLine[3];
     netWindow->BroadcastMessage(updateMessage);
-    updateMessage.payload.widget.command = NET_BOX_COLOR_COMMAND;
+    updateMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID;
     updateMessage.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
     netWindow->BroadcastMessage(updateMessage);
@@ -3362,7 +3364,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
 
         if (redrawLines) {
             redrawLines = false;
-            SET_WIDGET_MESSAGE(updateMessage, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
+            SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
             updateMessage.payload.widget.data.text = cNetBoxLine[0];
             netWindow->BroadcastMessage(updateMessage);
             updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3374,7 +3376,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 3;
             updateMessage.payload.widget.data.text = cNetBoxLine[3];
             netWindow->BroadcastMessage(updateMessage);
-            updateMessage.payload.widget.command = NET_BOX_COLOR_COMMAND;
+            updateMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID;
             updateMessage.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
             netWindow->BroadcastMessage(updateMessage);
@@ -3399,7 +3401,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             else
                 inputText[inputLength] = BOX_CURSOR_GLYPH;
             inputText[inputLength + 1] = 0;
-            SET_WIDGET_MESSAGE(updateMessage, NET_BOX_TEXT_COMMAND, BOX_INPUT_ID);
+            SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_INPUT_ID);
             updateMessage.payload.widget.data.text = inputText;
             netWindow->BroadcastMessage(updateMessage);
             netWindow->DrawWindow();
@@ -3576,14 +3578,9 @@ void FileError(H2_CONST char* filename) {
 
 H2_ENUM_BEGIN(SmackFadeConstant)
     SMACK_FADE_FIRST_COLOR = WINGRAPH_SYSTEM_PALETTE_SIZE,
-    SMACK_FADE_COLOR_LIMIT = WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_COLOR_LIMIT = PALETTE_COLOR_COUNT - WINGRAPH_SYSTEM_PALETTE_SIZE,
     SMACK_FADE_MATCH_COLOR_LIMIT = 36,
     SMACK_FADE_DISTANCE_SENTINEL = 999,
-    SMACK_FADE_SCREEN_WIDTH = 640,
-    SMACK_FADE_SCREEN_HEIGHT = 480,
-    SMACK_FADE_BLUE_COMPONENT = 2,
-    SMACK_FADE_GREEN_COMPONENT = 1,
-    SMACK_FADE_RED_COMPONENT = 0
 H2_ENUM_END(SmackFadeConstant)
 
 #if H2_RETAIL_COMPILER
@@ -3615,21 +3612,21 @@ void SmackFade(u8* source, u8* destination) {
     transitionPalette = NULL;
     colorMap = NULL;
     bestColor = -1;
-    transitionPalette = static_cast<u8*>(H2_ALLOC(MISC_PALETTE_BYTE_COUNT));
-    colorMap = static_cast<u8*>(H2_ALLOC(WINGRAPH_PALETTE_SIZE));
-    memset(transitionPalette, 0, MISC_PALETTE_BYTE_COUNT);
-    memset(colorMap, 0, WINGRAPH_PALETTE_SIZE);
+    transitionPalette = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    colorMap = static_cast<u8*>(H2_ALLOC(PALETTE_COLOR_COUNT));
+    memset(transitionPalette, 0, PALETTE_DATA_SIZE);
+    memset(colorMap, 0, PALETTE_COLOR_COUNT);
     for (sourceColor = SMACK_FADE_FIRST_COLOR; sourceColor < SMACK_FADE_COLOR_LIMIT; sourceColor++) {
-        sourceBrightness = (source[sourceColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-             + source[sourceColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-             + source[sourceColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-            / MISC_PALETTE_COMPONENT_BYTES;
+        sourceBrightness = (source[sourceColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)]
+             + source[sourceColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)]
+             + source[sourceColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)])
+            / IDX(PALETTE_CHANNEL_COUNT);
         bestDistance = SMACK_FADE_DISTANCE_SENTINEL;
         for (destinationColor = SMACK_FADE_FIRST_COLOR; destinationColor < SMACK_FADE_MATCH_COLOR_LIMIT; destinationColor++) {
-            destinationBrightness = (destination[destinationColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-                 + destination[destinationColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-                 + destination[destinationColor * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-                / MISC_PALETTE_COMPONENT_BYTES;
+            destinationBrightness = (destination[destinationColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)]
+                 + destination[destinationColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)]
+                 + destination[destinationColor * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)])
+                / IDX(PALETTE_CHANNEL_COUNT);
             brightnessDistance = abs(sourceBrightness - destinationBrightness);
             if (brightnessDistance < bestDistance) {
                 bestDistance = brightnessDistance;
@@ -3637,16 +3634,16 @@ void SmackFade(u8* source, u8* destination) {
             }
         }
         memcpy(
-            transitionPalette + sourceColor * MISC_PALETTE_COMPONENT_BYTES,
-            destination + bestColor * MISC_PALETTE_COMPONENT_BYTES,
-            MISC_PALETTE_COMPONENT_BYTES
+            transitionPalette + sourceColor * IDX(PALETTE_CHANNEL_COUNT),
+            destination + bestColor * IDX(PALETTE_CHANNEL_COUNT),
+            IDX(PALETTE_CHANNEL_COUNT)
         );
         colorMap[sourceColor] = bestColor;
     }
     FadeTo(source, transitionPalette, HIGH_SCORE_FADE_STEPS);
     pixel = gpWindowManager->m_screen->m_pixels;
-    for (column = 0; column < SMACK_FADE_SCREEN_WIDTH; column++) {
-        for (row = 0; row < SMACK_FADE_SCREEN_HEIGHT; row++) {
+    for (column = 0; column < LOGICAL_SCREEN_WIDTH; column++) {
+        for (row = 0; row < LOGICAL_SCREEN_HEIGHT; row++) {
             *pixel = colorMap[*pixel];
             pixel++;
         }
@@ -3673,14 +3670,14 @@ void SmackFade(u8* source, u8* destination) {
 
 VA(0x0046d109, 0x3b2)
 void ShowCongrats(HighScoreType highScoreType) {
-    u8 palette[MISC_PALETTE_BYTE_COUNT];
+    u8 palette[PALETTE_DATA_SIZE];
     i32 H2_UNUSED(unused);
     i32 baseScore;
     i32 realScore;
     char ratingText[CONGRATS_RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
-    memcpy(palette, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(palette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     gpWindowManager->m_updateFlags = 0;
     congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
@@ -3725,10 +3722,10 @@ void ShowCongrats(HighScoreType highScoreType) {
     }
 
     PlaySmacker(CONGRATS_SMACKER);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), palette);
-    memcpy(gPalette->m_data, palette, MISC_PALETTE_BYTE_COUNT);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gPalette->m_data, palette, PALETTE_DATA_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     gpMouseManager->ShowColorPointer();
     AddScoreToHighScore(
         realScore,
@@ -3740,7 +3737,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     H2_FREE(congratsText);
     congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
 }
 
 #if H2_RETAIL_COMPILER
@@ -4063,7 +4060,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL) {
-                for (loopIndex = IDX(SPELL_FIREBALL); loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
+                for (loopIndex = IDX(SPELL_FIREBALL); loopIndex < IDX(SPELL_COUNT); loopIndex++)
                     currentHeroRec->AddSpell(
                         static_cast<SpellType>(loopIndex),
                         APP_MENU_SPELL_COUNT
@@ -4111,10 +4108,10 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
                 secondarySkillIndex = static_cast<HeroSecondarySkill>(
-                    (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS
+                    (command - APP_MENU_SECONDARY_FIRST) / IDX(HERO_SKILL_LEVEL_COUNT)
                 );
                 ssLevel = static_cast<HeroSkillLevel>(
-                    (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS
+                    (command - APP_MENU_SECONDARY_FIRST) % IDX(HERO_SKILL_LEVEL_COUNT)
                 );
                 if (currentHeroRec != NULL)
                     currentHeroRec->SetSS(secondarySkillIndex, ssLevel);
@@ -4629,8 +4626,8 @@ void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles) {
         0,
         0,
         1,
-        WINGRAPH_WIDTH,
-        WINGRAPH_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         widthInTiles * TILE_SIZE,
         heightInTiles * TILE_SIZE,
         &windowWidth,
@@ -4744,7 +4741,7 @@ VA(0x0046ed70, 0x4f)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
-    for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
+    for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
         if (i != giThisNetPos)
             gbHumanPlayer[i] = false;
     ComputeAdvNetControl();
@@ -4794,7 +4791,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[hostNetPosition].name
             );
             NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
                 DropDownToOnePlayer();
             } else {
                 RemoteCleanup();
@@ -4826,13 +4823,13 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         giThisNetPos--;
     gbHumanPlayer[exitInfo.gamePosition] = false;
 
-    for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
+    for (netPosition = exitInfo.netPosition; netPosition < GAME_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
         giNetPosToDCOPos[netPosition] = giNetPosToDCOPos[netPosition + 1];
         strcpy(gsNetPlayerInfo[netPosition].name, gsNetPlayerInfo[netPosition + 1].name);
     }
 
-    for (netPosition = 0; netPosition < REMOTE_PLAYER_COUNT; netPosition++) {
+    for (netPosition = 0; netPosition < GAME_PLAYER_COUNT; netPosition++) {
         if (gbGamePosToNetPos[netPosition] == exitInfo.netPosition)
             gbGamePosToNetPos[netPosition] = -1;
         else if (gbGamePosToNetPos[netPosition] > exitInfo.netPosition)
@@ -4915,7 +4912,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             );
         }
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-        exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE;
+        exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES;
     }
 
 exitInfoProcessed:
@@ -4936,7 +4933,7 @@ exitInfoProcessed:
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
-        for (recipient = 0; recipient < REMOTE_PLAYER_COUNT; recipient++) {
+        for (recipient = 0; recipient < GAME_PLAYER_COUNT; recipient++) {
             if ((recipient == exitInfo.netPosition && exitInfo.eliminated && !exitInfo.hostReported)
                 || (recipient != exitInfo.netPosition && recipient < giNumHumanPlayers
                     && recipient != giThisNetPos)) {
@@ -5344,10 +5341,10 @@ void NormalDialog(
     windowHeight =
         windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
-    if (windowX == -1 || windowWidth + windowX >= NORMAL_DIALOG_SCREEN_RIGHT)
+    if (windowX == -1 || windowWidth + windowX >= LOGICAL_SCREEN_MAX_X)
         windowX = NORMAL_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowHeight + windowY >= NORMAL_DIALOG_SCREEN_BOTTOM) {
-        windowY = NormalDialogCenterOffset(NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight);
+    if (windowY == -1 || windowHeight + windowY >= LOGICAL_SCREEN_MAX_Y) {
+        windowY = NormalDialogCenterOffset(LOGICAL_SCREEN_HEIGHT - windowHeight);
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
     }
@@ -5361,30 +5358,30 @@ void NormalDialog(
     if (!pNormalDialogWindow)
         MemError();
 
-    message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message.payload.widget.data.value = IDX(NORMAL_DIALOG_DISABLE_COMMAND);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = IDX(WIDGET_COMMAND_CLEAR_FLAGS);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
+        message.payload.widget.id = DIALOG_BUTTON_7;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
+        message.payload.widget.id = DIALOG_BUTTON_8;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
+        message.payload.widget.id = DIALOG_BUTTON_1;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
         && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
+        message.payload.widget.id = DIALOG_BUTTON_2;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
+        message.payload.widget.id = NORMAL_DIALOG_YES;
         pNormalDialogWindow->BroadcastMessage(message);
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
+        message.payload.widget.id = NORMAL_DIALOG_NO;
         pNormalDialogWindow->BroadcastMessage(message);
     }
 
@@ -5824,7 +5821,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(borderWidget, -1);
     }
 
-    SET_WIDGET_MESSAGE(message, NORMAL_DIALOG_SET_TEXT_COMMAND, NORMAL_DIALOG_TEXT_WIDGET_ID);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message);
 
@@ -5917,9 +5914,13 @@ void UpdateNormalDialog(H2_CONST char* text) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
     message.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message);
-    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
     pNormalDialogWindow
-        ->DrawWindow(1, WINDOW_ALL_WIDGETS_LOW, NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID);
+        ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
+    pNormalDialogWindow->DrawWindow(
+        WINDOW_DRAW_UPDATE_SCREEN,
+        WINDOW_ALL_WIDGETS_LOW,
+        NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
+    );
 }
 #if H2_RETAIL_COMPILER
 #undef message
@@ -6017,7 +6018,7 @@ DATA(0x004f82e8) u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
 
-DATA(0x004f8498) u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8498) u8 gColorTableTan[PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
     0xd3, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
@@ -6035,7 +6036,7 @@ DATA(0x004f8498) u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xc6, 0xc8, 0xcb, 0xcc, 0xcf, 0xd0, 0xd1, 0xc9, 0xcb, 0xcf, 0xd1, 0xce, 0xd1, 0xd0, 0xc6, 0xc6,
     0xcf, 0xd5, 0xc6, 0xc9, 0xce, 0xd0, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5
 };
-DATA(0x004f8598) u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8598) u8 gColorTableGray[PALETTE_COLOR_COUNT] = {
     0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x0a, 0x0b, 0x0c, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x12,
@@ -6053,7 +6054,7 @@ DATA(0x004f8598) u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x14, 0x15, 0x16, 0x17, 0x19, 0x1a, 0x1b, 0x1b, 0x18, 0x15, 0x16, 0x1a, 0x1a, 0x1b, 0x24, 0x0c,
     0x12, 0x19, 0x13, 0x15, 0x18, 0x1a, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24
 };
-DATA(0x004f8698) u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8698) u8 gColorTableYellow[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x73, 0x73, 0x74, 0x75, 0x75,
     0x76, 0x77, 0x77, 0x78, 0x79, 0x79, 0x7a, 0x7b, 0x7b, 0x7c, 0x7d, 0x7d, 0x7e, 0x7f, 0x7f, 0x80,
     0x81, 0x81, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -6071,7 +6072,7 @@ DATA(0x004f8698) u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f8798) u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8798) u8 gColorTableScenWin[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -6089,7 +6090,7 @@ DATA(0x004f8798) u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f8898) u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8898) u8 gColorTableDarkGray[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
     0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24,
     0x24, 0x24, 0x24, 0x24, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -6107,7 +6108,7 @@ DATA(0x004f8898) u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f8998) u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8998) u8 gColorTableRed[PALETTE_COLOR_COUNT] = {
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb6, 0xb8, 0xba, 0xd0, 0xd1,
     0xd2, 0xd2, 0xd3, 0xd3, 0xd4, 0xd5, 0xd5, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb4, 0xb6, 0xb6, 0xb8, 0xba, 0xd0, 0xd1, 0xd1, 0xd2, 0xd2,
@@ -6125,7 +6126,7 @@ DATA(0x004f8998) u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc0, 0xc1, 0xc2, 0xd5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xd3, 0xc5, 0xd3, 0xd4, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5
 };
-DATA(0x004f8a98) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8a98) u8 gColorTableDarkBrown[PALETTE_COLOR_COUNT] = {
     0x32, 0x2a, 0x2a, 0x2a, 0x2a, 0x32, 0x32, 0x32, 0x32, 0x35, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d,
     0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
     0x3c, 0x3e, 0x3e, 0x3e, 0x3e, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -6149,8 +6150,8 @@ DATA(0x005265dc) u8* mapExtra = NULL;
 DATA(0x005265e0) b32 gbClosingApp = false;
 DATA(0x005265e4) b32 gbForegroundApp = false;
 DATA(0x004f8ba0) i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
-DATA(0x004f8ba4) i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
-DATA(0x004f8ba8) i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
+DATA(0x004f8ba4) i32 giMainVideoModeWidth = LOGICAL_SCREEN_WIDTH;
+DATA(0x004f8ba8) i32 giMainVideoModeHeight = LOGICAL_SCREEN_HEIGHT;
 DATA(0x004f8bac) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0};
 DATA(0x004f8bb8) u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
@@ -6227,7 +6228,7 @@ DATA(0x004f8cd0) u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
 };
-DATA(0x004f8d10) u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8d10) u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][PALETTE_COLOR_COUNT] = {
     {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
       0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
       0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
@@ -6445,7 +6446,7 @@ DATA(0x004f8d10) u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_
       0x00, 0x4b, 0xf2, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x0a}}
 };
-DATA(0x004f9910) u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f9910) u8 gColorTableLighten[PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0b,
     0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b,
     0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x25, 0x25, 0x25, 0x25, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
@@ -6463,7 +6464,7 @@ DATA(0x004f9910) u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0xdf, 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xee,
     0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
-DATA(0x004f9a10) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f9a10) u8 gColorTableNoCycle[PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -6490,7 +6491,7 @@ DATA(0x004f9b14) b32 giScreenScroll = true;
 DATA(0x004f9b18) i32 giMenuCommand = -1;
 DATA(0x005265f8) b32 gbSendMouseMoveMessages = false;
 DATA(0x004f9b1c) b32 gbColorMice = true;
-DATA(0x004f9b20) u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
+DATA(0x004f9b20) u32l gTownEligibleBuildMask[IDX(FACTION_COUNT)] = {
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
     TOWN_ELIGIBLE_BUILD_SORCERESS_MASK,
@@ -6667,7 +6668,7 @@ DATA(0x004f9f58) b32 gbDrawWindowBackground = true;
 DATA(0x0052661c) b32 gbCheatMenus = false;
 DATA(0x00526620) b32 gbUseWaveout = false;
 DATA(0x00526624) b32 gbShowAllMaps = false;
-DATA(0x004f9f5c) H2_CONST char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+DATA(0x004f9f5c) H2_CONST char* gCombatFxNames[IDX(COMBAT_EFFECT_COUNT)] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6711,7 +6712,7 @@ DATA(0x004fa020) i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
 DATA(0x004fa028) i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 DATA(0x004fa02c) i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
     {640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0};
-DATA(0x004fa038) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fa038) tag_tilePoint normalDirTable[IDX(MAP_DIRECTION_COUNT)] = {
     {0, -1, 16},
     {1, -1, 16},
     {1, 0, 16},
@@ -6721,22 +6722,22 @@ DATA(0x004fa038) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {-1, 0, 16},
     {-1, -1, 16}
 };
-DATA(0x004fa058) i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1};
-DATA(0x004fa074) i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+DATA(0x004fa058) i32 gResourceBaseValue[IDX(RES_COUNT)] = {200, 300, 200, 300, 300, 300, 1};
+DATA(0x004fa074) i32 gInitResourcesHuman[IDX(DIFFICULTY_COUNT)][IDX(RES_COUNT)] = {
     {30, 10, 30, 10, 10, 10, 10000},
     {20, 5, 20, 5, 5, 5, 7500},
     {10, 2, 10, 2, 2, 2, 5000},
     {5, 0, 5, 0, 0, 0, 2500},
     {0, 0, 0, 0, 0, 0, 0}
 };
-DATA(0x004fa100) i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+DATA(0x004fa100) i32 gInitResourcesComputer[IDX(DIFFICULTY_COUNT)][IDX(RES_COUNT)] = {
     {20, 5, 20, 5, 5, 5, 7500},
     {20, 5, 20, 5, 5, 5, 7500},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000}
 };
-DATA(0x004fa18c) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000};
+DATA(0x004fa18c) i32 gMineCharacteristics[IDX(RES_COUNT)] = {2, 1, 2, 1, 1, 1, 1000};
 DATA(0x004fa1a8) i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {400, 750, 1000},
     {200, 450, 850},
@@ -6763,7 +6764,7 @@ gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x10, 0x20, 0x20, 0x20, 0x20, 0x02, 0x08, 0x02, 0x08,
     0x02, 0x02, 0x08, 0x08, 0x02, 0x02, 0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x04, 0x00
 };
-DATA(0x004fa2b8) i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
+DATA(0x004fa2b8) i32 gArtifactBaseRV[IDX(ARTIFACT_COUNT)] = {
     13600, 22000, 18000, 14000, 19000, 18500, 22200, 25000, 6000,  4000, 4000,  5600,  1200,
     1200,  1200,  1200,  -1200, 2000,  1800,  1800,  2000,  1000,  3600, 5600,  4000,  5040,
     3060,  4420,  5610,  6630,  7000,  6000,  4000,  4500,  2250,  1200, 1200,  1200,  1200,
@@ -6778,20 +6779,20 @@ DATA(0x00526628) i32 giDebugLevel = 0;
 DATA(0x004fa458) i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {20, 33, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
-    {150, 312, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {200, 463, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
+    {150, 312, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_FLAGS_SHOOTER},
+    {200, 463, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_FLAGS_SHOOTER},
     {200, 639, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
     {250, 824, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
     {250, 1130, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
     {300, 1350, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {300, 1830, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {375, 2273, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
+    {300, 1830, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
+    {375, 2273, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
     {600, 4704, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
     {1000, 5822, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
     {40, 109, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MONSTER_FLAGS_NONE},
-    {140, 299, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {175, 512, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {200, 865, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
+    {140, 299, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_FLAGS_SHOOTER},
+    {175, 512, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_FLAGS_SHOOTER},
+    {200, 865, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_FLAGS_WIDE},
     {300, 1065, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
     {500, 2070, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
     {600, 1921,
@@ -6806,7 +6807,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      8,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_SHOOTER},
     {700, 2337,
      33,
      3,
@@ -6819,7 +6820,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      9,
      16,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_SHOOTER},
     {750, 6074,
      58,
      2,
@@ -6832,13 +6833,13 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      24,
      0,
      "cycl",
-     MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {50, 129, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 129, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_FLAGS_FLYING},
     {200, 500, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
     {250, 716, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {250, 554, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {300, 658, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {350, 1290, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
+    {250, 554, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {300, 658, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {350, 1290, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_FLAGS_SHOOTER},
     {400, 1428,
      36,
      3,
@@ -6851,8 +6852,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      16,
      "drui",
-     MONSTER_ATTRIBUTE_RANGED},
-    {500, 2702, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_SHOOTER},
+    {500, 2702, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_FLAGS_WIDE},
     {1500, 10114,
      56,
      1,
@@ -6865,7 +6866,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {60, 154,
      26,
      8,
@@ -6878,8 +6879,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {200, 579, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_SHOOTER},
+    {200, 579, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_FLAGS_FLYING},
     {300, 1101,
      37,
      4,
@@ -6892,10 +6893,10 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
     {400, 1751, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
     {500, 2252, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {800, 2878, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
+    {800, 2878, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_FLAGS_WIDE},
     {3000, 18153,
      55,
      1,
@@ -6908,7 +6909,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {3500, 22962,
      68,
      1,
@@ -6921,7 +6922,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
     {4000, 28144,
      74,
      1,
@@ -6934,9 +6935,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {50, 134, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {150, 493, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 134, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_FLAGS_SHOOTER},
+    {150, 493, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_FLAGS_WIDE},
     {300, 951, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
     {350, 1324, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
     {400, 1739,
@@ -6951,9 +6952,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {600, 1935, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {700, 2469, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
+    {600, 1935, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_FLAGS_SHOOTER},
+    {700, 2469, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_FLAGS_SHOOTER},
     {2000, 9589, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
     {5000, 22933,
      79,
@@ -6967,8 +6968,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      24,
      "titn",
-     MONSTER_ATTRIBUTE_RANGED},
-    {75, 203, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER},
+    {75, 203, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_FLAGS_UNDEAD},
     {150, 310,
      21,
      6,
@@ -6981,7 +6982,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {200, 506,
      25,
      6,
@@ -6994,7 +6995,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {250, 868,
      35,
      4,
@@ -7007,7 +7008,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {300, 1056,
      35,
      4,
@@ -7020,7 +7021,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_UNDEAD},
     {500, 1685,
      42,
      3,
@@ -7033,7 +7034,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {650, 2461,
      45,
      3,
@@ -7046,7 +7047,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {750, 2069,
      28,
      2,
@@ -7059,7 +7060,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
     {900, 2625,
      29,
      2,
@@ -7072,7 +7073,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
     {1500, 11744,
      78,
      1,
@@ -7085,9 +7086,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {50, 177, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MONSTER_FLAGS_NONE},
-    {200, 805, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
+    {200, 805, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_FLAGS_WIDE},
     {1000, 1545,
      62,
      3,
@@ -7100,7 +7101,7 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
     {650, 5692,
      60,
      2,
@@ -7113,8 +7114,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      0,
      "geni",
-     MONSTER_ATTRIBUTE_FLYING},
-    {500, 1979, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
+     MONSTER_FLAGS_FLYING},
+    {500, 1979, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_FLAGS_WIDE},
     {500, 1732, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
     {500, 1412, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
     {500, 1501, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
@@ -7143,7 +7144,7 @@ DATA(0x004face8) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
 DATA(0x004fad14) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
 DATA(0x0052662c) b32 gbDrawSavedCursor = false;
-DATA(0x004fad30) i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fad30) i8 gbArrow[IDX(MAP_DIRECTION_COUNT)][IDX(MAP_DIRECTION_COUNT)] = {
     {8, 0, 0, 0, 8, 16, 16, 16},
     {17, 9, 1, 1, 1, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -7845,7 +7846,7 @@ DATA(0x004fba68) H2_ENUM_STORAGE(SpellType, u8) giSpellInfluenceToSpell[KB_SPELL
     SPELL_STEEL_SKIN,
     SPELL_FIREBALL
 };
-DATA(0x004fba78) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
+DATA(0x004fba78) u8 giNumPowFrames[IDX(COMBAT_EFFECT_COUNT)] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
                                             10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
 DATA(0x004fba98) SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
@@ -7926,7 +7927,7 @@ DATA(0x004fbee0) H2_CONST char* gTownPrefixNames[IDX(FACTION_COUNT)] = {
     "twnw",
     "twnz",
     "twnn"};
-DATA(0x004fbef8) H2_CONST char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+DATA(0x004fbef8) H2_CONST char* gTownObjNames[IDX(BUILDING_SLOT_COUNT)] = {
     "mage",
     "thie",
     "tvrn",
@@ -7960,8 +7961,8 @@ DATA(0x004fbef8) H2_CONST char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "up5b",
     "ext3"
 };
-DATA(0x004fbf78) H2_ENUM_STORAGE(CreatureType, i8)
-gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fbf78)
+H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {IDX(CREATURE_PEASANT),
      IDX(CREATURE_ARCHER),
      IDX(CREATURE_PIKEMAN),
@@ -8035,7 +8036,7 @@ gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      ARMY_GROUP_EMPTY_SLOT,
      ARMY_GROUP_EMPTY_SLOT}
 };
-DATA(0x004fbfc0) i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fbfc0) i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][IDX(RES_COUNT)] = {
     {0, 0, 0, 0, 0, 0, 0},
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 4, 5, 4, 4, 4, 1000},
@@ -8043,7 +8044,7 @@ DATA(0x004fbfc0) i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_R
     {5, 8, 5, 8, 8, 8, 1000},
     {5, 10, 5, 10, 10, 10, 1000}
 };
-DATA(0x004fc068) i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc068) i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][IDX(RES_COUNT)] = {
     {5, 0, 15, 0, 0, 0, 1500},
     {10, 0, 10, 0, 0, 0, 2000},
     {0, 0, 0, 0, 10, 0, 1500},
@@ -8051,7 +8052,7 @@ DATA(0x004fc068) i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOU
     {5, 5, 5, 5, 5, 5, 1500},
     {0, 10, 0, 10, 0, 0, 1000}
 };
-DATA(0x004fc110) i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc110) i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][IDX(RES_COUNT)] = {
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 0, 0, 0, 0, 0, 750},
     {5, 0, 0, 0, 0, 0, 500},
@@ -8074,7 +8075,7 @@ DATA(0x004fc2e8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0
 };
 DATA(0x004fc334) i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
-DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
@@ -8082,7 +8083,7 @@ DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
-DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT][IDX(RES_COUNT)] = {
     {{0, 0, 0, 0, 0, 0, 200},
      {0, 0, 0, 0, 0, 0, 1000},
      {0, 0, 5, 0, 0, 0, 1000},
@@ -8156,7 +8157,7 @@ DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][
      {0, 0, 0, 0, 0, 0, 0},
      {0, 0, 0, 0, 0, 0, 0}}
 };
-DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -8239,7 +8240,7 @@ DATA(0x004fcd7c) H2_CONST char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {
     "wrlk",
     "wzrd",
     "necr"};
-DATA(0x004fcd94) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
+DATA(0x004fcd94) char cHeroTypeInitial[IDX(FACTION_COUNT)] = {'k', 'b', 's', 'w', 'z', 'n'};
 DATA(0x004fcd9c) i32 giDeferObjDrawX = -1;
 DATA(0x004fcda0) i32 giDeferObjDrawY = -1;
 DATA(0x0052667c) class heroWindow* gpInitWin = NULL;
@@ -8472,7 +8473,7 @@ DATA(0x004fd41c) u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)]
 DATA(0x004fd42c) u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {{393, 192}, {348, 262}};
 DATA(0x004fd434) float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] =
     {0.0f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.5f};
-DATA(0x004fd460) struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
+DATA(0x004fd460) struct SElevationOverlay sElevationOverlay[COMBAT_ELEVATION_OVERLAY_COUNT] = {
     {0x0000, {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {30, 31, 32, 33, 47, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {56, 57, 58, 59, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
@@ -9134,7 +9135,7 @@ DATA(0x004fdfd8) H2_CONST char* gTerrainNames[IDX(TERRAIN_COUNT)] = {
     localization::Tr("table.gTerrainNames.7"),
     localization::Tr("table.gTerrainNames.8")
 };
-DATA(0x004fdffc) H2_CONST char* gResourceNames[RESOURCE_VALUE_COUNT] = {
+DATA(0x004fdffc) H2_CONST char* gResourceNames[IDX(RES_COUNT)] = {
     localization::Tr("table.gResourceNames.0"),
     localization::Tr("table.gResourceNames.1"),
     localization::Tr("table.gResourceNames.2"),
@@ -9146,7 +9147,7 @@ DATA(0x004fdffc) H2_CONST char* gResourceNames[RESOURCE_VALUE_COUNT] = {
 // The localised build names the mine, not the resource it yields, in the
 // adventure-map quick info; the English 2.1 tree has no such table and reads
 // gResourceNames there. See docs/version-changes.md.
-DATA(0x004fe018) H2_CONST char* gMineNames[KB_MINE_NAME_COUNT] = {
+DATA(0x004fe018) H2_CONST char* gMineNames[IDX(RES_COUNT)] = {
     localization::Tr("table.gMineNames.0"),
     localization::Tr("table.gMineNames.1"),
     localization::Tr("table.gMineNames.2"),
@@ -9996,7 +9997,7 @@ DATA(0x004fe798) H2_CONST char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
      localization::Tr("table.cTownCommand.26"),
      localization::Tr("table.cTownCommand.27")
 };
-DATA(0x004fe808) H2_CONST char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+DATA(0x004fe808) H2_CONST char* gHeroDefaultNames[GAME_HERO_COUNT] = {
      localization::Tr("table.gHeroDefaultNames.0"), localization::Tr("table.gHeroDefaultNames.1"), localization::Tr("table.gHeroDefaultNames.2"), localization::Tr("table.gHeroDefaultNames.3"), localization::Tr("table.gHeroDefaultNames.4"), localization::Tr("table.gHeroDefaultNames.5"), localization::Tr("table.gHeroDefaultNames.6"),
      localization::Tr("table.gHeroDefaultNames.7"), localization::Tr("table.gHeroDefaultNames.8"), localization::Tr("table.gHeroDefaultNames.9"), localization::Tr("table.gHeroDefaultNames.10"), localization::Tr("table.gHeroDefaultNames.11"), localization::Tr("table.gHeroDefaultNames.12"), localization::Tr("table.gHeroDefaultNames.13"),
      localization::Tr("table.gHeroDefaultNames.14"), localization::Tr("table.gHeroDefaultNames.15"), localization::Tr("table.gHeroDefaultNames.16"), localization::Tr("table.gHeroDefaultNames.17"), localization::Tr("table.gHeroDefaultNames.18"), localization::Tr("table.gHeroDefaultNames.19"), localization::Tr("table.gHeroDefaultNames.20"),
@@ -10138,20 +10139,20 @@ DATA(0x004fe9f4) H2_CONST char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
      localization::Tr("table.cMoraleInfo.31")
 };
 DATA(0x004fea74) H2_CONST char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = { localization::Tr("table.cMapSize.0"), localization::Tr("table.cMapSize.1"), localization::Tr("table.cMapSize.2"), localization::Tr("table.cMapSize.3")};
-DATA(0x004fea84) H2_CONST char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004fea84) H2_CONST char* cDifficulty[IDX(DIFFICULTY_COUNT)] =
     { localization::Tr("table.cDifficulty.0"), localization::Tr("table.cDifficulty.1"), localization::Tr("table.cDifficulty.2"), localization::Tr("table.cDifficulty.3"), localization::Tr("table.cDifficulty.4")};
 DATA(0x004fea98) H2_CONST char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = { localization::Tr("table.cStartDifficulty.0"), localization::Tr("table.cStartDifficulty.1"), localization::Tr("table.cStartDifficulty.2"), localization::Tr("table.cStartDifficulty.3")};
 DATA(0x004feaa8) H2_CONST char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     { localization::Tr("table.cCampaignLeaders.0"), localization::Tr("table.cCampaignLeaders.1"), localization::Tr("table.cCampaignLeaders.2"), localization::Tr("table.cCampaignLeaders.3")};
 DATA(0x004feab8) H2_CONST char* cWinText[KB_WIN_TEXT_COUNT] =
     { localization::Tr("table.cWinText.0"), localization::Tr("table.cWinText.1"), localization::Tr("table.cWinText.2"), localization::Tr("table.cWinText.3"), localization::Tr("table.cWinText.4")};
-DATA(0x004feacc) H2_CONST char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004feacc) H2_CONST char* cHumanDifficulty[IDX(DIFFICULTY_COUNT)] =
     { localization::Tr("table.cHumanDifficulty.0"), localization::Tr("table.cHumanDifficulty.1"), localization::Tr("table.cHumanDifficulty.2"), localization::Tr("table.cHumanDifficulty.3"), localization::Tr("table.cHumanDifficulty.4")};
-DATA(0x004feae0) H2_CONST char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004feae0) H2_CONST char* cHumanInfoDifficulty[IDX(DIFFICULTY_COUNT)] =
     { localization::Tr("table.cHumanInfoDifficulty.0"), localization::Tr("table.cHumanInfoDifficulty.1"), localization::Tr("table.cHumanInfoDifficulty.2"), localization::Tr("table.cHumanInfoDifficulty.3"), localization::Tr("table.cHumanInfoDifficulty.4")};
 DATA(0x004feaf4) H2_CONST char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {/* MIDI */ "MIDI", localization::Tr("table.musicQualityText.1"), localization::Tr("table.musicQualityText.2")};
-DATA(0x004feb00) H2_CONST char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004feb00) H2_CONST char* gSpellDesc[IDX(SPELL_COUNT)] = {
      localization::Tr("table.gSpellDesc.0"),
      localization::Tr("table.gSpellDesc.1"),
      localization::Tr("table.gSpellDesc.2"),
@@ -10218,7 +10219,7 @@ DATA(0x004feb00) H2_CONST char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
      localization::Tr("table.gSpellDesc.63"),
      localization::Tr("table.gSpellDesc.64")
 };
-DATA(0x004fec04) H2_CONST char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004fec04) H2_CONST char* gSpellNames[IDX(SPELL_COUNT)] = {
      localization::Tr("table.gSpellNames.0"),
      localization::Tr("table.gSpellNames.1"),
      localization::Tr("table.gSpellNames.2"),
@@ -10287,7 +10288,7 @@ DATA(0x004fec04) H2_CONST char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
 };
 DATA(0x004fed08) H2_CONST char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     { localization::Tr("table.gSecondarySkillLevels.0"), localization::Tr("table.gSecondarySkillLevels.1"), localization::Tr("table.gSecondarySkillLevels.2")};
-DATA(0x004fed14) H2_CONST char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+DATA(0x004fed14) H2_CONST char* gSecondarySkills[IDX(HERO_SKILL_COUNT)] = {
      localization::Tr("table.gSecondarySkills.0"),
      localization::Tr("table.gSecondarySkills.1"),
      localization::Tr("table.gSecondarySkills.2"),
@@ -10335,77 +10336,77 @@ DATA(0x004fed98) H2_CONST char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
 };
 DATA(0x004fedb4) H2_CONST char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     { localization::Tr("table.gSpecialBuildingNames.0"), localization::Tr("table.gSpecialBuildingNames.1"), localization::Tr("table.gSpecialBuildingNames.2"), localization::Tr("table.gSpecialBuildingNames.3"), localization::Tr("table.gSpecialBuildingNames.4"), localization::Tr("table.gSpecialBuildingNames.5"), localization::Tr("table.gSpecialBuildingNames.6")};
-DATA(0x004fedd0) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
-    { localization::Tr("table.gDwellingNames.0.0"),
-      localization::Tr("table.gDwellingNames.0.1"),
-      localization::Tr("table.gDwellingNames.0.2"),
-      localization::Tr("table.gDwellingNames.0.3"),
-      localization::Tr("table.gDwellingNames.0.4"),
-      localization::Tr("table.gDwellingNames.0.5"),
-      localization::Tr("table.gDwellingNames.0.6"),
-      localization::Tr("table.gDwellingNames.0.7"),
-      localization::Tr("table.gDwellingNames.0.8"),
-      localization::Tr("table.gDwellingNames.0.9"),
-      localization::Tr("table.gDwellingNames.0.10"),
+DATA(0x004fedd0) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
+    {localization::Tr("table.gDwellingNames.0.0"),
+     localization::Tr("table.gDwellingNames.0.1"),
+     localization::Tr("table.gDwellingNames.0.2"),
+     localization::Tr("table.gDwellingNames.0.3"),
+     localization::Tr("table.gDwellingNames.0.4"),
+     localization::Tr("table.gDwellingNames.0.5"),
+     localization::Tr("table.gDwellingNames.0.6"),
+     localization::Tr("table.gDwellingNames.0.7"),
+     localization::Tr("table.gDwellingNames.0.8"),
+     localization::Tr("table.gDwellingNames.0.9"),
+     localization::Tr("table.gDwellingNames.0.10"),
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.1.0"),
-      localization::Tr("table.gDwellingNames.1.1"),
-      localization::Tr("table.gDwellingNames.1.2"),
-      localization::Tr("table.gDwellingNames.1.3"),
-      localization::Tr("table.gDwellingNames.1.4"),
-      localization::Tr("table.gDwellingNames.1.5"),
-      localization::Tr("table.gDwellingNames.1.6"),
+    {localization::Tr("table.gDwellingNames.1.0"),
+     localization::Tr("table.gDwellingNames.1.1"),
+     localization::Tr("table.gDwellingNames.1.2"),
+     localization::Tr("table.gDwellingNames.1.3"),
+     localization::Tr("table.gDwellingNames.1.4"),
+     localization::Tr("table.gDwellingNames.1.5"),
+     localization::Tr("table.gDwellingNames.1.6"),
      /*  */ "",
-      localization::Tr("table.gDwellingNames.1.8"),
-      localization::Tr("table.gDwellingNames.1.9"),
-     /*  */ "",
-     /*  */ ""},
-    { localization::Tr("table.gDwellingNames.2.0"),
-      localization::Tr("table.gDwellingNames.2.1"),
-      localization::Tr("table.gDwellingNames.2.2"),
-      localization::Tr("table.gDwellingNames.2.3"),
-      localization::Tr("table.gDwellingNames.2.4"),
-      localization::Tr("table.gDwellingNames.2.5"),
-      localization::Tr("table.gDwellingNames.2.6"),
-      localization::Tr("table.gDwellingNames.2.7"),
-      localization::Tr("table.gDwellingNames.2.8"),
-     /*  */ "",
+     localization::Tr("table.gDwellingNames.1.8"),
+     localization::Tr("table.gDwellingNames.1.9"),
      /*  */ "",
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.3.0"),
-      localization::Tr("table.gDwellingNames.3.1"),
-      localization::Tr("table.gDwellingNames.3.2"),
-      localization::Tr("table.gDwellingNames.3.3"),
-      localization::Tr("table.gDwellingNames.3.4"),
-      localization::Tr("table.gDwellingNames.3.5"),
+    {localization::Tr("table.gDwellingNames.2.0"),
+     localization::Tr("table.gDwellingNames.2.1"),
+     localization::Tr("table.gDwellingNames.2.2"),
+     localization::Tr("table.gDwellingNames.2.3"),
+     localization::Tr("table.gDwellingNames.2.4"),
+     localization::Tr("table.gDwellingNames.2.5"),
+     localization::Tr("table.gDwellingNames.2.6"),
+     localization::Tr("table.gDwellingNames.2.7"),
+     localization::Tr("table.gDwellingNames.2.8"),
      /*  */ "",
      /*  */ "",
-      localization::Tr("table.gDwellingNames.3.8"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.3.10"),
-      localization::Tr("table.gDwellingNames.3.11")},
-    { localization::Tr("table.gDwellingNames.4.0"),
-      localization::Tr("table.gDwellingNames.4.1"),
-      localization::Tr("table.gDwellingNames.4.2"),
-      localization::Tr("table.gDwellingNames.4.3"),
-      localization::Tr("table.gDwellingNames.4.4"),
-      localization::Tr("table.gDwellingNames.4.5"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.4.7"),
-     /*  */ "",
-      localization::Tr("table.gDwellingNames.4.9"),
-      localization::Tr("table.gDwellingNames.4.10"),
      /*  */ ""},
-    { localization::Tr("table.gDwellingNames.5.0"),
-      localization::Tr("table.gDwellingNames.5.1"),
-      localization::Tr("table.gDwellingNames.5.2"),
-      localization::Tr("table.gDwellingNames.5.3"),
-      localization::Tr("table.gDwellingNames.5.4"),
-      localization::Tr("table.gDwellingNames.5.5"),
-      localization::Tr("table.gDwellingNames.5.6"),
-      localization::Tr("table.gDwellingNames.5.7"),
-      localization::Tr("table.gDwellingNames.5.8"),
-      localization::Tr("table.gDwellingNames.5.9"),
+    {localization::Tr("table.gDwellingNames.3.0"),
+     localization::Tr("table.gDwellingNames.3.1"),
+     localization::Tr("table.gDwellingNames.3.2"),
+     localization::Tr("table.gDwellingNames.3.3"),
+     localization::Tr("table.gDwellingNames.3.4"),
+     localization::Tr("table.gDwellingNames.3.5"),
+     /*  */ "",
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.8"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.10"),
+     localization::Tr("table.gDwellingNames.3.11")},
+    {localization::Tr("table.gDwellingNames.4.0"),
+     localization::Tr("table.gDwellingNames.4.1"),
+     localization::Tr("table.gDwellingNames.4.2"),
+     localization::Tr("table.gDwellingNames.4.3"),
+     localization::Tr("table.gDwellingNames.4.4"),
+     localization::Tr("table.gDwellingNames.4.5"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.7"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.9"),
+     localization::Tr("table.gDwellingNames.4.10"),
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.5.0"),
+     localization::Tr("table.gDwellingNames.5.1"),
+     localization::Tr("table.gDwellingNames.5.2"),
+     localization::Tr("table.gDwellingNames.5.3"),
+     localization::Tr("table.gDwellingNames.5.4"),
+     localization::Tr("table.gDwellingNames.5.5"),
+     localization::Tr("table.gDwellingNames.5.6"),
+     localization::Tr("table.gDwellingNames.5.7"),
+     localization::Tr("table.gDwellingNames.5.8"),
+     localization::Tr("table.gDwellingNames.5.9"),
      /*  */ "",
      /*  */ ""}
 };
@@ -10506,7 +10507,7 @@ DATA(0x004ff020) H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DES
 };
 DATA(0x004ff044) H2_CONST char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = { localization::Tr("table.gInterfaceTypeText.0"), localization::Tr("table.gInterfaceTypeText.1"), localization::Tr("table.gInterfaceTypeText.2")};
 DATA(0x004ff050) H2_CONST char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = { localization::Tr("table.cBWMouseText.0"), localization::Tr("table.cBWMouseText.1")};
-DATA(0x004ff058) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = { localization::Tr("table.combatSpeedText.0"), localization::Tr("table.combatSpeedText.1"), localization::Tr("table.combatSpeedText.2")};
+DATA(0x004ff058) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_COUNT] = { localization::Tr("table.combatSpeedText.0"), localization::Tr("table.combatSpeedText.1"), localization::Tr("table.combatSpeedText.2")};
 DATA(0x004ff064) H2_CONST char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = { localization::Tr("table.combatMiniInfoText.0"), localization::Tr("table.combatMiniInfoText.1"), localization::Tr("table.combatMiniInfoText.2")};
 DATA(0x004ff070) H2_CONST char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     /* \n\n\n***Command Line Help***\n */ "\n\n\n***Command Line Help***\n",
@@ -10860,7 +10861,7 @@ DATA(0x005261e0) configStruct gConfig;
 DATA(0x00525f7c) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00526404) u32l gTimeMark;
 DATA(0x00524e0c) char* EXPANSION_AGGREGATE_NAME;
-DATA(0x00524f98) char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+DATA(0x00524f98) char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 DATA(0x00526124) game* gpGame;
 DATA(0x00525bc3) b8 gbRetreatWin;
 DATA(0x005260fc) DialogWaitType giWaitType;

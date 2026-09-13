@@ -7,19 +7,15 @@
 
 struct tag_message;
 
-H2_ENUM_BEGIN(CombatRemotePacketConstant)
-    COMBAT_REMOTE_PAYLOAD_CAPACITY = 247
-H2_ENUM_END(CombatRemotePacketConstant)
-
 H2_ENUM_CLASS_BEGIN(CombatAction)
     ACTION_NONE       = 0,
     ACTION_CAST_SPELL = 1,
     ACTION_MOVE       = 2,
-    ACTION_WAIT       = 3,
+    ACTION_SKIP_TURN  = 3,
     ACTION_RETREAT    = 4,
     ACTION_SURRENDER  = 5,
     ACTION_ATTACK     = 6,
-    ACTION_DEFEND     = 7
+    ACTION_DEFER_TURN = 7
 H2_ENUM_CLASS_END(CombatAction)
 
 #pragma pack(push, 1)
@@ -36,7 +32,7 @@ struct CombatRemotePacket {
             i32 nextActionGridIndex;
             i32 nextActionGridIndex2;
         };
-        char text[COMBAT_REMOTE_PAYLOAD_CAPACITY];
+        char text[REMOTE_MESSAGE_PAYLOAD_SIZE];
     };
 };
 #pragma pack(pop)

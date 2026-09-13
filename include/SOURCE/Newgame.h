@@ -27,10 +27,6 @@ H2_ENUM_BEGIN(NewGameControlConstant)
     NEW_GAME_RACE_NAME_FIRST       = 0x4e
 H2_ENUM_END(NewGameControlConstant)
 
-H2_ENUM_BEGIN(NewGameRemotePacketConstant)
-    NEW_GAME_REMOTE_PAYLOAD_CAPACITY = 247
-H2_ENUM_END(NewGameRemotePacketConstant)
-
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
     i8 sender;
@@ -38,7 +34,7 @@ struct NewGameRemotePacket {
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     i16 payloadSize;
-    char payload[NEW_GAME_REMOTE_PAYLOAD_CAPACITY];
+    char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 
 #pragma pack(pop)

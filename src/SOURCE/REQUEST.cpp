@@ -18,6 +18,8 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
+#include <BASE/font.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     REQUESTER_HELP_NONE          = -1,
@@ -66,14 +68,7 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
     FILENAME_ENTRY_LIMIT        = 201,
     FILTER_FRAME_STEP           = 2,
     FILTER_FRAME_BASE           = 9,
-    SELECTED_FILL_COLOR         = 2,
     SCROLL_CENTER_DIVISOR       = 2,
-    CP1251_UPPER_FIRST          = 0xc0,
-    CP1251_UPPER_LAST           = 0xdf,
-    CP1251_LOWER_FIRST          = 0xe0,
-    CP1251_LOWER_LAST           = 0xff,
-    CP1251_YO_UPPER             = 0xa8,
-    CP1251_YO_LOWER             = 0xb8
 H2_ENUM_END(FileRequesterPrivateConstant)
 
 VA(0x0048e730, 0x70)
@@ -480,7 +475,7 @@ void fileRequester::SetOK(i32 enabled) {
         enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
         FILE_REQUESTER_OK
     );
-    message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAG_GRAYED);
+    message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
@@ -551,7 +546,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             break;
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case FILE_REQUESTER_SCROLL_UP:
                             if (m_topIndex > 0) {
@@ -588,8 +583,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
                     if (HAS(
                             message.payload.widget.modifiers,
                             MESSAGE_MODIFIER_RIGHT_BUTTON
@@ -747,12 +742,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                               && newNameData[iResult] <= 'z')
                                           || (newNameData[iResult] >= '0'
                                               && newNameData[iResult] <= '9')
-                                          || (newNameData[iResult] >= CP1251_UPPER_FIRST
-                                              && newNameData[iResult] <= CP1251_UPPER_LAST)
-                                          || (newNameData[iResult] >= CP1251_LOWER_FIRST
-                                              && newNameData[iResult] <= CP1251_LOWER_LAST)
-                                          || newNameData[iResult] == CP1251_YO_UPPER
-                                          || newNameData[iResult] == CP1251_YO_LOWER
+                                          || (newNameData[iResult] >= CYRILLIC_CAPITAL_A
+                                              && newNameData[iResult] <= CYRILLIC_CAPITAL_YA)
+                                          || (newNameData[iResult] >= CYRILLIC_SMALL_A
+                                              && newNameData[iResult] <= CYRILLIC_SMALL_YA)
+                                          || newNameData[iResult] == CYRILLIC_CAPITAL_YO
+                                          || newNameData[iResult] == CYRILLIC_SMALL_YO
                                           || newNameData[iResult] == '_'
                                           || newNameData[iResult] == ' '
                                           || FindToken(
@@ -899,14 +894,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult - giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5) {
                     acceptStep = false;
                 }
             }
         }
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;
+            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
         }
     }
@@ -959,13 +954,13 @@ void fileRequester::DoKnob(void) {
                     m_topIndex = topIndex;
                     Update(0);
                     m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                     oldTopIndex = topIndex;
                 } else {
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             } else {
-                m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
         Process1WindowsMessage();
@@ -1130,9 +1125,9 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_selectedIndex == m_topIndex + i) {
-            message.payload.widget.data.value = SELECTED_FILL_COLOR;
+            message.payload.widget.data.value = IDX(FONT_DRAW_YELLOW);
         } else {
-            message.payload.widget.data.value = 1;
+            message.payload.widget.data.value = IDX(FONT_DRAW_DEFAULT);
         }
         m_window->BroadcastMessage(message);
     }
@@ -1166,7 +1161,7 @@ void fileRequester::Update(i32 drawWindow) {
         m_scrollKnob->m_y = (fGutterMinY + m_topIndex * gutterStepCount);
     }
     if (drawWindow) {
-        m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
 #if H2_RETAIL_COMPILER

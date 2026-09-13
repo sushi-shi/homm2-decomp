@@ -19,6 +19,8 @@
 #include <SOURCE/wingraph.h>
 #include <stdio.h>
 #include <string.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(SmackManagerConstant)
     PALETTE_VALUE_SHIFT            = 2,
@@ -45,7 +47,7 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     POINTER_ID                     = 40,
     POINTER_DEFAULT                = 0,
     EXPANSION_RECT_COUNT           = 4,
-    CAMPAIGN_DIVIDER_X             = WINGRAPH_WIDTH / 2,
+    CAMPAIGN_DIVIDER_X             = LOGICAL_SCREEN_WIDTH / 2,
     CAMPAIGN_LEFT_FRAME            = 0,
     CAMPAIGN_RIGHT_FRAME           = 1,
     CAMPAIGN_RIGHT_SELECTED_FRAME  = 2,
@@ -55,8 +57,8 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     CONGRATS_TEXT_Y                = 98,
     CONGRATS_TEXT_WIDTH            = 134,
     CONGRATS_TEXT_HEIGHT           = 217,
-    CONGRATS_BLIT_WIDTH            = WINGRAPH_WIDTH - 1,
-    CONGRATS_BLIT_HEIGHT           = WINGRAPH_HEIGHT - 1,
+    CONGRATS_BLIT_WIDTH            = LOGICAL_SCREEN_WIDTH - 1,
+    CONGRATS_BLIT_HEIGHT           = LOGICAL_SCREEN_HEIGHT - 1,
     MOVIE_PATH_SIZE                = 352,
     MILES_SOUND_SYSTEM_PREFERENCE  = 15,
     CAMPAIGN_BLIT_X                = 49,
@@ -277,7 +279,7 @@ void SmackManagerMain(void) {
                     ,
                     NORMAL_DIALOG_CONFIRM
                 );
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SIX)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_6)
                     ShutDown("CDROM drive error.  Exiting.");
             }
         }
@@ -285,8 +287,8 @@ void SmackManagerMain(void) {
             smk1,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             gpWindowManager->m_screen->m_pixels,
             0
         );
@@ -314,21 +316,21 @@ void SmackManagerMain(void) {
                 smk2,
                 SmackOptions[bSmackNum].companionX,
                 SmackOptions[bSmackNum].companionY,
-                WINGRAPH_WIDTH,
-                WINGRAPH_HEIGHT,
+                LOGICAL_SCREEN_WIDTH,
+                LOGICAL_SCREEN_HEIGHT,
                 gpWindowManager->m_screen->m_pixels,
                 0
             );
         }
     }
 
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT, 0);
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         0,
-        WINGRAPH_WIDTH,
-        WINGRAPH_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         0,
         0
     );
@@ -473,8 +475,8 @@ void SmackManagerMain(void) {
                             gpWindowManager->m_screen,
                             0,
                             0,
-                            WINGRAPH_WIDTH,
-                            WINGRAPH_HEIGHT,
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT,
                             0,
                             0
                         );
@@ -501,8 +503,8 @@ void SmackManagerMain(void) {
                                 smk2,
                                 SmackOptions[bExpansionSmackNum].companionX,
                                 SmackOptions[bExpansionSmackNum].companionY,
-                                WINGRAPH_WIDTH,
-                                WINGRAPH_HEIGHT,
+                                LOGICAL_SCREEN_WIDTH,
+                                LOGICAL_SCREEN_HEIGHT,
                                 gpWindowManager->m_screen->m_pixels,
                                 0
                             );
@@ -566,16 +568,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );
@@ -586,16 +588,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );

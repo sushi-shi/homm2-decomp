@@ -6,6 +6,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
+#include <SOURCE/CONFIG_TYPES.h>
 
 H2_ENUM_BEGIN(ComConstant)
     PORT_COUNT           = 2,
@@ -28,11 +29,7 @@ H2_ENUM_BEGIN(ComErrorText)
 H2_ENUM_END(ComErrorText)
 
 H2_ENUM_BEGIN(ComSerialConstant)
-    BAUD_VALUE_2400        = 2400,
     BAUD_VALUE_4800        = 4800,
-    BAUD_VALUE_9600        = 9600,
-    BAUD_VALUE_19200       = 19200,
-    BAUD_VALUE_38400       = 38400
 
 H2_ENUM_END(ComSerialConstant)
 
@@ -183,19 +180,19 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
 
     switch (baudRate) {
         case COM_BAUD_2400:
-            state.BaudRate = BAUD_VALUE_2400;
+            state.BaudRate = IDX(CONFIG_BAUD_2400);
             break;
         case COM_BAUD_4800:
             state.BaudRate = BAUD_VALUE_4800;
             break;
         case COM_BAUD_9600:
-            state.BaudRate = BAUD_VALUE_9600;
+            state.BaudRate = IDX(CONFIG_BAUD_9600);
             break;
         case COM_BAUD_19200:
-            state.BaudRate = BAUD_VALUE_19200;
+            state.BaudRate = IDX(CONFIG_BAUD_19200);
             break;
         case COM_BAUD_38400:
-            state.BaudRate = BAUD_VALUE_38400;
+            state.BaudRate = IDX(CONFIG_BAUD_38400);
             break;
         default:
             state.BaudRate = IDX(baudRate);

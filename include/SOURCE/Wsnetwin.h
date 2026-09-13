@@ -10,7 +10,6 @@ H2_ENUM_BEGIN(WinsockTransportConstant)
     WS_TRANSPORT_BUFFER_COUNT       = 200,
     WS_TRANSPORT_BUFFER_SIZE        = 0x100,
     WS_TRANSPORT_BROADCAST_POSITION = 0x7f,
-    WS_TRANSPORT_PLAYER_COUNT       = IDX(GAME_PLAYER_COUNT),
     WS_TRANSPORT_PORT               = 2000,
     WS_TRANSPORT_SEND_RETRY_DELAY   = 300,
     WS_TRANSPORT_HOST_RETRY_DELAY   = 3000,
@@ -22,7 +21,7 @@ H2_ENUM_END(WinsockTransportConstant)
 struct WinsockStartupMessage {
     i8 playerCount;
     i8 netPosition;
-    i32 playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
+    i32 playerAddresses[GAME_PLAYER_COUNT];
 };
 #pragma pack(pop)
 SIZE(WinsockStartupMessage, 0x1a);

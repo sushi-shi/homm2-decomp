@@ -24,14 +24,14 @@ H2_ENUM_CLASS_BEGIN_SPLIT(WidgetFlag, i16)
     WIDGET_FLAG_ENABLED  = 2,
     WIDGET_FLAG_DRAW     = 4,
     WIDGET_FLAG_DIMMED   = 8,
-    WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
 H2_ENUM_CLASS_END_SPLIT(WidgetFlag, i16)
 H2_ENUM_FLAGS(WidgetFlag)
 
-H2_ENUM_CLASS_BEGIN(WidgetCommandArgument)
-    WIDGET_COMMAND_DIMMED = 0x1000
-H2_ENUM_CLASS_END(WidgetCommandArgument)
+H2_ENUM_CLASS_BEGIN(WidgetFlagArgument)
+    // Exact SET/CLEAR_FLAGS payload: change WIDGET_FLAG_DIMMED without drawing/updating.
+    WIDGET_FLAGS_ARGUMENT_DIMMED = 0x1000
+H2_ENUM_CLASS_END(WidgetFlagArgument)
 
 #pragma pack(push, 1)
 class widget {

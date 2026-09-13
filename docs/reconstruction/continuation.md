@@ -24,6 +24,17 @@ A supplemental C++20 parse covered 96 TUs with no project-source diagnostics,
 but emitted 1,520 errors in legacy MSVC library headers. It is not a clean
 whole-tree strict-build result and is not used as the compatibility proof.
 
+#63 incorporates that resolved #59 commit (`21b35341`) into `f17bc1704`.
+Its 44 conflicted files retain the enum/event changes and newer identifiers;
+the `DrawWindow` definitions now use the meaningful parameter names already
+present in its declarations. Both locale builds, all 98 raw-object comparisons,
+contracts and 988 selftests (seven skips) pass on the combined source.
+Fresh enum inventories cover all 96 C++ TUs: 7,177 retail / 7,176 strict members
+in 740 source blocks. Retained values agree with the prior full inventory plus
+the nine already-reviewed neutral frame renames. Each mode has one known inactive
+conditional block; each inventory reports 1,520 SDK dialect diagnostics and no
+accepted project-source diagnostic. This still is not a clean modern build.
+
 ## What is left
 
 Do not add these overlapping counts together or interpret them as confirmed bugs:
@@ -37,6 +48,13 @@ Do not add these overlapping counts together or interpret them as confirmed bugs
   File reviews: 42/229 hashes match; 187 need refresh. Macro census: 2,736.
 - #63 has six known naming findings from its review at `f17bc1704`; they remain
   follow-up work, not conflict resolutions. See the next batch below.
+
+After combining #63 with the resolved base, the live inventory is 804/1,654
+matching function review hashes; **850 need refresh** (713 stale hashes, 137
+missing keys). There are **135 orphaned historical keys**. File review hashes
+match for 33/231 files; 198 need refresh. The macro census is 2,738. This supersedes
+the #59-only counts above for work after both PRs merge; it does not add a second
+backlog to them. These are exact-body hash checks, not dependency review proof.
 
 `functions.tsv`, `files.tsv`, `macros.tsv`, `progress.md`, `reviews.json` and
 `file-reviews.json` remain the historical `36ace4cae` snapshot. Do not cite their

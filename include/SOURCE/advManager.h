@@ -6,6 +6,7 @@
 #include <BASE/widget.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
+#include <SOURCE/GAME.h>
 
 class armyGroup;
 class hero;
@@ -37,7 +38,6 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_OBJECT_ICON_COUNT             = 64,
     ADVMGR_ANIMATION_PHASE_COUNT         = 4,
     ADVMGR_HERO_ICON_COUNT               = IDX(FACTION_COUNT) + 2,
-    ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
     ADVMGR_STEP_PIXEL_COUNT              = 5,
@@ -109,8 +109,8 @@ public:
     class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
     class icon* m_shadowIcon;
     class icon* m_boatShadowIcon;
-    class icon* m_flagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
-    class icon* m_boatFlagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
+    class icon* m_flagIcons[GAME_PLAYER_COUNT];
+    class icon* m_boatFlagIcons[GAME_PLAYER_COUNT];
     b32 m_cursorActive;
     i32 m_drawHeroShadows;
     H2_ENUM_STORAGE(HeroCursorType, i32) m_cursorType;

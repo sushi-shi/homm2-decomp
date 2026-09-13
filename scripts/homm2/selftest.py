@@ -33,7 +33,9 @@ PACKAGE = SCRIPTS / "homm2"
 # Raised deliberately when cases are ADDED - the number is a floor against silent
 # loss, not a target. If a package legitimately shrinks, lower it in the same
 # commit that removes the tests, so the drop is reviewed rather than absorbed.
-MINIMUM_CASES = 949
+# The one-off enum-review verifier and its 20 tests were removed; the reusable
+# enum inventory keeps its 12 focused tests.
+MINIMUM_CASES = 986
 
 
 def _packages():

@@ -1,7 +1,16 @@
 #include <SOURCE/KB.h>
 #include <BASE/message.h>
+#include <BASE/inputManager.h>
+#include <BASE/dialog.h>
+#include <BASE/font.h>
+#include <BASE/widget.h>
+#include <SOURCE/Campaign.h>
+#include <SOURCE/CURSOR.h>
+#include <SOURCE/highScoreManager.h>
+#include <SOURCE/fileRequester.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/combatManager.h>
+#include <SOURCE/COMMAND.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 #include <BASE/Misc.h>
@@ -12,6 +21,36 @@
 #include <fcntl.h>
 
 i32 __cdecl main() {
+    // Notifications describe the widget protocol; screen actions alias its IDs.
+    if (IDX(WIDGET_NOTIFY_SELECT) != 12 || IDX(WIDGET_NOTIFY_DESELECT) != 13
+        || IDX(WIDGET_NOTIFY_RIGHT_CLICK) != 14 || CAMPAIGN_DIALOG_CANCEL != DIALOG_BUTTON_1
+        || CAMPAIGN_DIALOG_ACCEPT != DIALOG_BUTTON_2 || FILE_REQUESTER_CANCEL != DIALOG_BUTTON_1
+        || FILE_REQUESTER_OK != DIALOG_BUTTON_2 || HIGH_SCORE_CLOSE_BUTTON != DIALOG_BUTTON_0
+        || NORMAL_DIALOG_YES != DIALOG_BUTTON_5 || NORMAL_DIALOG_NO != DIALOG_BUTTON_6
+        || IDX(FONT_DRAW_DEFAULT) != 1 || IDX(FONT_DRAW_YELLOW) != 2 || IDX(FONT_DRAW_DIMMED) != 3
+        || IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW) != 6
+        || IDX(WIDGET_FLAG_DIMMED) != 8 || IDX(WIDGET_FLAGS_ARGUMENT_DIMMED) != 0x1000
+        || IDX(MONSTER_FLAGS_DEAD) != 0x10 || IDX(MONSTER_FLAGS_MIRROR_IMAGE) != 0x100
+        || IDX(MONSTER_FLAGS_TURN_SPENT) != 0x80 || IDX(MONSTER_FLAGS_DEFERRED_TURN) != 0x1000
+        || IDX(ACTION_SKIP_TURN) != 3 || IDX(ACTION_DEFER_TURN) != 7
+        || IDX(INPUT_SCAN_F2) != 0x3c || IDX(INPUT_SCAN_Q) != 0x10
+        || IDX(HERO_EVENT_RESERVED_FOR_RECRUITMENT) != 0x10000
+        || HERO_BASE_LEARNABLE_SPELL_LEVEL != 2
+        || COMBAT_ALL_DIRECTIONS_BLOCKED != 0xff) {
+        printf("enum protocol contract mismatch\n");
+        return 20;
+    }
+    printf("Enum contracts: notifications, dialog slots, payloads and gameplay flags pass\n");
+    // Lock the dialog discriminator and asset IDs; these checks do not infer semantics.
+    if (NORMAL_DIALOG_ARTIFACT != 7
+        || CURSOR_HERO_TURN_FRAME_46 != 46 || CURSOR_HERO_TURN_FRAME_47 != 47
+        || CURSOR_HERO_TURN_FRAME_49 != 49 || CURSOR_HERO_TURN_FRAME_50 != 50
+        || CURSOR_HERO_TURN_FRAME_51 != 51 || CURSOR_HERO_TURN_SHADOW_FRAME_55 != 55
+        || CURSOR_HERO_TURN_SHADOW_FRAME_56 != 56 || CURSOR_HERO_TURN_SHADOW_FRAME_57 != 57
+        || CURSOR_HERO_TURN_SHADOW_FRAME_58 != 58) {
+        printf("artifact dialog / turning shadow frame contract mismatch\n");
+        return 21;
+    }
     for (i32 value = 0; value < 256; ++value) {
         const char input = static_cast<char>(value);
         const i32 upper = ((value >= 'a' && value <= 'z') || value >= 0xe0)
@@ -30,7 +69,7 @@ i32 __cdecl main() {
             || IS_LICH_CREATURE(type) != (type == 54 || type == 55)
             || IS_VAMPIRE_CREATURE(type) != (type == 52 || type == 53)
             || IS_TROLL_CREATURE(type) != (type == 17 || type == 18)
-            || IS_WIDGET_SELECTION_COMMAND(type) != (type == 12 || type == 14)) {
+            || IS_WIDGET_SELECTION_NOTIFICATION(type) != (type == 12 || type == 14)) {
             printf("classification mismatch at %d\n", type);
             return 2;
         }

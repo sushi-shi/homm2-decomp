@@ -22,6 +22,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/swapManager.h>
 #include <SOURCE/townManager.h>
+#include <BASE/dialog.h>
 H2_ENUM_BEGIN(SwapManagerControl)
     CONTROL_LEFT_HERO               = 0x41,
     CONTROL_RIGHT_HERO              = 0x42,
@@ -44,44 +45,36 @@ H2_ENUM_BEGIN(SwapManagerControl)
 H2_ENUM_END(SwapManagerControl)
 
 H2_ENUM_BEGIN(SwapManagerConstant)
-    SECONDARY_SKILL_WIDGET_COUNT = 8,
-    WINDOW_TEXT_ID               = 0x15,
-    CONTROL_CLOSE                = 0x7800,
-    SPLIT_MODIFIER_MASK          = 3,
-    LEFT_PORTRAIT_WIDGET         = 0x41,
-    RIGHT_PORTRAIT_WIDGET        = 0x42,
-    TITLE_WIDGET                 = 0x4d,
-    ADVENTURE_WIDGET_FIRST       = 1,
-    ADVENTURE_WIDGET_LAST        = 6,
-    ADVENTURE_DISABLE_VALUE      = 2,
-    EMPTY_SKILL_VALUE            = 4,
-    MONO_ICON_SKIP               = 2,
-    MONO_ICON_DEFAULT            = -1,
-    MANAGER_MESSAGE              = 0x100,
-    SLOT_NONE                    = -1,
-    ARTIFACT_COLUMN_COUNT        = 7,
-    FADE_STEPS                   = 8,
-    VIEW_FULL                    = 0,
-    VIEW_QUICK                   = 1,
-    CLOSE_REQUESTED              = 1,
-    SELECTOR_WIDTH               = 0x2e,
-    SELECTOR_HEIGHT              = 0x2e,
-    ARMY_SELECTOR_FRAME          = 3,
-    ARTIFACT_SELECTOR_FRAME      = 2,
-    EMPTY_ITEM_VALUE             = 4,
-    ARTIFACT_FIRST_ROW_LAST      = 6,
-    PRIMARY_SKILL_COUNT          = 4,
-    LEFT_PRIMARY_SKILL_FIRST     = 0x43,
-    RIGHT_PRIMARY_SKILL_FIRST    = 0x48,
-    LEFT_ARMY_COUNT_FIRST        = 0x74,
-    RIGHT_ARMY_COUNT_FIRST       = 0x79,
-    ARMY_VIEW_X                  = 0x77,
-    ARMY_VIEW_Y                  = 0x14,
-    SPLIT_WINDOW_X               = 0xb1,
-    SPLIT_WINDOW_Y               = 0x14,
-    SPLIT_TEXT_CONTROL           = 1,
-    SPLIT_AMOUNT_CONTROL         = 0x44,
-    SPLIT_CONFIRM                = 0x7802
+    SPLIT_CONFIRM             = DIALOG_BUTTON_2,
+    CONTROL_CLOSE             = DIALOG_BUTTON_0,
+    WINDOW_TEXT_ID            = 0x15,
+    SPLIT_MODIFIER_MASK       = 3,
+    TITLE_WIDGET              = 0x4d,
+    ADVENTURE_WIDGET_FIRST    = 1,
+    ADVENTURE_WIDGET_LAST     = 6,
+    MONO_ICON_SKIP            = 2,
+    MONO_ICON_DEFAULT         = -1,
+    MANAGER_MESSAGE           = 0x100,
+    SLOT_NONE                 = -1,
+    ARTIFACT_COLUMN_COUNT     = 7,
+    FADE_STEPS                = 8,
+    VIEW_FULL                 = 0,
+    VIEW_QUICK                = 1,
+    CLOSE_REQUESTED           = 1,
+    SELECTOR_WIDTH            = 0x2e,
+    SELECTOR_HEIGHT           = 0x2e,
+    ARMY_SELECTOR_FRAME       = 3,
+    ARTIFACT_SELECTOR_FRAME   = 2,
+    ARTIFACT_FIRST_ROW_LAST   = 6,
+    LEFT_PRIMARY_SKILL_FIRST  = 0x43,
+    RIGHT_PRIMARY_SKILL_FIRST = 0x48,
+    LEFT_ARMY_COUNT_FIRST     = 0x74,
+    RIGHT_ARMY_COUNT_FIRST    = 0x79,
+    ARMY_VIEW_X               = 0x77,
+    ARMY_VIEW_Y               = 0x14,
+    SPLIT_WINDOW_X            = 0xb1,
+    SPLIT_WINDOW_Y            = 0x14,
+    SPLIT_TEXT_CONTROL        = 1,
 H2_ENUM_END(SwapManagerConstant)
 
 VA(0x004a2260, 0x79)
@@ -112,7 +105,7 @@ void swapManager::Reset(void) {
 
 VA(0x004a2349, 0x25)
 i32 swapManager::DrawSwapWin(void) {
-    m_window->DrawWindow(0);
+    m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     gpWindowManager->UpdateScreen();
     return 0;
 }
@@ -131,12 +124,12 @@ i32 swapManager::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
-    message.payload.widget.id = LEFT_PORTRAIT_WIDGET;
+    message.payload.widget.id = CONTROL_LEFT_HERO;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait));
-    message.payload.widget.id = RIGHT_PORTRAIT_WIDGET;
+    message.payload.widget.id = CONTROL_RIGHT_HERO;
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -151,16 +144,16 @@ i32 swapManager::Open(i32 id) {
     m_window->BroadcastMessage(message);
 
     for (SwapManagerSide swapSide = SWAP_SIDE_LEFT; swapSide < SWAP_SIDE_COUNT; ++swapSide) {
-        for (skillWidget = 0; skillWidget < SECONDARY_SKILL_WIDGET_COUNT; ++skillWidget) {
+        for (skillWidget = 0; skillWidget < HERO_SECONDARY_SKILL_CAPACITY; ++skillWidget) {
             if (skillWidget < m_heroes[IDX(swapSide)]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = IDX(m_heroes[IDX(swapSide)]->GetNthSS(skillWidget));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 message.payload.widget.data.text = gText;
                 sprintf(
@@ -171,9 +164,9 @@ i32 swapManager::Open(i32 id) {
                 m_window->BroadcastMessage(message);
             } else {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
+                message.payload.widget.id = IDX(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = EMPTY_SKILL_VALUE;
+                message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                 m_window->BroadcastMessage(message);
             }
         }
@@ -339,15 +332,15 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     if (quickView)
                         break;
                     if (message.payload.widget.id == CONTROL_CLOSE)
                         closeRequested = true;
                     break;
 
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
                     switch (message.payload.widget.id) {
                         case CONTROL_LEFT_SKILL_FIRST:
                         case CONTROL_LEFT_SKILL_FIRST + 1:
@@ -730,7 +723,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
     if (closeRequested == CLOSE_REQUESTED) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = SWAP_COMMAND_EXIT;
+        message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -793,10 +786,10 @@ void swapManager::SwapArtifacts(void) {
         i32 slotSkill;
         message.type = MESSAGE_WIDGET;
         for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
-            for (slotSkill = 0; slotSkill < SECONDARY_SKILL_WIDGET_COUNT; ++slotSkill) {
+            for (slotSkill = 0; slotSkill < HERO_SECONDARY_SKILL_CAPACITY; ++slotSkill) {
                 if (slotSkill < m_heroes[IDX(side)]->m_secondarySkillCount) {
                     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                    message.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
+                    message.payload.widget.id = IDX(side) * HERO_SECONDARY_SKILL_CAPACITY
                                                   + slotSkill + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                     message.payload.widget.data.text = gText;
                     sprintf(
@@ -858,7 +851,7 @@ void swapManager::Update(void) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
 
-    for (slot = 0; slot < PRIMARY_SKILL_COUNT; ++slot) {
+    for (slot = 0; slot < HERO_PRIMARY_STAT_COUNT; ++slot) {
         message.payload.widget.id = slot + LEFT_PRIMARY_SKILL_FIRST;
         sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message);
@@ -871,10 +864,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_LEFT_ARMY_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -887,10 +880,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + LEFT_ARMY_COUNT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
@@ -903,10 +896,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_RIGHT_ARMY_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -919,10 +912,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + RIGHT_ARMY_COUNT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
@@ -935,10 +928,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_LEFT_ARTIFACT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -951,10 +944,10 @@ void swapManager::Update(void) {
         message.payload.widget.id = slot + CONTROL_RIGHT_ARTIFACT_FIRST;
         if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         } else {
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = EMPTY_ITEM_VALUE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.data.value =
@@ -974,7 +967,7 @@ void swapManager::SplitMons(void) {
     tag_message message;
     i32 H2_UNUSED(dlgState);
 
-    unusedAmountControl = SPLIT_AMOUNT_CONTROL;
+    unusedAmountControl = TOWN_SPLIT_AMOUNT_CONTROL;
     dlgState = 0;
     selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
     targetTroops = &m_heroes[IDX(m_targetSide)]->m_army;
@@ -1008,7 +1001,7 @@ void swapManager::SplitMons(void) {
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
-    message.payload.widget.id = SPLIT_AMOUNT_CONTROL;
+    message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);

@@ -10,6 +10,9 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
+#include <SOURCE/KB_TYPES.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -418,7 +421,7 @@ LRESULT AppCommand(
             );
             break;
         case KBWIN_MENU_SIZE_640_480:
-            ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
+            ResizeWindow(-1, -1, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
             break;
         case KBWIN_MENU_SIZE_800_600:
             ResizeWindow(-1, -1, KBWIN_WIDTH_800, KBWIN_HEIGHT_600);
@@ -445,7 +448,7 @@ void UpdateDfltMenu(HMENU menu) {
 
     if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
-    if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
+    if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
     if (giMainVideoModeWidth <= KBWIN_WIDTH_800)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_800_600), MF_GRAYED);
@@ -541,7 +544,7 @@ void SetMenus(HMENU menu, b32 enabled) {
                 disabled = 1;
             } else {
                 match = 0;
-                for (position = 0; position < KBWIN_MENU_ENTRY_COUNT; position++) {
+                for (position = 0; position < MENU_ENABLE_STATUS_COUNT; position++) {
                     if (gsMenuEnableStatus[position].command == id) {
                         match = position;
                     }

@@ -8,11 +8,10 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <windows.h>
 #include <string.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(VesaBlitConstant)
-    VESA_SCREEN_WIDTH    = 640,
-    VESA_SCREEN_HEIGHT   = 480,
-    ENLARGE_EXTENT_LIMIT = VESA_SCREEN_WIDTH - 3,
+    ENLARGE_EXTENT_LIMIT = LOGICAL_SCREEN_WIDTH - 3,
     ENLARGE_PIXEL_GROWTH = 4,
     NET_BOX_TOP          = 411
 H2_ENUM_END(VesaBlitConstant)
@@ -38,18 +37,18 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         for (row = 0; row < height; row++)
             memcpy(
                 gpWindowManager->m_screen->m_pixels
-                    + (destinationY + row) * VESA_SCREEN_WIDTH + destinationX,
+                    + (destinationY + row) * LOGICAL_SCREEN_WIDTH + destinationX,
                 sourceBitmap->m_pixels + (row + sourceY) * sourceBitmap->m_width + sourceX,
                 width
             );
     }
 
     if (gbEnlargeScreenBlit != 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
-        if (iMainWinScreenWidth == VESA_SCREEN_WIDTH
-            && iMainWinScreenHeight == VESA_SCREEN_HEIGHT) {
-            if (width < VESA_SCREEN_WIDTH)
+        if (iMainWinScreenWidth == LOGICAL_SCREEN_WIDTH
+            && iMainWinScreenHeight == LOGICAL_SCREEN_HEIGHT) {
+            if (width < LOGICAL_SCREEN_WIDTH)
                 ++width;
-            if (height < VESA_SCREEN_WIDTH)
+            if (height < LOGICAL_SCREEN_WIDTH)
                 ++height;
         } else {
             if (destinationX > 0)
@@ -71,12 +70,12 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
     }
 
     RECT invalidRectangle;
-    invalidRectangle.left = destinationX * iMainWinScreenWidth / VESA_SCREEN_WIDTH;
-    invalidRectangle.top = destinationY * iMainWinScreenHeight / VESA_SCREEN_HEIGHT;
+    invalidRectangle.left = destinationX * iMainWinScreenWidth / LOGICAL_SCREEN_WIDTH;
+    invalidRectangle.top = destinationY * iMainWinScreenHeight / LOGICAL_SCREEN_HEIGHT;
     invalidRectangle.right =
-        (destinationX + width) * iMainWinScreenWidth / VESA_SCREEN_WIDTH - 1;
+        (destinationX + width) * iMainWinScreenWidth / LOGICAL_SCREEN_WIDTH - 1;
     invalidRectangle.bottom =
-        (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
+        (destinationY + height) * iMainWinScreenHeight / LOGICAL_SCREEN_HEIGHT - 1;
 
     if (InvalidateRect(hwndApp, &invalidRectangle, 0) == 0)
         LogStr(gInvalidateRectFailedText);

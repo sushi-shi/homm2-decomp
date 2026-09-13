@@ -48,6 +48,9 @@
 #include <BASE/mouseManager.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/kbwin.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <SOURCE/KB_TYPES.h>
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \
@@ -57,6 +60,11 @@
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
     0.66
+
+H2_ENUM_BEGIN(ViewArmyControlId)
+    VIEW_ARMY_DISMISS_ID    = DIALOG_BUTTON_3,
+    VIEW_ARMY_CLOSE_BUTTON  = DIALOG_BUTTON_0,
+H2_ENUM_END(ViewArmyControlId)
 
 H2_ENUM_BEGIN(MapTilesetConstant)
     WAGON_CAMP_ACTIVE_FRAME = 129
@@ -68,14 +76,6 @@ H2_ENUM_END(ExpansionCampaignSaveConstant)
 
 /* CP1251 (Russian) code points the Buka build folds when it derives a save-file
    base name; the Latin fold is the same 0x20 distance in both alphabets. */
-H2_ENUM_BEGIN(Cp1251Constant)
-    CP1251_CAPITAL_YO = 0xa8,
-    CP1251_SMALL_YO   = 0xb8,
-    CP1251_CAPITAL_A  = 0xc0,
-    CP1251_CAPITAL_YA = 0xdf,
-    CP1251_SMALL_A    = 0xe0,
-    CP1251_SMALL_YA   = 0xff
-H2_ENUM_END(Cp1251Constant)
 
 namespace {
 
@@ -86,10 +86,10 @@ namespace {
 
         if (letter >= 'a' && letter <= 'z')
             capital = letter - ('a' - 'A');
-        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
-            capital = letter - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (letter == CP1251_SMALL_YO)
-            capital = CP1251_CAPITAL_YO;
+        else if (letter >= CYRILLIC_SMALL_A && letter <= CYRILLIC_SMALL_YA)
+            capital = letter - (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
+        else if (letter == CYRILLIC_SMALL_YO)
+            capital = CYRILLIC_CAPITAL_YO;
         else
             capital = letter;
         return capital;
@@ -99,10 +99,10 @@ namespace {
         char lowerFirst;
         if (letter >= 'A' && letter <= 'Z')
             lowerFirst = letter + ('a' - 'A');
-        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
-            lowerFirst = letter + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (letter == CP1251_CAPITAL_YO)
-            lowerFirst = CP1251_SMALL_YO;
+        else if (letter >= CYRILLIC_CAPITAL_A && letter <= CYRILLIC_CAPITAL_YA)
+            lowerFirst = letter + (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
+        else if (letter == CYRILLIC_CAPITAL_YO)
+            lowerFirst = CYRILLIC_SMALL_YO;
         else
             lowerFirst = letter;
         return lowerFirst;
@@ -190,7 +190,6 @@ H2_ENUM_BEGIN(NewMapConstant)
 H2_ENUM_END(NewMapConstant)
 
 H2_ENUM_BEGIN(GameDailyEconomyConstant)
-    DAILY_GOLD_MINE_INCOME          = 1000,
     DAILY_GOLD_TOWN_INCOME          = 1000,
     DAILY_GOLD_VILLAGE_INCOME       = 250,
     DAILY_GOLD_STATUE_INCOME        = 250,
@@ -200,7 +199,6 @@ H2_ENUM_BEGIN(GameDailyEconomyConstant)
     DAILY_GOLD_ENDLESS_PURSE_INCOME = 500,
     DAILY_GOLD_GOLDEN_GOOSE_INCOME  = 10000,
     DAILY_GOLD_TAX_LIEN_INCOME      = -250,
-    DAILY_MINE_BULK_RESOURCE_INCOME = 2,
     DAILY_CAMPAIGN_WOOD_BONUS       = 2,
     DAILY_RESOURCE_BONUS_FIRST_DAY  = 1,
     DAILY_RESOURCE_BONUS_LAST_DAY   = IDX(RES_GOLD),
@@ -212,8 +210,6 @@ H2_ENUM_BEGIN(WeeklyRuntimeConstant)
     WEEK_NAME_LAST                = KB_WEEK_NAME_COUNT - 1,
     CREATURE_WEEK_LAST            = IDX(CREATURE_BONE_DRAGON),
     SPECIAL_WEEK_ROLL_MAX         = 4,
-    CASTLE_GROWTH_SPECIAL_BONUS   = 2,
-    CASTLE_GROWTH_WELL_BONUS      = 8,
     NEUTRAL_CASTLE_GROWTH_DIVISOR = 2,
     CREATURE_WEEK_GROWTH_BONUS    = 5,
     CREATURE_MONTH_MULTIPLIER     = 2
@@ -223,7 +219,6 @@ H2_ENUM_BEGIN(RandomMapConstant)
     RANDOM_TOWN_SCRATCH_WIDTH    = 2,
     RANDOM_MINE_RETRY_LIMIT      = 30,
     RANDOM_MINE_FOOTPRINT_WIDTH  = 2,
-    RANDOM_MINE_RESOURCE_COUNT   = IDX(MINE_TYPE_GOLD) + 1,
     RANDOM_HERO_SECOND_SELECTION = 2,
     RANDOM_HERO_AVERAGE_DIVISOR  = 2
 H2_ENUM_END(RandomMapConstant)
@@ -235,15 +230,9 @@ H2_ENUM_BEGIN(GameMapSetupConstant)
     HEROES_LOGO_Y                         = 16,
     HEROES_LOGO_WIDTH                     = 144,
     HEROES_LOGO_HEIGHT                    = 144,
-    GAME_SCREEN_WIDTH                     = 640,
-    GAME_SCREEN_HEIGHT                    = 480,
     ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
     DEFAULT_DWELLING_ROLL_CAPACITY        = 10,
     DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
-    TOWN_UPGRADE_BUILDING_FIRST           = IDX(BUILDING_SLOT_UPGRADE_FIRST),
-    TOWN_UPGRADE_BUILDING_LAST            = IDX(BUILDING_SLOT_SPECIAL_THIRTY),
-    TOWN_DWELLING_BUILDING_FIRST          = IDX(BUILDING_SLOT_DWELLING_FIRST),
-    TOWN_DWELLING_BUILDING_LAST           = IDX(BUILDING_SLOT_DWELLING_LAST),
     TOWN_UPGRADE_TO_DWELLING_OFFSET       = 5,
     MAP_HERO_PROCESS_PASS_COUNT           = 3,
     MAP_HERO_ASSIGNMENT_PASS              = 0,
@@ -253,8 +242,6 @@ H2_ENUM_BEGIN(GameMapSetupConstant)
     MAP_HERO_RANDOM_FACTION_FRAME         = IDX(FACTION_NEUTRAL),
     MAP_HEROES_PER_FACTION                = GAME_HERO_COUNT / IDX(FACTION_COUNT),
     MAP_HERO_CLASS_SCAN_RETRY_LIMIT       = 1000,
-    MAP_HERO_SCOUTING_SKILL_INDEX         = IDX(HERO_SKILL_SCOUTING),
-    HERO_CONSISTENCY_PLAYABLE_FACTION_MAX = IDX(FACTION_NECROMANCER),
     HERO_CONSISTENCY_POOL_THRESHOLD       = 40
 H2_ENUM_END(GameMapSetupConstant)
 
@@ -286,17 +273,11 @@ H2_ENUM_BEGIN(GameJoinConstant)
 H2_ENUM_END(GameJoinConstant)
 
 H2_ENUM_BEGIN(RemoteSaveConstant)
-    TRANSMIT_FILENAME_CAPACITY       = SAVE_PATH_CAPACITY,
-    RECEIVE_FILENAME_CAPACITY        = SAVE_PATH_CAPACITY,
-    REMOTE_LOOPING_SOUND_COUNT       = 4,
     REMOTE_PACKET_TRACKING_CAPACITY  = 5000,
-    REMOTE_HEADER_CAPACITY           = REMOTE_SAVE_BUFFER_SIZE,
     REMOTE_BUFFER_EXTRA              = 2000,
-    REMOTE_PACKET_PAYLOAD_SIZE       = REMOTE_SAVE_CHUNK_SIZE,
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
-    REMOTE_DECODE_BUFFER_SIZE        = JOIN_BUFFER_SIZE,
     REMOTE_RECEIVE_TIMEOUT           = 90000,
     REMOTE_RECEIVE_DIALOG_BUTTONS    = 2,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
@@ -366,9 +347,7 @@ H2_ENUM_BEGIN(GameMonthlyConstant)
     CREATURE_LIST_MIN             = 0,
     CREATURE_LIST_MAX             = 11,
     WELL_BUILDING                 = 0x10,
-    WELL_GROWTH                   = 2,
     FIRST_DWELLING_BONUS_BUILDING = 0x800,
-    FIRST_DWELLING_GROWTH         = 8,
     MONSTER_TRIGGER               = 0x98,
     MONSTER_SPAWN_MIN             = 0,
     MONSTER_SPAWN_MAX             = 360,
@@ -510,9 +489,6 @@ H2_ENUM_BEGIN(GameLuckConstant)
 H2_ENUM_END(GameLuckConstant)
 
 H2_ENUM_BEGIN(GameTimeEventConstant)
-    EVENT_DAYS_PER_WEEK    = 7,
-    EVENT_DAYS_PER_MONTH   = 28,
-    EVENT_RESOURCE_COUNT   = 7,
     EVENT_RESOURCE_PENALTY = 100000
 H2_ENUM_END(GameTimeEventConstant)
 
@@ -546,8 +522,6 @@ H2_ENUM_BEGIN(GameTuningConstant)
 H2_ENUM_END(GameTuningConstant)
 
 H2_ENUM_BEGIN(GamePasswordConstant)
-    PASSWORD_INDEX_COUNT = X_GLOBAL_PASSWORD_STRING_INDEX_COUNT,
-    PASSWORD_INDEX_MASK  = PASSWORD_INDEX_COUNT - 1,
     PASSWORD_COLOR_SHIFT = 3
 H2_ENUM_END(GamePasswordConstant)
 
@@ -595,8 +569,6 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_ICON_ID_10              = 110,
     VIEW_SPELL_ICON_ID_11              = 111,
     VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_AVAILABLE_COLOR         = 1,
-    VIEW_SPELL_UNAVAILABLE_COLOR       = 3,
     VIEW_SPELL_NAME_WIDTH              = 78,
     VIEW_SPELL_MANA_MAX                = 999,
     VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
@@ -622,7 +594,7 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_DETAIL_WIDGET_ID        = 4,
     VIEW_ARMY_MONSTER_WIDGET_ID       = 5,
     VIEW_ARMY_UPGRADE_ACTION_ID       = 500,
-    VIEW_ARMY_CLOSE_ID                = 10,
+    VIEW_ARMY_FINISH_COMMAND          = IDX(WIDGET_COMMAND_DIALOG_SELECT),
     VIEW_ARMY_WINDOW_X                = 19,
     VIEW_ARMY_WINDOW_Y                = 75,
     VIEW_ARMY_MONSTER_BASE_X          = 167,
@@ -678,11 +650,6 @@ H2_ENUM_END(GameArmyDetailText)
 #define WEEKLY_HARD_GROWTH_FACTOR 1.20
 #define WEEKLY_EXPERT_GROWTH_FACTOR 1.32
 #define WEEKLY_IMPOSSIBLE_GROWTH_FACTOR 1.44
-
-H2_ENUM_BEGIN(ViewArmyControlId)
-    VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
-    VIEW_ARMY_UPGRADE_ID    = 0x7803
-H2_ENUM_END(ViewArmyControlId)
 
 #define WORLDMAP (&m_worldMap)
 
@@ -2750,7 +2717,7 @@ void game::RandomizeEvents(void) {
                         artifactGuardianChoices[7] = CREATURE_BONE_DRAGON;
                         artifactGuardianChoices[8] = CREATURE_GIANT;
                         artifactGuardianChoices[9] = CREATURE_TITAN;
-                        cell->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
+                        cell->m_objectMetadata = MAP_EVENT_ARTIFACT_GUARD_FLAG;
                         if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_TREASURE)
                             cell->m_objectMetadata |= IDX(CREATURE_ROGUE);
                         else if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_MINOR)
@@ -3005,7 +2972,7 @@ void game::InitializePasswords(void) {
     bchar flag;
     i32 i;
     i32 j;
-    for (i = 0; i < PASSWORD_INDEX_COUNT; i++) {
+    for (i = 0; i < X_GLOBAL_PASSWORD_STRING_INDEX_COUNT; i++) {
         flag = false;
         while (flag == 0) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
@@ -3024,7 +2991,7 @@ void game::InitializePasswords(void) {
 VA(0x00453b1a, 0x6b)
 void game::RandomizeBarrier(mapCell* cell) {
     i32 index = cell->m_objectMetadata;
-    index &= PASSWORD_INDEX_MASK;
+    index &= EVENT_BARRIER_COLOR_MASK;
     i32 passwordIndex = xPasswordStringsIndex[index];
     i32 color = (passwordIndex << PASSWORD_COLOR_SHIFT) | index;
     cell->m_objectMetadata = color;
@@ -3411,9 +3378,9 @@ void game::UpdateSpellWidgets(void) {
             );
             SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FILL_COLOR, i + VIEW_SPELL_TEXT_ID_BASE);
             if (GetManaCost(spell, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
-                message.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
+                message.payload.widget.data.value = IDX(FONT_DRAW_DIMMED);
             else
-                message.payload.widget.data.value = VIEW_SPELL_AVAILABLE_COLOR;
+                message.payload.widget.data.value = IDX(FONT_DRAW_DEFAULT);
             m_viewSpellsWindow->BroadcastMessage(message);
 
             lines = smallFont->LineLength(gSpellNames[IDX(spell)], VIEW_SPELL_NAME_WIDTH);
@@ -3473,8 +3440,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
-                if (message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+            case WIDGET_NOTIFY_DESELECT:
+                if (message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK
                     || (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
                     break;
                 {
@@ -3522,15 +3489,15 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case EVENT_WINDOW_FIRST_BUTTON:
+                        case DIALOG_BUTTON_0:
                             message.payload.widget.id = VIEW_SPELL_CLOSE_ID;
                             break;
                     }
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
-                if (message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
+                if (message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK
                     || (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
                     switch (message.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
@@ -3682,7 +3649,7 @@ MessageDispatchResult ViewSpecialHandler(tag_message& message) {
             case VIEW_SPELL_ADVENTURE_TAB_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_ADVENTURE]);
                 break;
-            case EVENT_WINDOW_FIRST_BUTTON:
+            case DIALOG_BUTTON_0:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_CLOSE]);
                 break;
             case VIEW_SPELL_MANA_LABEL_ID:
@@ -3734,7 +3701,7 @@ void game::ViewArmy(
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 numTroops,
     town* castle,
-    i32 disableUpgrade,
+    i32 disableDismiss,
     H2_ENUM_PARAM(ArmyFacing, i32) facing,
     i32 quickView,
     hero* theHero,
@@ -3792,7 +3759,7 @@ void game::ViewArmy(
             }
         }
         if ((monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON)
-            && HAS(castle->m_buildings, IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
+            && HAS(castle->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
             gbAllowUpgrade = true;
             iViewArmyUpgradeToType = CREATURE_BLACK_DRAGON;
         }
@@ -3971,16 +3938,16 @@ void game::ViewArmy(
         message.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
-    if (disableUpgrade) {
+    if (disableDismiss) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
+        message.payload.widget.id = VIEW_ARMY_DISMISS_ID;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (quickView) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
+        message.payload.widget.id = VIEW_ARMY_CLOSE_BUTTON;
         m_viewArmyWindow->BroadcastMessage(message);
     }
     if (numTroops < 1) {
@@ -4098,25 +4065,25 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
+                    case VIEW_ARMY_CLOSE_BUTTON:
+                    case DIALOG_BUTTON_1:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                        message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                        message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                        message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                         return MESSAGE_DISPATCH_FORWARD;
-                    case EVENT_WINDOW_FOURTH_BUTTON:
+                    case VIEW_ARMY_DISMISS_ID:
                         NormalDialog(
                             const_cast<char*>(
                                 localization::Tr("army.confirm.dismiss")
                             ),
                             NORMAL_DIALOG_CONFIRM
                         );
-                        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+                        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             gbDismissArmy = true;
-                            message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                            message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                            message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                            message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
@@ -4153,14 +4120,14 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+                            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost;
                                 if (resourceType != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType)] -= resourceCost;
                                 gbUpgradeArmy = true;
-                                message.payload.widget.id = VIEW_ARMY_CLOSE_ID;
+                                message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
                                 message.payload.widget.command =
-                                    BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
+                                    BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
@@ -4199,7 +4166,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
             viewArmyBaseX
             + viewArmyFacingWIPXMod * sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(message);
-        gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        gpGame->m_viewArmyWindow->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
@@ -4371,8 +4338,8 @@ void game::NextPlayer(void) {
     i32 index;
     i32 H2_UNUSED(humansAlive);
 
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &= ~HERO_EVENT_WEEKLY_VISIT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
@@ -4479,9 +4446,9 @@ i32 game::ComputeDailyGold(i32 player) {
     for (index = 0; index < GAME_MINE_COUNT; index++) {
         if (m_mines[index].owner == player) {
             if (m_mines[index].resourceType == MINE_TYPE_GOLD)
-                dailyGold += DAILY_GOLD_MINE_INCOME;
+                dailyGold += MINE_GOLD_INCOME;
             if (m_mines[index].resourceType == MINE_TYPE_ALCHEMIST_LAB)
-                dailyGold += DAILY_GOLD_MINE_INCOME;
+                dailyGold += MINE_GOLD_INCOME;
         }
     }
 
@@ -4573,9 +4540,9 @@ void game::PerDay(void) {
             mineType = m_mines[player].resourceType;
             dailyIncome = 0;
             if (mineType == MINE_TYPE_ORE)
-                dailyIncome = DAILY_MINE_BULK_RESOURCE_INCOME;
+                dailyIncome = MINE_ORE_INCOME;
             else if (mineType == MINE_TYPE_WOOD)
-                dailyIncome = DAILY_MINE_BULK_RESOURCE_INCOME;
+                dailyIncome = MINE_ORE_INCOME;
             else if (mineType != MINE_TYPE_GOLD)
                 dailyIncome = 1;
 
@@ -4630,7 +4597,7 @@ void game::PerDay(void) {
     m_day++;
     giCurTurn = GAME_DAY_NUMBER(*this);
     if (!gbGameOver) {
-        if (m_day > EVENT_DAYS_PER_WEEK) {
+        if (m_day > CALENDAR_DAYS_PER_WEEK) {
             m_day = 1;
             PerWeek();
         }
@@ -4641,7 +4608,7 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
-        m_heroRecs[player].m_eventFlags &= ~WEEKLY_HERO_RESERVED_FLAG;
+        m_heroRecs[player].m_eventFlags &= ~HERO_EVENT_RESERVED_FOR_RECRUITMENT;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource = RES_WOOD; resource < RES_GOLD; resource++) {
@@ -4735,21 +4702,21 @@ void game::PerWeek(void) {
 
     for (outerIndex = 0; outerIndex < GAME_TOWN_COUNT; outerIndex++) {
         castle = GetTown(outerIndex);
-        for (innerIndex = WEEKLY_FIRST_DWELLING; innerIndex <= WEEKLY_LAST_DWELLING;
+        for (innerIndex = IDX(BUILDING_SLOT_DWELLING_FIRST); innerIndex <= IDX(BUILDING_SLOT_DWELLING_LAST);
              innerIndex++) {
             if (HAS(castle->m_buildings, (1 << innerIndex))) {
                 creatureGrowth = gMonsterDatabase[IDX(gDwellingType[IDX(castle->m_type)]
-                                                             [innerIndex - WEEKLY_FIRST_DWELLING])]
+                                                             [innerIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
                                .growth;
                 if (HAS(castle->m_buildings, BIT(BUILDING_SLOT_SPECIAL_FOUR)))
-                    creatureGrowth += CASTLE_GROWTH_SPECIAL_BONUS;
-                if (innerIndex == WEEKLY_FIRST_DWELLING
+                    creatureGrowth += TOWN_WELL_BASE_GROWTH_BONUS;
+                if (innerIndex == IDX(BUILDING_SLOT_DWELLING_FIRST)
                     && HAS(castle->m_buildings, BIT(BUILDING_SLOT_WELL_EXTRA)))
-                    creatureGrowth += CASTLE_GROWTH_WELL_BONUS;
+                    creatureGrowth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
                 if (castle->m_owner == -1)
                     creatureGrowth /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
                 if (castle->m_owner >= 0
-                    && castle->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] == 0
+                    && castle->m_garrison[innerIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)] == 0
                     && !gbHumanPlayer[IDX(castle->m_owner)]) {
                     if (gpGame->m_difficulty == DIFFICULTY_HARD)
                         creatureGrowth = static_cast<i32>(creatureGrowth * WEEKLY_HARD_GROWTH_FACTOR);
@@ -4760,16 +4727,16 @@ void game::PerWeek(void) {
                 }
                 if (giWeekType == CALENDAR_PERIOD_CREATURE
                     && IDX(gDwellingType[IDX(castle->m_type)]
-                                        [innerIndex - WEEKLY_FIRST_DWELLING])
+                                        [innerIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)])
                            == giWeekTypeExtra)
                     creatureGrowth += CREATURE_WEEK_GROWTH_BONUS;
-                castle->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] += creatureGrowth;
+                castle->m_garrison[innerIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)] += creatureGrowth;
             }
         }
     }
 
     for (outerIndex = 0; outerIndex < GAME_PLAYER_COUNT; outerIndex++) {
-        for (innerIndex = 0; innerIndex < AVAILABLE_HERO_SLOTS; innerIndex++) {
+        for (innerIndex = 0; innerIndex < HERO_AVAILABLE_SLOT_COUNT; innerIndex++) {
             if (innerIndex == 1) {
                 heroClass =
                     m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
@@ -4790,7 +4757,7 @@ void game::PerWeek(void) {
                 if (HAS(gpGame
                             ->m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                             .m_eventFlags,
-                        WEEKLY_HERO_RESERVED_FLAG))
+                        HERO_EVENT_RESERVED_FOR_RECRUITMENT))
                     continue;
             }
             {
@@ -4816,9 +4783,9 @@ void game::PerWeek(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER): {
                     monsterCount = WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
-                    monsterIncrease = monsterCount / EVENT_DAYS_PER_WEEK;
-                    if (Random(1, EVENT_DAYS_PER_WEEK)
-                        <= (monsterCount % EVENT_DAYS_PER_WEEK))
+                    monsterIncrease = monsterCount / CALENDAR_DAYS_PER_WEEK;
+                    if (Random(1, CALENDAR_DAYS_PER_WEEK)
+                        <= (monsterCount % CALENDAR_DAYS_PER_WEEK))
                         monsterIncrease++;
                     monsterCount += monsterIncrease;
                     if (monsterCount > WEEKLY_MONSTER_LIMIT)
@@ -4939,8 +4906,8 @@ void game::PerWeek(void) {
 
     for (outerIndex = 0; outerIndex < GAME_HERO_COUNT; outerIndex++) {
         weeklyHero = &m_heroRecs[outerIndex];
-        if (HAS(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
-            H2_ENUM_CLEAR_FLAG(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG);
+        if (HAS(weeklyHero->m_eventFlags, HERO_EVENT_STABLES))
+            H2_ENUM_CLEAR_FLAG(weeklyHero->m_eventFlags, HERO_EVENT_STABLES);
     }
 
     m_week++;
@@ -4958,9 +4925,9 @@ void game::PerWeek(void) {
 VA(0x0045997e, 0x13a)
 void game::WeeklyRecruitSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
-    type &= WEEKLY_RECRUIT_TYPE_MASK;
+    type &= EVENT_RECRUIT_TYPE_MASK;
     i32 recruitCount = cell->m_objectMetadata;
-    recruitCount >>= WEEKLY_RECRUIT_COUNT_SHIFT;
+    recruitCount >>= EVENT_RECRUIT_COUNT_SHIFT;
     i32 value;
 
     switch (type) {
@@ -4983,14 +4950,14 @@ void game::WeeklyRecruitSite(mapCell* cell) {
 
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
-    value = (recruitCount << WEEKLY_RECRUIT_COUNT_SHIFT) | type;
+    value = (recruitCount << EVENT_RECRUIT_COUNT_SHIFT) | type;
     cell->m_objectMetadata = value;
 }
 
 VA(0x00459ab8, 0x61)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
-    type &= WEEKLY_SITE_TYPE_MASK;
+    type &= GENERIC_SITE_TYPE_MASK;
     switch (type) {
         case 4:
             cell->m_objectMetadata = type;
@@ -5024,29 +4991,29 @@ void game::PerMonth(void) {
     }
 
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
-        for (j = WEEKLY_FIRST_DWELLING; j <= WEEKLY_LAST_DWELLING; j++) {
+        for (j = IDX(BUILDING_SLOT_DWELLING_FIRST); j <= IDX(BUILDING_SLOT_DWELLING_LAST); j++) {
             townPointer = GetTown(i);
             if (HAS(townPointer->m_buildings, (1 << j))) {
                 growth = gMonsterDatabase[IDX(gDwellingType[IDX(townPointer->m_type)]
-                                                           [j - WEEKLY_FIRST_DWELLING])]
+                                                           [j - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
                               .growth;
                 if (HAS(townPointer->m_buildings, WELL_BUILDING))
-                    growth += WELL_GROWTH;
-                if (j == WEEKLY_FIRST_DWELLING
+                    growth += TOWN_WELL_BASE_GROWTH_BONUS;
+                if (j == IDX(BUILDING_SLOT_DWELLING_FIRST)
                     && HAS(townPointer->m_buildings, FIRST_DWELLING_BONUS_BUILDING))
-                    growth += FIRST_DWELLING_GROWTH;
+                    growth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
-                    && IDX(gDwellingType[IDX(townPointer->m_type)][j - WEEKLY_FIRST_DWELLING])
+                    && IDX(gDwellingType[IDX(townPointer->m_type)][j - IDX(BUILDING_SLOT_DWELLING_FIRST)])
                            == giMonthTypeExtra)
-                    townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] *= CREATURE_MONTH_MULTIPLIER;
+                    townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] *= CREATURE_MONTH_MULTIPLIER;
 
                 if (giMonthType == CALENDAR_PERIOD_PLAGUE) {
-                    townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] -= growth;
-                    if (townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] < 0)
-                        townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] = 0;
-                    townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] =
-                        townPointer->m_garrison[j - WEEKLY_FIRST_DWELLING] >> 1;
+                    townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] -= growth;
+                    if (townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] < 0)
+                        townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] = 0;
+                    townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] =
+                        townPointer->m_garrison[j - IDX(BUILDING_SLOT_DWELLING_FIRST)] >> 1;
                 }
             }
         }
@@ -5183,7 +5150,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     FactionType race;
 
     if (townExtra->color == RANDOM_TOWN_UNOWNED_COLOR)
-        race = static_cast<FactionType>(Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX));
+        race = static_cast<FactionType>(Random(IDX(FACTION_KNIGHT), IDX(FACTION_NECROMANCER)));
     else
         race = m_setupPlayerRace[gcColorToSetupPos[townExtra->color]];
 
@@ -5193,10 +5160,10 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         y + RANDOM_TOWN_TOP,
         x + RANDOM_TOWN_RIGHT,
         y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_SOURCE_TILESET,
+        TILESET_OBJNTWRD,
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
@@ -5206,10 +5173,10 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         y + RANDOM_TOWN_TOP,
         x + RANDOM_TOWN_RIGHT,
         y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_SOURCE_TILESET,
+        TILESET_OBJNTWRD,
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
@@ -5219,10 +5186,10 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         y + RANDOM_TOWN_TOP,
         x + RANDOM_TOWN_RIGHT,
         y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_SOURCE_TILESET,
+        TILESET_OBJNTWRD,
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
@@ -5232,10 +5199,10 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         y + RANDOM_TOWN_TOP,
         x + RANDOM_TOWN_RIGHT,
         y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_SOURCE_TILESET,
+        TILESET_OBJNTWRD,
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
@@ -5469,7 +5436,7 @@ i32 IsCursedItem(ArtifactType item) {
 
 VA(0x0045ab58, 0x1a8)
 void game::RandomizeHeroPool(void) {
-    for (i32 heroId = 0; heroId < RANDOM_HERO_COUNT; heroId++) {
+    for (i32 heroId = 0; heroId < GAME_HERO_COUNT; heroId++) {
         m_heroRecs[heroId].m_experience =
             Random(RANDOM_HERO_EXPERIENCE_MIN, RANDOM_HERO_EXPERIENCE_MAX)
             + RANDOM_HERO_EXPERIENCE_BASE;
@@ -5530,7 +5497,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     if (!selected[RANDOM_HERO_SECOND_SELECTION])
         selected[1] = true;
 
-    for (index = 0; index < RANDOM_HERO_ARMY_SLOT_COUNT; index++) {
+    for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         army->m_creatureTypes[index] = CREATURE_NONE;
         army->m_creatureCounts[index] = RANDOM_HERO_EMPTY_COUNT;
     }
@@ -5579,7 +5546,7 @@ void game::ProcessRandomObjects(void) {
     giUABaseX = -1;
     giUABaseY = -1;
     giUARadius = 0;
-    for (mineIndex = 0; mineIndex < RANDOM_MINE_RESOURCE_COUNT; mineIndex++)
+    for (mineIndex = 0; mineIndex < IDX(RES_COUNT); mineIndex++)
         RandMineQty[mineIndex] = 0;
 
     for (y = 0; y < MAP_HEIGHT; y++) {
@@ -6072,8 +6039,8 @@ void game::ShowHeroesLogo(void) {
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            GAME_SCREEN_WIDTH,
-            GAME_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0
         );
         gpWindowManager->UpdateScreenRegion(
@@ -6392,10 +6359,10 @@ void game::SetupTowns(void) {
             castle->m_buildState = 0;
         }
 
-        for (slot = TOWN_UPGRADE_BUILDING_FIRST; slot <= TOWN_UPGRADE_BUILDING_LAST;
+        for (slot = IDX(BUILDING_SLOT_UPGRADE_FIRST); slot <= IDX(BUILDING_SLOT_DWELLING_LAST);
              slot++) {
             if (HAS(castle->m_buildings, (1 << slot))) {
-                if (slot == TOWN_UPGRADE_BUILDING_LAST)
+                if (slot == IDX(BUILDING_SLOT_DWELLING_LAST))
                     castle->m_buildings &=
                         ~(IDX(TOWN_BUILDING_DWELLING_6)
                           | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
@@ -6404,14 +6371,14 @@ void game::SetupTowns(void) {
                         -1 - (1 << (slot - TOWN_UPGRADE_TO_DWELLING_OFFSET));
             }
         }
-        for (slot = TOWN_DWELLING_BUILDING_FIRST;
-             slot <= TOWN_DWELLING_BUILDING_LAST;
+        for (slot = IDX(BUILDING_SLOT_DWELLING_FIRST);
+             slot <= IDX(BUILDING_SLOT_DWELLING_LAST);
              slot++) {
             if (HAS(castle->m_buildings, (1 << slot))) {
-                castle->m_garrison[slot - TOWN_DWELLING_BUILDING_FIRST] =
+                castle->m_garrison[slot - IDX(BUILDING_SLOT_DWELLING_FIRST)] =
                     gMonsterDatabase[IDX(
                         gDwellingType[IDX(castle->m_type)]
-                                      [slot - TOWN_DWELLING_BUILDING_FIRST]
+                                      [slot - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                     )]
                         .growth;
             }
@@ -6669,7 +6636,7 @@ void game::ProcessOnMapHeroes(void) {
                             mapHero->m_patrolRadius = extra->patrolRadius;
                         }
                         if (extra->hasCustomArmy) {
-                            for (armySlot = 0; armySlot < EVENT_RECORD_ARMY_SLOT_COUNT;
+                            for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT;
                                  armySlot++) {
                                 mapHero->m_army.m_creatureCounts[armySlot] =
                                     extra->troopCounts[armySlot];
@@ -6741,7 +6708,7 @@ void game::ProcessOnMapHeroes(void) {
                                 mapHero->m_secondarySkillOrder[recordPosition] = 0;
                             }
                             for (recordPosition = 0;
-                                 recordPosition < EVENT_RECORD_SKILL_CAPACITY;
+                                 recordPosition < HERO_SECONDARY_SKILL_CAPACITY;
                                  recordPosition++) {
                                 if (extra->skillTypes[recordPosition] != -1) {
                                     mapHero->GiveSS(
@@ -6761,7 +6728,7 @@ void game::ProcessOnMapHeroes(void) {
                                 mapHero->m_y,
                                 mapHero->m_owner,
                                 giVisRange[IDX(mapHero->m_secondarySkills
-                                                   [MAP_HERO_SCOUTING_SKILL_INDEX])]
+                                                   [IDX(HERO_SKILL_SCOUTING)])]
                             );
                         }
                         H2_FREE(ppMapExtra[extraIndex]);
@@ -6819,10 +6786,10 @@ void game::CheckHeroConsistency(void) {
 
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] == 0) {
-            for (slot = 0; slot < AVAILABLE_HERO_SLOTS; slot++) {
+            for (slot = 0; slot < HERO_AVAILABLE_SLOT_COUNT; slot++) {
                 if ((m_availableHeroes[m_players[player].m_availableHeroIds[slot]] >= 0
                      && m_availableHeroes[m_players[player].m_availableHeroIds[slot]]
-                            <= HERO_CONSISTENCY_PLAYABLE_FACTION_MAX)
+                            <= IDX(FACTION_NECROMANCER))
                     || (totalHeroes < HERO_CONSISTENCY_POOL_THRESHOLD
                         && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
@@ -6919,7 +6886,7 @@ void game::CheckHeroConsistency(void) {
 #endif
 VA(0x0045da83, 0x7b3)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave) {
-    char filename[TRANSMIT_FILENAME_CAPACITY];
+    char filename[SAVE_PATH_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
     i32 H2_UNUSED(unusedValue1);
@@ -6946,7 +6913,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     i32 batch;
     i32 H2_UNUSED(unusedValue4);
 
-    gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
+    gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
     header = NULL;
     reply = NULL;
     transmitData = NULL;
@@ -6983,7 +6950,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     fileSize = FileSize(filename);
     LogInt("PostDiffFileSize", fileSize);
 
-    header = static_cast<RemoteSaveBuffer*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
+    header = static_cast<RemoteSaveBuffer*>(H2_ALLOC(REMOTE_SAVE_BUFFER_SIZE));
     if (gbUseRegularCompression)
         transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
@@ -7029,7 +6996,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
         if (!result)
             ShutDown(NULL);
 
-        packetCount = (fileSize - 1) / REMOTE_PACKET_PAYLOAD_SIZE + 1;
+        packetCount = (fileSize - 1) / REMOTE_SAVE_CHUNK_SIZE + 1;
         batchCount = (packetCount - 1) / REMOTE_PACKET_BATCH_SIZE + 1;
         for (batch = 0; batch < batchCount; batch++) {
             if (batch + 1 == batchCount)
@@ -7046,13 +7013,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                     CheckDoMain(0, 1);
                     if (!acknowledged[sendPacketIndex]) {
                         if (sendPacketIndex + 1 == packetCount)
-                            chunkSize = fileSize - sendPacketIndex * REMOTE_PACKET_PAYLOAD_SIZE;
+                            chunkSize = fileSize - sendPacketIndex * REMOTE_SAVE_CHUNK_SIZE;
                         else
-                            chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
+                            chunkSize = REMOTE_SAVE_CHUNK_SIZE;
                         header->chunk.packetIndex = sendPacketIndex;
                         memcpy(
                             header->chunk.data,
-                            transmitData + sendPacketIndex * REMOTE_PACKET_PAYLOAD_SIZE,
+                            transmitData + sendPacketIndex * REMOTE_SAVE_CHUNK_SIZE,
                             chunkSize
                         );
                         result = TransmitRemoteData(
@@ -7172,7 +7139,7 @@ i32 game::ReceiveSaveGame(
     i32 expectedTransmitCrc,
     i32 remotePlayer
 ) {
-    char filename[RECEIVE_FILENAME_CAPACITY];
+    char filename[SAVE_PATH_CAPACITY];
     i32 receivedCrc;
     b32 finished;
     i32 oldTrack;
@@ -7194,7 +7161,7 @@ i32 game::ReceiveSaveGame(
     LogInt("FW1", remotePlayer);
     LogStr("RSG1");
     AiPrint("Receive Start - Getting Data");
-    gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
+    gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
 
     ackBuffer = NULL;
     incomingData = NULL;
@@ -7226,8 +7193,8 @@ i32 game::ReceiveSaveGame(
     received = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(REMOTE_DECODE_BUFFER_SIZE));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
+        decodedData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_SAVE_BUFFER_SIZE));
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA));
 
     lastPacketTime = KBTickCount();
@@ -7240,7 +7207,7 @@ i32 game::ReceiveSaveGame(
                 localization::Tr("network.receive.retry"),
                 REMOTE_RECEIVE_DIALOG_BUTTONS
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 lastPacketTime = KBTickCount();
             else
                 ShutDown(NULL);
@@ -7256,7 +7223,7 @@ i32 game::ReceiveSaveGame(
                     packetStart = receivedPacket->payload.chunk.packetIndex;
                     received[packetStart] = 1;
                     memcpy(
-                        incomingData + packetStart * REMOTE_PACKET_PAYLOAD_SIZE,
+                        incomingData + packetStart * REMOTE_SAVE_CHUNK_SIZE,
                         receivedPacket->payload.chunk.data,
                         receivedPacket->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
@@ -7270,7 +7237,7 @@ i32 game::ReceiveSaveGame(
                     result = TransmitRemoteData(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
-                        REMOTE_PACKET_PAYLOAD_SIZE,
+                        REMOTE_SAVE_CHUNK_SIZE,
                         REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                         1
                     );
@@ -8148,7 +8115,7 @@ void game::CheckForTimeEvent(void) {
             primaryAmount = 0;
             secondaryType = -1;
             secondaryAmount = 0;
-            for (resourceIndex = 0; resourceIndex < EVENT_RESOURCE_COUNT;
+            for (resourceIndex = 0; resourceIndex < IDX(RES_COUNT);
                  resourceIndex++) {
                 resourceAmount = event->resources[resourceIndex];
                 if (-resourceAmount
@@ -8168,11 +8135,11 @@ void game::CheckForTimeEvent(void) {
                     primaryAmount = resourceAmount;
                 }
             }
-            if (primaryType >= 0 && primaryType <= EVENT_RESOURCE_COUNT - 1
+            if (primaryType >= 0 && primaryType <= IDX(RES_COUNT) - 1
                 && primaryAmount < 0) {
                 primaryAmount -= EVENT_RESOURCE_PENALTY;
             }
-            if (secondaryType >= 0 && secondaryType <= EVENT_RESOURCE_COUNT - 1
+            if (secondaryType >= 0 && secondaryType <= IDX(RES_COUNT) - 1
                 && secondaryAmount < 0) {
                 secondaryAmount -= EVENT_RESOURCE_PENALTY;
             }
@@ -8220,7 +8187,7 @@ void CheckValidAvailableHeroes(void) {
              heroIndex++) {
             for (candidatePlayer = 0; candidatePlayer < gpGame->m_playerCount;
                  candidatePlayer++) {
-                for (availableSlot = 0; availableSlot < AVAILABLE_HERO_SLOTS;
+                for (availableSlot = 0; availableSlot < HERO_AVAILABLE_SLOT_COUNT;
                      availableSlot++) {
                     if (gpGame->m_players[candidatePlayer].m_availableHeroIds[availableSlot]
                         == gpGame->m_players[heroPlayer].m_heroIds[heroIndex]) {

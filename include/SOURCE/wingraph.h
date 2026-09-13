@@ -5,16 +5,14 @@
 #include <ddraw.h>
 #include <wing.h>
 #include <va.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(WingraphConstant)
-    WINGRAPH_WIDTH                 = 640,
-    WINGRAPH_HEIGHT                = 480,
     WINGRAPH_COLOR_DEPTH           = 8,
-    WINGRAPH_PALETTE_SIZE          = 256,
     WINGRAPH_PALETTE_VERSION       = 0x300,
     WINGRAPH_SYSTEM_PALETTE_SIZE   = 10,
     WINGRAPH_SCROLL_MARGIN         = 16,
-    WINGRAPH_SCROLL_SIZE           = WINGRAPH_HEIGHT - WINGRAPH_SCROLL_MARGIN * 2,
+    WINGRAPH_SCROLL_SIZE           = LOGICAL_SCREEN_HEIGHT - WINGRAPH_SCROLL_MARGIN * 2,
     WINGRAPH_LIMITED_COMBAT_HEIGHT = 458,
     WINGRAPH_PAINT_ALIGN_MASK      = 0xfffc,
     WINGRAPH_LOAD_LIBRARY_SUCCESS  = 32,
@@ -31,14 +29,14 @@ H2_ENUM_CLASS_END(WingraphGraphicsType)
 struct _PALETTE {
     WORD version;
     WORD entryCount;
-    PALETTEENTRY entries[WINGRAPH_PALETTE_SIZE];
+    PALETTEENTRY entries[PALETTE_COLOR_COUNT];
 };
 #pragma pack(pop)
 SIZE(_PALETTE, 0x404);
 
 struct _IMAGE {
     BITMAPINFOHEADER header;
-    RGBQUAD colors[WINGRAPH_PALETTE_SIZE];
+    RGBQUAD colors[PALETTE_COLOR_COUNT];
     void* bits;
 };
 SIZE(_IMAGE, 0x42c);

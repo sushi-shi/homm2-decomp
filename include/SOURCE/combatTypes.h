@@ -127,10 +127,38 @@ H2_ENUM_CLASS_BEGIN(CombatCastleHex)
 H2_ENUM_CLASS_END(CombatCastleHex)
 
 H2_ENUM_CLASS_BEGIN(ArmyPathTarget)
-    COMBAT_AI_PATH_TO_TARGET   = -1,
-    ARMY_PATH_ANY_TARGET_HEX   = 0,
-    ARMY_PATH_EXACT_TARGET_HEX = 1,
-    COMBAT_AI_PATH_TO_FRONT    = ARMY_PATH_EXACT_TARGET_HEX
+    ARMY_PATH_ASSIGNED_TARGET_HEX = -1,
+    ARMY_PATH_ANY_TARGET_HEX      = 0,
+    ARMY_PATH_EXACT_TARGET_HEX    = 1,
 H2_ENUM_CLASS_END(ArmyPathTarget)
+
+H2_ENUM_BEGIN(CombatGeometryConstant)
+    COMBAT_GRID_ROW_LENGTH = 13,
+    COMBAT_AREA_HEIGHT     = 443,
+    COMBAT_MAX_EXTENT_Y    = 442,
+    COMBAT_HEX_COUNT       = 117,
+H2_ENUM_END(CombatGeometryConstant)
+
+H2_ENUM_BEGIN(CombatStorageConstant)
+    COMBAT_WIN_LOSE_WIDGET_COUNT  = 25,
+    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
+H2_ENUM_END(CombatStorageConstant)
+
+H2_ENUM_BEGIN(CombatElevationOverlayConstant)
+    COMBAT_ELEVATION_OVERLAY_COUNT      = 25,
+    COMBAT_ELEVATION_OVERLAY_CELL_COUNT = 15,
+H2_ENUM_END(CombatElevationOverlayConstant)
+
+H2_ENUM_BEGIN(CombatMissileAnimationConstant)
+    COMBAT_MISSILE_HALF_WIDTH  = 25,
+    COMBAT_MISSILE_HALF_HEIGHT = 25,
+    COMBAT_MISSILE_SPACING     = 31,
+    COMBAT_MISSILE_TIMER_DELAY = 25,
+H2_ENUM_END(CombatMissileAnimationConstant)
+
+H2_ENUM_BEGIN(CombatDirectionMask)
+    // GetMoveMask/GetAttackMask set a bit when the corresponding direction is blocked.
+    COMBAT_ALL_DIRECTIONS_BLOCKED = 255,
+H2_ENUM_END(CombatDirectionMask)
 
 #endif

@@ -20,6 +20,8 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/GAME.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(RemoteImplementationConstant)
     CRC_FEEDBACK_BIT                 = 0x08000000,
@@ -111,7 +113,7 @@ void RemoteCleanup(void) {
 #endif
 VA(0x0048d1ac, 0x5ff)
 void RemoteMain(RemoteGameMode gameMode) {
-    i8 gotPlayers[REMOTE_PLAYER_COUNT];
+    i8 gotPlayers[GAME_PLAYER_COUNT];
     i32 H2_UNUSED(playerState);
     char* gameMessage;
     char* recvData;
@@ -125,7 +127,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     bGotGameType = false;
     LogStr("In Remote Main");
     LogStr("RM 1");
-    for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
+    for (player = 0; player < GAME_PLAYER_COUNT; player++) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
         sprintf(
             gsNetPlayerInfo[player].name,
@@ -226,7 +228,7 @@ void RemoteMain(RemoteGameMode gameMode) {
         LogStr("RM 2");
         if (giThisNetPos == 0) {
             pending = true;
-            memset(gotPlayers, 0, REMOTE_PLAYER_COUNT);
+            memset(gotPlayers, 0, GAME_PLAYER_COUNT);
             while (pending != 0) {
                 PollSound();
                 LogStr("RM 3");
@@ -562,7 +564,7 @@ i32 TransmitRemoteData(
                 localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 tries = -1;
         }
         tries++;
@@ -673,7 +675,7 @@ void PollRemote(void) {
                     gsNetPlayerInfo[queueIndex].name
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     lLastHeartbeatReceive[queueIndex] = KBTickCount();
                 } else {
                     hostExit.netPosition = static_cast<i8>(queueIndex);
@@ -709,7 +711,7 @@ void PollRemote(void) {
                 );
             }
             NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 lLastHeartbeatReceive[0] = KBTickCount();
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
@@ -730,7 +732,7 @@ void PollRemote(void) {
                     localization::Tr("network.player_exit.continue_alone.buka")
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+                if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                     DropDownToOnePlayer();
                 else
                     ShutDown("");
@@ -841,7 +843,7 @@ i32 TransmitAndWait(
                 localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 clock = KBTickCount();
             } else {
                 result = 0;
@@ -871,9 +873,9 @@ DATA(0x00533428) bchar gbUseRegularCompression;
 DATA(0x0053342c) i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 DATA(0x00533654) char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533c18) char gcThisNetName[REMOTE_NET_NAME_SIZE];
-DATA(0x00533300) i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+DATA(0x00533300) i32l lLastHeartbeatReceive[GAME_PLAYER_COUNT];
 DATA(0x00533318) char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x00533230) SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
+DATA(0x00533230) SNetPlayerInfo gsNetPlayerInfo[GAME_PLAYER_COUNT];
 DATA(0x0053386c) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533978) char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 DATA(0x00533424) b32 bGotGameType;

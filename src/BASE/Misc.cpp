@@ -1,5 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
+#include <BASE/dialog.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -41,14 +42,9 @@ H2_ENUM_BEGIN(DataEntryLayout)
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_BEGIN(DataEntryWidgetId)
+    ENTRY_CANCEL_BUTTON = DIALOG_BUTTON_2,
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
-    ENTRY_BUTTON_ONE    = 0x7801,
-    ENTRY_CANCEL_BUTTON = 0x7802,
-    ENTRY_BUTTON_FIVE   = 0x7805,
-    ENTRY_BUTTON_SIX    = 0x7806,
-    ENTRY_BUTTON_SEVEN  = 0x7807,
-    ENTRY_BUTTON_EIGHT  = 0x7808
 H2_ENUM_END(DataEntryWidgetId)
 
 H2_ENUM_BEGIN(MiscLogPrivateConstant)
@@ -67,8 +63,6 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
-    DEFAULT_WINDOW_WIDTH         = 0x280,
-    DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
     DEFAULT_MAP_OFFSET_MAX       = 32000,
     UNIQUE_ID_RANDOM_MAX         = 999999,
@@ -101,7 +95,6 @@ H2_ENUM_BEGIN(PCXConstant)
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
     VGA_PALETTE_MARKER    = 0x0c,
-    PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
 H2_ENUM_END(PCXConstant)
 
@@ -113,8 +106,6 @@ H2_ENUM_BEGIN(MiscCycleColorRange)
 H2_ENUM_END(MiscCycleColorRange)
 
 H2_ENUM_BEGIN(MiscFadeConstant)
-    FADE_LEVEL_COUNT              = 0x40,
-    FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
     FADE_FRAME_DELAY              = 0x14,
     WINDOWED_FADE_INCREMENT_SCALE = 2,
@@ -122,13 +113,6 @@ H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
 H2_ENUM_END(MiscFadeConstant)
-
-H2_ENUM_BEGIN(MiscPaletteComponent)
-    PALETTE_COMPONENT_COUNT     = 3,
-    PALETTE_RED_INDEX           = 0,
-    PALETTE_GREEN_INDEX         = 1,
-    PALETTE_BLUE_INDEX          = 2
-H2_ENUM_END(MiscPaletteComponent)
 
 H2_ENUM_BEGIN(MiscWindowConstant)
     MINIMUM_WINDOW_WIDTH   = 320,
@@ -139,8 +123,6 @@ H2_ENUM_END(MiscWindowConstant)
 H2_ENUM_BEGIN(MiscBlitConstant)
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
-    BLIT_SCREEN_WIDTH  = 0x280,
-    BLIT_SCREEN_HEIGHT = 0x1e0
 H2_ENUM_END(MiscBlitConstant)
 
 H2_ENUM_BEGIN(SeededRandomConstant)
@@ -204,7 +186,6 @@ DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
 DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 H2_ENUM_BEGIN(StatusBarLayout)
-    STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
@@ -374,6 +355,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 }
 
 #include <BASE/MiscGraphicsConstants.h>
+#include <BASE/display.h>
 
 #if H2_RETAIL_COMPILER
 #define currentPalette pal
@@ -388,17 +370,17 @@ void FadeIn(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memset(currentPalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
+    memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == MISC_PALETTE_MAX_LEVEL) {
+        if (i == PALETTE_CHANNEL_MAX) {
             done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
-            threshold = MISC_PALETTE_MAX_LEVEL - i;
-            for (j = 0; j < MISC_PALETTE_BYTE_COUNT; ++j) {
+            threshold = PALETTE_CHANNEL_MAX - i;
+            for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
                 if (gpBufferPalette->m_data[j] > threshold)
                     currentPalette->m_data[j] = gpBufferPalette->m_data[j] - threshold;
             }
@@ -407,7 +389,7 @@ void FadeIn(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = MISC_PALETTE_MAX_LEVEL;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -429,12 +411,12 @@ void FadeOut(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memcpy(currentPalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
+    memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == FADE_LEVEL_LAST)
+        if (i == PALETTE_CHANNEL_MAX)
             done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (currentPalette->m_data[j] > 0) {
@@ -448,7 +430,7 @@ void FadeOut(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = FADE_LEVEL_LAST;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -569,12 +551,12 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].colorMouseCursor = false;
         gConfig.gfx[i].fullScreen = true;
-        if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
+        if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gConfig.gfx[i].width = DEFAULT_WINDOW_WIDTH;
-            gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = LOGICAL_SCREEN_WIDTH;
+            gConfig.gfx[i].height = LOGICAL_SCREEN_HEIGHT;
         }
     }
     gConfig.showCombatGrid = 0;
@@ -1620,10 +1602,10 @@ void BitmapToScreen(class bitmap* image) {
 
 VA(0x004bf700, 0x5b)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
-    memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
     memcpy(
         gCyclePal,
-        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * IDX(PALETTE_CHANNEL_COUNT),
         sizeof(gCyclePal)
     );
     if (updateDisplay != 0)
@@ -1800,13 +1782,13 @@ void AiPrint(H2_CONST char* text) {
         return;
 
     FillBitmapArea(
-        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, LOGICAL_SCREEN_WIDTH, STATUS_BAR_HEIGHT, 0
     );
     smallFont->DrawBoundedString(
         text,
         0,
         STATUS_TEXT_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_TEXT_HEIGHT,
         FONT_DRAW_DEFAULT,
         FONT_ALIGN_LEFT
@@ -1815,7 +1797,7 @@ void AiPrint(H2_CONST char* text) {
         gpWindowManager->m_screen,
         0,
         STATUS_BAR_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_BAR_HEIGHT,
         0,
         STATUS_BAR_Y
@@ -1836,27 +1818,27 @@ void AbsAiPrint(H2_CONST char* text) {
 #endif
 VA(0x004bfd40, 0x19c)
 void FadeTo(u8* source, u8* destination, i32 increment) {
-    u8 temp[MISC_PALETTE_BYTE_COUNT];
+    u8 temp[PALETTE_DATA_SIZE];
     u8 *current, *destinationPalette;
     i32 index, change, diff, move, H2_UNUSED(delay), iLevel, nextTime, k;
 
     delay = FADE_TO_FRAME_DELAY;
-    memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
+    memcpy(temp, source, PALETTE_DATA_SIZE);
     increment >>= FADE_TO_INCREMENT_SHIFT;
     if (increment < 1) {
         increment = 1;
         delay *= WINDOWED_FADE_INCREMENT_SCALE;
     }
-    for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
+    for (iLevel = FADE_TO_START_LEVEL; iLevel < PALETTE_LEVEL_COUNT; iLevel += increment) {
         nextTime = KBTickCount() + FADE_TO_FRAME_DELAY;
         PollSound();
-        index = MISC_PALETTE_LEVEL_COUNT - iLevel - increment;
+        index = PALETTE_LEVEL_COUNT - iLevel - increment;
         if (index < 0)
             index = 0;
         change = giChangeThreshold[index];
         current = temp;
         destinationPalette = destination;
-        for (k = 0; k < MISC_PALETTE_BYTE_COUNT; ++k) {
+        for (k = 0; k < PALETTE_DATA_SIZE; ++k) {
             diff = *destinationPalette - *current;
             if (abs(diff) > change) {
                 move = abs(diff) - change;
@@ -1888,25 +1870,25 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     i32 x;
     i32 i;
     i32 y;
-    u8 tempPal[MISC_PALETTE_BYTE_COUNT];
+    u8 tempPal[PALETTE_DATA_SIZE];
     i8* paletteData;
     i32 savedFlags;
 
     savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     paletteData = gpBufferPalette->m_data;
-    for (i = 0; i < IDX(MISC_PALETTE_BYTE_COUNT) / IDX(PALETTE_COMPONENT_COUNT); ++i) {
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX];
+    for (i = 0; i < IDX(PALETTE_DATA_SIZE) / IDX(PALETTE_CHANNEL_COUNT); ++i) {
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)];
     }
     FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
     currentColorTable = gpWindowManager->m_screen->m_pixels;
-    for (y = 0; y < BLIT_SCREEN_HEIGHT; ++y) {
-        for (x = 0; x < BLIT_SCREEN_WIDTH; ++x) {
+    for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
             *currentColorTable = colorTable[*currentColorTable];
             ++currentColorTable;
         }
@@ -1990,10 +1972,10 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
     write(fileDescriptor, &bMark, 1);
-    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
-    for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
+    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    for (x = 0; x < PALETTE_DATA_SIZE; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
-    write(fileDescriptor, palOut, PALETTE_BYTE_COUNT);
+    write(fileDescriptor, palOut, PALETTE_DATA_SIZE);
     H2_FREE(palOut);
     close(fileDescriptor);
 }
@@ -2173,15 +2155,15 @@ void GetDataEntry(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    message.payload.widget.id = ENTRY_BUTTON_ONE;
+    message.payload.widget.id = DIALOG_BUTTON_1;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
+    message.payload.widget.id = DIALOG_BUTTON_7;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
+    message.payload.widget.id = DIALOG_BUTTON_8;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_FIVE;
+    message.payload.widget.id = DIALOG_BUTTON_5;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SIX;
+    message.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
         message.payload.widget.id = ENTRY_CANCEL_BUTTON;
@@ -2254,7 +2236,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_CANCEL_BUTTON:
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;
@@ -2262,7 +2244,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         return MESSAGE_DISPATCH_FORWARD;
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_TEXT_WIDGET:
                     gotText:

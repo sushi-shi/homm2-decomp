@@ -17,6 +17,7 @@
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <SOURCE/Wsnetwin.h>
+#include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(WinsockPrivateConstant)
     IP_ADDRESS_ENTRY_LIMIT = 20,
@@ -491,7 +492,7 @@ i32 wsWaitForHost(void) {
                     /* Сервер не отвечает. Продолжить ожидание? */ localization::Tr("network.tcp.host.not_responding")
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5)
                     ShutDown(NULL);
                 iWSAttempts = 0;
             }

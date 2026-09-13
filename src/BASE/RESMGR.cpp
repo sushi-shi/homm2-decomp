@@ -16,14 +16,13 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(ResourceConstant)
     INVALID_FILE            = -1,
     LOAD_SUCCESS            = 0,
     LOAD_ERROR              = 3,
     ENTRY_BYTES             = 0xc,
-    EVIL_TRANSLATION_COUNT  = 37,
-    BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
 
     POSITION_STACK_DEPTH    = 10
@@ -88,7 +87,7 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                (curRow * BACKDROP_ROW_BYTES)
+                (curRow * LOGICAL_SCREEN_WIDTH)
                     + destination->m_pixels + destinationX,
                 width
             );
@@ -501,7 +500,7 @@ VA(0x004b8ea0, 0xa0)
 u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
