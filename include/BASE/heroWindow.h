@@ -32,6 +32,11 @@ enum class WindowState : i32 {
 using enum WindowState;
 ENABLE_ENUM_FLAGS(WindowState)
 
+typedef enum WindowDrawUpdate {
+    WINDOW_DRAW_BUFFER_ONLY   = 0,
+    WINDOW_DRAW_UPDATE_SCREEN = 1
+} WindowDrawUpdate;
+
 typedef enum HeroWindowConstant {
     HERO_WINDOW_NAME_CAPACITY = 0x14
 } HeroWindowConstant;
@@ -62,8 +67,8 @@ public:
     void RemoveWidget(class widget* currentWidget);
     MessageDispatchResult BroadcastMessage(struct tag_message& message);
     void DrawWindow(void);
-    void DrawWindow(i32 flags);
-    void DrawWindow(i32 update, i32 firstId, i32 lastId);
+    void DrawWindow(i32 updateScreen);
+    void DrawWindow(i32 updateScreen, i32 firstWidgetId, i32 lastWidgetId);
     i32 SaveBackground(void);
     void RestoreBackground(void);
     void MoveWindow(i32 dx, i32 dy);

@@ -6,6 +6,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
+#include <SOURCE/KB_TYPES.h>
 
 
 typedef enum MoraleConstant {
@@ -33,7 +34,7 @@ i32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && !(gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes
-                 & MONSTER_ATTRIBUTE_UNDEAD))
+                 & MONSTER_FLAGS_UNDEAD))
             return 0;
     }
     return 1;
@@ -42,7 +43,7 @@ i32 armyGroup::HasAllUndead(void) {
 i32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
-            && (H2EnumIndex((gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes) & (MONSTER_ATTRIBUTE_UNDEAD))))
+            && (H2EnumIndex((gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes) & (MONSTER_FLAGS_UNDEAD))))
             return 1;
     }
     return 0;

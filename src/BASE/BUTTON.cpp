@@ -150,7 +150,7 @@ MessageDispatchResult button::Main(tag_message& message) {
             i16 y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
-                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
+                    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_RIGHT_CLICK, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -205,7 +205,7 @@ MessageDispatchResult button::Select(struct tag_message& message) {
     if (m_selectMode == BUTTON_SELECT_DIALOG_RESULT) {
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     } else {
-        message.payload.widget.command = WIDGET_COMMAND_SELECT;
+        message.payload.widget.command = WIDGET_NOTIFY_SELECT;
     }
     glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = platform::Ticks() + REPEAT_DELAY_TICKS;
     iLeftRightSave = message.payload.widget.modifiers
@@ -224,7 +224,7 @@ MessageDispatchResult button::Deselect(struct tag_message& message) {
         m_width,
         m_height
     );
-    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
+    SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
     message.payload.widget.modifiers = iLeftRightSave;
     iLeftRightSave = MESSAGE_MODIFIER_NONE;
     return MESSAGE_DISPATCH_FORWARD;

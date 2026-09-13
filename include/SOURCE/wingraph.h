@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_WINGRAPH_H
 
 #include <Ints.h>
+#include <BASE/display.h>
 
 enum GraphicsConstant : i32 {
     GRAPHICS_WIDTH = 640,

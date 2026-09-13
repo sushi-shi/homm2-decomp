@@ -419,6 +419,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_mapcell_layout_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME mapcell_layout COMMAND homm2_mapcell_layout_test)
+  add_executable(homm2_checkpoint_layout_test tools/checkpoint_layout_test.cpp)
+  target_include_directories(homm2_checkpoint_layout_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME checkpoint_layout COMMAND homm2_checkpoint_layout_test)
   add_test(
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)

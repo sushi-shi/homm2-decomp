@@ -431,7 +431,7 @@ i32 wsWaitForHost(void) {
                     localization::Tr("network.tcp.host.not_responding")
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5)
                     ShutDown(NULL);
                 iWSAttempts = 0;
             }

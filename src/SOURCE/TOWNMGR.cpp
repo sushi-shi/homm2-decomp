@@ -48,16 +48,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SOURCE/Localization.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <BASE/widget.h>
+#include <SOURCE/KB_TYPES.h>
 
 
 namespace {
 
+    typedef enum TownDialogResult {
+        DIALOG_CANCEL_ID = DIALOG_BUTTON_1,
+    } TownDialogResult;
+
     typedef enum TownManagerInputCode {
+        DIALOG_BUY_SPELL_BOOK = DIALOG_BUTTON_5,
+        DIALOG_BUILD_BOAT = DIALOG_BUTTON_2,
+        CONTROL_CLOSE = DIALOG_BUTTON_0,
         CONTROL_PREVIOUS_TOWN = 0x387,
         CONTROL_NEXT_TOWN = 0x388,
-        CONTROL_CLOSE = 0x7800,
-        DIALOG_BUILD_BOAT = 0x7802,
-        DIALOG_BUY_SPELL_BOOK = 0x7805
     } TownManagerInputCode;
 
     enum class TownManagerWidgetId : i32 {
@@ -115,21 +123,8 @@ using enum TownManagerWidgetId;
     ENABLE_ENUM_STEPS(TownManagerWidgetId)
 
     enum class TownObjectRenderMask : i32 {
-        RENDER_KNIGHT_LEFT_GATE = 0x4,
-        RENDER_KNIGHT_LEFT_FIRST_OPTION = 0x1,
-        RENDER_KNIGHT_LEFT_SECOND_OPTION = 0x1000000,
-        RENDER_KNIGHT_LEFT_THIRD_OPTION = 0x20000000,
-        RENDER_KNIGHT_RIGHT_GATE = 0x1,
-        RENDER_KNIGHT_RIGHT_FIRST_OPTION = 0x1000000,
-        RENDER_KNIGHT_RIGHT_SECOND_OPTION = 0x20000000,
-        RENDER_BARBARIAN_RIGHT_GATE = 0x1,
-        RENDER_BARBARIAN_RIGHT_OPTION = 0x2000,
-        RENDER_BARBARIAN_OVERLAY_GATE = 0x2,
-        RENDER_BARBARIAN_OVERLAY_OPTION = 0x200000,
-        RENDER_SORCERESS_LEFT_GATE = 0x80,
         RENDER_SORCERESS_LEFT_OPTION = 0x800,
         RENDER_RACE_OVERLAY_FIRST_OPTION = 0x4000,
-        RENDER_RACE_OVERLAY_SECOND_OPTION = 0x8,
         RENDER_DOCK_GATE = 0x4000
     };
 using enum TownObjectRenderMask;
@@ -166,15 +161,6 @@ using enum TownObjectRenderMask;
     };
 using enum TownCommandTextId;
 
-    enum class TownDialogResult : i32 {
-        DIALOG_CANCEL_ID = 0x7801
-    };
-using enum TownDialogResult;
-
-    enum class TownPortraitIcon : i32 {
-        TOWN_PORTRAIT_ICON_BASE = 90
-    };
-using enum TownPortraitIcon;
 
     typedef enum TownAnimationConstant {
         NECROMANCER_BUILD_STATE_FRAME_STRIDE = 6,
@@ -204,7 +190,6 @@ using enum TownPortraitIcon;
     } TownSplitConstant;
 
     typedef enum BuildDialogConstant {
-        BUILD_RESOURCE_STORAGE_COUNT = TOWN_RESOURCE_COUNT + 1,
         BUILD_ROW_RESOURCE_CAPACITY = 4,
         BUILD_DESCRIPTION_WIDTH = 240,
         BUILD_WINDOW_BASE_Y = 151,
@@ -254,7 +239,6 @@ using enum TownPortraitIcon;
     } RecruitDialogConstant;
 
     typedef enum WellConstant {
-        WELL_DWELLING_TYPE_STORAGE_COUNT = 8,
         WELL_DETAIL_TEXT_CAPACITY = 40,
         WELL_ALTERNATE_UPGRADE_INDEX = TOWN_WELL_DWELLING_COUNT * 2 - 1
     } WellConstant;
@@ -318,7 +302,7 @@ using enum TownPortraitIcon;
 // clang-format on
 
 static const H2EnumStorage<BuildingSlotType, i8>
-    gTownObjectOrder[KB_FACTION_TABLE_CAPACITY][TOWN_BUILDING_COUNT] = {
+    gTownObjectOrder[KB_FACTION_TABLE_CAPACITY][H2EnumIndex(BUILDING_SLOT_COUNT)] = {
     {TOWN_OBJECT_SECOND_WELL,
      TOWN_OBJECT_CASTLE_UPGRADE,
      TOWN_OBJECT_CASTLE,
@@ -553,7 +537,7 @@ static const H2EnumStorage<BuildingSlotType, i8>
      BUILDING_SLOT_DISABLED_LAST}
 };
 
-SBuildingInfo sBuildingInfo[KB_FACTION_TABLE_CAPACITY][TOWN_BUILDING_COUNT] = {
+SBuildingInfo sBuildingInfo[KB_FACTION_TABLE_CAPACITY][H2EnumIndex(BUILDING_SLOT_COUNT)] = {
     {
      {0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
      {0, 188, 214, 39, 42},  {0, 69, 108, 67, 55},   {5, 0, 49, 286, 116},   {0, 478, 193, 46, 63},
@@ -654,7 +638,7 @@ townObject::townObject(
             y,
             currentWidth,
             currentHeight,
-            static_cast<i16>(H2EnumIndex(objectBuildingId)),
+            H2EnumIndex(objectBuildingId),
             WIDGET_KIND_TRANSPARENT,
             0,
             NULL
@@ -679,36 +663,36 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_KNIGHT
-        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_LEFT_GATE))
-            || (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_LEFT_FIRST_OPTION))
-                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_LEFT_SECOND_OPTION))
-                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_LEFT_THIRD_OPTION)))))
+        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_TAVERN))
+            || (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD))
+                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_DWELLING_6))
+                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6)))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_KNIGHT
-        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_RIGHT_GATE))
-            || (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_RIGHT_FIRST_OPTION))
-                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_KNIGHT_RIGHT_SECOND_OPTION)))))
+        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD))
+            || (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_DWELLING_6))
+                && !(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6)))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_BARBARIAN
-        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_BARBARIAN_RIGHT_GATE))
-            || !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_BARBARIAN_RIGHT_OPTION))))
+        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD))
+            || !(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_COLISEUM))))
         return;
     if (m_buildingId == TOWN_OBJECT_BARBARIAN_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_BARBARIAN
-        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_BARBARIAN_OVERLAY_GATE))
-            || !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_BARBARIAN_OVERLAY_OPTION))))
+        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_THIEVES_GUILD))
+            || !(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_DWELLING_3))))
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
-        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_SORCERESS_LEFT_GATE))
+        && (!(gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN))
             || !(gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION))))
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
-        && (gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_SORCERESS_LEFT_GATE))
+        && (gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN))
         && (gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
@@ -717,7 +701,7 @@ void townObject::Draw(i32 advanceAnimation) {
             || gpTownManager->m_town->m_type == FACTION_SORCERESS
             || gpTownManager->m_town->m_type == FACTION_KNIGHT)
         && ((gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_RACE_OVERLAY_FIRST_OPTION))
-            || (gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_RACE_OVERLAY_SECOND_OPTION))))
+            || (gpTownManager->m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_DOCK))))
         return;
     if (m_buildingId == TOWN_OBJECT_DOCK
         && (gpTownManager->m_town->m_buildings & H2EnumIndex(RENDER_DOCK_GATE)))
@@ -855,24 +839,28 @@ void townManager::SetupTown(void) {
     i32 i;
 
     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, GetTownName(m_town->m_id));
-    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_WINDOW_TEXT_CONTROL);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_WINDOW_TEXT_CONTROL);
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("town.screen.title"));
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(0, TOWN_WINDOW_DRAW_WIDTH, TOWN_WINDOW_DRAW_RIGHT);
+    m_townWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        TOWN_NAVIGATION_DRAW_FIRST_WIDGET,
+        TOWN_NAVIGATION_DRAW_LAST_WIDGET
+    );
 
     if (gpCurPlayer->m_townCount == 1) {
-        message.payload.widget.command = TOWN_WIDGET_DISABLE;
-        message.payload.widget.data.value = TOWN_WIDGET_DISABLED_VALUE;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEXT_TOWN;
         m_townWindow->BroadcastMessage(message);
-        message.payload.widget.command = TOWN_WIDGET_ENABLE;
-        message.payload.widget.data.value = TOWN_WIDGET_ENABLED_VALUE;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
         message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEXT_TOWN;
@@ -888,7 +876,7 @@ void townManager::SetupTown(void) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "townbkg%d.icn", H2EnumIndex(m_town->m_type));
         m_backgroundIcon = gpResourceManager->GetIcon(gText);
         m_townObjectCount = 0;
-        for (i = 0; i < TOWN_BUILDING_COUNT; ++i) {
+        for (i = 0; i < H2EnumIndex(BUILDING_SLOT_COUNT); ++i) {
             H2EnumStorage<BuildingSlotType, i32> buildId = gTownObjectOrder[H2EnumIndex(m_town->m_type)][i];
             if (buildId != TOWN_OBJECT_NONE) {
                 utf8::Format(
@@ -916,7 +904,7 @@ void townManager::SetupTown(void) {
         gpWindowManager->AddWindow(m_townWindow, 0, 1);
     } else {
         m_townObjectCount = 0;
-        for (i = 0; i < TOWN_BUILDING_COUNT; ++i) {
+        for (i = 0; i < H2EnumIndex(BUILDING_SLOT_COUNT); ++i) {
             H2EnumStorage<BuildingSlotType, i32> buildId = gTownObjectOrder[H2EnumIndex(m_town->m_type)][i];
             if (buildId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
@@ -1011,7 +999,7 @@ void townManager::SetupTown(void) {
     m_swapArmySlot = TOWN_ARMY_SLOT_NONE;
     m_selectedArmySlot = TOWN_ARMY_SLOT_NONE;
     DrawTown(0, 0);
-    gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH, TOWN_SCREEN_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
 void townManager::UnloadTown(void) {
@@ -1059,7 +1047,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
 
     m_command = ARMY_COMMAND_NONE;
     cantMoveLastArmy = false;
-    if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
+    if (m_swapStrip->m_army->GetNumArmies() == 1 && m_swapStrip == m_heroStrip
         && m_pendingStrip != m_swapStrip)
         cantMoveLastArmy = true;
 
@@ -1283,10 +1271,14 @@ void townManager::SetCommandAndText(struct tag_message& message) {
 void townManager::ShowText(char*) {
     tag_message message;
 
-    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(TOWN_STATUS_DRAW_LEFT, TOWN_STATUS_DRAW_WIDTH, TOWN_STATUS_DRAW_RIGHT);
+    m_townWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        TOWN_STATUS_DRAW_FIRST_WIDGET,
+        TOWN_STATUS_DRAW_LAST_WIDGET
+    );
     gpWindowManager->UpdateScreenRegion(
         TOWN_STATUS_REGION_X,
         TOWN_STATUS_REGION_Y,
@@ -1327,7 +1319,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
         dbgBuild = giDebugBuildingToBuild;
         giDebugBuildingToBuild = -1;
         if (dbgBuild == TOWN_DEBUG_BUILD_ALL) {
-            for (loop = 0; loop < TOWN_BUILDING_COUNT; ++loop) {
+            for (loop = 0; loop < H2EnumIndex(BUILDING_SLOT_COUNT); ++loop) {
                 if ((gTownEligibleBuildMask[H2EnumIndex(m_town->m_type)]
                      & (1 << H2EnumIndex(BuildingSlotTypeFromOrdinal(loop))))
                     || loop == H2EnumIndex(BUILDING_SLOT_CASTLE))
@@ -1349,8 +1341,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT: {
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK: {
                     switch (TownManagerWidgetIdFromCode(message.payload.widget.id)) {
                         case TOWN_WIDGET_BUILDING_DWELLING_1:
                         case TOWN_WIDGET_BUILDING_DWELLING_2:
@@ -1427,7 +1419,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     buildSound = LoadPlaySample("buildtwn.82M");
 
                                     i32 width = TOWN_VIEW_FIZZLE_WIDTH;
-                                    m_townWindow->DrawWindow(0);
+                                    m_townWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
                                     gpWindowManager->FizzleForward(
@@ -1451,7 +1443,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         utf8::Format(
                                             gText, GLOBAL_TEXT_BUFFER_SIZE,
                                             "port%04d.icn",
-                                            H2EnumIndex(m_town->m_type) + H2EnumIndex(TOWN_PORTRAIT_ICON_BASE)
+                                            H2EnumIndex(m_town->m_type) + H2EnumIndex(TOWN_PORTRAIT_FRAME_BASE)
                                         );
                                         m_heroStrip = new strip(
                                             0,
@@ -1485,7 +1477,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     && !gpGame->GetHero(m_town->m_occupyingHeroId)
                                             ->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
-                                        == TOWN_MAX_ARTIFACTS) {
+                                        == HERO_ARTIFACT_SLOT_COUNT) {
                                         NormalDialog(localization::Tr("town.mage_guild.spell_book.no_artifact_space"), NORMAL_DIALOG_INFO);
                                     } else if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)]
                                                < TOWN_SPELL_BOOK_COST) {
@@ -1607,9 +1599,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_SET_FLAGS,
                                     CONTROL_CLOSE,
-                                    TOWN_INTERFACE_BROADCAST_FLAGS
+                                    H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
                                 );
-                                if (gpGame->GetBoatsBuilt() < TOWN_MAX_BOATS
+                                if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
                                     && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)
                                                ->m_triggerType
                                            == MAP_OBJECT_NONE) {
@@ -1626,7 +1618,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         || gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_WOOD)]
                                                < TOWN_BOAT_WOOD_COST) {
                                         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DIALOG_BUILD_BOAT);
-                                        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_GRAYED);
+                                        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                                         message.payload.widget.data.value =
@@ -1657,7 +1649,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_CLEAR_FLAGS,
                                     CONTROL_CLOSE,
-                                    TOWN_INTERFACE_BROADCAST_FLAGS
+                                    H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
                                 );
                             }
                             break;
@@ -1773,7 +1765,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                     break;
                 }
 
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case CONTROL_CLOSE:
                             if (quickView)
@@ -1893,12 +1885,12 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             if (m_pendingStrip != m_swapStrip
                 && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
                        != m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]) {
-                for (slot = 0; slot < TOWN_ARMY_SLOT_COUNT; ++slot) {
+                for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
                     if (m_pendingStrip->m_army->m_creatureTypes[slot]
                         == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
                         break;
                 }
-                if (slot < TOWN_ARMY_SLOT_COUNT)
+                if (slot < ARMY_GROUP_SLOT_COUNT)
                     m_pendingArmySlot = slot;
             }
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] +=
@@ -1942,11 +1934,11 @@ void townManager::RedrawTownScreen(void) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
-    m_townWindow->DrawWindow(0);
+    m_townWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     m_garrisonStrip->DrawIcons(0);
     m_heroStrip->DrawIcons(0);
     m_bankBox->Update(0);
-    gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH, TOWN_SCREEN_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
 void townManager::SplitArmy(void) {
@@ -2035,14 +2027,15 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
         m_townObjects[index]->Draw(drawFlags);
         PollSound();
     }
-    m_townWindow->DrawWindow(0, TOWN_REDRAW_FIRST_CONTROL, TOWN_REDRAW_LAST_CONTROL);
+    m_townWindow
+        ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, TOWN_REDRAW_FIRST_CONTROL, TOWN_REDRAW_LAST_CONTROL);
     PollSound();
     if (updateScreen != 0)
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            TOWN_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             TOWN_VIEWPORT_HEIGHT,
             0,
             0
@@ -2059,9 +2052,9 @@ i32 townManager::BuyBuild(
     i32 prerequisiteCount;
     char* description;
 
-    textWidget* amountWidgets[TOWN_RESOURCE_COUNT];
-    char* amountText[TOWN_RESOURCE_COUNT];
-    iconWidget* resourceWidgets[TOWN_RESOURCE_COUNT];
+    textWidget* amountWidgets[H2EnumIndex(RES_COUNT)];
+    char* amountText[H2EnumIndex(RES_COUNT)];
+    iconWidget* resourceWidgets[H2EnumIndex(RES_COUNT)];
     i32 rowResourceTypes[BUILD_ROW_RESOURCE_CAPACITY];
     i32 topRowCount;
     tag_message message;
@@ -2072,7 +2065,7 @@ i32 townManager::BuyBuild(
     i32 resourcesInRow;
     i32 rowY;
     i32 windowY;
-    i8 resourceTypes[BUILD_RESOURCE_STORAGE_COUNT];
+    i8 resourceTypes[H2EnumIndex(RES_COUNT)];
     i32 costCount;
 
     i32 index;
@@ -2093,7 +2086,7 @@ i32 townManager::BuyBuild(
     i32 dwelling;
 
     i32 entryWidth;
-    i16 costs[BUILD_RESOURCE_STORAGE_COUNT];
+    i16 costs[H2EnumIndex(RES_COUNT)];
     widget* descriptionWidget;
 
     mageLevel = 0;
@@ -2101,7 +2094,7 @@ i32 townManager::BuyBuild(
     costCount = 0;
     description = static_cast<char*>(H2_ALLOC(BUILDING_DESCRIPTION_CAPACITY));
 
-    for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+    for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
         costs[index] = -1;
         resourceTypes[index] = -1;
     }
@@ -2111,7 +2104,7 @@ i32 townManager::BuyBuild(
         dwelling = H2EnumIndex(building) - H2EnumIndex(TOWN_OBJECT_DWELLING_1);
 
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (xShrineBuildingCost[index] > 0) {
                 resourceTypes[costCount] = static_cast<i8>(index);
                 costs[costCount] = static_cast<i16>(xShrineBuildingCost[index]);
@@ -2120,7 +2113,7 @@ i32 townManager::BuyBuild(
         }
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         mageLevel = gpTownManager->m_town->m_buildState;
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gMageBuildingCosts
                     [NEXT_MAGE_GUILD_LEVEL(mageLevel)]
                     [index]
@@ -2133,7 +2126,7 @@ i32 townManager::BuyBuild(
             }
         }
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index] > 0) {
                 resourceTypes[costCount] = static_cast<i8>(index);
                 costs[costCount] = static_cast<i16>(
@@ -2143,7 +2136,7 @@ i32 townManager::BuyBuild(
             }
         }
     } else if (building <= BUILDING_SLOT_NEUTRAL_LAST) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gNeutralBuildingCosts[H2EnumIndex(building)][index] > 0) {
                 resourceTypes[costCount] = static_cast<i8>(index);
                 costs[costCount] =
@@ -2152,7 +2145,7 @@ i32 townManager::BuyBuild(
             }
         }
     } else {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling][index] > 0) {
                 resourceTypes[costCount] = static_cast<i8>(index);
                 costs[costCount] = static_cast<i16>(
@@ -2168,7 +2161,7 @@ i32 townManager::BuyBuild(
     topRowCount = 0;
     bottomRowCount = 0;
 
-    for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+    for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
         if (resourceTypes[index] != -1)
             ++resourceCount;
     }
@@ -2180,7 +2173,7 @@ i32 townManager::BuyBuild(
     } else if (resourceCount == 6) {
         topRowCount = 3;
         bottomRowCount = 3;
-    } else if (resourceCount == TOWN_RESOURCE_COUNT) {
+    } else if (resourceCount == H2EnumIndex(RES_COUNT)) {
         topRowCount = 3;
         bottomRowCount = 4;
     }
@@ -2201,7 +2194,7 @@ i32 townManager::BuyBuild(
     } else if (dwelling >= 0) {
         prerequisiteCount = 0;
         prerequisiteMask = gHierarchyMask[H2EnumIndex(m_town->m_type)][dwelling];
-        for (index = 0; index < TOWN_BUILDING_COUNT; ++index) {
+        for (index = 0; index < H2EnumIndex(BUILDING_SLOT_COUNT); ++index) {
             if (prerequisiteMask & (1L << index)) {
                 if (prerequisiteCount == 0)
                     utf8::Append(
@@ -2377,7 +2370,7 @@ i32 townManager::BuyBuild(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
             CONTROL_CLOSE,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     m_selectedBuilding = BUILDING_SLOT_NONE;
     if (quickView != 0) {
@@ -2404,7 +2397,7 @@ i32 townManager::BuyBuild(
             window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_GRAYED);
+            message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
             window->BroadcastMessage(message);
         }
         gpWindowManager->DoDialog(window, TrueFalseDialogHandler, 0);
@@ -2419,7 +2412,7 @@ i32 townManager::BuyBuild(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             CONTROL_CLOSE,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     delete window;
     if (quickView != 0) {
@@ -2463,7 +2456,7 @@ void townManager::BuildObj(BuildingSlotType building) {
 
         giMaxExtentY = 0;
         giMaxExtentX = giMaxExtentY;
-        giMinExtentX = TOWN_SCREEN_WIDTH - 1;
+        giMinExtentX = LOGICAL_SCREEN_WIDTH - 1;
         giMinExtentY = TOWN_VIEWPORT_HEIGHT - 1;
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;
@@ -2525,7 +2518,7 @@ void townManager::BuildObj(BuildingSlotType building) {
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             CONTROL_CLOSE,
-            TOWN_INTERFACE_BROADCAST_FLAGS
+            H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
         RedrawTownScreen();
     }
@@ -2574,8 +2567,8 @@ void townManager::SetupMage(heroWindow* window) {
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    for (level = 0; level < TOWN_MAGE_GUILD_MAX_LEVEL; ++level) {
-        for (slot = 0; slot < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot) {
+    for (level = 0; level < TOWN_MAGE_GUILD_LEVEL_COUNT; ++level) {
+        for (slot = 0; slot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; ++slot) {
             i32 slotLimit =
                 gSpellLimits[level]
                 + (m_town->m_type == FACTION_WIZARD
@@ -2586,21 +2579,21 @@ void townManager::SetupMage(heroWindow* window) {
                 spellState = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {
                 spellState =
-                    static_cast<i16>(slot >= m_town->m_spellCounts[level + 1]);
+                    static_cast<i16>(slot >= m_town->m_spellCounts[level]);
             }
 
             message.payload.widget.command =
                 spellState == TOWN_MAGE_SPELL_UNAVAILABLE ? WIDGET_COMMAND_CLEAR_FLAGS
                                                             : WIDGET_COMMAND_SET_FLAGS;
             message.payload.widget.id =
-                level * TOWN_MAGE_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_SPELL_CONTROL;
+                level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_SPELL_CONTROL;
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
             window->BroadcastMessage(message);
 
             if (spellState != TOWN_MAGE_SPELL_UNAVAILABLE) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id =
-                    level * TOWN_MAGE_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_SPELL_CONTROL;
+                    level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_SPELL_CONTROL;
                 message.payload.widget.data.value = spellState;
                 window->BroadcastMessage(message);
             }
@@ -2609,15 +2602,15 @@ void townManager::SetupMage(heroWindow* window) {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                 message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
                 message.payload.widget.id =
-                    level * TOWN_MAGE_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_ICON_CONTROL;
+                    level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_ICON_CONTROL;
                 window->BroadcastMessage(message);
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot
+                message.payload.widget.id = level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot
                                               + TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
                 window->BroadcastMessage(message);
             } else {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id =
-                    level * TOWN_MAGE_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_ICON_CONTROL;
+                    level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot + TOWN_MAGE_FIRST_ICON_CONTROL;
                 message.payload.widget.data.value =
                     gsSpellInfo[H2EnumIndex(m_town->m_spells[level][slot])].iconIndex;
                 window->BroadcastMessage(message);
@@ -2640,7 +2633,7 @@ void townManager::SetupMage(heroWindow* window) {
                         GetManaCost(m_town->m_spells[level][slot], NULL)
                     );
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot
+                message.payload.widget.id = level * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + slot
                                               + TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
                 message.payload.widget.data.text = gText;
                 window->BroadcastMessage(message);
@@ -2670,29 +2663,29 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 quickView = (H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)));
                 spellSlot = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
                     && message.payload.widget.id
                            < TOWN_MAGE_FIRST_SPELL_CONTROL
-                                 + TOWN_MAGE_GUILD_MAX_LEVEL * TOWN_MAGE_SPELLS_PER_LEVEL)
+                                 + TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL)
                     spellSlot = message.payload.widget.id - TOWN_MAGE_FIRST_SPELL_CONTROL;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_ICON_CONTROL
                     && message.payload.widget.id
                            < TOWN_MAGE_FIRST_ICON_CONTROL
-                                 + TOWN_MAGE_GUILD_MAX_LEVEL * TOWN_MAGE_SPELLS_PER_LEVEL)
+                                 + TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL)
                     spellSlot = message.payload.widget.id - TOWN_MAGE_FIRST_ICON_CONTROL;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_DESCRIPTION_CONTROL
                     && message.payload.widget.id
                            < TOWN_MAGE_FIRST_DESCRIPTION_CONTROL
-                                 + TOWN_MAGE_GUILD_MAX_LEVEL * TOWN_MAGE_SPELLS_PER_LEVEL)
+                                 + TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL)
                     spellSlot = message.payload.widget.id - TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
                 if (spellSlot != -1) {
-                    level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
-                    slot = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
-                    if (slot >= level[gpTownManager->m_town->m_spellCounts + 1])
+                    level = spellSlot / TOWN_MAGE_GUILD_SPELLS_PER_LEVEL;
+                    slot = spellSlot % TOWN_MAGE_GUILD_SPELLS_PER_LEVEL;
+                    if (slot >= gpTownManager->m_town->m_spellCounts[level])
                         return MESSAGE_DISPATCH_CONSUME;
                     spell = gpTownManager->m_town->m_spells[level][slot];
                     NormalDialog(gSpellDesc[H2EnumIndex(spell)], quickView != 0 ? NORMAL_DIALOG_QUICK_VIEW : NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_SPELL, H2EnumIndex(spell));
@@ -2717,7 +2710,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         MemError();
     SetWinText(m_heroWindow1, RECRUIT_WINDOW_TEXT_ID);
     m_recruitHero = &gpGame->m_heroRecs[gpCurPlayer->m_availableHeroIds[availableHeroIndex]];
-    m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+    m_recruitHero->m_owner = giCurPlayer;
     message.type = MESSAGE_WIDGET;
 
     if (cannotRecruit != 0) {
@@ -2730,7 +2723,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         message.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_GRAYED);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
         message.payload.widget.id = RECRUIT_BUTTON_TEXT_CONTROL;
         m_heroWindow1->BroadcastMessage(message);
         message.payload.widget.id = RECRUIT_BUTTON_ICON_CONTROL;
@@ -2740,7 +2733,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     }
 
     artifactCount = 0;
-    for (index = 0; index < TOWN_MAX_ARTIFACTS; ++index) {
+    for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; ++index) {
         if (m_recruitHero->m_artifacts[index] != ARTIFACT_NONE
             && m_recruitHero->m_artifacts[index] != ARTIFACT_MAGIC_BOOK)
             ++artifactCount;
@@ -2805,7 +2798,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_recruitResult = true;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            static_cast<i8>(giCurPlayer);
+            giCurPlayer;
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(NULL);
@@ -2813,9 +2806,9 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         newHeroClass = FactionTypeFromCode(
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
         );
-        newHeroClass = (newHeroClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
+        newHeroClass = (newHeroClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % H2EnumIndex(FACTION_COUNT);
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
+            gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
     } else {
@@ -2830,11 +2823,11 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
         CONTROL_CLOSE,
-        TOWN_INTERFACE_BROADCAST_FLAGS
+        H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
     m_recruitHero->m_owner = -1;
     if (m_recruitState != -1)
-        m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+        m_recruitHero->m_owner = giCurPlayer;
     recruitedHero->m_remainingMobility = previousMobility;
     return m_recruitState != -1;
 }
@@ -2843,10 +2836,10 @@ MessageDispatchResult TavernHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
                     case TOWN_DIALOG_CONFIRM:
                         FINISH_DIALOG_MESSAGE(message);
                         return MESSAGE_DISPATCH_FORWARD;
@@ -2899,7 +2892,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_AMOUNT_CONTROL:
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -2912,7 +2905,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                         goto update_amount;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_INCREASE_CONTROL:
                         ++gpTownManager->m_splitAmount;
@@ -2924,8 +2917,8 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                         if (gpTownManager->m_splitAmount < 0)
                             gpTownManager->m_splitAmount = 0;
                         goto update_amount;
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
                         gpTownManager->m_splitAmount = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         handled = true;
@@ -2956,14 +2949,17 @@ update_amount:
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_SPLIT_AMOUNT_CONTROL);
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpTownManager->m_heroWindow1
-        ->DrawWindow(1, TOWN_SPLIT_AMOUNT_CONTROL, TOWN_SPLIT_AMOUNT_CONTROL);
+    gpTownManager->m_heroWindow1->DrawWindow(
+        WINDOW_DRAW_UPDATE_SCREEN,
+        TOWN_SPLIT_AMOUNT_CONTROL,
+        TOWN_SPLIT_AMOUNT_CONTROL
+    );
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 void townManager::SetupWell(heroWindow* window) {
 
-    u8 dwellingTypes[WELL_DWELLING_TYPE_STORAGE_COUNT];
+    u8 dwellingTypes[TOWN_WELL_DWELLING_COUNT];
     i32 available;
     i32 dwellingResult;
     tag_message message;
@@ -2980,9 +2976,9 @@ void townManager::SetupWell(heroWindow* window) {
                    && (m_town->m_buildings
                        & (1L << (dwellingResult + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
             dwellingTypes[dwellingResult] =
-                static_cast<u8>(dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET);
+                dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET;
         } else {
-            dwellingTypes[dwellingResult] = static_cast<u8>(dwellingResult);
+            dwellingTypes[dwellingResult] = dwellingResult;
         }
     }
 
@@ -3094,7 +3090,7 @@ void townManager::SetupWell(heroWindow* window) {
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
     TownThievesGuildCategory category;
-    i8 categoryOrder[TOWN_THIEVES_ORDER_BUFFER_SIZE];
+    i8 categoryOrder[GAME_PLAYER_COUNT];
     i32 rank;
     i32 tiedCount;
     i32 rankX;
@@ -3106,7 +3102,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i32 strongestHeroValue;
     char statText[THIEVES_STAT_TEXT_CAPACITY];
     i32 armySlot;
-    i32l categoryStats[TOWN_THIEVES_PLAYER_COUNT];
+    i32l categoryStats[GAME_PLAYER_COUNT];
     i32 heroPosition;
     i32 heroValue;
     i32 strongestCreatureValue;
@@ -3137,7 +3133,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     }
 
     for (position = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
-         position < TOWN_THIEVES_PLAYER_COUNT;
+         position < GAME_PLAYER_COUNT;
          ++position) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, position + TOWN_THIEVES_FIRST_RANK_CONTROL);
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
@@ -3146,7 +3142,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         window->BroadcastMessage(message);
     }
     for (position = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
-         position < TOWN_THIEVES_PLAYER_COUNT;
+         position < GAME_PLAYER_COUNT;
          ++position) {
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, position + TOWN_THIEVES_FIRST_PLAYER_CONTROL);
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
@@ -3159,7 +3155,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         SortStats(categoryStats, categoryOrder);
         firstAtRank = 0;
         lastAtRank = 0;
-        for (rank = 0; rank < TOWN_THIEVES_PLAYER_COUNT; ++rank) {
+        for (rank = 0; rank < GAME_PLAYER_COUNT; ++rank) {
             if (firstAtRank == gpGame->m_playerCount - gpGame->m_deadPlayerCount)
                 break;
             tiedCount = 1;
@@ -3291,7 +3287,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
                     gText[0] = 0;
                     for (heroPosition = 0;
-                         heroPosition < TOWN_THIEVES_PRIMARY_STAT_COUNT;
+                         heroPosition < HERO_PRIMARY_STAT_COUNT;
                          ++heroPosition) {
                         utf8::Format(
                             statText,
@@ -3348,7 +3344,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                              heroPosition < gpGame->m_players[rank].m_townCount;
                              ++heroPosition) {
                             playerTown = gpGame->GetPlayerTown(rank, heroPosition);
-                            for (armySlot = 0; armySlot < TOWN_ARMY_SLOT_COUNT;
+                            for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT;
                                  ++armySlot) {
                                 if (ARMY_GROUP_HAS_POSITIVE_STACK(playerTown->m_army, armySlot)
                                     && gMonsterDatabase[H2EnumIndex(playerTown->m_army
@@ -3368,7 +3364,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                              heroPosition < gpGame->m_players[rank].m_heroCount;
                              ++heroPosition) {
                             strongestHero = gpGame->GetPlayerHero(rank, heroPosition);
-                            for (armySlot = 0; armySlot < TOWN_ARMY_SLOT_COUNT;
+                            for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT;
                                  ++armySlot) {
                                 if (ARMY_GROUP_HAS_POSITIVE_STACK(
                                         strongestHero->m_army,
@@ -3483,7 +3479,7 @@ void GetCategoryStats(
                          ++townIndex) {
                         playerHero =
                             gpGame->GetHero(gpGame->m_players[player].m_heroIds[townIndex]);
-                        for (heroIndex = 0; heroIndex < TOWN_MAX_ARTIFACTS; ++heroIndex) {
+                        for (heroIndex = 0; heroIndex < HERO_ARTIFACT_SLOT_COUNT; ++heroIndex) {
                             if (playerHero->m_artifacts[heroIndex] != ARTIFACT_NONE
                                 && playerHero->m_artifacts[heroIndex] != ARTIFACT_MAGIC_BOOK) {
                                 ++stats[player];

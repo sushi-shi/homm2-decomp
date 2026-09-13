@@ -13,6 +13,7 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
+#include <BASE/dialog.h>
 
 #include <string>
 
@@ -45,14 +46,9 @@ typedef enum DataEntryLayout {
 } DataEntryLayout;
 
 typedef enum DataEntryWidgetId {
+    ENTRY_CANCEL_BUTTON = DIALOG_BUTTON_2,
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
-    ENTRY_BUTTON_ONE    = 0x7801,
-    ENTRY_CANCEL_BUTTON = 0x7802,
-    ENTRY_BUTTON_FIVE   = 0x7805,
-    ENTRY_BUTTON_SIX    = 0x7806,
-    ENTRY_BUTTON_SEVEN  = 0x7807,
-    ENTRY_BUTTON_EIGHT  = 0x7808
 } DataEntryWidgetId;
 
 typedef enum MiscLogPrivateConstant {
@@ -71,8 +67,6 @@ typedef enum MiscGameDefaultConstant {
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
-    DEFAULT_WINDOW_WIDTH         = 0x280,
-    DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
     DEFAULT_MAP_OFFSET_MAX       = 32000,
     UNIQUE_ID_RANDOM_MAX         = 999999,
@@ -94,7 +88,6 @@ typedef enum PCXConstant {
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
     VGA_PALETTE_MARKER    = 0x0c,
-    PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
 } PCXConstant;
 
@@ -106,8 +99,6 @@ typedef enum MiscCycleColorRange {
 } MiscCycleColorRange;
 
 typedef enum MiscFadeConstant {
-    FADE_LEVEL_COUNT              = 0x40,
-    FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
     FADE_FRAME_DELAY              = 0x14,
     WINDOWED_FADE_INCREMENT_SCALE = 2,
@@ -115,13 +106,6 @@ typedef enum MiscFadeConstant {
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
 } MiscFadeConstant;
-
-typedef enum MiscPaletteComponent {
-    PALETTE_COMPONENT_COUNT     = 3,
-    PALETTE_RED_INDEX           = 0,
-    PALETTE_GREEN_INDEX         = 1,
-    PALETTE_BLUE_INDEX          = 2
-} MiscPaletteComponent;
 
 typedef enum MiscWindowConstant {
     MINIMUM_WINDOW_WIDTH   = 320,
@@ -132,8 +116,6 @@ typedef enum MiscWindowConstant {
 typedef enum MiscBlitConstant {
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
-    BLIT_SCREEN_WIDTH  = 0x280,
-    BLIT_SCREEN_HEIGHT = 0x1e0
 } MiscBlitConstant;
 
 typedef enum SeededRandomConstant {
@@ -195,7 +177,6 @@ i32 iLastSeed = INITIAL_SEED;
 static char gMemEntryTag[sizeof("IME")] = "IME";
 
 typedef enum StatusBarLayout {
-    STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
@@ -340,6 +321,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 }
 
 #include <BASE/MiscGraphicsConstants.h>
+#include <BASE/display.h>
 
 void FadeIn(i32 increment) {
     i32 i, j, delayTime, threshold;
@@ -348,27 +330,27 @@ void FadeIn(i32 increment) {
         MemError();
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memset(currentPalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
+    memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
     i = 0;
     while (true) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == MISC_PALETTE_MAX_LEVEL) {
+        if (i == PALETTE_CHANNEL_MAX) {
             UpdatePalette(gpBufferPalette->m_data);
         } else {
-            threshold = MISC_PALETTE_MAX_LEVEL - i;
-            for (j = 0; j < MISC_PALETTE_BYTE_COUNT; ++j) {
+            threshold = PALETTE_CHANNEL_MAX - i;
+            for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
                 if (gpBufferPalette->m_data[j] > threshold)
                     currentPalette->m_data[j] = gpBufferPalette->m_data[j] - threshold;
             }
             UpdatePalette(currentPalette->m_data);
         }
         DelayTil(&delayTime);
-        if (i == MISC_PALETTE_MAX_LEVEL)
+        if (i == PALETTE_CHANNEL_MAX)
             break;
         i += increment;
-        if (i >= MISC_PALETTE_LEVEL_COUNT)
-            i = MISC_PALETTE_MAX_LEVEL;
+        if (i >= PALETTE_LEVEL_COUNT)
+            i = PALETTE_CHANNEL_MAX;
     }
     delete currentPalette;
 }
@@ -380,7 +362,7 @@ void FadeOut(i32 increment) {
         MemError();
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memcpy(currentPalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     i = 0;
     while (true) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
@@ -395,11 +377,11 @@ void FadeOut(i32 increment) {
         }
         UpdatePalette(currentPalette->m_data);
         DelayTil(&delayTime);
-        if (i == FADE_LEVEL_LAST)
+        if (i == PALETTE_CHANNEL_MAX)
             break;
         i += increment;
-        if (i >= FADE_LEVEL_COUNT)
-            i = FADE_LEVEL_LAST;
+        if (i >= PALETTE_LEVEL_COUNT)
+            i = PALETTE_CHANNEL_MAX;
     }
     delete currentPalette;
 }
@@ -489,12 +471,12 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].colorMouseCursor = CONFIG_DEFAULT_COLOR_MOUSE_CURSOR;
         gConfig.gfx[i].fullScreen = true;
-        if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
+        if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gConfig.gfx[i].width = DEFAULT_WINDOW_WIDTH;
-            gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = LOGICAL_SCREEN_WIDTH;
+            gConfig.gfx[i].height = LOGICAL_SCREEN_HEIGHT;
         }
     }
     gConfig.showCombatGrid = 1;
@@ -513,9 +495,9 @@ void SetGameDefaults(void) {
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
-    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
+    gConfig.walkSpeeds[H2EnumIndex(CONFIG_WALK_SPEED_HUMAN)] = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
-    gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
+    gConfig.walkSpeeds[H2EnumIndex(CONFIG_WALK_SPEED_COMPUTER)] = CONFIG_WALK_SPEED_FAST;
 
     utf8::Copy(
         gConfig.networkDefaultName,
@@ -625,10 +607,10 @@ void BitmapToScreen(class bitmap* image) {
 }
 
 void SetPalette(i8* paletteData, i32 updateDisplay) {
-    memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
     memcpy(
         gCyclePal,
-        paletteData + H2EnumIndex(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        paletteData + H2EnumIndex(CYCLE_RANGE_ONE_FIRST) * H2EnumIndex(PALETTE_CHANNEL_COUNT),
         sizeof(gCyclePal)
     );
     if (updateDisplay != 0)
@@ -795,13 +777,13 @@ void AiPrint(const char* text) {
         return;
 
     FillBitmapArea(
-        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, LOGICAL_SCREEN_WIDTH, STATUS_BAR_HEIGHT, 0
     );
     smallFont->DrawBoundedString(
         text,
         0,
         STATUS_TEXT_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_TEXT_HEIGHT,
         FONT_DRAW_DEFAULT,
         FONT_ALIGN_LEFT
@@ -810,7 +792,7 @@ void AiPrint(const char* text) {
         gpWindowManager->m_screen,
         0,
         STATUS_BAR_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_BAR_HEIGHT,
         0,
         STATUS_BAR_Y
@@ -825,25 +807,25 @@ void AbsAiPrint(const char* text) {
 }
 
 void FadeTo(u8* source, u8* destination, i32 increment) {
-    u8 temp[MISC_PALETTE_BYTE_COUNT];
+    u8 temp[PALETTE_DATA_SIZE];
     u8 *current, *destinationPalette;
     i32 index, change, diff, move, iLevel, nextTime, k;
 
-    memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
+    memcpy(temp, source, PALETTE_DATA_SIZE);
     increment >>= FADE_TO_INCREMENT_SHIFT;
     if (increment < 1) {
         increment = 1;
     }
-    for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
+    for (iLevel = FADE_TO_START_LEVEL; iLevel < PALETTE_LEVEL_COUNT; iLevel += increment) {
         nextTime = platform::Ticks() + FADE_TO_FRAME_DELAY;
         PollSound();
-        index = MISC_PALETTE_LEVEL_COUNT - iLevel - increment;
+        index = PALETTE_LEVEL_COUNT - iLevel - increment;
         if (index < 0)
             index = 0;
         change = giChangeThreshold[index];
         current = temp;
         destinationPalette = destination;
-        for (k = 0; k < MISC_PALETTE_BYTE_COUNT; ++k) {
+        for (k = 0; k < PALETTE_DATA_SIZE; ++k) {
             diff = *destinationPalette - *current;
             if (abs(diff) > change) {
                 move = abs(diff) - change;
@@ -866,7 +848,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     i32 x;
     i32 i;
     i32 y;
-    u8 tempPal[MISC_PALETTE_BYTE_COUNT];
+    u8 tempPal[PALETTE_DATA_SIZE];
     i8* paletteData;
     i32 savedFlags;
 
@@ -874,19 +856,19 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     gpWindowManager->m_updateFlags = 0;
     paletteData = gpBufferPalette->m_data;
     for (i = 0;
-         i < H2EnumIndex(MISC_PALETTE_BYTE_COUNT) / H2EnumIndex(PALETTE_COMPONENT_COUNT);
+         i < H2EnumIndex(PALETTE_DATA_SIZE) / H2EnumIndex(PALETTE_CHANNEL_COUNT);
          ++i) {
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX];
+        tempPal[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)] =
+            paletteData[colorTable[i] * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)];
+        tempPal[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_GREEN)] =
+            paletteData[colorTable[i] * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_GREEN)];
+        tempPal[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_BLUE)] =
+            paletteData[colorTable[i] * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_BLUE)];
     }
     FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
     currentColorTable = gpWindowManager->m_screen->m_pixels;
-    for (y = 0; y < BLIT_SCREEN_HEIGHT; ++y) {
-        for (x = 0; x < BLIT_SCREEN_WIDTH; ++x) {
+    for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
             *currentColorTable = colorTable[*currentColorTable];
             ++currentColorTable;
         }
@@ -964,10 +946,10 @@ void CreatePCXFile(
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
     complete = complete && platform::FileWriteExact(fileDescriptor, &bMark, 1);
-    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
-    for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
+    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    for (x = 0; x < PALETTE_DATA_SIZE; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
-    complete = complete && platform::FileWriteExact(fileDescriptor, palOut, PALETTE_BYTE_COUNT);
+    complete = complete && platform::FileWriteExact(fileDescriptor, palOut, PALETTE_DATA_SIZE);
     H2_FREE(palOut);
     platform::FileClose(fileDescriptor);
     if (!complete)
@@ -1101,15 +1083,15 @@ void GetDataEntry(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    message.payload.widget.id = ENTRY_BUTTON_ONE;
+    message.payload.widget.id = DIALOG_BUTTON_1;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
+    message.payload.widget.id = DIALOG_BUTTON_7;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
+    message.payload.widget.id = DIALOG_BUTTON_8;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_FIVE;
+    message.payload.widget.id = DIALOG_BUTTON_5;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SIX;
+    message.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
         message.payload.widget.id = ENTRY_CANCEL_BUTTON;
@@ -1167,11 +1149,11 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
 
     if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT) {
         ++bDataEntryTime;
-        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, ENTRY_TEXT_WIDGET);
+        SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, ENTRY_TEXT_WIDGET);
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_CANCEL_BUTTON:
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;
@@ -1179,7 +1161,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         return MESSAGE_DISPATCH_FORWARD;
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_TEXT_WIDGET:
                         message.type = MESSAGE_WIDGET;

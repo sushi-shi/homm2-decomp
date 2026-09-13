@@ -4,9 +4,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 #include <SOURCE/KB.h>
-typedef enum BitmapDimConstant {
-    DIM_PALETTE_LEVEL_STRIDE = 256
-} BitmapDimConstant;
 
 static i32 gFillRow = 0;
 static u8* gFillPtr = 0;
@@ -80,7 +77,7 @@ void DimBitmapArea(class bitmap* image, i32 x, i32 y, i32 width, i32 height, i32
     for (gDimRow = 0; gDimRow < height; gDimRow++) {
         gDimNext = gDimPtr + image->m_width;
         for (gDimCol = 0; gDimCol < width; gDimCol++) {
-            *gDimPtr = uDimPal[0][0][level * DIM_PALETTE_LEVEL_STRIDE + *gDimPtr];
+            *gDimPtr = uDimPal[0][level][*gDimPtr];
             gDimPtr++;
         }
         gDimPtr = gDimNext;

@@ -7,6 +7,7 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 #include <SOURCE/KB.h>
+#include <BASE/display.h>
 
 
 static i32 s_left = 0;
