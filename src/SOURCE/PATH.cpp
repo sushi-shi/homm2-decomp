@@ -48,7 +48,7 @@ i32 army::FindPath(
             pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 1);
     }
 
-    m_monster.speed = static_cast<i8>(savedSpeed2);
+    m_monster.speed = savedSpeed2;
     return pathResult2;
 }
 

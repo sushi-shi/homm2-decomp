@@ -428,6 +428,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   checks pass. Nineteen source products retain unsupported goto, unused-local
   and role-split rewrites as measured residuals, not silent gameplay changes.
 
+- C66/S60/B81: all twelve PATH functions reviewed. One signed-byte speed
+  restoration cast removed with complete native and retail proof; unused-local
+  deletion changes code and is retained as measured debt. Real 117x6 adjacency
+  ownership and sentinel/direction/placement contracts are documented in
+  [the function-by-function report](C66-S60-B81.md).
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

@@ -781,6 +781,10 @@
   },
   "include/SOURCE/PATH.h": {
     "sha256": "c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2",
-    "note": "Full9-line header read: combatTypes dependency and two direction/adjacent-hex free-function declarations; no function/macro body, aggregate or address helper. PATH.cpp functions remain a separate pending review."
+    "note": "Full9-line header read: combatTypes dependency and two direction/adjacent-hex free-function declarations; no function/macro body, aggregate or address helper. Follow-up: all12 PATH.cpp bodies now independently reviewed in C66-S60-B81.md; no declaration change."
+  },
+  "src/SOURCE/PATH.cpp": {
+    "sha256": "32ab668c3b5ba57b6c56e92e0050ab51a13da4456e5e4585950a60b5ded830c8",
+    "note": "Full638-line TU read, all12 physical functions reconciled with private CombatPathConstant enum and final compiler-generated markers; no data/format/owner macro hidden outside bodies. C66 sole written cast removed after2-arm native/retail proof; S60 unused scalar measured2/2 and retained. B81 real117x6 adjacency, sentinel/direction/facing/placement contracts documented; no fake buffer, goto, manual varargs or unrelated variable roles. All15 emitted functions and allocated native sections unchanged; all12 source functions independently match complete retail bytes/sites/targets."
   }
 }

@@ -22718,5 +22718,197 @@
       "bounds": "open"
     },
     "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions."
+  },
+  "src/SOURCE/PATH.cpp:army::FindPath(i32 sourceHex,i32 targetHex,i32,i32 ignoreSpeed,ArmyPathTarget pathMode)#1": {
+    "body_sha256": "7c01e2877e4d670206871f1e4702ccb5ca120bc945ba2b93b982fc962b6a5a82",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C66 signed-byte speed restore cast removed after complete two-arm product; native full-TU and independent269-byte retail proof. Real saved speed spans both normal and wide-target retry; unnamed third argument is truly unused. U05 width flag meaningful. B81 source/target validated before search; valid manager/search owners, facing and path-mode contracts remain. No goto, scratch aggregate, manual varargs or unrelated variable reuse."
+  },
+  "src/SOURCE/PATH.cpp:army::ValidPath(i32 targetHex,ArmyPathTarget pathMode)#1": {
+    "body_sha256": "46bb8bf5ddc20d41c5796afb80e34cdcd858f57327b84042fdc4e42b26006b02",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S60 unread extra scalar deletion measured2/2: same128-byte size and8 diagnostic blocks but different text hash; original retained. Real flight/search dispatch and successful move-target write preserved. U05 flying attribute retained. B81 valid army/search/flight state and path mode required, target is explicitly validated; no fabricated buffer or ownership pointer."
+  },
+  "src/SOURCE/PATH.cpp:army::GetMoveMask(i32 sourceHex)#1": {
+    "body_sha256": "ecc7a28aed95e7249849e783c054bd422ef6673b3012d0e32c85ae557f1e0bfc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Iterates six actual adjacent directions, setting blocked bits in original positions; special6/7 are always blocked. B81 direction loop and all shifts bounded, even postfinal bit advance; source validation occurs in ValidMove. Valid live this/manager required. No cast, goto, union view, fake stack owner or unrelated cursor roles."
+  },
+  "src/SOURCE/PATH.cpp:army::GetAttackMask(i32 sourceHex,ArmyAttackTarget targetMode,i32 targetHex)#1": {
+    "body_sha256": "357e7edce692b971fdaa5eaf65abce8c528c5961f92adfc3aba8753d3b4bc87f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real width attribute selects six/eight logical directions and initial special mask. attackHexNext_a is actual output storage passed to ValidAttack, not a fake/unused aggregate despite no caller read. B81 loops/shifts bounded, output pointer valid, source validated by callee; manager/mode/facing contracts remain. U05 attribute view meaningful."
+  },
+  "src/SOURCE/PATH.cpp:army::ValidMove(CombatHexDirection direction)#1": {
+    "body_sha256": "6e5a1dfcc2c075e7ef6d39add92bf4c7f748ed1d327a88208fc22e802d5395e1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Direct direction forwarding with real m_hex member to two-argument ValidMove; no hidden accessor, fake owner, cast, goto, unused local or manual argument access. B81 live this and valid direction required; delegated source/destination guards do not validate direction before adjacency lookup."
+  },
+  "src/SOURCE/PATH.cpp:army::ValidMove(i32 sourceHex,CombatHexDirection direction)#1": {
+    "body_sha256": "b675147c7895b755a2b1d42ed35a94479175df5027d194977e36406fff4d3139",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Source and computed destination validated before hex-cell access; wide rear sentinel tested before read. U05 width flag and actual drawbridge/gate occupancy checks retained. B81 direction must be valid before helper lookup, facing/manager/placement remain contracts; early front/rear-only returns preserve wide horizontal move policy. Real scalar locals, no fake aggregate or unrelated reuse."
+  },
+  "src/SOURCE/PATH.cpp:army::ValidAttack(i32 sourceHex,CombatHexDirection direction,ArmyAttackTarget targetMode,i32 requiredTargetHex,i32 * attackHex)#1": {
+    "body_sha256": "a47fdc50fc1ffd285540ae962ef3b0c8bfb14622fadca33e30499d13ae6e372c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete wide special-direction and rear-origin mapping, required-hex filter and three occupancy modes read. Real writable attackHex output is conditionally written; failure need not initialize it, success supplies a validated hex. U05 width view retained. B81 direction/facing/side/target/manager contracts remain, no artificial owner pointer or scratch aggregate."
+  },
+  "src/SOURCE/PATH.cpp:army::GetAdjacentCellIndex(i32 sourceHex,CombatHexDirection direction)#1": {
+    "body_sha256": "f28768b934a4a5dffe6704edb28a22c8e3f30941a200ab204e412c11ddbe8537",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual m_adjacency117x6 row owner, six-byte retail stride and signed-byte load verified. Logical6/7 remap through facing; rewriting direction stays the same semantic role. B81 only source-1 is guarded, arbitrary negative/117+ sources or invalid directions are not validated. No cast, union, goto, synthesized owner offset or fake buffer."
+  },
+  "src/SOURCE/PATH.cpp:GetAdjacentCellIndexNoArmy(i32 sourceHex,CombatHexDirection direction)#1": {
+    "body_sha256": "c82e286ce35a5330e0d1c197a4e7b6e79fc9c5872ab2300993275318a3555c03",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual117x6 adjacency owner; special6/7 map to northwest/southwest before signed-byte access, no army-facing lookup. B81 source-1 sentinel only, remaining source0..116 and direction0..5 after remap are caller contracts. Direction conversion is related computation, not unrelated reuse."
+  },
+  "src/SOURCE/PATH.cpp:army::ValidRange(i32 targetHex)#1": {
+    "body_sha256": "4e771c70fae22f430694b9801b3a6d4227a736f2394848b5c6c4830cd4cd24b2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Complete two-step range and both facing branches read; asymmetric early returns and stored attack/move direction remain retail exact. U05 real width attribute. B81 target guard explicit, m_hex and +/-1 wide rear validity rely on placement; chained neighbor-1 safely propagates. Fixed0xc0 mask leaves ordinary directions available for valid endpoints. No pointer arithmetic, goto, fake aggregate or unrelated reuse."
+  },
+  "src/SOURCE/PATH.cpp:OppositeDirection(CombatHexDirection direction)#1": {
+    "body_sha256": "3ded4bd3db4bf20c8c1103aff3974fa92cd8c0e777bb99fb604a24577e309cd2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Maps ordinary0..5 by add3 modulo6 and exchanges logical6/7. B81 arbitrary direction integers are not validated: sentinel-1 becomes2; preserve retail rather than inventing a guard. Related input transformation, no casts, goto, owner recovery, stack buffers or varargs."
+  },
+  "src/SOURCE/PATH.cpp:army::GetBestDirection(i32 sourceHex,i32 targetHex,i32 blockedMask)#1": {
+    "body_sha256": "cd4d8f72ccd668cef656b8f39a80432a2af193d7e28c449db7227fff573ef29e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Entire ordered preference tree read. Explicitly validates both endpoints, then bounded row/column arithmetic and fixed eight mask bits; all-blocked returns-1, equal endpoints use existing no-horizontal fallback. B81 callers must handle invalid returned direction. No goto, local lookup array, pointer, casts or unrelated roles. Independent1918-byte retail proof excludes four generated-helper blocks overincluded by ordinary sema."
   }
 }
