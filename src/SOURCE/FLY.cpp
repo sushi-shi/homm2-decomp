@@ -1,10 +1,12 @@
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 #include <math.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
+#include <BASE/Misc.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
@@ -54,8 +56,11 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         }
         if (ValidHex(candidateHex)
             && (cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                    && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
+                || HEX_HAS_OCCUPANT(
+                    *cell_9,
+                    gpCombatManager->m_currentArmySide,
+                    gpCombatManager->m_currentArmyIndex
+                ))
             && !cell_9->m_blocked) {
             return 1;
         } else {
@@ -72,8 +77,11 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                     return 0;
                 }
                 if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                     || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                         && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
+                     || HEX_HAS_OCCUPANT(
+                         *cell_9,
+                         gpCombatManager->m_currentArmySide,
+                         gpCombatManager->m_currentArmyIndex
+                     ))
                     && !cell_9->m_blocked) {
                     if (fittingHex) {
                         *fittingHex = candidateHex;
@@ -266,8 +274,7 @@ i32 army::FlyTo(i32 destination) {
     yPos = static_cast<float>(sourceY);
     xDistance = endX - fromX;
     ySpan0 = endY - sourceY;
-    length =
-        static_cast<i32>(sqrt(static_cast<double>(xDistance * xDistance + ySpan0 * ySpan0)));
+    length = INTEGER_VECTOR_LENGTH(xDistance, ySpan0);
     stepCount1 = 0;
     if (m_frameInfo.flightSpeed > 0) {
         stepCount1 = (length + (m_frameInfo.flightSpeed >> 1)) / m_frameInfo.flightSpeed;
@@ -340,14 +347,10 @@ i32 army::FlyTo(i32 destination) {
                 }
                 if (m_animationFrame % m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
                     == FLIGHT_SOUND_FRAME) {
-                    if ((m_monsterType == CREATURE_VAMPIRE
-                         || m_monsterType == CREATURE_VAMPIRE_LORD)
-                        && leg == 0) {
+                    if (IS_VAMPIRE_CREATURE(m_monsterType) && leg == 0) {
                         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)]);
                         DelayMilli(VAMPIRE_FLIGHT_SOUND_DELAY);
-                    } else if ((m_monsterType == CREATURE_VAMPIRE
-                                || m_monsterType == CREATURE_VAMPIRE_LORD)
-                               && leg == stepCount1 - 1) {
+                    } else if (IS_VAMPIRE_CREATURE(m_monsterType) && leg == stepCount1 - 1) {
                         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_TWO)]);
                     } else {
                         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_MOVE)]);
@@ -402,9 +405,7 @@ i32 army::FlyTo(i32 destination) {
 
                 DelayTil(glTimers);
                 if (m_animationFrame < frameStart
-                    || (m_animationFrame + 1 >= midCount
-                        && (m_monsterType == CREATURE_VAMPIRE
-                            || m_monsterType == CREATURE_VAMPIRE_LORD))) {
+                    || (m_animationFrame + 1 >= midCount && IS_VAMPIRE_CREATURE(m_monsterType))) {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount()
                         + m_frameInfo.walkDuration * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE
@@ -417,12 +418,7 @@ i32 army::FlyTo(i32 destination) {
                               / frameCount0
                     );
                 }
-                gpWindowManager->UpdateScreenRegion(
-                    lastMinX,
-                    oldMinY,
-                    oldMaxX0 - lastMinX + 1,
-                    oldMaxY - oldMinY + 1
-                );
+                UPDATE_INCLUSIVE_REGION(lastMinX, oldMinY, oldMaxX0, oldMaxY);
                 if (m_animationFrame
                     == m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] - 1) {
                     xPos = fromX + (leg + 1) * xSpeed;

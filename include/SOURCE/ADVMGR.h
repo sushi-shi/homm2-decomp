@@ -9,6 +9,29 @@
 class mapCell;
 struct tag_message;
 
+typedef enum AdventureViewportConstant {
+    ADVENTURE_VIEWPORT_EXTENT = 480
+} AdventureViewportConstant;
+
+
+#define DRAW_ADVENTURE_ICON(pic, x, y, frame, clip)                                                \
+    IconToBitmap(                                                                                  \
+        (pic),                                                                                     \
+        gpWindowManager->m_screen,                                                                 \
+        (x),                                                                                       \
+        (y),                                                                                       \
+        (frame),                                                                                   \
+        (clip),                                                                                    \
+        0,                                                                                         \
+        0,                                                                                         \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        0                                                                                          \
+    )
+#define DRAW_FLIPPED_ADVENTURE_ICON(pic, x, y, frame, clip) \
+    FlipIconToBitmap((pic), gpWindowManager->m_screen, (x), (y), (frame), (clip), \
+                     0, 0, ADVENTURE_VIEWPORT_EXTENT, ADVENTURE_VIEWPORT_EXTENT, 0)
+
 typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
     ADVMGR_REMOTE_COMMAND_SAVE_GAME        = 1,

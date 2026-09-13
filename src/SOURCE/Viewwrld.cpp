@@ -155,9 +155,7 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
                           ? LEGEND_WORLD
                           : H2EnumIndex(whatToDraw) - H2EnumIndex(SPELL_VIEW_MINES)]
     );
-    legendMessage.type = VIEW_WORLD_MESSAGE;
-    legendMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
-    legendMessage.payload.widget.id = WORLD_ICON_WIDGET;
+    SET_WIDGET_MESSAGE(legendMessage, VIEW_WORLD_ICON_MESSAGE, WORLD_ICON_WIDGET);
     legendMessage.payload.widget.data.text = gText;
     window->BroadcastMessage(legendMessage);
     gpWindowManager->DoDialog(window, ViewWorldDialogHandler, 0);
@@ -345,8 +343,7 @@ void advManager::VWCompleteDraw(void) {
                         (cellY * GROUND_RANDOM_X_MULTIPLIER + cellX) & GROUND_RANDOM_FRAME_MASK;
                 else
                     frame0 += GROUND_FRAME_OFFSET;
-                frame0 += H2EnumIndex(giGroundToTerrain[cell->m_terrainImageIndex])
-                                 * WORLD_TERRAIN_FRAME_STRIDE;
+                frame0 += H2EnumIndex(CELL_TERRAIN(cell)) * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit) || iVWDrawAllTerrains) {
                     pVWGround->DrawToBuffer(
                         screenX

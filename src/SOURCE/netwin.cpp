@@ -148,10 +148,8 @@ extern "C" void __fastcall nb_term(void) {
         Netbios(&block);
     }
     EnterCriticalSection(&gNbSndLock);
-    while ((np = pop_node(&gNbSndQueue)) != NULL)
-        H2_FREE(np);
-    while ((np = pop_node(&gNbFreeQueue)) != NULL)
-        H2_FREE(np);
+    FREE_NODE_QUEUE(np, &gNbSndQueue);
+    FREE_NODE_QUEUE(np, &gNbFreeQueue);
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -161,8 +159,7 @@ extern "C" void __fastcall nb_term(void) {
     gNbShutdown |= 1;
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
-    while ((np = pop_node(&gNbRcvQueue)) != NULL)
-        H2_FREE(np);
+    FREE_NODE_QUEUE(np, &gNbRcvQueue);
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }

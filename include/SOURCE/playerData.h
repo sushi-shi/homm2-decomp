@@ -103,5 +103,7 @@ public:
     }
 };
 #pragma pack(pop)
+
+#define PLAYER_HAS_VISITED_TENT(p, color) ((p).m_barrierTents & (1 << (color)))
 extern playerData* gpCurPlayer;
 #endif

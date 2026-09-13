@@ -147,7 +147,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
         case MESSAGE_MOUSE_MOVE:
             x = message.payload.mouse.x - m_owner->m_posX;
             y = message.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 message.payload.hover.id = m_id;
                 return MESSAGE_DISPATCH_FORWARD;
             }

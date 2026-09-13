@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <BASE/widget.h>
+#include <BASE/message.h>
 #include <BASE/iconWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/icon.h>
@@ -68,10 +70,7 @@ iconWidget::iconWidget(
 
 void iconWidget::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
@@ -146,7 +145,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_DOWN:
             x = msg.payload.mouse.x - m_owner->m_posX;
             y = msg.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
@@ -164,9 +163,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
 
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;

@@ -74,7 +74,14 @@ public:
     void TurnCostResource(i32);
     float TurnValueOfObelisk(i32);
     float FutureDeflator(i32* const);
-    i32 FightValueOfStack(class armyGroup*, class hero*, i32, i32, i32, i32);
+    i32 FightValueOfStack(
+        class armyGroup* group,
+        class hero* heroPtr,
+        i32 useHero,
+        i32 useTown = 0,
+        i32 townId = 0,
+        i32 useEnemyMods = 0
+    );
     void EvaluateOneTimeCreaturePurchase(CreatureType, i32, i32, i32&, i32&, i32&);
     i32 QuickCombat(
         class armyGroup*,

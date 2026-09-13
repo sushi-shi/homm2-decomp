@@ -52,4 +52,11 @@ public:
     void DamageGroup(float);
 };
 #pragma pack(pop)
+
+#define CLEAR_ARMY_GROUP(group)                                                                    \
+    (memset((group).m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof((group).m_creatureTypes)),      \
+     memset((group).m_creatureCounts, 0, sizeof((group).m_creatureCounts)))
+
+#define ARMY_GROUP_HAS_POSITIVE_STACK(group, slot)                                                 \
+    ((group).m_creatureTypes[slot] != CREATURE_NONE && (group).m_creatureCounts[slot] > 0)
 #endif

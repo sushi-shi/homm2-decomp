@@ -55,6 +55,14 @@ public:
     void ReleaseFizzleSource(void);
 };
 #pragma pack(pop)
+
+#define FINISH_DIALOG_MESSAGE(message)                                                             \
+    (gpWindowManager->m_dialogResult = (message).payload.widget.id,                                \
+     (message).payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT),                              \
+     (message).payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT)
+
+#define UPDATE_INCLUSIVE_REGION(left, top, right, bottom)                                          \
+    (gpWindowManager->UpdateScreenRegion((left), (top), (right) - (left) + 1, (bottom) - (top) + 1))
 extern i32 iCombatCycleFrame;
 extern u8 gbEveryOtherCycle;
 extern i32 iCycle1Count;

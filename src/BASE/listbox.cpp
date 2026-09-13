@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/message.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -102,10 +103,7 @@ void listBoxWidget::Read(void) {
     IconEntry* entry;
     i8 name[RESOURCE_NAME_CAPACITY];
 
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(name));
@@ -237,9 +235,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                     text = message.payload.widget.data.text;
                     if (m_itemCount > message.payload.widget.parameter) {
                         H2_FREE(m_items[message.payload.widget.parameter]);
-                        m_items[message.payload.widget.parameter] =
-                            static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                        strcpy(m_items[message.payload.widget.parameter], text);
+                        ALLOC_COPY_STRING(m_items[message.payload.widget.parameter], text);
                     }
                     break;
 
@@ -250,8 +246,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                     newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
-                    newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                    strcpy(newItems[m_itemCount], text);
+                    ALLOC_COPY_STRING(newItems[m_itemCount], text);
                     m_itemCount++;
                     if (m_items != NULL)
                         H2_FREE(m_items);
@@ -287,11 +282,9 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                 break;
             x = message.payload.mouse.x - m_owner->m_posX;
             y = message.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -466,9 +459,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
             } else {
                 if (m_itemSelectionTracking) {
                     m_itemSelectionTracking = 0;
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
                     message.payload.widget.data.value = m_selectedIndex;
                     message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
                     if (m_selectedIndex == m_lastSelectedIndex) {

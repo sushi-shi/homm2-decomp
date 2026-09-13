@@ -328,7 +328,7 @@ typedef enum EventEffectConstant {
 } EventEffectConstant;
 
 i8 StrEqNoCase(const char*, const char*);
-i32 GiveArtifact(class hero*, ArtifactType, b32, i8);
+i32 GiveArtifact(class hero* heroPtr, ArtifactType artifact, b32 checkEndGame, i8 extra = -1);
 void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
 i32 RiddleStringsEqual(const char*, const char*);
 
