@@ -129,39 +129,29 @@ void UpdateTradingPost(i32 draw) {
 
         sprintf(
             gText,
-            "{%s}\n\n\xcd\xe0 \xec\xee\xe5\xec \xf0\xfb\xed\xea\xe5 %s \xe8 %s "
-            "\xec\xe5\xed\xff\xfe\xf2\xf1\xff \xe8\xe7 \xf1\xee\xee\xf2\xed\xee\xf8\xe5\xed\xe8\xff "
-            "%d %s \xea %d %s" /* "{%s}\n\nНа моем рынке %s и %s меняются из соотношения %d %s к %d %s" */,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
-                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */,
+            localization::Tr("trading.bargain.buka"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title"),
             rightName,
             leftName,
             offeredValue,
-            offeredValue > 1 ? "\xe5\xe4." /* "ед." */ : "\xe5\xe4." /* "ед." */,
+            offeredValue > 1 ? localization::Tr("trading.unit") : localization::Tr("trading.unit"),
             requestedValue,
-            requestedValue > 1 ? "\xe5\xe4." /* "ед." */ : "\xe5\xe4." /* "ед." */
+            requestedValue > 1 ? localization::Tr("trading.unit") : localization::Tr("trading.unit")
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            "{%s}\n\n\xc2\xe0\xec \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe0 "
-            "\xe4\xee\xf1\xf2\xee\xe9\xed\xe0\xff \xf1\xe4\xe5\xeb\xea\xe0. \xdf \xed\xe5 "
-            "\xef\xfb\xf2\xe0\xfe\xf1\xfc \xed\xe0\xe6\xe8\xf2\xfc\xf1\xff \xed\xe0 \xed\xe5\xe9. "
-            "\xc2\xe0\xf1 \xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2 \xf7\xf2\xee-\xed\xe8\xe1\xf3\xe4\xfc "
-            "\xe8\xe7 \xec\xee\xe8\xf5 \xf2\xee\xe2\xe0\xf0\xee\xe2?" /* "{%s}\n\nВам предложена достойная сделка. Я не пытаюсь нажиться на ней. Вас интересует что-нибудь из моих товаров?" */,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
-                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */
+            localization::Tr("trading.bargain"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title")
         );
     } else {
         sprintf(
             gText,
-            "{%s}\n\n\xcf\xee\xf1\xec\xee\xf2\xf0\xe8\xf2\xe5 \xed\xe0 \xed\xe0\xf8\xe8 "
-            "\xf2\xee\xe2\xe0\xf0\xfb. \xc5\xf1\xeb\xe8 \xf7\xf2\xee-\xf2\xee \xe2\xe0\xf1 "
-            "\xe7\xe0\xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2, \xf9\xe5\xeb\xea\xed\xe8\xf2\xe5 "
-            "\xef\xee \xed\xf3\xe6\xed\xfb\xec \xe2\xe5\xf9\xe0\xec \xe8 \xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5, "
-            "\xed\xe0 \xf7\xf2\xee \xf5\xee\xf2\xe8\xf2\xe5 \xef\xee\xec\xe5\xed\xff\xf2\xfc." /* "{%s}\n\nПосмотрите на наши товары. Если что-то вас заинтересует, щелкните по нужным вещам и выберите, на что хотите поменять." */,
-            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
-                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */
+            localization::Tr("trading.inspect_wares"),
+            bIsMarketPlace != 0 ? localization::Tr("trading.marketplace.title")
+                                : localization::Tr("trading.marketplace.title")
         );
     }
     SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
@@ -214,7 +204,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
                     if (leftResource == idx) {
-                        sprintf(gText, "\xed/\xe4" /* "н/д" */);
+                        sprintf(gText, localization::Tr("common.not_applicable"));
                     } else {
                         ComputeTradeRatios(
                             leftResource,

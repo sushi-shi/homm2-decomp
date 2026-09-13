@@ -59,6 +59,7 @@ def main(argv=None):
         print("usage: homm2 data-topology census", file=sys.stderr)
         return 1
     if cmd == "build":
+        if sh("python3", "-m", "homm2.build.localization"): return 1
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
         if sh("python3", "configure.py"): return 1

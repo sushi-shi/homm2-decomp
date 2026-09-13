@@ -549,7 +549,7 @@ void SetGameDefaults(void) {
     // Неизвестный герой
     strcpy(
         gConfig.networkDefaultName,
-        "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb\xe9 \xe3\xe5\xf0\xee\xe9"
+        localization::Tr("player.unknown_hero_name")
     );
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

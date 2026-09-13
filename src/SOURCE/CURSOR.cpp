@@ -1208,7 +1208,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!" /* "%s сокрушен!" */,
+                localization::Tr("player.vanquished"),
                 cPlayerNames[change.id]
             );
             NormalDialog(

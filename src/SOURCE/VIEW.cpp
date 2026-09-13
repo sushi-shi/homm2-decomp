@@ -148,7 +148,7 @@ i32 combatManager::ViewGeneral(
     if (m_heroes[IDX(side)]->m_isCaptain != 0)
         sprintf(
             gText,
-            /* Капитан */ "\xca\xe0\xef\xe8\xf2\xe0\xed"
+             localization::Tr("hero.captain")
         );
     else
         sprintf(

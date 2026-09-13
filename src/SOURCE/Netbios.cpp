@@ -32,7 +32,7 @@ i8 InitNetHost(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
+                ShutDown(localization::Tr("network.netbios.not_loaded"));
             else {
                 iInitNetHostStatus++;
                 gbRemoteOn = true;
@@ -61,7 +61,7 @@ i8 InitNetHost(void) {
                 == NETBIOS_RESULT_SUCCESS)
                 iInitNetHostStatus++;
             else
-                ShutDown("\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
+                ShutDown(localization::Tr("network.initialization_failed"));
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
@@ -83,7 +83,7 @@ i8 InitNetGuest(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
+                ShutDown(localization::Tr("network.netbios.not_loaded"));
             else {
                 gbRemoteOn = true;
                 iInitNetGuestStatus++;
@@ -133,7 +133,7 @@ i8 InitNetGuest(void) {
                     )
                 )
                 != NETBIOS_RESULT_SUCCESS) {
-                sprintf(gText, "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
+                sprintf(gText, localization::Tr("network.initialization_failed"));
                 ShutDown(gText);
             }
             return 1;
@@ -201,16 +201,12 @@ i32 nbnet_init(void) {
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
-            sprintf(gText, "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
-                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
+            sprintf(gText, localization::Tr("network.netbios.initializing"));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
-            sprintf(gText, "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
-                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
+            sprintf(gText, localization::Tr("network.waiting_guest.buka"));
             LogStr("GUON2");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             LogStr("GUON3");
@@ -220,16 +216,12 @@ i32 nbnet_init(void) {
             break;
         case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
-            sprintf(gText, "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
-                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
+            sprintf(gText, localization::Tr("network.netbios.initializing"));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
-            sprintf(gText, "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xf5\xee\xf1\xf2\xe0.\n\n  "
-                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
+            sprintf(gText, localization::Tr("network.netbios.waiting_host"));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);

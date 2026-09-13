@@ -248,13 +248,7 @@ void game::GetMap(void) {
     );
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
-            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3"
-            "\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 "
-            "II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec"
-            "\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2"
-            "\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed"
-            "\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 "
-            "II.",
+            localization::Tr("network.load.expansion_unavailable"),
             NORMAL_DIALOG_INFO
         );
         sprintf(fileMask, "*.%s", "MP2");
@@ -913,7 +907,7 @@ cleanup:
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
                 sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
-                sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerIndex] + 1);
+                sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
             }
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
@@ -996,7 +990,7 @@ cleanup:
         gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
-        sprintf(gText, "%s %d%%", "\xd0\xe5\xe9\xf2\xe8\xed\xe3", gpGame->m_difficultyRating);
+        sprintf(gText, "%s %d%%", localization::Tr("new_game.rating.label"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
         DrawNGKPDisplayString(0);
@@ -1044,8 +1038,7 @@ cleanup:
 
                     case GAME_REMOTE_CANCEL:
                         NormalDialog(
-                            "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
-                            "\xe8\xeb \xe8\xe3\xf0\xf3.",
+                            localization::Tr("network.host.canceled_game"),
                             NORMAL_DIALOG_INFO
                         );
                         ShutDown(NULL);
@@ -1383,10 +1376,7 @@ cleanup:
                                                 static_cast<i8>(swapPlayerTemp);
                                         } else {
                                             NormalDialog(
-                                                "\xc4\xe2\xe5 \xe2\xfb\xe1\xf0\xe0\xed\xed\xfb"
-                                                "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
-                                                "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
-                                                "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
+                                                localization::Tr("new_game.positions.cannot_swap"),
                                                 NORMAL_DIALOG_INFO
                                             );
                                         }
@@ -1941,7 +1931,7 @@ void game::ShowScenInfo(void) {
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
-            sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerCounter] + 1);
+            sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
@@ -2036,9 +2026,9 @@ void game::GetLossConditionText(char* text) {
                 city2 = GetTown(townId12);
                 sprintf(
                     text,
-                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc %s '%s'.",
-                    HAS(city2->m_buildings, IDX(TOWN_BUILDING_CASTLE)) ? "\xe7\xe0\xec\xee\xea"
-                                                                       : "\xe3\xee\xf0\xee\xe4",
+                    localization::Tr("scenario.loss.settlement.buka"),
+                    HAS(city2->m_buildings, IDX(TOWN_BUILDING_CASTLE)) ? localization::Tr("scenario.fragment.castle")
+                                                                       : localization::Tr("scenario.fragment.town"),
                     city2->m_name
                 );
                 break;
@@ -2047,7 +2037,7 @@ void game::GetLossConditionText(char* text) {
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
                 sprintf(
                     text,
-                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'.",
+                    localization::Tr("scenario.loss.hero"),
                     lossHero11->m_name
                 );
                 break;
@@ -2062,9 +2052,7 @@ void game::GetLossConditionText(char* text) {
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
-                    "\xcd\xe5 \xee\xe4\xe5\xf0\xe6\xe0\xf2\xfc \xef\xee\xe1\xe5"
-                    "\xe4\xf3 \xe4\xee \xea\xee\xed\xf6\xe0 %d \xec\xe5\xf1\xff\xf6"
-                    "\xe0, %d \xed\xe5\xe4\xe5\xeb\xe8, %d \xe4\xed\xff.",
+                    localization::Tr("scenario.loss.time"),
                     month19,
                     week2,
                     day26
@@ -2074,8 +2062,7 @@ void game::GetLossConditionText(char* text) {
     } else {
         sprintf(
             text,
-            "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe2\xf1\xe5\xf5 \xe3\xe5\xf0\xee"
-            "\xe5\xe2, \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+            localization::Tr("scenario.loss.standard")
         );
     }
 }
@@ -2096,10 +2083,10 @@ void game::GetVictoryConditionText(char* text) {
                 );
                 sprintf(
                     text,
-                    "\xc7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc %s '%s'",
+                    localization::Tr("scenario.victory.capture_settlement.buka"),
                     HAS(targetTown->m_buildings, IDX(TOWN_BUILDING_CASTLE))
-                        ? "\xe7\xe0\xec\xee\xea"
-                        : "\xe3\xee\xf0\xee\xe4",
+                        ? localization::Tr("scenario.fragment.castle")
+                        : localization::Tr("scenario.fragment.town"),
                     targetTown->m_name
                 );
                 break;
@@ -2108,7 +2095,7 @@ void game::GetVictoryConditionText(char* text) {
                 victoryHero = GetHero(m_mapHeader.victoryConditionValue);
                 sprintf(
                     text,
-                    "\xcf\xee\xe1\xe5\xe4\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'",
+                    localization::Tr("scenario.victory.defeat_hero"),
                     victoryHero->m_name
                 );
                 break;
@@ -2117,13 +2104,12 @@ void game::GetVictoryConditionText(char* text) {
                 if (m_mapHeader.victoryConditionValue == 0)
                     sprintf(
                         text,
-                        "\xcd\xe0\xe9\xf2\xe8 \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2"
-                        "\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                        localization::Tr("scenario.victory.find_ultimate_artifact")
                     );
                 else
                     sprintf(
                         text,
-                        "\xcd\xe0\xe9\xf2\xe8 %s",
+                        localization::Tr("scenario.victory.find_artifact"),
                         gArtifactNames[m_mapHeader.victoryConditionValue - 1]
                     );
                 break;
@@ -2131,7 +2117,7 @@ void game::GetVictoryConditionText(char* text) {
             case MAP_VICTORY_ACCUMULATE_GOLD:
                 sprintf(
                     text,
-                    "\xd1\xee\xe1\xf0\xe0\xf2\xfc %d \xe7\xee\xeb\xee\xf2\xe0",
+                    localization::Tr("scenario.victory.accumulate_gold"),
                     m_mapHeader.victoryConditionValue * GAME_GOLD_CONDITION_MULTIPLIER
                 );
                 break;
@@ -2147,16 +2133,14 @@ void game::GetVictoryConditionText(char* text) {
                 if (localPlayerFirst)
                     sprintf(
                         text,
-                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
-                        "\xf2\xfc\xf1\xff",
+                        localization::Tr("scenario.victory.side_must_defeat"),
                         firstSide,
                         secondSideValue
                     );
                 else
                     sprintf(
                         text,
-                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
-                        "\xf2\xfc\xf1\xff",
+                        localization::Tr("scenario.victory.side_must_defeat"),
                         secondSideValue,
                         firstSide
                     );
@@ -2166,22 +2150,14 @@ void game::GetVictoryConditionText(char* text) {
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,
-                ", \xe8\xeb\xe8 \xe2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe8"
-                "\xe3\xf0\xe0\xf2\xfc, \xf3\xed\xe8\xf7\xf2\xee\xe6\xe8\xe2 "
-                "\xe2\xf1\xe5\xf5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5"
-                "\xf0\xee\xe5\xe2 \xe8 \xe7\xe0\xf5\xe2\xe0\xf2\xe8\xe2 \xe2\xf1"
-                "\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4"
-                "\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+                localization::Tr("scenario.victory.standard_alternative.suffix")
             );
         else
             strcat(text, ".");
     } else {
         strcpy(
             text,
-            "\xd3\xed\xe8\xf7\xf2\xee\xe6\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2\xf0"
-            "\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5\xf0\xee\xe5\xe2  \xe8 \xe7\xe0"
-            "\xf5\xe2\xe0\xf2\xe8\xf2\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1"
-            "\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+            localization::Tr("scenario.victory.standard")
         );
     }
 }
@@ -2210,9 +2186,9 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     if (onSide) {
         if (otherPlayerCount != 0) {
             if (otherPlayerCount > 1)
-                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8\xe8 \xf1\xee\xfe\xe7\xed\xe8\xea\xe8 ");
+                sprintf(text, localization::Tr("scenario.side.you_and_allies.prefix"));
             else
-                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8 \xf1\xee\xfe\xe7\xed\xe8\xea ");
+                sprintf(text, localization::Tr("scenario.side.you_and_ally.prefix"));
 
             listedPlayerCount = 0;
             for (i = firstPlayer; i <= lastPlayer; ++i) {
@@ -2224,17 +2200,17 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
                     if (listedPlayerCount < otherPlayerCount - 1)
                         strcat(text, ", ");
                     else if (listedPlayerCount < otherPlayerCount)
-                        strcat(text, " \xe8 ");
+                        strcat(text, localization::Tr("scenario.side.and"));
                 }
             }
         } else {
-            sprintf(text, "\xc2\xfb");
+            sprintf(text, localization::Tr("scenario.side.you"));
         }
     } else {
         if (sideCount > 1)
-            strcpy(text, "\xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xf1\xee\xfe\xe7 ");
+            strcpy(text, localization::Tr("scenario.side.enemy_alliance.prefix"));
         else
-            strcpy(text, "\xe2\xf0\xe0\xe3 - ");
+            strcpy(text, localization::Tr("scenario.side.enemy.prefix"));
 
         listedPlayerCount = 0;
         for (i = firstPlayer; i <= lastPlayer; ++i) {
@@ -2245,7 +2221,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             if (listedPlayerCount < otherPlayerCount - 1)
                 strcat(text, ", ");
             else if (listedPlayerCount < otherPlayerCount)
-                strcat(text, " \xe8 ");
+                strcat(text, localization::Tr("scenario.side.and"));
         }
     }
 

@@ -467,9 +467,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
-            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-            "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0 "
-            "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
+            localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
@@ -594,40 +592,40 @@ void game::CampaignInfoUpdate(i32 redraw) {
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->artifact) {
                     case ARTIFACT_MINOR_SCROLL:
-                        strcpy(gText, "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.minor_scroll"));
                         break;
                     case ARTIFACT_MAGE_RING:
-                        strcpy(gText, "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.mage_ring"));
                         break;
                     case ARTIFACT_DEFENDER_HELM:
                         strcpy(
                             gText,
-                            "\xd9\xeb\xe5\xec \xe7\xe0\xf9\xe8\xf2\xed\xe8\xea\xe0"
+                            localization::Tr("campaign.bonus.artifact.defender_helm")
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.power_axe"));
                         break;
                     case ARTIFACT_DRAGON_SWORD:
-                        strcpy(gText, "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.dragon_sword"));
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.breastplate"));
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
                             gText,
-                            "\xd1\xe8\xec\xe2\xee\xeb \xed\xe5\xf3\xe4\xe0\xf7\xe8"
+                            localization::Tr("campaign.bonus.artifact.fizbin_medal")
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
                         strcpy(
                             gText,
-                            "\xc3\xf0\xee\xec\xee\xe2\xe0\xff \xef\xe0\xeb\xe8\xf6\xe0"
+                            localization::Tr("campaign.bonus.artifact.thunder_mace")
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8");
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.gauntlets"));
                         break;
                     default:
                         sprintf(gText, "%s", gArtifactNames[IDX(choice->artifact)]);
@@ -636,7 +634,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_SPELL:
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
-                    sprintf(gText, "\xcf\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xe7\xe5\xec\xeb\xff\xed\xfb\xf5 \xfd\xeb.");
+                    sprintf(gText, localization::Tr("campaign.bonus.spell.summon_earth"));
                 else
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 break;
@@ -653,13 +651,13 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 sprintf(gText, "%d %s", choice->amount, armyName);
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-                sprintf(gText, "%d %s", choice->value, "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb");
+                sprintf(gText, "%d %s", choice->value, localization::Tr("campaign.bonus.puzzle_pieces.label"));
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2");
+                sprintf(gText, "%d %s", choice->value, localization::Tr("campaign.bonus.experience.label"));
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "\xed/\xe4");
+                sprintf(gText, localization::Tr("common.not_applicable"));
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
@@ -784,12 +782,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 }
                             } else {
                                 NormalDialog(
-                                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xea\xe0\xf0\xf2\xe0 - "
-                                    "\xef\xeb\xee\xf5\xee\xe9 \xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff "
-                                    "\xe2\xe0\xf8\xe5\xe3\xee "
-                                    "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee "
-                                    "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xff."
-                                    /* "Выбранная карта - плохой выбор для вашего следующего сценария." */
+                                    localization::Tr("campaign.selection.invalid_next_scenario")
+
                                     ,
                                     NORMAL_DIALOG_INFO
                                 );
