@@ -32,7 +32,8 @@ contracts and 988 selftests (seven skips) pass on the combined source.
 Fresh enum inventories cover all 96 C++ TUs: 7,177 retail / 7,176 strict members
 in 740 source blocks. Retained values agree with the prior full inventory plus
 the nine already-reviewed neutral frame renames. Each mode has one known inactive
-conditional block; the existing SDK/retail-analysis diagnostic limits remain.
+conditional block; each inventory reports 1,520 SDK dialect diagnostics and no
+accepted project-source diagnostic. This still is not a clean modern build.
 
 ## What is left
 
