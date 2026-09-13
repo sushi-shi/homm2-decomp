@@ -5,12 +5,12 @@
 #include <SOURCE/KB_TYPES.h>
 
 i32 CalcTerrainCost(
-    TerrainType,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    TerrainType terrain,
+    i32 diagonal,
+    i32 mobility,
+    i32 pathfindingLevel,
+    i32 useRoad,
+    i32 usePathfinding
 );
 
 #endif

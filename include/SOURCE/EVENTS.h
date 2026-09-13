@@ -331,9 +331,9 @@ typedef enum EventEffectConstant {
     EVENT_FIZZLE_STEPS               = 65
 } EventEffectConstant;
 
-i8 StrEqNoCase(const char*, const char*);
-i32 GiveArtifact(class hero* heroPtr, ArtifactType artifact, b32 checkEndGame, i8 extra = -1);
-void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
-i32 RiddleStringsEqual(const char*, const char*);
+i8 StrEqNoCase(const char* firstString, const char* sndString);
+i32 GiveArtifact(class hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra = -1);
+void GiveTakeArtifactStat(class hero* targetHero, ArtifactType artifact, b32 take);
+i32 RiddleStringsEqual(const char* answer, const char* expected);
 
 #endif

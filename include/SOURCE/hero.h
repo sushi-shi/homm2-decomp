@@ -192,46 +192,46 @@ public:
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
     hero(void);
-    void Read(i32, i8);
-    void Write(i32, i8);
+    void Read(i32 file, i8 expansion);
+    void Write(i32 file, i8 expansion);
     void GetArmyStrengths(u32l* const);
-    i32 HasArtifact(ArtifactType);
+    i32 HasArtifact(ArtifactType artifact);
     i32 CalcMobility(void);
-    i32 HasSpell(SpellType);
-    SpellType GetNthSpell(HeroSpellType, i32);
-    i32 GetNumSpells(HeroSpellType);
-    void UseSpell(SpellType);
-    void AddSpell(SpellType, i32);
+    i32 HasSpell(SpellType spell);
+    SpellType GetNthSpell(HeroSpellType type, i32 spellNumber);
+    i32 GetNumSpells(HeroSpellType type);
+    void UseSpell(SpellType spell);
+    void AddSpell(SpellType spell, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
-    void ViewStat(i32, i32);
-    void ViewArtifact(ArtifactType, b32, i32);
+    void ViewStat(i32 stat, i32 quickView);
+    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra);
     i32 Dismiss(void);
-    void Deallocate(i32);
-    i32 GetExperience(i32);
-    i32 GetLevel(i32);
+    void Deallocate(i32 updateMap);
+    i32 GetExperience(i32 level);
+    i32 GetLevel(i32 experienceValue);
     void ApplyBattleWinTemps(void);
     void ApplyBattleLossTemps(void);
     void CheckLevel(void);
     i32 NumArtifacts(void);
     void SetSS(
-        HeroSecondarySkill, HeroSkillLevel
+        HeroSecondarySkill skill, HeroSkillLevel level
     );
-    i32 TakeSS(HeroSecondarySkill, i32);
+    i32 TakeSS(HeroSecondarySkill skill, i32 levels);
     i32 GiveSS(
-        HeroSecondarySkill,
-        HeroSkillLevel
+        HeroSecondarySkill skill,
+        HeroSkillLevel levels
     );
-    i32 CreatureTypeCount(CreatureType);
+    i32 CreatureTypeCount(CreatureType creatureType);
     void UpgradeCreatures(
-        CreatureType, CreatureType
+        CreatureType oldCreatureType, CreatureType newCreatureType
     );
-    HeroSecondarySkill GetNthSS(i32);
+    HeroSecondarySkill GetNthSS(i32 ordinal);
     class town* GetOccupiedTown(void);
-    i8 Stats(HeroPrimaryStat);
-    i8 GetSSLevel(HeroSecondarySkill);
-    void DoSSLevelDialog(HeroSecondarySkill, i32);
-    void CheckAnduranPieces(b32);
+    i8 Stats(HeroPrimaryStat stat);
+    i8 GetSSLevel(HeroSecondarySkill skill);
+    void DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView);
+    void CheckAnduranPieces(b32 showDialog);
 };
 #pragma pack(pop)
 

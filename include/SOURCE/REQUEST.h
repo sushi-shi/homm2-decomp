@@ -77,10 +77,10 @@ struct SMapHeader {
 };
 #pragma pack(pop)
 
-i32 GetMapHeader(const char*, struct SMapHeader*);
-localization::TextEncoding GetMapHeaderTextEncoding(const struct SMapHeader*);
+i32 GetMapHeader(const char* filename, struct SMapHeader* header);
+localization::TextEncoding GetMapHeaderTextEncoding(const struct SMapHeader* header);
 i32 CheckSumIsDemoOK(const char*);
-i32 ShowThisMapGame(const char*);
+i32 ShowThisMapGame(const char* filename);
 i32 ShowThisMap(const char*);
 
 #endif

@@ -42,6 +42,6 @@ typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 extern OverviewTextWidgetRow* textWidgetDynamic;
 extern OverviewIconWidgetRow* iconWidgetDynamic;
 
-MessageDispatchResult OverviewHandler(struct tag_message&);
+MessageDispatchResult OverviewHandler(struct tag_message& message);
 
 #endif

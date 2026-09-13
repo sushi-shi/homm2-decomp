@@ -111,13 +111,13 @@ public:
     i32 OccupyingHero(void) {
         return m_occupyingHeroId;
     }
-    void GiveSpells(class hero*);
+    void GiveSpells(class hero* targetHero);
     void XformToCastle(void);
-    void View(i32);
+    void View(i32 noFade);
     void Deallocate(void);
-    void BuildBuilding(BuildingSlotType);
+    void BuildBuilding(BuildingSlotType building);
     i32 CanBuildDock(void);
-    void CalcNumLevelArchers(i32*, i32*);
+    void CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel);
 };
 #pragma pack(pop)
 extern b32 bEnteringTown;

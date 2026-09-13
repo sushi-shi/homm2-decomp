@@ -44,7 +44,7 @@ public:
     );
     virtual ~textWidget() override;
     virtual void Draw(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
+    virtual MessageDispatchResult Main(struct tag_message& msg) override;
     void Read(void);
     void SetColorIndex(FontDrawMode color);
     void SetText(const char* text);
