@@ -118,5 +118,32 @@ homm2 build --no-match --en
 
 `BEFORE` must be a separately saved/built pre-change raw-object tree. Generated
 evidence stays under `build/`; add concise dispositions here or in the existing
-finding reports, not another large committed audit dump. Downstream propagation
-and source/classic regeneration are subsequent work, not performed by this merge.
+finding reports, not another large committed audit dump.
+
+## Published downstream checkpoint (2026-09-13)
+
+The post-merge compatibility commit `2037def88` was used to regenerate
+`source-gold-2.1-buka` at `a2c70f14c` (RU/EN build logic preserved) and
+`classic-gold-2.1-buka` at `fdd70881c` (Russian UTF-8 view). Both are published.
+The portable first-parent source delta was then adapted and cherry-picked
+through the requested chain, preserving each branch's platform and mod changes:
+
+- `master`: `27153a20b`; native Debug build, 23/23 CTest checks.
+- `ironfist`: checkpoint `dbc8c451d`, Cyborg layout follow-up `72c5df764`;
+  native Debug build, 24/24 CTest checks.
+- `ironfist-master`: checkpoint `52b89b154`, adapted follow-up `d323df793`;
+  strict native Debug build, 26/26 CTest checks.
+
+All three portable tips are published and pass English/Russian startup-and-exit
+replays. Ironfist's Russian checks use the Buka locale overlay with Ironfist
+resources. These are smoke checks, not exhaustive gameplay or multiplayer proof.
+The mod follow-up covers Cyborg spell-count indices in both town setup and
+mage-guild construction; XML field tags and Lua API indexing remain compatible.
+The final branch retains its refactored engine methods and post-scaling ordinary
+Well suppression, with updated regression contracts.
+
+The full historical audit archive stays here on decomp; generated and portable
+branches do not duplicate it. Their `docs/reconstruction-checkpoint.md` links
+back to this continuation. Propagation is complete, but the six naming findings
+and broader audit backlog above remain open. This publication note is doc-only;
+generated-source code provenance remains `2037def88`.
