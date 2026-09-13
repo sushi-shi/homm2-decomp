@@ -35,7 +35,7 @@ public:
     void DrawGround(void);
     void DrawLowerDeadOccupants(void);
     void DrawUpperDeadOccupant(void);
-    void DrawOccupant(ArmyDrawState, i32);
+    void DrawOccupant(ArmyDrawState drawState, i32);
     void DrawTower(i32);
     void DrawClouds(void);
     void DrawObstacle(void);

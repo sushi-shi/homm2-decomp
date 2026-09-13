@@ -16,7 +16,7 @@ public:
     H2_ENUM_STORAGE(BuildingSlotType, i32) m_buildingId;
     icon* m_icon;
     border* m_border;
-    townObject(FactionType, H2_ENUM_PARAM(BuildingSlotType, i32), char*);
+    townObject(FactionType townType, H2_ENUM_PARAM(BuildingSlotType, i32) buildingId, char*);
     ~townObject();
     void Draw(i32);
 };

@@ -39,14 +39,14 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(H2_CONST char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void DrawStringExecute(H2_CONST char*, i32, i32, FontDrawMode mode, i32, i32, i32, i32);
     void PolishBoundedTextLayout(H2_CONST char*, char*, u32*, i32, i32*, char);
 
 public:
-    void DrawString(H2_CONST char*, i32, i32, FontDrawMode);
+    void DrawString(H2_CONST char*, i32, i32, FontDrawMode mode);
     i32 GetCharacterWidth(u8);
     void ExtractLine(H2_CONST char*, char*, i32*, i32, i32*, u8);
-    void DrawBoundedString(H2_CONST char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
+    void DrawBoundedString(H2_CONST char*, i32, i32, i32, i32, FontDrawMode mode, FontAlignment align);
     i32 LineLength(H2_CONST char*, i32);
     i32 LineWidth(H2_CONST char*);
 };

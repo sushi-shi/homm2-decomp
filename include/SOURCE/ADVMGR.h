@@ -124,17 +124,17 @@ H2_ENUM_BEGIN(AdventureAIStorageConstant)
 H2_ENUM_END(AdventureAIStorageConstant)
 
 i32 SaveGame(void);
-MessageDispatchResult DimensionDoorHandler(struct tag_message&);
-MessageDispatchResult TownPortalHandler(struct tag_message&);
+MessageDispatchResult DimensionDoorHandler(struct tag_message& message);
+MessageDispatchResult TownPortalHandler(struct tag_message& message);
 void ComputeAdvNetControl(void);
 i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
-MessageDispatchResult APanelHandler(struct tag_message&);
-MessageDispatchResult CPanelHandler(struct tag_message&);
+MessageDispatchResult APanelHandler(struct tag_message& message);
+MessageDispatchResult CPanelHandler(struct tag_message& message);
 void UpdateSystemOptions(i32);
-MessageDispatchResult SystemOptionsHandler(struct tag_message&);
+MessageDispatchResult SystemOptionsHandler(struct tag_message& message);
 i32 GetMobilityFrame(i32);
 i32 GetManaFrame(i32);
-u8 StopOnTrigger(class mapCell*);
+u8 StopOnTrigger(class mapCell* cell);
 
 extern float fFirstWeekTownFV;
 extern i32 iVepCacheHits;

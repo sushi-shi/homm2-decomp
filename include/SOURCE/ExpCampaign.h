@@ -109,11 +109,11 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
+    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
+    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
+    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(ExpansionCampaignId);
+    void InitNewCampaign(ExpansionCampaignId campaignId);
     void InitMap(void);
     void ShowInfo(i32, i32);
     void UpdateInfo(i32);
@@ -131,7 +131,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static MessageDispatchResult MessageHandler(struct tag_message&);
+    static MessageDispatchResult MessageHandler(struct tag_message& message);
 
 public:
     void Autosave(void);

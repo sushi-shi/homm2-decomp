@@ -344,12 +344,12 @@ MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& msg)
 
 VA(0x004b7270, 0x36)
 MessageDispatchResult
-heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
+heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value) {
     tag_message msg;
     msg.type = type;
-    msg.payload.widget.command = p2;
-    msg.payload.widget.id = p3;
-    msg.payload.widget.data.value = p4;
+    msg.payload.widget.command = command;
+    msg.payload.widget.id = widgetId;
+    msg.payload.widget.data.value = value;
     return Main(msg);
 }
 

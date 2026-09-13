@@ -123,7 +123,7 @@ public:
     void SeedPosition(
         i32,
         i32,
-        H2_ENUM_PARAM(MapDirection, i32),
+        H2_ENUM_PARAM(MapDirection, i32) seedDirection,
         i32,
         i32,
         i32,
@@ -141,7 +141,7 @@ public:
     void PushPoint(
         i32,
         i32,
-        H2_ENUM_PARAM(MapDirection, i32),
+        H2_ENUM_PARAM(MapDirection, i32) direction,
         i32,
         i32,
         i32,
@@ -155,14 +155,14 @@ public:
     void TestPossibleDirections(
         i32,
         i32,
-        H2_ENUM_STORAGE(TerrainType, i8) * const,
+        H2_ENUM_STORAGE(TerrainType, i8) * const terrain,
         i8* const,
         i32,
         i32
     );
-    void SeedCombatPosition(class army*);
-    i32 FindCombatPath(i32, i32, class army*, ArmyPathTarget, i32);
-    void PushCombatPoint(i32, H2_ENUM_PARAM(CombatHexDirection, i32), i32, i32);
+    void SeedCombatPosition(class army* unit);
+    i32 FindCombatPath(i32, i32, class army* unit, ArmyPathTarget attackPath, i32);
+    void PushCombatPoint(i32, H2_ENUM_PARAM(CombatHexDirection, i32) direction, i32, i32);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];
     }

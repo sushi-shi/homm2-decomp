@@ -26,10 +26,10 @@ public:
     void Write(i32);
     void Read(i32, i32);
     void ChangeTilesetIndex(
-        class mapCell*,
+        class mapCell* cell,
         i32,
         i32,
-        H2_ENUM_PARAM(TilesetId, i32),
+        H2_ENUM_PARAM(TilesetId, i32) tileset,
         i32,
         i32,
         i32

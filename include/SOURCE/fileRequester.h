@@ -98,12 +98,12 @@ public:
     i32 m_result;
     char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
-    fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
+    fileRequester(i32, i32, FileRequesterMode mode, char*, char*, char*);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     i32 InitializeFiles(char*, char*, i32);
-    i32 MapExistsForFilter(FileRequesterMapSizeFilter);
+    i32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
     void SetupFiles(void);
     void CleanUpData(void);
     void SetOK(i32);

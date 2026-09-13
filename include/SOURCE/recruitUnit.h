@@ -37,11 +37,11 @@ public:
     i32 m_goldTotal;
     i32 m_resourceTotal;
     i32 m_quantity;
-    recruitUnit(class armyGroup*, CreatureType, i16*);
-    recruitUnit(class town*, i32, i32);
+    recruitUnit(class armyGroup* army, CreatureType creatureType, i16*);
+    recruitUnit(class town* townData, i32, i32);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Update(void);
 };
 #pragma pack(pop)

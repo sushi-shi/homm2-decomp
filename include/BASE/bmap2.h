@@ -5,9 +5,9 @@
 
 class bitmap;
 
-void FillBitmapArea(class bitmap* bitmap, i32 x, i32 y, i32 width, i32 height, i32 color);
+void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 width, i32 height, i32 color);
 void FillBitmapAreaClip(
-    class bitmap* bitmap,
+    class bitmap* bmp,
     i32 x,
     i32 y,
     i32 width,
@@ -19,15 +19,15 @@ void FillBitmapAreaClip(
     i32 clipHeight
 );
 void BlitBitmap(
-    class bitmap* source,
+    class bitmap* src,
     i32 sourceX,
     i32 sourceY,
     i32 width,
     i32 height,
-    class bitmap* destination,
+    class bitmap* dst,
     i32 destinationX,
     i32 destinationY
 );
-void DimBitmapArea(class bitmap* bitmap, i32 x, i32 y, i32 width, i32 height, i32 level);
+void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 width, i32 height, i32 level);
 
 #endif

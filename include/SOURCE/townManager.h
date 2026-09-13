@@ -66,7 +66,7 @@ public:
     townManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void SetupExtraStuff(void);
     void SetTown(class town* townData) {
         m_town = townData;
@@ -75,23 +75,23 @@ public:
     void SetupTown(void);
     void UnloadTown(void);
     void SetArmyCommand(i32);
-    void SetCommandAndText(struct tag_message&);
+    void SetCommandAndText(struct tag_message& message);
     void ShowText(char*);
-    void DoCommand(TownManagerArmyCommand);
+    void DoCommand(TownManagerArmyCommand command);
     void RedrawTownScreen(void);
     void SplitArmy(void);
     void ShiftQualChange(void);
     void ResetStrips(void);
-    void Toggle(H2_ENUM_PARAM(BuildingSlotType, i32));
+    void Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building);
     void DrawTown(i32, i32);
-    i32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32), i32, i32);
-    void BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32));
-    void SetupMage(class heroWindow*);
+    i32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32) building, i32, i32);
+    void BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building);
+    void SetupMage(class heroWindow* window);
     i32 RecruitHero(i32, i32);
     void DoTavern(void);
-    void SetupWell(class heroWindow*);
-    void SetupThievesGuild(class heroWindow*, i32);
-    void SetupCastle(class heroWindow*, i32);
+    void SetupWell(class heroWindow* window);
+    void SetupThievesGuild(class heroWindow* window, i32);
+    void SetupCastle(class heroWindow* window, i32);
 };
 #pragma pack(pop)
 SIZE(townManager, 0x17a);

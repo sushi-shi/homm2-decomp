@@ -44,8 +44,8 @@ public:
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void GetBackdrop(H2_CONST char*, class bitmap*, i32);
-    void GetBackdropAtLoc(H2_CONST char*, class bitmap*, i32, i32, i32);
+    void GetBackdrop(H2_CONST char*, class bitmap* backdrop, i32);
+    void GetBackdropAtLoc(H2_CONST char*, class bitmap* destination, i32, i32, i32);
     class palette* GetPalette(H2_CONST char*);
     class bitmap* GetBitmap(H2_CONST char*);
     class icon* GetIcon(H2_CONST char*);
@@ -55,11 +55,11 @@ public:
     class font* GetFont(H2_CONST char*);
     class sample* GetSample(H2_CONST char*);
     class MIDIWrap* GetMIDIWrap(H2_CONST char*);
-    void Dispose(class resource*);
-    void AddResource(class resource*);
+    void Dispose(class resource* resourceToDispose);
+    void AddResource(class resource* newResource);
     void Expunge(void);
     class resource* Query(u32l);
-    void RemoveResource(class resource*);
+    void RemoveResource(class resource* resourceToRemove);
     i32 LoadAggregateHeader(H2_CONST char*);
     void PointToFile(u32l);
     u32l GetFileSize(u32l);

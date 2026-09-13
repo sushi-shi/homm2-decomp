@@ -2767,10 +2767,10 @@ void ClearMapExtra(void) {
 }
 
 VA(0x0046ba95, 0x79)
-i32 GetMonType(i32 score, HighScoreType campaign) {
+i32 GetMonType(i32 score, HighScoreType highScoreType) {
     i32 idx;
     for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
-        if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
+        if (highScoreType == HIGH_SCORE_CAMPAIGN || highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
             if (score <= giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)])
                 return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
         } else {

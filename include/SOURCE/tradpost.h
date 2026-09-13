@@ -30,9 +30,9 @@ H2_ENUM_END(TradingPostConstant)
 void DoTradingPost(i32, float);
 void UpdateTradingPost(i32);
 void ComputeTradeRatios(i32, i32, i32*, i32*, i32*);
-void DoTradeKnob(struct tag_message);
+void DoTradeKnob(struct tag_message message);
 void SetupNewTrade(void);
-MessageDispatchResult TradingPostHandler(struct tag_message&);
+MessageDispatchResult TradingPostHandler(struct tag_message& message);
 
 extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
 extern class iconWidget* tradeKnob;

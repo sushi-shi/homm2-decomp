@@ -190,17 +190,17 @@ public:
     void Read(i32, i8);
     void Write(i32, i8);
     void GetArmyStrengths(u32l* const);
-    i32 HasArtifact(ArtifactType);
+    i32 HasArtifact(ArtifactType artifact);
     i32 CalcMobility(void);
-    i32 HasSpell(SpellType);
-    SpellType GetNthSpell(HeroSpellType, i32);
-    i32 GetNumSpells(HeroSpellType);
-    void UseSpell(SpellType);
-    void AddSpell(H2_ENUM_PARAM(SpellType, i32), i32);
+    i32 HasSpell(SpellType spell);
+    SpellType GetNthSpell(HeroSpellType type, i32);
+    i32 GetNumSpells(HeroSpellType type);
+    void UseSpell(SpellType spell);
+    void AddSpell(H2_ENUM_PARAM(SpellType, i32) spell, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32, i32);
-    void ViewArtifact(ArtifactType, b32, i32);
+    void ViewArtifact(ArtifactType artifact, b32, i32);
     i32 Dismiss(void);
     void Deallocate(i32);
     i32 GetExperience(i32);
@@ -210,22 +210,22 @@ public:
     void CheckLevel(void);
     i32 NumArtifacts(void);
     void SetSS(
-        H2_ENUM_PARAM(HeroSecondarySkill, i32), H2_ENUM_PARAM(HeroSkillLevel, i32)
-    );
-    i32 TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+        H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, H2_ENUM_PARAM(HeroSkillLevel, i32)
+     level);
+    i32 TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32);
     i32 GiveSS(
-        H2_ENUM_PARAM(HeroSecondarySkill, i32),
+        H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
         H2_ENUM_PARAM(HeroSkillLevel, i32)
-    );
-    i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32));
+     levels);
+    i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType);
     void UpgradeCreatures(
-        H2_ENUM_PARAM(CreatureType, i32), H2_ENUM_PARAM(CreatureType, i32)
-    );
+        H2_ENUM_PARAM(CreatureType, i32) oldCreatureType, H2_ENUM_PARAM(CreatureType, i32)
+     newCreatureType);
     HeroSecondarySkill GetNthSS(i32);
     class town* GetOccupiedTown(void);
-    i8 Stats(HeroPrimaryStat);
-    i8 GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32));
-    void DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+    i8 Stats(HeroPrimaryStat stat);
+    i8 GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill);
+    void DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32);
     void CheckAnduranPieces(b32);
 };
 #pragma pack(pop)

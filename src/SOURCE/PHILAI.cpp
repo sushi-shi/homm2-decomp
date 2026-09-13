@@ -2856,12 +2856,12 @@ i32 philAI::CreaturesToBuy(town* t, i32 level) {
 }
 
 VA(0x00483e3a, 0x47)
-i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b) {
-    i32 n = MaxBuyableCreatures(a);
+i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) creatureType, i32 availableCount) {
+    i32 n = MaxBuyableCreatures(creatureType);
     if (n > 1)
         n >>= 1;
-    if (n > b)
-        n = b;
+    if (n > availableCount)
+        n = availableCount;
     if (n > 1)
         return n;
     else
@@ -2869,11 +2869,11 @@ i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b) {
 }
 
 VA(0x00483e81, 0x82)
-i32 philAI::MaxBuyableCreatures(CreatureType level) {
+i32 philAI::MaxBuyableCreatures(CreatureType creatureType) {
     i32 res;
     i32 i;
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
-    GetMonsterCost(level, cost);
+    GetMonsterCost(creatureType, cost);
     for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
         if (cost[i] == 0)
             res = CREATURE_PURCHASE_UNLIMITED;
@@ -5198,17 +5198,17 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 }
 
 VA(0x00488e2b, 0x8a)
-i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
-    i32 cnt = gpCurAIHero->CreatureTypeCount(a1);
+i32 philAI::ComputeUpgradeValue(CreatureType baseCreatureType, CreatureType upgradedCreatureType) {
+    i32 cnt = gpCurAIHero->CreatureTypeCount(baseCreatureType);
     if (cnt == 0)
         return 0;
     i32 rv = static_cast<i32>(
         static_cast<float>(
-            cnt * (gMonsterDatabase[IDX(a2)].fightValue - gMonsterDatabase[IDX(a1)].fightValue)
+            cnt * (gMonsterDatabase[IDX(upgradedCreatureType)].fightValue - gMonsterDatabase[IDX(baseCreatureType)].fightValue)
         )
         * gpCurPlayer->m_aiData.m_upgradeValueWeight
     );
-    if (gpCurAIHero->CreatureTypeCount(a2) != 0)
+    if (gpCurAIHero->CreatureTypeCount(upgradedCreatureType) != 0)
         rv = static_cast<i32>(rv * AI_UPGRADE_EXISTING_STACK_FACTOR);
     return rv;
 }

@@ -7,13 +7,13 @@ class bitmap;
 class icon;
 
 void FlipDimIconToBitmap(
-    class icon*,
-    class bitmap*,
+    class icon* srcIcon,
+    class bitmap* dest,
     i32,
     i32,
     i32,
     i32,
-    H2_ENUM_PARAM(IconDrawClipMode, i32),
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32,
     i32,
     i32,

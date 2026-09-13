@@ -46,13 +46,13 @@ SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
 SIZE(SmackSum, 0x54);
 
-void DoAdvance(Smack*, i32, i32, i32, i32);
+void DoAdvance(Smack* smack, i32, i32, i32, i32);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
 i32 PlaySmacker(i32);
 ExpansionCampaignId ExpansionCampaignRect(i32, i32);
-i8 PointInRect(i32, i32, struct tag_rect*);
-void PrintSummaryInfo(SmackSum*);
+i8 PointInRect(i32, i32, struct tag_rect* rect);
+void PrintSummaryInfo(SmackSum* summary);
 
 extern b32 bSmackSound;
 extern class icon* brotherIcon;

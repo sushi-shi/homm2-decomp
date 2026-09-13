@@ -156,16 +156,16 @@ public:
     advManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void StartCursor(H2_ENUM_PARAM(MapDirection, i32));
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    void StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction);
     void StopCursor(i32);
     void DrawCursor(void);
     void DrawCursorShadow(void);
-    i32 GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32));
-    void TurnTo(H2_ENUM_PARAM(MapDirection, i32));
-    b32 GetMoveShowIt(class hero*, H2_ENUM_PARAM(MapDirection, i32));
+    i32 GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction);
+    void TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction);
+    b32 GetMoveShowIt(class hero* movingHero, H2_ENUM_PARAM(MapDirection, i32) direction);
     class mapCell* MoveHero(
-        H2_ENUM_PARAM(MapDirection, i32),
+        H2_ENUM_PARAM(MapDirection, i32) direction,
         i32,
         i32*,
         i32*,
@@ -175,19 +175,19 @@ public:
         i32
     );
     void CheckAdjacentMon(i32*);
-    i32 ValidMoveWithEvent(class hero*, H2_ENUM_PARAM(MapDirection, i32));
-    i32 ValidMove(H2_ENUM_PARAM(MapDirection, i32), i32);
+    i32 ValidMoveWithEvent(class hero* movingHero, H2_ENUM_PARAM(MapDirection, i32) direction);
+    i32 ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32);
     void MoveOrigin(i32, i32);
-    void ProcessMapChange(struct SMapChange);
-    void ProcessIncomingSingleMapChange(struct SMapChange*);
+    void ProcessMapChange(struct SMapChange change);
+    void ProcessIncomingSingleMapChange(struct SMapChange* incoming);
     void ProcessIncomingGroupMapChange(char*);
     void PurgeMapChangeQueue(void);
     void UnwindMapChangeQueue(i32, i32);
-    void ViewWorld(SpellType, b32, b32);
+    void ViewWorld(SpellType whatToDraw, b32, b32);
     void VWCleanup(void);
     void VWInit(i32, i32);
     void VWCompleteDraw(void);
-    void GetCursorSampleSet(ConfigWalkSpeed);
+    void GetCursorSampleSet(ConfigWalkSpeed sampleSet);
     class mapCell* DoAdvCommand(void);
     i32 GetCommandTargetX(void) {
         return m_commandTargetX;
@@ -197,15 +197,15 @@ public:
     }
     void CheckSetEvilInterface(i32, i32);
     void Reseed(i32, i32);
-    MessageDispatchResult ProcessSelect(struct tag_message*, class mapCell**);
-    MessageDispatchResult ProcessDeSelect(struct tag_message*, i32*, class mapCell**);
+    MessageDispatchResult ProcessSelect(struct tag_message* message, class mapCell** eventCell);
+    MessageDispatchResult ProcessDeSelect(struct tag_message* message, i32*, class mapCell** eventCell);
     i32 ProcessSearch(i32, i32);
     MessageDispatchResult ProcessHover(i32, i32);
     void UpdateScreen(i32, i32);
     void CompleteDraw(i32, i32, i32, i32);
     void CompleteDraw(i32);
     i32 GetCloudLookup(i32, i32);
-    void DrawCell(i32, i32, i32, i32, AdventureDrawMask, i32);
+    void DrawCell(i32, i32, i32, i32, AdventureDrawMask drawMask, i32);
     class mapCell* GetCell(i32, i32);
     void UpdateRadar(i32, i32);
     void QuickInfo(i32, i32);
@@ -220,7 +220,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    H2_CONST char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32));
+    H2_CONST char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar);
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
@@ -231,7 +231,7 @@ public:
     void SetHeroContext(i32, i32);
     void DoHeroKnob(void);
     void DoTownKnob(void);
-    void CastSpell(SpellType);
+    void CastSpell(SpellType spell);
     void CheckCastSpell(void);
     i32 ComboDraw(i32, i32, i32);
     i32 ComboDraw(i32);
@@ -239,9 +239,9 @@ public:
     void CheckLoadSample(i32);
     AdventureEnvironmentSoundId GetSoundId(i32, i32);
     void InsertSound(i32, i32, i32, i32);
-    void TeleportTo(class hero*, i32, i32, i32, i32);
+    void TeleportTo(class hero* mapHero, i32, i32, i32, i32);
     void DimensionDoor(void);
-    void TownGate(SpellType);
+    void TownGate(SpellType spellId);
     void SummonBoat(void);
     void ShowRoute(i32, i32, i32);
     void HideRoute(i32, i32, i32);
@@ -249,13 +249,13 @@ public:
     void CheckDimNextHeroBut(void);
     void SeedTo(i32, i32);
     void ForceNewHover(void);
-    void ScreenScroll(H2_ENUM_PARAM(MapDirection, i32), i32);
+    void ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32);
     void CheckScreenScroll(void);
     i32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);
     void LoadRemote(void);
     char* CheckHandleNet(void);
-    MessageDispatchResult CheckHandleNetPlayerWait(struct tag_message&, i32);
+    MessageDispatchResult CheckHandleNetPlayerWait(struct tag_message& message, i32);
     void TrimLoopingSounds(i32);
     void DisableButtons(void);
     void EnableButtons(void);
@@ -267,31 +267,31 @@ public:
     void AdvPanel(void);
     i32 ControlPanel(void);
     void SystemOptions(void);
-    i32 DoVisions(class hero*);
+    i32 DoVisions(class hero* visionHero);
     i32 IsCrystalBallInEffect(i32, i32, i32);
-    void DoEvent(class mapCell*, i32, i32);
-    void EraseObj(class mapCell*, i32, i32);
-    void HeroSwap(class hero*, class hero*);
-    i32 BarrierEvent(class mapCell*, class hero*);
-    void PasswordEvent(class mapCell*, class hero*);
-    void GenericSiteEvent(class mapCell*, class hero*);
-    void RecruitSiteEvent(class mapCell*, class hero*);
-    void ExpansionRecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), i16*);
-    void JailEvent(class mapCell*, class hero*, i32, i32);
-    void TownEvent(class mapCell*, i32, i32);
-    void EventSound(H2_ENUM_PARAM(MapObjectType, i32), i32, SAMPLE2*);
+    void DoEvent(class mapCell* cell, i32, i32);
+    void EraseObj(class mapCell* cell, i32, i32);
+    void HeroSwap(class hero* firstHero, class hero* secondHero);
+    i32 BarrierEvent(class mapCell* cell, class hero*);
+    void PasswordEvent(class mapCell* cell, class hero*);
+    void GenericSiteEvent(class mapCell* cell, class hero* eventHero);
+    void RecruitSiteEvent(class mapCell* cell, class hero* eventHero);
+    void ExpansionRecruitEvent(class hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, i16*);
+    void JailEvent(class mapCell* cell, class hero* eventHero, i32, i32);
+    void TownEvent(class mapCell* cell, i32, i32);
+    void EventSound(H2_ENUM_PARAM(MapObjectType, i32) eventType, i32, SAMPLE2* outSample);
     void EventWindow(i32, i32, H2_CONST char*, i32, i32, i32, i32, i32);
-    ArtifactType GiveRandomArtifact(class hero*);
-    i32 GiveExperience(class hero*, i32, i32);
-    void GiveResource(class hero*, ResourceType, i32);
-    void RecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), class mapCell*);
-    i32 SkeletonEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
-    i32 ZombieEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
-    i32 GhostEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
-    void HouseEvent(class hero*, class mapCell*);
+    ArtifactType GiveRandomArtifact(class hero* eventHero);
+    i32 GiveExperience(class hero* eventHero, i32, i32);
+    void GiveResource(class hero* eventHero, ResourceType resourceType, i32);
+    void RecruitEvent(class hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, class mapCell* cell);
+    i32 SkeletonEvent(class hero* eventHero, class mapCell* cell, H2_CONST char*, i32, i32);
+    i32 ZombieEvent(class hero* eventHero, class mapCell* cell, H2_CONST char*, i32, i32);
+    i32 GhostEvent(class hero* eventHero, class mapCell* cell, H2_CONST char*, i32, i32);
+    void HouseEvent(class hero* eventHero, class mapCell* cell);
     CombatResult CombatMonsterEvent(
-        class hero*,
-        CreatureType,
+        class hero* eventHero,
+        CreatureType monsterType,
         i32,
         class mapCell*,
         i32,
@@ -299,27 +299,27 @@ public:
         i32,
         i32,
         i32,
-        H2_ENUM_PARAM(CreatureType, i32),
+        H2_ENUM_PARAM(CreatureType, i32) secondaryType,
         i32,
         i32,
-        H2_ENUM_PARAM(CreatureType, i32),
+        H2_ENUM_PARAM(CreatureType, i32) tertiaryType,
         i32,
         i32
     );
-    void TransferArtifacts(class hero*, class hero*);
-    void HeroLoses(class hero*);
-    void DoWhirlpool(class hero*);
+    void TransferArtifacts(class hero* sourceHero, class hero* destinationHero);
+    void HeroLoses(class hero* lostHero);
+    void DoWhirlpool(class hero* eventHero);
     void FizzleCenter(i32);
-    void DoAIEvent(class mapCell*, class hero*, i32, i32);
-    i32 BarrierAIEvent(class mapCell*, class hero*);
-    void PasswordAIEvent(class mapCell*, class hero*);
-    void GenericSiteAIEvent(class mapCell*, class hero*);
-    void RecruitSiteAIEvent(class mapCell*, class hero*);
-    void JailAIEvent(class mapCell*, class hero*, i32, i32);
+    void DoAIEvent(class mapCell* cell, class hero* eventHero, i32, i32);
+    i32 BarrierAIEvent(class mapCell* cell, class hero*);
+    void PasswordAIEvent(class mapCell* cell, class hero*);
+    void GenericSiteAIEvent(class mapCell* cell, class hero* eventHero);
+    void RecruitSiteAIEvent(class mapCell* cell, class hero* eventHero);
+    void JailAIEvent(class mapCell* cell, class hero* eventHero, i32, i32);
     void PlayerMonsterInteract(
-        class mapCell*,
-        class mapCell*,
-        class hero*,
+        class mapCell* cell,
+        class mapCell* combatCell,
+        class hero* eventHero,
         i32*,
         i32,
         i32,
@@ -327,16 +327,16 @@ public:
         i32,
         i32
     );
-    void ComputerMonsterInteract(class mapCell*, class hero*, i32*);
+    void ComputerMonsterInteract(class mapCell* cell, class hero* eventHero, i32*);
     i32 DoNetCombat(char*);
     CombatResult DoCombat(
         i32,
         i32,
-        class hero*,
-        class armyGroup*,
-        class town*,
-        class hero*,
-        class armyGroup*,
+        class hero* firstHero,
+        class armyGroup* firstArmy,
+        class town* combatTown,
+        class hero* secondHero,
+        class armyGroup* secondArmy,
         i32,
         i32,
         i32,
@@ -345,16 +345,16 @@ public:
     void SendHeroTownData(
         i32,
         i32,
-        class hero*,
-        class armyGroup*,
-        class town*,
-        class hero*,
-        class armyGroup*,
+        class hero* firstHero,
+        class armyGroup* firstArmy,
+        class town* combatTown,
+        class hero* secondHero,
+        class armyGroup* secondArmy,
         i32,
         i32,
         i32,
         i32,
-        H2_ENUM_PARAM(CombatResult, i32),
+        H2_ENUM_PARAM(CombatResult, i32) combatResult,
         i32,
         i32
     );
@@ -363,26 +363,26 @@ public:
         i32*,
         i32*,
         i32*,
-        class hero**,
-        class armyGroup**,
-        class town**,
-        class hero**,
-        class armyGroup**,
+        class hero** firstHero,
+        class armyGroup** firstArmy,
+        class town** combatTown,
+        class hero** secondHero,
+        class armyGroup** secondArmy,
         i32*,
         i32*,
         i32*,
-        H2_ENUM_STORAGE(CombatResult, i8)*,
+        H2_ENUM_STORAGE(CombatResult, i8)* combatResult,
         i8*,
         i8*
     );
     CombatResult AutoResolveCombat(
         i32,
         i32,
-        class hero*,
-        class armyGroup*,
-        class town*,
-        class hero*,
-        class armyGroup*,
+        class hero* firstHero,
+        class armyGroup* firstArmy,
+        class town* combatTown,
+        class hero* secondHero,
+        class armyGroup* secondArmy,
         i32,
         i32,
         i32,

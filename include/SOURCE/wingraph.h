@@ -80,7 +80,7 @@ void __cdecl UpdatePalette(i8*);
 void CleanUpWinGraphics(void);
 void SetFullScreenStatus(b32);
 i32 QueryNewPalette(void);
-i32 SetGraphicsType(WingraphGraphicsType);
+i32 SetGraphicsType(WingraphGraphicsType graphicsType);
 
 extern WingraphGraphicsType giGraphicsType;
 

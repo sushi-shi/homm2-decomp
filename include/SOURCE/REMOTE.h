@@ -61,7 +61,7 @@ SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
 SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);
-void RemoteMain(RemoteGameMode);
+void RemoteMain(RemoteGameMode gameMode);
 void UnloadRemoteDriver(i16);
 i32 calc_crc_long(u8*, i32);
 void calc_crc(u16*, u8*, i32);

@@ -115,10 +115,10 @@ void WritePrefs(void);
 i32 IsCDDrive(i32);
 bool DriveSupportsFreeSpaceQuery(char);
 H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void);
-void BitmapToScreen(class bitmap*);
+void BitmapToScreen(class bitmap* bmp);
 void SetPalette(i8*, i32);
-void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
-void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
+void BlitBitmapToScreenNoMouseCheck(class bitmap* bmp, i32, i32, i32, i32, i32, i32);
+void BlitBitmapToScreen(class bitmap* bmp, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(H2_CONST char*);
 void LogInt(

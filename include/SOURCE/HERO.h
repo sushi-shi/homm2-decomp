@@ -7,8 +7,8 @@
 struct tag_message;
 
 void HeroMessageUpdate(H2_CONST char*);
-void UpdateHeroScreenStatusBar(struct tag_message&);
-MessageDispatchResult HeroHandler(struct tag_message&);
+void UpdateHeroScreenStatusBar(struct tag_message& message);
+MessageDispatchResult HeroHandler(struct tag_message& message);
 void RedrawHeroScreen(void);
 i32 HeroView(i32, b32, b32);
 void SetupHeroView(void);

@@ -149,9 +149,9 @@ H2_ENUM_END(GameHeroPoolConstant)
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32);
 void GenerateStandardFileName(char*, char*);
-MessageDispatchResult ViewSpellsHandler(struct tag_message&);
-MessageDispatchResult ViewSpecialHandler(struct tag_message&);
-MessageDispatchResult ViewArmyHandler(struct tag_message&);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& msg);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& msg);
+MessageDispatchResult ViewArmyHandler(struct tag_message& msg);
 i32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32);
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
