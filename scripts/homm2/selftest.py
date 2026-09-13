@@ -35,7 +35,7 @@ PACKAGE = SCRIPTS / "homm2"
 # commit that removes the tests, so the drop is reviewed rather than absorbed.
 # The one-off enum-review verifier and its 20 tests were removed; the reusable
 # enum inventory keeps its 12 focused tests.
-MINIMUM_CASES = 981
+MINIMUM_CASES = 986
 
 
 def _packages():

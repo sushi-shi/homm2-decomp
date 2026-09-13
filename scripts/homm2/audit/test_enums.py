@@ -35,6 +35,50 @@ class EnumAuditTests(unittest.TestCase):
         self.assertEqual([(row.name, row.value, row.enum) for row in rows],
                          [("A", 7, "Domain"), ("B", 8, "Domain")])
 
+    def test_same_line_enums_keep_distinct_owners(self):
+        rows = self.scan("enum First { A = 1 }; enum Second { B = 2 };")
+        self.assertEqual([(row.name, row.enum) for row in rows],
+                         [("A", "First"), ("B", "Second")])
+        self.assertEqual(len({row.enum_offset for row in rows}), 2)
+
+    def test_same_line_macro_enums_keep_distinct_owners(self):
+        rows = self.scan("#define H2_ENUM_BEGIN(name) enum {\n"
+                         "#define H2_ENUM_END(name) }; typedef int name;\n"
+                         "H2_ENUM_BEGIN(First) A = 1 H2_ENUM_END(First) "
+                         "H2_ENUM_BEGIN(Second) B = 2 H2_ENUM_END(Second)")
+        self.assertEqual([(row.name, row.enum) for row in rows],
+                         [("A", "First"), ("B", "Second")])
+
+    def test_owner_offsets_are_utf8_bytes(self):
+        text = "/* русский */ enum First { A = 1 }; enum Second { B = 2 };"
+        rows = self.scan(text)
+        self.assertEqual([(row.name, row.enum) for row in rows],
+                         [("A", "First"), ("B", "Second")])
+        for row in rows:
+            self.assertEqual(row.enum_offset, len(text[:text.index("enum " + row.enum)].encode("utf-8")))
+
+    def test_comments_and_multiline_names_do_not_change_owners(self):
+        rows = self.scan("enum /* enum Wrong */\n First { A = 1 }; "
+                         "enum { B = 2 /* enum AlsoWrong */ }; "
+                         "enum struct\n Second { C = 3 };", arguments=("-std=c++20",))
+        self.assertEqual(rows[0].enum, "First")
+        self.assertTrue(rows[1].enum.startswith("anonymous@"))
+        self.assertEqual(rows[2].enum, "Second")
+
+    def test_same_line_unobserved_enum_is_a_coverage_gap(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "src").mkdir()
+            source = root / "src/test.cpp"
+            source.write_text("#define OMIT(...)\n"
+                              "enum Active { A = 1 }; OMIT(enum Inactive { B = 2 };)\n")
+            entries = [{"directory": str(root), "file": str(source)}]
+            with patch("homm2.audit.enums._entries", return_value=entries), \
+                 patch("homm2.audit.enums._clang_args", return_value=["-x", "c++"]):
+                report = collect(root)
+            self.assertEqual([row["enum"] for row in report["constants"]], ["Active"])
+            self.assertEqual([row["enum"] for row in report["unobserved_blocks"]], ["Inactive"])
+
     def test_local_enum_is_not_lost_when_pruning_function_bodies(self):
         rows = self.scan("int f() {\n enum Local { COUNT = 3 };\n return COUNT;\n}")
         self.assertEqual([(row.name, row.enum) for row in rows], [("COUNT", "Local")])

@@ -13,7 +13,6 @@ from dataclasses import asdict, dataclass
 from functools import lru_cache
 import json
 from pathlib import Path
-import re
 import sys
 
 import clang.cindex as ci
@@ -21,7 +20,7 @@ import clang.cindex as ci
 from homm2.audit.bool_fields import _entries, _project_relative, _reviewed_exceptions
 from homm2.build.annotated_data import _clang_args, configure_libclang
 from homm2.clang_options import ClangMode
-from homm2.constants_syntax import parse_enum_declarations
+from homm2.constants_syntax import lex, parse_enum_declarations
 from homm2.core.paths import REPO
 
 
@@ -35,20 +34,30 @@ class Constant:
     offset: int
     enum: str
     enum_line: int
+    enum_offset: int
 
 
 @lru_cache(None)
 def source_blocks(path: Path) -> list[dict]:
     text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
     result = []
     for block in parse_enum_declarations(path, text):
-        opening = lines[block.line - 1]
-        match = re.search(r"H2_ENUM\w*_BEGIN\w*\s*\(\s*(\w+)|"
-                          r"\benum\s+(?:class\s+)?(\w+)", opening)
-        name = next((part for part in match.groups() if part), "") if match else ""
+        opening = text[block.start:block.end]
+        tokens = lex(opening)
+        if tokens[0].text.startswith("H2_ENUM"):
+            name = tokens[2].text
+        else:
+            name_index = 2 if tokens[0].text == "typedef" else 1
+            if tokens[name_index].text in {"class", "struct"}:
+                name_index += 1
+            candidate = tokens[name_index].text
+            name = candidate if candidate.isidentifier() else ""
+        # The lexer indexes Unicode characters; Clang locations index UTF-8 bytes.
+        offset = len(text[:block.start].encode("utf-8"))
+        end_offset = offset + len(opening.encode("utf-8"))
         result.append({"line": block.line, "end_line": block.end_line,
-                       "enum": name or f"anonymous@{block.line}"})
+                       "offset": offset, "end_offset": end_offset,
+                       "enum": name or f"anonymous@{block.line}:{offset}"})
     return result
 
 
@@ -107,12 +116,12 @@ def scan_file(path: Path, arguments: list[str], *, root: Path,
                 return
         if cursor.kind == ci.CursorKind.ENUM_CONSTANT_DECL and location.file:
             owner = next((block for block in blocks(relative)
-                          if block["line"] <= location.line <= block["end_line"]), None)
+                          if block["offset"] <= location.offset < block["end_offset"]), None)
             # Exclude compatibility machinery (Ints.h) and non-enum macro output.
             if owner:
                 constants.add(Constant(cursor.enum_value, cursor.spelling, relative,
                                        location.line, location.column, location.offset,
-                                       owner["enum"], owner["line"]))
+                                       owner["enum"], owner["line"], owner["offset"]))
         for child in cursor.get_children():
             walk(child)
     walk(translation.cursor)
@@ -158,7 +167,7 @@ def collect(repo: Path = REPO, *, filters: tuple[str, ...] = (), strict: bool = 
     if failures:
         raise ValueError("\n".join(failures))
     constants = sorted(rows.values(), key=lambda row: (row["value"], row["file"], row["offset"]))
-    observed = {(row["file"], row["enum_line"]) for row in constants}
+    observed = {(row["file"], row["enum_offset"]) for row in constants}
     lexical = []
     for directory in ("src", "include"):
         for path in sorted((repo / directory).rglob("*")):
@@ -166,7 +175,7 @@ def collect(repo: Path = REPO, *, filters: tuple[str, ...] = (), strict: bool = 
                 continue
             for block in source_blocks(path):
                 lexical.append({"file": path.relative_to(repo).as_posix(), **block})
-    missing = [block for block in lexical if (block["file"], block["line"]) not in observed]
+    missing = [block for block in lexical if (block["file"], block["offset"]) not in observed]
     return {"schema": 1, "mode": "strict" if strict else "retail",
             "translation_units": len(entries), "constants": constants,
             "accepted_diagnostics": diagnostics,
