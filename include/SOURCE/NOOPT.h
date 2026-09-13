@@ -3,8 +3,8 @@
 
 #include <Ints.h>
 
-void DelayTil(i32*);
-void DelayMilli(i32l);
-void DelayTilMilli(i32l);
+void DelayTil(i32* endTime);
+void DelayMilli(i32l delay);
+void DelayTilMilli(i32l endTime);
 
 #endif

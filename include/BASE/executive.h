@@ -15,11 +15,11 @@ public:
     executive(void);
     i32 InitSystem(void);
     void ShutDownSystem(void);
-    i32 DoDialog(class baseManager*);
+    i32 DoDialog(class baseManager* manager);
     void PrintManagerList(void);
-    i32 AddManager(class baseManager*, i32);
-    void RemoveManager(class baseManager*);
-    void CallManager(class baseManager*);
+    i32 AddManager(class baseManager* mgr, i32 priority);
+    void RemoveManager(class baseManager* mgr);
+    void CallManager(class baseManager* mgr);
     void MainLoop(void);
     void Terminate(void);
 };

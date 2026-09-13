@@ -54,9 +54,9 @@ public:
     bchar m_showCampaignScores;
     heroWindow* m_window;
     highScoreManager(void);
-    virtual i32 Open(i32) OVERRIDE;
+    virtual i32 Open(i32 id) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Update(void);
 };
 #pragma pack(pop)

@@ -20,7 +20,7 @@ public:
     );
     virtual ~dimmerWidget(void) OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& msg) OVERRIDE;
     void Read(void);
 };
 #pragma pack(pop)
