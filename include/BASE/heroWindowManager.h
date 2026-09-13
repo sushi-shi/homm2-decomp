@@ -55,6 +55,14 @@ public:
 };
 #pragma pack(pop)
 SIZE(heroWindowManager, 0x62);
+// Save the selected id before requesting dialog completion; the type is retained.
+#define FINISH_DIALOG_MESSAGE(message)                                                             \
+    (gpWindowManager->m_dialogResult = (message).payload.widget.id,                                \
+     (message).payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT),                              \
+     (message).payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT)
+// Inclusive bounds, not a clipping operation. Repeated operands must be stable.
+#define UPDATE_INCLUSIVE_REGION(left, top, right, bottom)                                          \
+    (gpWindowManager->UpdateScreenRegion((left), (top), (right) - (left) + 1, (bottom) - (top) + 1))
 extern i32 iCombatCycleFrame;
 extern u8 gbEveryOtherCycle;
 extern i32 iCycle1Count;

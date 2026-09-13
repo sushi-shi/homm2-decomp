@@ -1,4 +1,6 @@
 #include <va.h>
+#include <SOURCE/hero.h>
+#include <BASE/message.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -183,7 +185,7 @@ i32 combatManager::ViewGeneral(
         gLuckText[luck14 + GENERAL_LUCK_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_MANA],
         m_heroes[IDX(side)]->m_spellPoints,
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_KNOWLEDGE) * GENERAL_MANA_PER_KNOWLEDGE
+        HERO_NORMAL_SPELL_POINTS(*m_heroes[IDX(side)])
     );
     message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
     message16.payload.widget.id = GENERAL_STATS_WIDGET;
@@ -279,8 +281,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 helpIndex36 = -1;
-                if (message.payload.widget.command == WIDGET_COMMAND_SELECT
-                    || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+                if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                     switch (message.payload.widget.id) {
                         case GENERAL_CLOSE:
                             helpIndex36 = GENERAL_LONG_HELP_CLOSE;
@@ -296,18 +297,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                             break;
                     }
                     if (helpIndex36 != -1)
-                        NormalDialog(
-                            cViewGeneralLongHelp[helpIndex36],
-                            NORMAL_DIALOG_QUICK_VIEW,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(cViewGeneralLongHelp[helpIndex36], NORMAL_DIALOG_QUICK_VIEW);
                 }
                 break;
             }

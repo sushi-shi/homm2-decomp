@@ -147,18 +147,23 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
         if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
             && castleSlotsBase[slotNum] <= BUILDING_SLOT_DWELLING_SIXTH
-            && ((m_town->m_buildings & (1L << IDX(castleSlotsBase[slotNum])))
-                || (m_town->m_buildings
-                    & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))
+            && (HAS(m_town->m_buildings, (1L << IDX(castleSlotsBase[slotNum])))
+                || HAS(
+                    m_town->m_buildings,
+                    (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET))
+                )
                 || (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
-                    && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
+                    && HAS(m_town->m_buildings, IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
             && (gTownEligibleBuildMask[IDX(m_town->m_type)]
                 & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
-                && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
-                    || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
+                && (HAS(m_town->m_buildings, IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
+                    || HAS(
+                        m_town->m_buildings,
+                        IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)
+                    ))) {
                 castleSlotsUse[slotNum] = BUILDING_SLOT_DWELLING_LAST;
             } else {
                 castleSlotsUse[slotNum] = castleSlotsBase[slotNum] + CASTLE_UPGRADE_OFFSET;
@@ -201,9 +206,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             sprintf(
                 gText,
                 "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2"
-                    /* "%d этаж Гильдии магов" */,
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
-                                                                     : TOWN_MAGE_GUILD_MAX_LEVEL
+                /* "%d этаж Гильдии магов" */,
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
             );
             msg.payload.widget.data.text = gText;
         } else {
@@ -217,9 +221,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         stateFrame = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << IDX(castleSlotsUse[slotNum])))
-            && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+        if (TOWN_BUILDING_COMPLETE(*m_town, castleSlotsUse[slotNum])) {
             stateFrame = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << IDX(castleSlotsUse[slotNum]))))
@@ -392,11 +394,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     tileX = BACKGROUND_LEFT;
     tileY = BACKGROUND_TOP;
-    terrainIconFrame = (IDX(giGroundToTerrain
-                                  [gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)
-                                       ->m_terrainImageIndex])
-                          - 1)
-                         * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
+    terrainIconFrame = (IDX(CELL_TERRAIN(gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y))) - 1)
+                       * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
     raceBase = IDX(m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backFrame = 0;
@@ -589,7 +588,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             "\xf1\xf2\xf0\xee\xe8\xeb\xe8 \xe7\xe4\xe5\xf1\xfc \xe2 \xfd\xf2\xee\xec \xf5\xee\xe4\xf3."
                             /* "Нельзя построить. Вы уже строили здесь в этом ходу." */
                     );
-                } else if (gpTownManager->m_town->m_buildings & BIT(whichBuilding)) {
+                } else if (HAS(gpTownManager->m_town->m_buildings, BIT(whichBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_ALREADY_BUILT)],
@@ -673,9 +672,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = CASTLE_WIDGET_TEXT;
-        message.payload.widget.id = CONTROL_STATUS_TEXT;
+        SET_WIDGET_MESSAGE(message, CASTLE_WIDGET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
@@ -699,25 +696,18 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         if (quickFlag) {
                             NormalDialog(
                                 "{\xd8\xe8\xf0\xee\xea\xe8\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xe2\xe0\xf8\xe5 \xe2\xee\xe9"
-                                    "\xf1\xea\xee \xe7\xe0\xed\xe8\xec\xe0\xe5\xf2 \xef\xee\xe7"
-                                    "\xe8\xf6\xe8\xe8 \xef\xee \xe2\xf1\xe5\xe9 \xf8\xe8\xf0"
-                                    "\xe8\xed\xe5 \xef\xee\xeb\xff \xe1\xee\xff \xe8 \xec\xe5"
-                                    "\xe6\xe4\xf3 \xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8 \xee\xf2"
-                                    "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
-                                    "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
-                                    "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
-                                    /* "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка." */,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
+                                "\xef\xee\xf0\xff\xe4\xea\xe5 \xe2\xe0\xf8\xe5 \xe2\xee\xe9"
+                                "\xf1\xea\xee \xe7\xe0\xed\xe8\xec\xe0\xe5\xf2 \xef\xee\xe7"
+                                "\xe8\xf6\xe8\xe8 \xef\xee \xe2\xf1\xe5\xe9 \xf8\xe8\xf0"
+                                "\xe8\xed\xe5 \xef\xee\xeb\xff \xe1\xee\xff \xe8 \xec\xe5"
+                                "\xe6\xe4\xf3 \xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8 \xee\xf2"
+                                "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
+                                "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
+                                "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
+                                /* "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка." */
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         }
@@ -730,23 +720,16 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         if (quickFlag) {
                             NormalDialog(
                                 "{\xcf\xeb\xee\xf2\xed\xfb\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xf0\xff\xe4\xfb \xe2\xe0\xf8"
-                                    "\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xf1\xec\xfb\xea\xe0\xfe\xf2"
-                                    "\xf1\xff \xe2\xee\xea\xf0\xf3\xe3 \xf6\xe5\xed\xf2\xf0\xe0"
-                                    "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
-                                    " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
-                                    "\xe1\xee\xff."
-                                    /* "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя." */,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
+                                "\xef\xee\xf0\xff\xe4\xea\xe5 \xf0\xff\xe4\xfb \xe2\xe0\xf8"
+                                "\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xf1\xec\xfb\xea\xe0\xfe\xf2"
+                                "\xf1\xff \xe2\xee\xea\xf0\xf3\xe3 \xf6\xe5\xed\xf2\xf0\xe0"
+                                "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
+                                " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
+                                "\xe1\xee\xff."
+                                /* "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя." */
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         }
@@ -788,7 +771,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case IDX(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
                     case IDX(BUILDING_SLOT_SPECIAL_THIRTY):
                         if (!quickFlag) {
-                            if ((gpTownManager->m_town->m_buildings & BIT(whichBuilding))
+                            if (HAS(gpTownManager->m_town->m_buildings, BIT(whichBuilding))
                                 || !(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
                                 break;
                         }

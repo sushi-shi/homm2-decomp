@@ -1,8 +1,10 @@
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bmap2.h>
@@ -308,30 +310,6 @@ namespace {
         MINE_CENTER_GOLD_FRAME = 4
     H2_ENUM_END(AbandonedMineConversionConstant)
 
-    H2_ENUM_BEGIN(Cp1251Letter)
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO = 0xb8,
-        CP1251_CAPITAL_A = 0xc0,
-        CP1251_CAPITAL_YA = 0xdf,
-        CP1251_CASE_STEP = 0x20
-    H2_ENUM_END(Cp1251Letter)
-
-    // The localised build folds the leading letter of a resource name through
-    // the CP1251 alphabet, not through a bare +32 on the Latin range.
-    inline char ToLowerCp1251(u8 letter) {
-        char smallLetter;
-
-        if (letter >= 'A' && letter <= 'Z')
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter == CP1251_CAPITAL_YO)
-            smallLetter = CP1251_SMALL_YO;
-        else
-            smallLetter = letter;
-        return smallLetter;
-    }
-
 }
 
 #define TRADING_POST_EFFICIENCY 0.2f
@@ -464,17 +442,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra_o->active) {
                 NormalDialog(
-                    "{\xd1\xf4\xe8\xed\xea\xf1}\n\n\xc2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea \xee\xe3\xf0\xee\xec\xed\xee\xec\xf3 "
-                        "\xd1\xf4\xe8\xed\xea\xf1\xf3, \xed\xee \xee\xed \xe4\xe0\xe6\xe5 \xed\xe5 \xf8\xe5\xeb\xee\xf5\xed\xf3\xeb\xf1\xff.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xd1\xf4\xe8\xed\xea\xf1}\n\n\xc2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea "
+                    "\xee\xe3\xf0\xee\xec\xed\xee\xec\xf3 "
+                    "\xd1\xf4\xe8\xed\xea\xf1\xf3, \xed\xee \xee\xed \xe4\xe0\xe6\xe5 \xed\xe5 "
+                    "\xf8\xe5\xeb\xee\xf5\xed\xf3\xeb\xf1\xff.",
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             } else {
@@ -486,7 +458,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "- \xff \xf1\xee\xe6\xf0\xf3 \xf2\xe5\xe1\xff. \xcf\xf0\xe8\xed\xe8\xec\xe0\xe5\xf8\xfc \xeb\xe8 "
                         "\xf2\xfb \xec\xee\xe9 \xe2\xfb\xe7\xee\xe2?\""
                 );
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
@@ -524,7 +496,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                         if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true, -1);
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true);
                             if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_k = primaryReward_e;
                                 secondaryAmount_j = primaryAmount_j;
@@ -551,20 +523,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventExtra_o->active = 0;
                     } else {
                         NormalDialog(
-                            "\"\xd2\xe2\xee\xff \xe4\xee\xe3\xe0\xe4\xea\xe0 \xee\xf8\xe8\xe1\xee\xf7\xed\xe0,\" \xf1\xea\xe0\xe7\xe0\xeb,"
-                                " \xf3\xeb\xfb\xe1\xe0\xff\xf1\xfc, \xd1\xf4\xe8\xed\xea\xf1. \xd3\xf5\xec\xfb\xeb\xff\xfe\xf9\xe8\xe9\xf1\xff "
-                                "\xd1\xf4\xe8\xed\xea\xf1 \xef\xee\xe2\xe0\xeb\xe8\xeb \xf2\xe5\xe1\xff \xed\xe0 \xe7\xe5\xec\xeb\xfe "
-                                "\xe8 \xec\xe8\xf0 \xee\xea\xf3\xf2\xe0\xeb\xe0 \xed\xe5\xef\xf0\xee\xe3\xeb\xff\xe4\xed\xe0\xff "
-                                "\xf2\xfc\xec\xe0.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            "\"\xd2\xe2\xee\xff \xe4\xee\xe3\xe0\xe4\xea\xe0 "
+                            "\xee\xf8\xe8\xe1\xee\xf7\xed\xe0,\" \xf1\xea\xe0\xe7\xe0\xeb,"
+                            " \xf3\xeb\xfb\xe1\xe0\xff\xf1\xfc, \xd1\xf4\xe8\xed\xea\xf1. "
+                            "\xd3\xf5\xec\xfb\xeb\xff\xfe\xf9\xe8\xe9\xf1\xff "
+                            "\xd1\xf4\xe8\xed\xea\xf1 \xef\xee\xe2\xe0\xeb\xe8\xeb "
+                            "\xf2\xe5\xe1\xff \xed\xe0 \xe7\xe5\xec\xeb\xfe "
+                            "\xe8 \xec\xe8\xf0 \xee\xea\xf3\xf2\xe0\xeb\xe0 "
+                            "\xed\xe5\xef\xf0\xee\xe3\xeb\xff\xe4\xed\xe0\xff "
+                            "\xf2\xfc\xec\xe0.",
+                            NORMAL_DIALOG_INFO
                         );
                         HeroLoses(eventHero2);
                     }
@@ -575,18 +543,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{\xce\xe1\xe7\xee\xf0\xed\xe0\xff \xe1\xe0\xf8\xed\xff}\n\n\xd1 \xe2\xe5\xf0\xf8\xe8\xed\xfb "
-                    "\xee\xe1\xe7\xee\xf0\xed\xee\xe9 \xe1\xe0\xf8\xed\xe8 \xe2\xfb \xf1\xec\xee\xe3\xeb\xe8 "
-                    "\xf0\xe0\xe7\xe3\xeb\xff\xe4\xe5\xf2\xfc \xe4\xe0\xeb\xfc\xed\xe8\xe5 \xe7\xe5\xec\xeb\xe8.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "{\xce\xe1\xe7\xee\xf0\xed\xe0\xff \xe1\xe0\xf8\xed\xff}\n\n\xd1 "
+                "\xe2\xe5\xf0\xf8\xe8\xed\xfb "
+                "\xee\xe1\xe7\xee\xf0\xed\xee\xe9 \xe1\xe0\xf8\xed\xe8 \xe2\xfb "
+                "\xf1\xec\xee\xe3\xeb\xe8 "
+                "\xf0\xe0\xe7\xe3\xeb\xff\xe4\xe5\xf2\xfc \xe4\xe0\xeb\xfc\xed\xe8\xe5 "
+                "\xe7\xe5\xec\xeb\xe8.",
+                NORMAL_DIALOG_INFO
             );
             gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
             CompleteDraw(0);
@@ -807,8 +770,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
@@ -830,20 +792,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
             } else {
                 NormalDialog(
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xee\xf2\xf0\xe0\xf2\xe8\xe2 \xf7\xe0\xf1\xfb \xed\xe0 "
-                        "\xf2\xee, \xf7\xf2\xee\xe1\xfb \xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea "
-                        "\xe8\xe7 \xec\xee\xf0\xff, \xe2\xfb \xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 "
-                        "\xe5\xe3\xee \xeb\xe8\xf8\xfc \xe7\xe0 \xf2\xe5\xec, \xf7\xf2\xee\xe1\xfb \xf3\xe2\xe8\xe4\xe5\xf2\xfc:"
-                        " \xe2\xed\xf3\xf2\xf0\xe8 \xef\xf3\xf1\xf2\xee.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xee\xf2\xf0\xe0\xf2\xe8\xe2 "
+                    "\xf7\xe0\xf1\xfb \xed\xe0 "
+                    "\xf2\xee, \xf7\xf2\xee\xe1\xfb \xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc "
+                    "\xf1\xf3\xed\xe4\xf3\xea "
+                    "\xe8\xe7 \xec\xee\xf0\xff, \xe2\xfb \xed\xe0\xea\xee\xed\xe5\xf6 "
+                    "\xee\xf2\xea\xf0\xfb\xeb\xe8 "
+                    "\xe5\xe3\xee \xeb\xe8\xf8\xfc \xe7\xe0 \xf2\xe5\xec, \xf7\xf2\xee\xe1\xfb "
+                    "\xf3\xe2\xe8\xe4\xe5\xf2\xfc:"
+                    " \xe2\xed\xf3\xf2\xf0\xe8 \xef\xf3\xf1\xf2\xee.",
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -854,18 +812,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8, \xed\xee \xed\xe8\xf7\xe5\xe3\xee "
-                            "\xed\xe5 \xed\xe0\xf8\xeb\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb "
+                        "\xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
+                        "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8, "
+                        "\xed\xee \xed\xe8\xf7\xe5\xe3\xee "
+                        "\xed\xe5 \xed\xe0\xf8\xeb\xe8.",
+                        NORMAL_DIALOG_INFO
                     );
                     break;
                 case FLOTSAM_WOOD:
@@ -950,25 +902,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true);
             } else {
                 NormalDialog(
-                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
-                        "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
-                        "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
-                        "\xee\xea\xe5\xe0\xed\xe5. \xc8\xf1\xef\xee\xeb\xed\xe5\xed\xed\xfb\xe9 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xe8,"
-                        " \xe1\xe5\xe4\xed\xff\xe3\xe0 \xf1\xea\xe0\xe7\xe0\xeb: \"\xdf \xe1\xfb \xed\xe0\xe3\xf0\xe0\xe4\xe8\xeb "
-                        "\xe2\xe0\xf1 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xec, \xed\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 "
-                        "\xe4\xeb\xff \xed\xe5\xe3\xee \xec\xe5\xf1\xf2\xe0.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 "
+                    "\xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
+                    "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 "
+                    "\xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
+                    "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 "
+                    "\xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
+                    "\xee\xea\xe5\xe0\xed\xe5. \xc8\xf1\xef\xee\xeb\xed\xe5\xed\xed\xfb\xe9 "
+                    "\xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xe8,"
+                    " \xe1\xe5\xe4\xed\xff\xe3\xe0 \xf1\xea\xe0\xe7\xe0\xeb: \"\xdf \xe1\xfb "
+                    "\xed\xe0\xe3\xf0\xe0\xe4\xe8\xeb "
+                    "\xe2\xe0\xf1 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xec, \xed\xee \xf3 "
+                    "\xe2\xe0\xf1 \xed\xe5\xf2 "
+                    "\xe4\xeb\xff \xed\xe5\xe3\xee \xec\xe5\xf1\xf2\xe0.\"",
+                    NORMAL_DIALOG_INFO
                 );
             }
             fizzleType_k = true;
@@ -978,39 +928,32 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xca\xe0\xef\xe8\xf2\xe0\xed "
-                        "\xe2\xe7\xe4\xfb\xf5\xe0\xe5\xf2. \"\xd7\xf2\xee, \xe4\xe5\xed\xfc\xe6\xe0\xf2 \xed\xe5 "
-                        "\xf5\xe2\xe0\xf2\xe0\xe5\xf2, \xe4\xe0? \xd2\xfb \xe6\xe5 \xed\xe5 \xe4\xf3\xec\xe0\xe5\xf8\xfc,"
-                        " \xe1\xf3\xe4\xf2\xee \xff \xee\xf2\xe4\xe0\xec \xf2\xe5\xe1\xe5 \xf1\xe2\xee\xe8 \xea\xe0\xf0\xf2\xfb "
-                        "\xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xca\xe0\xf0\xf2\xfb "
+                    "\xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xca\xe0\xef\xe8\xf2\xe0\xed "
+                    "\xe2\xe7\xe4\xfb\xf5\xe0\xe5\xf2. \"\xd7\xf2\xee, "
+                    "\xe4\xe5\xed\xfc\xe6\xe0\xf2 \xed\xe5 "
+                    "\xf5\xe2\xe0\xf2\xe0\xe5\xf2, \xe4\xe0? \xd2\xfb \xe6\xe5 \xed\xe5 "
+                    "\xe4\xf3\xec\xe0\xe5\xf8\xfc,"
+                    " \xe1\xf3\xe4\xf2\xee \xff \xee\xf2\xe4\xe0\xec \xf2\xe5\xe1\xe5 "
+                    "\xf1\xe2\xee\xe8 \xea\xe0\xf0\xf2\xfb "
+                    "\xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee!\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xc1\xfb\xe2\xf8\xe8\xe9 "
-                        "\xea\xe0\xef\xe8\xf2\xe0\xed, \xe6\xe8\xe2\xf3\xf9\xe8\xe9 \xed\xe0 \xfd\xf2\xee\xec \xef\xee\xe4\xed\xee\xe2\xeb\xe5\xed\xed\xee\xec "
-                        "\xf0\xfb\xe1\xee\xeb\xee\xe2\xed\xee\xec \xef\xf0\xe8\xf7\xe0\xeb\xe5, \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe2\xe0\xec \xea\xe0\xf0\xf2\xfb, \xf1\xee\xf1\xf2\xe0\xe2\xeb\xe5\xed\xed\xfb\xe5 \xe2 "
-                        "\xef\xf0\xe5\xe6\xed\xe8\xe5 \xe4\xed\xe8, \xe7\xe0 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xe8\xf5 \xea\xf3\xef\xe8\xf2\xfc?",
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xca\xe0\xf0\xf2\xfb "
+                    "\xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xc1\xfb\xe2\xf8\xe8\xe9 "
+                    "\xea\xe0\xef\xe8\xf2\xe0\xed, \xe6\xe8\xe2\xf3\xf9\xe8\xe9 \xed\xe0 "
+                    "\xfd\xf2\xee\xec \xef\xee\xe4\xed\xee\xe2\xeb\xe5\xed\xed\xee\xec "
+                    "\xf0\xfb\xe1\xee\xeb\xee\xe2\xed\xee\xec \xef\xf0\xe8\xf7\xe0\xeb\xe5, "
+                    "\xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                    "\xe2\xe0\xec \xea\xe0\xf0\xf2\xfb, "
+                    "\xf1\xee\xf1\xf2\xe0\xe2\xeb\xe5\xed\xed\xfb\xe5 \xe2 "
+                    "\xef\xf0\xe5\xe6\xed\xe8\xe5 \xe4\xed\xe8, \xe7\xe0 1000 "
+                    "\xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                    "\xe8\xf5 \xea\xf3\xef\xe8\xf2\xfc?",
+                    NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     gpCurPlayer->m_resources[IDX(RES_GOLD)] -= MAGELLAN_MAP_COST;
@@ -1035,7 +978,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "\xed\xe8\xf7\xe5\xec \xef\xee\xec\xee\xf7\xfc \xed\xe5 \xf1\xec\xee\xe3\xf3.\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 sprintf(
                     gText,
@@ -1051,7 +994,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "\xe8\xe7 \xec\xee\xe5\xe3\xee \xe4\xee\xec\xe0!\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(
@@ -1083,59 +1026,45 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xdd\xf2\xee\xf2 "
-                        "\xf0\xee\xe4\xed\xe8\xea \xe2\xee\xf1\xef\xee\xeb\xed\xff\xe5\xf2\xf1\xff \xf0\xe0\xe7 \xe2 "
-                        "\xed\xe5\xe4\xe5\xeb\xfe, \xe0 \xea\xf2\xee-\xf2\xee \xf3\xe6\xe5 \xef\xf0\xe8\xea\xeb\xe0\xe4\xfb\xe2\xe0\xeb\xf1\xff "
-                        "\xea \xed\xe5\xec\xf3 \xed\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 "
+                    "\xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xdd\xf2\xee\xf2 "
+                    "\xf0\xee\xe4\xed\xe8\xea \xe2\xee\xf1\xef\xee\xeb\xed\xff\xe5\xf2\xf1\xff "
+                    "\xf0\xe0\xe7 \xe2 "
+                    "\xed\xe5\xe4\xe5\xeb\xfe, \xe0 \xea\xf2\xee-\xf2\xee \xf3\xe6\xe5 "
+                    "\xef\xf0\xe8\xea\xeb\xe0\xe4\xfb\xe2\xe0\xeb\xf1\xff "
+                    "\xea \xed\xe5\xec\xf3 \xed\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints_j =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xe4\xe2\xee\xe5 \xef\xee\xe2\xfb\xf8\xe0\xe5\xf2 "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, "
-                            "\xed\xee \xe2\xfb \xf3\xe6\xe5 \xef\xf0\xe8\xe1\xfb\xe2\xe0\xe5\xf2\xe5 \xe2 \xef\xee\xe4\xee\xe1\xed\xee\xec "
-                            "\xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 "
+                        "\xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xee\xe1\xfb\xf7\xed\xee "
+                        "\xe2\xe4\xe2\xee\xe5 \xef\xee\xe2\xfb\xf8\xe0\xe5\xf2 "
+                        "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe "
+                        "\xfd\xed\xe5\xf0\xe3\xe8\xfe, "
+                        "\xed\xee \xe2\xfb \xf3\xe6\xe5 \xef\xf0\xe8\xe1\xfb\xe2\xe0\xe5\xf2\xe5 "
+                        "\xe2 \xef\xee\xe4\xee\xe1\xed\xee\xec "
+                        "\xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8.",
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xf3 "
-                            "\xea\xf0\xee\xe2\xfc \xec\xe0\xe3\xe8\xe5\xe9! \xd2\xe5\xef\xe5\xf0\xfc \xf3 \xe2\xe0\xf1 "
-                            "\xe2 \xe7\xe0\xef\xe0\xf1\xe5 \xe2\xe4\xe2\xee\xe5 \xe1\xee\xeb\xfc\xf8\xe5 \xee\xe1\xfb\xf7\xed\xee\xe3\xee "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9 \xfd\xed\xe5\xf0\xe3\xe8\xe8.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 "
+                        "\xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 "
+                        "\xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xf3 "
+                        "\xea\xf0\xee\xe2\xfc \xec\xe0\xe3\xe8\xe5\xe9! \xd2\xe5\xef\xe5\xf0\xfc "
+                        "\xf3 \xe2\xe0\xf1 "
+                        "\xe2 \xe7\xe0\xef\xe0\xf1\xe5 \xe2\xe4\xe2\xee\xe5 "
+                        "\xe1\xee\xeb\xfc\xf8\xe5 \xee\xe1\xfb\xf7\xed\xee\xe3\xee "
+                        "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9 \xfd\xed\xe5\xf0\xe3\xe8\xe8.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_spellPoints = springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 }
@@ -1145,54 +1074,40 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_MAGIC_WELL)) {
                 NormalDialog(
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
-                        "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xf2\xee\xf0\xee\xe9 \xe3\xeb\xee\xf2\xee\xea \xe8\xe7 "
-                        "\xea\xee\xeb\xee\xe4\xf6\xe0 \xe7\xe0 \xe4\xe5\xed\xfc \xe2\xe0\xec \xed\xe5 \xef\xee\xec\xee\xe6\xe5\xf2.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
+                    "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
+                    "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xf2\xee\xf0\xee\xe9 "
+                    "\xe3\xeb\xee\xf2\xee\xea \xe8\xe7 "
+                    "\xea\xee\xeb\xee\xe4\xf6\xe0 \xe7\xe0 \xe4\xe5\xed\xfc \xe2\xe0\xec \xed\xe5 "
+                    "\xef\xee\xec\xee\xe6\xe5\xf2.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints_o =
-                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero2);
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2 "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 "
-                            "\xee\xed\xe0 \xf3 \xe2\xe0\xf1 \xe8 \xf2\xe0\xea \xed\xe0 \xef\xf0\xe5\xe4\xe5\xeb\xe5.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
+                        "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xee\xe1\xfb\xf7\xed\xee "
+                        "\xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2 "
+                        "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, "
+                        "\xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 "
+                        "\xee\xed\xe0 \xf3 \xe2\xe0\xf1 \xe8 \xf2\xe0\xea \xed\xe0 "
+                        "\xef\xf0\xe5\xe4\xe5\xeb\xe5.",
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xe2\xee\xf1\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
+                        "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 "
+                        "\xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe "
+                        "\xe2\xee\xf1\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb "
+                        "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe "
+                        "\xfd\xed\xe5\xf0\xe3\xe8\xfe.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
@@ -1203,7 +1118,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if (eventHero2->IsEmbarked()) {
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
                 );
@@ -1229,7 +1144,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL,
                     NULL
                 );
-                WaitEndSample(&playedSample3, -1);
+                WaitEndSample(&playedSample3);
                 CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
@@ -1386,8 +1301,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGold:
@@ -1641,18 +1555,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_TEMPLE:
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_TEMPLE)) {
                 NormalDialog(
-                    "{\xd5\xf0\xe0\xec}\n\n\xc4\xe2\xee\xe9\xed\xe0\xff \xec\xee\xeb\xe8\xf2\xe2\xe0 \xe2\xee\xe9\xed\xe5 "
-                        "\xed\xe5 \xef\xee\xe4\xf1\xef\xee\xf0\xfc\xe5. \xc7\xe0\xf5\xee\xe4\xe8\xf2\xe5 \xef\xee\xf1\xeb\xe5 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xd5\xf0\xe0\xec}\n\n\xc4\xe2\xee\xe9\xed\xe0\xff "
+                    "\xec\xee\xeb\xe8\xf2\xe2\xe0 \xe2\xee\xe9\xed\xe5 "
+                    "\xed\xe5 \xef\xee\xe4\xf1\xef\xee\xf0\xfc\xe5. "
+                    "\xc7\xe0\xf5\xee\xe4\xe8\xf2\xe5 \xef\xee\xf1\xeb\xe5 "
+                    "\xe1\xe8\xf2\xe2\xfb.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1679,18 +1587,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xdd\xf2\xee \xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe5 \xe4\xe0\xe2\xed\xee "
-                        "\xe1\xf0\xee\xf8\xe5\xed\xee. \xcd\xe8\xf7\xe5\xe3\xee \xf6\xe5\xed\xed\xee\xe3\xee \xf2\xf3\xf2 "
-                        "\xed\xe5\xf2.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xdd\xf2\xee "
+                    "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe5 \xe4\xe0\xe2\xed\xee "
+                    "\xe1\xf0\xee\xf8\xe5\xed\xee. \xcd\xe8\xf7\xe5\xe3\xee "
+                    "\xf6\xe5\xed\xed\xee\xe3\xee \xf2\xf3\xf2 "
+                    "\xed\xe5\xf2.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1763,7 +1665,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                 cell->m_objectMetadata = 0;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1833,7 +1735,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
                         );
-                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
+                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true);
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1884,20 +1786,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xd3\xe7\xed\xe0\xe2 \xe2\xe0\xf1, \xeb\xe0\xea\xe5\xe9 "
-                        "\xee\xf2\xea\xe0\xe7\xe0\xeb\xf1\xff \xef\xf3\xf1\xf2\xe8\xf2\xfc \xe2\xed\xf3\xf2\xf0\xfc."
-                        " \"\xcd\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea,\" - \xf1\xea\xe0\xe7\xe0\xeb \xee\xed, - \"\xed\xe5 "
-                        "\xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xee\xe4\xed\xee\xe3\xee \xe8 \xf2\xee\xe3\xee \xe6\xe5 "
-                        "\xf1\xf2\xf3\xe4\xe5\xed\xf2\xe0 \xe4\xe2\xe0\xe6\xe4\xfb.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xd3\xe7\xed\xe0\xe2 \xe2\xe0\xf1, "
+                    "\xeb\xe0\xea\xe5\xe9 "
+                    "\xee\xf2\xea\xe0\xe7\xe0\xeb\xf1\xff \xef\xf3\xf1\xf2\xe8\xf2\xfc "
+                    "\xe2\xed\xf3\xf2\xf0\xfc."
+                    " \"\xcd\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea,\" - \xf1\xea\xe0\xe7\xe0\xeb "
+                    "\xee\xed, - \"\xed\xe5 "
+                    "\xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xee\xe4\xed\xee\xe3\xee \xe8 "
+                    "\xf2\xee\xe3\xee \xe6\xe5 "
+                    "\xf1\xf2\xf3\xe4\xe5\xed\xf2\xe0 \xe4\xe2\xe0\xe6\xe4\xfb.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 if (eventHero2->m_level
@@ -1906,20 +1804,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     >= XANADU_ADMISSION_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xe4\xee\xef\xf3\xf1\xf2\xe8\xeb "
-                            "\xe2\xe0\xf1 \xe4\xee \xe0\xf3\xe4\xe8\xe5\xed\xf6\xe8\xe8 \xf1 \xf5\xee\xe7\xff\xe8\xed\xee\xec "
-                            "\xe4\xee\xec\xe0. \xc7\xe0\xed\xff\xf2\xe8\xff \xf1 \xed\xe8\xec \xef\xee\xe2\xfb\xf1\xe8\xeb\xe8 "
-                            "\xf7\xe5\xf2\xfb\xf0\xe5 \xf3\xec\xe5\xed\xe8\xff, \xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xe5 "
-                            "\xea\xe0\xe6\xe4\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 "
+                        "\xe4\xee\xef\xf3\xf1\xf2\xe8\xeb "
+                        "\xe2\xe0\xf1 \xe4\xee \xe0\xf3\xe4\xe8\xe5\xed\xf6\xe8\xe8 \xf1 "
+                        "\xf5\xee\xe7\xff\xe8\xed\xee\xec "
+                        "\xe4\xee\xec\xe0. \xc7\xe0\xed\xff\xf2\xe8\xff \xf1 \xed\xe8\xec "
+                        "\xef\xee\xe2\xfb\xf1\xe8\xeb\xe8 "
+                        "\xf7\xe5\xf2\xfb\xf0\xe5 \xf3\xec\xe5\xed\xe8\xff, "
+                        "\xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xe5 "
+                        "\xea\xe0\xe6\xe4\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe.",
+                        NORMAL_DIALOG_INFO
                     );
                     eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
                     eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
@@ -1928,22 +1822,20 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
                 } else {
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xee\xf2\xea\xf0\xfb\xeb \xe4\xe2\xe5\xf0\xfc "
-                            "\xe8 \xee\xe3\xeb\xff\xe4\xe5\xeb \xe2\xe0\xf1 \xf1 \xed\xee\xe3 \xe4\xee \xe3\xee\xeb\xee\xe2\xfb."
-                            " \"\xc2\xfb \xed\xe5 \xf2\xe0\xea \xe7\xed\xe0\xec\xe5\xed\xe8\xf2\xfb \xe8 \xed\xe5 \xf2\xe0\xea\xee\xe9 "
-                            "\xf3\xe6 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2, \xf7\xf2\xee\xe1\xfb \xec\xee\xe9 \xf5\xee\xe7\xff\xe8\xed "
-                            "\xef\xf0\xe8\xed\xff\xeb \xe2\xe0\xf1,\" - \xf4\xfb\xf0\xea\xed\xf3\xeb \xee\xed. - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf2\xe5\xf1\xfc,"
-                            " \xea\xee\xe3\xe4\xe0 \xf1\xee\xf7\xf2\xe5\xf2\xe5 \xf1\xe5\xe1\xff \xe4\xee\xf1\xf2\xee\xe9\xed\xfb\xec."
-                            "\"",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 "
+                        "\xee\xf2\xea\xf0\xfb\xeb \xe4\xe2\xe5\xf0\xfc "
+                        "\xe8 \xee\xe3\xeb\xff\xe4\xe5\xeb \xe2\xe0\xf1 \xf1 \xed\xee\xe3 \xe4\xee "
+                        "\xe3\xee\xeb\xee\xe2\xfb."
+                        " \"\xc2\xfb \xed\xe5 \xf2\xe0\xea \xe7\xed\xe0\xec\xe5\xed\xe8\xf2\xfb "
+                        "\xe8 \xed\xe5 \xf2\xe0\xea\xee\xe9 "
+                        "\xf3\xe6 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2, \xf7\xf2\xee\xe1\xfb "
+                        "\xec\xee\xe9 \xf5\xee\xe7\xff\xe8\xed "
+                        "\xef\xf0\xe8\xed\xff\xeb \xe2\xe0\xf1,\" - \xf4\xfb\xf0\xea\xed\xf3\xeb "
+                        "\xee\xed. - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf2\xe5\xf1\xfc,"
+                        " \xea\xee\xe3\xe4\xe0 \xf1\xee\xf7\xf2\xe5\xf2\xe5 \xf1\xe5\xe1\xff "
+                        "\xe4\xee\xf1\xf2\xee\xe9\xed\xfb\xec."
+                        "\"",
+                        NORMAL_DIALOG_INFO
                     );
                 }
             }
@@ -1952,19 +1844,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FORT:
             if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd4\xee\xf0\xf2}\n\n \"\xcf\xf0\xee\xf1\xe8\xf2\xe5, \xf1\xfd\xf0,\" - \xd1\xea\xe0\xe7\xe0\xeb "
-                        "\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xfc \xe2\xee\xe8\xed\xee\xe2, - \"\xed\xee "
-                        "\xe2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xe2\xf1\xe5, \xf7\xe5\xec\xf3 \xec\xfb \xf1\xef\xee\xf1\xee\xe1\xed\xfb "
-                        "\xed\xe0\xf3\xf7\xe8\xf2\xfc.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xd4\xee\xf0\xf2}\n\n \"\xcf\xf0\xee\xf1\xe8\xf2\xe5, \xf1\xfd\xf0,\" - "
+                    "\xd1\xea\xe0\xe7\xe0\xeb "
+                    "\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xfc \xe2\xee\xe8\xed\xee\xe2, - "
+                    "\"\xed\xee "
+                    "\xe2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xe2\xf1\xe5, \xf7\xe5\xec\xf3 "
+                    "\xec\xfb \xf1\xef\xee\xf1\xee\xe1\xed\xfb "
+                    "\xed\xe0\xf3\xf7\xe8\xf2\xfc.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1990,21 +1877,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_STANDING_STONES:
             if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
-                        "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
-                        "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
-                        "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xc4\xf0\xf3\xe8\xe4\xfb, \xed\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff "
-                        "\xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff, \xef\xee\xea\xe0\xe7\xe0\xeb\xe8 \xe6\xe5\xf1\xf2\xe0\xec\xe8,"
-                        " \xf7\xf2\xee \xe8\xec \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe5\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xf3\xf7\xe8\xf2\xfc.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 "
+                    "\xe3\xf0\xf3\xef\xef\xf3 "
+                    "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 "
+                    "\xee\xe4\xed\xee\xec "
+                    "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 "
+                    "\xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
+                    "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xc4\xf0\xf3\xe8\xe4\xfb, \xed\xe5 "
+                    "\xed\xe0\xf0\xf3\xf8\xe0\xff "
+                    "\xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff, \xef\xee\xea\xe0\xe7\xe0\xeb\xe8 "
+                    "\xe6\xe5\xf1\xf2\xe0\xec\xe8,"
+                    " \xf7\xf2\xee \xe8\xec \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe5\xf7\xe5\xec\xf3 "
+                    "\xe2\xe0\xf1 \xf3\xf7\xe8\xf2\xfc.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2033,18 +1918,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\"\xd3\xe1\xe8\xf0\xe0\xe9\xf1\xff!"
-                        "\" -  \xf0\xff\xe2\xea\xed\xf3\xeb\xe0 \xe2\xe5\xe4\xfc\xec\xe0, \"\xf2\xfb \xe7\xed\xe0\xe5\xf8\xfc "
-                        "\xe2\xf1\xe5, \xf7\xf2\xee \xe7\xed\xe0\xfe \xff.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 "
+                    "\xe2\xe5\xe4\xfc\xec\xfb}\n\n\"\xd3\xe1\xe8\xf0\xe0\xe9\xf1\xff!"
+                    "\" -  \xf0\xff\xe2\xea\xed\xf3\xeb\xe0 \xe2\xe5\xe4\xfc\xec\xe0, \"\xf2\xfb "
+                    "\xe7\xed\xe0\xe5\xf8\xfc "
+                    "\xe2\xf1\xe5, \xf7\xf2\xee \xe7\xed\xe0\xfe \xff.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2074,22 +1953,20 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MERCENARY_CAMP:
             if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
-                        "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xe3\xe4\xe5 \xe2\xee\xe8\xed\xfb "
-                        "\xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf2 \xf2\xe0\xea\xf2\xe8\xea\xf3. \"\xc4\xeb\xff "
-                        "\xed\xe0\xf1 \xe2\xfb \xf1\xeb\xe8\xf8\xea\xee\xec \xf3\xec\xe5\xeb\xfb\xe9 \xe1\xee\xe5\xf6,"
-                        "\" -\xf1\xea\xe0\xe7\xe0\xeb \xea\xe0\xef\xe8\xf2\xe0\xed \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2."
-                        " - \"\xc1\xee\xeb\xfc\xf8\xe5 \xec\xfb \xed\xe8\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xed\xe0\xf3\xf7\xe8\xf2\xfc "
-                        "\xed\xe5 \xec\xee\xe6\xe5\xec.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb "
+                    "\xef\xf0\xe8\xf8\xeb\xe8 "
+                    "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, "
+                    "\xe3\xe4\xe5 \xe2\xee\xe8\xed\xfb "
+                    "\xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf2 "
+                    "\xf2\xe0\xea\xf2\xe8\xea\xf3. \"\xc4\xeb\xff "
+                    "\xed\xe0\xf1 \xe2\xfb \xf1\xeb\xe8\xf8\xea\xee\xec \xf3\xec\xe5\xeb\xfb\xe9 "
+                    "\xe1\xee\xe5\xf6,"
+                    "\" -\xf1\xea\xe0\xe7\xe0\xeb \xea\xe0\xef\xe8\xf2\xe0\xed "
+                    "\xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2."
+                    " - \"\xc1\xee\xeb\xfc\xf8\xe5 \xec\xfb \xed\xe8\xf7\xe5\xec\xf3 \xe2\xe0\xf1 "
+                    "\xed\xe0\xf3\xf7\xe8\xf2\xfc "
+                    "\xed\xe5 \xec\xee\xe6\xe5\xec.\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2183,7 +2060,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType_a)]);
-            sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+            sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
@@ -2724,21 +2601,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                  & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
                 != 0) {
                 NormalDialog(
-                    "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                    "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                    "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec.  \"\xd0\xe0\xe4 \xe2\xe8\xe4\xe5\xf2\xfc "
-                    "\xf2\xe5\xe1\xff, \xec\xee\xe9 \xf3\xf7\xe5\xed\xe8\xea.  \xcd\xe0\xe4\xe5\xfe\xf1\xfc, "
-                    "\xec\xee\xff \xed\xe0\xf3\xea\xe0 \xef\xee\xf8\xeb\xe0 \xf2\xe5\xe1\xe5 \xed\xe0 \xef\xee\xeb\xfc\xe7\xf3."
-                        "\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 "
+                    "\xe2\xe0\xf8\xe5\xec "
+                    "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 "
+                    "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
+                    "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec.  "
+                    "\"\xd0\xe0\xe4 \xe2\xe8\xe4\xe5\xf2\xfc "
+                    "\xf2\xe5\xe1\xff, \xec\xee\xe9 \xf3\xf7\xe5\xed\xe8\xea.  "
+                    "\xcd\xe0\xe4\xe5\xfe\xf1\xfc, "
+                    "\xec\xee\xff \xed\xe0\xf3\xea\xe0 \xef\xee\xf8\xeb\xe0 \xf2\xe5\xe1\xe5 "
+                    "\xed\xe0 \xef\xee\xeb\xfc\xe7\xf3."
+                    "\"",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -2798,20 +2672,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc3\xeb\xe0\xe7\xe0 \xe4\xe5\xf0\xe5\xe2\xe0 "
-                                "\xed\xe0\xef\xee\xeb\xed\xe8\xeb\xe8\xf1\xfc \xf1\xeb\xe5\xe7\xe0\xec\xe8. \"\xcc\xed\xe5 "
-                                "\xed\xf3\xe6\xed\xee 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xe2\xe7\xe4\xee\xf5) - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf1\xff, \xea\xee\xe3\xe4\xe0 "
-                                    "\xf1\xec\xee\xe6\xe5\xf8\xfc \xe2\xed\xe5\xf1\xf2\xe8 \xef\xeb\xe0\xf2\xf3.\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{\xc4\xf0\xe5\xe2\xee "
+                                "\xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc3\xeb\xe0\xe7\xe0 "
+                                "\xe4\xe5\xf0\xe5\xe2\xe0 "
+                                "\xed\xe0\xef\xee\xeb\xed\xe8\xeb\xe8\xf1\xfc "
+                                "\xf1\xeb\xe5\xe7\xe0\xec\xe8. \"\xcc\xed\xe5 "
+                                "\xed\xf3\xe6\xed\xee 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5.\" - "
+                                "\xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
+                                "\xee\xed\xee. (\xe2\xe7\xe4\xee\xf5) - "
+                                "\"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf1\xff, "
+                                "\xea\xee\xe3\xe4\xe0 "
+                                "\xf1\xec\xee\xe6\xe5\xf8\xfc \xe2\xed\xe5\xf1\xf2\xe8 "
+                                "\xef\xeb\xe0\xf2\xf3.\"",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2843,21 +2716,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xd1\xeb\xe5\xe7\xfb \xef\xe5\xf0\xe5\xef\xee\xeb\xed\xff\xfe\xf2 "
-                                "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0. \"\xcc\xed\xe5 \xed\xf3\xe6\xed\xee "
-                                "10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xc2\xe7\xe4\xee\xf5). \"\xd7\xf2\xee \xe6, \xef\xf0\xe8\xf5\xee\xe4\xe8,"
-                                " \xea\xee\xe3\xe4\xe0 \xf1\xec\xee\xe6\xe5\xf8\xfc \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xfc."
-                                    "\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "{\xc4\xf0\xe5\xe2\xee "
+                                "\xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xd1\xeb\xe5\xe7\xfb "
+                                "\xef\xe5\xf0\xe5\xef\xee\xeb\xed\xff\xfe\xf2 "
+                                "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0. "
+                                "\"\xcc\xed\xe5 \xed\xf3\xe6\xed\xee "
+                                "10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2.\" - "
+                                "\xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
+                                "\xee\xed\xee. (\xc2\xe7\xe4\xee\xf5). \"\xd7\xf2\xee \xe6, "
+                                "\xef\xf0\xe8\xf5\xee\xe4\xe8,"
+                                " \xea\xee\xe3\xe4\xe0 \xf1\xec\xee\xe6\xe5\xf8\xfc "
+                                "\xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xfc."
+                                "\"",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -2893,9 +2764,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
                     "\xe8\xe3\xf0\xee\xea\xe0\xf5"
             );
-            oracleMessage_o.type = MESSAGE_WIDGET;
-            oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            oracleMessage_o.payload.widget.id = 0;
+            SET_WIDGET_MESSAGE(oracleMessage_o, WIDGET_COMMAND_SET_TEXT, 0);
             oracleMessage_o.payload.widget.data.text = gText;
             oracleWindow_o->BroadcastMessage(oracleMessage_o);
             gpWindowManager->DoDialog(oracleWindow_o, TrueFalseDialogHandler, 0);
@@ -2999,11 +2868,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
                     if (H2_ENUM_RAW(
-                            (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                            (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
+                        ) == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX_e - x) + abs(teleportY_e - y)
+                        && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
                         teleportCount_e++;
@@ -3015,13 +2884,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount_e = Random(1, teleportCount_e);
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                        if (H2_ENUM_RAW(
-                                (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
+                        if (H2_ENUM_RAW((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))
+                                            ->m_triggerType)
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
-                            && abs(teleportX_e - x) + abs(teleportY_e - y)
+                            && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
@@ -3044,17 +2913,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe4\xee\xe1\xf0\xe0\xf2\xfc \xfd\xf2\xee\xf2 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0!",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 "
+                    "\xef\xee\xe4\xee\xe1\xf0\xe0\xf2\xfc \xfd\xf2\xee\xf2 "
+                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 "
+                    "\xec\xe5\xf1\xf2\xe0!",
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             }
@@ -3111,20 +2974,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xe7\xe0\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2. \xcd\xee \xe5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 "
-                        "\xea \xed\xe5\xec\xf3, \xe8\xe7 \xea\xf3\xf1\xf2\xee\xe2 \xe2\xfb\xf1\xea\xee\xf7\xe8\xeb\xe0 "
-                        "\xf8\xe0\xe9\xea\xe0 \xf0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea\xee\xe2, \xee\xf5\xf0\xe0\xed\xff\xfe\xf9\xe8\xf5 "
-                            "\xf1\xe2\xee\xe5 \xed\xe0\xe3\xf0\xe0\xe1\xeb\xe5\xed\xed\xee\xe5 \xe4\xee\xe1\xf0\xee.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb "
+                        "\xe7\xe0\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
+                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2. \xcd\xee \xe5\xe4\xe2\xe0 \xe2\xfb "
+                        "\xef\xee\xe4\xee\xf8\xeb\xe8 "
+                        "\xea \xed\xe5\xec\xf3, \xe8\xe7 \xea\xf3\xf1\xf2\xee\xe2 "
+                        "\xe2\xfb\xf1\xea\xee\xf7\xe8\xeb\xe0 "
+                        "\xf8\xe0\xe9\xea\xe0 \xf0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea\xee\xe2, "
+                        "\xee\xf5\xf0\xe0\xed\xff\xfe\xf9\xe8\xf5 "
+                        "\xf1\xe2\xee\xe5 \xed\xe0\xe3\xf0\xe0\xe1\xeb\xe5\xed\xed\xee\xe5 "
+                        "\xe4\xee\xe1\xf0\xee.",
+                        NORMAL_DIALOG_INFO
                     );
                     guardedCount_i = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
                     goto artifactFight;
@@ -3141,7 +3001,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[IDX(guardedMonster_c)],
                         gArmyNamesPlural[IDX(guardedMonster_c)]
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 }
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 artifactFight:
@@ -3186,18 +3046,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     }
                 } else {
                     NormalDialog(
-                        "\xc3\xeb\xe0\xe2\xed\xee\xe5 \xe2 \xe4\xee\xe1\xeb\xe5\xf1\xf2\xe8 - \xe1\xeb\xe0\xe3\xee\xf0\xe0\xe7\xf3\xec\xe8\xe5,"
-                            " \xef\xee\xfd\xf2\xee\xec\xf3 \xe2\xfb \xf0\xe5\xf8\xe8\xeb\xe8 \xef\xee\xea\xe0 \xf7\xf2\xee "
-                            "\xe2\xee\xe7\xe4\xe5\xf0\xe6\xe0\xf2\xfc\xf1\xff \xee\xf2 \xfd\xf2\xee\xe9 \xe1\xe8\xf2\xe2\xfb.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "\xc3\xeb\xe0\xe2\xed\xee\xe5 \xe2 \xe4\xee\xe1\xeb\xe5\xf1\xf2\xe8 - "
+                        "\xe1\xeb\xe0\xe3\xee\xf0\xe0\xe7\xf3\xec\xe8\xe5,"
+                        " \xef\xee\xfd\xf2\xee\xec\xf3 \xe2\xfb \xf0\xe5\xf8\xe8\xeb\xe8 "
+                        "\xef\xee\xea\xe0 \xf7\xf2\xee "
+                        "\xe2\xee\xe7\xe4\xe5\xf0\xe6\xe0\xf2\xfc\xf1\xff \xee\xf2 "
+                        "\xfd\xf2\xee\xe9 \xe1\xe8\xf2\xe2\xfb.",
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 break;
@@ -3216,7 +3071,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 "\xec\xf3\xe4\xf0\xe5\xf6\xf3.",
                             gArtifactNames[IDX(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
@@ -3232,7 +3087,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 "\xeb\xe8\xe4\xe5\xf0\xf3, \xea\xee\xf2\xee\xf0\xee\xe3\xee \xee\xed \xe2\xf1\xf2\xf0\xe5\xf2\xe8\xf2.",
                             gArtifactNames[IDX(artifact_g)]
                         );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_INFO);
                         break;
 
                     case ARTIFACT_EVENT_MODE_PICKUP:
@@ -3249,7 +3104,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1
                         );
                     giveArtifact:
-                        GiveArtifact(eventHero2, artifact_g, true, -1);
+                        GiveArtifact(eventHero2, artifact_g, true);
                         eraseObject_l = 1;
                         fizzleType_k = true;
                         break;
@@ -3281,36 +3136,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb "
+                                "\xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee "
+                                "\xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee "
+                                "\xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 "
+                                "\xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 "
+                                "\xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee "
+                                "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec "
+                                "\xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 "
+                                "\xe2\xe0\xf1.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3318,7 +3165,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
@@ -3354,36 +3201,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb "
+                                "\xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee "
+                                "\xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee "
+                                "\xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 "
+                                "\xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 "
+                                "\xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee "
+                                "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec "
+                                "\xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 "
+                                "\xe2\xe0\xf1.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -3391,7 +3230,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
@@ -3427,36 +3266,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb "
+                                "\xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee "
+                                "\xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee "
+                                "\xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 "
+                                "\xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                NORMAL_DIALOG_INFO
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 "
+                                "\xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee "
+                                "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec "
+                                "\xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 "
+                                "\xe2\xe0\xf1.",
+                                NORMAL_DIALOG_INFO
                             );
                         }
                         break;
@@ -4173,7 +4004,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     }
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
-    WaitEndSample(&eventSample_f, -1);
+    WaitEndSample(&eventSample_f);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -4407,36 +4238,22 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     );
     GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
     if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+        && PLAYER_HAS_VISITED_TENT(*gpCurPlayer, colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
             "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 "
-                "\xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xea\xe0\xea "
-                "\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0 \xe8\xf1\xf7\xe5\xe7 "
-                "\xe2 \xef\xf3\xf1\xf2\xee\xf2\xe5.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xea\xe0\xea "
+            "\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0 "
+            "\xe8\xf1\xf7\xe5\xe7 "
+            "\xe2 \xef\xf3\xf1\xf2\xee\xf2\xe5.",
+            NORMAL_DIALOG_INFO
         );
         return 1;
     } else {
         NormalDialog(
-            "\xc2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 \xf1\xeb\xee\xe2\xee, \xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5 \xef\xf0\xee\xe8\xe7\xee\xf8\xeb\xee.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xc2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 \xf1\xeb\xee\xe2\xee, \xed\xee "
+            "\xed\xe8\xf7\xe5\xe3\xee \xed\xe5 \xef\xf0\xee\xe8\xe7\xee\xf8\xeb\xee.",
+            NORMAL_DIALOG_INFO
         );
         return 0;
     }
@@ -4486,7 +4303,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
         xBarrierColor[color],
         xPasswordStrings[passwordIndex]
     );
-    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
@@ -4539,7 +4356,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         cursedArtifactCount2
                     );
                 }
-                NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
@@ -4553,31 +4370,23 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
                         NormalDialog(
-                            "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xe8\xe7-\xe7\xe0 \xe7\xe0\xef\xe5\xf0\xf2\xee\xe9 \xe4\xe2\xe5\xf0\xe8: \"\xd3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee \xe7\xee\xeb\xee\xf2\xe0 \xe4\xeb\xff \xec\xee\xe8\xf5 \xf3\xf1\xeb\xf3\xe3.\"",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 "
+                            "\xe8\xe7-\xe7\xe0 \xe7\xe0\xef\xe5\xf0\xf2\xee\xe9 "
+                            "\xe4\xe2\xe5\xf0\xe8: \"\xd3 \xe2\xe0\xf1 "
+                            "\xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
+                            "\xe7\xee\xeb\xee\xf2\xe0 \xe4\xeb\xff \xec\xee\xe8\xf5 "
+                            "\xf3\xf1\xeb\xf3\xe3.\"",
+                            NORMAL_DIALOG_INFO
                         );
                     }
                 }
             } else {
                 NormalDialog(
-                    "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xf1 \xe2\xe5\xf0\xf8\xe8\xed\xfb \xe1\xe0\xf8\xed\xe8: \"\xd3\xe1\xe8\xf0\xe0\xe9\xf2\xe5\xf1\xfc! \xdf \xed\xe5 \xec\xee\xe3\xf3 \xe2\xe0\xec \xef\xee\xec\xee\xf7\xfc!\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xf1 "
+                    "\xe2\xe5\xf0\xf8\xe8\xed\xfb \xe1\xe0\xf8\xed\xe8: "
+                    "\"\xd3\xe1\xe8\xf0\xe0\xe9\xf2\xe5\xf1\xfc! \xdf \xed\xe5 \xec\xee\xe3\xf3 "
+                    "\xe2\xe0\xec \xef\xee\xec\xee\xf7\xfc!\"",
+                    NORMAL_DIALOG_INFO
                 );
             }
             break;
@@ -4585,16 +4394,11 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_ARENA:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_ARENA)) {
                 NormalDialog(
-                    "\xd1\xf2\xf0\xe0\xe6\xe0 \xc0\xf0\xe5\xed\xfb \xef\xf0\xe5\xe3\xf0\xe0\xe4\xe8\xeb\xe0 \xe2\xe0\xec \xe4\xee\xf0\xee\xe3\xf3 \xe8 \xed\xe5 \xef\xf3\xf1\xf2\xe8\xeb\xe0 \xe2\xed\xf3\xf2\xf0\xfc.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xd1\xf2\xf0\xe0\xe6\xe0 \xc0\xf0\xe5\xed\xfb "
+                    "\xef\xf0\xe5\xe3\xf0\xe0\xe4\xe8\xeb\xe0 \xe2\xe0\xec "
+                    "\xe4\xee\xf0\xee\xe3\xf3 \xe8 \xed\xe5 \xef\xf3\xf1\xf2\xe8\xeb\xe0 "
+                    "\xe2\xed\xf3\xf2\xf0\xfc.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4611,16 +4415,12 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_MERMAID:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MERMAID)) {
                 NormalDialog(
-                    "\xd0\xf3\xf1\xe0\xeb\xea\xe8 \xec\xee\xeb\xf7\xe0\xeb\xe8\xe2\xee \xe4\xe0\xeb\xe8 \xe2\xe0\xec \xef\xee\xed\xff\xf2\xfc, \xf7\xf2\xee\xe1\xfb \xe2\xfb \xef\xf0\xe8\xf5\xee\xe4\xe8\xeb\xe8 \xe2 \xe4\xf0\xf3\xe3\xee\xe9 \xf0\xe0\xe7, \xf2\xee\xe3\xe4\xe0 \xee\xed\xe8 \xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xff\xf2 \xe2\xe0\xf1.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xd0\xf3\xf1\xe0\xeb\xea\xe8 \xec\xee\xeb\xf7\xe0\xeb\xe8\xe2\xee "
+                    "\xe4\xe0\xeb\xe8 \xe2\xe0\xec \xef\xee\xed\xff\xf2\xfc, \xf7\xf2\xee\xe1\xfb "
+                    "\xe2\xfb \xef\xf0\xe8\xf5\xee\xe4\xe8\xeb\xe8 \xe2 \xe4\xf0\xf3\xe3\xee\xe9 "
+                    "\xf0\xe0\xe7, \xf2\xee\xe3\xe4\xe0 \xee\xed\xe8 "
+                    "\xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xff\xf2 \xe2\xe0\xf1.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 EventSound(
@@ -4646,16 +4446,15 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_HUT_OF_MAGI:
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9);
             NormalDialog(
-                "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xe2\xe5\xf2\xf5\xf3\xfe \xf5\xe8\xe1\xe0\xf0\xf3 \xe8 \xe7\xe0\xe3\xee\xe2\xee\xf0\xe8\xeb\xe8 \xf1 \xec\xe0\xe3\xee\xec, \xe6\xe8\xe2\xf3\xf9\xe8\xec \xf2\xf3\xf2. \xce\xed \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec \xee \xec\xe5\xf1\xf2\xe0\xf5, \xea\xee\xf2\xee\xf0\xfb\xe5 \xe5\xec\xf3 \xe4\xee\xe2\xee\xe4\xe8\xeb\xee\xf1\xfc \xe2\xe8\xe4\xe5\xf2\xfc. \xdd\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xfc\xf1\xff \xe2\xe0\xec \xe2 \xe2\xe0\xf8\xe8\xf5 \xef\xf3\xf2\xe5\xf8\xe5\xf1\xf2\xe2\xe8\xff\xf5.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xe2\xe5\xf2\xf5\xf3\xfe "
+                "\xf5\xe8\xe1\xe0\xf0\xf3 \xe8 \xe7\xe0\xe3\xee\xe2\xee\xf0\xe8\xeb\xe8 \xf1 "
+                "\xec\xe0\xe3\xee\xec, \xe6\xe8\xe2\xf3\xf9\xe8\xec \xf2\xf3\xf2. \xce\xed "
+                "\xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec \xee \xec\xe5\xf1\xf2\xe0\xf5, "
+                "\xea\xee\xf2\xee\xf0\xfb\xe5 \xe5\xec\xf3 "
+                "\xe4\xee\xe2\xee\xe4\xe8\xeb\xee\xf1\xfc \xe2\xe8\xe4\xe5\xf2\xfc. \xdd\xf2\xee "
+                "\xec\xee\xe6\xe5\xf2 \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xfc\xf1\xff \xe2\xe0\xec "
+                "\xe2 \xe2\xe0\xf8\xe8\xf5 \xef\xf3\xf2\xe5\xf8\xe5\xf1\xf2\xe2\xe8\xff\xf5.",
+                NORMAL_DIALOG_INFO
             );
             for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
                 for (mapY14 = 0; mapY14 < MAP_HEIGHT; mapY14++) {
@@ -4675,32 +4474,26 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
-                "\xca\xe0\xe6\xe5\xf2\xf1\xff, \xfd\xf2\xee\xf2 \xe3\xeb\xe0\xe7 \xe2\xed\xe8\xec\xe0\xf2\xe5\xeb\xfc\xed\xee \xe8\xe7\xf3\xf7\xe0\xe5\xf2 \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xca\xe0\xe6\xe5\xf2\xf1\xff, \xfd\xf2\xee\xf2 \xe3\xeb\xe0\xe7 "
+                "\xe2\xed\xe8\xec\xe0\xf2\xe5\xeb\xfc\xed\xee \xe8\xe7\xf3\xf7\xe0\xe5\xf2 "
+                "\xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8.",
+                NORMAL_DIALOG_INFO
             );
             break;
 
         case GENERIC_SITE_SIRENS:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_SIRENS)) {
                 NormalDialog(
-                    "\xc2\xfb \xef\xf0\xe8\xea\xe0\xe7\xe0\xeb\xe8 \xf1\xe2\xee\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xe5 \xe7\xe0\xeb\xe8\xf2\xfc \xf3\xf8\xe8 \xe2\xee\xf1\xea\xee\xec, \xef\xf0\xe5\xe6\xe4\xe5 \xf7\xe5\xec \xef\xee\xe4\xef\xeb\xfb\xf2\xfc \xea \xf1\xe8\xf0\xe5\xed\xe0\xec, \xf7\xf2\xee\xe1\xfb \xef\xee\xf1\xeb\xf3\xf8\xe0\xf2\xfc \xe8\xf5 \xef\xe5\xed\xe8\xe5, \xea\xee\xf2\xee\xf0\xee\xe5 \xe7\xe0\xef\xf0\xee\xf1\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xee\xe3\xf3\xe1\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xc2\xfb \xef\xf0\xe8\xea\xe0\xe7\xe0\xeb\xe8 \xf1\xe2\xee\xe5\xe9 "
+                    "\xea\xee\xec\xe0\xed\xe4\xe5 \xe7\xe0\xeb\xe8\xf2\xfc \xf3\xf8\xe8 "
+                    "\xe2\xee\xf1\xea\xee\xec, \xef\xf0\xe5\xe6\xe4\xe5 \xf7\xe5\xec "
+                    "\xef\xee\xe4\xef\xeb\xfb\xf2\xfc \xea \xf1\xe8\xf0\xe5\xed\xe0\xec, "
+                    "\xf7\xf2\xee\xe1\xfb \xef\xee\xf1\xeb\xf3\xf8\xe0\xf2\xfc \xe8\xf5 "
+                    "\xef\xe5\xed\xe8\xe5, \xea\xee\xf2\xee\xf0\xee\xe5 "
+                    "\xe7\xe0\xef\xf0\xee\xf1\xf2\xee \xec\xee\xe6\xe5\xf2 "
+                    "\xef\xee\xe3\xf3\xe1\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2 "
+                    "\xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5.",
+                    NORMAL_DIALOG_INFO
                 );
             } else {
                 experience11 = 0;
@@ -4728,20 +4521,19 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         "\xcd\xe0\xe4 \xea\xe0\xec\xed\xff\xec\xe8 \xf0\xe0\xe7\xe4\xe0\xeb\xe0\xf1\xfc \xe6\xf3\xf2\xea\xe0\xff \xef\xe5\xf1\xed\xff \xf1\xe8\xf0\xe5\xed. \xcc\xed\xee\xe3\xe8\xe5 \xe8\xe7 \xe2\xe0\xf8\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xfb \xf0\xee\xf1\xe8\xeb\xe8\xf1\xfc \xe2 \xe2\xee\xe4\xf3 \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe5\xec \xfd\xf2\xe8\xf5 \xf7\xe0\xf0 \xe8 \xf3\xf2\xee\xed\xf3\xeb\xe8 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5. \xc4\xeb\xff \xe2\xe0\xf1 \xfd\xf2\xee \xe1\xfb\xeb \xf5\xee\xf0\xee\xf8\xe8\xe9 \xf3\xf0\xee\xea, \xe4\xe0\xe2\xf8\xe8\xe9 %d \xee\xf7\xea\xee\xe2 \xee\xef\xfb\xf2\xe0.",
                         experience11
                     );
-                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
                     NormalDialog(
-                        "\xc5\xe4\xe2\xe0 \xf1\xe8\xf0\xe5\xed\xfb \xe7\xe0\xf2\xff\xed\xf3\xeb\xe8 \xf1\xe2\xee\xfe \xf3\xe6\xe0\xf1\xed\xf3\xfe \xef\xe5\xf1\xed\xfe, \xea\xe0\xea \xe2\xe0\xf8\xe0 \xea\xee\xec\xe0\xed\xe4\xe0 \xef\xee\xf1\xe8\xeb\xfc\xed\xe5\xe5 \xed\xe0\xeb\xe5\xe3\xeb\xe0 \xed\xe0 \xe2\xe5\xf1\xeb\xe0 \xe8 \xf3\xe2\xe5\xeb\xe0 \xef\xee\xe4\xe0\xeb\xfc\xf8\xe5 \xea\xee\xf0\xe0\xe1\xeb\xfc \xe2 \xee\xf2\xea\xf0\xfb\xf2\xee \xec\xee\xf0\xe5.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
+                        "\xc5\xe4\xe2\xe0 \xf1\xe8\xf0\xe5\xed\xfb "
+                        "\xe7\xe0\xf2\xff\xed\xf3\xeb\xe8 \xf1\xe2\xee\xfe "
+                        "\xf3\xe6\xe0\xf1\xed\xf3\xfe \xef\xe5\xf1\xed\xfe, \xea\xe0\xea "
+                        "\xe2\xe0\xf8\xe0 \xea\xee\xec\xe0\xed\xe4\xe0 "
+                        "\xef\xee\xf1\xe8\xeb\xfc\xed\xe5\xe5 \xed\xe0\xeb\xe5\xe3\xeb\xe0 "
+                        "\xed\xe0 \xe2\xe5\xf1\xeb\xe0 \xe8 \xf3\xe2\xe5\xeb\xe0 "
+                        "\xef\xee\xe4\xe0\xeb\xfc\xf8\xe5 \xea\xee\xf0\xe0\xe1\xeb\xfc \xe2 "
+                        "\xee\xf2\xea\xf0\xfb\xf2\xee \xec\xee\xf0\xe5.",
+                        NORMAL_DIALOG_INFO
                     );
                 }
                 eventHero->m_eventFlags = HeroEventFlag(
@@ -4859,18 +4651,11 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
         NormalDialog(
             "\xd2\xfe\xf0\xe5\xec\xf9\xe8\xea \xf1\xea\xe0\xe7\xe0\xeb \xe2\xe0\xec, "
-                "\xf7\xf2\xee \xe3\xe5\xf0\xee\xe9, \xf2\xee\xec\xe8\xe2\xf8\xe8\xe9\xf1\xff "
-                "\xf2\xf3\xf2 \xe2 \xef\xeb\xe5\xed\xf3 \xe1\xfb\xeb \xee\xf1\xe2\xee\xe1\xee\xe6\xe4\xe5\xed "
-                "\xe5\xe3\xee \xea\xee\xf0\xee\xeb\xe5\xec.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xf7\xf2\xee \xe3\xe5\xf0\xee\xe9, \xf2\xee\xec\xe8\xe2\xf8\xe8\xe9\xf1\xff "
+            "\xf2\xf3\xf2 \xe2 \xef\xeb\xe5\xed\xf3 \xe1\xfb\xeb "
+            "\xee\xf1\xe2\xee\xe1\xee\xe6\xe4\xe5\xed "
+            "\xe5\xe3\xee \xea\xee\xf0\xee\xeb\xe5\xec.",
+            NORMAL_DIALOG_INFO
         );
         EraseObj(cell, x, y);
         return;
@@ -4879,20 +4664,13 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
             "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 8 \xe3\xe5\xf0\xee\xe5\xe2. "
-                "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe2\xe0\xec \xef\xf0\xe8\xe4\xe5\xf2\xf1\xff "
-                "\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xf2\xee\xec\xe8\xf2\xfc\xf1\xff "
-                "\xfd\xf2\xee\xe3\xee \xe3\xe5\xf0\xee\xff \xe2 \xf2\xe5\xec\xed\xe8\xf6\xe5 "
-                "\xe5\xf9\xe5 \xed\xe5\xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee\xe5 "
-                "\xe2\xf0\xe5\xec\xff.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe2\xe0\xec "
+            "\xef\xf0\xe8\xe4\xe5\xf2\xf1\xff "
+            "\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xf2\xee\xec\xe8\xf2\xfc\xf1\xff "
+            "\xfd\xf2\xee\xe3\xee \xe3\xe5\xf0\xee\xff \xe2 \xf2\xe5\xec\xed\xe8\xf6\xe5 "
+            "\xe5\xf9\xe5 \xed\xe5\xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee\xe5 "
+            "\xe2\xf0\xe5\xec\xff.",
+            NORMAL_DIALOG_INFO
         );
         return;
     }
@@ -4900,22 +4678,14 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
     NormalDialog(
         "\xd1 \xee\xf1\xeb\xe5\xef\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9 \xee\xf2\xe2\xe0\xe3\xee\xe9 "
-            "\xe2\xfb \xe2\xee\xf0\xe2\xe0\xeb\xe8\xf1\xfc \xe2 \xec\xe5\xf1\xf2\xed\xf3\xfe "
-            "\xf2\xe5\xec\xed\xe8\xf6\xf3 \xe8 \xee\xf1\xe2\xee\xe1\xee\xe4\xe8\xeb\xe8 "
-            "\xe3\xe5\xf0\xee\xff, \xf2\xee\xec\xff\xf9\xe5\xe3\xee\xf1\xff "
-            "\xe7\xe4\xe5\xf1\xfc \xe2 \xef\xeb\xe5\xed\xf3. "
-            "\xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
-            "\xee\xed \xef\xee\xea\xeb\xff\xeb\xf1\xff \xf1\xeb\xf3\xe6\xe8\xf2\xfc "
-            "\xe2\xe0\xec.",
-        NORMAL_DIALOG_INFO,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
+        "\xe2\xfb \xe2\xee\xf0\xe2\xe0\xeb\xe8\xf1\xfc \xe2 \xec\xe5\xf1\xf2\xed\xf3\xfe "
+        "\xf2\xe5\xec\xed\xe8\xf6\xf3 \xe8 \xee\xf1\xe2\xee\xe1\xee\xe4\xe8\xeb\xe8 "
+        "\xe3\xe5\xf0\xee\xff, \xf2\xee\xec\xff\xf9\xe5\xe3\xee\xf1\xff "
+        "\xe7\xe4\xe5\xf1\xfc \xe2 \xef\xeb\xe5\xed\xf3. "
+        "\xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
+        "\xee\xed \xef\xee\xea\xeb\xff\xeb\xf1\xff \xf1\xeb\xf3\xe6\xe8\xf2\xfc "
+        "\xe2\xe0\xec.",
+        NORMAL_DIALOG_INFO
     );
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
     gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
@@ -5266,7 +5036,7 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, artifactId, true, -1);
+        GiveArtifact(eventHero, artifactId, true);
     return artifactId;
 }
 
@@ -5927,8 +5697,7 @@ CombatResult advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, IDX(CREATURE_NONE), MONSTER_ARMY_SLOTS);
-    memset(gpMonGroup->m_creatureCounts, 0, MONSTER_ARMY_SLOTS * sizeof(i16));
+    CLEAR_ARMY_GROUP(*gpMonGroup);
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
@@ -6339,8 +6108,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
         if (i == IDX(HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
-            maxSpellPoints =
-                targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
+            maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*targetHero);
             if (targetHero->m_spellPoints > maxSpellPoints)
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
@@ -6506,7 +6274,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
             NULL
         );
         gpMouseManager->ShowColorPointer();
-        WaitEndSample(&fizzleSample, -1);
+        WaitEndSample(&fizzleSample);
     }
 }
 
@@ -6573,7 +6341,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if (eventHero->IsEmbarked()) {
                 eventHero->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
                 );
@@ -6663,8 +6431,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
             } else {
             chestGoldOrExperience:
@@ -6766,8 +6533,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveArtifact(
                         eventHero,
                         ArtifactType(cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET),
-                        true,
-                        -1
+                        true
                     );
                     cell->m_objectMetadata = SKELETON_EMPTY;
                     break;
@@ -6810,7 +6576,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT) {
                         index_h = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                        GiveArtifact(eventHero, ArtifactType(index_h), true, -1);
+                        GiveArtifact(eventHero, ArtifactType(index_h), true);
                     }
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 } else {
@@ -6831,8 +6597,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    true,
-                    -1
+                    true
                 );
                 GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
@@ -7150,7 +6915,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(exitX - x) + abs(exitY_d - y)
+                        && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
                                       ? EVENT_TELEPORT_STONE_DISTANCE
                                       : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
@@ -7167,7 +6932,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
-                            && abs(exitX - x) + abs(exitY_d - y)
+                            && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
@@ -7231,7 +6996,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         if (gpCurPlayer->m_resources[index_h] < 0)
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
-                    GiveArtifact(eventHero, artifact_g, true, -1);
+                    GiveArtifact(eventHero, artifact_g, true);
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
@@ -7541,7 +7306,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true);
             eraseObject_l = 1;
             break;
 
@@ -7549,8 +7314,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata == 0)
                 break;
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-            springSpellPoints_j =
-                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            springSpellPoints_j = HERO_NORMAL_SPELL_POINTS(*eventHero);
             if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
                 eventHero->m_spellPoints =
                     static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
@@ -7559,8 +7323,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_MAGIC_WELL:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MAGIC_WELL) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                wellSpellPoints_o =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+                wellSpellPoints_o = HERO_NORMAL_SPELL_POINTS(*eventHero);
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
@@ -7598,7 +7361,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 }
                 if (eventExtra_o->artifact != -1
                     && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
-                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true, -1);
+                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true);
                 }
                 eventExtra_o->active = 0;
             } else {
@@ -7642,7 +7405,7 @@ VA(0x004478df, 0x56)
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 1;
     else
         return 0;
@@ -7893,12 +7656,9 @@ void advManager::PlayerMonsterInteract(
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
-                / static_cast<double>(
-                    creatureCount * gMonsterDatabase[IDX(monsterType)].fightValue
-                );
+    armyRatio =
+        static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
+        / static_cast<double>(creatureCount * gMonsterDatabase[IDX(monsterType)].fightValue);
 
     if (gbInCampaign
         && ((gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
@@ -7912,104 +7672,61 @@ void advManager::PlayerMonsterInteract(
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
                     "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xf3\xfe "
-                        "\xe2\xe0\xf1: \"\xc4\xf0\xf3\xe3 \xd0\xee\xeb\xe0\xed\xe4\xe0 "
-                        "- \xed\xe0\xf8 \xe4\xf0\xf3\xe3. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
-                        "\xef\xf0\xee\xe9\xf2\xe8.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xe2\xe0\xf1: \"\xc4\xf0\xf3\xe3 \xd0\xee\xeb\xe0\xed\xe4\xe0 "
+                    "- \xed\xe0\xf8 \xe4\xf0\xf3\xe3. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
+                    "\xef\xf0\xee\xe9\xf2\xe8.\"",
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
                     "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xe2\xe0\xf1: "
-                        "\"\xd1\xee\xfe\xe7\xed\xe8\xea\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
-                        "\xec\xee\xe3\xf3\xf2 \xef\xf0\xee\xe9\xf2\xe8.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\"\xd1\xee\xfe\xe7\xed\xe8\xea\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
+                    "\xec\xee\xe3\xf3\xf2 \xef\xf0\xee\xe9\xf2\xe8.\"",
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
                     "\xc4\xf0\xe0\xea\xee\xed\xfb, \xef\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 "
-                        "\xed\xe0 \xe2\xe0\xf1, \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb\xe8: "
-                        "\"\xcd\xe0\xf8 \xe0\xeb\xfc\xff\xed\xf1 \xf1 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xee\xec "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe0\xe5\xf2 \xed\xe0\xf1 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.  \xca \xed\xe5\xf1\xf7\xe0\xf1\xf2\xfc\xfe, "
-                        "\xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe4\xeb\xff \xed\xe0\xf1 \xec\xe5\xf1\xf2\xe0. "
-                        "\xca\xe0\xea\xe0\xff \xe6\xe0\xeb\xee\xf1\xf2\xfc!\"  \xc8 "
-                        "\xe1\xfb\xf1\xf2\xf0\xee \xf3\xeb\xe5\xf2\xe5\xeb\xe8.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xed\xe0 \xe2\xe0\xf1, \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb\xe8: "
+                    "\"\xcd\xe0\xf8 \xe0\xeb\xfc\xff\xed\xf1 \xf1 "
+                    "\xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xee\xec "
+                    "\xe2\xfb\xed\xf3\xe6\xe4\xe0\xe5\xf2 \xed\xe0\xf1 "
+                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec.  \xca \xed\xe5\xf1\xf7\xe0\xf1\xf2\xfc\xfe, "
+                    "\xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe4\xeb\xff \xed\xe0\xf1 "
+                    "\xec\xe5\xf1\xf2\xe0. "
+                    "\xca\xe0\xea\xe0\xff \xe6\xe0\xeb\xee\xf1\xf2\xfc!\"  \xc8 "
+                    "\xe1\xfb\xf1\xf2\xf0\xee \xf3\xeb\xe5\xf2\xe5\xeb\xe8.",
+                    NORMAL_DIALOG_INFO
                 );
             *handled = 1;
         } else {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
                     "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xf1\xe2\xee\xe8\xf5 "
-                        "\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2 \xe8 \xf0\xe0\xe4\xfb "
-                        "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea "
-                        "\xed\xe8\xec.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2 \xe8 \xf0\xe0\xe4\xfb "
+                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea "
+                    "\xed\xe8\xec.",
+                    NORMAL_DIALOG_INFO
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
                     "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xed\xe0\xf1, "
-                        "\xea\xe0\xea \xe2\xf0\xe0\xe3\xee\xe2 \xe3\xed\xee\xec\xee\xe2 "
-                        "\xe8 \xf0\xe0\xe4\xfb \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec. ",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xea\xe0\xea \xe2\xf0\xe0\xe3\xee\xe2 \xe3\xed\xee\xec\xee\xe2 "
+                    "\xe8 \xf0\xe0\xe4\xfb "
+                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec. ",
+                    NORMAL_DIALOG_INFO
                 );
             else
                 NormalDialog(
                     "\xc3\xee\xf0\xe4\xe5\xeb\xe8\xe2\xfb\xe5 \xe4\xf0\xe0\xea\xee\xed\xfb "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe5\xed\xfb \xe1\xfb\xeb\xe8 \xef\xf0\xe8\xe7\xed\xe0\xf2\xfc "
-                        "\xe2 \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xf5 '\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2' "
-                        "\xe8 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xe2\xfb\xed\xf3\xe6\xe4\xe5\xed\xfb \xe1\xfb\xeb\xe8 "
+                    "\xef\xf0\xe8\xe7\xed\xe0\xf2\xfc "
+                    "\xe2 \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xf5 '\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2' "
+                    "\xe8 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec.",
+                    NORMAL_DIALOG_INFO
                 );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
             *handled = 1;
@@ -8021,16 +7738,8 @@ void advManager::PlayerMonsterInteract(
         && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
             "\"\xc2\xf0\xe0\xe3\xe8 \xe3\xed\xee\xec\xee\xe2! \xc1\xe5\xe3\xe8\xf2\xe5, "
-                "\xe5\xf1\xeb\xe8 \xe6\xe8\xe7\xed\xfc \xe4\xee\xf0\xee\xe3\xe0.\"",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xe5\xf1\xeb\xe8 \xe6\xe8\xe7\xed\xfc \xe4\xee\xf0\xee\xe3\xe0.\"",
+            NORMAL_DIALOG_INFO
         );
         *handled = 1;
         return;
@@ -8042,58 +7751,40 @@ void advManager::PlayerMonsterInteract(
         if (eventHero->m_army.CanJoin(monsterType)) {
             NormalDialog(
                 "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea "
-                    "\xee\xf2\xf0\xff\xe4\xf3 \xfd\xeb\xfc\xf4\xee\xe2, \xea\xe0\xea "
-                    "\xe8\xf5 \xe2\xee\xe6\xe0\xea \xef\xf0\xe8\xe7\xe2\xe0\xeb "
-                    "\xf1\xe2\xee\xe9 \xee\xf2\xf0\xff\xe4 \xea \xee\xf0\xf3\xe6\xe8\xfe. "
-                    "\xce\xed \xf1\xea\xe0\xe7\xe0\xeb \xe8\xec: \"\xca\xf2\xee "
-                    "\xe8\xe7 \xe2\xe0\xf1 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
-                    "\xf1\xec\xe5\xeb, \xf7\xf2\xee\xe1\xfb \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
-                    "\xe2 \xe0\xf0\xec\xe8\xfe \xed\xe0\xf8\xe5\xe3\xee \xec\xf3\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea\xe0?\" \xc2\xe5\xf1\xfc \xee\xf2\xf0\xff\xe4 "
-                    "\xe5\xe4\xe8\xed\xee\xe4\xf3\xf8\xed\xee \xe2\xf1\xf2\xf3\xef\xe8\xeb "
-                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xee\xf2\xf0\xff\xe4\xf3 \xfd\xeb\xfc\xf4\xee\xe2, \xea\xe0\xea "
+                "\xe8\xf5 \xe2\xee\xe6\xe0\xea \xef\xf0\xe8\xe7\xe2\xe0\xeb "
+                "\xf1\xe2\xee\xe9 \xee\xf2\xf0\xff\xe4 \xea \xee\xf0\xf3\xe6\xe8\xfe. "
+                "\xce\xed \xf1\xea\xe0\xe7\xe0\xeb \xe8\xec: \"\xca\xf2\xee "
+                "\xe8\xe7 \xe2\xe0\xf1 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
+                "\xf1\xec\xe5\xeb, \xf7\xf2\xee\xe1\xfb \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
+                "\xe2 \xe0\xf0\xec\xe8\xfe \xed\xe0\xf8\xe5\xe3\xee "
+                "\xec\xf3\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
+                "\xf1\xee\xfe\xe7\xed\xe8\xea\xe0?\" \xc2\xe5\xf1\xfc \xee\xf2\xf0\xff\xe4 "
+                "\xe5\xe4\xe8\xed\xee\xe4\xf3\xf8\xed\xee \xe2\xf1\xf2\xf3\xef\xe8\xeb "
+                "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe.",
+                NORMAL_DIALOG_INFO
             );
             eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
             NormalDialog(
                 "\xdd\xeb\xfc\xf4\xfb \xed\xe0\xf1\xf2\xee\xf0\xee\xe6\xe8\xeb\xe8\xf1\xfc "
-                    "\xef\xf0\xe8 \xe2\xe0\xf8\xe5\xec \xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8. "
-                    "\xc8\xf5 \xe2\xee\xe6\xe0\xea \xee\xe1\xf0\xe0\xf2\xe8\xeb\xf1\xff "
-                    "\xea \xe2\xe0\xec \xf1\xee \xf1\xeb\xee\xe2\xe0\xec\xe8: \"\xcc\xfb "
-                    "\xed\xe5 \xec\xee\xe6\xe5\xec \xef\xf0\xe8\xed\xff\xf2\xfc "
-                    "\xf3\xf7\xe0\xf1\xf2\xe8\xe5 \xe2 \xe2\xe0\xf8\xe8\xf5 \xe4\xe5\xeb\xe0\xf5, "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea! \xcf\xf0\xee\xf5\xee\xe4\xe8, "
-                    "\xed\xe0\xf8\xe0 \xef\xee\xe1\xe5\xe4\xe0 \xe1\xf3\xe4\xe5\xf2 "
-                    "\xe2\xe0\xf8\xe5\xe9.\"",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xef\xf0\xe8 \xe2\xe0\xf8\xe5\xec \xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8. "
+                "\xc8\xf5 \xe2\xee\xe6\xe0\xea \xee\xe1\xf0\xe0\xf2\xe8\xeb\xf1\xff "
+                "\xea \xe2\xe0\xec \xf1\xee \xf1\xeb\xee\xe2\xe0\xec\xe8: \"\xcc\xfb "
+                "\xed\xe5 \xec\xee\xe6\xe5\xec \xef\xf0\xe8\xed\xff\xf2\xfc "
+                "\xf3\xf7\xe0\xf1\xf2\xe8\xe5 \xe2 \xe2\xe0\xf8\xe8\xf5 \xe4\xe5\xeb\xe0\xf5, "
+                "\xf1\xee\xfe\xe7\xed\xe8\xea! \xcf\xf0\xee\xf5\xee\xe4\xe8, "
+                "\xed\xe0\xf8\xe0 \xef\xee\xe1\xe5\xe4\xe0 \xe1\xf3\xe4\xe5\xf2 "
+                "\xe2\xe0\xf8\xe5\xe9.\"",
+                NORMAL_DIALOG_INFO
             );
         }
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && armyRatio
-            > 2.0 /* MONSTER_STRENGTH_JOIN */
+    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > 2.0 /* MONSTER_STRENGTH_JOIN */
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -8268,19 +7959,15 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    armyRatio = static_cast<double>(
-                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
-                )
+    armyRatio = static_cast<double>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0))
                 / static_cast<double>(
                     creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                     * gMonsterDatabase[IDX(monsterType)].fightValue
                 );
 
-    if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
-        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-        && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+        && armyRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
+        && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
@@ -8763,9 +8450,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8780,9 +8465,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8795,9 +8478,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8812,9 +8493,7 @@ void advManager::SendHeroTownData(
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
             REMOTE_COMMAND,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            COMBAT_REMOTE_FRAGMENT_TYPE,
-            REMOTE_MESSAGE_DEFAULT
+            COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
             ShutDown(NULL);
@@ -8895,9 +8574,7 @@ void advManager::ReceiveHeroTownData(
         *remotePlayer,
         0,
         REMOTE_CONFIRM_COMMAND,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        COMBAT_REMOTE_FRAGMENT_TYPE,
-        REMOTE_MESSAGE_DEFAULT
+        COMBAT_REMOTE_FRAGMENT_TYPE
     );
     if (!result7)
         ShutDown(NULL);
@@ -8923,16 +8600,10 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
-                NORMAL_DIALOG_CONFIRM,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff "
+                                  "\xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. "
+                                  "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();

@@ -7,6 +7,15 @@
 
 struct tag_message;
 
+H2_ENUM_BEGIN(InputLogicalExtent)
+    INPUT_GAME_WIDTH = 640,
+    INPUT_GAME_HEIGHT = 480
+H2_ENUM_END(InputLogicalExtent)
+
+// Keep caller-side signed conversions and the live client dimensions.
+#define CLIENT_TO_GAME_X(x) (((x) * INPUT_GAME_WIDTH) / iMainWinScreenWidth)
+#define CLIENT_TO_GAME_Y(y) (((y) * INPUT_GAME_HEIGHT) / iMainWinScreenHeight)
+
 H2_ENUM_CLASS_BEGIN(InputManagerKeyCodeType)
     INPUT_KEY_CODE_ASCII = 0,
     INPUT_KEY_CODE_SCAN  = 1

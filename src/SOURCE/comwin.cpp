@@ -239,10 +239,8 @@ void com_term(i16 portIndex) {
         CloseHandle(s_comPorts[portIndex].handle);
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
-        while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != NULL)
-            H2_FREE(node);
-        while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != NULL)
-            H2_FREE(node);
+        FREE_NODE_QUEUE(node, &s_comPorts[portIndex].normalQueue);
+        FREE_NODE_QUEUE(node, &s_comPorts[portIndex].priorityQueue);
     }
 }
 

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/armyGroup.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <stdio.h>
@@ -178,21 +179,11 @@ i32 swapManager::Open(i32 id) {
         }
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(
+        message,
+        gpAdvManager->m_adventureWindow,
+        WIDGET_COMMAND_CLEAR_FLAGS
+    );
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -217,21 +208,7 @@ void swapManager::Close(void) {
     gpAdvManager->Activate();
 
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(message, gpAdvManager->m_adventureWindow, WIDGET_COMMAND_SET_FLAGS);
 }
 
 VA(0x004a286f, 0x185)
@@ -439,16 +416,10 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    /* Нельзя передать этот предмет. */ "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+                                    /* Нельзя передать этот предмет. */
+                                    "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc"
+                                    "\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -514,16 +485,10 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    /* Нельзя передать этот предмет. */ "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+                                    /* Нельзя передать этот предмет. */
+                                    "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc"
+                                    "\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -807,8 +772,7 @@ VA(0x004a3699, 0x14e)
 void swapManager::SwapMons(void) {
     i32 H2_UNUSED(selectedArmyCount) = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
-        if (m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
-            && m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
+        if (ARMY_GROUP_HAS_POSITIVE_STACK(m_heroes[IDX(m_selectedSide)]->m_army, slot_1))
             ++selectedArmyCount;
     }
 

@@ -49,7 +49,7 @@ void town::GiveSpells(hero* targetHero) {
 
     if (!pupil->HasArtifact(ARTIFACT_MAGIC_BOOK))
         return;
-    if (!(m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)))
+    if (!HAS(m_buildings, IDX(TOWN_BUILDING_MAGE_GUILD)))
         return;
 
     for (stage = 0; stage < IDX(pupil->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
@@ -143,7 +143,7 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         ++m_buildState;
         m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
-        if (m_type == FACTION_WIZARD && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
+        if (m_type == FACTION_WIZARD && HAS(m_buildings, IDX(TOWN_BUILDING_LIBRARY)))
             ++m_spellCounts[m_buildState];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
@@ -205,12 +205,12 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     BuildingSlotType building;
     for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_SPECIAL_THIRTY;
          ++building) {
-        if (m_buildings & BIT(building))
+        if (HAS(m_buildings, BIT(building)))
             ++*numArchers;
     }
     for (building = BUILDING_SLOT_MAGE_GUILD; building <= BUILDING_SLOT_NEUTRAL_LAST;
          ++building) {
-        if (m_buildings & BIT(building))
+        if (HAS(m_buildings, BIT(building)))
             ++*numArchers;
     }
 }

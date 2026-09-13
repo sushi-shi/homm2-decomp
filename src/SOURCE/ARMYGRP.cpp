@@ -25,8 +25,7 @@ void SwapValues(Value& lhs, Value& rhs) {
 
 VA(0x00421710, 0x31)
 armyGroup::armyGroup(void) {
-    memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
-    memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
+    CLEAR_ARMY_GROUP(*this);
 }
 
 VA(0x00421741, 0xd)
@@ -101,8 +100,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
             moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = true;
-        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
-            && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
+        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD) && armyHero->IsEmbarked())
             ++moraleCount;
     }
 
@@ -113,10 +111,10 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     moraleCount += IDX(alignValue);
 
     if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER
-        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
+        && HAS(occupiedTown->m_buildings, IDX(TOWN_BUILDING_TAVERN)))
         ++moraleCount;
     if (occupiedTown != NULL && occupiedTown->m_type == FACTION_BARBARIAN
-        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
+        && HAS(occupiedTown->m_buildings, IDX(TOWN_BUILDING_COLISEUM)))
         moraleCount += COLISEUM_MORALE_BONUS;
 
     if (moraleCount < ARMY_GROUP_MORALE_MIN)

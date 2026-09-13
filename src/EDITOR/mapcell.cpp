@@ -144,10 +144,10 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
 
 VA(0x0047266d, 0x8c)
 void fullMap::Write(i32 handle) {
-    write(handle, &width, sizeof(width));
-    write(handle, &height, sizeof(height));
+    WRITE_FILE_VALUE(handle, width);
+    WRITE_FILE_VALUE(handle, height);
     write(handle, cells, width * height * sizeof(mapCell));
-    write(handle, &extraCount, sizeof(extraCount));
+    WRITE_FILE_VALUE(handle, extraCount);
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
@@ -158,8 +158,8 @@ void fullMap::Read(i32 handle, i32 convert) {
     i32 x, y;
     oldMapCellExtra* tmp2;
 
-    read(handle, &width, sizeof(width));
-    read(handle, &height, sizeof(height));
+    READ_FILE_VALUE(handle, width);
+    READ_FILE_VALUE(handle, height);
     Init(width, height);
     if (convert) {
         tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
@@ -171,7 +171,7 @@ void fullMap::Read(i32 handle, i32 convert) {
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
     }
-    read(handle, &extraCount, sizeof(extraCount));
+    READ_FILE_VALUE(handle, extraCount);
     if (extras)
         delete extras;
     extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));

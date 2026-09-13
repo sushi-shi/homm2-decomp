@@ -14,6 +14,11 @@ H2_ENUM_BEGIN(IconRleCommandConstant)
     ICON_RLE_DIM_PALETTE_LEVEL_STRIDE = 0x40
 H2_ENUM_END(IconRleCommandConstant)
 
+// Half-open placed-icon extent; operands are stable and left is already resolved.
+#define ICON_FITS_CLIP(left, top, width, height, clipX, clipY, clipW, clipH) \
+    ((left) >= (clipX) && (left) + (width) <= (clipX) + (clipW) \
+     && (top) >= (clipY) && (top) + (height) <= (clipY) + (clipH))
+
 inline u8 ReadIconRleByte(u8*& cursor) {
     cursor++;
     return cursor[-1];

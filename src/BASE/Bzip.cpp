@@ -963,12 +963,7 @@ LOOPSTART:
         goto LOOPSTART;
     }
 
-    sprintf(
-        gText,
-        "bad MTF value %d\n",
-        nextSym
-    );
-    LogStr(gText);
+    LOG_SUMMARY_VALUE("bad MTF value %d\n", nextSym);
     panic(const_cast<char*>("getAndMoveToFrontDecode\n"));
     return True;
 }
@@ -1606,12 +1601,7 @@ void compressStream(FILE* stream, FILE* zStream) {
 
     do {
         if (veryVerbose) {
-            sprintf(
-                gText,
-                "\nBEGIN block %d\n",
-                blockNo
-            );
-            LogStr(gText);
+            LOG_SUMMARY_VALUE("\nBEGIN block %d\n", blockNo);
         }
         blockNo++;
         thisIsTheLastBlock = loadAndRLEsource(stream);
@@ -1623,12 +1613,7 @@ void compressStream(FILE* stream, FILE* zStream) {
     crcToSend = getFinalCRC();
     putUInt32(zbs, crcToSend);
     if (veryVerbose) {
-        sprintf(
-            gText,
-            "\nCRC = 0x%x\n",
-            crcToSend
-        );
-        LogStr(gText);
+        LOG_SUMMARY_VALUE("\nCRC = 0x%x\n", crcToSend);
     }
 
     arithCodeDoneEncoding(zbs);
@@ -1709,12 +1694,7 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     do {
         currBlockNo++;
         if (veryVerbose) {
-            sprintf(
-                gText,
-                "[%d: ac+mtf ",
-                currBlockNo
-            );
-            LogStr(gText);
+            LOG_SUMMARY_VALUE("[%d: ac+mtf ", currBlockNo);
         }
         thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
         if (veryVerbose)
@@ -1782,13 +1762,11 @@ void crcError(UInt32 crcStored, UInt32 crcComputed) {
 
 VA(0x004ca510, 0x40)
 void compressedStreamEOF(void) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "\n%s: Compressed file ends unexpectedly;\n\t"
-            "perhaps it is corrupted?  *Possible* reason follows.\n",
+        "perhaps it is corrupted?  *Possible* reason follows.\n",
         progName
     );
-    LogStr(gText);
     perror(progName);
     showFileNames();
     cleanUpAndFail();
@@ -1796,12 +1774,10 @@ void compressedStreamEOF(void) {
 
 VA(0x004ca550, 0x40)
 void ioError(void) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "\n%s: I/O or other error, bailing out.  Possible reason follows.\n",
         progName
     );
-    LogStr(gText);
     perror(progName);
     showFileNames();
     cleanUpAndFail();
@@ -1809,75 +1785,60 @@ void ioError(void) {
 
 VA(0x004ca590, 0x31)
 void blockOverrun(void) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "\n%s: block overrun during decompression,\n"
-            "\twhich probably means the compressed file\n"
-            "\tis corrupted.\n",
+        "\twhich probably means the compressed file\n"
+        "\tis corrupted.\n",
         progName
     );
-    LogStr(gText);
     showFileNames();
     cleanUpAndFail();
 }
 
 VA(0x004ca5d0, 0x31)
 void unblockError(void) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "\n%s: compressed file didn't unblock correctly,\n"
-            "\twhich probably means it is corrupted.\n",
+        "\twhich probably means it is corrupted.\n",
         progName
     );
-    LogStr(gText);
     showFileNames();
     cleanUpAndFail();
 }
 
 VA(0x004ca610, 0x31)
 void bitStreamEOF(void) {
-    sprintf(
-        gText,
+    LOG_SUMMARY_VALUE(
         "\n%s: read past the end of compressed data,\n"
-            "\twhich probably means it is corrupted.\n",
+        "\twhich probably means it is corrupted.\n",
         progName
     );
-    LogStr(gText);
     showFileNames();
     cleanUpAndFail();
 }
 
 VA(0x004ca650, 0x2c)
 void __cdecl mySignalCatcher(IntNative* H2_UNUSED(n)) {
-    sprintf(
-        gText,
-        "\n%s: Control-C (or similar) caught, quitting.\n",
-        progName
-    );
-    LogStr(gText);
+    LOG_SUMMARY_VALUE("\n%s: Control-C (or similar) caught, quitting.\n", progName);
     cleanUpAndFail();
 }
 
 VA(0x004ca680, 0x65)
 void mySIGSEGVorSIGBUScatcher(IntNative* H2_UNUSED(n)) {
     if (compressing) {
-        sprintf(
-            gText,
+        LOG_SUMMARY_VALUE(
             "\n%s: Caught a SIGSEGV or SIGBUS whilst compressing,\n"
-                "\twhich probably indicates a bug in BZIP.  Please\n"
-                "\treport it to me at: sewardj@cs.man.ac.uk\n",
+            "\twhich probably indicates a bug in BZIP.  Please\n"
+            "\treport it to me at: sewardj@cs.man.ac.uk\n",
             progName
         );
-        LogStr(gText);
     } else {
-        sprintf(
-            gText,
+        LOG_SUMMARY_VALUE(
             "\n%s: Caught a SIGSEGV or SIGBUS whilst decompressing,\n"
-                "\twhich probably indicates that the compressed data\n"
-                "\tis corrupted.\n",
+            "\twhich probably indicates that the compressed data\n"
+            "\tis corrupted.\n",
             progName
         );
-        LogStr(gText);
     }
 
     showFileNames();

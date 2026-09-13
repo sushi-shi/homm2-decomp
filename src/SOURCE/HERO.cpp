@@ -250,7 +250,7 @@ i32 hero::CalcMobility(void) {
     i32 slowestSpeedValue;
     i32 creatureIndex;
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (IsEmbarked()) {
         movePoints = seaBaseMobility;
         movePoints = static_cast<i32>(
             movePoints * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
@@ -385,9 +385,7 @@ void HeroMessageUpdate(H2_CONST char* text) {
     if (gheroWin == NULL)
         return;
 
-    message.type = HERO_UI_MESSAGE;
-    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
-    message.payload.widget.id = UI_STATUS_TEXT_WIDGET;
+    SET_WIDGET_MESSAGE(message, HERO_UI_WIDGET_TEXT, UI_STATUS_TEXT_WIDGET);
     message.payload.widget.data.text = text;
     gheroWin->BroadcastMessage(message);
     gheroWin->DrawWindow(0, UI_PREVIOUS_HERO, UI_STATUS_TEXT_WIDGET);
@@ -469,18 +467,7 @@ void hero::UpdateArmies(void) {
 
 VA(0x004616e3, 0x39)
 void hero::ViewStat(i32 stat, i32 quickView) {
-    NormalDialog(
-        gStatDesc[stat],
-        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
-    );
+    NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
 VA(0x0046171c, 0x8b)
@@ -521,15 +508,7 @@ i32 hero::Dismiss(void) {
         "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 "
         "\xf3\xe2\xee\xeb\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff?" /* "Вы действительно хотите уволить героя?" */
         ,
-        NORMAL_DIALOG_CONFIRM,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
+        NORMAL_DIALOG_CONFIRM
     );
     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
         Deallocate(1);
@@ -567,7 +546,7 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         gpAdvManager->HideRoute(0, 0, 0);
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (IsEmbarked()) {
         for (i = 0; i < GAME_BOAT_COUNT; i++) {
             if (gpGame->m_boats[i].heroId == m_id) {
                 gpGame->m_boats[i].heroId = -1;
@@ -874,7 +853,7 @@ void hero::CheckLevel(void) {
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[IDX(m_owner)]) {
             samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
             if (choices[0] == HERO_SKILL_NONE) {
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (choices[1] == HERO_SKILL_NONE) {
                 sprintf(
                     text,
@@ -945,7 +924,7 @@ void hero::CheckLevel(void) {
         }
     }
     m_level = static_cast<i16>(newLevel);
-    WaitEndSample(&samp, -1);
+    WaitEndSample(&samp);
 }
 
 VA(0x0046276b, 0x4b)
@@ -1288,16 +1267,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
                                 "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
                                 "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
-                                /* "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка." */,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                /* "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка." */
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
@@ -1320,16 +1292,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
                                 " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
                                 "\xe1\xee\xff."
-                                /* "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя." */,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
+                                /* "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя." */
+                                ,
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
@@ -1358,23 +1323,15 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             "\xe8\xf7\xe5\xf1\xf2\xe2\xee \xee\xf7\xea\xee\xe2 \xec\xe0\xe3"
                             "\xe8\xe8 \xec\xee\xe6\xe5\xf2 \xef\xf0\xe5\xe2\xfb\xf8\xe0\xf2"
                             "\xfc \xee\xe1\xfb\xf7\xed\xfb\xe9 \xeb\xe8\xec\xe8\xf2."
-                            /* "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит." */,
+                            /* "{Очки магии}\n\n%s сейчас располагает %d очками магии из возможных %d оч. Максимально возможное число очков магии равно уровню знаний помноженному на 10. Но иногда, в особых случаях, количество очков магии может превышать обычный лимит." */
+                            ,
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
-                            gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                                * HERO_SPELL_POINTS_PER_KNOWLEDGE
+                            HERO_NORMAL_SPELL_POINTS(*gpHVHero)
                         );
                         NormalDialog(
                             gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
 
@@ -1394,15 +1351,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         );
                         NormalDialog(
                             gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
                     }
@@ -1563,9 +1512,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     }
 
     if (bExit) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(UI_DIALOG_CLOSE_COMMAND);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1770,12 +1717,7 @@ void SetupHeroView(void) {
     msg.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(
-        gText,
-        "%d/%d",
-        gpHVHero->m_spellPoints,
-        gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
-    );
+    sprintf(gText, "%d/%d", gpHVHero->m_spellPoints, HERO_NORMAL_SPELL_POINTS(*gpHVHero));
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_SPELL_POINTS_LAST;
     msg.payload.widget.data.text = gText;
@@ -2104,7 +2046,7 @@ void hero::CheckAnduranPieces(b32 showDialog) {
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog);
         if (gbThisNetHumanPlayer[IDX(m_owner)]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
