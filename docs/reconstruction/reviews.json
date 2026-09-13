@@ -8176,10 +8176,10 @@
     "note": "C12: serialized IconEntry prefix cast is genuine; dim palette byte flattening can use real dimensions after RLE-domain proof. Signed command-byte and recolor narrowing casts are semantic. G15 backward fill_run shares genuine solid/recolor fill. B28 row pointer formed before clipping may precede bitmap; streamed RLE/frame/clip/level extents lack local guards. run/length state remains related decoding, not unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::LeaveNoBody(void)#1": {
-    "body_sha256": "7f65029bab4d54bcff94094b42d7487256644c53ff750f72f57653ea5d808b8b",
+    "body_sha256": "abca8835c67f03662f3a12db632c10c1414fe0c740eeda1f2a4780eb0a9158bb",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -8189,13 +8189,13 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "Elemental-type and mirror-image flag predicate; monster bitfield/all-word view is genuine shared flags, no synthetic union."
+    "note": "Elemental-type and mirror-image flag predicate; monster bitfield/all-word view is genuine shared flags, no synthetic union. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::ProcessDeath(i32 immediate)#1": {
-    "body_sha256": "c04edd7e2a9dceaeab557efdf8ecc0e8ecf57f8ecd01f056873a623179f5352e",
+    "body_sha256": "730f3923cc5522769773b71f4b4a29b4fec99f64343ee97748a55ccd222d2f24",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -8205,7 +8205,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Corpse append checks both14-entry records before writes/increments; real front/rear hex pointers and mirror owners. B27 combat side/index/hex/mirror-reference domains remain state invariants, no fake aggregate or pointer subtraction. Flag overlay is real."
+    "note": "Corpse append checks both14-entry records before writes/increments; real front/rear hex pointers and mirror owners. B27 combat side/index/hex/mirror-reference domains remain state invariants, no fake aggregate or pointer subtraction. Flag overlay is real. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/HEXCELL.cpp:hexcell::hexcell(void)#1": {
     "body_sha256": "74c955906c28cbe846b0b8f67142cd61d65f4e0b68425394cf15a8d229e8950a",
@@ -17248,10 +17248,10 @@
     "note": "Whole hover dispatch; U01 hover ID read only under mouse-move tag. Eight help-table cases/default use known indices; B59 actual help strings/formats, live viewSpellsHero and gText768 lengths need pinned data evidence. Plain CRT calls not manual varargs; no casts, goto, scratch, unrelated reuse or owner tricks."
   },
   "src/SOURCE/GAME.cpp:game::ViewArmy(i32 x,i32 y,CreatureType monsterType,i32 numTroops,town * castle,i32 disableUpgrade,ArmyFacing facing,i32 quickView,hero * theHero,class army * theArmy,armyGroup * theGroup,i32 groupIndex)#1": {
-    "body_sha256": "89608d2d843f7e8a70549832ae4e448af8cc51930d9bc29c7e718e55270c0f2c",
+    "body_sha256": "1a47ece506204d53beb0b74d064e72eb37f7ca43ebfa115ff072621a78f7cd2c",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17261,7 +17261,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C38 char name owner removes two pointer casts; C39 five scalar vararg casts removed via complete2/2 and32/32 matrices. All102 GAME functions/sections/ordered relocations native-identical. Remaining literal-const, coordinate narrowing and unsigned health-subtraction boundaries retained for separate review. U01 message numeric/text arms and monster flags meaningful; S40 seven unread i16 widget/frame locals. B60 complete chain198/550, largest gText part32/768, names20/32, filenames13/16, positive troop count11/12 including NUL from pinned retail. B61 live creature/faction/speed/morale/luck/icon-frame domains, spellCount/influence consistency, groupIndex<5 and active-combat nonnull theArmy required. x/y inputs overwritten with window constants, same coordinate role but incoming values unused. No goto, owner recovery, fake offsets or manual varargs. Whole3336 ordinary bytes match; four EH operands/DIR32 unresolved, no whole-retail closure claim."
+    "note": "C38 char name owner removes two pointer casts; C39 five scalar vararg casts removed via complete2/2 and32/32 matrices. All102 GAME functions/sections/ordered relocations native-identical. Remaining literal-const, coordinate narrowing and unsigned health-subtraction boundaries retained for separate review. U01 message numeric/text arms and monster flags meaningful; S40 seven unread i16 widget/frame locals. B60 complete chain198/550, largest gText part32/768, names20/32, filenames13/16, positive troop count11/12 including NUL from pinned retail. B61 live creature/faction/speed/morale/luck/icon-frame domains, spellCount/influence consistency, groupIndex<5 and active-combat nonnull theArmy required. x/y inputs overwritten with window constants, same coordinate role but incoming values unused. No goto, owner recovery, fake offsets or manual varargs. Whole3336 ordinary bytes match; four EH operands/DIR32 unresolved, no whole-retail closure claim. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/GAME.cpp:ViewArmyHandler(tag_message & msg)#1": {
     "body_sha256": "fd0b8e8d682f42b89c812782b81f4e27fffd7fefb90ac54db52e33faa0d2d7e1",
@@ -17568,10 +17568,10 @@
     "note": "C34 bounded creature/count casts from six-faction table. S41 real6x3 six-byte records, but third column unused by selection loop2; selected[2] IS read to force selected[1], cannot remove flag. Five slots initialized, at most two filled. B61 hero0..53/faction0..5; fixed random counts fit i16. No union/goto/fake address/manual varargs."
   },
   "src/SOURCE/GAME.cpp:game::ProcessRandomObjects(void)#1": {
-    "body_sha256": "3ae23d73f8c8aed8232f10b24955466fedc77576cb12de246e7a61e427cc4782",
+    "body_sha256": "43564bfc49c94e44790d4e5beac172a427c924db331b49c97d266d2a9ff2607c",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -17581,7 +17581,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full switch read. G49 five randomMonster/four monsterBoundsReady joins need structural families. C34 coordinates/13-bit radius and random0..65 creature stores; real trigger conversion. MonsterDatabase randomValue is real fightValue union view. B58 map/terrain/extra contracts, fixed66 creature index fits; chosen value interval must contain a creature for rejection termination. Random resource0..6 and converted rectangles clipped by callee. No fake aggregate/manual varargs/owner recovery/arbitrary offsets."
+    "note": "Full switch read. G49 five randomMonster/four monsterBoundsReady joins need structural families. C34 coordinates/13-bit radius and random0..65 creature stores; real trigger conversion. MonsterDatabase randomValue is real fightValue union view. B58 map/terrain/extra contracts, fixed66 creature index fits; chosen value interval must contain a creature for rejection termination. Random resource0..6 and converted rectangles clipped by callee. No fake aggregate/manual varargs/owner recovery/arbitrary offsets. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/GAME.cpp:game::SetVisibility(i32 x,i32 y,i32 player,i32 radius)#1": {
     "body_sha256": "fac13142f7956c7ff0da8a8d76650eb68f42af111a9acb6e1d3a9a907cac7857",
@@ -19424,10 +19424,10 @@
     "note": "Both visiting-hero and town ranged-stack passes and danger/discount tail read. Real numeric precision/truncation casts retained, including explicit denominator float boundary noted by source. archers intentionally accumulates both army contributions, not unrelated reuse. Seven-resource costs and threat output locals are real. B70 positive costRV, valid town/owner/hero/creature IDs, finite ratios and representable multiplied costs required. No goto, union, fake aggregate, manual varargs or artificial owner pointer."
   },
   "src/SOURCE/PHILAI.cpp:philAI::GetBestCreature(town * townPtr,BHC & best,float & bestValue)#1": {
-    "body_sha256": "374aea23d462ff57779507282be966c01ee33c4359d586b859662c220f2295c2",
+    "body_sha256": "c36d93ec389f459f908db5af7d3b4b05bdc738c57f3e1af79c17ca4e2a7d7ea8",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19437,7 +19437,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "All twelve dwelling choices, army-capacity/value replacement, suppression, purchase quantity and jitter branches read. U16 integer arm really stores dwelling slot, num stores quantity. S51 resourceValue is modified for difficulty/threat but never used for selection. Real casts retained pending that structural recovery. B70 valid faction/creature mapping, garrison/army domains, finite debug values and live output required. No goto, fake scratch, manual varargs, unrelated reuse or artificial pointer."
+    "note": "All twelve dwelling choices, army-capacity/value replacement, suppression, purchase quantity and jitter branches read. U16 integer arm really stores dwelling slot, num stores quantity. S51 resourceValue is modified for difficulty/threat but never used for selection. Real casts retained pending that structural recovery. B70 valid faction/creature mapping, garrison/army domains, finite debug values and live output required. No goto, fake scratch, manual varargs, unrelated reuse or artificial pointer. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/PHILAI.cpp:philAI::CreaturesToBuy(town * t,i32 level)#1": {
     "body_sha256": "a91c1478535354e2f0763e420111b67cc27bf682a277d45086ddfed49ac62b80",
@@ -20384,10 +20384,10 @@
     "note": "Full samples/spells/timer/resource-state reset read. Actual seven sample pointers and fifteen influence bytes; sizeof covers full real array. B73 resets pointers without disposing previous resources, requiring lifecycle discipline; missileIcon left to LoadResources. No casts, union use, goto, fake aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::Init(CreatureType monsterType,i32 quantity,CombatSide side,i32 index,i32 hex,i32 unknown)#1": {
-    "body_sha256": "b72e0f0b398b322a8dc3fbeb67685562af85e4bb00e3d198d9f884440ea73d09",
+    "body_sha256": "09ebc083b3806230caf9736f9ede783ffd37d1c9ef563d440a498102584ad4cf",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20397,13 +20397,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full monster copy, hero stat modifiers, morale/luck and front/rear occupancy setup read including both strict-enum branches. C57 retail side-integer-XOR-facing roundtrip candidate; types and narrow stat arithmetic require valid domains. U05 real monster flag views retained. B73 creature0..65, side0..1, army/hex and wide rear-cell validity, initialized combat owners and representable stats required. No goto, fake aggregate, varargs or unrelated reuse."
+    "note": "Full monster copy, hero stat modifiers, morale/luck and front/rear occupancy setup read including both strict-enum branches. C57 retail side-integer-XOR-facing roundtrip candidate; types and narrow stat arithmetic require valid domains. U05 real monster flag views retained. B73 creature0..65, side0..1, army/hex and wide rear-cell validity, initialized combat owners and representable stats required. No goto, fake aggregate, varargs or unrelated reuse. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::LoadResources(void)#1": {
-    "body_sha256": "36b4cac84c3d8e190cbc2116f902cd79e22e45f2372417e8cc2e9a905f38b22b",
+    "body_sha256": "a5fbaa314c524e685fcc1db95a813457e5e3ddb01e20ca82341e78160572e6c0",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20413,7 +20413,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full frame read/modify, samples, missile-name selection and primary-sample setup read. B73 all66 retail spriteName fields are terminated within5 bytes, maximum prefix4, so fixed suffix filenames fit gText768; catalog proof in check-army-combat-text.py. Resource read success, valid creature and frame/count domains remain. U05 flags retained. Seven samples are real; only primary five playback settings modified intentionally. No cast, goto, fake aggregate, varargs or unrelated reuse."
+    "note": "Full frame read/modify, samples, missile-name selection and primary-sample setup read. B73 all66 retail spriteName fields are terminated within5 bytes, maximum prefix4, so fixed suffix filenames fit gText768; catalog proof in check-army-combat-text.py. Resource read success, valid creature and frame/count domains remain. U05 flags retained. Seven samples are real; only primary five playback settings modified intentionally. No cast, goto, fake aggregate, varargs or unrelated reuse. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::FreeResources(void)#1": {
     "body_sha256": "07386264bd04901ee3260a032efc0934fb363547e50be7571e205504ef2ce25b",
@@ -20432,10 +20432,10 @@
     "note": "Full optional missile/icon and seven-sample disposal/reset read. Typed sample loop bounds actual owner array; no void recovery cast. B73 initialization and visual/nonvisual resource lifecycle required; early no-show return does not free resources. No union, goto, fake aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::DrawToBuffer(i32 x,i32 y,i32 effectsOnly)#1": {
-    "body_sha256": "1efcc31bd91cf8712b94a9cccf50d6d409ea704561df581d35885e422dc222a8",
+    "body_sha256": "1310d3ba0293ccc1dd2e30852c9db405f6ae90315218cf41c064c864af6e8483",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20445,7 +20445,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete238-line draw/palette/quantity/effect body read. C57 facing-to-orientation numeric expression candidate. U05 flags real. S54 flags assigned0 then unread. countText12 fits signed i32 minimum11 characters plus NUL; fifteen spell slots and real limit records retained. B73 frame/sequence/facing domains, positive walk-frame divisor, live icons and neighboring hex (possibly +/-2) validity required before occupancy read; clipping does not establish these indices. No goto, fake aggregate, varargs or unrelated reuse."
+    "note": "Complete238-line draw/palette/quantity/effect body read. C57 facing-to-orientation numeric expression candidate. U05 flags real. S54 flags assigned0 then unread. countText12 fits signed i32 minimum11 characters plus NUL; fifteen spell slots and real limit records retained. B73 frame/sequence/facing domains, positive walk-frame divisor, live icons and neighboring hex (possibly +/-2) validity required before occupancy read; clipping does not establish these indices. No goto, fake aggregate, varargs or unrelated reuse. U05 applied: 7 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::Wince(void)#1": {
     "body_sha256": "3f76299e6c8db0bba0e97f50a132a89a2c53584527ef08901b64e7e4c9846fe3",
@@ -20464,10 +20464,10 @@
     "note": "Entire typed animation-sequence/frame reset read. No ten-pattern instance."
   },
   "src/SOURCE/ARMY.cpp:army::Walk(CombatHexDirection direction,i32 finishStanding,i32 skipDrawing)#1": {
-    "body_sha256": "dc5d2a66e8c73b298376981ef8427d03c87d4e213d01e553adeafead29f37289",
+    "body_sha256": "95dc4c4f9049ab965104b62ea59275702afadf58f02f4431abbb986729528e46",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20477,13 +20477,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete247-line bridge/facing/extent/animation/occupancy/restore body read. Real floating timer truncation and U05 flags retained. S54 saveHex assigned but unread. B73 valid adjacent/front/rear hexes, positive frame counts<=16, speed domain and initialized visual resources/extents required. In-loop CopyTo precedes reclamping the current extent; no hardening reordering. Real extent scalars are snapshots, not unrelated reuse. No goto, fake aggregate, varargs or owner recovery."
+    "note": "Complete247-line bridge/facing/extent/animation/occupancy/restore body read. Real floating timer truncation and U05 flags retained. S54 saveHex assigned but unread. B73 valid adjacent/front/rear hexes, positive frame counts<=16, speed domain and initialized visual resources/extents required. In-loop CopyTo precedes reclamping the current extent; no hardening reordering. Real extent scalars are snapshots, not unrelated reuse. No goto, fake aggregate, varargs or owner recovery. U05 applied: 8 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::SpecialAttack(void)#1": {
-    "body_sha256": "ac488d06aecec73930a8def569b391369786e21bd0c1721d044fdea30affc5b8",
+    "body_sha256": "252833cf9e6282bce98134ea496f8a285bcfcab5f044fb4117b610a5dc78c22e",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20493,7 +20493,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete460-line facing/projectile/lich damage/text/effect/second-shot flow read. C55 removes four redundant numeric conversions and literal-to-cancel-enum conversion after complete32-arm family; full native proof required alongside documented retail EH/private-operand limits. Explicit parenthesized float divisor and actual float-to-i32/coordinate narrowings retained. U05 flags. R16 k spans angle boundaries, projectile steps and splash directions. S54 hisRow and first wasFacing assignment unread. B73 Y background clamp uses640 in retail too; frame/direction/hex/resource/short-coordinate domains and finite path arithmetic required. Last splash iteration sets adjacentHex to target hex, so it is assigned before final coordinate read. Name100/text768/snapshot800 proven for retail catalogs. No goto, manual varargs or artificial owner."
+    "note": "Complete460-line facing/projectile/lich damage/text/effect/second-shot flow read. C55 removes four redundant numeric conversions and literal-to-cancel-enum conversion after complete32-arm family; full native proof required alongside documented retail EH/private-operand limits. Explicit parenthesized float divisor and actual float-to-i32/coordinate narrowings retained. U05 flags. R16 k spans angle boundaries, projectile steps and splash directions. S54 hisRow and first wasFacing assignment unread. B73 Y background clamp uses640 in retail too; frame/direction/hex/resource/short-coordinate domains and finite path arithmetic required. Last splash iteration sets adjacentHex to target hex, so it is assigned before final coordinate read. Name100/text768/snapshot800 proven for retail catalogs. No goto, manual varargs or artificial owner. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::DirDoAttack(CombatHexDirection direction)#1": {
     "body_sha256": "b814ab1266a3db284b45ab10835e11c0052333e2783d733079a11fd319dc4d0c",
@@ -20512,10 +20512,10 @@
     "note": "Entire typed direction store and DoAttack delegation read; inherits valid attack/target/hex state requirements. No cast, union use, goto, aggregate scratch, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::DoHydraAttack(i32)#1": {
-    "body_sha256": "10befe61649ae62cea0f631e4d28f84bbd591502b1ace1f8dd6af3bbcb9c801a",
+    "body_sha256": "6b5971bbf02354b6d1b5479009440b1fe91f1b504f3846d5555a2e09ab61c421",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20525,13 +20525,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete eight-direction wide-hex/unique-hit/damage/text flow read. C57 attack mask-to-i16 conversions require mask domain; bits0..7 are bounded by loop. ValidHex guards target cell, then side/index lower guards rely on upper-domain occupancy invariant. U05 flags retained. B73 valid army arrays, damage outputs and representable totals; text768/snapshot800 proven by retail name catalog. No goto, artificial aggregate, varargs, unrelated reuse or owner recovery."
+    "note": "Complete eight-direction wide-hex/unique-hit/damage/text flow read. C57 attack mask-to-i16 conversions require mask domain; bits0..7 are bounded by loop. ValidHex guards target cell, then side/index lower guards rely on upper-domain occupancy invariant. U05 flags retained. B73 valid army arrays, damage outputs and representable totals; text768/snapshot800 proven by retail name catalog. No goto, artificial aggregate, varargs, unrelated reuse or owner recovery. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::DoAttack(i32 retaliation)#1": {
-    "body_sha256": "4842a9c9b04382776dc466f78131e0443929aef441a380746f27415ba200997e",
+    "body_sha256": "8d94fe84d5ac124b51d474a2f8b03e73996b5ef55b50fc297335a0a2d321f276",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -20541,7 +20541,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete357-line hydra/breath/effect/retaliation/second-attack/facing-restore body read. C55 typed AFTER_ATTACK constant replaces literal enum conversion with measured native equivalence. Remaining C57 side cast and real timer conversions retained. G63 hydra cleanup, mummy shared spell and secondAttack joins untried. R16 targetHex_3 reused as final -1 side sentinel carrier. S54 occupantSide_5 unused. U05 flags real. B73 valid first attack neighbor/occupancy without local guard, positive vampire hitpoints and postdamage target lifecycle required. Both100-byte name and768/800 text owners fit verified catalog formats. No fake aggregate, manual varargs or artificial pointer."
+    "note": "Complete357-line hydra/breath/effect/retaliation/second-attack/facing-restore body read. C55 typed AFTER_ATTACK constant replaces literal enum conversion with measured native equivalence. Remaining C57 side cast and real timer conversions retained. G63 hydra cleanup, mummy shared spell and secondAttack joins untried. R16 targetHex_3 reused as final -1 side sentinel carrier. S54 occupantSide_5 unused. U05 flags real. B73 valid first attack neighbor/occupancy without local guard, positive vampire hitpoints and postdamage target lifecycle required. Both100-byte name and768/800 text owners fit verified catalog formats. No fake aggregate, manual varargs or artificial pointer. U05 applied: 10 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::ResetPath(void)#1": {
     "body_sha256": "ffe848cc0d381bc71489b226941d5bbf2de2dac6065196299bddaeb857356ffb",
@@ -20576,10 +20576,10 @@
     "note": "Full no-argument delegation to stored movement target read. Inherits WalkTo(destination) path/hex/lifecycle requirements, no distinct cast, union, goto, scratch aggregate, varargs or role reuse."
   },
   "src/SOURCE/ARMY.cpp:army::WalkTo(i32 destination)#1": {
-    "body_sha256": "d321a2c558c23094a405eb113353e19b89482656c09ff5d39f3e0864d58cdc4b",
+    "body_sha256": "d953feb4079e9c9f23625dc7f64278cb8265c5300208e441af16402405ad8be6",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20589,7 +20589,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete moat/path walk and cancellation tail read. C55 typed AFTER_MOVE constant removes literal enum conversion with full682-byte retail and native proof. C57 direction enum conversions remain; U02 actual search path view/U05 flags retained. R16 direction_3 spans moat index, hex direction and reverse path index. B73 valid 9-row moat index and initialized bounded positive path length, direction bytes and movement invariants required; neighbor moat accesses explicitly guarded, but path usesindex+1. No goto, fake aggregate, manual varargs or artificial owner."
+    "note": "Complete moat/path walk and cancellation tail read. C55 typed AFTER_MOVE constant removes literal enum conversion with full682-byte retail and native proof. C57 direction enum conversions remain; U02 actual search path view/U05 flags retained. R16 direction_3 spans moat index, hex direction and reverse path index. B73 valid 9-row moat index and initialized bounded positive path length, direction bytes and movement invariants required; neighbor moat accesses explicitly guarded, but path usesindex+1. No goto, fake aggregate, manual varargs or artificial owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::AttackTo(void)#1": {
     "body_sha256": "7b2967244734c91c4a4f5c5eaba9492d95a377e7ed12a63251c7c81369335eec",
@@ -20608,10 +20608,10 @@
     "note": "Full no-argument stored-target delegation read; inherits typed attack/path preconditions. No independent cast, union, goto, fake aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::AttackTo(i32 destination)#1": {
-    "body_sha256": "63be63d9b3c235c41334f88bf1f28dc1093509cb82f8d06ec07d652864748694",
+    "body_sha256": "b93064ed57affd12dc05937abdb936e6898efdaba0d3db77d2f0a4c7c4aac570",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20621,7 +20621,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete flying/breath/one-step/multiple-step attack dispatch read. C55 typed AFTER_MOVE constant removes literal enum conversion; full456-byte retail/native proof. C57 path direction conversions remain, U02 path/U05 flag views genuine. S54 pathIndex=0 immediately overwritten by for initialization. B73 successful FindPath must provide length>=1 and bounded direction array; zero length enters pathIndex=-1 with loop!=0 and out-of-range access. No guard invented. No goto, fake aggregate, varargs, unrelated reuse or owner recovery."
+    "note": "Complete flying/breath/one-step/multiple-step attack dispatch read. C55 typed AFTER_MOVE constant removes literal enum conversion; full456-byte retail/native proof. C57 path direction conversions remain, U02 path/U05 flag views genuine. S54 pathIndex=0 immediately overwritten by for initialization. B73 successful FindPath must provide length>=1 and bounded direction array; zero length enters pathIndex=-1 with loop!=0 and out-of-range access. No guard invented. No goto, fake aggregate, varargs, unrelated reuse or owner recovery. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::CheckLuck(void)#1": {
     "body_sha256": "ed4507d085d32c67c450c3309b174dfb1b45248cea9c3557be47e09b72f15322",
@@ -20640,10 +20640,10 @@
     "note": "Full luck roll, sample lifetime, text/effect and redraw flow read. SAMPLE2 is a real sample pointer passed by address, not fake stack aggregate. B73 side/creature/speed/luck numeric and sound lifecycle contracts; formatted text fits retail-catalog bound. No explicit cast, union, goto, unused local, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::DamageEnemy(army * target,i32 * damageResult,i32 * killedResult,i32 rangedAttack,i32 defenseModifier)#1": {
-    "body_sha256": "47aa24419df32e8e082d3cf955184f237cb9877786dd73cb45a518aca7d1382d",
+    "body_sha256": "c1bd07486441256b81bf3a0bae4c3b7359e69636f2f663364b1ccf5b61ddc2dc",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20653,13 +20653,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full quantity damage rolls, modifiers, moat, luck/shield/petrify/genie and output flow read. Real float accumulation/rounding truncation retained; U05 aliases. R16 count spans troop count then nine moat cells. attackAdd/defBonus initialized0 and read are redundant scalar candidates but not unused storage. B73 null target returns without assigning outputs, otherwise output pointers required; valid side/skill/monster domains and representable values. diff clamped +/-20 proves41-entry multiplier index0..40. No goto, fake aggregate, varargs or artificial owner."
+    "note": "Full quantity damage rolls, modifiers, moat, luck/shield/petrify/genie and output flow read. Real float accumulation/rounding truncation retained; U05 aliases. R16 count spans troop count then nine moat cells. attackAdd/defBonus initialized0 and read are redundant scalar candidates but not unused storage. B73 null target returns without assigning outputs, otherwise output pointers required; valid side/skill/monster domains and representable values. diff clamped +/-20 proves41-entry multiplier index0..40. No goto, fake aggregate, varargs or artificial owner. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::Damage(i32l damage,SpellType spell)#1": {
-    "body_sha256": "3a990cb543af54a012a760e291d8a6934e8065bb1dbc17500e4435704608a6a4",
+    "body_sha256": "b7c87673ea44ae8895ec4d991f8aed5ed081070a22f7f296e7bf96320c30c373",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20669,7 +20669,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire artifact-modified damage, division/remainder, state changes and cancellation read. C57 XOR-facing expression then immediate restoration candidate. S54 quantityFifth computed/capped but unread; intermediate m_facing write overwritten by oldFacing without a call. U05 flags. B73 positive hitPoints divisor, valid current attacker arrays/heroes and representable damage/count arithmetic required. Mirror special case occurs after division. No goto, fake aggregate, varargs or unrelated owner pointer."
+    "note": "Entire artifact-modified damage, division/remainder, state changes and cancellation read. C57 XOR-facing expression then immediate restoration candidate. S54 quantityFifth computed/capped but unread; intermediate m_facing write overwritten by oldFacing without a call. U05 flags. B73 positive hitPoints divisor, valid current attacker arrays/heroes and representable damage/count arithmetic required. Mirror special case occurs after division. No goto, fake aggregate, varargs or unrelated owner pointer. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::PowEffect(CombatEffectType effect,i32 resetLimits,i32 effectX,i32 effectY)#1": {
     "body_sha256": "77101a8c2030c4385f0b983867302afe9f0685dfdba19d4d6fa3a3b66a07c4de",
@@ -20784,10 +20784,10 @@
     "note": "Complete bounded fifteen-influence decay/cancel loop and positive round-counter decrement read. No explicit casts or union access; coherent spellCount/status/stat lifecycle inherited from setters. No goto, fake aggregate, varargs, role reuse or artificial owner."
   },
   "src/SOURCE/ARMY.cpp:army::GoBerserk(void)#1": {
-    "body_sha256": "58d0acef87b504f8799f1c2d4af13228537c380ca6eb53a8571e6053e5c9a5ef",
+    "body_sha256": "dd75261a7fea0d5770a963637fba560c42b72d1145d0cb18c22c3c9d6d19df33",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -20797,13 +20797,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full adjacent random attack, nearest target, two-side attempt and walking fallback read. Genuine two-side mask array plus scalar attack/found roles; unused historical BerserkMaskIndex enum does not prove a live five-word aggregate. S54 unusedMask_16 declaration/assignment removal measured2/2; disposition documented, not disguised by padding. G64 five berserkFinish exits remain untried. Random direction-to-enum conversion expresses actual bounded0..7 domain. U05 flags. B73 valid masks/occupancy/output targets, side/army/hex domains and successful ValidAttack output required; return ignored. No manual varargs, unrelated local reuse or artificial owner."
+    "note": "Full adjacent random attack, nearest target, two-side attempt and walking fallback read. Genuine two-side mask array plus scalar attack/found roles; unused historical BerserkMaskIndex enum does not prove a live five-word aggregate. S54 unusedMask_16 declaration/assignment removal measured2/2; disposition documented, not disguised by padding. G64 five berserkFinish exits remain untried. Random direction-to-enum conversion expresses actual bounded0..7 domain. U05 flags. B73 valid masks/occupancy/output targets, side/army/hex domains and successful ValidAttack output required; return ignored. No manual varargs, unrelated local reuse or artificial owner. U05 applied: 3 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::MoveAttack(i32 destination,i32 moveOnly)#1": {
-    "body_sha256": "855e556c9cfbc805604ce4d1bab8d0fa881aa9e0ea0f48bca5ec18f145602479",
+    "body_sha256": "6f7a0f3725b85fc77c8013cb5166de1e08b03d81e075ce4156f807233f6219b2",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -20813,13 +20813,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete validated-destination melee/ranged/flying/walking dispatch read. G65 retry after FlyTo is one goto; potential structured loop untried. U05 flags. B73 valid army/occupancy/hex state and successful flight progress required; originalDirection must be established by actual matching adjacent target before DoAttack. Early returns leave limitCreature false as written. No casts, fake aggregate, varargs or unrelated local roles."
+    "note": "Complete validated-destination melee/ranged/flying/walking dispatch read. G65 retry after FlyTo is one goto; potential structured loop untried. U05 flags. B73 valid army/occupancy/hex state and successful flight progress required; originalDirection must be established by actual matching adjacent target before DoAttack. Early returns leave limitCreature false as written. No casts, fake aggregate, varargs or unrelated local roles. U05 applied: 5 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::SpellCastWorkChance(SpellType spell)#1": {
-    "body_sha256": "29fe7e0860e18234bd91bfefed767dfd5e6379caf04e540714bc274ab86b6beb",
+    "body_sha256": "e134a8f7dea83bd8e5004311dae0cc32978e87e11e74f73a6474c88905d1849f",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20829,7 +20829,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete172-line immunity, artifacts, resurrection/hypnosis and dwarf chance predicate read. U05 real attributes retained. Typed fifteen-influence scan bounded; no explicit cast or scratch aggregate. B73 valid side/current-side/creature state and representable power/HP arithmetic. HYPNOTIZE branch dereferences current-side hero without a null guard, unlike resurrection artifact branch. No normal-game reachability claim or behavior correction. No goto, manual varargs, unrelated reuse or artificial pointer."
+    "note": "Complete172-line immunity, artifacts, resurrection/hypnosis and dwarf chance predicate read. U05 real attributes retained. Typed fifteen-influence scan bounded; no explicit cast or scratch aggregate. B73 valid side/current-side/creature state and representable power/HP arithmetic. HYPNOTIZE branch dereferences current-side hero without a null guard, unlike resurrection artifact branch. No normal-game reachability claim or behavior correction. No goto, manual varargs, unrelated reuse or artificial pointer. U05 applied: 8 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::SpellCastWorks(SpellType spell)#1": {
     "body_sha256": "bf9955e3a3a6fdafc5f3cffb83571718c04cd67355b0eb15488c40861a8b65fa",
@@ -20896,10 +20896,10 @@
     "note": "All seven fixed bad-influence cancellations and damage-loss reduction/clamp read. Fixed indices valid; amount*5 and subtraction require representable arithmetic. Does not resurrect quantities. No casts, union view, goto, scratch aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::MidX(void)#1": {
-    "body_sha256": "a383a8bd0dfa26026a4169d71c0c899f0ce743585a1bd85784b26b980323dec1",
+    "body_sha256": "8f3d15a38702163532d1f5063b476b52e02673b343f205b48448007dcbf4a14c",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20909,7 +20909,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full front-hex coordinate and wide half-width expression read. U05 wide flag real; valid hex/facing and representable coordinate arithmetic required. No casts, goto, scratch aggregate, varargs, unrelated reuse or artificial address."
+    "note": "Full front-hex coordinate and wide half-width expression read. U05 wide flag real; valid hex/facing and representable coordinate arithmetic required. No casts, goto, scratch aggregate, varargs, unrelated reuse or artificial address. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:army::MidY(void)#1": {
     "body_sha256": "b6554fe22347b73d5743d7bd16c77b8ae3b9a571f921f1184665db1f4c99bc23",
@@ -20976,10 +20976,10 @@
     "note": "Both mirrored coordinate/entry offset-width branches read. Real resource accessor and hex owner; valid facing/hex/icon/frame and arithmetic required. No casts, union, goto, scratch aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::OtherArmyAdjacent(CombatSide side,i32 index)#1": {
-    "body_sha256": "393bfeaaba5c5f66ad2ccc6dae780bf7bbda07a5525aa69e98da79f7a43c0da2",
+    "body_sha256": "81189467190544e6494d682601ee8831a9ba9e754875e2aa8c27e6f8fc15b723",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20989,7 +20989,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full six-neighbor front/rear search read. U05 wide flag; other rear positions use original side rather than current facing, retained source behavior. B73 valid side/army/hex owners required; -1 adjacent sentinel is excluded for rear equality but assumes other front hex valid. No casts, goto, fake aggregate, varargs, unrelated reuse or artificial address."
+    "note": "Full six-neighbor front/rear search read. U05 wide flag; other rear positions use original side rather than current facing, retained source behavior. B73 valid side/army/hex owners required; -1 adjacent sentinel is excluded for rear equality but assumes other front hex valid. No casts, goto, fake aggregate, varargs, unrelated reuse or artificial address. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/ARMY.cpp:ModifyFrameInfo(struct SMonFrameInfo * frameInfo,CreatureType monsterType)#1": {
     "body_sha256": "1bf1182811ea6c7a0f3a34a4162d450022c235f148a9035949188fb392329099",
@@ -21040,10 +21040,10 @@
     "note": "Full inline predicate read: nonnegative creature code and positive quantity, no indexing or hidden owner recovery. It is an alive-state predicate, not validation of upper creature-ID bounds. No ten-pattern instance."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::CastSpell(SpellType spell,i32 targetHex,i32 castByCreature,i32 teleportDestination)#1": {
-    "body_sha256": "0424c4e06ab105d9039964df659a9d51d0ef5198cfc85636b721bb6a77eb38de",
+    "body_sha256": "a583a09b9a73f73a37115cab26d5839176b39a6accaf3b63c1df41e15df1e444",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -21053,7 +21053,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full576-line eagle-eye/targeting/hero-animation/sound/spell dispatch and cleanup body read as sole external animation-state writer. C56 false store preserves recovered u8 owner; entire SPELLS native object unchanged. C57 teleport index narrowings remain; real numeric truncations and printf int-versus-long boundary casts retained. U05 flags real. G66 shared cast_done failure cleanup untried; S55 unusedCastA8/B1 unread; nine missile angles and SAMPLE2 sample pointer are genuine. B74 combat IDs0..47 all have nonempty <=8-byte retail sound prefixes, filename<=13 fits16; special101/102 normalized before lookup. Adventure48..64 empty names leave filename uninitialized if misrouted, not ordinary reachability proof. Valid current-side hero required for hero casting despite earlier guard; valid target/teleport/area hex, side/index, animation/resource and representable damage/power domains required. No fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+    "note": "Full576-line eagle-eye/targeting/hero-animation/sound/spell dispatch and cleanup body read as sole external animation-state writer. C56 false store preserves recovered u8 owner; entire SPELLS native object unchanged. C57 teleport index narrowings remain; real numeric truncations and printf int-versus-long boundary casts retained. U05 flags real. G66 shared cast_done failure cleanup untried; S55 unusedCastA8/B1 unread; nine missile angles and SAMPLE2 sample pointer are genuine. B74 combat IDs0..47 all have nonempty <=8-byte retail sound prefixes, filename<=13 fits16; special101/102 normalized before lookup. Adventure48..64 empty names leave filename uninitialized if misrouted, not ordinary reachability proof. Valid current-side hero required for hero casting despite earlier guard; valid target/teleport/area hex, side/index, animation/resource and representable damage/power domains required. No fake aggregate, manual varargs, unrelated reuse or owner arithmetic. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::HasValidSpellTarget(SpellType spell)#1": {
     "body_sha256": "57512def89868ec3aa963926a14ff46e929c20b861085f77481cf372a108688d",
@@ -21264,10 +21264,10 @@
     "note": "Entire limit/save/draw/petrify/fizzle sequence read. Target and target side/index must be live; inclusive extents must cover a valid saved rectangle and frame resources. No cast, union, goto, unused local, fake aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::BloodLustEffect(army * target,MonsterFlags effect)#1": {
-    "body_sha256": "0de34723847d540b66d027e864aa4598f4f4a01e8add7d4b71be0480e76992cb",
+    "body_sha256": "71f15cc06d3ba80e1de53ebad3f634592554447800784964ba33039845ac7cb6",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21277,7 +21277,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full set-flag/fizzle/save/clear-flag/fizzle sequence read. U05 actual abilityFlags view retained. Clearing effect does not restore a preexisting bit; caller must supply a transient animation flag. B75 live target/side/slot and valid inclusive extents/resources required. No cast, goto, scratch aggregate, manual varargs or owner arithmetic."
+    "note": "Full set-flag/fizzle/save/clear-flag/fizzle sequence read. U05 actual abilityFlags view retained. Clearing effect does not restore a preexisting bit; caller must supply a transient animation flag. B75 live target/side/slot and valid inclusive extents/resources required. No cast, goto, scratch aggregate, manual varargs or owner arithmetic. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::Ripple(i32 strength)#1": {
     "body_sha256": "c5e838958f55c3d3a2adab8e4b64faf1e07147cf3604b917e6adbf8ed089d123",
@@ -21472,10 +21472,10 @@
     "note": "Full171-line target-mask selection, holy/death damage and influence application read. Real2x20 i8 affected array is fully zeroed; fifteen influence indices bounded. U05 undead attributes are actual flags. G70 no-show jump skips presentation, not damage/influence; structured wrapper untried. B75 valid selected combat spell, counts/hero/effect/stat/duration and resource domains; B76 text fits768. No written cast, artificial owner, fake aggregate, manual varargs or unrelated reuse."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::MirrorImage(i32 targetHex)#1": {
-    "body_sha256": "6eb0ef34709a7f06b9a141dee83e3df4aea5bc44c7ed23fcdd37e80fb8448595",
+    "body_sha256": "997c1a6d84d4e848c84db8d26e8afab336d44906518873baf0e596c56bc9eefc",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -21485,13 +21485,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete four-level search, AddArmy/linked mirror metadata and16-frame slide read. G71 mirror_found nested exit remains untried. U05 real wide/summoned flags; real timer conversion retained. B75 validated original occupied hex, army capacity, successful AddArmy and nonnull current hero required; CanFit does not establish capacity. Invalid intermediate neighbor continues next step and relies on neighbor helper sentinel behavior. No fake aggregate, varargs or unrelated scalar reuse."
+    "note": "Complete four-level search, AddArmy/linked mirror metadata and16-frame slide read. G71 mirror_found nested exit remains untried. U05 real wide/summoned flags; real timer conversion retained. B75 validated original occupied hex, army capacity, successful AddArmy and nonnull current hero required; CanFit does not establish capacity. Invalid intermediate neighbor continues next step and relies on neighbor helper sentinel behavior. No fake aggregate, varargs or unrelated scalar reuse. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::SummonElemental(CreatureType monsterType,i32 spellPower)#1": {
-    "body_sha256": "cbff79d85b0293f9ceda2ded92a75bb41c0fe03abe1a39580054a34ed1bfc576",
+    "body_sha256": "33dbd2b51f98e35ebfae2d372b2332a6b4b7b25536cf7fcfeb1d42d1be2ef95d",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21501,7 +21501,7 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "Full six-position selection and elemental creation read. S56 reduces summonHexes8 to6 after complete2/2 family and exact482-byte/full native proof; no fabricated padding remains. Only slots0..5 are written/read for side0..1 and random0..2. R17 final spellPower changes from quantity power to duration, but result is never stored; artifact calls retained. Unsigned -1 sentinel cast and U05 summoned flag are meaningful. B75 SpaceForElementalExists/capacity/hero/AddArmy success required; otherwise sentinel0xffffffff reaches hex lookup, and final hero calls lack null guards. No goto or manual varargs."
+    "note": "Full six-position selection and elemental creation read. S56 reduces summonHexes8 to6 after complete2/2 family and exact482-byte/full native proof; no fabricated padding remains. Only slots0..5 are written/read for side0..1 and random0..2. R17 final spellPower changes from quantity power to duration, but result is never stored; artifact calls retained. Unsigned -1 sentinel cast and U05 summoned flag are meaningful. B75 SpaceForElementalExists/capacity/hero/AddArmy success required; otherwise sentinel0xffffffff reaches hex lookup, and final hero calls lack null guards. No goto or manual varargs. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::DoLuck(CombatSide side,i32 armyIndex)#1": {
     "body_sha256": "f094e2c9b925b77722e148f09438ab144a328f096418e75b77e2e73aae3ed73c",
@@ -21536,10 +21536,10 @@
     "note": "Full two-resource ray interpolation and clipped drawing read. C58 three body casts plus BLAST_FRAME_DELAY cast removed with16/16 product and full native/retail proof. Actual SLimitData and floating division/result truncations retained. B75 target/hero coordinates and resources valid; segmentCount=distance/18 or24 must be positive before step division. For count1, first frame (-1)/1=-1; for count>=2 truncation gives0. Local clipping bounds rectangles, not frame validity. No goto, union, fake aggregate, manual varargs or unrelated reuse."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::Resurrect(SpellType spell,i32 targetHex,i32 spellPower)#1": {
-    "body_sha256": "ec4237e4a13cb12850e2c915692dffd96b883e393b24feb3e2c9eda1a16566cd",
+    "body_sha256": "c2b84f1af012b069836dc2579d7531b9c453511d4278fc9cf0882e653d5e71b7",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21549,7 +21549,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire142-line quantity/corpse removal,22-frame animation and flag restoration read. S56 three unused words; R17 index_o spans corpse and icon-frame indices. U05 real ability flags, timer conversion retained. B75 successful corpse selection, positive HP and representable power required. After match, every following corpse iteration overwrites live occupant; only side/index are shifted, not frame; count decremented even if no match. Full1426 retail bytes/sites/targets plus fixed75f prove sequence, not normal reachability of inconsistent corpse states. B76 formatted names fit768. No goto, fake aggregate or manual varargs."
+    "note": "Entire142-line quantity/corpse removal,22-frame animation and flag restoration read. S56 three unused words; R17 index_o spans corpse and icon-frame indices. U05 real ability flags, timer conversion retained. B75 successful corpse selection, positive HP and representable power required. After match, every following corpse iteration overwrites live occupant; only side/index are shifted, not frame; count decremented even if no match. Full1426 retail bytes/sites/targets plus fixed75f prove sequence, not normal reachability of inconsistent corpse states. B76 formatted names fit768. No goto, fake aggregate or manual varargs. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLS.cpp:combatManager::SpaceForElementalExists(void)#1": {
     "body_sha256": "9765ffcddc385bc5d19111e9b8c8822f797003cd30cd62b785a089ee3677e6b2",
@@ -21664,10 +21664,10 @@
     "note": "Complete hero/artifact eligibility, restricted spell list, mana weighting and action publication read. R18 spell local first indexes two sides then65 spells; all four real side/scope alternatives measured, none retained because frame/slot bytes differ despite532-byte sizes. Float effect truncation is real. B77 default combat IDs0..47 have positive mana costs even after the applicable artifact halving; eligibility and upper clamp prove modifier index1..10. Requires side0..1, matching m_currentSide and live hero; candidate hex is consumed only for positive effect. No union, goto, fake aggregate, manual varargs or artificial owner."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::DetermineEffectOfSpell(SpellType spell,i32 * bestEffect,i32 * bestHex)#1": {
-    "body_sha256": "091e3688deda9457c2a05ca02678ecfd413524905c0e97a45c188ff685bf3714",
+    "body_sha256": "f6d3726b4a7449157499673856848e25123c292d6fd8f4b626de6fe06f3e1ae0",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21677,13 +21677,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire583-line mode selection, every spell score branch and scan transition read. Real effect truncations, U05 flags and creature pointer retained. S57 unused durMax removal changes3918 to3912 bytes; no arm retained. B77 duration index min(power-fullQuantityFlag,10) lacks lower clamp; requires positive effective power. CURE passes hex to a callee expecting army index; full retail call operands prove mismatch. Area search stops at43. bestHex remains unchanged on zero/default score; DoSpellAI guards use. All target side/slot/stat/table and representable numeric contracts remain explicit. No goto, fake aggregate, manual varargs, unrelated role reuse or fabricated owner."
+    "note": "Entire583-line mode selection, every spell score branch and scan transition read. Real effect truncations, U05 flags and creature pointer retained. S57 unused durMax removal changes3918 to3912 bytes; no arm retained. B77 duration index min(power-fullQuantityFlag,10) lacks lower clamp; requires positive effective power. CURE passes hex to a callee expecting army index; full retail call operands prove mismatch. Area search stops at43. bestHex remains unchanged on zero/default score; DoSpellAI guards use. All target side/slot/stat/table and representable numeric contracts remain explicit. No goto, fake aggregate, manual varargs, unrelated role reuse or fabricated owner. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellCreateCreature(i32 hex,SpellType spell)#1": {
-    "body_sha256": "ef7e16d1bc5109ff1401d352e9d91e74ced4d091af9788fa2f1ac13912a6e96f",
+    "body_sha256": "be5b560d6b9a8f9397ce758ffb69ef437a94e517609f3c05e548219d326d70a4",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21693,13 +21693,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full621-byte summon/mirror evaluation read. S57 computed spellPower, artifact doubling and mirrored quantity assignment are unread in final value; calls cannot be discarded as pure. R18 spellPower changes from hero power to creature quantity. B77 retail multiplies creature type ID by database fightValue, not computed quantity; mirror modifiers and cast chance follow. U05 shooter flag and float-result truncations are real. Summon capacity predicate checks hex space only; default mirror path requires valid occupied hex, side/slot and creature. No goto, fake aggregate, manual varargs or owner recovery."
+    "note": "Full621-byte summon/mirror evaluation read. S57 computed spellPower, artifact doubling and mirrored quantity assignment are unread in final value; calls cannot be discarded as pure. R18 spellPower changes from hero power to creature quantity. B77 retail multiplies creature type ID by database fightValue, not computed quantity; mirror modifiers and cast chance follow. U05 shooter flag and float-result truncations are real. Summon capacity predicate checks hex space only; default mirror path requires valid occupied hex, side/slot and creature. No goto, fake aggregate, manual varargs or owner recovery. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::RawEffectSpellInfluence(army * target,ArmySpellInfluence influence)#1": {
-    "body_sha256": "b753f0c414beebb0af447a57faf161149f4b983383e51dabacb80ce082fc464a",
+    "body_sha256": "9083083c35e8d484ea70506063d919c291c3401aea0735cc86d1e67258b71e46",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21709,7 +21709,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire fifteen-influence score switch read. C60 four redundant float casts removed after complete32-arm family; damageMin float conversion remains necessary and both dragon/shooter ratios remain integer division. C61 typed one-byte spell table removes one functional enum cast after all-consumer review,16-byte retail data and full98-object native proof. S57 all eight unused-three-word combinations measured; every removal changes native bytes, originals retained. U05 flags and actual numeric truncations retained. B77 enemy count bounds own-side array scan; dragon/shield scores truncate to zero for valid positive count. Valid influence0..14, side/count/creature, positive damage denominator and numeric domains required. No goto, fake aggregate, varargs, role reuse or artificial owner."
+    "note": "Entire fifteen-influence score switch read. C60 four redundant float casts removed after complete32-arm family; damageMin float conversion remains necessary and both dragon/shooter ratios remain integer division. C61 typed one-byte spell table removes one functional enum cast after all-consumer review,16-byte retail data and full98-object native proof. S57 all eight unused-three-word combinations measured; every removal changes native bytes, originals retained. U05 flags and actual numeric truncations retained. B77 enemy count bounds own-side array scan; dragon/shield scores truncate to zero for valid positive count. Valid influence0..14, side/count/creature, positive damage denominator and numeric domains required. No goto, fake aggregate, varargs, role reuse or artificial owner. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::NextPos(i32 * hex)#1": {
     "body_sha256": "2eb117b0dba8f2fc8dce147519ac3a6088c5abe3219499be686d8ae40bd04ca1",
@@ -21760,10 +21760,10 @@
     "note": "Entire scan read, including successful and exhausted output conventions. Returns0 for found hex and1 with output-1 on exhaustion. B77 start<=115 is an upper-only guard; negative input reaches FindResurrectArmyIndex. Ordinary callers provide1 or prior+1. Valid current side/spell and corpse lifecycle inherit the reviewed selection helper contracts. No casts, union, goto, unused aggregate, manual varargs, unrelated reuse or artificial owner."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellCure(i32 * effect,i32 targetSide,i32 targetIndex,i32 cure)#1": {
-    "body_sha256": "572a7689786282ac2a9aaec000c002886100d322bc512fce464172a6fcac294d",
+    "body_sha256": "9e5a664f0fe78b74ac2e68cd91115168e60a0b12af3b6cfbe0d0e6d989cf6b77",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21773,7 +21773,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete875-byte two-side/20-slot evaluation and all influence classes read. Real floating truncations and U05 mirror/full-quantity flags retained. B77 targetIndex is army slot, while Determine CURE passes hex. Positive/negative sums initialize per side, mirror assignment overwrites prior negative sum, and cure mode1 zeros positive sum including calculated healing before final combination; exact retail sequence preserved. Influence byte plus boolean and clamp10 proves cancel-duration index0..10. Valid target side/slot or documented sentinels, positive creature HP and representable power/value required. No goto, fake aggregate, manual varargs, unrelated reuse or owner arithmetic."
+    "note": "Complete875-byte two-side/20-slot evaluation and all influence classes read. Real floating truncations and U05 mirror/full-quantity flags retained. B77 targetIndex is army slot, while Determine CURE passes hex. Positive/negative sums initialize per side, mirror assignment overwrites prior negative sum, and cure mode1 zeros positive sum including calculated healing before final combination; exact retail sequence preserved. Influence byte plus boolean and clamp10 proves cancel-duration index0..10. Valid target side/slot or documented sentinels, positive creature HP and representable power/value required. No goto, fake aggregate, manual varargs, unrelated reuse or owner arithmetic. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellResurrect(i32 * effect,i32 hex,SpellType spell)#1": {
     "body_sha256": "4d0876cc8028960545bd98f02b52d0fb9736b2bb9422d798bf2bab4e064159d5",
@@ -21792,10 +21792,10 @@
     "note": "Full319-byte Ankh, corpse lookup, count cap, chance and temporary-resurrection discount read. Actual float-result truncations retained. S57 unused workChance removal preserves total size and normalized relocation sequence but changes native stack bytes, so not retained. B77 successful FindResurrectArmyIndex required before forming army pointer: -1 is not locally guarded. Positive HP, valid creature/current-side/corpse lifecycle and representable doubling/value required. No union, goto, fake aggregate, manual varargs or unrelated reuse."
   },
   "src/SOURCE/SPELLAI.cpp:combatManager::EffectSpellDamage(i32 * effect,SpellType spell,i32 targetHex)#1": {
-    "body_sha256": "52697a27e037a5130a147f6fa85493fa842dfe1a8ca5b7fad206db47318a6d9f",
+    "body_sha256": "ff7df3ec7ecd5dd55a421055a0b511a336617cb5578f2f8bccced4e5098e051f",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21805,7 +21805,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Entire354-line damage dispatch, nineteen-cell geometry, chain walk, victim scoring and final side comparison read. Three two-side arrays are genuine fully observed owners; effect mask already uses actual rows. Direction enum casts, damage ABI i32l and floating truncations are meaningful; U05 flags retained. B77 initial targetHex occupancy read precedes loop guard; unsupported non-damage spells can leave loop stationary forever. Normal dispatcher uses damage family. Loop checks0<=hex<116, trusts positive occupant side/index and chain source; valid neighbor sentinel, counts<=20, positive HP and representable damage/ratios required. Mirror branch halves accumulated side values, not only current victim. No goto, artificial owner, fake aggregate, manual varargs or unrelated reuse."
+    "note": "Entire354-line damage dispatch, nineteen-cell geometry, chain walk, victim scoring and final side comparison read. Three two-side arrays are genuine fully observed owners; effect mask already uses actual rows. Direction enum casts, damage ABI i32l and floating truncations are meaningful; U05 flags retained. B77 initial targetHex occupancy read precedes loop guard; unsupported non-damage spells can leave loop stationary forever. Normal dispatcher uses damage family. Loop checks0<=hex<116, trusts positive occupant side/index and chain source; valid neighbor sentinel, counts<=20, positive HP and representable damage/ratios required. Mirror branch halves accumulated side values, not only current victim. No goto, artificial owner, fake aggregate, manual varargs or unrelated reuse. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::combatManager(void)#1": {
     "body_sha256": "2dddddb03123b9e275b1759ea95ea5389a52e9f68916b30a759baf42ece4f5e2",
@@ -21920,10 +21920,10 @@
     "note": "C62 removes both explicit guardian byte casts without changing truncation. U06 five-slot group aggregation and exact palette owners retained; C64 side conversion and boolean-selected side remain for measurement. R19 i indexes combat sides then group slots. B78 live battlefield/group/window/palette, mine/hero IDs and balanced open/close remain; no clamp or gameplay fix inserted."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::UpdateArmyGroup(CombatSide side)#1": {
-    "body_sha256": "0c77878b75bf92cc7a72cd565923f3fe4d7910482c300563557e93379f66c672",
+    "body_sha256": "2113dfd0c6a039f146fd58c759f4dde8575ebc13c7b848bbf767e20a09ae6cc6",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -21933,7 +21933,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C62 implicit signed16-bit quantity assignment preserves the retail store. U05 flags filter excluded, summoned elementals and mirrors; U06 five-slot target uses each live army group-slot field, whose range is a B78 contract. S58 unused pos removal measured2/2 changes stack bytes, original retained. Index traverses source stacks and destination group as related transfer phases; skeleton reward remains result-gated."
+    "note": "C62 implicit signed16-bit quantity assignment preserves the retail store. U05 flags filter excluded, summoned elementals and mirrors; U06 five-slot target uses each live army group-slot field, whose range is a B78 contract. S58 unused pos removal measured2/2 changes stack bytes, original retained. Index traverses source stacks and destination group as related transfer phases; skeleton reward remains result-gated. U05 applied: 3 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::GenerateMap(void)#1": {
     "body_sha256": "48ded5a543e2b90442c3454d3aaa4427fa4673c516911cfbc6a84cef9613f5b3",
@@ -22064,10 +22064,10 @@
     "note": "G72 specialRegion joins negative-column and out-of-grid paths into special edge-region tests; full guarded/early-return/single-pass versions measured4/4, none reproduces401-byte retail body. Ordinary divisions and polygon coordinate state retained, no fake local carrier. B78 representable screen-coordinate arithmetic and callers distinguishing returned special hexes/-1 remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::CheckApplyGoodMorale(CombatSide side,i32 index)#1": {
-    "body_sha256": "b0c311c6e85d36177b9004c21ccfa4ed2bf776b936d9c753a3276fecb7cff476",
+    "body_sha256": "1b8f8a4df5af321d8a1fa46d85c7a000b974babbf6f80e4602147e7f72b13b30",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22077,13 +22077,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Lower guards alone do not bound side/index above; U05 all/ability flags retain no-morale/high/bad domains. Global high-morale latch and actual sample handle lifetime read in full. B79 singular/plural catalog message fits768. B78 valid army/type IDs and owner lifecycle remain; no fake stack aggregate or unrelated sample reuse."
+    "note": "Lower guards alone do not bound side/index above; U05 all/ability flags retain no-morale/high/bad domains. Global high-morale latch and actual sample handle lifetime read in full. B79 singular/plural catalog message fits768. B78 valid army/type IDs and owner lifecycle remain; no fake stack aggregate or unrelated sample reuse. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::CheckApplyBadMorale(CombatSide side,i32 index)#1": {
-    "body_sha256": "981d028b6bf64596b9adb70f64149e582f8a90b1070ddfe1c947066a265abbb2",
+    "body_sha256": "d09b0119a29873d39f668fb6cd8a0dfe00d6b8f58490b47322dca3efd3955241",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22093,13 +22093,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Lower side/index guards precede no-morale/negative-roll/network skip policy; no upper guards locally. U05 ability flags and no-show sample/message branches preserve actual behavior. B79 both creature-name formats bounded within768; B78 valid active stack/catalog domains remain. No manual varargs or avoidable local conversion."
+    "note": "Lower side/index guards precede no-morale/negative-roll/network skip policy; no upper guards locally. U05 ability flags and no-show sample/message branches preserve actual behavior. B79 both creature-name formats bounded within768; B78 valid active stack/catalog domains remain. No manual varargs or avoidable local conversion. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::GetNextArmy(i32 checkMorale)#1": {
-    "body_sha256": "f50648e5a595f60ed16238c36ed5c85732922d5fbc8df83c3c9edc77c2855d16",
+    "body_sha256": "8624579e9a4e209d61c52dfd0931a01d658d8a2df9a33af2ff81ef787183c9c3",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -22109,13 +22109,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G73 restart is a real deferred-turn retry after clearing flags; complete retry-loop/do-while3-arm family changes837-byte retail shape. S58 unused i removal2/2 changes stack bytes. U05 exclusion/morale/defer and hypnosis side selection are actual state domains. Normal row-relative army pointer arithmetic is not owner recovery; B78 side/count/speed/occupancy/control contracts remain."
+    "note": "G73 restart is a real deferred-turn retry after clearing flags; complete retry-loop/do-while3-arm family changes837-byte retail shape. S58 unused i removal2/2 changes stack bytes. U05 exclusion/morale/defer and hypnosis side selection are actual state domains. Normal row-relative army pointer arithmetic is not owner recovery; B78 side/count/speed/occupancy/control contracts remain. U05 applied: 5 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::IsWinner(CombatSide side)#1": {
-    "body_sha256": "0a91fef40ef397c99c0bc5ab63ec1c34fb143695c383760efbdbd97e07aa460e",
+    "body_sha256": "72e0aa7f1e648a3a8a614dc969b5b7b548f01d9d52e21f29a837416d57571295",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22125,7 +22125,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Tests opposite-side defeated/retreated then scans that side for any nonexcluded army. Toggling the side is a related perspective change, not unrelated variable reuse. U05 flags retained; B78 two-side domain and valid count are required for inverse indexing. No buffer or fabricated pointer owner."
+    "note": "Tests opposite-side defeated/retreated then scans that side for any nonexcluded army. Toggling the side is a related perspective change, not unrelated variable reuse. U05 flags retained; B78 two-side domain and valid count are required for inverse indexing. No buffer or fabricated pointer owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::CatAttack(CombatSide side)#1": {
     "body_sha256": "895ccee8ccb06adf662d9f37af426410297446abae982006263549fcffcf4af1",
@@ -22144,10 +22144,10 @@
     "note": "C62 five casts removed, C63 two more via typed byte castle-hex tables with all consumers/native proof. Real float truncations, double constants and integer midpoint division retained. G74 foundMissHex exits nested neighbor search;2-arm explicit-found loop changes3544 to3576. R19 frame has direction/projectile/cloud roles; S58 post-search frame increment/sample initialization untried. B78 wall/hex/resource/side/arithmetic/screen contracts and B79 fixed cloud/name text recorded; no enlarged owners. Conditional cloud-name const_cast restored for required C++98 annotation dialect; native removal was byte-neutral but not parser-compatible."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::KeepAttack(CombatTowerSelector tower)#1": {
-    "body_sha256": "9420e853105db2027ca72ccbc693149a5d5206e921de546ada9f462684cac8a5",
+    "body_sha256": "80d951207a36cbc8e43b491bdbc787bae4688f366f1694cb4668bda5d797ee6a",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22157,13 +22157,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Real6x3 four-byte origins and nine-float angle table are fully addressable, not redundant fake rows. S58 unused tower scratch removal2/2 changes1634 to1610 bytes. R19 armyIndex later sums shots. U05 target priority flags retained; real damage truncation retained. B78 this/gpCombatManager identity,faction/tower/type/positiveHP and screen contracts remain; stat clamp proves41-entry index0..40. B79 all damage text fits768."
+    "note": "Real6x3 four-byte origins and nine-float angle table are fully addressable, not redundant fake rows. S58 unused tower scratch removal2/2 changes1634 to1610 bytes. R19 armyIndex later sums shots. U05 target priority flags retained; real damage truncation retained. B78 this/gpCombatManager identity,faction/tower/type/positiveHP and screen contracts remain; stat clamp proves41-entry index0..40. B79 all damage text fits768. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::ExperienceValueOfStack(CombatSide side)#1": {
-    "body_sha256": "cc6164316e6124ba70c68631fb3b6dc11a00ae6a1d491c55e49ffdfa020fb24f",
+    "body_sha256": "027d42d3255fcdd94766bc7732e8a727e327861a3921cab33e46b6b4edf12efc",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22173,7 +22173,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Scans20 actual army slots, excludes missing/summoned and sums quantity loss times real database HP, then adds hero bonus. U05 summed flags are meaningful. B78 side/type domains and representable signed products/sum remain; no fake stack aggregate, cast or manual varargs."
+    "note": "Scans20 actual army slots, excludes missing/summoned and sums quantity loss times real database HP, then adds hero bonus. U05 summed flags are meaningful. B78 side/type domains and representable signed products/sum remain; no fake stack aggregate, cast or manual varargs. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::ResetHitByCreature(void)#1": {
     "body_sha256": "d9b3194f27b6a8568992087ee9914c8bb3bf4f2fbf659e7ae617384a0182817f",
@@ -22256,10 +22256,10 @@
     "note": "C62 implicit signed-byte obstacle index preserves native output. B78 exact retail inclusive0..32 roll accesses one past32x14 global records; actual adjacent zero mask prevents typeUsed[32] read. Two-cell site116 nevertheless reads hex117 after setting blocked, before rejecting placement. Real typeUsed32 and elevation/obstacle owners not enlarged. Normal initialized icon count<=7 within8 proven from every default record; terrain/manager/catalog contracts remain. B79 numeric filename fits768."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::MakeCreaturesVanish(void)#1": {
-    "body_sha256": "f4606cc1b703209fe4a70e4a2e3e3ddd6a30abe2f8ed6acef8edfb8d688ddde1",
+    "body_sha256": "d4414adb6dfd3ad8786bfc9a116185d39fa5cf4db3b0443f553437f69724a422",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22269,7 +22269,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Uses actual removed/limit rows and wide-creature rear hex state, snapshots global draw extents, clears occupant fields then performs real fizzle sequence. U05 wide flag retained. Real float-duration truncation remains. B78 side/count/rear-hex domains, this/global-manager identity and positive clipped screen rectangle remain contracts; no fake owner recovery."
+    "note": "Uses actual removed/limit rows and wide-creature rear hex state, snapshots global draw extents, clears occupant fields then performs real fizzle sequence. U05 wide flag retained. Real float-duration truncation remains. B78 side/count/rear-hex domains, this/global-manager identity and positive clipped screen rectangle remain contracts; no fake owner recovery. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/CMBTMGR.cpp:combatManager::LowerDoor(void)#1": {
     "body_sha256": "e0a929b4115560a48e202a02dbd6f129bae60f1cb8ec5c7bab4dae530893fed8",
@@ -22416,10 +22416,10 @@
     "note": "C62 replaces widget-ID cast with real dialog-select command constant, both encoded10 but distinct domains. U01 message tag/modifier/command/payload transitions preserve completion ID forwarding. Help index initialized-1 and guarded; B78 valid starting config values for modulo/toggles and live dialog globals remain. No artificial owner arithmetic or manual argument access."
   },
   "src/SOURCE/AI.cpp:combatManager::AICheckRetreat(void)#1": {
-    "body_sha256": "c7dfc37b027a59685b7d37c7e33ef7dd85954925ccefd488e6839c52b4f52a93",
+    "body_sha256": "c7da347ceefc38d1fb9e9f6d956f5c596ed257db2e55e1a6f3141a1c591f8991",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22429,13 +22429,13 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C65 fourteen casts removed across complete group/artifact/force/policy products, then combined native proof. Real hero copy and fallback armyGroup isolate five-slot input; force/artifact two-side arrays are consumed, not fake stack owners. U05 flags/U06 group views retained. R20 army/artifact index separation measured3/3 changes native stack bytes. B80 integer force/20000 and experience/200000 remain, quantity narrowing and unguarded force-sum floating divisor preserved; valid owners/IDs/stat arithmetic and finite nonzero sum remain contracts."
+    "note": "C65 fourteen casts removed across complete group/artifact/force/policy products, then combined native proof. Real hero copy and fallback armyGroup isolate five-slot input; force/artifact two-side arrays are consumed, not fake stack owners. U05 flags/U06 group views retained. R20 army/artifact index separation measured3/3 changes native stack bytes. B80 integer force/20000 and experience/200000 remain, quantity narrowing and unguarded force-sum floating divisor preserved; valid owners/IDs/stat arithmetic and finite nonzero sum remain contracts. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::DoCompAI(CombatSide)#1": {
-    "body_sha256": "a5c5b1a5ffa8ce71a121e3a553d32ddbdcbdbc7ef6ba90950872c7a66fbbb722",
+    "body_sha256": "9b0da60091f3eda16ac080c19618ba4bf3c717e1cb317d4d202d942129bf00e6",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -22445,13 +22445,13 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "S59 boundary owner12->9 applied after4-arm extent/local product and all98-object proof; every initialized/read row and constant checked in retail. Remaining unused combat/fifth/castle/archery/shootStrengths owners measured but retained, with all GetStrength/HasArtifact calls preserved in experiments. G75 full switch-exit/single-pass forms and false-constant branch removal all change4000-byte retail code. U05 masks/flags real; sign-changing strength casts and actual float truncations retained. B80 unguarded castle attacker-hero archery read, source hex row domain, manager identity and current side/index/action lifecycle remain; incoming side parameter is genuinely unused."
+    "note": "S59 boundary owner12->9 applied after4-arm extent/local product and all98-object proof; every initialized/read row and constant checked in retail. Remaining unused combat/fifth/castle/archery/shootStrengths owners measured but retained, with all GetStrength/HasArtifact calls preserved in experiments. G75 full switch-exit/single-pass forms and false-constant branch removal all change4000-byte retail code. U05 masks/flags real; sign-changing strength casts and actual float truncations retained. B80 unguarded castle attacker-hero archery read, source hex row domain, manager identity and current side/index/action lifecycle remain; incoming side parameter is genuinely unused. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetModLichDamage(class army * target,float damage)#1": {
-    "body_sha256": "f7a836e761d984216e9c97097154b2af05be1498ca8b538118d94f511583283d",
+    "body_sha256": "5e2964123ffac92fbd324d7ced4777c6e24792c4323aa9d691d68e6917a828a4",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22461,13 +22461,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C65 three float destination casts removed after complete8-arm equality. Integer remaining-HP product precedes float assignment; sequential shooter/flyer1.3 factors and HP weighting retained. U05 flags meaningful, B80 valid live target/positiveHP and representable quantity product remain. No artificial stack aggregate, pointer recovery, format buffer or manual varargs."
+    "note": "C65 three float destination casts removed after complete8-arm equality. Integer remaining-HP product precedes float assignment; sequential shooter/flyer1.3 factors and HP weighting retained. U05 flags meaningful, B80 valid live target/positiveHP and representable quantity product remain. No artificial stack aggregate, pointer recovery, format buffer or manual varargs. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::DoLichShot(class army * lich)#1": {
-    "body_sha256": "06ac63d534df8ed1802952465a0b12f69683ac58c5a549eb56f36f7919429904",
+    "body_sha256": "5cac16b6e32a5470d4d445cdac218cf8273e3908778e3e0c59b46928aeda3e28",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "applied",
       "owner": "absent",
@@ -22477,13 +22477,13 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "C65 one assignment cast removed. A02 three manual pointer expressions replaced by real2x20 marker rows; complete pointer/flat-index/row product retains659-byte rows, rejects656-byte flat-index spelling. Full40-byte clear per candidate and all three consumers have exact stack/retail proof. U05 exclusion flags and opponent/friendly scoring remain; B80 valid side/index occupants, quantity/HP arithmetic and stale-action precondition when no candidate exists remain. Original flat object covered valid inputs; no false prior first-row-overrun claim."
+    "note": "C65 one assignment cast removed. A02 three manual pointer expressions replaced by real2x20 marker rows; complete pointer/flat-index/row product retains659-byte rows, rejects656-byte flat-index spelling. Full40-byte clear per candidate and all three consumers have exact stack/retail proof. U05 exclusion flags and opponent/friendly scoring remain; B80 valid side/index occupants, quantity/HP arithmetic and stale-action precondition when no candidate exists remain. Original flat object covered valid inputs; no false prior first-row-overrun claim. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetShooterMask(CombatSide side)#1": {
-    "body_sha256": "d045104bc7a24cd308f36a5b61c2f8bbedcbad9c00d987d233c51b3c0db19082",
+    "body_sha256": "ab78169f087b2d7c524d63aebfadf7cbfa480a53a8cbe0d71b678d7d2f1a5bc2",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22493,13 +22493,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U05 shooter/excluded flags plus positive shots and five disabling influences define the actual category. One unsigned bit advances per active slot; valid count<=20 keeps every bit within low20. B80 side/count/initialized influence data remain caller contracts; pointer-plus-index is ordinary array traversal, not owner recovery. No cast, unused aggregate, goto or manual argument access."
+    "note": "U05 shooter/excluded flags plus positive shots and five disabling influences define the actual category. One unsigned bit advances per active slot; valid count<=20 keeps every bit within low20. B80 side/count/initialized influence data remain caller contracts; pointer-plus-index is ordinary array traversal, not owner recovery. No cast, unused aggregate, goto or manual argument access. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetMirrorImageMask(CombatSide side)#1": {
-    "body_sha256": "988fd7e71d9d1e91bc3cd697bc5712e9ec9855dd27ed9c96e7e4dcefdb568d07",
+    "body_sha256": "91004ef9efbfac140bd007692a4e132a00c594d4dce4f75d77e78d86c6cef9cb",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22509,13 +22509,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U05 all/ability flag views jointly require mirror and not excluded. Actual unsigned bit mask is returned through the existing i32 ABI; low20 valid bits make that harmless without changing declaration domains. B80 side/count/live army flags remain; no fake array or out-of-object owner claim."
+    "note": "U05 all/ability flag views jointly require mirror and not excluded. Actual unsigned bit mask is returned through the existing i32 ABI; low20 valid bits make that harmless without changing declaration domains. B80 side/count/live army flags remain; no fake array or out-of-object owner claim. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetFlyerMask(CombatSide side)#1": {
-    "body_sha256": "a234da574c671de76ba89fbed8a0ab690b48fdc59e8c29276b811bb602893b8b",
+    "body_sha256": "245887fdf5aeb3a9f4a713643f7557ba3d02e1867d5388b5e9c8668e0478c171",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22525,13 +22525,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U05 flying/exclusion flags and five disabling spell bytes distinguish active flyers. Bits advance for all slots rather than packing selected indices. B80 count<=20 and two-side/initialized army state required; no avoidable explicit cast or unrelated variable role."
+    "note": "U05 flying/exclusion flags and five disabling spell bytes distinguish active flyers. Bits advance for all slots rather than packing selected indices. B80 count<=20 and two-side/initialized army state required; no avoidable explicit cast or unrelated variable role. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetAllMask(CombatSide side)#1": {
-    "body_sha256": "915e165be538371f03e7cf5b31e9a6342d12647b80d309aee42221997ff5f9ca",
+    "body_sha256": "e664fd7ab9970c4584f20c815728b5b2d55afac5ef2f08f31a43b1e6b3ced0a3",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22541,13 +22541,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Scans active row, checks excluded flag and positive quantity before setting the original slot bit. U05 flag view retained. B80 valid side/count remains despite the nonnull test on an array-derived pointer; that test is not an upper-bound validator. No stack buffer, goto or manual varargs."
+    "note": "Scans active row, checks excluded flag and positive quantity before setting the original slot bit. U05 flag view retained. B80 valid side/count remains despite the nonnull test on an array-derived pointer; that test is not an upper-bound validator. No stack buffer, goto or manual varargs. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetWalkerMask(CombatSide side)#1": {
-    "body_sha256": "3a73d9070f8ca1c8df279fa2e7671143fe4f8d6a097b7a1369cd7a31bf20d424",
+    "body_sha256": "5dc1cf5cafa691cdf14d8976f253a07184ec2ecc2c5f05544b9a00100424de48",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22557,13 +22557,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Actual nonflying category includes nonshooters and shooters without ammunition, then excludes five disabling influences. U05 fields are meaningful, not alternate-owner recovery. B80 side/count/initialized flags and spell bytes required; unsigned single-bit traversal stays within20 active slots."
+    "note": "Actual nonflying category includes nonshooters and shooters without ammunition, then excludes five disabling influences. U05 fields are meaningful, not alternate-owner recovery. B80 side/count/initialized flags and spell bytes required; unsigned single-bit traversal stays within20 active slots. U05 applied: 3 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetOutOfItMask(CombatSide side)#1": {
-    "body_sha256": "15aa08245a67b9f3d56eb8a74aa27ecb1320399e3e2d9bc213572d91d50c410e",
+    "body_sha256": "f54d3dec0ebfe1a2cd1fa28f0021e505d9bdad03a89f5dc8a8566157420bcaad",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22573,13 +22573,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Selects nonexcluded armies with blind/paralyze/petrify; not the berserk/hypnotize traitor category. U05 flags and real influence array retained. B80 active side/count valid-domain requirements remain. idx and bitMask evolve together as ordinary slot traversal, not unrelated reuse; no fake local aggregate."
+    "note": "Selects nonexcluded armies with blind/paralyze/petrify; not the berserk/hypnotize traitor category. U05 flags and real influence array retained. B80 active side/count valid-domain requirements remain. idx and bitMask evolve together as ordinary slot traversal, not unrelated reuse; no fake local aggregate. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetTraitorMask(CombatSide side)#1": {
-    "body_sha256": "ef4ed3563b0020cf1a255d605c9aa75233282c90bef6e20123843e081abcce89",
+    "body_sha256": "dace2ad886e0ce13d0d61a3f09d39eb91f9e0783d675c597e0d738608c0c0023",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22589,7 +22589,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Selects nonexcluded berserk or hypnotized armies, preserving their original row/index bits. U05 meaningful flag/influence owners; B80 valid side/count/initialized state. No casts, goto, pointer-owner recovery, buffer formatter or unused stack owner."
+    "note": "Selects nonexcluded berserk or hypnotized armies, preserving their original row/index bits. U05 meaningful flag/influence owners; B80 valid side/count/initialized state. No casts, goto, pointer-owner recovery, buffer formatter or unused stack owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::GetBestArmy(CombatSide side,i32 mask)#1": {
     "body_sha256": "0e9c3bdb0aa3c0ec6320956e90e80d76e10d15b1d4416df246ff35f757d6f745",
@@ -22640,10 +22640,10 @@
     "note": "Score is QuickDistance*1000 minus quantity*HP, not plain closest distance; its9999999 initial cutoff may leave-1. Reusing val from distance to derived score is related computation. B80 valid current/target hexes, side/count and representable arithmetic required. No temporary buffer, fake owner or manual varargs."
   },
   "src/SOURCE/AI.cpp:combatManager::GetStrength(CombatSide side,i32 mask)#1": {
-    "body_sha256": "57970c31ca6ae1494d6e103cd1f532f39872436e9b474e46a80e48e082217477",
+    "body_sha256": "b54ffbec5401f3b2969e6479eee49c687dc4f21231750137ba5c5abf9e9c8227",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22653,13 +22653,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Sums selected nonexcluded army::Strength results in the real unsigned-long domain. U05 exclusion view retained. B80 valid side/count and army/type/stat contracts remain; unsigned aggregate overflow behavior is not silently replaced with signed arithmetic. No explicit cast or fabricated stack owner."
+    "note": "Sums selected nonexcluded army::Strength results in the real unsigned-long domain. U05 exclusion view retained. B80 valid side/count and army/type/stat contracts remain; unsigned aggregate overflow behavior is not silently replaced with signed arithmetic. No explicit cast or fabricated stack owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::AttemptAttack(class army * currentArmy,CombatSide side,i32 mask)#1": {
-    "body_sha256": "697afaf0768571daf869044dcc64b4f0dfdf66b780d278064427f6aa18c20371",
+    "body_sha256": "41f88b75bf286b38a3fd21e8aa3ccec68660c4f62156654ca5c1be55056f2076",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "applied",
       "owner": "absent",
@@ -22669,7 +22669,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "A02 three reversed index[array] expressions now use actual m_armies[side][targetArmy], complete2-arm376-byte/relocation proof. Ghost chooses weakest, others strongest; failed target removes precisely its bit, and wide facing tries rear hex. U05 wide flag retained. B80 valid side/count/target bit index, path target and live unit required; targetHex adjustment remains a related coordinate role."
+    "note": "A02 three reversed index[array] expressions now use actual m_armies[side][targetArmy], complete2-arm376-byte/relocation proof. Ghost chooses weakest, others strongest; failed target removes precisely its bit, and wide facing tries rear hex. U05 wide flag retained. B80 valid side/count/target bit index, path target and live unit required; targetHex adjustment remains a related coordinate role. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::AttemptAdjacentAttack(class army * currentArmy)#1": {
     "body_sha256": "88aa0e0a2c4af38e1fc2f8f86f34458f697ce2003623095a987cad88d73b1b51",
@@ -22688,10 +22688,10 @@
     "note": "S59 unused hexes removal measured2/2 keeps324-byte size but changes stack operands, original retained. Real unsigned available/oneBit/enemyMask roles remain. B80 ValidAttack must supply an upper-bounded destHex and occupant index0..19 before signed1<<index; only nonnegative destination is checked locally. Selected army becomes global action; no new fake owner or return-buffer wrapper."
   },
   "src/SOURCE/AI.cpp:combatManager::WalkTowardArmyFront(class army * currentArmy,CombatSide side,i32 mask)#1": {
-    "body_sha256": "4d53a2694e128c41c53ce601f088dfc4b41da3b92034da25d931091b72071768",
+    "body_sha256": "5bbb40a42c6572114b82672ae99078769db332c7b5c315a102bc9ab50d68985b",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "applied",
       "owner": "absent",
@@ -22701,13 +22701,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "A02 two reversed index[array] expressions recovered with2-arm proof; C65 signed-byte speed restoration cast removed with2-arm proof. U05 wide flag and U02 raw path-byte enum conversion remain genuine boundaries. S59 pathFound result-store removal changes519 to516 bytes while preserving FindCombatPath call, original retained. B80 valid closest target/facing, stable search storage, capped path length/directions and next moat hex domain remain; no new return-value guard invented."
+    "note": "A02 two reversed index[array] expressions recovered with2-arm proof; C65 signed-byte speed restoration cast removed with2-arm proof. U05 wide flag and U02 raw path-byte enum conversion remain genuine boundaries. S59 pathFound result-store removal changes519 to516 bytes while preserving FindCombatPath call, original retained. B80 valid closest target/facing, stable search storage, capped path length/directions and next moat hex domain remain; no new return-value guard invented. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/AI.cpp:combatManager::WalkTowardArmy(class army * currentArmy,CombatSide side,i32 mask)#1": {
-    "body_sha256": "605789e83f265c19df45dd8506ed1aa2f7fea4d662f1a9c0558855a510c2b63c",
+    "body_sha256": "eae97df025be07e5053e6f24a0099b448e7bc0906fa405d92ad1d51698b56ccf",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22717,7 +22717,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions."
+    "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/PATH.cpp:army::FindPath(i32 sourceHex,i32 targetHex,i32,i32 ignoreSpeed,ArmyPathTarget pathMode)#1": {
     "body_sha256": "7c01e2877e4d670206871f1e4702ccb5ca120bc945ba2b93b982fc962b6a5a82",
@@ -22912,10 +22912,10 @@
     "note": "Entire ordered preference tree read. Explicitly validates both endpoints, then bounded row/column arithmetic and fixed eight mask bits; all-blocked returns-1, equal endpoints use existing no-horizontal fallback. B81 callers must handle invalid returned direction. No goto, local lookup array, pointer, casts or unrelated roles. Independent1918-byte retail proof excludes four generated-helper blocks overincluded by ordinary sema."
   },
   "src/SOURCE/FLY.cpp:army::CanFit(i32 hex,i32 tryOtherSide,i32 * fittingHex)#1": {
-    "body_sha256": "61640439866189152ea6b3bb16c5d0f76f4a10b25063979c7a33338300016794",
+    "body_sha256": "c019e70af477675f9e932c3958567b1f1dc3a5b2581a328e268b6f7ddfe438cf",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22925,13 +22925,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete front/rear/alternate fit and optional output read. B82 apparent cell_9 NULL edge case is excluded by initialized adjacency: full447-byte producer proof and all702 geometry positions show every valid neighbor is interior-column, so pointer assignment executes. Success/output and current-army occupancy contracts retained; output is initialized even before failure. U05 width flag real. No cast, goto, fake owner/aggregate, varargs or unrelated reuse."
+    "note": "Complete front/rear/alternate fit and optional output read. B82 apparent cell_9 NULL edge case is excluded by initialized adjacency: full447-byte producer proof and all702 geometry positions show every valid neighbor is interior-column, so pointer assignment executes. Success/output and current-army occupancy contracts retained; output is initialized even before failure. U05 width flag real. No cast, goto, fake owner/aggregate, varargs or unrelated reuse. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/FLY.cpp:army::ValidFlight(i32 destination,ArmyPathTarget pathMode)#1": {
-    "body_sha256": "5a5638ad67f5d569eb60eefc47b177d8257bab88d7afd847777a69c5e46d9ee4",
+    "body_sha256": "9ebbf10aea794d03d996ec3de5083e376a60b5748de2258186750b6c92ac0800",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22941,7 +22941,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full target validation, immediate attack and both landing loops read. Real two-side20-slot target owner; U05 wide flags retained. S61 all8 unused-local subsets measured, every deletion changes918-byte native text, original retained. B82 valid own/wide rear hex, facing, mode, initialized adjacency and attack-direction result required; low8/low6 mask termination fits valid endpoints. Wide attack scan stores last enabled direction, not first; no new initialization if none. No cast/goto/fake aggregate/varargs or unrelated roles."
+    "note": "Full target validation, immediate attack and both landing loops read. Real two-side20-slot target owner; U05 wide flags retained. S61 all8 unused-local subsets measured, every deletion changes918-byte native text, original retained. B82 valid own/wide rear hex, facing, mode, initialized adjacency and attack-direction result required; low8/low6 mask termination fits valid endpoints. Wide attack scan stores last enabled direction, not first; no new initialization if none. No cast/goto/fake aggregate/varargs or unrelated roles. U05 applied: 3 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/FLY.cpp:army::FlyTo(void)#1": {
     "body_sha256": "d05f212235dafa481199cc0b581aa1fde784e6f1439f1a3d0aae2f87c07a0817",
@@ -22960,10 +22960,10 @@
     "note": "Direct FlyTo(m_moveTargetHex) forwarding. No casts, unions, goto, stack owner, varargs, pointer arithmetic or unrelated roles. B82 live this and approved landing/placement contract delegated to full movement body."
   },
   "src/SOURCE/FLY.cpp:army::FlyTo(i32 destination)#1": {
-    "body_sha256": "1822091a7314ea8319453180f238fcb3c8888ad21549603de35a9ed32e082ad6",
+    "body_sha256": "aeef149db2bba824e4078664d812e252d42dc654cb68d54796edd9c1f673350d",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -22973,7 +22973,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire270-line movement/animation/facing tail read. C67 six assignment casts removed in complete4/16-arm phase products and combined whole-TU native proof. True sqrt, x87 ratio and float-to-integer boundaries retained. S61 unused locals all8 subsets and overwritten frameCount addition2-arm test change code, originals retained. U05 wide flags real. B82 adjusted front/rear placement, arithmetic/animation16-frame capacity, timing/frameCount divisor and rectangle/resource domains remain; positive step clamp does not prove timer frameCount positive. Sole private double1.3 at+73e independently fixed-operand checked; all2530 bytes/sites and other targets pass. No goto, fake aggregate, manual varargs or unrelated variable roles."
+    "note": "Entire270-line movement/animation/facing tail read. C67 six assignment casts removed in complete4/16-arm phase products and combined whole-TU native proof. True sqrt, x87 ratio and float-to-integer boundaries retained. S61 unused locals all8 subsets and overwritten frameCount addition2-arm test change code, originals retained. U05 wide flags real. B82 adjusted front/rear placement, arithmetic/animation16-frame capacity, timing/frameCount divisor and rectangle/resource domains remain; positive step clamp does not prove timer frameCount positive. Sole private double1.3 at+73e independently fixed-operand checked; all2530 bytes/sites and other targets pass. No goto, fake aggregate, manual varargs or unrelated variable roles. U05 applied: 5 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::Main(tag_message & message)#1": {
     "body_sha256": "314ca133c743dc943373674f4da744592e4b3d3a8ebf60003fb0a4e38c533a37",
@@ -23008,10 +23008,10 @@
     "note": "Entire sentinel/occupancy/wide fit predicate read. B83 -1 rejected and -2 accepted; column test compares hex%13 to global MAP_WIDTH-1, not combat constant12. Retail291 bytes/sites/targets confirms unusual logic; remaining hex and occupant side/index bounds are caller contracts, no invented range fix. No casts, unions, goto, fake owner, stack aggregate or varargs."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::SetCombatDirections(i32 targetHex)#1": {
-    "body_sha256": "03099e0f45c42b9c1b56b78d2e677aeb0709b706bae6222d7d2489d2b41fb838",
+    "body_sha256": "df5559a4214086beb41d6c32a63f286bea34fddbc53ac78110aa83967329dabe",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "applied",
       "owner": "absent",
@@ -23021,13 +23021,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete208-line four8-element local arrays, eight-direction eligibility and24-sector ring fill read. C68 six assignment casts removed in all64 subsets. A03 replaces first-row flattened adjacency pointer with actual m_adjacency[targetHex][direction], full3-arm row-owner family native exact. Saved target pair and four arrays are meaningful owners. B83 target army pointer formed before validation requires selected target; adjusted front/rear hexes need placement contract. Forced wide-west seed ensures ring fill has a seed; no goto/unrelated reuse/varargs."
+    "note": "Complete208-line four8-element local arrays, eight-direction eligibility and24-sector ring fill read. C68 six assignment casts removed in all64 subsets. A03 replaces first-row flattened adjacency pointer with actual m_adjacency[targetHex][direction], full3-arm row-owner family native exact. Saved target pair and four arrays are meaningful owners. B83 target army pointer formed before validation requires selected target; adjusted front/rear hexes need placement contract. Forced wide-west seed ensures ring fill has a seed; no goto/unrelated reuse/varargs. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::CheckSetMouseDirection(i32 mouseX,i32 mouseY,i32 targetHex)#1": {
-    "body_sha256": "6649d417986e9460f46d0cee5ddeccf543d5ebd8251dcb79ed649fcd963939f6",
+    "body_sha256": "95a1b223e9c792718b884676d445bc3738d3b295563cb629fb89246f9d844774",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23037,7 +23037,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full sector selection and adjusted wide attack hex read. Actual24-sector map and117x6 adjacency; ten fixed float/double operands checked individually. Retain explicit float ratio and enum-domain conversion: zero absY denominator is x87 floating division, not integer divide. S62 removing unread target pointer changes1397 to1358, retained. B83 current target, map initialization, direction0..7 and adjusted placement contracts remain. No fake stack aggregate, owner recovery, goto or manual varargs."
+    "note": "Full sector selection and adjusted wide attack hex read. Actual24-sector map and117x6 adjacency; ten fixed float/double operands checked individually. Retain explicit float ratio and enum-domain conversion: zero absY denominator is x87 floating division, not integer divide. S62 removing unread target pointer changes1397 to1358, retained. B83 current target, map initialization, direction0..7 and adjusted placement contracts remain. No fake stack aggregate, owner recovery, goto or manual varargs. U05 applied: 6 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::GetPointer(CombatMessageCommand command,i32 hexIndex)#1": {
     "body_sha256": "5a57ab07e3eee1567387b70cd596e60d48dc334649fb92515688985159c14a73",
@@ -23088,10 +23088,10 @@
     "note": "Checks exactly two hero pointers, each null-guarded, for sphere-negation artifact. Real side array and callee artifact owner retained; no local scratch buffer, casts, goto, manual varargs, artificial arithmetic or unrelated reuse."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::ResetRound(void)#1": {
-    "body_sha256": "3413b538defcc42c292fe5a878dee8eea7be84fa60cd9ea0af746a5a48d25902",
+    "body_sha256": "93ea3f4a02953f869dba645c67d933680bd99cc7a7d7fd3040868c377a19b68b",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23101,13 +23101,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "All reset fields, whole removed-army memset and2x20 army loop read. Real flag union and army pointer into actual row retained. S62 unused word removal changes452-byte text without size change; retained. B83 live manager, valid creature/lifecycle and spell-round owners required; no fabricated aggregate or manual varargs."
+    "note": "All reset fields, whole removed-army memset and2x20 army loop read. Real flag union and army pointer into actual row retained. S62 unused word removal changes452-byte text without size change; retained. B83 live manager, valid creature/lifecycle and spell-round owners required; no fabricated aggregate or manual varargs. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::CheckWin(struct tag_message * message)#1": {
-    "body_sha256": "bbd9c40fcbcb6ada9736df26ebad39a43650623f7ca8778ae819a22bcedf7a85",
+    "body_sha256": "e69e8ce587be66ba7d3089c84619380e5f163a2663b4e41250ba27d0bcf20213",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23117,13 +23117,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full win/draw/retreat selection,20-slot surviving nonsummoned scan and optional message write read. Draw excluded before indexing result row; real flag and executive message views retained. S62 unread word removal changes517-byte text. B83 valid current side and writable message when visible combat ends are contracts; no new guard or fake storage."
+    "note": "Full win/draw/retreat selection,20-slot surviving nonsummoned scan and optional message write read. Draw excluded before indexing result row; real flag and executive message views retained. S62 unread word removal changes517-byte text. B83 valid current side and writable message when visible combat ends are contracts; no new guard or fake storage. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::GetCommand(i32 hexIndex)#1": {
-    "body_sha256": "2992e6efe6b1e5343b341173a0152f92518b0ac194cf8b384d86b44bdebe07f4",
+    "body_sha256": "6d8c5ef39805386e594c41c0c6c658e09a7ae79be81d1a180301a4197055f493",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -23133,7 +23133,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete command selection and shared small-view tail read. C68 both removing two inner i8 casts and typed-enum conditional keep1014 bytes but change text; explicit enum/narrowing boundary retained. G77 if/else and guarded switch yield1010/1002; original goto retained. S62 all4 column/row removal subsets change code. B83 sentinel/hex/selected target coherence, side/index and wide placement contracts; no manual varargs or fake aggregate."
+    "note": "Complete command selection and shared small-view tail read. C68 both removing two inner i8 casts and typed-enum conditional keep1014 bytes but change text; explicit enum/narrowing boundary retained. G77 if/else and guarded switch yield1010/1002; original goto retained. S62 all4 column/row removal subsets change code. B83 sentinel/hex/selected target coherence, side/index and wide placement contracts; no manual varargs or fake aggregate. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::RightClick(i32 hexIndex)#1": {
     "body_sha256": "a585b742993e65915c8cadfdb5550f24d4cdb69e3c72d9abcfdde4f7155c700b",
@@ -23264,10 +23264,10 @@
     "note": "Entire casualty owner: real2x20 type/count arrays and two side counts, initialization25 widget slots, display max7 per side. R21 separates widget index from side in2 arms, same2517 size but changed text; retained. S62 complete bounded13-shape family (not full512 subsets) changes all nonoriginal text. B83 9-byte decimal allocations still need quantity bound; headings fit30/10. Allocator casts real; private EH model gap retained, no fake stack aggregation or manual varargs."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::DoVictory(CombatResult winningSide)#1": {
-    "body_sha256": "dca92b580e933ee39dc8750eba135038492c02f8e60bf20819f7b7337dcd7cae",
+    "body_sha256": "c3b195d7a6055925f679cb7e0622d8f9f1be2ed1078b9c3cf2d351dd34240399",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23277,7 +23277,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "All239-line victory cleanup/necromancy/fades/artifact transfer/UI read. Actual flag/message views and double-to-i32 necromancy conversion retained; fixed double.1 operand pinned. R21 split fade/artifact counter and S62 unused cost each change2839-byte text, originals retained. B83 fourteen hero slots bound transfer count<=14 within16; valid artifact/spell IDs, bodies arithmetic and quantities remain contracts. Retail experience114 fits152, combined victory129 fits768 with terminated hero name. EH model gap open."
+    "note": "All239-line victory cleanup/necromancy/fades/artifact transfer/UI read. Actual flag/message views and double-to-i32 necromancy conversion retained; fixed double.1 operand pinned. R21 split fade/artifact counter and S62 unused cost each change2839-byte text, originals retained. B83 fourteen hero slots bound transfer count<=14 within16; valid artifact/spell IDs, bodies arithmetic and quantities remain contracts. Retail experience114 fits152, combined victory129 fits768 with terminated hero name. EH model gap open. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::DoLoseWindow(void)#1": {
     "body_sha256": "62680105dbb11c508da63c29a90cbb36f98b141aa1f2dd57155981eb517b86c8",
@@ -23392,10 +23392,10 @@
     "note": "Actual mouse x/y outputs populate only MESSAGE_MOUSE_MOVE fields before dispatch; unrelated tag_message payload slots need no blanket initialization. Guards no-show/control/nonnegative player but upper ranges remain contracts. No casts/goto/manual varargs/fake aggregate or owner recovery."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::ProcessNextAction(struct tag_message & message)#1": {
-    "body_sha256": "3a1bdfffd706550874ef1245f62cd7ffb94726b90196ae0c9bace263d20424df",
+    "body_sha256": "e7b8858eb1f7b8bcb96af39cbb8ba2167277fc375debb3f7827bc0aba8b857b0",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -23405,13 +23405,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete network serialization/action dispatch/shared cleanup read. Real four-i32 actionData owner serialized for16 bytes; char reinterpretation retained. G80 do-single-pass cleanup alternative preserves1547 size but changes bytes/sites, original gotos retained. Pre-action win leaves CONSUME while post-action wins set FORWARD; cleanup always clears processing flag/resets mouse. Flag views genuine. B83 action/side/player/hex/amount inputs and network state remain contracts; no manual varargs/fake stack owner."
+    "note": "Complete network serialization/action dispatch/shared cleanup read. Real four-i32 actionData owner serialized for16 bytes; char reinterpretation retained. G80 do-single-pass cleanup alternative preserves1547 size but changes bytes/sites, original gotos retained. Pre-action win leaves CONSUME while post-action wins set FORWARD; cleanup always clears processing flag/resets mouse. Flag views genuine. B83 action/side/player/hex/amount inputs and network state remain contracts; no manual varargs/fake stack owner. U05 applied: 4 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::ResetCyclingCreatures(void)#1": {
-    "body_sha256": "6f641a1d8c1c5e1a7a9cf028bdfacab524d980ef79fcd49d47201e86cbdb9bbf",
+    "body_sha256": "284ba1274e6980fe7e022c3f35270387d68debd4503574c7dd1368ee9e38f549",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23421,7 +23421,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Both two-side creature passes, rotate count, repeated currentTroop assignment and timers read. S62 complete8 products cover unused word, initial null and repeated pointer store; every nonoriginal changes529-byte body. Real row owners and flag view retained; B83 live count<=20 and animation/resource state contract. No goto/cast/manual varargs/fake aggregate/unrelated reuse."
+    "note": "Both two-side creature passes, rotate count, repeated currentTroop assignment and timers read. S62 complete8 products cover unused word, initial null and repeated pointer store; every nonoriginal changes529-byte body. Real row owners and flag view retained; B83 live count<=20 and animation/resource state contract. No goto/cast/manual varargs/fake aggregate/unrelated reuse. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::ResetCycleTimers(void)#1": {
     "body_sha256": "ea04fd7450ff3d625490014823aef11e3ca3af0ba963800aa1e252fd616920ba",
@@ -23456,10 +23456,10 @@
     "note": "Pure x/y rectangular predicate with fixed screen width and combat-area height; comparisons accept arbitrary signed inputs without buffer/index arithmetic. No occurrence of any of the ten debt patterns."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::CycleCombatScreen(void)#1": {
-    "body_sha256": "faa99eef73a60b0ab84b61eb41e7489a591cb05cefc7bcc6d7f5513cbcfe74dd",
+    "body_sha256": "398892d24918ac8a101a15b47f96350d3c1c9e49ebf974378794b7837b335ff8",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -23469,7 +23469,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Entire hero overlay/death/idle selection,2x20 cycle flags and creature animation processing read. C68 numerator float cast removed with real float100 denominator; two real timer truncations and enum construction retained. Four fixed numeric operands pinned. G81 guarded work2352->2347 and R21 separate hero/army indices same2352 changed text; originals retained. B83 count<=20, sprite/sequence/frame/standing-chance domains, positive standing count, coherent nextHeroAnimation and finite timers required. Actual2-slot and2x20 arrays are not fake stack owners."
+    "note": "Entire hero overlay/death/idle selection,2x20 cycle flags and creature animation processing read. C68 numerator float cast removed with real float100 denominator; two real timer truncations and enum construction retained. Four fixed numeric operands pinned. G81 guarded work2352->2347 and R21 separate hero/army indices same2352 changed text; originals retained. B83 count<=20, sprite/sequence/frame/standing-chance domains, positive standing count, coherent nextHeroAnimation and finite timers required. Actual2-slot and2x20 arrays are not fake stack owners. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::SetCombatViewArmySmallLevel(i32 level)#1": {
     "body_sha256": "76b48f48358efcb73a8a642cf78fd692d3e16eb0f7e503aec402d7404a42c834",
@@ -23504,10 +23504,10 @@
     "note": "No-change early return then clears mouse grid, writes three preferences, rebuilds current army grid/redraws/resets/persists. B83 current army and rendering/preference domains required. No cast/union/goto/manual varargs/fake aggregate/owner arithmetic or unrelated reuse."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::AddArmy(CombatSide side,CreatureType monsterType,i32 quantity,i32 hex,MonsterFlags flags,i32 animate)#1": {
-    "body_sha256": "857fac768023992854886352716133207ffbb8c699fd4d8eb911009496d2097a",
+    "body_sha256": "a6f78459a76aa0dc81e9af07effc30f06b0db63b99946c9480654b49c5893895",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -23517,7 +23517,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete20-slot search prefers unused or eligible dead elemental/mirror stack, validates found index before Init/resources/count and optional fizzle. Real flag union and owner retained; no fake array or unrelated reusedArmy scalar role. B83 caller side/monster/quantity/hex/wide placement and resource/rectangle domains required; hex indexing itself lacks local bounds. No casts/goto/manual varargs/unread aggregate."
+    "note": "Complete20-slot search prefers unused or eligible dead elemental/mirror stack, validates found index before Init/resources/count and optional fizzle. Real flag union and owner retained; no fake array or unrelated reusedArmy scalar role. B83 caller side/monster/quantity/hex/wide placement and resource/rectangle domains required; hex indexing itself lacks local bounds. No casts/goto/manual varargs/unread aggregate. U05 applied: 3 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/COMMAND.cpp:combatManager::SetupSmallView(void)#1": {
     "body_sha256": "d41911354b2bd448a2ea4addfc2d8a0b0495ec9aeaba6c24f1f134129a614f84",
@@ -24480,10 +24480,10 @@
     "note": "Real writable 400-byte static owner and 400-byte wrapped local; source is copied before no-show/window/nonvisual guards. Requires input at most 399 chars. Temporary newline mutation is within that owner and restored; preceding-byte read has pointer-greater-than-start guard. Replacing a period-following newline with two spaces needs input at most 398 chars. Each destination line separately needs at most 119 chars; pixel LineLength is not a byte-capacity proof. Tagged widget payload and old extent flags are real related state. Clock + 2500 can overflow signed long. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 935 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
   },
   "src/SOURCE/DRAWING.cpp:combatManager::CombatMessage(CombatMessageCommand messageType)#1": {
-    "body_sha256": "b07662a5f7a2318aac2870164aa0a879301f1c58d6dc0552e0da923407fb1b35",
+    "body_sha256": "2b9463b34c5fc2b07c9e850a50fc97e7dfbaef337069b4354c4fd58af526a35a",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -24493,13 +24493,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "C75 one promotion cast removed. Default twelve-entry catalog plus all66 creature-name entries bounds formatted output at 56/120 including NUL. Actual side/index/creature/selected-hex/occupant domains remain necessary: target only has lower-bound checks, view info indexes army on current side. Unsupported command has no default and forwards old gText; no initialization or behavior fix invented. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 887 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+    "note": "C75 one promotion cast removed. Default twelve-entry catalog plus all66 creature-name entries bounds formatted output at 56/120 including NUL. Actual side/index/creature/selected-hex/occupant domains remain necessary: target only has lower-bound checks, view info indexes army on current side. Unsupported command has no default and forwards old gText; no initialization or behavior fix invented. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 887 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/DRAWING.cpp:combatManager::ResetLimitCreature(void)#1": {
-    "body_sha256": "6e05bcd60186e078f0397cbe317a2266aab3bded0e6ece8d1009a2ac24dca656",
+    "body_sha256": "2d036e1532fcdd1774dfb839fece64a8fcbc857e94abfcf1d0760b7be270a417",
     "patterns": {
       "casts": "absent",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -24509,7 +24509,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Two sides × 20 active slots are bounded within actual two × 21 army storage and matching limit array. Monster mirror flag view and four hero flags are real; resets extent extrema. No unallocated aggregate or owner arithmetic. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 223 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+    "note": "Two sides × 20 active slots are bounded within actual two × 21 army storage and matching limit array. Monster mirror flag view and four hero flags are real; resets extent extrema. No unallocated aggregate or owner arithmetic. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 223 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/DRAWING.cpp:combatManager::UpdateCombatArea(void)#1": {
     "body_sha256": "23cdb94db6b3c395cbd8af6bc389fadcc0d2da7ae9bb44b726c1d933270d8c0a",
@@ -24592,10 +24592,10 @@
     "note": "C75 two timer casts removed; G92–G94/S68/R26 measured originals retained. Real9 rows and1..11/reversed11..1 columns address99 of117 cells; fixed nine moat centers and each ±1 neighbor are in bounds. Actual6×8 u16 wall coordinates and seven u8 frame offsets initialized every iteration, not fabricated padding. Faction0..5, wall-state0..6, hero sprite/state/frame, army hex and walking-coordinate domains required. Extent clamping does not validate every caller-provided rectangle or resource. Finite three-entry speed domain and representable float timer result required. Cursor/sound cleanup and draw order preserved. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 5406 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
   },
   "src/SOURCE/DRAWING.cpp:combatManager::DrawSmallView(i32 viewIndex,i32 updateScreen)#1": {
-    "body_sha256": "fd8baff74905a9402bb82669b8e299ca3becdbe3a1a29d13dcf6c69fc7be9b3d",
+    "body_sha256": "6a615c7ab30244b81fb97d5c820a041768d004e41a7b371dc9c5c43363f3be44",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -24605,7 +24605,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C75 six promotions removed; S68/R26 originals retained. Real6×6×2 byte position table, including rectangular255 filler. Positive loop entry and min(count,6) bound both table indices and never select filler. Fifteen-byte active-spell scan is bounded only if count agrees with nonzero entries; all32768 occupancy masks checked under that contract. Producer casts duration to u8: zero or truncated-to-zero duration can break it. Two-view side/army index, resource/frame and screen lifecycle required. Fixed quantity/stat text fits768; morale/luck drawing needs intended small values and avoids signed INT_MIN negation. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 2857 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged."
+    "note": "C75 six promotions removed; S68/R26 originals retained. Real6×6×2 byte position table, including rectangular255 filler. Positive loop entry and min(count,6) bound both table indices and never select filler. Fifteen-byte active-spell scan is bounded only if count agrees with nonzero entries; all32768 occupancy masks checked under that contract. Producer casts duration to u8: zero or truncated-to-zero duration can break it. Two-view side/army index, resource/frame and screen lifecycle required. Fixed quantity/stat text fits768; morale/luck drawing needs intended small values and avoids signed INT_MIN negation. No manual varargs/enclosing-owner subtraction/artificial address or fabricated stack aggregate. Full 2857 retail bytes; all sites/ordered targets pass. C75/S68/R26/G91-G94/B90 report, combined all98 native objects unchanged. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
   },
   "src/SOURCE/Newgame.cpp:game::GetMap(void)#1": {
     "body_sha256": "f858b8ca4e99ed0338a2b6b7a7646c0612b9baa79aa3a5087310cd6850b44110",

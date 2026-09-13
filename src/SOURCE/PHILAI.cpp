@@ -2852,14 +2852,14 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
             }
             for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE
-                    && gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].randomValue
+                    && gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].fightValue
                            < weakestArmyValue) {
                     weakestArmyValue =
-                        gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].randomValue;
+                        gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].fightValue;
                 }
             }
-            if (gMonsterDatabase[IDX(candidateMonster)].randomValue > weakestArmyValue
-                && gMonsterDatabase[IDX(candidateMonster)].randomValue
+            if (gMonsterDatabase[IDX(candidateMonster)].fightValue > weakestArmyValue
+                && gMonsterDatabase[IDX(candidateMonster)].fightValue
                        > CREATURE_PURCHASE_EXPENSIVE_VALUE) {
                 canAddUnit8 = true;
             }

@@ -280,7 +280,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
 
     switch (messageType) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
-            if (HAS(currentArmy->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER) != 0
+            if (HAS(currentArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER) != 0
                 && currentArmy->m_monster.shots == 0 && targetArmy != NULL)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_NO_SHOTS)]);
             else
@@ -361,7 +361,7 @@ void combatManager::ResetLimitCreature(void) {
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
             m_limitCreatureCount[IDX(side)][armySlotIndex]
-                = HAS(m_armies[IDX(side)][armySlotIndex].m_monster.flags.all,
+                = HAS(m_armies[IDX(side)][armySlotIndex].m_monster.attributes,
                       COMBAT_ARMY_FLAG_MIRROR_IMAGE)
                         != 0
                     ? -1
@@ -1648,7 +1648,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_LEFT
             );
-            if (HAS(smallArmy->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER))
+            if (HAS(smallArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER))
                 smallFont->DrawBoundedString(
                     cMiniViewText[IDX(SMALL_VIEW_TEXT_SHOTS)],
                     viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1771,7 +1771,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 );
             }
 
-            if (HAS(smallArmy->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER)) {
+            if (HAS(smallArmy->m_monster.attributes, COMBAT_ARMY_FLAG_SHOOTER)) {
                 sprintf(gText, "%d", smallArmy->m_monster.shots);
                 smallFont->DrawBoundedString(
                     gText,

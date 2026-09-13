@@ -608,15 +608,15 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     }
 
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
-        if (!HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED)
+        if (!HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_AI_EXCLUDED)
             && m_armies[IDX(side)][index].m_quantity > 0
             && (m_playerId[IDX(side)] == -1
                 || ((m_armies[IDX(side)][index].m_monsterType != CREATURE_EARTH_ELEMENTAL
                      && m_armies[IDX(side)][index].m_monsterType != CREATURE_AIR_ELEMENTAL
                      && m_armies[IDX(side)][index].m_monsterType != CREATURE_FIRE_ELEMENTAL
                      && m_armies[IDX(side)][index].m_monsterType != CREATURE_WATER_ELEMENTAL)
-                    || !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)))
-            && !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
+                    || !HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_SUMMONED)))
+            && !HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE)) {
             m_armyGroups[IDX(side)]->m_creatureTypes[m_armies[IDX(side)][index].m_armyGroupSlot] =
                 m_armies[IDX(side)][index].m_monsterType;
             m_armyGroups[IDX(side)]->m_creatureCounts[m_armies[IDX(side)][index].m_armyGroupSlot] =
@@ -1035,7 +1035,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     bInHighMoraleBonus = false;
 
     army* activeArmy = &m_armies[IDX(side)][index];
-    if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
+    if (HAS(activeArmy->m_monster.attributes, MONSTER_FLAGS_NO_MORALE))
         return;
     if (activeArmy->m_quantity == 0)
         return;
@@ -1066,11 +1066,11 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
+    if HAS (activeArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_BAD_MORALE)
         H2_ENUM_CLEAR_FLAG(
-            activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE
+            activeArmy->m_monster.attributes, MONSTER_ABILITY_FLAG_BAD_MORALE
         );
-    activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
+    activeArmy->m_monster.attributes |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample, -1);
@@ -1084,7 +1084,7 @@ i32 combatManager::CheckApplyBadMorale(
         return 0;
 
     army* activeArmy = &m_armies[IDX(side)][index];
-    if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
+    if (HAS(activeArmy->m_monster.attributes, MONSTER_FLAGS_NO_MORALE))
         return 0;
     if (activeArmy->m_morale >= 0
         || SRandom(MORALE_ROLL_MIN, BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
@@ -1115,7 +1115,7 @@ i32 combatManager::CheckApplyBadMorale(
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
-    activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+    activeArmy->m_monster.attributes |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample, -1);
     return 1;
@@ -1142,25 +1142,25 @@ restart:
             for (stackCounter = 0; stackCounter < m_armyCount[IDX(stackSide)]; stackCounter++) {
                 skipEnt = false;
                 curArmy = stackCounter + m_armies[IDX(stackSide)];
-                if (HAS(curArmy->m_monster.flags.abilityFlags,
+                if (HAS(curArmy->m_monster.attributes,
                         MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
                     || IDX(curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                     || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
                     || (curArmy->m_monster.speed != m_currentSpeed
                         && !(
-                            curArmy->m_monster.flags.abilityFlags
+                            curArmy->m_monster.attributes
                             & MONSTER_ABILITY_FLAG_HIGH_MORALE
                         )))
                     skipEnt = true;
 
                 if (!skipEnt && speedIter == 0
                     && !(
-                        curArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_HIGH_MORALE
+                        curArmy->m_monster.attributes & MONSTER_ABILITY_FLAG_HIGH_MORALE
                     ))
                     skipEnt = true;
 
-                if HAS (curArmy->m_monster.flags.abilityFlags,
+                if HAS (curArmy->m_monster.attributes,
                         MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
                     skipEnt = true;
                     hasPending = true;
@@ -1196,7 +1196,7 @@ restart:
         checkMorale = 0;
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             for (stackCounter = 0; stackCounter < m_armyCount[sideLoop]; stackCounter++) {
-                (m_armies[sideLoop] + stackCounter)->m_monster.flags.abilityFlags &=
+                (m_armies[sideLoop] + stackCounter)->m_monster.attributes &=
                     ~MONSTER_ABILITY_FLAG_DEFERRED_TURN;
             }
         }
@@ -1223,7 +1223,7 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     side ^= 1;
     result = true;
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
-        if (!(m_armies[IDX(side)][index].m_monster.flags.abilityFlags
+        if (!(m_armies[IDX(side)][index].m_monster.attributes
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
             result = false;
     }
@@ -1635,9 +1635,9 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
                 || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
                 || target9->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
                 priority7 = KEEP_PRIORITY_DISABLED;
-            } else if (HAS(target9->m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
+            } else if (HAS(target9->m_monster.attributes, MONSTER_FLAGS_SHOOTER)) {
                 priority7 = KEEP_PRIORITY_SHOOTER;
-            } else if (HAS(target9->m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
+            } else if (HAS(target9->m_monster.attributes, MONSTER_FLAGS_FLYING)) {
                 priority7 = KEEP_PRIORITY_FLYER;
             } else {
                 priority7 = KEEP_PRIORITY_WALKER;
@@ -1745,7 +1745,7 @@ i32 combatManager::ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side) {
 
     for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
         if (m_armies[IDX(side)][index].m_monsterType != CREATURE_NONE
-            && !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)) {
+            && !HAS(m_armies[IDX(side)][index].m_monster.attributes, MONSTER_FLAGS_SUMMONED)) {
             experienceValue6 +=
                 (m_armies[IDX(side)][index].m_initialQuantity - m_armies[IDX(side)][index].m_quantity)
                 * gMonsterDatabase[IDX(m_armies[IDX(side)][index].m_monsterType)].hitPoints;
@@ -1915,7 +1915,7 @@ void combatManager::MakeCreaturesVanish(void) {
                 removedArmy = &m_armies[iSide][armyIndex];
                 m_hexCells[removedArmy->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
                 m_hexCells[removedArmy->m_hex].m_occupantIndex = -1;
-                if (HAS(removedArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+                if (HAS(removedArmy->m_monster.attributes, MONSTER_FLAGS_WIDE)) {
                     m_hexCells[removedArmy->m_hex
                                + ArmyFacingRearHexOffset(removedArmy->m_facing)]
                             .m_occupantSide = COMBAT_SIDE_NONE;

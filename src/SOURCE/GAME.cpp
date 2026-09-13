@@ -3727,7 +3727,7 @@ void game::ViewArmy(
         morale = theGroup->GetMorale(theHero, castle, NULL);
     else
         morale = 0;
-    if (HAS(monster->flags.all, MONSTER_FLAGS_NO_MORALE))
+    if (HAS(monster->attributes, MONSTER_FLAGS_NO_MORALE))
         morale = 0;
 
     sprintf(
@@ -3768,7 +3768,7 @@ void game::ViewArmy(
         strcat(details0, gText);
     }
 
-    if (HAS(monster->flags.all, MONSTER_FLAGS_SHOOTER)) {
+    if (HAS(monster->attributes, MONSTER_FLAGS_SHOOTER)) {
         i32 shots8 = armyMonster2->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active == 1)
@@ -5427,8 +5427,8 @@ void game::ProcessRandomObjects(void) {
                 monsterBoundsReady:
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
                     cell->m_objectIndex = static_cast<u8>(Random(0, 65));
-                    while (gMonsterDatabase[cell->m_objectIndex].randomValue <= minValue
-                           || gMonsterDatabase[cell->m_objectIndex].randomValue >= maxValue)
+                    while (gMonsterDatabase[cell->m_objectIndex].fightValue <= minValue
+                           || gMonsterDatabase[cell->m_objectIndex].fightValue >= maxValue)
                         cell->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):

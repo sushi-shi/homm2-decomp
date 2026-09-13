@@ -179,9 +179,9 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B30: the scaler's six callers supply only scales 4/6/12 with no clipping.
   Their temporary samples fit the initialized first 2048 bytes of a real
   4096-byte bitmap; destination and input-frame contracts remain B25/B28.
-- U05: the monster database record has a single-arm outer union/struct and
-  duplicate flag aliases. Initializer topology and all consumers must be checked
-  before removing alternate views from the packed 26-byte record.
+- U05: removed four duplicate monster-record unions, retaining actual value
+  and flag owners. All168 affected accesses and66 initializers have
+  [complete native, layout and retail-data proof](U05.md).
 - B31: all three bit helpers use byte-indexed DWORD accesses; the six-byte
   puzzle mask's final byte access spans through offset 8, where a separate
   hero-screen selection global is claimed. Retail proves the helper widths;

@@ -882,7 +882,7 @@ void combatManager::CastSpell(
                 sprintf(gText, "telptin.82m");
                 spellSample6 = LoadPlaySample(gText);
             }
-            if (HAS(teleportArmy6->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
+            if (HAS(teleportArmy6->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
                 adjacentHex8 = targetHex;
                 if (teleportArmy6->m_facing == ARMY_FACING_RIGHT) {
                     adjacentHex8 = teleportArmy6->GetAdjacentCellIndex(
@@ -1853,7 +1853,7 @@ void combatManager::BloodLustEffect(army* target, H2_ENUM_PARAM(MonsterFlags, i3
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags |= effect;
+    target->m_monster.attributes |= effect;
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -1870,7 +1870,7 @@ void combatManager::BloodLustEffect(army* target, H2_ENUM_PARAM(MonsterFlags, i3
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    H2_ENUM_CLEAR_FLAG(target->m_monster.flags.abilityFlags, effect);
+    H2_ENUM_CLEAR_FLAG(target->m_monster.attributes, effect);
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -3103,7 +3103,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             if (sourcePart7 == 0) {
                 searchHex10 = source2->m_hex;
             } else {
-                if (HAS(source2->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+                if (HAS(source2->m_monster.attributes, MONSTER_FLAGS_WIDE)) {
                     searchHex10 = source2->m_facing == ARMY_FACING_RIGHT ? source2->m_hex + 1
                                 : source2->m_hex - 1;
                 } else {
@@ -3184,7 +3184,7 @@ mirror_found:
     );
     image0 = &m_armies[IDX(m_hexCells[candidateHex].m_occupantSide)]
                       [m_hexCells[candidateHex].m_occupantIndex];
-    image0->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
+    image0->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
     duration2 = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration2 += SPELL_HOURGLASS_POWER_BONUS;
@@ -3268,7 +3268,7 @@ void combatManager::SummonElemental(H2_ENUM_PARAM(CreatureType, i32) monsterType
     );
     elementals = &m_armies[IDX(m_hexCells[summonHex4].m_occupantSide)]
                           [m_hexCells[summonHex4].m_occupantIndex];
-    elementals->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
+    elementals->m_monster.attributes |= MONSTER_ABILITY_FLAG_SUMMONED;
     spellPower = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
@@ -3564,7 +3564,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags &= MONSTER_FLAGS_RESURRECTED_MASK;
+    target->m_monster.attributes &= MONSTER_FLAGS_RESURRECTED_MASK;
 }
 
 VA(0x004a09c5, 0x86)

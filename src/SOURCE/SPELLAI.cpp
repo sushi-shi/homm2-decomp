@@ -246,7 +246,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                       [m_hexCells[hexCell_9].m_occupantIndex];
             giCurrSpellGroup = IDX(m_hexCells[hexCell_9].m_occupantSide);
             fullQuantityFlag_4 =
-                HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
+                HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
 
             spellPowerWork = m_spellPower[IDX(m_currentSide)];
             if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
@@ -519,7 +519,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 );
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL
                     && targetCreature->m_side == COMBAT_ATTACKER_SIDE
-                    && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+                    && HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                     effect_8 = static_cast<i32>(
                         effect_8 * COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER
                     );
@@ -544,7 +544,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 );
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL
                     && targetCreature->m_side == COMBAT_ATTACKER_SIDE
-                    && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+                    && HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                     effect_8 = static_cast<i32>(
                         effect_8 * COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER
                     );
@@ -583,7 +583,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 );
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL
                     && targetCreature->m_side == COMBAT_ATTACKER_SIDE
-                    && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+                    && HAS(targetCreature->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                     effect_8 <<= 1;
                 if (hasDamageReductionResult)
                     effect_8 =
@@ -759,7 +759,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
             mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
         creatureEffect = static_cast<i32>(creatureEffect * mirrorMod);
         if (HAS(
-                gMonsterDatabase[IDX(monType)].flags.abilityFlags,
+                gMonsterDatabase[IDX(monType)].attributes,
                 MONSTER_ABILITY_FLAG_SHOOTER
             ))
             creatureEffect =
@@ -800,12 +800,12 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             goto hasteSlowCommon;
         case ARMY_SPELL_INFLUENCE_HASTE:
             newSpd = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
-            if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_FLYING))
+            if (HAS(target->m_monster.attributes, MONSTER_FLAGS_FLYING))
                 return 0;
         hasteSlowCommon:
             if (m_inCastleCombat && target->m_side == COMBAT_DEFENDER_SIDE)
                 return 0;
-            if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+            if (HAS(target->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                 return 0;
             attackMask =
                 target->GetAttackMask(target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
@@ -822,7 +822,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             if (m_inCastleCombat)
                 distance += COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS;
 
-            if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_FLYING))
+            if (HAS(target->m_monster.attributes, MONSTER_FLAGS_FLYING))
                 beforeTurns = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
                 beforeTurns =
@@ -900,7 +900,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             shooters = 0;
             for (cnt = 0; cnt < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; cnt++) {
                 other = &m_armies[IDX(target->m_side)][cnt];
-                if (HAS(other->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+                if (HAS(other->m_monster.attributes, MONSTER_FLAGS_SHOOTER))
                     shooters++;
             }
             factor = shooters / m_armyCount[IDX(OppositeCombatSide(target->m_side))];
@@ -1014,10 +1014,10 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 }
 
                 fullQuantityWork =
-                    HAS(combatTarget->m_monster.flags.all, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
+                    HAS(combatTarget->m_monster.attributes, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
                 armyValueResult_3 = combatTarget->m_quantity
                                   * gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue;
-                if (HAS(combatTarget->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
+                if (HAS(combatTarget->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE)) {
                     negativeEffectResult = armyValueResult_3;
                 } else {
                 for (influence_9 = ARMY_SPELL_INFLUENCE_HASTE;
@@ -1399,7 +1399,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                         m_heroes[IDX(m_currentSide)],
                         m_heroes[IDX(targetCreature_18->m_side)]
                     );
-                    if (HAS(targetCreature_18->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)
+                    if (HAS(targetCreature_18->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE)
                         && spellDamageWork != 0)
                         spellDamageWork = COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE;
 
@@ -1426,7 +1426,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                         creaturesKilledResult_5 * targetCreature_18->m_monster.hitPoints
                         * gMonsterDatabase[IDX(targetCreature_18->m_monsterType)].fightValue
                         / targetCreature_18->m_monster.hitPoints;
-                    if (HAS(targetCreature_18->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
+                    if (HAS(targetCreature_18->m_monster.attributes, MONSTER_FLAGS_MIRROR_IMAGE)) {
                         killedCombatValue_1[IDX(m_hexCells[currentHex_1].m_occupantSide)] /=
                             SPELL_AI_MIRROR_VALUE_DIVISOR;
                         fightValueKilledAI_3[IDX(m_hexCells[currentHex_1].m_occupantSide)] /=

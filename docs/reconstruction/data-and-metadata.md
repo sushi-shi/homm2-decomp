@@ -34,8 +34,8 @@ Campaign choices are genuinely tagged records (two sides, twelve maps,
 three choices). The per-tag resource/artifact/spell/faction/skill values and
 amounts were read in full. This does not establish safety for an invalid
 campaign index or fabricated saved record. Monster flag/resource alternate
-views retain their separate U05 disposition; initializer nesting alone does
-not prove a union removable.
+views now have the [U05 all-consumer and native proof](U05.md); four duplicate
+unions are removed. Initializer nesting alone was not used as proof.
 
 Read every literal and initializer in the artifact, creature, spell, terrain,
 resource, building, UI/help, campaign, settings, networking and expansion
