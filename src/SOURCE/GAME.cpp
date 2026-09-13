@@ -300,7 +300,7 @@ H2_ENUM_BEGIN(RemoteSaveConstant)
     REMOTE_SAVE_HEADER_FILE_SIZE     = 0,
     REMOTE_SAVE_HEADER_FILE_CRC      = 1,
     REMOTE_SAVE_HEADER_TRANSMIT_CRC  = 2,
-    REMOTE_SAVE_HEADER_PLAYER        = 3,
+    REMOTE_SAVE_HEADER_PLAYER_EXITED = 3,
     REMOTE_SAVE_INIT_COMMAND         = 1,
     REMOTE_SAVE_INIT_RESPONSE        = 2,
     REMOTE_SAVE_DATA_COMMAND         = 3,
@@ -6547,7 +6547,7 @@ void game::CheckHeroConsistency(void) {
 #define success success7
 
 VA(0x0045da83, 0x7b3)
-i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
+i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave) {
     char filename[TRANSMIT_FILENAME_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
@@ -6591,10 +6591,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gSoundBackendsReady = samplesReady;
 
-    LogStr(const_cast<char*>("Transmit Game Start"));
+    LogStr("Transmit Game Start");
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("\xcf\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe0 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
-    AiPrint(const_cast<char*>("Transmit Start - Compressing"));
+        BVResMsg("\xcf\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe0 \xe4\xe0\xed\xed\xfb\xf5", RES_NONE, 0);
+    AiPrint("Transmit Start - Compressing");
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
@@ -6611,7 +6611,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
     LogInt(
-        const_cast<char*>("PostDiffFileSize"),
+        "PostDiffFileSize",
         fileSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6645,13 +6645,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         else
             transmitData = fileData;
 
-        AiPrint(const_cast<char*>("Transmit Start - Sending"));
+        AiPrint("Transmit Start - Sending");
         if (gbUseRegularCompression)
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
         LogInt(
-            const_cast<char*>("Send"),
+            "Send",
             fileSize,
             transmitCrc,
             LOG_UNUSED_VALUE,
@@ -6664,7 +6664,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         header[REMOTE_SAVE_HEADER_FILE_SIZE] = fileSize;
         header[REMOTE_SAVE_HEADER_FILE_CRC] = fileCrc;
         header[REMOTE_SAVE_HEADER_TRANSMIT_CRC] = transmitCrc;
-        header[REMOTE_SAVE_HEADER_PLAYER] = player;
+        header[REMOTE_SAVE_HEADER_PLAYER_EXITED] = playerExited;
         result = TransmitAndWait(
             reinterpret_cast<char*>(header),
             remotePlayer,
@@ -6696,7 +6696,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             chunkSize = fileSize - packet * REMOTE_PACKET_PAYLOAD_SIZE;
                         else
                             chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
-                        *reinterpret_cast<i16*>(header) = static_cast<i16>(packet);
+                        *reinterpret_cast<i16*>(header) = packet;
                         memcpy(
                             reinterpret_cast<char*>(header) + REMOTE_PACKET_INDEX_SIZE,
                             transmitData + packet * REMOTE_PACKET_PAYLOAD_SIZE,
@@ -6715,9 +6715,9 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             ShutDown(NULL);
                     }
                 }
-                LogStr(const_cast<char*>("PreWait"));
+                LogStr("PreWait");
                 *reinterpret_cast<i16*>(header) =
-                    static_cast<i16>(batch * REMOTE_PACKET_BATCH_SIZE);
+                    batch * REMOTE_PACKET_BATCH_SIZE;
                 result = TransmitAndWait(
                     reinterpret_cast<char*>(header),
                     remotePlayer,
@@ -6726,7 +6726,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                     &reply
                 );
-                LogStr(const_cast<char*>("PostWait"));
+                LogStr("PostWait");
                 if (!result)
                     ShutDown(NULL);
                 for (packet = 0; packet < packetsInBatch; packet++) {
@@ -6766,7 +6766,7 @@ transmitCleanup:
     if (acknowledged)
         H2_FREE(acknowledged);
 
-    AiPrint(const_cast<char*>("Transmit End"));
+    AiPrint("Transmit End");
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(true, true, true);
@@ -6841,7 +6841,7 @@ i32 game::ReceiveSaveGame(
     i32l lastPacketTime;
 
     LogInt(
-        const_cast<char*>("FW1"),
+        "FW1",
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6850,8 +6850,8 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    LogStr(const_cast<char*>("RSG1"));
-    AiPrint(const_cast<char*>("Receive Start - Getting Data"));
+    LogStr("RSG1");
+    AiPrint("Receive Start - Getting Data");
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
 
     ackBuffer = NULL;
@@ -6867,7 +6867,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("\xcf\xee\xeb\xf3\xf7\xe5\xed\xe8\xe5 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
+        BVResMsg("\xcf\xee\xeb\xf3\xf7\xe5\xed\xe8\xe5 \xe4\xe0\xed\xed\xfb\xf5", RES_NONE, 0);
 
     samplesReady = gSoundBackendsReady;
     oldTrack = gpSoundManager->m_musicTrack;
@@ -6875,7 +6875,7 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->SwitchAmbientMusic(-1);
     gSoundBackendsReady = samplesReady;
 
-    LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
+    LogStr("Begin Transmit Init Confirm");
     result = TransmitRemoteData(
         NULL,
         remotePlayer,
@@ -6885,7 +6885,7 @@ i32 game::ReceiveSaveGame(
         1,
         REMOTE_MESSAGE_DEFAULT
     );
-    LogStr(const_cast<char*>("End Transmit Init Confirm"));
+    LogStr("End Transmit Init Confirm");
     if (!result)
         ShutDown(NULL);
 
@@ -6898,7 +6898,7 @@ i32 game::ReceiveSaveGame(
 
     lastPacketTime = KBTickCount();
     LogInt(
-        const_cast<char*>("FW2"),
+        "FW2",
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6912,7 +6912,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                "\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?",
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
@@ -6950,7 +6950,7 @@ i32 game::ReceiveSaveGame(
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
                     LogInt(
-                        const_cast<char*>("FW3"),
+                        "FW3",
                         remotePlayer,
                         LOG_UNUSED_VALUE,
                         LOG_UNUSED_VALUE,
@@ -6978,10 +6978,10 @@ i32 game::ReceiveSaveGame(
         }
     }
 
-    AiPrint(const_cast<char*>("Receive Start - Decompressing Data"));
+    AiPrint("Receive Start - Decompressing Data");
     receivedCrc = calc_crc_long(incomingData, dataSize);
     LogInt(
-        const_cast<char*>("Receive"),
+        "Receive",
         dataSize,
         receivedCrc,
         expectedTransmitCrc,
@@ -7002,7 +7002,7 @@ i32 game::ReceiveSaveGame(
         computedCrc = receivedCrc;
     }
     LogInt(
-        const_cast<char*>("Receive"),
+        "Receive",
         dataSize,
         computedCrc,
         expectedCrc,
@@ -7030,7 +7030,7 @@ i32 game::ReceiveSaveGame(
         H2_FREE(decodedData);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
-    AiPrint(const_cast<char*>("Receive End"));
+    AiPrint("Receive End");
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(true, true, true);

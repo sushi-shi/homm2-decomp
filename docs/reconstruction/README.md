@@ -59,7 +59,7 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 - [Global data and annotation reconciliation](data-and-metadata.md): complete
   KB data tail, X_GLOBAL catalogs/runtime owners and va.h metadata read.
-  All 1,655 physical functions and all 228 project files now have manual
+  All 1,656 physical functions and all 228 project files now have manual
   reviews; remaining findings retain their individual dispositions.
 
 - C79/C80/O09/S72/S73/R29/G106-G108/A05/B94: all43 EVENTS definitions
@@ -405,14 +405,19 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   alternatives. Other setup storage remains open. S42 retains the unread
   NextPlayer count and PerDay income slot after all96 measured arms;
   [four further S41/S42 deletions change native code](C43-S41-S42-B65.md)
-  and remain. Other turn-update and S43 transfer/compression locals remain open.
+  and remain. [S43 transfer locals and overwritten initializations](C44-G50-S43.md)
+  retain their measured native-changing forms. Other turn-update and
+  compression locals remain open.
   [R09 tests 22 counter-role/cast variants](C34-C39-R09.md); the measured
   role splits change native code and are retained as negative alternatives.
-- G49-G54: random-monster bounds, transfer cleanup, score clamping, map-size
-  setup, diff completion and rumour fallback joins need structural tests.
+- G49-G54: [G50 transfer cleanup retains its measured join](C44-G50-S43.md).
+  Random-monster bounds, score clamping, map-size setup, diff completion and
+  rumour fallback joins still need structural tests.
 - B61/B64/B65: turn-state, town/hero setup, rumour/event and compression
-  domains remain function-specific contracts. U14/C44 tracks typed save-packet
-  ownership and erased byte-buffer interfaces; no fabricated padding is added.
+  domains remain function-specific contracts. [C44 removes 24 transfer casts
+  and recovers the exit-flag name](C44-G50-S43.md). U14/C44 still tracks typed
+  save-packet ownership and erased byte-buffer interfaces; no fabricated
+  padding is added.
 - B62/B63: [retail confirms](B62-B63.md) the receiver's100-byte acknowledgement fill with
   a200-byte transmission, and diff completion using the old-file remainder.
   These defects are separate from byte-preserving reconstruction fixes.

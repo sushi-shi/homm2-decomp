@@ -17855,38 +17855,6 @@
     },
     "note": "C34 applies the natural replacement-hero assignment to the existing i8 destination; GetNewHeroId always returns0..53 after its positive retry loop. S42 complete4-arm product retains sane and its write-only owner-check loop: removal changes1225 to1118 bytes. R09 player/hero/town index reuse remains. B61 counts/list IDs/occupiedTown required; map metadata checked0..53 before hero access and invalid owner handled. Five troop slots fit54 heroes/72 towns. U06 existing15-byte army owner and containing layouts unchanged. No goto,fake aggregate,raw owner trick or manual varargs. See C43-S41-S42-B65.md: all98 native objects/full ordinary retail bytes,size,DIR32 sites and ordered targets pass without exceptions; both dialects pass. R09 measured follow-up: complete3-arm product compares existing reuse with separate top-level and phase-scoped semantic indices. Both retain1225-byte length but grow the frame0x28 to0x30 and change stack operands; retain original locals. See C34-C39-R09.md: all98 native objects and this full ordinary-retail check still pass; this scoped negative does not rule out later structural recovery."
   },
-  "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 player,i32 useCurrentSave)#1": {
-    "body_sha256": "60dc23611282f5e1988e7a88379a3483e41b051087057390419f0e79857ff503",
-    "patterns": {
-      "casts": "open",
-      "unions": "absent",
-      "gotos": "open",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "open",
-      "bounds": "open"
-    },
-    "note": "U14/C44 heap256 header has four i32 init words then i16 packet index+bytes: typed protocol candidate, not fake stack union. CRC/codec/byte and literal interfaces need review. G50 cleanup join; S43 six unread scalars/overwritten oldTrack initialization. B62 file/packet sizes, tracking5000/signed IDs/batch100/reply length, payload200+2<=256 and codec output<=fileSize+2000 required. fileSize naturally becomes encoded length; alias-aware cleanup avoids double free. No manual varargs/container recovery or proven local outside pointer."
-  },
-  "src/SOURCE/GAME.cpp:game::ReceiveSaveGame(i32 dataSize,i32 expectedCrc,i32 expectedTransmitCrc,i32 remotePlayer)#1": {
-    "body_sha256": "07122ab2fa8a8739f7d7305990944991d55e0e791f3de22de0579646d7eeff2f",
-    "patterns": {
-      "casts": "open",
-      "unions": "absent",
-      "gotos": "absent",
-      "address": "absent",
-      "owner": "absent",
-      "outside": "absent",
-      "varargs": "absent",
-      "reuse": "absent",
-      "stack": "open",
-      "bounds": "open"
-    },
-    "note": "C44 tagged RemoteMessage/i16 packet prefix and codec/CRC views; S43 unused2080 and overwritten initial locals. B62 whole1736-byte retail proof: ackBuffer256 gets100 bytes but sends200, remaining100 not initialized here; CRCs only logged, never compared. Signed packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 validations absent locally. Tagged payload reuse meaningful; no goto/fake aggregate/manual varargs/owner recovery. No hardening silently applied."
-  },
   "src/SOURCE/GAME.cpp:game::DoNewTurn(void)#1": {
     "body_sha256": "b52a02a8c91c86c6774fd0a277920839ac9755a3bba7585e60896a4d24ef2689",
     "patterns": {
@@ -26494,5 +26462,37 @@
       "bounds": "absent"
     },
     "note": "Unsigned-byte CP1251 first-character fold returning text char; covers all256 byte inputs without indexing or pointer access. ASCII capitals and basic Russian capitals including Ё map to lowercase; all other bytes remain unchanged. C43 recovered inline sibling of ToUpperCp1251; actual helper tested exhaustively under both C++98/20 and both call-site native sequences remain retail exact. No cast,union,goto,address/owner/outside trick,varargs,reuse,aggregate or unresolved buffer."
+  },
+  "src/SOURCE/GAME.cpp:game::TransmitSaveGame(i32 remotePlayer,i32 playerExited,i32 useCurrentSave)#1": {
+    "body_sha256": "4775664f077ef6bfddfaeac98b676114559d1c95e7841b6ca8e330c50ef54a87",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "retain",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C44 removes9 literal const_casts and2 direct i16 assignment casts; existing destination narrowing remains. U14 identifies fourth header word as playerExited, not a player ID, from all3 call sites and CheckHandleNet; i32 ABI/raw flag preserved. The256-byte allocation really alternates four-word init and i16-index+payload protocol states; typed packet/API ownership remains open. G50/S43 complete128-arm guard/5-unread-local/oldTrack product retains original; guard loses8 bytes, each unread deletion changes bytes even when size stays1971. Two32-arm initialization products and receiver16-arm structure product retain measured stores; no fake padding/steering. Reply initialization and compression-failure cleanup remain meaningful. B62 filenames fit19/452 if config names terminate within13; allocation products, file reads, signed indices/tracking5000/batch100/reply lengths and codec capacities remain contracts. Full1971 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. See C44-G50-S43.md; bounds not hardened."
+  },
+  "src/SOURCE/GAME.cpp:game::ReceiveSaveGame(i32 dataSize,i32 expectedCrc,i32 expectedTransmitCrc,i32 remotePlayer)#1": {
+    "body_sha256": "5b43ce5f49ebee44562c4bba8e0ee7e5cbf6293f638b602d17853b7167d031ca",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C44 removes13 literal const_casts through existing text APIs. Tagged RemoteMessage/i16 prefix, char/u8 codec/CRC interfaces and acknowledgement owner recovery remain open with U14. S43 complete16-arm unused2080/file/packet/oldTrack product and32-arm ackBuffer/incomingData/decodedData/received/success initialization product retain original: every individual deletion loses10 bytes, all tested nonbaseline subsets differ. B62 filenames fit19/452 with terminated config name13; packetStart/payloadSize-2/tracking5000/dataSize+2000/decode700000 remain unchecked. Retail allocates ackBuffer256, fills100 and sends200; CRCs are logged, not compared; sender not locally checked. Alias-aware cleanup retained. All1736 retail bytes,size,DIR32 sites,ordered targets and all98 native objects unchanged. No goto/fake aggregate/manual varargs/member recovery. See C44-G50-S43.md; no hardening."
   }
 }
