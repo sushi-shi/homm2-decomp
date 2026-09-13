@@ -11,8 +11,8 @@ struct CombatTowerOrigin {
     u16 y;
 };
 
-i32 ValidHex(i32);
-void UpdateCombatSystemOptions(i32);
-MessageDispatchResult CombatSystemOptionsHandler(struct tag_message&);
+i32 ValidHex(i32 hex);
+void UpdateCombatSystemOptions(i32 initialDraw);
+MessageDispatchResult CombatSystemOptionsHandler(struct tag_message& message);
 
 #endif
