@@ -16976,9 +16976,9 @@
     "note": "B56 mutable source temporarily split at last dot then restored; destination capacity/termination/nonoverlap and extension length are caller contracts. No-dot path copies source unbounded. Eight-character basename cap uses i=999 rather than break, so requires source length<=1000 to prevent reentry at index1000; no generic cap claim. chr remains one character through case folding, not unrelated reuse; no cast, union, goto, fake aggregate or manual varargs."
   },
   "src/SOURCE/GAME.cpp:game::SaveGame(char * filename,i32 generateName,i8 expansionFormat)#1": {
-    "body_sha256": "6739ee37ed85158fac613fd4cace1541d6820eb40168c26afb605cc966845075",
+    "body_sha256": "0849145dadf679e9b788324997b0927f2f8e814d162d802acf0e67fb1729bf01",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
       "gotos": "absent",
       "address": "absent",
@@ -16986,15 +16986,15 @@
       "outside": "open",
       "varargs": "absent",
       "reuse": "retain",
-      "stack": "open",
+      "stack": "applied",
       "bounds": "open"
     },
-    "note": "Complete body read. C34 current-player/human byte conversions need native alternatives. U12/U13 serialize real aliased owners. B57 setup65-byte prefix starts at six-byte color array, campaign327-byte prefix at one-byte campaignType, and each four-byte event header at a two-byte count; all stay in game allocation but cross declared subobjects. this points to real first difficulty field, not fabricated owner recovery. S37 unread saveFlag/scratchVals6/lastTag; workBuf100 cleared40/written36 then reused for filename14, humans8 only6, plBuf4 only1. Sequential file scratch reuse is related, not unrelated. B56/B57 format-as-filename when generateName false, path452 and saveName351 termination/capacity, event counts30/50/50, map sizes/products/extra lengths/null allocation and ignored short writes require contracts. Null-payload50000 covers only validated nonnegative i16 lengths. Ordinary CRT varargs calls, not manual slot access; no goto or raw address trick. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
+    "note": "Complete body read. C34 two redundant char-assignment casts removed after complete4-arm measurement; destination narrowing unchanged. U12/U13 serialize real aliased owners. B57 setup65-byte prefix starts at six-byte color array, campaign327-byte prefix at one-byte campaignType, and each four-byte event header at a two-byte count; all stay in game allocation but cross declared subobjects. this points to real first difficulty field, not fabricated owner recovery. S37 complete64-arm product reduces humans8 to6 and plBuf4 to1; unused saveFlag/scratchVals6/lastTag and workBuf100 retained because their alternatives change bytes. workBuf100 cleared40/written36 then used for filename output and14-byte write: output is not universally bounded14 because GenerateStandardFileName has unbounded no-dot/extension paths. Sequential file scratch reuse is related, not unrelated. B56/B57 format-as-filename when generateName false, path452 and saveName351 termination/capacity, event counts30/50/50, map sizes/products/extra lengths/null allocation and ignored short writes require contracts. Null-payload50000 covers only validated nonnegative i16 lengths. Ordinary CRT varargs calls, not manual slot access; no goto or raw address trick. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md. C34/S37 follow-up: all136 arms compiled/restored without truncation; all98 native objects unchanged, ordinary retail bytes/size/sites pass with the same pre-existing strnicmp identity gaps. See C34-save-load-S37.md; no new checker exception, no filename/file-count hardening."
   },
   "src/SOURCE/GAME.cpp:game::LoadGame(char * filename,i32 loadFromFile,i32)#1": {
-    "body_sha256": "b9a9e3c5b49db870421a12afd4efbb5d78bf08ecea8daa05938755df27f9675f",
+    "body_sha256": "0202bf34fa9faaa4fef5e31318bbbb9cee5f299a1c15a7c5480c2a9d6b00476d",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "applied",
       "gotos": "absent",
       "address": "absent",
@@ -17002,10 +17002,10 @@
       "outside": "open",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "applied",
       "bounds": "open"
     },
-    "note": "Complete body read. Typed allocations retain erased storage boundary; C34 player bitmask casts require valid0..5. U12/U13 genuine serialized aliases. B57 same cross-member65/327-byte prefixes and four-byte headers at u16 counts as SaveGame, no claim of allocation overrun solely from those prefixes. S37 workData40 reads36/14, human8 reads6, plBuf4 reads1, junk40 and oldFlag/saveVal unread; chunkTag4 actually reads4. B57 file-controlled counts, signed i16 sizes, allocation products, map dimensions, format-as-filename saveName351/path452 and ignored read returns unresolved. Watched-player loop requires positive count<=6 and at least one local human; current player from signed byte must be live. No goto, fake pointer arithmetic, owner recovery or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
+    "note": "Complete body read. Typed allocations retain erased storage boundary; C34 two redundant u8-mask assignment casts removed after complete4-arm measurement; shift still requires valid count and ordinary player0..5. U12/U13 genuine serialized aliases. B57 same cross-member65/327-byte prefixes and four-byte headers at u16 counts as SaveGame, no claim of allocation overrun solely from those prefixes. S37 complete64-arm product reduces isHuman8 to6 and plBuf4 to1; workData40 reads36/14 but its36-byte alternative changes bytes, as do removal of unread junk40/oldFlag/saveVal. chunkTag4 actually reads4 and is not reduced. B57 file-controlled counts, signed i16 sizes, allocation products, map dimensions, format-as-filename saveName351/path452 and ignored read returns unresolved. Watched-player loop requires positive count<=6 and at least one local human; current player from signed byte must be live. No goto, fake pointer arithmetic, owner recovery or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md. C34/S37 follow-up: all136 arms compiled/restored without truncation; all98 native objects unchanged, ordinary retail bytes/size/sites pass with the same pre-existing strnicmp identity gaps. See C34-save-load-S37.md; no new checker exception, no filename/file-count hardening."
   },
   "src/SOURCE/GAME.cpp:game::GiveTroopsToNeutralTown(i32 townId)#1": {
     "body_sha256": "a94bbe59824e937a8176e33200964de64b7dff10b2edbec7b172595abf1580f0",

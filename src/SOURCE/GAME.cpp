@@ -1140,8 +1140,8 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     i32 outFile;
     i32 iFile;
     char genName[SAVE_PATH_CAPACITY];
-    bchar humans[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    char plBuf[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
+    bchar humans[GAME_PLAYER_COUNT];
+    char plBuf[1];
     void* emptyPayload;
     i32 H2_UNUSED(lastTag);
     i32 chunkTag;
@@ -1240,13 +1240,13 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     GenerateStandardFileName(m_saveName, workBuf);
     write(outFile, workBuf, SAVE_STANDARD_FILENAME_SIZE);
     write(outFile, &m_playerCount, sizeof(m_playerCount));
-    plBuf[0] = static_cast<char>(giCurPlayer);
+    plBuf[0] = giCurPlayer;
     write(outFile, plBuf, sizeof(plBuf[0]));
     write(outFile, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
     write(outFile, m_playerDead, sizeof(m_playerDead));
 
     for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
-        humans[iFile] = static_cast<char>(gbHumanPlayer[iFile]);
+        humans[iFile] = gbHumanPlayer[iFile];
         if (m_playerDead[iFile] != 0)
             humans[iFile] = false;
     }
@@ -1458,7 +1458,7 @@ VA(0x0044e8d9, 0xa79)
 void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
     i32 H2_UNUSED(oldFlag);
-    char isHuman[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
+    char isHuman[GAME_PLAYER_COUNT];
     i32 H2_UNUSED(saveVal);
     i32 rows;
     char pathBuf[SAVE_PATH_CAPACITY];
@@ -1466,7 +1466,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     i32 fd;
     char H2_UNUSED(junkBuf)[SAVE_LEGACY_CLEAR_SIZE];
     i32 ndx;
-    char plBuf[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
+    char plBuf[1];
     char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
     i32 numHumans;
     i32 wide;
@@ -1619,11 +1619,11 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
 
     gpAdvManager->m_heroContextLocked = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
-    giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
+    giCurPlayerBit = 1 << giCurPlayer;
     giCurWatchPlayer = giCurPlayer;
     while (!gbThisNetHumanPlayer[giCurWatchPlayer])
         giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
-    giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
+    giCurWatchPlayerBit = 1 << giCurWatchPlayer;
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     SetupAdjacentMons();
     LogStr("LG3");

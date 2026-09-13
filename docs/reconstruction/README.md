@@ -370,7 +370,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   B56 tracks standard-filename mutation, capacity, aliasing and loop-limit contracts.
 - B57: save/load uses cross-member serialized prefixes, duplicated two-byte count
   headers and unchecked file-supplied lengths. S37 tracks save/load/map scratch
-  arrays larger than their observed accesses; no padding is silently removed.
+  arrays larger than their observed accesses. [C34/S37 removes four save/load
+  assignment casts and reduces four player arrays](C34-save-load-S37.md) after
+  all136 measured arms; unused slots and work buffers retain native-changing
+  alternatives. Filename output is not bounded by its14-byte serialized write.
+  Map scratch remains separate; no padding is silently removed.
 - G48/R07: new-map award joins and player/town counters reused as artifact
   coordinates need structural recovery. R08 tracks event random-roll/layer-index
   and town/mine-ID reuse; S38 tracks event layer-index arrays written but not read.
