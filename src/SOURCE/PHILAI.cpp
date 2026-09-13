@@ -3562,7 +3562,7 @@ i32 philAI::ValueOfTown(town* t) {
         if (t->m_buildings & (1 << IDX(building)))
             sum += GetBuildingBaseResourceValue(t->m_type, building, t->m_buildState);
     }
-    sum = (i32)(
+    sum = static_cast<i32>(
         sum
         + AI_GOLD_TURN_VALUE_SCALE * gafAITurnCostResource[IDX(RES_GOLD)] * 5.0f * 1.5
     );
@@ -3589,17 +3589,17 @@ void philAI::TurnCostResource(i32 player) {
     pAI = &gpGame->m_players[player].m_aiData;
     sum = 0;
     for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
-        resValue[res] = (i32)(
-            (double)gResourceBaseValue[res]
-            * ((double)(pAI->m_income[res] * 5) * 0.7
-               + (double)gpGame->m_players[player].m_resources[res])
+        resValue[res] = static_cast<i32>(
+            gResourceBaseValue[res]
+            * ((pAI->m_income[res] * 5) * 0.7
+               + gpGame->m_players[player].m_resources[res])
         );
         sum += resValue[res];
     }
-    avg = (float)(sum / AI_PURCHASE_RESOURCE_COUNT);
+    avg = (sum / AI_PURCHASE_RESOURCE_COUNT);
     for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
-        frac[res] = (float)resValue[res] / avg;
-        gafAITurnCostResource[res] = (float)(gResourceBaseValue[res] / (frac[res] / 2.0f + 0.5));
+        frac[res] = resValue[res] / avg;
+        gafAITurnCostResource[res] = (gResourceBaseValue[res] / (frac[res] / 2.0f + 0.5));
     }
 }
 
@@ -3617,8 +3617,8 @@ float philAI::TurnValueOfObelisk(i32 player) {
         return 0.0f;
     ai->m_obeliskValue = each * GAME_OBELISK_VISITOR_COUNT / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
-        ai->m_obeliskValue = (i32)(ai->m_obeliskValue * 1.4);
-    ai->m_obeliskValue = (i32)(
+        ai->m_obeliskValue = static_cast<i32>(ai->m_obeliskValue * 1.4);
+    ai->m_obeliskValue = static_cast<i32>(
         ai->m_obeliskValue
         * (1.5
            - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, 1))
@@ -3626,7 +3626,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     );
     ai->m_obeliskValue =
         static_cast<i32>(ai->m_obeliskValue * (ai->m_attentionWeights.heroValue + 0.66));
-    return (float)ai->m_obeliskValue;
+    return ai->m_obeliskValue;
 }
 
 VA(0x00485981, 0x47)
@@ -4728,9 +4728,9 @@ i32 philAI::ChooseToFightForArtifact(
 VA(0x00487bdc, 0x36)
 i32 philAI::NetValueOfArtifact(i32 a1, i32 a2, i32 a3, i32 a4) {
     return static_cast<i32>(
-        static_cast<float>(gArtifactBaseRV[a1])
-        - (static_cast<float>(a2) * gafAITurnCostResource[IDX(RES_GOLD)]
-           + static_cast<float>(a4) * gafAITurnCostResource[a3])
+        gArtifactBaseRV[a1]
+        - (a2 * gafAITurnCostResource[IDX(RES_GOLD)]
+           + a4 * gafAITurnCostResource[a3])
     );
 }
 

@@ -374,6 +374,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   last-resource result and the independent seven-resource purchase guard are
   verified separately; movement constants close B69's operand-evidence gap.
 
+- C51/B71/C52/R14/S52: [combat-value and recruitment review](C51-B71.md)
+  adds20 PHILAI bodies. Four numeric cleanups remove ten casts after complete
+  2/65/12/8-arm comparisons and full native/retail operand proof. A pre-sentinel
+  artifact read, duplicated hero-role pointer and slot-based replacement value
+  are confirmed retail sequences and preserved, with reachability limits stated.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes
