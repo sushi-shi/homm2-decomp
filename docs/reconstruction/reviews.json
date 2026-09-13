@@ -23902,5 +23902,261 @@
       "bounds": "open"
     },
     "note": "C72 literal backdrop cast removed. B87 IDs200..999 produce row0..3 but top+row==count accepted by > guard before GetHero/GetTown; ordinary created widgets omit emptyrows so bad-widget reachability not presumed. Subwidget ranges bound real5army/8skill/14artifact/4stat/12dwelling owners under typed owner/input contract. Related widgetId decode not unrelatedreuse; R24 non-strict skill/artifact role split changes bytes at1187 size retainedoriginal. U06 army normal view consumer does not resolve alternate signed/count union debt; no fake aggregate/goto/manualvarargs/owner arithmetic. Full1187bytes/ordinary58targets pass, EH+6,c,14,499 explicit; helper4blocks outside function not mismatch."
+  },
+  "src/SOURCE/REQUEST.cpp:GetMapHeader(char * filename,struct SMapHeader * header)#1": {
+    "body_sha256": "4aea73e25922640111a71d8d8412eee3fd167f59f5c224ceb0c3f0ad7d203074",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B88 actual420-byte packed SMapHeader read fits its owner, but read result/magic/domains/termination ignored; returns1 whenever open succeeded. File/path/header allocation inputs required. gcMapPath20 plus terminated Win32name260 fits279/768, arbitrary publicfilename still unbounded. No cast/union/goto/artificial owner/manualvarargs/unusedaggregate/reuse. Full112bytes/sites/ordered8targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:CheckSumIsDemoOK(char *)#1": {
+    "body_sha256": "b4bc1646d794e3ce386575c983b57f8193870ad41afdb07b872008431cd0e60e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Disabled demo check returns1 without reading unnamed filename. No instance of any ten patterns; full16bytes, no relocations."
+  },
+  "src/SOURCE/REQUEST.cpp:ShowThisMapGame(char * filename)#1": {
+    "body_sha256": "6a9fcd03e934eab54f6c807de1d8fe6cf20b421ca27b1eaadf3012d553300b7f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S66 unconditional return1 bypasses entire vestigial300-byte mapName/demo body. Retail retains118bytes and10blocks; complete2-arm removal produces16, originalretained. No active strcpy or filename read along actual entry path, so inactive source is not a demonstrated overflow. No casts/union/gotos/manualvarargs/owner arithmetic/unrelatedreuse. Full118bytes/sites/ordered3targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:ShowThisMap(char *)#1": {
+    "body_sha256": "b71ca264031d8ebda7ab26f96d320a93c90b014cb5095f022aeaf601accd1474",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Disabled map gate returns1 without reading unnamed filename. No instance of any ten patterns; full16bytes, no relocations."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::InitializeFiles(char * directory,char * pattern,i32 countOnly)#1": {
+    "body_sha256": "b0a853606f61885de337e12b4758b55124c98b3841a9ecf7661a9f1878ce4530",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G87/G88 single-pass skip scopes1827->1810/1817, G89 insertionbreak1819; all rejected. R25 separate clear/header counters same1827 differenttext. B88 realWIN32find record,SMapHeader420,name352/ext5/path300 scratch; heapname351/ext5 actualstrides,count+1 names/extensions vs count headers. Two unbounded enumerations need stablecounts; growth can overflow headers, shrink leavesunused/uninitialized headers. CountOnly mutatesm_fileCount. Headerread failure/shortreads ignored, filter/domain/magic/termination notchecked. Win32filename<=259fits352/351/300 but extensionmustdot+<=3suffix chars; missingdot leavesuninitialized/staleextension, longsuffix exceeds5. Directory attributesunchecked; mapreads usegcMapPath notdirectory. No artificialowner/union/manualvarargs/fake aggregate. Full1827bytes/sites/ordered59targets pass, including2individuallyverifiedemptystrings."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::fileRequester(i32 x,i32 y,FileRequesterMode mode,char * pattern,char * directory,char * defaultExtension)#1": {
+    "body_sha256": "71f7e9f36003763414ee6ae482d56113757bcc82de463ec87fb7b088b376f62e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B88 actual0x42f owner initialized with nullarrays/none selection/top0; private9-byte m_listState unused semantic unknown, retainedlayout. Pattern/directory300/defaultExt5 strcpy requirebounds. ActualGetMap/PickLoadGame pass6-byte wildcardpattern into5-byte defaultExtension at+2ae; NUL writesadjacentfilename[0] at+2b3 withincompleteowner. Retailoffsets+callerbytes provecross-subobjectbehavior, notwrongfieldstride/outsideallocation. Savecallerproper5-byte suffixfits. Actualglobals9/11visible rows123/163travel73min dependexclusive requester lifecycle. Countquery followedfullinit; no fakeunion/manualvarargs/owner subtraction/reuse. Full342bytes/sites/ordered15targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter)#1": {
+    "body_sha256": "49a5f0403e856db0ad307c76972671b4297424bc896c68ba18172e6e4baf3763",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B88 temporaryglobalfilter isrestored, but InitializeFiles(countOnly1) rewritesm_fileCount and thisroutine doesnotrestoreit. Failedquery canleaveoldarrays/selectionwithnewcount. Validfilter0..4 and stablefilesystem/state needed. No casts/union/goto/manualvarargs/artificial aggregate/owner/reuse. Full79bytes/sites/ordered4targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::SetupFiles(void)#1": {
+    "body_sha256": "2c6fb0bac7a7d594407a5763572c8cf817458294585c3fa592801d7f0bcb6301",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B88 frees old arrays, resets count/top/result/selected and repopulates realowners. RetainsInitializeFiles enumeration/header/extension/capacity contracts; m_filename notreset. No cast/union/goto/manualvarargs/artificialaggregate/owner/reuse. Full98bytes/sites/ordered2targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::CleanUpData(void)#1": {
+    "body_sha256": "c7c44e856852d1340235ef4bffbf9ea338bffb9b9a683b861eb63dd1952def71",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Actual threeowned arrays null-checked/deleted thennulled, repeat-safe with initialized validowners. No resettingcount here; caller mustnotreusefreedarray views. Real351/5/420 elementowners notfakeaggregates. No casts/union/goto/manualvarargs/owner/reuse. Full160bytes/sites/ordered3targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::Close(void)#1": {
+    "body_sha256": "1a4b04c6660567162962191357531676884b837d303ad97b8d163eec23751e57",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Activeguard avoidsrepeatedcleanup; restoresmenu,copiesGetFilename evenonCancel beforefreeingdata,removes/deleteswindow,clearsactive. Filename source/destination351 requireGetFilename bounded result; onlyin-treeGetFilenamecall. Menu/window/object lifecycle required,windowpointer notnulledbutactiveguard. No casts/union/goto/manualvarargs/artificialowner/stackaggregate/reuse. Full117bytes/sites/ordered8targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::Open(i32 id)#1": {
+    "body_sha256": "83998b14ce45ab18cc5f22b11212349583162b0d3f0de9abc7184103fc546df2",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "C73 float->i16 yparametercastremoved; genuineconditionalresource const_cast retained(C++98). S66 mapName12->9 exact, first9cleared/copymax8; R25 char/filecountersplit1099sameSIZEdifferenttextretained. B88 actualwindow/knob/widgetprotocol, savename351 terminatedcopy and maxLength201 set; SET_TEXT bypasseslengthcap. CallsUpdate beforelaterempty-listdisable, so mapcount0 header[-1] issue remains. Managername14/30, resourceframes/currenttype/menu/widgetcopy/allocation lifetimes required. Full1099bytes and ordinary targets pass (51 total relocations), existingEH+6,c,14,441 gaps explicitnotclosed; all98native."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::SetOK(i32 enabled)#1": {
+    "body_sha256": "67e0e8497bf585b16c979b00167b9d8d85f9fd5fb4a1f660523bd13ce38a026f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actualwidget flagcommands vary with enabled/active state; packedmessage owner andflagdomain remain meaningful, no vararg/localowner/unusedaggregate/reuse/cast/goto. Requiresinitializedm_active/window andmatchingbuttonID. Full119bytes/sites/ordered2targets pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::Main(struct tag_message & message)#1": {
+    "body_sha256": "a3ca22d9fb0ef6d19e887701a9f1894e3946118379a10e7ad61960502d7478ca",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C73 twoimplicitintegerdestinationcastsremoved; threefilter-domain casts retained; fiveunsignedCP1251byte/stringpointer casts stillopen: charowner+unsignedreads4387/per-character4356 vs4388 originals. G90 five-listjoin ifelse4349 rejected; R25 distinctfile/filter/character/row/playercount roles4379 rejected; S66 unreadmousexstoreorstore+slot4377 rejected. Real352byteedit and2x300filename buffers, taggedinput/widget/executive record. B88 accepted maxLength201 limitsnewtypedbase200 only (disabledwidgetcanignorecommand); existingSET_TEXT canlonger, needs<=350chars/termination. Filterquerychangescount; staleevents/indices/domains remain. Rowoffset0..19 equality-to-selected precedescountguard. Integerstep int(travel*100/positions) becomes0atcount12309map/16311standard beforeidiv; normaltopclamped. Extensionplayerdigitphysicalindex3fits5butneeds4charvalidsuffix/1..6domain. Fourprintfdialogsmax136/768;textresourcecopy/lifecycle contracts. Full4388bytes/sites/all109targets withfixedfloat100+bbf pass; embeddedjumpdata size-only, notcodegap."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::DoKnob(void)#1": {
+    "body_sha256": "796ac5a00910c7b7e4dd465ebd22840008eaa4f2914e4275e2f758841ee03377",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C73 five integerdestination/floatcomparison castsremoved acrosscomplete32arms; full603bytes/sites/ordered31targets pass/all98native. Actualmouseevent/knobrelativecoordinates notunrelatedreuse/fakeaggregate. B88 initialgutterStep=floatdivisiondenomcount-(visible-1) unguardedatcounts8/10; latercount>visible gate preventsuseforshortlists, nointegercrashclaim. Validpositiveglobaltravel,initializedknob/window/event/owner andfinitecoordinates required; long-list topclamped0..count-visible."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::Update(i32 drawWindow)#1": {
+    "body_sha256": "13ea0330e1d25035055a6e78d6aa67803d6ef7722cffa7f12182804f835bccd9",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C73 two destinationi16 ycastsremoved full2718native. S66 complete32subsetsfourunusedscalars+372byteunreadbuffer allnonoriginaltextdifferent2718/2711/2153/2146; originalbuffer typeunknowable/framepreservednotauthenticaggregateproof. R25 filter/listcounter2739rejected. B88 mapmodecount0 leavesselected=-1 thenunconditionallyreadsheader[-1] beforebuttondisable; raw/stalepositiveindices/negativeTopnotguarded. Raw420headerdifficulty0..4/resourceframes/domain andname60/description300terminationneeded; `%s` protectsformatbutnottermination. Validtextfits768,difficultymax12. Normal9/11list rows boundedbycount; mouseknobformulasnonzeroguardeddenomsunderpositiveglobals. Actualtaggedwidgetpayload,noownerrecovery/manualvarargs/gotos. Full2718bytes/sites/ordered65targets withfixedfloat2+a01 pass."
+  },
+  "src/SOURCE/REQUEST.cpp:fileRequester::GetFilename(void)#1": {
+    "body_sha256": "e1e6cc75b15b8562a5251e2a2bec01c4a35d4d655da3324bad7ad36d03d8dfb2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B88 non-save selectionnegative/outofrangerejected; savemode needs-1orvalidindex. Recombinesreal351names/5extensions intogText768 thencopiesintom_filename351. Win32fullfilename<=259 ornewtypedbase<=200+suffix4 fits, arbitrary350basename+suffixneeds355notfit351. Existingm_saveName/SET_TEXT notboundedbyentry201. Unselectedsave appends suffixagainonrepeatedcalls becausewritesbackname; solein-treeClose call. Realmemberreturnnotownerarithmetic/artificialbuffer/union/manualvarargs/cast/reuse/goto. Full299bytes/sites/ordered12targets pass;4extrahelpers outsideactualboundary."
   }
 }

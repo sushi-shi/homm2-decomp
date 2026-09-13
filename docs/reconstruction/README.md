@@ -57,6 +57,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 ## Findings
 
+- C73/S66/R25/G87-G90/B88: all16 REQUEST functions reviewed; ten numeric casts
+  and three unused scratch bytes removed with all98 native objects unchanged.
+  Two-pass list consistency, empty-list access and the retail cross-field
+  extension copy remain explicit. [Evidence](C73-S66-R25-G87-G90-B88.md).
+
 - C72/A04/S65/R24/G85/G86/B87: all seven Overview functions reviewed;
   117 casts and one unused mine-count element removed, with both dialects
   checked and all98 native objects unchanged. Retail scroll/selection bounds,

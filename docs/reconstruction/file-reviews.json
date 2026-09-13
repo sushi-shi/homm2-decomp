@@ -830,5 +830,17 @@
   "include/SOURCE/Overview.h": {
     "sha256": "905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe",
     "note": "Full42-line header read, actual OverviewType/ReturnAction domains, four rows70slots/86height/200IDstride and5troop12dwelling8skill14artifact constants reconciled with all seven bodies. Row typedefs unused, not instantiated fake aggregates or proof of a row-pointer owner; actual flat heaps remain. No bodies/union/padding changes; forward declarations genuine owner header."
+  },
+  "src/SOURCE/REQUEST.cpp": {
+    "sha256": "359cd032c4ec680013154cd398f641a875cb3b17f729b50e04f41818dfda6ba6",
+    "note": "Full1247parentlines read(all16functions/privateenums/5globals/vtable). C73tennumericcastsremoved,S66mapbasename12->9; all17complete100arm65.052024s matrices and98native/fullbuild/dualdialect/retail proof. FiveCP1251viewcasts,threefiltercasts,conditionalnamecast remain; G87..90/R25/fourunusedscalars+372scratch residuals explicit. B88 twoenumerations/countmutation/headerread/emptymaplist/cross-subobjectextension/longlistdivision/textbounds recorded. No manualargvarargs/fakeunion/owner subtraction/artificialaddress."
+  },
+  "include/SOURCE/REQUEST.h": {
+    "sha256": "00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8",
+    "note": "Full83lines read: realpacked420SMapHeader, magic4/playertriples18/conditions/reserved8/name60/description300/counttail2, actualoffsetdescription0x76. Fixedbyte-width enumstorage and dimensions36/72/108/144 are realdiskdomains; no fakeunion/padding orfunctionbodies. GetMapHeaderretailread420/existingNewgameconsumers type/layout reconciled; rawfieldvalidation/termination remainsB88."
+  },
+  "include/SOURCE/fileRequester.h": {
+    "sha256": "77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b",
+    "note": "Full122lines read: genuine0x42f packedbaseManagerderived owner, pattern300/directory300, name351/ext5 records/pointers/map420 pointer and UI/indexmembers. defaultExt5 at2ae followedfilename351 at2b3 isfixedretailboundary; actualmap/loadcallerpatternNULcrossing documentedB88 notwidened. Unaccessedm_listState9 semanticunknownretainedknob42b; unused208/372 constants notproofofauthenticlocaltypes. No methodbodies/union; all16consumerreview/full98nativeproof."
   }
 }
