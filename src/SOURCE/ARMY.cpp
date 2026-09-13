@@ -1898,7 +1898,7 @@ i32 army::WalkTo(i32 destination) {
     for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
         Walk(
             static_cast<CombatHexDirection>(
-                gpSearchArray->m_storage.path.directions[direction_3 + 1]
+                gpSearchArray->m_storage.directions[direction_3]
             ),
             0,
             direction_3 != gpSearchArray->m_pathLength - 1
@@ -1940,7 +1940,7 @@ i32 army::AttackTo(i32 destination) {
     if (FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
         if (gpSearchArray->m_pathLength == 1) {
             m_attackDirection = static_cast<CombatHexDirection>(
-                gpSearchArray->m_storage.path.directions[1]
+                gpSearchArray->m_storage.directions[0]
             );
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
@@ -1951,7 +1951,7 @@ i32 army::AttackTo(i32 destination) {
                 stepCount++;
                 Walk(
                     static_cast<CombatHexDirection>(
-                        gpSearchArray->m_storage.path.directions[pathIndex + 1]
+                        gpSearchArray->m_storage.directions[pathIndex]
                     ),
                     pathIndex != 1 && stepCount < m_monster.speed ? 0 : 1,
                     pathIndex != gpSearchArray->m_pathLength - 1
@@ -1962,7 +1962,7 @@ i32 army::AttackTo(i32 destination) {
             }
             CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
             m_attackDirection = static_cast<CombatHexDirection>(
-                gpSearchArray->m_storage.path.directions[1]
+                gpSearchArray->m_storage.directions[0]
             );
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);

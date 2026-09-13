@@ -1137,8 +1137,8 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
     x = pHero->m_x;
     y = pHero->m_y;
     for (i = gpSearchArray->m_pathLength - 1; i >= 1; i--) {
-        x += normalDirTable[gpSearchArray->m_storage.aiPath.directions[i]].x;
-        y += normalDirTable[gpSearchArray->m_storage.aiPath.directions[i]].y;
+        x += normalDirTable[gpSearchArray->m_storage.directions[i]].x;
+        y += normalDirTable[gpSearchArray->m_storage.directions[i]].y;
         if (abs(x - pHero->m_x) <= 7 && abs(y - pHero->m_y) <= 7) {
             cell = gpAdvManager->GetCell(x, y);
             if (!(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
@@ -1420,13 +1420,13 @@ void philAI::DoAI(i32 player) {
                                 moveFlagA3 = 0;
                                 moveFlagB12 = 0;
                                 if (GoodAdjacent(&adjacentDirection2)) {
-                                    gpSearchArray->m_storage.aiPath.directions[pathIndex0] =
+                                    gpSearchArray->m_storage.directions[pathIndex0] =
                                         static_cast<i8>(adjacentDirection2);
                                     stopAfterStep6 = true;
                                 }
                             }
                             direction26 = static_cast<MapDirection>(
-                                gpSearchArray->m_storage.aiPath.directions[pathIndex0]
+                                gpSearchArray->m_storage.directions[pathIndex0]
                             );
                         aiMoveDirection:
                             if (gpAdvManager->GetMoveShowIt(gpCurAIHero, direction26)) {

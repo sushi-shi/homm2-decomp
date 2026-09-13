@@ -50,7 +50,7 @@ i32 searchArray::BuildPath(
     i32 destinationY,
     i32 maximumCost
 ) {
-    u8* pathDirection = &m_storage.path.directions[1];
+    u8* pathDirection = m_storage.directions;
     m_pathLength = 0;
     while (destinationX != startX || destinationY != startY) {
         searchNode* node = &GetColumn(destinationX)[MAP_WIDTH * destinationY];
@@ -94,8 +94,8 @@ void searchArray::SeedPosition(
         giCurTempMobility = mobility;
         giFullySeeded = false;
         Clear();
-        m_lastX = SEARCH_INVALID_COORDINATE;
-        m_lastY = SEARCH_INVALID_COORDINATE;
+        m_specialTargetY = SEARCH_INVALID_COORDINATE;
+        m_specialTargetX = SEARCH_INVALID_COORDINATE;
         s_currentCost = 0;
     }
 
@@ -144,13 +144,13 @@ void searchArray::SeedPosition(
     s_currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
 
     while (m_queueCount > 0) {
-        --m_queueSize;
-        s_currentNode = m_queue[m_queueSize];
+        --m_queueCount;
+        s_currentNode = m_queue[m_queueCount];
 
         if (s_hasTarget && s_bestTargetCost < SEARCH_MAX_COST
             && s_currentNode.distance + SEARCH_TARGET_COST_WINDOW >= s_bestTargetCost) {
             s_currentCost = s_currentNode.distance;
-            ++m_queueSize;
+            ++m_queueCount;
             return;
         }
 

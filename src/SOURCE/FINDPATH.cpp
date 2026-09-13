@@ -150,7 +150,7 @@ void searchArray::PushPoint(
             gSearchHigh = gSearchMiddle;
     }
 
-    if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
+    if (gSearchMiddle < m_queueCount) {
         memmove(
             gSearchQueueNode + 1,
             gSearchQueueNode,
@@ -439,7 +439,7 @@ i32 searchArray::FindCombatPath(
     if (!ValidHex(sourceHex) || !ValidHex(targetHex) || unit == NULL)
         goto restoreMoatFailure;
 
-    path_d = m_storage.aiPath.directions;
+    path_d = m_storage.directions;
     PushCombatPoint(
         sourceHex,
         unit->m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST,
@@ -575,7 +575,7 @@ void searchArray::PushCombatPoint(
             high_c = middle_a;
     }
 
-    if (static_cast<u32>(middle_a) < m_queueCount) {
+    if (middle_a < m_queueCount) {
         memmove(node_e + 1, node_e, (m_queueCount - middle_a) * sizeof(searchNode));
     }
     m_queueCount++;

@@ -848,10 +848,10 @@
     "note": "G35 summon_done tail; S30 fromCell assigned but unread. Direction loop0..7 guards placement world coordinates before access;48 boat entries scanned and slot used only afterfound. Actual i8 boat-coordinate/u8 metadata serialization casts remain; i8 coordinates on maps>127 need existing boat-coordinate-domain interpretation. Clipped fizzle rectangle stays16..464, target154,152,150,136 fits viewport. B43 hero/terrain/boat-record lifecycle remains."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::ShowRoute(i32 redraw,i32,i32 updateButton)#1": {
-    "body_sha256": "44147deefe807c099c56a6aabc8be67dc4ea4cece4b3471f94eaf4de007f1fd9",
+    "body_sha256": "1c7484cd7af012a35fef785115249e2c4c69eb38046f806a986ba851a625fdde",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -861,7 +861,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Actual search path union and flat u16 visibility array; sizeof clear covers allocated map dimensions. B18 pathLength, directions[index+1]/directions[index],0..7 arrow/direction tables and path world positions need search contract; GetCell clamp does not validate subsequent visibility write index. Terrain/pathfinding domains remain B43. u16 frame storage cast is real narrow map representation; no unrelated reuse or fake stack array."
+    "note": "Actual search path union and flat u16 visibility array; sizeof clear covers allocated map dimensions. B18 pathLength, directions[index+1]/directions[index],0..7 arrow/direction tables and path world positions need search contract; GetCell clamp does not validate subsequent visibility write index. Terrain/pathfinding domains remain B43. u16 frame storage cast is real narrow map representation; no unrelated reuse or fake stack array. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::HideRoute(i32 redraw,i32 clearDestination,i32 updateButton)#1": {
     "body_sha256": "e07d6c470cb7160b452eab6ce86c2cb6b5f6a1828625c82009da6cac98e1327e",
@@ -2032,10 +2032,10 @@
     "note": "All initialization loops fit64 object,8 hero,6 flag,28 looping-sample and9 cursor-sample owners; four animation-phase indices are explicit. Duplicate NULL assignments are observed retail statements, not unobserved stack padding. No artificial local aggregate."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::DoAdvCommand(void)#1": {
-    "body_sha256": "880bf61d87bf462285b0c3421c56ec8a67a86e1ec7d52526f656d073040cf72d",
+    "body_sha256": "c2eb089a40e1b8f2bdefb39751f7c264d359af3fb9c73a2a74a9a7dee5db85c7",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -2045,7 +2045,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "G27 continue_route/movement_done joins need structured-source matrices. Real event record and MoveHero result scalars; map-direction cast decodes path byte. B18/B43 pathLength+1 domain, current hero/town, hovered cell and terrain indices depend on gameplay state. SelectedHero is checked in move/view arms but not occupied-town arm."
+    "note": "G27 continue_route/movement_done joins need structured-source matrices. Real event record and MoveHero result scalars; map-direction cast decodes path byte. B18/B43 pathLength+1 domain, current hero/town, hovered cell and terrain indices depend on gameplay state. SelectedHero is checked in move/view arms but not occupied-town arm. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::CheckSetEvilInterface(i32 redraw,i32 player)#1": {
     "body_sha256": "871cf4345c37bccd7c9b39f1595325a40b0717f2e52eee4efc88f29cce75f8dc",
@@ -9475,7 +9475,7 @@
     "body_sha256": "6d312102aaafb6f926cba0340a55172af7cfab8c9b4527a9fdf7add027c4e33d",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9485,13 +9485,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Returns a real nine-byte node-row address using caller width/y; not fabricated owner recovery. U02: storage pointer and two path-array overlays should become one pointer view plus a real separate direction array after caller proof."
+    "note": "Returns a real nine-byte node-row address using caller width/y; not fabricated owner recovery. U02: storage pointer and two path-array overlays should become one pointer view plus a real separate direction array after caller proof. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "include/SOURCE/searchArray.h:searchArray::GetColumn(i32 x)#1": {
     "body_sha256": "60c14c12d2b460272f8f34fd4746262019957927bc053c2ccbd99cb9148a0dff",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9501,13 +9501,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Returns the real node-array base plus x for later row indexing, preserving GetColumn inline access shape. U02 concerns owner storage layout, not a synthetic pointer or a container-of idiom."
+    "note": "Returns the real node-array base plus x for later row indexing, preserving GetColumn inline access shape. U02 concerns owner storage layout, not a synthetic pointer or a container-of idiom. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "include/SOURCE/searchArray.h:searchArray::GetNode(i32 x,i32 y)#1": {
     "body_sha256": "e03b83cd9ba3e44c47e91e5c59b6f5c413c5d050d81b26243052a290b1b45d26",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9517,13 +9517,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Returns actual node[x+MAP_WIDTH*y]; caller coordinates must fit allocated width*height. U02 pointer/path storage overlay remains an owner-layout candidate."
+    "note": "Returns actual node[x+MAP_WIDTH*y]; caller coordinates must fit allocated width*height. U02 pointer/path storage overlay remains an owner-layout candidate. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "include/SOURCE/searchArray.h:searchArray::GetCell(i32 x,i32 y)#1": {
     "body_sha256": "a6592d289204f9f17ee4dca00ddc8365a81d5afa159bf3c4935955649a7e8948",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9533,13 +9533,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Returns a real searchCell at x+width*y through the alternative nine-byte grid view; no member-owner recovery. U02: preserve genuine cell/node interpretation but remove padding-based path overlay if native caller tests support it."
+    "note": "Returns a real searchCell at x+width*y through the alternative nine-byte grid view; no member-owner recovery. U02: preserve genuine cell/node interpretation but remove padding-based path overlay if native caller tests support it. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::searchArray(void)#1": {
     "body_sha256": "5eadac2ebcf90a53aa825cbf05337359fc615716c42442ce09d720b4f9d4fa6e",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9549,7 +9549,7 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "Initializes real storage pointer and maximum queue count. U02/U03: path-array overlay and signed/unsigned queue-counter alias pairs need shared-owner recovery, not more casts."
+    "note": "Initializes real storage pointer and maximum queue count. U02/U03: path-array overlay and signed/unsigned queue-counter alias pairs need shared-owner recovery, not more casts. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::~searchArray()#1": {
     "body_sha256": "101c38dcff635fa040ac40032f4c4034e6f56239174e0d588c05b014994c49bc",
@@ -9571,7 +9571,7 @@
     "body_sha256": "434a2a1f475e909159a9649573ccdeb1ad50ef362c680f5e9e96dd82d79d12c6",
     "patterns": {
       "casts": "retain",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9581,13 +9581,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Allocator cast gives the real nine-byte cell grid width*height owner; dimensions/allocation success are existing caller/runtime contracts. U02: cells/nodes pointer views and path overlay still need owner-wide layout reconstruction."
+    "note": "Allocator cast gives the real nine-byte cell grid width*height owner; dimensions/allocation success are existing caller/runtime contracts. U02: cells/nodes pointer views and path overlay still need owner-wide layout reconstruction. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::Close(void)#1": {
     "body_sha256": "6f344042db6f93a78114c1d1b64cd0a065e43f860beffe014e9642465636539a",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9597,13 +9597,13 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "Releases the actual cell allocation and clears its pointer. U02: pointer occupies the same storage word as the prefix of padded path views; no deliberate freeing of an interior pointer."
+    "note": "Releases the actual cell allocation and clears its pointer. U02: pointer occupies the same storage word as the prefix of padded path views; no deliberate freeing of an interior pointer. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::Clear(void)#1": {
     "body_sha256": "eed36e82902f98992c9708a904e0046575c27451d5217d1f0ff8f68379070fed",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9613,7 +9613,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Zeroes real queue[1024] and allocated width*height nine-byte grid; resets path length/count. U02/U03: overlapping path prefix and counter signedness aliases remain open; no fake stack aggregate."
+    "note": "Zeroes real queue[1024] and allocated width*height nine-byte grid; resets path length/count. U02/U03: overlapping path prefix and counter signedness aliases remain open; no fake stack aggregate. U02-U04 shared-owner recovery now resolves these duplicate path/queue/target views; unchanged consumer body and all98 native objects retain identical bytes/relocations. Actual grid pointer/node views remain; see U02-U04-S08-G11.md."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::QuickDistance(i32 x1,i32 y1,i32 x2,i32 y2)#1": {
     "body_sha256": "f2ddd4af293a327872c28b55011e1dbe233ddf3ecae5e0c411b62e17f06ca85a",
@@ -9648,10 +9648,10 @@
     "note": "Indexes real terrain/pathfinding-level/two-parity cost table under caller enum/skill domains. Terrain is deliberately changed to ROAD for the same cost role, not unrelated reuse; diagonal&1 bounds the last dimension."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::PushPoint(i32 x,i32 y,MapDirection direction,i32 cost,i32 mobility,i32 unknownFlag,i32 rvFlag1,i32 valueX,i32 valueY,i32 rvFlag2,i32 previousX,i32 previousY)#1": {
-    "body_sha256": "5af242e10c7447c481b3920e5c2a9917cf9d846bb3bf29c58e53bad8658cfbc6",
+    "body_sha256": "bc6b0a3847aaecae3641c484b1d7fe0a2351ec4ec5ea046a878f0578139a78ed",
     "patterns": {
-      "casts": "retain",
-      "unions": "open",
+      "casts": "applied",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9661,7 +9661,7 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Bounds coordinates and queueCount<1024 before node formation/insertion; memmove into next node stays within queue after capacity check. Narrowing stores express packed coordinates, distance, direction and flags. searchNode union preserves actual signed/unsigned auxiliary interpretations; U03 redundant queue-counter alias remains open."
+    "note": "Bounds coordinates and queueCount<1024 before node formation/insertion; memmove into next node stays within queue after capacity check. Narrowing stores express packed coordinates, distance, direction and flags. searchNode union preserves actual signed/unsigned auxiliary interpretations; U03 redundant queue-counter alias remains open. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain. U03 complete2-arm comparison removes redundant u32 comparison cast with full native/retail proof."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::TestPossibleDirections(i32 x,i32 y,TerrainType * const terrain,i8 * const occupied,i32 allowOccupied,i32 waterMode)#1": {
     "body_sha256": "01b824f14acd1f72547bd6a378bafa2864e4622b73ad4f50d081260fd5233a81",
@@ -9696,26 +9696,26 @@
     "note": "S08: seven named unused scalar slots (unused04/0c/10_a/1c_g/18/28_o/20_a) need native frame tests, not automatic deletion. B19: enemy/adjacent-wide hexes index 117 hex entries under army placement contracts. Index is consistently an enumeration cursor, hex_c remains the current target hex."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::FindCombatPath(i32 sourceHex,i32 targetHex,class army * unit,ArmyPathTarget attackPath,i32 ignoreTargetMoat)#1": {
-    "body_sha256": "aeca23ff1bf352d519744b652a06217210dd68f50f29de5d12cb00351d166d37",
+    "body_sha256": "1b781fec43a42ed104de8efdfa6ec3ac401cc7bb2513f7c0be1b3d8d19d5b978",
     "patterns": {
       "casts": "retain",
-      "unions": "open",
-      "gotos": "open",
+      "unions": "applied",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "U02/U03: path overlays and queue-counter aliases. G11: failure/success goto tails restore saved moat bytes; real savedMoatState array is entirely saved/restored conditionally. S08: two unread scalar slots remain. B19: bIsMoatSlowed[nextHex] precedes PushCombatPoint validation; unit is dereferenced before later NULL check. Packed direction casts are semantic; path writes stop at capacity 256."
+    "note": "U02/U03: path overlays and queue-counter aliases. G11: failure/success goto tails restore saved moat bytes; real savedMoatState array is entirely saved/restored conditionally. S08: two unread scalar slots remain. B19: bIsMoatSlowed[nextHex] precedes PushCombatPoint validation; unit is dereferenced before later NULL check. Packed direction casts are semantic; path writes stop at capacity 256. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain. G11 structured completion changes1315 to1312 bytes; S08 all three unused-slot deletion arms change frame operands at1315. Retain both slots and cleanup gotos."
   },
   "src/SOURCE/FINDPATH.cpp:searchArray::PushCombatPoint(i32 hex,CombatHexDirection direction,i32 distance,i32 speed)#1": {
-    "body_sha256": "1f09fee245d743660927b7bd0977090a2858dc7307adac3c12cb1fb0f9b22073",
+    "body_sha256": "46b2ffcc302a32b39226e6b8bade9f448f4952edf793a29b861edf217f363fac",
     "patterns": {
-      "casts": "retain",
-      "unions": "open",
+      "casts": "applied",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9725,13 +9725,13 @@
       "stack": "absent",
       "bounds": "retain"
     },
-    "note": "Validates hex, speed and queueCount<1024 before sorted insertion; shifted queue range fits capacity. Narrowing is genuine packed hex/direction/distance storage. U03 counter aliases can potentially be one real numeric owner."
+    "note": "Validates hex, speed and queueCount<1024 before sorted insertion; shifted queue range fits capacity. Narrowing is genuine packed hex/direction/distance storage. U03 counter aliases can potentially be one real numeric owner. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain. U03 complete2-arm comparison removes redundant u32 comparison cast with full native/retail proof."
   },
   "src/SOURCE/SEARCH.cpp:searchArray::BuildPath(i32 startX,i32 startY,i32 destinationX,i32 destinationY,i32 maximumCost)#1": {
-    "body_sha256": "44997437537bd6f5390877e635890022cca311a73f44dc69a07667d8138c78d6",
+    "body_sha256": "9ced0e45bfa8c92a9cc1e8f18201d5b097ae827b70bc239523621a23eae41b2b",
     "patterns": {
       "casts": "retain",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -9741,13 +9741,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U02: path.directions[1] begins four bytes into storage, preserving live grid pointer; both path views may be a separate 256-byte array. Real packed direction becomes MapDirection for reverse traversal. Capacity check permits at most 256 writes; B18: endpoint/node-coordinate validity relies on callers. Native instructions and ordered retail relocations match after O02."
+    "note": "U02: path.directions[1] begins four bytes into storage, preserving live grid pointer; both path views may be a separate 256-byte array. Real packed direction becomes MapDirection for reverse traversal. Capacity check permits at most 256 writes; B18: endpoint/node-coordinate validity relies on callers. Native instructions and ordered retail relocations match after O02. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/SEARCH.cpp:searchArray::SeedPosition(i32 seedX,i32 seedY,MapDirection seedDirection,i32 maximumCost,i32 waterMode,i32 findAdjacentMonster,i32 mobility,i32 pathfindingSkill,i32 targetX,i32 targetY,i32 continueSeed,i32 scanMap)#1": {
-    "body_sha256": "da4364cea814a01b0fb597dff48a763f906f44d7d7efe63300e8ccec886feea3",
+    "body_sha256": "146d03a0c62c4fccd836032a58b290180d2e5129ee9e79055f6a9302141b9eb3",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -9757,7 +9757,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "O02 applied: split 29 scratch objects out of a padding-bearing 140-byte global record, preserving all original field addresses; removed two unobserved padding arrays. Five emitted functions have equivalent before/after instructions and ordered field relocations. Both game functions and two compiler helpers match verified retail bytes, complete absolute operand sites and all ordered relocation destinations. Genuine searchNode tagged views retained. U03/U04 queue/target-coordinate aliases, G09 shared tail and B18 map/queue/caller domains remain open."
+    "note": "O02 applied: split 29 scratch objects out of a padding-bearing 140-byte global record, preserving all original field addresses; removed two unobserved padding arrays. Five emitted functions have equivalent before/after instructions and ordered field relocations. Both game functions and two compiler helpers match verified retail bytes, complete absolute operand sites and all ordered relocation destinations. Genuine searchNode tagged views retained. U03/U04 queue/target-coordinate aliases, G09 shared tail and B18 map/queue/caller domains remain open. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "include/BASE/Misc.h:LogInt(char * text,Enum value,i32 b,i32 c,i32 d,i32 e,i32 f,i32 g)#1": {
     "body_sha256": "45a82f6d5a1283c75f6e8fc8dabb12e8dddbf9c009ceb72153889d904c784ee6",
@@ -19200,10 +19200,10 @@
     "note": "U02 search pointer view is real. B69 candidate visited lookup precedes coordinate guard; negative/one-past grid access possible for edge candidates under source-domain counterexamples. All947 ordinary retail bytes/DIR32 sites/ordered targets pass; local byte evidence in B69-S50.md. No normal gameplay reachability claim. bestY initialized whenever bestX becomes usable. No casts, goto, fake scratch, owner recovery, manual varargs or unrelated reuse."
   },
   "src/SOURCE/PHILAI.cpp:philAI::DoDimensionDoor(hero * pHero)#1": {
-    "body_sha256": "e3a278ed8494f6679dcc138a996dad71c5b91bdcb324e8228ec45e3baa1884b6",
+    "body_sha256": "b6fe616475193266e341bb4f8d3dd00851e01597c43b5e5f3171aa20b8703087",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19213,7 +19213,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U02 path/aiPath overlay pending all-consumer recovery; walks actual directions array backward. B69 pathLength<=256, direction0..7, generated path inside map and currentHero matching argument required. len/bestY are assigned whenever bestX is valid and protected by short circuit; not uninitialized on that tail. No casts, goto, fake local arrays, manual varargs or unrelated reuse."
+    "note": "U02 path/aiPath overlay pending all-consumer recovery; walks actual directions array backward. B69 pathLength<=256, direction0..7, generated path inside map and currentHero matching argument required. len/bestY are assigned whenever bestX is valid and protected by short circuit; not uninitialized on that tail. No casts, goto, fake local arrays, manual varargs or unrelated reuse. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/PHILAI.cpp:philAI::SetupRelativeHeroStrengths(void)#1": {
     "body_sha256": "d8a757ba9e33ddd0831e635f4ad1133dbe7a30fb4c40698aafca38149268f140",
@@ -19248,10 +19248,10 @@
     "note": "S50 j initialized then incremented only for invalid creature ID and never consumed; body does not actually reject or repair invalid state. B69 live hero required, loop itself fits five army slots. No casts, unions, goto, fake aggregate, manual varargs or unrelated local reuse."
   },
   "src/SOURCE/PHILAI.cpp:philAI::DoAI(i32 player)#1": {
-    "body_sha256": "3766af2130f33749de71b7db29b1fa577f1f7bda563312ee0ed2ef2388e03488",
+    "body_sha256": "7682368ee8312a46625545af270d4808e67fcebce23cbd7ba63efcf41ee4a9bc",
     "patterns": {
       "casts": "open",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -19261,7 +19261,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire orchestration body read. C48 narrow direction storage and enum recovery need owner review; real floating scaling/truncation retained. U02 aiPath overlay pending. G58 cleanup, retarget, special move and next-hero joins; special move jumps past initialization of stopAfterStep6/move flags/path index. R12 pathIndex0 is hero/resource/visited-position/path index. S50 savedShow3 uses only element0 and unusedVars1[7] never used; complete6/6 owner family rejects all five smaller candidates by raw size, source restored. B69 coordinates/path/IDs, text inputs, movement and cleanup lifetime contracts remain; four private floats prevent general whole-function target closure. No manual varargs, invented owner offset or aggregate replacing unrelated objects. B70 DetermineTargetPosition whole-body review confirms GoodAdjacent success supplies direction; fixed movement-float supplement now resolves all four private operands without relaxing the general checker. Normal execution has not been instrumented."
+    "note": "Entire orchestration body read. C48 narrow direction storage and enum recovery need owner review; real floating scaling/truncation retained. U02 aiPath overlay pending. G58 cleanup, retarget, special move and next-hero joins; special move jumps past initialization of stopAfterStep6/move flags/path index. R12 pathIndex0 is hero/resource/visited-position/path index. S50 savedShow3 uses only element0 and unusedVars1[7] never used; complete6/6 owner family rejects all five smaller candidates by raw size, source restored. B69 coordinates/path/IDs, text inputs, movement and cleanup lifetime contracts remain; four private floats prevent general whole-function target closure. No manual varargs, invented owner offset or aggregate replacing unrelated objects. B70 DetermineTargetPosition whole-body review confirms GoodAdjacent success supplies direction; fixed movement-float supplement now resolves all four private operands without relaxing the general checker. Normal execution has not been instrumented. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/PHILAI.cpp:philAI::GetGameAIVars(void)#1": {
     "body_sha256": "5ac29ea2629fe29a6b5e4dc011b97e560c1cd6fa39f447869b941b8f5c31a77f",
@@ -20576,7 +20576,7 @@
     "note": "Full no-argument delegation to stored movement target read. Inherits WalkTo(destination) path/hex/lifecycle requirements, no distinct cast, union, goto, scratch aggregate, varargs or role reuse."
   },
   "src/SOURCE/ARMY.cpp:army::WalkTo(i32 destination)#1": {
-    "body_sha256": "d953feb4079e9c9f23625dc7f64278cb8265c5300208e441af16402405ad8be6",
+    "body_sha256": "ab0913378c8afac819fe81757bcec64e2b73762b9f8e0937bdeccd8f87bae6f0",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -20589,7 +20589,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete moat/path walk and cancellation tail read. C55 typed AFTER_MOVE constant removes literal enum conversion with full682-byte retail and native proof. C57 direction enum conversions remain; U02 actual search path view/U05 flags retained. R16 direction_3 spans moat index, hex direction and reverse path index. B73 valid 9-row moat index and initialized bounded positive path length, direction bytes and movement invariants required; neighbor moat accesses explicitly guarded, but path usesindex+1. No goto, fake aggregate, manual varargs or artificial owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "Complete moat/path walk and cancellation tail read. C55 typed AFTER_MOVE constant removes literal enum conversion with full682-byte retail and native proof. C57 direction enum conversions remain; U02 actual search path view/U05 flags retained. R16 direction_3 spans moat index, hex direction and reverse path index. B73 valid 9-row moat index and initialized bounded positive path length, direction bytes and movement invariants required; neighbor moat accesses explicitly guarded, but path usesindex+1. No goto, fake aggregate, manual varargs or artificial owner. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/ARMY.cpp:army::AttackTo(void)#1": {
     "body_sha256": "7b2967244734c91c4a4f5c5eaba9492d95a377e7ed12a63251c7c81369335eec",
@@ -20608,7 +20608,7 @@
     "note": "Full no-argument stored-target delegation read; inherits typed attack/path preconditions. No independent cast, union, goto, fake aggregate, varargs or unrelated reuse."
   },
   "src/SOURCE/ARMY.cpp:army::AttackTo(i32 destination)#1": {
-    "body_sha256": "b93064ed57affd12dc05937abdb936e6898efdaba0d3db77d2f0a4c7c4aac570",
+    "body_sha256": "c478cdc07c1cfeb15f49550d7455e67ed27c6d594bd51896b034b18c96de85cb",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -20621,7 +20621,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete flying/breath/one-step/multiple-step attack dispatch read. C55 typed AFTER_MOVE constant removes literal enum conversion; full456-byte retail/native proof. C57 path direction conversions remain, U02 path/U05 flag views genuine. S54 pathIndex=0 immediately overwritten by for initialization. B73 successful FindPath must provide length>=1 and bounded direction array; zero length enters pathIndex=-1 with loop!=0 and out-of-range access. No guard invented. No goto, fake aggregate, varargs, unrelated reuse or owner recovery. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "Complete flying/breath/one-step/multiple-step attack dispatch read. C55 typed AFTER_MOVE constant removes literal enum conversion; full456-byte retail/native proof. C57 path direction conversions remain, U02 path/U05 flag views genuine. S54 pathIndex=0 immediately overwritten by for initialization. B73 successful FindPath must provide length>=1 and bounded direction array; zero length enters pathIndex=-1 with loop!=0 and out-of-range access. No guard invented. No goto, fake aggregate, varargs, unrelated reuse or owner recovery. U05 applied: 2 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/ARMY.cpp:army::CheckLuck(void)#1": {
     "body_sha256": "ed4507d085d32c67c450c3309b174dfb1b45248cea9c3557be47e09b72f15322",
@@ -22688,7 +22688,7 @@
     "note": "S59 unused hexes removal measured2/2 keeps324-byte size but changes stack operands, original retained. Real unsigned available/oneBit/enemyMask roles remain. B80 ValidAttack must supply an upper-bounded destHex and occupant index0..19 before signed1<<index; only nonnegative destination is checked locally. Selected army becomes global action; no new fake owner or return-buffer wrapper."
   },
   "src/SOURCE/AI.cpp:combatManager::WalkTowardArmyFront(class army * currentArmy,CombatSide side,i32 mask)#1": {
-    "body_sha256": "5bbb40a42c6572114b82672ae99078769db332c7b5c315a102bc9ab50d68985b",
+    "body_sha256": "1ff45d6db45424fce3d4f74b19e25e96719412bf5532c0859b7e90f490d15dfa",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -22701,10 +22701,10 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "A02 two reversed index[array] expressions recovered with2-arm proof; C65 signed-byte speed restoration cast removed with2-arm proof. U05 wide flag and U02 raw path-byte enum conversion remain genuine boundaries. S59 pathFound result-store removal changes519 to516 bytes while preserving FindCombatPath call, original retained. B80 valid closest target/facing, stable search storage, capped path length/directions and next moat hex domain remain; no new return-value guard invented. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "A02 two reversed index[array] expressions recovered with2-arm proof; C65 signed-byte speed restoration cast removed with2-arm proof. U05 wide flag and U02 raw path-byte enum conversion remain genuine boundaries. S59 pathFound result-store removal changes519 to516 bytes while preserving FindCombatPath call, original retained. B80 valid closest target/facing, stable search storage, capped path length/directions and next moat hex domain remain; no new return-value guard invented. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/AI.cpp:combatManager::WalkTowardArmy(class army * currentArmy,CombatSide side,i32 mask)#1": {
-    "body_sha256": "eae97df025be07e5053e6f24a0099b448e7bc0906fa405d92ad1d51698b56ccf",
+    "body_sha256": "9d1d63481efa619adcfb43c04d4a015a075e12f29a0afe81f1d0ba5c26a6227e",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -22717,7 +22717,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain."
+    "note": "C65 implicit signed-byte previous-speed restore preserves516-byte body. Actual target mask check, wide rear retry, temporary127 speed and path-length>1 traversal retained. U05 wide flag/U02 path-direction enum boundary remain. S59 unused path removal measured2/2 changes stack bytes. B80 valid target/side/path/next hex and search lifecycle remain; ordinary helper tail partition28vs24 is not additional source functions. U05 applied: 1 duplicate monster-member accesses use the same-type single value/flag owners. All98 native objects/1826 functions/allocated sections/ordered relocations unchanged; packed26-byte and1716-byte retail table proofs pass. Full per-body retail disposition in U05-functions.tsv; earlier runtime contracts and genuine tagged unions remain. U02-U04 applied: separate256-byte direction owner and single unsigned queue/target fields, preserving all access addresses/reset order. Full98-object native, VC6 layout and both-dialect proof in U02-U04-S08-G11.md; per-body retail result U02-functions.tsv. Existing grid-pointer/node tagged views and runtime bounds remain."
   },
   "src/SOURCE/PATH.cpp:army::FindPath(i32 sourceHex,i32 targetHex,i32,i32 ignoreSpeed,ArmyPathTarget pathMode)#1": {
     "body_sha256": "7c01e2877e4d670206871f1e4702ccb5ca120bc945ba2b93b982fc962b6a5a82",

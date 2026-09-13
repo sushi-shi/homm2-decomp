@@ -1523,7 +1523,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 for (; pathIndex >= 0; --pathIndex) {
                     eventCellState = MoveHero(
                         static_cast<MapDirection>(
-                            gpSearchArray->m_storage.path.directions[pathIndex + 1]
+                            gpSearchArray->m_storage.directions[pathIndex]
                         ),
                         pathIndex == 0,
                         &TrigX,
@@ -8901,7 +8901,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         mapY = hero->m_y;
 
         for (index = gpSearchArray->m_pathLength - 1; index >= 0; --index) {
-            dir = gpSearchArray->m_storage.path.directions[index + 1];
+            dir = gpSearchArray->m_storage.directions[index];
             thisTile = GetCell(mapX, mapY);
             mapX += normalDirTable[dir].x;
             mapY += normalDirTable[dir].y;
@@ -8961,7 +8961,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             if (index == 0) {
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = 1;
             } else {
-                fromDir = gpSearchArray->m_storage.path.directions[index];
+                fromDir = gpSearchArray->m_storage.directions[index - 1];
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = static_cast<u16>(
                     frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir]
                     + ROUTE_ARROW_FRAME_OFFSET

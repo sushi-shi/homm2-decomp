@@ -139,10 +139,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - O02: split the padding-bearing 140-byte pathfinding scratch record into
   29 objects at the original field addresses; removed two unobserved padding
   arrays. [Native before/after and verified retail evidence](O02.md).
-- U02-U04: path-array/pointer overlays and duplicate queue/target-coordinate
-  views need shared-owner reconstruction. G09-G11 are the pathfinding common
-  completion/store/restore tails. B18/B19 cover map-edge and combat-hex input
-  domains; S08 covers unused combat-search scalar slots.
+- U02-U04: recovered the separate direction array and single queue/target
+  fields, removing two redundant comparison casts with [full native and
+  scoped retail proof](U02-U04-S08-G11.md). G11 and S08 retain measured
+  cleanup/slot forms; G09/G10 remain separate common-tail candidates.
+  B18/B19 cover map-edge and combat-hex input domains.
 - O03: bitmap helpers form possible beyond-end final row cursors, and dimming
   crossed a palette subarray instead of indexing its real level dimension.
   The palette access is now corrected with [native equivalence proof](O03.md);
