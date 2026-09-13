@@ -49,6 +49,16 @@ definition. Packed enum storage exposes an already-typed `enum_value()` instead
 of re-decoding it. A source-policy test rejects direct numeric enum casts and
 bypasses of the shared low-level conversion.
 
+The Overview's dynamic widget tables use their existing 70-slot row types on
+`master`, with direct `[row][slot]` access and declarations in `Overview.h`.
+Initialization, replacement and cleanup still use four rows; the original
+11200-byte allocations and allocation/free pairing are unchanged. This is a
+source-ownership improvement, not a claim of an original-game defect. The
+corresponding decomp experiment (PR #60, CP03) changed VC6's stride calculation
+from multiply-by-70 plus scaled LEA to multiply-by-280 plus ADD, so it was not
+retained on the matching branch. `overview_rows` checks every slot of both row
+types and their declared global pointer types without depending on a display.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |

@@ -330,8 +330,6 @@ public:
      + ((g).m_month - 1) * CALENDAR_DAYS_PER_MONTH)
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
-extern class textWidget** textWidgetDynamic;
-extern class iconWidget** iconWidgetDynamic;
 extern OverviewType iLastDynamicType;
 extern OverviewType giOverviewType;
 extern i32 giOverviewTop[H2EnumIndex(OVERVIEW_TYPE_COUNT)];
