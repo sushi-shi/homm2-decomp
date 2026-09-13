@@ -886,5 +886,17 @@
   "include/SOURCE/ExpCampaign.h": {
     "sha256": "d7c9d144cd759deaeab9e984b7f9dd4bc6582355a6aab771a7d2a8df10322551",
     "note": "Full153lineparent read; removes obsolete6-index Ivan offset, retained152lines. Fourshared domains and constants, actual packed79bytecampaign object incl8choices/8played/16daybytes/11awards/8bonus/fourbytegap/viewenum/windowptr/viewOnly. Save/load entire79bytes so opaquegap and runtimefields are not deleted or replaced with a fictional smaller prefix. Thirty-six declarations match implementation; real dimensions/domain and serializedvalidation contracts reviewed. C++98/20 actualfieldoffset/size checks PASS, all98native unchanged except two intentionally correct source-name-owner relocations."
+  },
+  "src/SOURCE/EVENTS.cpp": {
+    "sha256": "8f0367e41edd9268d4bb77c4586518da38d5f1049c618a9cc14bd7d4a00c8641",
+    "note": "Full9078-line parent/43definitions/allswitches/privateenums/numericmacros/fourpacketviewmacros read. C79 removes99writtenconversions gross, fournewwholeherocharcasts mean95net; C80fourvoidownerreinterpret-to-static corrections; O09four250bytehero tailviews replace50bytecopies through13remaining spellbytes; S72word16->14/answer8->5 andobsoleteconstants removed. All58products766arms764.476063scomplete/restored; otherunusedslots/arrays/capacities, R29buffer/counters, S73count-resultscalars, G106-G108structuredtails, A05mineindex andteleportcasts rejectedinmeasuredparents, retainedexplicitopen. All42retailspanssamebytes,10fixednumericsitesproved,separateemptystringoperandsverified,fourprivateEH/FSmodelgapsexplicit. Bothdialectslayout/syntaxpass;full98native1826functions/allallocatedsections/orderedrelocsunchanged;fullbuildpass. B94fixedcatalogcapacities/variablemaptext500vs768/malformedmetadata&packets/ratio&timer&signedarithmeticcontracts reportedforeachdefinition. Noargument-slotvarargs/enclosingownerrecovery. Sourceandattemptreportsareevidence, notassertionallinputsafe."
+  },
+  "include/SOURCE/EVENTS.h": {
+    "sha256": "36a6536c4fcb37103f55d65988b778f5f551462fa661d519872c81b2395dfe4e",
+    "note": "Completeheader/constants/packedrecords/declarationsread,obsolete spellindex52removedafterO09wholeherooffset200recovery. mapEvent/sign/rumour/time trailingtext[1] arevariable-length serializedheaders: GAMEloaderallocates recordlength, notsizeofheader; length, terminator and tagremaincontracts. mapHero patrolRadius/heroClassunionisreal: jailclassversusnonjailpatrolradiusproducer/consumerchecked. Opaque record bytes retained as serialized, nofakepadding introduced. C++98/20actualmapEvent137offsetsproven, all98nativeunchangedafterheaderedit. Shared IDs/ranges reconciledwithallEVENTScases/callers;includesdonotclaimmetadata validation."
+  },
+  "include/SOURCE/EVENTS_TYPES.h": {
+    "sha256": "33ad4e93fb77eeed235a8f5b40cf6a24eaa21e70143ba7321ae2dc71d6780210",
+    "note": "CompletepackedcombatRemoteData155 andcombatRemoteHeroFragment201 ownersread. Battleheader25+army15+army15+town100; hero tag1+data200 reusedfor51bytesecondfragment. armys/townhavenontrivialconstructors, soVC6unionofexistingtypesisnotavalidtrivialwireunion; fourmacroalternateviewsremainexplicitdebt/separatePODrecoveryUNTRIED, nofakepaddingunion. Physicalallocation255andRemoteMessagepayload247supportallnormalcopies; flags,lengths,sender,absentheroes,rawallocationlifetimeanduninitializedabsenttownbytesarenotvalidated. C++98/20sizes/memberoffsetspass; sender/receiver/producercopyreadandall98nativeunchanged."
   }
 }

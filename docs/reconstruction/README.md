@@ -57,6 +57,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 ## Findings
 
+- C79/C80/O09/S72/S73/R29/G106-G108/A05/B94: all43 EVENTS definitions
+  reviewed; 99 gross written conversions removed (95 net), four void-owner
+  cast kinds corrected, four hero-tail copies use the actual250-byte owner,
+  and two input buffers use proved smaller extents. All98 native objects
+  remain unchanged. The58 complete products and per-function bounds,
+  rejected alternatives and existing relocation-model gaps are preserved.
+  [Evidence](C79-C80-O09-S72-S73-R29-G106-G108-A05-B94.md).
+
 - C73/S66/R25/G87-G90/B88: all16 REQUEST functions reviewed; ten numeric casts
   and three unused scratch bytes removed with all98 native objects unchanged.
   Two-pass list consistency, empty-list access and the retail cross-field
