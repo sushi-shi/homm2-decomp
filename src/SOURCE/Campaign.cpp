@@ -463,26 +463,10 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     gbUseEvilInterface = savedInterface;
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
-        NormalDialog(
-            localization::Tr("campaign.confirm.restart_scenario"),
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
-        );
+        NormalDialog(localization::Tr("campaign.confirm.restart_scenario"), CAMPAIGN_RESTART_CONFIRM);
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitCampaignMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -810,18 +794,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                     gpGame->m_campaignType = iCurViewSide;
                                 }
                             } else {
-                                NormalDialog(
-                                    localization::Tr("campaign.selection.invalid_next_scenario"),
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
-                                );
+                                NormalDialog(localization::Tr("campaign.selection.invalid_next_scenario"), NORMAL_DIALOG_INFO);
                                 break;
                             }
                         }

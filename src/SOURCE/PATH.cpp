@@ -162,17 +162,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     frontValid = false;
     if (gpCombatManager->m_hexCells[destHexNext].m_occupantSide == COMBAT_SIDE_NONE
         && (!gpCombatManager->m_hexCells[destHexNext].m_blocked
-            || (gpCombatManager->m_inCastleCombat
-                && (destHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
-                    || destHexNext == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))
-                && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
-                    || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
-                        && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                   .m_occupantSide
-                               == COMBAT_SIDE_NONE
-                        && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                   .m_deadOccupantCount
-                               == 0))))) {
+            || CAN_PASS_CASTLE_GATE(destHexNext))) {
         frontValid = true;
     }
 
@@ -194,19 +184,10 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         }
 
         rearValidResult = false;
-        if (ValidHex(rearSquare) && gpCombatManager->m_hexCells[rearSquare].m_occupantSide == COMBAT_SIDE_NONE
+        if (ValidHex(rearSquare)
+            && gpCombatManager->m_hexCells[rearSquare].m_occupantSide == COMBAT_SIDE_NONE
             && (!gpCombatManager->m_hexCells[rearSquare].m_blocked
-                || (gpCombatManager->m_inCastleCombat
-                    && (rearSquare == COMBAT_CASTLE_GATE_APPROACH_HEX
-                        || rearSquare == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))
-                    && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
-                        || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
-                            && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_occupantSide
-                                   == COMBAT_SIDE_NONE
-                            && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_deadOccupantCount
-                                   == 0))))) {
+                || CAN_PASS_CASTLE_GATE(rearSquare))) {
             rearValidResult = true;
         }
 

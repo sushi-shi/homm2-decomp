@@ -392,8 +392,10 @@ void ExpCampaign::InitMap(void) {
             b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
-                gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
-                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
+                ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(
+                    *gpGame->GetHero(player->m_heroIds[0]),
+                    bonus->value
+                );
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -589,27 +591,10 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     gbUseEvilInterface = savedTheme;
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
-        NormalDialog(
-
-            localization::Tr("campaign.confirm.restart_scenario"),
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
-        );
+        NormalDialog(localization::Tr("campaign.confirm.restart_scenario"), CAMPAIGN_RESTART_CONFIRM);
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
-            gpAdvManager->m_visibilityMapValid = false;
-            giBottomViewOverride = BOTTOM_VIEW_NONE;
-            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
-            gpAdvManager->SetInitialMapOrigin();
-            gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
     }
 }
@@ -1278,20 +1263,9 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                             if (xCampaign.m_mapChoices[H2EnumIndex(xCampaign.m_viewMap)]) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
                             } else {
-                                NormalDialog(
-                                    localization::Tr(
+                                NormalDialog(localization::Tr(
                                         "campaign.selection.invalid_next_scenario"
-                                    ),
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
-                                );
+                                    ), NORMAL_DIALOG_INFO);
                                 break;
                             }
                         }

@@ -426,18 +426,7 @@ void SetupCDRom(void) {
         sound->ShutdownSoundBackends();
         gSoundDisabled = true;
         if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.unavailable_guest_only"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("system.cdrom.unavailable_guest_only"), NORMAL_DIALOG_INFO);
         gbNoCDRom = true;
     } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
         soundManager* sound;
@@ -447,18 +436,7 @@ void SetupCDRom(void) {
         sound->ShutdownSoundBackends();
         gSoundDisabled = true;
         if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.expansion_disc_missing"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(localization::Tr("system.cdrom.expansion_disc_missing"), NORMAL_DIALOG_INFO);
         gbNoCDRom = true;
     }
     if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
@@ -529,7 +507,7 @@ i32 oldmain(void) {
         0,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    gpMouseManager->SetColorMice(gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor);
+    gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
     LogStr("OM4");
     SetupCDRom();
     LogStr("OM5");
@@ -866,18 +844,7 @@ i32 oldmain(void) {
             if (gbRemoteOn && gbWaitForRemoteReceive) {
                 LogStr("DWM 5");
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
-                NormalDialog(
-                    localization::Tr("network.data.waiting_to_receive"),
-                    OLD_MAIN_DIALOG_WAIT,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("network.data.waiting_to_receive"), OLD_MAIN_DIALOG_WAIT);
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
                 gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -1281,18 +1248,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(
-                    gInitMenuHelp[helpIndex],
-                    MENU_HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
             }
         }
     } else {
@@ -1811,152 +1767,42 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     }
                     switch (resType) {
                         case EVENT_WINDOW_LUCK:
-                            NormalDialog(
-                                cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_BAD_LUCK:
-                            NormalDialog(
-                                cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_MORALE:
-                            NormalDialog(
-                                cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_BAD_MORALE:
-                            NormalDialog(
-                                cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
-                            NormalDialog(
-                                localization::Tr("help.experience"),
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("help.experience"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
                             if (resExtra == H2EnumIndex(ARTIFACT_SPELL_SCROLL)) {
                                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
-                                NormalDialog(
-                                    gText,
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             } else {
-                                NormalDialog(
-                                    gArtifactDesc[resExtra],
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gArtifactDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             }
                             break;
                         case NORMAL_DIALOG_SPELL:
-                            NormalDialog(
-                                gSpellDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gSpellDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
-                            NormalDialog(
-                                resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+                            NormalDialog(resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT
                                         == CYBERNETICS_SKILL_ROW
                                     ? cyberneticsDesc
                                           [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
                                     : cSecSkillDesc
                                           [resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
-                                          [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                                          [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_PRIMARY_SKILL:
-                            NormalDialog(
-                                gStatDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gStatDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_RESOURCE_WOOD:
                         case NORMAL_DIALOG_RESOURCE_MERCURY:
@@ -1965,18 +1811,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_RESOURCE_CRYSTAL:
                         case NORMAL_DIALOG_RESOURCE_GEMS:
                         case NORMAL_DIALOG_RESOURCE_GOLD:
-                            NormalDialog(
-                                localization::Tr("help.resources"),
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("help.resources"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
                 }
@@ -2104,7 +1939,7 @@ void CheckEndGame(
                 if (player == giThisGamePos) {
                     showedDialog_o = true;
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 } else {
                     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), cPlayerNames[player]);
                     NormalDialog(
@@ -2128,18 +1963,7 @@ void CheckEndGame(
                             localization::Tr("player.last_town_warning"),
                             cPlayerNames[player]
                         );
-                        NormalDialog(
-                            gText,
-                            1,
-                            -1,
-                            -1,
-                            END_GAME_PLAYER_DIALOG_ICON,
-                            gpGame->m_players[static_cast<i8>(player)].m_color,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
                     }
                     rec_n->m_daysLeft = END_GAME_GRACE_DAYS;
                 } else if (rec_n->m_daysLeft == 0) {
@@ -2160,18 +1984,7 @@ void CheckEndGame(
                             cPlayerNames[player]
                         );
                     }
-                    NormalDialog(
-                        gText,
-                        1,
-                        -1,
-                        -1,
-                        END_GAME_PLAYER_DIALOG_ICON,
-                        gpGame->m_players[static_cast<i8>(player)].m_color,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
                 }
             } else {
                 rec_n->m_daysLeft = -1;
@@ -2247,7 +2060,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2279,7 +2092,7 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2293,7 +2106,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.town_fallen"), lossTown->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2330,7 +2143,7 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 }
             }
         }
@@ -2348,7 +2161,7 @@ void CheckEndGame(
                     localization::Tr("victory.hero_captured"),
                     winningHeroEntry_g->m_name
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2361,20 +2174,18 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.hero"), lossHero_k->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
-        if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
-            > gpGame->m_mapHeader.lossConditionValue) {
+        if (GAME_DAY_NUMBER(*gpGame) > gpGame->m_mapHeader.lossConditionValue) {
             defeated_m = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.time_expired"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2436,7 +2247,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2458,7 +2269,7 @@ void CheckEndGame(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.loss.dwarf_towns")
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2470,7 +2281,7 @@ void CheckEndGame(
         if (!showedDialog_o) {
             showedDialog_o = true;
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.victory.dragon_city"));
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
         }
     }
 
@@ -2490,7 +2301,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.loss.roland_captured"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2511,7 +2322,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2807,7 +2618,7 @@ showDialog:
     if (modifierStart == static_cast<i32>(strlen(gText))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_NONE)]);
     }
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
@@ -2861,7 +2672,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_NONE)]);
 
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 void ClearMapExtra(void) {
@@ -3262,9 +3073,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 
         if (redrawLines_l) {
             redrawLines_l = false;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
             updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
             netWindow_j->BroadcastMessage(updateMessage_i);
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3301,9 +3110,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             else
                 inputText_b[inputLength_a] = BOX_CURSOR_GLYPH;
             inputText_b[inputLength_a + 1] = 0;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_INPUT_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_INPUT_ID);
             updateMessage_i.payload.widget.data.text = inputText_b;
             netWindow_j->BroadcastMessage(updateMessage_i);
             netWindow_j->DrawWindow();
@@ -3415,16 +3222,7 @@ void FileError(const char* filename) {
     char buf1[FILE_ERROR_BUFFER_SIZE];
     err = errno;
     utf8::Format(buf1, "File Error %s", strerror(err));
-    LogInt(
-        buf1,
-        err,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(buf1, err);
     utf8::Format(
         buf,
         localization::Tr("system.file.open_error"),
@@ -3744,7 +3542,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
                 if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
             }
@@ -3901,7 +3699,7 @@ void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     const platform::MenuHandle currentMenu = platform::CurrentMenu();
     if (currentMenu != hmnuAdv)
@@ -4378,7 +4176,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 gbGameOver = true;
                 giEndSequence = false;
                 return;
@@ -4406,7 +4204,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[hostNetPosition].name,
                 save_names::PlayerExit
             );
-            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 DropDownToOnePlayer();
             } else {
@@ -4519,7 +4317,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         }
-        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
         exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE;
     }
 
@@ -4567,7 +4365,7 @@ playerExitHandled:
     if (localPlayerLost_e) {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
         RemoteCleanup();
-        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         gbGameOver = true;
         giEndSequence = false;
         return;
@@ -4615,9 +4413,7 @@ void SetWinText(heroWindow* j, i32 id) {
     tag_message msg;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            msg.payload.widget.id = gWinSetup[i].widgetId;
+            SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
             msg.payload.widget.data.text = gWinSetup[i].text;
             j->BroadcastMessage(msg);
         }
@@ -5379,9 +5175,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(borderWidget_k, -1);
     }
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    SET_WIDGET_MESSAGE(message_b, NORMAL_DIALOG_SET_TEXT_COMMAND, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message_b.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message_b);
 
@@ -5442,9 +5236,7 @@ void NormalDialog(
 void UpdateNormalDialog(const char* text) {
 
     tag_message evt;
-    evt.type = MESSAGE_WIDGET;
-    evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    evt.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(evt, WIDGET_COMMAND_SET_TEXT, 1);
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);

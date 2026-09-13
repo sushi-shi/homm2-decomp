@@ -202,6 +202,10 @@ inline constexpr BaseWidgetCommand ADVMGR_TOWN_PORTAL_COMMAND_ADD_TOWN = WIDGET_
 inline constexpr BaseWidgetCommand ADVMGR_REMOTE_WAIT_POP_NET_BOX_COMMAND = WIDGET_COMMAND_REPLACE_ICON;
 inline constexpr BaseWidgetCommand ADVMGR_INTERFACE_REPLACE_RESOURCE = WIDGET_COMMAND_REPLACE_ICON;
 
+
+#define IS_WIDGET_SELECTION_COMMAND(command) \
+    ((command) == WIDGET_COMMAND_SELECT || (command) == WIDGET_COMMAND_ALTERNATE_SELECT)
+
 enum class MessageModifier : i32 {
     MESSAGE_MODIFIER_NONE                   = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT            = 1,
@@ -308,4 +312,11 @@ struct tag_message {
     MessageType type;
     tag_messagePayload payload;
 };
+
+
+#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                    \
+    ((messageValue).type = MESSAGE_WIDGET,                                                         \
+     (messageValue).payload.widget.command = (commandValue),                                       \
+     (messageValue).payload.widget.id = (idValue))
+
 #endif

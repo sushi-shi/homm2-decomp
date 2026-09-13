@@ -5,9 +5,7 @@
 
 static tag_message MakeWidgetMessage(i32 id, i32 command) {
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = static_cast<BaseWidgetCommand>(command);
-    message.payload.widget.id = id;
+    SET_WIDGET_MESSAGE(message, static_cast<BaseWidgetCommand>(command), id);
     return message;
 }
 

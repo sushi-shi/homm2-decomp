@@ -542,65 +542,20 @@ void hero::UpdateArmies(void) {
 }
 
 void hero::ViewStat(i32 stat, i32 quickView) {
-    NormalDialog(
-        gStatDesc[stat],
-        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
-    );
+    NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[extra]);
-        NormalDialog(
-            gText,
-            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-            -1,
-            UI_ARTIFACT_DIALOG_ICON,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_ICON);
     } else {
-        NormalDialog(
-            gArtifactDesc[H2EnumIndex(artifact)],
-            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-            -1,
-            UI_ARTIFACT_DIALOG_ICON,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(gArtifactDesc[H2EnumIndex(artifact)], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_ICON);
     }
 }
 
 i32 hero::Dismiss(void) {
-    NormalDialog(
-        localization::Tr("hero.confirm.dismiss")
-        ,
-        NORMAL_DIALOG_CONFIRM,
-        -1,
-        -1,
-        -1,
-        0,
-        -1,
-        0,
-        -1,
-        0
-    );
+    NormalDialog(localization::Tr("hero.confirm.dismiss"), NORMAL_DIALOG_CONFIRM);
     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
         Deallocate(1);
         return 1;
@@ -935,7 +890,7 @@ void hero::CheckLevel(void) {
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
             samp = LoadPlaySample("nwherolv.82m");
             if (choices[0] == HERO_SKILL_NONE) {
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             } else if (choices[1] == HERO_SKILL_NONE) {
                 utf8::Format(
                     text,
@@ -944,19 +899,8 @@ void hero::CheckLevel(void) {
                     SecondarySkillName(this, choices[0])
                 );
                 strcat(gText, text);
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_SECONDARY_SKILL,
-                    SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
-                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]),
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]));
                 GiveSS(choices[0], HERO_SKILL_LEVEL_BASIC);
             } else {
                 utf8::Format(
@@ -969,20 +913,9 @@ void hero::CheckLevel(void) {
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])])]
                 );
                 strcat(gText, text);
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_DISABLE_SEVENTH,
-                    -1,
-                    -1,
-                    NORMAL_DIALOG_SECONDARY_SKILL,
-                    SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
-                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]),
-                    NORMAL_DIALOG_SECONDARY_SKILL,
-                    SecondarySkillIconRow(this, choices[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE
-                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])]),
-                    -1,
-                    0
-                );
+                NormalDialog(gText, NORMAL_DIALOG_DISABLE_SEVENTH, -1, -1, NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]), NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                        + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])]));
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SEVEN)
                     GiveSS(choices[0], HERO_SKILL_LEVEL_BASIC);
                 else
@@ -1022,7 +955,7 @@ void hero::CheckLevel(void) {
         }
     }
     m_level = static_cast<i16>(newLevel);
-    WaitEndSample(&samp, -1);
+    WaitEndSample(&samp);
 }
 
 i32 hero::NumArtifacts(void) {
@@ -1349,19 +1282,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 
                     case UI_FORMATION_SPREAD:
                         if (quickView) {
-                            NormalDialog(
-                                localization::Tr("formation.spread.help")
-                                 ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.spread.help"), NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
                                 static_cast<i32>(gpHVHero->m_eventFlags)
@@ -1374,19 +1295,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 
                     case UI_FORMATION_GROUPED:
                         if (quickView) {
-                            NormalDialog(
-                                localization::Tr("formation.grouped.help")
-                                 ,
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
-                            );
+                            NormalDialog(localization::Tr("formation.grouped.help"), NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
                                 static_cast<i32>(gpHVHero->m_eventFlags)
@@ -1404,21 +1313,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             localization::Tr("hero.spell_points.help"),
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
-                            gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                                * HERO_SPELL_POINTS_PER_KNOWLEDGE
+                            HERO_NORMAL_SPELL_POINTS(*gpHVHero)
                         );
-                        NormalDialog(
-                            gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
-                        );
+                        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         break;
 
                     case UI_EXPERIENCE_FIRST:
@@ -1433,18 +1330,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             gpHVHero->m_experience,
                             nextExperience
                         );
-                        NormalDialog(
-                            gText,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
-                        );
+                        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         break;
                     }
 
@@ -1601,9 +1487,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     }
 
     if (bExit) {
-        gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(UI_DIALOG_CLOSE_COMMAND);
+        FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1809,7 +1693,7 @@ void SetupHeroView(void) {
         gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%d/%d",
         gpHVHero->m_spellPoints,
-        gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
+        HERO_NORMAL_SPELL_POINTS(*gpHVHero)
     );
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_SPELL_POINTS_LAST;
@@ -2098,20 +1982,9 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
             "%s",
             cyberneticsDesc[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]
         );
-        NormalDialog(
-            gText,
-            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-            NORMAL_DIALOG_NO_RESOURCE,
-            NORMAL_DIALOG_NO_VALUE,
-            NORMAL_DIALOG_SECONDARY_SKILL,
-            H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
+        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_SECONDARY_SKILL, H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
                 + SecondarySkillIconRow(this, skill) * H2EnumIndex(HERO_SECONDARY_SKILL_ICON_STRIDE)
-                - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
-            NORMAL_DIALOG_NO_RESOURCE,
-            0,
-            NORMAL_DIALOG_NO_RESOURCE,
-            0
-        );
+                - HERO_SECONDARY_SKILL_ICON_FRAME_BASE);
         return;
     }
 
@@ -2131,19 +2004,8 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     } else {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cSecSkillDesc[H2EnumIndex(skill)][H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]);
     }
-    NormalDialog(
-        gText,
-        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-        NORMAL_DIALOG_NO_RESOURCE,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_SECONDARY_SKILL,
-        H2EnumIndex(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
-            - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0
-    );
+    NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_SECONDARY_SKILL, H2EnumIndex(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
+            - HERO_SECONDARY_SKILL_ICON_FRAME_BASE);
 }
 
 void hero::CheckAnduranPieces(i32 showDialog) {
@@ -2162,18 +2024,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, H2EnumIndex(ARTIFACT_NONE));
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
-            NormalDialog(
-                localization::Tr("hero.artifact.anduran_combined"),
-                NORMAL_DIALOG_INFO,
-                NORMAL_DIALOG_NO_RESOURCE,
-                NORMAL_DIALOG_NO_VALUE,
-                NORMAL_DIALOG_ARTIFACT,
-                H2EnumIndex(ARTIFACT_BATTLE_GARB),
-                NORMAL_DIALOG_NO_RESOURCE,
-                0,
-                NORMAL_DIALOG_NO_RESOURCE,
-                0
-            );
+            NormalDialog(localization::Tr("hero.artifact.anduran_combined"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_ARTIFACT, H2EnumIndex(ARTIFACT_BATTLE_GARB));
         }
     }
 }

@@ -203,8 +203,7 @@ typedef enum StatusBarLayout {
 } StatusBarLayout;
 
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
-           LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
+    LogInt(gMemEntryTag, iMemEntries);
     gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
     for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
@@ -240,32 +239,14 @@ void BaseFree(void* ptr, const char* originalFile, i32 originalLine) {
     if (gpMemEntry == NULL)
         InitMemEntry();
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-        LogInt(
-            "Free ",
-            reinterpret_cast<i32>(ptr),
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("Free ", reinterpret_cast<i32>(ptr));
     if (ptr == NULL) {
         LogStr("NULL POINTER");
         return;
     }
     --iMemEntries;
     if (iMemEntries < 0)
-        LogInt(
-            "MemEntries Below 0",
-            iMemEntries,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("MemEntries Below 0", iMemEntries);
     i32 entryIndex;
     for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == ptr) {
@@ -294,16 +275,7 @@ void PrintMemoryLeaks(void) {
         return;
     if (gpMemEntry == NULL)
         return;
-    LogInt(
-        "Total Memory Leaks",
-        iMemEntries,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Total Memory Leaks", iMemEntries);
     for (i32 entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].used != 0) {
             utf8::Format(
@@ -374,7 +346,7 @@ void FadeIn(i32 increment) {
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     i = 0;
@@ -406,7 +378,7 @@ void FadeOut(i32 increment) {
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i = 0;
@@ -1110,9 +1082,7 @@ void GetDataEntry(
     if (DataEntryWin == NULL)
         MemError();
 
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    msg.payload.widget.id = ENTRY_PROMPT_WIDGET;
+    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, ENTRY_PROMPT_WIDGET);
     msg.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(msg);
 
@@ -1221,9 +1191,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                             break;
                         memset(cDEDest, 0, iDEMaxLen);
                         strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
-                        message.type = MESSAGE_WIDGET;
-                        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_TEXT_WIDGET);
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
                         DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);

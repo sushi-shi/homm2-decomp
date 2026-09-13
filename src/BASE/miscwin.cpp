@@ -40,7 +40,7 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
             );
     }
 
-    if (gbEnlargeScreenBlit != 0 && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
+    if (gbEnlargeScreenBlit != 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
         const platform::Size screen = platform::Video().Resolution();
         if (screen.width == VESA_SCREEN_WIDTH && screen.height == VESA_SCREEN_HEIGHT) {
             if (width < VESA_SCREEN_WIDTH)

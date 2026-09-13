@@ -183,21 +183,11 @@ i32 swapManager::Open(i32 id) {
         }
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(
+        message,
+        gpAdvManager->m_adventureWindow,
+        WIDGET_COMMAND_CLEAR_FLAGS
+    );
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -221,21 +211,7 @@ void swapManager::Close(void) {
     gpAdvManager->Activate();
 
     tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    SET_ADVENTURE_BUTTON_FLAGS(message, gpAdvManager->m_adventureWindow, WIDGET_COMMAND_SET_FLAGS);
 }
 
 void swapManager::DrawSelector(void) {
@@ -440,18 +416,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             if (!quickView_9
                                 && m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
-                                NormalDialog(
-                                    localization::Tr("swap.artifact.cannot_trade"),
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
-                                );
+                                NormalDialog(localization::Tr("swap.artifact.cannot_trade"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_VALUE);
                                 break;
                             }
                             if (quickView_9) {
@@ -515,18 +480,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             if (!quickView_9
                                 && m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
-                                NormalDialog(
-                                    localization::Tr("swap.artifact.cannot_trade"),
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
-                                );
+                                NormalDialog(localization::Tr("swap.artifact.cannot_trade"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_VALUE);
                                 break;
                             }
                             if (quickView_9) {

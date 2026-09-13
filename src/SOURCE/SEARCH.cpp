@@ -58,7 +58,7 @@ i32 searchArray::BuildPath(
     u8* pathDirection = &m_storage.path.directions[1];
     m_pathLength = 0;
     while (destinationX != startX || destinationY != startY) {
-        searchNode* node = &GetColumn(destinationX)[MAP_WIDTH * destinationY];
+        searchNode* node = &GetNode(destinationX, destinationY);
         if (node->x != destinationX && node->y != destinationY)
             return 0;
         if (node->distance <= maximumCost) {
@@ -113,7 +113,7 @@ void searchArray::SeedPosition(
         if (s_seedPositionState.targetCell->m_flags & H2EnumIndex(MAP_CELL_OCCUPIED))
             return;
 
-        targetTerrain = giGroundToTerrain[s_seedPositionState.targetCell->m_terrainImageIndex];
+        targetTerrain = CELL_TERRAIN(s_seedPositionState.targetCell);
         if (targetTerrain == TERRAIN_WATER) {
             if (waterMode) {
                 if (s_seedPositionState.targetCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT)))
@@ -136,7 +136,7 @@ void searchArray::SeedPosition(
     }
 
     if (s_seedPositionState.hasTarget && continueSeed) {
-        s_seedPositionState.currentNode = GetColumn(targetX)[MAP_WIDTH * targetY];
+        s_seedPositionState.currentNode = GetNode(targetX, targetY);
         if (s_seedPositionState.currentNode.visited
             && s_seedPositionState.currentNode.distance <= s_seedPositionState.currentCost + SEARCH_TARGET_COST_WINDOW)
             return;
@@ -241,8 +241,10 @@ void searchArray::SeedPosition(
                 1,
                 waterMode
             );
-            s_seedPositionState.terrain = giGroundToTerrain[gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)
-                                              ->m_terrainImageIndex];
+            s_seedPositionState.terrain = CELL_TERRAIN(gpAdvManager->GetCell(
+                s_seedPositionState.currentNode.x,
+                s_seedPositionState.currentNode.y
+            ));
             s_seedPositionState.currentWater = gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)->m_isRoad;
             s_seedPositionState.remainingMobility = giCurTempMobility - s_seedPositionState.currentNode.distance;
             for (s_seedPositionState.direction = MAP_DIRECTION_NORTH; s_seedPositionState.direction < MAP_DIRECTION_COUNT;
@@ -252,7 +254,8 @@ void searchArray::SeedPosition(
                 {
                     s_seedPositionState.neighborX = s_seedPositionState.currentNode.x + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].x;
                     s_seedPositionState.neighborY = s_seedPositionState.currentNode.y + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].y;
-                    s_seedPositionState.neighborNode = &GetColumn(s_seedPositionState.neighborX)[MAP_WIDTH * s_seedPositionState.neighborY];
+                    s_seedPositionState.neighborNode =
+                        &GetNode(s_seedPositionState.neighborX, s_seedPositionState.neighborY);
                     if (!(!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1
                           || !(MAP_EXTRA_AT(s_seedPositionState.neighborX, s_seedPositionState.neighborY)
                                & SEARCH_MAP_BLOCKED)
@@ -338,21 +341,27 @@ void searchArray::SeedPosition(
                                         gpAdvManager->GetCell(s_seedPositionState.adjacentX, s_seedPositionState.candidateY);
                                     s_seedPositionState.directionBlocked = true;
                                     if (((1 << H2EnumIndex(s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
-                                        && s_seedPositionState.neighborCell->m_objectIndex != SEARCH_NO_OBJECT
-                                        && s_seedPositionState.neighborCell->ObjectTileset() != TILESET_DUMMY
-                                        && !(s_seedPositionState.neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
+                                        && CELL_HAS_NON_SHADOW_OBJECT(s_seedPositionState.neighborCell)) {
                                         s_seedPositionState.directionBlocked = false;
                                     }
 
                                     if (s_seedPositionState.directionBlocked
-                                        && GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
+                                        && GetNode(
+                                               s_seedPositionState.adjacentX,
+                                               s_seedPositionState.candidateY
+                                        )
                                                .visited
-                                        && !(s_seedPositionState.neighborCell->m_triggerType
-                                             & MAP_TRIGGER_ACTION_FLAG)) {
+                                        && !(
+                                            s_seedPositionState.neighborCell->m_triggerType
+                                            & MAP_TRIGGER_ACTION_FLAG
+                                        )) {
                                         s_seedPositionState.terrain =
-                                            giGroundToTerrain[s_seedPositionState.neighborCell->m_terrainImageIndex];
+                                            CELL_TERRAIN(s_seedPositionState.neighborCell);
                                         s_seedPositionState.adjacentCost =
-                                            GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
+                                            GetNode(
+                                                s_seedPositionState.adjacentX,
+                                                s_seedPositionState.candidateY
+                                            )
                                                 .distance;
                                         PushPoint(
                                             s_seedPositionState.mapX,

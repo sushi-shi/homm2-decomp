@@ -309,6 +309,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME enum_code COMMAND homm2_enum_code_test)
+  add_executable(homm2_common_helpers_test tools/common_helpers_test.cpp)
+  target_include_directories(homm2_common_helpers_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME common_helpers COMMAND homm2_common_helpers_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE

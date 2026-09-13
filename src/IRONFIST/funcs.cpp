@@ -40,7 +40,7 @@ static bool PlaySoundEffect(std::string snd, SoundEffectWait wait, SAMPLE2* samp
         if (samp != NULL)
             *samp = res;
         if (wait == SND_DO_WAIT)
-            WaitEndSample(&res, -1);
+            WaitEndSample(&res);
         free(src);
         return true;
     }
@@ -784,7 +784,7 @@ static i32 l_mapFizzleObj(lua_State* L) {
         CURSOR_FIZZLE_X, CURSOR_FIZZLE_Y, CURSOR_FIZZLE_WIDTH, CURSOR_FIZZLE_HEIGHT, -1, 0, 0
     );
     if (snd) {
-        WaitEndSample(&res, -1);
+        WaitEndSample(&res);
     }
     return 0;
 }
