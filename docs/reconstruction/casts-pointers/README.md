@@ -46,13 +46,15 @@ explained as such; moving arithmetic into a macro does not establish a better
 owner. A documented original-game defect is not a removed out-of-object access.
 No case is silently closed to achieve a numerical zero.
 
-The working constraint is to preserve the 100% Buka match. The user has been
-asked to decide whether original-game defects may instead be fixed with explicit
-binary divergence. Until that choice is made, no behavior-changing hardening is
-authorized by this work log.
+The user confirmed the routing policy: preserve the 100% Buka match on decomp.
+Verified improvements that change native code belong in separate PRs targeting
+`master`; do not merge them into this matching branch. Existing master fixes
+and open PRs must be reconciled before proposing duplicates. Uncertain object
+boundaries are evidence gaps, not automatically confirmed original defects.
 
 Concrete examples requiring that distinction include `nb_listen` copying 16
-bytes from the two-byte wildcard literal (B38), signed palette indexing in
+bytes starting at the wildcard and into an independently referenced filename
+(B38: original C++ source-object extent remains inferred), signed palette indexing in
 DrawBolt, and misindexed campaign writes. Recovering real campaign/setup/event
 subobjects can fix other crossed-member accesses without changing the format;
 it does not fix those separate defects. Caller-bound and malformed-input
