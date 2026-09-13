@@ -9104,33 +9104,33 @@ void advManager::LoadRemote(void) {
 
 #if H2_RETAIL_COMPILER
 #define exitInfo exitInfo4
-#define packet packet9
+#define receivedPacket packet9
 #define playerExited playerExited5
 #endif
 VA(0x00412e8c, 0x1f5)
 char* advManager::CheckHandleNet(void) {
-    RemoteMessage* packet;
+    RemoteMessage* receivedPacket;
     i32 playerExited;
     SPlayerExit exitInfo;
 
-    packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
-    if (packet
-        && (packet->type == REMOTE_MESSAGE_RELIABLE
-            || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
-        switch (packet->command) {
+    receivedPacket = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
+    if (receivedPacket
+        && (receivedPacket->type == REMOTE_MESSAGE_RELIABLE
+            || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
+        switch (receivedPacket->command) {
             case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-                playerExited = ADVMGR_REMOTE_PAYLOAD(packet)->savePlayerExited;
+                playerExited = ADVMGR_REMOTE_PAYLOAD(receivedPacket)->savePlayerExited;
                 if (!gpGame->ReceiveSaveGame(
-                        ADVMGR_REMOTE_PAYLOAD(packet)->saveDataSize,
-                        ADVMGR_REMOTE_PAYLOAD(packet)->saveCrc,
-                        ADVMGR_REMOTE_PAYLOAD(packet)->saveTransmitCrc,
-                        packet->sender
+                        ADVMGR_REMOTE_PAYLOAD(receivedPacket)->saveDataSize,
+                        ADVMGR_REMOTE_PAYLOAD(receivedPacket)->saveCrc,
+                        ADVMGR_REMOTE_PAYLOAD(receivedPacket)->saveTransmitCrc,
+                        receivedPacket->sender
                     )) {
                     ShutDown(NULL);
                 }
                 if (playerExited) {
-                    exitInfo.netPosition = packet->sender;
-                    exitInfo.gamePosition = static_cast<i8>(NetPosToGamePos(packet->sender));
+                    exitInfo.netPosition = receivedPacket->sender;
+                    exitInfo.gamePosition = static_cast<i8>(NetPosToGamePos(receivedPacket->sender));
                     exitInfo.updateNetworkControl = false;
                     exitInfo.eliminated = true;
                     exitInfo.hostReported = true;
@@ -9141,44 +9141,44 @@ char* advManager::CheckHandleNet(void) {
                 break;
 
             case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
-                PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet)->bytes, packet->sender);
+                PopNetBox(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes, receivedPacket->sender);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
-                    return reinterpret_cast<char*>(packet);
+                    return reinterpret_cast<char*>(receivedPacket);
                 } else {
-                    DoNetCombat(reinterpret_cast<char*>(packet));
+                    DoNetCombat(reinterpret_cast<char*>(receivedPacket));
                 }
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
-                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet)->playerExit);
+                ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
-                    packet->sender,
-                    ADVMGR_REMOTE_PAYLOAD(packet)->playerExit,
+                    receivedPacket->sender,
+                    ADVMGR_REMOTE_PAYLOAD(receivedPacket)->playerExit,
                     0
                 );
                 break;
 
             case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
-                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet)->bytes);
+                ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes);
                 break;
 
             default:
-                return reinterpret_cast<char*>(packet);
+                return reinterpret_cast<char*>(receivedPacket);
         }
     }
     return NULL;
 }
 #if H2_RETAIL_COMPILER
 #undef exitInfo
-#undef packet
+#undef receivedPacket
 #undef playerExited
 #endif
 
