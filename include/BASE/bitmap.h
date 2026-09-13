@@ -26,7 +26,7 @@ public:
     void DrawToBuffer(i16 x, i16 y);
     void DrawToScreen(i16 x, i16 y);
     void GrabScreen(i16 x, i16 y);
-    void GrabBitmap(class bitmap* source, i16 x, i16 y);
+    void GrabBitmap(class bitmap* src, i16 x, i16 y);
     void GrabBitmapCareful(class bitmap* source, i16 x, i16 y);
     void CopyTo(
         class bitmap* destination,

@@ -111,14 +111,14 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(ExpansionCampaignAward);
-    void RemoveAward(ExpansionCampaignAward);
-    i8 HasAward(ExpansionCampaignAward);
+    void GrantAward(ExpansionCampaignAward award);
+    void RemoveAward(ExpansionCampaignAward award);
+    i8 HasAward(ExpansionCampaignAward award);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(ExpansionCampaignId);
+    void InitNewCampaign(ExpansionCampaignId campaignId);
     void InitMap(void);
-    void ShowInfo(i32, i32);
-    void UpdateInfo(i32);
+    void ShowInfo(i32 viewOnly, i32);
+    void UpdateInfo(i32 redraw);
     i32 HandleVictory(void);
     void HandleVictory1(void);
     void HandleVictory2(void);
@@ -135,7 +135,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static MessageDispatchResult MessageHandler(struct tag_message&);
+    static MessageDispatchResult MessageHandler(struct tag_message& message);
 
 public:
     void Autosave(void);
@@ -144,9 +144,9 @@ public:
     i32 CampaignID(void);
     const char* JosephName(void);
     const char* IvanName(void);
-    i8 IsSpecialGoldenBow(i32, i32);
+    i8 IsSpecialGoldenBow(i32 x, i32 y);
     i8 IsSpecialUA(void);
-    i8 IsSpecialLossCondition(i32);
+    i8 IsSpecialLossCondition(i32 playerIndex);
 };
 #pragma pack(pop)
 
