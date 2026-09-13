@@ -394,7 +394,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Сохранить файл: */ "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+             localization::Tr("requester.file_to_save")
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -424,7 +424,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Загрузить файл: */ "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+             localization::Tr("requester.file_to_load")
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -444,7 +444,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-               /* НОВАЯ ИГРА */ "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
+                localization::Tr("save.filename.new_game")
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -558,10 +558,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
-                                    "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe8\xe7 \xf1\xef\xe8\xf1\xea"
-                                    "\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 \xea\xed\xee"
-                                    "\xef\xea\xf3 \xee\xf2\xec\xe5\xed\xfb."
-                                    /* "Выберите из списка или нажмите кнопку отмены." */
+                                    localization::Tr("requester.selection.required")
+
                                     ,
                                     NORMAL_DIALOG_INFO
                                 );
@@ -679,20 +677,16 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2 \xf2\xe0\xea\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-                                            /* "Нет карт такого размера для %d игроков-людей." */
+                                            localization::Tr("requester.map.size_mismatch.multiple.buka")
+
                                             ,
                                             giNumHumanPlayers
                                         );
                                     } else {
                                         sprintf(
                                             gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2\xfb \xfd\xf2\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-                                            /* "Нет карты этого размера для %d игроков-людей." */
+                                            localization::Tr("requester.map.size_mismatch.one.buka")
+
                                             ,
                                             giNumHumanPlayers
                                         );
@@ -874,11 +868,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe2\xe0\xec\xe8 \xe8\xe3\xf0\xe0 \xf0"
-                    "\xe0\xf1\xf1\xf7\xe8\xf2\xe0\xed\xe0 \xf2\xee\xeb\xfc\xea\xee \xed\xe0 %d \xf7"
-                    "\xe5\xeb\xee\xe2\xe5\xea.  \xc0 \xe2\xe0\xec \xed\xf3\xe6\xed\xe0 \xea\xe0\xf0"
-                    "\xf2\xe0, \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xed\xe0 %d \xf7\xe5\xeb"
-                    "\xee\xe2\xe5\xea."
+                    localization::Tr("requester.load.insufficient_human_slots")
                     /* "Выбранная вами игра рассчитана только на %d человек.  А вам нужна
                        карта, как минимум на %d человек." */
                     ,
@@ -891,12 +881,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe8\xe3\xf0\xe0 \xed\xe0\xf7\xed\xe5\xf2"
-                    "\xf1\xff \xf1 %d \xe8\xe3\xf0\xee\xea\xe0\xec\xe8-\xeb\xfe\xe4\xfc\xec\xe8. "
-                    "\xcc\xee\xe6\xed\xee \xeb\xe8 \xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xf3 \xe2"
-                    "\xe7\xff\xf2\xfc \xef\xee\xe4 \xf1\xe2\xee\xe5 \xf3\xef\xf0\xe0\xe2\xeb\xe5"
-                    "\xed\xe8\xe5 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff %d \xec\xe5\xf1\xf2 \xeb"
-                    "\xfe\xe4\xe5\xe9?"
+                    localization::Tr("requester.load.replace_human_slots")
                     /* "Выбранная игра начнется с %d игроками-людьми. Можно ли
                        компьютеру взять под свое управление оставшиеся %d мест людей?" */
                     ,

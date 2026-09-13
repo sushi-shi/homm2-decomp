@@ -65,22 +65,22 @@ i16 dpnet_init(void) {
         INIT_TRANSPORT_RECEIVE_STORAGE();
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         createFunction = NULL;
         dpEnumerate = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayCreate")
         );
         if (createFunction == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         dpEnumerate = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
         if (dpEnumerate == NULL)
-            ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+            ShutDown(localization::Tr("network.directplay.load_failed")
+                );
         dpEnumerate(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
@@ -99,10 +99,8 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
             sprintf(
                 gText,
-                "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
-                    "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
-                    /* "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение." */
+                localization::Tr("network.waiting_guest.buka")
+
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
@@ -111,11 +109,7 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
-                "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
-                "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
-                "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
-                "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+                localization::Tr("network.directplay.guests_ready.buka")
                 ,
                 giNumHumanPlayers - 1
             );
@@ -136,9 +130,8 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
             sprintf(
                 gText,
-                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff \xed\xe0\xf7\xe0\xeb\xe0 "
-                    "\xe8\xe3\xf0\xfb."
-                    /* "Ожидаю игрока для начала игры." */
+                localization::Tr("network.waiting_player_start")
+
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
@@ -376,11 +369,7 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
-            "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
-            "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
-            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
-            "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-            "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+            localization::Tr("network.directplay.guests_ready.buka")
             ,
             giNumHumanPlayers - 1
         );

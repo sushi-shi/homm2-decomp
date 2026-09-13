@@ -248,9 +248,8 @@ void SmackManagerMain(void) {
             if (!smk1) {
                 gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
                 NormalDialog(
-                    "\xce\xf8\xe8\xe1\xea\xe0 \xf7\xf2\xe5\xed\xe8\xff \xe4\xe8\xf1\xea\xe0 "
-                    "\xc3\xe5\xf0\xee\xe5\xe2 2. \xcf\xee\xe2\xf2\xee\xf0\xe8\xf2\xfc?"
-                    /* "Ошибка чтения диска Героев 2. Повторить?" */,
+                    localization::Tr("system.cdrom.read_error.retry")
+                    ,
                     NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SIX)

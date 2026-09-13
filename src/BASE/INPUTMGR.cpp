@@ -16,6 +16,7 @@ H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
     SCAN_CODE_MASK          = 0xff,
     WINDOWS_HIGH_WORD_SHIFT = 16,
     ENCODED_SCAN_CODE_SHIFT = 8,
+    ASCII_ESCAPE_CODE       = 0x1b,
     ASCII_DELETE_CODE       = 0x7f
 H2_ENUM_CLASS_END(InputManagerScanCodeEncoding)
 
@@ -433,7 +434,7 @@ void inputManager::MakeScanCodeTable(void) {
         m_keyState[scanCode] = EncodeScanCode(scanCode);
 
     m_keyState[IDX(INPUT_SCAN_NONE)] = 0;
-    m_keyState[IDX(INPUT_SCAN_ESCAPE)] = '\x1b';
+    m_keyState[IDX(INPUT_SCAN_ESCAPE)] = IDX(ASCII_ESCAPE_CODE);
     m_keyState[IDX(INPUT_SCAN_1)] = '1';
     m_keyState[IDX(INPUT_SCAN_2)] = '2';
     m_keyState[IDX(INPUT_SCAN_3)] = '3';

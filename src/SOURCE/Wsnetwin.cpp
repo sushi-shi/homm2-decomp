@@ -40,11 +40,7 @@ i16 wsnet_init(void) {
 
                Когда соединение будет установлено, вы сможете вернуться в полноэкранный режим
                нажав 'F4'. */
-            "\xce\xe1 \xe8\xed\xe8\xf6\xe8\xe8\xf0\xee\xe2\xe0\xed\xe8\xe8 TCP/IP \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff. "
-                "\xc3\xe5\xf0\xee\xe8 II \xef\xe5\xf0\xe5\xea\xeb\xfe\xf7\xe0\xf2\xf1\xff \xe2 \xee\xea\xee\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec, \xf7\xf2\xee\xe1\xfb \xe2\xfb "
-                "\xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 \xe4\xee\xf1\xf2\xf3\xef \xea \xe4\xe8\xe0\xeb\xee\xe3\xee\xe2\xfb\xec \xee\xea\xed\xe0\xec Windows.\n\n"
-                "\xca\xee\xe3\xe4\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5 \xe1\xf3\xe4\xe5\xf2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xeb\xe5\xed\xee, \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
-                "\xef\xee\xeb\xed\xee\xfd\xea\xf0\xe0\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec \xed\xe0\xe6\xe0\xe2 'F4'."
+            localization::Tr("network.tcp.fullscreen_warning")
         );
         NormalDialog(gText, 1);
         SetFullScreenStatus(false);
@@ -97,10 +93,7 @@ i16 wsnet_init(void) {
 
                    У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
                    игру, не дожидаясь  остальных гостей. */
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                    "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                localization::Tr("network.tcp.host.guest_progress.buka"),
                 inet_ntoa(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
@@ -114,9 +107,7 @@ i16 wsnet_init(void) {
                    Ожидание гостя(ей).
 
                      Нажмите 'ОТМЕНА', чтобы прервать соединение. */
-                "\xce\xf2\xea\xf0\xfb\xf2\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s\n\n"
-                    "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff(\xe5\xe9).\n\n  "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.",
+                localization::Tr("network.tcp.host.waiting_guests"),
                 inet_ntoa(gIn_addrIP)
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
@@ -133,10 +124,7 @@ i16 wsnet_init(void) {
 
                        У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
                        игру, не дожидаясь  остальных гостей. */
-                    "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                        "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                        "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                        "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                    localization::Tr("network.tcp.host.guest_progress.buka"),
                     inet_ntoa(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
@@ -149,9 +137,7 @@ i16 wsnet_init(void) {
                 /* Создание игры на %s.
 
                    У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                    "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+                localization::Tr("network.tcp.host.guests_ready.buka"),
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
@@ -181,8 +167,7 @@ i16 wsnet_init(void) {
             GetDataEntry(
                 /* Введите IP адрес сервера.
                    (Например: 220.415.119.223) */
-                "\xc2\xe2\xe5\xe4\xe8\xf2\xe5 IP \xe0\xe4\xf0\xe5\xf1 \xf1\xe5\xf0\xe2\xe5\xf0\xe0.\n"
-                    "(\xcd\xe0\xef\xf0\xe8\xec\xe5\xf0: 220.415.119.223)",
+                localization::Tr("network.tcp.host_address.prompt"),
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
@@ -193,9 +178,8 @@ i16 wsnet_init(void) {
         giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
         if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
             NormalDialog(
-                /* Неправильный IP адрес. Попробуйте еще раз. */
-                "\xcd\xe5\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xfb\xe9 IP \xe0\xe4\xf0\xe5\xf1. "
-                "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe5\xf9\xe5 \xf0\xe0\xe7.",
+
+                localization::Tr("network.tcp.host_address.invalid"),
                 NORMAL_DIALOG_WAIT_FIRST
             );
             goto retryAddress;
@@ -203,7 +187,7 @@ i16 wsnet_init(void) {
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         sprintf(
             cWSTextBuffer,
-            /* Поиск сервера. */ "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
+             localization::Tr("network.tcp.host.searching")
         );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
@@ -409,9 +393,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
                 cWSTextBuffer,
-                "\xd1\xe5\xf0\xe2\xe5\xf0 \xf3\xe6\xe5 \xf1\xee\xe7\xe4\xe0\xeb \xe8\xe3\xf0\xf3 "
-                "\xe8 \xed\xe5 \xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xed\xee\xe2\xfb\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Сервер уже создал игру и не принимает новых игроков." */
+                localization::Tr("network.tcp.host.rejected")
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
             ShutDown(NULL);
@@ -419,8 +401,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_GUEST_ACCEPTED:
             sprintf(
                 cWSTextBuffer,
-                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff "
-                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb." /* "Ожидаю игрока для начала игры." */
+                localization::Tr("network.waiting_player_start")
             );
             SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, 1);
             windowMessage.payload.widget.data.text = cWSTextBuffer;
@@ -461,9 +442,7 @@ i32 wsWaitForExtraGuests(void) {
             /* Создание игры на %s.
 
                У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
-            "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+            localization::Tr("network.tcp.host.guests_ready.buka"),
             inet_ntoa(gIn_addrIP),
             giNumHumanPlayers - 1
         );
@@ -497,8 +476,7 @@ i32 wsWaitForHost(void) {
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(
                     cWSTextBuffer,
-                    /* Сервер не отвечает. Продолжить ожидание? */ "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
-                        "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xee\xe6\xe8\xe4\xe0\xed\xe8\xe5? "
+                    /* Сервер не отвечает. Продолжить ожидание? */ localization::Tr("network.tcp.host.not_responding")
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)

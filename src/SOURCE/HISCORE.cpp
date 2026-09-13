@@ -223,7 +223,7 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Читер)" */
+                localization::Tr("high_score.cheater_suffix")
             );
         m_window->BroadcastMessage(hsMessage);
 

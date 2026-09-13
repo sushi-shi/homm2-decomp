@@ -568,10 +568,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
-            /* "Вы действительно хотите начать сначала сценарий?" */
-            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-            "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc "
-            "\xf1\xed\xe0\xf7\xe0\xeb\xe0 \xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
+
+            localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
@@ -642,7 +640,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "\xcd\xe5\xf2" /* "Нет" */);
+        sprintf(gText, localization::Tr("common.none"));
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
@@ -656,85 +654,85 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     case ARTIFACT_MINOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                            localization::Tr("campaign.bonus.artifact.minor_scroll")
                         );
                         break;
                     case ARTIFACT_MAGE_RING:
                         strcpy(
                             gText,
-                            "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0" /* "Кольцо мага" */
+                            localization::Tr("campaign.bonus.artifact.mage_ring")
                         );
                         break;
                     case ARTIFACT_DEFENDER_HELM:
                         strcpy(
                             gText,
-                            /* "Щлем защитника" */
-                            "\xd9\xeb\xe5\xec \xe7\xe0\xf9\xe8\xf2\xed\xe8\xea\xe0"
+
+                            localization::Tr("campaign.bonus.artifact.defender_helm")
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb" /* "Топор силы" */);
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.power_axe"));
                         break;
                     case ARTIFACT_DRAGON_SWORD:
                         strcpy(
                             gText,
-                            "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7" /* "Драконий меч" */
+                            localization::Tr("campaign.bonus.artifact.dragon_sword")
                         );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8" /* "Доспехи" */);
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.breastplate"));
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
                             gText,
-                            /* "Символ неудачи" */
-                            "\xd1\xe8\xec\xe2\xee\xeb \xed\xe5\xf3\xe4\xe0\xf7\xe8"
+
+                            localization::Tr("campaign.bonus.artifact.fizbin_medal")
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
                         strcpy(
                             gText,
-                            /* "Громовая палица" */
-                            "\xc3\xf0\xee\xec\xee\xe2\xe0\xff \xef\xe0\xeb\xe8\xf6\xe0"
+
+                            localization::Tr("campaign.bonus.artifact.thunder_mace")
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8" /* "Перчатки" */);
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.gauntlets"));
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                            localization::Tr("campaign.bonus.artifact.minor_scroll")
                         );
                         break;
                     case ARTIFACT_FOREMOST_SCROLL:
                         strcpy(
                             gText,
-                            /* "Свиток высш. зн." */
-                            "\xd1\xe2\xe8\xf2\xee\xea \xe2\xfb\xf1\xf8. \xe7\xed."
+
+                            localization::Tr("campaign.bonus.artifact.foremost_scroll")
                         );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0" /* "Баллиста" */);
+                        strcpy(gText, localization::Tr("campaign.bonus.artifact.ballista"));
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
                         strcpy(
                             gText,
-                            "\xcd\xe5\xe7\xf0\xe8\xec\xfb\xe9 \xf9\xe8\xf2" /* "Незримый щит" */
+                            localization::Tr("table.gArtifactNames.22")
                         );
                         break;
                     case ARTIFACT_NOMAD_BOOTS:
                         strcpy(
                             gText,
-                            /* "Башмаки кочевника" */
-                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xea\xee\xf7\xe5\xe2\xed\xe8\xea\xe0"
+
+                            localization::Tr("table.gArtifactNames.33")
                         );
                         break;
                     case ARTIFACT_TRAVELER_BOOTS:
                         strcpy(
                             gText,
-                            /* "Башмаки путника" */
-                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xef\xf3\xf2\xed\xe8\xea\xe0"
+
+                            localization::Tr("table.gArtifactNames.34")
                         );
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
@@ -748,8 +746,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(
                         gText,
-                        "\xcf\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xe7\xe5\xec\xeb\xff\xed\xfb\xf5 \xfd"
-                        "\xeb." /* "Призвать земляных эл." */
+                        localization::Tr("campaign.bonus.spell.summon_earth")
                     );
                 else
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
@@ -783,14 +780,14 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     gText,
                     "%d %s",
                     choice->value,
-                    "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb" /* "Обрывки карты" */
+                    localization::Tr("campaign.bonus.puzzle_pieces.label")
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2" /* "Опыт" */);
+                sprintf(gText, "%d %s", choice->value, localization::Tr("campaign.bonus.experience.label"));
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "\xed/\xe4" /* "н/д" */);
+                sprintf(gText, localization::Tr("common.not_applicable"));
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
@@ -811,7 +808,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         gText,
                         "%s %s",
                         gSpellNames[IDX(choice->spell)],
-                        "\xd1\xe2\xe8\xf2\xee\xea" /* "Свиток" */
+                        localization::Tr("table.xPasswordStrings.170")
                     );
                 } else {
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
@@ -1239,12 +1236,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 NormalDialog(
                                     /* "Выбранная карта - плохой выбор
                                        для вашего следующего сценария." */
-                                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff "
-                                    "\xea\xe0\xf0\xf2\xe0 - \xef\xeb\xee\xf5\xee\xe9 "
-                                    "\xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff "
-                                    "\xe2\xe0\xf8\xe5\xe3\xee "
-                                    "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee "
-                                    "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xff.",
+                                    localization::Tr("campaign.selection.invalid_next_scenario"),
                                     NORMAL_DIALOG_INFO
                                 );
                                 break;

@@ -72,7 +72,7 @@ void SetupRecruitWin(
     strcpy(monsterName, GetMonsterPluralName(creatureType));
     ch = CyrillicToLower(monsterName[0]);
     monsterName[0] = ch;
-    sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc" /* "Нанять" */, monsterName);
+    sprintf(label, "%s %s", localization::Tr("table.xPasswordStrings.159"), monsterName);
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = label;
     window->BroadcastMessage(message);
@@ -86,7 +86,7 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Доступно: " */, available);
+    sprintf(gText, "%s%d", localization::Tr("recruit.available.prefix"), available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
@@ -178,8 +178,7 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "\xc4\xeb\xff \xfd\xf2\xee\xe9 \xe0\xf0\xec\xe8\xe8 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 "
-            "\xe2 \xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe5." /* "Для этой армии нет места в гарнизоне." */
+            localization::Tr("recruit.garrison_full")
             ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
@@ -212,7 +211,7 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Доступно: " */, *m_available);
+    sprintf(gText, "%s%d", localization::Tr("recruit.available.prefix"), *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);

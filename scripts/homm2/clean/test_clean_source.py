@@ -424,6 +424,71 @@ class ClassicSourceTests(unittest.TestCase):
 
 
 class CleanSourceOutputSafetyTests(unittest.TestCase):
+    def localized_fixture(self, root):
+        repo = self.fixture_repo(root)
+        (repo / 'locales').mkdir()
+        (repo / 'locales/messages.def').write_text('HOMM2_MESSAGE("test.greeting", "Hello")\n')
+        (repo / 'locales/ru.po').write_text(
+            'msgctxt "test.greeting"\nmsgid "Hello"\nmsgstr "Привет"\n', encoding='utf-8')
+        (repo / 'src/example.cpp').write_text('char text[] = localization::Tr("test.greeting");\n')
+        (repo / 'include/example.h').write_text('char header[] = localization::Tr("test.greeting");\n')
+        import shutil
+        (repo / 'scripts/homm2/build').mkdir()
+        for path in ('scripts/homm2/build/catalog.py', 'scripts/homm2/clean/project/build.py'):
+            shutil.copyfile(clean_source.REPO / path, repo / path)
+        output = root / 'generated'
+        with mock.patch.object(clean_source, 'REPO', repo), mock.patch.object(
+                clean_source, 'OVERRIDE_DIR', repo / 'overrides'), mock.patch.object(
+                clean_source, 'GENERATED_PATCHES', {}):
+            clean_source.generate(output)
+        return output
+
+    def test_source_preserves_ids_catalog_and_independent_locale_builds(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = self.localized_fixture(Path(directory))
+            source = output / 'src/example.cpp'
+            original = source.read_bytes()
+            self.assertIn(b'localization::Tr', original)
+            for locale, expected in (('en', '"Hello"'), ('ru', '"\\317\\360\\350\\342\\345\\362"')):
+                subprocess.run([sys.executable, 'build.py', '--prepare', '--' + locale],
+                               cwd=output, check=True)
+                for relative in ('src/example.cpp', 'include/example.h'):
+                    rendered = (output / 'build' / locale / 'localized' / relative).read_text()
+                    self.assertIn(expected, rendered)
+                    self.assertNotIn('localization::Tr', rendered)
+            self.assertEqual(source.read_bytes(), original)
+            self.assertEqual((output / 'locales/ru.po').read_text(encoding='utf-8'),
+                             'msgctxt "test.greeting"\nmsgid "Hello"\nmsgstr "Привет"\n')
+            for locale, graph in (('ru', 'build.ninja'), ('en', 'build-en.ninja')):
+                ninja = (output / graph).read_text()
+                self.assertIn(f'builddir = build/{locale}', ninja)
+                self.assertIn(f'python3 build.py --prepare --{locale}', ninja)
+                self.assertIn('locales/messages.def locales/ru.po', ninja)
+                self.assertIn(f'-Ibuild/{locale}/localized/include', ninja)
+
+    def test_classic_materializes_its_source_catalog_not_parent_catalog(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = self.localized_fixture(root)
+            git(source, 'init')
+            git(source, 'add', 'src', 'include', 'locales', 'tools', 'build.py',
+                'build.ninja', 'build-en.ninja')
+            output = root / 'classic'
+            clean_source.generate_classic(source, output, readable_russian=True)
+            for relative in ('src/example.cpp', 'include/example.h'):
+                text = (output / relative).read_text(encoding='utf-8')
+                self.assertIn('"Привет"', text)
+                self.assertNotIn('localization::Tr', text)
+                self.assertNotIn('\\317', text)
+            for path in ('locales', 'tools', 'build.py', 'build.ninja', 'build-en.ninja'):
+                self.assertFalse((output / path).exists())
+
+    def test_readable_classic_octal_literals_preserve_ascii_controls(self):
+        source = r'"\317\360\350\342\345\362\0\012" "\\317"'
+        text, count = clean_source.materialize_cp1251_literals(source)
+        self.assertEqual(count, 6)
+        self.assertEqual(text, r'"Привет\0\n" "\\317"')
+
     def fixture_repo(self, root: Path) -> Path:
         repo = root / "repo"
         (repo / "include").mkdir(parents=True)

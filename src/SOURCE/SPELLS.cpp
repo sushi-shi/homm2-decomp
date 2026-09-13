@@ -186,12 +186,7 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_EARTHQUAKE:
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] == NULL) {
                     NormalDialog(
-                        "\xce\xf2 \xe7\xe5\xec\xeb\xe5\xf2\xf0\xff\xf1\xe5\xed\xe8\xff "
-                        "\xed\xe5\xf2 \xed\xe8\xea\xe0\xea\xee\xe3\xee \xef\xf0\xee\xea\xe0, "
-                        "\xe5\xf1\xeb\xe8 \xf2\xee\xeb\xfc\xea\xee \xed\xe0 \xea\xe0\xf0\xf2\xe5 "
-                        "\xe5\xf1\xf2\xfc \xe3\xee\xf0\xee\xe4\xf1\xea\xe8\xe5 "
-                        "\xf1\xf2\xe5\xed\xfb, \xea\xee\xf2\xee\xf0\xfb\xe5 \xec\xee\xe6\xed\xee "
-                        "\xf0\xe0\xe7\xf0\xf3\xf8\xe8\xf2\xfc." /* "От землетрясения нет никакого прока, если только на карте есть городские стены, которые можно разрушить." */
+                        localization::Tr("spell.earthquake.requires_walls")
                         ,
                         NORMAL_DIALOG_INFO
                     );
@@ -215,10 +210,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_summonedCreatureType[IDX(m_currentSide)] != CREATURE_SUMMONED_NONE
                     && m_summonedCreatureType[IDX(m_currentSide)] != elementalType) {
                     NormalDialog(
-                        "\xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc "
-                        "\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2 \xf2\xee\xeb\xfc\xea\xee "
-                        "\xee\xe4\xed\xee\xe3\xee \xf2\xe8\xef\xe0 \xe2\xee \xe2\xf0\xe5\xec\xff "
-                        "\xee\xe4\xed\xee\xe3\xee \xe1\xee\xff." /* "Вы можете призвать элементалов только одного типа во время одного боя." */
+                        localization::Tr("spell.summon_elemental.one_type_only")
                         ,
                         NORMAL_DIALOG_INFO
                     );
@@ -227,9 +219,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[IDX(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 \xe5\xf1\xf2\xfc %d \xe3\xf0\xf3\xef\xef "
-                        "\xe2\xee\xe8\xed\xee\xe2 \xe2 \xe1\xee\xfe \xe8 \xe1\xee\xeb\xfc\xf8\xe5 "
-                        "\xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xed\xe5\xeb\xfc\xe7\xff." /* "У вас уже есть %d групп воинов в бою и больше добавить нельзя." */
+                        localization::Tr("spell.summon_elemental.army_full")
                         ,
                         m_armyCount[IDX(m_currentSide)]
                     );
@@ -239,11 +229,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (!SpaceForElementalExists()) {
                     sprintf(
                         gText,
-                        "\xd0\xff\xe4\xee\xec \xf1 \xe2\xe0\xf8\xe8\xec \xe3\xe5\xf0\xee\xe5\xec "
-                        "\xed\xe5\xf2 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee\xe3\xee "
-                        "\xf1\xe2\xee\xe1\xee\xe4\xed\xee\xe3\xee \xec\xe5\xf1\xf2\xe0, "
-                        "\xf7\xf2\xee\xe1\xfb \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc "
-                        "\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2 \xf2\xf3\xe4\xe0." /* "Рядом с вашим героем нет достаточного свободного места, чтобы призвать элементалов туда." */
+                        localization::Tr("spell.summon_elemental.no_adjacent_space")
                     );
                     NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
@@ -265,8 +251,7 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_MASS_SHIELD:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xed\xe8 \xed\xe0 "
-                        "\xea\xee\xe3\xee \xed\xe5 \xef\xee\xe4\xe5\xe9\xf1\xf2\xe2\xf3\xe5\xf2!" /* "Заклинание ни на кого не подействует!" */
+                        localization::Tr("spell.no_valid_target")
                         ,
                         NORMAL_DIALOG_INFO
                     );
@@ -281,9 +266,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[IDX(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 \xe5\xf1\xf2\xfc %d \xe3\xf0\xf3\xef\xef "
-                        "\xe2\xee\xe8\xed\xee\xe2 \xe2 \xe1\xee\xfe \xe8 \xe1\xee\xeb\xfc\xf8\xe5 "
-                        "\xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xed\xe5\xeb\xfc\xe7\xff." /* "У вас уже есть %d групп воинов в бою и больше добавить нельзя." */
+                        localization::Tr("spell.summon_elemental.army_full")
                         ,
                         m_armyCount[IDX(m_currentSide)]
                     );
@@ -293,8 +276,7 @@ i32 combatManager::ViewSpells(i32) {
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xed\xe8 \xed\xe0 "
-                        "\xea\xee\xe3\xee \xed\xe5 \xef\xee\xe4\xe5\xe9\xf1\xf2\xe2\xf3\xe5\xf2!" /* "Заклинание ни на кого не подействует!" */
+                        localization::Tr("spell.no_valid_target")
                         ,
                         NORMAL_DIALOG_INFO
                     );
@@ -363,12 +345,12 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
                         gpCombatManager->CombatMessage(
-                            /* Недопустимое место для телепортации */ "\xcd\xe5\xe4\xee\xef\xf3\xf1\xf2\xe8\xec\xee\xe5\x20\xec\xe5\xf1\xf2\xee\x20\xe4\xeb\xff\x20\xf2\xe5\xeb\xe5\xef\xee\xf0\xf2\xe0\xf6\xe8\xe8\x20",
+                            /* Недопустимое место для телепортации */ localization::Tr("combat.spell.invalid_teleport_destination"),
                             1, 0, 0
                         );
                     } else {
                         gpCombatManager->CombatMessage(
-                            /* Выберите цель для заклинания */ "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5\x20\xf6\xe5\xeb\xfc\x20\xe4\xeb\xff\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff",
+                             localization::Tr("combat.spell.select_target"),
                             1, 0, 0
                         );
                     }
@@ -396,7 +378,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage(
-                            /* Выберите место назначения телепортации. */ "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5\x20\xec\xe5\xf1\xf2\xee\x20\xed\xe0\xe7\xed\xe0\xf7\xe5\xed\xe8\xff\x20\xf2\xe5\xeb\xe5\xef\xee\xf0\xf2\xe0\xf6\xe8\xe8\x2e",
+                             localization::Tr("combat.spell.select_teleport_destination"),
                             1, 0, 0
                         );
                         return MESSAGE_DISPATCH_CONSUME;
@@ -588,7 +570,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_COLD_RING:
             sprintf(
                 gText,
-                /* Направить '%s' */ "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\x27\x25\x73\x27",
+                 localization::Tr("combat.spell.cast"),
                 gSpellNames[IDX(spell)]
             );
             break;
@@ -596,7 +578,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             if (bInTeleportGetDest) {
                 sprintf(
                     gText,
-                    /* Перенестись сюда */ "\xcf\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc\x20\xf1\xfe\xe4\xe0"
+                     localization::Tr("combat.spell.teleport_here")
                 );
                 break;
             }
@@ -614,7 +596,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         format_target:
             sprintf(
                 gText,
-                /* Направить '%s' на %s */ "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\x27\x25\x73\x27\x20\xed\xe0\x20\x25\x73",
+                 localization::Tr("combat.spell.cast_on_target"),
                 gSpellNames[IDX(spell)],
                 target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
                                         : gArmyNamesPlural[IDX(target->m_monsterType)]
@@ -888,7 +870,7 @@ void combatManager::CastSpell(
                 target3->m_monster.defense = SPELL_MINIMUM_DEFENSE;
             sprintf(
                 gText,
-                "\xd0\xe0\xe7\xf0\xf3\xf8\xe8\xf2\xe5\xeb\xfc\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xf3\xec\xe5\xed\xfc\xf8\xe0\xe5\xf2\x20\xe7\xe0\xf9\xe8\xf2\xf3\x20\xed\xe0\x20\x25\x64\x20\xe5\xe4\x2e",
+                localization::Tr("combat.spell.disrupting_ray"),
                 oldDefense - target3->m_monster.defense
             );
             CombatMessage(gText, 1, 1, 0);
@@ -912,9 +894,7 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "\xd5\xeb\xe0\xe4\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20"
-                "\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3"
-                "\x20\x25\x73\x2e",
+                localization::Tr("combat.spell.cold_ray_damage"),
                 static_cast<i32>(damage1),
                 CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
@@ -941,9 +921,7 @@ void combatManager::CastSpell(
                 );
                 sprintf(
                     gText,
-                    "\xc2\xee\xeb\xf8\xe5\xe1\xed\xe0\xff\x20\xf1\xf2\xf0\xe5\xeb\xe0\x20\xed\xe0"
-                    "\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0"
-                    "\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e",
+                    localization::Tr("combat.spell.magic_arrow_damage"),
                     static_cast<i32>(damage1),
                     CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
                 );
@@ -985,9 +963,7 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "\xd0\xe0\xe7\xf0\xff\xe4\x20\xec\xee\xeb\xed\xe8\xe8\x20\xed\xe0\xed\xee\xf1\xe8"
-                "\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff"
-                "\xe4\xf3\x20\x25\x73\x2e",
+                localization::Tr("combat.spell.lightning_bolt_damage"),
                 static_cast<i32>(damage1),
                 CREATURE_DISPLAY_NAME(target3->m_monsterType, target3->m_quantity)
             );
@@ -1363,9 +1339,9 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[IDX(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "\xcb\xe5\xe4\xff\xed\xee\xe5 \xea\xee\xeb\xfc\xf6\xee \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", static_cast<i32>(baseDamage));
+            sprintf(gText, localization::Tr("spell.damage.cold_ring"), static_cast<i32>(baseDamage));
         else
-            sprintf(gText, "\xce\xe3\xed\xe5\xed\xed\xfb\xe9 \xf8\xe0\xf0 \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", static_cast<i32>(baseDamage));
+            sprintf(gText, localization::Tr("spell.damage.fireball"), static_cast<i32>(baseDamage));
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1439,7 +1415,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, "\xc7\xe2\xe5\xe7\xe4\xee\xef\xe0\xe4 \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage);
+        sprintf(gText, localization::Tr("spell.damage.meteor_shower"), baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1509,7 +1485,7 @@ void combatManager::ElementalStorm(void) {
     if (hit) {
         sprintf(
             gText,
-            "\xc1\xf3\xf0\xff\x20\xf1\xf2\xe8\xf5\xe8\xe9\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x2e",
+            localization::Tr("combat.spell.elemental_storm_damage"),
             baseDam
         );
         CombatMessage(gText, 1, 1, 0);
@@ -1551,7 +1527,7 @@ void combatManager::Armageddon(void) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, "\xc0\xf0\xec\xe0\xe3\xe5\xe4\xe4\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage);
+        sprintf(gText, localization::Tr("spell.damage.armageddon"), baseDamage);
         CombatMessage(gText, 1, 1, 0);
     }
 
@@ -2884,7 +2860,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             }
             sprintf(
                 gText,
-                "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 '%s' \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0\n\xe2\xf1\xe5\xec \xed\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xec \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0\xec.",
+                localization::Tr("spell.damage.all_undead"),
                 gSpellNames[IDX(spell)],
                 damage_c
             );
@@ -2917,7 +2893,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             }
             sprintf(
                 gText,
-                "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xd1\xec\xe5\xf0\xf2\xe8 \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0\n\xe2\xf1\xe5\xec \xe6\xe8\xe2\xfb\xec \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0\xec.",
+                localization::Tr("spell.damage.all_living"),
                 damage_c
             );
             CombatMessage(gText, 1, 1, 0);
@@ -3060,7 +3036,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         }
         ++distance0;
     }
-    sprintf(gText, "\xd1\xee\xf0\xe2\xe0\xeb\xee\xf1\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xee\xf2\xe2\xee\xf0\xe5\xed\xe8\xff \xf4\xe0\xed\xf2\xee\xec\xee\xe2!");
+    sprintf(gText, localization::Tr("spell.mirror_image.failed"));
     NormalDialog(gText, NORMAL_DIALOG_INFO);
     return;
 
@@ -3381,14 +3357,14 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
     if (target->m_quantity - oldQuantity_o > 1)
         sprintf(
             gText,
-            "%d %s \xe2\xee\xf1\xea\xf0\xe5\xf1\xe0\xfe\xf2 \xe8\xe7 \xec\xe5\xf0\xf2\xe2\xfb\xf5!",
+            localization::Tr("combat.spell.resurrect.multiple.buka"),
             target->m_quantity - oldQuantity_o,
             gArmyNamesPlural[IDX(target->m_monsterType)]
         );
     else
         sprintf(
             gText,
-            "%d %s \xe2\xee\xf1\xea\xf0\xe5\xf1\xe0\xe5\xf2 \xe8\xe7 \xec\xe5\xf0\xf2\xe2\xfb\xf5!",
+            localization::Tr("combat.spell.resurrect.one.buka"),
             target->m_quantity - oldQuantity_o,
             gArmyNames[IDX(target->m_monsterType)]
         );
@@ -3458,11 +3434,10 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 fizzleSample = LoadPlaySample("rsbryfzl.82m");
     sprintf(
         gText,
-        "%s%s \xf1\xee\xef\xf0\xee\xf2\xe8\xe2\xeb\xff\xe5\xf2\xf1\xff "
-        "\xfd\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe!",
+        localization::Tr("combat.spell.resist.buka"),
         target->m_quantity == 1
             ? ""
-            : "\xce\xf2\xf0\xff\xe4 ",
+            : localization::Tr("combat.spell.resist.troop_prefix"),
         target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
                                 : gArmyNamesPlural[IDX(target->m_monsterType)]
     );
@@ -3717,15 +3692,15 @@ void combatManager::ShowSpellMessage(
         sprintf(targetName, gArmyNamesPlural[IDX(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, "\x25\x73\x20\xef\xe0\xf0\xe0\xeb\xe8\xe7\xee\xe2\xe0\xed\xfb\x20\xf6\xe8\xea\xeb\xee\xef\xe0\xec\xe8\x21", targetName);
+            sprintf(message, localization::Tr("combat.ability.cyclops_paralyze"), targetName);
         else if (spell == SPELL_BLIND)
-            sprintf(message, "\x25\x73\x20\xee\xf1\xeb\xe5\xef\xeb\xe5\xed\xfb\x20\xe0\xf2\xe0\xea\xee\xe9\x20\xe5\xe4\xe8\xed\xee\xf0\xee\xe3\xee\xe2\x21", targetName);
+            sprintf(message, localization::Tr("combat.ability.unicorn_blind"), targetName);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message, "\x25\x73\x20\xee\xe1\xf0\xe0\xf9\xe5\xed\xfb\x20\xe2\xe7\xee\xf0\xee\xec\x20\xec\xe5\xe4\xf3\xe7\xfb\x20\xe2\x20\xea\xe0\xec\xe5\xed\xfc\x21", targetName);
+            sprintf(message, localization::Tr("combat.ability.medusa_petrify"), targetName);
         else if (spell == SPELL_CURSE)
-            sprintf(message, "\x25\x73\x20\xef\xf0\xee\xea\xeb\xff\xf2\xfb\x20\xec\xf3\xec\xe8\xff\xec\xe8\x21", targetName);
+            sprintf(message, localization::Tr("combat.ability.mummy_curse"), targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message, "\x25\x73\x20\xeb\xe8\xf8\xe8\xeb\xe8\xf1\xfc\x20\xed\xe0\xeb\xee\xe6\xe5\xed\xed\xfb\xf5\x20\xed\xe0\x20\xed\xe8\xf5\x20\xf7\xe0\xf0\x0a\xe8\xe7\x2d\xe7\xe0\x20\xe0\xf0\xf5\xe8\xec\xe0\xe3\xee\xe2\x21", targetName);
+            sprintf(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
         else {
             unhandledSpell5 = 0;
             ++unhandledSpell5;
@@ -3735,25 +3710,25 @@ void combatManager::ShowSpellMessage(
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
                 sprintf(
                     message,
-                    "\xca\xe0\xef\xe8\xf2\xe0\xed\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\x0a\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27\x20\xed\xe0\x20\xee\xf2\xf0\xff\xe4\x20\x25\x73\x2e",
+                    localization::Tr("combat.spell.captain_cast_on"),
                     gSpellNames[IDX(spell)],
                     targetName
                 );
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\x27\x25\x73\x27\x20\xed\xe0\x20\x25\x73",
+                    localization::Tr("combat.spell.hero_cast_on"),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)],
                     targetName
                 );
         } else {
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
-                sprintf(message, "\xca\xe0\xef\xe8\xf2\xe0\xed\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27", gSpellNames[IDX(spell)]);
+                sprintf(message, localization::Tr("combat.spell.captain_cast"), gSpellNames[IDX(spell)]);
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27",
+                    localization::Tr("combat.spell.hero_cast"),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)]
                 );

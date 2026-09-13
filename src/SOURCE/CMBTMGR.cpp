@@ -356,7 +356,7 @@ void combatManager::SetupCombat(
             );
             strcpy(
                 m_captain.m_name,
-                "\xca\xe0\xef\xe8\xf2\xe0\xed" /* "Капитан" */
+                localization::Tr("hero.captain")
             );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
@@ -1058,15 +1058,13 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNames[IDX(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1107,15 +1105,13 @@ i32 combatManager::CheckApplyBadMorale(
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNames[IDX(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1441,7 +1437,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 static_cast<i32l>(
                     projectileX11
                     + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
-                    
+
                 );
             giMinExtentY =
                 static_cast<i32l>(
@@ -1709,22 +1705,22 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
             gText,
             "%s %d %s.\n%d %s %s.",
             tower == COMBAT_TOWER_GARRISON
-                ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+                ? localization::Tr("combat.tower.garrison.damage.prefix")
+                : localization::Tr("combat.tower.keep.damage.prefix"),
             damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
+            localization::Tr("combat.fragment.damage_points"),
             killed0,
             CREATURE_DISPLAY_NAME(target9->m_monsterType, killed0),
-            killed0 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+            killed0 <= 1 ? localization::Tr("combat.fragment.dies") : localization::Tr("combat.fragment.killed")
         );
     } else {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+            tower == COMBAT_TOWER_GARRISON ? localization::Tr("combat.tower.garrison.damage.prefix")
+                                                : localization::Tr("combat.tower.keep.damage.prefix"),
             damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
+            localization::Tr("combat.fragment.damage_points")
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);

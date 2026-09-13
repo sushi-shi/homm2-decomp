@@ -2039,21 +2039,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 'e';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            localization::Tr("adventure.confirm.restart")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            localization::Tr("adventure.confirm.load_new_game")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
+                            localization::Tr("adventure.confirm.quit")
                         );
                         goto confirm_game_command;
                     confirm_game_command:
@@ -2419,11 +2419,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         case PANEL_RADAR:
             if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xe0 \xec\xe8\xf0\xe0}\n\n"
-                    "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee "
-                    "\xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 "
-                    "\xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc "
-                    "\xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec.",
+                    localization::Tr("adventure.help.world_map"),
                     NORMAL_DIALOG_QUICK_VIEW
                 );
                 break;
@@ -2521,16 +2517,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            "{\xce\xea\xed\xee \xf1\xf2\xe0\xf2\xf3\xf1\xe0}\n\n"
-            "\xdd\xf2\xee \xee\xea\xed\xee \xf1\xee\xee\xe1\xf9\xe0\xe5\xf2 "
-            "\xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe \xee \xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8 "
-            "\xe2\xe0\xf8\xe5\xe3\xee \xe3\xe5\xf0\xee\xff \xe8\xeb\xe8 "
-            "\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0, \xe0 \xf2\xe0\xea\xe6\xe5, "
-            "\xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xe5\xf2 \xea\xe0\xeb\xe5\xed\xe4\xe0\xf0\xfc. "
-            "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 "
-            "\xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec "
-            "\xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 "
-            "\xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec.",
+            localization::Tr("adventure.help.status_window"),
             NORMAL_DIALOG_QUICK_VIEW
         );
     }
@@ -2578,11 +2565,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee "
-                    "\xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 "
-                    "\xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb "
-                    "\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 "
-                    "\xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?",
+                    localization::Tr("adventure.confirm.end_turn_with_mobile_heroes"),
                     NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == DIALOG_OK) {
@@ -2668,10 +2651,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 "
-            "\xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. "
-            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, "
-            "\xe7\xe0\xe2\xf2\xf0\xe0."
+            localization::Tr("adventure.search.requires_full_day")
             /* "Раскопки артефакта занимают целый день." */,
             1
         );
@@ -2682,14 +2662,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
-            "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 "
-            "\xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 "
-            "\xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, "
-            "\xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 "
-            "\xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. "
-            "\xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff "
-            "\xe7\xe0\xed\xff\xf2.",
+            localization::Tr("adventure.search.inventory_full"),
             1
         );
         return 1;
@@ -2710,8 +2683,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 "
-            "\xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5.",
+            localization::Tr("adventure.search.clear_ground_only"),
             1
         );
         return 1;
@@ -2721,8 +2693,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 "
-            "\xf1\xf3\xf8\xe5!!!",
+            localization::Tr("adventure.search.land_only"),
             1
         );
         return 1;
@@ -2749,8 +2720,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (hero->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 "
-                    "\xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!",
+                    localization::Tr("adventure.search.no_artifact_space"),
                     1
                 );
             }
@@ -2765,14 +2735,14 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                     sprintf(
                         gText,
                         "%s%s",
-                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
+                        localization::Tr("adventure.search.found_artifact.prefix"),
                         gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
                         "%s%s",
-                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
+                        localization::Tr("adventure.search.found_artifact.prefix"),
                         gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
@@ -2793,8 +2763,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog(
-            "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee "
-            "\xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?",
+            localization::Tr("adventure.search.nothing_found"),
             1
         );
     }
@@ -4613,7 +4582,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         sprintf(
             gText,
             "%s",
-            "\xc3\xf0\xe0\xed\xe8\xf6\xe0"
+            localization::Tr("adventure.quick.border")
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
@@ -4623,7 +4592,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(
                 gText,
                 "%s",
-                "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff"
+                localization::Tr("adventure.quick.uncharted")
             );
         } else {
 
@@ -4632,7 +4601,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                        localization::Tr("adventure.quick.artifact")
                     );
                     break;
                 case MAP_OBJECT_OBELISK:
@@ -4644,8 +4613,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4660,8 +4629,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4676,8 +4645,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4692,8 +4661,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4708,8 +4677,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4724,8 +4693,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4740,8 +4709,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4756,8 +4725,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         goto quick_info_default;
@@ -4804,8 +4773,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         gText,
                         "%s\n%s",
                         gTerrainNames[IDX(CELL_TERRAIN(currentCell))],
-                        blocked ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
-                                : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
+                        blocked ? localization::Tr("adventure.quick_info.cannot_dig")
+                                : localization::Tr("adventure.quick_info.can_dig")
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
@@ -4827,7 +4796,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     quick_info_guarded:
                         sprintf(
                             guardStr,
-                            "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s",
+                            localization::Tr("adventure.quick_info.guarded_by"),
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
@@ -4948,7 +4917,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            localization::Tr("adventure.quick.unknown")
                         );
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
@@ -4961,8 +4930,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         strcat(
                             gText,
                             HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     }
                     break;
@@ -4998,7 +4967,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            localization::Tr("adventure.quick.unknown")
                         );
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
@@ -5009,7 +4978,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
                         sprintf(
                             gText,
-                            "\xd0\xe8\xf4\xfb"
+                            localization::Tr("adventure.quick.reefs")
                         );
                     } else {
                         goto quick_info_default;
@@ -5023,8 +4992,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? localization::Tr("adventure.quick.already_visited")
+                                : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
                         sprintf(
@@ -5566,9 +5535,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         week,
         "%s: %d  %s: %d",
-        "\xcc\xe5\xf1\xff\xf6" /* "Месяц" */,
+        localization::Tr("calendar.month.label"),
         gpGame->m_month,
-        "\xcd\xe5\xe4\xe5\xeb\xff" /* "Неделя" */,
+        localization::Tr("calendar.week.label"),
         gpGame->m_week
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5592,7 +5561,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         day,
         "%s: %d",
-        "\xc4\xe5\xed\xfc" /* "День" */,
+        localization::Tr("calendar.day.label"),
         gpGame->m_day
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -6506,12 +6475,12 @@ void advManager::TownQuickView(
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(
                 blankLabel,
-                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                localization::Tr("adventure.quick.unknown")
             );
         } else {
             sprintf(
                 blankLabel,
-                "\xcd\xe5\xf2"
+                localization::Tr("adventure.quick.none")
             );
         }
         noArmyText = new textWidget(
@@ -7077,13 +7046,7 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))) {
                 NormalDialog(
-                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 "
-                    "\xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 "
-                    "(\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 "
-                    "\xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 "
-                    "\xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb "
-                    "\xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee "
-                    "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
+                    localization::Tr("adventure.spell.mine_guardian.requires_mine"),
                     1
                 );
                 return;
@@ -7111,9 +7074,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = true;
             NormalDialog(
-                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 "
-                "\xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe "
-                "\xee\xef\xee\xe7\xed\xe0\xed\xfb.",
+                localization::Tr("adventure.spell.identify_hero.success"),
                 1
             );
             break;
@@ -7125,11 +7086,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec "
-                    "\xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb "
-                    "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc "
-                    "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. "
-                    "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
+                    localization::Tr("adventure.spell.travel.too_tired"),
                     1
                 );
                 return;
@@ -7211,9 +7168,8 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee "
-                "\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
-                /* "Игра успешно сохранена." */,
+                localization::Tr("save.success")
+                ,
                 1
             );
         }
@@ -8164,9 +8120,7 @@ void advManager::DimensionDoor(void) {
         if ((targetHero->IsEmbarked() && CELL_TERRAIN(targetCell) != TERRAIN_WATER)
             || (!targetHero->IsEmbarked() && CELL_TERRAIN(targetCell) == TERRAIN_WATER)) {
             NormalDialog(
-                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc "
-                "\xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 "
-                "\xe2\xf0\xe0\xf2\xe0!!!",
+                localization::Tr("adventure.spell.dimension_door.failed"),
                 OPTION_DIALOG_MESSAGE
             );
             UpdateRadar(1, 0);
@@ -8231,18 +8185,14 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  "
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            localization::Tr("adventure.spell.town_gate.no_town"),
             OPTION_DIALOG_MESSAGE
         );
         return;
     }
     if (targetHero->IsEmbarked()) {
         NormalDialog(
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb "
-            "\xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, "
-            "\xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
-            "\xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
+            localization::Tr("adventure.spell.town_gate.land_only"),
             OPTION_DIALOG_MESSAGE
         );
         return;
@@ -8256,7 +8206,7 @@ void advManager::TownGate(SpellType spellId) {
         );
         sprintf(
             gText,
-            "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
+            localization::Tr("adventure.spell.town_portal.prompt")
         );
         SET_WIDGET_MESSAGE(message, ADVMGR_TOWN_PORTAL_COMMAND_TEXT, TOWN_PORTAL_TITLE_WIDGET);
         message.payload.widget.data.text = gText;
@@ -8297,9 +8247,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 "
-            "\xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. "
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            localization::Tr("adventure.spell.town_gate.occupied"),
             OPTION_DIALOG_MESSAGE
         );
         return;
@@ -8472,9 +8420,8 @@ summon_done:
     Reseed(0, 0);
     if (!foundBoat) {
         NormalDialog(
-            "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
-            "\xf0\xe0\xe1\xeb\xfc!!!"
-            /* "Не удалось призвать корабль!!!" */,
+            localization::Tr("adventure.spell.summon_boat.failed")
+            ,
             OPTION_DIALOG_MESSAGE
         );
     }
@@ -8965,7 +8912,7 @@ void advManager::LoadRemote(void) {
             cheatWarned = true;
             sprintf(
                 gText,
-                "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
+                localization::Tr("game.cheats_in_use")
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
@@ -9728,29 +9675,22 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0"
-                                    "\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4"
-                                    "\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                    /* "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)" */
+                                localization::Tr("adventure.confirm.restart")
+
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc "
-                                    "\xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0"
-                                    "\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                    /* "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)" */
+                                localization::Tr("adventure.confirm.load_new_game")
+
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
-                                    /* "Вы действительно хотите выйти?" */
+                                localization::Tr("adventure.confirm.quit")
+
                             );
                         confirm_reset:
                             handled = true;
@@ -9908,7 +9848,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     msg.payload.widget.id =
         IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc";
+        msg.payload.widget.data.text = localization::Tr("system.options.do_not_show");
     } else {
         msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     }
@@ -10009,10 +9949,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
-                                    "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
-                                    "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
-                                    "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
-                                    /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */
+                                    localization::Tr("system.audio.midi_unavailable")
+
                                     ,
                                     OPTION_DIALOG_MESSAGE
                                 );
@@ -10033,10 +9971,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {
                                 NormalDialog(
-                                    "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
-                                    "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
-                                    "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
-                                    /* "Цифровая музыка не доступна в этой системе." */,
+                                    localization::Tr("system.audio.digital_sound_unavailable")
+                                    ,
                                     OPTION_DIALOG_MESSAGE
                                 );
                                 break;
@@ -10072,18 +10008,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
-                                        "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
-                                        "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
-                                        "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
-                                        " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
-                                        "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
-                                        "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
-                                        "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
-                                        "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
-                                        "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
-                                        "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
-                                        "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
-                                        /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */
+                                        localization::Tr("system.audio.cd_playback_unavailable")
+
                                         ,
                                         OPTION_DIALOG_MESSAGE
                                     );
@@ -10229,12 +10155,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea "
-            "\xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 "
-            "\xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb "
-            "\xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc "
-            "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
-            /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */
+            localization::Tr("adventure.spell.visions.no_monster")
+
             ,
             1
         );
@@ -10260,8 +10182,8 @@ i32 advManager::DoVisions(hero* visionHero) {
         if (isForced) {
             sprintf(
                 msg,
-                "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
-                    /* Существа хотят вступить в вашу армию! */
+                localization::Tr("adventure.spell.visions.forced_join")
+
             );
             strcat(gText, msg);
             goto showVision;
@@ -10293,7 +10215,7 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinNum == count) {
                 sprintf(
                     msg,
-                    "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                    localization::Tr("adventure.spell.visions.all_join_fee")
                         /* "Все существа вступят в нашу армию... / за плату в размере %d
                            золотых." */,
                     joinFee
@@ -10301,7 +10223,7 @@ i32 advManager::DoVisions(hero* visionHero) {
             } else {
                 sprintf(
                     msg,
-                    "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                    localization::Tr("adventure.spell.visions.some_join_fee")
                         /* "%d существ присоединятся к нам... / за плату в размере %d
                            золотых." */,
                     count,
@@ -10317,8 +10239,8 @@ i32 advManager::DoVisions(hero* visionHero) {
     creaturesFlee:
         sprintf(
             msg,
-            "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
-                /* Эти слабые твари определенно побегут, едва завидев нас. */
+            localization::Tr("adventure.spell.visions.flee")
+
         );
         strcat(gText, msg);
         goto showVision;
@@ -10326,8 +10248,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 creaturesFight:
     sprintf(
         msg,
-        "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
-            /* Боюсь, эти создания в отвратительном настроении и будут сражаться. */
+        localization::Tr("adventure.spell.visions.fight")
+
     );
     strcat(gText, msg);
     goto showVision;

@@ -325,8 +325,8 @@ i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     if (aggregateFp == INVALID_FILE) {
         sprintf(
             gText,
-            /* Не могу открыть файл: %s */
-            "\xcd\xe5 \xec\xee\xe3\xf3 \xee\xf2\xea\xf0\xfb\xf2\xfc \xf4\xe0\xe9\xeb: %s",
+
+            localization::Tr("resource.file.open_failed"),
             aggregateName
         );
         ShutDown(gText);

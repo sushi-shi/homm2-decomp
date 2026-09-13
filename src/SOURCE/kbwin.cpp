@@ -26,21 +26,21 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
-        "\xc3\xe5\xf0\xee\xe8\x20\x49\x49"
-    ); /* "Герои II" */
+        localization::Tr("system.title.short")
+    );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
-            "\xd2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xed\xe0\x20\xea\xee\xef\xe8\xff\x20\x25\x73\x20\xec\xee\xe6\xe5\xf2\x20\xe1\xfb\xf2\xfc\x20\xe7\xe0\xef\xf3\xf9\xe5\xed\xe0\x20\xee\xe4\xed\xee\xe2\xf0\xe5\xec\xe5\xed\xed\xee",
-            "\xc3\xe5\xf0\xee\xe8\x20\xcc\xe5\xf7\xe0\x20\xe8\x20\xcc\xe0\xe3\xe8\xe8\x20\x49\x49"
+            localization::Tr("system.single_instance"),
+            localization::Tr("system.title.full")
         ); /* "Только одна копия %s может быть запущена одновременно", "Герои Меча и Магии II" */
         MessageBoxA(
             NULL,
             gText,
-            "\xce\xf8\xe8\xe1\xea\xe0\x20\xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+            localization::Tr("system.startup_error.title"),
             MB_ICONHAND
-        ); /* "Ошибка загрузки" */
+        );
         return 0;
     }
 
@@ -107,8 +107,8 @@ i32 AppInit(
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
-            "\xc3\xe5\xf0\xee\xe8\x20\x49\x49"
-        ); /* "Герои II" */
+            localization::Tr("system.title.short")
+        );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
         appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
@@ -268,8 +268,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (window == hwndApp) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                        "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
+                        localization::Tr("adventure.confirm.quit"),
                         NORMAL_DIALOG_CONFIRM
                     );
                     if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
@@ -547,9 +546,9 @@ void InitVideo(void) {
     return;
 }
 
-DATA(0x005157dc) char szAppName[] = "\xc3\xe5\xf0\xee\xe8 II"; /* "Герои II" */
-DATA(0x005157e8) char szTitle[] = /* "Герои Меча и Магии II" */
-    "\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II";
+DATA(0x005157dc) char szAppName[] = localization::Tr("system.title.short");
+DATA(0x005157e8) char szTitle[] =
+    localization::Tr("system.title.full");
 DATA(0x00526cd4) HWND hwndApp = NULL;
 DATA(0x00526cd8) HMENU hmnuApp = NULL;
 DATA(0x00526cdc) HANDLE gEventHandle = NULL;
