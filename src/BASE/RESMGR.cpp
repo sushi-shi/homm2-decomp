@@ -95,27 +95,27 @@ void resourceManager::GetBackdropAtLoc(
 
 class palette* resourceManager::GetPalette(const char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<palette*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<palette*>(resourceEntry);
     } else {
-        r = new palette(id);
-        AddResource(r);
-        return static_cast<palette*>(r);
+        resourceEntry = new palette(id);
+        AddResource(resourceEntry);
+        return static_cast<palette*>(resourceEntry);
     }
 }
 
 class bitmap* resourceManager::GetBitmap(const char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<bitmap*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<bitmap*>(resourceEntry);
     } else {
-        r = new bitmap(fileId);
-        AddResource(r);
-        return static_cast<bitmap*>(r);
+        resourceEntry = new bitmap(fileId);
+        AddResource(resourceEntry);
+        return static_cast<bitmap*>(resourceEntry);
     }
 }
 
@@ -137,14 +137,14 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
 
 class tileset* resourceManager::GetTileset(const char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<tileset*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<tileset*>(resourceEntry);
     } else {
-        r = new tileset(id);
-        AddResource(r);
-        return static_cast<tileset*>(r);
+        resourceEntry = new tileset(id);
+        AddResource(resourceEntry);
+        return static_cast<tileset*>(resourceEntry);
     }
 }
 
@@ -167,27 +167,27 @@ class font* resourceManager::GetFont(const char* name) {
 
 class sample* resourceManager::GetSample(const char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<sample*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<sample*>(resourceEntry);
     } else {
-        r = new sample(name);
-        AddResource(r);
-        return static_cast<sample*>(r);
+        resourceEntry = new sample(name);
+        AddResource(resourceEntry);
+        return static_cast<sample*>(resourceEntry);
     }
 }
 
 class MIDIWrap* resourceManager::GetMIDIWrap(const char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<MIDIWrap*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<MIDIWrap*>(resourceEntry);
     } else {
-        r = new MIDIWrap(name);
-        AddResource(r);
-        return static_cast<MIDIWrap*>(r);
+        resourceEntry = new MIDIWrap(name);
+        AddResource(resourceEntry);
+        return static_cast<MIDIWrap*>(resourceEntry);
     }
 }
 
@@ -217,13 +217,13 @@ void resourceManager::AddResource(class resource* newResource) {
 
 void resourceManager::Expunge(void) {
     m_expunging = true;
-    resource* cur = m_resourceListHead;
+    resource* resourceEntry = m_resourceListHead;
     resource* next = NULL;
-    while (cur != NULL) {
-        next = cur->m_next;
-        RemoveResource(cur);
-        delete cur;
-        cur = next;
+    while (resourceEntry != NULL) {
+        next = resourceEntry->m_next;
+        RemoveResource(resourceEntry);
+        delete resourceEntry;
+        resourceEntry = next;
     }
     m_expunging = false;
 }

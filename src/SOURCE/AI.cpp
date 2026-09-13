@@ -514,7 +514,7 @@ void combatManager::DoLichShot(class army* lich) {
     float shotDamage = static_cast<float>(lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
     i32 sideHex;
     float score;
-    CombatHexDirection iDir;
+    CombatHexDirection iDirection;
     army* targetArmy;
     u8 marked[(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
     i32 targetHex;
@@ -532,10 +532,10 @@ void combatManager::DoLichShot(class army* lich) {
         *(marked + (targetArmy->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + targetArmy->m_index) =
             1;
         targetHex = targetArmy->m_hex;
-        for (iDir = COMBAT_DIRECTION_NORTHEAST;
-             (iDir) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
-             iDir++) {
-            sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDir);
+        for (iDirection = COMBAT_DIRECTION_NORTHEAST;
+             (iDirection) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             iDirection++) {
+            sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDirection);
             if (sideHex >= 0 && sideHex < COMBAT_HEX_COUNT
                 && m_hexCells[sideHex].m_occupantSide != COMBAT_SIDE_NONE
                 && m_hexCells[sideHex].m_occupantIndex != -1
@@ -659,14 +659,14 @@ i32 combatManager::GetWalkerMask(CombatSide side) {
 }
 
 i32 combatManager::GetOutOfItMask(CombatSide side) {
-    i32 idx = 0;
+    i32 index = 0;
     u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
     u32 result = 0;
     army* currentArmy;
 
-    for (idx = 0; idx < m_armyCount[(side)]; idx++) {
+    for (index = 0; index < m_armyCount[(side)]; index++) {
         currentArmy =
-            m_armies[(side)] + idx;
+            m_armies[(side)] + index;
         if (currentArmy != NULL
             && (((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED))) == 0
             && ARMY_HAS_INCAPACITATING_SPELL(*currentArmy))
@@ -694,23 +694,23 @@ i32 combatManager::GetTraitorMask(CombatSide side) {
 }
 
 i32 combatManager::GetBestArmy(CombatSide side, i32 mask) {
-    i32 armyIndex2 = 0;
+    i32 armyIndex = 0;
     u32 armyBit = COMBAT_AI_MASK_FIRST_BIT;
-    u32l bestStrength8 = 0;
+    u32l bestStrength = 0;
     i32 best = COMBAT_AI_NO_ARMY;
-    u32l strength8;
+    u32l strength;
 
-    for (armyIndex2 = 0; armyIndex2 < m_armyCount[(side)]; armyIndex2++) {
+    for (armyIndex = 0; armyIndex < m_armyCount[(side)]; armyIndex++) {
         if ((mask & armyBit) != 0) {
-            strength8 =
-                (m_armies[(side)] + armyIndex2)
+            strength =
+                (m_armies[(side)] + armyIndex)
                     ->Strength();
-            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[(side)] + armyIndex2))
-                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[(side)] + armyIndex2)))
-                strength8 >>= 1;
-            if (strength8 > bestStrength8) {
-                best = armyIndex2;
-                bestStrength8 = strength8;
+            if (ARMY_HAS_INCAPACITATING_SPELL(*(m_armies[(side)] + armyIndex))
+                || ARMY_HAS_BERSERK_OR_HYPNOTIZE(*(m_armies[(side)] + armyIndex)))
+                strength >>= 1;
+            if (strength > bestStrength) {
+                best = armyIndex;
+                bestStrength = strength;
             }
         }
         armyBit <<= 1;
@@ -746,22 +746,22 @@ i32 combatManager::GetClosestArmy(
     u32 bitFlag = COMBAT_AI_MASK_FIRST_BIT;
     i32 bestValue = COMBAT_AI_CLOSEST_ARMY_LIMIT;
     i32 armyFound = COMBAT_AI_NO_ARMY;
-    i32 val;
+    i32 value;
 
     for (armyIndex = 0; armyIndex < m_armyCount[(side)]; armyIndex++) {
         if ((mask & bitFlag) != 0) {
             target = &m_armies[(side)][armyIndex];
-            val = gpSearchArray->QuickDistance(
+            value = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
                 m_hexCells[target->m_hex].m_x,
                 m_hexCells[target->m_hex].m_y
             );
-            val = val * COMBAT_AI_DISTANCE_WEIGHT
+            value = value * COMBAT_AI_DISTANCE_WEIGHT
                   - target->m_quantity * target->m_monster.hitPoints;
-            if (val < bestValue) {
+            if (value < bestValue) {
                 armyFound = armyIndex;
-                bestValue = val;
+                bestValue = value;
             }
         }
         bitFlag <<= 1;
@@ -770,14 +770,14 @@ i32 combatManager::GetClosestArmy(
 }
 
 u32l combatManager::GetStrength(CombatSide side, i32 mask) {
-    i32 idx = 0;
+    i32 index = 0;
     u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
     u32l totalStrength = 0;
     army* currentArmy;
 
-    for (idx = 0; idx < m_armyCount[(side)]; idx++) {
+    for (index = 0; index < m_armyCount[(side)]; index++) {
         if ((mask & bitMask) != 0) {
-            currentArmy = &m_armies[(side)][idx];
+            currentArmy = &m_armies[(side)][index];
             if (currentArmy != NULL
                 && (((currentArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED)))
                        == 0)
@@ -828,7 +828,7 @@ i32 combatManager::AttemptAttack(
 }
 
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
-    u32 availableMask4 =
+    u32 availableMask =
         ~currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
         );
@@ -837,9 +837,9 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     CombatHexDirection direction;
     i32 hexes [[maybe_unused]];
     i32 enemyArmy;
-    i32 destHex;
+    i32 destinationHex;
 
-    if (availableMask4 == 0)
+    if (availableMask == 0)
         return 0;
 
     oneBit = COMBAT_AI_MASK_FIRST_BIT;
@@ -847,16 +847,16 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     for (direction = COMBAT_DIRECTION_NORTHEAST;
          (direction) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
          direction++) {
-        if ((availableMask4 & oneBit) != 0
+        if ((availableMask & oneBit) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
                 direction,
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
-                &destHex
+                &destinationHex
             )
-            && destHex >= 0)
-            enemyMask |= 1 << m_hexCells[destHex].m_occupantIndex;
+            && destinationHex >= 0)
+            enemyMask |= 1 << m_hexCells[destinationHex].m_occupantIndex;
         oneBit <<= 1;
     }
     if (currentArmy->m_monsterType == CREATURE_GHOST)
@@ -938,7 +938,7 @@ i32 combatManager::WalkTowardArmy(
     i32 atkMask;
     i32 movement;
     i32 pathNdx;
-    army* targetPtr;
+    army* targetPointer;
     i32 targetSquare;
     i32 path [[maybe_unused]];
 
@@ -947,8 +947,8 @@ i32 combatManager::WalkTowardArmy(
     if (targetStack == COMBAT_AI_NO_ARMY)
         return 0;
 
-    targetPtr = &m_armies[(side)][targetStack];
-    targetSquare = targetPtr->m_hex;
+    targetPointer = &m_armies[(side)][targetStack];
+    targetSquare = targetPointer->m_hex;
     currentArmy->m_targetSide = side;
     currentArmy->m_targetIndex = targetStack;
     atkMask =
@@ -970,8 +970,8 @@ i32 combatManager::WalkTowardArmy(
         0
     );
     if (routeGot == 0
-        && (((targetPtr->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_WIDE))) != 0) {
-        switch (targetPtr->m_facing) {
+        && (((targetPointer->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_WIDE))) != 0) {
+        switch (targetPointer->m_facing) {
             case ARMY_FACING_LEFT:
                 targetSquare--;
                 break;

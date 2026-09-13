@@ -148,13 +148,13 @@ typedef enum GameHeroPoolConstant {
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32 playerIndex);
 void GenerateStandardFileName(char* source, char* destination);
-MessageDispatchResult ViewSpellsHandler(struct tag_message& msg);
-MessageDispatchResult ViewSpecialHandler(struct tag_message& msg);
-MessageDispatchResult ViewArmyHandler(struct tag_message& msg);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
+MessageDispatchResult ViewArmyHandler(struct tag_message& message);
 i32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32 days);
-void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
-i32 GetSkipCopyLen(u8* buf, i32* pos);
+void WriteDiffHeaderInfo(u8 command, i32 length, u8* buffer, i32* position);
+i32 GetSkipCopyLen(u8* buffer, i32* position);
 void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
 void CreateJoinFile(char* oldName, char* diffName, char* joinName);
 EventExtra* GetMapEvent(i32 x, i32 y);

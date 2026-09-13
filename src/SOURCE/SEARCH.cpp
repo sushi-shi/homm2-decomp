@@ -70,10 +70,10 @@ i32 searchArray::BuildPath(
                 break;
             }
         }
-        MapDirection backDir =
+        MapDirection backDirection =
             OppositeMapDirection(static_cast<MapDirection>(node->direction));
-        destinationX += normalDirTable[(backDir)].x;
-        destinationY += normalDirTable[(backDir)].y;
+        destinationX += normalDirTable[(backDirection)].x;
+        destinationY += normalDirTable[(backDirection)].y;
     }
     return m_pathLength;
 }

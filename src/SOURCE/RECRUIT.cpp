@@ -63,14 +63,14 @@ void SetupRecruitWin(
     i32 resourceCost,
     i32 available
 ) {
-    char ch;
+    char character;
     char monsterName[NAME_SIZE];
     char label[LABEL_SIZE];
     tag_message message;
 
     strcpy(monsterName, GetMonsterPluralName(creatureType));
-    ch = CyrillicToLower(monsterName[0]);
-    monsterName[0] = ch;
+    character = CyrillicToLower(monsterName[0]);
+    monsterName[0] = character;
     sprintf(label, "%s %s", "Нанять", monsterName);
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = label;

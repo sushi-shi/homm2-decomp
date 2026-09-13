@@ -367,12 +367,12 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
 void textEntryWidget::Draw(void) {
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         char display[TEXT_BUFFER_CAPACITY];
-        u32 len;
+        u32 length;
 
         strcpy(display, m_text + m_displayOffset);
-        len = strlen(display);
+        length = strlen(display);
         while (m_font->LineWidth(display) > m_innerW)
-            display[--len] = 0;
+            display[--length] = 0;
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_rectX,
             m_owner->m_posY + m_rectY,

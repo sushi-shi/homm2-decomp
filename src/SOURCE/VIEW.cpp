@@ -75,74 +75,74 @@ typedef enum ViewGeneralHoverHelp {
 i32 combatManager::ViewGeneral(
     CombatSide side, i32 allowActions, i32 quickView
 ) {
-    i16 msgConst37 [[maybe_unused]];
-    i16 msgConst4 [[maybe_unused]];
-    i16 msgConst10 [[maybe_unused]];
-    i16 msgConst3 [[maybe_unused]];
-    i16 msgConst29 [[maybe_unused]];
-    i16 msgConst2 [[maybe_unused]];
-    i32 luck14;
-    i16 msgConst1 [[maybe_unused]];
-    i32 morale11;
-    i16 msgConst7 [[maybe_unused]];
-    i16 msgConst6 [[maybe_unused]];
-    i16 msgConst5 [[maybe_unused]];
-    i16 msgConst17 [[maybe_unused]];
-    i16 msgConst18 [[maybe_unused]];
-    i16 msgConst15 [[maybe_unused]];
-    i32 cost2 [[maybe_unused]];
-    heroWindow* generalWindow26;
-    i16 msgConst28 [[maybe_unused]];
-    tag_message message16;
-    i16 msgConst26 [[maybe_unused]];
+    i16 statsWidgetId [[maybe_unused]];
+    i16 seventhControlWidgetId [[maybe_unused]];
+    i16 thirteenthControlWidgetId [[maybe_unused]];
+    i16 retreatWidgetId [[maybe_unused]];
+    i16 surrenderWidgetId [[maybe_unused]];
+    i16 eighthControlWidgetId [[maybe_unused]];
+    i32 luck;
+    i16 portraitWidgetId [[maybe_unused]];
+    i32 morale;
+    i16 captainWidgetId [[maybe_unused]];
+    i16 fourteenthControlWidgetId [[maybe_unused]];
+    i16 nameWidgetId [[maybe_unused]];
+    i16 closeWidgetId [[maybe_unused]];
+    i16 noControlWidgetId [[maybe_unused]];
+    i16 colorWidgetId [[maybe_unused]];
+    i32 cost [[maybe_unused]];
+    heroWindow* generalWindow;
+    i16 ninthControlWidgetId [[maybe_unused]];
+    tag_message message;
+    i16 nameWidgetIdCopy [[maybe_unused]];
 
     if (m_heroes[(side)] == NULL)
         return 0;
     iViewGeneralWhichSide = side;
-    msgConst5 = GENERAL_NAME_WIDGET;
-    msgConst1 = GENERAL_PORTRAIT_WIDGET;
-    msgConst15 = GENERAL_COLOR_WIDGET;
-    msgConst37 = GENERAL_STATS_WIDGET;
-    msgConst7 = GENERAL_CAPTAIN_WIDGET;
-    msgConst18 = GENERAL_CONTROL_NONE;
-    msgConst26 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst2 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst17 = GENERAL_CLOSE;
-    msgConst3 = GENERAL_RETREAT;
-    msgConst29 = GENERAL_SURRENDER;
-    msgConst10 = GENERAL_CONTROL_THIRTEEN;
-    msgConst6 = GENERAL_CONTROL_FOURTEEN;
+    nameWidgetId = GENERAL_NAME_WIDGET;
+    portraitWidgetId = GENERAL_PORTRAIT_WIDGET;
+    colorWidgetId = GENERAL_COLOR_WIDGET;
+    statsWidgetId = GENERAL_STATS_WIDGET;
+    captainWidgetId = GENERAL_CAPTAIN_WIDGET;
+    noControlWidgetId = GENERAL_CONTROL_NONE;
+    nameWidgetIdCopy = GENERAL_NAME_WIDGET;
+    seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
+    eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
+    ninthControlWidgetId = GENERAL_CONTROL_NINE;
+    closeWidgetId = GENERAL_CLOSE;
+    retreatWidgetId = GENERAL_RETREAT;
+    surrenderWidgetId = GENERAL_SURRENDER;
+    thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
+    fourteenthControlWidgetId = GENERAL_CONTROL_FOURTEEN;
     giCurGeneral = side;
 
-    message16.type = MESSAGE_WIDGET;
-    generalWindow26 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
-    if (generalWindow26 == NULL)
+    message.type = MESSAGE_WIDGET;
+    generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
+    if (generalWindow == NULL)
         MemError();
     sprintf(gText, "port%04d.icn", (m_heroes[(side)]->m_portrait));
-    message16.payload.widget.command = VIEW_GENERAL_SET_ICON;
-    message16.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
-    message16.payload.widget.data.text = gText;
-    generalWindow26->BroadcastMessage(message16);
+    message.payload.widget.command = VIEW_GENERAL_SET_ICON;
+    message.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
+    message.payload.widget.data.text = gText;
+    generalWindow->BroadcastMessage(message);
 
-    message16.payload.widget.command =
+    message.payload.widget.command =
         m_heroes[(side)]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
-    message16.payload.widget.id = GENERAL_CAPTAIN_WIDGET;
-    message16.payload.widget.data.value = (WIDGET_FLAG_DRAW);
-    generalWindow26->BroadcastMessage(message16);
+    message.payload.widget.id = GENERAL_CAPTAIN_WIDGET;
+    message.payload.widget.data.value = (WIDGET_FLAG_DRAW);
+    generalWindow->BroadcastMessage(message);
     if (m_heroes[(side)]->m_isCaptain) {
-        message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
-        message16.payload.widget.data.value = m_playerId[(side)] == -1
+        message.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+        message.payload.widget.data.value = m_playerId[(side)] == -1
             ? GENERAL_CAPTAIN_FRAME
             : gpGame->m_players[m_playerId[(side)]].m_color;
-        generalWindow26->BroadcastMessage(message16);
+        generalWindow->BroadcastMessage(message);
     }
 
-    message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
-    message16.payload.widget.id = GENERAL_COLOR_WIDGET;
-    message16.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[(side)]->m_owner) + 1;
-    generalWindow26->BroadcastMessage(message16);
+    message.payload.widget.command = VIEW_GENERAL_SET_FRAME;
+    message.payload.widget.id = GENERAL_COLOR_WIDGET;
+    message.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[(side)]->m_owner) + 1;
+    generalWindow->BroadcastMessage(message);
 
     if (m_heroes[(side)]->m_isCaptain != 0)
         sprintf(
@@ -156,17 +156,17 @@ i32 combatManager::ViewGeneral(
             m_heroes[(side)]->m_name,
             gAlignmentNames[(m_heroes[(side)]->m_cursorType)]
         );
-    message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
-    message16.payload.widget.id = GENERAL_NAME_WIDGET;
-    message16.payload.widget.data.text = gText;
-    generalWindow26->BroadcastMessage(message16);
+    message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message.payload.widget.id = GENERAL_NAME_WIDGET;
+    message.payload.widget.data.text = gText;
+    generalWindow->BroadcastMessage(message);
 
-    morale11 = m_heroes[(side)]->m_army.GetMorale(
+    morale = m_heroes[(side)]->m_army.GetMorale(
         m_heroes[(side)],
         m_combatTowns[(side)],
         gpCombatManager->m_armyGroups[(OppositeCombatSide(side))]
     );
-    luck14 = gpGame->GetLuck(m_heroes[(side)], NULL, m_combatTowns[(side)]);
+    luck = gpGame->GetLuck(m_heroes[(side)], NULL, m_combatTowns[(side)]);
     sprintf(
         gText,
         "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
@@ -179,62 +179,62 @@ i32 combatManager::ViewGeneral(
         cViewGeneralLabels[(HERO_PRIMARY_KNOWLEDGE)],
         m_heroes[(side)]->Stats(HERO_PRIMARY_KNOWLEDGE),
         cViewGeneralLabels[GENERAL_LABEL_MORALE],
-        gMoraleText[morale11 + GENERAL_MORALE_TEXT_OFFSET],
+        gMoraleText[morale + GENERAL_MORALE_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_LUCK],
-        gLuckText[luck14 + GENERAL_LUCK_TEXT_OFFSET],
+        gLuckText[luck + GENERAL_LUCK_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_MANA],
         m_heroes[(side)]->m_spellPoints,
         HERO_NORMAL_SPELL_POINTS(*m_heroes[(side)])
     );
-    message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
-    message16.payload.widget.id = GENERAL_STATS_WIDGET;
-    message16.payload.widget.data.text = gText;
-    generalWindow26->BroadcastMessage(message16);
+    message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
+    message.payload.widget.id = GENERAL_STATS_WIDGET;
+    message.payload.widget.data.text = gText;
+    generalWindow->BroadcastMessage(message);
 
     if (m_heroes[(side)] == NULL || allowActions == 0
         || m_heroes[(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[(side)] != 0
         || giCurGeneral != m_currentSide) {
-        message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_CLOSE;
-        message16.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
-        generalWindow26->BroadcastMessage(message16);
-        message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
-        generalWindow26->BroadcastMessage(message16);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.id = GENERAL_CLOSE;
+        message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
+        generalWindow->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        generalWindow->BroadcastMessage(message);
     }
     if (allowActions == 0 || m_heroes[(OppositeCombatSide(m_currentSide))] == NULL
         || giCurGeneral != m_currentSide
         || m_heroes[(side)]->m_isCaptain != 0) {
-        message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_SURRENDER;
-        message16.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
-        generalWindow26->BroadcastMessage(message16);
-        message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
-        generalWindow26->BroadcastMessage(message16);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.id = GENERAL_SURRENDER;
+        message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
+        generalWindow->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        generalWindow->BroadcastMessage(message);
     }
     if (allowActions == 0 || giCurGeneral != m_currentSide
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
             && m_combatTowns[(COMBAT_DEFENDER_SIDE)] != NULL)
         || m_sideRetreated[(COMBAT_ATTACKER_SIDE)] != 0
         || m_sideRetreated[1] != 0 || m_heroes[(side)]->m_isCaptain != 0) {
-        message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message16.payload.widget.id = GENERAL_RETREAT;
-        message16.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
-        generalWindow26->BroadcastMessage(message16);
-        message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
-        generalWindow26->BroadcastMessage(message16);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.id = GENERAL_RETREAT;
+        message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
+        generalWindow->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
+        generalWindow->BroadcastMessage(message);
     }
 
     if (quickView != 0) {
-        gpWindowManager->AddWindow(generalWindow26, -1, 1);
+        gpWindowManager->AddWindow(generalWindow, -1, 1);
         QuickViewWait();
-        gpWindowManager->RemoveWindow(generalWindow26);
+        gpWindowManager->RemoveWindow(generalWindow);
     } else {
-        gpWindowManager->DoDialog(generalWindow26, HandleViewGeneral, 0);
+        gpWindowManager->DoDialog(generalWindow, HandleViewGeneral, 0);
     }
-    delete generalWindow26;
+    delete generalWindow;
     DrawFrame(1, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
     if (quickView == 0)
         DoCommand(static_cast<CombatMessageCommand>(gpWindowManager->m_dialogResult));
@@ -242,60 +242,60 @@ i32 combatManager::ViewGeneral(
 }
 
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 msgConst8 [[maybe_unused]];
-    i16 msgConst28 [[maybe_unused]];
-    i16 msgConst1 [[maybe_unused]];
-    i16 msgConst19 [[maybe_unused]];
-    i16 msgConst6 [[maybe_unused]];
-    b32 handled28;
-    i16 msgConst0 [[maybe_unused]];
-    i16 msgConst18 [[maybe_unused]];
-    i16 msgConst17 [[maybe_unused]];
-    i16 msgConst3 [[maybe_unused]];
-    i16 msgConst4 [[maybe_unused]];
-    i32 helpIndex36;
-    i32 hintIndex11;
-    i16 msgConst5 [[maybe_unused]];
-    i16 msgConst9 [[maybe_unused]];
-    i16 msgConst7 [[maybe_unused]];
-    i16 msgConst15 [[maybe_unused]];
-    msgConst18 = GENERAL_NAME_WIDGET;
-    msgConst5 = GENERAL_PORTRAIT_WIDGET;
-    msgConst0 = GENERAL_COLOR_WIDGET;
-    msgConst3 = GENERAL_STATS_WIDGET;
-    msgConst9 = GENERAL_CONTROL_NONE;
-    msgConst19 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst7 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst15 = GENERAL_CLOSE;
-    msgConst1 = GENERAL_RETREAT;
-    msgConst6 = GENERAL_SURRENDER;
-    msgConst8 = GENERAL_CONTROL_THIRTEEN;
-    msgConst17 = GENERAL_CONTROL_FOURTEEN;
-    handled28 = false;
+    i16 thirteenthControlWidgetId [[maybe_unused]];
+    i16 ninthControlWidgetId [[maybe_unused]];
+    i16 retreatWidgetId [[maybe_unused]];
+    i16 nameWidgetId [[maybe_unused]];
+    i16 surrenderWidgetId [[maybe_unused]];
+    b32 handled;
+    i16 colorWidgetId [[maybe_unused]];
+    i16 nameWidgetIdCopy [[maybe_unused]];
+    i16 fourteenthControlWidgetId [[maybe_unused]];
+    i16 statsWidgetId [[maybe_unused]];
+    i16 seventhControlWidgetId [[maybe_unused]];
+    i32 helpIndex;
+    i32 hintIndex;
+    i16 portraitWidgetId [[maybe_unused]];
+    i16 noControlWidgetId [[maybe_unused]];
+    i16 eighthControlWidgetId [[maybe_unused]];
+    i16 closeWidgetId [[maybe_unused]];
+    nameWidgetIdCopy = GENERAL_NAME_WIDGET;
+    portraitWidgetId = GENERAL_PORTRAIT_WIDGET;
+    colorWidgetId = GENERAL_COLOR_WIDGET;
+    statsWidgetId = GENERAL_STATS_WIDGET;
+    noControlWidgetId = GENERAL_CONTROL_NONE;
+    nameWidgetId = GENERAL_NAME_WIDGET;
+    seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
+    eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
+    ninthControlWidgetId = GENERAL_CONTROL_NINE;
+    closeWidgetId = GENERAL_CLOSE;
+    retreatWidgetId = GENERAL_RETREAT;
+    surrenderWidgetId = GENERAL_SURRENDER;
+    thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
+    fourteenthControlWidgetId = GENERAL_CONTROL_FOURTEEN;
+    handled = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
             if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
-                helpIndex36 = -1;
+                helpIndex = -1;
                 if (IS_WIDGET_SELECTION_COMMAND(message.payload.widget.command)) {
                     switch (message.payload.widget.id) {
                         case GENERAL_CLOSE:
-                            helpIndex36 = GENERAL_LONG_HELP_CLOSE;
+                            helpIndex = GENERAL_LONG_HELP_CLOSE;
                             break;
                         case GENERAL_RETREAT:
-                            helpIndex36 = GENERAL_LONG_HELP_RETREAT;
+                            helpIndex = GENERAL_LONG_HELP_RETREAT;
                             break;
                         case GENERAL_SURRENDER:
-                            helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
+                            helpIndex = GENERAL_LONG_HELP_SURRENDER;
                             break;
                         case GENERAL_CAST_SPELL:
-                            helpIndex36 = GENERAL_LONG_HELP_CAST;
+                            helpIndex = GENERAL_LONG_HELP_CAST;
                             break;
                     }
-                    if (helpIndex36 != -1)
-                        NormalDialog(cViewGeneralLongHelp[helpIndex36], NORMAL_DIALOG_QUICK_VIEW);
+                    if (helpIndex != -1)
+                        NormalDialog(cViewGeneralLongHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
                 }
                 break;
             }
@@ -307,7 +307,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                         case GENERAL_CAST_SPELL:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
-                            handled28 = true;
+                            handled = true;
                             break;
                     }
                     break;
@@ -322,28 +322,28 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
                 case GENERAL_CLOSE:
-                    hintIndex11 = GENERAL_HOVER_HELP_CLOSE;
+                    hintIndex = GENERAL_HOVER_HELP_CLOSE;
                     break;
                 case GENERAL_RETREAT:
-                    hintIndex11 = GENERAL_HOVER_HELP_RETREAT;
+                    hintIndex = GENERAL_HOVER_HELP_RETREAT;
                     break;
                 case GENERAL_SURRENDER:
-                    hintIndex11 = GENERAL_HOVER_HELP_SURRENDER;
+                    hintIndex = GENERAL_HOVER_HELP_SURRENDER;
                     break;
                 case GENERAL_CAST_SPELL:
-                    hintIndex11 = GENERAL_HOVER_HELP_CAST;
+                    hintIndex = GENERAL_HOVER_HELP_CAST;
                     break;
                 default:
-                    hintIndex11 = GENERAL_HOVER_HELP_HERO;
+                    hintIndex = GENERAL_HOVER_HELP_HERO;
                     break;
             }
-            if (hintIndex11 == GENERAL_HOVER_HELP_HERO
+            if (hintIndex == GENERAL_HOVER_HELP_HERO
                 && gpCombatManager->m_heroes[(iViewGeneralWhichSide)]->m_isCaptain)
-                hintIndex11 = GENERAL_HOVER_HELP_CAPTAIN;
-            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex11], 1, 0, 0);
+                hintIndex = GENERAL_HOVER_HELP_CAPTAIN;
+            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex], 1, 0, 0);
             return MESSAGE_DISPATCH_CONSUME;
     }
-    if (handled28) {
+    if (handled) {
         message.payload.widget.id = GENERAL_CLOSE;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
