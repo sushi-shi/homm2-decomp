@@ -23710,5 +23710,85 @@
       "bounds": "open"
     },
     "note": "C70 hero/puzzle byte-assignment casts removed4-arm2653-byte product/all98 native proof; skill type/level enum boundaries and tagged SCampaignChoice union remain. O06 reset65bytes from six-byte setup-color field crosses real setup members; shared owner recovery open. S64 ignored mapHeaderResult slot/store2 arms2653->2650 and R23 hero-record/roster/army4 arms all text-different, originals retained. B85 valid maps1..12 filenames12/13 in13 andgMapName16; true roster8/records54/five army slots with valid counts/IDs; unguarded carryover/special first-hero accesses need map contract. Load/init/resource errors and quantity arithmetic not hardened. Full2653 bytes/sites/ordered79 targets pass; helper-overincluding last block view not closure metric."
+  },
+  "src/SOURCE/HISCORE.cpp:highScoreManager::highScoreManager(void)#1": {
+    "body_sha256": "2c1cc6ec5862ad392a2ee9ccedc1ec6332b3df2b9907ecb28860934c6d223a63",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "B86 real10-element animation array initialized by Random(0,17); actual base constructor/vtable and false campaign flag. No casts, union, goto, raw owner arithmetic, fake stack storage or unrelated local reuse. Other runtime members require Open/Update before Main. Full89bytes/sites/ordered3targets pass."
+  },
+  "src/SOURCE/HISCORE.cpp:highScoreManager::Open(i32 id)#1": {
+    "body_sha256": "83a0b84dcebd7f75fee0f165446fd33c016af00f32aa49f84b5b9c52ecc3f929",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B86 literal manager name17/30 and backdrop filename10/768 fit; actual owned window constructed before Update, added to manager and animation timer started. Resource/global/menu/window lifecycle and timer arithmetic remain contracts; no fake aggregate, cast or manual varargs. All365bytes/ordinary targets pass; existing privateEH+6 and except-list+c,+14,+163 site/identity model gap remains explicit."
+  },
+  "src/SOURCE/HISCORE.cpp:highScoreManager::Close(void)#1": {
+    "body_sha256": "32dd9f7f48144f137201365a052a1fe8e8a14533c6223fd5bdf2bc287999844c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B86 real window removed then deleted, active flag cleared. Pointer not nulled; requires successfully opened live window and no repeated Close. No casts, union, goto, manual varargs, owner recovery, fake aggregate or local reuse. Full79bytes/sites/ordered5targets pass."
+  },
+  "src/SOURCE/HISCORE.cpp:highScoreManager::Main(struct tag_message & message)#1": {
+    "body_sha256": "424a13dcab22b2a14db77b1f9e77f76c4a821310013934e36df539a5dc8a369c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B86 real10 animation/type elements; initialized0..17 frames increment modulo18, retail table entries0..5 and monster IDs0..65 give imageframes<=591 with resource extent contract. Shared input modifier field and widget-to-executive message transition preserve actual union payload; close result carries widgetID. Actual time arithmetic/window/text/resource lifecycle remains. No casts/gotos/manual varargs/fake stack aggregate or unrelated role reuse. Full458bytes/sites/ordered13targets pass."
+  },
+  "src/SOURCE/HISCORE.cpp:highScoreManager::Update(void)#1": {
+    "body_sha256": "0408e81fb4e8d05c68a83c48a0b453f16a810fdb6ace8c8171efa4f7e2ba01f1",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C71 two expliciti16 conditional-button conversions precede actuali32 message ID; complete4-arm2.571048s matrix1724->1719/1719/1718, originals retained/all98 native proof. Real100-byte HighScoreEntry(17/41-byte names,29 serialized reserved) and352-byte path not fake stack aggregate. B86 ignored100-byte reads allow uninitialized/stale fields; missing file sets only score=-1 then reads cheated unconditionally. Both stored names passed as sprintf formats with no extra args: termination and percent directives remain unsafe even when nominal lengths fit. Fixed paths19/352,numeric12/768; real10rank,18frame,66creature tables bounded only under initialized/resource contracts. Real widget/taggeddata union, no unrelated reuse/goto/manualarg varargs. Full1724bytes/sites/ordered73targets pass; four extra block-helper artifacts outside boundary."
   }
 }

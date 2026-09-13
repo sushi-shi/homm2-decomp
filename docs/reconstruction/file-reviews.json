@@ -814,5 +814,13 @@
   "include/SOURCE/Campaign.h": {
     "sha256": "8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc",
     "note": "Full78-line header read: actual12-award enum, dialog/widget IDs, display/frame constants and handler declaration. No function/macro body, storage overlay or raw owner recovery. ID maps and track versus bonus intervals reconciled with all7 reviewed Campaign functions; B85 runtime/resource contracts remain."
+  },
+  "src/SOURCE/HISCORE.cpp": {
+    "sha256": "a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b",
+    "note": "Full320-line TU, five functions, includes and trailing vtable marker read. C71 complete4-arm cast product rejects both removals; source unchanged with all98native/fullbuild/retail evidence. B86 file read/uninitialized cheated/raw-name format findings documented; real100-byte record,352 path,10 animation/type arrays and taggedwidget/executive views retained. No goto/artificial owner/unused aggregate/manual varargs or unrelated reuse."
+  },
+  "include/SOURCE/highScoreManager.h": {
+    "sha256": "05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c",
+    "note": "Full64-line header read: all UI/timer/frame/filename constants and packed0x63 owner with real10i16 animation and10i16 monster slots, signedbyte flag/window pointer and inherited0x36 base. No bodies or fake union/padding. Full5consumer review reconciles dimensions; B86 initialized state, resourceframes/file/widgetlifetime contracts explicit."
   }
 }

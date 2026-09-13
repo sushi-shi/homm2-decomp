@@ -57,6 +57,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 ## Findings
 
+- C71/B86: all five HISCORE functions reviewed; both narrowing casts retained
+  after a complete four-arm matrix. Real score records reveal unchecked reads,
+  an uninitialized cheated field and stored names used as formats.
+  [Evidence and bounds](C71-B86.md).
+
 - C70/S64/R23/B85/O06: all seven Campaign functions reviewed; five redundant
   casts removed with complete matrices and98-object native proof. Retail
   crossed-array accesses and campaign/setup reset owners remain explicit open
