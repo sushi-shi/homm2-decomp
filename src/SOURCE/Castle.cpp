@@ -578,7 +578,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case IDX(BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
             case IDX(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
             case IDX(BUILDING_SLOT_SPECIAL_THIRTY):
-                if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
+                if (BitTest(gpGame->m_townBuiltToday, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
                         "\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc. \xc2\xfb \xf3\xe6\xe5 "

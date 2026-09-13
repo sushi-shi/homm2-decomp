@@ -542,10 +542,10 @@ void advManager::VWCompleteDraw(void) {
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_TOWNS)) {
                 if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                    color0 = gpGame->m_castleOwners[cell->m_objectMetadata];
+                    color0 = gpGame->m_townOwners[cell->m_objectMetadata];
                 else
                     color0 =
-                        gpGame->m_castleOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
+                        gpGame->m_townOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
                                                    .m_occupiedTown];
                 if (color0 < 0)
                     color0 = WORLD_NO_OWNER_COLOR;

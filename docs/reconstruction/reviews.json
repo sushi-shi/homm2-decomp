@@ -1360,10 +1360,10 @@
     "note": "Actual12-byte cArmySizeName global fits every decimal i32 including-2147483648 and NUL. Nine army thresholds select valid table rows, including negative input in first row; grammar must be0..2. Genuine27 pointer destinations contain max9-byte text, title column max7 (check-advm-bounds.py). No casts, fake stack aggregate, manual varargs or owner arithmetic."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::TownQuickView(i32 townId,i32 locatorSlot,i32 windowX,i32 windowY)#1": {
-    "body_sha256": "c3f0838e5987eefff772012147bf8089c8c97a1d3b7b4fa7335de1698e1e226f",
+    "body_sha256": "d1a108cf05c592012ed287cb8ddb8edb5b7b18ce452d1307ef4cf459500d75b2",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -1373,7 +1373,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Real five-slot widget/label arrays and saved map origins; counted stacks prove scan indices and nonzero row divisors. S30 unread layout/id scalars and armySlot. Exact i16 counts need at most7 bytes and fit15-byte labels; title names(max7), debug i32(max11), ??? also fit15. Unknown text fits20. B45 sprintf(gText,GetTownName(id)) uses a town name as format. B43 town/owner/icon domains remain; neutral owner guarded."
+    "note": "Real five-slot widget/label arrays and saved map origins; counted stacks prove scan indices and nonzero row divisors. S30 unread layout/id scalars and armySlot. Exact i16 counts need at most7 bytes and fit15-byte labels; title names(max7), debug i32(max11), ??? also fit15. Unknown text fits20. B45 sprintf(gText,GetTownName(id)) uses a town name as format. B43 town/owner/icon domains remain; neutral owner guarded. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::RedrawAdvScreen(i32 update,i32 freeBorder)#1": {
     "body_sha256": "40b76386e268b167f3c2a8d3e260e6e6c9023c72a2f1b87ec776fb11b0c8db16",
@@ -1747,7 +1747,7 @@
     "body_sha256": "9c9cdc8eb28b0bb4a5ed5817f976436edb61a5f2dab22b079df0bba95f114056",
     "patterns": {
       "casts": "retain",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -1757,7 +1757,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G31 radar_default_object shares terrain/mine fallback. S30 w/delta/oldColor/cx are unread; scalar floating coordinate conversions are real. B43 direct fullMap GetCell(i+1,j) lies outside the left-neighbor bounds guard and can dereference beyond the final map cell; all3767 instruction bytes/sites and ordinary targets pass, with six numeric constant destinations independently proven in check-advm-bounds.py. Standard36/72/108/144 maps fit radar144x144 at480,16; final line pointer remains inside screen480 rows. Metadata/owner/terrain domains remain."
+    "note": "G31 radar_default_object shares terrain/mine fallback. S30 w/delta/oldColor/cx are unread; scalar floating coordinate conversions are real. B43 direct fullMap GetCell(i+1,j) lies outside the left-neighbor bounds guard and can dereference beyond the final map cell; all3767 instruction bytes/sites and ordinary targets pass, with six numeric constant destinations independently proven in check-advm-bounds.py. Standard36/72/108/144 maps fit radar144x144 at480,16; final line pointer remains inside screen480 rows. Metadata/owner/terrain domains remain. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::QuickInfo(i32 cellX,i32 cellY)#1": {
     "body_sha256": "f5dcb6419f8d108287b1e07933e01f8ab021aba699a6fbca54e2676f1fab7185",
@@ -1808,10 +1808,10 @@
     "note": "Actual widget message and double-to-i16 knob coordinate. heroCount>=5 proves denominator count-4 nonzero; valid page0..count-4 yields195..268 and fits i16. Four locator calls still require valid page/IDs (B43). No unrelated scalar reuse or fake stack owner."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::UpdateTownLocators(i32 drawWindow,i32 updateScreen)#1": {
-    "body_sha256": "f15cc33e5c7204e025a7d705de3e31f450b9c9244e097d49340b58de03237064",
+    "body_sha256": "7732f039f7e55895c94fdd314b1be32a3ff167b0bb66fa7ed8584a4dbf27c29b",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -1821,7 +1821,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "Real town portrait/flag and knob widget messages. townCount>=5 protects denominator count-4; valid page bounds keep knob coordinate in i16. Four town IDs, faction/owner and initialized sentinel slots remain B43 contracts. No artificial stack aggregation or owner arithmetic."
+    "note": "Real town portrait/flag and knob widget messages. townCount>=5 protects denominator count-4; valid page bounds keep knob coordinate in i16. Four town IDs, faction/owner and initialized sentinel slots remain B43 contracts. No artificial stack aggregation or owner arithmetic. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomView(b32 forceUpdate,b32 drawWindow,b32 updateScreen)#1": {
     "body_sha256": "fe09e1726952f15ee86e2d2ab41f8ff6f89efd0fd69beccb0e531ae99e19b9c1",
@@ -8432,10 +8432,10 @@
     "note": "Scale is initialized/cycled only among4/6/12 and lookup assigned0/1/2; no zero divisor. Count clamps to MAP_WIDTH; B25 rectangular-map/square-map invariant needed for Y count and map extents. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "src/SOURCE/Viewwrld.cpp:advManager::VWCompleteDraw(void)#1": {
-    "body_sha256": "c3d969999d5e2377257c2e24f4029527c36eaf332724738e64fa527bf7162992",
+    "body_sha256": "c539da60d64e57cddbd4ac56668c38767c52cabcdf8156c3fbac2ada45f32678",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -8445,7 +8445,7 @@
       "stack": "applied",
       "bounds": "open"
     },
-    "note": "S14 removes nonexistent fourth elements from three real scale-offset tables; all8 emitted functions/allocated sections unchanged. Unread spare/dead scalars remain an open subcase. Real64-entry tileset bitmap fully initialized; fixed rows y16..463 and x16..463 stay within640x480 allocation. B25 terrain/tileset/hero/mine indices and extra-list extents need loader guarantees; shared frame/color roles remain related rendering state."
+    "note": "S14 removes nonexistent fourth elements from three real scale-offset tables; all8 emitted functions/allocated sections unchanged. Unread spare/dead scalars remain an open subcase. Real64-entry tileset bitmap fully initialized; fixed rows y16..463 and x16..463 stay within640x480 allocation. B25 terrain/tileset/hero/mine indices and extra-list extents need loader guarantees; shared frame/color roles remain related rendering state. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/Viewwrld.cpp:ViewWorldDialogHandler(struct tag_message & message)#1": {
     "body_sha256": "d7b776b15f3f51353fddb03a6189bc19425810a822098e8acde51bfeb98c1051",
@@ -15680,10 +15680,10 @@
     "note": "Writes exactly seven i32 costs for supported domains. S33 level local computes mageLevel+1 and clamps to5, but the actual lookup still uses mageLevel+1: B51 clamp does not protect the table. Disabled>=last branch can return without initializing dest; CanBuy consumes that output. No cast, union, goto or fake aggregate."
   },
   "src/SOURCE/KB.cpp:CanBuild(town * t,BuildingSlotType building)#1": {
-    "body_sha256": "af70bea09a5cc77958d5652296668d854ed8868beb40c1e8b5fa612681bfe81f",
+    "body_sha256": "e058a8bd0a6f88fb4249f5ff40101b6bb7ede2790da180d60229614a9dc4a76f",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -15693,7 +15693,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Dwelling range guards its column before hierarchy lookup; six-faction type and known-town bit index remain B51. Real requirement/current bitmask locals and explicit upgrade-prerequisite expansion, not unrelated reuse. No arrays on stack, casts, unions, gotos or manual varargs."
+    "note": "Dwelling range guards its column before hierarchy lookup; six-faction type and known-town bit index remain B51. Real requirement/current bitmask locals and explicit upgrade-prerequisite expansion, not unrelated reuse. No arrays on stack, casts, unions, gotos or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/KB.cpp:CanBuy(town * t,BuildingSlotType type)#1": {
     "body_sha256": "e9cddf24d69bc4115f3da5f41cec78530ed281cfe953123fa27334b73c7e3986",
@@ -16640,10 +16640,10 @@
     "note": "S34 actual52-byte scratch receives42 reserved file bytes and is otherwise unread; not a fabricated combined stack record. Raw one-byte cheat flag and typed player fields/arrays preserve packed representation; barrier byte is read twice. Complete556-byte retail proof passes. B55 short/error reads and unvalidated loaded counts/IDs remain; no cast, union, goto or manual argument access. S34 complete safe scratch matrix rejects smaller capacities: writer6/6, reader4/4, no truncation; only original52-byte reservation preserves actual frame/offsets. Retained whole-function bytes/DIR32/ordered targets independently pass. This proves compatible frame reservation, not unknowable original declaration extent; see S34-C35.md."
   },
   "src/SOURCE/GAME.cpp:game::SetupOrigData(void)#1": {
-    "body_sha256": "44d3fbe64658af26dd2f2c0ab29d8f1a8c09c471e603f0611afe780269e49ca8",
+    "body_sha256": "07026d123e9b30899ed62e23e3af083d94e4f511857c8b5d2c146682c1052c50",
     "patterns": {
-      "casts": "open",
-      "unions": "open",
+      "casts": "applied",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -16653,7 +16653,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Full140-line initializer reviewed; complete2513-byte retail proof passes. Fixed6 players/54 heroes/72 towns and other named-array loops fit owners; initial active-player count4 is distinct. Hero faction i/9 is0..5, town faction0..7 intentionally includes neutral/random. C34 seven bounded narrow assignment/bit-mask casts need matrices; two real faction conversions retained. U12/U13 owner aliases need global reconciliation. B55 default hero names into13 bytes and at-least-one-local-human watch-loop termination need contracts. Real i/j scan roles, no goto, fake stack aggregate, varargs or enclosing-owner arithmetic."
+    "note": "Full140-line initializer reviewed; complete2513-byte retail proof passes. Fixed6 players/54 heroes/72 towns and other named-array loops fit owners; initial active-player count4 is distinct. Hero faction i/9 is0..5, town faction0..7 intentionally includes neutral/random. C34 seven assignment/bit-mask casts removed after complete128-arm matrix; all2513 retail bytes/sites/ordered targets and full native proof pass. Two real faction conversions retained. See C34-setup.md. U12/U13 owner aliases need global reconciliation. B55 default hero names into13 bytes and at-least-one-local-human watch-loop termination need contracts. Real i/j scan roles, no goto, fake stack aggregate, varargs or enclosing-owner arithmetic. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/GAME.cpp:(anonymous)::ToUpperCp1251(u8 letter)#1": {
     "body_sha256": "a9529bf40c75443d169d1b3bd9835f88c8fbc3b37a7893c60c7cec83423f32a8",
@@ -16976,10 +16976,10 @@
     "note": "B56 mutable source temporarily split at last dot then restored; destination capacity/termination/nonoverlap and extension length are caller contracts. No-dot path copies source unbounded. Eight-character basename cap uses i=999 rather than break, so requires source length<=1000 to prevent reentry at index1000; no generic cap claim. chr remains one character through case folding, not unrelated reuse; no cast, union, goto, fake aggregate or manual varargs."
   },
   "src/SOURCE/GAME.cpp:game::SaveGame(char * filename,i32 generateName,i8 expansionFormat)#1": {
-    "body_sha256": "d8b7b2449b812d2bfbbb48ce27fcbb3525c38db9313dff4be6b707666ed6f0ce",
+    "body_sha256": "6739ee37ed85158fac613fd4cace1541d6820eb40168c26afb605cc966845075",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -16989,13 +16989,13 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete body read. C34 current-player/human byte conversions need native alternatives. U12/U13 serialize real aliased owners. B57 setup65-byte prefix starts at six-byte color array, campaign327-byte prefix at one-byte campaignType, and each four-byte event header at a two-byte count; all stay in game allocation but cross declared subobjects. this points to real first difficulty field, not fabricated owner recovery. S37 unread saveFlag/scratchVals6/lastTag; workBuf100 cleared40/written36 then reused for filename14, humans8 only6, plBuf4 only1. Sequential file scratch reuse is related, not unrelated. B56/B57 format-as-filename when generateName false, path452 and saveName351 termination/capacity, event counts30/50/50, map sizes/products/extra lengths/null allocation and ignored short writes require contracts. Null-payload50000 covers only validated nonnegative i16 lengths. Ordinary CRT varargs calls, not manual slot access; no goto or raw address trick."
+    "note": "Complete body read. C34 current-player/human byte conversions need native alternatives. U12/U13 serialize real aliased owners. B57 setup65-byte prefix starts at six-byte color array, campaign327-byte prefix at one-byte campaignType, and each four-byte event header at a two-byte count; all stay in game allocation but cross declared subobjects. this points to real first difficulty field, not fabricated owner recovery. S37 unread saveFlag/scratchVals6/lastTag; workBuf100 cleared40/written36 then reused for filename14, humans8 only6, plBuf4 only1. Sequential file scratch reuse is related, not unrelated. B56/B57 format-as-filename when generateName false, path452 and saveName351 termination/capacity, event counts30/50/50, map sizes/products/extra lengths/null allocation and ignored short writes require contracts. Null-payload50000 covers only validated nonnegative i16 lengths. Ordinary CRT varargs calls, not manual slot access; no goto or raw address trick. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/GAME.cpp:game::LoadGame(char * filename,i32 loadFromFile,i32)#1": {
-    "body_sha256": "49eee54b3762b016a0202bc108967c3749b4f3bf9cb275c42d605f2b7aa400f2",
+    "body_sha256": "b9a9e3c5b49db870421a12afd4efbb5d78bf08ecea8daa05938755df27f9675f",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17005,7 +17005,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Complete body read. Typed allocations retain erased storage boundary; C34 player bitmask casts require valid0..5. U12/U13 genuine serialized aliases. B57 same cross-member65/327-byte prefixes and four-byte headers at u16 counts as SaveGame, no claim of allocation overrun solely from those prefixes. S37 workData40 reads36/14, human8 reads6, plBuf4 reads1, junk40 and oldFlag/saveVal unread; chunkTag4 actually reads4. B57 file-controlled counts, signed i16 sizes, allocation products, map dimensions, format-as-filename saveName351/path452 and ignored read returns unresolved. Watched-player loop requires positive count<=6 and at least one local human; current player from signed byte must be live. No goto, fake pointer arithmetic, owner recovery or manual varargs."
+    "note": "Complete body read. Typed allocations retain erased storage boundary; C34 player bitmask casts require valid0..5. U12/U13 genuine serialized aliases. B57 same cross-member65/327-byte prefixes and four-byte headers at u16 counts as SaveGame, no claim of allocation overrun solely from those prefixes. S37 workData40 reads36/14, human8 reads6, plBuf4 reads1, junk40 and oldFlag/saveVal unread; chunkTag4 actually reads4. B57 file-controlled counts, signed i16 sizes, allocation products, map dimensions, format-as-filename saveName351/path452 and ignored read returns unresolved. Watched-player loop requires positive count<=6 and at least one local human; current player from signed byte must be live. No goto, fake pointer arithmetic, owner recovery or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/GAME.cpp:game::GiveTroopsToNeutralTown(i32 townId)#1": {
     "body_sha256": "a94bbe59824e937a8176e33200964de64b7dff10b2edbec7b172595abf1580f0",
@@ -17152,10 +17152,10 @@
     "note": "Whole1077-byte function independently matches ordinary bytes, complete DIR32 sites and ordered retail targets. C36 x/y char arrays are read one unsigned coordinate byte then repeatedly castu8; unsigned owner recovery candidate, while type byte has real signed high-bit test/enum conversion and erased allocations need typed boundary. S37 x4/y4/type8 only1 and junk8 only2 accessed. B57 pathgText768, header event counts30/50, extra allocation products and signed lengths, file termination/read failures and unchecked dimensions remain contracts. Fixed town72/mine144 loops fit; old-format extra72 mine slots explicitly initialized-1. No union/goto/owner recovery/artificial address/varargs/unrelated reuse."
   },
   "src/SOURCE/GAME.cpp:game::ClaimTown(i32 townId,i32 player,i32 suppressVisibility)#1": {
-    "body_sha256": "f784ed9973b885eaa4e47c2214295072e35be6b260d97fe45ec4fe3e3872ed46",
+    "body_sha256": "cf983eae5ada04f86d8898695fbd69c60b728feea085bbe55c632b27f7611c29",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17165,7 +17165,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Typed town pointer and real owner/list update; U12 castleOwners union consumer. C34 narrow player/town IDs and redundant i8 GetPlayerColor arguments candidates under valid domains. B55 town0..71/player0..5 and townCount<72 needed; fullMap flag cells at x-1/x+1 require edge contract. Fixed five army slots cleared safely; prior-owner deallocation occurs before appending. No goto, fake aggregate, manual varargs, artificial offsets or unrelated local reuse."
+    "note": "Typed town pointer and real owner/list update; U12 castleOwners union consumer. C34 narrow player/town IDs and redundant i8 GetPlayerColor arguments candidates under valid domains. B55 town0..71/player0..5 and townCount<72 needed; fullMap flag cells at x-1/x+1 require edge contract. Fixed five army slots cleared safely; prior-owner deallocation occurs before appending. No goto, fake aggregate, manual varargs, artificial offsets or unrelated local reuse. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/GAME.cpp:game::ClaimMine(i32 mineId,i32 player)#1": {
     "body_sha256": "1f52fff5c351ac7abfc29868ab04604b442711fad38a376f1ffac8eec638f684",
@@ -17360,10 +17360,10 @@
     "note": "Seven real floating-to-i32 difficulty/handicap conversions preserve truncation. Fixed144 mine/72 town scans fit; B61 player0..5, hero count<=8, IDs54 and Estates skill index needed. Income arithmetic requires representable values. No union/goto/fake aggregate/varargs/owner recovery; dailyGold always accumulator."
   },
   "src/SOURCE/GAME.cpp:game::PerDay(void)#1": {
-    "body_sha256": "3a68c0d5b326981ba96f87c9c6d54dc292245555a059ca7bf13082ad886c084e",
+    "body_sha256": "3f4926e36ae021289e26d3192e1b3439869878b97aa2ee77fa9acdc63effbdb1",
     "patterns": {
       "casts": "open",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -17373,7 +17373,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C42 flag scalar view, true handicap float-to-int and mana i16 narrowing. U13 daily-event view clears shared bytes. R09 player alternates player/mine/town/hero indices; S42 income8 unread. B61 mine owner/resource domain (upper bound alone permits negative type), playerCount<=6 and hero/town state required. Day guard1..6 maps to resource0..5 safely; fixed54/72 loops fit. No goto, fake stack, artificial address or manual varargs."
+    "note": "C42 flag scalar view, true handicap float-to-int and mana i16 narrowing. U13 daily-event view clears shared bytes. R09 player alternates player/mine/town/hero indices; S42 income8 unread. B61 mine owner/resource domain (upper bound alone permits negative type), playerCount<=6 and hero/town state required. Day guard1..6 maps to resource0..5 safely; fixed54/72 loops fit. No goto, fake stack, artificial address or manual varargs. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/GAME.cpp:game::PerWeek(void)#1": {
     "body_sha256": "3520f2fc276abb2187b55f6a72e4786859c1c2afdeb6230611e1a5e17037e342",
@@ -18867,7 +18867,7 @@
     "body_sha256": "3122b167ec9aa3eacc5ec7d61dfc76ff1d70c05f2e327c84e49be86ed66466fb",
     "patterns": {
       "casts": "absent",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -18877,10 +18877,10 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "B67 owner0..5, nonempty town list<=72 and this ID present required. pos starts-1; absent ID makes compaction use negative index, empty list writes townIds[-1]. Real member array, not owner recovery or deliberate before-object base. No casts, unions, goto, fake scratch, manual varargs or unrelated roles; list index i remains compaction/search cursor."
+    "note": "B67 owner0..5, nonempty town list<=72 and this ID present required. pos starts-1; absent ID makes compaction use negative index, empty list writes townIds[-1]. Real member array, not owner recovery or deliberate before-object base. No casts, unions, goto, fake scratch, manual varargs or unrelated roles; list index i remains compaction/search cursor. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/TOWN.cpp:town::BuildBuilding(BuildingSlotType building)#1": {
-    "body_sha256": "07cf1f8bbe70e65a0ddf25ed0d2306c3ee15d85023b69abe4b8ee1b239dc7ba3",
+    "body_sha256": "477dbaa7b853c361c5f1558187c60c3e8d42bc6608fe2d5aa16402037860c98b",
     "patterns": {
       "casts": "absent",
       "unions": "applied",
@@ -18893,7 +18893,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "U15 five adjacent count bytes and20-spell owner now recovered; B67 buildState before guild increment<5, counts<=4, valid building/faction/creature/town ID required. Dwelling/garrison derived ranges0..11 guarded by building ranges; upgrades copy earlier real slots. No casts/goto/fake scratch/manual varargs/owner recovery/unrelated reuse. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent."
+    "note": "U15 five adjacent count bytes and20-spell owner now recovered; B67 buildState before guild increment<5, counts<=4, valid building/faction/creature/town ID required. Dwelling/garrison derived ranges0..11 guarded by building ranges; upgrades copy earlier real slots. No casts/goto/fake scratch/manual varargs/owner recovery/unrelated reuse. U15 all-consumer structural recovery: count index now zero-based; all98 native objects/1826 function instances/allocated sections/ordered relocs unchanged and VC6 town100/counts5@0x50/layout assertions pass. Independent whole-retail consumer proof passes. Historical A01/S41/C45 notes describe their own earlier parent. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/TOWN.cpp:town::CanBuildDock(void)#1": {
     "body_sha256": "4cddd8a95853142ca7d0ce9497b8b5e13bfc74eff772749d5ff9deae744e25f8",
@@ -19136,10 +19136,10 @@
     "note": "Eight real direction candidates, ValidMoveWithEvent guard, tagged town/hero metadata and live output pointer required B69. Saves two global value factors and restores on ordinary tail, but stone-lith early return leaves both1; recorded behavior, not a buffer fix. No casts, union, goto, fake aggregate, manual varargs or unrelated roles."
   },
   "src/SOURCE/PHILAI.cpp:philAI::CheckReload(void)#1": {
-    "body_sha256": "0efdc00d06b2f021ca2ff96057f25066a29c0c37c0504450b7a57b41092a5349",
+    "body_sha256": "7b08e8db87cf5126d5b9515909c98f3c5c78bf1e49bda1f36a4c1d48b68d4510",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19149,13 +19149,13 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Integer-to-float conversions force real division rather than integer division; retain. U02/U03/U04 search node/pointer aliases remain. B69 initialized search grid, map/metadata domains, strength arithmetic and positive distance denominators required; clamps own strength before half-strength denominator. No goto, fake array, artificial pointer or manual varargs; misleading names do not themselves imply unrelated reuse."
+    "note": "Integer-to-float conversions force real division rather than integer division; retain. U02/U03/U04 search node/pointer aliases remain. B69 initialized search grid, map/metadata domains, strength arithmetic and positive distance denominators required; clamps own strength before half-strength denominator. No goto, fake array, artificial pointer or manual varargs; misleading names do not themselves imply unrelated reuse. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/PHILAI.cpp:philAI::CheckBerserk(void)#1": {
-    "body_sha256": "20097c190ebe6b63e3b7f74a4db2e466de4ec4d406741cba52bd8f49c92540f4",
+    "body_sha256": "00d72bd59017d9255d6ec5eab74566e805ee45cafc7c3e1af961185d68632410",
     "patterns": {
       "casts": "retain",
-      "unions": "absent",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -19165,7 +19165,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real scaled float-to-i32 truncation retained. Full map scan with tagged hero/town metadata, B69 valid owners/IDs and representable doubled strength required. Early returns are coherent rejection paths; no goto, union, fake scratch, manual varargs or unrelated reuse."
+    "note": "Real scaled float-to-i32 truncation retained. Full map scan with tagged hero/town metadata, B69 valid owners/IDs and representable doubled strength required. Early returns are coherent rejection paths; no goto, union, fake scratch, manual varargs or unrelated reuse. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/PHILAI.cpp:philAI::DimensionDoorTo(i32 x,i32 y)#1": {
     "body_sha256": "501655fcb0408dbbe6269dd84ada87fb50fb2047b420ebac130eb8447c0cfbb4",
@@ -19293,7 +19293,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Entire259-line setup body read. C48 bounded mineValue i8 conversion plus real floating precision/truncation boundaries. U12 castleOwners alias and U02 node pointer remain. G59 one nested first-week break join. R12 generalIndex4 spans hero/town/artifact/player/global-bonus indices. S50 unusedFightValue9 unread; initial fightValueFloat0 overwritten before all reads. B69 search y loop uses MAP_WIDTH, assuming square map; threat-town occupant-1 not guarded before GetHeroSlot/member army address. Mine neighborhood has explicit x/y guards and value0..4. Resource, hero, town, player counts, nonzero divisors and arithmetic/float ranges remain caller contracts.3295 ordinary retail bytes/sites pass,11 private floats unresolved by general checker. No fake aggregate, manual varargs or artificial owner arithmetic."
+    "note": "Entire259-line setup body read. C48 bounded mineValue i8 conversion plus real floating precision/truncation boundaries. U12 shared owner alias removed by U12-U13.md; no direct town-owner-table access in this body. U02 real node pointer remains. G59 one nested first-week break join. R12 generalIndex4 spans hero/town/artifact/player/global-bonus indices. S50 unusedFightValue9 unread; initial fightValueFloat0 overwritten before all reads. B69 search y loop uses MAP_WIDTH, assuming square map; threat-town occupant-1 not guarded before GetHeroSlot/member army address. Mine neighborhood has explicit x/y guards and value0..4. Resource, hero, town, player counts, nonzero divisors and arithmetic/float ranges remain caller contracts.3295 ordinary retail bytes/sites pass,11 private floats unresolved by general checker. No fake aggregate, manual varargs or artificial owner arithmetic."
   },
   "src/SOURCE/PHILAI.cpp:philAI::GetBestBHC(i32 player,BHC & best)#1": {
     "body_sha256": "1d104257023c74ead1b823a4bcc55c2b997a4ffa76086735d574506366dfa528",
@@ -20291,7 +20291,7 @@
     "body_sha256": "6bfd00dcff82b9520b87ca91c8137d7cc636c96ea3882dab0672bda46ab972b5",
     "patterns": {
       "casts": "retain",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -20301,7 +20301,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Complete ownership/alliance, cached hero visit, guarded garrison hero and weighted battle valuation read. Occupying hero -1 guard is present, unlike GetTurnAIVars threat setup. U12 town/castle owner views remain pending full-consumer simplification. Real numeric truncations retained. B72 town/player/hero/grid/cache domains, live armies and finite representable values required; early friendly/allied returns depend on caller chance initialization. No goto, fake aggregate, artificial pointer, manual varargs or unrelated local reuse."
+    "note": "Complete ownership/alliance, cached hero visit, guarded garrison hero and weighted battle valuation read. Occupying hero -1 guard is present, unlike GetTurnAIVars threat setup. U12 town/castle owner views remain pending full-consumer simplification. Real numeric truncations retained. B72 town/player/hero/grid/cache domains, live armies and finite representable values required; early friendly/allied returns depend on caller chance initialization. No goto, fake aggregate, artificial pointer, manual varargs or unrelated local reuse. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/ARMY.cpp:(anonymous)::ToLowerCp1251(u8 letter)#1": {
     "body_sha256": "4100f0663a204c0c4a7b1ef53b2a7898e1d0a48b322239505ef031c019026721",
@@ -23584,10 +23584,10 @@
     "note": "Full347-line owner setup, eighteen slot mappings, building masks, captain/hero panels and both background tile loops read. C69 six redundant i16 parameter casts removed in two complete8-arm constructor products, combined all98 native proof. S63 all32 five-unused-local subsets and R22 all4 building/stat/hero counter splits change3856-byte native text, originals retained. U01 tagged widget message real. B84 initialized slots remain0..30, real18 and6x12 owners; filenames13 fit16; captain scratch13 fits200 and global lists32/49 fit768. Valid faction/available hero/world-map/terrain/resource/window domains remain; no fake aggregate/outside pointer/manual varargs. Existing EH handler/__except_list retail-model gap explicitly retained."
   },
   "src/SOURCE/Castle.cpp:CastleHandler(tag_message & message)#1": {
-    "body_sha256": "d423409d486fb32a6f3313c7431aee4a5d14e97be486983f149c0c68121a00f6",
+    "body_sha256": "83a910e892f27269bcedce1a76263aa499c9f7f5e17daef65924406e5fc0fd06",
     "patterns": {
       "casts": "applied",
-      "unions": "retain",
+      "unions": "applied",
       "gotos": "open",
       "address": "absent",
       "owner": "absent",
@@ -23597,7 +23597,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "Full374-line hover/select/captain/build/recruit dispatch read. C69 three redundant i32 slot-count casts removed in complete8 subsets; seven casts from mixed slot/control selector to genuine BuildingSlotType retained. G82/G83 all4 hero-join combinations and G84 shared build guard2 arms change2925-byte original, gotos retained. S63 all4 status scalar/unused-result object-search deletions and R22 info/object index split change text, originals retained. U01 ConvertToHover then widget payload role is real. B84 ID intervals bound castleSlotsUse0..17; selected building cases constrain bit shifts, other owner/count domains remain. All16 retail status templates max52 bytes; recruit text has no directives although hero/alignment arguments still evaluated. Full2925 bytes/sites/ordered targets including switch tables pass; helper/data decoding explains block-view extras."
+    "note": "Full374-line hover/select/captain/build/recruit dispatch read. C69 three redundant i32 slot-count casts removed in complete8 subsets; seven casts from mixed slot/control selector to genuine BuildingSlotType retained. G82/G83 all4 hero-join combinations and G84 shared build guard2 arms change2925-byte original, gotos retained. S63 all4 status scalar/unused-result object-search deletions and R22 info/object index split change text, originals retained. U01 ConvertToHover then widget payload role is real. B84 ID intervals bound castleSlotsUse0..17; selected building cases constrain bit shifts, other owner/count domains remain. All16 retail status templates max52 bytes; recruit text has no directives although hero/alignment arguments still evaluated. Full2925 bytes/sites/ordered targets including switch tables pass; helper/data decoding explains block-view extras. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/Campaign.cpp:game::HandleCampaignWin(void)#1": {
     "body_sha256": "c985abbac2d3c17fcd989593b35f0301bc555441b78d31e01abc9cbeb422ade3",
@@ -23792,7 +23792,7 @@
     "note": "C71 two expliciti16 conditional-button conversions precede actuali32 message ID; complete4-arm2.571048s matrix1724->1719/1719/1718, originals retained/all98 native proof. Real100-byte HighScoreEntry(17/41-byte names,29 serialized reserved) and352-byte path not fake stack aggregate. B86 ignored100-byte reads allow uninitialized/stale fields; missing file sets only score=-1 then reads cheated unconditionally. Both stored names passed as sprintf formats with no extra args: termination and percent directives remain unsafe even when nominal lengths fit. Fixed paths19/352,numeric12/768; real10rank,18frame,66creature tables bounded only under initialized/resource contracts. Real widget/taggeddata union, no unrelated reuse/goto/manualarg varargs. Full1724bytes/sites/ordered73targets pass; four extra block-helper artifacts outside boundary."
   },
   "src/SOURCE/Overview.cpp:game::SetupDynamicStuff(i32 redraw,i32 updateKnob,i32 forceUpdate)#1": {
-    "body_sha256": "21f5941393f30606ef87220aad7662bc0fef58471bfae6a5832a6a68571e8f3f",
+    "body_sha256": "846a1155c907a09340210e4ed7beb75a7a35993825d41e9aea9fc7e6b69cb542",
     "patterns": {
       "casts": "applied",
       "unions": "applied",
@@ -23805,7 +23805,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "C72 redundant scalar/literal conversions removed; six strong enum-to-frame casts and conditional-filename const_cast retained after C++98/C++20 checks. A04 actual flat11200-byte heaps, row70 address stages; flattened macros7750->7549/cleanup7727 rejected. S65 unread scalar removal7744 rejected; R24 distinct role/count splits7771/7756 rejected. B87 each row town24icons18texts/hero58icons17texts <70; real5army/4stats/8skills/14artifacts/12dwellings bounded with typed inputs. Positivei16 quantities fit6 but arbitrary garrison signed16 needs7; signed8 stats5 vs4, valid skill0..9 fits2. Names termination/allocation/widget lifetimes remain. Negative top not excluded before roster lookup; normal cache NONE short-circuit avoids reset-1 lookup, never-updated cache retained. U06 army alternate views still open. Full7750bytes/ordinary targets and three fixed numeric operands pass; existing EH+6,c,14,1e10 gaps not closed; all98native unchanged. U06 resolved by shared-owner recovery: all alternate consumers reconciled, both army unions removed; this unchanged body and all98 objects retain complete native byte/relocation equivalence. U06.md records serialized signedness and layout proof."
+    "note": "C72 redundant scalar/literal conversions removed; six strong enum-to-frame casts and conditional-filename const_cast retained after C++98/C++20 checks. A04 actual flat11200-byte heaps, row70 address stages; flattened macros7750->7549/cleanup7727 rejected. S65 unread scalar removal7744 rejected; R24 distinct role/count splits7771/7756 rejected. B87 each row town24icons18texts/hero58icons17texts <70; real5army/4stats/8skills/14artifacts/12dwellings bounded with typed inputs. Positivei16 quantities fit6 but arbitrary garrison signed16 needs7; signed8 stats5 vs4, valid skill0..9 fits2. Names termination/allocation/widget lifetimes remain. Negative top not excluded before roster lookup; normal cache NONE short-circuit avoids reset-1 lookup, never-updated cache retained. U06 army alternate views still open. Full7750bytes/ordinary targets and three fixed numeric operands pass; existing EH+6,c,14,1e10 gaps not closed; all98native unchanged. U06 resolved by shared-owner recovery: all alternate consumers reconciled, both army unions removed; this unchanged body and all98 objects retain complete native byte/relocation equivalence. U06.md records serialized signedness and layout proof. U12/U13 follow-up supersedes earlier alias status: single signed town-owner table and unsigned daily-construction bitset, complete named-consumer reconciliation and preserved packed layout. All98 native objects and this function ordinary retail bytes/size pass; exact ordered-target result and existing checker gaps are in U12-functions.tsv. No bounds, protocol or lifecycle hardening. See U12-U13.md."
   },
   "src/SOURCE/Overview.cpp:game::SetupNewOverviewType(OverviewType overviewType,i32 redrawFrom)#1": {
     "body_sha256": "02a64611541cf95c53d22ed6762af74f93cb3f76e6b19d705181b35c0b0b9dc5",

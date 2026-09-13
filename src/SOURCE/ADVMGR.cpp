@@ -5546,7 +5546,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             }
             m_adventureWindow->BroadcastMessage(msg);
 
-            if (BitTest(gpGame->m_knownTowns, whichTown)) {
+            if (BitTest(gpGame->m_townBuiltToday, whichTown)) {
                 msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
             } else {
                 msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
@@ -6773,7 +6773,7 @@ void advManager::TownQuickView(
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
-        || BitTest(gpGame->m_knownTowns, townPtr->m_id) == 0) {
+        || BitTest(gpGame->m_townBuiltToday, townPtr->m_id) == 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);

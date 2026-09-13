@@ -1262,8 +1262,8 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
         m_heroRecs[iFile].Write(outFile, !expansionFormat);
     write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
     write(outFile, m_castleRecs, sizeof(m_castleRecs));
-    write(outFile, m_castleOwners, sizeof(m_castleOwners));
-    write(outFile, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    write(outFile, m_townOwners, sizeof(m_townOwners));
+    write(outFile, m_townBuiltToday, sizeof(m_townBuiltToday));
     write(outFile, m_mines, sizeof(m_mines));
     write(outFile, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
@@ -1351,7 +1351,7 @@ void game::SetupOrigData(void) {
             gbHumanPlayer[i] = false;
         }
         memset(&m_players[i], 0, sizeof(m_players[i]));
-        m_players[i].m_color = static_cast<i8>(i);
+        m_players[i].m_color = i;
         m_players[i].m_heroCount = 0;
         m_players[i].m_townCount = 0;
         m_players[i].m_daysLeft = -1;
@@ -1370,8 +1370,8 @@ void game::SetupOrigData(void) {
         memset(m_heroRecs[i].m_artifacts, IDX(ARTIFACT_NONE), sizeof(m_heroRecs[i].m_artifacts));
         m_heroRecs[i].m_patrolY = HERO_PATROL_NONE;
         m_heroRecs[i].m_patrolX = HERO_PATROL_NONE;
-        m_heroRecs[i].m_id = static_cast<i8>(i);
-        m_heroRecs[i].m_portrait = static_cast<u8>(i);
+        m_heroRecs[i].m_id = i;
+        m_heroRecs[i].m_portrait = i;
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
         m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
@@ -1418,11 +1418,11 @@ void game::SetupOrigData(void) {
         }
     }
 
-    memset(m_castleOwners, TOWN_OWNER_NONE, sizeof(m_castleOwners));
+    memset(m_townOwners, TOWN_OWNER_NONE, sizeof(m_townOwners));
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         memset(&m_castleRecs[i], 0, sizeof(m_castleRecs[i]));
         m_castleRecs[i].m_onMap = 0;
-        m_castleRecs[i].m_id = static_cast<u8>(i);
+        m_castleRecs[i].m_id = i;
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
         m_castleRecs[i].m_type = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
@@ -1434,10 +1434,10 @@ void game::SetupOrigData(void) {
     memset(m_mineOwners, -1, sizeof(m_mineOwners));
     for (i = 0; i < GAME_BOAT_COUNT; i++) {
         memset(&m_boats[i], 0, sizeof(m_boats[i]));
-        m_boats[i].id = static_cast<i8>(i);
+        m_boats[i].id = i;
         m_boats[i].heroId = BOAT_HERO_NONE;
     }
-    memset(m_dailyEventFlags, 0, sizeof(m_dailyEventFlags));
+    memset(m_townBuiltToday, 0, sizeof(m_townBuiltToday));
     memset(m_boatSlots, BOAT_SLOT_EMPTY, sizeof(m_boatSlots));
     m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = HINT_COORDINATE_UNKNOWN;
@@ -1445,11 +1445,11 @@ void game::SetupOrigData(void) {
     strcpy(gpGame->m_saveName, "\xcd\xce\xc2\xc0\xdf \xc8\xc3\xd0\xc0"); /* "НОВАЯ ИГРА" */
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
-    giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
+    giCurPlayerBit = 1 << giCurPlayer;
     giCurWatchPlayer = giCurPlayer;
     while (!gbThisNetHumanPlayer[giCurWatchPlayer])
         giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
-    giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
+    giCurWatchPlayerBit = 1 << giCurWatchPlayer;
     gpAdvManager->CheckSetEvilInterface(0, -1);
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
@@ -1566,8 +1566,8 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
         m_heroRecs[ndx].Read(fd, expTag);
     read(fd, m_availableHeroes, sizeof(m_availableHeroes));
     read(fd, m_castleRecs, sizeof(m_castleRecs));
-    read(fd, m_castleOwners, sizeof(m_castleOwners));
-    read(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    read(fd, m_townOwners, sizeof(m_townOwners));
+    read(fd, m_townBuiltToday, sizeof(m_townBuiltToday));
     read(fd, m_mines, sizeof(m_mines));
     read(fd, m_mineOwners, sizeof(m_mineOwners));
     if (expTag)
@@ -2984,7 +2984,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     if (townRec4->m_owner == player)
         return;
     townRec4->m_formation = TOWN_FORMATION_SPREAD;
-    if (m_castleOwners[townId] != -1)
+    if (m_townOwners[townId] != -1)
         GetCastle(townId)->Deallocate();
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         townRec4->m_army.m_creatureTypes[i] = CREATURE_NONE;
@@ -2995,7 +2995,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     else
         m_castleRecs[townId].m_turnsOwned = 0;
     m_castleRecs[townId].m_owner = static_cast<i8>(player);
-    m_castleOwners[townId] = static_cast<i8>(player);
+    m_townOwners[townId] = static_cast<i8>(player);
     m_players[player].m_townIds[m_players[player].m_townCount] = static_cast<i8>(townId);
     m_players[player].m_townCount++;
 
@@ -4402,7 +4402,7 @@ void game::PerDay(void) {
         }
     }
 
-    memset(m_dailyEventFlags, 0, sizeof(m_dailyEventFlags));
+    memset(m_townBuiltToday, 0, sizeof(m_townBuiltToday));
 
     for (player = 0; player < GAME_MINE_COUNT; player++) {
         if (m_mines[player].owner != -1) {

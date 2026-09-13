@@ -1673,7 +1673,7 @@ VA(0x00468e12, 0x273)
 i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqBits;
     i32 curMask;
-    if (BitTest(gpGame->m_knownTowns, t->m_id))
+    if (BitTest(gpGame->m_townBuiltToday, t->m_id))
         return 0;
     if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
         return 0;

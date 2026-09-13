@@ -403,7 +403,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 icons++;
             }
 
-            if (BitTest(gpGame->m_knownTowns, record->m_id)) {
+            if (BitTest(gpGame->m_townBuiltToday, record->m_id)) {
                 OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                     TOWN_LOCATOR_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_LOCATOR_Y_OFFSET,

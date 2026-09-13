@@ -191,7 +191,7 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         XformToCastle();
     }
     GiveSpells(NULL);
-    BitSet(gpGame->m_knownTowns, m_id);
+    BitSet(gpGame->m_townBuiltToday, m_id);
 }
 
 VA(0x004a4645, 0x1e)

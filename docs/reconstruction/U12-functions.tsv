@@ -1,0 +1,18 @@
+function	unit	rva	retail_bytes	ordinary_bytes_exact	complete_DIR32_sites	ordered_target_gaps
+advManager::UpdateRadar	SOURCE/ADVMGR	0x84ac	3767	True	True	0xb13:__real@4@40038000000000000000; 0xb28:__real@4@4007f000000000000000; 0xb6c:__real@4@40038000000000000000; 0xb84:__real@4@4007f000000000000000; 0xbf0:__real@4@40038000000000000000; 0xc02:__real@4@4007f000000000000000
+advManager::UpdateTownLocators	SOURCE/ADVMGR	0xa85c	658	True	True	0x242:__real@8@40059400000000000000; 0x25e:__real@8@4006c300000000000000
+advManager::TownQuickView	SOURCE/ADVMGR	0xd1f9	3281	True	False	0x6:$L66601; 0xc:__except_list; 0x14:__except_list; 0xcc6:__except_list
+CastleHandler	SOURCE/Castle	0x25230	2925	True	True	none
+game::SaveGame	SOURCE/GAME	0x4d3ae	2906	True	True	0x198:_strnicmp; 0x1f4:_strnicmp; 0x20e:_strnicmp
+game::SetupOrigData	SOURCE/GAME	0x4df08	2513	True	True	none
+game::LoadGame	SOURCE/GAME	0x4e8d9	2681	True	True	0x69:_strnicmp; 0x2ce:_strnicmp
+game::ClaimTown	SOURCE/GAME	0x53fd3	775	True	True	none
+game::PerDay	SOURCE/GAME	0x574c6	2576	True	True	none
+CanBuild	SOURCE/KB	0x68e12	627	True	True	none
+game::SetupDynamicStuff	SOURCE/Overview	0x79ba0	7750	True	False	0x6:$L60794; 0xc:__except_list; 0x14:__except_list; 0x5f:__real@8@40079780000000000000; 0x78:__real@4@40039000000000000000; 0x7e:__real@8@3ffdccccccccccccd000; 0x1e10:__except_list
+philAI::CheckReload	SOURCE/PHILAI	0x7f04d	978	True	True	0x1f3:__real@4@3fff8000000000000000; 0x25b:__real@4@3fff8000000000000000; 0x336:__real@4@3fff8000000000000000; 0x391:__real@4@3fff8000000000000000; 0x3a1:__real@4@3fff8000000000000000; 0x3ae:__real@4@40008000000000000000; 0x3ba:__real@4@4000c000000000000000
+philAI::CheckBerserk	SOURCE/PHILAI	0x7f41f	671	True	True	0x58:__real@8@3fff9333333333333000; 0x284:__real@8@3ffec000000000000000
+philAI::EvaluateTownEvent	SOURCE/PHILAI	0x8bf2a	967	True	True	0x2c7:__real@4@4005c800000000000000; 0x323:__real@8@3ffd8000000000000000; 0x329:__real@8@3ffee666666666666800; 0x39f:__real@8@3fffccccccccccccd000; 0x3b2:__real@8@3fffa666666666666800
+town::Deallocate	SOURCE/TOWN	0xa42d0	297	True	True	none
+town::BuildBuilding	SOURCE/TOWN	0xa43f9	588	True	True	none
+advManager::VWCompleteDraw	SOURCE/Viewwrld	0xae4ee	4578	True	True	none

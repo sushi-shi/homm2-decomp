@@ -351,12 +351,14 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B52: [selected KB formatter bounds](B52.md) account for complete morale/luck
   append chains, command-line help, ranking/congratulations and memory-error text.
   Other text owners and caller-domain contracts remain individually open.
-- U12/U13: game's duplicate castle/town-owner and daily-event/known-town views
-  need all-consumer reconciliation. S34 [retains52-byte reserved-file scratch
+- U12/U13: [removed both duplicate game-state unions](U12-U13.md), preserving
+  one signed town-owner table and one daily construction bitset. All 17 direct
+  consumers, native objects and VC6/dialect layouts are reconciled.
+  S34 [retains52-byte reserved-file scratch
   after complete native layout matrices](S34-C35.md);
   S35 covers unknown game-layout regions, not proven deletable padding.
-  C34 covers bounded narrowing casts in SetupOrigData; B55 tracks game getter,
-  saved-player and initialization-domain contracts.
+  C34 [removes seven SetupOrigData casts after all 128 combinations pass](C34-setup.md);
+  B55 tracks game getter, saved-player and initialization-domain contracts.
 - G47: ultimate-artifact hint retry exit needs a structured-source matrix.
   C34 also covers bounded byte stores in hint/boat setup; C35 covers the
   puzzle interpolator's [applied constant-conversion cleanup](S34-C35.md).

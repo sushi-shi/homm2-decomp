@@ -894,7 +894,7 @@ void philAI::CheckReload(void) {
                             0,
                             0
                         );
-                        if (gpGame->m_castleOwners[nb_1->m_objectMetadata] == gpCurAIHero->m_owner) {
+                        if (gpGame->m_townOwners[nb_1->m_objectMetadata] == gpCurAIHero->m_owner) {
                             if (jb_5 > kn * 2) {
                                 friendly +=
                                     (static_cast<float>(jb_5) / (kn * 2) - 1.0f)
@@ -959,8 +959,8 @@ void philAI::CheckBerserk(void) {
                 knIndex = gpAdvManager->GetCell(col, line);
                 switch (knIndex->m_triggerType) {
                     case (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)):
-                        if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != gpCurAIHero->m_owner) {
-                            if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != -1) {
+                        if (gpGame->m_townOwners[knIndex->m_objectMetadata] != gpCurAIHero->m_owner) {
+                            if (gpGame->m_townOwners[knIndex->m_objectMetadata] != -1) {
                                 ndx = FightValueOfStack(
                                     &GetCastleSlot(knIndex->m_objectMetadata)->m_army,
                                     NULL,
