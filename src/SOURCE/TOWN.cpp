@@ -139,12 +139,12 @@ void town::BuildBuilding(BuildingSlotType building) {
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         ++m_buildState;
         if (m_type == FACTION_CYBORG)
-            m_spellCounts[m_buildState] =
+            m_spellCounts[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL] =
                 ironfistCyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         else
-            m_spellCounts[m_buildState- TOWN_MAGE_GUILD_FIRST_LEVEL ] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+            m_spellCounts[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & H2EnumIndex(TOWN_BUILDING_LIBRARY)))
-            ++m_spellCounts[m_buildState- TOWN_MAGE_GUILD_FIRST_LEVEL ];
+            ++m_spellCounts[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }

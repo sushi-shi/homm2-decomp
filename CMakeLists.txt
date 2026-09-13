@@ -399,6 +399,8 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_checkpoint_layout_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME checkpoint_layout COMMAND homm2_checkpoint_layout_test)
+  add_test(NAME checkpoint_mod_consumers
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_checkpoint_mod_consumers.py)
   add_executable(homm2_binary_io_test tools/binary_io_test.cpp)
   target_include_directories(homm2_binary_io_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
