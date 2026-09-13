@@ -39,6 +39,17 @@ XML tag names remain unchanged for save compatibility. Mod-only path consumers
 also use the recovered zero-based direction storage. The packet-index binary
 helper and its regression test accompany the updated network layouts.
 
+The mod-consumer follow-up also migrates Cyborg spell-count initialization in
+both town setup and mage-guild construction. `checkpoint_mod_consumers` pins
+these indices and the XML consumers; Ironfist passes all 24 CTest checks with
+this follow-up.
+
+The `ironfist-master` integration retains its refactored engine methods and
+strict native build checks. It passes all 26 CTest checks, including the
+interface/hook contracts and the post-scaling Well suppression check. Both
+Ironfist branches pass English and Russian startup/exit replays; Russian uses
+the Buka locale overlay alongside the Ironfist resources.
+
 All approximately 100,000 lines of reconstruction audit material remain on the
 evidence-owning `decomp-gold-2.1-buka` branch. Generated and portable branches
 do not duplicate that archive. Continue from that branch's

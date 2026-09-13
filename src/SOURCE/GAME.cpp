@@ -5653,12 +5653,12 @@ void game::SetupTowns(void) {
         if (castle->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD)) {
             for (slot = 1; slot <= castle->m_buildState; slot++) {
                 if (castle->m_type == FACTION_CYBORG)
-                    castle->m_spellCounts[slot] = ironfist::CyborgSpellLimits[slot - 1];
+                    castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL] = ironfist::CyborgSpellLimits[slot - 1];
                 else
-                    castle->m_spellCounts[slot- TOWN_MAGE_GUILD_FIRST_LEVEL ] = gSpellLimits[slot - 1];
+                    castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL] = gSpellLimits[slot - 1];
                 if (castle->m_type == FACTION_WIZARD
                     && (castle->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_SPECIAL))))
-                    castle->m_spellCounts[slot- TOWN_MAGE_GUILD_FIRST_LEVEL ]++;
+                    castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
         if (extra->hasShrine)
