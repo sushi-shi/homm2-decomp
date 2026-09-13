@@ -101,10 +101,10 @@ static string GetScriptFileName(const string& mapFileName) {
     return ResolveDataPath("SCRIPTS/" + mapFileName + ".lua");
 }
 
-void ScriptingInit(string& map_filnam) {
+void ScriptingInit(string& mapFileName) {
     ScriptingShutdown();
 
-    string script_file = GetScriptFileName(map_filnam);
+    string script_file = GetScriptFileName(mapFileName);
     error_code statError;
 
     if (std::filesystem::exists(script_file, statError)) {

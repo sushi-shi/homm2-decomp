@@ -50,7 +50,7 @@ class IronfistHookContractTest(unittest.TestCase):
         assert_order(
             self,
             body,
-            "eventSample_f = NULL;",
+            "eventSample = NULL;",
             "if (Ironfist_LocationVisit(cell, x, y))",
             "goto event_done;",
             "event_done:",
@@ -76,12 +76,12 @@ class IronfistHookContractTest(unittest.TestCase):
 
     def test_script_info_text_precedes_none_fallback(self):
         body = function_body(
-            "src/SOURCE/KB.cpp", "void game::ShowMoraleInfo(hero* h, i32 dialogType)"
+            "src/SOURCE/KB.cpp", "void game::ShowMoraleInfo(hero* heroPointer, i32 dialogType)"
         )
         assert_order(
             self,
             body,
-            "Ironfist_AppendMoraleInfo(h);",
+            "Ironfist_AppendMoraleInfo(heroPointer);",
             "MORALE_INFO_NONE",
             "NormalDialog(",
         )

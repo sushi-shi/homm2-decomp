@@ -70,7 +70,7 @@ struct PCXHeader {
 
 void InitMemEntry(void);
 void* BaseAlloc(u32 size, const char* originalFile, i32 originalLine);
-void BaseFree(void* ptr, const char* originalFile, i32 originalLine);
+void BaseFree(void* pointer, const char* originalFile, i32 originalLine);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
 u32l MAKEFILEID(const char* text);
@@ -114,10 +114,10 @@ void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
 CDRomSetupResult SetupCDDrive(void);
-void BitmapToScreen(class bitmap* bmp);
+void BitmapToScreen(class bitmap* image);
 void SetPalette(i8* paletteData, i32 updateDisplay);
-void BlitBitmapToScreenNoMouseCheck(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
-void BlitBitmapToScreen(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
+void BlitBitmapToScreenNoMouseCheck(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
+void BlitBitmapToScreen(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
 void LogTruncate(void);
 void LogStr(const char* text);
 void LogInt(
@@ -150,7 +150,7 @@ void FadeToColorTable(u8* colorTable, i32 increment);
 i32 IsCycleColor(i32 color);
 void CreatePCXFile(const char* filename, u8* pixels, i32 width, i32 height, u8* paletteData);
 i32l FileSize(const char* filename);
-struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index);
+struct IconEntry* GetIconEntry(class icon* iconPointer, i32 index);
 i32 SRandom(i32 low, i32 high);
 void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);

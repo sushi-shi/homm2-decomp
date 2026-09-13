@@ -468,7 +468,7 @@ void EarlyShutdown(const char* caption, const char* text);
 void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
-char toupper(char c);
+char toupper(char character);
 typedef enum Cp1251CaseConstant {
     CYRILLIC_CASE_OFFSET = 0x20,
     CYRILLIC_CAPITAL_YO = 0xa8,
@@ -491,41 +491,41 @@ inline char CyrillicToUpper(char c) {
     return c;
 }
 i32 InterpretCommandLine(void);
-MessageDispatchResult InitMenuHandler(struct tag_message& msg);
-MessageDispatchResult NullHandler(struct tag_message& msg);
-MessageDispatchResult RecruitHeroHandler(tag_message& msg);
+MessageDispatchResult InitMenuHandler(struct tag_message& message);
+MessageDispatchResult NullHandler(struct tag_message& message);
+MessageDispatchResult RecruitHeroHandler(tag_message& message);
 const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
 const char* GetBuildingName(FactionType race, BuildingSlotType building);
-void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
 const char* GetMonsterName(CreatureType monster);
 const char* GetMonsterPluralName(CreatureType monster);
 void GetMonsterCost(CreatureType monster, i32* const cost);
-i32 CanBuild(town* t, BuildingSlotType building);
-i32 CanBuy(town* t, BuildingSlotType type);
+i32 CanBuild(town* townPointer, BuildingSlotType building);
+i32 CanBuy(town* townPointer, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
-MessageDispatchResult WaitHandler(tag_message& msg);
-MessageDispatchResult EventWindowHandler(struct tag_message& msg);
-MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg);
+MessageDispatchResult WaitHandler(tag_message& message);
+MessageDispatchResult EventWindowHandler(struct tag_message& message);
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& message);
 void PlayerDead(i32 player);
 void CheckEndGame(CheckEndGameForcedResult forcedResult, b32 dragonCityCaptured);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
-i32 GetMonType(i32 score, HighScoreType campaign);
+i32 GetMonType(i32 score, HighScoreType highScoreType);
 i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, const char* scenarioName);
-void BVResMsg(const char* s, ResourceType res, i32 qty);
-void GOut(const char* str);
-i32 NetPosToGamePos(i32 netPos);
+void BVResMsg(const char* text, ResourceType resourceType, i32 quantity);
+void GOut(const char* text);
+i32 NetPosToGamePos(i32 netPosition);
 i32 WaitForOtherPlayer(void);
 void PopNetBox(char* text, i32 netPlayer);
-void AddNetBoxLine(const char* str, char color);
-void ShutDown(const char* msg);
+void AddNetBoxLine(const char* text, char color);
+void ShutDown(const char* message);
 void FileError(const char* filename);
-void SmackFade(u8* src, u8* dst);
+void SmackFade(u8* source, u8* destination);
 void ShowCongrats(HighScoreType highScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(const char* name);
-void WaitEndSample(SAMPLE2* s, i32 waitTime = -1);
+void WaitEndSample(SAMPLE2* sample, i32 waitTime = -1);
 void MemError(void);
 const char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
@@ -555,15 +555,15 @@ void SetupDynamicWindow(
     class heroWindow** window,
     i32 windowType
 );
-void TestDynamicWindow(i32 p1, i32 p2);
-void HandleRemoteDeadPlayerExit(i32 pos);
+void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles);
+void HandleRemoteDeadPlayerExit(i32 position);
 void HandleRemoteSuddenExit(void);
 void DropDownToOnePlayer(void);
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, i32 forwardedReport);
 void ReceiveRemotePlayerExit(struct SPlayerExit exitInfo);
 i32 CheckMem(void);
-i32 GetManaCost(SpellType spell, hero* h);
-void SetWinText(heroWindow* j, i32 id);
+i32 GetManaCost(SpellType spell, hero* heroPointer);
+void SetWinText(heroWindow* window, i32 id);
 void CheckShingleUpdate(void);
 void NormalDialog(
     const char* text,

@@ -133,16 +133,16 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
-    CreatureType prev = CREATURE_NONE;
+    CreatureType previous = CREATURE_NONE;
     i32 numRaces;
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
             if (countRaces == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[H2EnumIndex(gMonsterDatabase[H2EnumIndex(m_creatureTypes[i])].race)];
-            if (m_creatureTypes[i] != prev) {
+            if (m_creatureTypes[i] != previous) {
                 ++numCreatureTypes;
-                prev = m_creatureTypes[i];
+                previous = m_creatureTypes[i];
             }
         }
     }

@@ -28,8 +28,8 @@ static i32 s_clipB = 0;
 static i32 s_right = 0;
 
 void FlipDimIconToBitmap(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -40,8 +40,8 @@ void FlipDimIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
+    s_src = sourceIcon->m_data + s_entry->srcOffset;
     s_left = x - s_entry->x - s_entry->w + 1;
     s_right = s_left + s_entry->w - 1;
     s_x = s_right;
@@ -57,7 +57,7 @@ void FlipDimIconToBitmap(
         }
     }
 
-    s_row = dest->m_pixels + s_y * dest->m_width;
+    s_row = destination->m_pixels + s_y * destination->m_width;
 
     for (;;) {
         s_run = *s_src;
@@ -102,7 +102,7 @@ void FlipDimIconToBitmap(
         } else {
             s_x = s_right;
             s_y = s_y + 1;
-            s_row = s_row + dest->m_width;
+            s_row = s_row + destination->m_width;
         }
     }
 }
