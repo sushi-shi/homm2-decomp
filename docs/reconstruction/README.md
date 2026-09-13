@@ -380,9 +380,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   and town/mine-ID reuse; S38 tracks event layer-index arrays written but not read.
 - B58: map-event allocation, terrain, layer-chain and town/mine-edge contracts
   remain open. C36 covers map-coordinate byte owners; C37 covers spell-widget
-  boolean conversions and literal constness. S39 records the spell-message
-  assignment overwritten by its following clear; B59 tracks spell-view text
-  lengths and live widget/spell-index domains.
+  [eight cast removals through direct literals and named selections](C34-C37-S39-B59.md).
+  S39 retains the overwritten spell-message assignment after its deletion
+  loses seven bytes. B59 proves complete spell labels fit35 bytes in768;
+  live widget/spell-index/resource domains remain separate contracts.
 - C38/C39: [army-view name storage is now text](C38-C41-S41-S44.md), and five variadic numeric
   arguments use normal promotions. B60 covers the complete198-byte detail
   chain in550 bytes. S40 records unread army-dialog locals.

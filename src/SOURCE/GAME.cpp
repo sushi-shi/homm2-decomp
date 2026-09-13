@@ -3122,10 +3122,10 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
-        m_viewSpellsReadOnly = static_cast<i8>(readOnly);
+        m_viewSpellsReadOnly = readOnly;
         m_viewSpellsHero = spellHero;
         if (spellType == SPELL_TYPE_ALL)
             m_viewSpellsType = SPELL_TYPE_ADVENTURE;
@@ -3138,7 +3138,7 @@ game::ViewSpells(
         m_viewSpellsCount[IDX(SPELL_TYPE_ADVENTURE)] =
             spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
         m_viewSpellsWindow = new heroWindow(
-            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>("spellwin.bin")
+            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, "spellwin.bin"
         );
         if (m_viewSpellsWindow == NULL)
             MemError();
@@ -3146,8 +3146,8 @@ game::ViewSpells(
             message.type = MESSAGE_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = static_cast<i16>(
-                VIEW_SPELL_COMBAT_TAB_ID
-                + static_cast<i32>(spellType != SPELL_TYPE_COMBAT)
+                spellType == SPELL_TYPE_COMBAT
+                ? VIEW_SPELL_COMBAT_TAB_ID : VIEW_SPELL_ADVENTURE_TAB_ID
             );
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
@@ -3174,19 +3174,15 @@ void game::UpdateSpellWidgets(void) {
     memset(&message, 0, sizeof(message));
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = static_cast<BaseWidgetCommand>(
-        IDX(WIDGET_COMMAND_SET_FLAGS)
-        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
-    );
+    message.payload.widget.command = (spellPoints0 <= VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
+        ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_viewSpellsWindow->BroadcastMessage(message);
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = static_cast<BaseWidgetCommand>(
-        IDX(WIDGET_COMMAND_SET_FLAGS)
-        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_TENS_THRESHOLD)
-    );
+    message.payload.widget.command = (spellPoints0 <= VIEW_SPELL_MANA_TENS_THRESHOLD)
+        ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_viewSpellsWindow->BroadcastMessage(message);

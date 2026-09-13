@@ -17184,9 +17184,9 @@
     "note": "Full claim/flag-coordinate body reviewed. C34 complete16-arm family removes wire-ID and two owner-store casts; retains GetPlayerColor argument cast whose removal changes1044 to1043 bytes. Temporary switch labels renumber, but all14 local-label destinations and six other relocation targets remain correct. Independent all1044 retail bytes/sites/ordered targets and whole98-object native proof pass. Signed-byte narrowing persists, including wire bits for mine IDs128..143. B55 mine0..143/player-1 or0..5, edge coordinates and live map domains remain; player-1 guard precedes color lookup. No union/goto/fake aggregate/varargs/owner recovery. See C34-map-G47.md."
   },
   "src/SOURCE/GAME.cpp:game::ViewSpells(hero * spellHero,HeroSpellType spellType,MessageDispatchHandler callback,i32 readOnly)#1": {
-    "body_sha256": "e2d790e9644fb66ab36716f901150eec2ea1cd1adab08af0aec2f8b34f8ac8ae",
+    "body_sha256": "b2830227be608866d8e306b01c032587ac73833436a85a3d2d3b8f400e4780a9",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "retain",
       "gotos": "absent",
       "address": "absent",
@@ -17197,12 +17197,12 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Real stack tag_message initialized along active widget arm before synchronous broadcast; U01 numeric flags preserved, not fake aggregate. C37 two const_cast literal API boundaries and bool->i32 in tab ID; C34 readOnly byte and bounded ID narrowing candidates. B59 live hero/window, valid spellType0/1/all and callback required. Counts stored per two real categories and initialized before UI; no goto, manual varargs, unrelated reuse or fabricated pointer."
+    "note": "C34/C37 complete48-arm joint product: two direct const-correct literal arguments, natural readOnly i8 assignment and named tab-ID selection remove four casts. Retain outer i16 conversion before real i32 widget-ID store; dropping it loses3 bytes, bare arithmetic bool adds5. All four callers supply readOnly0/1; no normalization to bool introduced. Real tag_message initialized along widget arm and flags passed numerically; no fake aggregate, goto/manual varargs, reused role or fabricated pointer. B59 live hero/window/callback, valid categories/counts/resource widgets remain caller contracts; spellwin.bin13 bytes inclNUL fits20-byte window name. All98 native objects unchanged, VC6 layout and16 consumer/dialect checks pass. Ordinary481 retail bytes pass with same four pre-existing EH/FS gaps at6/c/14/1d7; ordinary named/string targets pass. Full products and rejected alternatives: C34-C37-S39-B59.md."
   },
   "src/SOURCE/GAME.cpp:game::UpdateSpellWidgets(void)#1": {
-    "body_sha256": "4e3229cca25efa5c94ba5bf4b447f3b38d34291eb2b9211f2ddb8de9975fbcea",
+    "body_sha256": "7804b08da8a808bdf56c91d3fb05dd1a16e9a81a004ec88fafb3898942486a0d",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "retain",
       "gotos": "absent",
       "address": "absent",
@@ -17210,10 +17210,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "retain",
       "bounds": "open"
     },
-    "note": "Whole body read. U01 message data numeric/text follows command correctly; real reused message. C37 two bool->i32 conversions and real computed BaseWidgetCommand conversion. S39 initial message.type assignment overwritten by memset before use. B59 categories2, nonnegative page positions/count, valid GetNthSpell result and owner strings needed; fixed12 page loop fits widget domain. Decimal mana remainders have magnitude<=9, each <=3bytes inclNUL even negative; spell name plus signed cost capacity needs retail string bound. No goto, manual varargs, fake aggregate or address arithmetic."
+    "note": "C37 complete18-arm joint product: two named command selections remove four casts with exact original1167 bytes; bare arithmetic bool adds6 bytes per site. S39 overwritten message.type assignment retained: deleting it loses7 bytes in every named/arithmetic command family. Real U01 command-tagged numeric/text message, not fake aggregate. B59 all65 retail spell names/pointers checked: longest20 CP1251 bytes; complete name/cost labels <=35 bytes inclNUL for any i32 cost, mana digit <=3, all within actualgText768. Categories2, page counts/nonnegative offsets, valid GetNthSpell index, live hero/window/font/callback/resources remain contracts. No goto/manual varargs/artificial address or unrelated reuse. All98 native objects unchanged; full ordinary retail bytes/size/DIR32/ordered targets and both source dialects pass. C34-C37-S39-B59.md and check-spell-widget-text.py."
   },
   "src/SOURCE/GAME.cpp:ViewSpellsHandler(tag_message & msg)#1": {
     "body_sha256": "fc5efdf310e907d5e40ab062d4c500413fdff8191a97f9c0cd85dfd43acd0d64",

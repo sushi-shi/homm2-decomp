@@ -883,11 +883,11 @@ SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	100.0000	9e2f32183de0
 SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	100.0000	bf7e444523eb
 SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000	63ded3fd9f1e
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	cff1d66d1e75
-SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	4da03f6a3a00
+SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	b07a27150a1a
 SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	100.0000	24d5ff170701
 SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	100.0000	0fe87938e14c
 SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	100.0000	f5e1d2324645
-SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	7a6d0d783734
+SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	5e82003f76e8
 SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	100.0000	204aa764dfc3
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	100.0000	17de3fca216e
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	e99d589ef4ed
