@@ -3075,7 +3075,7 @@ void philAI::LikelihoodOfEnemyAttacking(
     chanceA = 0.15f;
     chanceB = 0.6f;
     nAttack = 3000;
-    nValue = (i32)((float)nAttack * chanceA);
+    nValue = static_cast<i32>(nAttack * chanceA);
     nWeeks = 6;
     fOut = chanceA * chanceB;
 }
@@ -3139,13 +3139,13 @@ void philAI::GetTurnAttentionValue(i32 player) {
 
 VA(0x00484504, 0x71)
 i32 philAI::RVConversion(i32* const p) {
-    return (i32)((((((((float)p[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)])
-                      + (float)p[IDX(RES_WOOD)] * gafAITurnCostResource[IDX(RES_WOOD)])
-                     + (float)p[IDX(RES_ORE)] * gafAITurnCostResource[IDX(RES_ORE)])
-                    + (float)p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)])
-                   + (float)p[IDX(RES_SULFUR)] * gafAITurnCostResource[IDX(RES_SULFUR)])
-                  + (float)p[IDX(RES_MERCURY)] * gafAITurnCostResource[IDX(RES_MERCURY)])
-                 + (float)p[IDX(RES_GEMS)] * gafAITurnCostResource[IDX(RES_GEMS)]);
+    return static_cast<i32>((((((((p[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)])
+                      + p[IDX(RES_WOOD)] * gafAITurnCostResource[IDX(RES_WOOD)])
+                     + p[IDX(RES_ORE)] * gafAITurnCostResource[IDX(RES_ORE)])
+                    + p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)])
+                   + p[IDX(RES_SULFUR)] * gafAITurnCostResource[IDX(RES_SULFUR)])
+                  + p[IDX(RES_MERCURY)] * gafAITurnCostResource[IDX(RES_MERCURY)])
+                 + p[IDX(RES_GEMS)] * gafAITurnCostResource[IDX(RES_GEMS)]));
 }
 
 VA(0x00484575, 0xcd)

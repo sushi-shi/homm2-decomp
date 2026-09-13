@@ -367,6 +367,13 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   initialization and threat-occupant contracts. The complete six-arm DoAI
   storage family rejects all smaller owners; no source change retained.
 
+- C49/B70/C50/R13/S51/G60/G61: [purchase and target-selection review](C49-B70.md)
+  adds21 complete PHILAI bodies. Two numeric cleanups remove eight casts after
+  complete129-arm and three-arm exact comparisons. U16's real tagged purchase
+  union is retained after its full consumer review. The resource-limit loop's
+  last-resource result and the independent seven-resource purchase guard are
+  verified separately; movement constants close B69's operand-evidence gap.
+
 ## Build setup observations
 
 The public `toolchain-vc6-sp5` archive downloaded during this review hashes

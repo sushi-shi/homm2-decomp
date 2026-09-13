@@ -729,7 +729,7 @@
   },
   "include/SOURCE/PHILAI.h": {
     "sha256": "dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18",
-    "note": "Full115-line owner header read. U16 BHC has real town pointer, purchase tag, integer/building union and quantity; pending complete producers before simplifying. Player arrays6 and resource arrays7 agree with reviewed consumers; all prototypes/macros/forward declarations read, no function bodies."
+    "note": "Full115-line owner header read. U16 BHC has real town pointer, purchase tag, integer/building union and quantity; pending complete producers before simplifying. Player arrays6 and resource arrays7 agree with reviewed consumers; all prototypes/macros/forward declarations read, no function bodies. U16 all named BHC producers/consumers now reviewed: retain tagged enum/integer views; real num only consumed for creature tag. No header change or duplicate file credit."
   },
   "include/SOURCE/philAI.h": {
     "sha256": "3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c",
