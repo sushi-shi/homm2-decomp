@@ -57,6 +57,12 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 ## Findings
 
+- C72/A04/S65/R24/G85/G86/B87: all seven Overview functions reviewed;
+  117 casts and one unused mine-count element removed, with both dialects
+  checked and all98 native objects unchanged. Retail scroll/selection bounds,
+  real heap rows and rejected cleanup families are recorded.
+  [Evidence and residuals](C72-A04-S65-R24-G85-G86-B87.md).
+
 - C71/B86: all five HISCORE functions reviewed; both narrowing casts retained
   after a complete four-arm matrix. Real score records reveal unchecked reads,
   an uninitialized cheated field and stored names used as formats.

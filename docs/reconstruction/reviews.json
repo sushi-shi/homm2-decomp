@@ -23790,5 +23790,117 @@
       "bounds": "open"
     },
     "note": "C71 two expliciti16 conditional-button conversions precede actuali32 message ID; complete4-arm2.571048s matrix1724->1719/1719/1718, originals retained/all98 native proof. Real100-byte HighScoreEntry(17/41-byte names,29 serialized reserved) and352-byte path not fake stack aggregate. B86 ignored100-byte reads allow uninitialized/stale fields; missing file sets only score=-1 then reads cheated unconditionally. Both stored names passed as sprintf formats with no extra args: termination and percent directives remain unsafe even when nominal lengths fit. Fixed paths19/352,numeric12/768; real10rank,18frame,66creature tables bounded only under initialized/resource contracts. Real widget/taggeddata union, no unrelated reuse/goto/manualarg varargs. Full1724bytes/sites/ordered73targets pass; four extra block-helper artifacts outside boundary."
+  },
+  "src/SOURCE/Overview.cpp:game::SetupDynamicStuff(i32 redraw,i32 updateKnob,i32 forceUpdate)#1": {
+    "body_sha256": "21f5941393f30606ef87220aad7662bc0fef58471bfae6a5832a6a68571e8f3f",
+    "patterns": {
+      "casts": "applied",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "open",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C72 redundant scalar/literal conversions removed; six strong enum-to-frame casts and conditional-filename const_cast retained after C++98/C++20 checks. A04 actual flat11200-byte heaps, row70 address stages; flattened macros7750->7549/cleanup7727 rejected. S65 unread scalar removal7744 rejected; R24 distinct role/count splits7771/7756 rejected. B87 each row town24icons18texts/hero58icons17texts <70; real5army/4stats/8skills/14artifacts/12dwellings bounded with typed inputs. Positivei16 quantities fit6 but arbitrary garrison signed16 needs7; signed8 stats5 vs4, valid skill0..9 fits2. Names termination/allocation/widget lifetimes remain. Negative top not excluded before roster lookup; normal cache NONE short-circuit avoids reset-1 lookup, never-updated cache retained. U06 army alternate views still open. Full7750bytes/ordinary targets and three fixed numeric operands pass; existing EH+6,c,14,1e10 gaps not closed; all98native unchanged."
+  },
+  "src/SOURCE/Overview.cpp:game::SetupNewOverviewType(OverviewType overviewType,i32 redrawFrom)#1": {
+    "body_sha256": "02a64611541cf95c53d22ed6762af74f93cb3f76e6b19d705181b35c0b0b9dc5",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C72 literal filenames/title destinationi16 ID conversions removed; allocator pointer cast retained. B87 actual two overview types, three titles,2x3 geometry tables and terminated exact-length title allocations; window/resources/text ownership and giOverviewType domain required. Real widget message view retained, no artificial aggregate, goto/manualvarargs/owner subtraction or unrelated reuse. Full836bytes/ordinary53targets pass; existing EH+6,c,14,33a gap explicit."
+  },
+  "src/SOURCE/Overview.cpp:game::SetupResources(void)#1": {
+    "body_sha256": "19f6a6e814d7ede5b7bb3bebae84e2a625df47aecce0c38fdc84d65ab01e8fe7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B87 real seven resource values and widgetIDs; each signed32 format fits12/768, message text must be consumed/copied before global gText reuse, current player/window valid. Genuine widget payload, no cast/goto/raw owner address/manualvarargs/artificial stack owner/unrelated reuse. Full119bytes/sites/ordered7targets pass."
+  },
+  "src/SOURCE/Overview.cpp:game::Overview(void)#1": {
+    "body_sha256": "b719a2993245069a194eff654d20cbdefa17a05bc4f0f3b0db68e662dccd13a3",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "open",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "C72 literal/promotion casts removed, actual allocated text/icon pointer conversions retained. S65 mineCounts8->7 native exact, only seven bytes initialized/read. R24 distinct record/resource/lighthouse counters changes bytes at same1202 size; A04 init flattening1197 rejected. B87 actual two11200-byte heaps but four70-pointer rows1120 bytes used, no fake stack owner or allocation shrink. Real144 mines permit char count overflow beyond127; resourceType<=GOLD lacks negative check before indexing; valid0..6/100/101 domain required. Seven signed32 formats fitgText768; selected player/rosters/resource/window/widget lifetime contracts. Real taggedmessage. Full1202bytes/ordinary84targets pass, EH+6,c,14,4aa remains."
+  },
+  "src/SOURCE/Overview.cpp:game::DoKnob(void)#1": {
+    "body_sha256": "fa4322263a0037a946f2ebf95b93fd088fde71ca97c75b8cba51afb67c037723",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C72 seven float/integer destination/arithmetic conversions removed across original and final32-arm numeric product, pairedi16 y casts also removed; exact686bytes/all45targets with two fixedfloat1 operands. Real mouse/event payload lifecycle. B87 early count<=4 guard gives positive count-3 denominator, clamps inputy then top0..count-4, initialized valid type/window/knob/current event required. No unrelated variable reuse/artificial aggregate/goto/owner recovery/manualvarargs. All98native proof."
+  },
+  "src/SOURCE/Overview.cpp:OverviewHandler(struct tag_message & message)#1": {
+    "body_sha256": "5d54519683efd8085d272cfa077ddb4b76d4da42318eceb9bff69791c82d16b7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G85/G86 two real shared-tab joins retained: complete4-arm body-duplication matrix1202->1229/1229/1253 changes code. Real input/widget/executive payloads and BaseWidgetCommand SCROLL_UP boundary retained. B87 NUMPAD3/NUMPAD1 assign count-4 without lower clamp, count<4 produces negative top before unchecked dynamic roster access if those keys delivered; fixed retail instructions prove stores. Track scroll count>4 denominator needs bounded roster<=72 for32100/(count-3)>0. No manualvarargs/owner subtraction/fake aggregate/unrelated reuse. Full1202bytes/sites/ordered105targets pass."
+  },
+  "src/SOURCE/Overview.cpp:game::ProcessIconSelect(i32 widgetId,b32 quickView)#1": {
+    "body_sha256": "eb82382729e3c5f56a4953ed31ce29675fd2d127fac84b3ac1760d28e22941bc",
+    "patterns": {
+      "casts": "applied",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C72 literal backdrop cast removed. B87 IDs200..999 produce row0..3 but top+row==count accepted by > guard before GetHero/GetTown; ordinary created widgets omit emptyrows so bad-widget reachability not presumed. Subwidget ranges bound real5army/8skill/14artifact/4stat/12dwelling owners under typed owner/input contract. Related widgetId decode not unrelatedreuse; R24 non-strict skill/artifact role split changes bytes at1187 size retainedoriginal. U06 army normal view consumer does not resolve alternate signed/count union debt; no fake aggregate/goto/manualvarargs/owner arithmetic. Full1187bytes/ordinary58targets pass, EH+6,c,14,499 explicit; helper4blocks outside function not mismatch."
   }
 }
