@@ -23598,5 +23598,117 @@
       "bounds": "open"
     },
     "note": "Full374-line hover/select/captain/build/recruit dispatch read. C69 three redundant i32 slot-count casts removed in complete8 subsets; seven casts from mixed slot/control selector to genuine BuildingSlotType retained. G82/G83 all4 hero-join combinations and G84 shared build guard2 arms change2925-byte original, gotos retained. S63 all4 status scalar/unused-result object-search deletions and R22 info/object index split change text, originals retained. U01 ConvertToHover then widget payload role is real. B84 ID intervals bound castleSlotsUse0..17; selected building cases constrain bit shifts, other owner/count domains remain. All16 retail status templates max52 bytes; recruit text has no directives although hero/alignment arguments still evaluated. Full2925 bytes/sites/ordered targets including switch tables pass; helper/data decoding explains block-view extras."
+  },
+  "src/SOURCE/Campaign.cpp:game::HandleCampaignWin(void)#1": {
+    "body_sha256": "c985abbac2d3c17fcd989593b35f0301bc555441b78d31e01abc9cbeb422ade3",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C70 scenario-assignment cast removed after2-arm1264-byte matrix and combined98-object native proof. B85 real2x12 enabled table cleared and fixed per-side map flags written; final scan covers2x11, may leave scenario=-1 if none enabled. Real five-slot carryover army/12 awards and valid side0/1, scenario/map/hero contracts; no fake aggregate, manual varargs or unrelated local reuse. Full1264 bytes/sites/ordered59 targets pass."
+  },
+  "src/SOURCE/Campaign.cpp:game::PlayPreScenarioSmacker(CampaignSide side,i32 map)#1": {
+    "body_sha256": "e4e4e37fa34e539c17e5fdeb258fd59f3b283b6003b39a6b08394fabafc24eed",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B85 input side/map select actual campaign resource switches; map+1 and completed-side lookup require valid campaign domains. No local buffer, written cast, manual varargs, artificial address/owner recovery, goto or fake aggregate. Full738 bytes/sites/ordered60 targets pass; trailing-table decoder size-only diagnostic is not code divergence."
+  },
+  "src/SOURCE/Campaign.cpp:game::ShowCampaignInfo(i32 viewOnly,i32)#1": {
+    "body_sha256": "cae63b61192c7f19e747ae5939faeba0baa1e0818ea23273ae7a794ede0579e4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "TrackType cast decodes true shared enum; tag_message union follows widget commands. Real2x13x2 trackXY; guard uses viewing side while coordinates choose starting/current side, so positions/resource frames need contract. Logical map12 clamped11 before widget creation. S64 overwritten trackWidget NULL removal2-arm changes1034 to1027; retain. B85 window/interface restoration, global campWin dangling after delete, text lifetime and valid side/map/resources remain. All1034 bytes/ordinary targets pass; existing privateEH+6 and except-list+c,+14,+400 retail model gap remains."
+  },
+  "src/SOURCE/Campaign.cpp:game::CampaignInfoUpdate(i32 redraw)#1": {
+    "body_sha256": "801b6f048536762701241d4b91e919a33e297f4fbfdebba33195ff8ce920d38f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B85 actual retail13-iteration load of2x12 enabled array before map<11 guard: map12 reads next row0 for side0 or score low byte atgame+ba for side1. Do not widen/guard silently. Real tagged5-byte SCampaignChoice and widget message union. R23 complete4-arm award/choice/track counter splits all change2268-byte text; retain. Pinned24 names/descriptions, all12-award total199/768, choice formats<=34/768, army scratch22/52, percent-free alignment and all72 choice domains pass. Live index/choice/widget-text domains remain. Full2268 bytes/sites/ordered196 targets pass."
+  },
+  "src/SOURCE/Campaign.cpp:CampaignHandler(struct tag_message & message)#1": {
+    "body_sha256": "62ad1dfb45053cde59fe6451de7666186a57a3f2328e13ff7c122e287777605d",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C70 two assignment casts removed with4-arm1162-byte product and all98 native proof. Widget/command switches bound decoded map0..11 and choice0..2; real message union retained. B85 retail switch-side write uses enabled[scenario4][side0/1], reaches existing game paddingd2/d3 outside enabled subobject but inside game. Wrong axes not silently transposed. R23 map/award role split2 arms changes1162-byte text; retain. Live side/map, timeout/music/resource/window contracts remain. Full1162 bytes/sites/ordered74 targets pass."
+  },
+  "src/SOURCE/Campaign.cpp:game::InitEntireCampaign(CampaignSide side)#1": {
+    "body_sha256": "2094baa2c10e6fb1b749874e871b631ffa98dff208530d72e1e038deff9699b0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O06/B57 real327-byte campaign reset begins at one-byte type field(game+2), crosses subobjects and stops before paddingbyte149; campaign region ends14a. Same prefix serialized in GAME. Real state-aggregate recovery remains open pending SETUP/Newgame/X_CAMPGN dependencies; do not widen327 to328 or manufacture overlay. Side parameter narrows to actual byte enum fields, scenario=-1 sentinel. Full60 bytes/sites/ordered memset target pass."
+  },
+  "src/SOURCE/Campaign.cpp:game::InitCampaignMap(void)#1": {
+    "body_sha256": "e91ce251ab357414c08bfe2c007a805bb8b78bddf3ec03e352c2711e90afb781",
+    "patterns": {
+      "casts": "applied",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C70 hero/puzzle byte-assignment casts removed4-arm2653-byte product/all98 native proof; skill type/level enum boundaries and tagged SCampaignChoice union remain. O06 reset65bytes from six-byte setup-color field crosses real setup members; shared owner recovery open. S64 ignored mapHeaderResult slot/store2 arms2653->2650 and R23 hero-record/roster/army4 arms all text-different, originals retained. B85 valid maps1..12 filenames12/13 in13 andgMapName16; true roster8/records54/five army slots with valid counts/IDs; unguarded carryover/special first-hero accesses need map contract. Load/init/resource errors and quantity arithmetic not hardened. Full2653 bytes/sites/ordered79 targets pass; helper-overincluding last block view not closure metric."
   }
 }

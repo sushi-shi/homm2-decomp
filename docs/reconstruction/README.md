@@ -57,6 +57,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 
 ## Findings
 
+- C70/S64/R23/B85/O06: all seven Campaign functions reviewed; five redundant
+  casts removed with complete matrices and98-object native proof. Retail
+  crossed-array accesses and campaign/setup reset owners remain explicit open
+  findings. [Evidence and per-function boundaries](C70-S64-R23-B85-O06.md).
+
 - C01: implemented `Read13(char*)`, `ReadBlock(void*)` and text name arrays;
   26 casts removed, native before/after bytes and relocation graphs identical.
   [Evidence and remaining full-build gate](C01.md).

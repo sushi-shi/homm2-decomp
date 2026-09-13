@@ -806,5 +806,13 @@
   "include/SOURCE/Castle.h": {
     "sha256": "f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510",
     "note": "Complete22-line owner header read: eighteen-slot capacity and five-slot upgrade offset, CastleHandler declaration, base/use byte-valued BuildingSlotType arrays and window pointer. Arrays are genuine initialized/live building-slot owners, not overlapping/fabricated storage; producer/access ranges reconciled with full Castle.cpp. No function definitions or manual varargs."
+  },
+  "src/SOURCE/Campaign.cpp": {
+    "sha256": "ae133a078303de22a6b92eec2004bde6fe835e4dee75e26af5ede1ea7ada96c0",
+    "note": "Full1129-line parent/final1127-line TU, all7 functions, private enums, sixEOF globals and actual2x13x2 trackXY read. C70 five casts removed with complete24 arms across8 families, all98 native/retail proof. S64/R23 tested originals retained. B85 two genuine retail crossed-index operations explicitly open; O06 shared campaign327/setup65 state owner recovery deferred to remaining consumers, not silently fixed. Tagged choice/message views real; no gotos/manual varargs/fake stack aggregate. Per-function all10 verdicts and C70-S64-R23-B85-O06 evidence recorded."
+  },
+  "include/SOURCE/Campaign.h": {
+    "sha256": "8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc",
+    "note": "Full78-line header read: actual12-award enum, dialog/widget IDs, display/frame constants and handler declaration. No function/macro body, storage overlay or raw owner recovery. ID maps and track versus bonus intervals reconciled with all7 reviewed Campaign functions; B85 runtime/resource contracts remain."
   }
 }

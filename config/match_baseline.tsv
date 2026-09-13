@@ -715,10 +715,10 @@ SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	89f4b309ab2c
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	03b301389824
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	3867e6ccca9a
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	922522c2da1d
-SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	be8d86338359
+SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	0d8481860682
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	100.0000	fc9c994942e2
-SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	32df4ef318ee
-SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	100.0000	084b561d55c0
+SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	149a66b508c1
+SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	100.0000	9f1d1588a4ec
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	7b252f8765d3
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	08fd006208a0
