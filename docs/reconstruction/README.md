@@ -149,7 +149,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   both monochrome icon decoders now use the same level dimension (four more
   accesses corrected). Row-pointer and clipping questions remain open.
 - B20: [retail-confirmed receive overread](B20.md), plus transport packet/player
-  bounds. C07 covers typed startup-payload access; G12/G13 cover send/input
+  bounds. C07 applies signed startup fields and actual tagged payload views
+  with [complete native and retail proof](C07.md); G12/G13 cover send/input
   retries. S09/S10 record unused trading-message aggregate/send-result scalar.
 - B21: trading-ratio indexing can receive an unselected resource (-1);
   caller/UI and retail proof must distinguish reconstruction error from old behavior.
@@ -258,8 +259,8 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   [retail shutdown-drain capacity hazard is confirmed](B42.md). Packet
   lengths/player mappings and retained provider GUID lifetime/mutable name
   contracts need proof. B20 now includes
-  independently verified DirectPlay overread evidence. C07 also applies to
-  its startup-typed carrier reinterpreted as a guest-info record.
+  independently verified DirectPlay overread evidence. C07 now replaces
+  its false startup-typed carrier with an explicit erased payload boundary.
 - S27/S28/S29: DirectPlay unused locals/state, cursor unread flag/counter
   stores, and the system-options unused message need native structural tests.
 - G25/G26: cursor movement completion/event joins and map-change queue retry/

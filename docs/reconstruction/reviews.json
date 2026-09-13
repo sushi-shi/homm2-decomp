@@ -2688,9 +2688,9 @@
     "note": "B42: callback appends lSessions[iMaxSession] without checking its ten-element capacity. Session enumeration is not bounded by the six-player session limit. DWORD session identifier logging preserves the ABI bit pattern."
   },
   "src/SOURCE/dpnetwin.cpp:dpnet_init(void)#1": {
-    "body_sha256": "60f4145387704528b01d351c57d6f698c76d0be63797837c930e27c8c6cc8fba",
+    "body_sha256": "a6b7b63ab2048480124c97fa70595bd63064e9b569f8b736bf821be86042732e",
     "patterns": {
-      "casts": "retain",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -2701,7 +2701,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "Real 26-byte startup record and two 200-element heap tables; memset sizes cover their owners. GetProcAddress function-pointer conversions and allocation casts are native boundaries. B42: guest count/startup map indices and retained provider GUID lifetime need proof; fixed dialog strings plus one integer fit gText[768]."
+    "note": "Real 26-byte startup record and two 200-element heap tables; memset sizes cover their owners. GetProcAddress function-pointer conversions and allocation casts are native boundaries. B42: guest count/startup map indices and retained provider GUID lifetime need proof; fixed dialog strings plus one integer fit gText[768]. C07 follow-up: both startup fields recovered as i8 and both intervening u8 store casts removed after complete four-arm matrix; full native/retail and both-dialect proof in C07.md. Other API and enum conversions retain their earlier individual boundaries."
   },
   "src/SOURCE/dpnetwin.cpp:CleanupDPVars(void)#1": {
     "body_sha256": "e9cbd304e66b64907f24f81e309acb51090c40ea0a771bf443d650c20edbf17e",
@@ -2832,9 +2832,9 @@
     "note": "C18 applied: SDK DPID owners remove two output-pointer reinterpretations and one scalar conversion with complete native/retail proof. S27 unread i/j slots remain. B42: size starts256 in268-byte rcvBufIn, but an error/DPSD reentry can continue with modified size and stale outputs; successful packets still need tag-specific minimum lengths."
   },
   "src/SOURCE/dpnetwin.cpp:dpEvaluateMessage(u32l size,i32 sender)#1": {
-    "body_sha256": "12bf5bb5cf85a1e78e6ee03fb1cd5c350baa2f528e517dead1b483365fa94225",
+    "body_sha256": "8f173fcfa73c7cbb28c9387a2225757e8a8dc5495f6a532dc8059d9fe174d485",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "absent",
       "address": "absent",
@@ -2845,7 +2845,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "B20 retail-confirmed size-1 allocation/copy versus stored size; B42 unchecked input header, startup extent, player count/map indices and queue-full contracts. C07: startup-typed local is reinterpreted as unrelated SNetPlayerInfo in another tag arm; recover a payload owner rather than a false type carrier."
+    "note": "C07 applied: erased payload carrier and tag-specific record views replace the false startup-typed guest carrier; actual signed startup fields preserve MOVSX. Complete20-arm families and all98-object native/four-function retail proof in C07.md. Case-local pointer and payload rename rejected by actual native bytes. B20 retail size-1 allocation/copy versus stored size remains; B42 unchecked packet extent, player count/map indices and queue-full contracts remain."
   },
   "src/SOURCE/dpnetwin.cpp:dpWaitForFirstGuest(void)#1": {
     "body_sha256": "d20ab28c47243dc817c777b7fc8e0c39f05efb9a5c768989c6003abeb16f7a54",
@@ -9216,9 +9216,9 @@
     "note": "O03 applied: uDimPal[0][level][pixel] respects the real four-level/256-color owner; both callers supply0 or3. Seven native functions and all allocated sections are identical before/after, including ordered targets. O03.md preserves evidence. outside/bounds remain open only for B07/O03 rectangle and final-row pointer formation, not the corrected palette indexing."
   },
   "src/SOURCE/Wsnetwin.cpp:wsnet_init(void)#1": {
-    "body_sha256": "050dbacfa2bbf27ea5f378cb9a2623d19c8514e3cf7a82184e1ebef29e0890a4",
+    "body_sha256": "0f593ba340987dbf4f1673f2d83d21348d52da99464db33e031345e48ef793d8",
     "patterns": {
-      "casts": "retain",
+      "casts": "applied",
       "unions": "absent",
       "gotos": "open",
       "address": "absent",
@@ -9229,7 +9229,7 @@
       "stack": "retain",
       "bounds": "open"
     },
-    "note": "G13: retryAddress is a natural input retry loop candidate. SDK sockaddr/in_addr and allocator conversions retain real boundaries; startup is a genuine packed26-byte packet, all sent fields initialized. B20: giNumHumanPlayers/positions must fit six player slots and 200 ring entries; gethostname termination/host lookup assumptions need caller/API evidence. Fixed IP/error formats fit256-byte local/global strings."
+    "note": "G13: retryAddress is a natural input retry loop candidate. SDK sockaddr/in_addr and allocator conversions retain real boundaries; startup is a genuine packed26-byte packet, all sent fields initialized. B20: giNumHumanPlayers/positions must fit six player slots and 200 ring entries; gethostname termination/host lookup assumptions need caller/API evidence. Fixed IP/error formats fit256-byte local/global strings. C07 follow-up: both startup fields recovered as i8 and both intervening u8 store casts removed after complete four-arm matrix; full native/retail and both-dialect proof in C07.md. Other API and enum conversions retain their earlier individual boundaries."
   },
   "src/SOURCE/Wsnetwin.cpp:wsnet_term(void)#1": {
     "body_sha256": "09bb544a5b950bfc502ed995657fabb89c8cd25e23465b00643c57f8f3ecca95",
@@ -9312,12 +9312,12 @@
     "note": "SDK sockaddr output record and address reinterpretation are genuine. B20: errors other than WSAEWOULDBLOCK leave iRc as positive error code then can pass it as received length, reusing status as size for stale rcvBufIn; native error-path/consumer evidence needed. Receive request is256 bytes; addressLength is same API output role."
   },
   "src/SOURCE/Wsnetwin.cpp:wsEvaluateMessage(u32l size,i32 sender)#1": {
-    "body_sha256": "6d6cc0393137e87e71139bc11728f171c48f9a46a11963cf4cec03f2b2f44c9c",
+    "body_sha256": "cce857101b0dae365a54934d7f3592302fda69d248c111c8d810484ae42fe77c",
     "patterns": {
-      "casts": "open",
+      "casts": "applied",
       "unions": "retain",
       "gotos": "absent",
-      "address": "open",
+      "address": "applied",
       "owner": "absent",
       "outside": "retain",
       "varargs": "absent",
@@ -9325,7 +9325,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "B20: confirmed retail alloc/copy(size-1), queue-length=size (B20.md); startup/guest payload lengths, ring fullness and six-player bounds remain unchecked. C07: existing packed startup owner may replace offsetof byte accesses, but current char reads sign-extend while owner fields are u8. SNetPlayerInfo pointer equality is unusual but retail4b274f..4b2758 proves direct address comparison; do not substitute content comparison. Widget message uses genuine tagged payload."
+    "note": "C07 applied: three offsetof byte accesses become actual signed packed startup members through the erased payload; guest records keep their separate tag views. All98-object native and full836-byte retail/ordered-relocation proof; case-local pointer rejected. Retail address comparison of SNetPlayerInfo remains unchanged, not a content comparison. B20 size-1 allocation/copy versus stored size and packet/ring/player bounds remain open; genuine widget message union retained. See C07.md."
   },
   "src/SOURCE/Wsnetwin.cpp:wsWaitForFirstGuest(void)#1": {
     "body_sha256": "47e45e06d5872140cece2193fc56ba1e3ba74d5b26715bf6e5dc84b21fd328ba",

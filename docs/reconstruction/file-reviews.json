@@ -44,16 +44,16 @@
     "note": "Full updated header/two inline accessors read and reconciled. U08 replaces two union owners with actual12-element widget* arrays; all seven consumers and shared native output reviewed. Removed integer/derived/padding views; packed0x37e layout preserved. S30 unrelated runtime gaps remain unproven. Cursor/frame/sound dimensions and all declarations inspected; remaining out-of-line bodies individually pending."
   },
   "src/SOURCE/dpnetwin.cpp": {
-    "sha256": "7ccab6fd6609c02e62dbb0394c65dce517752cde1cc9a426dcd2fed85933a7ae",
-    "note": "Full671-line TU,16 definitions and all storage/macros read. C18 SDK outputs applied; B20 same genuine-retail queue overread as Winsock, C07 false startup carrier, B42 session/player/drain/API contracts, S27 unread locals/global/enum remain. No goto or manual varargs body."
+    "sha256": "f7f5f707d7cb6a58dc8c15c2ecc38d6d01dd14e4021ca69695c456d1a61ba260",
+    "note": "Full671-line TU,16 definitions and all storage/macros read. C18 SDK outputs applied; B20 same genuine-retail queue overread as Winsock, C07 false startup carrier, B42 session/player/drain/API contracts, S27 unread locals/global/enum remain. No goto or manual varargs body. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
   },
   "src/SOURCE/CURSOR.cpp": {
     "sha256": "e5a7902be0c90a9b615ca96c48ec0e59fde82ef23b137151448b1e16bbe25941",
     "note": "Full1583-line TU/18 definitions, private enums and globals read. O04 twelve scalar-neighbor lookups replaced by true array with98-TU native proof. G25/G26 joins, R02 step role reuse, S28 unread locals, B43 map/frame/network domains remain. Real11-byte changes and44-byte history owner retained."
   },
   "include/SOURCE/dpnetwin.h": {
-    "sha256": "ed4e337cf85139cf1ea816c6668120be372acf6c045a536d1fed768ede2d87b1",
-    "note": "Full103-line header read. Real packed26-byte startup mapping, SDK declarations and200-slot transport globals; maxPlayers6 does not establish ten-session callback cap. B42 drain100 argument/104 caller extent and provider lifetime remain."
+    "sha256": "9dee01ed73e0659a1152eed0c3edcbef9c475c889bcad65a8841692fe271b335",
+    "note": "Full103-line header read. Real packed26-byte startup mapping, SDK declarations and200-slot transport globals; maxPlayers6 does not establish ten-session callback cap. B42 drain100 argument/104 caller extent and provider lifetime remain. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
   },
   "include/SOURCE/CURSOR.h": {
     "sha256": "8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916",
@@ -372,12 +372,12 @@
     "note": "Full geometry/resource/widget constants and prototypes/externs; no functions or storage-view macros. Resource count seven and offer indices reconciled with handlers."
   },
   "src/SOURCE/Wsnetwin.cpp": {
-    "sha256": "6b7c68d77cfdf3b9f95b3c22b776400868011fe8d65c6d0b1816649ceff8ea69",
-    "note": "All572 lines/ten definitions and static/socket data claims reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. B20 payload overread proved directly in retail; other bounds and C07/G12/G13/S10 remain explicit."
+    "sha256": "fa308739c7bcc79fe79ffc19a88c70e7049fbf7eb8edf9141973ac773d7ccccc",
+    "note": "All572 lines/ten definitions and static/socket data claims reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. B20 payload overread proved directly in retail; other bounds and C07/G12/G13/S10 remain explicit. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
   },
   "include/SOURCE/Wsnetwin.h": {
-    "sha256": "daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b50606f4bf40",
-    "note": "Full constants, packed26-byte startup packet, transport prototypes and SDK object externs reviewed. Packet uses six addresses and two byte fields; C07 signed read versus u8 owner ambiguity recorded. No function definitions."
+    "sha256": "8876e71e16ab0cd0e83d672df4db6bc7c1c226af7a7a19b9c4d7a1f029134830",
+    "note": "Full constants, packed26-byte startup packet, transport prototypes and SDK object externs reviewed. Packet uses six addresses and two byte fields; C07 signed read versus u8 owner ambiguity recorded. No function definitions. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
   },
   "src/SOURCE/SEARCH.cpp": {
     "sha256": "db79c87d9297de0e5e0f3e5f75a8e16e0b74f7ca76abee2c366b45557dc6761a",
