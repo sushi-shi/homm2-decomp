@@ -1,7 +1,7 @@
 # Native final linking and retail comparison
 
-The target remains an executable exactly matching retail, including the six
-private `.bss` empty-string cells in REQUEST. A successful native link is not
+The target remains an executable exactly matching retail. REQUEST's six
+private `.bss` empty-string cells now follow ordinary source storage ownership. A successful native link is not
 matching closure. COFF/PE correction machinery and the former `--transform`
 mode have been removed; remaining differences require source/build recovery.
 
@@ -41,12 +41,13 @@ rebuild a supported mode before interpreting a local executable.
 ## Source and build evidence
 
 `native_link.py` and the Ninja link graph consume raw `build/objdiff/base`
-objects. Comparison-normalized objects never enter the link. The six project
-archives (`BASE-prefix.lib`, `Misc.lib`, `MiscRuntime.lib`, `BASE-middle.lib`,
-`Midi.lib`, `BASE-suffix.lib`) contain untouched
-compiler/assembler outputs, in the reconstructed native archive order.
+objects. Comparison-normalized objects never enter the link. The seven project
+archives (`BASE-prefix.lib`, `Misc.lib`, `BASE-middle.lib`, `Midi.lib`,
+`BASE-before-dimmer.lib`, `DIMMER.lib`, `BASE-after-dimmer.lib`) contain untouched
+compiler/assembler outputs, in the reconstructed native archive order. Misc
+is one source unit; DIMMER's template destructor has a separate source owner.
 
-The response scans SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock
+The response scans SP5 `MSVCPRT.LIB` after `BASE-after-dimmer.lib`; its stock
 `delop_s.obj` supplies the early operator-delete body. The subsequent stock
 `LIBCMT.LIB` scan resolves the other runtime members. Both archives come from
 the pinned toolchain. `BITS.asm` and `TILE.asm` supply ordinary MASM OMF objects;

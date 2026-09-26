@@ -37,6 +37,8 @@ H2_ENUM_END(HeroWindowConstant)
 #pragma pack(push, 1)
 class heroWindow {
 public:
+    template<class BaseWidget>
+    class DimmerWidget;
     i32 m_zOrder;
     heroWindow* m_nextWindow;
     heroWindow* m_prevWindow;

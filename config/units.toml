@@ -77,6 +77,11 @@ source = "src/BASE/DIMMER.cpp"
 flags = "base"
 
 [[unit]]
+unit = "BASE/DIMMERDestructor"
+source = "src/BASE/DIMMERDestructor.cpp"
+flags = "base"
+
+[[unit]]
 unit = "BASE/EXEC"
 source = "src/BASE/EXEC.cpp"
 flags = "base"
@@ -144,11 +149,6 @@ flags = "base"
 [[unit]]
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
-flags = "base_nogf"
-
-[[unit]]
-unit = "BASE/MiscRuntime"
-source = "src/BASE/MiscRuntime.cpp"
 flags = "base_nogf"
 
 [[unit]]
