@@ -6944,7 +6944,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 if (joiningCost
                     > gpGame->m_players[eventHero->m_owner].m_resources[H2EnumIndex(RES_GOLD)]) {
                     if (armyRatio > MONSTER_STRENGTH_FLEE)
-                        goto computerMonstersFlee;
+                        goto autoDefeatMonsters;
                     else
                         goto fightComputerMonsters;
                 }
@@ -6972,7 +6972,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     }
 
     if (armyRatio > MONSTER_STRENGTH_FLEE) {
-    computerMonstersFlee:
+    autoDefeatMonsters:
         gpAdvManager->GiveExperience(
             eventHero,
             creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
