@@ -23,7 +23,9 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 import gc
+import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -159,8 +161,9 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path,
 
     unit = path.relative_to(source_root).with_suffix("").as_posix()
     rows = []
+    template_bodies = {}
     for cursor in translation.cursor.walk_preorder():
-        if cursor.kind not in DEFINITION_KINDS or not cursor.is_definition():
+        if cursor.kind not in DEFINITION_KINDS:
             continue
         if cursor.location.file is None:
             continue
@@ -169,15 +172,31 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path,
         annotated = _annotation(cursor)
         if annotated is None:
             continue
+        owner = _dependent_template_owner(cursor) if not cursor.mangled_name else None
+        # With delayed template parsing, an uninstantiated body is reported
+        # as a declaration. Still audit its VA claim rather than dropping it.
+        if not cursor.is_definition() and not owner:
+            continue
         va, size = annotated
         # A marker that cannot produce a symbol is a source defect, not a row to
         # drop quietly: the delinker would carve a span nothing can be matched to.
-        if va < IMAGE_BASE or size <= 0 or not cursor.mangled_name:
+        name = cursor.mangled_name
+        if not name and owner:
+            if owner not in template_bodies:
+                template_bodies[owner] = _instantiated_template_bodies(path, repo, owner)
+            matches = template_bodies[owner].get(cursor.location.offset, set())
+            if len(matches) != 1:
+                raise ValueError(
+                    f"{path}:{cursor.location.line}: VA template definition "
+                    f"{cursor.spelling!r} requires exactly one instantiated body, "
+                    f"found {len(matches)}")
+            name = next(iter(matches))
+        if va < IMAGE_BASE or size <= 0 or not name:
             raise ValueError(
                 f"{path}:{cursor.location.line}: unusable VA marker on "
                 f"{cursor.spelling!r}")
         rows.append(SourceSymbol(
-            rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor), unit=unit,
+            rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor, name), unit=unit,
             size=size, kind="func", provenance="source-annotation"))
 
     # DATA() names an ordinary storage definition, including a block-scope
@@ -220,12 +239,88 @@ def _symbols_for_files_worker(
     return rows
 
 
-def _vc6_symbol_name(cursor) -> str:
+def _dependent_template_owner(cursor) -> str | None:
+    """Filter the AST dump to the annotated method's semantic class owner."""
+    parent = cursor.semantic_parent
+    names = []
+    dependent = False
+    while parent is not None and parent.kind != ci.CursorKind.TRANSLATION_UNIT:
+        dependent |= parent.kind == ci.CursorKind.CLASS_TEMPLATE
+        if parent.spelling:
+            names.append(parent.spelling.split("<", 1)[0])
+        parent = parent.semantic_parent
+    return "::".join(reversed(names)) if dependent and names else None
+
+
+def _json_roots(payload: str):
+    """Clang's filtered JSON dump can contain several concatenated roots."""
+    decoder = json.JSONDecoder()
+    offset = 0
+    while offset < len(payload):
+        while offset < len(payload) and payload[offset].isspace():
+            offset += 1
+        if offset == len(payload):
+            break
+        root, offset = decoder.raw_decode(payload, offset)
+        yield root
+
+
+def _instantiated_template_bodies(path: Path, repo: Path, owner: str):
+    """Read actual Clang-instantiated names missing from libclang's child walk.
+
+    Match the annotated primary definition offset and instantiated body.
+    Declarations or implicit helpers cannot supply a VA identity. Never infer mangling
+    from a template's spelling or choose between multiple specializations.
+    """
+    command = [
+        "clang", *_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
+        "-fsyntax-only", "-Xclang", "-ast-dump=json", "-Xclang",
+        "-ast-dump-filter", "-Xclang", owner, str(path),
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+    if result.returncode:
+        # Match symbols_for_file's policy: errors in owned source are fatal;
+        # vendor-header recovery is permitted when Clang still produces a body.
+        diagnostics = re.findall(
+            r"^(.+?):[0-9]+:[0-9]+: (?:fatal )?error:", result.stderr, re.M)
+        owned = [name for name in diagnostics if any(
+            Path(name).resolve().is_relative_to(repo / directory)
+            for directory in ("src", "include"))]
+        if not diagnostics or owned:
+            raise ValueError(f"{path}: template AST dump failed: {result.stderr.strip()}")
+    bodies = {}
+
+    def visit(node):
+        if not isinstance(node, dict):
+            return
+        children = node.get("inner", [])
+        kinds = {child.get("kind") for child in children}
+        location = node.get("loc", {})
+        filename = location.get("file")
+        if (node.get("kind") in {
+                "CXXConstructorDecl", "CXXDestructorDecl", "CXXMethodDecl",
+                "CXXConversionDecl"}
+                and node.get("mangledName") and "offset" in location
+                and "CompoundStmt" in kinds
+                and (filename is None or Path(filename).resolve() == path.resolve())):
+            bodies.setdefault(location["offset"], set()).add(node["mangledName"])
+        for child in children:
+            visit(child)
+
+    try:
+        for root in _json_roots(result.stdout):
+            visit(root)
+    except json.JSONDecodeError as error:
+        raise ValueError(f"{path}: invalid template AST dump: {error}") from error
+    return bodies
+
+
+def _vc6_symbol_name(cursor, mangled_name: str | None = None) -> str:
     """clang's MSVC mangler names destructor definitions as the vbase
     destructor (??_D...@@QAEXXZ); VC6 only emits that helper for classes with
     virtual bases, which this codebase never uses. The retail symbol for a
     user destructor is the plain ??1, virtual destructors as UAE."""
-    name = cursor.mangled_name
+    name = cursor.mangled_name if mangled_name is None else mangled_name
     if cursor.kind == ci.CursorKind.DESTRUCTOR and name.startswith("??_D"):
         access = "U" if cursor.is_virtual_method() else "Q"
         assert name.endswith("@@QAEXXZ"), name

@@ -83,22 +83,36 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     if any(obj in base_objects for obj in (
             "build/objdiff/base/BASE/Misc.obj", "build/objdiff/base/BASE/MiscRuntime.obj")):
         misc_index = base_objects.index("build/objdiff/base/BASE/Misc.obj")
-        misc_runtime_index = base_objects.index("build/objdiff/base/BASE/MiscRuntime.obj")
-        if misc_runtime_index != misc_index + 1 or misc_runtime_index >= midi_index:
+        runtime = "build/objdiff/base/BASE/MiscRuntime.obj"
+        misc_runtime_index = base_objects.index(runtime) if runtime in base_objects else misc_index
+        if misc_runtime_index not in (misc_index, misc_index + 1) or misc_runtime_index >= midi_index:
             raise ValueError("Misc and MiscRuntime must be adjacent before Midi")
         prefix_libraries = [
             ("build/link/BASE-prefix.lib", base_objects[:misc_index]),
             ("build/link/Misc.lib", base_objects[misc_index:misc_index + 1]),
-            ("build/link/MiscRuntime.lib", base_objects[misc_runtime_index:misc_runtime_index + 1]),
+            *([("build/link/MiscRuntime.lib", [runtime])] if runtime in base_objects else []),
             ("build/link/BASE-middle.lib", base_objects[misc_runtime_index + 1:midi_index]),
+        ]
+    suffix_libraries = [("build/link/BASE-suffix.lib", base_objects[midi_index + 1:])]
+    destructor = "build/objdiff/base/BASE/DIMMERDestructor.obj"
+    if destructor in base_objects:
+        dimmer_index = base_objects.index("build/objdiff/base/BASE/DIMMER.obj")
+        if dimmer_index <= midi_index or base_objects.index(destructor) != dimmer_index + 1:
+            raise ValueError("DIMMER and DIMMERDestructor must be adjacent after Midi")
+        # The destructor owner must be scanned before the remaining widget
+        # dependencies. These are ordinary archives of untouched compiler output.
+        suffix_libraries = [
+            ("build/link/BASE-before-dimmer.lib", base_objects[midi_index + 1:dimmer_index]),
+            ("build/link/DIMMER.lib", base_objects[dimmer_index:dimmer_index + 2]),
+            ("build/link/BASE-after-dimmer.lib", base_objects[dimmer_index + 2:]),
         ]
     base_libraries = []
     for library, members in (
             *prefix_libraries,
             ("build/link/Midi.lib", base_objects[midi_index:midi_index + 1]),
-            ("build/link/BASE-suffix.lib", base_objects[midi_index + 1:])):
-        # VC6 LIB prepends each input member.  Feed the reviewed retail
-        # order backwards so each archive scans forwards.
+            *suffix_libraries):
+        # VC6 LIB prepends input members. Preserve the configured member order;
+        # actual extraction follows unresolved externals, not this member list.
         w.build(library, "archive", inputs=list(reversed(members)))
         base_libraries.append(library)
     # The native-link driver places the SP5 MSVCPRT scan before this ordinary

@@ -23,6 +23,14 @@ CONFIGURED = [
 
 
 class NativeLinkTests(unittest.TestCase):
+    def test_merged_misc_and_split_dimmer_keep_configured_archive_scan_order(self):
+        archives = ["BASE-prefix", "Misc", "BASE-middle", "Midi",
+                    "BASE-before-dimmer", "DIMMER", "BASE-after-dimmer"]
+        tail = [f"build/link/{name}.lib" for name in archives]
+        configured = CONFIGURED[:6] + tail + CONFIGURED[-2:]
+        inputs = native_link.final_inputs(configured, include_resources=True)
+        self.assertEqual(inputs[10:], tail + ["MSVCPRT.LIB", "LIBCMT.LIB", CONFIGURED[-1]])
+
     def test_both_modes_preserve_all_raw_objects_and_archive_order(self):
         for resources in (False, True):
             with self.subTest(resources=resources):

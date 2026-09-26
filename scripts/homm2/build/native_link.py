@@ -48,12 +48,19 @@ def final_inputs(configured: list[str], *, include_resources: bool) -> list[str]
     first_source = next((i for i, path in enumerate(configured)
                          if path.startswith("build/objdiff/base/")), None)
     first_base = configured.index("build/link/BASE-prefix.lib")
-    expected_tail = [
+    legacy_tail = [
         "build/link/BASE-prefix.lib", "build/link/Misc.lib",
         "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib", "build/link/Midi.lib",
         "build/link/BASE-suffix.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
     ]
-    if configured[first_base:] != expected_tail:
+    merged_tail = [
+        "build/link/BASE-prefix.lib", "build/link/Misc.lib",
+        "build/link/BASE-middle.lib", "build/link/Midi.lib",
+        "build/link/BASE-before-dimmer.lib", "build/link/DIMMER.lib",
+        "build/link/BASE-after-dimmer.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
+    ]
+    expected_tail = configured[first_base:]
+    if expected_tail not in (legacy_tail, merged_tail):
         raise RuntimeError("unexpected configured final-link tail")
     if first_source is None or first_source >= first_base:
         raise RuntimeError("configured link has no raw project objects")

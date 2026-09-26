@@ -195,5 +195,71 @@ class NothingMarkedTests(unittest.TestCase):
                 self.assertEqual(collect(root, root), [])
 
 
+class TemplateDefinitionTests(unittest.TestCase):
+    SOURCE = '''
+#define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
+struct Base { virtual ~Base() {} };
+struct Other { virtual ~Other() {} };
+struct Outer {
+    template<class T> struct Inner : T {
+        Inner();
+        Inner(int);
+        virtual ~Inner();
+        int value();
+        int value(int);
+    };
+};
+template<class T> VA(0x00400100, 0x10) Outer::Inner<T>::Inner() {}
+template<class T> VA(0x00400120, 0x10) Outer::Inner<T>::Inner(int) {}
+template<class T> VA(0x00400140, 0x10) Outer::Inner<T>::~Inner() {}
+template<class T> VA(0x00400160, 0x10) int Outer::Inner<T>::value() { return 1; }
+template<class T> VA(0x00400180, 0x10) int Outer::Inner<T>::value(int n) { return n; }
+'''
+
+    def _scan(self, instantiations):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_root = repo / "src"
+            source_root.mkdir()
+            source = source_root / "sample.cpp"
+            source.write_text(self.SOURCE + instantiations)
+            return mod.symbols_for_file(source, source_root, repo)
+
+    def test_nested_template_overloads_and_virtual_destructor(self):
+        rows = self._scan("template struct Outer::Inner<Base>;\n")
+        self.assertEqual([(row.rva, row.name) for row in rows], [
+            (0x100, "??0?$Inner@UBase@@@Outer@@QAE@XZ"),
+            (0x120, "??0?$Inner@UBase@@@Outer@@QAE@H@Z"),
+            (0x140, "??1?$Inner@UBase@@@Outer@@UAE@XZ"),
+            (0x160, "?value@?$Inner@UBase@@@Outer@@QAEHXZ"),
+            (0x180, "?value@?$Inner@UBase@@@Outer@@QAEHH@Z"),
+        ])
+
+    def test_class_instantiated_before_definition_keeps_primary_va_identity(self):
+        # sizeof instantiates member declarations before the annotated bodies.
+        # Clang's concrete body then need not inherit the AnnotateAttr.
+        self.SOURCE = self.SOURCE.replace(
+            "template<class T> VA(0x00400100",
+            "typedef char AliasSize[sizeof(Outer::Inner<Base>)];\n"
+            "template<class T> VA(0x00400100", 1)
+        rows = self._scan("template struct Outer::Inner<Base>;\n")
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(rows[0].name, "??0?$Inner@UBase@@@Outer@@QAE@XZ")
+        self.assertEqual(rows[2].name, "??1?$Inner@UBase@@@Outer@@UAE@XZ")
+
+    def test_missing_instantiation_does_not_invent_a_name(self):
+        with self.assertRaisesRegex(ValueError, "exactly one instantiated body, found 0"):
+            self._scan("")
+
+    def test_multiple_instantiations_are_ambiguous(self):
+        with self.assertRaisesRegex(ValueError, "exactly one instantiated body, found 2"):
+            self._scan("template struct Outer::Inner<Base>;\n"
+                       "template struct Outer::Inner<Other>;\n")
+
+    def test_json_dump_can_have_multiple_roots(self):
+        self.assertEqual(list(mod._json_roots(' {"kind":"A"}\n {"kind":"B"}\n')),
+                         [{"kind": "A"}, {"kind": "B"}])
+
+
 if __name__ == "__main__":
     unittest.main()
