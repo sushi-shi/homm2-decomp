@@ -103,19 +103,15 @@ def main(argv=None):
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":
-        # Three modes: `link` (generic: source + reviewed ABI manifests only),
-        # `link --rsrc` (the only ordinary mode that opens the retail exe: it
-        # extracts the icon and verifies the reconstructed .rsrc payloads),
-        # `link --transform` (adds the reviewed COFF transforms, four-pass
-        # historical PDB, retail SHA assertion, and the strict image audit).
+        if rest in (["--help"], ["-h"]):
+            print("usage: homm2 link [--rsrc] (native raw-object link)")
+            return 0
+        if rest not in ([], ["--rsrc"]):
+            print("usage: homm2 link [--rsrc]; layout corrections are not supported",
+                  file=sys.stderr)
+            return 1
         if sh("python3", "configure.py"): return 1
-        if "--transform" in rest:
-            return sh("ninja", "link")
-        targets = ["link-generic-inputs"]
-        if "--rsrc" in rest:
-            targets.append("link-resources")
-        if sh("ninja", *targets): return 1
-        return sh("python3", "-m", "homm2.build.exact_link.plain", *rest)
+        return sh("ninja", "link-rsrc" if rest else "link")
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks

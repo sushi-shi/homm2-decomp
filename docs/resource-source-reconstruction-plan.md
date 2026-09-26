@@ -28,10 +28,9 @@ of the gate comparison.
   language, bytes, order) against `build/orig/HMM2PL.exe` in both
   directions. Any drift fails the build. The report lands at
   `build/link/HMM2PL.resources.json`.
-- ninja's `link_resources` edge runs that driver; `homm2 link --rsrc` and
-  `homm2 link --transform` consume the compiled `.res`. The `--transform`
-  whole-file SHA-256 assertion additionally proves the linked `.rsrc` section
-  byte-exact end to end.
+- ninja's `link_resources` edge runs that driver; `homm2 link --rsrc` consumes
+  the compiled `.res`. `ninja link-audit` independently compares the final
+  native image, including its resources, against retail without modifying it.
 - `homm2 link` does not run this edge and does not open the retail executable;
   its resource-free output is the source-only provenance boundary.
 

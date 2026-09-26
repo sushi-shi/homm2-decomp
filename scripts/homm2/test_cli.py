@@ -56,31 +56,24 @@ class LinkCommandTest(unittest.TestCase):
             self.assertEqual(cli.main(["link", *arguments]), 0)
         return commands
 
-    def test_generic_builds_only_manifest_backed_inputs(self):
-        self.assertEqual(
-            self.run_link(),
-            [
-                ("python3", "configure.py"),
-                ("ninja", "link-generic-inputs"),
-                ("python3", "-m", "homm2.build.exact_link.plain"),
-            ],
-        )
+    def test_generic_uses_native_ninja_link(self):
+        self.assertEqual(self.run_link(),
+                         [("python3", "configure.py"), ("ninja", "link")])
 
-    def test_resource_mode_adds_only_the_resource_edge(self):
-        self.assertEqual(
-            self.run_link("--rsrc"),
-            [
-                ("python3", "configure.py"),
-                ("ninja", "link-generic-inputs", "link-resources"),
-                ("python3", "-m", "homm2.build.exact_link.plain", "--rsrc"),
-            ],
-        )
+    def test_resource_mode_uses_native_resource_link(self):
+        self.assertEqual(self.run_link("--rsrc"),
+                         [("python3", "configure.py"), ("ninja", "link-rsrc")])
 
-    def test_transform_uses_the_retail_exact_graph(self):
-        self.assertEqual(
-            self.run_link("--transform"),
-            [("python3", "configure.py"), ("ninja", "link")],
-        )
+    def test_removed_transform_and_unknown_options_are_rejected_before_build(self):
+        for args in (["--transform"], ["--rsrc", "--transform"], ["--unknown"]):
+            with self.subTest(args=args), mock.patch.object(cli, "sh") as run:
+                self.assertEqual(cli.main(["link", *args]), 1)
+                run.assert_not_called()
+
+    def test_link_help_does_not_build(self):
+        with mock.patch.object(cli, "sh") as run:
+            self.assertEqual(cli.main(["link", "--help"]), 0)
+            run.assert_not_called()
 
 
 if __name__ == "__main__":

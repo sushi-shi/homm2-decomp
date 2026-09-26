@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-"""Link the reconstruction and emit a PE/RVA audit against the retail image.
+"""Read-only PE/RVA audits and the legacy diagnostic native-link driver.
 
-The normal objdiff build remains relocatable-object only. This module is the
-explicit final-link path used by ``ninja link`` and ``homm2 link``. Object
-order is the config/units.toml manifest order - the stripped image carries no
-order oracle - and the per-unit anchor audit is the instrument that surfaces
-misordered units as source-marker anchors accumulate.
+Production generic and resource links are owned by native_link.py. Its untouched
+LINK output can be compared here with --audit-existing; --strict optionally
+makes a difference fail. These audits never rewrite an executable or object.
 """
 import argparse
 import csv

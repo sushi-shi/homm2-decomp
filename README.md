@@ -98,7 +98,6 @@ homm2 init                # one-time: fetch pinned toolchain -> delink -> config
 homm2 build               # compile everything, compare against retail, run gates
 homm2 link                # source-only link; never opens the retail executable
 homm2 link --rsrc         # + reconstructed resources and retail-extracted icon
-homm2 link --transform    # + exact imports/transforms; byte-identical to retail
 homm2 status              # per-unit and overall match %
 homm2 selftest            # tool test suite
 ```
@@ -173,8 +172,8 @@ CD-drive setup as the cleaned Buka runner. Pass `--prepare-only` to stop after
 setup without starting the game.
 
 The staged `game/HMM2PL.exe` is always the ordinary `homm2 link --rsrc`
-output—never the retail control image or `--transform` output—and Wine launches
-that file directly. The play workflow does not patch or transform the candidate.
+output, and Wine launches that file directly. The play workflow does not patch
+or transform the candidate.
 
 The play environment lives in `build/game-wine/` (gitignored): `game/` holds
 your install's data plus the rebuilt `HMM2PL.exe`, `cd/` holds the staged
@@ -183,30 +182,30 @@ the build one, with a virtual desktop so the game's mode switches never touch
 the host. Re-running the provisioner refreshes the rebuilt executable and
 never touches saves or configuration.
 
-## The three link modes
+## Native linking
 
-Every mode drives the untouched pinned `LINK.EXE`; nothing rewrites the output
-afterward. They differ only in what goes in:
+Both supported modes drive the pinned `LINK.EXE` with raw compiler/assembler
+outputs and import libraries generated from the reviewed `imports/*.def` ABI
+manifests. LINK writes the final executable directly.
 
-- **generic** — raw compiled objects plus import libraries generated from the
-  checked-in ABI manifests. It never opens or requires `build/orig/HMM2PL.exe`;
-  the binary runs but lacks `.rsrc` (window menus, About box, icon).
-- **`--rsrc`** — adds resources compiled from `res/HMM2PL.rc`; this is the
-  ordinary mode that opens `build/orig/HMM2PL.exe`, extracts `heroes.ico` into
-  a temporary build directory, and byte-gates every compiled resource against
-  retail. Code and data still come from the reconstruction.
-- **`--transform`** — adds the three reviewed COFF section-header permutations
-  (`scripts/homm2/build/exact_link/transforms.py`, each carrying a proof that no
-  compiler flag or source shape can replace it) plus the historical four-pass
-  PDB link, and asserts the retail SHA-256. The strict audit writes
-  `build/link/HMM2PL.link.json`.
+- `homm2 link` produces `build/link/generic/HMM2PL.exe` without resources or
+  access to the retail executable.
+- `homm2 link --rsrc` produces `build/link/rsrc/HMM2PL.exe`, adding resources
+  compiled from `res/HMM2PL.rc` and the retail-extracted program icon. The
+  resource compiler's output is checked against retail.
 
-Generic and `--rsrc` modes use import libraries generated from the reviewed
-`imports/*.def` manifests. Transform mode separately derives exact import
-hints and historical COFF member shapes from the retail control executable.
+The COFF/PE layout correction machinery and `--transform` mode have been removed.
+Successful native linking does **not** establish an exact retail executable:
+object matching and final linked placement are separate checks, and native
+layout residuals remain under investigation. Exact `.bss` ownership/order and
+whole-executable matching remain the objective.
 
-Evidence and contribution contracts: [`docs/retail-exact-link.md`](docs/retail-exact-link.md).
-Why the three transforms are irreducible: [`docs/compiler-re-allocation-order.md`](docs/compiler-re-allocation-order.md).
+`ninja link-audit` compares the resource-bearing native image with retail and
+writes `build/link/rsrc/HMM2PL.link.json`; it fails on differences without changing
+the executable. The command and evidence boundaries are documented in
+[`docs/retail-exact-link.md`](docs/retail-exact-link.md). Earlier compiler
+experiments remain in [`docs/compiler-re-allocation-order.md`](docs/compiler-re-allocation-order.md)
+as historical measurements, not proofs that source/build recovery is impossible.
 
 ## Toolchain
 

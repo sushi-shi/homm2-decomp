@@ -36,49 +36,24 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
                     "--symbols build/gen/symbol_names.csv "
                     "--rel32-aliases config/reviewed_rel32_aliases.tsv"),
            description="normalize-relocs $unit")
-    w.rule("implib_def",
-           command=('wine "$$MSVC_DIR/bin/LIB.EXE" /NOLOGO /MACHINE:IX86 '
-                    '/DEF:$in /OUT:$out'),
-           description="lib $out")
-    w.rule("implib_stub",
-           command=(f"{PY} -m homm2.build.import_lib --exe $in "
-                    "--dll $dll --out $out"),
-           description="stub-implib $dll")
     w.rule("legacy_implib",
            command=(f"{PY} -m homm2.build.legacy_import_lib "
                     "--definition $in --out $out"),
            description="legacy-implib WING32.dll")
-    w.rule("regular_implib",
-           command=(f"{PY} -m homm2.build.regular_import_lib --exe $in "
-                    "--dll $dll --out $out"),
-           description="regular-implib $dll")
     w.rule("definition_implib",
            command=(f"{PY} -m homm2.build.regular_import_lib "
                     "--definition $in --dll $dll --out $out"),
            description="definition-implib $dll")
-    w.rule("regular_vendor_implib",
-           command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
-                    "--exe $in --dll $dll --definition $definition "
-                    "--out $out $options"),
-           description="regular-implib $dll")
     w.rule("definition_vendor_implib",
            command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
                     "--definition-only --dll $dll --definition $in "
                     "--out $out $options"),
            description="definition-implib $dll")
-    w.rule("patched_implib",
-           command=(f"{PY} -m homm2.build.gen_vendor_imports "
-                    "--definition $in --out $out --dll $dll "
-                    "--symbol $symbol --lookup $lookup --hint $hint"),
-           description="patched-implib $dll")
     w.rule("archive",
            command='wine "$$MSVC_DIR/bin/LIB.EXE" @$out.rsp',
            rspfile="$out.rsp",
            rspfile_content="/NOLOGO /MACHINE:IX86 /OUT:$out $in",
            description="archive $out")
-    w.rule("extract_archive_member",
-           command='llvm-ar p $in "$member" > $out',
-           description="extract $member")
     w.rule("ml_omf",
            command=(f"{PY} -m homm2.build.ml_wrap "
                     "--src $in --out $out"),
@@ -88,11 +63,11 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
                     "--coff --src $in --out $out"),
            description="assemble-coff $in")
     w.rule("link_exe",
-           command=f"{PY} -m homm2.build.exact_link.plain --transform",
-           description="plain retail-exact LINK.EXE HMM2PL.exe")
+           command=f"{PY} -m homm2.build.native_link $link_mode",
+           description="native LINK.EXE $out")
     w.rule("link_audit",
            command=(f"{PY} -m homm2.build.link_exe --audit-existing "
-                    "--strict --out build/link/HMM2PL.exe"),
+                    "--strict --out build/link/rsrc/HMM2PL.exe"),
            description="link-audit HMM2PL.exe")
     w.rule("link_resources",
            command=(f"{PY} -m homm2.build.rc_res "

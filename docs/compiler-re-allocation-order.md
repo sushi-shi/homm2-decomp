@@ -1,5 +1,11 @@
 # VC6 front-end allocation & emission order (C1XX.DLL RE)
 
+> Historical investigation: the measurements below describe the tested source
+> and build states. Claims of universal impossibility or irreducible corrections
+> are not current conclusions; later ownership recovery can change the relevant
+> state. The referenced correction scripts and `--transform` mode have been
+> removed. Native source/build recovery remains required for exact matching.
+
 Reverse-engineering of the pinned VC6 SP5 C++ front end to explain the object
 topology residuals: deferred COMDAT emission order, and string-literal / data
 cell allocation order.

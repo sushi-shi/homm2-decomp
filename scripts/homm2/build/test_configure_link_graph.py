@@ -58,6 +58,27 @@ class ConfigureLinkGraphTests(unittest.TestCase):
                               ["build/link/omf/BASE/BITS.obj"],
                               ["build/link/omf/BASE/TILE.obj"])
 
+    def test_native_link_edges_have_no_retail_or_normalized_object_inputs(self):
+        writer = mock.Mock()
+        units = [dict(unit=name, source=record.source)
+                 for name, record in FIXED_ASM_UNITS.items()]
+        emit_link_graph(writer, units,
+                        [obj("SOURCE/ADVMGR"), obj("SOURCE/REQUEST"), obj("BASE/Midi")],
+                        ["comparison-only-sidecar.json"], {}, {})
+        links = [call for call in writer.build.call_args_list if call.args[1] == "link_exe"]
+        self.assertEqual(len(links), 2)
+        for call in links:
+            mode = call.kwargs["variables"]["link_mode"]
+            inputs = call.kwargs["inputs"]
+            self.assertIn(obj("SOURCE/REQUEST"), inputs)
+            self.assertEqual("build/link/HMM2PL.res" in inputs, mode == "--rsrc")
+            self.assertNotIn("build/orig/HMM2PL.exe", inputs + call.kwargs["implicit"])
+            self.assertNotIn("comparison-only-sidecar.json", call.kwargs["implicit"])
+        imports = [call for call in writer.build.call_args_list
+                   if call.args[1] in ("definition_implib", "definition_vendor_implib", "legacy_implib")]
+        self.assertEqual(len(imports), 5)
+        self.assertTrue(all(call.kwargs["inputs"].startswith("imports/") for call in imports))
+
 
 if __name__ == "__main__":
     unittest.main()
