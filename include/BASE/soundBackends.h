@@ -7,6 +7,18 @@
 class sample;
 struct _DIG_DRIVER;
 
+H2_ENUM_BEGIN(MilesSampleStorageConstant)
+    MILES_SAMPLE_HANDLE_STORAGE_COUNT = 16
+H2_ENUM_END(MilesSampleStorageConstant)
+
+// Startup clears this complete owner before allocating the handle prefix.
+struct MilesSampleState {
+    i32 ready;
+    struct _SAMPLE* handles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
+    i32 handleCount;
+};
+SIZE(MilesSampleState, 0x48);
+
 struct AudiereSampleNode {
     audiere::OutputStreamPtr stream;
     class sample* sampleResource;

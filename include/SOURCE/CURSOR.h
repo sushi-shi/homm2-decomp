@@ -6,7 +6,6 @@
 
 H2_ENUM_BEGIN(CursorConstant)
     CURSOR_BOAT_WAKE_TYPE               = 7,
-    CURSOR_DIRECTION_COUNT              = 8,
     CURSOR_TURN_FRAME_COUNT             = 16,
     CURSOR_FRAMES_PER_DIRECTION         = 9,
     CURSOR_LAST_FRAME_COUNT             = 8,
@@ -21,7 +20,6 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_SHADOW_FLIP_X_ADJUST         = 0x20,
     CURSOR_DRAW_Y                       = 0xFF,
     CURSOR_BOAT_DRAW_Y                  = 0xf5,
-    CURSOR_CLIP_SIZE                    = 0x1e0,
     CURSOR_FLAG_FRAME_BASE              = 0x38,
     CURSOR_HORSE_SHADOW_OFFSET          = 0x32,
     CURSOR_BOAT_SHADOW_OFFSET           = 0x24,
@@ -30,13 +28,9 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_SLOW_TURN_MULTIPLIER         = 3,
     CURSOR_MAP_VISIBLE_FLAG             = 0x40,
     CURSOR_CELL_UNCOVERED_FLAG          = 0x04,
-    CURSOR_CELL_BLOCKED_FLAG            = 0x08,
     CURSOR_OBJECT_PASSABLE_FLAG         = 0x80,
-    CURSOR_BOAT_COUNT                   = 48,
     CURSOR_MOVE_HALF_TILE_PIXELS        = 16,
-    CURSOR_ARTIFACT_CAPACITY            = 14,
-    CURSOR_RESOURCE_COUNT               = 7,
-    CURSOR_RESOURCE_LAST                = CURSOR_RESOURCE_COUNT - 1,
+    CURSOR_RESOURCE_LAST                = IDX(RES_COUNT) - 1,
     CURSOR_RESOURCE_DIALOG_PENALTY      = 100000,
     CURSOR_FIZZLE_X                     = 0xc0,
     CURSOR_FIZZLE_Y                     = 0xc0,
@@ -44,14 +38,12 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_FIZZLE_HEIGHT                = 0x60,
     CURSOR_FIZZLE_COMPUTER_TYPE         = 50,
     CURSOR_INVALID_POSITION             = -1,
-    CURSOR_EMPTY_OBJECT_INDEX           = 0xFF,
     CURSOR_NORTH_DIRECTION_MASK         = 0x83,
     CURSOR_SOUTH_DIRECTION_MASK         = 0x38,
     CURSOR_MAP_CHANGE_RECENT_COUNT      = 4,
     CURSOR_MAP_CHANGE_QUEUE_COUNT       = 196,
     CURSOR_MAP_CHANGE_PENDING_SENTINEL  = 999,
     CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL = 999999999,
-    CURSOR_PLAYER_COUNT                 = 6,
     CURSOR_DEAD_PLAYER_DIALOG_TIME      = 5000,
     CURSOR_REMOTE_PLAYER_ALL            = 0x7f,
     CURSOR_REMOTE_PACKET_TYPE           = 0x29,
@@ -106,5 +98,19 @@ SIZE(SMapChange, 11);
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 void SendMapChange(MapChangeType type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8 direction);
+
+// Masked hero turning-frame IDs used by mirrored shadow remapping.
+// Values identify asset frames, not walking steps or a single direction.
+H2_ENUM_BEGIN(CursorHeroTurnShadowFrame)
+    CURSOR_HERO_TURN_FRAME_46        = 46,
+    CURSOR_HERO_TURN_FRAME_47        = 47,
+    CURSOR_HERO_TURN_FRAME_49        = 49,
+    CURSOR_HERO_TURN_FRAME_50        = 50,
+    CURSOR_HERO_TURN_FRAME_51        = 51,
+    CURSOR_HERO_TURN_SHADOW_FRAME_55 = 55,
+    CURSOR_HERO_TURN_SHADOW_FRAME_56 = 56,
+    CURSOR_HERO_TURN_SHADOW_FRAME_57 = 57,
+    CURSOR_HERO_TURN_SHADOW_FRAME_58 = 58,
+H2_ENUM_END(CursorHeroTurnShadowFrame)
 
 #endif

@@ -28,8 +28,8 @@ H2_ENUM_END(ArmyHexConstant)
 #pragma pack(push, 1)
 class army {
 public:
-    bchar m_animationState;
-    bchar m_animationCycle;
+    u8 m_animationState;
+    u8 m_animationCycle;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, char) m_pendingAnimationSequence;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationStart;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationEnd;

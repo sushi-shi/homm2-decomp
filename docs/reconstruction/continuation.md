@@ -1,0 +1,149 @@
+# Continuation after PRs #59 and #63
+
+These PRs are verified cleanup checkpoints, **not completion of the broader
+semantic/reconstruction audit**. Both were squash-merged into decomp: #59 as
+`8a44b8247`, then #63 as `cb73b3b84`. The second PR's ancestry was reconciled
+against the content-identical #59 squash without changing its validated tree.
+The full historical documentation is retained deliberately as checkpoint evidence.
+
+The subsequent generated-build compatibility pass adds explicit numeric-domain
+conversions and actual Win32 paint handle types. Russian/English generated builds,
+Russian/English VC6 builds, all 98 raw-object comparisons and 988 selftests (seven
+skips) pass. No enum values or runtime behavior change. Latest review-key counts
+after this pass: 802/1,654 matching hashes, **852 pending function reviews**
+(712 stale hashes, 140 missing keys), **138 orphaned historical keys**;
+33/231 file hashes match. These supersede the earlier checkpoint counts below.
+
+## Integration checkpoint
+
+#59 combines its audited head `36ace4cae` with decomp `299514f88` (#62, #64 and
+the subsequent packet-name fixes). The 35 conflicted files retain the recovered
+owners, layouts, casts/control-flow cleanup and the newer readable identifiers.
+VC6 aliases for the sending packet index and remote-player exit flag use distinct
+local names so they cannot expand recovered record fields with the same name.
+
+Validation: Russian matching build reports 1,727/1,727 functions and
+291,987/291,987 data bytes under the existing comparison model; all 98 raw objects
+and 42,433 ordered relocations preserve the `36ace4cae` result. English ordinary
+build compiles and links; readability contracts pass; 971 selftests pass with
+seven skips. These are compatibility checks, not gameplay tests or closure of
+the independent retail-model gaps documented in the historical findings.
+
+A supplemental C++20 parse covered 96 TUs with no project-source diagnostics,
+but emitted 1,520 errors in legacy MSVC library headers. It is not a clean
+whole-tree strict-build result and is not used as the compatibility proof.
+
+#63 incorporates that resolved #59 commit (`21b35341`) into `f17bc1704`.
+Its 44 conflicted files retain the enum/event changes and newer identifiers;
+the `DrawWindow` definitions now use the meaningful parameter names already
+present in its declarations. Both locale builds, all 98 raw-object comparisons,
+contracts and 988 selftests (seven skips) pass on the combined source.
+Fresh enum inventories cover all 96 C++ TUs: 7,177 retail / 7,176 strict members
+in 740 source blocks. Retained values agree with the prior full inventory plus
+the nine already-reviewed neutral frame renames. Each mode has one known inactive
+conditional block; each inventory reports 1,520 SDK dialect diagnostics and no
+accepted project-source diagnostic. This still is not a clean modern build.
+
+## What is left
+
+Do not add these overlapping counts together or interpret them as confirmed bugs:
+
+- Historical ten-pattern research: 951 functions with an open category, comprising
+  1,437 function/category entries (897 bounds entries). Shared input contracts,
+  uncertain reconstruction claims and proven retail defects are included.
+- Live #59 source inventory after this integration: 1,654 definitions; 923 retain
+  their review hash and 731 need review refresh (597 changed hashes, 134 missing
+  keys). There are 132 orphaned historical keys after signature/name changes.
+  File reviews: 42/229 hashes match; 187 need refresh. Macro census: 2,736.
+- #63 has six known naming findings from its review at `f17bc1704`; they remain
+  follow-up work, not conflict resolutions. See the next batch below.
+
+After combining #63 with the resolved base, the live inventory is 804/1,654
+matching function review hashes; **850 need refresh** (713 stale hashes, 137
+missing keys). There are **135 orphaned historical keys**. File review hashes
+match for 33/231 files; 198 need refresh. The macro census is 2,738. This supersedes
+the #59-only counts above for work after both PRs merge; it does not add a second
+backlog to them. These are exact-body hash checks, not dependency review proof.
+
+`functions.tsv`, `files.tsv`, `macros.tsv`, `progress.md`, `reviews.json` and
+`file-reviews.json` remain the historical `36ace4cae` snapshot. Do not cite their
+coverage as current. Inventory `--check` is not a passing integration gate yet:
+orphaned keys must be reconciled before regeneration. Preserve old review hashes
+and notes; migrating a key must not certify a new function body as reviewed.
+
+## First follow-up batch: six naming findings
+
+1. `searchArray::FindCombatPath` (`FINDPATH.cpp`): its two combat-mask loops need
+   `COMBAT_DIRECTION_COUNT`, not `MAP_DIRECTION_COUNT`. Keep adventure-map loops
+   in the map domain; trace masks to `GetAttackMask`/`GetMoveMask` in `PATH.cpp`.
+2. Wagon/lean-to rewards (`PHILAI.cpp`, interactive and AI paths in `EVENTS.cpp`):
+   distinguish resource quantity/type encoding from artifact and daemon fields.
+   Establish shared encoding names from producers, then update every consumer.
+3. `advManager::SetEnvironmentOrigin` and `TrimLoopingSounds` callers: distinguish
+   spatial search range/cache policy from active sound-channel capacity.
+4. Daily wood/ore income (`GAME.cpp`) and sawmill display (`EVENTS.cpp`): use a
+   meaningful common rate or resource-role aliases, not an ore-only name for wood.
+5. `combatManager::EffectSpellDamage` (`SPELLAI.cpp`): Cold Ring uses a Fireball-only
+   rate name. Runtime `Fireball` handles Fireball/Fireblast/Cold Ring; name that
+   shared rate accurately or retain explicit spell aliases.
+6. Campaign confirmation (`Campaign.cpp`, `X_CAMPGN.cpp`): use standard Yes/No
+   names only in proven standard dialogs; align campaign activation aliases
+   across both handlers. Keep raw slots in generic dispatch/unknown layouts.
+
+For each: inspect producer and consumers, preserve numeric values/storage,
+update focused contracts, and compare fresh before/after raw objects. Equal
+enum values or matching bytes alone do not prove the new name is meaningful.
+
+## Then resume the broader audit
+
+Migrate the unambiguous historical keys using path, function identity and VA;
+retain old hashes, and investigate ambiguous/deleted definitions separately.
+Regenerate the inventory, review changed bodies and affected header consumers,
+and group open entries by their underlying issue before choosing a bounded batch.
+Useful research starting points are B13/B20 network layout/receive bounds and
+B28/B29 icon decoder input contracts. Separate reconstruction fixes from proven
+retail bugs; gameplay/input hardening requires a distinct, explicitly scoped change.
+
+Inside `nix develop .#build`, with Universal Ctags 6 available:
+
+```
+python3 -m homm2.audit.reconstruction --write
+python3 -m homm2.audit.reconstruction --check
+homm2 build
+python3 -m homm2.audit.object_equivalence BEFORE build/objdiff/base
+python3 -m homm2.audit.readability_contracts
+homm2 selftest
+homm2 build --no-match --en
+```
+
+`BEFORE` must be a separately saved/built pre-change raw-object tree. Generated
+evidence stays under `build/`; add concise dispositions here or in the existing
+finding reports, not another large committed audit dump.
+
+## Published downstream checkpoint (2026-09-13)
+
+The post-merge compatibility commit `2037def88` was used to regenerate
+`source-gold-2.1-buka` at `a2c70f14c` (RU/EN build logic preserved) and
+`classic-gold-2.1-buka` at `fdd70881c` (Russian UTF-8 view). Both are published.
+The portable first-parent source delta was then adapted and cherry-picked
+through the requested chain, preserving each branch's platform and mod changes:
+
+- `master`: `27153a20b`; native Debug build, 23/23 CTest checks.
+- `ironfist`: checkpoint `dbc8c451d`, Cyborg layout follow-up `72c5df764`;
+  native Debug build, 24/24 CTest checks.
+- `ironfist-master`: checkpoint `52b89b154`, adapted follow-up `d323df793`;
+  strict native Debug build, 26/26 CTest checks.
+
+All three portable tips are published and pass English/Russian startup-and-exit
+replays. Ironfist's Russian checks use the Buka locale overlay with Ironfist
+resources. These are smoke checks, not exhaustive gameplay or multiplayer proof.
+The mod follow-up covers Cyborg spell-count indices in both town setup and
+mage-guild construction; XML field tags and Lua API indexing remain compatible.
+The final branch retains its refactored engine methods and post-scaling ordinary
+Well suppression, with updated regression contracts.
+
+The full historical audit archive stays here on decomp; generated and portable
+branches do not duplicate it. Their `docs/reconstruction-checkpoint.md` links
+back to this continuation. Propagation is complete, but the six naming findings
+and broader audit backlog above remain open. This publication note is doc-only;
+generated-source code provenance remains `2037def88`.

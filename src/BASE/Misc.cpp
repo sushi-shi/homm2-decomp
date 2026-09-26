@@ -1,5 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
+#include <BASE/dialog.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -42,14 +43,9 @@ H2_ENUM_BEGIN(DataEntryLayout)
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_BEGIN(DataEntryWidgetId)
+    ENTRY_CANCEL_BUTTON = DIALOG_BUTTON_2,
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
-    ENTRY_BUTTON_ONE    = 0x7801,
-    ENTRY_CANCEL_BUTTON = 0x7802,
-    ENTRY_BUTTON_FIVE   = 0x7805,
-    ENTRY_BUTTON_SIX    = 0x7806,
-    ENTRY_BUTTON_SEVEN  = 0x7807,
-    ENTRY_BUTTON_EIGHT  = 0x7808
 H2_ENUM_END(DataEntryWidgetId)
 
 H2_ENUM_BEGIN(MiscLogPrivateConstant)
@@ -68,8 +64,6 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
-    DEFAULT_WINDOW_WIDTH         = 0x280,
-    DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
     DEFAULT_MAP_OFFSET_MAX       = 32000,
     UNIQUE_ID_RANDOM_MAX         = 999999,
@@ -102,7 +96,6 @@ H2_ENUM_BEGIN(PCXConstant)
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
     VGA_PALETTE_MARKER    = 0x0c,
-    PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
 H2_ENUM_END(PCXConstant)
 
@@ -114,8 +107,6 @@ H2_ENUM_BEGIN(MiscCycleColorRange)
 H2_ENUM_END(MiscCycleColorRange)
 
 H2_ENUM_BEGIN(MiscFadeConstant)
-    FADE_LEVEL_COUNT              = 0x40,
-    FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
     FADE_FRAME_DELAY              = 0x14,
     WINDOWED_FADE_INCREMENT_SCALE = 2,
@@ -123,13 +114,6 @@ H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
 H2_ENUM_END(MiscFadeConstant)
-
-H2_ENUM_BEGIN(MiscPaletteComponent)
-    PALETTE_COMPONENT_COUNT     = 3,
-    PALETTE_RED_INDEX           = 0,
-    PALETTE_GREEN_INDEX         = 1,
-    PALETTE_BLUE_INDEX          = 2
-H2_ENUM_END(MiscPaletteComponent)
 
 H2_ENUM_BEGIN(MiscWindowConstant)
     MINIMUM_WINDOW_WIDTH   = 320,
@@ -140,8 +124,6 @@ H2_ENUM_END(MiscWindowConstant)
 H2_ENUM_BEGIN(MiscBlitConstant)
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
-    BLIT_SCREEN_WIDTH  = 0x280,
-    BLIT_SCREEN_HEIGHT = 0x1e0
 H2_ENUM_END(MiscBlitConstant)
 
 H2_ENUM_BEGIN(SeededRandomConstant)
@@ -204,7 +186,6 @@ DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
 DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 H2_ENUM_BEGIN(StatusBarLayout)
-    STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
@@ -374,6 +355,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 }
 
 #include <BASE/MiscGraphicsConstants.h>
+#include <BASE/display.h>
 
 #if H2_RETAIL_COMPILER
 #define currentPalette pal
@@ -388,17 +370,17 @@ void FadeIn(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memset(currentPalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
+    memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == MISC_PALETTE_MAX_LEVEL) {
+        if (i == PALETTE_CHANNEL_MAX) {
             done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
-            threshold = MISC_PALETTE_MAX_LEVEL - i;
-            for (j = 0; j < MISC_PALETTE_BYTE_COUNT; ++j) {
+            threshold = PALETTE_CHANNEL_MAX - i;
+            for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
                 if (gpBufferPalette->m_data[j] > threshold)
                     currentPalette->m_data[j] = gpBufferPalette->m_data[j] - threshold;
             }
@@ -407,7 +389,7 @@ void FadeIn(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = MISC_PALETTE_MAX_LEVEL;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -429,12 +411,12 @@ void FadeOut(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memcpy(currentPalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
+    memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == FADE_LEVEL_LAST)
+        if (i == PALETTE_CHANNEL_MAX)
             done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (currentPalette->m_data[j] > 0) {
@@ -448,7 +430,7 @@ void FadeOut(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = FADE_LEVEL_LAST;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -569,12 +551,12 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].colorMouseCursor = false;
         gConfig.gfx[i].fullScreen = true;
-        if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
+        if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gConfig.gfx[i].width = DEFAULT_WINDOW_WIDTH;
-            gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = LOGICAL_SCREEN_WIDTH;
+            gConfig.gfx[i].height = LOGICAL_SCREEN_HEIGHT;
         }
     }
     gConfig.showCombatGrid = 0;
@@ -593,9 +575,9 @@ void SetGameDefaults(void) {
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
-    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)] = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
-    gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)] = CONFIG_WALK_SPEED_FAST;
     // Неизвестный герой
     strcpy(
         gConfig.networkDefaultName,
@@ -707,7 +689,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL WalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -715,7 +697,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL ComputerWalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -1147,7 +1129,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL WalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1155,7 +1137,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL ComputerWalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(

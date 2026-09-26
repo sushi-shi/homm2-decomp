@@ -38,3 +38,26 @@ message.payload.widget.command = static_cast<BaseWidgetCommand>(
 Both mana-digit sites closed with it; `UpdateSpellWidgets` went 99.31% ->
 EXACT (size 1179 -> 1167 = retail's 0x48f). A `? 1 : 0` ternary spelling
 produces the same bytes; the bare relational and an operand swap do not.
+
+## Reconstruction cleanup: select named commands directly
+
+The C37 follow-up measures a higher-level alternative at these same two
+sites, keeping the real command domain throughout:
+
+```cpp
+message.payload.widget.command = (spellPoints0 <= VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
+    ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
+```
+
+The named commands are6 and5. VC6 lowers this adjacent-value selection to
+the exact retail column above, without the extra AND, so both the bool-to-int
+cast and the outer BaseWidgetCommand cast disappear. The tens site uses
+the same form with its own threshold. This is the already measured
+[adjacent-enum ternary](adjacent-enum-ternary-setcc.md), not a reason to
+replace real named constants with raw integers or claim the original author
+necessarily wrote an explicit cast. The arithmetic form's direct cast
+deletion still adds the six-byte AND in this parent.
+
+The complete cross-products and native/retail evidence are recorded in
+[C34/C37/S39/B59](../reconstruction/C34-C37-S39-B59.md), with exact source
+axes under `docs/matching/game-spell-widgets/`.

@@ -5,6 +5,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
+#include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(MoraleConstant)
     FIZBIN_MORALE_PENALTY = 2,
@@ -36,7 +37,7 @@ i32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && !(gMonsterDatabase[IDX(m_creatureTypes[slot])].attributes
-                 & MONSTER_ATTRIBUTE_UNDEAD))
+                 & MONSTER_FLAGS_UNDEAD))
             return 0;
     }
     return 1;
@@ -48,7 +49,7 @@ i32 armyGroup::HasSomeUndead(void) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && HAS(
                 gMonsterDatabase[IDX(m_creatureTypes[slot])].attributes,
-                MONSTER_ATTRIBUTE_UNDEAD
+                MONSTER_FLAGS_UNDEAD
             ))
             return 1;
     }

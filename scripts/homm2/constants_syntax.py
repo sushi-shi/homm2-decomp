@@ -18,6 +18,8 @@ class Token:
 class EnumDeclaration:
     line: int
     end_line: int
+    start: int
+    end: int
 
 
 def lex(text: str) -> list[Token]:
@@ -106,7 +108,8 @@ def parse_enum_declarations(path: Path, text: str | None = None) -> list[EnumDec
             )
             if end is None:
                 raise ValueError(f"{path}:{tokens[index].line}: missing {end_name}")
-            result.append(EnumDeclaration(tokens[index].line, tokens[end].line))
+            result.append(EnumDeclaration(tokens[index].line, tokens[end].line,
+                                          tokens[index].start, tokens[end].end))
             index = end + 1
             continue
         if token == "typedef" and index + 1 < len(tokens) and tokens[index + 1].text == "enum":
@@ -124,6 +127,7 @@ def parse_enum_declarations(path: Path, text: str | None = None) -> list[EnumDec
             index += 1
             continue
         closing = _matching_token(tokens, opening, "{", "}")
-        result.append(EnumDeclaration(tokens[index].line, tokens[closing].line))
+        result.append(EnumDeclaration(tokens[index].line, tokens[closing].line,
+                                      tokens[index].start, tokens[closing].end))
         index = closing + 1
     return result

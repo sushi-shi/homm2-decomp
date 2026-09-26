@@ -31,10 +31,10 @@ from pathlib import Path
 import clang.cindex as ci
 
 from homm2.build.annotated_functions import (
-    IMAGE_BASE, VA_TOKEN, _annotation, configure_libclang,
+    IMAGE_BASE, VA_TOKEN, VA_MARKER, _annotation, configure_libclang,
 )
 from homm2.build.annotated_data import (
-    DATA_TOKEN, ClangMode, _clang_args, definitions_for_file,
+    DATA_TOKEN, ClangMode, _clang_args, _mask_lexical_noise, definitions_for_file,
 )
 from homm2.build.annotated_compgen_data import (
     compgen_data_symbol_name,
@@ -133,6 +133,17 @@ def source_compgen_functions(
     return sorted(rows)
 
 
+def unreviewed_diagnostics(diagnostics, repo: Path):
+    # The boolean audit already records the precise VC6/Clang language
+    # incompatibilities in this source tree. Reuse those reviewed exceptions;
+    # an unrelated error in the same file must still fail symbol recovery.
+    from homm2.audit.bool_fields import _project_relative, _reviewed_exceptions
+    reviewed = _reviewed_exceptions(repo)
+    return [d for d in diagnostics if (
+        "parse-diagnostic", _project_relative(str(d.location.file), repo), "", "", d.spelling
+    ) not in reviewed]
+
+
 def symbols_for_file(path: Path, source_root: Path, repo: Path,
                      index=None) -> list[SourceSymbol]:
     """Every VA- or DATA-annotated definition in one translation unit."""
@@ -150,9 +161,12 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path,
     own = [d for d in errors if d.location.file is not None and (
         Path(str(d.location.file)).resolve().is_relative_to(repo / "src")
         or Path(str(d.location.file)).resolve().is_relative_to(repo / "include"))]
-    if own:
-        detail = "; ".join(str(d) for d in own[:5])
+    unreviewed = unreviewed_diagnostics(own, repo)
+    if unreviewed:
+        detail = "; ".join(str(d) for d in unreviewed[:5])
         raise ValueError(f"{path}: Clang could not read the annotations: {detail}")
+    if own:
+        print(f"[source-symbols] {path.name}: {len(own)} reviewed VC6/Clang diagnostics")
     if errors:
         print(f"[source-symbols] {path.name}: tolerating {len(errors)} "
               "system/vendor header errors")
@@ -179,6 +193,11 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path,
         rows.append(SourceSymbol(
             rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor), unit=unit,
             size=size, kind="func", provenance="source-annotation"))
+    expected = [(int(m[1], 16) - IMAGE_BASE, int(m[2], 0))
+                for m in VA_MARKER.finditer(_mask_lexical_noise(blob))]
+    recovered = [(r.rva, r.size) for r in rows]
+    if sorted(expected) != sorted(recovered):
+        raise ValueError(f"{path}: VA markers and recovered function definitions disagree")
 
     # DATA() names an ordinary storage definition, including a block-scope
     # static. The marker binding, the one-VarDecl-per-marker rule and the

@@ -6,7 +6,6 @@
 #include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(HexcellConstant)
-    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
     HEXCELL_LIMIT_COUNT           = 2
 H2_ENUM_END(HexcellConstant)
 

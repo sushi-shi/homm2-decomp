@@ -62,7 +62,7 @@ sample::sample(H2_CONST char* name)
         static_cast<char*>(H2_ALLOC(size));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
+    gpResourceManager->ReadBlock(m_playbackData.data, size);
 }
 
 VA(0x004ce490, 0x8b)
@@ -86,7 +86,7 @@ MIDIWrap::MIDIWrap(H2_CONST char* name)
 #line 110
     m_data = static_cast<char*>(H2_ALLOC(size));
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
+    gpResourceManager->ReadBlock(m_data, size);
 }
 
 VA(0x004ce610, 0x3d)

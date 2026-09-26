@@ -16,16 +16,15 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <BASE/display.h>
 
 H2_ENUM_BEGIN(ResourceConstant)
     INVALID_FILE            = -1,
     LOAD_SUCCESS            = 0,
     LOAD_ERROR              = 3,
     ENTRY_BYTES             = 0xc,
-    EVIL_TRANSLATION_COUNT  = 37,
-    BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
-    FILE_COUNT_BUFFER_WORDS = 2,
+
     POSITION_STACK_DEPTH    = 10
 H2_ENUM_END(ResourceConstant)
 
@@ -59,7 +58,7 @@ void resourceManager::GetBackdrop(H2_CONST char* name, class bitmap* backdrop, i
         ReadWord();
         ReadWord();
         ReadBlock(
-            reinterpret_cast<i8*>(backdrop->m_pixels),
+            backdrop->m_pixels,
             backdrop->m_width * backdrop->m_height
         );
     }
@@ -88,8 +87,8 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                (curRow * BACKDROP_ROW_BYTES)
-                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
+                (curRow * LOGICAL_SCREEN_WIDTH)
+                    + destination->m_pixels + destinationX,
                 width
             );
         }
@@ -345,7 +344,7 @@ void resourceManager::Close(void) {
 
 VA(0x004b89b0, 0x138)
 i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i16 fpCountBuffer;
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -371,8 +370,8 @@ i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
-    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
+    read(m_aggregateFd[m_curAggregate], &fpCountBuffer, sizeof(i16));
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer;
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
@@ -501,7 +500,7 @@ VA(0x004b8ea0, 0xa0)
 u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
@@ -513,12 +512,12 @@ u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
 }
 
 VA(0x004b8f40, 0x1b)
-void resourceManager::Read13(i8* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
 VA(0x004b8f60, 0x9b)
-void resourceManager::ReadBlock(i8* destination, u32l size) {
+void resourceManager::ReadBlock(void* destination, u32l size) {
     H2_ASSERT(
         m_aggregateFd[m_curAggregate] != INVALID_FILE,
         "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP",

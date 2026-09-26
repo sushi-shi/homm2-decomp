@@ -30,6 +30,12 @@ def main(argv=None):
     if [argument for argument in argv if argument != "--force"]:
         print("usage: homm2 redelink [--force]")
         return 1
+    from homm2.core.retail import verify_retail
+    try:
+        verify_retail(REPO / "build/orig/HMM2PL.exe")
+    except (OSError, ValueError) as error:
+        print(f"[redelink] {error}")
+        return 1
     if run("python3", "configure.py"):
         return 1
     if run("ninja", "base"):

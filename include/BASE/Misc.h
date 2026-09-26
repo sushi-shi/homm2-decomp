@@ -11,11 +11,14 @@ class heroWindow;
 class icon;
 struct tag_message;
 
-H2_ENUM_BEGIN(MiscRecordConstant)
-    MEM_ENTRY_FILE_CAPACITY    = 0x3d,
+H2_ENUM_BEGIN(MemoryDebugRecordConstant)
+    MEM_ENTRY_FILE_CAPACITY = 0x3d,
+H2_ENUM_END(MemoryDebugRecordConstant)
+
+H2_ENUM_BEGIN(PcxHeaderConstant)
     PCX_HEADER_PALETTE16_BYTES = 48,
-    PCX_HEADER_FILLER_BYTES    = 54
-H2_ENUM_END(MiscRecordConstant)
+    PCX_HEADER_FILLER_BYTES    = 54,
+H2_ENUM_END(PcxHeaderConstant)
 
 H2_ENUM_BEGIN(LogConstant)
     LOG_UNUSED_VALUE = -999
@@ -28,7 +31,7 @@ H2_ENUM_END(LogConstant)
 // Existing signed integer deltas; no widening or alternative distance metric.
 #define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
 #define INTEGER_VECTOR_LENGTH(dx, dy) \
-    (static_cast<i32>(sqrt(static_cast<double>((dx) * (dx) + (dy) * (dy)))))
+    (static_cast<i32>(sqrt((dx) * (dx) + (dy) * (dy))))
 
 struct indexArray {
     u16 key;
