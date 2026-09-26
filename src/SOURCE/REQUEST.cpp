@@ -172,13 +172,15 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     for (indexData = 0; indexData < m_fileCount; ++indexData) {
+        static char emptyFileName[1] = "";
         strcpy(
             m_fileNames[indexData].text,
-            ""
+            emptyFileName
         );
+        static char emptyExtension[1] = "";
         strcpy(
             m_extensions[indexData].text,
-            ""
+            emptyExtension
         );
     }
 
@@ -323,9 +325,10 @@ void fileRequester::Close(void) {
 }
 
 i32 fileRequester::Open(i32 id) {
+    static char emptyLastFilename[1] = "";
     strcpy(
         gLastFilename,
-        ""
+        emptyLastFilename
     );
     m_previousMenu = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
@@ -478,9 +481,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
+                        static char emptyCycleName[1] = "";
                         strcpy(
                             cycleNameBuffer,
-                            ""
+                            emptyCycleName
                         );
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
@@ -677,9 +681,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                     strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                 } else {
+                                    static char emptyFilteredName[1] = "";
                                     strcpy(
                                         filteredNameMap,
-                                        ""
+                                        emptyFilteredName
                                     );
                                 }
                                 SetupFiles();
