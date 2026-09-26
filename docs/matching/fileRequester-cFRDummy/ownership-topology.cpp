@@ -1,3 +1,6 @@
+// Historical literal-ownership hypotheses; superseded for retained source by
+// local-initialized-storage.cpp, which models the five method cells as local
+// initialized arrays and recovers native order without correcting COFF.
 // Target: cFRDummy backing byte at retail VA 0x00533d98.
 // Units: SOURCE/REQUEST followed by SOURCE/SEARCH in the final link.
 // Artifacts:
