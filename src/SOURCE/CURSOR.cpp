@@ -43,12 +43,13 @@ typedef enum CursorHeroShadowFrame {
     SPRITE_UP_SHADOW_STEP_4 = 0x39,
     SPRITE_UP_SHADOW_STEP_3 = 0x3a
 } CursorHeroShadowFrame;
+#include <SOURCE/KB_TYPES.h>
 
 typedef enum CursorPrivateConstant {
     SLOW_CURSOR_CYCLE_START  = 2,
     SKIPPED_ANIMATION_FRAME  = 4,
     FOOTSTEP_ANIMATION_FRAME = 3,
-    DIRECTION_HALF_COUNT     = CURSOR_DIRECTION_COUNT / 2,
+    DIRECTION_HALF_COUNT     = H2EnumIndex(MAP_DIRECTION_COUNT) / 2,
     TURN_FRAME_MULTIPLIER    = 2,
     MOVE_TILE_HALF_COUNT     = 2,
     GROUP_ALLOC_LINE_OFFSET  = 7,
@@ -65,7 +66,7 @@ void advManager::StartCursor(MapDirection direction) {
 
     m_cursorDirection = direction;
     m_cursorFrame = GetCursorBaseFrame(direction) + 1;
-    m_cursorCycle = (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+    m_cursorCycle = gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
                             > CONFIG_WALK_SPEED_SLOWEST
                         ? 1
                         : SLOW_CURSOR_CYCLE_START;
@@ -166,7 +167,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
+                            + m_updateMaxY % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_FLIPPED_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -222,7 +223,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
+                            + m_updateMaxY % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -236,14 +237,14 @@ void advManager::DrawCursor(void) {
     }
 
     if (m_cursorCycle
-        && (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        && gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
                != CONFIG_WALK_SPEED_INSTANT) {
         ++m_cursorFrameCount;
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
                 == CONFIG_WALK_SPEED_FAST
             && (m_cursorFrameCount == SKIPPED_ANIMATION_FRAME || m_cursorFrameCount == 1))
             ++m_cursorFrameCount;
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
             == CONFIG_WALK_SPEED_SLOWEST) {
             EveryOther = !EveryOther;
             if (EveryOther)
@@ -255,7 +256,7 @@ void advManager::DrawCursor(void) {
 
     if (!m_cursorTurning) {
         if (m_cursorFrameCount == FOOTSTEP_ANIMATION_FRAME
-            || ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+            || (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
                     == CONFIG_WALK_SPEED_INSTANT
                 && !bMoveSoundMade)) {
             bMoveSoundMade = true;
@@ -317,16 +318,16 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowPic = frame;
-            if (shadowPic == SPRITE_UP_STEP_5)
-                shadowPic = SPRITE_UP_SHADOW_STEP_5;
-            if (shadowPic == SPRITE_UP_STEP_4)
-                shadowPic = SPRITE_UP_SHADOW_STEP_4;
-            if (shadowPic == SPRITE_UP_STEP_3)
-                shadowPic = SPRITE_UP_SHADOW_STEP_3;
-            if (shadowPic == SPRITE_UP_STEP_2)
-                shadowPic = SPRITE_UP_SHADOW_WIDE;
-            if (shadowPic == SPRITE_UP_STEP_1)
-                shadowPic = SPRITE_UP_SHADOW_WIDE;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_51)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_56;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_50)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_57;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_49)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_58;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_47)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_55;
+            if (shadowPic == CURSOR_HERO_TURN_FRAME_46)
+                shadowPic = CURSOR_HERO_TURN_SHADOW_FRAME_55;
             DRAW_ADVENTURE_ICON(
                 m_shadowIcon,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
@@ -384,11 +385,11 @@ void advManager::TurnTo(MapDirection direction) {
     m_cursorTurning = 1;
     i32 frameIndex = H2EnumIndex(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
     i32 delayTime =
-        giStepDelay[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        giStepDelay[H2EnumIndex(gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]])];
+    if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_SLOWEST)
         delayTime *= CURSOR_SLOW_TURN_MULTIPLIER;
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+    if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_SLOW)
         delayTime = static_cast<i32>(delayTime * SLOW_TURN_DELAY_SCALE);
 
@@ -398,7 +399,7 @@ void advManager::TurnTo(MapDirection direction) {
                                                       : boatFrameFlip[frameIndex];
         m_cursorFrameCount = 0;
         glTimers[1] = platform::Ticks() + delayTime;
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
             != CONFIG_WALK_SPEED_INSTANT) {
             if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
                 UpdateScreen(0, 0);
@@ -527,7 +528,7 @@ mapCell* advManager::MoveHero(
     movingHero->m_direction = direction;
 
     if (movingHero->IsEmbarked() && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
-        for (step = 0; step < CURSOR_BOAT_COUNT; ++step) {
+        for (step = 0; step < GAME_BOAT_COUNT; ++step) {
             if (gpGame->m_boats[step].heroId == movingHero->m_id)
                 break;
         }
@@ -642,11 +643,11 @@ mapCell* advManager::MoveHero(
     m_forceCompleteDraw = true;
 
     pixelsPerStep =
-        giPixelsPerStep[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+        giPixelsPerStep[H2EnumIndex(gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]])];
     stepDelay =
-        giStepDelay[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+        giStepDelay[H2EnumIndex(gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]])];
     StartCursor(direction);
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+    if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_INSTANT) {
         if (EveryOther)
             --m_cursorFrame;
@@ -795,14 +796,14 @@ adjacentDone:
     if (mapEvent) {
         if (processEvent) {
             if (mapEvent->applyToComputer) {
-                for (step = 0; step < CURSOR_RESOURCE_COUNT; ++step) {
+                for (step = 0; step < H2EnumIndex(RES_COUNT); ++step) {
                     gpGame->m_players[giCurPlayer].m_resources[step] +=
                         mapEvent->resources[step];
                     if (gpGame->m_players[giCurPlayer].m_resources[step] < 0)
                         gpGame->m_players[giCurPlayer].m_resources[step] = 0;
                 }
                 if (mapEvent->artifact != -1
-                    && movingHero->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
+                    && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
                     GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
                     mapEvent->active = false;
@@ -812,7 +813,7 @@ adjacentDone:
             i32 primaryAmount = 0;
             i32 secondaryType = -1;
             i32 secondaryAmount = 0;
-            for (step = 0; step < CURSOR_RESOURCE_COUNT; ++step) {
+            for (step = 0; step < H2EnumIndex(RES_COUNT); ++step) {
                 i32 eventAmount = mapEvent->resources[step];
                 if (-eventAmount > gpGame->m_players[giCurPlayer].m_resources[step]) {
                     eventAmount = -gpGame->m_players[giCurPlayer].m_resources[step];
@@ -830,13 +831,13 @@ adjacentDone:
                 }
             }
             if (mapEvent->artifact != -1
-                && movingHero->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
+                && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;
                 }
-                primaryType = CURSOR_RESOURCE_COUNT;
+                primaryType = NORMAL_DIALOG_ARTIFACT;
                 primaryAmount = mapEvent->artifact;
             }
             if (mapEvent->cancelAfterVisit)
@@ -968,7 +969,7 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
 
     destinationCell = m_mapData->GetCell(destinationCellX, destinationCellY);
     currentCell = m_mapData->GetCell(centerX, centerY);
-    if (destinationCell->m_flags & CURSOR_CELL_BLOCKED_FLAG)
+    if (destinationCell->m_flags & H2EnumIndex(MAP_CELL_OCCUPIED))
         return 0;
 
     if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
@@ -993,7 +994,7 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
         if (CELL_HAS_NON_SHADOW_OBJECT(currentCell)
             && currentCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
-        if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (destinationCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             northNeighborCell = m_mapData->GetCell(destinationCellX, destinationCellY + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(northNeighborCell))
                 return 0;
@@ -1005,7 +1006,7 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
             return 0;
-        if (currentCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (currentCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             southNeighborCell =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(southNeighborCell)
@@ -1063,7 +1064,7 @@ void advManager::ProcessMapChange(SMapChange change) {
         gpAdvManager->DeactivateCurrTown();
         gpAdvManager->DeactivateCurrHero();
     }
-    if (change.player >= 0 && change.player < CURSOR_PLAYER_COUNT) {
+    if (change.player >= 0 && change.player < GAME_PLAYER_COUNT) {
         giCurPlayer = change.player;
         gpCurPlayer = &gpGame->m_players[giCurPlayer];
         giCurPlayerBit = 1 << giCurPlayer;

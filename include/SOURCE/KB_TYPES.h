@@ -43,7 +43,6 @@ using enum HeroPortrait;
 
 enum class ResourceType : i16 {
     RES_NONE            = -1,
-    RECRUIT_NO_RESOURCE = RES_NONE,
     RES_VALID_BEGIN     = 0,
     RES_WOOD            = RES_VALID_BEGIN,
     RES_MERCURY         = 1,
@@ -112,9 +111,7 @@ enum class CreatureType : i8 {
     CREATURE_SWORDSMAN           = 5,
     CREATURE_MASTER_SWORDSMAN    = 6,
     CREATURE_CAVALRY             = 7,
-    AI_GENERIC_SITE_UPGRADE_FROM = CREATURE_CAVALRY,
     CREATURE_CHAMPION            = 8,
-    AI_GENERIC_SITE_UPGRADE_TO   = CREATURE_CHAMPION,
     CREATURE_PALADIN             = 9,
     CREATURE_CRUSADER            = 10,
     CREATURE_GOBLIN              = 11,
@@ -272,7 +269,6 @@ enum class ArtifactType : i8 {
     ARTIFACT_WAND_NEGATION         = 62,
     ARTIFACT_GOLDEN_BOW            = 63,
     ARTIFACT_TELESCOPE             = 64,
-    CURSOR_VISIBILITY_ARTIFACT     = ARTIFACT_TELESCOPE,
     ARTIFACT_STATESMANS_QUILL      = 65,
     ARTIFACT_WIZARD_HAT            = 66,
     ARTIFACT_POWER_RING            = 67,
@@ -686,7 +682,6 @@ enum class BuildingSlotType : i8 {
     BUILDING_SLOT_NONE                          = -1,
     TOWN_OBJECT_NONE                            = BUILDING_SLOT_NONE,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
-    CASTLE_MAGE_GUILD                           = BUILDING_SLOT_MAGE_GUILD,
     TOWN_OBJECT_MAGE_GUILD                      = BUILDING_SLOT_MAGE_GUILD,
     TOWN_OBJECT_PRIMARY_ANIMATION               = BUILDING_SLOT_MAGE_GUILD,
     BUILDING_SLOT_SPECIAL_ONE                   = 1,
@@ -725,7 +720,6 @@ enum class BuildingSlotType : i8 {
     BUILDING_SLOT_DISABLED_FIRST                = 14,
     TOWN_OBJECT_BOAT                            = BUILDING_SLOT_DISABLED_FIRST,
     BUILDING_SLOT_NEUTRAL_LAST                  = 15,
-    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST,
     TOWN_OBJECT_CAPTAIN_QUARTERS                = BUILDING_SLOT_NEUTRAL_LAST,
     BUILDING_SLOT_DISABLED_SECOND               = 16,
     TOWN_OBJECT_RACE_OVERLAY                    = BUILDING_SLOT_DISABLED_SECOND,
@@ -767,50 +761,29 @@ using enum BuildingSlotType;
 ENABLE_ENUM_STEPS(BuildingSlotType)
 
 enum class MonsterFlags : i32 {
-    MONSTER_FLAGS_NONE                    = 0,
-    MONSTER_FLAGS_WIDE                    = 0x00000001,
-    MONSTER_ATTRIBUTE_WIDE                = MONSTER_FLAGS_WIDE,
-    MONSTER_ABILITY_FLAG_WIDE             = MONSTER_FLAGS_WIDE,
-    MONSTER_FLAGS_FLYING                  = 0x00000002,
-    MONSTER_ATTRIBUTE_FLYING              = MONSTER_FLAGS_FLYING,
-    MONSTER_ABILITY_FLAG_FLYING           = MONSTER_FLAGS_FLYING,
-    COMBAT_ARMY_FLAG_FLYER                = MONSTER_FLAGS_FLYING,
-    MONSTER_FLAGS_SHOOTER                 = 0x00000004,
-    MONSTER_ATTRIBUTE_RANGED              = MONSTER_FLAGS_SHOOTER,
-    MONSTER_ABILITY_FLAG_SHOOTER          = MONSTER_FLAGS_SHOOTER,
-    COMBAT_ARMY_FLAG_SHOOTER              = MONSTER_FLAGS_SHOOTER,
-    MONSTER_FLAGS_BREATH_ATTACK           = 0x00000008,
-    MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER    = MONSTER_FLAGS_BREATH_ATTACK,
-    MONSTER_ABILITY_FLAG_BREATH_ATTACK    = MONSTER_FLAGS_BREATH_ATTACK,
-    MONSTER_FLAGS_DEAD                    = 0x00000010,
-    MONSTER_ATTRIBUTE_DEAD                = MONSTER_FLAGS_DEAD,
-    MONSTER_ABILITY_FLAG_AI_EXCLUDED      = MONSTER_FLAGS_DEAD,
-    MONSTER_FLAGS_AI_EXCLUDED             = MONSTER_FLAGS_DEAD,
-    COMBAT_ARMY_FLAG_MIRROR_IMAGE         =
-        MONSTER_FLAGS_DEAD,
-    MONSTER_ABILITY_FLAG_HIGH_MORALE      = 0x00000020,
-    MONSTER_FLAGS_RETALIATED              = 0x00000040,
-    MONSTER_ATTRIBUTE_RETALIATED          = MONSTER_FLAGS_RETALIATED,
-    MONSTER_FLAGS_WOKE_FROM_DAMAGE        = 0x00000080,
-    MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE    = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
-    MONSTER_ABILITY_FLAG_BAD_MORALE       = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
-    MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
-    MONSTER_FLAGS_FULL_AI_QUANTITY        = MONSTER_FLAGS_WOKE_FROM_DAMAGE,
-    COMBAT_ARMY_FLAG_FULL_AI_QUANTITY     = MONSTER_FLAGS_FULL_AI_QUANTITY,
-    MONSTER_FLAGS_LIGHT_PALETTE           = 0x00000100,
-    MONSTER_FLAGS_MIRROR_IMAGE            = MONSTER_FLAGS_LIGHT_PALETTE,
-    MONSTER_FLAGS_RED_PALETTE             = 0x00000200,
-    MONSTER_ABILITY_FLAG_BLOOD_LUST       = 0x00000200,
-    MONSTER_FLAGS_UNDEAD                  = 0x00000400,
-    MONSTER_ATTRIBUTE_UNDEAD              = MONSTER_FLAGS_UNDEAD,
-    MONSTER_FLAGS_NO_MORALE               = MONSTER_FLAGS_UNDEAD,
-    MONSTER_FLAGS_SUMMONED                = 0x00000800,
-    MONSTER_ABILITY_FLAG_SUMMONED         = MONSTER_FLAGS_SUMMONED,
-    MONSTER_ABILITY_FLAG_DEFERRED_TURN    = 0x00001000,
-    MONSTER_FLAGS_DARK_BROWN_PALETTE      = 0x00002000,
-    MONSTER_FLAGS_GRAY_PALETTE            = 0x00004000,
-    MONSTER_FLAGS_ROUND_PERSISTENT_MASK   = 0x0000ff1f,
-    MONSTER_FLAGS_RESURRECTED_MASK        = 0x0000ffef
+    MONSTER_FLAGS_NONE                  = 0,
+    MONSTER_FLAGS_WIDE                  = 0x00000001,
+    MONSTER_FLAGS_FLYING                = 0x00000002,
+    MONSTER_FLAGS_SHOOTER               = 0x00000004,
+    MONSTER_FLAGS_BREATH_ATTACK         = 0x00000008,
+    MONSTER_FLAGS_DEAD                  = 0x00000010,
+    MONSTER_FLAGS_HIGH_MORALE           = 0x00000020,
+    MONSTER_FLAGS_RETALIATED            = 0x00000040,
+
+
+    MONSTER_FLAGS_TURN_SPENT            = 0x00000080,
+    MONSTER_FLAGS_MIRROR_IMAGE          = 0x00000100,
+    MONSTER_FLAGS_LIGHT_PALETTE         = MONSTER_FLAGS_MIRROR_IMAGE,
+    MONSTER_FLAGS_BLOOD_LUST            = 0x00000200,
+    MONSTER_FLAGS_RED_PALETTE           = MONSTER_FLAGS_BLOOD_LUST,
+    MONSTER_FLAGS_UNDEAD                = 0x00000400,
+    MONSTER_FLAGS_NO_MORALE             = MONSTER_FLAGS_UNDEAD,
+    MONSTER_FLAGS_SUMMONED              = 0x00000800,
+    MONSTER_FLAGS_DEFERRED_TURN         = 0x00001000,
+    MONSTER_FLAGS_DARK_BROWN_PALETTE    = 0x00002000,
+    MONSTER_FLAGS_GRAY_PALETTE          = 0x00004000,
+    MONSTER_FLAGS_ROUND_PERSISTENT_MASK = 0x0000ff1f,
+    MONSTER_FLAGS_RESURRECTED_MASK      = 0x0000ffef
 };
 using enum MonsterFlags;
 ENABLE_ENUM_FLAGS(MonsterFlags)
@@ -842,15 +815,8 @@ typedef enum MonsterDatabaseConstant {
 } MonsterDatabaseConstant;
 #pragma pack(push, 1)
 struct tag_monsterInfo {
-    union {
-        struct {
-            i16 cost;
-            union {
-                i32 fightValue;
-                i32 randomValue;
-            };
-        };
-    };
+    i16 cost;
+    i32 fightValue;
     i8 iconIndex;
     i8 growth;
     u16 hitPoints;
@@ -862,17 +828,7 @@ struct tag_monsterInfo {
     i8 damageMax;
     i8 shots;
     char spriteName[MONSTER_SPRITE_NAME_SIZE];
-    union {
-        MonsterFlags attributes;
-        union {
-            MonsterFlags all;
-            MonsterFlags abilityFlags;
-            struct {
-                i8 abilities;
-                i8 attributeFlags;
-            } bytes;
-        } flags;
-    };
+    MonsterFlags attributes;
 };
 #pragma pack(pop)
 typedef enum CombatHeroAnimationConstant {
@@ -939,7 +895,6 @@ ENABLE_ENUM_FLAGS(SpellInfoAttribute)
 
 typedef enum SpellInfoConstant {
     SPELL_INFO_SOUND_NAME_SIZE = 9,
-    SPELL_INFO_RACE_COUNT      = H2EnumIndex(FACTION_COUNT)
 } SpellInfoConstant;
 
 enum class SpellLevel : u8 {
@@ -958,7 +913,7 @@ struct SSpellInfo {
     H2EnumStorage<CombatEffectType, u8> combatEffect;
     i16 aiValue;
     u8 cost;
-    u8 raceChance[SPELL_INFO_RACE_COUNT];
+    u8 raceChance[H2EnumIndex(FACTION_COUNT)];
     SpellInfoAttribute attributes;
 };
 typedef sample* SAMPLE2;
@@ -970,5 +925,9 @@ struct SWinSetup {
     const char* text;
 };
 #pragma pack(pop)
+
+typedef enum DwellingLayoutConstant {
+    DWELLING_TYPE_COUNT = 12,
+} DwellingLayoutConstant;
 
 #endif

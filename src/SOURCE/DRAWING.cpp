@@ -23,6 +23,9 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+#include <SOURCE/KB_TYPES.h>
+#include <BASE/display.h>
+#include <SOURCE/combatTypes.h>
 enum class CombatDrawLayer : i32 {
     DRAW_FIRST_LAYER        = 0,
     DRAW_LAYER_COUNT        = 9,
@@ -32,8 +35,6 @@ enum class CombatDrawLayer : i32 {
     DRAW_WALL_MIDDLE_LAYER  = 5,
     DRAW_GATE_LAYER         = 6,
     DRAW_CATAPULT_LAYER     = 7,
-    DRAW_CASTLE_GATE_ROW    = DRAW_WALL_TOP_LAYER,
-    DRAW_CASTLE_REVERSE_ROW = DRAW_WALL_MIDDLE_LAYER
 };
 using enum CombatDrawLayer;
 ENABLE_ENUM_STEPS(CombatDrawLayer)
@@ -78,7 +79,6 @@ enum class CombatMessageText : i32 {
 using enum CombatMessageText;
 
 typedef enum CombatDrawingConstant {
-    FULL_SCREEN_HEIGHT            = 480,
     DRAWBRIDGE_TOWER_FRAME_BASE   = 21,
     WALL_COORDINATE_COUNT         = 8,
     WALL_FRAME_OFFSET_COUNT       = 7,
@@ -229,7 +229,7 @@ void combatManager::CombatMessage(
         }
     }
 
-    SET_WIDGET_MESSAGE(windowMessage, COMBAT_MESSAGE_TEXT_ACTION, COMBAT_MESSAGE_WIDGET_FIRST);
+    SET_WIDGET_MESSAGE(windowMessage, WIDGET_COMMAND_SET_TEXT, COMBAT_MESSAGE_WIDGET_FIRST);
     windowMessage.payload.widget.data.text = m_previousCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
     windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_SECOND;
@@ -240,7 +240,11 @@ void combatManager::CombatMessage(
     oldLimit = gbLimitToExtent;
     gbLimitToExtent = false;
     gbComputeExtent = gbLimitToExtent;
-    m_combatWindow->DrawWindow(0, COMBAT_MESSAGE_DRAW_FIRST_WIDGET, COMBAT_MESSAGE_WIDGET_SECOND);
+    m_combatWindow->DrawWindow(
+        WINDOW_DRAW_BUFFER_ONLY,
+        COMBAT_MESSAGE_DRAW_FIRST_WIDGET,
+        COMBAT_MESSAGE_WIDGET_SECOND
+    );
     SaveCombatBorder();
     if (updateScreen != 0)
         gpWindowManager->UpdateScreenRegion(
@@ -276,7 +280,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
 
     switch (messageType) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
-            if ((H2EnumIndex((currentArmy->m_monster.flags.all) & (COMBAT_ARMY_FLAG_SHOOTER))) != 0
+            if ((H2EnumIndex((currentArmy->m_monster.attributes) & (MONSTER_FLAGS_SHOOTER))) != 0
                 && currentArmy->m_monster.shots == 0 && targetArmy != NULL)
                 strcpy(gText, cCombatMessage[H2EnumIndex(MESSAGE_TEXT_NO_SHOTS)]);
             else
@@ -309,7 +313,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cCombatMessage[H2EnumIndex(MESSAGE_TEXT_SHOOT)],
                 gArmyNamesPlural[H2EnumIndex(targetMonsterType)],
-                static_cast<i32>(currentArmy->m_monster.shots)
+                currentArmy->m_monster.shots
             );
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
@@ -353,9 +357,9 @@ void combatManager::ResetLimitCreature(void) {
     i32 armySlotIndex;
 
     for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
-        for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
+        for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT; armySlotIndex++) {
             m_limitCreatureCount[H2EnumIndex(side)][armySlotIndex]
-                = (H2EnumIndex((m_armies[H2EnumIndex(side)][armySlotIndex].m_monster.flags.all) & (COMBAT_ARMY_FLAG_MIRROR_IMAGE)))
+                = (H2EnumIndex((m_armies[H2EnumIndex(side)][armySlotIndex].m_monster.attributes) & (MONSTER_FLAGS_DEAD)))
                         != 0
                     ? -1
                     : 0;
@@ -367,7 +371,7 @@ void combatManager::ResetLimitCreature(void) {
     m_drawHeroOverlay[1] = 0;
     giMaxExtentY = 0;
     giMaxExtentX = giMaxExtentY;
-    giMinExtentX = COMBAT_MAX_EXTENT_X;
+    giMinExtentX = LOGICAL_SCREEN_MAX_X;
     giMinExtentY = COMBAT_MAX_EXTENT_Y;
 }
 
@@ -378,7 +382,7 @@ void combatManager::UpdateCombatArea(void) {
         return;
 
     gbEnlargeScreenBlit = false;
-    gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     gbEnlargeScreenBlit = true;
 }
 
@@ -449,7 +453,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         return 0;
 
     didRedraw = false;
-    minX = COMBAT_MAX_EXTENT_X;
+    minX = LOGICAL_SCREEN_MAX_X;
     minY = COMBAT_MAX_EXTENT_Y;
     maxX = 0;
     maxY = 0;
@@ -524,7 +528,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT
             );
             didRedraw = true;
@@ -548,7 +552,7 @@ DrawCombatGrid:
                     ICON_DRAW_CLIP,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT
                 );
             }
@@ -580,7 +584,7 @@ void combatManager::DrawBackground(void) {
         ICON_DRAW_CLIP,
         0,
         0,
-        COMBAT_SCREEN_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT,
         0
     );
@@ -598,7 +602,7 @@ void combatManager::DrawBackground(void) {
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT,
             0
         );
@@ -617,7 +621,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH / H2EnumIndex(COMBAT_SIDE_COUNT),
+                LOGICAL_SCREEN_WIDTH / H2EnumIndex(COMBAT_SIDE_COUNT),
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -631,7 +635,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -653,7 +657,7 @@ void combatManager::DrawBackground(void) {
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT,
             0
         );
@@ -667,7 +671,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -683,7 +687,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -697,7 +701,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_NO_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -720,7 +724,7 @@ void combatManager::DrawBackground(void) {
         0,
         0,
         0,
-        COMBAT_SCREEN_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT
     );
     m_backgroundDrawn = true;
@@ -793,7 +797,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
             ICON_DRAW_CLIP,
             0,
             0,
-            COMBAT_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             COMBAT_AREA_HEIGHT
         );
     }
@@ -810,8 +814,8 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentX = m_hexCells[m_mouseGridHex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
         giMaxExtentY = m_hexCells[m_mouseGridHex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
     } else {
-        giMinExtentX = COMBAT_SCREEN_WIDTH;
-        giMinExtentY = FULL_SCREEN_HEIGHT;
+        giMinExtentX = LOGICAL_SCREEN_WIDTH;
+        giMinExtentY = LOGICAL_SCREEN_HEIGHT;
         giMaxExtentX = 0;
         giMaxExtentY = 0;
     }
@@ -884,7 +888,7 @@ void combatManager::DrawFrame(
     if (computeExtent != 0) {
         extentChanged = false;
         for (state = 0; H2EnumIndex(state) < COMBAT_SIDE_COUNT; state++) {
-            for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex++) {
+            for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
                 if (m_limitCreatureCount[H2EnumIndex(state)][armyIndex] > 0) {
                     extentChanged = true;
                     gbComputeExtent = true;
@@ -959,8 +963,8 @@ void combatManager::DrawFrame(
             giMinExtentX = 0;
         if (giMinExtentY < 0)
             giMinExtentY = 0;
-        if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
-            giMaxExtentX = COMBAT_MAX_EXTENT_X;
+        if (giMaxExtentX > LOGICAL_SCREEN_MAX_X)
+            giMaxExtentX = LOGICAL_SCREEN_MAX_X;
         if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
             giMaxExtentY = COMBAT_MAX_EXTENT_Y;
     }
@@ -984,7 +988,7 @@ void combatManager::DrawFrame(
                     0,
                     0,
                     0,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     COMBAT_AREA_HEIGHT
                 );
             }
@@ -1044,7 +1048,7 @@ void combatManager::DrawFrame(
         startColumn = COMBAT_GRID_FIRST_COLUMN;
         endColumn = COMBAT_GRID_COLUMN_END;
         columnStep = 1;
-        if (m_inCastleCombat != 0 && row >= DRAW_CASTLE_REVERSE_ROW) {
+        if (m_inCastleCombat != 0 && H2EnumIndex(row) >= H2EnumIndex(COMBAT_CASTLE_REVERSE_ROW)) {
             startColumn = COMBAT_GRID_REVERSE_FIRST_COLUMN;
             endColumn = COMBAT_GRID_REVERSE_COLUMN_END;
             columnStep = -1;
@@ -1236,7 +1240,7 @@ void combatManager::DrawFrame(
             || (H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT))))
                    == 0)
             goto endRow;
-        if (row == DRAW_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
+        if (H2EnumIndex(row) == H2EnumIndex(COMBAT_CASTLE_GATE_ROW) && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;
 
         if (giWalkingTo == moatCell[H2EnumIndex(row)] || giWalkingTo2 == moatCell[H2EnumIndex(row)]
@@ -1287,7 +1291,7 @@ void combatManager::DrawFrame(
                     ICON_DRAW_CLIP,
                     0,
                     drawbridgeTop,
-                    COMBAT_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_WIDTH,
                     drawbridgeBottom - drawbridgeTop + 1,
                     0
                 );
@@ -1568,7 +1572,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_LEFT
             );
-            if ((H2EnumIndex((smallArmy->m_monster.flags.all) & (COMBAT_ARMY_FLAG_SHOOTER))))
+            if ((H2EnumIndex((smallArmy->m_monster.attributes) & (MONSTER_FLAGS_SHOOTER))))
                 smallFont->DrawBoundedString(
                     cMiniViewText[H2EnumIndex(SMALL_VIEW_TEXT_SHOTS)],
                     viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1579,7 +1583,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     FONT_ALIGN_LEFT
                 );
 
-            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.attack));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", smallArmy->m_monster.attack);
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1590,7 +1594,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.defense));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", smallArmy->m_monster.defense);
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1601,7 +1605,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<u32>(smallArmy->m_monster.hitPoints));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", smallArmy->m_monster.hitPoints);
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1615,8 +1619,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%d-%d",
-                static_cast<i32>(smallArmy->m_monster.damageMin),
-                static_cast<i32>(smallArmy->m_monster.damageMax)
+                smallArmy->m_monster.damageMin,
+                smallArmy->m_monster.damageMax
             );
             smallFont->DrawBoundedString(
                 gText,
@@ -1691,8 +1695,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 );
             }
 
-            if ((H2EnumIndex((smallArmy->m_monster.flags.all) & (COMBAT_ARMY_FLAG_SHOOTER)))) {
-                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.shots));
+            if ((H2EnumIndex((smallArmy->m_monster.attributes) & (MONSTER_FLAGS_SHOOTER)))) {
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", smallArmy->m_monster.shots);
                 smallFont->DrawBoundedString(
                     gText,
                     viewX + COMBAT_SMALL_VIEW_TEXT_X,

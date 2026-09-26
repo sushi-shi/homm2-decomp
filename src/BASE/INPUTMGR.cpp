@@ -12,6 +12,8 @@
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
+#include <BASE/baseManager.h>
+#include <BASE/display.h>
 
 enum class InputManagerScanCodeEncoding : i32 {
     SCAN_CODE_MASK          = 0xff,
@@ -345,7 +347,7 @@ i32 inputManager::Open(i32 priority) {
     m_modifiers = MESSAGE_MODIFIER_NONE;
     MakeScanCodeTable();
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
-    m_priority = INPUT_MANAGER_PRIORITY;
+    m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_active = true;
     platform::SetEventHandler(PlatformEventHandler);
     strcpy(
@@ -611,7 +613,7 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
         return;
 
     bInCheckChangeCursor = true;
-    if (force != 0 || (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
+    if (force != 0 || (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
             bLastMouseOffscreen = false;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
