@@ -7747,7 +7747,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 if (gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)]
                     < joiningCost) {
                     if (strengthRatio > MONSTER_STRENGTH_FLEE)
-                        goto computerMonstersFlee;
+                        goto autoDefeatMonsters;
                     else
                         goto fightComputerMonsters;
                 }
@@ -7775,7 +7775,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     }
 
     if (strengthRatio > MONSTER_STRENGTH_FLEE) {
-    computerMonstersFlee:
+    autoDefeatMonsters:
         gpAdvManager->GiveExperience(
             eventHero,
             gMonsterDatabase[(monsterType)].hitPoints
