@@ -5,6 +5,13 @@
 > are not current conclusions; later ownership recovery can change the relevant
 > state. The referenced correction scripts and `--transform` mode have been
 > removed. Native source/build recovery remains required for exact matching.
+>
+> Ownership corrections (2026-09-27): the typed retail caller audit identifies
+> the destructor at `0x004ccf70` as `RefPtr<OutputStream>`, not
+> `RefPtr<AudioDevice>`. The pinned header and raw-image census identify the
+> `$E` pair as initialization of a template static data member, not a source
+> function-local accessor. See the corrected conclusions in §§9.3–10.3 and
+> [the measured header audit](matching/Audiere-helper-identities/ctype-static-owner-audit.cpp).
 
 Reverse-engineering of the pinned VC6 SP5 C++ front end to explain the object
 topology residuals: deferred COMDAT emission order, and string-literal / data
@@ -657,32 +664,21 @@ residual is therefore **not** the definition-site axis. Retail's delinked
 ground truth is one contiguous `.text` run:
 
 ```
-…12 functions… , ??1RefPtr<AudioDevice> @0x7d0 , ??4RefPtr<OutputStream> @0x7fc ,
+…12 functions… , ??1RefPtr<OutputStream> @0x7d0 , ??4RefPtr<OutputStream> @0x7fc ,
 _$E21 @0x850 , _$E20 @0x878 , ??1AudiereSampleNode @0x88c
 ```
 
-Three differences from ours, each now a precise statement about the retail source:
+The earlier interpretation of this sequence was incorrect. The retail EH
+callers identify the first destructor as `RefPtr<OutputStream>`; they do not
+show a missing OutputStream destructor or an AudioDevice destructor at this
+address. See [the typed caller audit](matching/Audiere-helper-identities/typed-unwind-ownership.cpp).
 
-1. Retail never emits `??1RefPtr<OutputStream>` at all — we do. So in retail no
-   `RefPtr<OutputStream>` was ever destroyed by value in this TU.
-2. Retail's helper order is `RefPtr<AudioDevice>::~RefPtr` then
-   `RefPtr<OutputStream>::operator=`; ours is the reverse plus an extra. By §4.3
-   that is a first-use ordering statement about the twelve functions.
-3. `??1AudiereSampleNode` sits **after** both `$E` thunks, so by §4.5 its first
-   requirement came *during* dynamic-initializer emission — i.e. from the
-   object's atexit destructor, not from `PurgeFinishedAudiereSamples`.
-
-**Unresolved tension worth flagging:** by §9.2's `n5` result the `$E` thunk
-bodies follow the object's source position, and retail's are late (`0x850`),
-which implies the dynamically-initialized object was defined *after* all twelve
-functions — but retail's only `.bss` symbol is `_gAudiereEffects` at `.bss+0`,
-and by §5.2 `.bss` order is declaration order, which implies it was defined
-*first*. Both cannot hold for a single object. The most likely resolution is
-that retail's `$E21`/`$E20` belong to a **different, late-defined** file-scope
-object than `gAudiereEffects` (one whose storage is not in this TU's `.bss` —
-e.g. a `RefPtr`/`AudioDevicePtr`-typed static, which would also explain
-difference 1). That is the next thing to test, and it is a source-shape
-question, not a compiler question.
+The node destructor follows the initialization pair in the image, but that
+placement alone does not establish its first compiler requirement or prove
+that an atexit cleanup requested it. The pair initializes the shared `ctype`
+template static member described below. It does not initialize
+`gAudiereEffects`, and no additional late-defined Audiere static object is
+evidenced. Source ownership and native emission order remain unresolved.
 
 ---
 
@@ -693,7 +689,7 @@ question, not a compiler question.
 The delinked retail object's tail relocations settle it:
 
 ```
-_$E21 @0x850   +0x856 DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51   (local-static guard)
+_$E21 @0x850   +0x856 DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51   (generated initialization guard)
                +0x863 DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51
                +0x86c DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51
                +0x871 REL32 -> _$E20
@@ -702,21 +698,27 @@ _$E20 @0x878   +0x87c DIR32 -> ?id@?$ctype@G@std@@$E
 .CRT$XCU       +0x000 DIR32 -> _$E21
 ```
 
-> **Retail's `$E21`/`$E20` are the `std::ctype<G>::id` guarded-local-static
-> machinery** — `$E21` is the guarded initializer (tests/sets the `??_B…@51`
-> guard, calls `$E20`), `$E20` registers the facet's destructor with `_atexit`.
-> The `?1?` in the guard's decoration marks a **function-local** static.
+The symbol spelling above comes from reconstruction, not stripped retail
+debug information. It does **not** prove a function-local static in source.
+Pinned `XLOCALE` declares and defines `locale::id ctype<_E>::id`, a template
+static data member. The compiler's generated initialization context supplies
+the guard spelling; there is no source ctype accessor to recover.
 
-There is no late-defined `RefPtr`-typed file-scope object. My §9.3 reading (c)
-is refuted, and with it the §9.3 "unresolved tension" — retail's `$E` position
-has nothing to do with `gAudiereEffects`, so there is no conflict with
-`_gAudiereEffects` sitting at `.bss+0`. The `$E` pair's position is set by where
-the **ctype accessor containing that local static** was emitted.
+The raw-image audit finds the same complete helper pattern 95 times. Every
+39-byte initializer reads/writes the guard at VA `0x00539c80` and calls its
+18-byte atexit wrapper. Every wrapper registers the same five-byte empty
+cleanup at VA `0x00415a50` through `_atexit` at VA `0x004d7548`. The guard-taken
+branch still calls the wrapper: registration is unconditional in this pattern.
+
+A TU containing only `#include <audiere.h>` emits the full matching trio,
+as does `#include <string>`. All body bytes and ordered relocation roles match
+the 95 raw retail instances. Thus neither a separate late-defined Audiere
+object nor an explicit use of a locale facet is needed to produce this shape.
 
 Also confirmed from the same dump: Purge's two delete sites (`+0x65`, `+0x114`)
 are `REL32 -> ??1AudiereSampleNode@@QAE@XZ`, the **tail** body at `0x88c`.
 
-### 10.2 The retail tail is reachable — proven
+### 10.2 Historical local-static toy probes — limited relevance
 
 Probes `q1`, `q2`, `q3` (`/Gy`), modelling the TU as: a delete site, a function
 using a helper's dtor + `operator=`, a **function-local guarded static**, and
@@ -733,41 +735,27 @@ the node destructor defined **out-of-line at EOF**:
 [11] ??1Node            0x13   <- SECOND dtor body, LAST
 ```
 
-That is retail's `[0x2c dtor][0x54 assign][$E21][$E20][0x2c dtor]` shape: **two
-dtor bodies straddling the guarded-static `$E` machinery, the EOF-defined one
-last.** So the target topology is *reachable* under the pinned toolchain.
+These toy probes put destructor bodies on both sides of initialization code,
+but their source-local accessor is not the actual shared-header mechanism in
+§10.1. They therefore do not demonstrate the retail tail's source explanation
+or eliminate template ownership and inlining as relevant axes in the real TU.
+The observed equality of the toy `q2` and `q3` topology remains a measurement
+of those inputs only.
 
-**Option (b) is unnecessary.** `q2` (node class templated, `typedef` preserving
-the spelling, dtor instantiated in the end-of-TU walk) and `q3` (plain class,
-dtor defined out-of-line at EOF) produce **byte-identical topology**. Templating
-buys nothing; §9.2's definition-point rule alone does the work.
+### 10.3 The remaining gap is relative destructor placement
 
-**Option (a) is unnecessary too** — no inlining-at-the-delete-site trick is
-needed; the delete sites keep their `REL32` call to the tail body (§9.2 already
-showed the caller bytes are invariant across all these forms).
+The earlier claim that candidate ctype machinery consisted only of a five-byte
+thunk was incorrect. The native header alone supplies the 39-byte initializer,
+18-byte registration wrapper, and five-byte cleanup, without a source facet
+use. The retail aligned contributions occupy 0x28 and 0x14 bytes; these include
+padding and must not be confused with actual function sizes.
 
-### 10.3 The one remaining gap, stated exactly
-
-In `q1`/`q2`/`q3` the guarded-static accessor is defined **mid-file, before** the
-destructor's EOF definition. In our real `AudiereEffects.cpp` the ctype
-requirement lands **last** (section 11, the 5-byte `?id@?$ctype@G@std@@$E`),
-*after* the line-203 definition — which is exactly why our node destructor
-emits early instead of last. Everything else already matches.
-
-> **The required source shape is therefore:** keep
-> `AudiereSampleNode::~AudiereSampleNode` defined out-of-line at EOF (as it
-> already is), **and arrange for the `std::ctype<G>::id` accessor to be required
-> earlier in the TU than line 203** — i.e. between `PlayAudiereSample`'s
-> `RefPtr::operator=` use and the destructor's definition point.
-
-What triggers that requirement in our build is `<locale>` machinery reached
-through the audiere headers; it currently instantiates at the very end. The
-open question is a *header/instantiation-timing* question, not a compiler one:
-find what in retail's TU touched the `ctype<G>` facet mid-file. Note retail's
-ctype machinery is `0x28 + 0x14` bytes (a separate guarded init **and** an
-atexit thunk) while ours is a single 5-byte thunk — so retail's `ctype<G>`
-instantiation is not merely repositioned but *differently shaped*, which is a
-strong hint that the trigger is a real use, not an incidental one.
+The unresolved task is to retain the proven caller bodies and place the node
+destructor after these existing helpers through ordinary source/build inputs.
+Inventing a facet accessor or static object to trigger emission would not be
+supported by this evidence. The minimal inputs, full 95-pair census, and exact
+ordered-relocation checks are preserved in
+[ctype-static-owner-audit.cpp](matching/Audiere-helper-identities/ctype-static-owner-audit.cpp).
 
 ### 10.4 DIMMER — the recipe does NOT transfer; the pair stays eager
 
