@@ -26,8 +26,10 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     generic_import_outputs = []
     for name in ("audiere", "mss32"):
         output = f"build/link/generic-imports/{name}.lib"
-        w.build(output, "definition_implib", inputs=f"imports/{name}.def",
-                implicit="scripts/homm2/build/regular_import_lib.py",
+        w.build(output, "native_implib" if name == "audiere" else "definition_implib",
+                inputs=f"imports/{name}.def",
+                implicit=["scripts/homm2/build/regular_import_lib.py",
+                          "scripts/homm2/build/import_lib.py"],
                 variables={"dll": f"{name}.dll"})
         generic_import_outputs.append(output)
     for name, dll, options in (
@@ -104,11 +106,11 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     runtime_delete_scan = "LIBCMT.LIB"
     link_args = (LINK_LIBRARIES + source_objects + base_libraries
                  + [runtime_delete_scan, resource_output])
-    for mode in ("generic", "rsrc"):
+    for mode in ("generic", "rsrc", "historical"):
         outputs = [f"build/link/{mode}/HMM2PL.exe", f"build/link/{mode}/HMM2PL.map"]
         w.build(outputs, "link_exe",
                 inputs=(source_objects + base_libraries
-                        + ([resource_output] if mode == "rsrc" else [])),
+                        + ([resource_output] if mode != "generic" else [])),
                 implicit=(generic_import_outputs + [
                     "build.ninja",  # The driver reads link_args from this graph.
                     "scripts/homm2/build/native_link.py",
@@ -117,16 +119,16 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
                     "build/toolchain/msvc/lib/MSVCPRT.LIB",
                 ]),
                 variables={"link_args": " ".join(link_args),
-                           "link_mode": "--rsrc" if mode == "rsrc" else ""})
+                           "link_mode": "--" + mode if mode != "generic" else ""})
     for alias in ("link-inputs", "link-generic-inputs"):
         w.build(alias, "phony",
                 inputs=source_objects + base_libraries + generic_import_outputs)
     link_audit_outputs = [
-        "build/link/rsrc/HMM2PL.link.json",
-        "build/link/rsrc/HMM2PL.missing-data.tsv",
+        "build/link/historical/HMM2PL.link.json",
+        "build/link/historical/HMM2PL.missing-data.tsv",
     ]
     w.build(link_audit_outputs, "link_audit",
-            inputs=["build/link/rsrc/HMM2PL.exe", "build/link/rsrc/HMM2PL.map"],
+            inputs=["build/link/historical/HMM2PL.exe", "build/link/historical/HMM2PL.map"],
             implicit=[
                 "scripts/homm2/build/link_exe.py",
                 "build/gen/symbol_names.csv",
@@ -136,7 +138,8 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
             ] + base_symbol_sidecars)
     w.build("link", "phony", inputs="build/link/generic/HMM2PL.exe")
     w.build("link-rsrc", "phony", inputs="build/link/rsrc/HMM2PL.exe")
-    w.build("link-audit", "phony", inputs="build/link/rsrc/HMM2PL.link.json")
+    w.build("link-historical", "phony", inputs="build/link/historical/HMM2PL.exe")
+    w.build("link-audit", "phony", inputs="build/link/historical/HMM2PL.link.json")
     for alias in ("link-imports", "link-generic-imports"):
         w.build(alias, "phony", inputs=generic_import_outputs)
     w.build("link-resources", "phony", inputs=resource_output)

@@ -1,5 +1,5 @@
-; Reviewed Audiere 1.9.2 ABI surface for retail-free generic links.
-; Retail-exact links still derive used imports and their hints from HMM2PL.exe.
+; Reviewed Audiere 1.9.2 ABI surface for native import-library generation.
+; Microsoft LINK derives hints from these sorted exports without a retail image.
 LIBRARY audiere.dll
 EXPORTS
 _AdrCreatePinkNoise@0

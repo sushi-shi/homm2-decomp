@@ -104,14 +104,15 @@ def main(argv=None):
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":
         if rest in (["--help"], ["-h"]):
-            print("usage: homm2 link [--rsrc] (native raw-object link)")
+            print("usage: homm2 link [--rsrc | --historical] (native raw-object link)")
             return 0
-        if rest not in ([], ["--rsrc"]):
-            print("usage: homm2 link [--rsrc]; layout corrections are not supported",
+        if rest not in ([], ["--rsrc"], ["--historical"]):
+            print("usage: homm2 link [--rsrc | --historical]; layout corrections are not supported",
                   file=sys.stderr)
             return 1
         if sh("python3", "configure.py"): return 1
-        return sh("ninja", "link-rsrc" if rest else "link")
+        target = {"--rsrc": "link-rsrc", "--historical": "link-historical"}
+        return sh("ninja", target[rest[0]] if rest else "link")
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks

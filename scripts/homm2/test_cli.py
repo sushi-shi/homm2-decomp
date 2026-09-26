@@ -64,6 +64,10 @@ class LinkCommandTest(unittest.TestCase):
         self.assertEqual(self.run_link("--rsrc"),
                          [("python3", "configure.py"), ("ninja", "link-rsrc")])
 
+    def test_historical_mode_uses_native_history_link(self):
+        self.assertEqual(self.run_link("--historical"),
+                         [("python3", "configure.py"), ("ninja", "link-historical")])
+
     def test_removed_transform_and_unknown_options_are_rejected_before_build(self):
         for args in (["--transform"], ["--rsrc", "--transform"], ["--unknown"]):
             with self.subTest(args=args), mock.patch.object(cli, "sh") as run:

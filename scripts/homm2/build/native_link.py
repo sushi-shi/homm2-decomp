@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import shlex
 from pathlib import Path
 
@@ -23,6 +24,9 @@ LIBCMT = TOOLCHAIN / "lib/LIBCMT.LIB"
 MSVCPRT = TOOLCHAIN / "lib/MSVCPRT.LIB"
 RETAIL = ROOT / "build/orig/HMM2PL.exe"
 RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
+PDB_WINDOWS_PATH = r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb"
+PDB_RELATIVE_PATH = Path("Users/igorl/VSS/HMM/HMM2/temp/release/game/HMM2PL.pdb")
+LINK_TIMES = ("@2003-02-26 14:51:33",) + ("@2003-04-04 08:19:23",) * 3
 
 
 def relative(path: Path) -> str:
@@ -86,32 +90,63 @@ def link_prefix(output: Path, map_path: Path, pdb: str) -> list[str]:
     ]
 
 
+def prepare_historical_pdb() -> Path:
+    """Start the observed four-link PDB history using ordinary linker inputs."""
+    wineprefix = Path(os.environ.get("WINEPREFIX", ROOT / "build/wineprefix"))
+    drive = wineprefix / "dosdevices/e:"
+    target = LINK_ROOT / "historical-drive-e"
+    target.mkdir(parents=True, exist_ok=True)
+    if drive.is_symlink():
+        if drive.resolve() != target.resolve():
+            raise RuntimeError(f"Wine E: already maps to {drive.resolve()}, expected {target}")
+    elif drive.exists():
+        raise RuntimeError(f"Wine E: exists and is not a symlink: {drive}")
+    else:
+        drive.parent.mkdir(parents=True, exist_ok=True)
+        drive.symlink_to(target)
+    pdb = target / PDB_RELATIVE_PATH
+    pdb.parent.mkdir(parents=True, exist_ok=True)
+    pdb.unlink(missing_ok=True)
+    return pdb
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rsrc", action="store_true",
                         help="add reconstructed resources and the retail-extracted icon")
+    parser.add_argument("--historical", action="store_true",
+                        help="include resources and reproduce the observed PDB path and link times")
     args = parser.parse_args(argv)
-    mode = "rsrc" if args.rsrc else "generic"
+    mode = "historical" if args.historical else ("rsrc" if args.rsrc else "generic")
+    include_resources = args.rsrc or args.historical
     required = (LINK_EXE, LIBCMT, MSVCPRT)
-    if args.rsrc:
+    if include_resources:
         required += (RETAIL,)
     for tool in required:
         if not tool.exists():
             raise RuntimeError(f"required {mode}-link input is missing: {tool}")
-    if args.rsrc and hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
+    if include_resources and hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
         raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
-    inputs = final_inputs(ninja_link_args(), include_resources=args.rsrc)
+    inputs = final_inputs(ninja_link_args(), include_resources=include_resources)
     mode_root = LINK_ROOT / mode
     mode_root.mkdir(parents=True, exist_ok=True)
     output = mode_root / "HMM2PL.exe"
     map_path = mode_root / "HMM2PL.map"
     response = mode_root / "HMM2PL.rsp"
-    prefix = link_prefix(output, map_path, relative(mode_root / "HMM2PL.pdb"))
+    if args.historical:
+        prepare_historical_pdb()
+    pdb = PDB_WINDOWS_PATH if args.historical else relative(mode_root / "HMM2PL.pdb")
+    prefix = link_prefix(output, map_path, pdb)
     response.write_text(" ".join(prefix + inputs) + "\n")
     output.unlink(missing_ok=True)
     map_path.unlink(missing_ok=True)
-    wine.run(LINK_EXE, "@" + relative(response),
-             cwd=ROOT, log=mode_root / "HMM2PL.link.log")
+    if args.historical:
+        for iteration, timestamp in enumerate(LINK_TIMES, 1):
+            wine.run(LINK_EXE, "@" + relative(response), cwd=ROOT,
+                     faketime_spec=timestamp, log=mode_root / f"HMM2PL.link-{iteration}.log")
+    else:
+        wine.run(LINK_EXE, "@" + relative(response),
+                 cwd=ROOT, log=mode_root / "HMM2PL.link.log")
     if not output.exists():
         raise RuntimeError(f"{mode} LINK produced no executable; see {mode_root}/HMM2PL.link.log")
     digest = hashlib.sha256(output.read_bytes()).hexdigest()

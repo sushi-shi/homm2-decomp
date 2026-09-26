@@ -1,5 +1,6 @@
 import unittest
 import struct
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -7,6 +8,7 @@ from homm2.build.import_lib import (
     export_table,
     imported_names,
     stub_source,
+    synthesize_from_definition,
     verify_archive_hints,
 )
 
@@ -59,6 +61,38 @@ class ImportLibraryTests(unittest.TestCase):
         )
         self.assertIn("void __stdcall AIL_startup(void) {}", source)
         self.assertIn("void __stdcall AIL_stop_sequence(int a0) {}", source)
+
+    def test_definition_mode_never_reads_retail_or_requests_hint_fillers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            definition = Path(directory) / "example.def"
+            definition.write_text(
+                "LIBRARY example.dll\nEXPORTS\n_Second@4\n_First@0\n"
+            )
+            output = Path(directory) / "example.lib"
+            with mock.patch("homm2.build.import_lib.imported_hints",
+                            side_effect=AssertionError("retail input forbidden")), \
+                 mock.patch("homm2.build.import_lib._synthesize_exports",
+                            return_value=output) as generate:
+                self.assertEqual(
+                    synthesize_from_definition(definition, "example.dll", output),
+                    output,
+                )
+                generate.assert_called_once_with(
+                    "example.dll", ["_Second@4", "_First@0"], output, None
+                )
+
+    def test_complete_audiere_surface_has_native_hints_without_fillers(self):
+        from homm2.build.regular_import_lib import read_definition
+        from homm2.core.paths import REPO
+
+        dll, names = read_definition(REPO / "imports/audiere.def", "audiere.dll")
+        source = stub_source(dll, names)
+        self.assertEqual(len(names), 15)
+        self.assertEqual(source.count("__declspec(dllexport)"), len(names))
+        self.assertEqual(sorted(names).index("_AdrOpenDevice@8"), 10)
+        self.assertEqual(sorted(names).index("_AdrOpenSampleSource@4"), 11)
+        self.assertNotIn("void _Z", source)
+        self.assertNotIn("filler", source)
 
     def test_bare_export_is_cdecl(self):
         source = stub_source("example.dll", ["PlainExport"])

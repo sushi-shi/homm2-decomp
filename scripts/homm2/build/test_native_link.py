@@ -1,5 +1,6 @@
 """Native final links must preserve raw object ownership and supported modes."""
 import contextlib
+import hashlib
 import io
 import tempfile
 import unittest
@@ -101,3 +102,36 @@ class NativeLinkTests(unittest.TestCase):
             with mock.patch.object(native_link, "ROOT", root):
                 self.assertEqual(native_link.ninja_link_args(),
                                  ["WINMM.LIB", "build/objdiff/base/SOURCE/REQUEST.obj"])
+
+    def test_historical_history_uses_four_native_links_and_keeps_their_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            tool = root / "LINK.EXE"
+            tool.write_bytes(b"tool")
+            retail = root / "retail.exe"
+            retail.write_bytes(b"retail fixture")
+            output = root / "build/link/historical/HMM2PL.exe"
+
+            def link(*args, **kwargs):
+                output.write_bytes(b"native history output")
+
+            with (mock.patch.object(native_link, "ROOT", root),
+                  mock.patch.object(native_link, "LINK_ROOT", root / "build/link"),
+                  mock.patch.object(native_link, "LINK_EXE", tool),
+                  mock.patch.object(native_link, "LIBCMT", tool),
+                  mock.patch.object(native_link, "MSVCPRT", tool),
+                  mock.patch.object(native_link, "RETAIL", retail),
+                  mock.patch.object(native_link, "RETAIL_SHA256", hashlib.sha256(retail.read_bytes()).hexdigest()),
+                  mock.patch.object(native_link, "prepare_historical_pdb") as prepare,
+                  mock.patch.object(native_link, "ninja_link_args", return_value=CONFIGURED),
+                  mock.patch.object(native_link.wine, "run", side_effect=link) as run,
+                  contextlib.redirect_stdout(io.StringIO())):
+                self.assertEqual(native_link.main(["--historical"]), 0)
+                prepare.assert_called_once()
+                self.assertEqual([call.kwargs["faketime_spec"] for call in run.call_args_list],
+                                 ["@2003-02-26 14:51:33"] + ["@2003-04-04 08:19:23"] * 3)
+                self.assertEqual(len({call.args for call in run.call_args_list}), 1)
+            self.assertEqual(output.read_bytes(), b"native history output")
+            response = output.with_suffix(".rsp").read_text()
+            self.assertIn("/PDB:" + native_link.PDB_WINDOWS_PATH, response)
+            self.assertIn("build/link/HMM2PL.res", response)

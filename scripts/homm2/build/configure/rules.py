@@ -40,6 +40,10 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
            command=(f"{PY} -m homm2.build.legacy_import_lib "
                     "--definition $in --out $out"),
            description="legacy-implib WING32.dll")
+    w.rule("native_implib",
+           command=(f"{PY} -m homm2.build.import_lib "
+                    "--definition $in --dll $dll --out $out"),
+           description="native-implib $dll")
     w.rule("definition_implib",
            command=(f"{PY} -m homm2.build.regular_import_lib "
                     "--definition $in --dll $dll --out $out"),
@@ -67,7 +71,7 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
            description="native LINK.EXE $out")
     w.rule("link_audit",
            command=(f"{PY} -m homm2.build.link_exe --audit-existing "
-                    "--strict --out build/link/rsrc/HMM2PL.exe"),
+                    "--strict --out build/link/historical/HMM2PL.exe"),
            description="link-audit HMM2PL.exe")
     w.rule("link_resources",
            command=(f"{PY} -m homm2.build.rc_res "

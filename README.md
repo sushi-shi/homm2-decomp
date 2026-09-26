@@ -98,6 +98,7 @@ homm2 init                # one-time: fetch pinned toolchain -> delink -> config
 homm2 build               # compile everything, compare against retail, run gates
 homm2 link                # source-only link; never opens the retail executable
 homm2 link --rsrc         # + reconstructed resources and retail-extracted icon
+homm2 link --historical   # native resources + observed PDB path and link times
 homm2 status              # per-unit and overall match %
 homm2 selftest            # tool test suite
 ```
@@ -184,7 +185,7 @@ never touches saves or configuration.
 
 ## Native linking
 
-Both supported modes drive the pinned `LINK.EXE` with raw compiler/assembler
+All supported modes drive the pinned `LINK.EXE` with raw compiler/assembler
 outputs and import libraries generated from the reviewed `imports/*.def` ABI
 manifests. LINK writes the final executable directly.
 
@@ -193,6 +194,8 @@ manifests. LINK writes the final executable directly.
 - `homm2 link --rsrc` produces `build/link/rsrc/HMM2PL.exe`, adding resources
   compiled from `res/HMM2PL.rc` and the retail-extracted program icon. The
   resource compiler's output is checked against retail.
+- `homm2 link --historical` adds the observed PDB path and four-link clock
+  history, producing `build/link/historical/HMM2PL.exe` directly through LINK.
 
 The COFF/PE layout correction machinery and `--transform` mode have been removed.
 Successful native linking does **not** establish an exact retail executable:
@@ -200,8 +203,8 @@ object matching and final linked placement are separate checks, and native
 layout residuals remain under investigation. Exact `.bss` ownership/order and
 whole-executable matching remain the objective.
 
-`ninja link-audit` compares the resource-bearing native image with retail and
-writes `build/link/rsrc/HMM2PL.link.json`; it fails on differences without changing
+`ninja link-audit` compares the historical native image with retail and
+writes `build/link/historical/HMM2PL.link.json`; it fails on differences without changing
 the executable. The command and evidence boundaries are documented in
 [`docs/retail-exact-link.md`](docs/retail-exact-link.md). Earlier compiler
 experiments remain in [`docs/compiler-re-allocation-order.md`](docs/compiler-re-allocation-order.md)

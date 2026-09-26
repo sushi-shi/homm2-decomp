@@ -9,6 +9,10 @@ library emitted by Microsoft LINK.EXE.  Retail hint indices are reproduced by
 unreferenced filler exports in the stub DLL's sorted export-name table.  The
 stub DLL, EXP, object, and generated C source are disposable build products;
 no reconstruction of the vendor's complete export table is required.
+
+Normal ``--definition`` mode instead compiles exactly the complete reviewed
+export surface. Its native sorted export table supplies the hints without
+reading a retail image or introducing filler exports.
 """
 
 from __future__ import annotations
@@ -222,7 +226,7 @@ def stub_source(
     """Generate C definitions with retail export spellings and hint indices."""
     lines = [
         f"/* Generated throwaway exports for {dll}. */",
-        "/* The retail PE import names are authoritative. */",
+        "/* Export spellings come from the selected ABI input. */",
     ]
     table = (
         export_table(names, hints)
@@ -259,18 +263,19 @@ def _run(command: list[str], expected: Path, label: str) -> None:
         raise RuntimeError(f"{label} failed\n{tail}")
 
 
-def synthesize(
-    exe: Path,
+def _synthesize_exports(
     dll: str,
+    names: list[str],
     output: Path,
     toolchain_path: Path | None = None,
+    hints: dict[str, int] | None = None,
 ) -> Path:
-    """Create ``output`` via the selected Microsoft linker-generated library."""
-    exe = exe.resolve()
+    """Compile the ABI stubs and retain the untouched Microsoft import library."""
     output = output.resolve()
-    hints = imported_hints(exe, dll)
-    imports = list(hints)
-    names = imports
+    expected_hints = (
+        hints if hints is not None
+        else {name: index for index, name in enumerate(sorted(names))}
+    )
     toolchain = (
         toolchain_path.resolve() if toolchain_path is not None else msvc_dir()
     )
@@ -321,18 +326,45 @@ def synthesize(
             implib,
             f"{dll} stub link",
         )
-        verify_archive_hints(implib, hints)
+        verify_archive_hints(implib, expected_hints)
         output.write_bytes(implib.read_bytes())
-    print(
-        f"[import-lib] {dll}: {len(imports)} retail imports, "
-        f"{len(export_table(names, hints))} padded stub exports -> {output}"
-    )
+    export_count = len(export_table(names, hints)) if hints is not None else len(names)
+    mode = "retail-derived" if hints is not None else "declared"
+    print(f"[import-lib] {dll}: {export_count} {mode} exports -> {output}")
     return output
+
+
+def synthesize(
+    exe: Path,
+    dll: str,
+    output: Path,
+    toolchain_path: Path | None = None,
+) -> Path:
+    """Diagnostic mode: recover used import hints from a retail image."""
+    hints = imported_hints(exe.resolve(), dll)
+    return _synthesize_exports(dll, list(hints), output, toolchain_path, hints)
+
+
+def synthesize_from_definition(
+    definition: Path,
+    dll: str,
+    output: Path,
+    toolchain_path: Path | None = None,
+) -> Path:
+    """Generate a native import library from the complete reviewed ABI."""
+    # regular_import_lib also consumes our archive verifier; defer its parser
+    # import until both modules have finished loading.
+    from homm2.build.regular_import_lib import read_definition
+
+    declared_dll, names = read_definition(definition, dll)
+    return _synthesize_exports(declared_dll, names, output, toolchain_path)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--exe", type=Path, default=RETAIL_EXE)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--exe", type=Path)
+    source.add_argument("--definition", type=Path)
     parser.add_argument("--dll", required=True)
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument(
@@ -342,7 +374,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     try:
-        synthesize(args.exe, args.dll, args.out, args.toolchain)
+        if args.definition is not None:
+            synthesize_from_definition(args.definition, args.dll, args.out, args.toolchain)
+        else:
+            synthesize(args.exe or RETAIL_EXE, args.dll, args.out, args.toolchain)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"[import-lib] ERROR: {error}", file=sys.stderr)
         return 1

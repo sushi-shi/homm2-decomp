@@ -13,6 +13,7 @@ Run inside `nix develop .#build`:
 homm2 build
 homm2 link
 homm2 link --rsrc
+homm2 link --historical
 ninja link-audit
 ```
 
@@ -24,8 +25,11 @@ ninja link-audit
   compiled from `res/HMM2PL.rc`. The program icon is extracted from the retail
   control image while the era resource compiler runs; every compiled resource
   payload is compared against retail. Output: `build/link/rsrc/HMM2PL.exe`.
-- `ninja link-audit`: read-only comparison of the resource-bearing native image
-  against retail. It writes `build/link/rsrc/HMM2PL.link.json` and reports
+- `homm2 link --historical` / `ninja link-historical`: resource-bearing native
+  link with the observed PDB path, creation time, and four-link age history.
+  Output: `build/link/historical/HMM2PL.exe`.
+- `ninja link-audit`: read-only comparison of the historical native image
+  against retail. It writes `build/link/historical/HMM2PL.link.json` and reports
   unresolved differences. It fails while the executable differs from retail;
   the audit never changes inputs or output bytes.
 
@@ -37,8 +41,9 @@ rebuild a supported mode before interpreting a local executable.
 ## Source and build evidence
 
 `native_link.py` and the Ninja link graph consume raw `build/objdiff/base`
-objects. Comparison-normalized objects never enter the link. The three project
-archives (`BASE-prefix.lib`, `Midi.lib`, `BASE-suffix.lib`) contain untouched
+objects. Comparison-normalized objects never enter the link. The six project
+archives (`BASE-prefix.lib`, `Misc.lib`, `MiscRuntime.lib`, `BASE-middle.lib`,
+`Midi.lib`, `BASE-suffix.lib`) contain untouched
 compiler/assembler outputs, in the reconstructed native archive order.
 
 The response scans SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock
@@ -49,10 +54,16 @@ LINK performs its native OMF conversion. The comparison graph uses MASM COFF
 outputs for object-level byte and relocation review.
 
 Import libraries reconstruct the required ABI from `imports/*.def`, including
-Smacker ordinal imports and WinG aliases. These are normal linker inputs;
+Smacker ordinal imports and WinG aliases. Audiere uses VC6 to compile the full
+15-export ABI surface and retains its native LINK-generated import library;
+this also recovers the retail import-descriptor producer records. These are normal linker inputs;
 they are not patched copies of linked game code or data. Source-owned resources
-and native PDB/debug metadata also remain ordinary build inputs. The supported
-link runs once, using the current process clock and its normal output PDB path.
+and native PDB/debug metadata also remain ordinary build inputs. Generic and resource
+links run once with the current process clock and their normal output PDB path.
+The historical mode creates the PDB at `2003-02-26 14:51:33`, then links three
+more times at `2003-04-04 08:19:23`, using the retail-recorded
+`e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb` path.
+LINK itself emits the NB10 signature, age 4, and timestamps; no bytes are patched.
 
 ## Verification boundaries
 
@@ -66,8 +77,8 @@ For a strict read-only final comparison:
 
 ```sh
 python3 -m homm2.build.link_exe --audit-existing --strict \
-  --out build/link/rsrc/HMM2PL.exe
-sha256sum build/orig/HMM2PL.exe build/link/rsrc/HMM2PL.exe
+  --out build/link/historical/HMM2PL.exe
+sha256sum build/orig/HMM2PL.exe build/link/historical/HMM2PL.exe
 ```
 
 The strict audit is expected to fail while native image residuals remain. Only

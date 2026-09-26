@@ -66,16 +66,16 @@ class ConfigureLinkGraphTests(unittest.TestCase):
                         [obj("SOURCE/ADVMGR"), obj("SOURCE/REQUEST"), obj("BASE/Midi")],
                         ["comparison-only-sidecar.json"], {}, {})
         links = [call for call in writer.build.call_args_list if call.args[1] == "link_exe"]
-        self.assertEqual(len(links), 2)
+        self.assertEqual(len(links), 3)
         for call in links:
             mode = call.kwargs["variables"]["link_mode"]
             inputs = call.kwargs["inputs"]
             self.assertIn(obj("SOURCE/REQUEST"), inputs)
-            self.assertEqual("build/link/HMM2PL.res" in inputs, mode == "--rsrc")
+            self.assertEqual("build/link/HMM2PL.res" in inputs, mode != "")
             self.assertNotIn("build/orig/HMM2PL.exe", inputs + call.kwargs["implicit"])
             self.assertNotIn("comparison-only-sidecar.json", call.kwargs["implicit"])
         imports = [call for call in writer.build.call_args_list
-                   if call.args[1] in ("definition_implib", "definition_vendor_implib", "legacy_implib")]
+                   if call.args[1] in ("native_implib", "definition_implib", "definition_vendor_implib", "legacy_implib")]
         self.assertEqual(len(imports), 5)
         self.assertTrue(all(call.kwargs["inputs"].startswith("imports/") for call in imports))
 
