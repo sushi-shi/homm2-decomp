@@ -7,19 +7,22 @@
 class sample;
 struct _DIG_DRIVER;
 
-struct AudiereSampleNode {
+template<class Resource>
+struct AudiereSampleListNode {
     audiere::OutputStreamPtr stream;
-    class sample* sampleResource;
-    AudiereSampleNode* next;
+    Resource* sampleResource;
+    AudiereSampleListNode<Resource>* next;
 
-    AudiereSampleNode(class sample* resource, AudiereSampleNode* nextNode) {
-        stream = NULL;
-        sampleResource = resource;
-        next = nextNode;
-    }
-
-    H2_RETAIL_INLINE ~AudiereSampleNode();
+    H2_RETAIL_INLINE AudiereSampleListNode(
+        Resource* resource, AudiereSampleListNode<Resource>* nextNode);
+    H2_RETAIL_INLINE ~AudiereSampleListNode();
 };
+
+template<>
+H2_RETAIL_INLINE AudiereSampleListNode<sample>::AudiereSampleListNode(
+    sample* resource, AudiereSampleListNode<sample>* nextNode);
+
+typedef AudiereSampleListNode<sample> AudiereSampleNode;
 
 // Retail keeps AudiereMusic::stream/source as static class members: their atexit
 // teardowns carry VC6's member-static destroy-once guard (one flag byte,

@@ -21,6 +21,14 @@ SIZE(AudiereEffectsState, 0x1c);
 
 DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = H2_ZERO_INIT;
 
+template<>
+H2_RETAIL_INLINE AudiereSampleListNode<sample>::AudiereSampleListNode(
+    sample* resource, AudiereSampleListNode<sample>* nextNode) {
+    stream = NULL;
+    sampleResource = resource;
+    next = nextNode;
+}
+
 VA(0x004cc740, 0x162)
 void PurgeFinishedAudiereSamples(void) {
     if (gAudiereEffects.sampleList == NULL)
@@ -200,4 +208,5 @@ bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
 
-H2_RETAIL_INLINE AudiereSampleNode::~AudiereSampleNode() {}
+template<class Resource>
+H2_RETAIL_INLINE AudiereSampleListNode<Resource>::~AudiereSampleListNode() {}

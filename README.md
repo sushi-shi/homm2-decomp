@@ -200,8 +200,9 @@ manifests. LINK writes the final executable directly.
 The COFF/PE layout correction machinery and `--transform` mode have been removed.
 Successful native linking does **not** establish an exact retail executable:
 object matching and final linked placement are separate checks, and native
-layout residuals remain under investigation. Exact `.bss` ownership/order and
-whole-executable matching remain the objective.
+layout residuals remain under investigation. REQUEST's empty-string storage
+order now follows ordinary source inputs; whole-executable matching remains
+the objective.
 
 `ninja link-audit` compares the historical native image with retail and
 writes `build/link/historical/HMM2PL.link.json`; it fails on differences without changing

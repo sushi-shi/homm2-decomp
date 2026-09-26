@@ -178,7 +178,7 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xccfa0,81,??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd000,39,_$E21,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd030,18,_$E20,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
-0xcd050,44,??1AudiereSampleNode@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
+0xcd050,44,??1?$AudiereSampleListNode@Vsample@@@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd080,15,_$E17,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcd090,97,_$E14,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcd100,18,_$E16,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
