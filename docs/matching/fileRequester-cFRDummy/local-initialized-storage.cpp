@@ -96,3 +96,18 @@
 // are the byte-level proof, not that diagnostic partition.
 // The full-image audit still reports 500 differing bytes and 12 displaced
 // project functions. This commit closes REQUEST BSS, not the entire image.
+//
+// README branch propagation, 2026-09-26:
+// The annotation-free five-array source delta was integrated into the five
+// Gold-derived views, each as a REQUEST-only commit:
+//   source-gold-2.1-buka  a904db3308ae614507d7c8c1a967b2200fd09c49
+//   classic-gold-2.1-buka c41adf9b4519af2450a493b3181d2f53f57ad409
+//   master               2e7cb23182bf7a63949b6e62322ece34f4cde804
+//   ironfist             e8bd7073724e095fb66c650b7cf0cb8d1bc105e1
+//   ironfist-master      c249b0304bb4f5f62f55dde9bf4027c17c6aa724
+// Source Gold: nix build .#game passed. Each portable branch:
+// nix build .#homm2-linux passed. Classic's REQUEST equals the file-only
+// classicizer/catalog output; it is a reading view without a supported build.
+// Existing concurrent EVENTS edits were preserved byte-for-byte in both the
+// worktrees and indices. No PoL variant or retail-address annotation changed.
+// These are local branch integrations; no remote publication is implied.

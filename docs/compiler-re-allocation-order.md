@@ -331,7 +331,25 @@ Probes `p1`, `e1`–`e3`, `f1`–`f3`, all `/Od /MT /Gr /G5 /Ob1 /Gi- /GX`, **no
 literals), then `$SG269, $SG276` (the two function-body literals).
 `f2.cpp` (`.data`): `p1, p2`, then `PPPP, QQQQ`, then `AAAA, BBBB`.
 
-### 5.3 A correction to the recorded prior art
+### 5.3 Initialized local arrays change the storage category
+
+The three-group description above applies to the measured literal/pointer
+forms; it was too broad about function-local statics. The later complete
+REQUEST matrix in
+[`local-initialized-storage.cpp`](matching/fileRequester-cFRDummy/local-initialized-storage.cpp)
+measured initialized block-scope `static char name[1] = ""` arrays. VC6 emits
+those five method-owned arrays before the global-initializer empty literal,
+while preserving every method body and the three preceding named BSS globals.
+Uninitialized local arrays instead enter the ordinary symbol-allocation walk
+and disturb those globals. Thus initialized local arrays and local pointers
+whose initializers refer to literals must not be treated as one category.
+
+The retained reconstruction uses those initialized arrays. Native LINK now
+places all six REQUEST cells at the retail addresses without any object or
+executable correction. This is a source-storage explanation; neither the
+original private identifiers nor a universal allocation rule follow from it.
+
+### 5.4 A correction to the recorded prior art
 
 `docs/matching/…` records this as *"global-initializer literal cells are
 batched/reserved BEFORE function-level literal cells"*, implying the global's
