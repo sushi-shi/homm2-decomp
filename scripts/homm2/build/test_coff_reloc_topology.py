@@ -10,6 +10,7 @@ from unittest import mock
 
 from homm2.build import coff_reloc_topology as topology
 from homm2.build.annotated_data import AnnotatedDataDefinition
+from homm2.build.annotated_vtables import AnnotatedVtable
 
 
 def synthetic_coff(path: Path, relocations: list[tuple[int, int, int, int]],
@@ -288,6 +289,7 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             provenance, "SOURCE/B", "private$S1")["rva"])
         self.assertIsNone(topology._anchor_for(
             provenance, "SOURCE/C", "private$S1"))
+
         self.assertEqual(0x1300, topology._anchor_for(
             provenance, "SOURCE/C", "?gUnique@@3HA")["rva"])
         self.assertEqual(0x1400, topology._anchor_for(
@@ -308,6 +310,23 @@ class CoffRelocationTopologyTests(unittest.TestCase):
         self.assertEqual("ambiguous-data-anchor", topology.compare_pair(
             "SOURCE/C", base, target, self.mappings(), provenance=provenance
         )["policy_errors"][0]["kind"])
+
+    def test_folded_vtable_peer_is_not_an_additional_source_claim(self):
+        name = "??_7Owner@@6B@"
+        claim = AnnotatedVtable("SOURCE/A", 0x1000, "Owner", None, name, "src/SOURCE/A.cpp:3")
+        canonical = manifest_row(
+            name, "SOURCE/A", 0x1000,
+            provenance="source-VTBL:src/SOURCE/A.cpp:3:candidate-coff-folded-comdat")
+        peer = dict(canonical, object="SOURCE\\B.c",
+                    provenance="candidate-COFF-vtable:" + canonical["provenance"])
+        rows = [canonical, peer]
+        write_manifest(self.root / "build/gen/delink_data_from_source.tsv", rows)
+        write_delinker_manifest(self.root / "build/gen/delink_data_manifest.tsv", rows)
+        with mock.patch.object(topology, "annotated_source_definitions", return_value=[]), \
+                mock.patch.object(topology, "annotated_source_vtables", return_value=[claim]):
+            provenance = topology.load_homm2_provenance(self.root)
+        self.assertEqual(provenance["diagnostics"], [])
+        self.assertEqual(topology._anchor_for(provenance, "SOURCE/B", name)["rva"], 0x1000)
 
     def test_generated_manifest_must_be_exact_conflict_free_union(self):
         source = manifest_row(

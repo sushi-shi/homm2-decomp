@@ -1,4 +1,5 @@
 import unittest
+import struct
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -11,6 +12,7 @@ from homm2.build.data_manifest_adapter import (
     _bind_compgen_edges,
     _compgen_candidate_kind,
     _folded_compgen_rows,
+    _folded_vtable_rows,
     _interior_compgen_aliases,
     _unique_reviewed_pointer_sequence_rva,
     candidate_topology,
@@ -57,6 +59,61 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_vtable_projection_requires_raw_bytes_and_ordered_weak_relocations(self):
+        symbol = "??_7Widget@@6B@"
+        owner = CandidateDefinition(
+            "A", symbol, 1, ".rdata", 0, 0, 12, 4, "rdata", "global",
+            2, COMDAT_DATA_FLAGS, 2, None)
+        peer = replace(owner, unit="B", section_ordinal=2)
+        owner_section = CandidateSection(
+            "A", "A.c", 1, ".rdata", 12, 4, COMDAT_DATA_FLAGS,
+            "rdata", 0, 2, None)
+        peer_section = replace(owner_section, unit="B", object_name="B.c", ordinal=2)
+        topology = {"A": ([owner], [owner_section]), "B": ([peer], [peer_section])}
+        claim = AnnotatedVtable("A", 0x100, "Widget", None, symbol, "src/A.cpp:3")
+
+        def raw(ordinal, *, addend=0, fallback="??_GWidget@@", targets=None):
+            data = bytearray(160)
+            struct.pack_into("<I", data, 4, addend)
+            symbols = {}
+            for index, (name, offset, storage, aux) in enumerate([
+                    ("?Draw@Widget@@", 24, 2, 0),
+                    ("??_EWidget@@", 42, 105, 1),
+                    (fallback, 78, 2, 0),
+                    ("?Main@Widget@@", 96, 2, 0)]):
+                struct.pack_into("<HB", data, offset + 14, 0x20, storage)
+                symbols[index] = SimpleNamespace(name=name, offset=offset, aux_count=aux)
+            struct.pack_into("<II", data, 60, 2, 3)  # weak alias -> scalar destructor
+            targets = targets or (0, 1, 3)
+            return SimpleNamespace(
+                data=data, symbols=symbols,
+                sections=[SimpleNamespace(raw_offset=0, raw_size=12)] * ordinal,
+                relocations={(ordinal, site): SimpleNamespace(symbol_index=target, typ=6)
+                             for site, target in zip((0, 4, 8), targets)})
+
+        original = raw(1)
+        for options, expected in [({}, 2), ({"addend": 4}, 1),
+                                  ({"fallback": "??_GOther@@"}, 1),
+                                  ({"targets": (3, 1, 0)}, 1)]:
+            with self.subTest(options=options), mock.patch(
+                    "homm2.build.data_manifest_adapter.CoffFile",
+                    side_effect=lambda path: original if path.stem == "A" else raw(2, **options)):
+                rows = _folded_vtable_rows([(claim, owner)], topology, Path("base"))
+            self.assertEqual(len(rows), expected)
+            validate_symbol_rows(rows, "fixture")
+            self.assertTrue(rows[0]["provenance"].startswith("source-VTBL:"))
+            if expected == 2:
+                self.assertEqual(rows[1]["rva"], "0x100")
+                self.assertEqual(rows[1]["section_ordinal"], "2")
+                self.assertTrue(rows[1]["provenance"].startswith("candidate-COFF-vtable:"))
+
+        with mock.patch("homm2.build.data_manifest_adapter.CoffFile") as read:
+            unmergeable = {"A": topology["A"],
+                          "B": ([replace(peer, comdat_selection=0)], [peer_section])}
+            self.assertEqual(len(_folded_vtable_rows([(claim, owner)], unmergeable,
+                                                    Path("base"))), 1)
+            read.assert_not_called()
+
     def test_redundant_compgen_claim_requires_every_folded_emitter(self):
         claim = CompgenDataClaim(
             "A", 0x100, "literal", "STRING_LITERAL", 4,

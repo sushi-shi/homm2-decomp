@@ -1198,8 +1198,7 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
           for source, candidate in ordinary),
         *compiler_rows,
         *automatic_rows,
-        *(_vtable_row(source, candidate)
-          for source, candidate in table_rows),
+        *_folded_vtable_rows(table_rows, topology, base_root),
     ]
     _mark_vtable_aliases(rows)
     validate_symbol_rows(rows, "source data manifest")
@@ -1631,6 +1630,90 @@ def _vtable_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
         "scope": "external",
         "provenance": f"source-{'VTBL2' if claim.base else 'VTBL'}:{claim.location}",
     }
+
+
+def _vtable_raw_signature(candidate, coff):
+    """Prove bytes and ordered external relocation identities, including weak aliases."""
+    section = coff.sections[candidate.section_ordinal - 1]
+    start, end = candidate.section_value, candidate.section_value + candidate.size
+    if start != 0 or end != section.raw_size:
+        return None  # Partial/overlapping section ownership needs another proof.
+
+    def target_identity(index, seen=()):
+        if index in seen:
+            return None
+        symbol = coff.symbols[index]
+        _typ, storage = _coff_symbol_fields(coff, symbol)
+        if storage == 2:
+            return (symbol.name, "external")
+        if storage == 105 and symbol.aux_count == 1:
+            fallback, search = struct.unpack_from("<II", coff.data, symbol.offset + 18)
+            target = target_identity(fallback, (*seen, index))
+            if target is not None:
+                return (symbol.name, "weak", search, target)
+        return None  # Same-spelled private targets are not cross-TU identities.
+
+    relocations = []
+    for (ordinal, site), relocation in sorted(coff.relocations.items()):
+        if ordinal != candidate.section_ordinal:
+            continue
+        if relocation.typ != IMAGE_REL_I386_DIR32 or not start <= site <= end - 4:
+            return None
+        target = target_identity(relocation.symbol_index)
+        if target is None:
+            return None
+        relocations.append((site - start, relocation.typ, target))
+    payload = bytes(coff.data[section.raw_offset + start:section.raw_offset + end])
+    return payload, tuple(relocations)
+
+
+def _folded_vtable_rows(bindings, topology_by_unit, base_root):
+    """Mirror one source-owned retail vtable into exact external COMDAT emitters.
+
+    This is the same physical-copy model as folded compiler literals, with the
+    additional ordered relocation proof required for pointer tables. A peer is
+    not another source owner. Unequal bytes, targets, weak fallbacks, topology,
+    private storage, or non-foldable sections remain unprojected and visible.
+    """
+    sections = {(unit, section.ordinal): section
+                for unit, (_definitions, members) in topology_by_unit.items()
+                for section in members}
+    candidates = defaultdict(list)
+    for definitions, _sections in topology_by_unit.values():
+        for candidate in definitions:
+            if (candidate.storage_class == 2 and candidate.storage == "rdata"
+                    and candidate.comdat_selection in FOLDABLE_COMDAT_SELECTIONS
+                    and candidate.associative_ordinal is None):
+                candidates[candidate.symbol].append(candidate)
+    objects = {}
+
+    def raw(candidate):
+        if candidate.unit not in objects:
+            objects[candidate.unit] = CoffFile(Path(base_root) / f"{candidate.unit}.obj")
+        return _vtable_raw_signature(candidate, objects[candidate.unit])
+
+    rows = []
+    for claim, owner in bindings:
+        peers = candidates.get(owner.symbol, ())
+        if len(peers) > 1:
+            signature = raw(owner)
+            peers = [peer for peer in peers
+                     if signature is not None
+                     and _folded_candidate_signature(peer, sections)
+                     == _folded_candidate_signature(owner, sections)
+                     and raw(peer) == signature]
+        if len(peers) <= 1 or owner not in peers:
+            rows.append(_vtable_row(claim, owner))
+            continue
+        if len({peer.unit for peer in peers}) != len(peers):
+            raise ValueError(f"{owner.symbol} has duplicate folded vtables in one object")
+        for peer in sorted(peers, key=lambda row: row.unit):
+            row = _vtable_row(claim, peer)
+            if peer != owner:
+                row["provenance"] = "candidate-COFF-vtable:" + row["provenance"]
+            row["provenance"] += ":candidate-coff-folded-comdat"
+            rows.append(row)
+    return rows
 
 
 def _mark_vtable_aliases(rows: list[dict[str, str]]) -> None:
