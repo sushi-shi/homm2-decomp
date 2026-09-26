@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include "baseManager.h"
 #include <BASE/message.h>
+#include <BASE/display.h>
 
 struct tag_message;
 
@@ -104,6 +105,10 @@ typedef enum InputManagerScanCode {
     INPUT_SCAN_F11             = 0x57,
     INPUT_SCAN_F12             = 0x58
 } InputManagerScanCode;
+
+constexpr InputManagerScanCode InputManagerScanCodeFromCode(i32 value) {
+    return static_cast<InputManagerScanCode>(value); // H2_ENUM_CODE_BOUNDARY
+}
 
 typedef enum InputManagerCapacity {
     INPUT_EVENT_RING_CAPACITY = 64,

@@ -3,10 +3,10 @@
 
 #include <Ints.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/hero.h>
 
 typedef enum PlayerDataStorageConstant {
     PLAYER_HERO_CAPACITY         = 8,
-    PLAYER_AVAILABLE_HERO_COUNT  = 2,
     PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
     PLAYER_BARRIER_STATE_SIZE    = 6,
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
@@ -53,7 +53,7 @@ public:
     i8 m_currentHero;
     i8 m_heroLocatorPage;
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
-    i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
+    i8 m_availableHeroIds[HERO_AVAILABLE_SLOT_COUNT];
     u8 m_minimumHeroCount;
     PlayerPersonality m_aiDifficulty;
     i8 m_cheatValue;

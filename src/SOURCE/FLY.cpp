@@ -19,6 +19,8 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/display.h>
+#include <SOURCE/combatTypes.h>
 
 
 #define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE \
@@ -43,21 +45,21 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     if (fittingHex) {
         *fittingHex = hex;
     }
-    if (!ValidHex(candidateHex) || candidateHex % ARMY_HEX_COLUMNS == 0
-        || candidateHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1) {
+    if (!ValidHex(candidateHex) || candidateHex % COMBAT_GRID_ROW_LENGTH == 0
+        || candidateHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
         return 0;
     }
     if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_SIDE_NONE
         || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
         return 0;
     }
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         candidateHex = GetAdjacentCellIndex(
             hex,
             m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
         );
-        if (ValidHex(candidateHex) && candidateHex % ARMY_HEX_COLUMNS != 0
-            && candidateHex % ARMY_HEX_COLUMNS != ARMY_HEX_COLUMNS - 1) {
+        if (ValidHex(candidateHex) && candidateHex % COMBAT_GRID_ROW_LENGTH != 0
+            && candidateHex % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1) {
             cell = &gpCombatManager->m_hexCells[candidateHex];
         }
         if (ValidHex(candidateHex)
@@ -143,7 +145,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     }
 
     attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-    while (attackMask != ARMY_ALL_ATTACK_DIRECTIONS) {
+    while (attackMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
         moveDirection = GetBestDirection(m_hex, enemyHex, attackMask);
         if (ValidAttack(
                 m_hex,
@@ -161,7 +163,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     }
 
     directionMask = 0;
-    if ((H2EnumIndex((armyPointer->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
+    if ((H2EnumIndex((armyPointer->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
         directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))
@@ -173,13 +175,13 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         if (ValidHex(adjHex)
             && CanFit(adjHex, 1 - H2EnumIndex(pathMode), &freeHex)) {
             m_moveTargetHex = freeHex;
-            if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+            if (!(H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
                 m_attackDirection = OppositeDirection(direction);
             } else {
                 attackMask = ~GetAttackMask(
                     m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
                 );
-                for (currentDirection = COMBAT_DIRECTION_NORTHEAST; H2EnumIndex(currentDirection) < ARMY_COMBAT_DIRECTION_COUNT; currentDirection++) {
+                for (currentDirection = COMBAT_DIRECTION_NORTHEAST; H2EnumIndex(currentDirection) < H2EnumIndex(COMBAT_DIRECTION_COUNT); currentDirection++) {
                     if (attackMask & (1 << H2EnumIndex(currentDirection))) {
                         m_attackDirection = currentDirection;
                     }
@@ -191,7 +193,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    if ((H2EnumIndex((armyPointer->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
+    if ((H2EnumIndex((armyPointer->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
         directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))
@@ -236,9 +238,9 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
     gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
 
     bitmap* savedScreen =
-        new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+        new bitmap(BITMAP_TYPE_NONE, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
     gpWindowManager->m_screen->CopyTo(
-        savedScreen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+        savedScreen, 0, 0, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT
     );
 
     m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 31;
@@ -254,11 +256,11 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
             m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 33;
         }
         savedScreen->CopyTo(
-            gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+            gpWindowManager->m_screen, 0, 0, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT
         );
         DrawToBuffer(points[pointIndex].x, points[pointIndex].y, 0);
         gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 0, 1);
-        gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+        gpWindowManager->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
         glTimers[0] = static_cast<i32>(
             platform::Ticks()
             + H2EnumIndex(COMBAT_ARC_FRAME_DURATION) * gfCombatSpeedMod[gConfig.combatSpeed]
@@ -272,7 +274,7 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
 
     savedScreen->CopyTo(
-        gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+        gpWindowManager->m_screen, 0, 0, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT
     );
     giMinExtentY = giMinExtentX = giMaxExtentY = giMaxExtentX = 0;
     m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 1;
@@ -283,8 +285,8 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
 // Whether the hex borders this stack's current position (either hex of a
 // wide creature).
 bool army::IsCloseMove(i32 destination) {
-    for (i32 direction = 0; direction < ARMY_ADJACENT_DIRECTION_COUNT; direction++) {
-        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
+    for (i32 direction = 0; direction < COMBAT_DIRECTION_ADJACENT_COUNT; direction++) {
+        if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
             && GetAdjacentCellIndex(m_hex + 1, CombatHexDirection(direction)) == destination) {
             return true;
         }
@@ -330,21 +332,21 @@ i32 army::FlyTo(i32 destination) {
         return 0;
     }
 
-    column = m_hex % ARMY_HEX_COLUMNS;
-    toColumn = destination % ARMY_HEX_COLUMNS;
+    column = m_hex % COMBAT_GRID_ROW_LENGTH;
+    toColumn = destination % COMBAT_GRID_ROW_LENGTH;
     columnDelta = toColumn - column;
     m_facingChanged = false;
     if (columnDelta > 0 && m_facing == ARMY_FACING_LEFT) {
         m_facingChanged = true;
         m_facing = OppositeArmyFacing(m_facing);
-        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+        if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
             m_hex--;
             destination--;
         }
     } else if (columnDelta < 0 && m_facing == ARMY_FACING_RIGHT) {
         m_facingChanged = true;
         m_facing = OppositeArmyFacing(m_facing);
-        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+        if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
             m_hex++;
             destination++;
         }
@@ -357,8 +359,8 @@ i32 army::FlyTo(i32 destination) {
     endY = gpCombatManager->m_hexCells[destination].m_y;
     fromX = gpCombatManager->m_hexCells[m_hex].m_x;
     sourceY = gpCombatManager->m_hexCells[m_hex].m_y;
-    xPosition = static_cast<float>(fromX);
-    yPosition = static_cast<float>(sourceY);
+    xPosition = fromX;
+    yPosition = sourceY;
     xDistance = endX - fromX;
     ySpan = endY - sourceY;
     length = INTEGER_VECTOR_LENGTH(xDistance, ySpan);
@@ -376,7 +378,7 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         sourceRearHex = m_hex + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
@@ -394,8 +396,8 @@ i32 army::FlyTo(i32 destination) {
             0,
             0,
             0,
-            ARMY_COMBAT_WIDTH,
-            ARMY_COMBAT_MAX_Y
+            LOGICAL_SCREEN_WIDTH,
+            COMBAT_MAX_EXTENT_Y
         );
         gpCombatManager->m_backgroundDrawn = false;
         m_animationSequence = ARMY_ANIMATION_WALK;
@@ -484,10 +486,10 @@ i32 army::FlyTo(i32 destination) {
                 } else {
                     lastMinX = 0;
                     oldMinY = 0;
-                    oldMaxX = ARMY_COMBAT_MAX_X;
-                    oldMaxY = ARMY_COMBAT_MAX_Y;
+                    oldMaxX = LOGICAL_SCREEN_MAX_X;
+                    oldMaxY = COMBAT_MAX_EXTENT_Y;
                 }
-                giMinExtentY = ARMY_COMBAT_WIDTH;
+                giMinExtentY = LOGICAL_SCREEN_WIDTH;
                 giMinExtentX = giMinExtentY;
                 giMaxExtentY = 0;
                 giMaxExtentX = giMaxExtentY;
@@ -500,10 +502,10 @@ i32 army::FlyTo(i32 destination) {
                     giMinExtentX = 0;
                 if (giMinExtentY < 0)
                     giMinExtentY = 0;
-                if (giMaxExtentX > ARMY_COMBAT_MAX_X)
-                    giMaxExtentX = ARMY_COMBAT_MAX_X;
-                if (giMaxExtentY > ARMY_COMBAT_MAX_Y)
-                    giMaxExtentY = ARMY_COMBAT_MAX_Y;
+                if (giMaxExtentX > LOGICAL_SCREEN_MAX_X)
+                    giMaxExtentX = LOGICAL_SCREEN_MAX_X;
+                if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
+                    giMaxExtentY = COMBAT_MAX_EXTENT_Y;
                 if (giMinExtentX < lastMinX)
                     lastMinX = giMinExtentX;
                 if (giMinExtentY < oldMinY)
@@ -548,16 +550,16 @@ i32 army::FlyTo(i32 destination) {
 
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
     gpCombatManager->m_hexCells[destination].m_occupantSide =
-        static_cast<i8>(gpCombatManager->m_currentArmySide);
+        gpCombatManager->m_currentArmySide;
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
-        static_cast<i8>(gpCombatManager->m_currentArmyIndex);
+        gpCombatManager->m_currentArmyIndex;
     gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         endRearHex = destination + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
-            static_cast<i8>(gpCombatManager->m_currentArmySide);
+            gpCombatManager->m_currentArmySide;
         gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
-            static_cast<i8>(gpCombatManager->m_currentArmyIndex);
+            gpCombatManager->m_currentArmyIndex;
         gpCombatManager->m_hexCells[endRearHex].m_occupantFrame =
             endRearHex >= destination ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
         gpCombatManager->m_hexCells[destination].m_occupantFrame =
@@ -568,7 +570,7 @@ i32 army::FlyTo(i32 destination) {
     m_animationFrame = 0;
     if (m_facingChanged) {
         m_facing = OppositeArmyFacing(m_facing);
-        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+        if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
             if (m_facing == ARMY_FACING_LEFT) {
                 m_hex++;
                 destination++;

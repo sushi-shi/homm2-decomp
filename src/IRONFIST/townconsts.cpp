@@ -19,7 +19,7 @@ struct BuildingCost {
     i32 gold;
 };
 
-static CreatureType dwellingTypes[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {};
+static CreatureType dwellingTypes[KB_FACTION_TABLE_CAPACITY][DWELLING_TYPE_COUNT] = {};
 
 static std::vector<std::string> firstLevelGrowerNames = {
     "Farm",
@@ -103,7 +103,7 @@ static BuildingCost specialBuildingCosts[KB_FACTION_TABLE_CAPACITY] = {
   {5, 0, 15, 0, 0, 0, 1500}
 };
 
-static BuildingCost dwellingCosts[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {};
+static BuildingCost dwellingCosts[KB_FACTION_TABLE_CAPACITY][DWELLING_TYPE_COUNT] = {};
 
 static void InitDwellingCosts() {
   dwellingCosts[H2EnumIndex(FACTION_KNIGHT)][DWELLING_1] = { 0, 0, 0, 0, 0, 0, 200 };
@@ -187,7 +187,7 @@ static void InitDwellingCosts() {
 
 static void InitDwellingTypes() {
   for (i32 i = 0; i < KB_FACTION_TABLE_CAPACITY; ++i) {
-    for (i32 j = 0; j < KB_DWELLING_TYPE_COUNT; ++j) {
+    for (i32 j = 0; j < DWELLING_TYPE_COUNT; ++j) {
       dwellingTypes[i][j] = CREATURE_NONE;
     }
   }
@@ -293,11 +293,11 @@ static const char* townPrefixNames[KB_FACTION_TABLE_CAPACITY] = {
 };
 
 // The Cybernetics Lab holds fewer spells per level than a mage guild.
-i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL] = {2, 2, 1, 1, 1};
+i8 CyborgSpellLimits[TOWN_MAGE_GUILD_LEVEL_COUNT] = {2, 2, 1, 1, 1};
 
 const char* GetDwellingName(i32 faction, i32 dwellingIndex) {
     if (faction >= 0 && faction < KB_FACTION_TABLE_CAPACITY
-        && dwellingIndex >= 0 && dwellingIndex < KB_DWELLING_TYPE_COUNT
+        && dwellingIndex >= 0 && dwellingIndex < DWELLING_TYPE_COUNT
         && gDwellingNames[faction][dwellingIndex] != NULL) {
         return gDwellingNames[faction][dwellingIndex];
     }
@@ -338,14 +338,14 @@ void InitializeTownConstants() {
         localization::Tr("town.cyborg.special_building.name");
     specialBuildingDescriptions[H2EnumIndex(FACTION_CYBORG)] =
         localization::Tr("town.cyborg.special_building.description");
-    static const char* cyborgDwellingIds[KB_DWELLING_TYPE_COUNT] = {
+    static const char* cyborgDwellingIds[DWELLING_TYPE_COUNT] = {
         "town.cyborg.dwelling.1", "town.cyborg.dwelling.2", "town.cyborg.dwelling.3",
         "town.cyborg.dwelling.4", "town.cyborg.dwelling.5", "town.cyborg.dwelling.6",
         "town.cyborg.dwelling.upgrade_2", "town.cyborg.dwelling.upgrade_3",
         "town.cyborg.dwelling.upgrade_4", "town.cyborg.dwelling.upgrade_5",
         "town.cyborg.dwelling.upgrade_6", "town.cyborg.dwelling.upgrade_6"
     };
-    for (i32 dwelling = 0; dwelling < KB_DWELLING_TYPE_COUNT; ++dwelling) {
+    for (i32 dwelling = 0; dwelling < DWELLING_TYPE_COUNT; ++dwelling) {
         cyborgDwellings[dwelling] = localization::Tr(cyborgDwellingIds[dwelling]);
     }
 
@@ -359,12 +359,12 @@ void InitializeTownConstants() {
             gWellExtraNames[f] = GetFirstLevelGrowerName(f);
             gSpecialBuildingNames[f] = GetSpecialBuildingName(f);
             gBuildingInfoSpecial[f] = GetSpecialBuildingDesc(f);
-            for (i32 dwelling = 0; dwelling < KB_DWELLING_TYPE_COUNT; ++dwelling) {
+            for (i32 dwelling = 0; dwelling < DWELLING_TYPE_COUNT; ++dwelling) {
                 gDwellingNames[f][dwelling] = &cyborgDwellings[dwelling][0];
             }
         }
 
-        for (i32 d = 0; d < KB_DWELLING_TYPE_COUNT; ++d) {
+        for (i32 d = 0; d < DWELLING_TYPE_COUNT; ++d) {
             gDwellingType[f][d] = static_cast<i8>(dwellingTypes[f][d]);
             i32 costs[H2EnumIndex(RES_COUNT)];
             BuildingCostToIntArray(dwellingCosts[f][d], costs);

@@ -29,8 +29,8 @@ bool gDisplayOpen = false;
 // its own 8-bit pipeline at retail's size.
 void GetGraphicsInfo(void) {
     giMainVideoModeColorDepth = GRAPHICS_COLOR_DEPTH;
-    giMainVideoModeWidth = GRAPHICS_WIDTH;
-    giMainVideoModeHeight = GRAPHICS_HEIGHT;
+    giMainVideoModeWidth = LOGICAL_SCREEN_WIDTH;
+    giMainVideoModeHeight = LOGICAL_SCREEN_HEIGHT;
 }
 
 void InitGraphics(void) {
@@ -39,8 +39,8 @@ void InitGraphics(void) {
     }
 
     platform::DisplayMode mode;
-    mode.width = GRAPHICS_WIDTH;
-    mode.height = GRAPHICS_HEIGHT;
+    mode.width = LOGICAL_SCREEN_WIDTH;
+    mode.height = LOGICAL_SCREEN_HEIGHT;
     if (!platform::Video().Open(mode)) {
         ShutDown("Heroes II could not open a display.");
         return;

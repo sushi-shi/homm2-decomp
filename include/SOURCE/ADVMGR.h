@@ -5,6 +5,7 @@
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 class mapCell;
 struct tag_message;
@@ -40,7 +41,6 @@ typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_COMMAND_PLAYER_EXIT      = 31,
     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
-    ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = 16
 } AdventureRemoteConstant;
 
 typedef enum AdventureBottomViewSharedConstant {
@@ -118,7 +118,6 @@ typedef enum AdventureSystemOptionsConstant {
     ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE        = 18,
     ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE       = 20,
     ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET          = 10,
-    ADVMGR_SYSTEM_OPTIONS_DRAW_MASK               = 0x7fff
 } AdventureSystemOptionsConstant;
 
 typedef enum AdventureAIStorageConstant {
