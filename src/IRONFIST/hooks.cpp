@@ -234,7 +234,7 @@ static void HandlePandoraBox(i32 side) {
         const i32 tryFirst = SRandom(0, poss - 1);
         for (i32 i = 0; i < poss; i++) {
             i32 square = squaresAroundCaster[side][(i + tryFirst) % poss];
-            if (H2EnumIndex((gMonsterDatabase[creat].flags.all) & (MONSTER_FLAGS_WIDE))) {
+            if (H2EnumIndex((gMonsterDatabase[creat].attributes) & (MONSTER_FLAGS_WIDE))) {
                 i32 dir = side == 0 ? 1 : -1;
                 if (gpCombatManager->m_hexCells[square + dir].m_occupantSide.value() != -1)
                     continue;

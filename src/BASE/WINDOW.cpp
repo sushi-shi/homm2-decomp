@@ -18,6 +18,7 @@
 #include <SOURCE/KB.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/display.h>
 enum class WindowWidgetRecordType : i32 {
     WIDGET_RECORD_END                   = 0,
     WIDGET_RECORD_BORDER                = 1,
@@ -40,8 +41,6 @@ constexpr WindowWidgetRecordType WindowWidgetRecordTypeFromCode(i16 value) {
 }
 
 typedef enum WindowConstant {
-    SCREEN_WIDTH  = 640,
-    SCREEN_HEIGHT = 480,
     OPEN_FAILURE  = 3
 } WindowConstant;
 
@@ -50,8 +49,8 @@ heroWindow::heroWindow(void) {
     m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
     m_posX = m_posY = 0;
-    m_winWidth = SCREEN_WIDTH;
-    m_winHeight = SCREEN_HEIGHT;
+    m_winWidth = LOGICAL_SCREEN_WIDTH;
+    m_winHeight = LOGICAL_SCREEN_HEIGHT;
     m_winFlags = WINDOW_FLAG_FIXED_LAYER;
     m_winState = WINDOW_STATE_CLOSED;
     m_widgetListTail = m_widgetListHead = NULL;
@@ -294,14 +293,14 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
 }
 
 void heroWindow::DrawWindow(void) {
-    DrawWindow(1);
+    DrawWindow(WINDOW_DRAW_UPDATE_SCREEN);
 }
 
-void heroWindow::DrawWindow(i32 flags) {
-    DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
+void heroWindow::DrawWindow(i32 updateScreen) {
+    DrawWindow(updateScreen, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
 }
 
-void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
+void heroWindow::DrawWindow(i32 updateScreen, i32 firstWidgetId, i32 lastWidgetId) {
     tag_message message;
     widget* currentWidget;
     gpMouseManager->m_cursorReady = 0;
@@ -310,15 +309,15 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     message.payload.widget.command = WIDGET_COMMAND_DRAW;
     while (currentWidget != NULL) {
         PollSound();
-        if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
-            if (currentWidget->m_id >= firstId && currentWidget->m_id <= lastId)
+        if (firstWidgetId != WINDOW_ALL_WIDGETS_LOW || lastWidgetId != WINDOW_ALL_WIDGETS_HIGH) {
+            if (currentWidget->m_id >= firstWidgetId && currentWidget->m_id <= lastWidgetId)
                 currentWidget->Main(message);
         } else
             currentWidget->Main(message);
         currentWidget = currentWidget->m_prev;
     }
     PollSound();
-    if (update != 0
+    if (updateScreen != 0
         && (m_winFlags & WINDOW_UPDATE_SUPPRESS_MASK) != WINDOW_FLAG_FIXED_LAYER) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
@@ -354,15 +353,15 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
         destinationX = 0;
     if (destinationY < 0)
         destinationY = 0;
-    if (SCREEN_WIDTH < destinationX + m_winWidth)
-        destinationX = SCREEN_WIDTH - m_winWidth;
-    if (SCREEN_HEIGHT < destinationY + m_winHeight)
-        destinationY = SCREEN_HEIGHT - m_winHeight;
+    if (LOGICAL_SCREEN_WIDTH < destinationX + m_winWidth)
+        destinationX = LOGICAL_SCREEN_WIDTH - m_winWidth;
+    if (LOGICAL_SCREEN_HEIGHT < destinationY + m_winHeight)
+        destinationY = LOGICAL_SCREEN_HEIGHT - m_winHeight;
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
     m_posX = destinationX;
     m_posY = destinationY;
     m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
-    DrawWindow(0);
+    DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     oldWidth = oldWidth + abs(m_posX - x);
     oldHgt = oldHgt + abs(m_posY - yPrev);
     if (m_posX < x)

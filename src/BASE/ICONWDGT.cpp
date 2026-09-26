@@ -147,10 +147,10 @@ MessageDispatchResult iconWidget::Main(tag_message& message) {
             if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                    message.payload.widget.command = WIDGET_NOTIFY_RIGHT_CLICK;
                 } else {
                     m_flags |= WIDGET_FLAG_SELECTED;
-                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.payload.widget.command = WIDGET_NOTIFY_SELECT;
                 }
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
@@ -162,7 +162,7 @@ MessageDispatchResult iconWidget::Main(tag_message& message) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_DESELECT, m_id);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
 
                 if (message.type == MESSAGE_RIGHT_BUTTON_UP)
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;

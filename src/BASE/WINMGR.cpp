@@ -41,16 +41,9 @@ typedef enum WindowColorCyclePaletteOffset {
 } WindowColorCyclePaletteOffset;
 
 typedef enum WindowScreenConstant {
-    SCREEN_WIDTH            = 640,
-    SCREEN_HEIGHT           = 480,
     FRAMEBUFFER_DWORD_COUNT = 0x12c00,
     FRAMEBUFFER_FILL_COLOR  = 0x24
 } WindowScreenConstant;
-
-typedef enum WindowPaletteConstant {
-    PALETTE_COLOR_BYTES = 3,
-    PALETTE_BYTE_COUNT = 0x300
-} WindowPaletteConstant;
 
 typedef enum WindowFizzleConstant {
     FIZZLE_DEFAULT_DELAY          = 150,
@@ -91,7 +84,7 @@ i32 iDialogNestCount = 0;
 #include <SOURCE/KB.h>
 
 void CycleColors(i32 forceUpdate) {
-    i8 savedColor[PALETTE_COLOR_BYTES];
+    i8 savedColor[H2EnumIndex(PALETTE_CHANNEL_COUNT)];
     iCycle1Count++;
     if (gpWindowManager == NULL)
         return;
@@ -118,29 +111,29 @@ void CycleColors(i32 forceUpdate) {
         u8 colorIndices[WORLD_CYCLE_COLOR_COUNT] = {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
         for (i32 colorIndex = 0; colorIndex < WORLD_CYCLE_COLOR_COUNT; colorIndex++)
             memcpy(
-                gCyclePal + colorIndex * PALETTE_COLOR_BYTES,
+                gCyclePal + colorIndex * H2EnumIndex(PALETTE_CHANNEL_COUNT),
                 gpBufferPalette->m_data
                     + (colorIndices[colorIndex] + cycleFrame * WORLD_CYCLE_FRAME_COLOR_STEP)
-                          * PALETTE_COLOR_BYTES,
-                PALETTE_COLOR_BYTES
+                          * H2EnumIndex(PALETTE_CHANNEL_COUNT),
+                H2EnumIndex(PALETTE_CHANNEL_COUNT)
             );
     } else {
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_1_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
         memmove(
             gCyclePal + CYCLE_ROTATION_1_DESTINATION_OFFSET,
             gCyclePal,
             CYCLE_ROTATION_1_BYTES
         );
-        memcpy(gCyclePal, savedColor, PALETTE_COLOR_BYTES);
+        memcpy(gCyclePal, savedColor, H2EnumIndex(PALETTE_CHANNEL_COUNT));
 
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_2_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
         memmove(
             gCyclePal + CYCLE_ROTATION_2_DESTINATION_OFFSET,
@@ -150,13 +143,13 @@ void CycleColors(i32 forceUpdate) {
         memcpy(
             gCyclePal + CYCLE_ROTATION_2_SOURCE_OFFSET,
             savedColor,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
 
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_3_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
         memmove(
             gCyclePal + CYCLE_ROTATION_3_SAVE_OFFSET,
@@ -166,13 +159,13 @@ void CycleColors(i32 forceUpdate) {
         memcpy(
             gCyclePal + CYCLE_ROTATION_3_RESTORE_OFFSET,
             savedColor,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
 
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_4_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
         memmove(
             gCyclePal + CYCLE_ROTATION_4_DESTINATION_OFFSET,
@@ -182,13 +175,13 @@ void CycleColors(i32 forceUpdate) {
         memcpy(
             gCyclePal + CYCLE_ROTATION_4_SOURCE_OFFSET,
             savedColor,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
 
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_5_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
         memmove(
             gCyclePal + CYCLE_ROTATION_5_DESTINATION_OFFSET,
@@ -198,18 +191,18 @@ void CycleColors(i32 forceUpdate) {
         memcpy(
             gCyclePal + CYCLE_ROTATION_5_SOURCE_OFFSET,
             savedColor,
-            PALETTE_COLOR_BYTES
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
 
     cycleType:
         if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT) {
-            memcpy(savedColor, gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET, PALETTE_COLOR_BYTES);
+            memcpy(savedColor, gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET, H2EnumIndex(PALETTE_CHANNEL_COUNT));
             memmove(
                 gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET,
                 gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
-                PALETTE_COLOR_BYTES
+                H2EnumIndex(PALETTE_CHANNEL_COUNT)
             );
-            memcpy(gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET, savedColor, PALETTE_COLOR_BYTES);
+            memcpy(gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET, savedColor, H2EnumIndex(PALETTE_CHANNEL_COUNT));
         } else if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
             iCombatCycleFrame = (iCombatCycleFrame + 1) % CYCLE_FRAME_COUNT;
             i32 cycleFrame = iCombatCycleFrame < CYCLE_REFLECTION_THRESHOLD
@@ -219,8 +212,8 @@ void CycleColors(i32 forceUpdate) {
                 gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
                 gpBufferPalette->m_data
                     + (COMBAT_CYCLE_FIRST_COLOR + cycleFrame * COMBAT_CYCLE_FRAME_COLORS)
-                          * PALETTE_COLOR_BYTES,
-                PALETTE_COLOR_BYTES
+                          * H2EnumIndex(PALETTE_CHANNEL_COUNT),
+                H2EnumIndex(PALETTE_CHANNEL_COUNT)
             );
         } else if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE) {
             iCombatCycleFrame = (iCombatCycleFrame + 1) % ALTERNATE_CYCLE_FRAME_COUNT;
@@ -231,8 +224,8 @@ void CycleColors(i32 forceUpdate) {
                 gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
                 gpBufferPalette->m_data
                     + (ALTERNATE_CYCLE_FIRST_COLOR + cycleFrame * ALTERNATE_CYCLE_FRAME_COLORS)
-                          * PALETTE_COLOR_BYTES,
-                PALETTE_COLOR_BYTES
+                          * H2EnumIndex(PALETTE_CHANNEL_COUNT),
+                H2EnumIndex(PALETTE_CHANNEL_COUNT)
             );
         }
     }
@@ -260,6 +253,7 @@ void CycleColors(i32 forceUpdate) {
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
+#include <BASE/display.h>
 
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = false;
@@ -278,19 +272,19 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
 
 i32 heroWindowManager::Open(i32 managerOrder) {
     platform::InitializeVideo();
-    memset(gpBufferPalette->m_data, 0, PALETTE_BYTE_COUNT);
+    memset(gpBufferPalette->m_data, 0, PALETTE_DATA_SIZE);
     SetPalette(gpBufferPalette->m_data, 1);
     m_screen = new bitmap();
     if (m_screen == NULL)
         MemError();
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
-    m_screen->m_width = SCREEN_WIDTH;
-    m_screen->m_height = SCREEN_HEIGHT;
+    m_screen->m_width = LOGICAL_SCREEN_WIDTH;
+    m_screen->m_height = LOGICAL_SCREEN_HEIGHT;
     m_screen->m_pixels = platform::Video().Pixels();
     memset(
         m_screen->m_pixels,
         FRAMEBUFFER_FILL_COLOR,
-        SCREEN_WIDTH * SCREEN_HEIGHT
+        LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
     );
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
     m_priority = managerOrder;
@@ -517,8 +511,8 @@ void heroWindowManager::ScreenShot(void) {
     CreatePCXFile(
         filename,
         m_screen->m_pixels,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         reinterpret_cast<u8*>(gPalette->m_data)
     );
     m_screenshotIndex++;
@@ -536,10 +530,10 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
         height += y;
         y = 0;
     }
-    if (x + width > SCREEN_WIDTH)
-        width = SCREEN_WIDTH - x;
-    if (y + height > SCREEN_HEIGHT)
-        height = SCREEN_HEIGHT - y;
+    if (x + width > LOGICAL_SCREEN_WIDTH)
+        width = LOGICAL_SCREEN_WIDTH - x;
+    if (y + height > LOGICAL_SCREEN_HEIGHT)
+        height = LOGICAL_SCREEN_HEIGHT - y;
     if (width <= 0 || height <= 0)
         return;
     if (m_fizzleSource != NULL)
@@ -584,10 +578,10 @@ void heroWindowManager::FizzleForward(
         height += y;
         y = 0;
     }
-    if (x + width > SCREEN_WIDTH)
-        width = SCREEN_WIDTH - x;
-    if (y + height > SCREEN_HEIGHT)
-        height = SCREEN_HEIGHT - y;
+    if (x + width > LOGICAL_SCREEN_WIDTH)
+        width = LOGICAL_SCREEN_WIDTH - x;
+    if (y + height > LOGICAL_SCREEN_HEIGHT)
+        height = LOGICAL_SCREEN_HEIGHT - y;
     if (width <= 0 || height <= 0)
         return;
 
@@ -595,7 +589,7 @@ void heroWindowManager::FizzleForward(
     m_updateFlags = 0;
     if (delay == -1)
         delay = FIZZLE_DEFAULT_DELAY;
-    paletteBuffer = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
+    paletteBuffer = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     m_fizzleWork = new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
     colorCycleBuffer = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
     BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
@@ -607,7 +601,7 @@ void heroWindowManager::FizzleForward(
         for (sourceY = y; sourceY < y + height; sourceY++) {
             savePixel = m_fizzleSource->m_pixels + (sourceY - y) * m_fizzleSource->m_width;
             workPixel = m_fizzleWork->m_pixels + (sourceY - y) * width;
-            screenPixel = m_screen->m_pixels + sourceY * SCREEN_WIDTH + x;
+            screenPixel = m_screen->m_pixels + sourceY * LOGICAL_SCREEN_WIDTH + x;
             for (sourceX = x; sourceX < x + width; sourceX++) {
                 *screenPixel = colorCycleBuffer[static_cast<u16>(
                     *workPixel | (*savePixel << FIZZLE_LOOKUP_HIGH_BYTE_SHIFT)
@@ -622,8 +616,8 @@ void heroWindowManager::FizzleForward(
         tickStart = platform::Ticks();
         BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
         if (startPalette != NULL) {
-            memcpy(paletteBuffer, startPalette, PALETTE_BYTE_COUNT);
-            for (i = 0; i < PALETTE_BYTE_COUNT; i++)
+            memcpy(paletteBuffer, startPalette, PALETTE_DATA_SIZE);
+            for (i = 0; i < PALETTE_DATA_SIZE; i++)
                 paletteBuffer[i] +=
                     (frame + 1) * (endPalette[i] - startPalette[i]) / CYCLE_FRAME_COUNT;
             UpdatePalette(paletteBuffer);

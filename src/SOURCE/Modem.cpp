@@ -16,7 +16,7 @@ typedef enum ModemPrivateConstant {
     SETUP_TEXT_CAPACITY = 104,
     RESET_ATTEMPT_COUNT = 2,
     PRINTABLE_CHARACTER_FIRST = 32,
-    READ_STORAGE_SIZE = 4,
+
     HANDSHAKE_TEXT_CAPACITY = 20,
     HANDSHAKE_PACKET_SIZE = 10,
     HANDSHAKE_PREFIX_SIZE = 2,
@@ -206,10 +206,10 @@ i32 write_buffer(const char* buffer, i32 length) {
 }
 
 i32 read_byte(void) {
-    u8 value[READ_STORAGE_SIZE];
-    i32 received = com_rcv(0, 1, value);
+    u8 value;
+    i32 received = com_rcv(0, 1, &value);
     if (received == 1)
-        return value[0];
+        return value;
     else
         return -1;
 }

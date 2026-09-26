@@ -24,8 +24,6 @@ ENABLE_ENUM_FLAGS(BaseManagerMessageMask)
 
 typedef enum BaseManagerPriorityConstant {
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1,
-    INPUT_MANAGER_PRIORITY           = BASE_MANAGER_PRIORITY_UNASSIGNED,
-    SOUND_MANAGER_PRIORITY           = BASE_MANAGER_PRIORITY_UNASSIGNED
 } BaseManagerPriorityConstant;
 
 typedef enum BaseManagerConstant {

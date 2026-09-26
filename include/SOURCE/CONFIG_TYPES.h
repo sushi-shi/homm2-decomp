@@ -38,6 +38,13 @@ enum class ConfigWalkSpeed : i32 {
 using enum ConfigWalkSpeed;
 ENABLE_ENUM_STEPS(ConfigWalkSpeed)
 
+enum class ConfigWalkSpeedOwner : i32 {
+    CONFIG_WALK_SPEED_COMPUTER = 0,
+    CONFIG_WALK_SPEED_HUMAN    = 1,
+    CONFIG_WALK_SPEED_OWNER_COUNT = 2
+};
+using enum ConfigWalkSpeedOwner;
+
 enum class ConfigVolumeLevel : i32 {
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
@@ -90,8 +97,7 @@ enum class ConfigBaudRate : i32 {
 using enum ConfigBaudRate;
 
 struct configStruct {
-    ConfigWalkSpeed computerWalkSpeed;
-    ConfigWalkSpeed walkSpeed;
+    ConfigWalkSpeed walkSpeeds[H2EnumIndex(CONFIG_WALK_SPEED_OWNER_COUNT)];
     ConfigVolumeLevel musicVolume;
     ConfigVolumeLevel soundVolume;
     i32 autosave;

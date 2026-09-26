@@ -17,6 +17,8 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 #include <SOURCE/Localization.h>
+#include <BASE/dialog.h>
+#include <SOURCE/KB_TYPES.h>
 
 typedef enum TradingPostWidgetId {
     POST_LEFT_OFFER_ICON  = 0x14,
@@ -144,7 +146,7 @@ void UpdateTradingPost(i32 draw) {
             tradingPlace
         );
     }
-    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
+    SET_WIDGET_MESSAGE(messageTemp, WIDGET_COMMAND_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
@@ -160,13 +162,13 @@ void UpdateTradingPost(i32 draw) {
 
     for (sideCurrent = OFFER_LEFT; sideCurrent < OFFER_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             messageTemp.payload.widget.id =
                 sideCurrent == OFFER_LEFT ? POST_LEFT_OFFER_ICON : POST_RIGHT_OFFER_ICON;
             messageTemp.payload.widget.data.value =
                 sideCurrent == OFFER_LEFT ? leftResource : rightResource;
             tpWindow->BroadcastMessage(messageTemp);
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
@@ -184,8 +186,8 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
         }
 
-        for (index = 0; index < TRADING_POST_RESOURCE_COUNT; index++) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+        for (index = 0; index < H2EnumIndex(RES_COUNT); index++) {
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + index;
@@ -232,7 +234,7 @@ void UpdateTradingPost(i32 draw) {
     else
         tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
-        tpWindow->DrawWindow(0);
+        tpWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             tpX + REDRAW_X_OFFSET,
             tpY,
@@ -311,7 +313,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case POST_TRACK:
                         if (iMaxUnitsToTrade == 0)
@@ -360,9 +362,9 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case NORMAL_DIALOG_BUTTON_TWO:
+                    case DIALOG_BUTTON_2:
                         exitFlag = true;
                         break;
                     case POST_EXECUTE:
@@ -406,4 +408,4 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
+u16 coreRatio[H2EnumIndex(RES_COUNT)] = {250, 500, 250, 500, 500, 500, 1};

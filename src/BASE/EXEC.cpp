@@ -16,32 +16,17 @@
 #include <SOURCE/Localization.h>
 
 typedef enum ExecutiveManagerConstant {
-    MANAGER_DEFAULT_PRIORITY = -1,
     MANAGER_SUCCESS          = 0,
     MANAGER_ERROR            = 3,
     DIALOG_MANAGER_CAPACITY  = 20
 } ExecutiveManagerConstant;
 
-static SExecutiveText gExecutiveText = {
-    "Unable to initialize resources - possible disk problem.",
-    "Unable to initialize input devices - possible problem with mouse or keyboard.",
-    "Unable to initialize sound.",
-    "Unable to initialize mouse.",
-    "Unable to initialize windows - possible memory or disk error.",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Can't add manager!",
-    "-----Manager List Start-----",
-    "-----",
-    "Head %d   Tail %d",
-    "-----",
-    "Manager %20s  this %d   prev %d  next %d",
-    "--*--Manager List Stop --*--\n\n",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Terminated"
-};
+static const char gExecutiveManagerListStart[] = "-----Manager List Start-----";
+static const char gExecutiveManagerListDivider1[] = "-----";
+static const char gExecutiveManagerListHeaderFormat[] = "Head %d   Tail %d";
+static const char gExecutiveManagerListDivider2[] = "-----";
+static const char gExecutiveManagerListEntryFormat[] = "Manager %20s  this %d   prev %d  next %d";
+static const char gExecutiveManagerListStop[] = "--*--Manager List Stop --*--\n\n";
 
 executive::executive(void) {
     m_managerListHead = NULL;
@@ -51,17 +36,17 @@ executive::executive(void) {
 }
 
 i32 executive::InitSystem(void) {
-    if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpResourceManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.resources.initialization_failed"));
-    if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpInputManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.input.initialization_failed"));
     if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
-        if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+        if (gpSoundManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
             ShutDown(localization::Tr("system.sound.initialization_failed"));
     }
-    if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.mouse.initialization_failed"));
-    if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.window.initialization_failed"));
     return 0;
 }
@@ -102,13 +87,13 @@ i32 executive::DoDialog(class baseManager* manager) {
         currentManager = currentManager->m_next;
         count++;
     }
-    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (dialogExecutive.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (dialogExecutive.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (dialogExecutive.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
     dialogExecutive.MainLoop();
     RemoveManager(manager);
@@ -120,24 +105,24 @@ i32 executive::DoDialog(class baseManager* manager) {
 }
 
 void executive::PrintManagerList(void) {
-    LogStr(gExecutiveText.managerListStart);
-    LogStr(gExecutiveText.managerListDivider1);
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
+    LogStr(gExecutiveManagerListStart);
+    LogStr(gExecutiveManagerListDivider1);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveManagerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
-    LogStr(gExecutiveText.managerListDivider2);
+    LogStr(gExecutiveManagerListDivider2);
     baseManager* currentManager = m_managerListHead;
     while (currentManager != NULL) {
-        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveManagerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
         LogStr(gText);
         currentManager = currentManager->m_next;
     }
-    LogStr(gExecutiveText.managerListStop);
+    LogStr(gExecutiveManagerListStop);
 }
 
 i32 executive::AddManager(class baseManager* manager, i32 priority) {
     if (manager == NULL)
         return MANAGER_ERROR;
-    if (priority == MANAGER_DEFAULT_PRIORITY) {
+    if (priority == BASE_MANAGER_PRIORITY_UNASSIGNED) {
         if (m_managerListTail == NULL)
             priority = 0;
         else
@@ -199,11 +184,11 @@ void executive::RemoveManager(class baseManager* manager) {
 void executive::CallManager(class baseManager* manager) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
-    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
     MainLoop();
     RemoveManager(manager);
-    if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(saved, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
     m_activeManager = saved;
 }
