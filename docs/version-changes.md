@@ -55,8 +55,9 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   includes `<audiere.h>` — dragging `<string>`/`<vector>` into 90 of the 95
   game TUs; each emits the ctype-facet guard stub trio ($E19/$E18 +
   `?id@?$ctype@G@std@@` dtor thunk, the dtor COMDAT-folded to ADVMGR's copy
-  at 0x415a50). Only BITS, TILE, X_GLOBAL, MusicFlags, and the emptied TUs
-  stay clean. **Resolved 2026-08-03**: eleven of our TUs did not reach the
+  at 0x415a50). The recovered Misc utility prefix uses the lighter KB
+  declarations; MiscRuntime owns its initializer pair. The music-state
+  accessors share Midi's existing pair. **Resolved 2026-08-03**: eleven of our TUs did not reach the
   chain and so emitted no stubs, leaving their claimed `_$E18`/`_$E19`
   spans unpaired. Adding `#include <SOURCE/KB.h>` to Icon2b, Icond2b,
   Icondf2b, Iconf2b, Iconm2b, Iconmf2b, icon2bc, icon2bs, iconf2bc,
@@ -144,8 +145,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `AudiereSampleNode` list), `BASE/AudiereMusic` (7 music functions over
   class-static stream/source RefPtrs with guarded atexit teardowns), and the
   refactored Miles wrapper `BASE/MilesSound` (11 functions).
-- **[Buka] `BASE/MusicFlags`** — a new three-function /Od TU between EXEC
-  and Midi (`GetMusicFlagA`, `MusicFlagsActive`, `GetMusicFlagB`).
+- **[Buka] Music-state accessors** — three /Od functions immediately before
+  MIDIStartup (`GetMusicFlagA`, `MusicFlagsActive`, `GetMusicFlagB`). Native
+  byte, relocation, and producer evidence places them in `BASE/Midi`; the
+  earlier separate `BASE/MusicFlags` TU was a reconstruction claim.
 - **[Buka] The Cyrillic text engine** in `BASE/FONT`:
   `RemapCyrillicCharacter` (CP1251 → glyph range) and the 4KB
   `font::ExtractLine` — a line extractor that word-wraps and hyphenates
@@ -155,7 +158,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   Polish-release input remap this build inherited.
 - **[Buka] `GetMonsterPluralName`** (`SOURCE/KB`, 0x68cf0) — plural creature
   names for the localized UI.
-- **[unclassified] `DriveSupportsFreeSpaceQuery`** (`BASE/Misc`, 0xbf2f0).
+- **[unclassified] `DriveSupportsFreeSpaceQuery`** (`BASE/MiscRuntime`, 0xbf2f0).
 - **[Buka] soundManager backend plumbing** — `ShutdownSoundBackends`,
   `StartupMilesBackend`, `ConvertVolumeFloat` (see the class rework below).
 - **[Buka] EDITOR/mapcell gained the STL init pair** — the only editor-tier
@@ -449,7 +452,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   and the goose moved between heroes (PoL byte-proven); this image bounds
   at `<= ARTIFACT_GOLDEN_GOOSE` (7). English Gold 2.1 uses the same bound at
   0x48f4c4, proving the change is upstream.
-- **[Buka] Music configuration** routed through the new `MusicFlags` TU and
+- **[Buka] Music configuration** routed through the music-state accessors and
   the config musicSource/musicVolume paths in `GAME`/`ADVMGR`/`SMACKMGR`
   (fade timing via `glTimers` slots).
 - **[2.1?/unclassified] `SAMPLE2` shrank to one pointer and `NULL_SAMPLE2`

@@ -8,10 +8,11 @@ from homm2.core.manifest import load
 
 class OrdinaryBuildTests(unittest.TestCase):
     def test_all_edges_are_isolated_and_source_backed(self):
+        manifest = load()
         for locale in ('ru', 'en'):
-            graph = ordinary.graph(load(), locale).replace('$\n', '')
+            graph = ordinary.graph(manifest, locale).replace('$\n', '')
             edges = [line for line in graph.splitlines() if line.startswith('build ')]
-            self.assertEqual(len(edges), 107)
+            self.assertEqual(len(edges), len(manifest['unit']) + 9)
             for edge in edges:
                 self.assertTrue(edge.startswith(f'build build/ordinary/{locale}/'), edge)
                 for forbidden in ('build/orig/', 'build/gen/', 'build/objdiff/',

@@ -77,9 +77,22 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
     # Every archive member is an untouched compiler or assembler output.
     midi_index = base_objects.index("build/objdiff/base/BASE/Midi.obj")
+    prefix_libraries = [("build/link/BASE-prefix.lib", base_objects[:midi_index])]
+    if any(obj in base_objects for obj in (
+            "build/objdiff/base/BASE/Misc.obj", "build/objdiff/base/BASE/MiscRuntime.obj")):
+        misc_index = base_objects.index("build/objdiff/base/BASE/Misc.obj")
+        misc_runtime_index = base_objects.index("build/objdiff/base/BASE/MiscRuntime.obj")
+        if misc_runtime_index != misc_index + 1 or misc_runtime_index >= midi_index:
+            raise ValueError("Misc and MiscRuntime must be adjacent before Midi")
+        prefix_libraries = [
+            ("build/link/BASE-prefix.lib", base_objects[:misc_index]),
+            ("build/link/Misc.lib", base_objects[misc_index:misc_index + 1]),
+            ("build/link/MiscRuntime.lib", base_objects[misc_runtime_index:misc_runtime_index + 1]),
+            ("build/link/BASE-middle.lib", base_objects[misc_runtime_index + 1:midi_index]),
+        ]
     base_libraries = []
     for library, members in (
-            ("build/link/BASE-prefix.lib", base_objects[:midi_index]),
+            *prefix_libraries,
             ("build/link/Midi.lib", base_objects[midi_index:midi_index + 1]),
             ("build/link/BASE-suffix.lib", base_objects[midi_index + 1:])):
         # VC6 LIB prepends each input member.  Feed the reviewed retail

@@ -61,9 +61,13 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertNotIn("endTime > KBTickCount()", result)
 
     def test_menu_handles_use_the_windows_type(self):
-        header = (clean_source.REPO / "include/SOURCE/KB.h").read_text()
+        umbrella = (clean_source.REPO / "include/SOURCE/KB.h").read_text()
+        forward = (clean_source.REPO / "include/SOURCE/KBForward.h").read_text()
+        header = (clean_source.REPO / "include/SOURCE/KBDeclarations.h").read_text()
         source = (clean_source.REPO / "src/SOURCE/KB.cpp").read_text()
-        self.assertIn("#include <windows.h>", header)
+        self.assertIn("#include <SOURCE/KBDeclarations.h>", umbrella)
+        self.assertIn("#include <SOURCE/KBForward.h>", header)
+        self.assertIn("#include <windows.h>", forward)
         for name in ("hmnuAdv", "hmnuCmbt", "hmnuDflt", "hmnuTown"):
             self.assertIn(f"extern HMENU {name};", header)
             self.assertIn(f"HMENU {name} = NULL;", source)

@@ -79,6 +79,26 @@ class ConfigureLinkGraphTests(unittest.TestCase):
         self.assertEqual(len(imports), 5)
         self.assertTrue(all(call.kwargs["inputs"].startswith("imports/") for call in imports))
 
+    def test_misc_owners_have_separate_dependency_scans(self):
+        names = ["BASE/Before", "BASE/Misc", "BASE/MiscRuntime",
+                 "BASE/AfterMisc", "BASE/Midi", "BASE/After", "SOURCE/GAME"]
+        edges = self.edges(names)
+        self.assertEqual(edges["build/link/BASE-prefix.lib"]["inputs"], [obj("BASE/Before")])
+        self.assertEqual(edges["build/link/Misc.lib"]["inputs"], [obj("BASE/Misc")])
+        self.assertEqual(edges["build/link/MiscRuntime.lib"]["inputs"], [obj("BASE/MiscRuntime")])
+        self.assertEqual(edges["build/link/BASE-middle.lib"]["inputs"], [obj("BASE/AfterMisc")])
+        libraries = [path for path in edges["link-generic-inputs"]["inputs"]
+                     if path in ("build/link/BASE-prefix.lib", "build/link/Misc.lib",
+                                 "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib",
+                                 "build/link/Midi.lib", "build/link/BASE-suffix.lib")]
+        self.assertEqual(libraries, ["build/link/BASE-prefix.lib", "build/link/Misc.lib",
+                                    "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib",
+                                    "build/link/Midi.lib", "build/link/BASE-suffix.lib"])
+
+    def test_misc_owner_interleaving_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "must be adjacent"):
+            self.edges(["BASE/Misc", "BASE/Between", "BASE/MiscRuntime", "BASE/Midi"])
+
 
 if __name__ == "__main__":
     unittest.main()

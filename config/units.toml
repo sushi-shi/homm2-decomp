@@ -137,10 +137,6 @@ source = "src/BASE/MOUSEMGR.cpp"
 flags = "base_nogf"
 
 [[unit]]
-unit = "BASE/MusicFlags"
-source = "src/BASE/MusicFlags.cpp"
-
-[[unit]]
 unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
 flags = "base"
@@ -148,6 +144,11 @@ flags = "base"
 [[unit]]
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
+flags = "base_nogf"
+
+[[unit]]
+unit = "BASE/MiscRuntime"
+source = "src/BASE/MiscRuntime.cpp"
 flags = "base_nogf"
 
 [[unit]]

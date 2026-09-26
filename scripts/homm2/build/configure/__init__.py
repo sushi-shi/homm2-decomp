@@ -15,6 +15,7 @@ import json
 import struct
 
 from homm2.build import ninja_syntax
+from homm2.build.annotated_functions import source_function_spans
 from homm2.core.manifest import load as load_manifest
 from homm2.core.paths import REPO
 
@@ -59,6 +60,13 @@ def main() -> None:
                 rvas = (first_function_rva if row["provenance"] == "source-annotation"
                         else first_compgen_rva)
                 rvas[row["unit"]] = min(rva, rvas.get(row["unit"], rva))
+
+    # Source owns function boundaries; an owner split must configure before
+    # redelink regenerates the previous symbol inventory.
+    source_rvas = {}
+    for span in source_function_spans(REPO / "src", REPO):
+        source_rvas[span.unit] = min(span.rva, source_rvas.get(span.unit, span.rva))
+    first_function_rva.update(source_rvas)
 
     with open(REPO / "build.ninja", "w") as f:
         w = ninja_syntax.Writer(f)

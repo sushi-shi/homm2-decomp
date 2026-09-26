@@ -15,7 +15,8 @@ CONFIGURED = [
     "build/objdiff/base/SOURCE/ADVMGR.obj",
     "build/objdiff/base/SOURCE/REQUEST.obj",
     "build/objdiff/base/SOURCE/X_GLOBAL.obj",
-    "build/link/BASE-prefix.lib", "build/link/Midi.lib",
+    "build/link/BASE-prefix.lib", "build/link/Misc.lib",
+    "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib", "build/link/Midi.lib",
     "build/link/BASE-suffix.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
 ]
 
@@ -29,8 +30,8 @@ class NativeLinkTests(unittest.TestCase):
                                              "/NODEFAULTLIB:LIBCPMT", "/NODEFAULTLIB:OLDNAMES"])
                 self.assertEqual(inputs[3:6], CONFIGURED[3:6])
                 self.assertEqual(inputs[6:10], ["OLDNAMES.LIB", *CONFIGURED[:3]])
-                self.assertEqual(inputs[10:15], [*CONFIGURED[6:9], "MSVCPRT.LIB", "LIBCMT.LIB"])
-                self.assertEqual(inputs[15:], [CONFIGURED[-1]] if resources else [])
+                self.assertEqual(inputs[10:18], [*CONFIGURED[6:12], "MSVCPRT.LIB", "LIBCMT.LIB"])
+                self.assertEqual(inputs[18:], [CONFIGURED[-1]] if resources else [])
                 self.assertEqual(CONFIGURED[4], "build/objdiff/base/SOURCE/REQUEST.obj")
 
     def test_prepared_object_cannot_replace_raw_project_input(self):
@@ -45,7 +46,7 @@ class NativeLinkTests(unittest.TestCase):
 
     def test_prepared_archive_cannot_replace_raw_archive(self):
         configured = list(CONFIGURED)
-        configured[8] = "build/link/plain-inputs/BASE-suffix.lib"
+        configured[11] = "build/link/plain-inputs/BASE-suffix.lib"
         with self.assertRaisesRegex(RuntimeError, "unexpected configured final-link tail"):
             native_link.final_inputs(configured, include_resources=True)
 
