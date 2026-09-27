@@ -1,0 +1,11 @@
+{
+  "parent": "draft; semantic descendant preserves head visibility during release",
+  "status": "authored before compilation",
+  "files": {
+    "include/BASE/AudiereEffects.h": "71b5ee9e936b675b49f83885aa502e946fffa5b1f863b7459b858cd49e618a37",
+    "include/BASE/dimmerWidget.h": "7d14680a7a54092eb59f3dab730da45f2a8fc1207fdbc0465c647579246a1766",
+    "src/BASE/AudiereEffects.cpp": "451ee6cbd913ca1c5de77e3b3c24b81e6b3ca067453e51f614c9d5e0d1e50369",
+    "src/BASE/DIMMER.cpp": "85a427bfb8dcc349e59886a1d60ff1a446ac93cf8f345de04eca54cf887b7c21",
+    "src/SOURCE/REQUEST.cpp": "2ff1e4135aaa2ace8fbcc69c2335a1536b809d3be59108af8c31c2e639eba528"
+  }
+}

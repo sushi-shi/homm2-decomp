@@ -1,0 +1,24 @@
+[
+  {
+    "variant": "evaluation",
+    "size": 1208454,
+    "sha256": "c74356c00688f92bde01ef72f110922857a5ce9d0b1efc50974624e59b25e879",
+    "section_differences": {
+      ".text": 194973,
+      ".rdata": 6171,
+      ".data": 3074,
+      ".rsrc": 0
+    }
+  },
+  {
+    "variant": "evaluation-release-order",
+    "size": 1208468,
+    "sha256": "6616c93c099a3eccc498d85eddcc34c287440134ca853388ad113b0d18c6d5a9",
+    "section_differences": {
+      ".text": 193255,
+      ".rdata": 6057,
+      ".data": 3022,
+      ".rsrc": 0
+    }
+  }
+]
