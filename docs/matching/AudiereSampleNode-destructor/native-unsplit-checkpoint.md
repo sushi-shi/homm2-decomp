@@ -106,3 +106,18 @@ punctuation checks. The classic output is a terminal reading view: the generic
 successful classic executable build. Logs are `build/link/native-recovery-clean.log`,
 `native-recovery-classic.log`, and `native-recovery-classic-verify.log`.
 No shared branch or checkout was published or changed by these checks.
+
+## Current-parent build alternatives
+
+The [frontend replay](current-template-frontends.cpp) measures two distinct
+preserved C1XX binaries with the pinned driver/backend. Both preserve all section
+bytes, ordered semantic relocations, producer identity, and helper order. The
+old RTM/SP3 path labels are duplicate binary inputs, not independent revisions.
+
+The [non-/Gy comparison](../Audiere-emission-queues/non-gy-current-parent.md)
+preserves all nineteen function bodies, ordered relocations, EH and data while
+moving N after G/R. Its order is G R S A N, however, and the ordinary public
+functions are packed in one contribution without retail's gaps. This lower
+build state is preserved; it supplies neither the required S/A position nor an
+independent alignment mechanism. Neither experiment changes the production
+115-byte executable or its recorded SHA-256.
