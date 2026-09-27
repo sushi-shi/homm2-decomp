@@ -74,3 +74,20 @@ Its archive-extraction root was explicitly forced for the diagnostic and is
 not retained in production. The discarded-contribution probes in
 [producer-selection.md](../LINK6/producer-selection.md) show that loading and
 then discarding an object does not remove its producer record.
+
+## Clean-source propagation checks
+
+From isolated checkpoint `1af9ffa09`, `homm2 clean --out
+build/native-recovery-clean --verify` generated 235 files and successfully
+built the independent modern Win32 executable at
+`/nix/store/vr2p96b5hbxgd1z5fdnc3vic5xwhyrcf-homm2-gold-buka-i686-w64-mingw32-2.1/HMM2PL.exe`.
+This verifies the accepted Misc, DIMMER and Audiere structures after matching
+annotations and retail-only inline hints are removed.
+
+An isolated Git snapshot of that generated source also feeds the classic
+Russian transformation. It emits 231 files and passes UTF-8, scaffold and
+punctuation checks. The classic output is a terminal reading view: the generic
+`--verify` build attempt fails because it has no `build.ninja`. This is not a
+successful classic executable build. Logs are `build/link/native-recovery-clean.log`,
+`native-recovery-classic.log`, and `native-recovery-classic-verify.log`.
+No shared branch or checkout was published or changed by these checks.
