@@ -15,7 +15,7 @@ typedef enum SampleConstant {
 static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
-sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
+sample::sample(char* name, i32l channelType, i32l volume, i32l looping)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -25,7 +25,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     SampleAudioFormat formatFlags;
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
-    m_playbackData.loopCount = loopCount;
+    m_playbackData.looping = looping;
     formatFlags = FORMAT_STEREO;
 
     char filename[FILENAME_CAPACITY];

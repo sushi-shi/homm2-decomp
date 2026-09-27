@@ -130,8 +130,8 @@ i32 armyGroup::IsMember(CreatureType creatureType) {
     return 0;
 }
 
-ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
-    i32 numCreatureTypes = 0;
+ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
+    i32 creatureTypeRuns = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
     CreatureType last = CREATURE_NONE;
@@ -139,16 +139,16 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
-            if (countRaces == ARMY_GROUP_EMPTY_SLOT)
+            if (alignmentMode == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[(gMonsterDatabase[(m_creatureTypes[i])].race)];
             if (m_creatureTypes[i] != last) {
-                ++numCreatureTypes;
+                ++creatureTypeRuns;
                 last = m_creatureTypes[i];
             }
         }
     }
 
-    if (numCreatureTypes <= 1)
+    if (creatureTypeRuns <= 1)
         return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 
     nRaces = 0;
@@ -221,10 +221,10 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
     SwapValues(m_creatureCounts[slot], otherGroup->m_creatureCounts[otherSlot]);
 }
 
-void armyGroup::DamageGroup(float damagePercent) {
+void armyGroup::DamageGroup(float casualtyFraction) {
     i32 numKilled;
     i32 percentChance = static_cast<i32>(
-        damagePercent
+        casualtyFraction
         * (ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
     i32 i;
@@ -239,10 +239,10 @@ void armyGroup::DamageGroup(float damagePercent) {
                     ++numKilled;
             }
             if (isFirstTroop && numKilled == m_creatureCounts[i]
-                && damagePercent < 0.999)
+                && casualtyFraction < 0.999)
                 --numKilled;
             m_creatureCounts[i] -= numKilled;
-            if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
+            if (m_creatureCounts[i] <= 0 || casualtyFraction >= 1.0) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }

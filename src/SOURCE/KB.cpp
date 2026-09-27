@@ -1574,7 +1574,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         else
             return 0;
     }
-    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
+    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_mageGuildLevel >= KB_MAGE_GUILD_MAX_LEVEL)
         return 0;
     if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
@@ -1612,7 +1612,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         haveMask |= (KB_DWELLING_FIFTH_FLAG);
     if ((reqMask & haveMask) == reqMask) {
         if (t->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
+            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1623,7 +1623,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
     i32 idx;
-    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
+    GetBuildingCost(t->m_type, type, buf, t->m_mageGuildLevel);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->m_resources[idx] < buf[idx])
@@ -2624,7 +2624,7 @@ void InitVars(void) {
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
-    gpGame->m_viewArmyResult = 0;
+    gpGame->m_dialogAnimationCounter = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = 0;
     gbInNewGameSetup = false;

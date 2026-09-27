@@ -304,14 +304,14 @@ public:
         class mapCell*,
         class mapCell*,
         class hero*,
-        i32*,
+        i32* removeMonsterObject,
         i32,
         i32,
         i32,
         i32,
         i32
     );
-    void ComputerMonsterInteract(class mapCell*, class hero*, i32*);
+    void ComputerMonsterInteract(class mapCell*, class hero*, i32* removeMonsterObject);
     i32 DoNetCombat(char*);
     CombatResult DoCombat(
         i32,
