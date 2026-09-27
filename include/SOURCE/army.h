@@ -29,7 +29,7 @@ typedef enum ArmyHexConstant {
 class army {
 public:
     u8 m_animationState;
-    u8 m_animationCycle;
+    u8 m_shootingAnimationActive;
     char m_pendingAnimationSequence;
     i8 m_effectAnimationStart;
     i8 m_effectAnimationEnd;
@@ -49,7 +49,7 @@ public:
     b32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
     i32 m_mirrorImageIndex;
-    i32 m_roundCounter;
+    i32 m_mirrorImageRoundsRemaining;
     i32 m_monsterType;
     i32 m_hex;
     i32 m_animationSequence;
