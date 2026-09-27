@@ -45,10 +45,10 @@ public:
         i32 townId,
         i32 enemyPlayer,
         float& winChance,
-        i32& attackerLoss,
-        i32& defenderLoss,
-        i32& attackerRemaining,
-        i32& defenderRemaining,
+        i32& attackerLossValue,
+        i32& defenderLossValue,
+        i32& expectedAttackerLossValue,
+        i32& expectedDefenderLossValue,
         i32& outcomeValue
     );
     float GetOddsOfWinning(i32);
@@ -77,10 +77,10 @@ public:
     i32 FightValueOfStack(
         class armyGroup* group,
         class hero* heroPointer,
-        i32 useHero,
+        i32 useAdjustedFightValue,
         i32 useTown = 0,
         i32 townId = 0,
-        i32 useEnemyMods = 0
+        i32 applySiegeAttackerModifiers = 0
     );
     void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 useAvailableCount, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
     i32 QuickCombat(
@@ -90,8 +90,8 @@ public:
         class hero* defenderHero,
         i32 townBattle,
         i32 townId,
-        float& attackerDamage,
-        float& defenderDamage
+        float& attackerCasualtyFraction,
+        float& defenderCasualtyFraction
     );
     void HeroInteractionAtHero(class hero* firstHero, class hero* secondHero, i32 evaluateOnly, i32* value);
     void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 doInteraction, i32* value);
@@ -119,7 +119,7 @@ public:
         class hero* heroPointer, CreatureType monType, i32* pCount, class mapCell* cell
     );
     i32 FightEvent(class hero* heroPointer, class mapCell* cell, i32 evaluateOnly);
-    i32 DamageGroup(class armyGroup* armyGroupPointer, class hero* loser, class hero*, float damage);
+    i32 DamageGroup(class armyGroup* armyGroupPointer, class hero* loser, class hero*, float casualtyFraction);
     void IncrementHourGlass(void);
     void TownEvent(class mapCell* cell, class hero* heroPointer, i32 x, i32 y);
     i32 ComputeUpgradeValue(CreatureType baseCreatureType, CreatureType upgradedCreatureType);

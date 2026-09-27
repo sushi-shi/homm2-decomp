@@ -27,7 +27,7 @@ struct SamplePlaybackData {
     i32 volume;
     SampleAudioFormat sampleFormat;
     b32 stereo;
-    b32 loopCount;
+    b32 looping;
     struct _SAMPLE* activeSample;
     i32 channelType;
 };
