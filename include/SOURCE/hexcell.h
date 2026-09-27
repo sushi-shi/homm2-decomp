@@ -6,7 +6,6 @@
 #include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(HexcellConstant)
-    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
     HEXCELL_LIMIT_COUNT           = 2
 H2_ENUM_END(HexcellConstant)
 
@@ -24,18 +23,18 @@ public:
     i8 m_obstacleIndex;
     H2_ENUM_STORAGE(CombatSide, i8) m_occupantSide;
     i8 m_occupantIndex;
-    H2_ENUM_STORAGE(ArmyFacing, i8) m_occupantFrame;
+    H2_ENUM_STORAGE(ArmyFacing, i8) m_occupantFootprintHalf;
     i32 m_deadOccupantCount;
     H2_ENUM_STORAGE(CombatSide, i8) m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
     i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
-    H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
-    u8 m_pathReachable;
+    H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFootprintHalves[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    u8 m_movementOrAttackReachable;
     struct SLimitData m_limits[HEXCELL_LIMIT_COUNT];
     hexcell(void);
     void DrawGround(void);
     void DrawLowerDeadOccupants(void);
     void DrawUpperDeadOccupant(void);
-    void DrawOccupant(ArmyDrawState drawState, i32 frame);
+    void DrawOccupant(ArmyDrawState drawState, i32 quantityOverlayOnly);
     void DrawTower(i32 frame);
     void DrawClouds(void);
     void DrawObstacle(void);

@@ -1,33 +1,12 @@
 #include <va.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
+#include <BASE/AudiereEffects.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 
-SIZE(AudiereSampleNode, 0xc);
-
-struct AudiereEffectsState {
-    void* buffer;
-    i32 frameCount;
-    i32 channelCount;
-    i32 sampleRate;
-    audiere::SampleFormat sampleFormat;
-    AudiereSampleNode* sampleList;
-    i32 sampleIterationDepth;
-};
-
-SIZE(AudiereEffectsState, 0x1c);
-
 DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = H2_ZERO_INIT;
-
-template<>
-H2_RETAIL_INLINE AudiereSampleListNode<sample>::AudiereSampleListNode(
-    sample* resource, AudiereSampleListNode<sample>* nextNode) {
-    stream = NULL;
-    sampleResource = resource;
-    next = nextNode;
-}
 
 VA(0x004cc740, 0x162)
 void PurgeFinishedAudiereSamples(void) {
@@ -120,7 +99,7 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
         );
         gAudiereEffects.sampleList->stream->setVolume(convertedVolume);
         gAudiereEffects.sampleList->stream->setRepeat(
-            sampleResource->m_playbackData.loopCount != 0 ? true : false
+            sampleResource->m_playbackData.looping != 0 ? true : false
         );
         gAudiereEffects.sampleList->stream->play();
     }
@@ -207,6 +186,3 @@ VA(0x004ccf50, 0x11)
 bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
-
-template<class Resource>
-H2_RETAIL_INLINE AudiereSampleListNode<Resource>::~AudiereSampleListNode() {}

@@ -1,5 +1,11 @@
 # Audiere constructor ownership and remaining native placement
 
+**Historical experimental checkpoint.** The source-first review removed the
+standalone DIMMER destructor TU, template-only ownership models, and named
+read-only Misc string arrays. The 115-byte measurement below describes the
+old inputs, not the current source. See
+[the two source-first passes](../source-first-ownership/two-passes.cpp).
+
 The resource-parameterized node stores the existing `Resource*`, stream reference,
 and next-node pointer. Its concrete `sample` constructor specialization is defined
 before the public functions; its primary inline destructor remains at EOF. No

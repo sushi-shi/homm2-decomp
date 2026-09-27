@@ -94,18 +94,6 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
             ("build/link/BASE-middle.lib", base_objects[misc_runtime_index + 1:midi_index]),
         ]
     suffix_libraries = [("build/link/BASE-suffix.lib", base_objects[midi_index + 1:])]
-    destructor = "build/objdiff/base/BASE/DIMMERDestructor.obj"
-    if destructor in base_objects:
-        dimmer_index = base_objects.index("build/objdiff/base/BASE/DIMMER.obj")
-        if dimmer_index <= midi_index or base_objects.index(destructor) != dimmer_index + 1:
-            raise ValueError("DIMMER and DIMMERDestructor must be adjacent after Midi")
-        # The destructor owner must be scanned before the remaining widget
-        # dependencies. These are ordinary archives of untouched compiler output.
-        suffix_libraries = [
-            ("build/link/BASE-before-dimmer.lib", base_objects[midi_index + 1:dimmer_index]),
-            ("build/link/DIMMER.lib", base_objects[dimmer_index:dimmer_index + 2]),
-            ("build/link/BASE-after-dimmer.lib", base_objects[dimmer_index + 2:]),
-        ]
     base_libraries = []
     for library, members in (
             *prefix_libraries,

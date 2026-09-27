@@ -6,6 +6,12 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 
 | pattern | one-line trigger |
 | :-- | :-- |
+| [unsigned-byte-boolean-owner](unsigned-byte-boolean-owner.md) | zero-extending truth tests and boolean-only writers justify u8 fields, removing seven compensating casts with whole-native proof |
+| [patrol-coordinate-owner](patrol-coordinate-owner.md) | loader and AI coordinate semantics replace duplicate boat/patrol union views with unsigned anchor bytes and a signed radius, removing compensating casts |
+| [widget-pointer-array-owner](widget-pointer-array-owner.md) | common-interface widget storage permits real base-pointer arrays instead of integer/derived/scalar union views, with constant slot offsets folded into unchanged addressing |
+| [trivial-array-delete](trivial-array-delete.md) | a scalar operator-delete call can be the exact lowering of `delete[]` for a recovered trivial array; compare bytes and ordered targets before choosing the source form |
+| [serial-api-scalar-storage](serial-api-scalar-storage.md) | a one-byte read and a DWORD API output need scalar owners; VC6 preserves the aligned reservation and low-width loads |
+| [single-word-count-reservation](single-word-count-reservation.md) | two-byte read/load in a four-byte aligned reservation permits a scalar count without a fictional second array element |
 | [user-dtor-out-of-line](user-dtor-out-of-line.md) | delete-site calls `??1X` instead of inlining it → X has a user-declared dtor defined out of line |
 | [implicit-dtor-no-vptr-store](implicit-dtor-no-vptr-store.md) | polymorphic dtor COMDAT with NO `mov [eax],OFFSET vftbl` → the destructor is compiler-generated, not user-declared |
 | [inline-call-in-arglist-hoists-temps](inline-call-in-arglist-hoists-temps.md) | a narrowing-conversion temp materialised before the trailing constant pushes → some OTHER argument of the same call is an inlined function call |
@@ -62,7 +68,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [getcell-vs-row-plus-index](getcell-vs-row-plus-index.md) | `cells + y*width*12 + x*12` (y-term added first) is `Row(y) + x`; retail's `cells + x*12 + y*width*12` with the y product computed first is `GetCell(x, y)` |
 | [int-accessor-for-narrow-store](int-accessor-for-narrow-store.md) | `movsx` on the source of a `char = char` store → the RHS is an `int`-returning accessor; no cast reproduces it, and no frame temp means the accessor is not the narrow one |
 | [reloc-rows-are-not-the-residual](reloc-rows-are-not-the-residual.md) | a diff dominated by `const_<RVA>` vs owner+addend rows scores nothing (`functionRelocDiffs: none`); strip the symbol tokens and the real bytes appear |
-| [int-cast-suppresses-bool-widen](int-cast-suppresses-bool-widen.md) | `setcc` followed by an ours-only `and reg,0xff` -> cast the relational to `i32` in the arithmetic |
+| [int-cast-suppresses-bool-widen](int-cast-suppresses-bool-widen.md) | an arithmetic `i32` cast suppresses an extra bool mask; selecting adjacent named commands can preserve the same bytes without either cast |
 | [pointer-plus-index-base-first](pointer-plus-index-base-first.md) | pointer global loaded BEFORE the flat index -> `*(p + x + y*W)`, not `p[y*W + x]` |
 | [initializer-store-order-pins-declaration-order](initializer-store-order-pins-declaration-order.md) | frames identical, hundreds of raw bytes differ -> the `= N` store sequence is the declaration order |
 | [switch-goto-tail-stub-island](switch-goto-tail-stub-island.md) | a run of 5-byte `jmp <tail>` stubs before the epilogue, one per case, in reverse source order → the cases end in `goto`, not `break`, and the `ja` shows the tail lives inside the last case |
@@ -88,7 +94,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [direct-jcc-vs-goto-stub](direct-jcc-vs-goto-stub.md) | one near `jcc` to a far join where ours needs `short jcc` + `jmp` → a structured `if` block, not `if (c) goto L;` (and a real `goto`'s label position is byte-visible) |
 | [float-self-multiply-chain-keeps-st0](float-self-multiply-chain-keeps-st0.md) | non-popping `fst dword [x]` mid-chain with NO reload of `x` -> consecutive `x = (float)(x * expr);` statements, x on the LEFT; the equivalent nested inner casts match instruction-for-instruction but add one dead 4-byte frame temp each |
 | [bitfield-read-vs-masked-storage](bitfield-read-vs-masked-storage.md) | narrow mask then `and reg32,0xffff` -> the source names the `u16 x : N` bitfield; `xor reg,reg` BEFORE the load -> it masks the union's storage member by hand |
-| [short-cast-around-constant-select](short-cast-around-constant-select.md) | `movswl` between a two-constant `?:` and an `i32` store -> a `static_cast<i16>` in the source, not an enum-width effect (a sibling select in the same enum does not narrow) |
+| [short-cast-around-constant-select](short-cast-around-constant-select.md) | `movswl` before an `i32` store identifies a signed16-bit conversion; a cast around a named selection reproduces it without proving original source tokens |
 | [and-guard-join-is-loop-back-edge](and-guard-join-is-loop-back-edge.md) | an `&&` guard's failure `jcc`s target a lone `jmp <loop top>` island instead of the loop condition → the rest of the body is nested inside the guard and the loop is a `for(;;)` left only by `goto` |
 | [or-chain-join-past-loop-names-goto-loop](or-chain-join-past-loop-names-goto-loop.md) | the last `||` term's `jcc` jumps PAST the loop and the back edge sits inside the then-arm → `label: ... if (A||B||C) { ...; goto label; }`, not `for(;;) ... else break` |
 | [switch-body-order-vs-sorted-compare-chain](switch-body-order-vs-sorted-compare-chain.md) | compare chain identical (it is sorted by case VALUE) but one body/stub sits elsewhere in the body run → a source case-ORDER fact, never a goto/break one |
@@ -127,3 +133,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [narrow-compound-assignment](narrow-compound-assignment.md) | retail performs byte/word arithmetic directly where ours promotes to 32 bits → use `++`, `--`, or compound assignment on the narrow lvalue |
 | [od-frame-compiler-invariance](od-frame-compiler-invariance.md) | VC4.2 and VC6 SP5 produce the same `/Od` name-hash, scope-group, array, and inline-local frame layout on paired probes |
 | [od-slot-scope-groups](od-slot-scope-groups.md) | required slot order is not bucket-monotone → reconstruct lexical scope groups instead of renaming locals |
+| [two-dimensional-array-owner](two-dimensional-array-owner.md) | replace first-row pointer flattening with the real side/slot owner; complete five-site VC6 byte/relocation proof |
+| [typed-byte-enum-table](typed-byte-enum-table.md) | recover a lookup's enum domain while preserving one-byte storage and removing the compensating consumer cast; all-consumer/native/retail proof |

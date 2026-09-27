@@ -1,3 +1,8 @@
+// HISTORICAL EXPERIMENT: the source-first review rejected retaining this storage
+// or split-owner arrangement as recovered developer structure. The measured bytes
+// remain useful diagnostics. Current source and complete follow-up products are
+// described in ../source-first-ownership/two-passes.cpp.
+//
 // Full native-link follow-up to nested-template-split.cpp, 2026-09-27.
 // Root: decomp-gold-2.1-buka. Production source/build inputs remain unchanged.
 //

@@ -1,6 +1,7 @@
 #ifndef HOMM2_CAMPAIGN_H
 #define HOMM2_CAMPAIGN_H
 
+#include <BASE/dialog.h>
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
@@ -22,10 +23,9 @@ H2_ENUM_CLASS_BEGIN(CampaignAward)
     CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES = 11
 H2_ENUM_CLASS_END(CampaignAward)
 
-H2_ENUM_BEGIN(CampaignMessageConstant)
-    CAMPAIGN_CLOSE_COMMAND               = 10,
-    CAMPAIGN_DIALOG_CANCEL               = 0x7801,
-    CAMPAIGN_DIALOG_ACCEPT               = 0x7802,
+H2_ENUM_BEGIN(CampaignControlId)
+    CAMPAIGN_DIALOG_ACCEPT               = DIALOG_BUTTON_2,
+    CAMPAIGN_DIALOG_CANCEL               = DIALOG_BUTTON_1,
     CAMPAIGN_DIALOG_RESTART              = 0x385,
     CAMPAIGN_DIALOG_REPLAY               = 0x386,
     CAMPAIGN_TRACK_WIDGET_0              = 0x352,
@@ -54,10 +54,12 @@ H2_ENUM_BEGIN(CampaignMessageConstant)
     CAMPAIGN_SCENARIO_BONUS_WIDGET       = 0x324,
     CAMPAIGN_AWARDS_WIDGET               = 0x325,
     CAMPAIGN_BONUS_TEXT_WIDGET_FIRST     = 0x326,
-    CAMPAIGN_WIDGET_ENABLE_FRAME         = 8,
-    CAMPAIGN_WIDGET_DISABLE_FRAME        = 9,
-    CAMPAIGN_WIDGET_REFRESH_FRAME        = 4
-H2_ENUM_END(CampaignMessageConstant)
+H2_ENUM_END(CampaignControlId)
+
+H2_ENUM_BEGIN(CampaignBonusFrame)
+    CAMPAIGN_WIDGET_ENABLE_FRAME  = 8,
+    CAMPAIGN_WIDGET_DISABLE_FRAME = 9,
+H2_ENUM_END(CampaignBonusFrame)
 
 H2_ENUM_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_TRACK_ICON_SIZE       = 41,

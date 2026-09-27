@@ -99,18 +99,16 @@ class ConfigureLinkGraphTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must be adjacent"):
             self.edges(["BASE/Misc", "BASE/Between", "BASE/MiscRuntime", "BASE/Midi"])
 
-    def test_merged_misc_and_split_dimmer_preserve_every_raw_owner_once(self):
+    def test_merged_misc_preserves_every_raw_owner_once(self):
         names = ["BASE/Before", "BASE/Misc", "BASE/AfterMisc", "BASE/Midi",
-                 "BASE/AudiereEffects", "BASE/DIMMER", "BASE/DIMMERDestructor",
+                 "BASE/AudiereEffects", "BASE/DIMMER",
                  "BASE/WIDGET", "SOURCE/GAME"]
         edges = self.edges(names)
         self.assertNotIn("build/link/MiscRuntime.lib", edges)
         expected = {
             "BASE-prefix": ["BASE/Before"], "Misc": ["BASE/Misc"],
             "BASE-middle": ["BASE/AfterMisc"], "Midi": ["BASE/Midi"],
-            "BASE-before-dimmer": ["BASE/AudiereEffects"],
-            "DIMMER": ["BASE/DIMMER", "BASE/DIMMERDestructor"],
-            "BASE-after-dimmer": ["BASE/WIDGET"],
+            "BASE-suffix": ["BASE/AudiereEffects", "BASE/DIMMER", "BASE/WIDGET"],
         }
         for archive, members in expected.items():
             self.assertEqual(edges[f"build/link/{archive}.lib"]["inputs"],
@@ -123,9 +121,6 @@ class ConfigureLinkGraphTests(unittest.TestCase):
                           "build/link/generic-imports/smackw32.lib",
                           "build/link/generic-imports/netapi32.lib", "build/link/wing32.lib"])
 
-    def test_split_dimmer_interleaving_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "DIMMER.*must be adjacent"):
-            self.edges(["BASE/Midi", "BASE/DIMMER", "BASE/Between", "BASE/DIMMERDestructor"])
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <EDITOR/mapcell.h>
 VA(0x004a3ff0, 0x5a)
 town::town(void) {
     m_type = FACTION_KNIGHT;
@@ -20,7 +21,7 @@ town::town(void) {
     m_y = 0;
     m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     m_buildings = IDX(TOWN_BUILDING_TENT);
-    m_buildState = 0;
+    m_mageGuildLevel = 0;
     m_unknown1d = 0;
 }
 
@@ -53,9 +54,9 @@ void town::GiveSpells(hero* targetHero) {
         return;
 
     for (stage = 0; stage < IDX(pupil->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                                + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
+                                + HERO_BASE_LEARNABLE_SPELL_LEVEL;
          ++stage) {
-        for (slotN = 0; slotN < m_spellCounts[stage + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slotN) {
+        for (slotN = 0; slotN < m_spellCounts[stage]; ++slotN) {
             pupil->AddSpell(m_spells[stage][slotN], pupil->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
     }
@@ -69,10 +70,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OBJECT_TILESET,
+        TILESET_OBJNTOWN,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE
@@ -82,10 +83,10 @@ void town::XformToCastle(void) {
         m_y + RANDOM_TOWN_TOP,
         m_x + RANDOM_TOWN_RIGHT,
         m_y + RANDOM_TOWN_BOTTOM,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_SOURCE_FRAME,
         TOWN_CONVERT_ANY_FRAME,
-        RANDOM_TOWN_OVERLAY_TILESET,
+        TILESET_OBJNTWSH,
         TOWN_CONVERT_OBJECT_NONE,
         MAP_OBJECT_CASTLE,
         MAP_OBJECT_CASTLE
@@ -149,16 +150,16 @@ VA(0x004a43f9, 0x24c)
 void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 level;
     if (building == BUILDING_SLOT_MAGE_GUILD) {
-        ++m_buildState;
-        m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+        ++m_mageGuildLevel;
+        m_spellCounts[m_mageGuildLevel - TOWN_MAGE_GUILD_FIRST_LEVEL] = gSpellLimits[m_mageGuildLevel - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && HAS(m_buildings, IDX(TOWN_BUILDING_LIBRARY)))
-            ++m_spellCounts[m_buildState];
+            ++m_spellCounts[m_mageGuildLevel - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
     if (building == BUILDING_SLOT_SPECIAL && m_type == FACTION_WIZARD) {
-        for (level = 0; level < m_buildState; ++level)
-            ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
+        for (level = 0; level < m_mageGuildLevel; ++level)
+            ++m_spellCounts[level];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
@@ -178,7 +179,7 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         m_buildings &= ~(IDX(TOWN_BUILDING_DWELLING_6) | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
 
     if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_SIXTH) {
-        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+        m_dwellingAvailable[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
             gMonsterDatabase[IDX(
                 gDwellingType[IDX(m_type)][IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)]
             )]
@@ -186,19 +187,19 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     }
     if (building >= BUILDING_SLOT_UPGRADE_FIRST
         && building <= BUILDING_SLOT_SPECIAL_TWENTY_NINE) {
-        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
-            m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_6)];
+        m_dwellingAvailable[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+            m_dwellingAvailable[IDX(building) - IDX(TOWN_OBJECT_DWELLING_6)];
     }
     if (building == BUILDING_SLOT_SPECIAL_THIRTY) {
-        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
-            m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_2)];
+        m_dwellingAvailable[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+            m_dwellingAvailable[IDX(building) - IDX(TOWN_OBJECT_DWELLING_2)];
     }
     if (building == BUILDING_SLOT_CASTLE) {
         m_buildings &= ~IDX(TOWN_BUILDING_TENT);
         XformToCastle();
     }
     GiveSpells(NULL);
-    BitSet(gpGame->m_knownTowns, m_id);
+    BitSet(gpGame->m_townBuiltToday, m_id);
 }
 
 VA(0x004a4645, 0x1e)
@@ -208,7 +209,7 @@ i32 town::CanBuildDock(void) {
 
 VA(0x004a4663, 0x9e)
 void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
-    *mageGuildLevel = m_buildState;
+    *mageGuildLevel = m_mageGuildLevel;
     *numArchers = 0;
     BuildingSlotType building;
     for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_SPECIAL_THIRTY;

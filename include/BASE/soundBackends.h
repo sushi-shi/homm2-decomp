@@ -7,22 +7,17 @@
 class sample;
 struct _DIG_DRIVER;
 
-template<class Resource>
-struct AudiereSampleListNode {
-    audiere::OutputStreamPtr stream;
-    Resource* sampleResource;
-    AudiereSampleListNode<Resource>* next;
+H2_ENUM_BEGIN(MilesSampleStorageConstant)
+    MILES_SAMPLE_HANDLE_STORAGE_COUNT = 16
+H2_ENUM_END(MilesSampleStorageConstant)
 
-    H2_RETAIL_INLINE AudiereSampleListNode(
-        Resource* resource, AudiereSampleListNode<Resource>* nextNode);
-    H2_RETAIL_INLINE ~AudiereSampleListNode();
+// Startup clears this complete owner before allocating the handle prefix.
+struct MilesSampleState {
+    i32 ready;
+    struct _SAMPLE* handles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
+    i32 handleCount;
 };
-
-template<>
-H2_RETAIL_INLINE AudiereSampleListNode<sample>::AudiereSampleListNode(
-    sample* resource, AudiereSampleListNode<sample>* nextNode);
-
-typedef AudiereSampleListNode<sample> AudiereSampleNode;
+SIZE(MilesSampleState, 0x48);
 
 // Retail keeps AudiereMusic::stream/source as static class members: their atexit
 // teardowns carry VC6's member-static destroy-once guard (one flag byte,

@@ -28,8 +28,8 @@ H2_ENUM_END(ArmyHexConstant)
 #pragma pack(push, 1)
 class army {
 public:
-    bchar m_animationState;
-    bchar m_animationCycle;
+    u8 m_animationState;
+    u8 m_shootingAnimationActive;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, char) m_pendingAnimationSequence;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationStart;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationEnd;
@@ -49,7 +49,7 @@ public:
     b32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
     i32 m_mirrorImageIndex;
-    i32 m_roundCounter;
+    i32 m_mirrorImageRoundsRemaining;
     H2_ENUM_STORAGE(CreatureType, i32) m_monsterType;
     i32 m_hex;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, i32) m_animationSequence;
@@ -59,7 +59,7 @@ public:
     b32 m_facingChanged;
     i32 m_initialQuantity;
     i32 m_quantity;
-    i32 m_lastTargetHex;
+    i32 m_displayQuantityOverride;
     i32 m_temporaryResurrectionQuantity;
     i32 m_hitPointsLost;
     i32 m_armyGroupSlot;
@@ -97,7 +97,7 @@ public:
     void Init(CreatureType monsterType, i32 quantity, H2_ENUM_PARAM(CombatSide, i32) side, i32 index, i32 hex, i32 unknown);
     void LoadResources(void);
     void FreeResources(void);
-    void DrawToBuffer(i32 x, i32 y, i32 effectsOnly);
+    void DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly);
     void Wince(void);
     void Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing);
     void SpecialAttack(void);

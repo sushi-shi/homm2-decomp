@@ -1,3 +1,8 @@
+// HISTORICAL EXPERIMENT: the source-first review rejected retaining this storage
+// or split-owner arrangement as recovered developer structure. The measured bytes
+// remain useful diagnostics. Current source and complete follow-up products are
+// described in ../source-first-ownership/two-passes.cpp.
+//
 // Structural recovery: one Misc translation unit with real initialized static
 // storage for the nonempty strings owned by its prefix functions.
 // Measured 2026-09-27 in matcher-1, branch matcher/bss-misc, with pinned VC6 SP5.

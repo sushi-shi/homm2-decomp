@@ -8,9 +8,9 @@
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(IconDimConstant)
-    DIM_PALETTE_LEVEL_STRIDE = 0x100
-H2_ENUM_END(IconDimConstant)
+
+
+
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
@@ -71,7 +71,7 @@ void DimIconToBitmap(
             if (clip == ICON_DRAW_NO_CLIP) {
                 s_dst = s_row + s_x;
                 for (s_loopCount = 0; s_loopCount < s_run; s_loopCount++) {
-                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    *s_dst = uDimPal[0][color][*s_dst];
                     s_dst++;
                 }
             } else if (s_y >= clipY && s_y <= s_clipB && s_x + s_run > clipX && s_x <= s_clipR) {
@@ -89,7 +89,7 @@ void DimIconToBitmap(
                     s_dst = s_row + clipX;
                 }
                 for (s_loopCount = 0; s_loopCount < s_spanCount; s_loopCount++) {
-                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    *s_dst = uDimPal[0][color][*s_dst];
                     s_dst++;
                 }
             }

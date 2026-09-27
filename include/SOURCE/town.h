@@ -46,25 +46,22 @@ H2_ENUM_BEGIN(TownFormation)
 H2_ENUM_END(TownFormation)
 
 H2_ENUM_BEGIN(TownConstant)
-    TOWN_GARRISON_SLOT_COUNT           = 12,
-    TOWN_OWNER_NONE                    = -1,
-    TOWN_ID_NONE                       = -1,
-    TOWN_OCCUPYING_HERO_NONE           = -1,
-    TOWN_DOCK_COORDINATE_NONE          = 0xFF,
-    TOWN_PLAYER_WINDOW_SIZE            = 5,
-    TOWN_MAGE_GUILD_LEVEL_COUNT        = 5,
-    TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
-    TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
-    TOWN_MAGE_GUILD_SPELLS_PER_LEVEL   = 4,
-    TOWN_SPELL_COUNT_OVERLAY_OFFSET    = 19,
-    TOWN_SPELL_COUNT_OVERLAY_SIZE      = 6,
-    TOWN_NAME_CAPACITY                 = 13,
-    TOWN_CONVERT_SOURCE_FRAME          = 0x10,
-    TOWN_CONVERT_ANY_FRAME             = 0xFF,
-    TOWN_CONVERT_OBJECT_NONE           = 0,
-    TOWN_VIEW_MEMORY_REQUIREMENT       = 0x514,
-    TOWN_VIEW_LOW_MEMORY_LIMIT         = 0x320,
-    TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
+    TOWN_DWELLING_STOCK_SLOT_COUNT         = 12,
+    TOWN_OWNER_NONE                  = -1,
+    TOWN_ID_NONE                     = -1,
+    TOWN_OCCUPYING_HERO_NONE         = -1,
+    TOWN_DOCK_COORDINATE_NONE        = 0xFF,
+    TOWN_PLAYER_WINDOW_SIZE          = 5,
+    TOWN_MAGE_GUILD_LEVEL_COUNT      = 5,
+    TOWN_MAGE_GUILD_FIRST_LEVEL      = 1,
+    TOWN_MAGE_GUILD_SPELLS_PER_LEVEL = 4,
+    TOWN_NAME_CAPACITY               = 13,
+    TOWN_CONVERT_SOURCE_FRAME        = 0x10,
+    TOWN_CONVERT_ANY_FRAME           = 0xFF,
+    TOWN_CONVERT_OBJECT_NONE         = 0,
+    TOWN_VIEW_MEMORY_REQUIREMENT     = 0x514,
+    TOWN_VIEW_LOW_MEMORY_LIMIT       = 0x320,
+    TOWN_VIEW_HIGH_MEMORY_LIMIT      = 0xb54
 H2_ENUM_END(TownConstant)
 
 // Displayed/offered guild level: signed promotion, upper cap only.
@@ -72,7 +69,7 @@ H2_ENUM_END(TownConstant)
     ((level) + 1 < TOWN_MAGE_GUILD_LEVEL_COUNT ? (level) + 1 : TOWN_MAGE_GUILD_LEVEL_COUNT)
 #define TOWN_BUILDING_COMPLETE(t, slot)                                                            \
     (HAS((t).m_buildings, BIT(slot))                                                               \
-     && ((slot) != BUILDING_SLOT_MAGE_GUILD || (t).m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT))
+     && ((slot) != BUILDING_SLOT_MAGE_GUILD || (t).m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT))
 
 #pragma pack(push, 1)
 class town {
@@ -88,9 +85,9 @@ public:
     armyGroup m_army;
     i8 m_occupyingHeroId;
     u32l m_buildings;
-    i8 m_buildState;
+    i8 m_mageGuildLevel;
     char m_unknown1d;
-    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)];
+    i16 m_dwellingAvailable[IDX(TOWN_DWELLING_STOCK_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
     H2_ENUM_STORAGE(TownFormation, i8) m_formation;
@@ -101,11 +98,8 @@ public:
             m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         H2_ENUM_STORAGE(SpellType, i8)
             m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
-        struct {
-            char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
-            i8 m_spellCounts[TOWN_SPELL_COUNT_OVERLAY_SIZE];
-        };
     };
+    i8 m_spellCounts[TOWN_MAGE_GUILD_LEVEL_COUNT];
     u16 m_turnsOwned;
     char m_name[TOWN_NAME_CAPACITY];
     town(void);

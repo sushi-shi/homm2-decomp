@@ -56,8 +56,7 @@ def final_inputs(configured: list[str], *, include_resources: bool) -> list[str]
     merged_tail = [
         "build/link/BASE-prefix.lib", "build/link/Misc.lib",
         "build/link/BASE-middle.lib", "build/link/Midi.lib",
-        "build/link/BASE-before-dimmer.lib", "build/link/DIMMER.lib",
-        "build/link/BASE-after-dimmer.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
+        "build/link/BASE-suffix.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
     ]
     expected_tail = configured[first_base:]
     if expected_tail not in (legacy_tail, merged_tail):

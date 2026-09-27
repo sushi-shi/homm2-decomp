@@ -1,5 +1,7 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -11,9 +13,26 @@
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
 #include <BASE/MiscState.h>
+#include <BASE/MiscEnums.h>
+#include <BASE/miscwin.h>
+#include <SOURCE/KBDeclarations.h>
+#include <SOURCE/wingraph.h>
+#include <SOURCE/NOOPT.h>
+#include <BASE/message.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <io.h>
+#include <direct.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <BASE/palette.h>
+#include <SOURCE/X_GLOBAL.h>
+#include <BASE/MiscGraphicsConstants.h>
+#include <SOURCE/KB.h>
 
 #define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
-#include <BASE/MiscEnums.h>
 H2_ENUM_BEGIN(DataEntryLayout)
     WINDOW_X                    = 0xb1,
     WINDOW_Y                    = 0x14,
@@ -42,14 +61,9 @@ H2_ENUM_BEGIN(DataEntryLayout)
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_BEGIN(DataEntryWidgetId)
+    ENTRY_CANCEL_BUTTON = DIALOG_BUTTON_2,
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
-    ENTRY_BUTTON_ONE    = 0x7801,
-    ENTRY_CANCEL_BUTTON = 0x7802,
-    ENTRY_BUTTON_FIVE   = 0x7805,
-    ENTRY_BUTTON_SIX    = 0x7806,
-    ENTRY_BUTTON_SEVEN  = 0x7807,
-    ENTRY_BUTTON_EIGHT  = 0x7808
 H2_ENUM_END(DataEntryWidgetId)
 
 H2_ENUM_BEGIN(MiscLogPrivateConstant)
@@ -68,8 +82,6 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
-    DEFAULT_WINDOW_WIDTH         = 0x280,
-    DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
     DEFAULT_MAP_OFFSET_MAX       = 32000,
     UNIQUE_ID_RANDOM_MAX         = 999999,
@@ -102,7 +114,6 @@ H2_ENUM_BEGIN(PCXConstant)
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
     VGA_PALETTE_MARKER    = 0x0c,
-    PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
 H2_ENUM_END(PCXConstant)
 
@@ -114,8 +125,6 @@ H2_ENUM_BEGIN(MiscCycleColorRange)
 H2_ENUM_END(MiscCycleColorRange)
 
 H2_ENUM_BEGIN(MiscFadeConstant)
-    FADE_LEVEL_COUNT              = 0x40,
-    FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
     FADE_FRAME_DELAY              = 0x14,
     WINDOWED_FADE_INCREMENT_SCALE = 2,
@@ -123,13 +132,6 @@ H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
 H2_ENUM_END(MiscFadeConstant)
-
-H2_ENUM_BEGIN(MiscPaletteComponent)
-    PALETTE_COMPONENT_COUNT     = 3,
-    PALETTE_RED_INDEX           = 0,
-    PALETTE_GREEN_INDEX         = 1,
-    PALETTE_BLUE_INDEX          = 2
-H2_ENUM_END(MiscPaletteComponent)
 
 H2_ENUM_BEGIN(MiscWindowConstant)
     MINIMUM_WINDOW_WIDTH   = 320,
@@ -140,8 +142,6 @@ H2_ENUM_END(MiscWindowConstant)
 H2_ENUM_BEGIN(MiscBlitConstant)
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
-    BLIT_SCREEN_WIDTH  = 0x280,
-    BLIT_SCREEN_HEIGHT = 0x1e0
 H2_ENUM_END(MiscBlitConstant)
 
 H2_ENUM_BEGIN(SeededRandomConstant)
@@ -167,21 +167,6 @@ H2_ENUM_BEGIN(FileIdHashConstant)
 H2_ENUM_END(FileIdHashConstant)
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
-#include <BASE/miscwin.h>
-#include <SOURCE/KBDeclarations.h>
-#include <SOURCE/wingraph.h>
-#include <SOURCE/NOOPT.h>
-#include <BASE/message.h>
-#include <windows.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <io.h>
-#include <direct.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <BASE/palette.h>
-#include <SOURCE/X_GLOBAL.h>
 
 DATA(0x00536088) static i32 giFindMid = 0;
 DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime =
@@ -196,15 +181,13 @@ DATA(0x005360a8) i32 iDEMaxLen = 0;
 DATA(0x005360ac) i32 iMemEntries = 0;
 DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
 DATA(0x005360b4) i32 giTotalMemAllocated = 0;
-DATA(0x0051e5dc) H2_CONST char* gcCDTrackName = gcCDTrackNameText;
+DATA(0x0051e5dc) H2_CONST char* gcCDTrackName = "\\Tracks2\\02-AudioTrack 02.ogg";
 DATA(0x0051e5e0) u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
 DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
-DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 H2_ENUM_BEGIN(StatusBarLayout)
-    STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
@@ -213,7 +196,7 @@ H2_ENUM_END(StatusBarLayout)
 
 VA(0x004bd4b0, 0x75)
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries);
+    LogInt("IME", iMemEntries);
     gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
     for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
@@ -257,26 +240,17 @@ void* BaseAlloc(u32 size, H2_CONST char* originalFile, i32 originalLine) {
 #endif
 VA(0x004bd650, 0x154)
 void BaseFree(void* pointer, H2_CONST char* originalFile, i32 originalLine) {
-    DATA(0x0051e5f8)
-    static char freeTag[] = "Free ";
-    DATA(0x0051e600)
-    static char nullPointerMessage[] = "NULL POINTER";
-    DATA(0x0051e610)
-    static char negativeEntryCountMessage[] = "MemEntries Below 0";
-    DATA(0x0051e624)
-    static char badDeleteFormat[] = "Bad Delete,  File '%13s'  Line % 4d, ptr %12d";
-
     if (gpMemEntry == NULL)
         InitMemEntry();
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-        LogInt(freeTag, reinterpret_cast<i32>(pointer));
+        LogInt("Free ", reinterpret_cast<i32>(pointer));
     if (pointer == NULL) {
-        LogStr(nullPointerMessage);
+        LogStr("NULL POINTER");
         return;
     }
     --iMemEntries;
     if (iMemEntries < 0)
-        LogInt(negativeEntryCountMessage, iMemEntries);
+        LogInt("MemEntries Below 0", iMemEntries);
     i32 entryIndex;
     for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == pointer) {
@@ -288,7 +262,7 @@ void BaseFree(void* pointer, H2_CONST char* originalFile, i32 originalLine) {
     if (entryIndex < ENTRY_SEARCH_COMPLETE) {
         sprintf(
             gText,
-            badDeleteFormat,
+            "Bad Delete,  File '%13s'  Line % 4d, ptr %12d",
             originalFile,
             originalLine,
             reinterpret_cast<i32>(pointer)
@@ -305,21 +279,16 @@ void BaseFree(void* pointer, H2_CONST char* originalFile, i32 originalLine) {
 
 VA(0x004bd7b0, 0xe7)
 void PrintMemoryLeaks(void) {
-    DATA(0x0051e654)
-    static char leakCountTag[] = "Total Memory Leaks";
-    DATA(0x0051e668)
-    static char leakEntryFormat[] = "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d";
-
     if (giDebugLevel < MEMORY_LEAK_DEBUG_LEVEL)
         return;
     if (gpMemEntry == NULL)
         return;
-    LogInt(leakCountTag, iMemEntries);
+    LogInt("Total Memory Leaks", iMemEntries);
     for (i32 entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].used != 0) {
             sprintf(
                 gText,
-                leakEntryFormat,
+                "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
                 gpMemEntry[entryIndex].file,
                 gpMemEntry[entryIndex].line,
                 reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
@@ -332,11 +301,8 @@ void PrintMemoryLeaks(void) {
 
 VA(0x004bd8a0, 0x35)
 void ShowMemoryStatus(void) {
-    DATA(0x0051e6a4)
-    static char memoryStatusFormat[] = "Mem Left %dK";
-
     i32 memLeft = MemSize(1);
-    sprintf(gText, memoryStatusFormat, memLeft);
+    sprintf(gText, "Mem Left %dK", memLeft);
     AbsAiPrint(gText);
 }
 
@@ -390,7 +356,6 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     }
 }
 
-#include <BASE/MiscGraphicsConstants.h>
 
 #if H2_RETAIL_COMPILER
 #define currentPalette pal
@@ -405,17 +370,17 @@ void FadeIn(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memset(currentPalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
+    memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == MISC_PALETTE_MAX_LEVEL) {
+        if (i == PALETTE_CHANNEL_MAX) {
             done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
-            threshold = MISC_PALETTE_MAX_LEVEL - i;
-            for (j = 0; j < MISC_PALETTE_BYTE_COUNT; ++j) {
+            threshold = PALETTE_CHANNEL_MAX - i;
+            for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
                 if (gpBufferPalette->m_data[j] > threshold)
                     currentPalette->m_data[j] = gpBufferPalette->m_data[j] - threshold;
             }
@@ -424,7 +389,7 @@ void FadeIn(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = MISC_PALETTE_MAX_LEVEL;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -446,12 +411,12 @@ void FadeOut(i32 increment) {
     done = false;
     if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memcpy(currentPalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
+    memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
+    for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == FADE_LEVEL_LAST)
+        if (i == PALETTE_CHANNEL_MAX)
             done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (currentPalette->m_data[j] > 0) {
@@ -465,7 +430,7 @@ void FadeOut(i32 increment) {
         DelayTil(&delayTime);
     }
     if (done == 0) {
-        i = FADE_LEVEL_LAST;
+        i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
     delete currentPalette;
@@ -487,17 +452,12 @@ i32 Random(i32 low, i32 high) {
 
 VA(0x004bde90, 0x74)
 void ProcessAssert(i32 condition, H2_CONST char* file, i32 line) {
-    DATA(0x0051e6b4)
-    static char assertMessageFormat[] = "Assert statement failed in module %s, line %d.  Do you wish to abort the program?";
-    DATA(0x0051e708)
-    static char assertTitle[] = "Assert Failure";
-
     i32 H2_UNUSED(unusedAssertWord);
     if (condition == 0) {
         gpMouseManager->SetColorMice(false);
         SetFullScreenStatus(false);
-        sprintf(gText, assertMessageFormat, file, line);
-        if (MessageBoxA(hwndApp, gText, assertTitle, MB_YESNO | MB_ICONHAND) == IDNO)
+        sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
+        if (MessageBoxA(hwndApp, gText, "Assert Failure", MB_YESNO | MB_ICONHAND) == IDNO)
             return;
         unusedAssertWord = 0;
         ShutDown(NULL);
@@ -568,23 +528,13 @@ char* FindLastToken(char* text, char token) {
 
 VA(0x004be050, 0x47)
 void SetInstallDefaults(void) {
-    DATA(0x0051e718)
-    static char autoLoadName[] = "AUTO";
-    DATA(0x0051e720)
-    static char autoSaveName[] = "AUTO";
-
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-    strcpy(gConfig.autoLoadName, autoLoadName);
-    strcpy(gConfig.autoSaveName, autoSaveName);
+    strcpy(gConfig.autoLoadName, "AUTO");
+    strcpy(gConfig.autoSaveName, "AUTO");
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 VA(0x004be0a0, 0x29d)
 void SetGameDefaults(void) {
-    DATA(0x0051e728)
-    static char unknownHeroName[] = localization::Tr("player.unknown_hero_name");
-    DATA(0x0051e73c)
-    static char uniqueIdCharacters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
     i32 i;
     i32 seed;
     i32 H2_UNUSED(nAlpha);
@@ -601,12 +551,12 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].colorMouseCursor = false;
         gConfig.gfx[i].fullScreen = true;
-        if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
+        if (giMainVideoModeWidth <= LOGICAL_SCREEN_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gConfig.gfx[i].width = DEFAULT_WINDOW_WIDTH;
-            gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = LOGICAL_SCREEN_WIDTH;
+            gConfig.gfx[i].height = LOGICAL_SCREEN_HEIGHT;
         }
     }
     gConfig.showCombatGrid = 0;
@@ -625,16 +575,16 @@ void SetGameDefaults(void) {
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
-    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)] = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
-    gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)] = CONFIG_WALK_SPEED_FAST;
     // Неизвестный герой
     strcpy(
         gConfig.networkDefaultName,
-        unknownHeroName
+        localization::Tr("player.unknown_hero_name")
     );
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
-    alpha = uniqueIdCharacters;
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
     seed = 0;
     seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
@@ -651,23 +601,16 @@ void SetGameDefaults(void) {
 
 VA(0x004be340, 0xcb)
 void ReadPrefsFromFile(void) {
-    DATA(0x0051e764)
-    static char configFileName[] = "HEROES2.CFG";
-    DATA(0x0051e770)
-    static char fileNameFormat[] = "%s";
-    DATA(0x0051e774)
-    static char readMode[] = "rb";
-
     i32 H2_UNUSED(result);
     FILE* file;
 
-    sprintf(gText, fileNameFormat, configFileName);
+    sprintf(gText, "%s", "HEROES2.CFG");
     if (access(gText, 0) == -1) {
         SetInstallDefaults();
         SetGameDefaults();
         WritePrefs();
     } else {
-        file = fopen(gText, readMode);
+        file = fopen(gText, "rb");
         if (file == NULL)
             FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, file);
@@ -697,103 +640,6 @@ H2_ENUM_END(RegistryValueSize)
 
 VA(0x004be410, 0x89f)
 void ReadPrefsFromRegistry(void) {
-    DATA(0x0051e778)
-    static char registryKey[] = "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000";
-    DATA(0x0051e7b4)
-    static char musicVolumeProbeValue[] = "HMM2POL MusicVolume";
-    DATA(0x0051e7c8)
-    static char musicVolumeValue[] = "HMM2POL MusicVolume";
-    DATA(0x0051e7dc)
-    static char fXVolumeValue[] = "HMM2POL FXVolume";
-    DATA(0x0051e7f0)
-    static char walkSpeedValue[] = "HMM2POL WalkSpeed";
-    DATA(0x0051e804)
-    static char computerWalkSpeedValue[] = "HMM2POL ComputerWalkSpeed";
-    DATA(0x0051e820)
-    static char showRouteValue[] = "HMM2POL ShowRoute";
-    DATA(0x0051e834)
-    static char blackoutComputerValue[] = "HMM2POL BlackoutComputer";
-    DATA(0x0051e850)
-    static char soundQualityValue[] = "HMM2POL SoundQuality";
-    DATA(0x0051e868)
-    static char useOperaValue[] = "HMM2POL UseOpera";
-    DATA(0x0051e87c)
-    static char directConnectComPortValue[] = "HMM2POL DirectConnectComPort";
-    DATA(0x0051e89c)
-    static char directConnectBaudRateValue[] = "HMM2POL DirectConnectBaudRate";
-    DATA(0x0051e8bc)
-    static char modemComPortValue[] = "HMM2POL ModemComPort";
-    DATA(0x0051e8d4)
-    static char modemBaudRateValue[] = "HMM2POL ModemBaudRate";
-    DATA(0x0051e8ec)
-    static char modemInitStringValue[] = "HMM2POL ModemInitString";
-    DATA(0x0051e904)
-    static char uniqueSystemIDValue[] = "HMM2POL UniqueSystemID";
-    DATA(0x0051e91c)
-    static char netNameValue[] = "HMM2POL NetName";
-    DATA(0x0051e92c)
-    static char useAutosaveValue[] = "HMM2POL UseAutosave";
-    DATA(0x0051e940)
-    static char slowVideoValue[] = "HMM2POL SlowVideo";
-    DATA(0x0051e954)
-    static char combatShowGridValue[] = "HMM2POL CombatShowGrid";
-    DATA(0x0051e96c)
-    static char combatShowMouseHexValue[] = "HMM2POL CombatShowMouseHex";
-    DATA(0x0051e988)
-    static char combatGridLevelValue[] = "HMM2POL CombatGridLevel";
-    DATA(0x0051e9a0)
-    static char combatViewArmyLevelValue[] = "HMM2POL CombatViewArmyLevel";
-    DATA(0x0051e9bc)
-    static char evilInterfaceUsageValue[] = "HMM2POL EvilInterfaceUsage";
-    DATA(0x0051e9d8)
-    static char autoCombatValue[] = "HMM2POL AutoCombat";
-    DATA(0x0051e9ec)
-    static char combatSpeedValue[] = "HMM2POL CombatSpeed";
-    DATA(0x0051ea00)
-    static char autoCombatSpellsValue[] = "HMM2POL AutoCombatSpells";
-    DATA(0x0051ea1c)
-    static char firstMapOffsetValue[] = "HMM2POL FirstMapOffset";
-    DATA(0x0051ea34)
-    static char currentMapOffsetValue[] = "HMM2POL CurrentMapOffset";
-    DATA(0x0051ea50)
-    static char showObjectBoxesValue[] = "HMM2POL ShowObjectBoxes";
-    DATA(0x0051ea68)
-    static char editorAnimateScreenValue[] = "HMM2POL EditorAnimateScreen";
-    DATA(0x0051ea84)
-    static char editorPaletteCyclingValue[] = "HMM2POL EditorPaletteCycling";
-    DATA(0x0051eaa4)
-    static char gameShowMenuValue[] = "HMM2POL GameShowMenu";
-    DATA(0x0051eabc)
-    static char gameWindowXLeftValue[] = "HMM2POL GameWindowXLeft";
-    DATA(0x0051ead4)
-    static char gameWindowYTopValue[] = "HMM2POL GameWindowYTop";
-    DATA(0x0051eaec)
-    static char gameWindowWidthValue[] = "HMM2POL GameWindowWidth";
-    DATA(0x0051eb04)
-    static char gameWindowHeightValue[] = "HMM2POL GameWindowHeight";
-    DATA(0x0051eb20)
-    static char gameFullScreenValue[] = "HMM2POL GameFullScreen";
-    DATA(0x0051eb38)
-    static char gameColorMouseCursorValue[] = "HMM2POL GameColorMouseCursor";
-    DATA(0x0051eb58)
-    static char editorShowMenuValue[] = "HMM2POL EditorShowMenu";
-    DATA(0x0051eb70)
-    static char editorWindowXLeftValue[] = "HMM2POL EditorWindowXLeft";
-    DATA(0x0051eb8c)
-    static char editorWindowYTopValue[] = "HMM2POL EditorWindowYTop";
-    DATA(0x0051eba8)
-    static char editorWindowWidthValue[] = "HMM2POL EditorWindowWidth";
-    DATA(0x0051ebc4)
-    static char editorWindowHeightValue[] = "HMM2POL EditorWindowHeight";
-    DATA(0x0051ebe0)
-    static char editorFullScreenValue[] = "HMM2POL EditorFullScreen";
-    DATA(0x0051ebfc)
-    static char editorColorMouseCursorValue[] = "HMM2POL EditorColorMouseCursor";
-    DATA(0x0051ec1c)
-    static char installPathValue[] = "PathPL2";
-    DATA(0x0051ec24)
-    static char cdDriveValue[] = "HMM2POL CDDrive";
-
     DWORD dwcbData;
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
@@ -801,14 +647,14 @@ void ReadPrefsFromRegistry(void) {
     LONG lRet;
     DWORD dwType;
 
-    strcpy(szKey, registryKey);
+    strcpy(szKey, MISC_REGISTRY_KEY);
     hKey = NULL;
     lRet = RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey);
     if (lRet == 0) {
         dwcbData = REGISTRY_DWORD_BYTES;
         if (RegQueryValueExA(
                 hKey,
-                musicVolumeProbeValue,
+                "HMM2POL MusicVolume",
                 NULL,
                 &dwType,
                 reinterpret_cast<u8*>(&gConfig.musicVolume),
@@ -824,7 +670,7 @@ void ReadPrefsFromRegistry(void) {
         }
         RegQueryValueExA(
             hKey,
-            musicVolumeValue,
+            "HMM2POL MusicVolume",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.musicVolume),
@@ -832,7 +678,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            fXVolumeValue,
+            "HMM2POL FXVolume",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.soundVolume),
@@ -840,23 +686,23 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            walkSpeedValue,
+            "HMM2POL WalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             &dwcbData
         );
         RegQueryValueExA(
             hKey,
-            computerWalkSpeedValue,
+            "HMM2POL ComputerWalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             &dwcbData
         );
         RegQueryValueExA(
             hKey,
-            showRouteValue,
+            "HMM2POL ShowRoute",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.showRoute),
@@ -864,7 +710,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            blackoutComputerValue,
+            "HMM2POL BlackoutComputer",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.blackoutComputer),
@@ -872,7 +718,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            soundQualityValue,
+            "HMM2POL SoundQuality",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.musicSource),
@@ -880,7 +726,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            useOperaValue,
+            "HMM2POL UseOpera",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.useOpera),
@@ -888,7 +734,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            directConnectComPortValue,
+            "HMM2POL DirectConnectComPort",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
@@ -896,7 +742,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            directConnectBaudRateValue,
+            "HMM2POL DirectConnectBaudRate",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
@@ -904,7 +750,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            modemComPortValue,
+            "HMM2POL ModemComPort",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
@@ -912,7 +758,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            modemBaudRateValue,
+            "HMM2POL ModemBaudRate",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
@@ -921,7 +767,7 @@ void ReadPrefsFromRegistry(void) {
         dwcbData = MODEM_INIT_STRING_SIZE + 1;
         RegQueryValueExA(
             hKey,
-            modemInitStringValue,
+            "HMM2POL ModemInitString",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(gConfig.modemInitString),
@@ -930,7 +776,7 @@ void ReadPrefsFromRegistry(void) {
         dwcbData = REGISTRY_DWORD_BYTES;
         RegQueryValueExA(
             hKey,
-            uniqueSystemIDValue,
+            "HMM2POL UniqueSystemID",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(gConfig.uniqueSystemID),
@@ -940,7 +786,7 @@ void ReadPrefsFromRegistry(void) {
         dwcbData = NETWORK_DEFAULT_NAME_SIZE + 1;
         RegQueryValueExA(
             hKey,
-            netNameValue,
+            "HMM2POL NetName",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(gConfig.networkDefaultName),
@@ -949,7 +795,7 @@ void ReadPrefsFromRegistry(void) {
         dwcbData = REGISTRY_DWORD_BYTES;
         RegQueryValueExA(
             hKey,
-            useAutosaveValue,
+            "HMM2POL UseAutosave",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.autosave),
@@ -957,7 +803,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            slowVideoValue,
+            "HMM2POL SlowVideo",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.slowVideo),
@@ -965,7 +811,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            combatShowGridValue,
+            "HMM2POL CombatShowGrid",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.showCombatGrid),
@@ -973,7 +819,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            combatShowMouseHexValue,
+            "HMM2POL CombatShowMouseHex",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
@@ -981,7 +827,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            combatGridLevelValue,
+            "HMM2POL CombatGridLevel",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
@@ -989,7 +835,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            combatViewArmyLevelValue,
+            "HMM2POL CombatViewArmyLevel",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
@@ -997,7 +843,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            evilInterfaceUsageValue,
+            "HMM2POL EvilInterfaceUsage",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
@@ -1005,7 +851,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            autoCombatValue,
+            "HMM2POL AutoCombat",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
@@ -1013,7 +859,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            combatSpeedValue,
+            "HMM2POL CombatSpeed",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.combatSpeed),
@@ -1021,7 +867,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            autoCombatSpellsValue,
+            "HMM2POL AutoCombatSpells",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
@@ -1029,7 +875,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            firstMapOffsetValue,
+            "HMM2POL FirstMapOffset",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.firstMapOffset),
@@ -1037,7 +883,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            currentMapOffsetValue,
+            "HMM2POL CurrentMapOffset",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.currentMapOffset),
@@ -1045,7 +891,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            showObjectBoxesValue,
+            "HMM2POL ShowObjectBoxes",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
@@ -1053,7 +899,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorAnimateScreenValue,
+            "HMM2POL EditorAnimateScreen",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
@@ -1061,7 +907,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorPaletteCyclingValue,
+            "HMM2POL EditorPaletteCycling",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
@@ -1069,7 +915,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameShowMenuValue,
+            "HMM2POL GameShowMenu",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
@@ -1077,7 +923,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameWindowXLeftValue,
+            "HMM2POL GameWindowXLeft",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
@@ -1085,7 +931,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameWindowYTopValue,
+            "HMM2POL GameWindowYTop",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
@@ -1093,7 +939,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameWindowWidthValue,
+            "HMM2POL GameWindowWidth",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
@@ -1101,7 +947,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameWindowHeightValue,
+            "HMM2POL GameWindowHeight",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
@@ -1109,7 +955,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameFullScreenValue,
+            "HMM2POL GameFullScreen",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
@@ -1117,7 +963,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            gameColorMouseCursorValue,
+            "HMM2POL GameColorMouseCursor",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
@@ -1125,7 +971,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorShowMenuValue,
+            "HMM2POL EditorShowMenu",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
@@ -1133,7 +979,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorWindowXLeftValue,
+            "HMM2POL EditorWindowXLeft",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
@@ -1141,7 +987,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorWindowYTopValue,
+            "HMM2POL EditorWindowYTop",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
@@ -1149,7 +995,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorWindowWidthValue,
+            "HMM2POL EditorWindowWidth",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
@@ -1157,7 +1003,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorWindowHeightValue,
+            "HMM2POL EditorWindowHeight",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
@@ -1165,7 +1011,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorFullScreenValue,
+            "HMM2POL EditorFullScreen",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
@@ -1173,7 +1019,7 @@ void ReadPrefsFromRegistry(void) {
         );
         RegQueryValueExA(
             hKey,
-            editorColorMouseCursorValue,
+            "HMM2POL EditorColorMouseCursor",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
@@ -1182,7 +1028,7 @@ void ReadPrefsFromRegistry(void) {
         dwcbData = MODEM_INIT_STRING_SIZE + 1;
         if (RegQueryValueExA(
                 hKey,
-                installPathValue,
+                "PathPL2",
                 NULL,
                 &dwType,
                 reinterpret_cast<u8*>(gcRegAppPath),
@@ -1195,7 +1041,7 @@ void ReadPrefsFromRegistry(void) {
             );
         if (RegQueryValueExA(
                 hKey,
-                cdDriveValue,
+                "HMM2POL CDDrive",
                 NULL,
                 &dwType,
                 reinterpret_cast<u8*>(gcRegCDRomPath),
@@ -1224,27 +1070,14 @@ void ReadPrefsFromRegistry(void) {
 
 VA(0x004becb0, 0xa8)
 void ReadPrefs(void) {
-    DATA(0x0051ec34)
-    static char rmtRLNameFormat[] = "RMT%sRL.BIN";
-    DATA(0x0051ec40)
-    static char rmtRCNameFormat[] = "RMT%sRC.BIN";
-    DATA(0x0051ec4c)
-    static char rmtRDNameFormat[] = "RMT%sRD.BIN";
-    DATA(0x0051ec58)
-    static char rmtSLNameFormat[] = "RMT%sSL.BIN";
-    DATA(0x0051ec64)
-    static char rmtSCNameFormat[] = "RMT%sSC.BIN";
-    DATA(0x0051ec70)
-    static char rmtSDNameFormat[] = "RMT%sSD.BIN";
-
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
-    sprintf(gConfig.rmtRLName, rmtRLNameFormat, gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRCName, rmtRCNameFormat, gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRDName, rmtRDNameFormat, gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSLName, rmtSLNameFormat, gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSCName, rmtSCNameFormat, gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSDName, rmtSDNameFormat, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSLName, "RMT%sSL.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSCName, "RMT%sSC.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
 }
 
 #if H2_RETAIL_COMPILER
@@ -1252,14 +1085,9 @@ void ReadPrefs(void) {
 #endif
 VA(0x004bed60, 0x63)
 void WritePrefsToFile(void) {
-    DATA(0x0051ec7c)
-    static char configFileName[] = "HEROES2.CFG";
-    DATA(0x0051ec88)
-    static char fileNameFormat[] = "%s";
-
     i32 fileDescriptor;
 
-    sprintf(gText, fileNameFormat, configFileName);
+    sprintf(gText, "%s", "HEROES2.CFG");
     fileDescriptor = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fileDescriptor == -1)
         return;
@@ -1272,108 +1100,17 @@ void WritePrefsToFile(void) {
 
 VA(0x004bedd0, 0x4cb)
 void WritePrefsToRegistry(void) {
-    DATA(0x0051ec8c)
-    static char registryKey[] = "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000";
-    DATA(0x0051ecc8)
-    static char musicVolumeValue[] = "HMM2POL MusicVolume";
-    DATA(0x0051ecdc)
-    static char fXVolumeValue[] = "HMM2POL FXVolume";
-    DATA(0x0051ecf0)
-    static char walkSpeedValue[] = "HMM2POL WalkSpeed";
-    DATA(0x0051ed04)
-    static char computerWalkSpeedValue[] = "HMM2POL ComputerWalkSpeed";
-    DATA(0x0051ed20)
-    static char showRouteValue[] = "HMM2POL ShowRoute";
-    DATA(0x0051ed34)
-    static char blackoutComputerValue[] = "HMM2POL BlackoutComputer";
-    DATA(0x0051ed50)
-    static char soundQualityValue[] = "HMM2POL SoundQuality";
-    DATA(0x0051ed68)
-    static char useOperaValue[] = "HMM2POL UseOpera";
-    DATA(0x0051ed7c)
-    static char directConnectComPortValue[] = "HMM2POL DirectConnectComPort";
-    DATA(0x0051ed9c)
-    static char directConnectBaudRateValue[] = "HMM2POL DirectConnectBaudRate";
-    DATA(0x0051edbc)
-    static char modemComPortValue[] = "HMM2POL ModemComPort";
-    DATA(0x0051edd4)
-    static char modemBaudRateValue[] = "HMM2POL ModemBaudRate";
-    DATA(0x0051edec)
-    static char modemInitStringValue[] = "HMM2POL ModemInitString";
-    DATA(0x0051ee04)
-    static char uniqueSystemIDValue[] = "HMM2POL UniqueSystemID";
-    DATA(0x0051ee1c)
-    static char netNameValue[] = "HMM2POL NetName";
-    DATA(0x0051ee2c)
-    static char useAutosaveValue[] = "HMM2POL UseAutosave";
-    DATA(0x0051ee40)
-    static char slowVideoValue[] = "HMM2POL SlowVideo";
-    DATA(0x0051ee54)
-    static char combatShowGridValue[] = "HMM2POL CombatShowGrid";
-    DATA(0x0051ee6c)
-    static char combatShowMouseHexValue[] = "HMM2POL CombatShowMouseHex";
-    DATA(0x0051ee88)
-    static char combatGridLevelValue[] = "HMM2POL CombatGridLevel";
-    DATA(0x0051eea0)
-    static char combatViewArmyLevelValue[] = "HMM2POL CombatViewArmyLevel";
-    DATA(0x0051eebc)
-    static char evilInterfaceUsageValue[] = "HMM2POL EvilInterfaceUsage";
-    DATA(0x0051eed8)
-    static char autoCombatValue[] = "HMM2POL AutoCombat";
-    DATA(0x0051eeec)
-    static char combatSpeedValue[] = "HMM2POL CombatSpeed";
-    DATA(0x0051ef00)
-    static char autoCombatSpellsValue[] = "HMM2POL AutoCombatSpells";
-    DATA(0x0051ef1c)
-    static char firstMapOffsetValue[] = "HMM2POL FirstMapOffset";
-    DATA(0x0051ef34)
-    static char currentMapOffsetValue[] = "HMM2POL CurrentMapOffset";
-    DATA(0x0051ef50)
-    static char showObjectBoxesValue[] = "HMM2POL ShowObjectBoxes";
-    DATA(0x0051ef68)
-    static char editorAnimateScreenValue[] = "HMM2POL EditorAnimateScreen";
-    DATA(0x0051ef84)
-    static char editorPaletteCyclingValue[] = "HMM2POL EditorPaletteCycling";
-    DATA(0x0051efa4)
-    static char gameShowMenuValue[] = "HMM2POL GameShowMenu";
-    DATA(0x0051efbc)
-    static char gameWindowXLeftValue[] = "HMM2POL GameWindowXLeft";
-    DATA(0x0051efd4)
-    static char gameWindowYTopValue[] = "HMM2POL GameWindowYTop";
-    DATA(0x0051efec)
-    static char gameWindowWidthValue[] = "HMM2POL GameWindowWidth";
-    DATA(0x0051f004)
-    static char gameWindowHeightValue[] = "HMM2POL GameWindowHeight";
-    DATA(0x0051f020)
-    static char gameFullScreenValue[] = "HMM2POL GameFullScreen";
-    DATA(0x0051f038)
-    static char gameColorMouseCursorValue[] = "HMM2POL GameColorMouseCursor";
-    DATA(0x0051f058)
-    static char editorShowMenuValue[] = "HMM2POL EditorShowMenu";
-    DATA(0x0051f070)
-    static char editorWindowXLeftValue[] = "HMM2POL EditorWindowXLeft";
-    DATA(0x0051f08c)
-    static char editorWindowYTopValue[] = "HMM2POL EditorWindowYTop";
-    DATA(0x0051f0a8)
-    static char editorWindowWidthValue[] = "HMM2POL EditorWindowWidth";
-    DATA(0x0051f0c4)
-    static char editorWindowHeightValue[] = "HMM2POL EditorWindowHeight";
-    DATA(0x0051f0e0)
-    static char editorFullScreenValue[] = "HMM2POL EditorFullScreen";
-    DATA(0x0051f0fc)
-    static char editorColorMouseCursorValue[] = "HMM2POL EditorColorMouseCursor";
-
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
     LONG lRet;
 
-    strcpy(szKey, registryKey);
+    strcpy(szKey, MISC_REGISTRY_KEY);
     hKey = NULL;
     lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey);
     if (lRet == 0) {
         RegSetValueExA(
             hKey,
-            musicVolumeValue,
+            "HMM2POL MusicVolume",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.musicVolume),
@@ -1381,7 +1118,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            fXVolumeValue,
+            "HMM2POL FXVolume",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.soundVolume),
@@ -1389,23 +1126,23 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            walkSpeedValue,
+            "HMM2POL WalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
             hKey,
-            computerWalkSpeedValue,
+            "HMM2POL ComputerWalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
             hKey,
-            showRouteValue,
+            "HMM2POL ShowRoute",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.showRoute),
@@ -1413,7 +1150,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            blackoutComputerValue,
+            "HMM2POL BlackoutComputer",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.blackoutComputer),
@@ -1421,7 +1158,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            soundQualityValue,
+            "HMM2POL SoundQuality",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.musicSource),
@@ -1429,7 +1166,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            useOperaValue,
+            "HMM2POL UseOpera",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.useOpera),
@@ -1437,7 +1174,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            directConnectComPortValue,
+            "HMM2POL DirectConnectComPort",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
@@ -1445,7 +1182,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            directConnectBaudRateValue,
+            "HMM2POL DirectConnectBaudRate",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
@@ -1453,7 +1190,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            modemComPortValue,
+            "HMM2POL ModemComPort",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
@@ -1461,7 +1198,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            modemBaudRateValue,
+            "HMM2POL ModemBaudRate",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
@@ -1469,7 +1206,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            modemInitStringValue,
+            "HMM2POL ModemInitString",
             0,
             REG_SZ,
             reinterpret_cast<u8*>(gConfig.modemInitString),
@@ -1477,7 +1214,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            uniqueSystemIDValue,
+            "HMM2POL UniqueSystemID",
             0,
             REG_SZ,
             reinterpret_cast<u8*>(gConfig.uniqueSystemID),
@@ -1485,7 +1222,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            netNameValue,
+            "HMM2POL NetName",
             0,
             REG_SZ,
             reinterpret_cast<u8*>(gConfig.networkDefaultName),
@@ -1493,7 +1230,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            useAutosaveValue,
+            "HMM2POL UseAutosave",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.autosave),
@@ -1501,7 +1238,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            slowVideoValue,
+            "HMM2POL SlowVideo",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.slowVideo),
@@ -1509,7 +1246,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            combatShowGridValue,
+            "HMM2POL CombatShowGrid",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.showCombatGrid),
@@ -1517,7 +1254,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            combatShowMouseHexValue,
+            "HMM2POL CombatShowMouseHex",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
@@ -1525,7 +1262,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            combatGridLevelValue,
+            "HMM2POL CombatGridLevel",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
@@ -1533,7 +1270,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            combatViewArmyLevelValue,
+            "HMM2POL CombatViewArmyLevel",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
@@ -1541,7 +1278,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            evilInterfaceUsageValue,
+            "HMM2POL EvilInterfaceUsage",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
@@ -1549,7 +1286,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            autoCombatValue,
+            "HMM2POL AutoCombat",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
@@ -1557,7 +1294,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            combatSpeedValue,
+            "HMM2POL CombatSpeed",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.combatSpeed),
@@ -1565,7 +1302,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            autoCombatSpellsValue,
+            "HMM2POL AutoCombatSpells",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
@@ -1573,7 +1310,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            firstMapOffsetValue,
+            "HMM2POL FirstMapOffset",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.firstMapOffset),
@@ -1581,7 +1318,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            currentMapOffsetValue,
+            "HMM2POL CurrentMapOffset",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.currentMapOffset),
@@ -1589,7 +1326,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            showObjectBoxesValue,
+            "HMM2POL ShowObjectBoxes",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
@@ -1597,7 +1334,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorAnimateScreenValue,
+            "HMM2POL EditorAnimateScreen",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
@@ -1605,7 +1342,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorPaletteCyclingValue,
+            "HMM2POL EditorPaletteCycling",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
@@ -1613,7 +1350,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameShowMenuValue,
+            "HMM2POL GameShowMenu",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
@@ -1621,7 +1358,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameWindowXLeftValue,
+            "HMM2POL GameWindowXLeft",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
@@ -1629,7 +1366,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameWindowYTopValue,
+            "HMM2POL GameWindowYTop",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
@@ -1637,7 +1374,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameWindowWidthValue,
+            "HMM2POL GameWindowWidth",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
@@ -1645,7 +1382,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameWindowHeightValue,
+            "HMM2POL GameWindowHeight",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
@@ -1653,7 +1390,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameFullScreenValue,
+            "HMM2POL GameFullScreen",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
@@ -1661,7 +1398,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            gameColorMouseCursorValue,
+            "HMM2POL GameColorMouseCursor",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
@@ -1669,7 +1406,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorShowMenuValue,
+            "HMM2POL EditorShowMenu",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
@@ -1677,7 +1414,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorWindowXLeftValue,
+            "HMM2POL EditorWindowXLeft",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
@@ -1685,7 +1422,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorWindowYTopValue,
+            "HMM2POL EditorWindowYTop",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
@@ -1693,7 +1430,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorWindowWidthValue,
+            "HMM2POL EditorWindowWidth",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
@@ -1701,7 +1438,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorWindowHeightValue,
+            "HMM2POL EditorWindowHeight",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
@@ -1709,7 +1446,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorFullScreenValue,
+            "HMM2POL EditorFullScreen",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
@@ -1717,7 +1454,7 @@ void WritePrefsToRegistry(void) {
         );
         RegSetValueExA(
             hKey,
-            editorColorMouseCursorValue,
+            "HMM2POL EditorColorMouseCursor",
             0,
             REG_DWORD,
             reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
@@ -1735,17 +1472,11 @@ void WritePrefs(void) {
 
 VA(0x004bf2b0, 0x3f)
 i32 IsCDDrive(i32 driveIndex) {
-    DATA(0x0051f11c)
-    static char driveRoot[] = "A:\\";
-
-    sprintf(gText, driveRoot);
+    sprintf(gText, "A:\\");
     gText[0] += driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-#include <SOURCE/KB.h>
-#include <BASE/MiscGraphicsConstants.h>
-DATA(0x0051f120) char gcCDTrackNameText[] = "\\Tracks2\\02-AudioTrack 02.ogg";
 
 VA(0x004bf2f0, 0x7b)
 bool DriveSupportsFreeSpaceQuery(char driveLetter) {
@@ -1872,10 +1603,10 @@ void BitmapToScreen(class bitmap* image) {
 
 VA(0x004bf700, 0x5b)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
-    memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
     memcpy(
         gCyclePal,
-        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * IDX(PALETTE_CHANNEL_COUNT),
         sizeof(gCyclePal)
     );
     if (updateDisplay != 0)
@@ -2052,13 +1783,13 @@ void AiPrint(H2_CONST char* text) {
         return;
 
     FillBitmapArea(
-        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, LOGICAL_SCREEN_WIDTH, STATUS_BAR_HEIGHT, 0
     );
     smallFont->DrawBoundedString(
         text,
         0,
         STATUS_TEXT_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_TEXT_HEIGHT,
         FONT_DRAW_DEFAULT,
         FONT_ALIGN_LEFT
@@ -2067,7 +1798,7 @@ void AiPrint(H2_CONST char* text) {
         gpWindowManager->m_screen,
         0,
         STATUS_BAR_Y,
-        STATUS_BAR_WIDTH,
+        LOGICAL_SCREEN_WIDTH,
         STATUS_BAR_HEIGHT,
         0,
         STATUS_BAR_Y
@@ -2088,27 +1819,27 @@ void AbsAiPrint(H2_CONST char* text) {
 #endif
 VA(0x004bfd40, 0x19c)
 void FadeTo(u8* source, u8* destination, i32 increment) {
-    u8 temp[MISC_PALETTE_BYTE_COUNT];
+    u8 temp[PALETTE_DATA_SIZE];
     u8 *current, *destinationPalette;
     i32 index, change, diff, move, H2_UNUSED(delay), iLevel, nextTime, k;
 
     delay = FADE_TO_FRAME_DELAY;
-    memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
+    memcpy(temp, source, PALETTE_DATA_SIZE);
     increment >>= FADE_TO_INCREMENT_SHIFT;
     if (increment < 1) {
         increment = 1;
         delay *= WINDOWED_FADE_INCREMENT_SCALE;
     }
-    for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
+    for (iLevel = FADE_TO_START_LEVEL; iLevel < PALETTE_LEVEL_COUNT; iLevel += increment) {
         nextTime = KBTickCount() + FADE_TO_FRAME_DELAY;
         PollSound();
-        index = MISC_PALETTE_LEVEL_COUNT - iLevel - increment;
+        index = PALETTE_LEVEL_COUNT - iLevel - increment;
         if (index < 0)
             index = 0;
         change = giChangeThreshold[index];
         current = temp;
         destinationPalette = destination;
-        for (k = 0; k < MISC_PALETTE_BYTE_COUNT; ++k) {
+        for (k = 0; k < PALETTE_DATA_SIZE; ++k) {
             diff = *destinationPalette - *current;
             if (abs(diff) > change) {
                 move = abs(diff) - change;
@@ -2140,25 +1871,25 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     i32 x;
     i32 i;
     i32 y;
-    u8 tempPal[MISC_PALETTE_BYTE_COUNT];
+    u8 tempPal[PALETTE_DATA_SIZE];
     i8* paletteData;
     i32 savedFlags;
 
     savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     paletteData = gpBufferPalette->m_data;
-    for (i = 0; i < IDX(MISC_PALETTE_BYTE_COUNT) / IDX(PALETTE_COMPONENT_COUNT); ++i) {
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX];
-        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX] =
-            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX];
+    for (i = 0; i < IDX(PALETTE_DATA_SIZE) / IDX(PALETTE_CHANNEL_COUNT); ++i) {
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)];
     }
     FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
     currentColorTable = gpWindowManager->m_screen->m_pixels;
-    for (y = 0; y < BLIT_SCREEN_HEIGHT; ++y) {
-        for (x = 0; x < BLIT_SCREEN_WIDTH; ++x) {
+    for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
             *currentColorTable = colorTable[*currentColorTable];
             ++currentColorTable;
         }
@@ -2242,10 +1973,10 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
     write(fileDescriptor, &bMark, 1);
-    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
-    for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
+    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    for (x = 0; x < PALETTE_DATA_SIZE; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
-    write(fileDescriptor, palOut, PALETTE_BYTE_COUNT);
+    write(fileDescriptor, palOut, PALETTE_DATA_SIZE);
     H2_FREE(palOut);
     close(fileDescriptor);
 }
@@ -2425,15 +2156,15 @@ void GetDataEntry(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    message.payload.widget.id = ENTRY_BUTTON_ONE;
+    message.payload.widget.id = DIALOG_BUTTON_1;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
+    message.payload.widget.id = DIALOG_BUTTON_7;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
+    message.payload.widget.id = DIALOG_BUTTON_8;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_FIVE;
+    message.payload.widget.id = DIALOG_BUTTON_5;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SIX;
+    message.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
         message.payload.widget.id = ENTRY_CANCEL_BUTTON;
@@ -2506,7 +2237,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_CANCEL_BUTTON:
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;
@@ -2514,7 +2245,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         return MESSAGE_DISPATCH_FORWARD;
                 }
                 break;
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_TEXT_WIDGET:
                     gotText:

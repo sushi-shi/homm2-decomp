@@ -30,6 +30,11 @@ H2_ENUM_CLASS_BEGIN(WindowState)
 H2_ENUM_CLASS_END(WindowState)
 H2_ENUM_FLAGS(WindowState)
 
+H2_ENUM_BEGIN(WindowDrawUpdate)
+    WINDOW_DRAW_BUFFER_ONLY   = 0,
+    WINDOW_DRAW_UPDATE_SCREEN = 1
+H2_ENUM_END(WindowDrawUpdate)
+
 H2_ENUM_BEGIN(HeroWindowConstant)
     HERO_WINDOW_NAME_CAPACITY = 0x14
 H2_ENUM_END(HeroWindowConstant)
@@ -37,8 +42,6 @@ H2_ENUM_END(HeroWindowConstant)
 #pragma pack(push, 1)
 class heroWindow {
 public:
-    template<class BaseWidget>
-    class DimmerWidget;
     i32 m_zOrder;
     heroWindow* m_nextWindow;
     heroWindow* m_prevWindow;
@@ -62,8 +65,8 @@ public:
     void RemoveWidget(class widget* currentWidget);
     MessageDispatchResult BroadcastMessage(struct tag_message& message);
     void DrawWindow(void);
-    void DrawWindow(i32 flags);
-    void DrawWindow(i32 update, i32 firstId, i32 lastId);
+    void DrawWindow(i32 updateScreen);
+    void DrawWindow(i32 updateScreen, i32 firstWidgetId, i32 lastWidgetId);
     i32 SaveBackground(void);
     void RestoreBackground(void);
     void MoveWindow(i32 dx, i32 dy);

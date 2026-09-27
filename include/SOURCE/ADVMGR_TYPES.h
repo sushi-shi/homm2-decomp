@@ -4,20 +4,16 @@
 #include <va.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 #pragma pack(push, 1)
 union AdventureRemotePayload {
-    char bytes[ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE];
-    struct {
-        i32 saveDataSize;
-        i32 saveCrc;
-        i32 saveTransmitCrc;
-        i32 savePlayerExited;
-    };
+    char bytes[REMOTE_MESSAGE_PAYLOAD_SIZE];
+    RemoteSaveInitialization save;
     SPlayerExit playerExit;
 };
 #pragma pack(pop)
 
-SIZE(AdventureRemotePayload, ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE);
+SIZE(AdventureRemotePayload, REMOTE_MESSAGE_PAYLOAD_SIZE);
 
 #endif

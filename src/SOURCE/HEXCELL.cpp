@@ -18,7 +18,7 @@ hexcell::hexcell(void) {
     m_blocked = 0;
     m_occupantSide = COMBAT_SIDE_NONE;
     m_occupantIndex = 0;
-    m_occupantFrame = ARMY_FACING_NONE;
+    m_occupantFootprintHalf = ARMY_FACING_NONE;
     m_deadOccupantCount = 0;
 }
 
@@ -27,9 +27,12 @@ void hexcell::DrawGround(void) {
     return;
 }
 
+#if H2_RETAIL_COMPILER
+#define occupantFacing currentFrame
+#endif
 VA(0x00464d06, 0xa1)
 void hexcell::DrawLowerDeadOccupants(void) {
-    ArmyFacing currentFrame;
+    ArmyFacing occupantFacing;
     i32 i;
     army* occupant;
 
@@ -37,16 +40,22 @@ void hexcell::DrawLowerDeadOccupants(void) {
         for (i = 0; i < m_deadOccupantCount - 1; ++i) {
             occupant =
                 &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
-            currentFrame = occupant->m_facing;
-            if (m_deadOccupantFrames[i] != currentFrame)
+            occupantFacing = occupant->m_facing;
+            if (m_deadOccupantFootprintHalves[i] != occupantFacing)
                 occupant->DrawToBuffer(m_x, m_y, 0);
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef occupantFacing
+#endif
 
+#if H2_RETAIL_COMPILER
+#define occupantFacing currentFrame
+#endif
 VA(0x00464da7, 0xa4)
 void hexcell::DrawUpperDeadOccupant(void) {
-    ArmyFacing currentFrame;
+    ArmyFacing occupantFacing;
     i32 i;
     army* occupant;
 
@@ -54,15 +63,21 @@ void hexcell::DrawUpperDeadOccupant(void) {
         for (i = m_deadOccupantCount - 1; i < m_deadOccupantCount; ++i) {
             occupant =
                 &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
-            currentFrame = occupant->m_facing;
-            if (m_deadOccupantFrames[i] != currentFrame)
+            occupantFacing = occupant->m_facing;
+            if (m_deadOccupantFootprintHalves[i] != occupantFacing)
                 occupant->DrawToBuffer(m_x, m_y, 0);
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef occupantFacing
+#endif
 
+#if H2_RETAIL_COMPILER
+#define quantityOverlayOnly frame
+#endif
 VA(0x00464e4b, 0x10d)
-void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
+void hexcell::DrawOccupant(ArmyDrawState drawState, i32 quantityOverlayOnly) {
     if (m_occupantSide != COMBAT_SIDE_NONE) {
         if (drawState != ARMY_DRAW_ALL) {
             if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_drawState
@@ -72,12 +87,15 @@ void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
         if (gbLimitToExtent && gpCombatManager->m_currentArmySide == m_occupantSide
             && gpCombatManager->m_currentArmyIndex == m_occupantIndex)
             gbCurrArmyDrawn = true;
-        if (m_occupantFrame
+        if (m_occupantFootprintHalf
             != gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_facing)
             gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex]
-                .DrawToBuffer(m_x, m_y, frame);
+                .DrawToBuffer(m_x, m_y, quantityOverlayOnly);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef quantityOverlayOnly
+#endif
 
 VA(0x00464f58, 0x126)
 void hexcell::DrawTower(i32 frame) {

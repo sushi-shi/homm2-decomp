@@ -23,9 +23,9 @@ CONFIGURED = [
 
 
 class NativeLinkTests(unittest.TestCase):
-    def test_merged_misc_and_split_dimmer_keep_configured_archive_scan_order(self):
+    def test_merged_misc_keeps_configured_archive_scan_order(self):
         archives = ["BASE-prefix", "Misc", "BASE-middle", "Midi",
-                    "BASE-before-dimmer", "DIMMER", "BASE-after-dimmer"]
+                    "BASE-suffix"]
         tail = [f"build/link/{name}.lib" for name in archives]
         configured = CONFIGURED[:6] + tail + CONFIGURED[-2:]
         inputs = native_link.final_inputs(configured, include_resources=True)

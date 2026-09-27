@@ -9,6 +9,22 @@ from homm2.build.annotated_functions import (
 
 
 class AnnotatedFunctionsTest(unittest.TestCase):
+    def test_template_prefix_keeps_marker_span_and_ignores_lexical_noise(self):
+        with TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            source_root = repo / "src"
+            source_root.mkdir()
+            (source_root / "example.cpp").write_text(
+                "// VA(0x00409990, 0x10)\n"
+                'const char* label = "VA(0x00409980, 0x10)";\n'
+                "template<class T> VA(0x00401230, 0x20) void work(T) {}\n"
+                "VA(0x00401250, 0x18) void ordinary() {}\n")
+
+            spans = source_function_spans(source_root, repo)
+
+        self.assertEqual([(row.rva, row.size) for row in spans], [
+            (0x1230, 0x20), (0x1250, 0x18)])
+
     def test_external_source_root_does_not_inherit_repository_masm_claims(self):
         with TemporaryDirectory() as temporary:
             repo = Path(temporary) / "repo"

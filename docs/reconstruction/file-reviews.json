@@ -1,0 +1,918 @@
+{
+  "include/va.h": {
+    "sha256": "613ae23bdf9a6f3e6d0b74217e62c4bd1008b2661ae0cdc861d253246bcb3278",
+    "note": "Full 55-line annotation header read. VA/DATA/COMPGEN/vtable/layout and legacy macros reconciled in data-and-metadata.md; no physical function, manual varargs or allocated stand-in storage. VC6 metadata remains byte-neutral."
+  },
+  "src/SOURCE/KB.cpp": {
+    "sha256": "83cd4c8575beaab4cb229f5b487db0883d47341a605fde218c3003b306b75090",
+    "note": "Full 11510-line file covered: all 75 physical definitions previously reviewed individually; complete preamble, every non-function complement span, initializer macros and full data tail now read/reconciled in data-and-metadata.md. Real terrain/palette/monster/spell/cost/animation/UI/campaign tables and distinct global buffers retained. All CP1251 catalogs read; per-consumer format/capacity and tag/domain contracts remain explicit. No missed executable macro or artificial aggregate found. Latest full 98-object native and data/build gates pass; this final file review changes no source. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain. U11/S33 follow-up: complete startup buffer/flag consumers reconciled. Two-arm typed212 owner alternative changes retail frame by44 bytes, so existing256 buffer retained. Complete32-arm local-storage product reduces both match arrays8 to6; three unused scalars retain measured slots. Full98 native objects, VC6 layouts/both dialects pass; ordinary oldmain retail bytes exact, existing EH/FS gaps recorded. Shared eight-byte global mapping and its count constant remain unchanged. See U11-S33.md. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "src/SOURCE/X_GLOBAL.cpp": {
+    "sha256": "776d73bf4ceeb3aa6bb9b214061048192227ff3f7c45c91a5689513b27aabf27",
+    "note": "Full 665-line data-only TU read, including every expansion help/award/scenario/name/recruit/stable/site/password literal, twelve hero alignments, seven costs and runtime globals. Zero physical function definitions; compiler-generated global initialization is not extra source-body credit. Real table extents, separate O08 name owners and constructed campaign/spell objects retained; normal-domain versus malformed-input contracts and B93/B94 catalog evidence reconciled in data-and-metadata.md."
+  },
+  "include/SOURCE/HERO.h": {
+    "sha256": "40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6",
+    "note": "Full17-line hero UI declarations header read. Real const text input/event references and function prototypes; no aggregate, function definition or hidden macro body."
+  },
+  "include/SOURCE/hero.h": {
+    "sha256": "77f1c891ea35d52ab0cbf6c8d914da6290fa2ec6e42d7211d98ac13777454dd4",
+    "note": "Full230-line updated packed250-byte hero owner, enums, declarations and inline IsEmbarked read. U10/C26 single unsigned patrol anchor/signed radius replaces misleading union with all named consumers and whole98-TU native evidence. S31 one unnamed interior byte remains serialized, not disposable padding; real spell/skill/order/artifact/army arrays and13-byte name inspected. B49 initialization/domain contracts remain per body."
+  },
+  "include/SOURCE/playerData.h": {
+    "sha256": "95fbf9b9517844c3a72b20f0f6fd44ddee9a406e094737359abc43a4ff0c0449",
+    "note": "Full109-line header, eight inline accessors and actual0x11b player/0x68 AI records read. Eight hero, two available-hero,72 town and7 resource slots real. S31 unknown44-byte saved/6-byte barrier/28-byte AI regions require semantic recovery; their presence in serialized/shared owners is not proof of deletable padding. Six-float attention record is meaningful named state."
+  },
+  "src/SOURCE/HERO.cpp": {
+    "sha256": "93cd9baaf8dbc390b944a950cf2437f5f41210a39c66ee44f63fb4850c98fa70",
+    "note": "Full2131-line TU, all41 physical definitions, prolog enums/macro and trailing globals read. Actual12-entry XP table and all UI IDs reconciled. G40-G42 skill joins, R06 type/count temporary, S32 unused locals and B49/B50 record/domain/text contracts tracked per function. U10 header change has whole native proof; C27 literal const_cast removal has44-function native and complete scoped retail proof. No fake stack owner or manual argument-slot access found."
+  },
+  "src/SOURCE/ADVMGR.cpp": {
+    "sha256": "2850d9b965faf5d4aa485eb6e450d0ad5d432d944af2f68f98f604b7c7c6c9f7",
+    "note": "Full10885-line TU read across ordered batches: prolog enums/macros/static owners, every physical body and trailing globals/vtable reconciled. O04/B44/U08 owner/type changes verified; G27-G39 joins, R03-R05 roles, C20-C25 conversions, S29/S30 unused state, U09 wire owner and B43/B45-B48 contracts retain per-function dispositions. Genuine-retail radar/grid/count-label/control evidence recorded separately; source anomalies not silently repaired. Real18x18 redraw grid,48-piece order,0x7400 border owner and other fixed arrays inspected. C25 LoadRemote cast removed after signed cheat-owner recovery and complete98-unit native verification; all other source remains the reviewed body/file content. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "include/SOURCE/ADVMGR.h": {
+    "sha256": "fca146c1d04749bd74aae7c0c772e8d790dff4d75f5d8caee1d3f95465b610c7",
+    "note": "Full149-line header read: sound/command/draw domains, network command lengths and all cross-TU globals/prototypes. No hidden function or macro body; real AI coordinate/resource arrays retain documented dimensions. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "include/SOURCE/ADVMGR_TYPES.h": {
+    "sha256": "483a67d49e099e20ae6070876d440829c383c9995592cdae29325f2af08a32b4",
+    "note": "Full23-line header read. U09 AdventureRemotePayload overlays sixteen raw bytes, save fields and SPlayerExit; tag-dependent wire meanings are credible but unused views/extents require remaining CheckHandleNet consumers. Not granted a safe bound by SIZE alone. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "include/SOURCE/advManager.h": {
+    "sha256": "53448f04e8ba505046a43e393585b6cdeb715e270a07a784603a9ddf8259fc5d",
+    "note": "Full updated header/two inline accessors read and reconciled. U08 replaces two union owners with actual12-element widget* arrays; all seven consumers and shared native output reviewed. Removed integer/derived/padding views; packed0x37e layout preserved. S30 unrelated runtime gaps remain unproven. Cursor/frame/sound dimensions and all declarations inspected; remaining out-of-line bodies individually pending."
+  },
+  "src/SOURCE/dpnetwin.cpp": {
+    "sha256": "f7f5f707d7cb6a58dc8c15c2ecc38d6d01dd14e4021ca69695c456d1a61ba260",
+    "note": "Full671-line TU,16 definitions and all storage/macros read. C18 SDK outputs applied; B20 same genuine-retail queue overread as Winsock, C07 false startup carrier, B42 session/player/drain/API contracts, S27 unread locals/global/enum remain. No goto or manual varargs body. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
+  },
+  "src/SOURCE/CURSOR.cpp": {
+    "sha256": "e5a7902be0c90a9b615ca96c48ec0e59fde82ef23b137151448b1e16bbe25941",
+    "note": "Full1583-line TU/18 definitions, private enums and globals read. O04 twelve scalar-neighbor lookups replaced by true array with98-TU native proof. G25/G26 joins, R02 step role reuse, S28 unread locals, B43 map/frame/network domains remain. Real11-byte changes and44-byte history owner retained."
+  },
+  "include/SOURCE/dpnetwin.h": {
+    "sha256": "9dee01ed73e0659a1152eed0c3edcbef9c475c889bcad65a8841692fe271b335",
+    "note": "Full103-line header read. Real packed26-byte startup mapping, SDK declarations and200-slot transport globals; maxPlayers6 does not establish ten-session callback cap. B42 drain100 argument/104 caller extent and provider lifetime remain. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
+  },
+  "include/SOURCE/CURSOR.h": {
+    "sha256": "8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916",
+    "note": "Full header read: direction/frame/queue dimensions and actual11-byte SMapChange. Movement-vs-wire union is a meaningful tagged byte/enum view, not a spare fake aggregate. Four-entry history and196-entry queue agree with consumer loops; B43 input domains remain."
+  },
+  "include/SOURCE/Modem.h": {
+    "sha256": "1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d",
+    "note": "Full91-line header including TruncateModemResponse, queue layouts and all declared capacities read. Byte packet storage belongs to REMOTE; queue structs are real ABI owners, not fake stack aggregates."
+  },
+  "include/SOURCE/Netbios.h": {
+    "sha256": "2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b",
+    "note": "Full32-line state/operation declarations read; stepped byte states distinguish setup and connection polling."
+  },
+  "include/SOURCE/REMOTE.h": {
+    "sha256": "242342030f2cb043dfa466afb8b67ecf5577d6b29fb1aa66021038a128c52476",
+    "note": "Full117-line header read: packed6-byte packet header/256-byte message,268-byte transport arrays and138-vs128 queue domain. C17 typed wire owners,S25/S26 extra elements and B41 input-length contracts need remaining consumer proof. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "include/SOURCE/comwin.h": {
+    "sha256": "951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512",
+    "note": "Full62-line header read. tag_Node has meaningful serial tail offset10 and NetBIOS tagged tail offset11, each represented by1-byte flexible member (B40). Real96-byte ComPortState has4/24-byte interior gaps S23; SDK DCB/timeouts are real."
+  },
+  "include/SOURCE/netwin.h": {
+    "sha256": "fe9583dd3a03f1d3c96f12ab5f70d46f95c970a7777be1e5c695dc270f1218a1",
+    "note": "Full updated header and all named payload/event consumers reviewed. U07 removes unused word arm and keeps4096-byte byte struct; S24 declares exactly nine36-byte event handles. Compiler alignment padding is not an extra handle. VC6 and both source dialects pass; all98 native objects and all eight direct retail consumers pass. NCB64 packed SDK fields/reserved10 remain real ABI. Session/name/payload extents7/16/4096 and existing B38/B40 protocol/lifecycle contracts unchanged. See U07-S24.md."
+  },
+  "include/SOURCE/netwin_private.h": {
+    "sha256": "335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11",
+    "note": "Full private header/prototypes read; typed control-block callbacks match actual postRoutine ABI, no inline or hidden cast bodies."
+  },
+  "src/SOURCE/Modem.cpp": {
+    "sha256": "e46545c2660cf613e8e93e227815048c16268ece5e30d26c11058dbdf50d9cba",
+    "note": "Full419-line TU/15 functions and private/global declarations read. S22 applied with native/retail proof; G19/G20 response/parser joins and S23 unused scalar remain. B37 user-controlled init format and transport length; one-byte/response/handshake bounds traced."
+  },
+  "src/SOURCE/Netbios.cpp": {
+    "sha256": "0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52",
+    "note": "Full247-line TU/5 functions and setup states read. Fixed names bounded9<40 and slots0/6->1 proven; casts interpret signed ABI/status domains. S23 unused scalars, no manual varargs implementation."
+  },
+  "src/SOURCE/REMOTE.cpp": {
+    "sha256": "503614fe6eefd081ac38eed237a4f1f5dcc85b4e1a25a096637ed851233bebc8",
+    "note": "Full891-line TU/13 functions,3 wire-cast macros and all globals read. C17 typed-owner candidates,G21..G24 shared joins,S25 scalar checksums applied with full native/retail proof,S26 unused packet/scalars/queue tails. B41 length/count/initialization and B13 network-name contracts remain."
+  },
+  "src/SOURCE/comwin.cpp": {
+    "sha256": "1fc0919d66e0582c33b53fdb723ea8544a7806929147dbf34a25fa4204fad00f",
+    "note": "Full356-line TU/11 functions read. C15 real DWORD read result applied with full native/retail proof. Serial caller slot0 and one-byte destination proven; error formatter max473<500 from genuine templates/all call sites. B39 API lifecycle,S23 class gaps, B40 flexible payload ownership remain."
+  },
+  "src/SOURCE/netwin.cpp": {
+    "sha256": "31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1",
+    "note": "Full660-line TU/19 functions and all aliases/storage read. V01 typed SDK varargs retained after all-exit va_end matrix adds retail-incompatible stores; U07 unused payload word view,S24 extra event slot,S23 unused block/scalars. B38 retail wildcard overread proven; B40 runtime tail/session/payload and asynchronous lifecycle contracts."
+  },
+  "src/SOURCE/ARMYGRP.cpp": {
+    "sha256": "a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6",
+    "note": "Full282-line TU/14physical bodies including strict-only swap helper read. U06 duplicate army aliases; S18 unread morale local; B36 creature/slot domains. Real raceUsed7 fits all retail race ids0..6."
+  },
+  "src/SOURCE/NOOPT.cpp": {
+    "sha256": "c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b",
+    "note": "Full25-line TU/3deadline helpers read; no ten-pattern candidates."
+  },
+  "src/SOURCE/STRIP.cpp": {
+    "sha256": "84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f",
+    "note": "Full255-line TU/8bodies read. S19 unknown class gap; real icon snapshots and12-byte numeric scratch retained. B36 cache/asset contracts; tagged message protocol preserved."
+  },
+  "src/SOURCE/RECRUIT.cpp": {
+    "sha256": "801b298faf802f09b349ffbe24f8ad67ab90598ec19fbc99c8c902866f3adae2",
+    "note": "Full458-line TU/8bodies read. C14 two const casts retained: native-equivalent removal fails required C++98 annotation recovery. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost."
+  },
+  "src/SOURCE/SWAPMGR.cpp": {
+    "sha256": "ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473",
+    "note": "Full1023-line TU/13bodies read. G18 shared skill tail; S21 computed-but-unread count and dialog scalar slots. UI control ranges prove two sides/five army/fourteen artifact slots; tagged payload transitions retained."
+  },
+  "include/SOURCE/armyGroup.h": {
+    "sha256": "15927d283ac9af904f78365ab2cdce22b15251b7630897a7341ad1c60ec42253",
+    "note": "Full header read;15-byte real packed owner. U06 duplicate type/quantity aliases and unsigned count view need all consumers before consolidation. U06 follow-up: both armyGroup unions consolidated as actual5-byte creature types/10-byte signed counts, with86 affected accesses in24 bodies; all alternate consumers and signed/u16 wire boundaries reconciled. Complete98-object native, VC6 layout and both-dialect proof, plus two exact signed-cast removal products. See U06.md."
+  },
+  "include/SOURCE/NOOPT.h": {
+    "sha256": "91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed",
+    "note": "Full three-prototype deadline owner header read."
+  },
+  "include/SOURCE/strip.h": {
+    "sha256": "b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083",
+    "note": "Full132-byte class declaration/enum/prototypes read. S19 unknown24-byte interior gap cannot be dropped without changing proven offsets; five icon/six border arrays real."
+  },
+  "include/SOURCE/bankBox.h": {
+    "sha256": "348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8",
+    "note": "Full12-byte packed player/window owner and16-bit coordinates reviewed; no artificial aggregation."
+  },
+  "include/SOURCE/recruitUnit.h": {
+    "sha256": "6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0",
+    "note": "Full126-byte packed manager declaration read; S20 three4-byte unidentified gaps retained pending owner evidence; counter is a true borrowed i16 pointer."
+  },
+  "include/SOURCE/RECRUIT.h": {
+    "sha256": "0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e",
+    "note": "Full typed recruit-function owner prototypes read; seven-resource output contract is in GetMonsterCost, not a raw varargs layout."
+  },
+  "include/SOURCE/swapManager.h": {
+    "sha256": "141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf",
+    "note": "Full90-byte packed manager declaration and typed side/item domains read; two-hero owner and selection fields fit UI range dispatch."
+  },
+  "src/BASE/Bzip.cpp": {
+    "sha256": "755f9e00d4091c6e472dfc1366cf919a01086d671a0bdb76cae1bafa233fa6d9",
+    "note": "Full2061-line TU,88 physical bodies and all macros/data read. C13 casts need type-boundary/invariant-source compiler proof; G16 three loop/store gotos remain. B33 returning panic/cleanup verified in genuine retail makes apparent malformed-input guards nonterminating. B34 dst/path/formatter contracts; S16 unused Model.numTraffic and I/O status scalars. Real Model arrays, MTF tables and quicksort stacks are not fabricated aggregates."
+  },
+  "src/BASE/BITS.asm": {
+    "sha256": "845c0d23d2ef13de5c06d9306831bb219cadb9feaa38eb5d496d077ebca14c9b",
+    "note": "Full73-line MASM TU and3procedures read; genuine-retail proof passes all3. B31 byte-indexed DWORD accesses can span beyond six-byte puzzle mask and packed town subarray. Assembly labels/registers retained as actual implementation."
+  },
+  "src/BASE/TILE.asm": {
+    "sha256": "a23dfc6b4cd0be08b3521f24bf7362ab81ad241d7ca468f28a4453b3a02ecbd0",
+    "note": "Full138-line MASM TU and one blitter read, all forward/vertical/horizontal/both-flipped paths and real two-word scratch. B32 dimensions/clip contracts and EBX/direction flags need callers and retail proof."
+  },
+  "src/EDITOR/mapcell.cpp": {
+    "sha256": "11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f",
+    "note": "Full264-line TU and11bodies read. B18 dimensions/counts/link domains; B35 zero-index first-growth sentinel/lifecycle issue. S17 two unused scalar declarations. Old-format prefix copies are bounded by real20/15-byte records; pointer reload after realloc is intentional."
+  },
+  "include/EDITOR/mapcell.h": {
+    "sha256": "c2aa8f2d2c3dae60671da97867fb09fd971afdd2915f6dedc645f63a282b6e11",
+    "note": "Full149-line header, one inline method, packed12-byte cells/7-byte extras and legacy20/15-byte records read. Union raw/bitfield views reflect serialized type/metadata/tent encodings; no fake stack overlay or removed old-format tail inferred. Consumer domain validation remains B18."
+  },
+  "include/BASE/DebugCheck.h": {
+    "sha256": "4000914f7ed51cb00d309b22dcc7777a5fac9ca16bb89261920a525a592f509c",
+    "note": "Full7-line empty inline hook header; one physical body accounted for."
+  },
+  "include/BASE/BITS.h": {
+    "sha256": "d5adfd9e9d4f670e35f3e7206b62e8b1ef342ace7592ceb5a28989032981f659",
+    "note": "Full10-line C ABI prototypes read. Generic void* is the assembly byte-addressed bit storage boundary, not evidence of a C++ unsigned-word array owner."
+  },
+  "include/BASE/TILE.h": {
+    "sha256": "7a5369246d69b240706a0fb437b3f2d0c80bf899fddde8dda3ace8373e7638dc",
+    "note": "Full17-line header/C ABI blitter declaration and explicit serialized index/flip masks read; real bitmap/tileset owner types."
+  },
+  "include/BASE/Bzip.h": {
+    "sha256": "2f75ce0d2dcb04fdbb7577694c8f0778d5d2c311021fd3dd126de7aa36602660",
+    "note": "Full139-line owner header read: aliases, prototypes, real BitStream and Model with258frequency entries. S16 numTraffic unreferenced; no padding invented. C13 model-name/diagnostic string constness, B34 incomplete external string arrays and capacity-less data APIs require consumer proof."
+  },
+  "include/Ints.h": {
+    "sha256": "6fd249695ef01cdc160942d87e37d0bc9af2958788205727702a2ed611acf87a",
+    "note": "Full539-line header read, all53 physical definitions plus modern/retail macro branches reconciled. Scalar wrappers own one representation member; casts are explicit domain/width boundaries. Postfix copies are genuine old-value results. Macro flag/step/IDX conversions are retained; BIT shift domain and CLEAR_FLAG known-set precondition must be proved by callers. ASSIGN_CHAIN strict arm evaluates value five times versus once retail, so side-effectful callers require separate audit."
+  },
+  "include/SOURCE/KB_TYPES.h": {
+    "sha256": "e5afe7c1e5ad5b2d386e00396959b8b63bbac692d2fa1e9a1e7dc6670c30b2f3",
+    "note": "Full969-line header read,26 physical functions and both modern/retail macro branches reconciled. Closed domains, open trigger codes and scalar conversions retained. U05: tag_monsterInfo contains a single-arm outer union/struct around cost/fightValue and alternate flag aliases; simplify only after initializer and consumer audit. Packed database structs are semantic records, not stack aggregates; menu reserved byte has no use proven here. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "include/EDITOR/fullMap.h": {
+    "sha256": "8d6b1d48cca513d44f22889844464ac49a2ec52809cff0943664cfa5ed9b452a",
+    "note": "Full58-line header and six pointer accessors reviewed. Flat cells/extras owners are real; pointer expressions are not fabricated stack addresses. B18 lifecycle and coordinate/index domains remain caller obligations."
+  },
+  "src/BASE/icon2by.cpp": {
+    "sha256": "22e525595d215aba11aa0706a1fe45b3522869bab2d8f230e1b977bae9de27fd",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 palette flattening and G15 shared fill tail remain candidates. B29 shear[s_y] is read at setup and before the Y-clip predicate; EOL uses the old row's shear before incrementing y. SPELLS allocates480 modifier bytes but sprite extent proof is not yet complete. B28 row/frame/stream bounds remain. Command and count roles are related file-static decoder state."
+  },
+  "src/BASE/iconf2by.cpp": {
+    "sha256": "f9312f65e08c74096d99cf775ed467b4d58d936d08416614d3216d54d6985187",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 palette flattening and G15 shared fill tail remain. B29 shear is indexed before vertical clipping and old-row shear sets next-row x. B28 reverse-copy postdecrement, preclip row and asset bounds/full-containment fill predicate remain. Redundant dimLen self-assignment is an emitted-state/source-shape candidate, not unrelated role reuse."
+  },
+  "src/BASE/icon2bc.cpp": {
+    "sha256": "ca93186adf5deb223cfb483727d1376c3c74df4d6c8934160b11ec3113c156db",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12: flattened uDimPal pointer/level arithmetic uses (command&0x3c)>>2, domain0..15; only12 levels are declared, so asset-level proof is required before typed replacement. Serialized IconEntry, high-bit i8, unsigned shift and recolor narrowing casts retained. G15 shared fill_run tail remains a structured-source candidate. B28 preclip row pointer, unbounded frame/RLE stream and colorTable256 contract remain. Static cursors/counts are real decoder state, not stack aggregation."
+  },
+  "src/BASE/iconf2bc.cpp": {
+    "sha256": "231940cad308a90e3f681be1411b5bb2e41c8f228d6596b514a4a29ace8693bb",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 flattened dim palette needs0..11 command-level proof; serialized header, sign-bit and recolor casts are genuine boundaries. G15 shared fill tail remains open. B28 reverse cursor decrements after final copied pixel, preclip row formation, frame/stream/colorTable bounds and clipped fill full-containment gate require review; no fake stack aggregate."
+  },
+  "src/BASE/icon2bs.cpp": {
+    "sha256": "edc23efebd89927f2b53262946d786add933d99ffae78c9361ee922a74c64acc",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. B30: all six source calls are VWCompleteDraw with scales4/6/12 and NO_CLIP; division is nonzero and all sampled temp offsets are at most1820, inside the cleared0..2047 region of the real64x64 bitmap. Non-native scaling ignores supplied destination clip, so destination coordinates remain a caller contract (B25); frame/RLE contracts remain B28. Source/destination cursors and inc/lineStep are related roles, not artificial stack aggregation."
+  },
+  "include/BASE/icon2by.h": {
+    "sha256": "9b1ff4f72329cd7f9ae53362aab4478bd944f430652e9ff968fbb535c2e2d8f0",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/iconf2by.h": {
+    "sha256": "127e45cb9b3a6958573d18bccab0f40b092cdf4f6163409a3efb9a165d8ebbbe",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/icon2bc.h": {
+    "sha256": "27be2881451fe5cacc671210ba0ed79d31058bae3253afe94c305c22af6646bb",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/iconf2bc.h": {
+    "sha256": "53bc0de213b2d72f232b50a046f138cb7038ac45e91b12c59026931ea9c5b44c",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/icon2bs.h": {
+    "sha256": "df406be7009f2d8a9994d8a4f24a81de67ab38870aa41940e5f7b7dbdb54a875",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "src/BASE/Iconf2b.cpp": {
+    "sha256": "e4ee63ea92cd19e6af2258c074cb0a2a3665a4e85cc6c8eab8c90e015c3e7bc7",
+    "note": "Full199-line TU/one decoder plus all18 static owners read. C12/G15/B28 retained for palette, shared-fill and clipping/stream pointer review."
+  },
+  "src/BASE/Icond2b.cpp": {
+    "sha256": "3eb19050fd436c66180e49d574194e00c41905824dd77c326d04deedd78ef979",
+    "note": "Full103-line TU/one decoder and12 static owners read. O03 real palette-level indexing applied; caller levels0/2 and full native/scoped-retail proof verified. B28 row/asset domains remain."
+  },
+  "src/BASE/Icondf2b.cpp": {
+    "sha256": "bdde924a3637728bf2ff3aef442a3dc99790f11c55251180f25ffde0b96aeeeb",
+    "note": "Full110-line TU/one decoder and13 static owners read. O03 palette-level indexing applied with full native/scoped-retail proof. B28 row, full-run clipping and stream/frame domains open."
+  },
+  "src/BASE/Iconm2b.cpp": {
+    "sha256": "6d89a4722c83f4d7b82e132c26a470ac8e26838da2b393e0039791fe409739b1",
+    "note": "Full87-line TU/one mono decoder and9 static owners read. Genuine serialized prefix/high-bit casts and related decoder state retained; B28 row/clipping/stream domains open."
+  },
+  "src/BASE/Iconmf2b.cpp": {
+    "sha256": "6b9f9b8de7153ddcf11baff992682fa8c2827da95becaf39820882649d6c9cca",
+    "note": "Full89-line TU/one flipped mono decoder and10 static owners read. B28 preclip row formation, full-run clipping predicate and asset bounds open; no artificial stack aggregate."
+  },
+  "include/BASE/Iconf2b.h": {
+    "sha256": "d7a65cdbdc7283dcb6c49a5e4f34dfb34c92d58292ec96a33d42ddeff8dd33f3",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Icond2b.h": {
+    "sha256": "559908059c151b4a2a4de3fea6c1787ee7a92acf53fe0499f8f1b5b71b740f10",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Icondf2b.h": {
+    "sha256": "b5448cd496bb2cf823d11e9e2f0be855b837f545ced92e110142ada0c606c56f",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Iconm2b.h": {
+    "sha256": "6b877a2d5abdb407d0b7d7e35fd434baea30ea130e970203ef667490a899b307",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/Iconmf2b.h": {
+    "sha256": "46132f9b1de5dd9bc7a790664bff7d8db2b79a54567c914fdeb7d4050b0ed5ef",
+    "note": "Full24-line decoder owner header/prototype reviewed; no body, aggregate or executable macro."
+  },
+  "include/BASE/IconMonoRle.h": {
+    "sha256": "ce7ae90eccf355b1634497de9337b3f9443d5196c77f8f6a460f9739be1eb3ae",
+    "note": "Full11-line header/four command constants read: newline0, skip flag0x80, end count0 and low7-bit run count; no inline body or executable macro."
+  },
+  "src/SOURCE/VIEW.cpp": {
+    "sha256": "0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436",
+    "note": "Full418 lines/all three functions, enums and side global read. S15 unused local constants and B26 hero/army/text domains remain open; genuine tagged messages retained. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "include/SOURCE/VIEW.h": {
+    "sha256": "8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d",
+    "note": "Full14-line header/prototypes/side declaration; no body, layout or executable macro."
+  },
+  "src/SOURCE/HEXCELL.cpp": {
+    "sha256": "af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720",
+    "note": "Full138 lines/eight definitions read. Real corpse arrays and clipping member array; B27 lifecycle bounds needs remaining producer review. No casts/gotos/artificial addresses."
+  },
+  "include/SOURCE/hexcell.h": {
+    "sha256": "bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5",
+    "note": "Full45-line packed98-byte class reviewed: three14-byte corpse arrays are real, with append capacity checks in ProcessDeath, plus real two-record limits. No inline bodies or union."
+  },
+  "include/SOURCE/combatTypes.h": {
+    "sha256": "b1b19e6a4a3e2de9512512c8a9be4aac6dc5f7c25ab66542b1f03d5079582ab1",
+    "note": "Full119 lines/all8 inline functions and7 alternate macros reviewed. Typed enum adapters model valid binary side/facing/result domains. NO sentinel equivalence claim is made between strict enums and legacy arithmetic macros. C63 shared CombatCastleHex declaration moved intact here; all values and consumers reviewed; all98 native objects unchanged."
+  },
+  "src/BASE/Icon2b.cpp": {
+    "sha256": "e790e3b76d481df35a558f81206e2d9162ea9f92b2e7e3f4c3ed22c65e35b0c9",
+    "note": "Full170 lines/one RLE decoder and16 file-static owners reviewed. C12/G15/B28 open; serialized entry prefix and real related decode state retained. No stack aggregates or varargs."
+  },
+  "include/BASE/Icon2b.h": {
+    "sha256": "ce7c737bfd2b9ab81e7de5ebbf8c98534c367f507a334f0fc2ddf5a144ab3a60",
+    "note": "Full25-line parameter/prototype owner header; no bodies or executable macros."
+  },
+  "include/BASE/IconRle.h": {
+    "sha256": "d3d3675349926a628d129f08da025033609a82aa48d2e1409e1d81433f0ff22d",
+    "note": "Full24-line command-bit constants and cursor helper read. Native byte helper uses valid previous-byte access under stream contract; B28 global decoder bounds open."
+  },
+  "src/SOURCE/Viewwrld.cpp": {
+    "sha256": "9c2f6c42ac14957c2bedc05ea9822f9a34fe344a75f968546555139a2b6d1047",
+    "note": "Full867 lines/all five functions/three-scale offset data and storage read. S14 array extents corrected with strict native proof; D01 withdrawn: original address claims restored after rejecting the reconstructed control. B24 retail wrong-axis clamp retained; B25 map/resource input domains open. All macros are constants or included known accessors. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "include/SOURCE/Viewwrld.h": {
+    "sha256": "7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139",
+    "note": "Full17-line header: three explicit4/6/12 scales and handler prototype; no function body, aggregate or executable macro."
+  },
+  "src/SOURCE/wingraph.cpp": {
+    "sha256": "d60c7e6e8f891b120134038b5fd579831a5a7055076822f0764235970a44e49f",
+    "note": "Full1158-line TU/32 functions plus all storage/macros reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Genuine API records retained; C04/C11, S13 and B23 are open native/caller investigations. C11 eleven identity handle casts removed under NO_STRICT; all3changed full retail bodies and all98 native objects pass. All S13 nine-slot deletion families and DD pointer assertion reject removal. C04 erased SDK surface/C05 signed component interpretation retained with explicit boundary rationale."
+  },
+  "src/SOURCE/x_arena.cpp": {
+    "sha256": "198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a",
+    "note": "Complete256-line source/three bodies and data owners reread. C10 required modern text const boundary retained; static-pointer deletion path proven through widget/window lifecycle and fixed retail operands, no runtime crash claim or behavior change. S12 both complete128/16 products reject every unused-storage deletion; original remains. Genuine3-slot widget arrays and bounded choice/name paths recorded."
+  },
+  "include/SOURCE/wingraph.h": {
+    "sha256": "0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f",
+    "note": "Full header, palette404/image42c layouts and graphics API/prototypes read. Both prefix records genuinely provide256 entries to variable-length Win32 interfaces. No function bodies; framebuffer/API owner typing C04/C11 remains. C04/C05/C11 follow-up keeps SDK void** pixel output, non-STRICT handle ABI, real variable-length record prefixes and signed palette interpretation; no header change."
+  },
+  "include/SOURCE/x_arena.h": {
+    "sha256": "af5b3824ca42955c116b48031643086cbf8abfb2bcabd80ad371f005ac18cd02",
+    "note": "Full17-line declarations/externs reviewed; no body or pointer macro. Real three-choice array is defined and bounded in source."
+  },
+  "src/SOURCE/SMACKMGR.cpp": {
+    "sha256": "6e3d8523d67e18d952134d295eaa98ba9b8fd4ded09515afcd91fc4f606dbf42",
+    "note": "All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed. C08/C09 follow-up removes six written casts with195-arm API-family record including valid IDX campaign-domain recovery; all98 native objects and all three changed retail bodies exact. G14/S11 complete families reject cleanup/unused removal; C05 byte/numeric palette boundary retained."
+  },
+  "include/SOURCE/SMACKMGR.h": {
+    "sha256": "21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20",
+    "note": "Full header layouts/prototypes/externs read: tag_rect8, options45 with four nine-byte names, SDK SmackSum84. SmackMilesDigitalDriver50-byte partial owner with76 reserved bytes has no source use or instance; investigate removal separately, not counted as a live stack aggregate."
+  },
+  "include/SOURCE/REMOTE_TYPES.h": {
+    "sha256": "1a2dc7d38b55895c10bde3a8453c632f1cbb328ce6b2ddb8cb6a76d4f10659f8",
+    "note": "Full packet/message/protocol domains and packed34-byte SNetPlayerInfo reviewed. Four-byte system ID,21-byte name and6-byte reserved extension are genuine network storage; reserved[0] used to identify old players in wsEvaluateMessage. No function definitions or executable pointer macros. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "src/BASE/bmap2.cpp": {
+    "sha256": "7da81092966cc9d02777eff0d5d3798924cff60507e3088e25de7dc34978ced8",
+    "note": "Full TU, four definitions and nine scratch owners read. O03 corrects palette subarray indexing and removes obsolete stride enum; seven native functions/all allocated sections remain identical. B07/O03 rectangle/final-row pointer bounds still need caller proof; no unions or stack aggregates."
+  },
+  "include/BASE/bmap2.h": {
+    "sha256": "195e2118d3d44d97efdba40edf5e0f471b554fbf06267d57bcd8ee2a407289f9",
+    "note": "Full four helper prototypes; no bodies, layout definitions or executable macros."
+  },
+  "include/SOURCE/dimPalette.h": {
+    "sha256": "bbebfa76143453b5a65687189a368b5e436756e073c5d2504703d46c4dabc945",
+    "note": "Full three-set/four-level/256-color array declaration. O03 must respect actual subarrays, not index a higher level through uDimPal[0][0]. No function definitions."
+  },
+  "src/SOURCE/tradpost.cpp": {
+    "sha256": "b0b69f9a7db5333ace20349089c95f9d74aaa66f12df9b34bf953ad131daac01",
+    "note": "All462 lines/six definitions, four private enum domains and data owners reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. S09 unused message aggregate; B21 invalid resource sentinel reaching ratio lookup. CP1251/name bounds verified from seven source literals."
+  },
+  "include/SOURCE/tradpost.h": {
+    "sha256": "34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484",
+    "note": "Full geometry/resource/widget constants and prototypes/externs; no functions or storage-view macros. Resource count seven and offer indices reconciled with handlers."
+  },
+  "src/SOURCE/Wsnetwin.cpp": {
+    "sha256": "fa308739c7bcc79fe79ffc19a88c70e7049fbf7eb8edf9141973ac773d7ccccc",
+    "note": "All572 lines/ten definitions and static/socket data claims reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. B20 payload overread proved directly in retail; other bounds and C07/G12/G13/S10 remain explicit. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
+  },
+  "include/SOURCE/Wsnetwin.h": {
+    "sha256": "8876e71e16ab0cd0e83d672df4db6bc7c1c226af7a7a19b9c4d7a1f029134830",
+    "note": "Full constants, packed26-byte startup packet, transport prototypes and SDK object externs reviewed. Packet uses six addresses and two byte fields; C07 signed read versus u8 owner ambiguity recorded. No function definitions. C07 follow-up: complete two startup producers/evaluators and both owner headers re-read; signed26-byte records, erased tag-specific views and four store-cast removals validated across both dialects, all98 native objects and all four retail consumers. Full evidence C07.md; no packet hardening or address-to-content comparison change."
+  },
+  "src/SOURCE/SEARCH.cpp": {
+    "sha256": "c4825097a88a3177eaaa7ab9390d017c8860692b856463bd050f2f40eea0b0c3",
+    "note": "Full original and reconstructed TU read, both physical definitions reconciled. O02 separates 29 scratch objects, removes padding arrays and preserves the original addresses (verified retail agrees with the old field map). All five emitted functions pass native before/after proof; both game functions match complete retail bytes/sites/targets. U02-U04/G09/B18 remain open. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md."
+  },
+  "src/SOURCE/FINDPATH.cpp": {
+    "sha256": "a70192e68c8867f9a2083d5ee6c684a4095a7eecb5f334f371058c8423503e03",
+    "note": "Read all 593 lines and twelve physical definitions, local enum/constants and static-data declarations. Queue/grid allocations and packed node views reviewed; U02/U03, G10/G11, B18/B19 and S08 need further evidence/experiments. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md."
+  },
+  "include/SOURCE/searchArray.h": {
+    "sha256": "b8b3b73c2d4077b71525f8e2a02858daa81d5aebe56b52c337599c4e0e85cc70",
+    "note": "Full layout and four inline helpers reviewed. U02: padded path/aiPath overlays preserve pointer first four bytes; prospective pointer union plus real direction[256] needs all caller builds. U03/U04: counter and target-coordinate aliases look redundant; genuine nine-byte node auxiliary views retained. Total class0x2518 preserved pending proof. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md."
+  },
+  "include/SOURCE/FINDPATH.h": {
+    "sha256": "7387c8ce7ed5e1a9dc76085f750b81c00099338fd73d2124c2fa5f0d980a7665",
+    "note": "Full owner header reviewed; one typed terrain-cost prototype, no definitions, aggregates or executable macros."
+  },
+  "src/BASE/Misc.cpp": {
+    "sha256": "34c990c39d3a8a5ff6298deaab4aa96f781ce664e3e886b67bdc83ed79379587",
+    "note": "Read all 2182 lines, including private constants/DATA declarations and both conditional FindToken bodies. Forty-eight definitions reconciled; G07/G08, C05, B13-B17 and S05-S07 remain explicit candidates. O04 six default/registry accesses now address actual walkSpeeds elements at unchanged offsets; all native code/data/targets unchanged. Genuine packed file records and tagged message views retained."
+  },
+  "include/BASE/Misc.h": {
+    "sha256": "a618108289ba29c8ffa978403b886cff3e9831d95bc877070900df025e41ea0e",
+    "note": "Full declarations/macros and strict-enum LogInt inline reviewed. MemEntry[74], conditional IconEntry[13], PCXHeader[128] are real layouts; H2_ALLOC returns byte-array allocation as void*, H2_FREE and H2_ASSERT are actual allocation/assertion boundaries, not manual varargs."
+  },
+  "include/BASE/MiscEnums.h": {
+    "sha256": "10e7ed0cddf99af74b8555ea9246947443bd33b24d4da28a0ac226d6ec6e456f",
+    "note": "Read all named numeric/string/fade/drive/logging constants; no function definitions or hidden pointer/aggregate macros. Extents used in Misc body review, including file[352], text[500], format[200] and data-entry[100]."
+  },
+  "include/BASE/MiscGraphicsConstants.h": {
+    "sha256": "ea4121af939b85b16b40d320ae5738e8df82b25f07585e7b00b583b538bdfd2f",
+    "note": "Read all graphics/fade/status geometry constants; no function bodies, union definitions or executable pointer macros. Palette 768, screen 640x480 and status y460/h20 checked against callers."
+  },
+  "include/SOURCE/CONFIG_TYPES.h": {
+    "sha256": "a0a18a6f54c2237b32aa84abb66d51c2f52f98ae4d6b7d29f37685fc54b45335",
+    "note": "Full packed exeGfxConfig/configStruct and enum domains reviewed; 413-byte persisted prefix versus416-byte claimed allocation. O04 computer/human speeds now form real two-element array at offsets0/4; all setters/callers inspected and98-TU byte/relocation comparison passes. B13 terminal name[24] at+188 is smaller than registry read31/write30; extent remains unresolved, not automatically enlarged."
+  },
+  "src/BASE/BASEMGR.cpp": {
+    "sha256": "32679850d68b15eb2e4d52448e034b6ffffdf71c7f08182dbb9a216107dc18ef",
+    "note": "R01: one constructor and vtable marker; bounded literal name and direct owner links."
+  },
+  "src/BASE/RESOURCE.cpp": {
+    "sha256": "76c8461449fdc8073f58466ae93fe4429d154bb60af3f00e67280ef7505457c5",
+    "note": "R01: all three resource constructors/destructor bodies; common polymorphic ownership, no debt candidate."
+  },
+  "src/BASE/RESMGR.cpp": {
+    "sha256": "296457da30cee27248700e38ef1c225f5957fadcac3f0bb997121eea4f92a446",
+    "note": "R01: all31 bodies, two ten-slot position arrays and enums. C01 read interfaces and S01 scalar count applied with native and true-retail evidence. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/WIDGET.cpp": {
+    "sha256": "05b5c3a6558559d17b1c9b2e475c0a223a7f3cc512b15534245beb603d654842",
+    "note": "R01: all seven bodies; U01 event views, narrowed flag decoding, no goto or synthetic local aggregate."
+  },
+  "src/BASE/TEXTWDGT.cpp": {
+    "sha256": "3c9f505cdb9f2a520a1224a8c0c235750ea4f6847f5edb5d7eae5b4f403f785a",
+    "note": "R01: all eight bodies and SET_WIDGET_MESSAGE macro; C01 signed-byte read views, U01 payload protocol, text ownership/length assumptions."
+  },
+  "src/BASE/BUTTON.cpp": {
+    "sha256": "c70f15c341a7ffbe813c57071bc4b2b25c98666b55494fa48d7cd1200fd4fa2e",
+    "note": "R01: all nine bodies, message macro and saved-modifier storage; C01 name-reader cast, G01 common-tail goto, U01 payload preservation."
+  },
+  "src/BASE/ICONWDGT.cpp": {
+    "sha256": "50df62dfb738bda1ea6cbd79d9dc532df30100754aa43fe08709a6268c73aff4",
+    "note": "R01: all seven bodies; C01 name-reader cast, U01 tagged payload retyping and width conversions."
+  },
+  "include/BASE/baseManager.h": {
+    "sha256": "1eab30ccd89463a3f9f654257dd3dcfa8d730e2f8d716dab353c3d0361e94baa",
+    "note": "R01: complete packed 0x36 owner, 30-byte name, message-mask domains and one Activate inline body."
+  },
+  "include/BASE/resource.h": {
+    "sha256": "4abe8b725aa764c1b65ae5337664d0341fdf59864a1ec435756b2fafc26de4f5",
+    "note": "R01: complete category/refcount domains and common resource class with virtual destruction."
+  },
+  "include/BASE/resourceManager.h": {
+    "sha256": "c29a656655ebb9d385658b7be43ddb86f8d5986c529f11e8e301d02c1d64c0ff",
+    "note": "R01: two aggregate slots, typed cache APIs, 1000-byte filename and read interfaces; C01 targets Read13/ReadBlock parameter types."
+  },
+  "include/BASE/widget.h": {
+    "sha256": "734055c1622691e5c519195e6359fb9a3922624ae7ddd43ce868ad5b9719acc6",
+    "note": "R01: complete 0x20 owner with typed window/list links and narrow enum storage; no function bodies."
+  },
+  "include/BASE/textWidget.h": {
+    "sha256": "5cc4ec66e3315739d76c89d0c90c05f1394f86c8d8f6b65138687c66a6c11454",
+    "note": "R01: complete 0x2b text/font owner and narrow alignment/draw storage; no function bodies."
+  },
+  "include/BASE/button.h": {
+    "sha256": "1d0ce609d2ba19b02430854d5ad185f268bf15d98757d6ce2d7b3319124afa37",
+    "note": "R01: complete 0x30 icon/button layout, narrow selection domain and saved-modifier declaration; no bodies."
+  },
+  "include/BASE/iconWidget.h": {
+    "sha256": "676e06cc42cdb205e07b90e4485419d686be95fb70b685b8b3b2f3984573a2c6",
+    "note": "R01: complete 0x2d owner with typed icon pointer and signed-byte orientation storage; no bodies."
+  },
+  "include/BASE/message.h": {
+    "sha256": "26336389fe4806de61933691de2d73aaeb1dc4684ec1ed6e5996490e59c3e860",
+    "note": "U01: all four union definitions reviewed. Top-level event tag, keyboard low-byte view, widget text/value and parameter/modifier views represent payload protocol. Unknown fields preserve the 24-byte payload; no local stack union invented."
+  },
+  "include/BASE/widgetKind.h": {
+    "sha256": "6e08cf446d6a74e76f4679751de59802bab547086de80e5dc555c908d6e08323",
+    "note": "R01: complete narrow widget-kind domain; constants only, no function bodies."
+  },
+  "src/BASE/BITMAP.cpp": {
+    "sha256": "dfe814bf6cc20d482be2c98f131c91f364ded927d570e84045ce331586be88da",
+    "note": "All bitmap constructors/destructor and copy/draw/clip wrappers; C01 raw header read and pixel allocation casts; rectangles remain real bitmap extents."
+  },
+  "src/BASE/Blur.cpp": {
+    "sha256": "38f8dc3e1e01189699fac8e7ea35cf9f4f6e8a6d30ee4dd2add0ed0a65cdf6fd",
+    "note": "Full blur passes and constants; C01 raw byte read; real 768-byte palette and scanline addressing."
+  },
+  "src/BASE/BORDER.cpp": {
+    "sha256": "403dd4c0e70785895574d0e6446022e4decb1d1f423d57291b265172cf988666",
+    "note": "All border constructors/read/draw/destructor; C01 name read and tagged widget dispatch."
+  },
+  "src/BASE/SAMPLE.cpp": {
+    "sha256": "498e621c5190f3839a1f61083b0c56b7c919519421815a0b55f1b7cf8c32d1b3",
+    "note": "Complete sample owner lifecycle; C01 raw read, real header/payload allocation and driver handles."
+  },
+  "src/BASE/PALETTE.cpp": {
+    "sha256": "a133bc0974b95e481031e435184be0710798ceb49fa33e453db521e2ba67e29b",
+    "note": "Complete palette lifecycle, 768-byte RGB owner and real allocation boundary."
+  },
+  "src/BASE/TILESET.cpp": {
+    "sha256": "9d9584c27ddb77c3b734b786fdc1aff57dec64e1950f7b0f9fbfc9e73fe84957",
+    "note": "Complete tileset lifecycle, serialized payload and C01 block read."
+  },
+  "src/BASE/ICON.cpp": {
+    "sha256": "1bb707b5a2b80244ec2501d3bf5fe4f1940c58d734b3c74cf67c03ad7c6368eb",
+    "note": "Full icon lifecycle and entry/bitmap decoder wrappers; serialized IconEntry prefix+blob remains meaningful."
+  },
+  "src/BASE/FONT.cpp": {
+    "sha256": "3eaec0228fafe88396d9e9ecf6888d07c1986df8321d92d122b659b26d210c5f",
+    "note": "Complete font TU; C01 reads, G02 next-character joins, S02 unused locals and B01 line-extraction bounds candidates."
+  },
+  "src/BASE/listbox.cpp": {
+    "sha256": "5658e2bfcbee761992965d964f149b901b2e9a1eb1ac7d937c01d41890ababc6",
+    "note": "Full list-box TU and message macro; C01 text names and raw read, item/list bounds and U01 event transformations."
+  },
+  "src/BASE/droplist.cpp": {
+    "sha256": "e69d01c5c983fb11b5ae8b6061a307469fc5a3de43ca28701670420c5a12e16b",
+    "note": "Full drop-list TU and message macro; C01 text names/read and U01 payload transitions; allocation/cursor roles reconciled."
+  },
+  "src/BASE/Textntry.cpp": {
+    "sha256": "39bdf8d3f9e17d851055843aa1afd21e6238a27b5406db1f720b18c23e1983d5",
+    "note": "Full text-entry TU, source constants and all body variants; C01 name reads, B02 1000-byte scratch/cursor limits, U01 message payload."
+  },
+  "include/BASE/tileset.h": {
+    "sha256": "cf04107eb476ff6e2236f174a8149e83d3bcb988342298617baafa3b69a55948",
+    "note": "Complete serialized tileset resource owner, no inline bodies or union."
+  },
+  "include/BASE/palette.h": {
+    "sha256": "3d4a3cc89afc30f03031743c24fffa7bb311becc2c6f4855aa1ede8ee56d98d7",
+    "note": "Complete palette resource owner and768-byte payload contract; palette signedness retained pending caller review."
+  },
+  "include/BASE/sample.h": {
+    "sha256": "0a15d616bf66e82d517f40f9a13baa569368333c3fc5755452f45e517a642586",
+    "note": "Complete sample resource owner, typed sampleData pointer and lifecycle; no inline bodies."
+  },
+  "include/BASE/sampleData.h": {
+    "sha256": "e7344b129f8a0bfe9926240ea216c254a46b2efa2438d46a6c0545b0bf3b156e",
+    "note": "Complete sample header fields and payload layout, SIZE evidence and data extent."
+  },
+  "include/BASE/MIDIWrap.h": {
+    "sha256": "c0cf943f538a4385511ff50b0991a1ccc2070dab0a6153a5544c58ec93d7dd20",
+    "note": "Complete typed MIDI wrapper storage and declarations; no inline bodies."
+  },
+  "include/BASE/border.h": {
+    "sha256": "5103ec9851c71e0185e436e449cc53b84555b4426d55cccadd0568aae157f505",
+    "note": "Complete border widget owner and resource/render declarations; no inline bodies."
+  },
+  "include/BASE/bitmap.h": {
+    "sha256": "02da19395546e378f2c7a55eb53b605d226dc92029aa362f3ff3a57856f44cb3",
+    "note": "Complete packed bitmap owner/dimensions/pixel pointer and copy APIs; no inline bodies."
+  },
+  "include/BASE/icon.h": {
+    "sha256": "b3c7de6c7c58d6448630790fc5f84e783899cd287b0b23ed04702cf59fb65e71",
+    "note": "Complete icon resource owner, entry access and bitmap operation APIs; serialized buffer owner retained."
+  },
+  "include/BASE/IconEntry.h": {
+    "sha256": "d097f1c68aab1090c4bc3b0d9aa844cd5d608e2da367efbdc3a2ef00aa68472f",
+    "note": "Complete packed13-byte frame record; blob offset/prefix reinterpretations describe serialized format."
+  },
+  "include/BASE/Blur.h": {
+    "sha256": "9f02898f81a837e6803d3ead70f5941fabeba60d3f80b6040fb42243c95e2863",
+    "note": "Complete blur helper declarations and bitmap owner references."
+  },
+  "include/BASE/listBoxWidget.h": {
+    "sha256": "566915a460dbb5c61e68022b4c26cd96cfda668f242c772c771a5a861456b5da",
+    "note": "Complete list-box layout, typed text/item owners, counts and enums; no hidden inline body."
+  },
+  "include/BASE/textEntryWidget.h": {
+    "sha256": "459e275aea85a3c324699da4771308483cef7d6a05dd56e953e22d2b7f232720",
+    "note": "Complete text-entry widget layout and text owner/cursor fields; B02 scratch capacity audited in implementation."
+  },
+  "include/BASE/dropListWidget.h": {
+    "sha256": "1b8eb0cdac10302fd7d88184583df41591f6771bdd082b08bcb374fd6c763f3a",
+    "note": "Complete drop-list layout, typed resource/text owners and saved widget state."
+  },
+  "include/BASE/font.h": {
+    "sha256": "a3d3f9ae7f519fbb6f3b3c7c6e5e158b47395dc5619e48aef980dbb71291bf61",
+    "note": "Complete font owner and256-character metric/offset domains; string API output capacity remains caller contract B01."
+  },
+  "src/BASE/MOUSEMGR.cpp": {
+    "sha256": "d1590e70dd95dccfb16a83683c66ba3eadb76cf59c227b19a5b0f45ca0f2ad05",
+    "note": "All17 functions and96 cursor dimensions/hotspots/handles; max66x43 fits saved66x64. C02 pixel owners, G03/G04 joins. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C02 typed byte owners verified across every named consumer,98 native objects and all three full retail bodies. Handle-assert and G03 structured-tail complete products reject removal; G04 separate."
+  },
+  "src/BASE/DIMMER.cpp": {
+    "sha256": "3c1d3913f68139f13037a4311226dc90930383e28c95c5cb9ee973cd73a4a74a",
+    "note": "All six functions and vtable; derived owner adds no fields or macro-hidden debt."
+  },
+  "src/BASE/Ripple.cpp": {
+    "sha256": "d3b1a07204c1db98896cfe5db134e476c645752500c6eb47a3958f3c9e1b258d",
+    "note": "Complete DoRipple/profile constants; real640-byte previous-column array and51-byte profile. B05 caller source-pointer bound."
+  },
+  "src/BASE/WINDOW.cpp": {
+    "sha256": "470241cd94088280bf3f770ad024bdf2360120b3e6ad78726cbac3f3df9549b2",
+    "note": "All15 constructors/methods, record-tag enum and geometry constants; B06 resource name bound, U01 real DRAW message."
+  },
+  "src/BASE/EXEC.cpp": {
+    "sha256": "d9d9934b547afa6024bf076ad8e3e5d418d800b570ae921d9d9900ee2edbcc66",
+    "note": "Complete source and all10 physical methods plus18 separate DATA text slots read. C03 removes char-storage aggregate reinterpretation using existing-capacity character arrays; direct-record/packing/inferred-string alternatives measured and rejected for section alignment/length. All98 objects/1826 emitted functions native exact after18 explicit owner-offset rewrites; all604 retail data bytes and five consumers fully exact. B03 manager count and B04 log format/name contracts remain; no unrelated changes."
+  },
+  "src/BASE/miscwin.cpp": {
+    "sha256": "14d866b4c87c49c46eb75011803c8cfbc14b146d711c408f930f1fc65a6bff0e",
+    "note": "Both functions, RECT/PAINTSTRUCT owners and constants; B07 caller rectangle bounds."
+  },
+  "src/BASE/INPUTMGR.cpp": {
+    "sha256": "1567deef750c9ba1cfbd2939ec9bb65073836db6bea7e26722b171de17873c8f",
+    "note": "All18 functions including two inline helpers, EncodeScanCode macro,128-byte CP1251 map, U01 event rings, G06 coordinate join, B09 scan index. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/WINMGR.cpp": {
+    "sha256": "f7a7d8fc33356dd7d3871762dbb37aa17990a84513dfa2f00c76c6214fa6b882",
+    "note": "All22 definitions including FadeSavedUpdate and empty table stubs; DATA macro override reviewed,96-byte palette covers rotation accesses; G05,C04-C06,B08. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C04 Open void* conversion kind corrected in complete2-arm family, full98-object native proof; generic EH checker limit documented. C05 screenshot raw-byte view retained; DoDialog/RemoveWindow ownership chain reread for C10."
+  },
+  "include/BASE/mouseManager.h": {
+    "sha256": "54e670433710bf63c7e3e0aadb0afd16d1842a450c36d8e7e25b9ae38d8684d6",
+    "note": "Complete packed0x8a manager,96 cursor slots,3 type offsets and saved66x64 bitmap constants; C02 recovered u8* buffer globals; both384-byte arrays/layout and all consumers verified with98-object native proof."
+  },
+  "include/BASE/dimmerWidget.h": {
+    "sha256": "ad38b443d5f1b7569d272ac4b06a9dcfed296b11f05dd7908f788071972ba849",
+    "note": "Complete0x20 fieldless derived widget and virtual declarations."
+  },
+  "include/BASE/Ripple.h": {
+    "sha256": "0430f46c11b75b02bd0165a0b2cca6c25683175b0e8766feb45e6f0dd9e9c526",
+    "note": "Complete bitmap-pointer ripple declaration; B05 caller strength remains unbounded in signature."
+  },
+  "include/BASE/heroWindow.h": {
+    "sha256": "6c07e5d463fb134951ac52f42737be2487eda3499e3e7b2955a4c49b355c9990",
+    "note": "Complete window owner links/name[20]/background fields and flag domains; B06 resource name contract."
+  },
+  "include/BASE/executive.h": {
+    "sha256": "30f4ae7614c533c323428327233fd37be3cf9a9a1fe5ce75ce0d58da558c0dae",
+    "note": "Complete0x10 manager-list executive owner and methods."
+  },
+  "include/BASE/EXEC_TYPES.h": {
+    "sha256": "6dc2b87ee2f064cbe61463780dad2ae31f234c0977f0095de8c126c3c610fa5f",
+    "note": "All18 text-slot capacities totaling0x25c read. C03 now uses separate actual character arrays with those capacities; existing layout declaration is not instantiated or reinterpreted. No object extension, new padding owner or signature change; complete native/retail proof in C03.md."
+  },
+  "include/BASE/miscwin.h": {
+    "sha256": "170685792af3e1f291e28ccbbd8b863f78e0c83e8c4dc4442522a4b518324686",
+    "note": "Complete blitter/SVGA declarations and SDK PAINTSTRUCT forward declaration."
+  },
+  "include/BASE/inputManager.h": {
+    "sha256": "e764ea765e3cf449d8d3475fd7842b8acc51ead42233a9815eb8612925e0b3bf",
+    "note": "Complete packed0x86a input owner:64 event messages,128 i16 scan cells and modifier/key domains."
+  },
+  "include/BASE/INPUTMGR.h": {
+    "sha256": "088cfd450f7e8143e2d3b83644bab30b8ef0b6e079f4d5880e5e8b04ac3c1cc6",
+    "note": "Complete Windows keyboard/mouse dispatch and cursor-change declarations."
+  },
+  "include/BASE/heroWindowManager.h": {
+    "sha256": "5e6cfde404b01ee82e9a95dab785ea6277f81ac9a57a4f340b1ae6219c61ed06",
+    "note": "Complete0x62 manager owner, fade domain, typed dialog callback and signed palette interfaces."
+  },
+  "include/BASE/WINMGR.h": {
+    "sha256": "07afad47fcc3583da119db7093aee81ef0193c9058346fd5d8e0d558e071611c",
+    "note": "Complete cycle mode enum,96-byte scratch extent and table helper declarations."
+  },
+  "src/BASE/soundmgr.cpp": {
+    "sha256": "3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750474a04b4d8231b0d26ca",
+    "note": "All22 methods, format constants, SDK aggregate globals and volume/backend state; D01 withdrawn: original address claims restored after rejecting the reconstructed control. B10 track bounds,S03 previousTrack,S04 unread fade scalar."
+  },
+  "src/BASE/MusicFlags.cpp": {
+    "sha256": "92cd3d0abe52bc3533dadcd23babff16b01514f147be89bcbe6293557e4cb125",
+    "note": "All3 byte-flag queries and feature flag; scalar temporary has real predicate role."
+  },
+  "src/BASE/Midi.cpp": {
+    "sha256": "6fc8dadf5d6368a71cc9020610eb920838d9e884f8d6251326dca57474930e83",
+    "note": "All6 MIDI helpers,60-track arrays and filename format; B10 pre-check indexing requires caller-domain proof. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+  },
+  "src/BASE/AudiereEffects.cpp": {
+    "sha256": "66050a61dac3b326c25705b7d704df52e28304179d2aad2093f59baa36dd1d2b",
+    "note": "All13 functions and0x1c global descriptor: buffer plus frame/channel/rate/format/list/depth. Every member is used; typed linked nodes and reference lifetimes retained."
+  },
+  "src/BASE/AudiereMusic.cpp": {
+    "sha256": "736b9ab782b1c3998cefdb9802b9341715da92c5c8b010e9b7fff1b98c5ebb4f",
+    "note": "All7 functions,8 static-member lifecycle claims and2 locale helpers; B10/B11 track/path bounds. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Real static smart-pointer owners and12-volume lookup."
+  },
+  "src/BASE/MilesSound.cpp": {
+    "sha256": "245f18bb510ab44e9a4406e749c760d69ae6bc4d8cb4a1685e53e47234c131ed",
+    "note": "All12 functions including inline format helper; O01 real72-byte state replaces out-of-object memset, all11 retail bodies exact with resolved relocations. B12 channel-allocation question retained."
+  },
+  "include/BASE/soundManager.h": {
+    "sha256": "5882906f4461821515ff1722aaf84bd2b8d24911dcc3ea5d6f8dcef5d809911d",
+    "note": "Complete0x52 manager, backend enum and all5 inline bodies; typed Miles/Audiere owners and60-track extern contracts."
+  },
+  "include/BASE/soundBackends.h": {
+    "sha256": "30299251f62b790dc2db13557d3acafa3e1c0b66dbd4782d0ed1b4390980ec82",
+    "note": "Complete sample node inline constructor, music static-member owners and backend APIs; O01 adds real72-byte MilesSampleState,16 handles plus ready/count."
+  },
+  "include/BASE/MusicFlags.h": {
+    "sha256": "acc8fe949ff9f44c480b2d69587865bdf2ec1907bd79a61266f36dea0463bbff",
+    "note": "Complete byte-flag declarations and three helper signatures; no inline body."
+  },
+  "include/BASE/Midi.h": {
+    "sha256": "c306dcba4410ebffcc50bf517bfeb27cb205ade68036bc14e05b79892ca43964",
+    "note": "Complete typed MIDI API; track/fade state passed as real references."
+  },
+  "include/SOURCE/KB.h": {
+    "sha256": "d934fd523cac541db923666a961e00cedae6e8632275d3c5afcd7377c2af728a",
+    "note": "Full header read through EOF including both inline bodies, actual campaign-choice/exit/setup/remote records, all declarations and map-extra macros. U11 setup212/raw256 union and S33 six-used/eight-reserved match arrays need native source proof; tagged KbRemotePacket setup/save/data all used, variable payload extent B41. HighScoreEntry100 with29 serialized reserved bytes is real, not fake padding. Explicit macro grouping has existing byte evidence and is not normalized for appearance. U11/S33 follow-up: complete startup buffer/flag consumers reconciled. Two-arm typed212 owner alternative changes retail frame by44 bytes, so existing256 buffer retained. Complete32-arm local-storage product reduces both match arrays8 to6; three unused scalars retain measured slots. Full98 native objects, VC6 layouts/both dialects pass; ordinary oldmain retail bytes exact, existing EH/FS gaps recorded. Shared eight-byte global mapping and its count constant remain unchanged. See U11-S33.md. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened."
+  },
+  "include/SOURCE/X_GLOBAL.h": {
+    "sha256": "6fa5bb6953421cf3a99a111283901311b7ae742bfcba0d3d83744e51e2ab86ec",
+    "note": "Full header and its one inline read. Real packed14-byte obstacle and17-byte elevation records; elevation table25 vs debug command range200 is B51. Global declarations and stated table extents inspected; remaining caller-domain obligations stay in the function ledger. Actual GLOBAL_TEXT_BUFFER_SIZE is768, correcting prior conservative500 wording. Globals, aliases, enum domains and source-owned arrays are not fake local aggregates. C61 follow-up: reviewed changed giSpellInfluenceToSpell definition/declaration and all consumers; H2_ENUM_STORAGE(SpellType,u8) preserves16 physical bytes, fifteen named influence entries and unused zero tail. Sole read is RawEffectSpellInfluence. Full98-object1826-function native/data/ordered-relocation proof passes. Prior complete file review retained; this follow-up does not claim a new whole-file read. C63 both castle-hex map externs now preserve the one-byte CombatCastleHex domain; all changed declarations/consumers and98-object native proof reviewed. Other prior declarations unchanged."
+  },
+  "include/SOURCE/game.h": {
+    "sha256": "3e6c66149da200f99b5e1f5ac849c6018344c6568f80df585e08bde5a4d0f79f",
+    "note": "Full header through EOF and all five inline bodies read. Packed0x660f game,7-byte mine/8-byte boat, fixed player/hero/town/event owners inspected. C25/C32 signed b8 cheat-flag owner verified across98 native units and all named consumers, serialized width unchanged. U12 duplicate castle/town-owner names and U13 daily-event/known-town byte views require all-consumer review. S35 unknown campaign/setup/runtime gaps are not proven deletable padding; B55 getters and event/name capacities keep caller contracts. No fake stack aggregate or manual varargs. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "include/SOURCE/GAME.h": {
+    "sha256": "709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1aea3185",
+    "note": "Full170-line declarations/constants header read through EOF; no physical function bodies. Packed50-byte EventExtra has one-byte message head and runtime fields, requiring actual variable-tail allocation contracts rather than sizeof as message extent (B55). Real six-byte RandomHeroArmyRange record and domain/serialization constants retained; no manual varargs or fabricated stack aggregate."
+  },
+  "src/SOURCE/GAME.cpp": {
+    "sha256": "2023b059e27769026dc8e9f3b229a5b08311f2052289b1afd80350ac1ec713c2",
+    "note": "Full8051-line TU read through final DATA definition; every helper/body, private enum, float factor, both temporary serialization identifier macro groups and undef pairs reconciled. All functions have ten manual pattern verdicts. C35/C38/C39/C41/S41/S44 source changes have complete matrices and102-function/all-allocated-section native equivalence. No probe declarations or fake padding retained. Full reading is not whole-retail exactness or resolution of open findings. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence. U06 follow-up: both armyGroup unions consolidated as actual5-byte creature types/10-byte signed counts, with86 affected accesses in24 bodies; all alternate consumers and signed/u16 wire boundaries reconciled. Complete98-object native, VC6 layout and both-dialect proof, plus two exact signed-cast removal products. See U06.md. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain. C34/G47 follow-up:16 written casts removed across hint/boat/town/mine functions after complete8/64/64/16 products; three color-argument casts retained. Full16-arm CFG/cast cross retains hint retry goto. All four complete retail comparisons, all98 native objects and both source dialects pass; temporary mine labels audited by exact destinations. Other C34 and bounds/storage findings remain separate. See C34-map-G47.md. C34/S37 SaveGame/LoadGame follow-up: four written assignment casts removed and both human/current-player arrays reduced to6/1 after all136 arms complete; each function retains its work buffer and three unread declarations after native-changing alternatives. Full native98-object equivalence, both dialects and unchanged retail CRT-name gaps documented in C34-save-load-S37.md. Filename helper output is not bounded by the14-byte serialized write; no buffer-bound hardening implied. C34/C37/S39/B59 spell-widget follow-up: final48/18-arm joint products remove eight casts through direct literals, natural readOnly assignment and named tab/command selections. Tab word conversion and overwritten message.type remain after byte-changing alternatives. Full98 native objects unchanged; ordinary retail proof retains four ViewSpells EH/FS gaps. All65 retail spell names checked; complete labels<=35 bytes inclNUL in768, while invalid-index/resource/lifecycle contracts remain. See C34-C37-S39-B59.md. C36/S37/S38/R08 map-input follow-up: all264 arms complete; LoadMap recovers u8 x/y[1] and signed i8 type[8], removing6 casts; RandomizeEvents removes7 assignment casts. Larger type/junk extents, write-only layer arrays and reused scalar roles remain after byte-changing alternatives. All98 native objects, both full retail byte/ordered-target checks, VC6 domain/layout and both dialects pass. C36-S37-S38.md distinguishes unsigned event/boat destinations and all256 byte-domain proof from unresolved external map/file/record contracts. C34/C40/S41 follow-up: ten ConvertObject casts and three hero-pool/army casts removed after complete64/16/2/8-arm products. Named255 sentinel and existing byte/word destinations preserve code; three-column army table retained after642-byte alternative differs from834-byte retail. All98 native objects and all three full retail target checks pass; both source dialects pass. Actual seed1..255/count2..50 and real selected[2] dependency documented in C34-C40-S41.md, external input/lifecycle contracts unchanged. C42/S42 follow-up rereads both turn-update bodies and flag/mana owners: ten cast expressions removed, unused count/income retained after complete96-arm products; all98 native objects/full two-function retail checks and16 dialect consumers pass. C42-S42.md. C43/S41/S42/B65 follow-up rereads four whole bodies and new inline lowercase helper; text owner recovered, five casts removed, four unused-local candidates retained after28 arms. All98 native objects, four full ordinary retail checks,16 dialect consumers and complete new-turn text/CP1251 tests pass. See C43-S41-S42-B65.md. C34/C39/R09 rereads PerWeek, PerDay and CheckHeroConsistency; two casts removed and role separation retained after22 complete arms. All98 native objects and full three-body retail proof pass; weekly private doubles proven by exact destinations/bytes, full13-bit metadata x7-roll domain checked. See C34-C39-R09.md. C34/G48/R07/S36 follow-up rereads all410 NewMap lines, owner declarations and expansion-name tables:14 cast removals retained,236 complete variants, full7290 retail proof and98 native objects unchanged. All campaign names fit13; external filename and signed artifact-coordinate domains remain explicit contracts. See C34-G48-R07-S36.md. C44/G50/S43 follow-up rereads complete232-line sender and228-line receiver, protocol declarations, full CheckHandleNet and all3 transmit call sites:24 casts removed, fourth word named playerExited,264 complete matrix arms, both full retail proofs and98 native objects unchanged. Tested goto/unread storage/initialization alternatives retained; typed packet/API recovery and malformed transfer bounds remain open. See C44-G50-S43.md. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened. C44/G52/G53/S43/B63 follow-up rereads complete SetMapSize, header encoder/decoder, diff/join, CRC and both compression tests, plus codec and CRC implementations. Removes14 casts after128 complete source arms; eight full retail checks and all98 native objects unchanged. Tested goto/unread storage retained. Diff destination bound max+5000 proved via oldSize+5 differential and joinSize+2 full-send bounds; terminal input defect, codec capacities and bit20 header limit remain explicit. See C44-G52-G53-S43-B63.md. C34/C39/G49/G51/G54 follow-up rereads complete ProcessRandomObjects, CalcBaseScore and SetupNewRumour: six casts removed after 45 complete arms; all three goto families retain measured native-changing alternatives. All 98 native objects unchanged; three full retail proofs include fixed score/rumour double operands and monster local-label destinations. VC6 game layout and all 16 consumer/dialect checks pass. See C34-C39-G49-G51-G54.md."
+  },
+  "src/SOURCE/TOWNMGR.cpp": {
+    "sha256": "c78985172e0be21cbc7d0433d677080b7f0043464dce3ba95665ec7ae06f7757",
+    "note": "Entire3635-line source through VTBL read, every function/inline helper, private enum and both6x32 DATA tables reconciled.32 newly reviewed bodies plus2 previously reviewed stats helpers; all have ten verdicts. A01/S45/S46/S47 applied with complete matrices and whole36-function/allocated-section/ordered-relocation native equivalence. C45 rejected boolean variant documented. Source has no active macro definitions or probes; unused UI declarations remain S48. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step. C46/R10/S48/G56 follow-up rereads ten complete setup/army/dialog bodies and actual owner types. Eight casts removed after 875 complete variants; 29 unused locals/results, swap-role reuse, crest casts and split-update joins remain after alternatives changed native code. All 98 native objects/1826 instances unchanged; complete TOWNMGR in both dialects and VC6 signed-width/owner probe pass. Five full retail checks pass; five retain exactly baseline four-operand EH/FS-site gaps. Relevant split command/dispatch contracts remain, with no fresh whole-Main review claimed. See C46-R10-S48-G56.md."
+  },
+  "src/SOURCE/TOWN.cpp": {
+    "sha256": "3fa70495d9c51bc2ed53e6cc4fb877d7bd27cf04a714915b3afbeb9fad54f760",
+    "note": "Entire218-line source through bEnteringTown DATA read; all9 physical functions have individual ten-pattern verdicts. Town spell/count consumers and serialized100-byte owner reviewed for U15; no source changes or fake storage introduced. U15 adjacent count-owner/index change re-reviewed against every consumer and all98-object native proof; only those count accesses changed in this step. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "include/SOURCE/TOWNMGR.h": {
+    "sha256": "e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2",
+    "note": "Full header read: packed9-byte SBuildingInfo, shared town masks/categories/control/resource domains and prototypes.32-entry building and6-player counts reconciled with whole TOWNMGR consumers. TOWN_THIEVES_ORDER_BUFFER_SIZE8 now has no in-tree use after S47; it is a non-emitted constant, not retained stack padding."
+  },
+  "include/SOURCE/townObject.h": {
+    "sha256": "4e0c90cbc973c613dd5b9e0b6a8dbcc4241fb97b77ef9488228c8149e16574fb",
+    "note": "Full packed24-byte object and prototypes read against constructor/destructor/Draw. Actual icon/border owners and frame/state fields, no synthetic aggregate or unnamed gap."
+  },
+  "include/SOURCE/townManager.h": {
+    "sha256": "89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc",
+    "note": "Full packed378-byte derived-manager layout, all32 object pointers,80-byte status and inline SetTown read against whole implementation. m_unknownC6 lacks semantics but cannot be deleted from proven layout; no padding invented."
+  },
+  "include/SOURCE/town.h": {
+    "sha256": "80eaf880f8d0cc72be7e82547467d4a2045af7758473d51bee1646edf92471cd",
+    "note": "Full packed100-byte town layout, enums/prototypes/accessor and every spell/count consumer reviewed. U15 removes19-byte overlay prefix and unused sixth overlapping count, retaining real20-byte flat/2D spell union followed by five counts. All98 native objects/1826 function instances/sections/ordered relocs identical; VC6 explicit layout assertions prove spells@0x3c,counts@0x50,turns@0x55,name@0x57,size100. No fake padding or before-array pointer."
+  },
+  "include/SOURCE/PHILAI.h": {
+    "sha256": "dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18",
+    "note": "Full115-line owner header read. U16 BHC has real town pointer, purchase tag, integer/building union and quantity. Player arrays6 and resource arrays7 agree with reviewed consumers; all prototypes/macros/forward declarations read, no function bodies. U16 all named BHC producers/consumers now reviewed: retain tagged enum/integer views; real num only consumed for creature tag. No header change or duplicate file credit."
+  },
+  "include/SOURCE/philAI.h": {
+    "sha256": "3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c",
+    "note": "Full138-line method declarations header read; typed enum parameter domains and real output-reference/pointer signatures. No data members, hidden inline body, aggregate scratch or active macro definition. All84 PHILAI source bodies subsequently reviewed and reconciled; open findings retain individual dispositions. No duplicate header credit."
+  },
+  "src/SOURCE/PHILAI.cpp": {
+    "sha256": "8a75543fcca398be985edc31be0510acdbb879c10f4f4b4e6be613ad76f332c4",
+    "note": "Full6864-line TU read across ordered batches, including private enums/macros, all84 physical bodies and trailing globals/compiler data. Both declaration headers separately reviewed. U15/C49/C51/C53 retained changes have complete native proof; real U16 tagged purchases retained after full producer/consumer review. C48/C50/C52/C54, G58-G62, R12-R15, S50-S53 and B69-B72 retain per-function dispositions and measured/untried distinctions. Real resource/army/spell/count owners reconciled; unread local arrays are not falsely credited as removed. Search/cache owners and U12 aliases retain pending shared-consumer contracts. Review completion is not all-findings application or whole-TU semantic/retail closure. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence. U06 follow-up: both armyGroup unions consolidated as actual5-byte creature types/10-byte signed counts, with86 affected accesses in24 bodies; all alternate consumers and signed/u16 wire boundaries reconciled. Complete98-object native, VC6 layout and both-dialect proof, plus two exact signed-cast removal products. See U06.md. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "src/SOURCE/ARMY.cpp": {
+    "sha256": "bd1881d833363407df2b58b4ae3a7601ab3b8e799946d73ed5437e2663ae0977",
+    "note": "Full3674-line parent TU read (3672 after measured cleanup), including prolog enums/macros, all47 physical definitions and three data owners;45 new reviews, two earlier corpse functions reread without duplicate credit. C55/C56 measured cast cleanup; G63-G65 joins, R16 roles, S54 unused state and B73 resource/hex/numeric contracts retained individually. U05 flag views real; unused BerserkMaskIndex historical enum noted, not evidence of live aggregate. Text bounds proven against both66-entry retail name tables, frame/animation contracts separately open. C56 owner follow-up removes all seven byte-boolean casts with full98-object native proof; whole source retains current hashes. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md."
+  },
+  "include/SOURCE/army.h": {
+    "sha256": "d8fcdd206d516e67d86ffb8960ce33fbb9f207c1e5d18fe0f650168bbe9cb13b",
+    "note": "Full160-line packed0x482 army layout, declarations and IsAlive inline read against complete ARMY implementation. Four real limit rectangles,15 spell bytes,7 sample owners, monster/frame records inspected. S54 unknown5e/unknownD4 fields remain actual layout storage, not declared disposable padding; semantics require remaining combat consumers. Animation/resource and side/hex/count lifecycle contracts documented per body. C56 unsigned byte animation fields replace plain-char owners after every reader/writer, including complete CastSpell, was reviewed; all98 native objects remain identical. No packed-layout change."
+  },
+  "include/SOURCE/ARMY.h": {
+    "sha256": "882dcfd1c9b2b3be1698c4e86f290255dc8081c28a729630d5e4203c51787658",
+    "note": "Full166-line enum/prototype and packed0x335 SMonFrameInfo owner read. Six16-byte source offsets,16 walk offsets,34 sequence counts and34x16 frames, ten standing chances, three missile offsets,12 projectile angles and two quantity offsets are genuine resource dimensions. B73 external frame counts/cumulative walk assembly bounds remain; unknown00 is uninterpreted resource byte, not safely removable padding. No hidden function body."
+  },
+  "src/SOURCE/SPELLS.cpp": {
+    "sha256": "e6a96b2c994cbcd83542439b8e559ab9edf56c12e5168da7d3f63d759c705bdb",
+    "note": "Full3918-line parent TU reconciled:36 new bodies read in full; CastSpell already fully reviewed in B74 and unchanged body hash verified. All37 VA markers match physical definitions. Private enums/macros and seven final data owners read, including real five red/15 rainbow colors, gyModify pointer, cast coordinates and teleport UI state. O05 five cross-row uses across this TU/ClearEffects recovered; C58 twenty casts removed; S56 summon owner6. B75/B76 contracts and G67-G71/R17/S56/O06 remaining findings recorded per body. Final3908-line source; no source literal/padding/unknown fake storage invented. C63 follow-up: complete Earthquake body and typed castle-map index reviewed; other bodies unchanged and whole native output preserved. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "include/SOURCE/SPELLS.h": {
+    "sha256": "d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f",
+    "note": "Full184-line spell header read through EOF: BoltColorMode tagged palette modes, spell/animation/geometry constants, real16-byte sample filename and9-angle domains, Damage multiplier macro, two message-handler declarations. No function body hidden; no struct/union definition or manual-varargs macro. Checked six summon positions,19 fireball cells,15 shake pairs,10 quake impacts,480 wave rows and real caller-domain limits against all37 SPELLS functions."
+  },
+  "src/SOURCE/SPELLAI.cpp": {
+    "sha256": "98d0630dab27f8fafa1457078ed6065546ca02a5645cabe9c3619fa6695fccf9",
+    "note": "Complete1475-line TU read through EOF and all11 physical VA-marked definitions reconciled. ClearEffects already credited under O05; ten new full-body reviews here. Private target-mode/layout enums, numerical macros, eleven named float DATA modifiers, two real11-entry duration tables and spell-group global reviewed. C60/C61 remove five casts with full native98-object1826-function preservation; fixed numeric operands and16-byte enum map checked against genuine retail. S57/R18 measured negatives and B77 caller/numeric/retail scoring behavior recorded without hardening or fabricated padding. No manual varargs or owner-recovery macro hidden outside functions. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "src/SOURCE/CMBTMGR.cpp": {
+    "sha256": "f2a7639acac0e228bff6e2e8c068e4764731df93d73876c3380ff445a35dab78",
+    "note": "Full2443-line source read and38 physical bodies reconciled, including prolog enums/macros,six actual data owners and vtable. C62/C63 remove37 written casts with complete measured source products and98-native-object evidence. G72-G74/S58/R19/C64 and B78/B79 retain detailed per-body results and limits; no whole-repository closure implied. Conditional cloud-name cast restored for C++98 annotation compatibility. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "include/SOURCE/CMBTMGR.h": {
+    "sha256": "9e2fc82b267ab2b69708140660f3ae6998f60f1ddfb2b4c14dbce6aaa2f9f43e",
+    "note": "Full18-line owner header read: real four-byte u16 x/y tower origin record, three free-function declarations and message dependency. No function/macro body or fabricated aggregate."
+  },
+  "include/SOURCE/combatManager.h": {
+    "sha256": "7facfb674224546e3fccacabca3b5a1ccb9e8f96d82fbe452c94b0c85fb7dfcd",
+    "note": "Full original868-line header and updated851-line owner reconciled. Shared enum moved intact to combatTypes under C63; native0xf877 manager layout unchanged. Real117 hexcell/two21-army rows backed by constructor count and stride; other arrays/declarations read. S58 unknown4/100/8/16-byte gaps remain unproven, not deleted as fake stack padding. B78 text/screen/index/lifecycle contracts persist in individual consumers, including still-pending command/drawing bodies. S59 follow-up: sole COMBAT_AI_CASTLE_BOUNDARY_COUNT consumer read completely; extent12->9 from nine actual initialized/used rows with unchanged full native layout and all98-object proof. Adjacency remains117x6, not117x8; no adjacency layout change."
+  },
+  "src/SOURCE/AI.cpp": {
+    "sha256": "c9fc27dfe56bf031f08dc3379ee5d584a80154d3e131b1dce9d26eac96c1e3bf",
+    "note": "Full1090-line parent source and final1080-line TU read; all19 physical functions reconciled with prolog macros/private front-offset enum and no trailing data definitions. C65 twenty casts removed; A02 real2x20 marker plus five actual-base index expressions; S59 nine boundary bytes recovered with all-consumer/98-native-object proof. G75/S59/R20 measured residuals and B80 arithmetic/ownership/input contracts remain explicit. No formatter, manual varargs or fabricated owner macro hidden outside bodies. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence. U02-U04 follow-up: separate grid pointer/directions owner, single queue/target fields, both redundant unsigned comparisons removed; all affected accesses/caller domains reconciled. Full98-object native/VC6 layout/both dialects pass; G11/S08 measured retain decisions. See U02-U04-S08-G11.md."
+  },
+  "include/SOURCE/PATH.h": {
+    "sha256": "c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2",
+    "note": "Full9-line header read: combatTypes dependency and two direction/adjacent-hex free-function declarations; no function/macro body, aggregate or address helper. Follow-up: all12 PATH.cpp bodies now independently reviewed in C66-S60-B81.md; no declaration change."
+  },
+  "src/SOURCE/PATH.cpp": {
+    "sha256": "32ab668c3b5ba57b6c56e92e0050ab51a13da4456e5e4585950a60b5ded830c8",
+    "note": "Full638-line TU read, all12 physical functions reconciled with private CombatPathConstant enum and final compiler-generated markers; no data/format/owner macro hidden outside bodies. C66 sole written cast removed after2-arm native/retail proof; S60 unused scalar measured2/2 and retained. B81 real117x6 adjacency, sentinel/direction/facing/placement contracts documented; no fake buffer, goto, manual varargs or unrelated variable roles. All15 emitted functions and allocated native sections unchanged; all12 source functions independently match complete retail bytes/sites/targets."
+  },
+  "src/SOURCE/FLY.cpp": {
+    "sha256": "ddd3fa1ea40230732200b1810085375f71b9cc8a75faf380896216bdcb0b3469",
+    "note": "Full476-line source read, all4 physical functions reconciled with private enum, double1.3 duration macro, includes and EOF; no separate FLY header. C67 six casts removed, ten real numeric boundary casts retained; S61 six unused scalars/one overwritten store measured in complete8/8/2 products and retained. B82 adjacency producer rules out apparent CanFit null case under initialization; animation/placement/timing contracts explicit. All7 emitted functions and allocated sections unchanged; four full retail bodies plus fixed private-double supplement pass. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "src/SOURCE/COMMAND.cpp": {
+    "sha256": "e21d670ee6b5fa1643cb71903bf7140331b0fc0c0b3f488b64aeec287c3e93cd",
+    "note": "Full3263-line source read:36 physical functions, private enum/macro domains, includes and15 EOF data globals reconciled. U17 actual packet owner; C68 nine scalar casts removed; A03 actual adjacency row; six G76-G81 flow families, S62 storage and R21 role splits measured/retained. All32 matrices176 arms complete. B83 retail strings prove selected buffers, quantity/network/placement/state contracts explicit. Combined all98 native objects/1826 emitted instances and allocated sections/ordered relocs unchanged; full36 byte checks plus20 fixed numerical operands, seven existing EH model gaps explicitly remain. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "include/SOURCE/COMMAND.h": {
+    "sha256": "5e56b46fea0a207684f62e055e6dbea0d91f67d8309246ac83fcf392053be277",
+    "note": "Complete48-line recovered header, enums, declarations, packed layout and SIZE read. U17 replaces false25-byte packet/member text view with actual256-byte RemoteMessage-compatible owner: sender0,id1,type5,command6,payloadSize7, tagged action/text payload9 of247 bytes. Real command-gated union; no fake reserved bytes. Entire producers TransmitRemoteData/GetRemoteData and PopNetBox sender role checked; only pointer view, no new allocation growth. All98 native objects unchanged; network validation not asserted."
+  },
+  "src/SOURCE/Castle.cpp": {
+    "sha256": "c37609dba5e16b3706e77fc6ebcf2a439cb10db8896ac79df1049afe492645ca",
+    "note": "Full850-line parent TU read, final846 after C69 cast removal;3 physical definitions include actual private inline CannotRecruitHero plus2 VA bodies. All private enums/includes/namespace and3 EOF globals reconciled. Nine casts removed; all9 source families72 arms complete. Three gotos, six unread scalars/result-unused search and separate counter-role candidates measured/retained. B84 retail tables/formatter capacities and initialized eighteen-slot domains checked. All5 emitted TU functions and all98 native objects/allocated sections/ordered relocs unchanged. SetupCastle EH model gap remains explicit; full CastleHandler including inline helper/switch targets passes. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "include/SOURCE/Castle.h": {
+    "sha256": "f83a261d82228e300376c669b6dc7995c79b5cb52d52b3ebac6a1284999cb510",
+    "note": "Complete22-line owner header read: eighteen-slot capacity and five-slot upgrade offset, CastleHandler declaration, base/use byte-valued BuildingSlotType arrays and window pointer. Arrays are genuine initialized/live building-slot owners, not overlapping/fabricated storage; producer/access ranges reconciled with full Castle.cpp. No function definitions or manual varargs."
+  },
+  "src/SOURCE/Campaign.cpp": {
+    "sha256": "ae133a078303de22a6b92eec2004bde6fe835e4dee75e26af5ede1ea7ada96c0",
+    "note": "Full1129-line parent/final1127-line TU, all7 functions, private enums, sixEOF globals and actual2x13x2 trackXY read. C70 five casts removed with complete24 arms across8 families, all98 native/retail proof. S64/R23 tested originals retained. B85 two genuine retail crossed-index operations explicitly open; O06 shared campaign327/setup65 state owner recovery deferred to remaining consumers, not silently fixed. Tagged choice/message views real; no gotos/manual varargs/fake stack aggregate. Per-function all10 verdicts and C70-S64-R23-B85-O06 evidence recorded."
+  },
+  "include/SOURCE/Campaign.h": {
+    "sha256": "8a7319524638d3c37b993b2aa5cba6e0e22bdbd28ce366e7e29db18c5892eabc",
+    "note": "Full78-line header read: actual12-award enum, dialog/widget IDs, display/frame constants and handler declaration. No function/macro body, storage overlay or raw owner recovery. ID maps and track versus bonus intervals reconciled with all7 reviewed Campaign functions; B85 runtime/resource contracts remain."
+  },
+  "src/SOURCE/HISCORE.cpp": {
+    "sha256": "a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b",
+    "note": "Full320-line TU, five functions, includes and trailing vtable marker read. C71 complete4-arm cast product rejects both removals; source unchanged with all98native/fullbuild/retail evidence. B86 file read/uninitialized cheated/raw-name format findings documented; real100-byte record,352 path,10 animation/type arrays and taggedwidget/executive views retained. No goto/artificial owner/unused aggregate/manual varargs or unrelated reuse."
+  },
+  "include/SOURCE/highScoreManager.h": {
+    "sha256": "05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c",
+    "note": "Full64-line header read: all UI/timer/frame/filename constants and packed0x63 owner with real10i16 animation and10i16 monster slots, signedbyte flag/window pointer and inherited0x36 base. No bodies or fake union/padding. Full5consumer review reconciles dimensions; B86 initialized state, resourceframes/file/widgetlifetime contracts explicit."
+  },
+  "src/SOURCE/Overview.cpp": {
+    "sha256": "d49c78685d8d03c3e921d7db65023c8b96257c6c8891dde9b89d4753d3ebf856",
+    "note": "Full1578-line parent including private enums, three floating macros, real row-address macros and all trailing globals read; all seven functions/all ten patterns covered. C72 117 casts removed with seven genuine boundary casts restored after paired dialect checks; S65 seven-element mine array.26complete matrices116arms86.632211s; all98native/fullbuild and focused retail/fixednumeric evidence. A04/G85/G86/R24/unusedscalar residuals and B87 negative scrolltop/equality guard/text signed domains remain explicit. No fake stackowner/manualarg varargs/member-owner subtraction. U12/U13 follow-up: all named town-owner/build-marker consumers reconciled; duplicate unions replaced by signed72-byte owners and unsigned9-byte construction bitset, full packed game layout retained. All98 native objects,17 direct retail byte comparisons, VC6 and both dialects pass. C34 SetupOrigData seven redundant casts removed after complete128-arm measurement and independent full retail proof. See U12-U13.md and C34-setup.md; unrelated findings remain."
+  },
+  "include/SOURCE/Overview.h": {
+    "sha256": "905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe",
+    "note": "Full42-line header read, actual OverviewType/ReturnAction domains, four rows70slots/86height/200IDstride and5troop12dwelling8skill14artifact constants reconciled with all seven bodies. Row typedefs unused, not instantiated fake aggregates or proof of a row-pointer owner; actual flat heaps remain. No bodies/union/padding changes; forward declarations genuine owner header."
+  },
+  "src/SOURCE/REQUEST.cpp": {
+    "sha256": "359cd032c4ec680013154cd398f641a875cb3b17f729b50e04f41818dfda6ba6",
+    "note": "Full1247parentlines read(all16functions/privateenums/5globals/vtable). C73tennumericcastsremoved,S66mapbasename12->9; all17complete100arm65.052024s matrices and98native/fullbuild/dualdialect/retail proof. FiveCP1251viewcasts,threefiltercasts,conditionalnamecast remain; G87..90/R25/fourunusedscalars+372scratch residuals explicit. B88 twoenumerations/countmutation/headerread/emptymaplist/cross-subobjectextension/longlistdivision/textbounds recorded. No manualargvarargs/fakeunion/owner subtraction/artificialaddress."
+  },
+  "include/SOURCE/REQUEST.h": {
+    "sha256": "00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8",
+    "note": "Full83lines read: realpacked420SMapHeader, magic4/playertriples18/conditions/reserved8/name60/description300/counttail2, actualoffsetdescription0x76. Fixedbyte-width enumstorage and dimensions36/72/108/144 are realdiskdomains; no fakeunion/padding orfunctionbodies. GetMapHeaderretailread420/existingNewgameconsumers type/layout reconciled; rawfieldvalidation/termination remainsB88."
+  },
+  "include/SOURCE/fileRequester.h": {
+    "sha256": "77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b",
+    "note": "Full122lines read: genuine0x42f packedbaseManagerderived owner, pattern300/directory300, name351/ext5 records/pointers/map420 pointer and UI/indexmembers. defaultExt5 at2ae followedfilename351 at2b3 isfixedretailboundary; actualmap/loadcallerpatternNULcrossing documentedB88 notwidened. Unaccessedm_listState9 semanticunknownretainedknob42b; unused208/372 constants notproofofauthenticlocaltypes. No methodbodies/union; all16consumerreview/full98nativeproof."
+  },
+  "src/SOURCE/kbwin.cpp": {
+    "sha256": "17603f6de6314303009205371e7fae333200659a7bf0df8bdacfa5ec64519016",
+    "note": "Full587lines including16functions/privateconstant/all21DATAowners read. C74removes same-HMENU and unsigned-sentinel casts; S67all3complete4-arm unusedslot/store products rejected. Full5families16arms, all98native/fullbuild, all16retailbytes/sites/orderedtargets pass without exceptions; dualdialect diagnostics unchanged. B89commandline64 clear61copy60/1024messageguard23stores/70x7menu boundedfallback/fixedstartup73of768 proved. Genuine lTemp sharedtimer/style scratch retainedopen; API/config/lifecycle/signedtick contracts open. No gotos/manualvarargs/artificialowner/arithmetic/fakeunion/stackaggregate."
+  },
+  "include/SOURCE/kbwin.h": {
+    "sha256": "d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561",
+    "note": "Full86lines read, nofunctionbodies/unions. ActualSDKrecord/handle andcallingconventionowners preserved; 1024messagecapacity,61/60copyconstants,70menutablebound,style/timer/commanddomains reconciled with all16 consumers/retail. Real long tick identity and taggedcommandenum retained; no padding/storage shrink fromunusedexterns. B89actualgraphics2owner/configboolean/APIlife contracts retained."
+  },
+  "src/SOURCE/DRAWING.cpp": {
+    "sha256": "e24afed895464eb4dc34e591770947a6aab1be8381f1faf94a70f9f60ae7bdbf",
+    "note": "Full1830lines including13functions/sevenprivateenumdomains/threeDATAowners read; SetupGridForArmy B19 reconciled. C75nine numericcasts removed withall98native/1826function proof, dualdialect exactexternaldiagnostics andfullbuild. Thirteencomplete158arm products preserve unsupported G91..94/S68/R26 forms. All13retailspans bytesexact,twelveallsites/orderedtargets; UpdateMouseGrid unchangedEH/FSgap explicit. B90real700log/400wrap/120lineowners,55wallinitializerstores/72spellpositionstores/117grid/ninemoatcells/catalogtext andconditional15spellscan bounds checked. APIresource/config/index/signedduration/timer contracts open; nofakeaggregate/manualarg/owner subtraction. U05 follow-up: four duplicate monster-record unions replaced by same-type value/flag owners; all named direct/pointer consumers and66 initializers reconciled. All98 native objects, VC6 layout, both source dialects and all1716 retail table bytes pass. U05.md and U05-functions.tsv preserve exact consumer and residual evidence."
+  },
+  "include/BASE/IconDraw.h": {
+    "sha256": "33208ff1322cf39240a04e3b6f7f2f23fd18002dc0e9f60f0db55b07c2ac71a7",
+    "note": "Full21lines read: real clipping0/1, orientation0/1 withsplit i8 storage and drawresult0/1 domains. No functions, unions, aggregate storage, casts, gotos, varargs, pointer arithmetic or buffers. Drawing consumers and prior icon decoder/clip consumers reviewed; header unchanged andfull98native proof preserved."
+  },
+  "include/BASE/IconShear.h": {
+    "sha256": "d5e75c40d24efe8ffcc7efd8a8dd6ac2f198923f130b968f3fe5c8685862fa97",
+    "note": "Full8lines read: semantic ICON_SHEAR_SKIP_ROW0x7f constant shared by previously reviewed shear decoders. No functions, unions, array/storage, casts, gotos, varargs or owner recovery. Skip sentinel isnot fabricatedpadding; unchanged declaration."
+  },
+  "src/SOURCE/Newgame.cpp": {
+    "sha256": "de7628b5f12b248e1c07f51e79c1dd86cdbdf2c7bc438131cdc800be9d5c91cc",
+    "note": "Full parent source read, all16functions/private domains/eightDATAowners reconciled. U18incoming256-byte transport view andO07outgoing300-byte wholeowner;71redundantnumeric casts removed plus enum constructor preservingi16truncation; G97structuredmapretry. All46complete256arm products preserve unsupported S69/R27/G95-G102 alternatives. Full98native1826instances/allallocated orderedrelocations, dualdialect16externaldiagnostics andfullbuild pass; all16retailbytes,twelvefulltargets, fourEH/FSgapexplicit andthreeCRTaliasoperands pinned. B91map116zeroedheader,player204,setup125,text95/100and210/768bounds; uncheckedformats/cursor/filename/playerdomain/resource contracts documented. No manualargvarargs/artificialaddress/enclosingowner subtraction."
+  },
+  "include/SOURCE/Newgame.h": {
+    "sha256": "ed1e540173b1a19c14e39550ef45915914d376f3ac2d001c939f5bd47fdfe93f",
+    "note": "Fullheader read: real widgetIDfamilies and recovered256-byte command-tagged incoming transport view, senderi8/id32/typei8/commandi8/payloadSizei16/payload247; no fake one-byte flexible tail. SharedRemote producer/GetRemoteData and bothNewgame consumers reviewed; all98nativeobjects unchanged; C++98/C++20 packet/map/game offsets pinned. No functionbodies/manualvarargs/owner subtraction. Realmessageunion remains elsewhere; sender/length/termination validity not fabricated by the widened view."
+  },
+  "src/SOURCE/SETUP.cpp": {
+    "sha256": "7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b0e962",
+    "note": "Full1184lines read:23functions/fourprivateenumdomains/onebooleanDATAowner. EarlierSetupComPortB37reconciled. Ninecomplete24arm18.080395s products retain fourrealwordtruncations, sharedG103-G105tails, S70libraryinitializer/emptyname24/mask12/emptydispatch. No source edits survive. All98native1826functions/fullallocatedorderedrelocations andfullbuildpass;23retailbytes,14fullsites/targets,nineEH/FSgapexplicit. B92entrycalleeproof maximum40->39/20->19/35->34 into40/21/36;56helpentries13catalogs boundschecked. B88downstreamext5/sixbytepattern remains; state/config/API/window domains explicit."
+  },
+  "include/SOURCE/SETUP.h": {
+    "sha256": "6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b",
+    "note": "Full26lines read:13actual handler declarations sharing tag_message reference/MessageDispatchResult ABI andboolean configuration flag declaration. No functions, unions, arrays, padding, explicit casts, gotos, manualvarargs or address/owner arithmetic. Declaration signatures reconciled with all23implementationfunctions and already reviewed Newgame consumers; header unchanged."
+  },
+  "src/SOURCE/X_CAMPGN.cpp": {
+    "sha256": "072eb9a37fae348c87d2e94daf9486f44b2d52617c2a840c679a6234b1750174",
+    "note": "Full1373lines/36functions/threeprivateenumdomains/fourdataarrays read. C78 removes2redundant bytecasts; O08 two actualsixentrynameowners replace beyond-four-entry stabletextlookups with map-4, same40bytecode/actualtargets. Eightcomplete23arm17.354004s products retain S71ignoredresult/twowidgetstores/name52 and R28map-award/globalhero counter reuse. All36retailbytes,35allsites/targets,ShowInfoEH/FSgapexplicit. All98native1826functions/allallocatedorderedrelocs equal except exactly2owner/addendrewrites independentlypinned;fullbuildpass. B93actual72validbonusrecords/name13/description256/awards146/army22bounds, invalidtrackIDs0..11versus8, Choosefailedmedia=-1, serializedfull79bytegap+windowptr and inheritedstate/lifecycle contracts documented."
+  },
+  "include/SOURCE/ExpCampaign.h": {
+    "sha256": "d7c9d144cd759deaeab9e984b7f9dd4bc6582355a6aab771a7d2a8df10322551",
+    "note": "Full153lineparent read; removes obsolete6-index Ivan offset, retained152lines. Fourshared domains and constants, actual packed79bytecampaign object incl8choices/8played/16daybytes/11awards/8bonus/fourbytegap/viewenum/windowptr/viewOnly. Save/load entire79bytes so opaquegap and runtimefields are not deleted or replaced with a fictional smaller prefix. Thirty-six declarations match implementation; real dimensions/domain and serializedvalidation contracts reviewed. C++98/20 actualfieldoffset/size checks PASS, all98native unchanged except two intentionally correct source-name-owner relocations."
+  },
+  "src/SOURCE/EVENTS.cpp": {
+    "sha256": "50befdf91be66933ec91cf542441d21f2db8f911a02de2a1ce28e3b9ae6dfc76",
+    "note": "Full9078-line parent/43definitions/allswitches/privateenums/numericmacros/fourpacketviewmacros read. C79 removes99writtenconversions gross, fournewwholeherocharcasts mean95net; C80fourvoidownerreinterpret-to-static corrections; O09four250bytehero tailviews replace50bytecopies through13remaining spellbytes; S72word16->14/answer8->5 andobsoleteconstants removed. All58products766arms764.476063scomplete/restored; otherunusedslots/arrays/capacities, R29buffer/counters, S73count-resultscalars, G106-G108structuredtails, A05mineindex andteleportcasts rejectedinmeasuredparents, retainedexplicitopen. All42retailspanssamebytes,10fixednumericsitesproved,separateemptystringoperandsverified,fourprivateEH/FSmodelgapsexplicit. Bothdialectslayout/syntaxpass;full98native1826functions/allallocatedsections/orderedrelocsunchanged;fullbuildpass. B94fixedcatalogcapacities/variablemaptext500vs768/malformedmetadata&packets/ratio&timer&signedarithmeticcontracts reportedforeachdefinition. Noargument-slotvarargs/enclosingownerrecovery. Sourceandattemptreportsareevidence, notassertionallinputsafe. U06 follow-up: both armyGroup unions consolidated as actual5-byte creature types/10-byte signed counts, with86 affected accesses in24 bodies; all alternate consumers and signed/u16 wire boundaries reconciled. Complete98-object native, VC6 layout and both-dialect proof, plus two exact signed-cast removal products. See U06.md."
+  },
+  "include/SOURCE/EVENTS.h": {
+    "sha256": "36a6536c4fcb37103f55d65988b778f5f551462fa661d519872c81b2395dfe4e",
+    "note": "Completeheader/constants/packedrecords/declarationsread,obsolete spellindex52removedafterO09wholeherooffset200recovery. mapEvent/sign/rumour/time trailingtext[1] arevariable-length serializedheaders: GAMEloaderallocates recordlength, notsizeofheader; length, terminator and tagremaincontracts. mapHero patrolRadius/heroClassunionisreal: jailclassversusnonjailpatrolradiusproducer/consumerchecked. Opaque record bytes retained as serialized, nofakepadding introduced. C++98/20actualmapEvent137offsetsproven, all98nativeunchangedafterheaderedit. Shared IDs/ranges reconciledwithallEVENTScases/callers;includesdonotclaimmetadata validation."
+  },
+  "include/SOURCE/EVENTS_TYPES.h": {
+    "sha256": "33ad4e93fb77eeed235a8f5b40cf6a24eaa21e70143ba7321ae2dc71d6780210",
+    "note": "CompletepackedcombatRemoteData155 andcombatRemoteHeroFragment201 ownersread. Battleheader25+army15+army15+town100; hero tag1+data200 reusedfor51bytesecondfragment. armys/townhavenontrivialconstructors, soVC6unionofexistingtypesisnotavalidtrivialwireunion; fourmacroalternateviewsremainexplicitdebt/separatePODrecoveryUNTRIED, nofakepaddingunion. Physicalallocation255andRemoteMessagepayload247supportallnormalcopies; flags,lengths,sender,absentheroes,rawallocationlifetimeanduninitializedabsenttownbytesarenotvalidated. C++98/20sizes/memberoffsetspass; sender/receiver/producercopyreadandall98nativeunchanged."
+  },
+  "include/SOURCE/REMOTE_SAVE.h": {
+    "note": "New complete wire-owner header authored and reviewed. U09/U14 follow-up recovers shared save header16, full payload247 and KB/save message256 owners, sender buffer256 and chunk index2/data245 with unchanged200-byte sending limit. Modified declarations and all direct type consumers reviewed; prior unchanged file content retains its full-file review. The complete transfer pair, CheckHandleNet, WaitForOtherPlayer, PopNetBox and relevant exit/map/transport consumers were reread. All98 native objects/1826 instances unchanged; VC6 packed offsets/types and94 affected native-TU closures in both C++98/20 pass. Eight full retail checks pass; PopNetBox retains baseline private-EH/site-model gaps. See U09-U14.md; malformed-input contracts not hardened.",
+    "sha256": "c779cf1b5f3d77a2850a8876bad50e2405bbd284f41464793b311bb995642451"
+  }
+}

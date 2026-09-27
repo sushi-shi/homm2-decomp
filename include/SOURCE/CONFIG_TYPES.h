@@ -35,6 +35,12 @@ H2_ENUM_CLASS_BEGIN(ConfigWalkSpeed)
 H2_ENUM_CLASS_END(ConfigWalkSpeed)
 H2_ENUM_STEPPED(ConfigWalkSpeed)
 
+H2_ENUM_CLASS_BEGIN(ConfigWalkSpeedOwner)
+    CONFIG_WALK_SPEED_COMPUTER = 0,
+    CONFIG_WALK_SPEED_HUMAN    = 1,
+    CONFIG_WALK_SPEED_OWNER_COUNT = 2
+H2_ENUM_CLASS_END(ConfigWalkSpeedOwner)
+
 H2_ENUM_CLASS_BEGIN(ConfigVolumeLevel)
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
@@ -82,8 +88,7 @@ H2_ENUM_CLASS_BEGIN(ConfigBaudRate)
 H2_ENUM_CLASS_END(ConfigBaudRate)
 
 struct configStruct {
-    ConfigWalkSpeed computerWalkSpeed;
-    ConfigWalkSpeed walkSpeed;
+    ConfigWalkSpeed walkSpeeds[IDX(CONFIG_WALK_SPEED_OWNER_COUNT)];
     ConfigVolumeLevel musicVolume;
     ConfigVolumeLevel soundVolume;
     i32 autosave;

@@ -5,7 +5,7 @@
 entry_rva,size,symbol,unit,source_object,evidence
 0x15a13,39,_$E19,SOURCE/ADVMGR,SOURCE/ADVMGR,masked-exact
 0x15a3a,18,_$E18,SOURCE/ADVMGR,SOURCE/ADVMGR,masked-exact
-0x15a50,5,?id@?$ctype@G@std@@$E,BASE/DIMMERDestructor,BASE/AudiereEffects,masked-exact
+0x15a50,5,?id@?$ctype@G@std@@$E,BASE/DIMMER,BASE/AudiereEffects,masked-exact
 0x18609,39,_$E19,SOURCE/AI,BASE/AudiereEffects,masked-exact
 0x18630,18,_$E18,SOURCE/AI,BASE/AudiereEffects,masked-exact
 0x216c8,39,_$E19,SOURCE/ARMY,SOURCE/ARMY,masked-exact
@@ -178,7 +178,7 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xccfa0,81,??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd000,39,_$E21,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd030,18,_$E20,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
-0xcd050,44,??1?$AudiereSampleListNode@Vsample@@@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
+0xcd050,44,??1AudiereSampleNode@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd080,15,_$E17,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcd090,97,_$E14,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcd100,18,_$E16,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
@@ -209,9 +209,9 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xd1d20,46,??_GtextEntryWidget@@UAEPAXI@Z,BASE/Textntry,BASE/FONT,masked-exact
 0xd32c0,39,_$E19,BASE/Textntry,BASE/AudiereEffects,masked-exact
 0xd32f0,18,_$E18,BASE/Textntry,BASE/Textntry,reviewed-callgraph
-0xd3440,46,??_G?$DimmerWidget@Vwidget@@@heroWindow@@UAEPAXI@Z,BASE/DIMMER,BASE/FONT,masked-exact
-0xd3490,39,_$E19,BASE/DIMMERDestructor,BASE/AudiereEffects,masked-exact
-0xd34c0,18,_$E18,BASE/DIMMERDestructor,BASE/AudiereEffects,masked-exact
+0xd3440,46,??_GdimmerWidget@@UAEPAXI@Z,BASE/DIMMER,BASE/FONT,masked-exact
+0xd3490,39,_$E19,BASE/DIMMER,BASE/AudiereEffects,masked-exact
+0xd34c0,18,_$E18,BASE/DIMMER,BASE/AudiereEffects,masked-exact
 0xd3550,46,??_Gbutton@@UAEPAXI@Z,BASE/BUTTON,BASE/FONT,masked-exact
 0xd3fc0,39,_$E19,BASE/BUTTON,BASE/AudiereEffects,masked-exact
 0xd3ff0,18,_$E18,BASE/BUTTON,BASE/AudiereEffects,masked-exact

@@ -1,0 +1,332 @@
+// VC6 SP5 source family c76-newgame-init-widget8; parent f84e0b7c plus U18 incoming packet header.
+// Except O07 itself, parent includes O07 recovered outgoing300-byte owner.
+// Source record only: alternatives are relative to BEFORE, not cumulative.
+// No cross-family Cartesian product or TU-state search is claimed.
+// build/source-variant-batch/c76-newgame-init-widget8/results.json; RVA 0x766a7
+// Complete 16 arms; elapsed 10.511189s; source restored.
+// Disposition: retain all tested destination/promotion cast removals; map domain keeps inner i16 truncation and uses enum constructor.
+// Private label/SG/EH counters can change relocation hashes without changing destinations.
+// Final native objects/retail sites and targets decide retention, not fuzzy scores.
+// Existing four EH/FS model gaps remain open; reviewed _stricmp alias is pinned separately.
+// trial / choices / bytes / text hash / normalized reloc hash / blocks / exact,size,shift,flow / graph exact
+// 0 / {'family': 'keep', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 5bcb53de2af7ca8e / 62:62 / 62,0,0,0 / True
+// 1 / {'family': 'remove_0001', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / b2891d20997c2734 / 62:62 / 62,0,0,0 / True
+// 2 / {'family': 'remove_0010', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / b2891d20997c2734 / 62:62 / 62,0,0,0 / True
+// 3 / {'family': 'remove_0011', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 4 / {'family': 'remove_0100', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / b2891d20997c2734 / 62:62 / 62,0,0,0 / True
+// 5 / {'family': 'remove_0101', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 6 / {'family': 'remove_0110', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 7 / {'family': 'remove_0111', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / e8e72c4a8045037d / 62:62 / 62,0,0,0 / True
+// 8 / {'family': 'remove_1000', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / b2891d20997c2734 / 62:62 / 62,0,0,0 / True
+// 9 / {'family': 'remove_1001', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 10 / {'family': 'remove_1010', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 11 / {'family': 'remove_1011', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / e8e72c4a8045037d / 62:62 / 62,0,0,0 / True
+// 12 / {'family': 'remove_1100', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / 1cde1fcbd2bf0603 / 62:62 / 62,0,0,0 / True
+// 13 / {'family': 'remove_1101', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / e8e72c4a8045037d / 62:62 / 62,0,0,0 / True
+// 14 / {'family': 'remove_1110', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / e8e72c4a8045037d / 62:62 / 62,0,0,0 / True
+// 15 / {'family': 'remove_1111', 'candidate': 'baseline'} / 1940 / a82616cb79137c3d / d5cab24d492f980f / 62:62 / 62,0,0,0 / True
+
+// AXIS family
+// BEFORE (complete exact span):
+// | new textWidget(
+// |                 static_cast<i16>(
+// |                     firstColumnX + playerStep * playerCounter
+// |                     + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// |                 ),
+// |                 static_cast<i16>(
+// |                     yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                 ),
+// |                 static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// |                 PLAYER_RACE_NAME_HEIGHT,
+// |                 name,
+// |                 "smalfont.fnt",
+// |                 FONT_DRAW_DEFAULT,
+// |                 static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// |                 WIDGET_KIND_TEXT,
+// |                 FONT_ALIGN_CENTER
+// |             );
+// ALTERNATIVE remove_0001 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0001
+// | @@ -11,7 +11,7 @@
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_0010 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0010
+// | @@ -6,7 +6,7 @@
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// ALTERNATIVE remove_0011 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0011
+// | @@ -6,12 +6,12 @@
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_0100 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0100
+// | @@ -3,9 +3,7 @@
+// |                      firstColumnX + playerStep * playerCounter
+// |                      + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// |                  ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// |                  static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// ALTERNATIVE remove_0101 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0101
+// | @@ -3,15 +3,13 @@
+// |                      firstColumnX + playerStep * playerCounter
+// |                      + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// |                  ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// |                  static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_0110 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0110
+// | @@ -3,10 +3,8 @@
+// |                      firstColumnX + playerStep * playerCounter
+// |                      + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// |                  ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// ALTERNATIVE remove_0111 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_0111
+// | @@ -3,15 +3,13 @@
+// |                      firstColumnX + playerStep * playerCounter
+// |                      + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// |                  ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_1000 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1000
+// | @@ -1,8 +1,6 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// ALTERNATIVE remove_1001 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1001
+// | @@ -1,8 +1,6 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// | @@ -11,7 +9,7 @@
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_1010 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1010
+// | @@ -1,12 +1,10 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// ALTERNATIVE remove_1011 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1011
+// | @@ -1,17 +1,15 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// |                  static_cast<i16>(
+// |                      yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// |                  ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_1100 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1100
+// | @@ -1,11 +1,7 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// |                  static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// ALTERNATIVE remove_1101 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1101
+// | @@ -1,17 +1,13 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// |                  static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );
+// ALTERNATIVE remove_1110 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1110
+// | @@ -1,12 +1,8 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// ALTERNATIVE remove_1111 (unified delta from BEFORE):
+// | --- before
+// | +++ remove_1111
+// | @@ -1,17 +1,13 @@
+// |  new textWidget(
+// | -                static_cast<i16>(
+// | -                    firstColumnX + playerStep * playerCounter
+// | -                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+// | -                ),
+// | -                static_cast<i16>(
+// | -                    yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y
+// | -                ),
+// | -                static_cast<i16>(raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+// | +                firstColumnX + playerStep * playerCounter
+// | +                    + PLAYER_RACE_NAME_X_OFFSET - raceNameWidth / PLAYER_RACE_NAME_CENTER_DIVISOR,
+// | +                yExtra + multiplayerYOffset + PLAYER_RACE_NAME_Y,
+// | +                raceNameWidth + PLAYER_RACE_NAME_BASE_WIDTH,
+// |                  PLAYER_RACE_NAME_HEIGHT,
+// |                  name,
+// |                  "smalfont.fnt",
+// |                  FONT_DRAW_DEFAULT,
+// | -                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+// | +                playerCounter + NEW_GAME_RACE_NAME_FIRST,
+// |                  WIDGET_KIND_TEXT,
+// |                  FONT_ALIGN_CENTER
+// |              );

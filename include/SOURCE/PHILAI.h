@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/GAME.h>
 
 class army;
 class hero;
@@ -28,8 +29,6 @@ struct BHC {
 };
 
 H2_ENUM_BEGIN(AIPurchaseConstant)
-    AI_PURCHASE_RESOURCE_COUNT     = IDX(RES_COUNT),
-    AI_PLAYER_COUNT                = 6,
     AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_LEVEL        = 3,
     AI_PURCHASE_DEBUG_DELAY        = 1500,
@@ -40,7 +39,6 @@ H2_ENUM_END(AIPurchaseConstant)
 
 H2_ENUM_BEGIN(AIBattleConstant)
     AI_BATTLE_NO_PLAYER              = -1,
-    AI_BATTLE_ARTIFACT_SLOT_COUNT    = 14,
     AI_BATTLE_BASE_ARTIFACT_LIMIT    = 37,
     AI_BATTLE_ATTACKER_ARTIFACT_BASE = 1400,
     AI_BATTLE_DEFENDER_ARTIFACT_BASE = 1250,
@@ -52,7 +50,6 @@ H2_ENUM_BEGIN(AIGenericSiteConstant)
     AI_GENERIC_SITE_GOLD_THRESHOLD        = 1500,
     AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE = 500,
     AI_GENERIC_SITE_MAX_LUCK              = 3,
-    AI_GENERIC_SITE_ARMY_SLOTS            = 5,
     AI_GENERIC_SITE_WEEK_END              = 8
 H2_ENUM_END(AIGenericSiteConstant)
 
@@ -67,16 +64,16 @@ void CloseAIMapVars(void);
 i32 OnMySide(i32 player);
 
 extern b32 bHeroBuiltThisTurn;
-extern float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
+extern float gafAITurnCostResource[IDX(RES_COUNT)];
 extern i8* gaiEnemyHeroReachable;
 extern i16* gaiHeroEventStratRVOfPos;
 extern i16* gaiHeroStrategicRVOfPos;
 extern i16* gaiLiveChanceOfPos;
 extern i8* gaiTurnValueOfMine;
 extern b32 gbReduceByReload;
-extern i8 giBuildBoat[AI_PLAYER_COUNT];
-extern i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
-extern i8 giBuildShipyard[AI_PLAYER_COUNT];
+extern i8 giBuildBoat[GAME_PLAYER_COUNT];
+extern i8 giBuildBoatStuffTurn[GAME_PLAYER_COUNT];
+extern i8 giBuildShipyard[GAME_PLAYER_COUNT];
 extern i32 giCurPlayer;
 extern u8 giCurPlayerBit;
 extern i32 giCurTurn;
