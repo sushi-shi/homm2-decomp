@@ -80,7 +80,13 @@ Three semantic owners can reproduce every byte after the PE headers, but add
 two C++ compiler producers. That image has 263 differing header bytes and no
 nonheader differences. It is diagnostic evidence, not executable closure.
 Its archive-extraction root was explicitly forced for the diagnostic and is
-not retained in production. The discarded-contribution probes in
+not retained in production.
+The [direct-input control](../LINK6/direct-project-import-boundary.md) removes
+that root but disrupts the earlier import-thunk boundary. A separate
+[Music provider matrix](music-provider-split-parent.cpp) can emit the exact node
+body before Music's real globals, preserving existing sections, but also emits
+an earlier ANY copy in Purge. That duplicate prevents the desired selection.
+Neither diagnostic is a retained source/build fix. The discarded-contribution probes in
 [producer-selection.md](../LINK6/producer-selection.md) show that loading and
 then discarding an object does not remove its producer record.
 
