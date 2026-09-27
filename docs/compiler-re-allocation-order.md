@@ -13,6 +13,22 @@
 > function-local accessor. See the corrected conclusions in §§9.3–10.3 and
 > [the measured header audit](matching/Audiere-helper-identities/ctype-static-owner-audit.cpp).
 
+> Queue audit correction (2026-09-27): §11.2 reverses the pending-body
+> switch predicate. Kinds 1–10 trigger processing; kinds 0 and 11–16 are
+> skipped. The driver also has a post-initializer A/B refill path, so §11.5's
+> exclusive queue-C inference is unsupported. Fresh table bytes, instructions,
+> and bounded decompilations are documented in
+> [pending-kind-audit.md](matching/Audiere-emission-queues/pending-kind-audit.md).
+> These corrections expose additional compiler mechanisms; they do not yet
+> identify a source construct that closes the remaining native ordering.
+
+> Dynamic trace (2026-09-27): the actual user-defined Node destructor has
+> kind 0 and is processed before initialization. Its observed registration
+> entry does not append it; the observed post-initializer queue-C callback is
+> a `std::pair` constructor. Instrumented and control objects have identical
+> sections, symbols and ordered relocations. See
+> [inprocess-proxy-trace.md](matching/Audiere-emission-queues/inprocess-proxy-trace.md).
+
 Reverse-engineering of the pinned VC6 SP5 C++ front end to explain the object
 topology residuals: deferred COMDAT emission order, and string-literal / data
 cell allocation order.

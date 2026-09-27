@@ -31,7 +31,7 @@ MessageDispatchResult dimmerWidget::Main(struct tag_message& message) {
 
 VA(0x004d3420, 0x13)
 void dimmerWidget::Draw(void) {
-    Dim();
+    widget::Dim();
 }
 
 VA(0x004d3470, 0x1c)

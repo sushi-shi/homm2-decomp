@@ -130,8 +130,8 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xbbf20,18,_$E18,BASE/ICONWDGT,BASE/AudiereEffects,masked-exact
 0xbd460,39,_$E19,BASE/INPUTMGR,BASE/AudiereEffects,masked-exact
 0xbd490,18,_$E18,BASE/INPUTMGR,BASE/AudiereEffects,masked-exact
-0xc0c50,39,_$E19,BASE/MiscRuntime,BASE/AudiereEffects,masked-exact
-0xc0c80,18,_$E18,BASE/MiscRuntime,BASE/AudiereEffects,masked-exact
+0xc0c50,39,_$E19,BASE/Misc,BASE/AudiereEffects,masked-exact
+0xc0c80,18,_$E18,BASE/Misc,BASE/AudiereEffects,masked-exact
 0xc1470,39,_$E19,BASE/icon2bc,BASE/AudiereEffects,masked-exact
 0xc14a0,18,_$E18,BASE/icon2bc,BASE/AudiereEffects,masked-exact
 0xc1c10,39,_$E19,BASE/Icon2b,BASE/AudiereEffects,masked-exact

@@ -1,3 +1,7 @@
+// The producer census below describes its pre-Misc-merge source snapshot.
+// Current ownership is recorded in ../LINK6/direct-project-import-boundary.md;
+// BASE/DIMMER is now the only C++ input without a CRT contribution.
+//
 // Measured 2026-09-27; independent raw-retail and pinned-header audit.
 // Worktree: .claude/worktrees/matcher-2, branch matcher/bss-audiere.
 // CWD, branch and HOMM2_DIR verified in one persistent nix develop shell.

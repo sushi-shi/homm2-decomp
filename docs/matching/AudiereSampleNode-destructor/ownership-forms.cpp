@@ -1,3 +1,12 @@
+// HISTORICAL MEASUREMENTS: the universal impossibility claims and retained
+// correction recommendations below are superseded. Correction machinery has
+// been removed; ordinary source/build recovery remains the objective.
+// The actual 115-byte parent processes the user-defined Node destructor before
+// initialization, but the compiler has multiple post-initializer work routes.
+// See ../Audiere-emission-queues/pending-kind-audit.md and
+// ../Audiere-emission-queues/inprocess-proxy-trace.md for current evidence.
+// The measured negative arms below apply only to their stated source parents.
+//
 // VC6-measured source-shape ledger for AudiereSampleNode::~AudiereSampleNode.
 // Target RVA: 0x004cd050, size 0x2c.  The clean inline declaration plus
 // end-of-TU definition is byte-exact and follows the last public function, but
@@ -280,10 +289,7 @@
 // end-of-TU instantiation walk to the last pre-$E slot; five include orders
 // and explicit early ctype requests (address-of, whole-class instantiation)
 // never move the ctype<G>::id member-init $E pair off the tail. The front
-// end's emission driver is a fixpoint loop whose only post-$E channel
-// (queue C, fed by the template-specialization scanner) can never carry a
-// COMDAT whose sole requirement is a delete in function 1, and the ?id$D
-// member-init form has no source-position path. Retail's tail slot is
-// therefore unreachable by any compiler state, linker flag, or source
-// arrangement under the pinned toolchain; the reviewed section move stands
-// as an original-object wall with a complete mechanism proof.
+// end's emission driver is a fixpoint loop. The original exclusive queue-C
+// inference was incorrect: a post-initializer A/B refill also exists. These
+// tested source forms do not reach the retail tail slot; they do not establish
+// a universal source/build impossibility. No correction is retained.

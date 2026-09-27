@@ -124,6 +124,16 @@ disagreement retain a single owner or fail validation. Vostok accepts these repe
 rows only for distinct external objects with identical RVA, size, storage, alignment,
 and scope; they remain physical compiler copies, not additional semantic owners.
 
+Source-owned vtables use the same physical-copy model. One `VTBL`/`VTBL2` marker
+owns the retail identity; an additional emitter receives a generated
+`candidate-COFF-vtable` row only when its complete foldable external COMDAT
+topology, raw bytes, and ordered relocation sites/types/targets agree with the
+claimed copy. Raw addends and weak-external fallback identities must agree too;
+equal checksums alone are insufficient. Unproved peers remain visible residuals.
+The target comparison objects mirror the proven table into each emitter rather
+than deleting a candidate-only table. This neither adds another source claim nor
+changes any compiler object passed to the native linker.
+
 A normal assembly warns and omits a missing or ambiguous compiler-generated binding so
 iterative work can continue. Strict assembly fails. It never guesses an identity or emits
 `const_*`, `string_*`, `data_*`, `bss_*`, or another fallback spelling.

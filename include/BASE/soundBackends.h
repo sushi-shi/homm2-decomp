@@ -19,20 +19,6 @@ struct MilesSampleState {
 };
 SIZE(MilesSampleState, 0x48);
 
-struct AudiereSampleNode {
-    audiere::OutputStreamPtr stream;
-    class sample* sampleResource;
-    AudiereSampleNode* next;
-
-    AudiereSampleNode(class sample* resource, AudiereSampleNode* nextNode) {
-        stream = NULL;
-        sampleResource = resource;
-        next = nextNode;
-    }
-
-    H2_RETAIL_INLINE ~AudiereSampleNode();
-};
-
 // Retail keeps AudiereMusic::stream/source as static class members: their atexit
 // teardowns carry VC6's member-static destroy-once guard (one flag byte,
 // bit per member), which file-scope statics never get.

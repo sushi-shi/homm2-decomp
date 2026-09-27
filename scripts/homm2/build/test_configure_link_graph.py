@@ -99,6 +99,29 @@ class ConfigureLinkGraphTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must be adjacent"):
             self.edges(["BASE/Misc", "BASE/Between", "BASE/MiscRuntime", "BASE/Midi"])
 
+    def test_merged_misc_preserves_every_raw_owner_once(self):
+        names = ["BASE/Before", "BASE/Misc", "BASE/AfterMisc", "BASE/Midi",
+                 "BASE/AudiereEffects", "BASE/DIMMER",
+                 "BASE/WIDGET", "SOURCE/GAME"]
+        edges = self.edges(names)
+        self.assertNotIn("build/link/MiscRuntime.lib", edges)
+        expected = {
+            "BASE-prefix": ["BASE/Before"], "Misc": ["BASE/Misc"],
+            "BASE-middle": ["BASE/AfterMisc"], "Midi": ["BASE/Midi"],
+            "BASE-suffix": ["BASE/AudiereEffects", "BASE/DIMMER", "BASE/WIDGET"],
+        }
+        for archive, members in expected.items():
+            self.assertEqual(edges[f"build/link/{archive}.lib"]["inputs"],
+                             [obj(name) for name in reversed(members)])
+        self.assertEqual(edges["link-generic-inputs"]["inputs"],
+                         [obj("SOURCE/GAME")] +
+                         [f"build/link/{name}.lib" for name in expected] +
+                         ["build/link/generic-imports/audiere.lib",
+                          "build/link/generic-imports/mss32.lib",
+                          "build/link/generic-imports/smackw32.lib",
+                          "build/link/generic-imports/netapi32.lib", "build/link/wing32.lib"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
