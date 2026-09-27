@@ -6912,7 +6912,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     spellValueFactor_i = DATA_COMPGEN(0x004eb928, doAIEventConstant, 1.0f);
                 }
                 pyramidBattleValue_l = static_cast<i32>(
-                    gsSpellInfo[index_h].aiValue * gpCurPlayer->m_aiData.m_upgradeValueWeight
+                    gsSpellInfo[index_h].aiValue * gpCurPlayer->m_aiData.m_fightValueResourceWeight
                     * spellValueFactor_i
                 );
                 gpPhilAI->ChooseEvaluateBattle(
@@ -7410,12 +7410,15 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     );
 }
 
+#if H2_RETAIL_COMPILER
+#define removeMonsterObject handled
+#endif
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(
     mapCell* cell,
     mapCell* combatCell,
     hero* eventHero,
-    i32* handled,
+    i32* removeMonsterObject,
     i32 x,
     i32 y,
     i32 unused,
@@ -7491,7 +7494,7 @@ void advManager::PlayerMonsterInteract(
                     -1,
                     0
                 );
-            *handled = 1;
+            *removeMonsterObject = 1;
         } else {
             if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog(
@@ -7534,7 +7537,7 @@ void advManager::PlayerMonsterInteract(
                     0
                 );
             eventHero->m_army.Add(monster_n, monsterCount_n, -1);
-            *handled = 1;
+            *removeMonsterObject = 1;
         }
         return;
     }
@@ -7553,13 +7556,13 @@ void advManager::PlayerMonsterInteract(
             -1,
             0
         );
-        *handled = 1;
+        *removeMonsterObject = 1;
         return;
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(AWARD_ELVEN_ALLIANCE)
         && (monster_n == CREATURE_ELF || monster_n == CREATURE_GRAND_ELF)) {
-        *handled = 1;
+        *removeMonsterObject = 1;
         if (eventHero->m_army.CanJoin(monster_n)) {
             NormalDialog(
                 DATA_COMPGEN(0x0051c640, playerMonsterInteractAsYouApproachTheGroupOf, "As you approach the group of elves, their leader calls them all to attention.  He "
@@ -7606,7 +7609,7 @@ void advManager::PlayerMonsterInteract(
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monster_n, monsterCount_n, -1);
-                *handled = 1;
+                *removeMonsterObject = 1;
                 return;
             } else {
                 EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x0051c7c4, playerMonsterInteractEmptyString, ""), -1, 0, -1, 0, -1);
@@ -7685,7 +7688,7 @@ void advManager::PlayerMonsterInteract(
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monster_n, joining, -1);
-                *handled = 1;
+                *removeMonsterObject = 1;
                 gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost_i;
                 return;
             } else {
@@ -7706,7 +7709,7 @@ void advManager::PlayerMonsterInteract(
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
             goto fightMonsters;
-        *handled = 1;
+        *removeMonsterObject = 1;
         return;
     }
 
@@ -7729,11 +7732,17 @@ fightMonsters:
         0
     );
     if (combatResult_f == COMBAT_RESULT_ATTACKER || combatResult_f == COMBAT_RESULT_DRAW)
-        *handled = 1;
+        *removeMonsterObject = 1;
 }
+#if H2_RETAIL_COMPILER
+#undef removeMonsterObject
+#endif
 
+#if H2_RETAIL_COMPILER
+#define removeMonsterObject handled
+#endif
 VA(0x004b5800, 0x440)
-void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
+void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* removeMonsterObject) {
     i32 replacementSlot;
     CreatureType monsterType;
     i32 purchaseValue;
@@ -7775,9 +7784,9 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
                     replacementSlot
                 );
-                *handled = 1;
+                *removeMonsterObject = 1;
             } else {
-                *handled = 1;
+                *removeMonsterObject = 1;
             }
         } else {
             if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
@@ -7823,7 +7832,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                         joiningCount,
                         replacementSlot
                     );
-                    *handled = 1;
+                    *removeMonsterObject = 1;
                 } else
                     goto fightComputerMonsters;
             }
@@ -7852,13 +7861,13 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 -1
             );
         }
-        *handled = 1;
+        *removeMonsterObject = 1;
     } else {
     fightComputerMonsters:
         monsterCount[MONSTER_COMBAT_RESULT] =
             gpPhilAI->CombatMonsterEvent(eventHero, monsterType, monsterCount, cell);
         if (monsterCount[MONSTER_COMBAT_RESULT] != 0) {
-            *handled = 1;
+            *removeMonsterObject = 1;
             return;
         }
         cell->m_objectMetadata = (cell->m_objectMetadata & MONSTER_FLAGS_MASK)
@@ -7866,6 +7875,9 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                                     & MONSTER_COUNT_MASK);
     }
 }
+#if H2_RETAIL_COMPILER
+#undef removeMonsterObject
+#endif
 
 VA(0x004b5c40, 0x1d0)
 i32 advManager::DoNetCombat(char* packet) {

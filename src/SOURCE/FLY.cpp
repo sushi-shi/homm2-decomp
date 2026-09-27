@@ -295,12 +295,12 @@ i32 army::FlyTo(i32 destination) {
 
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-    gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[m_hex].m_occupantFootprintHalf = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         sourceRearHex = (static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? -1 : 1) + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
-        gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantFootprintHalf = ARMY_FACING_NONE;
     }
 
     if (!gbNoShowCombat) {
@@ -450,7 +450,7 @@ i32 army::FlyTo(i32 destination) {
         static_cast<i8>(gpCombatManager->m_currentArmySide);
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
         static_cast<i8>(gpCombatManager->m_currentArmyIndex);
-    gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[destination].m_occupantFootprintHalf = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         endRearHex =
             (static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? -1 : 1) + destination;
@@ -459,14 +459,14 @@ i32 army::FlyTo(i32 destination) {
         gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
             static_cast<i8>(gpCombatManager->m_currentArmyIndex);
         if (endRearHex >= destination) {
-            gpCombatManager->m_hexCells[endRearHex].m_occupantFrame = ARMY_FACING_RIGHT;
+            gpCombatManager->m_hexCells[endRearHex].m_occupantFootprintHalf = ARMY_FACING_RIGHT;
         } else {
-            gpCombatManager->m_hexCells[endRearHex].m_occupantFrame = ARMY_FACING_LEFT;
+            gpCombatManager->m_hexCells[endRearHex].m_occupantFootprintHalf = ARMY_FACING_LEFT;
         }
         if (endRearHex <= destination) {
-            gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_RIGHT;
+            gpCombatManager->m_hexCells[destination].m_occupantFootprintHalf = ARMY_FACING_RIGHT;
         } else {
-            gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_LEFT;
+            gpCombatManager->m_hexCells[destination].m_occupantFootprintHalf = ARMY_FACING_LEFT;
         }
     }
     m_hex = destination;

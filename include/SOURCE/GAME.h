@@ -80,7 +80,7 @@ struct RandomHeroArmyRange {
 // troop count, bit 0x1000 marks a placed guardian.
 H2_ENUM_CLASS_BEGIN(GameMonsterMetadata)
     MAP_MONSTER_COUNT_MASK = 0xfff,
-    MAP_MONSTER_GUARD_FLAG = 0x1000
+    MAP_MONSTER_FORCE_JOIN = 0x1000
 H2_ENUM_CLASS_END(GameMonsterMetadata)
 
 H2_ENUM_BEGIN(GameWeeklyConstant)

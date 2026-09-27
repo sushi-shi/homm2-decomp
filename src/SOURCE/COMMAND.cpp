@@ -264,8 +264,8 @@ H2_ENUM_END(CombatCasualtyPanelConstant)
 
 H2_ENUM_BEGIN(CombatCycleConstant)
     HERO_ANIMATION_STAND           = 0,
-    HERO_ANIMATION_DEATH_FIRST     = 1,
-    HERO_ANIMATION_DEATH_SECOND    = 2,
+    HERO_ANIMATION_LOSS_REACTION     = 1,
+    HERO_ANIMATION_OPPONENT_LOSS_REACTION    = 2,
     HERO_ANIMATION_IDLE_FIRST      = 9,
     HERO_ANIMATION_IDLE_SECOND     = 10,
     HERO_ANIMATION_IDLE_LAST       = 11,
@@ -1083,10 +1083,10 @@ VA(0x0042c47a, 0x205)
 void combatManager::ResetRound(void) {
     i32 unusedResetRoundWord6;
 
-    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
-    m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
-    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
-    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
+    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
     m_catapultAttacksRemaining[0] = m_catapultAttackCount[0];
     m_catapultAttacksRemaining[1] = m_catapultAttackCount[1];
     m_keepAttacksRemaining[0] = 1;
@@ -1108,7 +1108,7 @@ void combatManager::ResetRound(void) {
                     || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
                 currentArmy->DecrementSpellRounds();
-                if (currentArmy->m_roundCounter == 0)
+                if (currentArmy->m_mirrorImageRoundsRemaining == 0)
                     currentArmy->ProcessDeath(1);
             }
         }
@@ -2682,7 +2682,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         case ACTION_SURRENDER:
             gbCombatSurrender = true;
             gbRetreatWin = true;
-            m_sideDefeated[IDX(m_currentSide)] = 1;
+            m_sideSurrendered[IDX(m_currentSide)] = 1;
             gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)] -=
                 giNextActionExtra;
             gpGame->m_players[m_playerId[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)]]
@@ -2836,44 +2836,44 @@ void combatManager::CycleCombatScreen(void) {
         nextHeroAnimation[IDX(side)] = -1;
         if (m_heroIcons[IDX(side)] == NULL) {
         } else {
-            if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_DEATH_FIRST
-                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_DEATH_SECOND
+            if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_LOSS_REACTION
+                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_OPPONENT_LOSS_REACTION
                 || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_FIRST
                 || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_SECOND
                 || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_LAST) {
                 m_drawHero[IDX(side)] = 1;
             } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
-                       && m_heroDeathAnimationPlayed[IDX(side)] == 0 && m_heroDeathPending[IDX(side)] != 0) {
+                       && m_heroLossReactionPlayed[IDX(side)] == 0 && m_heroLossReactionPending[IDX(side)] != 0) {
                 if (m_playerId[IDX(m_currentSide)] == -1
                     || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
-                    m_heroAlternateDeathPending[IDX(side)] = 0;
-                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
+                    m_heroOpponentLossReactionPending[IDX(side)] = 0;
+                    m_heroLossReactionPending[IDX(side)] = m_heroOpponentLossReactionPending[IDX(side)];
                 } else {
-                    m_heroAlternateDeathPending[IDX(side)] = 0;
-                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
-                    m_heroDeathAnimationPlayed[IDX(side)] = 1;
+                    m_heroOpponentLossReactionPending[IDX(side)] = 0;
+                    m_heroLossReactionPending[IDX(side)] = m_heroOpponentLossReactionPending[IDX(side)];
+                    m_heroLossReactionPlayed[IDX(side)] = 1;
                     if (sCmbtHero[m_heroSpriteIndex[IDX(side)]]
-                            .animationFrameCount[HERO_ANIMATION_DEATH_FIRST]
+                            .animationFrameCount[HERO_ANIMATION_LOSS_REACTION]
                         > 0) {
-                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_DEATH_FIRST;
+                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_LOSS_REACTION;
                         m_drawHero[IDX(side)] = 1;
                     }
                 }
             } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
-                       && m_heroAlternateDeathAnimationPlayed[IDX(side)] == 0
-                       && m_heroAlternateDeathPending[IDX(side)] != 0) {
+                       && m_heroOpponentLossReactionPlayed[IDX(side)] == 0
+                       && m_heroOpponentLossReactionPending[IDX(side)] != 0) {
                 if (m_playerId[IDX(m_currentSide)] == -1
                     || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
-                    m_heroAlternateDeathPending[IDX(side)] = 0;
-                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
+                    m_heroOpponentLossReactionPending[IDX(side)] = 0;
+                    m_heroLossReactionPending[IDX(side)] = m_heroOpponentLossReactionPending[IDX(side)];
                 } else {
-                    m_heroAlternateDeathPending[IDX(side)] = 0;
-                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
-                    m_heroAlternateDeathAnimationPlayed[IDX(side)] = 1;
+                    m_heroOpponentLossReactionPending[IDX(side)] = 0;
+                    m_heroLossReactionPending[IDX(side)] = m_heroOpponentLossReactionPending[IDX(side)];
+                    m_heroOpponentLossReactionPlayed[IDX(side)] = 1;
                     if (sCmbtHero[m_heroSpriteIndex[IDX(side)]]
-                            .animationFrameCount[HERO_ANIMATION_DEATH_SECOND]
+                            .animationFrameCount[HERO_ANIMATION_OPPONENT_LOSS_REACTION]
                         > 0) {
-                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_DEATH_SECOND;
+                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_OPPONENT_LOSS_REACTION;
                         m_drawHero[IDX(side)] = 1;
                     }
                 }

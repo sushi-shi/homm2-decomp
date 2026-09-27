@@ -493,9 +493,9 @@ i32 combatManager::FindResurrectArmyIndex(
 
     for (corpse = m_hexCells[hex].m_deadOccupantCount - 1; corpse >= 0; --corpse) {
         if (m_hexCells[hex].m_deadOccupantSides[corpse] != COMBAT_SIDE_NONE
-            && (m_hexCells[hex].m_deadOccupantFrames[corpse] != ARMY_FACING_LEFT
+            && (m_hexCells[hex].m_deadOccupantFootprintHalves[corpse] != ARMY_FACING_LEFT
                 || m_hexCells[hex + 1].m_occupantSide == COMBAT_SIDE_NONE)
-            && (m_hexCells[hex].m_deadOccupantFrames[corpse] != ARMY_FACING_RIGHT
+            && (m_hexCells[hex].m_deadOccupantFootprintHalves[corpse] != ARMY_FACING_RIGHT
                 || m_hexCells[hex - 1].m_occupantSide == COMBAT_SIDE_NONE)) {
             if (m_hexCells[hex].m_deadOccupantSides[corpse] != side)
                 continue;
@@ -836,10 +836,10 @@ void combatManager::CastSpell(
             );
             m_hexCells[teleportArmy_i->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
             m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
-            if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
+            if (m_hexCells[teleportArmy_i->m_hex].m_occupantFootprintHalf == ARMY_FACING_LEFT) {
                 m_hexCells[teleportArmy_i->m_hex + 1].m_occupantSide = COMBAT_SIDE_NONE;
                 m_hexCells[teleportArmy_i->m_hex + 1].m_occupantIndex = COMBAT_HEX_EMPTY;
-            } else if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_RIGHT) {
+            } else if (m_hexCells[teleportArmy_i->m_hex].m_occupantFootprintHalf == ARMY_FACING_RIGHT) {
                 m_hexCells[teleportArmy_i->m_hex - 1].m_occupantSide = COMBAT_SIDE_NONE;
                 m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
             }
@@ -883,22 +883,22 @@ void combatManager::CastSpell(
                         m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
                         m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
                             static_cast<i8>(targetIndex_k);
-                        m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_LEFT;
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantFootprintHalf = ARMY_FACING_LEFT;
                         m_hexCells[teleportArmy_i->m_hex + 1].m_occupantSide = targetSide_i;
                         m_hexCells[teleportArmy_i->m_hex + 1].m_occupantIndex =
                             static_cast<i8>(targetIndex_k);
-                        m_hexCells[teleportArmy_i->m_hex + 1].m_occupantFrame =
+                        m_hexCells[teleportArmy_i->m_hex + 1].m_occupantFootprintHalf =
                             ARMY_FACING_RIGHT;
                         break;
                     case ARMY_FACING_LEFT:
                         m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
                         m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
                             static_cast<i8>(targetIndex_k);
-                        m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_RIGHT;
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantFootprintHalf = ARMY_FACING_RIGHT;
                         m_hexCells[teleportArmy_i->m_hex - 1].m_occupantSide = targetSide_i;
                         m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex =
                             static_cast<i8>(targetIndex_k);
-                        m_hexCells[teleportArmy_i->m_hex - 1].m_occupantFrame =
+                        m_hexCells[teleportArmy_i->m_hex - 1].m_occupantFootprintHalf =
                             ARMY_FACING_LEFT;
                         break;
                 }
@@ -912,7 +912,7 @@ void combatManager::CastSpell(
                 m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
                 m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
                     static_cast<i8>(targetIndex_k);
-                m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_NONE;
+                m_hexCells[teleportArmy_i->m_hex].m_occupantFootprintHalf = ARMY_FACING_NONE;
                 RippleCreature(
                     teleportArmy_i->m_side,
                     teleportArmy_i->m_index,
@@ -1267,7 +1267,7 @@ cast_done:
             combatArmy.m_damagePending = combatArmy.m_deathPending;
             combatArmy.m_drawState = ARMY_DRAW_NORMAL;
             combatArmy.m_animationState = 0;
-            combatArmy.m_lastTargetHex = COMBAT_HEX_EMPTY;
+            combatArmy.m_displayQuantityOverride = COMBAT_HEX_EMPTY;
         }
     }
 
@@ -2565,7 +2565,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
             &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
         if (strike_i <= CHAIN_LIGHTNING_MAX_TARGETS - 2
             && m_hexCells[targetHex].m_occupantSide == m_currentSide)
-            gpCombatManager->m_heroDeathPending[IDX(m_currentSide)] = 1;
+            gpCombatManager->m_heroLossReactionPending[IDX(m_currentSide)] = 1;
 
         targetDamage_o = damage_l;
         if (target_j->m_monsterType == CREATURE_AIR_ELEMENTAL)
@@ -3247,7 +3247,7 @@ mirror_found:
         duration9 += SPELL_HOURGLASS_POWER_BONUS;
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_WIZARD_HAT))
         duration9 += SPELL_WIZARD_HAT_POWER_BONUS;
-    image3->m_roundCounter = duration9;
+    image3->m_mirrorImageRoundsRemaining = duration9;
     source6->m_mirrorImageIndex = image3->m_index;
     image3->m_mirrorSourceIndex = source6->m_index;
 
@@ -3520,10 +3520,10 @@ void combatManager::Resurrect(
                     && m_hexCells[deadHex_k].m_deadOccupantIndices[index_o] == armyIndex_f) {
                     deadIndex_e = index_o;
                     if (!processedOtherHex_p) {
-                        if (m_hexCells[deadHex_k].m_deadOccupantFrames[index_o]
+                        if (m_hexCells[deadHex_k].m_deadOccupantFootprintHalves[index_o]
                             == ARMY_FACING_RIGHT)
                             otherHex_i = deadHex_k - 1;
-                        else if (m_hexCells[deadHex_k].m_deadOccupantFrames[index_o]
+                        else if (m_hexCells[deadHex_k].m_deadOccupantFootprintHalves[index_o]
                                  == ARMY_FACING_LEFT)
                             otherHex_i = deadHex_k + 1;
                     }
@@ -3533,8 +3533,8 @@ void combatManager::Resurrect(
                         m_hexCells[deadHex_k].m_deadOccupantSides[index_o];
                     m_hexCells[deadHex_k].m_occupantIndex =
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o];
-                    m_hexCells[deadHex_k].m_occupantFrame =
-                        m_hexCells[deadHex_k].m_deadOccupantFrames[index_o];
+                    m_hexCells[deadHex_k].m_occupantFootprintHalf =
+                        m_hexCells[deadHex_k].m_deadOccupantFootprintHalves[index_o];
                     if (index_o + 1 == m_hexCells[deadHex_k].m_deadOccupantCount) {
                         m_hexCells[deadHex_k].m_deadOccupantSides[index_o] = COMBAT_SIDE_NONE;
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o] = COMBAT_HEX_EMPTY;

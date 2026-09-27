@@ -9,8 +9,7 @@ i32 CalcTerrainCost(
     i32,
     i32,
     i32,
-    i32,
-    i32
-);
+    i32 sourceHasRoad,
+    i32 destinationHasRoad);
 
 #endif

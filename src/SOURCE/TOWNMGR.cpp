@@ -650,14 +650,14 @@ void townObject::Draw(i32 advanceAnimation) {
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
         if (gpTownManager->m_town->m_type == FACTION_NECROMANCER) {
             baseFrame = NECROMANCER_BUILD_STATE_FRAME_STRIDE
-                        * (gpTownManager->m_town->m_buildState - 1);
+                        * (gpTownManager->m_town->m_mageGuildLevel - 1);
         } else {
-            baseFrame = gpTownManager->m_town->m_buildState - 1;
+            baseFrame = gpTownManager->m_town->m_mageGuildLevel - 1;
         }
         m_icon->DrawToBuffer(0, 0, baseFrame, ICON_DRAW_NORMAL);
         if (m_animationFrameCount != 0) {
             if (gpTownManager->m_town->m_type == FACTION_BARBARIAN
-                && gpTownManager->m_town->m_buildState < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
+                && gpTownManager->m_town->m_mageGuildLevel < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
                 return;
             m_icon->DrawToBuffer(0, 0, m_animationFrame + baseFrame + 1, ICON_DRAW_NORMAL);
             if (advanceAnimation == 1) {
@@ -2169,7 +2169,7 @@ i32 townManager::BuyBuild(
             }
         }
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
-        mageLevel_k = gpTownManager->m_town->m_buildState;
+        mageLevel_k = gpTownManager->m_town->m_mageGuildLevel;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts
                     [mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? mageLevel_k + 1
@@ -2272,7 +2272,7 @@ i32 townManager::BuyBuild(
         }
         if (m_town->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE
-            && m_town->m_buildState <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
+            && m_town->m_mageGuildLevel <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
             strcat(description_b, DATA_COMPGEN(0x004ef1b4, buyBuildLevel2MageGuild, "\nLevel 2 Mage Guild"));
     }
     strcat(description_b, DATA_COMPGEN(0x004ef1c8, buyBuildEmptyString2, "\n "));
@@ -2484,7 +2484,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 
     if ((m_town->m_buildings & BIT(building))
         && (building != BUILDING_SLOT_MAGE_GUILD
-            || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+            || m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_MAX_LEVEL)) {
         return;
     }
     if (building == BUILDING_SLOT_DOCK && !m_town->CanBuildDock()) {
@@ -2518,10 +2518,10 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         gbReturnAfterComputeExtent = true;
         if (building == BUILDING_SLOT_MAGE_GUILD) {
             if (gpTownManager->m_town->m_type == FACTION_NECROMANCER)
-                frame_g = (gpTownManager->m_town->m_buildState - 1)
+                frame_g = (gpTownManager->m_town->m_mageGuildLevel - 1)
                           * NECROMANCER_BUILD_STATE_FRAME_STRIDE;
             else
-                frame_g = gpTownManager->m_town->m_buildState - 1;
+                frame_g = gpTownManager->m_town->m_mageGuildLevel - 1;
             m_townObjects[objectIndex_k]
                 ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
@@ -2677,7 +2677,7 @@ void townManager::SetupMage(heroWindow* window) {
         }
     }
 
-    unusedGuildFrame_n = m_town->m_buildState - 1;
+    unusedGuildFrame_n = m_town->m_mageGuildLevel - 1;
     message_b.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     message_b.payload.widget.data.value = unusedGuildFrame_n;
@@ -2920,9 +2920,9 @@ MessageDispatchResult TavernHandler(tag_message& message) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = TAVERN_ANIMATION_CONTROL;
-        ++gpGame->m_viewArmyResult;
+        ++gpGame->m_dialogAnimationCounter;
         message.payload.widget.data.value =
-            gpGame->m_viewArmyResult % TOWN_TAVERN_ANIMATION_FRAME_COUNT
+            gpGame->m_dialogAnimationCounter % TOWN_TAVERN_ANIMATION_FRAME_COUNT
             + TOWN_TAVERN_FIRST_ANIMATION_FRAME;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
@@ -3104,7 +3104,7 @@ void townManager::SetupWell(heroWindow* window) {
 
         if (m_town->m_buildings
             & (1L << (dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)))) {
-            availablen = m_town->m_garrison[dwellingTypesValue[dwellingResult]];
+            availablen = m_town->m_dwellingAvailable[dwellingTypesValue[dwellingResult]];
             sprintf(gText, DATA_COMPGEN(0x004ef37c, setupWellAvailable, "Available:"));
             messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
             messaged.payload.widget.data.text = gText;
@@ -3439,7 +3439,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY)
                     goto nextRank;
                 {
-                    strcpy(gText, cPersonality[IDX(gpGame->m_players[rank].m_aiDifficulty)]);
+                    strcpy(gText, cPersonality[IDX(gpGame->m_players[rank].m_aiPersonality)]);
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC_AT(
                             strlen(gText) + 1, DATA_COMPGEN(0x004ef480, setupThievesGuildSourceFile3, RETAIL_FILE),

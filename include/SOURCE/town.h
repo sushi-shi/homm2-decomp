@@ -41,7 +41,7 @@ H2_ENUM_CLASS_END(TownBuilding)
 H2_ENUM_FLAGS(TownBuilding)
 
 H2_ENUM_BEGIN(TownConstant)
-    TOWN_GARRISON_SLOT_COUNT           = 12, // slots 19..30: dwellings + upgrades (see BuildingSlotType)
+    TOWN_DWELLING_STOCK_SLOT_COUNT           = 12, // slots 19..30: dwellings + upgrades (see BuildingSlotType)
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,
@@ -78,9 +78,9 @@ public:
     armyGroup m_army;
     char m_occupyingHeroId;
     u32l m_buildings;
-    i8 m_buildState;
+    i8 m_mageGuildLevel;
     char m_unknown1d;
-    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)];
+    i16 m_dwellingAvailable[IDX(TOWN_DWELLING_STOCK_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
     i8 m_formation;

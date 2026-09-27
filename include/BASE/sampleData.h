@@ -26,7 +26,7 @@ struct SamplePlaybackData {
     SamplePlaybackRate sampleRate;
     SampleAudioFormat format;
     i32 volume;
-    i32 loopCount;
+    i32 looping;
 };
 #pragma pack(pop)
 SIZE(SamplePlaybackData, 0x20);

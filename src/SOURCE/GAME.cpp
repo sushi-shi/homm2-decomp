@@ -440,9 +440,9 @@ H2_ENUM_BEGIN(ShipwreckSurvivorGenerationConstant)
 H2_ENUM_END(ShipwreckSurvivorGenerationConstant)
 
 H2_ENUM_BEGIN(MonsterGuardGenerationConstant)
-    MONSTER_GUARD_ROLL_MIN = 0,
-    MONSTER_GUARD_ROLL_MAX = 100,
-    MONSTER_GUARD_CUTOFF   = 20
+    MONSTER_FORCE_JOIN_ROLL_MIN = 0,
+    MONSTER_FORCE_JOIN_ROLL_MAX = 100,
+    MONSTER_FORCE_JOIN_CUTOFF   = 20
 H2_ENUM_END(MonsterGuardGenerationConstant)
 
 H2_ENUM_BEGIN(ResourceGenerationConstant)
@@ -701,8 +701,8 @@ void playerData::Write(i32 file) {
     memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
     write(file, unused, PLAYER_SAVE_RESERVED_SIZE);
     write(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    write(file, &m_cheatValue, sizeof(m_cheatValue));
-    write(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    write(file, &m_bonusPuzzlePieces, sizeof(m_bonusPuzzlePieces));
+    write(file, &m_aiPersonality, sizeof(m_aiPersonality));
     write(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
     write(file, &m_evilInterface, sizeof(m_evilInterface));
     write(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
@@ -732,8 +732,8 @@ void playerData::Read(i32 file) {
     read(file, m_availableHeroIds, sizeof(m_availableHeroIds));
     read(file, unused, PLAYER_SAVE_RESERVED_SIZE);
     read(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    read(file, &m_cheatValue, sizeof(m_cheatValue));
-    read(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    read(file, &m_bonusPuzzlePieces, sizeof(m_bonusPuzzlePieces));
+    read(file, &m_aiPersonality, sizeof(m_aiPersonality));
     read(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
     read(file, &m_evilInterface, sizeof(m_evilInterface));
     read(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
@@ -788,7 +788,7 @@ VA(0x00470eac, 0x64)
 i32 GetNumObelisks(i32 color) {
     i32 count = 0;
     i32 i;
-    for (i = 0; i < GAME_BOAT_COUNT; i++) {
+    for (i = 0; i < GAME_OBELISK_VISITOR_COUNT; i++) {
         if (gpGame->m_obeliskVisitors[i] & (1 << color))
             count++;
     }
@@ -804,7 +804,7 @@ i32 playerData::BuildingsOwned(FactionType townType, BuildingSlotType buildingIn
         if (buildingIndex < BUILDING_SLOT_DWELLING_FIRST || ownedTown->m_type == townType) {
             if (buildingIndex == BUILDING_SLOT_MAGE_GUILD) {
                 if (ownedTown->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
-                    if (ownedTown->m_buildState == buildState)
+                    if (ownedTown->m_mageGuildLevel == buildState)
                         count++;
                 }
             } else {
@@ -935,7 +935,7 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
 
     if (GetNumObelisks(player) == m_obeliskCount)
         pieceCountTotal = PUZZLE_PIECE_COUNT;
-    pieceCountTotal += m_players[player].m_cheatValue;
+    pieceCountTotal += m_players[player].m_bonusPuzzlePieces;
     if (pieceCountTotal > PUZZLE_PIECE_COUNT)
         pieceCountTotal = PUZZLE_PIECE_COUNT;
     if (justCount)
@@ -1330,7 +1330,7 @@ void game::SetupOrigData(void) {
         m_players[i].m_heroCount = 0;
         m_players[i].m_townCount = 0;
         m_players[i].m_daysLeft = -1;
-        m_players[i].m_cheatValue = 0;
+        m_players[i].m_bonusPuzzlePieces = 0;
         memset(m_players[i].m_availableHeroIds, -1, sizeof(m_players[i].m_availableHeroIds));
         memset(m_players[i].m_heroIds, -1, sizeof(m_players[i].m_heroIds));
         memset(m_players[i].m_townIds, -1, sizeof(m_players[i].m_townIds));
@@ -2053,7 +2053,7 @@ void game::NewMap(char* filename) {
         m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (gbHumanPlayer[player2]) {
-            m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
+            m_players[player2].m_aiPersonality = PLAYER_PERSONALITY_HUMAN;
             memcpy(
                 m_players[player2].m_resources,
                 gInitResourcesHuman[IDX(m_difficulty)],
@@ -2072,7 +2072,7 @@ void game::NewMap(char* filename) {
                 }
             }
         } else {
-            m_players[player2].m_aiDifficulty = static_cast<PlayerPersonality>(Random(
+            m_players[player2].m_aiPersonality = static_cast<PlayerPersonality>(Random(
                 IDX(PLAYER_PERSONALITY_COMPUTER_FIRST),
                 IDX(PLAYER_PERSONALITY_COMPUTER_LAST)
             ));
@@ -2443,9 +2443,9 @@ void game::RandomizeEvents(void) {
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
                         cell2->m_objectMetadata = GetRandomNumTroops(monsterType);
                         if (CanGenerateMonsterGuard(monsterType)
-                            && Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
-                                   < MONSTER_GUARD_CUTOFF)
-                            cell2->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
+                            && Random(MONSTER_FORCE_JOIN_ROLL_MIN, MONSTER_FORCE_JOIN_ROLL_MAX)
+                                   < MONSTER_FORCE_JOIN_CUTOFF)
+                            cell2->m_objectMetadata |= IDX(MAP_MONSTER_FORCE_JOIN);
                     }
                     break;
                 }
@@ -3810,7 +3810,7 @@ void game::ViewArmy(
     }
 
     glTimers[0] = KBTickCount() + VIEW_ARMY_ANIMATION_INITIAL_DELAY;
-    m_viewArmyResult = 0;
+    m_dialogAnimationCounter = 0;
     if (quickView) {
         gpWindowManager->AddWindow(m_viewArmyWindow, -1, 1);
         QuickViewWait();
@@ -4366,7 +4366,7 @@ void game::PerDay(void) {
                 && m_day >= DAILY_RESOURCE_BONUS_FIRST_DAY
                 && m_day <= DAILY_RESOURCE_BONUS_LAST_DAY)
                 m_players[player].m_resources[m_day - 1]++;
-            if (gpGame->m_players[player].m_aiDifficulty == PLAYER_PERSONALITY_BUILDER
+            if (gpGame->m_players[player].m_aiPersonality == PLAYER_PERSONALITY_BUILDER
                 && m_day >= DAILY_RESOURCE_BONUS_FIRST_DAY
                 && m_day <= DAILY_RESOURCE_BONUS_LAST_DAY)
                 m_players[player].m_resources[m_day - 1]++;
@@ -4486,7 +4486,7 @@ void game::PerWeek(void) {
                 if (castle37->m_owner == -1)
                     growth13 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
                 if (castle37->m_owner >= 0
-                    && castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0
+                    && castle37->m_dwellingAvailable[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0
                     && !gbHumanPlayer[castle37->m_owner]) {
                     if (gpGame->m_difficulty == DIFFICULTY_HARD)
                         growth13 = static_cast<i32>(growth13 * WEEKLY_HARD_GROWTH_FACTOR);
@@ -4500,7 +4500,7 @@ void game::PerWeek(void) {
                                         [innerIndex3 - WEEKLY_FIRST_DWELLING])
                            == giWeekTypeExtra)
                     growth13 += CREATURE_WEEK_GROWTH_BONUS;
-                castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
+                castle37->m_dwellingAvailable[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
             }
         }
     }
@@ -4576,7 +4576,7 @@ void game::PerWeek(void) {
                         monsterCount36 = WEEKLY_MONSTER_LIMIT;
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata =
                         (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
-                         & IDX(MAP_MONSTER_GUARD_FLAG))
+                         & IDX(MAP_MONSTER_FORCE_JOIN))
                         | monsterCount36;
                     break;
                 }
@@ -4791,15 +4791,15 @@ void game::PerMonth(void) {
                     && IDX(gDwellingType[IDX(castle10->m_type)]
                                         [building4 - WEEKLY_FIRST_DWELLING])
                            == giMonthTypeExtra)
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *=
+                    castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] *=
                         CREATURE_MONTH_MULTIPLIER;
 
                 if (giMonthType == CALENDAR_PERIOD_PLAGUE) {
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
-                    if (castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] < 0)
-                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] = 0;
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] =
-                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] >> 1;
+                    castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
+                    if (castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] < 0)
+                        castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] = 0;
+                    castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] =
+                        castle10->m_dwellingAvailable[building4 - WEEKLY_FIRST_DWELLING] >> 1;
                 }
             }
         }
@@ -4824,9 +4824,9 @@ void game::PerMonth(void) {
                             static_cast<CreatureType>(giMonthTypeExtra)
                         );
                         cell0->m_objectMetadata = (firstCount5 + secondCount4) | 0;
-                        if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
-                            < MONSTER_GUARD_CUTOFF)
-                            cell0->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
+                        if (Random(MONSTER_FORCE_JOIN_ROLL_MIN, MONSTER_FORCE_JOIN_ROLL_MAX)
+                            < MONSTER_FORCE_JOIN_CUTOFF)
+                            cell0->m_objectMetadata |= IDX(MAP_MONSTER_FORCE_JOIN);
                     }
                 }
             }
@@ -6016,7 +6016,7 @@ void game::SetupTowns(void) {
             castle->m_buildings =
                 (gTownEligibleBuildMask[IDX(castle->m_type)] & extra->buildings)
                 | (castle->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)));
-            castle->m_buildState = extra->mageGuildLevel;
+            castle->m_mageGuildLevel = extra->mageGuildLevel;
         } else {
             // The ten-entry table and AI adjustment are retail town-generation
             // probability payload.
@@ -6040,7 +6040,7 @@ void game::SetupTowns(void) {
             if (--dwellingCount != 0)
                 castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_2);
             dwellingCount--;
-            castle->m_buildState = 0;
+            castle->m_mageGuildLevel = 0;
         }
 
         for (building = TOWN_UPGRADE_BUILDING_FIRST; building <= TOWN_UPGRADE_BUILDING_LAST;
@@ -6059,7 +6059,7 @@ void game::SetupTowns(void) {
              building <= TOWN_DWELLING_BUILDING_LAST;
              building++) {
             if (castle->m_buildings & (1 << building)) {
-                castle->m_garrison[building - TOWN_DWELLING_BUILDING_FIRST] =
+                castle->m_dwellingAvailable[building - TOWN_DWELLING_BUILDING_FIRST] =
                     gMonsterDatabase[IDX(
                         gDwellingType[IDX(castle->m_type)]
                                       [building - TOWN_DWELLING_BUILDING_FIRST]
@@ -6068,7 +6068,7 @@ void game::SetupTowns(void) {
             }
         }
         if (castle->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
-            for (slot = 1; slot <= castle->m_buildState; slot++) {
+            for (slot = 1; slot <= castle->m_mageGuildLevel; slot++) {
                 castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
                 if (castle->m_type == FACTION_WIZARD
                     && (castle->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))

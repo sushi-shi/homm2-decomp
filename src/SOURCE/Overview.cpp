@@ -657,7 +657,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         sprintf(
                             valueText0,
                             DATA_COMPGEN(0x004edb44, setupDynamicStuffD2, "%d"),
-                            static_cast<i32>(record->m_garrison[detailIndex6])
+                            static_cast<i32>(record->m_dwellingAvailable[detailIndex6])
                         );
                         OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                             static_cast<i16>(

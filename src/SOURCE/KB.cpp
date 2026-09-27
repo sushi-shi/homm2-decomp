@@ -1595,7 +1595,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         else
             return 0;
     }
-    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
+    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_mageGuildLevel >= KB_MAGE_GUILD_MAX_LEVEL)
         return 0;
     if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
@@ -1633,7 +1633,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
     if ((reqMask & haveMask) == reqMask) {
         if (t->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
+            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1645,7 +1645,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
     i32 idx;
-    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
+    GetBuildingCost(t->m_type, type, buf, t->m_mageGuildLevel);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->m_resources[idx] < buf[idx])
@@ -2654,7 +2654,7 @@ void InitVars(void) {
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
-    gpGame->m_viewArmyResult = 0;
+    gpGame->m_dialogAnimationCounter = 0;
     strcpy(gpGame->m_mapFilename, DATA_COMPGEN(0x0051645c, initVarsBrokenaMp2, "brokena.mp2"));
     gpGame->m_newGameInitialized = 0;
     gbInNewGameSetup = false;
@@ -3941,7 +3941,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     currentHeroRec->SetSS(secondarySkillIndex, secondaryLevel);
             }
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
-                gpCombatManager->m_debugFormation = command - APP_MENU_COMBAT_FIRST;
+                gpCombatManager->m_elevationOverlayIndex = command - APP_MENU_COMBAT_FIRST;
                 gpCombatManager->m_backgroundDrawn = 0;
                 for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
@@ -3949,7 +3949,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 }
                 for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
                     formationHexIndex =
-                        sElevationOverlay[gpCombatManager->m_debugFormation].cellOffsets[loopIndex];
+                        sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
                     if (formationHexIndex != -1)
                         gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
                 }
