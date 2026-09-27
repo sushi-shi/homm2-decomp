@@ -13,7 +13,7 @@
 #include <SOURCE/KB_TYPES.h>
 
 
-static i32 s_currentWater;
+static i32 s_currentHasRoad;
 static i32 s_candidateY;
 static i32 s_adjacentY;
 static i32 s_adjacentX;
@@ -26,7 +26,7 @@ static i32 s_terrain;
 static searchNode s_currentNode;
 static i32 s_neighborY;
 static i32 s_neighborX;
-static i32 s_targetWater;
+static i32 s_targetHasRoad;
 static i32 s_adjacentMonsterX;
 static i32 s_remainingMobility;
 static b32 s_directionBlocked;
@@ -124,7 +124,7 @@ void searchArray::SeedPosition(
         }
 
         s_hasTarget = true;
-        s_targetWater = s_targetCell->m_isRoad;
+        s_targetHasRoad = s_targetCell->m_isRoad;
         s_bestTargetCost = SEARCH_MAX_COST;
     } else {
         s_hasTarget = false;
@@ -237,7 +237,7 @@ void searchArray::SeedPosition(
                 waterMode
             );
             s_terrain = CELL_TERRAIN(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y));
-            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
+            s_currentHasRoad = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
                  ++s_direction) {
@@ -275,7 +275,7 @@ void searchArray::SeedPosition(
                                     (s_direction),
                                     s_remainingMobility,
                                     pathfindingSkill,
-                                    s_currentWater,
+                                    s_currentHasRoad,
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
@@ -296,7 +296,7 @@ void searchArray::SeedPosition(
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad,
-                                s_targetWater
+                                s_targetHasRoad
                             );
                             if (s_currentNode.distance + s_targetStepCost < s_bestTargetCost)
                                 s_bestTargetCost = s_currentNode.distance + s_targetStepCost;
