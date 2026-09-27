@@ -120,3 +120,8 @@ this measured parent, not a universal impossibility claim.
 
 `node-phase-excerpt.log` preserves the selected Node and initializer events.
 All proxy code and compiled probe objects remain disposable under build/.
+
+The follow-up [header dependency audit](pair-header-dependency.md) reproduces
+the late pair processing with an include-only matrix and proves that it emits
+no COFF contribution in these inputs. It therefore supplies no measured route
+for relocating the required Node body.
