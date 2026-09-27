@@ -12,8 +12,15 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/KB_TYPES.h>
 
+// The retail compiler hashes file-static names when ordering BSS owners.
+// Keep its measured layout while the strict source uses the road semantics.
+#if !H2_STRICT_ENUMS
+#define s_currentHasRoad s_currentWater
+#define s_targetHasRoad s_targetWater
+#endif
+
 // Persistent search scratch has independently addressed owners, not one record.
-DATA(0x00533dc4) static i32 s_currentWater;
+DATA(0x00533dc4) static i32 s_currentHasRoad;
 DATA(0x00533dfc) static i32 s_candidateY;
 DATA(0x00533e20) static i32 s_adjacentY;
 DATA(0x00533dc8) static i32 s_adjacentX;
@@ -26,7 +33,7 @@ DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
 DATA(0x00533dd0) static searchNode s_currentNode;
 DATA(0x00533de4) static i32 s_neighborY;
 DATA(0x00533db0) static i32 s_neighborX;
-DATA(0x00533dbc) static i32 s_targetWater;
+DATA(0x00533dbc) static i32 s_targetHasRoad;
 DATA(0x00533e08) static i32 s_adjacentMonsterX;
 DATA(0x00533db4) static i32 s_remainingMobility;
 DATA(0x00533de0) static b32 s_directionBlocked;
@@ -132,7 +139,7 @@ void searchArray::SeedPosition(
         }
 
         s_hasTarget = true;
-        s_targetWater = s_targetCell->m_isRoad;
+        s_targetHasRoad = s_targetCell->m_isRoad;
         s_bestTargetCost = SEARCH_MAX_COST;
     } else {
         s_hasTarget = false;
@@ -245,7 +252,7 @@ void searchArray::SeedPosition(
                 waterMode
             );
             s_terrain = CELL_TERRAIN(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y));
-            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
+            s_currentHasRoad = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
                  ++s_direction) {
@@ -283,7 +290,7 @@ void searchArray::SeedPosition(
                                     IDX(s_direction),
                                     s_remainingMobility,
                                     pathfindingSkill,
-                                    s_currentWater,
+                                    s_currentHasRoad,
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
@@ -304,7 +311,7 @@ void searchArray::SeedPosition(
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad,
-                                s_targetWater
+                                s_targetHasRoad
                             );
                             if (s_currentNode.distance + s_targetStepCost < s_bestTargetCost)
                                 s_bestTargetCost = s_currentNode.distance + s_targetStepCost;

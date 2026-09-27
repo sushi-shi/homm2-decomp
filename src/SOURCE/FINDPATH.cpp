@@ -86,28 +86,36 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
                                  : xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
 }
 
+#if H2_RETAIL_COMPILER
+#define sourceHasRoad useRoad
+#define destinationHasRoad usePathfinding
+#endif
 VA(0x00449d9b, 0xa1)
 i32 CalcTerrainCost(
     H2_ENUM_PARAM(TerrainType, i32) terrain,
     i32 diagonal,
     i32 mobility,
     i32 pathfindingLevel,
-    i32 useRoad,
-    i32 usePathfinding
+    i32 sourceHasRoad,
+    i32 destinationHasRoad
 ) {
     if (mobility < giTerrainCost[IDX(terrain)][pathfindingLevel][1]) {
         if (mobility >= giTerrainCost[IDX(terrain)][pathfindingLevel][0]
-            || (useRoad != 0
+            || (sourceHasRoad != 0
                 && mobility >= giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0])) {
-            if (useRoad != 0)
+            if (sourceHasRoad != 0)
                 return giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
             return giTerrainCost[IDX(terrain)][pathfindingLevel][0];
         }
     }
-    if (useRoad != 0 && usePathfinding != 0)
+    if (sourceHasRoad != 0 && destinationHasRoad != 0)
         terrain = TERRAIN_ROAD;
     return giTerrainCost[IDX(terrain)][pathfindingLevel][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
+#if H2_RETAIL_COMPILER
+#undef sourceHasRoad
+#undef destinationHasRoad
+#endif
 
 VA(0x00449e3c, 0x2fa)
 void searchArray::PushPoint(
@@ -329,17 +337,17 @@ void searchArray::SeedCombatPosition(class army* unit) {
     i32 H2_UNUSED(unusedValue6);
 
     for (index = 0; index < COMBAT_HEX_COUNT; index++)
-        gpCombatManager->m_hexCells[index].m_pathReachable = 0;
+        gpCombatManager->m_hexCells[index].m_movementOrAttackReachable = 0;
 
     if (HAS(unit->m_monster.attributes, MONSTER_FLAGS_FLYING) != 0) {
         for (index = 0; index < COMBAT_HEX_COUNT; index++) {
             if (unit->CanFit(index, 0, NULL))
-                gpCombatManager->m_hexCells[index].m_pathReachable = 1;
+                gpCombatManager->m_hexCells[index].m_movementOrAttackReachable = 1;
         }
     } else {
         for (index = 0; index < COMBAT_HEX_COUNT; index++) {
             if (unit->ValidPath(index, ARMY_PATH_EXACT_TARGET_HEX))
-                gpCombatManager->m_hexCells[index].m_pathReachable = 1;
+                gpCombatManager->m_hexCells[index].m_movementOrAttackReachable = 1;
         }
     }
 
@@ -354,9 +362,9 @@ void searchArray::SeedCombatPosition(class army* unit) {
         if (unit->m_monster.shots > 0
             && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
                    == COMBAT_ALL_DIRECTIONS_BLOCKED) {
-            gpCombatManager->m_hexCells[enemyHex].m_pathReachable = 1;
+            gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
         } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
-            gpCombatManager->m_hexCells[enemyHex].m_pathReachable = 1;
+            gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
         }
 
         if (HAS(enemy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
@@ -368,9 +376,9 @@ void searchArray::SeedCombatPosition(class army* unit) {
             if (unit->m_monster.shots > 0
                 && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
                        == COMBAT_ALL_DIRECTIONS_BLOCKED) {
-                gpCombatManager->m_hexCells[enemyHex].m_pathReachable = 1;
+                gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
             } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
-                gpCombatManager->m_hexCells[enemyHex].m_pathReachable = 1;
+                gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
             }
         }
     }

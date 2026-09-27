@@ -21,7 +21,7 @@ sample::sample(H2_CONST char* name)
         NULL
     ) {
     m_playbackData.volume = 0x7f;
-    m_playbackData.loopCount = false;
+    m_playbackData.looping = false;
     m_playbackData.stereo = true;
     m_playbackData.sampleFormat = FORMAT_16_BIT;
     m_playbackData.sampleRate = RATE_44100;
