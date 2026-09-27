@@ -3170,7 +3170,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
                             [m_hexCells[targetHex].m_occupantIndex];
         if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2
             && m_hexCells[targetHex].m_occupantSide == m_currentSide)
-            gpCombatManager->m_heroDeathPending[H2EnumIndex(m_currentSide)] = 1;
+            gpCombatManager->m_heroLossReactionPending[H2EnumIndex(m_currentSide)] = 1;
 
         targetDamage = damage;
         if (target->m_monsterType == CREATURE_AIR_ELEMENTAL)
@@ -3826,7 +3826,7 @@ mirror_found:
         duration += SPELL_HOURGLASS_POWER_BONUS;
     if (m_heroes[H2EnumIndex(m_currentSide)]->HasArtifact(ARTIFACT_WIZARD_HAT))
         duration += SPELL_WIZARD_HAT_POWER_BONUS;
-    image->m_roundCounter = duration;
+    image->m_mirrorImageRoundsRemaining = duration;
     source->m_mirrorImageIndex = image->m_index;
     image->m_mirrorSourceIndex = source->m_index;
 

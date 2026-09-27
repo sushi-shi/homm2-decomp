@@ -1759,7 +1759,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
-                        gpCurPlayer->m_cheatValue += 12;
+                        gpCurPlayer->m_bonusPuzzlePieces += 12;
                         if (curHero != NULL) {
                             GiveExperience(curHero, CHEAT_EXPERIENCE_AMOUNT, 1);
                         }
@@ -7627,7 +7627,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(H2EnumIndex(soundId));
         m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.loopCount = true;
+        m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.looping = true;
         m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.channelType = ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[H2EnumIndex(soundId)]);
         m_activeSoundMask ^= 1 << H2EnumIndex(m_activeSounds[soundSlot].soundId);
