@@ -257,8 +257,8 @@ using enum CombatActionDataIndex;
 
     typedef enum CombatCycleConstant {
         HERO_ANIMATION_STAND = 0,
-        HERO_ANIMATION_DEATH_FIRST = 1,
-        HERO_ANIMATION_DEATH_SECOND = 2,
+        HERO_ANIMATION_LOSS_REACTION = 1,
+        HERO_ANIMATION_OPPONENT_LOSS_REACTION = 2,
         HERO_ANIMATION_IDLE_FIRST = 9,
         HERO_ANIMATION_IDLE_SECOND = 10,
         HERO_ANIMATION_IDLE_LAST = 11,
@@ -1024,10 +1024,10 @@ i32 combatManager::IsNegationSphereInEffect(void) {
 
 void combatManager::ResetRound(void) {
 
-    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
-    m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
-    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
-    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
+    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
     m_catapultAttacksRemaining[0] = m_catapultAttackCount[0];
     m_catapultAttacksRemaining[1] = m_catapultAttackCount[1];
     m_keepAttacksRemaining[0] = 1;
@@ -1047,7 +1047,7 @@ void combatManager::ResetRound(void) {
                 if (IS_TROLL_CREATURE(currentArmy->m_monsterType))
                     currentArmy->m_hitPointsLost = 0;
                 currentArmy->DecrementSpellRounds();
-                if (currentArmy->m_roundCounter == 0)
+                if (currentArmy->m_mirrorImageRoundsRemaining == 0)
                     currentArmy->ProcessDeath(1);
             }
         }
@@ -2655,7 +2655,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         case ACTION_SURRENDER:
             gbCombatSurrender = true;
             gbRetreatWin = true;
-            m_sideDefeated[H2EnumIndex(m_currentSide)] = true;
+            m_sideSurrendered[H2EnumIndex(m_currentSide)] = true;
             gpGame->m_players[m_playerId[H2EnumIndex(m_currentSide)]].m_resources[H2EnumIndex(RES_GOLD)] -=
                 giNextActionExtra;
             gpGame->m_players[m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE) - H2EnumIndex(m_currentSide)]]
@@ -2802,45 +2802,45 @@ void combatManager::CycleCombatScreen(void) {
         if (m_heroIcons[index] == NULL)
             continue;
 
-        if (m_heroAnimationState[index] == HERO_ANIMATION_DEATH_FIRST
-            || m_heroAnimationState[index] == HERO_ANIMATION_DEATH_SECOND
+        if (m_heroAnimationState[index] == HERO_ANIMATION_LOSS_REACTION
+            || m_heroAnimationState[index] == HERO_ANIMATION_OPPONENT_LOSS_REACTION
             || m_heroAnimationState[index] == HERO_ANIMATION_IDLE_FIRST
             || m_heroAnimationState[index] == HERO_ANIMATION_IDLE_SECOND
             || m_heroAnimationState[index] == HERO_ANIMATION_IDLE_LAST) {
             m_drawHero[index] = true;
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
-                   && m_heroDeathAnimationPlayed[index] == 0
-                   && m_heroDeathPending[index] != 0) {
+                   && m_heroLossReactionPlayed[index] == 0
+                   && m_heroLossReactionPending[index] != 0) {
             if (m_playerId[H2EnumIndex(m_currentSide)] == -1
                 || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0) {
-                m_heroAlternateDeathPending[index] = 0;
-                m_heroDeathPending[index] = 0;
+                m_heroOpponentLossReactionPending[index] = 0;
+                m_heroLossReactionPending[index] = 0;
             } else {
-                m_heroAlternateDeathPending[index] = 0;
-                m_heroDeathPending[index] = 0;
-                m_heroDeathAnimationPlayed[index] = 1;
+                m_heroOpponentLossReactionPending[index] = 0;
+                m_heroLossReactionPending[index] = 0;
+                m_heroLossReactionPlayed[index] = 1;
                 if (sCmbtHero[m_heroSpriteIndex[index]]
-                        .animationFrameCount[HERO_ANIMATION_DEATH_FIRST]
+                        .animationFrameCount[HERO_ANIMATION_LOSS_REACTION]
                     > 0) {
-                    nextHeroAnimation[index] = HERO_ANIMATION_DEATH_FIRST;
+                    nextHeroAnimation[index] = HERO_ANIMATION_LOSS_REACTION;
                     m_drawHero[index] = true;
                 }
             }
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
-                   && m_heroAlternateDeathAnimationPlayed[index] == 0
-                   && m_heroAlternateDeathPending[index] != 0) {
+                   && m_heroOpponentLossReactionPlayed[index] == 0
+                   && m_heroOpponentLossReactionPending[index] != 0) {
             if (m_playerId[H2EnumIndex(m_currentSide)] == -1
                 || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0) {
-                m_heroAlternateDeathPending[index] = 0;
-                m_heroDeathPending[index] = 0;
+                m_heroOpponentLossReactionPending[index] = 0;
+                m_heroLossReactionPending[index] = 0;
             } else {
-                m_heroAlternateDeathPending[index] = 0;
-                m_heroDeathPending[index] = 0;
-                m_heroAlternateDeathAnimationPlayed[index] = 1;
+                m_heroOpponentLossReactionPending[index] = 0;
+                m_heroLossReactionPending[index] = 0;
+                m_heroOpponentLossReactionPlayed[index] = 1;
                 if (sCmbtHero[m_heroSpriteIndex[index]]
-                        .animationFrameCount[HERO_ANIMATION_DEATH_SECOND]
+                        .animationFrameCount[HERO_ANIMATION_OPPONENT_LOSS_REACTION]
                     > 0) {
-                    nextHeroAnimation[index] = HERO_ANIMATION_DEATH_SECOND;
+                    nextHeroAnimation[index] = HERO_ANIMATION_OPPONENT_LOSS_REACTION;
                     m_drawHero[index] = true;
                 }
             }

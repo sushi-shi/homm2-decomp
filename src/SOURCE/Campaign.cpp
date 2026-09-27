@@ -988,7 +988,7 @@ void game::InitCampaignMap(void) {
                     ->m_army.Add(choiceBest->creature, choiceBest->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            m_players[0].m_cheatValue = choiceBest->value;
+            m_players[0].m_bonusPuzzlePieces = choiceBest->value;
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             savedNewGameSetup = gbInNewGameSetup;

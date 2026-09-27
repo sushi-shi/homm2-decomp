@@ -162,7 +162,7 @@ class IronfistHookContractTest(unittest.TestCase):
             "creatureGrowth -= castle->m_owner >= 0 ? TOWN_WELL_BASE_GROWTH_BONUS",
             ": static_cast<i32>(TOWN_WELL_BASE_GROWTH_BONUS)",
             "/ NEUTRAL_CASTLE_GROWTH_DIVISOR;",
-            "m_garrison[innerIndex - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)] += creatureGrowth;",
+            "m_dwellingAvailable[innerIndex - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)] += creatureGrowth;",
         )
         town_constants = (REPOSITORY / "include/SOURCE/TOWNMGR.h").read_text()
         self.assertRegex(town_constants, r"TOWN_WELL_BASE_GROWTH_BONUS\s*=\s*2\s*,")

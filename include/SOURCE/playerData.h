@@ -41,7 +41,7 @@ public:
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;
     i32 m_unexploredValue;
-    float m_upgradeValueWeight;
+    float m_fightValueResourceWeight;
     float m_artifactValue;
     float m_artifactPoolShare;
 };
@@ -55,8 +55,8 @@ public:
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
     i8 m_availableHeroIds[HERO_AVAILABLE_SLOT_COUNT];
     u8 m_minimumHeroCount;
-    PlayerPersonality m_aiDifficulty;
-    i8 m_cheatValue;
+    PlayerPersonality m_aiPersonality;
+    i8 m_bonusPuzzlePieces;
     char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];
     i8 m_ultimateArtifactHintChance;
     i8 m_ultimateArtifactHintX;

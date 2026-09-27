@@ -258,8 +258,8 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             static_cast<i32>(player->m_heroLocatorPage)
         );
         xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
-        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
-        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
+        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_bonusPuzzlePieces));
+        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiPersonality));
         xml::PushBack(
             tempDoc, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
         );
@@ -306,7 +306,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         xml::PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
         xml::PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
         xml::PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
-        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
+        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_mageGuildLevel));
         xml::PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
         xml::PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
         xml::PushBack(
@@ -319,7 +319,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         xml::PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
         xml::PushBack(tempDoc, townElem, "name", twn->m_name);
 
-        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
+        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_dwellingAvailable);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
             numSpellsOfLevel[j] = twn->m_spellCounts[j];
@@ -834,11 +834,11 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "curHeroIdx") xml::QueryCharText(elem, &pdata->m_currentHero);
         else if (name == "relatedToSomeSortOfHeroCountOrIdx") xml::QueryCharText(elem, &pdata->m_heroLocatorPage);
         else if (name == "hasCheated") xml::QueryCharText(elem, &gpGame->m_cheated);
-        else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_cheatValue);
+        else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_bonusPuzzlePieces);
         else if (name == "personality") {
             i32 personality;
             elem->QueryIntText(&personality);
-            pdata->m_aiDifficulty = PlayerPersonalityFromCode(personality);
+            pdata->m_aiPersonality = PlayerPersonalityFromCode(personality);
         }
         else if (name == "relatedToMaxOrNumHeroes") xml::QueryCharText(elem, &pdata->m_minimumHeroCount);
         else if (name == "hasEvilFaction") xml::QueryCharText(elem, &pdata->m_evilInterface);
@@ -970,7 +970,7 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             elem->QueryUnsignedText(&buildings);
             twn->m_buildings = buildings;
         }
-        else if (name == "mageGuildLevel") xml::QueryCharText(elem, &twn->m_buildState);
+        else if (name == "mageGuildLevel") xml::QueryCharText(elem, &twn->m_mageGuildLevel);
         else if (name == "field_1D") xml::QueryCharText(elem, &twn->m_unknown1d);
         else if (name == "exists") xml::QueryCharText(elem, &twn->m_onMap);
         else if (name == "mayNotBeUpgradedToCastle") xml::QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
@@ -997,7 +997,7 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             i32 spell = elem->IntAttribute("spell");
             twn->m_spells[level][idx] = static_cast<i8>(spell);
         } else if (name == "numCreaturesInDwelling")
-            twn->m_garrison[index] = static_cast<i16>(value);
+            twn->m_dwellingAvailable[index] = static_cast<i16>(value);
         else if (name == "numSpellsOfLevel")
             twn->m_spellCounts[index] = static_cast<i8>(value);
     }
