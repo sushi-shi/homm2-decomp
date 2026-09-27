@@ -198,7 +198,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("castle.mage_guild.level")
                      ,
-                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_mageGuildLevel)
             );
             message.payload.widget.data.text = gText;
         } else {
@@ -526,7 +526,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
                         objIndex = H2EnumIndex(INFO_BUILD_MAGE_GUILD);
-                    else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT)
+                    else if (gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT)
                         objIndex = H2EnumIndex(INFO_MAGE_GUILD_MAX_LEVEL);
                     else if (!CanBuy(gpTownManager->m_town, BUILDING_SLOT_MAGE_GUILD))
                         objIndex = H2EnumIndex(INFO_CANNOT_AFFORD_MAGE_LEVEL);
@@ -694,7 +694,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case H2EnumIndex(TOWN_OBJECT_MAGE_GUILD):
                         if (!quickFlag) {
-                            if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT
+                            if (gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT
                                 || !(gpTownManager->m_buildableBuildings & (1 << whichBuilding)))
                                 break;
                         }

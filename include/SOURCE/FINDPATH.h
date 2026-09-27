@@ -9,8 +9,8 @@ i32 CalcTerrainCost(
     i32 diagonal,
     i32 mobility,
     i32 pathfindingLevel,
-    i32 useRoad,
-    i32 usePathfinding
+    i32 sourceHasRoad,
+    i32 destinationHasRoad
 );
 
 #endif

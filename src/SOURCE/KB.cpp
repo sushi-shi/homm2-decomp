@@ -1581,7 +1581,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         else
             return 0;
     }
-    if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_buildState >= TOWN_MAGE_GUILD_LEVEL_COUNT)
+    if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
     if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
@@ -1619,7 +1619,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_buildState <= 1)
+            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1630,7 +1630,7 @@ i32 CanBuy(town* townPointer, BuildingSlotType type) {
     i32 buffer[H2EnumIndex(RES_COUNT)];
     playerData* player;
     i32 resourceIndex;
-    GetBuildingCost(townPointer->m_type, type, buffer, townPointer->m_buildState);
+    GetBuildingCost(townPointer->m_type, type, buffer, townPointer->m_mageGuildLevel);
     player = &gpGame->m_players[giCurPlayer];
     for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_COUNT); resourceIndex++)
         if (player->m_resources[resourceIndex] < buffer[resourceIndex])
@@ -2468,7 +2468,7 @@ void InitVars(void) {
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
-    gpGame->m_viewArmyResult = 0;
+    gpGame->m_dialogAnimationCounter = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = false;
     gbInNewGameSetup = false;
@@ -3659,7 +3659,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     currentHeroRec->SetSS(secondarySkillIndex, ssLevel);
             }
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
-                gpCombatManager->m_debugFormation = command - APP_MENU_COMBAT_FIRST;
+                gpCombatManager->m_elevationOverlayIndex = command - APP_MENU_COMBAT_FIRST;
                 gpCombatManager->m_backgroundDrawn = false;
                 for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
@@ -3667,7 +3667,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 }
                 for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
                     formationHexIndex =
-                        sElevationOverlay[gpCombatManager->m_debugFormation].cellOffsets[loopIndex];
+                        sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
                     if (formationHexIndex != -1)
                         gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
                 }

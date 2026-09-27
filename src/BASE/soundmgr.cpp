@@ -327,7 +327,7 @@ void soundManager::MemorySample(class sample* sampleResource) {
     sound.sampleRate = H2EnumIndex(playback.sampleRate);
     sound.channels = playback.stereo != 0 ? 2 : 1;
     sound.bitsPerSample = playback.sampleFormat == FORMAT_16_BIT ? 16 : 8;
-    const i32 loops = playback.loopCount != 0 ? -1 : 0;
+    const i32 loops = playback.looping != 0 ? -1 : 0;
     playback.activeSample = platform::Audio().PlaySound(
         sound,
         ConvertVolume(playback.volume, SOUND_VOLUME_EFFECT),
