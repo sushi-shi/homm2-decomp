@@ -28,7 +28,7 @@ struct SamplePlaybackData {
     i32 volume;
     SampleAudioFormat sampleFormat;
     b32 stereo;
-    b32 loopCount;
+    b32 looping;
     platform::VoiceId activeSample;
     i32 channelType;
 };
