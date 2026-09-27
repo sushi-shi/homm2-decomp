@@ -397,7 +397,7 @@ void ExpCampaign::InitMap(void) {
                     ->m_army.Add(campaignChoice->creature, campaignChoice->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            player->m_cheatValue = static_cast<i8>(campaignChoice->value);
+            player->m_bonusPuzzlePieces = static_cast<i8>(campaignChoice->value);
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             i32 savedNewGameSetup = gbInNewGameSetup;

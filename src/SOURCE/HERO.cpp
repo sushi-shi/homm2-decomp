@@ -284,7 +284,7 @@ i32 hero::CalcMobility(void) {
     if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
         && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         mobilityResult += AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
+        if (gpGame->m_players[m_owner].m_aiPersonality == PLAYER_PERSONALITY_EXPLORER)
             mobilityResult += AI_STATE_MOBILITY_BONUS;
     }
     return mobilityResult;

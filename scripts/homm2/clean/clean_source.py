@@ -259,6 +259,7 @@ def _arg(index: int, parenthesize: bool = False):
 # matching tree cannot build this way -- production needs each domain to *be* an
 # integer so MSVC 4.2 lowers it identically.
 STRICT_MACRO = "H2_STRICT_ENUMS"
+RETAIL_COMPILER_MACRO = "H2_RETAIL_COMPILER"
 
 
 # Domains that would stay plain integers. Empty on purpose: demoting a domain
@@ -711,6 +712,12 @@ def _strict_condition(line: str) -> bool | None:
                 return taken
     if body.startswith("if "):
         condition = body[3:].split("//")[0].strip()
+        if condition in (RETAIL_COMPILER_MACRO,
+                         "defined(%s)" % RETAIL_COMPILER_MACRO):
+            return False
+        if condition in ("!%s" % RETAIL_COMPILER_MACRO,
+                         "!defined(%s)" % RETAIL_COMPILER_MACRO):
+            return True
         if condition in (STRICT_MACRO, "defined(%s)" % STRICT_MACRO):
             return True
         if condition in ("!%s" % STRICT_MACRO, "!defined(%s)" % STRICT_MACRO):
@@ -1661,7 +1668,7 @@ INTENTIONALLY_KEPT = {
     "__stdcall",
 }
 MARKER_PREFIXES = ("H2_ENUM_",)
-MARKER_NAMES = {STRICT_MACRO, "RETAIL_FILE"}
+MARKER_NAMES = {STRICT_MACRO, RETAIL_COMPILER_MACRO, "RETAIL_FILE"}
 
 
 def residue(out_root: Path) -> dict[str, int]:

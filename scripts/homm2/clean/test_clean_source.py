@@ -163,6 +163,19 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         )
         self.assertEqual(clean_source.resolve_strict_conditionals(text), "typed\n")
 
+    def test_retail_name_aliases_are_removed_from_generated_source(self):
+        text = (
+            "#if H2_RETAIL_COMPILER\n"
+            "#define casualtyFraction damagePercent\n"
+            "#endif\n"
+            "void DamageGroup(float casualtyFraction);\n"
+            "#if H2_RETAIL_COMPILER\n"
+            "#undef casualtyFraction\n"
+            "#endif\n"
+        )
+        self.assertEqual(clean_source.resolve_strict_conditionals(text),
+                         "void DamageGroup(float casualtyFraction);\n")
+
     def test_clear_flag_expands_to_typed_bit_removal(self):
         self.assertEqual(
             clean_source.rewrite("H2_ENUM_CLEAR_FLAG(flags, FLAG_A)"),

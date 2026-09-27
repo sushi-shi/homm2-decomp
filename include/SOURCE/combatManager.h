@@ -523,10 +523,10 @@ public:
     i32 m_spellPower[COMBAT_SIDE_COUNT];
     class armyGroup* m_armyGroups[COMBAT_SIDE_COUNT];
     i32 m_mouseGridHex;
-    u8 m_heroDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroDeathAnimationPlayed[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPlayed[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationState[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationFrame[COMBAT_SIDE_COUNT];
     i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
