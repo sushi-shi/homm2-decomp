@@ -624,7 +624,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
-                        sprintf(valueText, "%d", record->m_garrison[building]);
+                        sprintf(valueText, "%d", record->m_dwellingAvailable[building]);
                         OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                             displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X,
                             rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_TEXT_Y_OFFSET,

@@ -165,7 +165,7 @@ void PlayMilesSample(class sample* sampleResource) {
         i32 formatMode = MilesSampleFormat(sampleData);
         AIL_set_sample_type(handle, formatMode, 0);
         AIL_set_sample_playback_rate(handle, H2EnumIndex(sampleData->sampleRate));
-        AIL_set_sample_loop_count(handle, sampleData->loopCount == 0);
+        AIL_set_sample_loop_count(handle, sampleData->looping == 0);
         AIL_set_sample_address(handle, sampleData->data, sampleData->size);
         AIL_set_sample_volume(
             handle,
