@@ -71,3 +71,44 @@ two full sets of RSP/MAP/images and linker logs, and
 `{import-prefix.py,import-prefix.log,import-provenance.json}` with the rejected
 control log. The current owner census is
 `build/native-owner-census/{census.py,results.json}`.
+
+## Ordinary librarian conversion follow-up
+
+A follow-up on the same isolated inputs inspected the pinned LIB help and tested
+its documented switches on `WINMM.LIB`. `/LINK50COMPAT` leaves all 197 short
+import records compact; `/CONVERT` rewrites them as ordinary COFF members in a
+separate output archive. This is LIB output, not a manually changed object.
+The original library is unchanged. The test avoids the `LNK1213` direct-input
+rejection without inventing import code.
+
+The complete two-image replay converts each input archive containing short
+records with `LIB /CONVERT /OUT:<disposable-library> <input-library>`, then
+extracts the same 120 selected member payloads, unchanged, for the direct prefix.
+The other linker arguments remain those of the preceding direct-input pair.
+Both images complete all four historical LINK passes with no forced root.
+
+| Direct input ownership | Retail differences | Nonheader differences | SHA-256 |
+| --- | ---: | ---: | --- |
+| Unsplit control, converted import prefix | 110,951 | 110,661 | `70b3190bd64b3469c22ece73fa96f3085d9e4692a662c2fcc5cb75c9f136f7a1` |
+| Three owners, converted import prefix | 110,842 | 110,551 | `04ed1387c5298c804b7bd81e07308d1c89084234ae6d8253ed27340eeaa8c9ef` |
+
+Both retain file size 1,208,393. The import prefix restores the tested project
+addresses: baseManager `0x4b5660`, Purge `0x4cc740`, and BitTest `0x4c2ed4`.
+It does not restore the complete module ordering: WinMainCRTStartup moves from
+`0x4d853e` to `0x4d96af`. In the converted control, `.text` virtual size is 16
+bytes smaller and `.data` virtual size is 32 bytes larger than the canonical
+build. Against that canonical image, the section differences are 102,143 text
+bytes, 4,926 rdata bytes, and 3,482 data bytes; resources remain exact. Restoring
+one import boundary is insufficient to reproduce CRT and storage placement.
+These section comparisons use the 115-byte canonical candidate, whereas the
+table compares retail; the two denominators are deliberately distinguished.
+
+All eight converted input libraries still have their recorded original hashes
+after the experiment. `converted-import-prefix.py` and its log reproduce the
+follow-up. Under `converted-imports/`, `conversion.json` records input/output
+hashes, `import-provenance.json` records extracted members, `audit.json` records
+section comparisons and example placements, and `import-prefix-results.json`
+records the full-image results. RSPs, maps, images, conversion logs and all eight
+link-pass logs are retained. No conversion or direct-input change is retained
+in production. This result rejects this complete direct-input replacement,
+not every possible ordinary archive or compiler ownership arrangement.
