@@ -187,15 +187,13 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     for (indexData = 0; indexData < m_fileCount; ++indexData) {
-        DATA(0x00533d84) static char emptyFileName[1] = "";
         strcpy(
             m_fileNames[indexData].text,
-            emptyFileName
+            ""
         );
-        DATA(0x00533d88) static char emptyExtension[1] = "";
         strcpy(
             m_extensions[indexData].text,
-            emptyExtension
+            ""
         );
     }
 
@@ -350,10 +348,9 @@ void fileRequester::Close(void) {
 
 VA(0x0048f275, 0x44b)
 i32 fileRequester::Open(i32 id) {
-    DATA(0x00533d8c) static char emptyLastFilename[1] = "";
     strcpy(
         gLastFilename,
-        emptyLastFilename
+        ""
     );
     m_previousMenu = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
@@ -508,10 +505,9 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
-                        DATA(0x00533d90) static char emptyCycleName[1] = "";
                         strcpy(
                             cycleNameBuffer,
-                            emptyCycleName
+                            ""
                         );
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
@@ -711,10 +707,9 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                     strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                 } else {
-                                    DATA(0x00533d94) static char emptyFilteredName[1] = "";
                                     strcpy(
                                         filteredNameMap,
-                                        emptyFilteredName
+                                        ""
                                     );
                                 }
                                 SetupFiles();

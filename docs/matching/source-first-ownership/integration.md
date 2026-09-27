@@ -1,5 +1,9 @@
 # Source-first ownership checkpoint
 
+Historical checkpoint: the [whole-module follow-through](follow-through.md)
+records the subsequent REQUEST cleanup, restored DIMMER header dependency,
+and fresh measurements.
+
 This supersedes the 115-byte checkpoint's source model. Misc uses direct
 literals/catalog references, DIMMER is an ordinary concrete class in one TU,
 and the Audiere node has a private header definition with straightforward
