@@ -42,7 +42,7 @@ using enum TownBuilding;
 ENABLE_ENUM_FLAGS(TownBuilding)
 
 typedef enum TownConstant {
-    TOWN_GARRISON_SLOT_COUNT           = 12,
+    TOWN_DWELLING_STOCK_SLOT_COUNT           = 12,
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,
@@ -79,9 +79,9 @@ public:
     armyGroup m_army;
     char m_occupyingHeroId;
     u32l m_buildings;
-    i8 m_buildState;
+    i8 m_mageGuildLevel;
     char m_unknown1d;
-    i16 m_garrison[H2EnumIndex(TOWN_GARRISON_SLOT_COUNT)];
+    i16 m_dwellingAvailable[H2EnumIndex(TOWN_DWELLING_STOCK_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
     i8 m_formation;

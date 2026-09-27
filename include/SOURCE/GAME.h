@@ -76,7 +76,7 @@ struct RandomHeroArmyRange {
 
 enum class GameMonsterMetadata : i32 {
     MAP_MONSTER_COUNT_MASK = 0xfff,
-    MAP_MONSTER_GUARD_FLAG = 0x1000
+    MAP_MONSTER_FORCE_JOIN = 0x1000
 };
 using enum GameMonsterMetadata;
 

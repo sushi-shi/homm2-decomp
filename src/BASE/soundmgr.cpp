@@ -940,7 +940,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     AIL_init_sample(smp);
     AIL_set_sample_type(smp, H2EnumIndex(playbackData->format), 0);
     AIL_set_sample_playback_rate(smp, H2EnumIndex(playbackData->sampleRate));
-    AIL_set_sample_loop_count(smp, playbackData->loopCount);
+    AIL_set_sample_loop_count(smp, playbackData->looping);
     AIL_set_sample_address(smp, playbackData->data, playbackData->size);
     if (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
         AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
