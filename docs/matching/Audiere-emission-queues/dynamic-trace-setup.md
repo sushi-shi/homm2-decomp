@@ -68,10 +68,12 @@ The build itself remains usable; only the attempted debugger entry paths failed.
 
 No dynamic mapping of Node to pending-kind/queue can be claimed from this
 attempt. The preceding static audit remains valid within its stated bounds.
-Further tracing requires a functioning debugger launch in Wine, or a host
-runtime permitting GDB to trace its child; setup stopped within the assigned
-20-minute limit instead of changing the shipped compiler or probing source
-mutations.
+Those debugger routes stopped within the assigned 20-minute limit. A later
+[in-process proxy trace](inprocess-proxy-trace.md) succeeded without ptrace or
+Windows debug-process flags. It uses disposable memory instrumentation, leaves
+the original compiler on disk unchanged, and verifies its output against an
+ordinary same-source compilation. That later result supersedes the debugger
+availability limitation, while the failures recorded here remain reproducible.
 
 Artifacts include `launch.py`, `launch32.py`, `native.py`, `native.gdb`,
 `direct.py`, their command/provenance JSON files, WineDbg/GDB logs, and the

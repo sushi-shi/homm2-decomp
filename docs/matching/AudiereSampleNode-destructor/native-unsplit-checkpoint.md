@@ -65,6 +65,15 @@ Logs: `build/link/ownership-combinations/audiere115-{redelink,build,native,reloc
 whole-image offsets: `audiere115-image-audit.json` in that directory.
 These object-level results do not close the 115-byte native placement residual.
 
+The independent `link_exe --audit-existing --strict` audit exits 1, as expected
+for this residual. It reports all 1,509 source function addresses exact, but
+only 1,724/1,727 project function addresses exact: the three helpers above are
+displaced. Import ABI, IAT order, all 6,374 semantic import bytes, all 244 import
+thunks, and resources match. The audit does not confuse exact comparison
+objects with an exact linked image. Its log and exit status are preserved as
+`audiere115-strict-audit.{log,status}` in the same artifact directory.
+
+
 ## Separate diagnostic branch
 
 Three semantic owners can reproduce every byte after the PE headers, but add

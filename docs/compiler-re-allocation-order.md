@@ -22,6 +22,13 @@
 > These corrections expose additional compiler mechanisms; they do not yet
 > identify a source construct that closes the remaining native ordering.
 
+> Dynamic trace (2026-09-27): the actual user-defined Node destructor has
+> kind 0 and is processed before initialization. Its observed registration
+> entry does not append it; the observed post-initializer queue-C callback is
+> a `std::pair` constructor. Instrumented and control objects have identical
+> sections, symbols and ordered relocations. See
+> [inprocess-proxy-trace.md](matching/Audiere-emission-queues/inprocess-proxy-trace.md).
+
 Reverse-engineering of the pinned VC6 SP5 C++ front end to explain the object
 topology residuals: deferred COMDAT emission order, and string-literal / data
 cell allocation order.
