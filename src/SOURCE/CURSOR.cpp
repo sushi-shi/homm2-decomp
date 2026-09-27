@@ -945,14 +945,14 @@ adjacentDone:
 
 void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     hero* currentHero_f;
-    i32 killed_e;
+    i32 removeMonster;
     i32 monsterX_e;
     i32 monsterY_f;
     mapCell* monsterCell_d;
     mapCell* heroCell_f;
 
     currentHero_f = gpGame->GetHero(gpCurPlayer->m_currentHero);
-    killed_e = 0;
+    removeMonster = 0;
     if (FindAdjacentMonster(
             currentHero_f->m_x,
             currentHero_f->m_y,
@@ -971,7 +971,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
                 monsterCell_d,
                 heroCell_f,
                 currentHero_f,
-                &killed_e,
+                &removeMonster,
                 currentHero_f->m_x,
                 currentHero_f->m_y,
                 1,
@@ -979,8 +979,8 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
                 monsterY_f
             );
         else
-            ComputerMonsterInteract(monsterCell_d, currentHero_f, &killed_e);
-        if (killed_e) {
+            ComputerMonsterInteract(monsterCell_d, currentHero_f, &removeMonster);
+        if (removeMonster) {
             EraseObj(monsterCell_d, monsterX_e, monsterY_f);
             if (gbThisNetHumanPlayer[giCurPlayer])
                 FizzleCenter(EVENT_FIZZLE_HERO_LOSS);

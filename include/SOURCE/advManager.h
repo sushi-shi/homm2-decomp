@@ -57,7 +57,7 @@ using enum ArmySizeNameVariant;
 #pragma pack(push, 1)
 class advManager : public baseManager {
 public:
-    AdventureCommand m_selectedCell;
+    AdventureCommand m_pendingCommand;
     union {
         i32 m_heroLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
         class widget* m_bottomViewPrimaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
@@ -98,7 +98,7 @@ public:
     i32 m_mapOriginY;
     i32 m_previousOriginX;
     i32 m_previousOriginY;
-    i32 m_lastHoverCell;
+    i32 m_hoverCellX;
     i32 m_hoverCellY;
     i32 m_commandTargetX;
     i32 m_commandTargetY;
@@ -305,14 +305,14 @@ public:
         class mapCell*,
         class mapCell*,
         class hero*,
-        i32*,
+        i32* removeMonsterObject,
         i32,
         i32,
         i32,
         i32,
         i32
     );
-    void ComputerMonsterInteract(class mapCell*, class hero*, i32*);
+    void ComputerMonsterInteract(class mapCell*, class hero*, i32* removeMonsterObject);
     i32 DoNetCombat(char*);
     CombatResult DoCombat(
         i32,

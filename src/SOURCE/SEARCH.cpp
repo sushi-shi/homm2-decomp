@@ -11,20 +11,21 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
+
 static i32 s_directionBlocked;
 static H2EnumStorage<MapObjectType, i32> s_triggerType;
 static i32 s_processedPointCount;
 static i32 s_remainingMobility;
 static i32 s_adjacentX;
 static H2EnumStorage<TerrainType, i8> s_possibleDirections[SEARCH_DIRECTION_COUNT];
-static i32 s_targetWater;
+static i32 s_targetHasRoad;
 static i32 s_neighborX;
 static i32 s_mapY;
 static i32 s_currentCost;
 static mapCell* s_neighborCell;
 static i32 s_adjacentY;
 static mapCell* s_targetCell;
-static i32 s_currentWater;
+static i32 s_currentHasRoad;
 static i32 s_bestTargetCost;
 static i32 s_adjacentMonsterX;
 static i32 s_adjacentCost;
@@ -126,7 +127,7 @@ void searchArray::SeedPosition(
         }
 
         s_hasTarget = 1;
-        s_targetWater = s_targetCell->m_isRoad;
+        s_targetHasRoad = s_targetCell->m_isRoad;
         s_bestTargetCost = SEARCH_MAX_COST;
     } else {
         s_hasTarget = 0;
@@ -235,7 +236,7 @@ seed_loop:
             );
             s_terrain = giGroundToTerrain[gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
                                               ->m_terrainImageIndex];
-            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
+            s_currentHasRoad = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_direction = MAP_DIRECTION_NORTH;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             do {
@@ -269,7 +270,7 @@ seed_loop:
                                     H2EnumIndex(s_direction),
                                     s_remainingMobility,
                                     pathfindingSkill,
-                                    s_currentWater,
+                                    s_currentHasRoad,
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
@@ -291,7 +292,7 @@ seed_loop:
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 neighborCell->m_isRoad,
-                                s_targetWater
+                                s_targetHasRoad
                             );
                             i32 targetCost = s_currentNode.distance + s_targetStepCost;
                             if (targetCost < s_bestTargetCost)

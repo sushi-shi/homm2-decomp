@@ -45,10 +45,10 @@ public:
         i32,
         i32,
         float&,
-        i32&,
-        i32&,
-        i32&,
-        i32&,
+        i32& attackerLossValue,
+        i32& defenderLossValue,
+        i32& expectedAttackerLossValue,
+        i32& expectedDefenderLossValue,
         i32&
     );
     float GetOddsOfWinning(i32);
@@ -74,7 +74,7 @@ public:
     void TurnCostResource(i32);
     float TurnValueOfObelisk(i32);
     float FutureDeflator(i32* const);
-    i32 FightValueOfStack(class armyGroup*, class hero*, i32, i32, i32, i32);
+    i32 FightValueOfStack(class armyGroup*, class hero*, i32 useAdjustedFightValue, i32, i32, i32 applySiegeAttackerModifiers);
     void EvaluateOneTimeCreaturePurchase(CreatureType, i32, i32, i32&, i32&, i32&);
     i32 QuickCombat(
         class armyGroup*,
@@ -83,9 +83,8 @@ public:
         class hero*,
         i32,
         i32,
-        float&,
-        float&
-    );
+        float& attackerCasualtyFraction,
+        float& defenderCasualtyFraction);
     void HeroInteractionAtHero(class hero*, class hero*, i32, i32*);
     void HeroInteractionAtTown(class hero*, class town*, i32, i32*);
     void RedistributeTroops(class armyGroup*, class armyGroup*, i32, i32, i32, i32, i32);
@@ -112,7 +111,7 @@ public:
         class hero*, CreatureType, i32*, class mapCell*
     );
     i32 FightEvent(class hero*, class mapCell*, i32);
-    i32 DamageGroup(class armyGroup*, class hero*, class hero*, float);
+    i32 DamageGroup(class armyGroup*, class hero*, class hero*, float casualtyFraction);
     void IncrementHourGlass(void);
     void TownEvent(class mapCell*, class hero*, i32, i32);
     i32 ComputeUpgradeValue(CreatureType, CreatureType);

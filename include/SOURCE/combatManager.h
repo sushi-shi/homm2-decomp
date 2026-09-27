@@ -512,7 +512,7 @@ public:
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;
     char _pad_0x31ee[COMBAT_RUNTIME_ALIGNMENT_SIZE];
-    i32 m_debugFormation;
+    i32 m_elevationOverlayIndex;
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];
     class icon* m_obstacleIcons[COMBAT_OBSTACLE_ICON_LOAD_COUNT];
     i32 m_obstacleCount;
@@ -532,10 +532,10 @@ public:
     i32 m_spellPower[COMBAT_SIDE_COUNT];
     class armyGroup* m_armyGroups[COMBAT_SIDE_COUNT];
     i32 m_mouseGridHex;
-    u8 m_heroDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroDeathAnimationPlayed[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPlayed[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationState[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationFrame[COMBAT_SIDE_COUNT];
     i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
@@ -551,8 +551,8 @@ public:
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
     H2EnumStorage<CreatureType, u8> m_summonedCreatureType[COMBAT_SIDE_COUNT];
-    i32 m_sideDefeated[COMBAT_SIDE_COUNT];
-    i32 m_networkArmyPresent[COMBAT_SIDE_COUNT];
+    i32 m_sideSurrendered[COMBAT_SIDE_COUNT];
+    i32 m_humanPlayerSide[COMBAT_SIDE_COUNT];
     i32 m_playerId[COMBAT_SIDE_COUNT];
     i32 m_experienceValue[COMBAT_SIDE_COUNT];
     i32 m_heroCastSpell[COMBAT_SIDE_COUNT];

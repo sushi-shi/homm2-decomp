@@ -31,7 +31,7 @@ typedef enum ArmyHexConstant {
 class army {
 public:
     char m_animationState;
-    char m_animationCycle;
+    char m_shootingAnimationActive;
     H2SteppedEnumStorage<ArmyAnimationSequence, char> m_pendingAnimationSequence;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationStart;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationEnd;
@@ -51,7 +51,7 @@ public:
     i32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
     i32 m_mirrorImageIndex;
-    i32 m_roundCounter;
+    i32 m_mirrorImageRoundsRemaining;
     H2EnumStorage<CreatureType, i32> m_monsterType;
     i32 m_hex;
     H2SteppedEnumStorage<ArmyAnimationSequence, i32> m_animationSequence;
@@ -61,7 +61,7 @@ public:
     i32 m_facingChanged;
     i32 m_initialQuantity;
     i32 m_quantity;
-    i32 m_lastTargetHex;
+    i32 m_displayQuantityOverride;
     i32 m_temporaryResurrectionQuantity;
     i32 m_hitPointsLost;
     i32 m_armyGroupSlot;
@@ -99,7 +99,7 @@ public:
     void Init(CreatureType, i32, CombatSide, i32, i32, i32);
     void LoadResources(void);
     void FreeResources(void);
-    void DrawToBuffer(i32, i32, i32);
+    void DrawToBuffer(i32, i32, i32 quantityOverlayOnly);
     void Wince(void);
     void Walk(CombatHexDirection, i32, i32);
     void SpecialAttack(void);
