@@ -630,7 +630,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             OVERVIEW_TROOP_TEXT_CAPACITY,
                             "%d",
-                            record->m_garrison[building])
+                            record->m_dwellingAvailable[building])
                         ;
                         OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                             displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X,

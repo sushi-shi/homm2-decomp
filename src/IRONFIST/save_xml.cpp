@@ -257,8 +257,8 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
             static_cast<i32>(player->m_heroLocatorPage)
         );
         PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
-        PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
-        PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
+        PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_bonusPuzzlePieces));
+        PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiPersonality));
         PushBack(
             tempDoc, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
         );
@@ -305,7 +305,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
         PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
         PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
-        PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
+        PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_mageGuildLevel));
         PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
         PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
         PushBack(
@@ -318,7 +318,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
         PushBack(tempDoc, townElem, "name", twn->m_name);
 
-        WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
+        WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_dwellingAvailable);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
             numSpellsOfLevel[j] = twn->m_spellCounts[j];
@@ -838,11 +838,11 @@ void IronfistXML::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "curHeroIdx") QueryCharText(elem, &pdata->m_currentHero);
         else if (name == "relatedToSomeSortOfHeroCountOrIdx") QueryCharText(elem, &pdata->m_heroLocatorPage);
         else if (name == "hasCheated") QueryCharText(elem, &gpGame->m_cheated);
-        else if (name == "puzzlePieces") QueryCharText(elem, &pdata->m_cheatValue);
+        else if (name == "puzzlePieces") QueryCharText(elem, &pdata->m_bonusPuzzlePieces);
         else if (name == "personality") {
             i32 personality;
             elem->QueryIntText(&personality);
-            pdata->m_aiDifficulty = PlayerPersonalityFromCode(personality);
+            pdata->m_aiPersonality = PlayerPersonalityFromCode(personality);
         }
         else if (name == "relatedToMaxOrNumHeroes") QueryCharText(elem, &pdata->m_minimumHeroCount);
         else if (name == "hasEvilFaction") QueryCharText(elem, &pdata->m_evilInterface);
@@ -974,7 +974,7 @@ void IronfistXML::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             elem->QueryUnsignedText(&buildings);
             twn->m_buildings = buildings;
         }
-        else if (name == "mageGuildLevel") QueryCharText(elem, &twn->m_buildState);
+        else if (name == "mageGuildLevel") QueryCharText(elem, &twn->m_mageGuildLevel);
         else if (name == "field_1D") QueryCharText(elem, &twn->m_unknown1d);
         else if (name == "exists") QueryCharText(elem, &twn->m_onMap);
         else if (name == "mayNotBeUpgradedToCastle") QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
@@ -1001,7 +1001,7 @@ void IronfistXML::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             i32 spell = elem->IntAttribute("spell");
             twn->m_spells[level][idx] = static_cast<i8>(spell);
         } else if (name == "numCreaturesInDwelling")
-            twn->m_garrison[index] = static_cast<i16>(value);
+            twn->m_dwellingAvailable[index] = static_cast<i16>(value);
         else if (name == "numSpellsOfLevel")
             twn->m_spellCounts[index] = static_cast<i8>(value);
     }

@@ -284,7 +284,7 @@ void army::InitClean(void) {
     for (sampleType = ARMY_SAMPLE_MOVE; sampleType < ARMY_SAMPLE_COUNT; sampleType++) {
         m_samples[H2EnumIndex(sampleType)] = NULL;
     }
-    m_roundCounter = -1;
+    m_mirrorImageRoundsRemaining = -1;
     m_spellCount = 0;
     memset(m_spellInfluence, 0, sizeof(m_spellInfluence));
     m_lastAnimationTime = platform::Ticks();
@@ -435,7 +435,7 @@ void army::LoadResources(void) {
         if (m_samples[i]) {
             m_samples[i]->m_playbackData.volume = ARMY_SAMPLE_VOLUME;
             m_samples[i]->m_playbackData.channelType = ARMY_SAMPLE_CHANNEL;
-            m_samples[i]->m_playbackData.loopCount = false;
+            m_samples[i]->m_playbackData.looping = false;
         }
     }
 }
@@ -2656,13 +2656,13 @@ void army::PowEffect(
                        == ARMY_ANIMATION_SHOOT_FORWARD
                 || gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_animationSequence
                        == ARMY_ANIMATION_SHOOT_DOWN) {
-                gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_animationCycle = 1;
+                gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_shootingAnimationActive = 1;
             } else {
-                gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_animationCycle = 0;
+                gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_shootingAnimationActive = 0;
             }
             if ((gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_damagePending
                  || gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_animationState
-                 || gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_animationCycle)
+                 || gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex].m_shootingAnimationActive)
                 && !gpCombatManager->m_limitCreatureCount[H2EnumIndex(sideNum)][armyIndex]) {
                 gpCombatManager->m_limitCreatureCount[H2EnumIndex(sideNum)][armyIndex]++;
             }
@@ -2730,7 +2730,7 @@ void army::PowEffect(
         for (sideNum = COMBAT_ATTACKER_SIDE; H2EnumIndex(sideNum) < COMBAT_SIDE_COUNT; sideNum++) {
             for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[H2EnumIndex(sideNum)]; armyIndex++) {
                 current = &gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex];
-                if (current->m_animationCycle) {
+                if (current->m_shootingAnimationActive) {
                     if (current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
                         || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD
                         || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
@@ -2945,9 +2945,9 @@ void army::ProcessDeath(i32 immediate) {
         return;
     }
     if (Random(0, DEATH_RANDOM_MAX) < DEATH_PRIMARY_CHANCE) {
-        gpCombatManager->m_heroDeathPending[H2EnumIndex(m_side)] = 1;
+        gpCombatManager->m_heroLossReactionPending[H2EnumIndex(m_side)] = 1;
     } else if (Random(0, DEATH_RANDOM_MAX) < DEATH_SECONDARY_CHANCE) {
-        gpCombatManager->m_heroAlternateDeathPending[H2EnumIndex(OppositeCombatSide(m_side))] = 1;
+        gpCombatManager->m_heroOpponentLossReactionPending[H2EnumIndex(OppositeCombatSide(m_side))] = 1;
     }
     m_monster.attributes |= MONSTER_FLAGS_DEAD;
     m_deathPending = false;
@@ -3279,8 +3279,8 @@ void army::DecrementSpellRounds(void) {
             }
         }
     }
-    if (m_roundCounter > 0) {
-        m_roundCounter--;
+    if (m_mirrorImageRoundsRemaining > 0) {
+        m_mirrorImageRoundsRemaining--;
     }
 }
 
@@ -3425,7 +3425,7 @@ void army::GoBerserk(void) {
 berserkFinish:
     if (giNextAction == ACTION_MOVE
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == m_side) {
-        gpCombatManager->m_heroDeathPending[H2EnumIndex(m_side)] = 1;
+        gpCombatManager->m_heroLossReactionPending[H2EnumIndex(m_side)] = 1;
     }
 }
 

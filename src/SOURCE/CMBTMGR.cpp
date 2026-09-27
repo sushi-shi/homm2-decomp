@@ -405,10 +405,10 @@ void combatManager::InitNonVisualVars(void) {
     m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
     m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
     m_combatResult = COMBAT_RESULT_PENDING;
-    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
-    m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
-    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
-    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
+    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
     m_eagleEyeSpell[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = SPELL_NONE;
     m_eagleEyeSpell[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = SPELL_NONE;
     giNextAction = ACTION_NONE;

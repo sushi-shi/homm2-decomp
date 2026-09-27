@@ -307,14 +307,14 @@ public:
         class mapCell* cell,
         class mapCell* combatCell,
         class hero* eventHero,
-        i32* handled,
+        i32* removeMonsterObject,
         i32 x,
         i32 y,
         i32 unused,
         i32 combatX,
         i32 combatY
     );
-    void ComputerMonsterInteract(class mapCell* cell, class hero* eventHero, i32* handled);
+    void ComputerMonsterInteract(class mapCell* cell, class hero* eventHero, i32* removeMonsterObject);
     i32 DoNetCombat(char* packetData);
     CombatResult DoCombat(
         i32 x,

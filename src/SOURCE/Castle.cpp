@@ -204,7 +204,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     m_town->m_type == FACTION_CYBORG ? "castle.cybernetics_lab.level"
                                                      : "castle.mage_guild.level"
                 ),
-                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_mageGuildLevel)
             );
             message.payload.widget.data.text = gText;
         } else {
@@ -224,7 +224,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             stateFrame = FRAME_CANNOT_BUILD;
         } else if ((m_town->m_buildings & (1L << H2EnumIndex(castleSlotsUse[slotNum])))
             && (castleSlotsUse[slotNum] != BUILDING_SLOT_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT)) {
+                || m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT)) {
             stateFrame = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << H2EnumIndex(castleSlotsUse[slotNum]))))
@@ -543,7 +543,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
                         objIndex = H2EnumIndex(INFO_BUILD_MAGE_GUILD);
-                    else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT)
+                    else if (gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT)
                         objIndex = H2EnumIndex(INFO_MAGE_GUILD_MAX_LEVEL);
                     else if (!CanBuy(gpTownManager->m_town, BUILDING_SLOT_MAGE_GUILD))
                         objIndex = H2EnumIndex(INFO_CANNOT_AFFORD_MAGE_LEVEL);
@@ -718,7 +718,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case H2EnumIndex(TOWN_OBJECT_MAGE_GUILD):
                         if (!quickFlag) {
-                            if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_LEVEL_COUNT
+                            if (gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_LEVEL_COUNT
                                 || !(gpTownManager->m_buildableBuildings & (1 << whichBuilding)))
                                 break;
                         }
