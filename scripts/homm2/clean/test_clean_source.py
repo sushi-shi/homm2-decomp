@@ -597,6 +597,13 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                 self.assertEqual(marked.count("(you are here)"), 1)
                 self.assertIn(f"{branch} (you are here)", marked)
 
+        for parent in sorted(clean_source.GENERATED_BRANCHES):
+            with self.subTest(review_parent=parent):
+                marked = clean_source._mark_readme_branch(
+                    readme, "review/names", "origin/" + parent)
+                self.assertEqual(marked.count("(you are here)"), 1)
+                self.assertIn(f"{parent} (you are here)", marked)
+
         source = clean_source._mark_readme_branch(readme, "source-pol-2.0")
         classic = clean_source._mark_readme_branch(source, "classic-pol-2.0")
         self.assertEqual(classic.count("(you are here)"), 1)

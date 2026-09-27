@@ -1854,12 +1854,12 @@ def publish(
             elif source.is_file():
                 shutil.copy2(source, target)
 
-        if branch in GENERATED_BRANCHES:
-            readme = worktree / "README.md"
-            readme.write_text(
-                _mark_readme_branch(readme.read_text(encoding="utf-8"), branch),
-                encoding="utf-8",
-            )
+        readme = worktree / "README.md"
+        readme.write_text(
+            _mark_readme_branch(readme.read_text(encoding="utf-8"), branch,
+                                publish_parent),
+            encoding="utf-8",
+        )
 
         stage_paths = [
             relative for relative in publish_paths
@@ -1927,8 +1927,11 @@ def publish(
     return 0
 
 
-def _mark_readme_branch(text: str, branch: str) -> str:
-    """Mark one generated branch in the README's branch diagram."""
+def _mark_readme_branch(text: str, branch: str,
+                        publish_parent: str | None = None) -> str:
+    """Mark the generated branch, including a review branch based on it."""
+    if branch not in GENERATED_BRANCHES and publish_parent:
+        branch = publish_parent.removeprefix("origin/")
     if branch not in GENERATED_BRANCHES:
         return text
 
