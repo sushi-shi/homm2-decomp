@@ -767,7 +767,7 @@ VA(0x0044c5a6, 0x5a)
 i32 GetNumObelisks(i32 color) {
     i32 count = 0;
     i32 index;
-    for (index = 0; index < GAME_BOAT_COUNT; index++) {
+    for (index = 0; index < GAME_OBELISK_VISITOR_COUNT; index++) {
         if (gpGame->m_obeliskVisitors[index] & (1 << color))
             count++;
     }

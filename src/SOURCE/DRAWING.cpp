@@ -614,8 +614,8 @@ void combatManager::DrawBackground(void) {
     );
     gpResourceManager->Dispose(backgroundIcon);
 
-    if (m_debugFormation != 0) {
-        sprintf(gText, "covr%04d.icn", m_debugFormation);
+    if (m_elevationOverlayIndex != 0) {
+        sprintf(gText, "covr%04d.icn", m_elevationOverlayIndex);
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(
             backgroundIcon,

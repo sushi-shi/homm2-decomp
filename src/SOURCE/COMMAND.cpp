@@ -2686,7 +2686,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         case ACTION_SURRENDER:
             gbCombatSurrender = true;
             gbRetreatWin = true;
-            m_sideDefeated[IDX(m_currentSide)] = true;
+            m_sideSurrendered[IDX(m_currentSide)] = true;
             gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)] -=
                 giNextActionExtra;
             gpGame->m_players[m_playerId[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)]]

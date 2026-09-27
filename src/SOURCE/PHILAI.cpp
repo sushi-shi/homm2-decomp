@@ -48,7 +48,7 @@
 #define AI_ZERO_FLOAT 0.0f
 #define AI_RELOAD_BASE 2.0f
 #define AI_RELOAD_NUMERATOR 3.0f
-#define AI_EASY_STRENGTH_FACTOR                                                    \
+#define AI_WARRIOR_STRENGTH_FACTOR                                                    \
     1.15
 #define AI_BERSERK_FACTOR 0.75
 #define AI_HERO_VALUE_SCALE 0.00004
@@ -60,7 +60,7 @@
 #define AI_BATTLE_DIFFICULTY_STEP                                                  \
     0.15
 #define AI_BATTLE_BASE_STRENGTH_FACTOR 0.7
-#define AI_BATTLE_EASY_STRENGTH_FACTOR                                             \
+#define AI_BATTLE_WARRIOR_STRENGTH_FACTOR                                             \
     1.08
 #define AI_BATTLE_HUMAN_DEFENDER_FACTOR                                            \
     1.14
@@ -962,7 +962,7 @@ void philAI::CheckBerserk(void) {
     fBerserkFactor = 1.0f;
     heroFightValue = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 1);
     if (gpCurPlayer->m_aiPersonality == PLAYER_PERSONALITY_WARRIOR)
-        heroFightValue = static_cast<i32>(heroFightValue * AI_EASY_STRENGTH_FACTOR);
+        heroFightValue = static_cast<i32>(heroFightValue * AI_WARRIOR_STRENGTH_FACTOR);
     if (heroFightValue < AI_MINIMUM_FIGHT_VALUE)
         heroFightValue = AI_MINIMUM_FIGHT_VALUE;
     if (heroFightValue < AI_BERSERK_THRESHOLD)
@@ -2421,7 +2421,7 @@ void philAI::ProbableOutcomeOfBattle(
         );
         if (gpCurPlayer->m_aiPersonality == PLAYER_PERSONALITY_WARRIOR)
             attStr =
-                static_cast<float>(attStr * AI_BATTLE_EASY_STRENGTH_FACTOR);
+                static_cast<float>(attStr * AI_BATTLE_WARRIOR_STRENGTH_FACTOR);
     } else {
         attStr = attFight;
         if (gbHumanPlayer[enemyPlayer] != 0) {
@@ -2429,7 +2429,7 @@ void philAI::ProbableOutcomeOfBattle(
                 static_cast<float>(defStrong * AI_BATTLE_HUMAN_DEFENDER_FACTOR);
         } else if (gpCurPlayer->m_aiPersonality == PLAYER_PERSONALITY_WARRIOR) {
             attStr =
-                static_cast<float>(attStr * AI_BATTLE_EASY_STRENGTH_FACTOR);
+                static_cast<float>(attStr * AI_BATTLE_WARRIOR_STRENGTH_FACTOR);
         }
     }
 
@@ -3997,6 +3997,8 @@ float philAI::FutureDeflator(i32* const resources) {
 #define townPointer townPtr
 #define useAdjustedFightValue useHero
 #define applySiegeAttackerModifiers useEnemyMods
+#define siegeFlyingModifier closeCombat
+#define siegeGroundModifier flyMod
 #endif
 VA(0x004859c8, 0x9a1)
 i32 philAI::FightValueOfStack(
@@ -4010,14 +4012,14 @@ i32 philAI::FightValueOfStack(
     i32 armyValue;
     float H2_UNUSED(rangeVal);
     town* townPointer;
-    float closeCombat;
+    float siegeFlyingModifier;
     i32 castleValue;
     float countMod;
     i32 spellIndex;
     i32 slot;
     i32 magicTotal;
     float archerMod;
-    float flyMod;
+    float siegeGroundModifier;
     i32 stackWorth;
     i32 numShooters;
     i32 heroLuck;
@@ -4038,8 +4040,8 @@ i32 philAI::FightValueOfStack(
     magicTotal = 0;
     castleValue = 0;
     archerMod = 0.9f;
-    closeCombat = 1.1f;
-    flyMod = 0.75f;
+    siegeFlyingModifier = 1.1f;
+    siegeGroundModifier = 0.75f;
     rangeVal = 0.1f;
     townPointer = NULL;
 
@@ -4047,8 +4049,8 @@ i32 philAI::FightValueOfStack(
         if (heroPointer->HasArtifact(ARTIFACT_BALLISTA) || heroPointer->HasSpell(SPELL_EARTHQUAKE)
             || heroPointer->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                    != HERO_SKILL_LEVEL_NONE) {
-            closeCombat = 1.05f;
-            flyMod = 0.95f;
+            siegeFlyingModifier = 1.05f;
+            siegeGroundModifier = 0.95f;
         }
         if (heroPointer->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)] != HERO_SKILL_LEVEL_NONE
             || heroPointer->HasArtifact(ARTIFACT_GOLDEN_BOW))
@@ -4142,9 +4144,9 @@ i32 philAI::FightValueOfStack(
                         stackWorth = static_cast<i32>(stackWorth * archerMod);
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[slot])].attributes,
                             MONSTER_FLAGS_FLYING))
-                        stackWorth = static_cast<i32>(stackWorth * closeCombat);
+                        stackWorth = static_cast<i32>(stackWorth * siegeFlyingModifier);
                     else
-                        stackWorth = static_cast<i32>(stackWorth * flyMod);
+                        stackWorth = static_cast<i32>(stackWorth * siegeGroundModifier);
                 }
             }
             armyValue += stackWorth;
@@ -4259,6 +4261,8 @@ i32 philAI::FightValueOfStack(
 #undef townPointer
 #undef useAdjustedFightValue
 #undef applySiegeAttackerModifiers
+#undef siegeFlyingModifier
+#undef siegeGroundModifier
 #endif
 
 #if H2_RETAIL_COMPILER
@@ -5811,15 +5815,15 @@ void philAI::IncrementHourGlass(void) {
 
 #if H2_RETAIL_COMPILER
 #define heroPointer h
-#define attackerCasualtyFraction attackerLoss
-#define defenderCasualtyFraction defenderLoss
+#define defenderCasualtyFraction attackerLoss
+#define attackerCasualtyFraction defenderLoss
 #endif
 VA(0x00488c35, 0x1f6)
 void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
     town* pTown;
     i32 H2_UNUSED(quickResult);
-    float defenderCasualtyFraction;
     float attackerCasualtyFraction;
+    float defenderCasualtyFraction;
     hero* defenderHero;
     CombatResult combatResult;
     i32 H2_UNUSED(owner);
@@ -5838,8 +5842,8 @@ void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
                     NULL,
                     TOWN_EVENT_USE_GARRISON,
                     pTown->m_id,
-                    defenderCasualtyFraction,
-                    attackerCasualtyFraction
+                    attackerCasualtyFraction,
+                    defenderCasualtyFraction
                 );
             } else {
                 defenderHero = pTown->m_occupyingHeroId == TOWN_EVENT_NO_HERO
