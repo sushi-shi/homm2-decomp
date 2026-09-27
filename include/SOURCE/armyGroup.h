@@ -43,12 +43,12 @@ public:
     i32 GetMorale(class hero*, class town*, class armyGroup*);
     void Dismiss(i32);
     i32 IsMember(CreatureType);
-    ArmyGroupAlignmentResult IsHomogeneous(i32);
+    ArmyGroupAlignmentResult IsHomogeneous(i32 alignmentMode);
     i32 CanJoin(CreatureType);
     i32 GetNumArmies(void);
     i32 Add(CreatureType, i32, i32);
     void Swap(i32, class armyGroup*, i32);
-    void DamageGroup(float);
+    void DamageGroup(float casualtyFraction);
 };
 #pragma pack(pop)
 #endif

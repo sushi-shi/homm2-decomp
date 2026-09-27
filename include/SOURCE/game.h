@@ -149,7 +149,7 @@ public:
     u16 m_mapEventCount;
     u16 m_mapEventIndices[GAME_MAP_EVENT_CAPACITY];
     class heroWindow* m_viewArmyWindow;
-    i32 m_viewArmyResult;
+    i32 m_dialogAnimationCounter;
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
     HeroSpellType m_viewSpellsType;

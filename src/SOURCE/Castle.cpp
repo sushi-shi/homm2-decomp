@@ -172,7 +172,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             sprintf(
                 gText,
                 "Mage Guild, Level %d",
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
+                m_town->m_mageGuildLevel + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_mageGuildLevel + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
             );
             message3.payload.widget.data.text = gText;
@@ -189,7 +189,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         widgetFrame12 = FRAME_NONE;
         if ((m_town->m_buildings & (1L << (castleSlotsUse[slot7])))
             && (castleSlotsUse[slot7] != CASTLE_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+                || m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_MAX_LEVEL)) {
             widgetFrame12 = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << (castleSlotsUse[slot7]))))
@@ -500,7 +500,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
                         loopIndex = (INFO_BUILD_MAGE_GUILD);
-                    else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)
+                    else if (gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_MAX_LEVEL)
                         loopIndex = (INFO_MAGE_GUILD_MAX_LEVEL);
                     else if (!CanBuy(gpTownManager->m_town, CASTLE_MAGE_GUILD))
                         loopIndex = (INFO_CANNOT_AFFORD_MAGE_LEVEL);
@@ -690,7 +690,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     case TOWN_OBJECT_MAGE_GUILD:
                         if (quickFlag
-                            || gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
+                            || gpTownManager->m_town->m_mageGuildLevel == TOWN_MAGE_GUILD_MAX_LEVEL
                             || (gpTownManager->m_buildableBuildings & (1 << (buildSlot))))
                             goto buy_building;
                         break;
