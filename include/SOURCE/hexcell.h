@@ -28,7 +28,7 @@ public:
     H2_ENUM_STORAGE(CombatSide, i8) m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
     i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
     H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
-    u8 m_pathReachable;
+    u8 m_movementOrAttackReachable;
     struct SLimitData m_limits[HEXCELL_LIMIT_COUNT];
     hexcell(void);
     void DrawGround(void);

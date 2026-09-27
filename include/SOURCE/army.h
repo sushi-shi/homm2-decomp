@@ -29,7 +29,7 @@ H2_ENUM_END(ArmyHexConstant)
 class army {
 public:
     u8 m_animationState;
-    u8 m_animationCycle;
+    u8 m_shootingAnimationActive;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, char) m_pendingAnimationSequence;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationStart;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationEnd;
@@ -49,7 +49,7 @@ public:
     b32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
     i32 m_mirrorImageIndex;
-    i32 m_roundCounter;
+    i32 m_mirrorImageRoundsRemaining;
     H2_ENUM_STORAGE(CreatureType, i32) m_monsterType;
     i32 m_hex;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, i32) m_animationSequence;

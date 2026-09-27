@@ -427,7 +427,7 @@ void combatManager::SetupGridForArmy(army* armyPointer) {
     for (j = 0; j < COMBAT_HEX_COUNT; j++) {
         if (j == armyPointer->m_hex) {
             m_gridState[j] = GRID_SHADE_REACHABLE;
-        } else if (m_hexCells[j].m_pathReachable != 0) {
+        } else if (m_hexCells[j].m_movementOrAttackReachable != 0) {
             if (m_hexCells[j].m_occupantSide != COMBAT_SIDE_NONE) {
                 if (m_hexCells[j].m_occupantSide != armyPointer->m_side)
                     m_gridState[j] = GRID_SHADE_REACHABLE;
