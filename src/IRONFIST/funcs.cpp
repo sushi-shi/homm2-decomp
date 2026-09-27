@@ -953,7 +953,7 @@ static i32 l_setNumberOfCreatures(lua_State* L) {
     town* cstle = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 dwllng = static_cast<i32>(luaL_checknumber(L, 2));
     i32 numcrtrs = static_cast<i32>(luaL_checknumber(L, 3));
-    cstle->m_garrison[dwllng] = numcrtrs;
+    cstle->m_dwellingAvailable[dwllng] = numcrtrs;
     return 0;
 }
 

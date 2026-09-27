@@ -233,7 +233,7 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
 
     gpCombatManager->m_hexCells[fromHex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[fromHex].m_occupantSide = COMBAT_SIDE_NONE;
-    gpCombatManager->m_hexCells[fromHex].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[fromHex].m_occupantFootprintHalf = ARMY_FACING_NONE;
     gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
 
     bitmap* savedScreen =
@@ -270,7 +270,7 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
     m_hex = toHex;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = m_side;
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = static_cast<i8>(m_index);
-    gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[m_hex].m_occupantFootprintHalf = ARMY_FACING_NONE;
 
     savedScreen->CopyTo(
         gpWindowManager->m_screen, 0, 0, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT
@@ -376,12 +376,12 @@ i32 army::FlyTo(i32 destination) {
 
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-    gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[m_hex].m_occupantFootprintHalf = ARMY_FACING_NONE;
     if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         sourceRearHex = m_hex + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
-        gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantFootprintHalf = ARMY_FACING_NONE;
     }
 
     if (!gbNoShowCombat) {
@@ -552,16 +552,16 @@ i32 army::FlyTo(i32 destination) {
         gpCombatManager->m_currentArmySide;
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
         gpCombatManager->m_currentArmyIndex;
-    gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->m_hexCells[destination].m_occupantFootprintHalf = ARMY_FACING_NONE;
     if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         endRearHex = destination + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
             gpCombatManager->m_currentArmySide;
         gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
             gpCombatManager->m_currentArmyIndex;
-        gpCombatManager->m_hexCells[endRearHex].m_occupantFrame =
+        gpCombatManager->m_hexCells[endRearHex].m_occupantFootprintHalf =
             endRearHex >= destination ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
-        gpCombatManager->m_hexCells[destination].m_occupantFrame =
+        gpCombatManager->m_hexCells[destination].m_occupantFootprintHalf =
             destination >= endRearHex ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
     }
     m_hex = destination;

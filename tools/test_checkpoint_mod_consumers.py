@@ -5,7 +5,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
-for filename, one_based_index in (("TOWN.cpp", "m_buildState"), ("GAME.cpp", "slot")):
+for filename, one_based_index in (("TOWN.cpp", "m_mageGuildLevel"), ("GAME.cpp", "slot")):
     source = (ROOT / "src/SOURCE" / filename).read_text()
     assignments = re.findall(
         r"m_spellCounts\[([^]]+)\]\s*=\s*([^;]*CyborgSpellLimits[^;]*);",

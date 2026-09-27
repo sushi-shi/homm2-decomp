@@ -368,9 +368,9 @@ void Ironfist_UndoWellGrowth(void) {
 
             const i32 dwellingIdx = d - 0x13;
             if (townObj.m_owner >= 0) {
-                townObj.m_garrison[dwellingIdx] -= 2;
+                townObj.m_dwellingAvailable[dwellingIdx] -= 2;
             } else {
-                townObj.m_garrison[dwellingIdx] -= 1;
+                townObj.m_dwellingAvailable[dwellingIdx] -= 1;
             }
         }
     }
