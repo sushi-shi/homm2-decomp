@@ -1,0 +1,42 @@
+{
+  "commit": "ec64499ea47f9a2e1b86105adb6264d1561230b7",
+  "files": 234,
+  "translation_units": 96,
+  "standalone_headers": [
+    "include/BASE/MiscGraphicsConstants.h",
+    "include/SOURCE/KB.h",
+    "include/va.h"
+  ],
+  "declarations": 26211,
+  "kinds": {
+    "function": 1074,
+    "argument": 4815,
+    "class": 219,
+    "typedef": 790,
+    "struct": 168,
+    "member": 1515,
+    "global": 2212,
+    "enum": 752,
+    "constant": 7278,
+    "constructor": 123,
+    "destructor": 48,
+    "method": 1814,
+    "union": 20,
+    "local": 5203,
+    "label": 168,
+    "namespace": 12
+  },
+  "macros": 2791,
+  "identifier_spellings": 48020,
+  "parse_gaps": 14,
+  "files_without_ast": [
+    "include/BASE/MiscGraphicsConstants.h",
+    "include/SOURCE/KB.h",
+    "include/va.h",
+    "src/BASE/BITS.asm",
+    "src/BASE/TILE.asm"
+  ],
+  "collection": "Tracked src/ and include/; Clang retail-analysis C++98, default ru locale; inactive branches indexed lexically.",
+  "va_markers": 1491,
+  "state": "All review entries unreviewed; no naming decisions made by collection."
+}
