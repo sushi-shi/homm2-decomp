@@ -1,10 +1,9 @@
-//! Differential tests: the decompiled C++ decoders against this crate.
+//! Differential tests: the portable C++ decoders against this crate.
 //!
 //! `build.rs` compiles the ten reconstructed translation units from the
 //! decomp tree and this test drives both implementations over generated
-//! valid streams, comparing whole surfaces byte for byte. Retail quirks are
-//! enabled on the Rust side so both reproduce the shipped behaviour,
-//! including the mirrored partial-run drop.
+//! valid streams, comparing whole surfaces byte for byte. Corrected clipping
+//! is enabled on the Rust side to check partial mirrored runs at both edges.
 //!
 //! Deliberately outside the corpus (documented divergences):
 //! * out-of-range shadow levels (retail reads past `uDimPal`);
@@ -317,19 +316,19 @@ fn retail_frames_agree() {
                     if variant < 6 {
                         let blit = retail_color_variant(variant, palettes, &table, &shear);
                         blit.clip(clip)
-                            .quirks(Quirks::retail())
+                            .quirks(Quirks::corrected())
                             .draw(&mut canvas, frame, x, y)
                             .expect("colour frame");
                     } else {
                         let blit = retail_mask_variant(variant, palettes);
                         blit.clip(clip)
-                            .quirks(Quirks::retail())
+                            .quirks(Quirks::corrected())
                             .draw(&mut canvas, frame, x, y)
                             .expect("mask frame");
                     }
                     assert!(
                         cxx == rust,
-                        "retail pixels differ: {:?}, frame {index}, variant {variant}",
+                        "pixels differ: {:?}, frame {index}, variant {variant}",
                         entry.name_str()
                     );
                     comparisons += 1;
@@ -548,7 +547,7 @@ fn rust_draw(blit: homm2_icon::ColorBlit<'_>, case: &Case, pixels: &mut [u8]) {
     let icon = Icon::from_body(1, &case.body).expect("body parses");
     let mut canvas = Canvas::new(CANVAS_W, CANVAS_H, pixels).expect("canvas");
     blit.clip(case.clip)
-        .quirks(Quirks::retail())
+        .quirks(Quirks::corrected())
         .draw(
             &mut canvas,
             icon.frame_data(0).expect("frame"),
@@ -562,7 +561,7 @@ fn rust_draw_mask(blit: homm2_icon::MaskBlit<'_>, case: &Case, pixels: &mut [u8]
     let icon = Icon::from_body(1, &case.body).expect("body parses");
     let mut canvas = Canvas::new(CANVAS_W, CANVAS_H, pixels).expect("canvas");
     blit.clip(case.clip)
-        .quirks(Quirks::retail())
+        .quirks(Quirks::corrected())
         .draw(
             &mut canvas,
             icon.frame_data(0).expect("frame"),

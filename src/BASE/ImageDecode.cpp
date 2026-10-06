@@ -167,11 +167,7 @@ bool DrawIcon(const icon* source, bitmap* destination, i32 x, i32 y, i32 index,
     const i64 base = options.mirrored ? static_cast<i64>(x) - frame.x
                                       : static_cast<i64>(x) + frame.x;
     i64 row = static_cast<i64>(y) + frame.y;
-    const i64 left = options.mirrored ? base - frame.width + 1 : base;
     const bool requestedClip = options.sheared || clip != ICON_DRAW_NO_CLIP;
-    const bool contained = left >= clipX && left + frame.width <= static_cast<i64>(clipX) + clipW
-        && row >= clipY && row + frame.height <= static_cast<i64>(clipY) + clipH;
-    const bool legacyClip = requestedClip && (options.sheared || !contained);
     i64 clipLeft = 0, clipTop = 0;
     i64 clipRight = destination->m_width, clipBottom = destination->m_height;
     if (requestedClip) {
@@ -205,12 +201,9 @@ bool DrawIcon(const icon* source, bitmap* destination, i32 x, i32 y, i32 index,
         if (run.kind == RunKind::Skip || run.length == 0 || row < clipTop || row >= clipBottom
             || (options.sheared && shearAt(row) == ICON_SHEAR_SKIP_ROW))
             return;
-        // The mirrored retail decoders drop partial nonliteral runs at the
-        // requested clip edge. Preserve that visible quirk independently of
-        // the unconditional safety intersection with the destination.
-        if (legacyClip && options.mirrored && run.kind != RunKind::Literal
-            && (runLeft < clipX || runRight > static_cast<i64>(clipX) + clipW))
-            return;
+        // Retail's mirrored decoders dropped nonliteral runs that crossed the
+        // requested clip edge, leaving gaps in partially redrawn sprites. The
+        // visible portion is clipped like every other run.
         const i64 begin = std::max(runLeft, clipLeft);
         const i64 end = std::min(runRight, clipRight);
         if (begin >= end)

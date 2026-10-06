@@ -132,6 +132,13 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
         return ICON_DRAW_SKIPPED;
 
+    // DrawFrame restores only this rectangle. Every variant must stay inside
+    // it, or shadows outside the restored area are applied again each frame.
+    const i32 clipX = gbLimitToExtent != 0 ? giMinExtentX : 0;
+    const i32 clipY = gbLimitToExtent != 0 ? giMinExtentY : 0;
+    const i32 clipW = gbLimitToExtent != 0 ? giMaxExtentX - giMinExtentX + 1 : LOGICAL_SCREEN_WIDTH;
+    const i32 clipH = gbLimitToExtent != 0 ? giMaxExtentY - giMinExtentY + 1 : DRAW_COMBAT_HEIGHT;
+
     if (yModify != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
             IconToBitmapYModify(
@@ -141,10 +148,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 y,
                 frame,
                 ICON_DRAW_CLIP,
-                0,
-                0,
-                LOGICAL_SCREEN_WIDTH,
-                DRAW_COMBAT_HEIGHT,
+                clipX,
+                clipY,
+                clipW,
+                clipH,
                 offset,
                 {yModify, LOGICAL_SCREEN_HEIGHT}
             );
@@ -156,10 +163,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 y,
                 frame,
                 ICON_DRAW_CLIP,
-                0,
-                0,
-                LOGICAL_SCREEN_WIDTH,
-                DRAW_COMBAT_HEIGHT,
+                clipX,
+                clipY,
+                clipW,
+                clipH,
                 offset,
                 {yModify, LOGICAL_SCREEN_HEIGHT}
             );
@@ -172,10 +179,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 y,
                 frame,
                 ICON_DRAW_CLIP,
-                0,
-                0,
-                LOGICAL_SCREEN_WIDTH,
-                DRAW_COMBAT_HEIGHT,
+                clipX,
+                clipY,
+                clipW,
+                clipH,
                 offset,
                 colorTable,
                 H2EnumIndex(COLOR_TABLE_APPLY_DIM)
@@ -188,41 +195,12 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 y,
                 frame,
                 ICON_DRAW_CLIP,
-                0,
-                0,
-                LOGICAL_SCREEN_WIDTH,
-                DRAW_COMBAT_HEIGHT,
+                clipX,
+                clipY,
+                clipW,
+                clipH,
                 offset,
                 colorTable
-            );
-    } else if (gbLimitToExtent != 0) {
-        if (orientation == ICON_DRAW_NORMAL)
-            IconToBitmap(
-                this,
-                gpWindowManager->m_screen,
-                x,
-                y,
-                frame,
-                ICON_DRAW_CLIP,
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1,
-                offset
-            );
-        else
-            FlipIconToBitmap(
-                this,
-                gpWindowManager->m_screen,
-                x,
-                y,
-                frame,
-                ICON_DRAW_CLIP,
-                giMinExtentX,
-                giMinExtentY,
-                giMaxExtentX - giMinExtentX + 1,
-                giMaxExtentY - giMinExtentY + 1,
-                offset
             );
     } else if (orientation == ICON_DRAW_NORMAL) {
         IconToBitmap(
@@ -232,10 +210,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             y,
             frame,
             ICON_DRAW_CLIP,
-            0,
-            0,
-            LOGICAL_SCREEN_WIDTH,
-            DRAW_COMBAT_HEIGHT,
+            clipX,
+            clipY,
+            clipW,
+            clipH,
             offset
         );
     } else {
@@ -246,10 +224,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             y,
             frame,
             ICON_DRAW_CLIP,
-            0,
-            0,
-            LOGICAL_SCREEN_WIDTH,
-            DRAW_COMBAT_HEIGHT,
+            clipX,
+            clipY,
+            clipW,
+            clipH,
             offset
         );
     }
