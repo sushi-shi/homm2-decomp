@@ -1715,11 +1715,11 @@ def review(rva):
     unit, name, _function_rva = _function_for_arg(rva)
     base_obj = B + "/objdiff/normalized/base/%s.obj" % unit
     target_obj = B + "/objdiff/normalized/target/%s.c.obj" % unit
-    B = parse_obj(base_obj).get(name, [])
-    T = parse_obj(target_obj).get(name, [])
+    base_relocs = parse_obj(base_obj).get(name, [])
+    target_relocs = parse_obj(target_obj).get(name, [])
     candidate_bodies = _function_bytes(base_obj)
     for s in sorted({
-            r[1] for r in B
+            r[1] for r in base_relocs
             if is_fake(sym, data, r[1]) and not candidate_bodies.get(r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
@@ -1731,13 +1731,13 @@ def review(rva):
             if v is not None:
                 c[v] += 1; sy.setdefault(v, r[1])
         return c, sy
-    bc, va_sym = bvas(B)
-    tvas = _tvas(sym, data, dups, [r for r in T if '_00A@' not in r[1]])
+    bc, va_sym = bvas(base_relocs)
+    tvas = _tvas(sym, data, dups, [r for r in target_relocs if '_00A@' not in r[1]])
     diff = bc - tvas
     for v, n in sorted(diff.items()):
         print("  base references 0x%x (%s) x%d that retail never does (wrong/extra global/const/fn)"
               % (v, va_sym[v], n))
-    print("base relocs=%d target relocs=%d  only-base=%d" % (len(B), len(T), sum(diff.values())))
+    print("base relocs=%d target relocs=%d  only-base=%d" % (len(base_relocs), len(target_relocs), sum(diff.values())))
 
 def review_counts(scope="BASE"):
     """List incomplete functions whose relocation occurrence counts still differ.
