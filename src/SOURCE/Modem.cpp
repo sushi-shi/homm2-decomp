@@ -226,19 +226,19 @@ void Connect(void) {
     localstage = remotestage;
     do {
         if (ReadPacket()) {
-            packet[packetlen] = 0;
+            packet.Bytes()[packetlen] = 0;
             if (packetlen != HANDSHAKE_PACKET_SIZE)
                 continue;
-            if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
+            if (strncmp(packet.Bytes(), "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                 continue;
-            if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
+            if (strncmp(packet.Bytes() + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Duplicate ID Strings!\nSorry Please Try Again\n");
                 GOut(gText);
                 RemoteCleanup();
             }
-            memcpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+            memcpy(remoteidstr, packet.Bytes() + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
             remoteidstr[HANDSHAKE_ID_SIZE] = '\0';
-            remotestage = packet[HANDSHAKE_STAGE_INDEX] - '0';
+            remotestage = packet.Bytes()[HANDSHAKE_STAGE_INDEX] - '0';
             localstage = remotestage + 1;
             oldsec = -1;
         }
@@ -270,19 +270,19 @@ i32 WaitForDirectConnect(void) {
         }
         case MODEM_CONNECTION_HANDSHAKE_STAGE:
             if (ReadPacket()) {
-                packet[packetlen] = 0;
+                packet.Bytes()[packetlen] = 0;
                 if (packetlen != HANDSHAKE_PACKET_SIZE)
                     return 0;
-                if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
+                if (strncmp(packet.Bytes(), "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                     return 0;
-                if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
+                if (strncmp(packet.Bytes() + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
                     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Duplicate ID Strings!\nSorry Please Try Again\n");
                     GOut(gText);
                     RemoteCleanup();
                 }
-                memcpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+                memcpy(remoteidstr, packet.Bytes() + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
                 remoteidstr[HANDSHAKE_ID_SIZE] = '\0';
-                remotestage = packet[HANDSHAKE_STAGE_INDEX] - '0';
+                remotestage = packet.Bytes()[HANDSHAKE_STAGE_INDEX] - '0';
                 localstage = remotestage + 1;
                 oldsec = -1;
             }
@@ -338,7 +338,7 @@ char ReadPacket(void) {
             LogStr("OverFlow2");
             continue;
         }
-        packet[packetlen] = static_cast<char>(input);
+        packet.Bytes()[packetlen] = static_cast<char>(input);
         ++packetlen;
     }
 }

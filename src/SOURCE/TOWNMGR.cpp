@@ -3385,7 +3385,7 @@ void GetCategoryStats(
 }
 
 void SortStats(i32l* const stats, i8* const order) {
-    i32 temporaryOrder;
+    i8 temporaryOrder;
     i32 secondPlayer;
     i32 firstPlayer;
     i32l tempStat;
@@ -3398,7 +3398,7 @@ void SortStats(i32l* const stats, i8* const order) {
                 stats[secondPlayer] = tempStat;
                 temporaryOrder = order[firstPlayer];
                 order[firstPlayer] = order[secondPlayer];
-                order[secondPlayer] = static_cast<i8>(temporaryOrder);
+                order[secondPlayer] = temporaryOrder;
             }
         }
     }

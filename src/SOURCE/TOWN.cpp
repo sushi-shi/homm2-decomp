@@ -108,7 +108,11 @@ void town::View(i32 noFade) {
 }
 
 void town::Deallocate(void) {
+    if (m_owner < 0 || m_owner >= GAME_PLAYER_COUNT || m_id < 0 || m_id >= GAME_TOWN_COUNT)
+        return;
     playerData* player = &gpGame->m_players[m_owner];
+    if (player->m_townCount <= 0 || player->m_townCount > GAME_TOWN_COUNT)
+        return;
     i32 position = TOWN_ID_NONE;
     i32 i;
 
@@ -116,6 +120,8 @@ void town::Deallocate(void) {
         if (player->m_townIds[i] == m_id)
             position = i;
     }
+    if (position == TOWN_ID_NONE)
+        return;
     for (i = position; i < player->m_townCount - 1; ++i)
         player->m_townIds[i] = player->m_townIds[i + 1];
 

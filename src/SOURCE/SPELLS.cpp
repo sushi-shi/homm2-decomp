@@ -26,6 +26,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
+#include <SOURCE/SpellMask.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
 #include <BASE/message.h>
@@ -1531,8 +1532,8 @@ void combatManager::Armageddon(void) {
     i32l damage;
     palette* originalPalette;
     palette* effectPalette;
-    i8* effectDataRestore;
-    i8* originalData;
+    u8* effectDataRestore;
+    u8* originalData;
     i32 restorePass;
     i32 component;
 
@@ -1695,31 +1696,31 @@ void combatManager::Armageddon(void) {
     if (gbNoShowCombat)
         return;
 
-    effectDataRestore = effectPalette->Data();
-    originalData = originalPalette->Data();
+    effectDataRestore = effectPalette->UnsignedData();
+    originalData = originalPalette->UnsignedData();
     for (restorePass = 0; restorePass < SPELL_ARMAGEDDON_RESTORE_PASS_COUNT; ++restorePass) {
         for (component = 0; component < PALETTE_DATA_SIZE; ++component) {
-            if (static_cast<u8>(effectDataRestore[component])
-                == static_cast<u8>(originalData[component]))
+            if (effectDataRestore[component]
+                == originalData[component])
                 continue;
 
-            if (static_cast<u8>(effectDataRestore[component])
-                > static_cast<u8>(originalData[component])) {
-                if (static_cast<u8>(effectDataRestore[component])
+            if (effectDataRestore[component]
+                > originalData[component]) {
+                if (effectDataRestore[component]
                         - SPELL_ARMAGEDDON_CHANNEL_STEP
-                    > static_cast<u8>(originalData[component]))
+                    > originalData[component])
                     effectDataRestore[component] -= SPELL_ARMAGEDDON_CHANNEL_STEP;
                 else
                     effectDataRestore[component] = originalData[component];
-            } else if (static_cast<u8>(effectDataRestore[component])
+            } else if (effectDataRestore[component]
                            + SPELL_ARMAGEDDON_CHANNEL_STEP
-                       < static_cast<u8>(originalData[component])) {
+                       < originalData[component]) {
                 effectDataRestore[component] += SPELL_ARMAGEDDON_CHANNEL_STEP;
             } else {
                 effectDataRestore[component] = originalData[component];
             }
         }
-        SetPalette(effectDataRestore, 1);
+        SetPalette(effectPalette->Data(), 1);
         DelayMilli(
             static_cast<i32l>(
                 SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
@@ -1959,21 +1960,27 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                         case BOLT_COLOR_RED_TABLE:
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * LOGICAL_SCREEN_WIDTH)[drawX] =
-                                gColorTableRed[static_cast<i8>(
+                                gColorTableRed[
                                     (gpWindowManager->m_screen->m_pixels
                                      + drawY * LOGICAL_SCREEN_WIDTH)[drawX]
-                                )];
+                                ];
                             break;
                         case BOLT_COLOR_RED_BEAM:
+                            if (edgeShade < 0 || edgeShade >= static_cast<i32>(sizeof(uRedBeam)))
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * LOGICAL_SCREEN_WIDTH)[drawX] = uRedBeam[edgeShade];
                             break;
                         case BOLT_COLOR_RAINBOW_FORWARD:
+                            if (beamOffset - widthFirst >= static_cast<i32>(sizeof(uRainbow)))
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * LOGICAL_SCREEN_WIDTH)[drawX] =
                                 uRainbow[beamOffset - widthFirst];
                             break;
                         case BOLT_COLOR_RAINBOW_REVERSE:
+                            if (beamOffset - widthFirst > BOLT_RAINBOW_LAST_INDEX)
+                                break;
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * LOGICAL_SCREEN_WIDTH)[drawX] =
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (beamOffset - widthFirst)];
@@ -2525,8 +2532,10 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
         if (phase == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         for (stripeRow = 0; stripeRow < rowCount; ++stripeRow) {
-            *(stripeRow * VAPORIZE_STRIPE_WIDTH + gyModify + topOffset + firstY) = VAPORIZE_MASKED;
-            *(gyModify - stripeRow * VAPORIZE_STRIPE_WIDTH - bottomOffset + lastY) = VAPORIZE_MASKED;
+            SetSpellMaskRow({gyModify, LOGICAL_SCREEN_HEIGHT},
+                firstY + stripeRow * VAPORIZE_STRIPE_WIDTH + topOffset, VAPORIZE_MASKED);
+            SetSpellMaskRow({gyModify, LOGICAL_SCREEN_HEIGHT},
+                lastY - stripeRow * VAPORIZE_STRIPE_WIDTH - bottomOffset, VAPORIZE_MASKED);
             gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
@@ -2632,7 +2641,7 @@ void combatManager::RippleCreature(
                 || skipDistance == RIPPLE_SKIP_DISTANCE_4))
             continue;
         amplitude = skipDistance * (amplitudeIndex * amplitudeStep + amplitudeBase);
-        memset(gyModify + giMinExtentY, 0, extentHeight);
+        FillSpellMask({gyModify, LOGICAL_SCREEN_HEIGHT}, giMinExtentY, giMaxExtentY, 0);
         for (rowIndex = giMinExtentY; rowIndex < giMaxExtentY; ++rowIndex) {
             if (mode == COMBAT_RIPPLE_DEATH_WAVE)
                 waveIndex = -giMaxExtentY + rowIndex
@@ -2642,7 +2651,8 @@ void combatManager::RippleCreature(
                             + (phase - RIPPLE_PHASE_START) * RIPPLE_WAVE_PHASE_MULTIPLIER;
             waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
             if (waveIndex >= 0 && waveIndex < LOGICAL_SCREEN_HEIGHT)
-                gyModify[rowIndex] = static_cast<i8>((wave[waveIndex]) * amplitude);
+                SetSpellMaskRow({gyModify, LOGICAL_SCREEN_HEIGHT}, rowIndex,
+                    static_cast<i8>((wave[waveIndex]) * amplitude));
         }
         if (mode == COMBAT_RIPPLE_DEATH_RIPPLE && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
             start = giMinExtentY - 1;
@@ -2650,13 +2660,13 @@ void combatManager::RippleCreature(
                    + (RIPPLE_DEATH_RIPPLE_FADE_BASE - (RIPPLE_PHASE_END - phase)) * extentHeight
                          / RIPPLE_FADE_DIVISOR
                    + 1;
-            memset(gyModify + start, VAPORIZE_MASKED, maskEnd - start + 1);
+            FillSpellMask({gyModify, LOGICAL_SCREEN_HEIGHT}, start, maskEnd, VAPORIZE_MASKED);
         }
         if (mode == COMBAT_RIPPLE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
             start = giMinExtentY - 1;
             maskEnd = giMaxExtentY - 1
                    - (phase - RIPPLE_DEATH_WAVE_FADE_BASE) * extentHeight / RIPPLE_FADE_DIVISOR;
-            memset(gyModify + start, VAPORIZE_MASKED, maskEnd - start + 1);
+            FillSpellMask({gyModify, LOGICAL_SCREEN_HEIGHT}, start, maskEnd, VAPORIZE_MASKED);
         }
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);

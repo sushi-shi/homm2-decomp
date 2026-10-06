@@ -275,11 +275,6 @@ typedef enum OverviewDialogConstant {
 #define OVERVIEW_SCROLL_ROUNDING_OFFSET                                            \
     0.4
 
-#define OVERVIEW_TEXT_WIDGET(row, item)                                                            \
-    (*(textWidgetDynamic + (row) * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + (item)))
-#define OVERVIEW_ICON_WIDGET(row, item)                                                            \
-    (*(iconWidgetDynamic + (row) * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + (item)))
-
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     i32 rowIndex;
     i32 i;
@@ -307,19 +302,19 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
     for (rowIndex = 0; rowIndex < OVERVIEW_VISIBLE_ROWS; rowIndex++) {
         for (i = 0; i < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; i++) {
-            if (*(textWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i) != NULL) {
+            if (textWidgetDynamic[rowIndex][i] != NULL) {
                 overWin->RemoveWidget(
-                    *(textWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i)
+                    textWidgetDynamic[rowIndex][i]
                 );
-                delete *(textWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i);
-                *(textWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i) = NULL;
+                delete textWidgetDynamic[rowIndex][i];
+                textWidgetDynamic[rowIndex][i] = NULL;
             }
-            if (*(iconWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i) != NULL) {
+            if (iconWidgetDynamic[rowIndex][i] != NULL) {
                 overWin->RemoveWidget(
-                    *(iconWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i)
+                    iconWidgetDynamic[rowIndex][i]
                 );
-                delete *(iconWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i);
-                *(iconWidgetDynamic + rowIndex * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + i) = NULL;
+                delete iconWidgetDynamic[rowIndex][i];
+                iconWidgetDynamic[rowIndex][i] = NULL;
             }
         }
     }
@@ -333,7 +328,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             break;
         }
 
-        OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+        iconWidgetDynamic[rowIndex][icons] = new iconWidget(
             ROW_BACKGROUND_X,
             rowIndex * OVERVIEW_ROW_HEIGHT + ROW_BACKGROUND_Y_OFFSET,
             ROW_BACKGROUND_WIDTH,
@@ -345,10 +340,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             WIDGET_KIND_ICON_DIRECT,
             OVERVIEW_ICON_FILL_COLOR
         );
-        if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+        if (iconWidgetDynamic[rowIndex][icons] == NULL) {
             MemError();
         }
-        overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+        overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
         icons++;
 
         if (giOverviewType == OVERVIEW_TOWNS) {
@@ -363,7 +358,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 ALLOC_COPY_STRING(valueText, record->m_name);
 
-                OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
+                textWidgetDynamic[rowIndex][texts] = new textWidget(
                     TOWN_NAME_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_NAME_Y_OFFSET,
                     TOWN_NAME_WIDTH,
@@ -375,7 +370,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
-                overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                 texts++;
             }
 
@@ -384,7 +379,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 if ((H2EnumIndex((record->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))) == 0) {
                     townFrame += TOWN_UNFORTIFIED_FRAME_OFFSET;
                 }
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_ICON_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_ICON_Y_OFFSET,
                     TOWN_ICON_WIDTH,
@@ -396,15 +391,15 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
             }
 
-            if (H2BitTest(gpGame->m_townBuiltToday, record->m_id)) {
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+            if (H2BitTest(gpGame->m_townBuiltToday, static_cast<u32>(record->m_id))) {
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_LOCATOR_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_LOCATOR_Y_OFFSET,
                     0,
@@ -416,10 +411,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
             }
 
@@ -434,7 +429,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             }
 
             if (heroData != NULL || capt) {
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_HERO_FRAME_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_HERO_FRAME_Y_OFFSET,
                     TOWN_HERO_FRAME_WIDTH,
@@ -446,13 +441,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
 
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_HERO_PORTRAIT_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_HERO_PORTRAIT_Y_OFFSET,
                     TOWN_HERO_PORTRAIT_WIDTH,
@@ -464,13 +459,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
 
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_MOBILITY_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_MOBILITY_Y_OFFSET,
                     0,
@@ -482,10 +477,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
 
                 if (record->m_type == FACTION_BARBARIAN || record->m_type == FACTION_KNIGHT) {
@@ -493,7 +488,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 } else {
                     captainMana = CAPTAIN_MANA_HIGH;
                 }
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                     TOWN_MANA_X,
                     rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_MANA_Y_OFFSET,
                     0,
@@ -505,10 +500,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
             }
 
@@ -516,9 +511,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 displayedTroops = 0;
                 for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
                     if (ARMY_GROUP_HAS_POSITIVE_STACK(record->m_army, i)) {
-                        OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                            displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_ICON_Y_OFFSET,
+                        iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                            static_cast<i16>(
+                                displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X
+                            ),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_ICON_Y_OFFSET
+                            ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
                             "mons32.icn",
@@ -528,10 +527,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
-                        if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                        if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                             MemError();
                         }
-                        overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                        overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
@@ -541,9 +540,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             "%d",
                             record->m_army.m_creatureCounts[i]
                         );
-                        OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
-                            displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_TEXT_Y_OFFSET,
+                        textWidgetDynamic[rowIndex][texts] = new textWidget(
+                            static_cast<i16>(
+                                displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_TROOP_FIRST_X
+                            ),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_TEXT_Y_OFFSET
+                            ),
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
@@ -553,7 +556,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
-                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                        overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                         texts++;
                         displayedTroops++;
                     }
@@ -606,9 +609,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                          & (1 << (H2EnumIndex(building)
                                   + H2EnumIndex(TOWN_DWELLING_BUILDING_BIT_BASE))))
                         != 0) {
-                        OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                            displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_ICON_Y_OFFSET,
+                        iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                            static_cast<i16>(
+                                displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X
+                            ),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_ICON_Y_OFFSET
+                            ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
                             "mons32.icn",
@@ -618,10 +625,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
-                        if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                        if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                             MemError();
                         }
-                        overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                        overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
@@ -629,11 +636,15 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             OVERVIEW_TROOP_TEXT_CAPACITY,
                             "%d",
-                            record->m_dwellingAvailable[building])
-                        ;
-                        OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
-                            displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_TEXT_Y_OFFSET,
+                            static_cast<i32>(record->m_dwellingAvailable[building])
+                        );
+                        textWidgetDynamic[rowIndex][texts] = new textWidget(
+                            static_cast<i16>(
+                                displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X
+                            ),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_TROOP_TEXT_Y_OFFSET
+                            ),
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
@@ -643,7 +654,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
-                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                        overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                         texts++;
                         displayedTroops++;
                     }
@@ -658,7 +669,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             curHero =
                 GetHero(gpCurPlayer->m_heroIds[giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex]);
 
-            OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+            iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                 HERO_FRAME_X,
                 rowIndex * OVERVIEW_ROW_HEIGHT + HERO_FRAME_Y_OFFSET,
                 HERO_FRAME_WIDTH,
@@ -670,13 +681,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
             );
-            if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+            if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                 MemError();
             }
-            overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+            overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
             icons++;
 
-            OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+            iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                 HERO_PORTRAIT_X,
                 rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PORTRAIT_Y_OFFSET,
                 HERO_PORTRAIT_WIDTH,
@@ -688,13 +699,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
             );
-            if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+            if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                 MemError();
             }
-            overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+            overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
             icons++;
 
-            OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+            iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                 HERO_MOBILITY_X,
                 rowIndex * OVERVIEW_ROW_HEIGHT + HERO_MOBILITY_Y_OFFSET,
                 0,
@@ -706,13 +717,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
             );
-            if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+            if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                 MemError();
             }
-            overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+            overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
             icons++;
 
-            OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
+            iconWidgetDynamic[rowIndex][icons] = new iconWidget(
                 HERO_MANA_X,
                 rowIndex * OVERVIEW_ROW_HEIGHT + HERO_MANA_Y_OFFSET,
                 0,
@@ -724,10 +735,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
             );
-            if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+            if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                 MemError();
             }
-            overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+            overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
             icons++;
 
             for (i = 0; i < HERO_PRIMARY_STAT_COUNT; i++) {
@@ -736,11 +747,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     valueText,
                     OVERVIEW_PRIMARY_TEXT_CAPACITY,
                     "%d",
-                    curHero->Stats(HeroPrimaryStat(i)))
-                ;
-                OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
-                    i * HERO_PRIMARY_COLUMN_STRIDE + HERO_PRIMARY_TEXT_FIRST_X,
-                    rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_TEXT_Y_OFFSET,
+                    static_cast<i32>(curHero->Stats(HeroPrimaryStat(i)))
+                );
+                textWidgetDynamic[rowIndex][texts] = new textWidget(
+                    static_cast<i16>(i * HERO_PRIMARY_COLUMN_STRIDE + HERO_PRIMARY_TEXT_FIRST_X),
+                    static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_TEXT_Y_OFFSET),
                     HERO_PRIMARY_TEXT_WIDTH,
                     HERO_PRIMARY_TEXT_HEIGHT,
                     valueText,
@@ -750,14 +761,14 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_TEXT,
                     FONT_ALIGN_RIGHT
                 );
-                overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                 texts++;
             }
 
             for (i = 0; i < HERO_PRIMARY_STAT_COUNT; i++) {
-                OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                    i * HERO_PRIMARY_COLUMN_STRIDE + HERO_PRIMARY_ICON_FIRST_X,
-                    rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_ICON_Y_OFFSET,
+                iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                    static_cast<i16>(i * HERO_PRIMARY_COLUMN_STRIDE + HERO_PRIMARY_ICON_FIRST_X),
+                    static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_ICON_Y_OFFSET),
                     HERO_PRIMARY_ICON_WIDTH,
                     HERO_PRIMARY_ICON_HEIGHT,
                     "overview.icn",
@@ -767,10 +778,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
-                if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                     MemError();
                 }
-                overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                 icons++;
             }
 
@@ -778,9 +789,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 shown = 0;
                 for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
                     if (ARMY_GROUP_HAS_POSITIVE_STACK(curHero->m_army, i)) {
-                        OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                            shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + HERO_TROOP_ICON_Y_OFFSET,
+                        iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                            static_cast<i16>(shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + HERO_TROOP_ICON_Y_OFFSET
+                            ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
                             "mons32.icn",
@@ -790,10 +803,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
-                        if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                        if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                             MemError();
                         }
-                        overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                        overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
@@ -803,9 +816,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             "%d",
                             curHero->m_army.m_creatureCounts[i]
                         );
-                        OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
-                            shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X,
-                            rowIndex * OVERVIEW_ROW_HEIGHT + HERO_TROOP_TEXT_Y_OFFSET,
+                        textWidgetDynamic[rowIndex][texts] = new textWidget(
+                            static_cast<i16>(shown * HERO_TROOP_COLUMN_STRIDE + HERO_TROOP_FIRST_X),
+                            static_cast<i16>(
+                                rowIndex * OVERVIEW_ROW_HEIGHT + HERO_TROOP_TEXT_Y_OFFSET
+                            ),
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
@@ -815,7 +830,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
-                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                        overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                         texts++;
                         shown++;
                     }
@@ -827,10 +842,12 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 if (skillIndex != HERO_SKILL_NONE) {
                     detailRow = i / OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     column = i % OVERVIEW_SECONDARY_SKILL_COLUMNS;
-                    OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                        column * DETAIL_COLUMN_STRIDE + HERO_SKILL_FRAME_FIRST_X,
-                        detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
-                            + HERO_SKILL_FRAME_Y_OFFSET,
+                    iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                        static_cast<i16>(column * DETAIL_COLUMN_STRIDE + HERO_SKILL_FRAME_FIRST_X),
+                        static_cast<i16>(
+                            detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
+                            + HERO_SKILL_FRAME_Y_OFFSET
+                        ),
                         DETAIL_FRAME_WIDTH,
                         DETAIL_FRAME_HEIGHT,
                         "overview.icn",
@@ -840,16 +857,18 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                    if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                    overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                     icons++;
 
-                    OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                        column * DETAIL_COLUMN_STRIDE + HERO_SKILL_ICON_FIRST_X,
-                        detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
-                            + HERO_SKILL_ICON_Y_OFFSET,
+                    iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                        static_cast<i16>(column * DETAIL_COLUMN_STRIDE + HERO_SKILL_ICON_FIRST_X),
+                        static_cast<i16>(
+                            detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
+                            + HERO_SKILL_ICON_Y_OFFSET
+                        ),
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
                         "miniss.icn",
@@ -859,10 +878,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                    if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                    overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                     icons++;
 
                     valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_SKILL_LEVEL_CAPACITY));
@@ -870,12 +889,14 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         valueText,
                         OVERVIEW_SKILL_LEVEL_CAPACITY,
                         "%d",
-                        curHero->GetSSLevel(skillIndex))
-                    ;
-                    OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
-                        column * DETAIL_COLUMN_STRIDE + HERO_SKILL_LEVEL_FIRST_X,
-                        detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
-                            + HERO_SKILL_LEVEL_Y_OFFSET,
+                        static_cast<i32>(curHero->GetSSLevel(skillIndex))
+                    );
+                    textWidgetDynamic[rowIndex][texts] = new textWidget(
+                        static_cast<i16>(column * DETAIL_COLUMN_STRIDE + HERO_SKILL_LEVEL_FIRST_X),
+                        static_cast<i16>(
+                            detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
+                            + HERO_SKILL_LEVEL_Y_OFFSET
+                        ),
                         HERO_SKILL_LEVEL_WIDTH,
                         HERO_SKILL_LEVEL_HEIGHT,
                         valueText,
@@ -885,7 +906,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_TEXT,
                         FONT_ALIGN_RIGHT
                     );
-                    overWin->AddWidget(OVERVIEW_TEXT_WIDGET(rowIndex, texts), -1);
+                    overWin->AddWidget(textWidgetDynamic[rowIndex][texts], -1);
                     texts++;
                 }
             }
@@ -895,10 +916,14 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 if (curHero->m_artifacts[i] != ARTIFACT_NONE) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     column = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
-                    OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                        column * DETAIL_COLUMN_STRIDE + HERO_ARTIFACT_FRAME_FIRST_X,
-                        detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
-                            + HERO_ARTIFACT_FRAME_Y_OFFSET,
+                    iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                        static_cast<i16>(
+                            column * DETAIL_COLUMN_STRIDE + HERO_ARTIFACT_FRAME_FIRST_X
+                        ),
+                        static_cast<i16>(
+                            detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
+                            + HERO_ARTIFACT_FRAME_Y_OFFSET
+                        ),
                         DETAIL_FRAME_WIDTH,
                         DETAIL_FRAME_HEIGHT,
                         "overview.icn",
@@ -908,16 +933,20 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                    if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                    overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                     icons++;
 
-                    OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
-                        column * DETAIL_COLUMN_STRIDE + HERO_ARTIFACT_ICON_FIRST_X,
-                        detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
-                            + HERO_ARTIFACT_ICON_Y_OFFSET,
+                    iconWidgetDynamic[rowIndex][icons] = new iconWidget(
+                        static_cast<i16>(
+                            column * DETAIL_COLUMN_STRIDE + HERO_ARTIFACT_ICON_FIRST_X
+                        ),
+                        static_cast<i16>(
+                            detailRow * DETAIL_ROW_STRIDE + rowIndex * OVERVIEW_ROW_HEIGHT
+                            + HERO_ARTIFACT_ICON_Y_OFFSET
+                        ),
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
                         "artfx.icn",
@@ -927,10 +956,10 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
+                    if (iconWidgetDynamic[rowIndex][icons] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET(rowIndex, icons), -1);
+                    overWin->AddWidget(iconWidgetDynamic[rowIndex][icons], -1);
                     icons++;
                     displayedArtifacts++;
                 }
@@ -1047,12 +1076,12 @@ void game::Overview(void) {
         textWidgetTitle[mine] = NULL;
     }
 
-    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
-    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
+    textWidgetDynamic = static_cast<OverviewTextWidgetRow*>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
+    iconWidgetDynamic = static_cast<OverviewIconWidgetRow*>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
     for (y = 0; y < OVERVIEW_VISIBLE_ROWS; y++) {
         for (mine = 0; mine < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; mine++) {
-            *(textWidgetDynamic + y * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + mine) = NULL;
-            *(iconWidgetDynamic + y * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + mine) = NULL;
+            textWidgetDynamic[y][mine] = NULL;
+            iconWidgetDynamic[y][mine] = NULL;
         }
     }
 
@@ -1502,8 +1531,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
 }
 
 class heroWindow* overWin = NULL;
-class textWidget** textWidgetDynamic = NULL;
-class iconWidget** iconWidgetDynamic = NULL;
+OverviewTextWidgetRow* textWidgetDynamic = NULL;
+OverviewIconWidgetRow* iconWidgetDynamic = NULL;
 OverviewType giOverviewType = OVERVIEW_HEROES;
 i32 giOverviewTop[H2EnumIndex(OVERVIEW_TYPE_COUNT)] = {0};
 class iconWidget* OVScrollKnob = NULL;
