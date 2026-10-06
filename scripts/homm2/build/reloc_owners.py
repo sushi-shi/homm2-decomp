@@ -7,10 +7,10 @@ an implicit COFF addend, for example ``gConfig + 0x30``.
 
 Ownership is a reviewed claim: a data symbol is accepted as an owner only when
 its source ``DATA()`` definition names the same RVA and an explicit extent is
-recorded in config/reloc_data_owners.tsv.  The inventory's own sizes are not
+recorded in config/retail/reloc_data_owners.tsv.  The inventory's own sizes are not
 ownership proof by themselves.
 
-This module also owns the reader for config/delink_relocs.tsv - the reviewed
+This module also owns the reader for config/retail/absolute_relocations.tsv - the reviewed
 absolute-relocation site list that substitutes for the image's missing
 base-relocation directory.
 """
@@ -22,8 +22,8 @@ from typing import NamedTuple
 
 
 IMAGE_BASE = 0x400000
-OWNER_EXTENTS = "config/reloc_data_owners.tsv"
-RELOC_MANIFEST = "config/delink_relocs.tsv"
+OWNER_EXTENTS = "config/retail/reloc_data_owners.tsv"
+RELOC_MANIFEST = "config/retail/absolute_relocations.tsv"
 
 
 class DataOwner(NamedTuple):

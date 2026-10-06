@@ -1,7 +1,7 @@
 # Buka VA claim queue, harvested from branch decomp-gold-2.1-buka-attempt-1 (its NEW_VA markers).
 # Every row is a remap CLAIM from the previous attempt: the function's
 # PoL-line reconstruction (pol_va) was located at buka_rva in this image.
-# inventory compares against config/retail_functions.csv byte_size:
+# inventory compares against config/retail/functions.csv byte_size:
 #   exact = Ghidra agrees on entry+size; size-differs:<n> = entry agrees,
 #   size does not; absent = Ghidra lists no function at that entry.
 # Claim a row by porting the body and marking it VA(0x<va>, 0x<size>).

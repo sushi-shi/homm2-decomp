@@ -11,7 +11,7 @@ bytes, so such a function looks absurdly small and delinks at 0.00%.
 
 ## Retail evidence — `ShowThisMapGame` (0x0048e7b0)
 
-`config/retail_functions.csv` claimed 26 bytes:
+`config/retail/functions.csv` claimed 26 bytes:
 
 ```
 0x8e7b0,26,FUN_0048e7b0,0,2,92,92,118

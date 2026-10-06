@@ -51,7 +51,7 @@ separately: they still differ in ordered relocation identity, but require
 instruction semantics to decide whether they are merely commutative operand
 ordering.
 
-For every entry in `config/required_initialized_storage.tsv`, the link gate also
+For every entry in `config/retail/data_initialized_storage.tsv`, the link gate also
 requires the current source `DATA()` allocation size reported by Clang to equal
 the reviewed retail extent. Hashing only the reviewed prefix is insufficient: a
 short array followed by zero-valued storage can otherwise reproduce the expected

@@ -20,5 +20,5 @@ symbol-relative addends.
 The candidate COFF has no `.data` relocations, the table's typed source has no
 pointer fields, and removing the seven false-positive sites makes the retail
 and candidate `.data` payloads byte-identical.  The sites are retained in
-`config/delink_reloc_exclusions.tsv` so future generated sweeps cannot
+`config/retail/reloc_exclusions.tsv` so future generated sweeps cannot
 reintroduce them.

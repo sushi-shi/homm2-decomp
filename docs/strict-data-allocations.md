@@ -99,7 +99,7 @@ requires its PE HIGHLOW count and offsets.
 
 This adapter is separate from the standalone interface above. `homm2
 strict-allocations` converts the reviewed rows in
-`config/required_initialized_storage.tsv` into one strict manifest per object
+`config/retail/data_initialized_storage.tsv` into one strict manifest per object
 unit, runs objdiff once per unit, and invokes the project-neutral checker above.
 Use `--unit SOURCE/KB` to limit a run. Generated manifests and the
 machine-readable coverage report are written to `build/gen/strict-allocations/`.

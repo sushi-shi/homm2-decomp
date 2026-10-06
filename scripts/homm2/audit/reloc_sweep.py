@@ -1,4 +1,4 @@
-"""Regenerate config/delink_relocs.tsv from the image with the delinker's sweep.
+"""Regenerate config/retail/absolute_relocations.tsv from the image with the delinker's sweep.
 
 The stripped target has no base-relocation directory, so the manifest is the
 only DIR32 channel. `find_relocs.py` in the vostok-delinker tree recovers those
@@ -14,7 +14,7 @@ sections could not start at all. Measured against PoL 2.0's surviving `.reloc`
 precision and 0.9942 recall; see docs/reloc-manifest-sweep.md.
 
     homm2 audit reloc-sweep              # report the yield, write nothing
-    homm2 audit reloc-sweep --write      # replace config/delink_relocs.tsv
+    homm2 audit reloc-sweep --write      # replace config/retail/absolute_relocations.tsv
 
 `find_relocs.py` lives in the delinker repository, not this one. Point
 `VOSTOK_DELINKER` at that checkout, or pass `--find-relocs PATH`; a checkout
@@ -31,9 +31,9 @@ from pathlib import Path
 from homm2.core.paths import REPO
 
 EXE = REPO / "build/orig/HMM2PL.exe"
-MANIFEST = REPO / "config/delink_relocs.tsv"
-EXCLUSIONS = REPO / "config/delink_reloc_exclusions.tsv"
-INCLUSIONS = REPO / "config/delink_reloc_inclusions.tsv"
+MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+EXCLUSIONS = REPO / "config/retail/reloc_exclusions.tsv"
+INCLUSIONS = REPO / "config/retail/reloc_inclusions.tsv"
 SCRIPT = "scripts/find_relocs.py"
 
 BANNER = """\
@@ -47,7 +47,7 @@ BANNER = """\
 # scripts/find_relocs.py). Do not hand-edit: regenerate instead. The rule set is
 # scored against PoL 2.0's surviving .reloc directory; see
 # docs/reloc-manifest-sweep.md for the measured precision per target class and
-# config/delink_reloc_{inclusions,exclusions}.tsv for reviewed target-specific
+# config/retail/reloc_{inclusions,exclusions}.tsv for reviewed target-specific
 # overrides.
 """
 
@@ -106,7 +106,7 @@ from homm2.core.usage import logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--write", action="store_true",
-                        help="replace config/delink_relocs.tsv with the sweep")
+                        help="replace config/retail/absolute_relocations.tsv with the sweep")
     parser.add_argument("--find-relocs", metavar="PATH",
                         help="path to vostok-delinker's scripts/find_relocs.py")
     args = parser.parse_args(argv)

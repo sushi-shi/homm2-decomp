@@ -40,12 +40,12 @@ from homm2.build.reloc_owners import (
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
-RETAIL_FUNCTIONS = REPO / "config/retail_functions.csv"
-LEDGER = REPO / "config/required_initialized_storage.tsv"
+RETAIL_FUNCTIONS = REPO / "config/retail/functions.csv"
+LEDGER = REPO / "config/retail/data_initialized_storage.tsv"
 EXE = REPO / "build/orig/HMM2PL.exe"
 PDB = REPO / "build/pdb/HMM2PL.pdb"
-RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
-RELOC_ALIASES = REPO / "config/delink_reloc_aliases.tsv"
+RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+RELOC_ALIASES = REPO / "config/retail/reloc_aliases.tsv"
 MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 SOURCE_DATA_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
@@ -262,7 +262,7 @@ def regenerate_targets(delinker=None, force=False):
     backup = TARGET.with_name(TARGET.name + ".pre-delink")
     try:
         # The image ships no .reloc directory, so every DIR32 site the delinker
-        # may use comes from the reviewed config/delink_relocs.tsv; the alias
+        # may use comes from the reviewed config/retail/absolute_relocations.tsv; the alias
         # manifest resolves reviewed interior references to their owner symbol.
         subprocess.run([
             str(delinker), "--pdb-path", str(PDB), "--exe-path", str(EXE),

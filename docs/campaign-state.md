@@ -198,7 +198,7 @@ every one exactly +3. Dumped the three unmatched site offsets for
 
 Those are genuine COFF relocations against `__except_list` in our object,
 but they are NOT image relocations - the operand is a segment-relative
-`fs:` offset, so `config/delink_relocs.tsv` correctly omits them. All 72
+`fs:` offset, so `config/retail/absolute_relocations.tsv` correctly omits them. All 72
 rows are /GX functions and the +3 is the same three sites every time.
 
 `homm2.audit.reloc_donation` already skips `__except_list`

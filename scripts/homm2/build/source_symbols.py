@@ -256,14 +256,14 @@ def _vc6_symbol_name(cursor) -> str:
 # campaign converts them to markers (compgen rows become VA_COMPGEN, CRT and
 # thunk rows stay config-owned). Each maps to (unit, name-builder).
 REVIEWED_CLAIMS = (
-    ("config/compgen_functions.csv", None,
+    ("config/retail/functions_compgen.csv", None,
      lambda row: (row["unit"], row["symbol"])),
-    ("config/crt_functions.csv", "reviewed-crt",
+    ("config/retail/functions_static_libs.csv", "reviewed-crt",
      lambda row: ("(libcmt)", row["symbol"])),
-    ("config/import_thunks.csv", "reviewed-thunk",
+    ("config/retail/functions_imports.csv", "reviewed-thunk",
      lambda row: ("(imports)", (row.get("coff") or "").strip() or "%s@%s" % (
          row["symbol"], row["dll"].rsplit(".", 1)[0]))),
-    ("config/eh_funclets.csv", "reviewed-funclet",
+    ("config/retail/functions_eh.csv", "reviewed-funclet",
      lambda row: ("(funclets)", row["name"])),
 )
 
@@ -340,7 +340,7 @@ def collect(source_root: Path, repo: Path,
             repo / "build/toolchain/msvc/lib",
         )
         provider_rows += compiler_data_claims(
-            repo / "config/compiler_generated_data.tsv",
+            repo / "config/retail/data_compgen.tsv",
             repo / "build/objdiff/base",
         )
         rows.extend(SourceSymbol(
@@ -400,7 +400,7 @@ def collect(source_root: Path, repo: Path,
 def _manifest_targets(repo: Path) -> list[int]:
     """RVAs the reviewed DIR32 sites point at (read from the retail image)."""
     import struct as _struct
-    manifest = repo / "config/delink_relocs.tsv"
+    manifest = repo / "config/retail/absolute_relocations.tsv"
     exe = repo / "build/orig/HMM2PL.exe"
     if not manifest.is_file() or not exe.is_file():
         return []

@@ -21,7 +21,7 @@ for globals whose decorated retail symbol depends on it. The audit also reports
 numeric literal writes and unproven writes to already recovered Boolean
 storage; ``--check`` fails on every actionable kind of remaining cleanup.
 The few byte-proven retail truth-value writes and parser-dialect diagnostics
-live in ``config/retail_bool_exceptions.tsv``. Full checks fail when an entry is
+live in ``config/reviews/bool_exceptions.tsv``. Full checks fail when an entry is
 no longer observed, so the manifest cannot silently become a stale allowlist.
 When one declaration statement owns Boolean and non-Boolean declarators, the
 candidate is marked ``requires_declaration_split``: its type token must not be
@@ -75,7 +75,7 @@ from homm2.core.paths import REPO
 SCHEMA_VERSION = 4
 RETAIL_DATABASE = Path("build/clangd/compile_commands.json")
 PORTABLE_DATABASE = Path("build/compile_commands.json")
-RETAIL_EXCEPTION_MANIFEST = Path("config/retail_bool_exceptions.tsv")
+RETAIL_EXCEPTION_MANIFEST = Path("config/reviews/bool_exceptions.tsv")
 RETAIL_EXCEPTION_FIELDS = (
     "category", "file", "qualified_name", "write_kind", "detail", "reason",
 )

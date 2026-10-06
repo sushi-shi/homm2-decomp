@@ -3,7 +3,7 @@
 #
 # functions.csv (entry_rva hex, byte_size decimal, name) is the WHOLE-.text function
 # boundary map homm2.analysis.xref reads, and the refresh path for the candidate
-# inventory config/retail_functions.csv when analysis improves (boundaries stay
+# inventory config/retail/functions.csv when analysis improves (boundaries stay
 # analysis opinion until a VA() marker claims them). Read-only over the
 # FunctionManager.
 #

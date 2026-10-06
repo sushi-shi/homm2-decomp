@@ -1,6 +1,6 @@
 # DIR32 relocation-count mismatches on SAME-LENGTH functions (2026-08-03).
 # ours = DIR32 sites in build/objdiff/base/<unit>.obj within the claimed span
-# retail = rows of config/delink_relocs.tsv falling in that span
+# retail = rows of config/retail/absolute_relocations.tsv falling in that span
 # RESOLVED 2026-08-03: all 72 deltas are +3 and are the SEH registration triple
 # (fs:[0] read + install + uninstall against __except_list). Those are COFF
 # relocations in our object but NOT image relocations, so the manifest rightly

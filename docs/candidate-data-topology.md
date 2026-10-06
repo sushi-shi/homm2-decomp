@@ -3,7 +3,7 @@
 Candidate objects and retail evidence have different jobs. Candidate COFF proves
 symbol spelling, local/external storage class, section ordinal and offset, alignment,
 allocation order, and relocation topology. Retail PE bytes, reviewed relocation sites
-(`config/delink_relocs.tsv` — the image has no base-relocation directory), and
+(`config/retail/absolute_relocations.tsv` — the image has no base-relocation directory), and
 reviewed owner intervals prove placement and contents; a group without reviewed
 intervals stays open. Claimed inventory addresses are anchors, but do not prove
 private identity, extent, TU ownership, or storage layout.

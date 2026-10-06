@@ -65,11 +65,11 @@ _**Functions exact** = byte-identical now. **Functions exact-max** = observed at
 
 _Excluded from the % above — identified generated/library code, not independent reconstruction targets:_
 
-| Module       | Functions | Code (B) | Why excluded                                             |
-| :----------- | --------: | -------: | :------------------------------------------------------- |
-| `(funclets)` |       311 |    3,739 | compiler /GX EH; match with their parent function        |
-| `(imports)`  |        23 |      138 | import thunks (config/import_thunks.csv)                 |
-| `(libcmt)`   |       413 |   61,348 | FID-identified static runtime (config/crt_functions.csv) |
+| Module       | Functions | Code (B) | Why excluded                                                            |
+| :----------- | --------: | -------: | :---------------------------------------------------------------------- |
+| `(funclets)` |       311 |    3,739 | compiler /GX EH; match with their parent function                       |
+| `(imports)`  |        23 |      138 | import thunks (config/retail/functions_imports.csv)                     |
+| `(libcmt)`   |       413 |   61,348 | FID-identified static runtime (config/retail/functions_static_libs.csv) |
 
 <!-- match-score:end -->
 

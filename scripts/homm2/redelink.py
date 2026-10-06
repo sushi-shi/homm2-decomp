@@ -1,7 +1,7 @@
 """Rebuild every delinker input from the source tree and replace the target.
 
 The target image is stripped, so the whole inventory is project evidence:
-source claims and explicit providers name identities, config/retail_functions.csv
+source claims and explicit providers name identities, config/retail/functions.csv
 carries the analysis candidates that fill the "(unmatched)" module, and the
 reviewed manifests under config/ supply relocation sites and aliases. Candidate
 objects are built first so compiler-generated providers can be re-proven before

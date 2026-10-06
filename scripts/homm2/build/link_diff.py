@@ -7,7 +7,7 @@
 Counts the bytes in which `build/link/historical/HMM2PL.exe` differs from the
 retail control at fixed file offsets: the headers before the first section,
 each section's raw data, the overlay after the last section, and the file-size
-difference. `config/link_diff_ceiling.tsv` holds the highest count each region
+difference. `config/link_diff.tsv` holds the highest count each region
 may have. A count above its ceiling, or a region the ceiling does not list,
 fails; a lower count passes and is reported as bankable with `--update`.
 
@@ -26,7 +26,7 @@ from homm2.core.paths import REPO
 
 RETAIL = REPO / "build/orig/HMM2PL.exe"
 CANDIDATE = REPO / "build/link/historical/HMM2PL.exe"
-CEILING = REPO / "config/link_diff_ceiling.tsv"
+CEILING = REPO / "config/link_diff.tsv"
 HEADER = ("# Highest differing byte count per region of the historical native link\n"
           "# against retail. Written by `python3 -m homm2.build.link_diff --update`;\n"
           "# lower it when the residual shrinks, never raise it to admit a regression.\n"

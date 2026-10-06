@@ -40,8 +40,8 @@ from homm2.core.paths import REPO
 EXE = REPO / "build/orig/HMM2PL.exe"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 BASE_OBJS = REPO / "build/objdiff/base"
-MANIFEST = REPO / "config/delink_relocs.tsv"
-ALIASES = REPO / "config/delink_reloc_aliases.tsv"
+MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+ALIASES = REPO / "config/retail/reloc_aliases.tsv"
 
 IMAGE_BASE = 0x400000
 IMAGE_DIR32 = 6
@@ -138,7 +138,7 @@ from homm2.core.usage import logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write", action="store_true",
-                        help="merge verified rows into config/delink_relocs.tsv")
+                        help="merge verified rows into config/retail/absolute_relocations.tsv")
     args = parser.parse_args(argv)
 
     exe = EXE.read_bytes()

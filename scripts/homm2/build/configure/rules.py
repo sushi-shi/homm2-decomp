@@ -34,7 +34,7 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
            command=(f"{PY} -m homm2.build.canonicalize_relocs "
                     "--unit $unit --base $base --target $in --output $out "
                     "--symbols build/gen/symbol_names.csv "
-                    "--rel32-aliases config/reviewed_rel32_aliases.tsv"),
+                    "--rel32-aliases config/retail/reloc_rel32_aliases.tsv"),
            description="normalize-relocs $unit")
     w.rule("legacy_implib",
            command=(f"{PY} -m homm2.build.legacy_import_lib "

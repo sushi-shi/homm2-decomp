@@ -4,7 +4,7 @@
 vostok-delinker consumes a PDB to slice HMM2PL.exe into per-symbol COFF .obj
 files. This target is stripped, so the claimed inventory comes from source
 VA/DATA markers (build/gen/symbol_names.csv) alone. Every function listed in
-config/retail_functions.csv whose entry RVA no source marker has claimed is placed
+config/retail/functions.csv whose entry RVA no source marker has claimed is placed
 in one extra "(unmatched)" module, so the whole retail .text delinks from the first
 run and matching has a browsable baseline. Rows move out of "(unmatched)" exactly
 when a VA marker claims their RVA; the boundaries of what remains stay analysis
@@ -87,7 +87,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HMM2PL.exe")))
     ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
-    ap.add_argument("--retail-functions", default=str(REPO / "config/retail_functions.csv"))
+    ap.add_argument("--retail-functions", default=str(REPO / "config/retail/functions.csv"))
     ap.add_argument("--out", default=str(REPO / "build/pdb/HMM2PL.pdb"))
     a = ap.parse_args(argv)
     exe, out = Path(a.exe), Path(a.out)

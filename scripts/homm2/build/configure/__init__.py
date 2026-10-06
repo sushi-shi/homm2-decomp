@@ -45,7 +45,7 @@ def main() -> None:
         dummy_path.write_bytes(dummy)
     delink = REPO / "build/delink"
     reviewed_units = set()
-    reviewed = REPO / "config/required_initialized_storage.tsv"
+    reviewed = REPO / "config/retail/data_initialized_storage.tsv"
     if reviewed.exists():
         with reviewed.open() as stream:
             for row in csv.DictReader(

@@ -265,7 +265,7 @@ exactly to `crc32Table` at 0x51f5a4, and `include/BASE/MIDI_TYPES.h` is gone.
   Claiming any one address would put the symbol where five of its own
   references contradict it. `_`-prefixed internal names are outside
   `assert_relocs`'s FAKE check, so this costs no audit row.
-- **`config/reloc_data_owners.tsv` recorded `gConfig` at `0x128d20`**, but 523
+- **`config/retail/reloc_data_owners.tsv` recorded `gConfig` at `0x128d20`**, but 523
   unanimous votes and the donation inventory both place it at `0x1261e0`. The
   row now reads `0x1261e0`, and `reloc_owners.owners_from_rows` raises on a
   reviewed extent whose address contradicts the symbol's `DATA()` claim instead
@@ -276,9 +276,9 @@ produce one report row per COFF data symbol, and no debug records carry allocati
 lengths on this target (the image is stripped); the reviewed ledgers below are the
 only extent authority.
 
-Two reviewed ledgers provide exact extents. `config/required_initialized_storage.tsv`
+Two reviewed ledgers provide exact extents. `config/retail/data_initialized_storage.tsv`
 records allocations whose initializer payload has been audited. The narrower
-`config/reloc_data_owners.tsv` records public owner regions whose source `DATA()` RVA
+`config/retail/reloc_data_owners.tsv` records public owner regions whose source `DATA()` RVA
 and type-derived size are independently proven, including loader-zero `.bss` storage.
 `scripts/homm2/build/reviewed_data.py` joins both to the public inventory, validates
 address, compiland ownership, and PE storage, and writes
@@ -318,7 +318,7 @@ contribution replay, and exact coverage partition live under `build/gen`. An exp
 and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
 the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal commands refuse a
 stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
-The stamp also hashes `config/delink_reloc_aliases.tsv`, whose reviewed function/address rows let
+The stamp also hashes `config/retail/reloc_aliases.tsv`, whose reviewed function/address rows let
 Vostok reproduce certain positive or negative COFF addends that the linked PE cannot encode.
 There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
 machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
@@ -336,7 +336,7 @@ missing or ambiguous bindings warn normally and fail strict assembly.
 configures and builds the candidate-only `ninja base` target first, then resolves one
 symbol inventory from source claims and explicit providers. Retail IAT identities come
 from the PE import descriptors joined to exact current/toolchain caller spellings; the
-reviewed `std::ctype<wchar_t>` guard in `config/compiler_generated_data.tsv` is re-proven
+reviewed `std::ctype<wchar_t>` guard in `config/retail/data_compgen.tsv` is re-proven
 against current candidate COMMON definitions; and the four MASM functions plus TILE's
 scratch allocation come from one fixed exception table. Missing or conflicting provider
 evidence fails before PDB synthesis. Vostok then runs once and the comparison graph is
@@ -354,7 +354,7 @@ canonical only by reconstructing a source `DATA()` definition or adding an expli
 `DATA_COMPGEN()` source claim followed by canonical assembly.
 
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
-about `required_initialized_storage.tsv`, so another reconstruction project
+about `config/retail/data_initialized_storage.tsv`, so another reconstruction project
 can generate the same generic manifest from its own reviewed evidence. Per-symbol
 allocation scoring belongs in the generic objdiff consumer; this adapter does not
 rewrite objdiff's native section measures. The final-link initialized-storage audit

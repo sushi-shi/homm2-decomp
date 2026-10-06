@@ -150,7 +150,7 @@
       # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
       # xref and supplies the WHOLE-.text function-boundary map; on this stripped
       # target its analysis is also the candidate function inventory
-      # (config/retail_functions.csv), while source VA() markers stay authoritative
+      # (config/retail/functions.csv), while source VA() markers stay authoritative
       # for names. Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
       # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [

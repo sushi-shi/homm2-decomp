@@ -11,13 +11,13 @@ MSVC object code and can be linked into a working executable.
 - The image is STRIPPED: no debug stream, no export directory, and no
   base-relocation directory (data directory 5 is 0/0). Nothing in the binary
   names a symbol or lists a DIR32 site.
-- `config/retail_functions.csv` is Ghidra's function inventory (2,472 candidate
+- `config/retail/functions.csv` is Ghidra's function inventory (2,472 candidate
   boundaries): ANALYSIS OUTPUT, edited as understanding improves, never retail
   evidence. A boundary becomes a claim only when a source `VA(...)` marker
   names its address; `build/gen/symbol_names.csv` is that claimed inventory.
 - Every function the retail inventory lists that no marker claims delinks into
   the `(unmatched)` module, so the whole `.text` is always comparable.
-- `config/delink_relocs.tsv` is the absolute-relocation site list — the only
+- `config/retail/absolute_relocations.tsv` is the absolute-relocation site list — the only
   DIR32 site channel (it substitutes for the missing `.reloc` directory, for
   both the delinker and the Python tooling). It is generated, not hand-edited:
   `homm2 audit reloc-sweep --write` regenerates it with the delinker's

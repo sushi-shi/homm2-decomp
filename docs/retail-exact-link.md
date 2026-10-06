@@ -31,7 +31,7 @@ ninja link-audit
 - `ninja link-diff` (part of the default graph, so `homm2 build` runs it):
   links the historical image and fails if any region (headers, a section, the
   overlay, the file size) differs from retail in more bytes than
-  `config/link_diff_ceiling.tsv` allows. Bank a lower count with
+  `config/link_diff.tsv` allows. Bank a lower count with
   `python3 -m homm2.build.link_diff --update`; never raise it to admit a
   regression.
 - `ninja link-audit`: read-only comparison of the historical native image
@@ -48,7 +48,7 @@ rebuild a supported mode before interpreting a local executable.
 
 The historical native link is byte-identical to retail: SHA-256
 `bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a`, and
-`link_exe --audit-existing --strict` passes. `config/link_diff_ceiling.tsv` is
+`link_exe --audit-existing --strict` passes. `config/link_diff.tsv` is
 banked at zero in every region, so `homm2 build` fails on any byte of drift.
 
 The last two placement walls closed with automatic precompiled headers (`/YX`)

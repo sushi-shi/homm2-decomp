@@ -2,7 +2,7 @@
 
 Candidate objects prove symbol topology only: which symbols are definitions, their
 section-relative offsets, sizes, alignment, and relocation spelling.  Retail PE
-bytes, reviewed relocation sites (config/delink_relocs.tsv - the image has no
+bytes, reviewed relocation sites (config/retail/absolute_relocations.tsv - the image has no
 base-relocation directory), and reviewed owner intervals remain the address
 authority.  An object/storage group is emitted only when every candidate
 definition maps through a unique, consistent relocation proof (or a reviewed
@@ -29,7 +29,7 @@ DIR32 = 0x0006
 DATA_SECTIONS = {".rdata": "rdata", ".data": "data", ".bss": "bss"}
 OUTPUT = REPO / "build/gen/candidate_delink_data.tsv"
 DIAGNOSTICS_OUTPUT = REPO / "build/gen/candidate_data_diagnostics.json"
-RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
+RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
 
 
 @dataclass(frozen=True)

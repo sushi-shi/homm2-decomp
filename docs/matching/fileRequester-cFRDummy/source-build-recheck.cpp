@@ -22,7 +22,7 @@
 //   build/bss-request-accessor/retail-refs.json
 // The script reads raw REQUEST.obj relocations and the retail operands at
 // their claimed function/data offsets. Every listed site is independently in
-// config/delink_relocs.tsv. REQUEST's three named BSS globals anchor +0,+4,+8
+// config/retail/absolute_relocations.tsv. REQUEST's three named BSS globals anchor +0,+4,+8
 // at retail 0x00533d78. The six private cells are:
 //
 // retail operand RVA   owner               candidate BSS   retail BSS

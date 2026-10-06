@@ -36,7 +36,7 @@
 // in EVERY executable PE section and decodes destinations numerically. It
 // does not use the suspect function names or their inferred owning TU. Each
 // listed relevant instruction is confirmed by the enclosing disassembly.
-// It separately reads every reviewed DIR32 site in config/delink_relocs.tsv;
+// It separately reads every reviewed DIR32 site in config/retail/absolute_relocations.tsv;
 // none points at any of these six helper destinations. No direct JMP enters
 // them. Indirect computed calls are not discoverable from this static census.
 //

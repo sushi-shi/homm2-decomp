@@ -17,8 +17,8 @@ sites independently:
 - `0xea630`: `highScoreManager::Open`
 - `0xea86c`: `swapManager::Open`
 
-They are reviewed in `config/delink_reloc_inclusions.tsv`; `homm2 audit
-reloc-sweep --write` regenerated `config/delink_relocs.tsv` with three new and
+They are reviewed in `config/retail/reloc_inclusions.tsv`; `homm2 audit
+reloc-sweep --write` regenerated `config/retail/absolute_relocations.tsv` with three new and
 zero lost sites. After `homm2 redelink && homm2 build`, all three vtables were
 byte-exact with all three ordered `.rdata` relocations matched. This advanced
 data from 291,784 / 291,976 bytes (99.934%, 77 / 97 reconstructed data-bearing
@@ -64,7 +64,7 @@ ret
 
 The sole `REL32` relocation also resolves to the already reviewed
 `__amsg_exit` at RVA `0xd8646`. Adding this archive-proven function identity to
-`config/crt_functions.csv` made the delinker emit `__purecall+0` at every slot.
+`config/retail/functions_static_libs.csv` made the delinker emit `__purecall+0` at every slot.
 Focused `homm2 data-relocs` reports then showed zero `.rdata` residuals and
 ordered matches of 3/3, 3/3, and 1/1 for `BASEMGR`, `WIDGET`, and `RESOURCE`.
 

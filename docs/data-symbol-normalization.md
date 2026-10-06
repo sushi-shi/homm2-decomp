@@ -40,7 +40,7 @@ score to authorize the address proof.
 The same pass handles `REL32` aliases when both names resolve to one unique
 public RVA and the encoded COFF addends are equal. Additional public spellings
 which the stripped PE cannot distinguish live in
-`config/reviewed_rel32_aliases.tsv`; each must name a canonical inventory symbol
+`config/retail/reloc_rel32_aliases.tsv`; each must name a canonical inventory symbol
 and exact RVA with independent provenance. The raw linker inputs retain their
 original names; only the disposable comparison target receives the candidate
 spelling. Thus neither a compiler-private counter nor an alternate external

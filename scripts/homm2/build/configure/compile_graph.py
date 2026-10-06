@@ -71,7 +71,7 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
                               "scripts/homm2/build/assert_relocs.py",
                               "scripts/homm2/build/gen_vendor_imports.py",
                               "build/gen/symbol_names.csv",
-                              "config/reviewed_rel32_aliases.tsv",
+                              "config/retail/reloc_rel32_aliases.tsv",
                               "build/orig/HMM2PL.exe"],
                     variables={"base": obj, "unit": u["unit"]})
             target_normalized = (

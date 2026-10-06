@@ -789,7 +789,7 @@ def main(argv=None):
     parser.add_argument("--output-dir", default="build/delink-paired")
     parser.add_argument("--symbols", default="build/gen/symbol_names.csv")
     parser.add_argument(
-        "--rel32-aliases", default="config/reviewed_rel32_aliases.tsv")
+        "--rel32-aliases", default="config/retail/reloc_rel32_aliases.tsv")
     parser.add_argument("--unit")
     parser.add_argument("--base")
     parser.add_argument("--target")

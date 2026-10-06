@@ -135,8 +135,8 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
             implicit=[
                 "scripts/homm2/build/link_exe.py",
                 "build/gen/symbol_names.csv",
-                "config/required_initialized_storage.tsv",
-                "config/delink_relocs.tsv",
+                "config/retail/data_initialized_storage.tsv",
+                "config/retail/absolute_relocations.tsv",
                 "build/orig/HMM2PL.exe",
             ] + base_symbol_sidecars)
     # The regression ceiling runs in the default graph so an ordinary build
@@ -144,7 +144,7 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     w.build(LINK_DIFF_STAMP, "link_diff",
             inputs="build/link/historical/HMM2PL.exe",
             implicit=["scripts/homm2/build/link_diff.py",
-                      "config/link_diff_ceiling.tsv", "build/orig/HMM2PL.exe"])
+                      "config/link_diff.tsv", "build/orig/HMM2PL.exe"])
     w.build("link-diff", "phony", inputs=LINK_DIFF_STAMP)
     w.build("link", "phony", inputs="build/link/generic/HMM2PL.exe")
     w.build("link-rsrc", "phony", inputs="build/link/rsrc/HMM2PL.exe")

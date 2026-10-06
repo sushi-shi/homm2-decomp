@@ -1,6 +1,6 @@
 # The DIR32 site manifest
 
-`config/delink_relocs.tsv` substitutes for the base-relocation directory the
+`config/retail/absolute_relocations.tsv` substitutes for the base-relocation directory the
 retail image does not have. It is generated, not hand-maintained:
 
 ```sh
@@ -14,9 +14,9 @@ about them is specific to this target. The build shell exports
 if you are iterating on the script.
 
 Target-specific overrides proven by candidate relocations, payload, and semantic
-field layout live in `config/delink_reloc_inclusions.tsv` and
-`config/delink_reloc_exclusions.tsv`. The wrapper applies those reviewed sets
-before comparing or rewriting `config/delink_relocs.tsv`, so a future generic
+field layout live in `config/retail/reloc_inclusions.tsv` and
+`config/retail/reloc_exclusions.tsv`. The wrapper applies those reviewed sets
+before comparing or rewriting `config/retail/absolute_relocations.tsv`, so a future generic
 sweep cannot drop a proven packed pointer or silently reintroduce a known
 non-relocation.
 
@@ -80,7 +80,7 @@ contiguous, so an isolated code pointer measured 0.07 against real `.reloc` wher
 one inside a run measured 0.89.
 
 `--function-starts` is deliberately **not** used here. It replaces the isolation
-test with an inventory lookup, and `config/retail_functions.csv` is Ghidra
+test with an inventory lookup, and `config/retail/functions.csv` is Ghidra
 analysis output, not retail evidence: only 63% of this image's `.rdata`
 code-pointer slots land on a boundary it knows. Measured against a comparably
 partial inventory on PoL it raised precision to 0.9993 while silently rejecting

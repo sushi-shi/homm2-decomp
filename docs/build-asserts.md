@@ -96,7 +96,7 @@ CFG is still divergent. At or above 99.5% they fail the build. A reference to `g
 therefore cannot match retail's
 `gConfig+0x30`, even when every ordinary instruction byte agrees.
 
-Owner extents live in `config/reloc_data_owners.tsv`. An entry requires all three forms of evidence:
+Owner extents live in `config/retail/reloc_data_owners.tsv`. An entry requires all three forms of evidence:
 an inventory data symbol, its source `DATA()` definition at the same RVA, and an independently
 recovered storage size. Do not use `symbol_names.csv`'s data size alone; sizes there are claims,
 not independently recovered extents. The generated `reviewed_delink_data.tsv` passes these owner regions to the pinned
@@ -133,7 +133,7 @@ it is a floating-point type.
 The default Ninja graph links the historical native image
 (`build/link/historical/HMM2PL.exe`) and counts the bytes in which it differs from
 the retail control at fixed file offsets: headers, each section's raw data, the
-overlay, and the file-size difference. `config/link_diff_ceiling.tsv` holds the
+overlay, and the file-size difference. `config/link_diff.tsv` holds the
 highest count each region may have; a rise, or a region without a banked ceiling,
 fails the build. A lower count passes and is reported as bankable; bank it with
 `python3 -m homm2.build.link_diff --update`. This is a regression ceiling, not

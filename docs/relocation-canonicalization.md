@@ -7,7 +7,7 @@ last-preceding-symbol rule is therefore only a fallback representation, not evid
 of the original source owner.
 
 Canonical target generation accepts reviewed disambiguation rows from
-`config/delink_reloc_aliases.tsv`:
+`config/retail/reloc_aliases.tsv`:
 
 ```text
 function_rva  target_rva  site_rva  owner  addend  occurrences  provenance
@@ -31,7 +31,7 @@ that emits retail's spelling instead of forcing the target to match the candidat
 
 Some reviewed runtime entries have more than one legitimate public spelling at
 the same linked RVA, while the stripped PE and synthetic PDB retain only one as
-the default target owner. `config/reviewed_rel32_aliases.tsv` records each
+the default target owner. `config/retail/reloc_rel32_aliases.tsv` records each
 additional spelling, its canonical inventory name, its exact RVA, and
 independent provenance. The paired-target pass admits an alias only when the
 canonical name already resolves uniquely to that RVA and the alias does not

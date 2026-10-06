@@ -34,7 +34,7 @@ print('PASS U18 physical256-byte transport owner, header9/payload247; map116/pla
 print('PASS zeroed420-byte map header +116-byte prefix leaves final two name bytes NUL; not field validation')
 print('OPEN setup blob65 spans game+44d..48e including opaque18; sender, payload length and names remain contracts')
 
-aliases=list(csv.DictReader((line for line in Path('config/reviewed_rel32_aliases.tsv').read_text().splitlines() if not line.startswith('#')),delimiter='\t'))
+aliases=list(csv.DictReader((line for line in Path('config/retail/reloc_rel32_aliases.tsv').read_text().splitlines() if not line.startswith('#')),delimiter='\t'))
 assert any('_stricmp' in row.values() and '_strcmpi' in row.values() and '0x000d8690' in row.values() for row in aliases)
 for prefix,rva,offsets in [('?GetMap@',0x754b0,[0x173]),('?NewGame@',0x75b4b,[0x602,0x641])]:
  fn=function(prefix)

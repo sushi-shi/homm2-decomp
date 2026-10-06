@@ -40,7 +40,7 @@ directory. Nothing in the binary hands you a symbol.
 - **Authoritative:** the retail bytes. Names, signatures, and boundaries are all
   reconstruction claims made by source `VA(...)` markers; claiming an address
   moves its function out of the `(unmatched)` module at the next redelink.
-- **Analysis opinion, not evidence:** `config/retail_functions.csv` (Ghidra's
+- **Analysis opinion, not evidence:** `config/retail/functions.csv` (Ghidra's
   2,472 candidate boundaries). Its entry points and sizes are claims to be
   proven; a span can absorb an unlisted helper, jump table, or embedded data,
   and the inventory is edited as understanding improves.

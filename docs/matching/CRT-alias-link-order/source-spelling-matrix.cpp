@@ -11,7 +11,7 @@
 //   RESMGR lseek, Misc lseek, Misc chdir, and dpnetwin strupr.
 // The matrix used the untouched VC6 SP5 monolithic LIBCMT.LIB and
 // OLDNAMES.LIB. Selected CRT members were recovered from each LINK map and
-// compared with config/retail_crt_order.txt.
+// compared with config/retail/link_order_crt.txt.
 //
 // Relevant arms:
 //

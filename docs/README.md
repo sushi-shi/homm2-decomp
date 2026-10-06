@@ -11,9 +11,9 @@ Their successors grow here from VC6-measured evidence.
 
 ## Binary and toolchain evidence
 
-- `config/retail_functions.csv` (with its header notes) is the candidate function
+- `config/retail/functions.csv` (with its header notes) is the candidate function
   inventory. It is config-tracked because it is a reviewed input, not generated output.
-- `reloc-manifest-sweep.md` covers `config/delink_relocs.tsv`, the DIR32 site
+- `reloc-manifest-sweep.md` covers `config/retail/absolute_relocations.tsv`, the DIR32 site
   manifest that stands in for the image's missing base-relocation directory. It is
   config-tracked but regenerated (`homm2 audit reloc-sweep --write`), and its rules
   are scored against PoL 2.0's surviving `.reloc`.

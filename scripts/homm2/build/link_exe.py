@@ -27,9 +27,9 @@ from homm2.core import wine as _wine
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
-RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
-CRT_FUNCTIONS = REPO / "config/crt_functions.csv"
-REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
+RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+CRT_FUNCTIONS = REPO / "config/retail/functions_static_libs.csv"
+REQUIRED_INITIALIZED_STORAGE = REPO / "config/retail/data_initialized_storage.tsv"
 IMAGE_BASE = 0x400000
 PE32_MAGIC = 0x10B
 COFF_SECTION_HEADER_SIZE = 40

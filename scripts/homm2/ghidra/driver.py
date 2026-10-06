@@ -2,7 +2,7 @@
 """homm2.ghidra.driver - PyGhidra driver + the `homm2 ghidra` command.
 
 This target is stripped, so Ghidra's analysis IS the candidate function inventory:
-config/retail_functions.csv started life as an export from this project, and
+config/retail/functions.csv started life as an export from this project, and
 export_functions.py is the refresh path when analysis improves. Boundaries stay
 analysis opinion - source VA() markers are what turn them into claims. The project
 also:

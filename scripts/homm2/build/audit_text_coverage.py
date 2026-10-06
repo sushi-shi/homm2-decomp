@@ -189,7 +189,7 @@ def write_coverage_partition(path, text_rva, text_end, spans, gaps, exclusions,
                 if start <= left and right <= end]
         for left, right in subtract_ranges(start, end, cuts):
             rows.append((left, right, kind, "-", reason,
-                         "config/delink_text_exclusions.csv"))
+                         "config/retail/text_exclusions.csv"))
         for left, right, table_kind, identity in cuts:
             rows.append((left, right, table_kind, "-", identity,
                          "build/gen/jump_tables.csv"))
@@ -230,7 +230,7 @@ def main(argv=None):
     manifest = argv[1] if len(argv) > 1 else "build/gen/symbol_names.csv"
     library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")
-    exclusion_path = Path("config/delink_text_exclusions.csv")
+    exclusion_path = Path("config/retail/text_exclusions.csv")
     jump_table_path = Path("build/gen/jump_tables.csv")
     output_path = Path(argv[2]) if len(argv) > 2 else None
 

@@ -19,9 +19,9 @@ retail                                     ours (before)
 ff 24 85 e4 06 00 00 jmpl *0x6e4(,%eax,4)  ff 24 85 e4 06 00 00 jmpl *0x6e4(,%eax,4)
 ```
 
-`0x6e4` is the *claimed size* of the function in `config/retail_functions.csv`
+`0x6e4` is the *claimed size* of the function in `config/retail/functions.csv`
 (1764). The tables therefore start exactly where the claim ends, and the two DIR32
-sites for them are already in `config/delink_relocs.tsv` (`0x19779`, `0x1977d`).
+sites for them are already in `config/retail/absolute_relocations.tsv` (`0x19779`, `0x1977d`).
 The gap to the next claimed function is exactly their size:
 
 ```

@@ -53,7 +53,7 @@ BASE_ROOT = REPO / "build/objdiff/base"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNITS = REPO / "config/units.toml"
 EXE = REPO / "build/orig/HMM2PL.exe"
-RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
+RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
 IMAGE_REL_I386_DIR32 = 0x0006
 SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",

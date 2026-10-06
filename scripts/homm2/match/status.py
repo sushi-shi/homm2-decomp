@@ -424,8 +424,8 @@ def _md_table(headers, aligns, rows):
 # matching targets. "(unmatched)" is NOT here - unclaimed reconstruction
 # targets stay in the denominator.
 CARVE_OUTS = {
-    "(libcmt)": "FID-identified static runtime (config/crt_functions.csv)",
-    "(imports)": "import thunks (config/import_thunks.csv)",
+    "(libcmt)": "FID-identified static runtime (config/retail/functions_static_libs.csv)",
+    "(imports)": "import thunks (config/retail/functions_imports.csv)",
     "(funclets)": "compiler /GX EH; match with their parent function",
     "(compgen)": "compiler-generated bodies awaiting an owner unit",
 }

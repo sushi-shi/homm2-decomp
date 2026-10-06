@@ -11,7 +11,7 @@ C++ cast in project-owned source.
 The report can also enforce the reviewed high-priority queue. Categories such
 as ``cross-enum``, ``literal-to-enum``, and ``same-type`` fail ``--check`` unless
 the current exact-retail site and its byte-evidence reason are recorded in
-``config/retail_cast_exceptions.tsv``. Stale exception rows fail too.
+``config/reviews/cast_exceptions.tsv``. Stale exception rows fail too.
 
 Run inside ``nix develop .#build``::
 
@@ -56,7 +56,7 @@ from homm2.core.paths import REPO
 
 
 SCHEMA_VERSION = 2
-RETAIL_EXCEPTION_MANIFEST = Path("config/retail_cast_exceptions.tsv")
+RETAIL_EXCEPTION_MANIFEST = Path("config/reviews/cast_exceptions.tsv")
 RETAIL_EXCEPTION_FIELDS = (
     "category", "file", "function", "source_type", "destination_type",
     "expression", "reason",
