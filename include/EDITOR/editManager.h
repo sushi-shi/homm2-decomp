@@ -88,6 +88,13 @@ public:
     void ScreenToCell(i32& x, i32& y);
     void DrawMap(void);
     void DrawRadar(b32 updateScreen);
+    // Sets the ground of the width x height view cells at (column, row) to
+    // the terrain and redraws them.
+    void PaintGround(i32 column, i32 row, i32 width, i32 height, i32 terrain);
+    // The same for map cells.
+    void FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain);
+    // Fits the terrain's edge tiles to their neighbours over the whole map.
+    void BlendTerrain(i32 terrain, b32 unused, b32 fromUndo, b32 skipBorders, b32 skipFill);
     void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 layer, i32 keepObjects);
 };
 #pragma pack(pop)

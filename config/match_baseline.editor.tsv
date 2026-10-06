@@ -404,6 +404,16 @@ EDITOR/mapcell	?RemoveCellOverlay@fullMap@@QAEXHH@Z	100.0000	f0ae366d98c3
 EDITOR/mapcell	?RemoveExtraObject@fullMap@@QAEXH@Z	100.0000	26d06e97d009
 EDITOR/mapcell	?RemoveExtraOverlay@fullMap@@QAEXH@Z	100.0000	285291b64bbb
 EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	78d2945db8c1
+EDITOR/terrain	??0terrainManager@@QAE@XZ	100.0000	a6f3293dd972
+EDITOR/terrain	?Close@terrainManager@@UAEXXZ	99.9594	c3a8d117ed18
+EDITOR/terrain	?GetBrushSize@terrainManager@@QAEHXZ	100.0000	b8f6676a64d2
+EDITOR/terrain	?Idle@terrainManager@@QAEXXZ	100.0000	82c9ec683309
+EDITOR/terrain	?Main@terrainManager@@UAEHAAUtag_message@@@Z	99.8714	78e35a01ff19
+EDITOR/terrain	?Open@terrainManager@@UAEHH@Z	100.0000	f82450525902
+EDITOR/terrain	?SelectBrush@terrainManager@@QAEXHHH@Z	100.0000	35265a053b49
+EDITOR/terrain	?SelectTerrain@terrainManager@@QAEXH@Z	100.0000	a63421b534d9
+EDITOR/terrain	?TrackCursor@terrainManager@@QAEXXZ	99.7917	a46f630b5668
+EDITOR/terrain	?UpdateButtons@terrainManager@@QAEXXZ	99.9138	9459d16a6d2c
 SOURCE/REQUEST	??0fileRequester@@QAE@HHHPAD00@Z	100.0000	b61318c8df6e
 SOURCE/REQUEST	?CheckSumIsDemoOK@@YIHPAD@Z	100.0000	bf34b35fca48
 SOURCE/REQUEST	?CleanUpData@fileRequester@@QAEXXZ	100.0000	c3d4935b2dbf

@@ -585,3 +585,8 @@ unit = "EDITOR/EDITOR"
 source = "src/EDITOR/EDITOR.cpp"
 images = ["editor"]
 flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/terrain"
+source = "src/EDITOR/terrain.cpp"
+images = ["editor"]
