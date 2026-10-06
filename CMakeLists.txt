@@ -345,6 +345,9 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_common_helpers_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME common_helpers COMMAND homm2_common_helpers_test)
+  add_executable(homm2_save_filename_test tools/save_filename_test.cpp src/SOURCE/SaveNames.cpp)
+  target_include_directories(homm2_save_filename_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME save_filename COMMAND homm2_save_filename_test)
   add_executable(homm2_music_playback_test
     tools/music_playback_test.cpp
     src/BASE/Midi.cpp src/BASE/MusicFlags.cpp

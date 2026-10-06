@@ -137,7 +137,6 @@ typedef enum GameWaitConstant {
 
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32 playerIndex);
-void GenerateStandardFileName(char* source, char* destination);
 MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
 MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
 MessageDispatchResult ViewArmyHandler(struct tag_message& message);
