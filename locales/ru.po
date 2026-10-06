@@ -655,6 +655,18 @@ msgctxt "editor.events.ultimate_artifact.radius_range"
 msgid "Must be between 0 and 127."
 msgstr "Значение должно быть от 0 до 127. "
 
+msgctxt "editor.grab.failed"
+msgid "Couldn't grab object!"
+msgstr "Нельзя схватить объект!"
+
+msgctxt "editor.grab.nothing"
+msgid "Nothing to grab!"
+msgstr "Нечего подбирать!"
+
+msgctxt "editor.map.no_name"
+msgid "No Name"
+msgstr "Нет имени"
+
 msgctxt "editor.overlay.invalid_placement"
 msgid "Invalid Placement"
 msgstr "Неподходящее место"

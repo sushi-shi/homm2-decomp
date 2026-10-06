@@ -12,6 +12,9 @@
 #include <SOURCE/fileRequester.h>
 #include <BASE/executive.h>
 #include <EDITOR/OVERLAY.h>
+#include <EDITOR/clearManager.h>
+#include <EDITOR/eventsManager.h>
+#include <EDITOR/terrainManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -35,7 +38,9 @@
 #include <BASE/widget.h>
 #include <BASE/resourceManager.h>
 #include <BASE/widgetKind.h>
+#include <fcntl.h>
 #include <io.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -186,6 +191,42 @@ H2_ENUM_BEGIN(EditMapCheck)
     EDIT_BARRIER_COLOR_MASK      = 7,
     EDIT_MAP_OBELISK_LIMIT       = 48
 H2_ENUM_END(EditMapCheck)
+
+H2_ENUM_BEGIN(EditTriggerType)
+    // UpdateTriggers: the catalogue types whose trigger is an action on
+    // the entrance (the two abandoned mines) or on every cell (the random
+    // monster).
+    EDIT_TYPE_RANDOM_MONSTER   = 214,
+    EDIT_TYPE_ABANDONED_MINE_A = 462,
+    EDIT_TYPE_ABANDONED_MINE_B = 662,
+    // The water ground shapes along a shore (giGroundShape), and the cell
+    // flags UpdateTriggers sets on them: any shore, and a straight shore.
+    EDIT_SHORE_SHAPE_A        = 1,
+    EDIT_SHORE_SHAPE_STRAIGHT = 2,
+    EDIT_SHORE_SHAPE_D        = 3,
+    EDIT_SHORE_SHAPE_E        = 4,
+    EDIT_SHORE_SHAPE_B        = 0x10,
+    EDIT_SHORE_SHAPE_C        = 0x11,
+    EDIT_CELL_SHORE           = 4,
+    EDIT_CELL_STRAIGHT_SHORE  = 0x10
+H2_ENUM_END(EditTriggerType)
+
+H2_ENUM_BEGIN(EditMapFileName)
+    // SaveMap and LoadMap: a path under .\maps, and a new map's file name
+    // built from the map name's first eight letters, cut to five to number
+    // it when taken (00..99).
+    EDIT_MAP_PATH_SIZE            = 40,
+    EDIT_MAP_BASE_NAME_SIZE       = 13,
+    EDIT_MAP_TARGET_NAME_SIZE     = 20,
+    EDIT_MAP_NO_NAME_LENGTH       = 7,
+    EDIT_MAP_BASE_NAME_LENGTH     = 8,
+    EDIT_MAP_NUMBERED_BASE_LENGTH = 5,
+    EDIT_MAP_NUMBERED_NAMES       = 100,
+    // LoadMap's buffer for the tables it skips.
+    EDIT_MAP_SKIPPED_SIZE         = 5500,
+    EDIT_MAP_FILE_OK              = 0,
+    EDIT_MAP_FILE_ERROR           = 3
+H2_ENUM_END(EditMapFileName)
 
 H2_ENUM_BEGIN(EditMapFile)
     // The map file's town and capturable-site tables: a fixed number of
@@ -9962,6 +10003,108 @@ void editManager::Close(void) {
     m_active = 0;
 }
 
+// The catalogue type of the object on map cell (x, y), from its topmost
+// part (flags and extra overlays do not count); -1 when there is none.
+VA(0x004020ad, 0x3d5)
+i32 editManager::OverlayTypeAt(i32 x, i32 y) {
+    b32 isLow;
+    i32 sprite;
+    i32 set;
+    mapCellExtra* part;
+    i32 i;
+    i32 j;
+    i32 found;
+    mapCell* cell;
+
+    found = OVERLAY_NONE;
+    set = OVERLAY_NONE;
+    sprite = OVERLAY_NONE;
+    isLow = false;
+    cell = gMap.CellAt(x, y);
+    if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
+        if (cell->m_overlayTileset != TILESET_FLAG32 && cell->m_overlayTileset != TILESET_EXTRAOVR) {
+            set = cell->m_overlayTileset;
+            sprite = cell->m_overlayIndex;
+        }
+        if (cell->m_extraIndex
+            && gMap.Extra(cell->m_extraIndex)->overlayIndex != MAPCELL_SPRITE_NONE)
+            part = gMap.Extra(cell->m_extraIndex);
+        else
+            part = NULL;
+        while (part) {
+            if (part->overlayTileset != TILESET_FLAG32 && part->overlayTileset != TILESET_EXTRAOVR) {
+                set = part->overlayTileset;
+                sprite = part->overlayIndex;
+            }
+            if (part->nextIndex && gMap.Extra(part->nextIndex)->overlayIndex != MAPCELL_SPRITE_NONE)
+                part = gMap.Extra(part->nextIndex);
+            else
+                part = NULL;
+        }
+    } else if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
+        if (!cell->m_objectLayerBit1 && cell->m_objectTileset != TILESET_FLAG32
+            && cell->m_objectTileset != TILESET_EXTRAOVR) {
+            set = cell->m_objectTileset;
+            sprite = cell->m_objectIndex;
+            isLow = cell->m_objectLayerBit0;
+        }
+        if (cell->m_extraIndex
+            && gMap.Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
+            part = gMap.Extra(cell->m_extraIndex);
+        else
+            part = NULL;
+        while (part) {
+            if ((!part->objectLayerBit0 || isLow) && !part->objectLayerBit1
+                && part->objectTileset != TILESET_FLAG32 && part->objectTileset != TILESET_EXTRAOVR) {
+                set = part->objectTileset;
+                sprite = part->objectIndex;
+                isLow = part->objectLayerBit0;
+            }
+            if (part->nextIndex && gMap.Extra(part->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
+                part = gMap.Extra(part->nextIndex);
+            else
+                part = NULL;
+        }
+    }
+    if (set == OVERLAY_NONE)
+        return OVERLAY_NONE;
+    for (i = 0; i < OVERLAY_TYPE_COUNT; i++) {
+        if (gOverlayTypes[i].tileset != set)
+            continue;
+        for (j = 0; j < OVERLAY_GRID_CELLS; j++) {
+            if (gOverlayTypes[i].frames[j] == sprite) {
+                found = i;
+                goto done;
+            }
+        }
+    }
+done:
+    return found;
+}
+
+// The object tool picks up the type of the object under the pointer.
+VA(0x00402482, 0xae)
+void editManager::GrabObject(void) {
+    i32 x;
+    i32 y;
+    i32 index;
+
+    index = OVERLAY_NONE;
+    gpMouseManager->MouseCoords(x, y);
+    ScreenToCell(x, y);
+    x += m_viewX;
+    y += m_viewY;
+    index = OverlayTypeAt(x, y);
+    if (index != OVERLAY_NONE) {
+        gSelectedOverlay = OVERLAY_NONE;
+        SelectTool(EDIT_TOOL_OBJECT);
+        if (!static_cast<overlayManager*>(m_toolManager)->SelectOverlay(index))
+            ShowStatusWarning(localization::Tr("editor.grab.failed"));
+    } else {
+        ShowStatusWarning(localization::Tr("editor.grab.nothing"));
+    }
+}
+
 VA(0x00403629, 0x1a)
 void editManager::SaveUndo(void) {
     gUndoMap.Copy(gMap);
@@ -10653,6 +10796,69 @@ void editManager::ToggleZoom(void) {
     UpdateMapView();
 }
 
+// Swaps the tool manager for the tool's (EDIT_TOOL_NONE: none) and shows
+// the tool's button pressed and its panel.
+VA(0x004051be, 0x382)
+void editManager::SelectTool(i32 tool) {
+    i32 i;
+    tag_message msg;
+
+    if (m_tool == tool)
+        return;
+    if (m_toolManager) {
+        gpExec->RemoveManager(m_toolManager);
+        delete m_toolManager;
+        m_toolManager = NULL;
+    }
+    for (i = 0; i < EDIT_TOOL_COUNT; i++) {
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.id = i + EDIT_CONTROL_TOOL_FIRST;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+        msg.payload.widget.data.value = (i == tool) + i * 2;
+        m_window->BroadcastMessage(msg);
+    }
+    if (tool != EDIT_TOOL_NONE) {
+        msg.payload.widget.id = EDIT_CONTROL_TOOL_PANEL;
+        msg.payload.widget.data.value = tool;
+        m_window->BroadcastMessage(msg);
+    }
+    switch (tool) {
+        case EDIT_TOOL_TERRAIN:
+            m_toolManager = new terrainManager;
+            break;
+        case EDIT_TOOL_OBJECT:
+            m_toolManager = new overlayManager;
+            break;
+        case EDIT_TOOL_DETAIL:
+            m_toolManager = new eventsManager;
+            break;
+        case EDIT_TOOL_ERASE:
+            m_toolManager = new clearManager;
+            break;
+        case EDIT_TOOL_STREAM:
+            m_toolManager = new lineManager;
+            gLineType = LINE_STREAM;
+            SetLineType(gLineType);
+            break;
+        case EDIT_TOOL_ROAD:
+            m_toolManager = new lineManager;
+            gLineType = LINE_ROAD;
+            SetLineType(gLineType);
+            break;
+    }
+    if (m_toolManager) {
+        if (!gpExec->AddManager(m_toolManager, EDIT_TOOL_PRIORITY)) {
+            m_tool = tool;
+        } else {
+            m_toolManager = NULL;
+            m_tool = EDIT_TOOL_NONE;
+        }
+    } else {
+        m_tool = EDIT_TOOL_NONE;
+    }
+    m_window->DrawWindow();
+}
+
 VA(0x00405540, 0x116)
 void editManager::Scroll(i32 dx, i32 dy) {
     m_viewX += dx;
@@ -10965,6 +11171,83 @@ void editManager::CheckObjects(void) {
     }
 }
 
+// Before a save: compacts the map's extras, clears the coast triggers and
+// gives every cell without an action the trigger of its catalogue type
+// (an action on an abandoned mine's entrance and on a random monster),
+// marks the coast around it, flags the water's shore cells and marks the
+// road cells.
+#define cell spot // frame-slot spelling
+VA(0x004081dc, 0x4a6)
+void editManager::UpdateTriggers(void) {
+    i32 type;
+    i32 x;
+    i32 temp;
+    mapCell* cell;
+    i32 y;
+    i32 lineType;
+
+    gMap.Compact();
+    cell = NULL;
+    temp = 0;
+    for (y = 0; y < MAP_HEIGHT; y++)
+        for (x = 0; x < MAP_WIDTH; x++)
+            if (gMap.CellAt(x, y)->m_triggerType == MAP_OBJECT_COAST)
+                gMap.CellAt(x, y)->m_triggerType = MAP_OBJECT_NONE;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (!(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                && cell->m_triggerType != MAP_OBJECT_COAST) {
+                type = OverlayTypeAt(x, y);
+                if (type != OVERLAY_NONE) {
+                    cell->m_triggerType = gOverlayTypes[type].trigger;
+                    if ((type == EDIT_TYPE_ABANDONED_MINE_A
+                         || (type == EDIT_TYPE_ABANDONED_MINE_B && x > 0 && x < MAP_WIDTH - 2
+                             && y < MAP_HEIGHT - 2 && y > 0))
+                        && OverlayTypeAt(x - 1, y) == type && OverlayTypeAt(x + 1, y) == type
+                        && OverlayTypeAt(x, y - 1) == type && OverlayTypeAt(x, y + 1) != type)
+                        cell->m_triggerType = gOverlayTypes[type].trigger | MAP_TRIGGER_ACTION_FLAG;
+                    if (type == EDIT_TYPE_RANDOM_MONSTER)
+                        cell->m_triggerType = gOverlayTypes[type].trigger | MAP_TRIGGER_ACTION_FLAG;
+                } else {
+                    cell->m_triggerType = MAP_OBJECT_NONE;
+                }
+                if (!(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                    && cell->m_triggerType != MAP_OBJECT_CASTLE
+                    && cell->m_triggerType != MAP_OBJECT_RANDOM_TOWN
+                    && cell->m_triggerType != MAP_OBJECT_RANDOM_CASTLE)
+                    SetCoast(x, y);
+                else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
+                    SetCoast(x, y);
+            } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT)) {
+                SetCoast(x, y);
+            }
+            if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
+                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_A
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_B
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_C
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_D
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_E))
+                cell->m_flags |= EDIT_CELL_SHORE;
+            else
+                cell->m_flags &= ~EDIT_CELL_SHORE;
+            if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
+                && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT)
+                cell->m_flags |= EDIT_CELL_STRAIGHT_SHORE;
+            else
+                cell->m_flags &= ~EDIT_CELL_STRAIGHT_SHORE;
+        }
+    }
+    lineType = gLineType;
+    BuildLineMap(0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1, true);
+    for (y = 0; y < MAP_HEIGHT; y++)
+        for (x = 0; x < MAP_WIDTH; x++)
+            gMap.CellAt(x, y)->m_isRoad = *(gLineMap + x + y * MAP_WIDTH) != 0;
+    gLineType = lineType;
+}
+#undef cell
+
 // Asks a yes/no question; true when answered yes.
 VA(0x00408682, 0x41)
 b32 editManager::Confirm(char* question) {
@@ -11241,6 +11524,161 @@ void editManager::WriteObelisks(i32 file) {
         sprintf(gText, localization::Tr("editor.check.obelisks.many"), obeliskCount);
         AddError(gText);
     }
+}
+
+// Saves the map as .\maps\<name> after the save checks, then shows their
+// messages. A new map's first save names the file after the map (its
+// first eight letters, numbered when taken); a map that needs the
+// expansion saves as .MX2 and replaces its .MP2 twin, and the other way
+// round.
+VA(0x00408fc2, 0x4a3)
+i32 editManager::SaveMap(char* name) {
+    char path[EDIT_MAP_PATH_SIZE];
+    char oldName[EDITOR_MAP_FILE_NAME_SIZE];
+    i32 length;
+    char* mark;
+    i32 mapHeight;
+    char* chars;
+    i32 height;
+    char base[EDIT_MAP_BASE_NAME_SIZE];
+    i32 n;
+    i32 formatWord;
+    char* namePos;
+    i32 file;
+    char target[EDIT_MAP_TARGET_NAME_SIZE];
+
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_01234567890";
+    if (gEditMapHeader.nameFileOnSave
+        && strnicmp(gEditMapHeader.name, localization::Tr("editor.map.no_name"),
+                    EDIT_MAP_NO_NAME_LENGTH)
+        && strlen(gEditMapHeader.name) > 1) {
+        namePos = gEditMapHeader.name;
+        length = 0;
+        memset(base, 0, sizeof(base));
+        while (*namePos && length < EDIT_MAP_BASE_NAME_LENGTH) {
+            if ((length == 0
+                 && ((gEditMapHeader.name[0] >= 'A' && gEditMapHeader.name[0] <= 'Z')
+                     || (gEditMapHeader.name[0] >= 'a' && gEditMapHeader.name[0] <= 'z')))
+                || (length > 0 && FindToken(chars, *namePos))) {
+                base[length] = *namePos;
+                length++;
+            }
+            namePos++;
+        }
+        sprintf(target, "%s.%s", base, "MP2");
+        sprintf(path, ".\\maps\\%s", target);
+        file = open(path, _O_BINARY);
+        if (file == -1) {
+            strcpy(name, target);
+            strcpy(gMapFileName, target);
+            goto named;
+        }
+        base[EDIT_MAP_NUMBERED_BASE_LENGTH] = 0;
+        close(file);
+        for (n = 0; n < EDIT_MAP_NUMBERED_NAMES; n++) {
+            sprintf(target, "%s_%02d.%s", base, n, "MP2");
+            sprintf(path, ".\\maps\\%s", target);
+            file = open(path, _O_BINARY);
+            if (file == -1) {
+                strcpy(name, target);
+                strcpy(gMapFileName, target);
+                goto named;
+            }
+            close(file);
+        }
+    }
+named:
+    gEditMapHeader.nameFileOnSave = false;
+    CoalesceObjectData();
+    ResetPlayerAvailability();
+    RandomizeTownNames();
+    ClearErrors();
+    CheckObjects();
+    UpdateTriggers();
+    mark = FindLastToken(name, '.');
+    mark[1] = 0;
+    strcpy(oldName, name);
+    if (UsesExpansionObjects()) {
+        strcat(name, "MX2");
+        strcat(oldName, "MP2");
+    } else {
+        strcat(name, "MP2");
+        strcat(oldName, "MX2");
+    }
+    sprintf(path, ".\\maps\\%s", oldName);
+    file = open(path, _O_BINARY);
+    if (file != -1) {
+        close(file);
+        unlink(path);
+    }
+    sprintf(path, ".\\maps\\%s", name);
+    file = open(path, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (file == -1)
+        return EDIT_MAP_FILE_ERROR;
+    write(file, &gEditMapHeader, sizeof(gEditMapHeader));
+    gMap.Write(file);
+    WriteTowns(file);
+    WriteMines(file);
+    WriteObelisks(file);
+    write(file, gRumourExtras, gEditMapHeader.rumourCount * sizeof(gRumourExtras[0]));
+    write(file, gTimeEventExtras, gEditMapHeader.timeEventCount * sizeof(gTimeEventExtras[0]));
+    WRITE_FILE_VALUE(file, m_extraCount);
+    for (n = 1; n < m_extraCount; n++) {
+        WRITE_FILE_VALUE(file, m_extraSizes[n]);
+        write(file, m_extras[n], m_extraSizes[n]);
+    }
+    WRITE_FILE_VALUE(file, gNextObjectLink);
+    close(file);
+    ShowErrors();
+    return EDIT_MAP_FILE_OK;
+}
+
+// Loads .\maps\<name>: a fresh map of its size, its header, cells and
+// map-extra records (the town, site and obelisk tables are rebuilt on
+// save). A base-game map loads as an expansion map.
+VA(0x00409465, 0x2db)
+i32 editManager::LoadMap(char* name) {
+    char fileName[EDIT_MAP_PATH_SIZE];
+    char tmpName[EDITOR_MAP_FILE_NAME_SIZE];
+    i32 width;
+    u8 ignored[EDIT_MAP_SKIPPED_SIZE];
+    i32 mapFormat;
+    i32 i;
+    i32 handle;
+    SMapHeader mapHeader;
+    i32 height;
+
+    strcpy(tmpName, name);
+    FreeMapExtras();
+    sprintf(fileName, ".\\maps\\%s", name);
+    handle = open(fileName, _O_BINARY);
+    if (handle == -1)
+        return EDIT_MAP_FILE_ERROR;
+    read(handle, &mapHeader, sizeof(mapHeader));
+    gEditManager->InitializeMap(false, mapHeader.width, mapHeader.height);
+    gEditMapHeader = mapHeader;
+    strcpy(name, tmpName);
+    sprintf(gMapFileName, name);
+    gMap.Read(handle, true);
+    read(handle, ignored, EDIT_MAP_TOWN_RECORDS * sizeof(EditMapRecord));
+    if (gEditMapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME)
+        read(handle, ignored, EDIT_MAP_TOWN_RECORDS * sizeof(EditMapRecord));
+    else
+        read(handle, ignored, EDIT_MAP_MINE_RECORDS * sizeof(EditMapRecord));
+    gEditMapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
+    read(handle, ignored, 1);
+    read(handle, gRumourExtras, gEditMapHeader.rumourCount * sizeof(gRumourExtras[0]));
+    read(handle, gTimeEventExtras, gEditMapHeader.timeEventCount * sizeof(gTimeEventExtras[0]));
+    READ_FILE_VALUE(handle, m_extraCount);
+    for (i = 1; i < m_extraCount; i++) {
+        READ_FILE_VALUE(handle, m_extraSizes[i]);
+        m_extras[i] = new char[m_extraSizes[i]];
+        read(handle, m_extras[i], m_extraSizes[i]);
+    }
+    READ_FILE_VALUE(handle, gNextObjectLink);
+    close(handle);
+    gEditManager->SaveUndo();
+    return EDIT_MAP_FILE_OK;
 }
 
 // The map file requester: lists both map formats and stores the chosen
