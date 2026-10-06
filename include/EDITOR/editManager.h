@@ -37,6 +37,15 @@ H2_ENUM_BEGIN(EditManagerLayout)
 H2_ENUM_END(EditManagerLayout)
 
 #pragma pack(push, 1)
+// A town or capturable-site record of the map file.
+struct EditMapRecord {
+    u8 x;
+    u8 y;
+    u8 type;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
 class editManager : public baseManager {
 public:
     // The selected tool (-1: none).

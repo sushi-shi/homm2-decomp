@@ -194,15 +194,6 @@ H2_ENUM_BEGIN(EditMapFile)
     EDIT_MINE_TYPE_ABANDONED_MINE = 103
 H2_ENUM_END(EditMapFile)
 
-#pragma pack(push, 1)
-// A town or site record of the map file.
-struct EditMapRecord {
-    u8 x;
-    u8 y;
-    u8 type;
-};
-#pragma pack(pop)
-
 // The drag selection's outline colour and the tick the view last animated.
 DATA(0x0049f5f0) i32 gSelectionColor;
 DATA(0x0049f940) i32 gLastAnimationTick;
