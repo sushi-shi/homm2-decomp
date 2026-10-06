@@ -3,10 +3,10 @@
 
 #include <Ints.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/hero.h>
 
 typedef enum PlayerDataStorageConstant {
     PLAYER_HERO_CAPACITY         = 8,
-    PLAYER_AVAILABLE_HERO_COUNT  = 2,
     PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
     PLAYER_BARRIER_STATE_SIZE    = 6,
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
@@ -41,7 +41,7 @@ public:
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;
     i32 m_unexploredValue;
-    float m_upgradeValueWeight;
+    float m_fightValueResourceWeight;
     float m_artifactValue;
     float m_artifactPoolShare;
 };
@@ -53,10 +53,10 @@ public:
     i8 m_currentHero;
     i8 m_heroLocatorPage;
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
-    i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
+    i8 m_availableHeroIds[HERO_AVAILABLE_SLOT_COUNT];
     u8 m_minimumHeroCount;
-    PlayerPersonality m_aiDifficulty;
-    i8 m_cheatValue;
+    PlayerPersonality m_aiPersonality;
+    i8 m_bonusPuzzlePieces;
     char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];
     i8 m_ultimateArtifactHintChance;
     i8 m_ultimateArtifactHintX;
@@ -71,12 +71,12 @@ public:
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
     playerAIData m_aiData;
-    void Write(i32);
-    void Read(i32);
+    void Write(i32 file);
+    void Read(i32 file);
     i32 NextHero(i32);
     i32 HasMobileHero(void);
-    i32 BuildingsOwned(FactionType, BuildingSlotType, i32);
-    i32 NumOfGivenArtifact(ArtifactType);
+    i32 BuildingsOwned(FactionType townType, BuildingSlotType buildingIndex, i32 buildState);
+    i32 NumOfGivenArtifact(ArtifactType artifact);
     i32 CurrentHero(void) {
         return m_currentHero;
     }
@@ -103,5 +103,7 @@ public:
     }
 };
 #pragma pack(pop)
+
+#define PLAYER_HAS_VISITED_TENT(p, color) ((p).m_barrierTents & (1 << (color)))
 extern playerData* gpCurPlayer;
 #endif
