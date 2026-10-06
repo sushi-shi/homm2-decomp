@@ -1,29 +1,47 @@
-# Heroes of Might and Magic II Gold reconstructed source
+# Heroes of Might and Magic II — Project Ironfist source
 
-This project recovers and modernizes the source code for Heroes of Might and
-Magic II Gold 2.1 as published by Buka. The Price of Loyalty 2.0 reconstruction
-remains available as an independent source reference and contributes verified
-cross-version work.
+Project Ironfist as separately distributed, unofficial runtime content on top
+of the reconstructed cross-platform engine of Heroes of Might and Magic II Gold
+2.1 (Buka). Supply your own complete installation (Heroes II Gold, or the base
+game upgraded with The Price of Loyalty); game data is not bundled.
 
-This branch adds Project Ironfist as separately distributed, unofficial runtime
-content on top of that reconstructed cross-platform engine.
+## Branches
 
-The repository does not contain the original game resources. An installed copy
-of the game is required to play it. Gold 2.1 describes the reconstructed engine
-and executable version; it does not mean that the retail data archives are
-embedded in the source tree.
+```text
+decomp-pol-2.0 -------------------> decomp-gold-2.1-buka
+    |                                   |
+    +------------------+                +------------------------+
+    |                  |                |                        |
+    v                  v                v                        v
+source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
+    |                                   |
+    +-----------------+-----------------+
+                      |
+                      v
+                    port --------> source-ironfist (you are here) --------> port-ironfist
+```
 
-## Quick start on Linux
+- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
+- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0) — Clean source, PoL 2.0
+- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0) — Reading view, PoL 2.0
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka) — Clean source, Gold 2.1 (ru/en)
+- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka) — Reading view, UTF-8 Russian
+- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port) — Native port: Linux, Windows, browser
+- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
+- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
+
+## Play on Linux
 
 You need Git, [Nix](https://nixos.org/download/) with flakes enabled, internet
 access for the first build, and a writable complete Heroes II installation:
 either Heroes II Gold, or the base game upgraded with The Price of Loyalty. The
 directory must contain `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`.
 
-1. Clone the Ironfist branch and enter it:
+1. Clone this branch and enter it:
 
    ```sh
-   git clone --branch ironfist --single-branch \
+   git clone --branch source-ironfist --single-branch \
      https://github.com/sushi-shi/homm2-decomp.git homm2-ironfist
    cd homm2-ironfist
    ```
@@ -51,88 +69,6 @@ directory must contain `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`.
 
 Later runs only need `HOMM2_DATA=/absolute/path/to/heroes2 nix run`; rebuild the
 resources only when this branch changes its pinned Ironfist source revision.
-The longer build, Windows/Wine, Web, locale, and runtime-option instructions are
-below.
-
-## Repository branch structure
-
-```text
-decomp-pol-2.0 -------------------> decomp-gold-2.1-buka
-    |                                   |
-    +------------------+                +------------------------+
-    |                  |                |                        |
-    v                  v                v                        v
-source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
-    |                                   |
-    +-----------------+-----------------+
-                      |
-                      v
-                    master --------> ironfist (you are here) --------> ironfist-master
-```
-
-- `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
-- `source-pol-2.0` is its generated, matching-machinery-free source tree.
-- `classic-pol-2.0` is the same generated tree with the original integer-enum
-  and name-mangling model preserved.
-- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction and preferred
-  non-incrementally-linked retail target.
-- `source-gold-2.1-buka` is its generated clean source tree and the primary
-  source base of `master`.
-- `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
-  with retail Windows-1251 string bytes rendered as readable UTF-8 Russian.
-- `master` is the cross-platform Linux, Windows, and Web port.
-- `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
-- `ironfist-master` is the maintained integration with narrow extension
-  boundaries and mechanics in their owning engine classes.
-
-The classic branches are terminal views of their corresponding reconstruction;
-they do not feed Gold or `master`.
-
-The cross-version behavioral ledger lives on the evidence-owning Buka
-reconstruction branch; see [Retail version differences](docs/version-differences.md).
-Corrections and subsystem replacements made only by the portable branch are
-listed in [Intentional retail divergences](docs/retail-divergences.md).
-
-## Reconstruction evidence
-
-The Gold decompilation branch matches all 1,727 reconstructed retail functions
-and all 291,995 reviewed data bytes. Its audited exact-link path also reproduces
-the supported retail executable byte for byte, including resources and import
-layout.
-
-Matching is evidence for a reconstruction, not a license to put compiler or
-linker tricks in the source. The decompilation branches retain credible
-developer-shaped C++; unavoidable private-data placement accommodations live in
-disposable comparison/link tooling. The generated source branches remove RVA
-annotations, delinking metadata, reconstruction comments, and other matching
-machinery.
-
-## Build
-
-The supported builds use Nix:
-
-```sh
-nix build .#homm2-linux
-nix build .#homm2-windows
-nix build .#homm2-web
-```
-
-### Building without Nix
-
-Requirements:
-
-1. CMake 3.20+, Ninja, and pkg-config.
-2. C and C++20 compilers with 32-bit support.
-3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
-   `libavutil`, and `libswresample`).
-
-```sh
-cmake -S . -B build -G Ninja
-cmake --build build
-HOMM2_DATA=/path/to/heroes2 ./build/homm2
-```
-
-## Installation
 
 ### Game data
 
@@ -184,15 +120,44 @@ On Linux and Web, installed game data may be read-only. Preferences, saves,
 high scores, and network exchange files are stored under the user data root.
 Windows retains the original writable game-directory behavior.
 
-### Linux
+## Build from source
 
-After setting `HOMM2_DATA`, run:
+The supported builds use Nix:
 
 ```sh
-nix run
+nix build .#homm2-linux
+nix build .#homm2-windows
+nix build .#homm2-web
 ```
 
-### Windows
+Without Nix:
+
+Requirements:
+
+1. CMake 3.20+, Ninja, and pkg-config.
+2. C and C++20 compilers with 32-bit support.
+3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
+   `libavutil`, and `libswresample`).
+
+```sh
+cmake -S . -B build -G Ninja
+cmake --build build
+HOMM2_DATA=/path/to/heroes2 ./build/homm2
+```
+
+## Browser
+
+```sh
+HOMM2_DATA=/path/to/heroes2 nix run .#web
+```
+
+The path must contain the retail data and the installed Ironfist resource pack.
+The launcher packages the installed data (including custom campaigns), serves
+the bundle on port 8080 (`HOMM2_WEB_PORT`), and caches it under
+`~/.cache/homm2-web` (`HOMM2_WEB_OUTPUT`). The first build also cross-compiles
+SDL3 and a minimal FFmpeg.
+
+## Windows (native)
 
 First run the source resource installer against the writable retail game
 directory. The Windows package is statically linked and does not require the
@@ -209,17 +174,14 @@ wine HMM2PL.exe
 The SDL3 port does not need retail registry keys, CD-drive mappings, or a
 special Wine prefix.
 
-### Web
+## Edition changes
 
-```sh
-HOMM2_DATA=/path/to/heroes2 nix run .#web
-```
-
-The path must contain the retail data and the installed Ironfist resource pack.
-The launcher packages the installed data (including custom campaigns), serves
-the bundle on port 8080 (`HOMM2_WEB_PORT`), and caches it under
-`~/.cache/homm2-web` (`HOMM2_WEB_OUTPUT`). The first build also cross-compiles
-SDL3 and a minimal FFmpeg.
+- [Building the Ironfist resources](docs/ironfist-resources.md)
+- [Ironfist on the port](docs/ironfist-port.md) and its
+  [equivalence record](docs/ironfist-equivalence.md)
+- [Localization architecture](docs/localization.md), the
+  [port guide](docs/porting.md) and
+  [intentional retail divergences](docs/retail-divergences.md)
 
 ## License
 
