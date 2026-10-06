@@ -8,6 +8,7 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
 #include <EDITOR/townedit.h>
+#include <EDITOR/heroedit.h>
 #include <EDITOR/lineManager.h>
 #include <SOURCE/fileRequester.h>
 #include <BASE/executive.h>
@@ -12772,5 +12773,148 @@ b32 editManager::FindHero(i32 index, i32* x, i32* y) {
         }
     }
     *x = *y = -1;
+    return false;
+}
+
+// Switches the ground under the pointer between its plain and a varied
+// tile.
+VA(0x0040fb39, 0x11b)
+void editManager::ToggleGroundVariant(void) {
+    i32 terrain;
+    i32 x;
+    i32 y;
+    i32 vary;
+    i32 ground;
+
+    SaveUndo();
+    gpMouseManager->MouseCoords(x, y);
+    ScreenToCell(x, y);
+    x += m_viewX;
+    y += m_viewY;
+    ground = gMap.CellAt(x, y)->m_terrainImageIndex;
+    terrain = giGroundToTerrain[ground];
+    if (giGroundShape[ground] & GROUND_SHAPE_FLIPPED)
+        vary = false;
+    else
+        vary = true;
+    gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
+        terrain, giGroundShape[ground] & EDIT_SHAPE_MASK, 1, x, y, vary, static_cast<float>(vary != false)
+    );
+    DrawMap();
+    UpdateMapView();
+}
+
+H2_ENUM_BEGIN(EditGroundVariety)
+    // RandomizeGround's variety settings.
+    EDIT_GROUND_VARIETY_LEVELS = 10
+H2_ENUM_END(EditGroundVariety)
+
+VA(0x0040fc54, 0x1bd)
+void editManager::RandomizeGround(i32 variety) {
+    i32 terrain;
+    i32 groundTile;
+    b32 isEmpty;
+    i32 x;
+    i32 y;
+    float chances[EDIT_GROUND_VARIETY_LEVELS];
+
+    SaveUndo();
+    chances[0] = 0.0f;
+    chances[1] = 0.2f;
+    chances[2] = 0.4f;
+    chances[3] = 0.6f;
+    chances[4] = 0.8f;
+    chances[5] = 1.0f;
+    chances[6] = 1.3f;
+    chances[7] = 1.6f;
+    chances[8] = 2.0f;
+    chances[9] = 2.4f;
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            groundTile = gMap.CellAt(x, y)->m_terrainImageIndex;
+            terrain = giGroundToTerrain[groundTile];
+            if (gMap.CellAt(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
+                && gMap.CellAt(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE)
+                isEmpty = true;
+            else
+                isEmpty = false;
+            if (!variety)
+                isEmpty = false;
+            gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
+                terrain, giGroundShape[groundTile] & EDIT_SHAPE_MASK, 1, x, y, 0,
+                isEmpty ? chances[variety] : 0.0f
+            );
+        }
+    }
+    DrawMap();
+    UpdateMapView();
+}
+
+// Whether the map needs the expansion: an expansion object, an expansion
+// artifact on the map, carried by a hero or rewarded by a sphinx or an
+// event, or a necromancer castle with the shrine built.
+VA(0x0040fe11, 0x315)
+b8 UsesExpansionObjects(void) {
+    i32 i;
+    i32 j;
+    i32 k;
+    mapCell* cell;
+
+    for (j = 0; j < MAP_HEIGHT; j++) {
+        for (i = 0; i < MAP_WIDTH; i++) {
+            cell = gMap.CellAt(i, j);
+            switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+                case MAP_OBJECT_BARRIER:
+                case MAP_OBJECT_TRAVELER_TENT:
+                case MAP_OBJECT_EXPANSION_DWELLING:
+                case MAP_OBJECT_EXPANSION_OBJECT:
+                case MAP_OBJECT_JAIL:
+                    return true;
+                case MAP_OBJECT_ARTIFACT:
+                    if (cell->m_objectIndex >> 1 > ARTIFACT_MAGIC_BOOK)
+                        return true;
+                    break;
+                case MAP_OBJECT_HERO:
+                    if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO) && cell->m_objectMetadata) {
+                        HeroExtra* hero;
+
+                        hero = static_cast<HeroExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                        for (k = 0; k < EVENT_RECORD_HERO_ARTIFACT_COUNT; k++) {
+                            if (hero->artifacts[k] > ARTIFACT_MAGIC_BOOK)
+                                return true;
+                        }
+                    }
+                    break;
+                case MAP_OBJECT_SPHINX:
+                    if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX) && cell->m_objectMetadata) {
+                        mapEventExtra* sphinx;
+
+                        sphinx = static_cast<mapEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                        if (sphinx->artifact > ARTIFACT_MAGIC_BOOK)
+                            return true;
+                    }
+                    break;
+                case MAP_OBJECT_MAP_EVENT:
+                    if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT) && cell->m_objectMetadata) {
+                        EventExtra* event;
+
+                        event = static_cast<EventExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                        if (event->artifact > ARTIFACT_MAGIC_BOOK)
+                            return true;
+                    }
+                    break;
+                case MAP_OBJECT_CASTLE:
+                    if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE) && cell->m_objectMetadata) {
+                        TownExtra* town;
+
+                        town = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                        if (town->faction == FACTION_NECROMANCER && town->hasCustomBuildings
+                            && (town->buildings & BIT(BUILDING_SLOT_NECROMANCER_SHRINE)))
+                            return true;
+                    }
+                    break;
+            }
+        }
+    }
     return false;
 }

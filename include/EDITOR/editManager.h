@@ -202,6 +202,8 @@ public:
     void CheckScreenScroll(void);
     // The map cell of the index-th artifact in row order (see FindTown).
     b32 FindArtifact(i32 index, i32* x, i32* y);
+    // Switches the ground under the pointer between plain and varied.
+    void ToggleGroundVariant(void);
     // The map cell of the index-th town or castle, or of the index-th hero,
     // in row order; false (and -1, -1) when there are fewer.
     b32 FindTown(i32 index, i32* x, i32* y);
