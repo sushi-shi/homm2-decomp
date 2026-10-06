@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/HighScoreIO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
@@ -2709,7 +2710,8 @@ i32 AddScoreToHighScore(
         }
     } else {
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
-            if (!platform::FileReadExact(file, &entries[entry], sizeof(entries))) {
+            // An invalid record reads back empty; only a short file ends the table.
+            if (ReadHighScoreEntry(file, entries[entry]) == HIGH_SCORE_READ_TRUNCATED) {
                 for (; entry < HIGH_SCORE_ENTRY_COUNT; ++entry) {
                     memset(&entries[entry], 0, sizeof(entries[entry]));
                     entries[entry].score = HIGH_SCORE_EMPTY;
@@ -2747,8 +2749,8 @@ i32 AddScoreToHighScore(
             1
         );
         memset(&entries[entry], 0, sizeof(HighScoreEntry));
-        strcpy(entries[entry].playerName, enteredPlayerName);
-        strcpy(entries[entry].scenarioName, scenarioName);
+        utf8::Copy(entries[entry].playerName, enteredPlayerName);
+        utf8::Copy(entries[entry].scenarioName, scenarioName);
         entries[entry].score = score;
         entries[entry].days = days;
         entries[entry].scenario = scenario;
@@ -2760,7 +2762,7 @@ i32 AddScoreToHighScore(
         if (file == -1)
             FileError(filename);
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
-            if (!platform::FileWriteExact(file, &entries[entry], sizeof(HighScoreEntry)))
+            if (!WriteHighScoreEntry(file, entries[entry]))
                 ShutDown(localization::Tr("system.file.write_error"));
         }
         platform::FileClose(file);
