@@ -36,7 +36,7 @@ def main(argv=None):
         return 1
     from homm2.core.retail import verify_retail
     try:
-        verify_retail(REPO / "build/orig/HMM2PL.exe")
+        verify_retail()
     except (OSError, ValueError) as error:
         print(f"[redelink] {error}")
         return 1

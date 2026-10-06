@@ -1,7 +1,7 @@
 """homm2 reconstruction CLI."""
 import os, subprocess, sys
 from pathlib import Path
-REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
+from homm2.core.paths import REPO
 
 # Every audit is off while the reconstruction is unmarked. They were written for a
 # COMPLETE inventory, and here the inventory starts empty and grows one proven
@@ -15,10 +15,45 @@ REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
 # do not depend on the target at all.
 AUDITS = False
 
+#: Commands that read the selected image (`--image`); the rest refuse another
+#: image instead of silently answering for the game.
+IMAGE_AWARE = {"inspect", "help", "-h", "--help"}
+
+
 def sh(*cmd):
     """Run a child with its output streamed through the usage log."""
     from homm2.core.usage import run_process
     return run_process([str(c) for c in cmd], cwd=REPO)
+
+def _inspect(argv):
+    import argparse, json
+    from homm2.core.image import Image
+    from homm2.core.inputs import InputError, read_verified, targets
+    from homm2.core.paths import image_key
+    ap = argparse.ArgumentParser(prog="homm2 inspect",
+                                 description="headers of a pinned retail image")
+    ap.add_argument("--target", choices=("game", "editor"), default=None,
+                    help="the image (default: the selected --image)")
+    ap.add_argument("--json", action="store_true")
+    a = ap.parse_args(argv)
+    key = a.target or image_key()
+    pin = targets(REPO)[key]
+    try:
+        report = Image(read_verified(pin, pin.destination)).report()
+    except InputError as error:
+        print(f"homm2 inspect: {error}", file=sys.stderr)
+        return 1
+    if a.json:
+        print(json.dumps(report, indent=2))
+        return 0
+    print(f"{key}: sha256 {report['sha256']}")
+    print(f"base 0x{report['image_base']:08X}, entry 0x{report['entry_va']:08X}, "
+          f"linker {report['linker'][0]}.{report['linker'][1]:02d}")
+    for section in report["sections"]:
+        print(f"{section['name']:8} RVA 0x{section['rva']:08X} "
+              f"virtual {section['virtual_size']:7} raw {section['raw_size']:7}")
+    return 0
+
 
 from homm2.core.usage import logged
 
@@ -26,7 +61,24 @@ from homm2.core.usage import logged
 @logged
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    # `homm2 --image editor <command>` selects the retail image for this process
+    # and every child it starts (homm2.core.paths, $HOMM2_IMAGE).
+    while argv and (argv[0] == "--image" or argv[0].startswith("--image=")):
+        key = argv[0].partition("=")[2] if "=" in argv[0] else (argv[1] if len(argv) > 1 else "")
+        argv = argv[1:] if "=" in argv[0] else argv[2:]
+        from homm2.core.paths import IMAGE_ENV, images
+        if key not in images():
+            print(f"homm2: --image expects one of {images()}", file=sys.stderr)
+            return 2
+        os.environ[IMAGE_ENV] = key
     cmd = argv[0] if argv else "help"; rest = argv[1:]
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    if image_key() != DEFAULT_IMAGE and cmd not in IMAGE_AWARE:
+        print(f"homm2 {cmd}: not yet keyed by image; it reads the game only "
+              f"(image-aware: {', '.join(sorted(IMAGE_AWARE))})", file=sys.stderr)
+        return 2
+    if cmd == "inspect":
+        return _inspect(rest)
     if cmd == "init":
         from homm2.init import main as m; return m(rest)
     if cmd == "redelink":
@@ -82,7 +134,7 @@ def main(argv=None):
         rest = [arg for arg in rest if arg != '--ru']
         from homm2.core.retail import verify_retail
         try:
-            verify_retail(REPO / "build/orig/HMM2PL.exe")
+            verify_retail()
         except (OSError, ValueError) as error:
             print(f"[build] {error}", file=sys.stderr)
             return 1
@@ -152,6 +204,6 @@ def main(argv=None):
         from homm2.permute.match_variants import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|audit|clean|verify|ghidra}",
+    print("usage: homm2 [--image {game,editor}] {inspect|init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|audit|clean|verify|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

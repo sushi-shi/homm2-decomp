@@ -23,7 +23,6 @@ LINK_EXE = TOOLCHAIN / "bin/LINK.EXE"
 LIBCMT = TOOLCHAIN / "lib/LIBCMT.LIB"
 MSVCPRT = TOOLCHAIN / "lib/MSVCPRT.LIB"
 RETAIL = ROOT / "build/orig/HMM2PL.exe"
-RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
 PDB_WINDOWS_PATH = r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb"
 PDB_RELATIVE_PATH = Path("Users/igorl/VSS/HMM/HMM2/temp/release/game/HMM2PL.pdb")
 # Each historical LINK runs with its clock frozen at one observed UTC second
@@ -132,8 +131,9 @@ def main(argv=None) -> int:
     for tool in required:
         if not tool.exists():
             raise RuntimeError(f"required {mode}-link input is missing: {tool}")
-    if include_resources and hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
-        raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
+    if include_resources:
+        from homm2.core.retail import verify_retail
+        verify_retail(RETAIL, "game")
     inputs = final_inputs(ninja_link_args(), include_resources=include_resources)
     mode_root = LINK_ROOT / mode
     mode_root.mkdir(parents=True, exist_ok=True)

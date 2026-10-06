@@ -1,0 +1,17 @@
+{
+  "game": {
+    "name": "HMM2PL.exe",
+    "size": 1208393,
+    "sha256": "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a",
+    "env_var": "HOMM2_EXE",
+    "option": "--exe",
+    "locale": "ru"
+  },
+  "editor": {
+    "name": "EDT2PL.exe",
+    "size": 659531,
+    "sha256": "f40ce4d24d91244c8837197e72456edbc8de238235185fccfd8b6f29e29dee3e",
+    "env_var": "HOMM2_EDITOR_EXE",
+    "option": "--editor-exe"
+  }
+}
