@@ -2,8 +2,8 @@
 #include <BASE/ImageDecode.h>
 
 void FlipDimIconToBitmap(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -18,5 +18,5 @@ void FlipDimIconToBitmap(
     options.color = color;
     options.mirrored = true;
     options.paint = images::IconPaint::MaskDim;
-    images::DrawIcon(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
+    images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

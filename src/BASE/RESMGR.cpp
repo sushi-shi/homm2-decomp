@@ -23,6 +23,7 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <BASE/display.h>
 
 typedef enum ResourceConstant {
     INVALID_FILE            = -1,
@@ -88,7 +89,7 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                destination->m_pixels + curRow * BACKDROP_ROW_BYTES + destinationX,
+                destination->m_pixels + curRow * LOGICAL_SCREEN_WIDTH + destinationX,
                 width
             );
         }
@@ -97,27 +98,27 @@ void resourceManager::GetBackdropAtLoc(
 
 class palette* resourceManager::GetPalette(const char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<palette*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<palette*>(resourceEntry);
     } else {
-        r = new palette(id);
-        AddResource(r);
-        return static_cast<palette*>(r);
+        resourceEntry = new palette(id);
+        AddResource(resourceEntry);
+        return static_cast<palette*>(resourceEntry);
     }
 }
 
 class bitmap* resourceManager::GetBitmap(const char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<bitmap*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<bitmap*>(resourceEntry);
     } else {
-        r = new bitmap(fileId);
-        AddResource(r);
-        return static_cast<bitmap*>(r);
+        resourceEntry = new bitmap(fileId);
+        AddResource(resourceEntry);
+        return static_cast<bitmap*>(resourceEntry);
     }
 }
 
@@ -139,14 +140,14 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
 
 class tileset* resourceManager::GetTileset(const char* name) {
     u32l id = MakeId(name, 1);
-    resource* r = Query(id);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<tileset*>(r);
+    resource* resourceEntry = Query(id);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<tileset*>(resourceEntry);
     } else {
-        r = new tileset(id);
-        AddResource(r);
-        return static_cast<tileset*>(r);
+        resourceEntry = new tileset(id);
+        AddResource(resourceEntry);
+        return static_cast<tileset*>(resourceEntry);
     }
 }
 
@@ -169,14 +170,14 @@ class font* resourceManager::GetFont(const char* name) {
 
 class sample* resourceManager::GetSample(const char* name) {
     u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<sample*>(r);
+    resource* resourceEntry = Query(fileId);
+    if (resourceEntry != NULL) {
+        resourceEntry->m_refCount++;
+        return static_cast<sample*>(resourceEntry);
     } else {
-        r = new sample(name);
-        AddResource(r);
-        return static_cast<sample*>(r);
+        resourceEntry = new sample(name);
+        AddResource(resourceEntry);
+        return static_cast<sample*>(resourceEntry);
     }
 }
 
@@ -206,13 +207,13 @@ void resourceManager::AddResource(class resource* newResource) {
 
 void resourceManager::Expunge(void) {
     m_expunging = true;
-    resource* cur = m_resourceListHead;
+    resource* resourceEntry = m_resourceListHead;
     resource* next = NULL;
-    while (cur != NULL) {
-        next = cur->m_next;
-        RemoveResource(cur);
-        delete cur;
-        cur = next;
+    while (resourceEntry != NULL) {
+        next = resourceEntry->m_next;
+        RemoveResource(resourceEntry);
+        delete resourceEntry;
+        resourceEntry = next;
     }
     m_expunging = false;
 }
@@ -505,7 +506,7 @@ i32l resourceManager::ReadLong(void) {
 u32l resourceManager::MakeId(const char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (platform::CompareIgnoringCase(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
@@ -516,7 +517,7 @@ u32l resourceManager::MakeId(const char* name, i32 translate) {
     return result;
 }
 
-void resourceManager::Read13(void* destination) {
+void resourceManager::Read13(char* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
     if (destination == nullptr
         || std::memchr(destination, 0, RESOURCE_MANAGER_READ13_BYTES) == nullptr)
@@ -532,6 +533,10 @@ void resourceManager::ReadBlock(void* destination, u32l size) {
     if (!selected || size > static_cast<u32l>(std::numeric_limits<i32>::max())
         || !resources::ReadAggMember(platform::Files(), m_aggregateFd[m_curAggregate],
             m_aggregateDir[m_curAggregate][m_curEntry], destination, static_cast<u32>(size))) {
+        // ShutDown returns when it is already running; callers then see zeros
+        // rather than a partial or uninitialized block.
+        if (destination != nullptr && size <= static_cast<u32l>(std::numeric_limits<i32>::max()))
+            std::memset(destination, 0, size);
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE,
             "Invalid or incomplete AGG member read: '%s'", m_lastFileName);
         ShutDown(gText);

@@ -7,25 +7,25 @@ static u32 gTileMode;
 static i32 gTileRowCtr;
 
 extern "C" void __cdecl
-TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
+TileToBitmap(tileset* source, u32 flags, bitmap* destination, i32 x, i32 y) {
     gTileMode = flags;
 
-    const u32 tileWidth = src->m_tileWidth;
-    const u32 tileHeight = src->m_tileHeight;
+    const u32 tileWidth = source->m_tileWidth;
+    const u32 tileHeight = source->m_tileHeight;
     const u32 tileIndex = flags & TILE_INDEX_MASK;
-    const u8* source = reinterpret_cast<const u8*>(src->m_data)
+    const u8* sourceData = reinterpret_cast<const u8*>(source->m_data)
         + tileWidth * tileHeight * tileIndex;
 
-    const u32 destinationStride = dst->m_width;
-    u8* destination = dst->m_pixels + y * destinationStride + x;
+    const u32 destinationStride = destination->m_width;
+    u8* destinationData = destination->m_pixels + y * destinationStride + x;
 
     const b32 flipHorizontal = (gTileMode & TILE_FLIP_HORIZONTAL) != 0;
     const b32 flipVertical = (gTileMode & TILE_FLIP_VERTICAL) != 0;
     for (gTileRowCtr = 0; gTileRowCtr < static_cast<i32>(tileHeight); ++gTileRowCtr) {
         const u32 row = static_cast<u32>(gTileRowCtr);
         const u32 sourceRow = flipVertical ? tileHeight - 1 - row : row;
-        const u8* sourcePixels = source + sourceRow * tileWidth;
-        u8* destinationPixels = destination + row * destinationStride;
+        const u8* sourcePixels = sourceData + sourceRow * tileWidth;
+        u8* destinationPixels = destinationData + row * destinationStride;
 
         if (flipHorizontal) {
             for (u32 column = 0; column < tileWidth; ++column) {

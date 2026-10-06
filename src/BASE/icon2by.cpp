@@ -2,8 +2,8 @@
 #include <BASE/ImageDecode.h>
 
 void IconToBitmapYModify(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -19,5 +19,5 @@ void IconToBitmapYModify(
     options.color = color;
     options.sheared = true;
     options.shear = shear;
-    images::DrawIcon(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
+    images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

@@ -2,8 +2,8 @@
 #include <BASE/ImageDecode.h>
 
 void MonoIconToBitmap(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -17,5 +17,5 @@ void MonoIconToBitmap(
     images::IconOptions options;
     options.color = color;
     options.paint = images::IconPaint::MaskFill;
-    images::DrawIcon(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
+    images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

@@ -2,8 +2,8 @@
 #include <BASE/ImageDecode.h>
 
 void FlipIconToBitmapColorTable(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -21,5 +21,5 @@ void FlipIconToBitmapColorTable(
     if (colorTable == nullptr)
         return;
     options.colorTable = colorTable;
-    images::DrawIcon(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
+    images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

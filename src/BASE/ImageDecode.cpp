@@ -107,13 +107,6 @@ bool WalkStream(std::span<const u8> bytes, const IconFrame& frame, bool mask,
     }
 }
 
-const u8* DimTable(u32 table) {
-    // Index the actual nested array objects, including the mask-dim path.
-    if (table < DIM_PALETTE_LIGHTEN_TABLE)
-        return uDimPal[table / DIM_PALETTE_LEVEL_COUNT][table % DIM_PALETTE_LEVEL_COUNT];
-    return GetDimPaletteTable(table);
-}
-
 } // namespace
 
 bool ReadIconFrame(std::span<const u8> body, i32 count, i32 index, IconFrame& frame) {
@@ -228,12 +221,12 @@ bool DrawIcon(const icon* source, bitmap* destination, i32 x, i32 y, i32 index,
         if (options.paint == IconPaint::MaskFill) {
             solid = static_cast<u8>(options.color);
         } else if (options.paint == IconPaint::MaskDim) {
-            dim = DimTable(static_cast<u32>(options.color));
+            dim = GetDimPaletteTable(static_cast<u32>(options.color));
         } else if (run.kind == RunKind::Shadow) {
             if (options.color != 0 && (run.value & 0x80) != 0)
                 solid = static_cast<u8>(options.color);
             else if (options.shadows && (run.value & 0x40) != 0)
-                dim = DimTable((run.value & 0x3c) >> 2);
+                dim = GetDimPaletteTable((run.value & 0x3c) >> 2);
             else
                 return;
         } else if (options.colorTable != nullptr) {

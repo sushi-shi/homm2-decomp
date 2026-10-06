@@ -18,7 +18,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/SPELLS.h>
+#include <BASE/display.h>
 
 enum class IconColorTableMode : i32 {
     COLOR_TABLE_SKIP_DIM  = 0,
@@ -27,8 +27,6 @@ enum class IconColorTableMode : i32 {
 using enum IconColorTableMode;
 
 typedef enum IconDrawExtentConstant {
-    DRAW_SCREEN_WIDTH  = 640,
-    DRAW_SCREEN_HEIGHT = 480,
     DRAW_COMBAT_HEIGHT = 444
 } IconDrawExtentConstant;
 
@@ -36,16 +34,16 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     m_data = nullptr;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
-    u32 len = gpResourceManager->ReadLong();
+    u32 length = gpResourceManager->ReadLong();
     const u32 memberSize = gpResourceManager->GetFileSize(id);
-    if (memberSize < 6 || len > memberSize - 6 || m_frameCount <= 0
-        || static_cast<u32>(m_frameCount) > len / images::IconFrameBytes) {
+    if (memberSize < 6 || length > memberSize - 6 || m_frameCount <= 0
+        || static_cast<u32>(m_frameCount) > length / images::IconFrameBytes) {
         ShutDown("Invalid ICN frame count or payload length.");
         return;
     }
-    m_data = static_cast<u8*>(H2_ALLOC(len));
-    m_dataSize = len;
-    gpResourceManager->ReadBlock(m_data, len);
+    m_data = static_cast<u8*>(H2_ALLOC(length));
+    m_dataSize = length;
+    gpResourceManager->ReadBlock(m_data, length);
     const char* error = nullptr;
     if (!images::ValidateIconPayload({m_data, m_dataSize}, m_frameCount, error)) {
         H2_FREE(m_data);
@@ -72,8 +70,8 @@ void icon::DrawToBuffer(
             ICON_DRAW_NO_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
-            DRAW_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0
         );
         return;
@@ -87,8 +85,8 @@ void icon::DrawToBuffer(
         ICON_DRAW_NO_CLIP,
         0,
         0,
-        DRAW_SCREEN_WIDTH,
-        DRAW_SCREEN_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         0
     );
 }
@@ -145,10 +143,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
-                {yModify, SPELL_MODIFIER_ROW_COUNT}
+                {yModify, LOGICAL_SCREEN_HEIGHT}
             );
         else
             FlipIconToBitmapYModify(
@@ -160,10 +158,10 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
-                {yModify, SPELL_MODIFIER_ROW_COUNT}
+                {yModify, LOGICAL_SCREEN_HEIGHT}
             );
     } else if (colorTable != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
@@ -176,7 +174,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable,
@@ -192,7 +190,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                DRAW_SCREEN_WIDTH,
+                LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable
@@ -236,7 +234,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             ICON_DRAW_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
             offset
         );
@@ -250,7 +248,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             ICON_DRAW_CLIP,
             0,
             0,
-            DRAW_SCREEN_WIDTH,
+            LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
             offset
         );

@@ -40,7 +40,6 @@ using enum SoundDigitalReportQuery;
 class sample;
 struct tag_message;
 
-#pragma pack(push, 1)
 struct SampleChannelStruct {
     i32 startChannel;
     i32 endChannel;
@@ -69,22 +68,21 @@ public:
     bool StartupMidiBackend(void);
     void SaveBackend(void);
     void RestoreBackend(void);
-    i32 ConvertVolume(i32, SoundVolumeConversionMode);
-    void StopAllSamples(i32);
-    void StopSample(class sample*);
-    void ModifySample(class sample*, i32);
-    bool DigitalReport(class sample*);
+    i32 ConvertVolume(i32 volume, SoundVolumeConversionMode soundType);
+    void StopAllSamples(i32 stopMusic);
+    void StopSample(class sample* sampleResource);
+    void ModifySample(class sample* sampleResource, i32 volume);
+    bool DigitalReport(class sample* sampleResource);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
-    void SetMusicQuality(i32);
-    void PlayAmbientMusic(i32);
+    void SetMusicQuality(i32 musicSource);
+    void PlayAmbientMusic(i32 track);
     void PollSound(void);
-    void SwitchAmbientMusic(i32);
-    void MemorySample(class sample*);
+    void SwitchAmbientMusic(i32 track);
+    void MemorySample(class sample* sampleResource);
     void ServiceSound(void);
     i32 MusicPlaying(void);
 };
-#pragma pack(pop)
 
 
 extern bool gSoundDisabled;
@@ -122,6 +120,5 @@ inline void soundManager::RestoreBackend(void) {
 
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern i32 CurrentMidiFile;
-extern u8 bGotMidi[MIDI_TRACK_COUNT];
 
 #endif
