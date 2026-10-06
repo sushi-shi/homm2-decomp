@@ -329,6 +329,88 @@
 
       homm2 = mkNative false;
       homm2-debug = mkNative true;
+
+      # The installable game: `heroes2` on the native program, with the
+      # player's game data laid out in the store when `game` is given
+      # (nix/game.nix; README, "Install with a NixOS flake"). The importer is
+      # copied alone, so that a source change does not import the game again.
+      importer =
+        let
+          scripts = pkgs.runCommand "homm2-import-scripts" { } ''
+            mkdir -p "$out"
+            cp ${./tools/game_data.py} "$out/game_data.py"
+            cp ${./tools/agg_manifest.py} "$out/agg_manifest.py"
+            cp ${./tools/package_web_data.py} "$out/package_web_data.py"
+          '';
+        in
+        pkgs.writeShellApplication {
+          name = "homm2-import";
+          runtimeInputs = [ pkgs.python3 pkgs.p7zip ];
+          text = ''exec python3 ${scripts}/game_data.py "$@"'';
+        };
+      # The languages the game can start in: English and each catalog.
+      languages = [ "en" ] ++ map (pkgs.lib.removeSuffix ".po")
+        (builtins.filter (pkgs.lib.hasSuffix ".po") (builtins.attrNames (builtins.readDir ./locales)));
+      game = pkgs.lib.makeOverridable (import ./nix/game.nix {
+        inherit pkgs importer languages;
+        programs = homm2;
+        edition = {
+          name = "heroes2";
+          title = "Heroes of Might and Magic II";
+          comment = "Turn-based strategy (native port of Heroes II Gold 2.1)";
+          stateName = "homm2";
+        };
+      }) { };
+      # The game as a NixOS or home-manager option set. `edition` picks the
+      # programs; ironfist-master offers its own edition the same way.
+      editions = system: { gold = self.packages.${system}.default; };
+      module = target: { config, lib, pkgs, ... }:
+        let
+          cfg = config.programs.homm2;
+          package = cfg.package.override { inherit (cfg) game locale; };
+        in {
+          options.programs.homm2 = {
+            enable = lib.mkEnableOption "Heroes of Might and Magic II (native port)";
+            edition = lib.mkOption {
+              type = lib.types.enum [ "gold" ];
+              default = "gold";
+              description = ''
+                The programs to install: gold (Heroes II Gold 2.1, the `heroes2` launcher).
+                Project Ironfist is the ironfist edition of the ironfist-master branch.
+              '';
+            };
+            game = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              example = lib.literalExpression ''"''${homm2-game}"'';
+              description = ''
+                Your copy of the game: an installed game folder (the one holding DATA), the
+                Buka disc's files, or a .zip/.7z/.iso of one, or a folder holding only that
+                archive. It is checked and its data laid out in the store on installation.
+                If unset, set HOMM2_DATA to the installed game when launching.
+              '';
+            };
+            locale = lib.mkOption {
+              type = lib.types.nullOr (lib.types.enum languages);
+              default = null;
+              example = "ru";
+              description = ''
+                The language the game starts in; null follows the desktop's locale. The
+                Russian text needs the Cyrillic font of a Buka copy.
+              '';
+            };
+            package = lib.mkOption {
+              type = lib.types.package;
+              default = (editions pkgs.stdenv.hostPlatform.system).${cfg.edition};
+              defaultText = lib.literalMD "the package of `edition`";
+              description = "The game package; the options above are applied to it with `override`.";
+            };
+          };
+          config = lib.mkIf cfg.enable (
+            if target == "nixos"
+            then { environment.systemPackages = [ package ]; }
+            else { home.packages = [ package ]; });
+        };
       homm2-check = homm2.overrideAttrs (_previous: {
         doCheck = true;
         checkPhase = ''
@@ -536,7 +618,7 @@
           homm2-windows-smoke;
         homm2-linux = homm2;
         homm2-windows = windows;
-        default = homm2;
+        default = game;
       };
 
       checks.${system} = {
@@ -546,12 +628,23 @@
         windows-tests = windows-tests;
         web = homm2-web;
         icon = icon-check;
+        launcher = game;
       };
 
+      nixosModules.default = module "nixos";
+      homeManagerModules.default = module "home-manager";
+
       apps.${system} = {
-        default = {
+        default = self.apps.${system}.heroes2;
+        heroes2 = {
+          type = "app";
+          program = "${game}/bin/heroes2";
+          meta.description = "The native game; set HOMM2_DATA to your installed game";
+        };
+        native = {
           type = "app";
           program = "${homm2}/bin/homm2";
+          meta.description = "The native program alone, which also reads HOMM2_DATA";
         };
         web = {
           type = "app";

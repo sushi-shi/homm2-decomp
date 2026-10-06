@@ -127,6 +127,24 @@ int main() {
         ExpectRoot(*files, otherText, "HOMM2_DATA with a trailing separator");
     }
 
+    // A launcher's own state folder, quoted as cmd keeps it. Saved games go
+    // there, so its GAMES folder exists from the first start.
+    const fs::path user = scratch / platform::HostPath("состояние") / "ironfist";
+    const std::string userText = platform::HostString(user);
+    const std::string quotedUser = "\"" + userText + kSeparator + "\"";
+    SetVariable("HOMM2_USER_DATA", &quotedUser);
+    {
+        auto files = platform::sdl3::CreateFileSystem();
+        Expect(
+            files->UserRoot() == userText,
+            "HOMM2_USER_DATA: got '" + files->UserRoot() + "', expected '" + userText + "'"
+        );
+#ifndef _WIN32
+        Expect(fs::is_directory(user / "GAMES", error), "HOMM2_USER_DATA holds GAMES");
+#endif
+    }
+    SetVariable("HOMM2_USER_DATA", nullptr);
+
     fs::current_path(programPath, error);
     fs::remove_all(scratch, error);
     fs::remove_all(programPath / "DATA", error);

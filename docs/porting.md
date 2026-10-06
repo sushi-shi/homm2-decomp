@@ -67,6 +67,32 @@ copies `result/bin` into a game folder holding only `DATA/HEROES2.AGG` and
 menu when started from that folder, from another folder, and with a quoted
 `HOMM2_DATA`.
 
+## Install with Nix
+
+The installable package (`packages.x86_64-linux.default`, `nix/game.nix`)
+puts a `heroes2` launcher (`nix/launch.sh`) on the native program, with a menu
+entry and the icon of your copy's Windows program (`HMM2PL.exe` or
+`HEROES2W.EXE`). Its `game` may be an installed game folder, the Buka disc's
+unpacked files, a `.zip`/`.7z`/`.iso` of one, or a folder holding only that
+archive (`game = homm2-game;`). `tools/game_data.py` finds the folder with
+`DATA/HEROES2.AGG`, checks both resource archives (they must parse as AGG
+archives; the tested GOG and Buka ones are named) and copies `DATA`, `MAPS`,
+`GAMES`, `HELP`, `HEROES2`, `MUSIC`, `TRACKS2` and the campaign texts into the
+store, locally and never from a binary cache. Without `game` the launcher runs
+on `HOMM2_DATA` or the folders the program searches.
+
+The launcher sets `HOMM2_DATA` to the store's copy and `HOMM2_USER_DATA` to
+`$XDG_DATA_HOME/homm2/<stateName>`, unless they are set already. The default
+`stateName`, `homm2`, is the program's own folder, so `heroes2` and the bare
+program share saves. `HOMM2_USER_DATA` is honoured by the program itself:
+saved games, high scores, `HEROES2.CFG`, the display and language settings
+and crash reports go there instead of SDL's preference folder. The store copy
+is read-only and never written. The package overrides as
+`.override { game = ...; locale = "ru"; stateName = "..."; }`; the module's
+options (`programs.homm2.game`, `.locale`, `.package`, and `.edition`, which
+only offers `gold` here; ironfist-master provides `ironfist`) do the same.
+The bare program stays available as `nix run .#native`.
+
 ## Web
 
 The WebAssembly build cross-compiles SDL3, libbz2, and a minimal FFmpeg. Game
