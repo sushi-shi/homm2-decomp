@@ -89,6 +89,29 @@ def image_lines(path, image: str | None = None,
     return lines
 
 
+def clang_image_defines(source, image: str | None = None,
+                        manifest: dict | None = None) -> list[str]:
+    """`/D` flags a clang view of `source` needs to see what VC6 compiles.
+
+    A unit linked only into other images always compiles with their
+    defines (an editor-only unit sees HOMM2_EDITOR). A shared unit compiles
+    once per image: it gets the selected image's defines when that image
+    links it, and the game's view (none) otherwise."""
+    manifest = manifest if manifest is not None else load()
+    key = image or image_key()
+    resolved = Path(source).resolve()
+    for unit in all_units(manifest):
+        if (REPO / unit["source"]).resolve() != resolved:
+            continue
+        images = unit_images(unit)
+        if DEFAULT_IMAGE not in images:
+            return image_defines(images[0], manifest)
+        if key != DEFAULT_IMAGE and key in images:
+            return image_defines(key, manifest)
+        return []
+    return []
+
+
 def unit_flags(unit: dict, manifest: dict | None = None,
                image: str | None = None) -> list[str]:
     """The complete compile flags for one manifest unit row.

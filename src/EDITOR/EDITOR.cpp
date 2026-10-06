@@ -7,10 +7,13 @@
 // IncrementArgumentB, EditorIdleHook, DelayTicks, ShowStatusText,
 // ClearStatusText, gMaps, gMapFileName, gStatusText,
 // gStatusTextShown, gStatusTextHoldTime, gStatusTextClearTime,
-// gCommandLineInterpreted, gShowMapInfo, gClearFlags.
+// gCommandLineInterpreted, gShowMapInfo, gClearFlags, gObjectClass,
+// gGenerateUnseen, gGeneratingMap, gRandomMapPlayers, the gUnusedData
+// holders of unreferenced retail storage, and the editor table names.
 
 #include <va.h>
 #include <EDITOR/EDITOR.h>
+#include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>
@@ -87,7 +90,6 @@ H2_ENUM_BEGIN(EditorNormalDialogConstant)
     EDITOR_DIALOG_SCREEN_MAX_X     = 0x27f,
     EDITOR_DIALOG_SCREEN_MAX_Y     = 0x1df,
     EDITOR_DIALOG_DEFAULT_X        = 0x9f,
-    EDITOR_DIALOG_WIN_SETUP_COUNT  = 0x74
 H2_ENUM_END(EditorNormalDialogConstant)
 
 // KB.cpp's tables, in KB.cpp's order.
@@ -845,6 +847,11 @@ DATA(0x00480008) ConfigExecutable giCurExe = CONFIG_EXECUTABLE_EDITOR;
 DATA(0x0048000c) i32 gClearFlags = EDITOR_CLEAR_FLAGS_DEFAULT;
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 DATA(0x00480010) i32 gSelectionX = EDIT_NO_CELL;
+// The random map generator's settings (EVENTMGR's dialog, RANDOM).
+DATA(0x00480014) i32 gRandomMapPlayers = 4;
+DATA(0x00480018) double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT] = {30.0, 30.0, 20.0, 0.0, 0.0, 0.0, 20.0, 0.0};
+DATA(0x00480058) double gDensityPercent[RANDOM_MAP_DENSITY_COUNT] = {50.0, 50.0, 50.0, 50.0, 50.0};
+DATA(0x00480080) b32 gScatterTowns = true;
 DATA(0x00480088) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {IDX(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
@@ -917,6 +924,2507 @@ DATA(0x00480088) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
+// The map view's three zoom levels: the cell scale, the cell and tile
+// sizes in pixels, and the cells the view spans.
+DATA(0x00480274) i32 gZoomScale[EDIT_ZOOM_COUNT] = {1, 2, 4};
+DATA(0x00480280) i32 gZoomCellSize[EDIT_ZOOM_COUNT] = {32, 16, 8};
+DATA(0x0048028c) i32 gZoomViewCells[EDIT_ZOOM_COUNT] = {14, 28, 56};
+DATA(0x00480298) i32 gZoomTileSize[EDIT_ZOOM_COUNT] = {32, 16, 8};
+// The road and stream tools' tiles by neighbour mask (eight neighbours, the
+// second set for a cell whose neighbours need the edge variants; four
+// neighbours for a stream end), and which road tiles join their neighbours.
+DATA(0x004802a4) u8 gLineTiles[LINE_NEIGHBOUR_MASKS] = {
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    24, 24, 255, 255, 24, 24, 255, 255, 24, 24, 255, 255, 24, 24, 255, 255,
+    25, 25, 25, 25, 255, 255, 255, 255, 25, 25, 25, 25, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 8, 255, 1, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1,
+    8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1,
+    15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1,
+    255, 8, 255, 8, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1,
+    255, 8, 255, 8, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1,
+    8, 8, 8, 8, 8, 8, 8, 8, 15, 1, 15, 1, 15, 1, 15, 1,
+    15, 8, 15, 8, 15, 8, 15, 8, 15, 1, 15, 1, 15, 1, 15, 1,
+    255, 8, 255, 8, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1
+};
+DATA(0x004803a4) u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS] = {
+    0, 18, 17, 10, 18, 18, 18, 10, 17, 18, 17, 10, 11, 11, 11, 10,
+    10, 10, 17, 10, 2, 2, 2, 2, 17, 17, 17, 17, 17, 17, 17, 17,
+    11, 18, 2, 18, 18, 18, 18, 18, 11, 18, 2, 18, 11, 18, 2, 2,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    0, 9, 0, 9, 0, 9, 0, 9, 12, 9, 12, 9, 12, 9, 12, 9,
+    22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
+    23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    0, 5, 7, 7, 16, 16, 7, 7, 13, 4, 7, 7, 16, 16, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 17, 7, 17, 17, 7, 7, 17, 17,
+    16, 18, 16, 16, 16, 18, 16, 18, 16, 16, 16, 16, 16, 18, 16, 18,
+    3, 21, 3, 21, 3, 21, 3, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+    0, 5, 0, 5, 0, 5, 0, 5, 13, 4, 13, 4, 13, 4, 13, 4,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+    3, 21, 3, 21, 3, 21, 3, 21, 21, 21, 21, 21, 21, 21, 21, 21
+};
+DATA(0x004804a4) u8 gLineEndTiles[LINE_END_MASKS] = {
+    3, 2, 3, 1, 2, 2, 0, 11, 3, 4, 3, 9, 7, 8, 10, 6
+};
+DATA(0x004804b4) u8 gRoadTileJoins[LINE_ROAD_TILES] = {
+    1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1
+};
+DATA(0x004804d4) u8 gRoadTileJoinsAlt[LINE_ROAD_TILES] = {
+    1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1
+};
+// The terrain tool panel: its terrains, then its brushes.
+DATA(0x004804f4) H2_CONST char* gTerrainHelp[EDITOR_TERRAIN_HELP_COUNT] = {
+    "",
+    localization::Tr("editor.table.gTerrainHelp.1"),
+    localization::Tr("editor.table.gTerrainHelp.2"),
+    localization::Tr("editor.table.gTerrainHelp.3"),
+    localization::Tr("editor.table.gTerrainHelp.4"),
+    localization::Tr("editor.table.gTerrainHelp.5"),
+    localization::Tr("editor.table.gTerrainHelp.6"),
+    localization::Tr("editor.table.gTerrainHelp.7"),
+    localization::Tr("editor.table.gTerrainHelp.8"),
+    localization::Tr("editor.table.gTerrainHelp.9"),
+    localization::Tr("editor.table.gTerrainHelp.10"),
+    localization::Tr("editor.table.gTerrainHelp.11"),
+    localization::Tr("editor.table.gTerrainHelp.12"),
+    localization::Tr("editor.table.gTerrainHelp.13")
+};
+// The eraser panel: its brushes, then the object classes it erases.
+DATA(0x0048052c) H2_CONST char* gClearHelp[CLEAR_HELP_COUNT] = {
+    localization::Tr("editor.table.gClearHelp.0"),
+    localization::Tr("editor.table.gClearHelp.1"),
+    localization::Tr("editor.table.gClearHelp.2"),
+    localization::Tr("editor.table.gClearHelp.3"),
+    "",
+    localization::Tr("editor.table.gClearHelp.5"),
+    localization::Tr("editor.table.gClearHelp.6"),
+    localization::Tr("editor.table.gClearHelp.7"),
+    localization::Tr("editor.table.gClearHelp.8"),
+    localization::Tr("editor.table.gClearHelp.9"),
+    localization::Tr("editor.table.gClearHelp.10"),
+    localization::Tr("editor.table.gClearHelp.11"),
+    localization::Tr("editor.table.gClearHelp.12"),
+    localization::Tr("editor.table.gClearHelp.13"),
+    localization::Tr("editor.table.gClearHelp.14"),
+    localization::Tr("editor.table.gClearHelp.15"),
+    localization::Tr("editor.table.gClearHelp.16"),
+    localization::Tr("editor.table.gClearHelp.17"),
+    localization::Tr("editor.table.gClearHelp.18"),
+    ""
+};
+// The main panel's controls.
+DATA(0x0048057c) H2_CONST char* gEditPanelHelp[EDIT_PANEL_HELP_COUNT] = {
+    "",
+    localization::Tr("editor.table.gEditPanelHelp.1"),
+    localization::Tr("editor.table.gEditPanelHelp.2"),
+    localization::Tr("editor.table.gEditPanelHelp.3"),
+    localization::Tr("editor.table.gEditPanelHelp.4"),
+    localization::Tr("editor.table.gEditPanelHelp.5"),
+    localization::Tr("editor.table.gEditPanelHelp.6"),
+    localization::Tr("editor.table.gEditPanelHelp.7"),
+    localization::Tr("editor.table.gEditPanelHelp.8"),
+    localization::Tr("editor.table.gEditPanelHelp.9"),
+    localization::Tr("editor.table.gEditPanelHelp.10"),
+    localization::Tr("editor.table.gEditPanelHelp.11"),
+    localization::Tr("editor.table.gEditPanelHelp.12"),
+    localization::Tr("editor.table.gEditPanelHelp.13"),
+    localization::Tr("editor.table.gEditPanelHelp.14"),
+    localization::Tr("editor.table.gEditPanelHelp.15")
+};
+// The terrains the random map dialog names.
+DATA(0x004805bc) H2_CONST char* gEditTerrainNames[EDITOR_TERRAIN_NAME_COUNT] = {
+    localization::Tr("editor.table.gEditTerrainNames.0"),
+    localization::Tr("editor.table.gEditTerrainNames.1"),
+    localization::Tr("editor.table.gEditTerrainNames.2"),
+    localization::Tr("editor.table.gEditTerrainNames.3"),
+    localization::Tr("editor.table.gEditTerrainNames.4"),
+    localization::Tr("editor.table.gEditTerrainNames.5"),
+    localization::Tr("editor.table.gEditTerrainNames.6"),
+    localization::Tr("editor.table.gEditTerrainNames.7"),
+    localization::Tr("editor.table.gEditTerrainNames.8")
+};
+// The object tool's object classes.
+DATA(0x004805e0) H2_CONST char* gObjectClassNames[EDITOR_OBJECT_CLASS_COUNT] = {
+    localization::Tr("editor.table.gObjectClassNames.0"),
+    localization::Tr("editor.table.gObjectClassNames.1"),
+    localization::Tr("editor.table.gObjectClassNames.2"),
+    localization::Tr("editor.table.gObjectClassNames.3"),
+    localization::Tr("editor.table.gObjectClassNames.4"),
+    localization::Tr("editor.table.gObjectClassNames.5"),
+    localization::Tr("editor.table.gObjectClassNames.6"),
+    localization::Tr("editor.table.gObjectClassNames.7"),
+    localization::Tr("editor.table.gObjectClassNames.8"),
+    localization::Tr("editor.table.gObjectClassNames.9"),
+    localization::Tr("editor.table.gObjectClassNames.10"),
+    localization::Tr("editor.table.gObjectClassNames.11"),
+    localization::Tr("editor.table.gObjectClassNames.12"),
+    localization::Tr("editor.table.gObjectClassNames.13"),
+    localization::Tr("editor.table.gObjectClassNames.14"),
+    localization::Tr("editor.table.gObjectClassNames.15")
+};
+// stpenew.bin: from scratch, random, cancel.
+DATA(0x00480620) H2_CONST char* gSetupNewMapHelp[SETUP_NEW_MAP_HELP_COUNT] = {
+    localization::Tr("editor.table.gSetupNewMapHelp.0"),
+    localization::Tr("editor.table.gSetupNewMapHelp.1"),
+    localization::Tr("editor.table.gSetupNewMapHelp.2")
+};
+// stpesize.bin: the four map sizes, cancel.
+DATA(0x0048062c) H2_CONST char* gSetupMapSizeHelp[SETUP_MAP_SIZE_HELP_COUNT] = {
+    localization::Tr("editor.table.gSetupMapSizeHelp.0"),
+    localization::Tr("editor.table.gSetupMapSizeHelp.1"),
+    localization::Tr("editor.table.gSetupMapSizeHelp.2"),
+    localization::Tr("editor.table.gSetupMapSizeHelp.3"),
+    localization::Tr("editor.table.gSetupMapSizeHelp.4")
+};
+// stpemain.bin: new map, load map, quit.
+DATA(0x00480640) H2_CONST char* gSetupMainHelp[SETUP_MAIN_HELP_COUNT] = {
+    localization::Tr("editor.table.gSetupMainHelp.0"),
+    localization::Tr("editor.table.gSetupMainHelp.1"),
+    localization::Tr("editor.table.gSetupMainHelp.2")
+};
+// How often a timed event repeats.
+DATA(0x0048064c) H2_CONST char* gEventFrequencyNames[EVENT_FREQUENCY_COUNT] = {
+    localization::Tr("editor.table.gEventFrequencyNames.0"),
+    localization::Tr("editor.table.gEventFrequencyNames.1"),
+    localization::Tr("editor.table.gEventFrequencyNames.2"),
+    localization::Tr("editor.table.gEventFrequencyNames.3"),
+    localization::Tr("editor.table.gEventFrequencyNames.4"),
+    localization::Tr("editor.table.gEventFrequencyNames.5"),
+    localization::Tr("editor.table.gEventFrequencyNames.6"),
+    localization::Tr("editor.table.gEventFrequencyNames.7"),
+    localization::Tr("editor.table.gEventFrequencyNames.8"),
+    localization::Tr("editor.table.gEventFrequencyNames.9"),
+    localization::Tr("editor.table.gEventFrequencyNames.10")
+};
+// The names a new town draws from.
+DATA(0x00480678) H2_CONST char* gTownNames[EDITOR_TOWN_NAME_COUNT] = {
+    localization::Tr("editor.table.gTownNames.0"),
+    localization::Tr("editor.table.gTownNames.1"),
+    localization::Tr("editor.table.gTownNames.2"),
+    localization::Tr("editor.table.gTownNames.3"),
+    localization::Tr("editor.table.gTownNames.4"),
+    localization::Tr("editor.table.gTownNames.5"),
+    localization::Tr("editor.table.gTownNames.6"),
+    localization::Tr("editor.table.gTownNames.7"),
+    localization::Tr("editor.table.gTownNames.8"),
+    localization::Tr("editor.table.gTownNames.9"),
+    localization::Tr("editor.table.gTownNames.10"),
+    localization::Tr("editor.table.gTownNames.11"),
+    localization::Tr("editor.table.gTownNames.12"),
+    localization::Tr("editor.table.gTownNames.13"),
+    localization::Tr("editor.table.gTownNames.14"),
+    localization::Tr("editor.table.gTownNames.15"),
+    localization::Tr("editor.table.gTownNames.16"),
+    localization::Tr("editor.table.gTownNames.17"),
+    localization::Tr("editor.table.gTownNames.18"),
+    localization::Tr("editor.table.gTownNames.19"),
+    localization::Tr("editor.table.gTownNames.20"),
+    localization::Tr("editor.table.gTownNames.21"),
+    localization::Tr("editor.table.gTownNames.22"),
+    localization::Tr("editor.table.gTownNames.23"),
+    localization::Tr("editor.table.gTownNames.24"),
+    localization::Tr("editor.table.gTownNames.25"),
+    localization::Tr("editor.table.gTownNames.26"),
+    localization::Tr("editor.table.gTownNames.27"),
+    localization::Tr("editor.table.gTownNames.28"),
+    localization::Tr("editor.table.gTownNames.29"),
+    localization::Tr("editor.table.gTownNames.30"),
+    localization::Tr("editor.table.gTownNames.31"),
+    localization::Tr("editor.table.gTownNames.32"),
+    localization::Tr("editor.table.gTownNames.33"),
+    localization::Tr("editor.table.gTownNames.34"),
+    localization::Tr("editor.table.gTownNames.35"),
+    localization::Tr("editor.table.gTownNames.36"),
+    localization::Tr("editor.table.gTownNames.37"),
+    localization::Tr("editor.table.gTownNames.38"),
+    localization::Tr("editor.table.gTownNames.39"),
+    localization::Tr("editor.table.gTownNames.40"),
+    localization::Tr("editor.table.gTownNames.41"),
+    localization::Tr("editor.table.gTownNames.42"),
+    localization::Tr("editor.table.gTownNames.43"),
+    localization::Tr("editor.table.gTownNames.44"),
+    localization::Tr("editor.table.gTownNames.45"),
+    localization::Tr("editor.table.gTownNames.46"),
+    localization::Tr("editor.table.gTownNames.47"),
+    localization::Tr("editor.table.gTownNames.48"),
+    localization::Tr("editor.table.gTownNames.49"),
+    localization::Tr("editor.table.gTownNames.50"),
+    localization::Tr("editor.table.gTownNames.51"),
+    localization::Tr("editor.table.gTownNames.52"),
+    localization::Tr("editor.table.gTownNames.53"),
+    localization::Tr("editor.table.gTownNames.54"),
+    localization::Tr("editor.table.gTownNames.55"),
+    localization::Tr("editor.table.gTownNames.56"),
+    localization::Tr("editor.table.gTownNames.57"),
+    localization::Tr("editor.table.gTownNames.58"),
+    localization::Tr("editor.table.gTownNames.59"),
+    localization::Tr("editor.table.gTownNames.60"),
+    localization::Tr("editor.table.gTownNames.61"),
+    localization::Tr("editor.table.gTownNames.62"),
+    localization::Tr("editor.table.gTownNames.63"),
+    localization::Tr("editor.table.gTownNames.64"),
+    localization::Tr("editor.table.gTownNames.65"),
+    localization::Tr("editor.table.gTownNames.66"),
+    localization::Tr("editor.table.gTownNames.67"),
+    localization::Tr("editor.table.gTownNames.68"),
+    localization::Tr("editor.table.gTownNames.69"),
+    localization::Tr("editor.table.gTownNames.70"),
+    localization::Tr("editor.table.gTownNames.71")
+};
+// The file options menu.
+DATA(0x00480798) H2_CONST char* gFileMenuHelp[EDIT_FILE_MENU_HELP_COUNT] = {
+    localization::Tr("editor.table.gFileMenuHelp.0"),
+    localization::Tr("editor.table.gFileMenuHelp.1"),
+    localization::Tr("editor.table.gFileMenuHelp.2"),
+    localization::Tr("editor.table.gFileMenuHelp.3"),
+    localization::Tr("editor.table.gFileMenuHelp.4")
+};
+// The editor's system options.
+DATA(0x004807ac) H2_CONST char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT] = {
+    localization::Tr("editor.table.gSystemOptionsHelp.0"),
+    localization::Tr("editor.table.gSystemOptionsHelp.1"),
+    localization::Tr("editor.table.gSystemOptionsHelp.2"),
+    localization::Tr("editor.table.gSystemOptionsHelp.3"),
+    localization::Tr("editor.table.gSystemOptionsHelp.4")
+};
+// The special victory conditions.
+DATA(0x004807c0) H2_CONST char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT] = {
+    localization::Tr("editor.table.gVictoryConditionNames.0"),
+    localization::Tr("editor.table.gVictoryConditionNames.1"),
+    localization::Tr("editor.table.gVictoryConditionNames.2"),
+    localization::Tr("editor.table.gVictoryConditionNames.3"),
+    localization::Tr("editor.table.gVictoryConditionNames.4"),
+    localization::Tr("editor.table.gVictoryConditionNames.5")
+};
+// The special loss conditions.
+DATA(0x004807d8) H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT] = {
+    localization::Tr("editor.table.gLossConditionNames.0"),
+    localization::Tr("editor.table.gLossConditionNames.1"),
+    localization::Tr("editor.table.gLossConditionNames.2"),
+    localization::Tr("editor.table.gLossConditionNames.3")
+};
+// The editor dialogs' captions (SetWinText): dialog, widget id and text.
+DATA(0x004807e8) SWinSetup gWinSetup[EDITOR_DIALOG_WIN_SETUP_COUNT] = {
+    {16, 500, localization::Tr("editor.table.gWinSetup.0")},
+    {3, 100, localization::Tr("editor.table.gWinSetup.1")},
+    {3, 101, localization::Tr("editor.table.gWinSetup.2")},
+    {3, 103, localization::Tr("editor.table.gWinSetup.3")},
+    {3, 105, localization::Tr("editor.table.gWinSetup.4")},
+    {4, 100, localization::Tr("editor.table.gWinSetup.5")},
+    {4, 101, localization::Tr("editor.table.gWinSetup.6")},
+    {4, 102, localization::Tr("editor.table.gWinSetup.7")},
+    {4, 103, localization::Tr("editor.table.gWinSetup.8")},
+    {4, 104, localization::Tr("editor.table.gWinSetup.9")},
+    {4, 105, localization::Tr("editor.table.gWinSetup.10")},
+    {4, 106, localization::Tr("editor.table.gWinSetup.11")},
+    {4, 107, localization::Tr("editor.table.gWinSetup.12")},
+    {4, 108, localization::Tr("editor.table.gWinSetup.13")},
+    {4, 109, localization::Tr("editor.table.gWinSetup.14")},
+    {4, 400, localization::Tr("editor.table.gWinSetup.15")},
+    {4, 420, localization::Tr("editor.table.gWinSetup.16")},
+    {4, 300, localization::Tr("editor.table.gWinSetup.17")},
+    {4, 305, localization::Tr("editor.table.gWinSetup.18")},
+    {4, 302, localization::Tr("editor.table.gWinSetup.19")},
+    {4, 600, localization::Tr("editor.table.gWinSetup.20")},
+    {5, 100, localization::Tr("editor.table.gWinSetup.21")},
+    {5, 200, localization::Tr("editor.table.gWinSetup.22")},
+    {5, 201, localization::Tr("editor.table.gWinSetup.23")},
+    {5, 202, localization::Tr("editor.table.gWinSetup.24")},
+    {5, 210, localization::Tr("editor.table.gWinSetup.25")},
+    {5, 211, localization::Tr("editor.table.gWinSetup.26")},
+    {5, 212, localization::Tr("editor.table.gWinSetup.27")},
+    {5, 213, localization::Tr("editor.table.gWinSetup.28")},
+    {5, 214, localization::Tr("editor.table.gWinSetup.29")},
+    {5, 215, localization::Tr("editor.table.gWinSetup.30")},
+    {5, 216, localization::Tr("editor.table.gWinSetup.31")},
+    {5, 300, localization::Tr("editor.table.gWinSetup.32")},
+    {5, 304, localization::Tr("editor.table.gWinSetup.33")},
+    {5, 305, localization::Tr("editor.table.gWinSetup.34")},
+    {5, 306, localization::Tr("editor.table.gWinSetup.35")},
+    {5, 800, localization::Tr("editor.table.gWinSetup.36")},
+    {5, 400, localization::Tr("editor.table.gWinSetup.37")},
+    {5, 500, localization::Tr("editor.table.gWinSetup.38")},
+    {5, 501, localization::Tr("editor.table.gWinSetup.39")},
+    {5, 502, localization::Tr("editor.table.gWinSetup.40")},
+    {5, 510, localization::Tr("editor.table.gWinSetup.41")},
+    {5, 511, localization::Tr("editor.table.gWinSetup.42")},
+    {5, 512, localization::Tr("editor.table.gWinSetup.43")},
+    {5, 513, localization::Tr("editor.table.gWinSetup.44")},
+    {5, 514, localization::Tr("editor.table.gWinSetup.45")},
+    {5, 515, localization::Tr("editor.table.gWinSetup.46")},
+    {5, 516, localization::Tr("editor.table.gWinSetup.47")},
+    {5, 517, localization::Tr("editor.table.gWinSetup.48")},
+    {5, 600, localization::Tr("editor.table.gWinSetup.49")},
+    {5, 601, localization::Tr("editor.table.gWinSetup.50")},
+    {5, 602, localization::Tr("editor.table.gWinSetup.51")},
+    {5, 700, localization::Tr("editor.table.gWinSetup.52")},
+    {8, 500, localization::Tr("editor.table.gWinSetup.53")},
+    {10, 100, localization::Tr("editor.table.gWinSetup.54")},
+    {10, 101, localization::Tr("editor.table.gWinSetup.55")},
+    {10, 102, localization::Tr("editor.table.gWinSetup.56")},
+    {10, 103, localization::Tr("editor.table.gWinSetup.57")},
+    {10, 104, localization::Tr("editor.table.gWinSetup.58")},
+    {10, 105, localization::Tr("editor.table.gWinSetup.59")},
+    {10, 106, localization::Tr("editor.table.gWinSetup.60")},
+    {10, 107, localization::Tr("editor.table.gWinSetup.61")},
+    {10, 108, localization::Tr("editor.table.gWinSetup.62")},
+    {10, 109, localization::Tr("editor.table.gWinSetup.63")},
+    {10, 300, localization::Tr("editor.table.gWinSetup.64")},
+    {10, 400, localization::Tr("editor.table.gWinSetup.65")},
+    {11, 100, localization::Tr("editor.table.gWinSetup.66")},
+    {13, 200, localization::Tr("editor.table.gWinSetup.67")},
+    {13, 220, localization::Tr("editor.table.gWinSetup.68")},
+    {13, 221, localization::Tr("editor.table.gWinSetup.69")},
+    {13, 250, localization::Tr("editor.table.gWinSetup.70")},
+    {13, 300, localization::Tr("editor.table.gWinSetup.71")},
+    {13, 320, localization::Tr("editor.table.gWinSetup.72")},
+    {13, 400, localization::Tr("editor.table.gWinSetup.73")},
+    {13, 401, localization::Tr("editor.table.gWinSetup.74")},
+    {13, 500, localization::Tr("editor.table.gWinSetup.75")},
+    {13, 600, localization::Tr("editor.table.gWinSetup.76")},
+    {13, 610, localization::Tr("editor.table.gWinSetup.77")},
+    {13, 611, localization::Tr("editor.table.gWinSetup.78")},
+    {13, 612, localization::Tr("editor.table.gWinSetup.79")},
+    {13, 613, localization::Tr("editor.table.gWinSetup.80")},
+    {13, 100, localization::Tr("editor.table.gWinSetup.81")},
+    {13, 700, localization::Tr("editor.table.gWinSetup.82")},
+    {13, 800, localization::Tr("editor.table.gWinSetup.83")},
+    {13, 900, localization::Tr("editor.table.gWinSetup.84")},
+    {15, 100, localization::Tr("editor.table.gWinSetup.85")},
+    {15, 200, localization::Tr("editor.table.gWinSetup.86")},
+    {15, 201, localization::Tr("editor.table.gWinSetup.87")},
+    {15, 202, localization::Tr("editor.table.gWinSetup.88")},
+    {15, 210, localization::Tr("editor.table.gWinSetup.89")},
+    {15, 211, localization::Tr("editor.table.gWinSetup.90")},
+    {15, 212, localization::Tr("editor.table.gWinSetup.91")},
+    {15, 213, localization::Tr("editor.table.gWinSetup.92")},
+    {15, 214, localization::Tr("editor.table.gWinSetup.93")},
+    {15, 215, localization::Tr("editor.table.gWinSetup.94")},
+    {15, 216, localization::Tr("editor.table.gWinSetup.95")},
+    {15, 600, localization::Tr("editor.table.gWinSetup.96")},
+    {15, 601, localization::Tr("editor.table.gWinSetup.97")},
+    {15, 602, localization::Tr("editor.table.gWinSetup.98")},
+    {15, 300, localization::Tr("editor.table.gWinSetup.99")},
+    {15, 310, localization::Tr("editor.table.gWinSetup.100")},
+    {15, 400, localization::Tr("editor.table.gWinSetup.101")},
+    {15, 401, localization::Tr("editor.table.gWinSetup.102")},
+    {15, 402, localization::Tr("editor.table.gWinSetup.103")},
+    {15, 470, localization::Tr("editor.table.gWinSetup.104")},
+    {15, 510, localization::Tr("editor.table.gWinSetup.105")},
+    {15, 512, localization::Tr("editor.table.gWinSetup.106")},
+    {15, 513, localization::Tr("editor.table.gWinSetup.107")},
+    {15, 514, localization::Tr("editor.table.gWinSetup.108")},
+    {15, 515, localization::Tr("editor.table.gWinSetup.109")},
+    {15, 516, localization::Tr("editor.table.gWinSetup.110")},
+    {15, 517, localization::Tr("editor.table.gWinSetup.111")},
+    {15, 518, localization::Tr("editor.table.gWinSetup.112")},
+    {15, 519, localization::Tr("editor.table.gWinSetup.113")},
+    {15, 520, localization::Tr("editor.table.gWinSetup.114")},
+    {15, 521, localization::Tr("editor.table.gWinSetup.115")}
+};
+// KB.cpp's text tables, in KB.cpp's order.
+DATA(0x00480b14) H2_CONST char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {
+    localization::Tr("table.gArtifactNames.0"),
+    localization::Tr("table.gArtifactNames.1"),
+    localization::Tr("table.gArtifactNames.2"),
+    localization::Tr("table.gArtifactNames.3"),
+    localization::Tr("table.gArtifactNames.4"),
+    localization::Tr("table.gArtifactNames.5"),
+    localization::Tr("table.gArtifactNames.6"),
+    localization::Tr("table.gArtifactNames.7"),
+    localization::Tr("table.gArtifactNames.8"),
+    localization::Tr("table.gArtifactNames.9"),
+    localization::Tr("table.gArtifactNames.10"),
+    localization::Tr("table.gArtifactNames.11"),
+    localization::Tr("table.gArtifactNames.12"),
+    localization::Tr("table.gArtifactNames.13"),
+    localization::Tr("table.gArtifactNames.14"),
+    localization::Tr("table.gArtifactNames.15"),
+    localization::Tr("table.gArtifactNames.16"),
+    localization::Tr("table.gArtifactNames.17"),
+    localization::Tr("table.gArtifactNames.18"),
+    localization::Tr("table.gArtifactNames.19"),
+    localization::Tr("table.gArtifactNames.20"),
+    localization::Tr("table.gArtifactNames.21"),
+    localization::Tr("table.gArtifactNames.22"),
+    localization::Tr("table.gArtifactNames.23"),
+    localization::Tr("table.gArtifactNames.24"),
+    localization::Tr("table.gArtifactNames.25"),
+    localization::Tr("table.gArtifactNames.26"),
+    localization::Tr("table.gArtifactNames.27"),
+    localization::Tr("table.gArtifactNames.28"),
+    localization::Tr("table.gArtifactNames.29"),
+    localization::Tr("table.gArtifactNames.30"),
+    localization::Tr("table.gArtifactNames.31"),
+    localization::Tr("table.gArtifactNames.32"),
+    localization::Tr("table.gArtifactNames.33"),
+    localization::Tr("table.gArtifactNames.34"),
+    localization::Tr("table.gArtifactNames.35"),
+    localization::Tr("table.gArtifactNames.36"),
+    localization::Tr("table.gArtifactNames.37"),
+    localization::Tr("table.gArtifactNames.38"),
+    localization::Tr("table.gArtifactNames.39"),
+    localization::Tr("table.gArtifactNames.40"),
+    localization::Tr("table.gArtifactNames.41"),
+    localization::Tr("table.gArtifactNames.42"),
+    localization::Tr("table.gArtifactNames.43"),
+    localization::Tr("table.gArtifactNames.44"),
+    localization::Tr("table.gArtifactNames.45"),
+    localization::Tr("table.gArtifactNames.46"),
+    localization::Tr("table.gArtifactNames.47"),
+    localization::Tr("table.gArtifactNames.48"),
+    localization::Tr("table.gArtifactNames.49"),
+    localization::Tr("table.gArtifactNames.50"),
+    localization::Tr("table.gArtifactNames.51"),
+    localization::Tr("table.gArtifactNames.52"),
+    localization::Tr("table.gArtifactNames.53"),
+    localization::Tr("table.gArtifactNames.54"),
+    localization::Tr("table.gArtifactNames.55"),
+    localization::Tr("table.gArtifactNames.56"),
+    localization::Tr("table.gArtifactNames.57"),
+    localization::Tr("table.gArtifactNames.58"),
+    localization::Tr("table.gArtifactNames.59"),
+    localization::Tr("table.gArtifactNames.60"),
+    localization::Tr("table.gArtifactNames.61"),
+    localization::Tr("table.gArtifactNames.62"),
+    localization::Tr("table.gArtifactNames.63"),
+    localization::Tr("table.gArtifactNames.64"),
+    localization::Tr("table.gArtifactNames.65"),
+    localization::Tr("table.gArtifactNames.66"),
+    localization::Tr("table.gArtifactNames.67"),
+    localization::Tr("table.gArtifactNames.68"),
+    localization::Tr("table.gArtifactNames.69"),
+    localization::Tr("table.gArtifactNames.70"),
+    localization::Tr("table.gArtifactNames.71"),
+    localization::Tr("table.gArtifactNames.72"),
+    localization::Tr("table.gArtifactNames.73"),
+    localization::Tr("table.gArtifactNames.74"),
+    localization::Tr("table.gArtifactNames.75"),
+    localization::Tr("table.gArtifactNames.76"),
+    localization::Tr("table.gArtifactNames.77"),
+    localization::Tr("table.gArtifactNames.78"),
+    localization::Tr("table.gArtifactNames.79"),
+    localization::Tr("table.gArtifactNames.80"),
+    localization::Tr("table.gArtifactNames.81"),
+    "ERROR : Artifact 82" /* "ERROR : Artifact 82" */,
+    "ERROR : Artifact 83" /* "ERROR : Artifact 83" */,
+    "ERROR : Artifact 84" /* "ERROR : Artifact 84" */,
+    "ERROR : Artifact 85" /* "ERROR : Artifact 85" */,
+    localization::Tr("table.gArtifactNames.86"),
+    localization::Tr("table.gArtifactNames.87"),
+    localization::Tr("table.gArtifactNames.88"),
+    localization::Tr("table.gArtifactNames.89"),
+    localization::Tr("table.gArtifactNames.90"),
+    localization::Tr("table.gArtifactNames.91"),
+    localization::Tr("table.gArtifactNames.92"),
+    localization::Tr("table.gArtifactNames.93"),
+    localization::Tr("table.gArtifactNames.94"),
+    localization::Tr("table.gArtifactNames.95"),
+    localization::Tr("table.gArtifactNames.96"),
+    localization::Tr("table.gArtifactNames.97"),
+    localization::Tr("table.gArtifactNames.98"),
+    localization::Tr("table.gArtifactNames.99"),
+    localization::Tr("table.gArtifactNames.100"),
+    localization::Tr("table.gArtifactNames.101"),
+    localization::Tr("table.gArtifactNames.102")
+};
+DATA(0x00480cb0) H2_CONST char* gArtifactDesc[IDX(ARTIFACT_COUNT)] = {
+    localization::Tr("table.gArtifactDesc.0"),
+    localization::Tr("table.gArtifactDesc.1"),
+    localization::Tr("table.gArtifactDesc.2"),
+    localization::Tr("table.gArtifactDesc.3"),
+    localization::Tr("table.gArtifactDesc.4"),
+    localization::Tr("table.gArtifactDesc.5"),
+    localization::Tr("table.gArtifactDesc.6"),
+    localization::Tr("table.gArtifactDesc.7"),
+    localization::Tr("table.gArtifactDesc.8"),
+    localization::Tr("table.gArtifactDesc.9"),
+    localization::Tr("table.gArtifactDesc.10"),
+    localization::Tr("table.gArtifactDesc.11"),
+    localization::Tr("table.gArtifactDesc.12"),
+    localization::Tr("table.gArtifactDesc.13"),
+    localization::Tr("table.gArtifactDesc.14"),
+    localization::Tr("table.gArtifactDesc.15"),
+    localization::Tr("table.gArtifactDesc.16"),
+    localization::Tr("table.gArtifactDesc.17"),
+    localization::Tr("table.gArtifactDesc.18"),
+    localization::Tr("table.gArtifactDesc.19"),
+    localization::Tr("table.gArtifactDesc.20"),
+    localization::Tr("table.gArtifactDesc.21"),
+    localization::Tr("table.gArtifactDesc.22"),
+    localization::Tr("table.gArtifactDesc.23"),
+    localization::Tr("table.gArtifactDesc.24"),
+    localization::Tr("table.gArtifactDesc.25"),
+    localization::Tr("table.gArtifactDesc.26"),
+    localization::Tr("table.gArtifactDesc.27"),
+    localization::Tr("table.gArtifactDesc.28"),
+    localization::Tr("table.gArtifactDesc.29"),
+    localization::Tr("table.gArtifactDesc.30"),
+    localization::Tr("table.gArtifactDesc.31"),
+    localization::Tr("table.gArtifactDesc.32"),
+    localization::Tr("table.gArtifactDesc.33"),
+    localization::Tr("table.gArtifactDesc.34"),
+    localization::Tr("table.gArtifactDesc.35"),
+    localization::Tr("table.gArtifactDesc.36"),
+    localization::Tr("table.gArtifactDesc.37"),
+    localization::Tr("table.gArtifactDesc.38"),
+    localization::Tr("table.gArtifactDesc.39"),
+    localization::Tr("table.gArtifactDesc.40"),
+    localization::Tr("table.gArtifactDesc.41"),
+    localization::Tr("table.gArtifactDesc.42"),
+    localization::Tr("table.gArtifactDesc.43"),
+    localization::Tr("table.gArtifactDesc.44"),
+    localization::Tr("table.gArtifactDesc.45"),
+    localization::Tr("table.gArtifactDesc.46"),
+    localization::Tr("table.gArtifactDesc.47"),
+    localization::Tr("table.gArtifactDesc.48"),
+    localization::Tr("table.gArtifactDesc.49"),
+    localization::Tr("table.gArtifactDesc.50"),
+    localization::Tr("table.gArtifactDesc.51"),
+    localization::Tr("table.gArtifactDesc.52"),
+    localization::Tr("table.gArtifactDesc.53"),
+    localization::Tr("table.gArtifactDesc.54"),
+    localization::Tr("table.gArtifactDesc.55"),
+    localization::Tr("table.gArtifactDesc.56"),
+    localization::Tr("table.gArtifactDesc.57"),
+    localization::Tr("table.gArtifactDesc.58"),
+    localization::Tr("table.gArtifactDesc.59"),
+    localization::Tr("table.gArtifactDesc.60"),
+    localization::Tr("table.gArtifactDesc.61"),
+    localization::Tr("table.gArtifactDesc.62"),
+    localization::Tr("table.gArtifactDesc.63"),
+    localization::Tr("table.gArtifactDesc.64"),
+    localization::Tr("table.gArtifactDesc.65"),
+    localization::Tr("table.gArtifactDesc.66"),
+    localization::Tr("table.gArtifactDesc.67"),
+    localization::Tr("table.gArtifactDesc.68"),
+    localization::Tr("table.gArtifactDesc.69"),
+    localization::Tr("table.gArtifactDesc.70"),
+    localization::Tr("table.gArtifactDesc.71"),
+    localization::Tr("table.gArtifactDesc.72"),
+    localization::Tr("table.gArtifactDesc.73"),
+    localization::Tr("table.gArtifactDesc.74"),
+    localization::Tr("table.gArtifactDesc.75"),
+    localization::Tr("table.gArtifactDesc.76"),
+    localization::Tr("table.gArtifactDesc.77"),
+    localization::Tr("table.gArtifactDesc.78"),
+    localization::Tr("table.gArtifactDesc.79"),
+    localization::Tr("table.gArtifactDesc.80"),
+    localization::Tr("table.gArtifactDesc.81"),
+    "{ERROR}\n\nArtifact 82." /* "{ERROR}\n\nArtifact 82." */,
+    "{ERROR}\n\nArtifact 83." /* "{ERROR}\n\nArtifact 83." */,
+    "{ERROR}\n\nArtifact 84." /* "{ERROR}\n\nArtifact 84." */,
+    "{ERROR}\n\nArtifact 85." /* "{ERROR}\n\nArtifact 85." */,
+    localization::Tr("table.gArtifactDesc.86"),
+    localization::Tr("table.gArtifactDesc.87"),
+    localization::Tr("table.gArtifactDesc.88"),
+    localization::Tr("table.gArtifactDesc.89"),
+    localization::Tr("table.gArtifactDesc.90"),
+    localization::Tr("table.gArtifactDesc.91"),
+    localization::Tr("table.gArtifactDesc.92"),
+    localization::Tr("table.gArtifactDesc.93"),
+    localization::Tr("table.gArtifactDesc.94"),
+    localization::Tr("table.gArtifactDesc.95"),
+    localization::Tr("table.gArtifactDesc.96"),
+    localization::Tr("table.gArtifactDesc.97"),
+    localization::Tr("table.gArtifactDesc.98"),
+    localization::Tr("table.gArtifactDesc.99"),
+    localization::Tr("table.gArtifactDesc.100"),
+    localization::Tr("table.gArtifactDesc.101"),
+    localization::Tr("table.gArtifactDesc.102")};
+DATA(0x00480e4c) H2_CONST char* gArtifactEvent[IDX(ARTIFACT_COUNT)] = {
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    "" /* "" */,
+    localization::Tr("table.gArtifactEvent.8"),
+    localization::Tr("table.gArtifactEvent.9"),
+    localization::Tr("table.gArtifactEvent.10"),
+    localization::Tr("table.gArtifactEvent.11"),
+    localization::Tr("table.gArtifactEvent.12"),
+    localization::Tr("table.gArtifactEvent.13"),
+    localization::Tr("table.gArtifactEvent.14"),
+    localization::Tr("table.gArtifactEvent.15"),
+    localization::Tr("table.gArtifactEvent.16"),
+    localization::Tr("table.gArtifactEvent.17"),
+    localization::Tr("table.gArtifactEvent.18"),
+    localization::Tr("table.gArtifactEvent.19"),
+    localization::Tr("table.gArtifactEvent.20"),
+    localization::Tr("table.gArtifactEvent.21"),
+    localization::Tr("table.gArtifactEvent.22"),
+    localization::Tr("table.gArtifactEvent.23"),
+    localization::Tr("table.gArtifactEvent.24"),
+    localization::Tr("table.gArtifactEvent.25"),
+    localization::Tr("table.gArtifactEvent.26"),
+    localization::Tr("table.gArtifactEvent.27"),
+    localization::Tr("table.gArtifactEvent.28"),
+    localization::Tr("table.gArtifactEvent.29"),
+    localization::Tr("table.gArtifactEvent.30"),
+    localization::Tr("table.gArtifactEvent.31"),
+    localization::Tr("table.gArtifactEvent.32"),
+    localization::Tr("table.gArtifactEvent.33"),
+    localization::Tr("table.gArtifactEvent.34"),
+    localization::Tr("table.gArtifactEvent.35"),
+    localization::Tr("table.gArtifactEvent.36"),
+    localization::Tr("table.gArtifactEvent.37"),
+    localization::Tr("table.gArtifactEvent.38"),
+    localization::Tr("table.gArtifactEvent.39"),
+    localization::Tr("table.gArtifactEvent.40"),
+    localization::Tr("table.gArtifactEvent.41"),
+    localization::Tr("table.gArtifactEvent.42"),
+    localization::Tr("table.gArtifactEvent.43"),
+    localization::Tr("table.gArtifactEvent.44"),
+    localization::Tr("table.gArtifactEvent.45"),
+    localization::Tr("table.gArtifactEvent.46"),
+    localization::Tr("table.gArtifactEvent.47"),
+    localization::Tr("table.gArtifactEvent.48"),
+    localization::Tr("table.gArtifactEvent.49"),
+    localization::Tr("table.gArtifactEvent.50"),
+    localization::Tr("table.gArtifactEvent.51"),
+    localization::Tr("table.gArtifactEvent.52"),
+    localization::Tr("table.gArtifactEvent.53"),
+    localization::Tr("table.gArtifactEvent.54"),
+    localization::Tr("table.gArtifactEvent.55"),
+    localization::Tr("table.gArtifactEvent.56"),
+    localization::Tr("table.gArtifactEvent.57"),
+    localization::Tr("table.gArtifactEvent.58"),
+    localization::Tr("table.gArtifactEvent.59"),
+    localization::Tr("table.gArtifactEvent.60"),
+    localization::Tr("table.gArtifactEvent.61"),
+    localization::Tr("table.gArtifactEvent.62"),
+    localization::Tr("table.gArtifactEvent.63"),
+    localization::Tr("table.gArtifactEvent.64"),
+    localization::Tr("table.gArtifactEvent.65"),
+    localization::Tr("table.gArtifactEvent.66"),
+    localization::Tr("table.gArtifactEvent.67"),
+    localization::Tr("table.gArtifactEvent.68"),
+    localization::Tr("table.gArtifactEvent.69"),
+    localization::Tr("table.gArtifactEvent.70"),
+    localization::Tr("table.gArtifactEvent.71"),
+    localization::Tr("table.gArtifactEvent.72"),
+    localization::Tr("table.gArtifactEvent.73"),
+    localization::Tr("table.gArtifactEvent.74"),
+    localization::Tr("table.gArtifactEvent.75"),
+    localization::Tr("table.gArtifactEvent.76"),
+    localization::Tr("table.gArtifactEvent.77"),
+    localization::Tr("table.gArtifactEvent.78"),
+    localization::Tr("table.gArtifactEvent.79"),
+    localization::Tr("table.gArtifactEvent.80"),
+    "" /* "" */,
+    "ERROR : Artifact event 82." /* "ERROR : Artifact event 82." */,
+    "ERROR : Artifact event 83." /* "ERROR : Artifact event 83." */,
+    "ERROR : Artifact event 84." /* "ERROR : Artifact event 84." */,
+    "ERROR : Artifact event 85." /* "ERROR : Artifact event 85." */,
+    localization::Tr("table.gArtifactEvent.86"),
+    localization::Tr("table.gArtifactEvent.87"),
+    localization::Tr("table.gArtifactEvent.88"),
+    localization::Tr("table.gArtifactEvent.89"),
+    localization::Tr("table.gArtifactEvent.90"),
+    localization::Tr("table.gArtifactEvent.91"),
+    localization::Tr("table.gArtifactEvent.92"),
+    localization::Tr("table.gArtifactEvent.93"),
+    localization::Tr("table.gArtifactEvent.94"),
+    localization::Tr("table.gArtifactEvent.95"),
+    localization::Tr("table.gArtifactEvent.96"),
+    localization::Tr("table.gArtifactEvent.97"),
+    localization::Tr("table.gArtifactEvent.98"),
+    localization::Tr("table.gArtifactEvent.99"),
+    localization::Tr("table.gArtifactEvent.100"),
+    localization::Tr("table.gArtifactEvent.101"),
+    localization::Tr("table.gArtifactEvent.102")};
+DATA(0x00480fe8) H2_CONST char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
+    localization::Tr("table.gStatNames.0"),
+    localization::Tr("table.gStatNames.1"),
+    localization::Tr("table.gStatNames.2"),
+    localization::Tr("table.gStatNames.3")
+};
+DATA(0x00480ff8) H2_CONST char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
+    localization::Tr("table.gStatDesc.0"),
+    localization::Tr("table.gStatDesc.1"),
+    localization::Tr("table.gStatDesc.2"),
+    localization::Tr("table.gStatDesc.3")
+};
+DATA(0x00481008) H2_CONST char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
+    localization::Tr("table.gAlignmentNames.0"),
+    localization::Tr("table.gAlignmentNames.1"),
+    localization::Tr("table.gAlignmentNames.2"),
+    localization::Tr("table.gAlignmentNames.3"),
+    localization::Tr("table.gAlignmentNames.4"),
+    localization::Tr("table.gAlignmentNames.5"),
+    localization::Tr("table.gAlignmentNames.6"),
+    localization::Tr("table.gAlignmentNames.7")
+};
+DATA(0x00481028) H2_CONST char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
+    "peasn",
+    "archr",
+    "arch2",
+    "pikmn",
+    "pikm2",
+    "swman",
+    "swma2",
+    "cvlry",
+    "cvlr2",
+    "paldn",
+    "pald2",
+    "gobln",
+    "orc__",
+    "orc_2",
+    "Wolf_",
+    "Ogre_",
+    "Ogre2",
+    "Troll",
+    "trol2",
+    "cyclp",
+    "sprit",
+    "Dwarf",
+    "dwar2",
+    "elf__",
+    "elf_2",
+    "druid",
+    "drui2",
+    "uncrn",
+    "phoen",
+    "centr",
+    "gargl",
+    "griff",
+    "mintr",
+    "mint2",
+    "Hydra",
+    "dragn",
+    "drag2",
+    "drag3",
+    "hlflg",
+    "Boar_",
+    "irong",
+    "iron2",
+    "roc__",
+    "archm",
+    "arch2",
+    "titan",
+    "tita2",
+    "skel_",
+    "zomb_",
+    "zomb2",
+    "Mummy",
+    "mumm2",
+    "vampr",
+    "vamp2",
+    "lich_",
+    "lich2",
+    "boned",
+    "Rogue",
+    "Nomad",
+    "Ghost",
+    "Genie",
+    "medus",
+    "eleme",
+    "elema",
+    "elemf",
+    "elemw"
+};
+DATA(0x00481130) H2_CONST char* gArmyNames[IDX(CREATURE_COUNT)] = {
+    localization::Tr("table.gArmyNames.0"),
+    localization::Tr("table.gArmyNames.1"),
+    localization::Tr("table.gArmyNames.2"),
+    localization::Tr("table.gArmyNames.3"),
+    localization::Tr("table.gArmyNames.4"),
+    localization::Tr("table.gArmyNames.5"),
+    localization::Tr("table.gArmyNames.6"),
+    localization::Tr("table.gArmyNames.7"),
+    localization::Tr("table.gArmyNames.8"),
+    localization::Tr("table.gArmyNames.9"),
+    localization::Tr("table.gArmyNames.10"),
+    localization::Tr("table.gArmyNames.11"),
+    localization::Tr("table.gArmyNames.12"),
+    localization::Tr("table.gArmyNames.13"),
+    localization::Tr("table.gArmyNames.14"),
+    localization::Tr("table.gArmyNames.15"),
+    localization::Tr("table.gArmyNames.16"),
+    localization::Tr("table.gArmyNames.17"),
+    localization::Tr("table.gArmyNames.18"),
+    localization::Tr("table.gArmyNames.19"),
+    localization::Tr("table.gArmyNames.20"),
+    localization::Tr("table.gArmyNames.21"),
+    localization::Tr("table.gArmyNames.22"),
+    localization::Tr("table.gArmyNames.23"),
+    localization::Tr("table.gArmyNames.24"),
+    localization::Tr("table.gArmyNames.25"),
+    localization::Tr("table.gArmyNames.26"),
+    localization::Tr("table.gArmyNames.27"),
+    localization::Tr("table.gArmyNames.28"),
+    localization::Tr("table.gArmyNames.29"),
+    localization::Tr("table.gArmyNames.30"),
+    localization::Tr("table.gArmyNames.31"),
+    localization::Tr("table.gArmyNames.32"),
+    localization::Tr("table.gArmyNames.33"),
+    localization::Tr("table.gArmyNames.34"),
+    localization::Tr("table.gArmyNames.35"),
+    localization::Tr("table.gArmyNames.36"),
+    localization::Tr("table.gArmyNames.37"),
+    localization::Tr("table.gArmyNames.38"),
+    localization::Tr("table.gArmyNames.39"),
+    localization::Tr("table.gArmyNames.40"),
+    localization::Tr("table.gArmyNames.41"),
+    localization::Tr("table.gArmyNames.42"),
+    localization::Tr("table.gArmyNames.43"),
+    localization::Tr("table.gArmyNames.44"),
+    localization::Tr("table.gArmyNames.45"),
+    localization::Tr("table.gArmyNames.46"),
+    localization::Tr("table.gArmyNames.47"),
+    localization::Tr("table.gArmyNames.48"),
+    localization::Tr("table.gArmyNames.49"),
+    localization::Tr("table.gArmyNames.50"),
+    localization::Tr("table.gArmyNames.51"),
+    localization::Tr("table.gArmyNames.52"),
+    localization::Tr("table.gArmyNames.53"),
+    localization::Tr("table.gArmyNames.54"),
+    localization::Tr("table.gArmyNames.55"),
+    localization::Tr("table.gArmyNames.56"),
+    localization::Tr("table.gArmyNames.57"),
+    localization::Tr("table.gArmyNames.58"),
+    localization::Tr("table.gArmyNames.59"),
+    localization::Tr("table.gArmyNames.60"),
+    localization::Tr("table.gArmyNames.61"),
+    localization::Tr("table.gArmyNames.62"),
+    localization::Tr("table.gArmyNames.63"),
+    localization::Tr("table.gArmyNames.64"),
+    localization::Tr("table.gArmyNames.65")
+};
+DATA(0x00481238) H2_CONST char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
+    localization::Tr("table.gArmyNamesPlural.0"),
+    localization::Tr("table.gArmyNamesPlural.1"),
+    localization::Tr("table.gArmyNamesPlural.2"),
+    localization::Tr("table.gArmyNamesPlural.3"),
+    localization::Tr("table.gArmyNamesPlural.4"),
+    localization::Tr("table.gArmyNamesPlural.5"),
+    localization::Tr("table.gArmyNamesPlural.6"),
+    localization::Tr("table.gArmyNamesPlural.7"),
+    localization::Tr("table.gArmyNamesPlural.8"),
+    localization::Tr("table.gArmyNamesPlural.9"),
+    localization::Tr("table.gArmyNamesPlural.10"),
+    localization::Tr("table.gArmyNamesPlural.11"),
+    localization::Tr("table.gArmyNamesPlural.12"),
+    localization::Tr("table.gArmyNamesPlural.13"),
+    localization::Tr("table.gArmyNamesPlural.14"),
+    localization::Tr("table.gArmyNamesPlural.15"),
+    localization::Tr("table.gArmyNamesPlural.16"),
+    localization::Tr("table.gArmyNamesPlural.17"),
+    localization::Tr("table.gArmyNamesPlural.18"),
+    localization::Tr("table.gArmyNamesPlural.19"),
+    localization::Tr("table.gArmyNamesPlural.20"),
+    localization::Tr("table.gArmyNamesPlural.21"),
+    localization::Tr("table.gArmyNamesPlural.22"),
+    localization::Tr("table.gArmyNamesPlural.23"),
+    localization::Tr("table.gArmyNamesPlural.24"),
+    localization::Tr("table.gArmyNamesPlural.25"),
+    localization::Tr("table.gArmyNamesPlural.26"),
+    localization::Tr("table.gArmyNamesPlural.27"),
+    localization::Tr("table.gArmyNamesPlural.28"),
+    localization::Tr("table.gArmyNamesPlural.29"),
+    localization::Tr("table.gArmyNamesPlural.30"),
+    localization::Tr("table.gArmyNamesPlural.31"),
+    localization::Tr("table.gArmyNamesPlural.32"),
+    localization::Tr("table.gArmyNamesPlural.33"),
+    localization::Tr("table.gArmyNamesPlural.34"),
+    localization::Tr("table.gArmyNamesPlural.35"),
+    localization::Tr("table.gArmyNamesPlural.36"),
+    localization::Tr("table.gArmyNamesPlural.37"),
+    localization::Tr("table.gArmyNamesPlural.38"),
+    localization::Tr("table.gArmyNamesPlural.39"),
+    localization::Tr("table.gArmyNamesPlural.40"),
+    localization::Tr("table.gArmyNamesPlural.41"),
+    localization::Tr("table.gArmyNamesPlural.42"),
+    localization::Tr("table.gArmyNamesPlural.43"),
+    localization::Tr("table.gArmyNamesPlural.44"),
+    localization::Tr("table.gArmyNamesPlural.45"),
+    localization::Tr("table.gArmyNamesPlural.46"),
+    localization::Tr("table.gArmyNamesPlural.47"),
+    localization::Tr("table.gArmyNamesPlural.48"),
+    localization::Tr("table.gArmyNamesPlural.49"),
+    localization::Tr("table.gArmyNamesPlural.50"),
+    localization::Tr("table.gArmyNamesPlural.51"),
+    localization::Tr("table.gArmyNamesPlural.52"),
+    localization::Tr("table.gArmyNamesPlural.53"),
+    localization::Tr("table.gArmyNamesPlural.54"),
+    localization::Tr("table.gArmyNamesPlural.55"),
+    localization::Tr("table.gArmyNamesPlural.56"),
+    localization::Tr("table.gArmyNamesPlural.57"),
+    localization::Tr("table.gArmyNamesPlural.58"),
+    localization::Tr("table.gArmyNamesPlural.59"),
+    localization::Tr("table.gArmyNamesPlural.60"),
+    localization::Tr("table.gArmyNamesPlural.61"),
+    localization::Tr("table.gArmyNamesPlural.62"),
+    localization::Tr("table.gArmyNamesPlural.63"),
+    localization::Tr("table.gArmyNamesPlural.64"),
+    localization::Tr("table.gArmyNamesPlural.65")
+};
+DATA(0x00481340) H2_CONST char* gTerrainNames[IDX(TERRAIN_COUNT)] = {
+    localization::Tr("table.gTerrainNames.0"),
+    localization::Tr("table.gTerrainNames.1"),
+    localization::Tr("table.gTerrainNames.2"),
+    localization::Tr("table.gTerrainNames.3"),
+    localization::Tr("table.gTerrainNames.4"),
+    localization::Tr("table.gTerrainNames.5"),
+    localization::Tr("table.gTerrainNames.6"),
+    localization::Tr("table.gTerrainNames.7"),
+    localization::Tr("table.gTerrainNames.8")
+};
+DATA(0x00481364) H2_CONST char* gResourceNames[IDX(RES_COUNT)] = {
+    localization::Tr("table.gResourceNames.0"),
+    localization::Tr("table.gResourceNames.1"),
+    localization::Tr("table.gResourceNames.2"),
+    localization::Tr("table.gResourceNames.3"),
+    localization::Tr("table.gResourceNames.4"),
+    localization::Tr("table.gResourceNames.5"),
+    localization::Tr("table.gResourceNames.6")
+};
+// The localised build names the mine, not the resource it yields, in the
+// adventure-map quick info; the English 2.1 tree has no such table and reads
+// gResourceNames there. See docs/version-changes.md.
+DATA(0x00481380) H2_CONST char* gMineNames[IDX(RES_COUNT)] = {
+    localization::Tr("table.gMineNames.0"),
+    localization::Tr("table.gMineNames.1"),
+    localization::Tr("table.gMineNames.2"),
+    localization::Tr("table.gMineNames.3"),
+    localization::Tr("table.gMineNames.4"),
+    localization::Tr("table.gMineNames.5"),
+    localization::Tr("table.gMineNames.6")
+};
+DATA(0x0048139c) H2_CONST char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
+    "" /* "" */,
+    localization::Tr("table.gQuickViewText.1"),
+    localization::Tr("table.gQuickViewText.2"),
+    localization::Tr("table.gQuickViewText.3"),
+    localization::Tr("table.gQuickViewText.4"),
+    localization::Tr("table.gQuickViewText.5"),
+    localization::Tr("table.gQuickViewText.6"),
+    localization::Tr("table.gQuickViewText.7"),
+    localization::Tr("table.gQuickViewText.8"),
+    localization::Tr("table.gQuickViewText.9"),
+    localization::Tr("table.gQuickViewText.10"),
+    localization::Tr("table.gQuickViewText.11"),
+    localization::Tr("table.gQuickViewText.12"),
+    localization::Tr("table.gQuickViewText.13"),
+    localization::Tr("table.gQuickViewText.14"),
+    localization::Tr("table.gQuickViewText.15"),
+    localization::Tr("table.gQuickViewText.16"),
+    localization::Tr("table.gQuickViewText.17"),
+    localization::Tr("table.gQuickViewText.18"),
+    localization::Tr("table.gQuickViewText.19"),
+    localization::Tr("table.gQuickViewText.20"),
+    localization::Tr("table.gQuickViewText.21"),
+    localization::Tr("table.gQuickViewText.22"),
+    localization::Tr("table.gQuickViewText.23"),
+    localization::Tr("table.gQuickViewText.24"),
+    localization::Tr("table.gQuickViewText.25"),
+    localization::Tr("table.gQuickViewText.26"),
+    localization::Tr("table.gQuickViewText.27"),
+    "" /* "" */,
+    localization::Tr("table.gQuickViewText.29"),
+    localization::Tr("table.gQuickViewText.30"),
+    localization::Tr("table.gQuickViewText.31"),
+    localization::Tr("table.gQuickViewText.32"),
+    localization::Tr("table.gQuickViewText.33"),
+    localization::Tr("table.gQuickViewText.34"),
+    localization::Tr("table.gQuickViewText.35"),
+    localization::Tr("table.gQuickViewText.36"),
+    localization::Tr("table.gQuickViewText.37"),
+    localization::Tr("table.gQuickViewText.38"),
+    localization::Tr("table.gQuickViewText.39"),
+    localization::Tr("table.gQuickViewText.40"),
+    localization::Tr("table.gQuickViewText.41"),
+    localization::Tr("table.gQuickViewText.42"),
+    localization::Tr("table.gQuickViewText.43"),
+    localization::Tr("artifact.ultimate_generic"),
+    localization::Tr("table.gQuickViewText.45"),
+    localization::Tr("table.gQuickViewText.46"),
+    localization::Tr("table.gQuickViewText.47"),
+    localization::Tr("table.gQuickViewText.48"),
+    localization::Tr("table.gQuickViewText.49"),
+    "" /* "" */,
+    localization::Tr("table.gQuickViewText.51"),
+    localization::Tr("table.gQuickViewText.52"),
+    localization::Tr("table.gQuickViewText.53"),
+    localization::Tr("table.gQuickViewText.54"),
+    localization::Tr("table.gQuickViewText.55"),
+    localization::Tr("table.gQuickViewText.56"),
+    "" /* "" */,
+    localization::Tr("table.gQuickViewText.58"),
+    localization::Tr("table.gQuickViewText.59"),
+    localization::Tr("table.gQuickViewText.60"),
+    localization::Tr("table.gQuickViewText.61"),
+    localization::Tr("table.gQuickViewText.62"),
+    localization::Tr("table.gQuickViewText.63"),
+    localization::Tr("table.gQuickViewText.64"),
+    localization::Tr("table.gQuickViewText.65"),
+    localization::Tr("table.gQuickViewText.66"),
+    localization::Tr("table.gQuickViewText.67"),
+    localization::Tr("table.gQuickViewText.68"),
+    localization::Tr("table.gQuickViewText.69"),
+    localization::Tr("table.gQuickViewText.70"),
+    localization::Tr("table.gQuickViewText.71"),
+    localization::Tr("table.gQuickViewText.72"),
+    localization::Tr("table.gQuickViewText.73"),
+    localization::Tr("table.gQuickViewText.74"),
+    localization::Tr("table.gQuickViewText.75"),
+    localization::Tr("table.gQuickViewText.76"),
+    localization::Tr("table.gQuickViewText.77"),
+    localization::Tr("table.gQuickViewText.78"),
+    localization::Tr("table.gQuickViewText.79"),
+    localization::Tr("table.gQuickViewText.80"),
+    localization::Tr("table.gQuickViewText.81"),
+    localization::Tr("table.gQuickViewText.82"),
+    localization::Tr("table.gQuickViewText.83"),
+    localization::Tr("table.gQuickViewText.84"),
+    localization::Tr("table.gQuickViewText.85"),
+    localization::Tr("table.gQuickViewText.86"),
+    localization::Tr("table.gQuickViewText.87"),
+    localization::Tr("table.gQuickViewText.88"),
+    localization::Tr("table.gQuickViewText.89"),
+    localization::Tr("table.gQuickViewText.90"),
+    localization::Tr("table.gQuickViewText.91"),
+    localization::Tr("table.gQuickViewText.92"),
+    localization::Tr("table.gQuickViewText.93"),
+    localization::Tr("table.gQuickViewText.94"),
+    localization::Tr("table.gQuickViewText.95"),
+    localization::Tr("table.gQuickViewText.96"),
+    localization::Tr("table.gQuickViewText.97"),
+    localization::Tr("table.gQuickViewText.98"),
+    localization::Tr("table.gQuickViewText.99"),
+    localization::Tr("table.gQuickViewText.100"),
+    localization::Tr("table.gQuickViewText.101"),
+    localization::Tr("table.gQuickViewText.102"),
+    localization::Tr("table.gQuickViewText.103"),
+    localization::Tr("table.gQuickViewText.104"),
+    localization::Tr("table.gQuickViewText.105"),
+    localization::Tr("table.gQuickViewText.106"),
+    localization::Tr("table.gQuickViewText.107"),
+    localization::Tr("table.gQuickViewText.108"),
+    localization::Tr("table.gQuickViewText.109"),
+    localization::Tr("table.gQuickViewText.110"),
+    localization::Tr("table.gQuickViewText.111"),
+    localization::Tr("table.gQuickViewText.112"),
+    localization::Tr("table.gQuickViewText.113"),
+    localization::Tr("table.gQuickViewText.114"),
+    localization::Tr("table.gQuickViewText.115"),
+    localization::Tr("table.gQuickViewText.116"),
+    localization::Tr("table.gQuickViewText.117"),
+    localization::Tr("table.gQuickViewText.118"),
+    localization::Tr("table.gQuickViewText.119"),
+    localization::Tr("table.gQuickViewText.120"),
+    "%s" /* "%s" */,
+    "%s" /* "%s" */,
+    localization::Tr("table.gQuickViewText.123")
+};
+DATA(0x0048158c) H2_CONST char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
+    // Алхимик\n\nВы стали хозяином лаборатории местного алхимика. Она будет приносить вам по одной
+    // единице ртути в день.
+    localization::Tr("table.gEventText.0"),
+    // Указатель\n\nНа указателе написано:\n\n%s находится неподалеку отсюда.
+    localization::Tr("table.gEventText.1"),
+    // Буй\n\nВаши спутники замечают морской буй. Он указывает верный курс.
+    localization::Tr("table.gEventText.2"),
+    // Буй\n\nВаши спутники замечают морской буй. Он указывает верный курс, и это повышает их боевой
+    // дух.
+    localization::Tr("table.gEventText.3"),
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    // Кольцо фейри\n\nВаше войско вступает внутрь кольца фейри, но ничего не происходит.
+    localization::Tr("table.gEventText.12"),
+    // Кольцо фейри\n\nВаше войско вступает внутрь кольца фейри, чары которого принесут вам удачу в
+    // грядущем сражении.
+    localization::Tr("table.gEventText.13"),
+    // Костер\n\nОбыскав вражеский лагерь, вы находите спрятанный клад.
+    localization::Tr("table.gEventText.14"),
+    // Фонтан\n\nВы припадаете к струям волшебного фонтана, но ничего не происходит.
+    localization::Tr("table.gEventText.15"),
+    // Фонтан\n\nБлагоуханная влага волшебного фонтана принесет вам удачу в грядущем сражении.
+    localization::Tr("table.gEventText.16"),
+    // Беседка\n\nНа ступенях беседки появляется старый рыцарь. \"Мне жаль, храбрый воин, но я уже
+    // научил тебя всему, что знаю сам.\"
+    localization::Tr("table.gEventText.17"),
+    // Беседка\n\nНа ступенях беседки появляется старый рыцарь. \"О храбрый воин, я научу тебя всему,
+    // что знаю сам; пусть мой опыт поможет тебе в твоих странствиях.\"
+    localization::Tr("table.gEventText.18"),
+    // Лампа джинна\n\nВы находите засыпанную землей помятую и закопченную лампа. Хотите ее потереть?
+    localization::Tr("table.gEventText.19"),
+    // Кладбище\n\nВы осторожно приближаетесь к захоронению древних воинов. Хотите вскрыть их могилы?
+    localization::Tr("table.gEventText.20"),
+    // Одержав победу над зомби, вы несколько часов подряд обыскиваете могилы, но ничего не находите.
+    // Ваш недостойный поступок отрицательно влияет на боевой дух войска.
+    localization::Tr("table.gEventText.21"),
+    // Одержав победу над зомби, вы обыскиваете могилы и удаляетесь с находкой!
+    localization::Tr("table.gEventText.22"),
+    // {Дом стрелков}\n\nГруппа стрелков в поисках славы желает примкнуть к вашему войску. Согласны ли
+    // вы принять их?
+    localization::Tr("table.gEventText.23"),
+    // В вашем войске нет места для новых рекрутов.
+    localization::Tr("table.gEventText.24"),
+    // {Дом стрелков}\n\nПриблизившись к жилищу, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.25"),
+    // Хибара гоблинов\n\nГруппа гоблинов в поисках славы желает примкнуть к вашему войску. Согласны ли
+    // вы принять их?
+    localization::Tr("table.gEventText.26"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.27"),
+    // Хибара гоблинов\n\nПриблизившись к жилищу гоблинов, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.28"),
+    // Хижина крестьян\n\nГруппа крестьян в поисках славы желает примкнуть к вашему войску. Согласны ли
+    // вы принять их?
+    localization::Tr("table.gEventText.29"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.30"),
+    // Хижина крестьян\n\nПриблизившись к жилищу крестьян, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.31"),
+    // Избушка гномов\n\nГруппа стрелков в поисках славы желает примкнуть к вашему войску. Согласны ли
+    // вы принять их?
+    localization::Tr("table.gEventText.32"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.33"),
+    // Избушка гномов\n\nПриблизившись к жилищу стрелков, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.34"),
+    // {Мазанка}\n\nГруппа крестьян в поисках славы желает примкнуть к вашему войску. Согласны ли вы
+    // принять их?
+    localization::Tr("table.gEventText.35"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.36"),
+    // {Мазанка}\n\nПриблизившись к жилищу Крестьян, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.37"),
+    // {Древо-дом}\n\nГруппа фей в поисках славы желает примкнуть к вашему войску. Согласны ли вы
+    // принять их?
+    localization::Tr("table.gEventText.38"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.39"),
+    // {Древо-дом}\n\nПриблизившись к древесному дому Фей, вы обнаруживаете, что он пустует.
+    localization::Tr("table.gEventText.40"),
+    // {Нора полуросликов}\n\nГруппа полуросликов в поисках славы желает примкнуть к вашему войску.
+    // Согласны ли вы принять их?
+    localization::Tr("table.gEventText.41"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.42"),
+    // {Нора полуросликов}\n\nПриблизившись к норе полуросликов, вы обнаруживаете, что она пустует.
+    localization::Tr("table.gEventText.43"),
+    // {Сторожевая вышка}\n\nГруппа орков в поисках славы желает примкнуть к вашему войску. Согласны ли
+    // вы принять их?
+    localization::Tr("table.gEventText.44"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.45"),
+    // {Сторожевая вышка}\n\nПриблизившись к сторожевой вышке орков, вы обнаруживаете, что она пустует.
+    localization::Tr("table.gEventText.46"),
+    // {Снежная пещера}\n\nГруппа кентавров в поисках славы желает примкнуть к вашему войску. Согласны
+    // ли вы принять их?
+    localization::Tr("table.gEventText.47"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.48"),
+    // {Пещера}\n\nПриблизившись к пещере кентавров, вы обнаруживаете, что она пустует.
+    localization::Tr("table.gEventText.49"),
+    // {Раскопки}\n\nГруппа скелетов в поисках славы желает примкнуть к вашему войску. Согласны ли вы
+    // принять их?
+    localization::Tr("table.gEventText.50"),
+    // Вы не можете принять новых рекрутов в свое войско, его ряды полны.
+    localization::Tr("table.gEventText.51"),
+    // {Раскопки}\n\nПриблизившись к захоронению скелетов, вы обнаруживаете, что оно пустует.
+    localization::Tr("table.gEventText.52"),
+    "",
+    "",
+    "",
+    "",
+    "",
+    // Маяк\n\nТеперь маяк ваш, и все ваши корабли будут преодолевать большее расстояние за один ход.
+    localization::Tr("table.gEventText.58"),
+    // Водяная мельница\n\nМельник обращается к вам со словами: \"Сожалею, господин, но сегодня золота
+    // у меня нет. Приходите на следующей неделе.\"
+    localization::Tr("table.gEventText.59"),
+    // Водяная мельница\n\nМельник обращается к вам со словами: \"Господин, я трудился в поте лица и
+    // прошу вас принять мою скромную лепту. Приходите на следующей неделе, и вы получите еще столько
+    // же.\"
+    localization::Tr("table.gEventText.60"),
+    // Рудная шахта\n\nВы стали хозяином рудной шахты. Она будет приносить вам по две меры руды в день.
+    localization::Tr("table.gEventText.61"),
+    // Серная шахта\n\nВы стали хозяином серной шахты. Она будут приносить вам по 1 единице серы в
+    // день.
+    localization::Tr("table.gEventText.62"),
+    // Кристальная шахта\n\nВы стали хозяином кристальной шахты. Она будет приносить вам по одной мере
+    // кристаллов в день.
+    localization::Tr("table.gEventText.63"),
+    // Самоцветная шахта\n\nВы стали хозяином самоцветной шахты. Она будет приносить вам по 1 единице
+    // самоцветов в день.
+    localization::Tr("table.gEventText.64"),
+    // Золотая шахта\n\nВы стали хозяином золотой шахты. Она будет приносить вам по 1000 золотых в
+    // день.
+    localization::Tr("table.gEventText.65"),
+    // Последователи\n\nГруппа %s в поисках славы желает примкнуть к вашему войску. Вы согласны принять
+    // их?
+    localization::Tr("table.gEventText.66"),
+    // Оскорбленные отказом быть принятыми в ваши ряды, они нападают на вас!
+    localization::Tr("table.gEventText.67"),
+    // Обелиск\n\nПеред вами обелиск, высеченный из невиданного камня. Вы вглядываетесь в его гладкую
+    // поверхность и вдруг замечаете, что на ней начинают проступать таинственные знаки. Знаки
+    // складываются во фрагмент древней карты. Вы торопливо срисовываете его, и знаки исчезают так же
+    // внезапно, как и появились.
+    localization::Tr("table.gEventText.68"),
+    // Обелиск\n\nВы уже посещали этот обелиск.
+    localization::Tr("table.gEventText.69"),
+    "",
+    "",
+    // Вы нашли ресурс (%s).
+    localization::Tr("table.gEventText.72"),
+    // Лесопилка\n\nВы стали хозяином лесопилки. Она будет приносить вам по 2 единицы древесины в день.
+    localization::Tr("table.gEventText.73"),
+    // {Оракул}\n\nНа поляне в окружении деревьев восседает слепой оракул. Вы рассказываете ему о целях
+    // вашего похода, и он показывает вам сильные и слабые стороны ваших противников в магическом
+    // хрустальном шаре.
+    localization::Tr("table.gEventText.74"),
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    // {Шатер}\n\nВаше внимание привлекает шатер, пологи которых трепещут на жарком ветру пустыни. В
+    // нем никого нет. Пройдет время, и, быть может, сюда придет новый отряд кочевников.
+    localization::Tr("table.gEventText.81"),
+    // {Шатер}\n\nВаше внимание привлекают шатер, пологи которого трепещут на жарком ветру пустыни. Вы
+    // хотите принять в ваше войско отряд кочевников?
+    localization::Tr("table.gEventText.82"),
+    // {Повозка}\n\nЦветастая повозка разбойников пуста. Пройдет время, и, быть может, здесь обоснуется
+    // новая шайка.
+    localization::Tr("table.gEventText.83"),
+    // {Повозка}\n\nВдалеке слышится музыка и смех. Вы идете на звуки и видите цветастую повозку, в
+    // которой живут разбойники. Вы хотите принять в ваше войско шайку разбойников?
+    localization::Tr("table.gEventText.84"),
+    // {Водоворот}\n\nВаш корабль попадает в водоворот. Часть вашего войска исчезает в пучине.
+    localization::Tr("table.gEventText.85"),
+    // {Ветряная мельница}\n\nМельник обращается к вам со словами: \"Сожалею, господин, но сегодня у
+    // меня ничего нет. Приходите на следующей неделе.\"
+    localization::Tr("table.gEventText.86"),
+    // {Ветряная мельница}\n\nМельник обращается к вам со словами: \"Господин, я работал не покладая
+    // рук, и прошу вас принять мой скромный дар. Приходите на следующей неделе, у меня опять найдется,
+    // чем вас порадовать.\"
+    localization::Tr("table.gEventText.87"),
+    "",
+    "",
+    "",
+    "",
+    "",
+    // {Скелет}\n\nВы находите останки незадачливого искателя приключений. Пошарив в груде лохмотьев,
+    // вы ничего не находите.
+    localization::Tr("table.gEventText.93"),
+    // {Скелет}\n\nВы находите останки незадачливого искателя приключений. Пошарив в груде лохмотьев,
+    // вы находите.
+    localization::Tr("table.gEventText.94")
+};
+DATA(0x00481708) H2_CONST char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
+    // Начать одиночную или сетевую игру.
+    localization::Tr("table.gCPanelHelp.0"),
+    // Загрузить сохраненную игру.
+    localization::Tr("table.gCPanelHelp.1"),
+    // Сохранить игру.
+    localization::Tr("table.gCPanelHelp.2"),
+    // Выйти из Героев Меча и Магии II.
+    localization::Tr("table.gCPanelHelp.3"),
+    // Закрыть меню, ничего не делая.
+    localization::Tr("table.gCPanelHelp.4")
+};
+DATA(0x0048171c) H2_CONST char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
+    // {ОК}\n\nЗакрыть это меню.
+    localization::Tr("table.gCSPanelHelp.0"),
+    // {Скорость}\n\nУстановить скорость действий и анимации воинов в бою.
+    localization::Tr("table.gCSPanelHelp.1"),
+    // {Информация о воине}\n\nВключить или выключить отображение окна с информацией о выбранном и
+    // атакуемом воине.
+    localization::Tr("table.gCSPanelHelp.2"),
+    // {Магия в автобое}\n\nЕсли эта опция включена, ваш герой будет использовать заклинания во время
+    // автобоя. (Примечание: Эта опция не влияет на использование заклинаний компьютерными игроками, и
+    // на быстрый бой.)
+    localization::Tr("table.gCSPanelHelp.3"),
+    // {Сетка}\n\nВключает или выключает отображение сетки. Все перемещения на поле боя происходят по
+    // гексагональной сетке, даже если ее отображение отключено.
+    localization::Tr("table.gCSPanelHelp.4"),
+    // {Затенение сетки}\n\nВключает или выключает режим обозначения возможной дальности передвижения
+    // выбранного отряда воинов.
+    localization::Tr("table.gCSPanelHelp.5"),
+    // {Курсор с тенью}\n\nВключает или выключает отрисовку тени от курсора на сетке координат.
+    localization::Tr("table.gCSPanelHelp.6")
+};
+DATA(0x00481738) H2_CONST char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
+    // Осмотреть весь мир.
+    localization::Tr("table.gAPanelHelp.0"),
+    // Посмотреть головоломку.
+    localization::Tr("table.gAPanelHelp.1"),
+    // Показать информацию о сценарии, на котором идет игра.
+    localization::Tr("table.gAPanelHelp.2"),
+    // Копать в поисках Великого артефакта.
+    (localization::Tr("table.gAPanelHelp.3")),
+    // Закрыть это меню.
+    localization::Tr("table.gAPanelHelp.4")
+};
+DATA(0x0048174c) H2_CONST char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
+    // {Новая игра}\n\nНачать отдельный сценарий или сетевую игру.
+    localization::Tr("table.gInitMenuHelp.0"),
+    // {Игры}\n\nЗагрузить ранее сохраненную игру.
+    localization::Tr("table.gInitMenuHelp.1"),
+    // {Рекорды}\n\nПоказать таблицу рекордов.
+    localization::Tr("table.gInitMenuHelp.2"),
+    // {Авторы}\n\nПоказать перечень авторов игры.
+    localization::Tr("table.gInitMenuHelp.3"),
+    // {Выйти}\n\nВыйти из героев Меча и Магии II и вернуться в операционную систему.
+    localization::Tr("table.gInitMenuHelp.4")
+};
+DATA(0x00481760) H2_CONST char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
+    // {Следующий герой}\n\nВыбрать следующего героя.
+    localization::Tr("table.gAdvMenuHelp.0"),
+    // {Продолжить движение}\n\nПродолжить движение героя по намеченному пути.
+    localization::Tr("table.gAdvMenuHelp.1"),
+    // {Обзор королевства}\n\nОсмотреть ваши владения.
+    localization::Tr("table.gAdvMenuHelp.2"),
+    // {Окончить ход}\n\nОкончить ход и передать управление компьютеру.
+    localization::Tr("table.gAdvMenuHelp.3"),
+    // {Игровые действия}\n\nОткрыть окно доступных игровых действий.
+    localization::Tr("table.gAdvMenuHelp.4"),
+    // {Окно файлов}\n\nОткрывает меню, где вы можете загружать или сохранять игры.
+    localization::Tr("table.gAdvMenuHelp.5"),
+    // {Системные настройки}\n\nОткрывает окно системных настроек, позволяющих настроить игру.
+    localization::Tr("table.gAdvMenuHelp.6"),
+    // {Направить заклинание}\n\nНаправить заклинание на стратегической карте.
+    localization::Tr("table.gAdvMenuHelp.7")
+};
+DATA(0x00481780) H2_CONST char* gLuckText[KB_LUCK_TEXT_COUNT] = {
+    // Проклятая
+    localization::Tr("table.gLuckText.0"),
+    // Ужасная
+    localization::Tr("table.gLuckText.1"),
+    // Плохая
+    localization::Tr("table.gLuckText.2"),
+    // Обычная
+    localization::Tr("table.gLuckText.3"),
+    // Хорошая
+    localization::Tr("table.gLuckText.4"),
+    // Отличная
+    localization::Tr("table.gLuckText.5"),
+    // Божественная
+    localization::Tr("table.gLuckText.6")
+};
+DATA(0x0048179c) H2_CONST char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
+    // Предательская
+    localization::Tr("table.gMoraleText.0"),
+    // Ужасная
+    localization::Tr("table.gMoraleText.1"),
+    // Плохая
+    localization::Tr("table.gMoraleText.2"),
+    // Обычная
+    localization::Tr("table.gMoraleText.3"),
+    // Хорошая
+    localization::Tr("table.gMoraleText.4"),
+    // Отличная
+    localization::Tr("table.gMoraleText.5"),
+    // Кровавая!
+    localization::Tr("table.gMoraleText.6")
+};
+DATA(0x004817b8) H2_CONST char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
+    // Выкл.
+    localization::Tr("table.onOffText.0"),
+    // Вкл.
+    localization::Tr("table.onOffText.1"),
+    // Вкл.\nГромкость 9
+    localization::Tr("table.onOffText.2"),
+    // Вкл.\nГромкость 8
+    localization::Tr("table.onOffText.3"),
+    // Вкл.\nГромкость 7
+    localization::Tr("table.onOffText.4"),
+    // Вкл.\nГромкость 6
+    localization::Tr("table.onOffText.5"),
+    // Вкл.\nГромкость 5
+    localization::Tr("table.onOffText.6"),
+    // Вкл.\nГромкость 4
+    localization::Tr("table.onOffText.7"),
+    // Вкл.\nГромкость 3
+    localization::Tr("table.onOffText.8"),
+    // Вкл.\nГромкость 2
+    localization::Tr("table.onOffText.9"),
+    // Вкл.\nГромкость 1
+    localization::Tr("table.onOffText.10")
+};
+DATA(0x004817e4) H2_CONST char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
+    // Шагом
+    localization::Tr("table.walkSpeedText.0"),
+    // Рысью
+    localization::Tr("table.walkSpeedText.1"),
+    // Аллюром
+    localization::Tr("table.walkSpeedText.2"),
+    // Галопом
+    localization::Tr("table.walkSpeedText.3"),
+    // Прыжками
+    localization::Tr("table.walkSpeedText.4")
+};
+DATA(0x004817f8) H2_CONST char* gColors[IDX(FACTION_COUNT)] = {
+    localization::Tr("table.gColors.0"),
+    localization::Tr("table.gColors.1"),
+    localization::Tr("table.gColors.2"),
+    localization::Tr("table.gColors.3"),
+    localization::Tr("table.gColors.4"),
+    localization::Tr("table.gColors.5")
+};
+DATA(0x00481810) static H2_CONST char* H2_UNUSED(gColorAbbreviations)[IDX(FACTION_COUNT)] = {
+    localization::Tr("color.abbreviated.blue"),
+    localization::Tr("color.abbreviated.green"),
+    localization::Tr("color.abbreviated.red"),
+    localization::Tr("color.abbreviated.yellow"),
+    localization::Tr("color.abbreviated.orange"),
+    localization::Tr("color.abbreviated.purple")
+};
+DATA(0x00481828) H2_CONST char* gMonthNames[KB_MONTH_NAME_COUNT] = {
+    // Кузнечика
+    localization::Tr("table.gMonthNames.0"),
+    // Муравья
+    localization::Tr("table.gMonthNames.1"),
+    // Стрекозы
+    localization::Tr("table.gMonthNames.2"),
+    // Паука
+    localization::Tr("table.gMonthNames.3"),
+    // Бабочки
+    localization::Tr("table.gMonthNames.4"),
+    // Шмеля
+    localization::Tr("table.gMonthNames.5"),
+    // Цикады
+    localization::Tr("table.gMonthNames.6"),
+    // Земляного червя
+    localization::Tr("table.gMonthNames.7"),
+    // Шершня
+    localization::Tr("table.gMonthNames.8"),
+    // Жука
+    localization::Tr("table.gMonthNames.9")
+};
+DATA(0x00481850) H2_CONST char* gWeekNames[KB_WEEK_NAME_COUNT] = {
+    // Белки
+    localization::Tr("table.gWeekNames.0"),
+    // Кролика
+    localization::Tr("table.gWeekNames.1"),
+    // Суслика
+    localization::Tr("table.gWeekNames.2"),
+    // Барсука
+    localization::Tr("table.gWeekNames.3"),
+    // Крысы
+    localization::Tr("table.gWeekNames.4"),
+    // Орла
+    localization::Tr("table.gWeekNames.5"),
+    // Горностая
+    localization::Tr("table.gWeekNames.6"),
+    // Ворона
+    localization::Tr("table.gWeekNames.7"),
+    // Мангуста
+    localization::Tr("table.gWeekNames.8"),
+    // Собаки
+    localization::Tr("table.gWeekNames.9"),
+    // Муравьеда
+    localization::Tr("table.gWeekNames.10"),
+    // Ящерицы
+    localization::Tr("table.gWeekNames.11"),
+    // Черепахи
+    localization::Tr("table.gWeekNames.12"),
+    // Дикобраза
+    localization::Tr("table.gWeekNames.13"),
+    // Кондора
+    localization::Tr("table.gWeekNames.14")
+};
+DATA(0x0048188c) H2_CONST char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+    // Обзор королевства
+    localization::Tr("table.cHeroScreen.0"),
+    // %s - информация
+    localization::Tr("table.cHeroScreen.1"),
+    // Дополнительная статистика героя
+    localization::Tr("table.cHeroScreen.2"),
+    // Информация о высокой морали
+    localization::Tr("table.cHeroScreen.3"),
+    // Информация об обычной морали
+    localization::Tr("table.cHeroScreen.4"),
+    // Информация о плохой морали
+    localization::Tr("table.cHeroScreen.5"),
+    // Информация о хорошей удаче
+    localization::Tr("table.cHeroScreen.6"),
+    // Информация об обычной удаче
+    localization::Tr("table.cHeroScreen.7"),
+    // Информация о плохой удаче
+    localization::Tr("table.cHeroScreen.8"),
+    // Показать опыт
+    localization::Tr("table.cHeroScreen.9"),
+    // Выбрать %s
+    localization::Tr("table.cHeroScreen.10"),
+    // Пусто
+    localization::Tr("table.cHeroScreen.11"),
+    // Перенести сюда отряд %s
+    localization::Tr("table.cHeroScreen.12"),
+    // Отряды %s и %s меняются местами
+    localization::Tr("table.cHeroScreen.13"),
+    // Показать заклинания
+    localization::Tr("table.cHeroScreen.14"),
+    // Посмотреть информацию об: %s
+    localization::Tr("table.cHeroScreen.15"),
+    // %s %s - уволить
+    localization::Tr("table.cHeroScreen.16"),
+    // Закрыть экран героя
+    localization::Tr("table.cHeroScreen.17"),
+    // Экран героя
+    localization::Tr("table.cHeroScreen.18"),
+    // %s в один отряд
+    localization::Tr("table.cHeroScreen.19"),
+    // Разделить отряд %s
+    localization::Tr("table.cHeroScreen.20"),
+    // %s %s - информация
+    localization::Tr("table.cHeroScreen.21"),
+    // Информация об очках магии
+    localization::Tr("table.cHeroScreen.22"),
+    // Выбрать широкие ряды в бою
+    localization::Tr("table.cHeroScreen.23"),
+    // Сгруппировать воинов
+    localization::Tr("table.cHeroScreen.24")
+};
+DATA(0x004818f0) H2_CONST char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+    // Построить Гильдию магов
+    localization::Tr("table.cCastleInfo.0"),
+    // Построены все этажи Гильдии магов.
+    localization::Tr("table.cCastleInfo.1"),
+    // Нельзя построить следующий этаж.
+    localization::Tr("table.cCastleInfo.2"),
+    // Построить следующий этаж Гильдии магов
+    localization::Tr("table.cCastleInfo.3"),
+    // Постройка '%s' уже возведена
+    localization::Tr("table.cCastleInfo.4"),
+    // Нельзя возвести постройку '%s'
+    localization::Tr("table.cCastleInfo.5"),
+    // Нельзя возвести постройку '%s'
+    localization::Tr("table.cCastleInfo.6"),
+    // Возвести постройку '%s'
+    localization::Tr("table.cCastleInfo.7"),
+    // Герой вам не по карману.
+    localization::Tr("table.cCastleInfo.8"),
+    // Нельзя нанять - у вас уже %d героев.
+    localization::Tr("table.cCastleInfo.9"),
+    // Нельзя нанять - в этом городе у вас уже есть герой.
+    localization::Tr("table.cCastleInfo.10"),
+    // Нанять нового героя
+    localization::Tr("town.recruit.new_hero"),
+    // Выйти из замка
+    localization::Tr("table.cCastleInfo.12"),
+    // Возможности замка
+    localization::Tr("table.cCastleInfo.13"),
+    // Сгруппировать гарнизон
+    localization::Tr("table.cCastleInfo.14"),
+    // Выбрать широкие ряды для гарнизона
+    localization::Tr("table.cCastleInfo.15")
+};
+DATA(0x00481930) H2_CONST char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+    // {Хорошая удача}\n\nЕсли удача вашего войска выше обычной, атаки отдельных отрядов на поле боя
+    // иногда оказываются более результативными (их сила удваивается).
+    localization::Tr("table.cLuckInfo.0"),
+    // {Обычная удача}\n\nС обычной удачей ваше войско не имеет ни преимуществ, ни недостатков на поле
+    // боя.
+    localization::Tr("table.cLuckInfo.1"),
+    // {Плохая удача}\n\nЕсли вашему войску не везет, урон, наносимый  отдельными отрядами на поле боя,
+    // может оказаться вдвое меньше обычного.
+    localization::Tr("table.cLuckInfo.2"),
+    // %s\n\n\nМодификаторы удачи:
+    localization::Tr("table.cLuckInfo.3"),
+    // \nЛапка кролика +1
+    localization::Tr("table.cLuckInfo.4"),
+    // \nЗолотая подкова +1
+    localization::Tr("table.cLuckInfo.5"),
+    // \nМонета +1
+    localization::Tr("table.cLuckInfo.6"),
+    // \nКлевер +1
+    localization::Tr("table.cLuckInfo.7"),
+    // \nПосещен Круг фейри +1
+    localization::Tr("table.cLuckInfo.8"),
+    // \nПосещен фонтан +1
+    localization::Tr("table.cLuckInfo.9"),
+    // \nНет
+    localization::Tr("table.cLuckInfo.10"),
+    // \nГрабитель могил -1
+    localization::Tr("table.cLuckInfo.11"),
+    // \nРадуга магов +2
+    localization::Tr("table.cLuckInfo.12"),
+    // \nПосещен идол +1
+    localization::Tr("table.cLuckInfo.13"),
+    // \nОграблена пирамида -2
+    localization::Tr("table.cLuckInfo.14"),
+    // \nБазовая удача +1
+    localization::Tr("table.cLuckInfo.15"),
+    // \nВысокая удача +2
+    localization::Tr("table.cLuckInfo.16"),
+    // \nЭксперт удачи +3
+    localization::Tr("table.cLuckInfo.17"),
+    // \nБонус мачты на море +1
+    localization::Tr("table.cLuckInfo.18"),
+    // \nПосещена русалка +1
+    localization::Tr("table.cLuckInfo.19"),
+    // \nБоевое одеяние Андурана дает максимальную удачу.
+    localization::Tr("table.cLuckInfo.20")
+};
+DATA(0x00481984) H2_CONST char* IQnames[KB_IQ_NAME_COUNT] = {
+    // Нет
+    localization::Tr("table.IQnames.0"),
+    // Глупый
+    localization::Tr("table.IQnames.1"),
+    // Средний
+    localization::Tr("table.IQnames.2"),
+    // Умный
+    localization::Tr("table.IQnames.3"),
+    // Гений
+    localization::Tr("table.IQnames.4")
+};
+DATA(0x00481998) H2_CONST char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+    // Предыдущая страница
+    localization::Tr("table.cSpellHelp.0"),
+    // Следующая страница
+    localization::Tr("table.cSpellHelp.1"),
+    // Небоевые заклинания
+    localization::Tr("table.cSpellHelp.2"),
+    // Боевые заклинания
+    localization::Tr("table.cSpellHelp.3"),
+    // Закрыть волшебную книгу
+    localization::Tr("table.cSpellHelp.4"),
+    // Заклинания
+    localization::Tr("table.cSpellHelp.5"),
+    // Выбрать заклинание
+    localization::Tr("table.cSpellHelp.6"),
+    // Боевые заклинания
+    localization::Tr("table.cSpellHelp.7"),
+    // У вашего героя осталось %d оч. магии
+    (localization::Tr("table.cSpellHelp.8"))
+};
+DATA(0x004819bc) H2_CONST char* speedText[KB_SPEED_TEXT_COUNT] = {
+    /*  */ "",
+     localization::Tr("table.speedText.1"),
+     localization::Tr("table.speedText.2"),
+     localization::Tr("table.speedText.3"),
+     localization::Tr("table.speedText.4"),
+     localization::Tr("table.speedText.5"),
+     localization::Tr("table.speedText.6"),
+     localization::Tr("table.speedText.7"),
+     localization::Tr("table.speedText.8"),
+     localization::Tr("table.speedText.9")
+};
+DATA(0x004819e4) H2_CONST char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+     localization::Tr("table.cArmyDetail.0"),
+     localization::Tr("table.cArmyDetail.1"),
+    /* Выстрелов:  */ localization::Tr("table.cArmyDetail.2"),
+    /* Урон:  */ localization::Tr("table.cArmyDetail.3"),
+    /* Здоровье:  */ localization::Tr("table.cArmyDetail.4"),
+    /* Скорость:  */ localization::Tr("table.cArmyDetail.5"),
+    /* Мораль:  */ localization::Tr("table.cArmyDetail.6"),
+    /* Удача:  */ localization::Tr("table.cArmyDetail.7"),
+    /* Выстрелов:  */ localization::Tr("table.cArmyDetail.8")
+};
+DATA(0x00481a08) H2_CONST char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+     localization::Tr("table.cWellDetail.0"),
+     localization::Tr("table.cWellDetail.1"),
+    /* Выстр.:  */ localization::Tr("table.cWellDetail.2"),
+    /* Урон:  */ localization::Tr("table.cWellDetail.3"),
+    /* ЗД:  */ localization::Tr("table.cWellDetail.4"),
+    /* Скор.:  */ localization::Tr("table.cWellDetail.5"),
+    /* Всего:  */ localization::Tr("table.cWellDetail.6"),
+     localization::Tr("table.cWellDetail.7"),
+     localization::Tr("table.cWellDetail.8")
+};
+DATA(0x00481a2c) H2_CONST char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
+
+    (localization::Tr("table.cKingdomOverview.0")),
+     localization::Tr("table.cKingdomOverview.1"),
+     localization::Tr("table.cKingdomOverview.2")
+};
+DATA(0x00481a38) H2_CONST char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+     localization::Tr("table.cNewTurn.0"),
+     localization::Tr("table.cNewTurn.1"),
+     localization::Tr("table.cNewTurn.2"),
+     localization::Tr("table.cNewTurn.3"),
+     localization::Tr("table.cNewTurn.4"),
+     localization::Tr("table.cNewTurn.5"),
+     localization::Tr("table.cNewTurn.6")
+};
+DATA(0x00481a54) H2_CONST char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+     localization::Tr("table.cViewGeneralLabels.0"),
+     localization::Tr("table.cViewGeneralLabels.1"),
+     localization::Tr("table.cViewGeneralLabels.2"),
+     localization::Tr("table.cViewGeneralLabels.3"),
+    /* Мораль:  */ localization::Tr("table.cViewGeneralLabels.4"),
+    /* Удача:  */ localization::Tr("table.cViewGeneralLabels.5"),
+     localization::Tr("table.cViewGeneralLabels.6")
+};
+DATA(0x00481a70) H2_CONST char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+     localization::Tr("table.cViewGeneralHelp.0"),
+     localization::Tr("table.cViewGeneralHelp.1"),
+     localization::Tr("table.cViewGeneralHelp.2"),
+     localization::Tr("table.cViewGeneralHelp.3"),
+     localization::Tr("table.cViewGeneralHelp.4"),
+     localization::Tr("table.cViewGeneralHelp.5"),
+     localization::Tr("table.cViewGeneralHelp.6")
+};
+DATA(0x00481a8c) H2_CONST char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+     localization::Tr("table.cViewGeneralLongHelp.0"),
+     localization::Tr("table.cViewGeneralLongHelp.1"),
+     localization::Tr("table.cViewGeneralLongHelp.2"),
+     localization::Tr("table.cViewGeneralLongHelp.3")
+};
+DATA(0x00481a9c) H2_CONST char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+    /*  */ "",
+     localization::Tr("table.cCombatMessage.1"),
+     localization::Tr("table.cCombatMessage.2"),
+     localization::Tr("table.cCombatMessage.3"),
+     localization::Tr("table.cCombatMessage.4"),
+     localization::Tr("table.cCombatMessage.5"),
+     localization::Tr("table.cCombatMessage.6"),
+     localization::Tr("table.cCombatMessage.7"),
+     localization::Tr("table.cCombatMessage.8"),
+     localization::Tr("table.cCombatMessage.9"),
+     localization::Tr("table.cCombatMessage.10"),
+     localization::Tr("table.cCombatMessage.11")
+};
+DATA(0x00481acc) H2_CONST char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
+    { localization::Tr("table.cHeroLevel.0"), /*  уровень опыта.\n */ localization::Tr("table.cHeroLevel.1"), /*  %d уровней опыта.\n */ localization::Tr("table.cHeroLevel.2")};
+DATA(0x00481ad8) H2_CONST char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+     localization::Tr("table.cCombatHelp.0"),
+     localization::Tr("table.cCombatHelp.1"),
+     localization::Tr("table.cCombatHelp.2"),
+     localization::Tr("table.cCombatHelp.3"),
+    /*  */ ""
+};
+DATA(0x00481aec) H2_CONST char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+     localization::Tr("table.cLongCombatHelp.0"),
+     localization::Tr("table.cLongCombatHelp.1"),
+     localization::Tr("table.cLongCombatHelp.2"),
+     localization::Tr("table.cLongCombatHelp.3"),
+     localization::Tr("table.cLongCombatHelp.4")
+};
+DATA(0x00481b00) H2_CONST char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
+     localization::Tr("table.cTownCommand.0"),
+    /* Нельзя отнять последних воинов у героя  */ localization::Tr("table.cTownCommand.1"),
+     localization::Tr("table.cTownCommand.2"),
+     localization::Tr("table.cTownCommand.3"),
+     localization::Tr("table.cTownCommand.4"),
+     localization::Tr("table.cTownCommand.5"),
+     localization::Tr("table.cTownCommand.6"),
+     localization::Tr("table.cTownCommand.7"),
+     localization::Tr("table.cTownCommand.8"),
+    /*  */ "",
+     localization::Tr("table.cTownCommand.10"),
+     localization::Tr("table.cTownCommand.11"),
+    /* %s */ "%s",
+     localization::Tr("table.cTownCommand.13"),
+     localization::Tr("table.cTownCommand.14"),
+     localization::Tr("table.cTownCommand.15"),
+     localization::Tr("table.cTownCommand.16"),
+     localization::Tr("table.cTownCommand.17"),
+     localization::Tr("table.cTownCommand.18"),
+     localization::Tr("table.cTownCommand.19"),
+     localization::Tr("table.cTownCommand.20"),
+     localization::Tr("table.cTownCommand.21"),
+     localization::Tr("table.cTownCommand.22"),
+     localization::Tr("table.cTownCommand.23"),
+     localization::Tr("table.cTownCommand.24"),
+     localization::Tr("table.cTownCommand.25"),
+     localization::Tr("table.cTownCommand.26"),
+     localization::Tr("table.cTownCommand.27")
+};
+DATA(0x00481b70) H2_CONST char* gHeroDefaultNames[GAME_HERO_COUNT] = {
+     localization::Tr("table.gHeroDefaultNames.0"), localization::Tr("table.gHeroDefaultNames.1"), localization::Tr("table.gHeroDefaultNames.2"), localization::Tr("table.gHeroDefaultNames.3"), localization::Tr("table.gHeroDefaultNames.4"), localization::Tr("table.gHeroDefaultNames.5"), localization::Tr("table.gHeroDefaultNames.6"),
+     localization::Tr("table.gHeroDefaultNames.7"), localization::Tr("table.gHeroDefaultNames.8"), localization::Tr("table.gHeroDefaultNames.9"), localization::Tr("table.gHeroDefaultNames.10"), localization::Tr("table.gHeroDefaultNames.11"), localization::Tr("table.gHeroDefaultNames.12"), localization::Tr("table.gHeroDefaultNames.13"),
+     localization::Tr("table.gHeroDefaultNames.14"), localization::Tr("table.gHeroDefaultNames.15"), localization::Tr("table.gHeroDefaultNames.16"), localization::Tr("table.gHeroDefaultNames.17"), localization::Tr("table.gHeroDefaultNames.18"), localization::Tr("table.gHeroDefaultNames.19"), localization::Tr("table.gHeroDefaultNames.20"),
+     localization::Tr("table.gHeroDefaultNames.21"), localization::Tr("table.gHeroDefaultNames.22"), localization::Tr("table.gHeroDefaultNames.23"), localization::Tr("table.gHeroDefaultNames.24"), localization::Tr("table.gHeroDefaultNames.25"), localization::Tr("table.gHeroDefaultNames.26"), localization::Tr("table.gHeroDefaultNames.27"),
+     localization::Tr("table.gHeroDefaultNames.28"), localization::Tr("table.gHeroDefaultNames.29"), localization::Tr("table.gHeroDefaultNames.30"), localization::Tr("table.gHeroDefaultNames.31"), localization::Tr("table.gHeroDefaultNames.32"), localization::Tr("table.gHeroDefaultNames.33"), localization::Tr("table.gHeroDefaultNames.34"),
+     localization::Tr("table.gHeroDefaultNames.35"), localization::Tr("table.gHeroDefaultNames.36"), localization::Tr("table.gHeroDefaultNames.37"), localization::Tr("table.gHeroDefaultNames.38"), localization::Tr("table.gHeroDefaultNames.39"), localization::Tr("table.gHeroDefaultNames.40"), localization::Tr("table.gHeroDefaultNames.41"),
+     localization::Tr("table.gHeroDefaultNames.42"), localization::Tr("table.gHeroDefaultNames.43"), localization::Tr("table.gHeroDefaultNames.44"), localization::Tr("table.gHeroDefaultNames.45"), localization::Tr("table.gHeroDefaultNames.46"), localization::Tr("table.gHeroDefaultNames.47"), localization::Tr("table.gHeroDefaultNames.48"),
+     localization::Tr("table.gHeroDefaultNames.49"), localization::Tr("table.gHeroDefaultNames.50"), localization::Tr("table.gHeroDefaultNames.51"), localization::Tr("table.gHeroDefaultNames.52"), localization::Tr("table.gHeroDefaultNames.53")
+};
+DATA(0x00481c48) H2_CONST char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+     localization::Tr("table.gNewGameHelp.0"),
+     localization::Tr("table.gNewGameHelp.1"),
+     localization::Tr("table.gNewGameHelp.2"),
+     localization::Tr("table.gNewGameHelp.3"),
+     localization::Tr("table.gNewGameHelp.4"),
+     localization::Tr("table.gNewGameHelp.5"),
+     localization::Tr("table.gNewGameHelp.6"),
+     localization::Tr("table.gNewGameHelp.7")
+};
+DATA(0x00481c68) H2_CONST char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+     localization::Tr("table.gSetupBaudHelp.0"),
+     localization::Tr("table.gSetupBaudHelp.1"),
+     localization::Tr("table.gSetupBaudHelp.2"),
+     localization::Tr("table.gSetupBaudHelp.3"),
+     localization::Tr("table.gSetupBaudHelp.4")
+};
+DATA(0x00481c7c) H2_CONST char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+     localization::Tr("table.gSetupComPortHelp.0"),
+     localization::Tr("table.gSetupComPortHelp.1"),
+     localization::Tr("table.gSetupComPortHelp.2"),
+     localization::Tr("table.gSetupComPortHelp.3"),
+     localization::Tr("table.gSetupComPortHelp.4")
+};
+DATA(0x00481c90) H2_CONST char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+     localization::Tr("table.gSetupDCBaudHelp.0"),
+     localization::Tr("table.gSetupDCBaudHelp.1"),
+     localization::Tr("table.gSetupDCBaudHelp.2"),
+     localization::Tr("table.gSetupDCBaudHelp.3"),
+     localization::Tr("table.gSetupDCBaudHelp.4")
+};
+DATA(0x00481ca4) H2_CONST char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+     localization::Tr("table.gSetupDCComPortHelp.0"),
+     localization::Tr("table.gSetupDCComPortHelp.1"),
+     localization::Tr("table.gSetupDCComPortHelp.2"),
+     localization::Tr("table.gSetupDCComPortHelp.3"),
+     localization::Tr("table.gSetupDCComPortHelp.4")
+};
+DATA(0x00481cb8) H2_CONST char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+     localization::Tr("table.gSetupHotSeatGameHelp.0"),
+     localization::Tr("table.gSetupHotSeatGameHelp.1"),
+     localization::Tr("table.gSetupHotSeatGameHelp.2"),
+     localization::Tr("table.gSetupHotSeatGameHelp.3"),
+     localization::Tr("table.gSetupHotSeatGameHelp.4"),
+     localization::Tr("table.gSetupHotSeatGameHelp.5")
+};
+DATA(0x00481cd0) H2_CONST char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+     localization::Tr("table.gSetupModemGameHelp.0"),
+
+    (localization::Tr("table.gSetupModemGameHelp.1")),
+     localization::Tr("table.gSetupModemGameHelp.2"),
+     localization::Tr("table.gSetupModemGameHelp.3")
+};
+DATA(0x00481ce0) H2_CONST char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+     localization::Tr("table.gSetupDCGameHelp.0"),
+
+    (localization::Tr("table.gSetupDCGameHelp.1")),
+     localization::Tr("table.gSetupDCGameHelp.2"),
+     localization::Tr("table.gSetupDCGameHelp.3")
+};
+DATA(0x00481cf0) H2_CONST char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+     localization::Tr("table.gSetupMultiPlayerGameHelp.0"),
+     localization::Tr("table.gSetupMultiPlayerGameHelp.1"),
+     localization::Tr("table.gSetupMultiPlayerGameHelp.2"),
+     localization::Tr("table.gSetupMultiPlayerGameHelp.3"),
+     localization::Tr("table.gSetupMultiPlayerGameHelp.4")
+};
+DATA(0x00481d04) H2_CONST char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+     localization::Tr("table.gSetupNetworkGameHelp.0"),
+     localization::Tr("table.gSetupNetworkGameHelp.1"),
+     localization::Tr("table.gSetupNetworkGameHelp.2")
+};
+DATA(0x00481d10) H2_CONST char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+     localization::Tr("table.gSetupNetworkGame2Help.0"),
+     localization::Tr("table.gSetupNetworkGame2Help.1"),
+     localization::Tr("table.gSetupNetworkGame2Help.2"),
+     localization::Tr("table.gSetupNetworkGame2Help.3")
+};
+DATA(0x00481d20) H2_CONST char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+     localization::Tr("table.gSetupGameHelp.0"),
+     localization::Tr("table.gSetupGameHelp.1"),
+     localization::Tr("table.gSetupGameHelp.2"),
+     localization::Tr("table.gSetupGameHelp.3")
+};
+DATA(0x00481d30) H2_CONST char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+     localization::Tr("table.cBattleResults.0"),
+     localization::Tr("table.cBattleResults.1"),
+     localization::Tr("table.cBattleResults.2"),
+     localization::Tr("table.cBattleResults.3"),
+     localization::Tr("table.cBattleResults.4"),
+     localization::Tr("table.cBattleResults.5"),
+     localization::Tr("table.cBattleResults.6"),
+     localization::Tr("table.cBattleResults.7"),
+     localization::Tr("table.cBattleResults.8"),
+     localization::Tr("table.cBattleResults.9"),
+     localization::Tr("table.cBattleResults.10")
+};
+DATA(0x00481d5c) H2_CONST char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+     localization::Tr("table.cMoraleInfo.0"),
+     localization::Tr("table.cMoraleInfo.1"),
+     localization::Tr("table.cMoraleInfo.2"),
+     localization::Tr("table.cMoraleInfo.3"),
+     localization::Tr("table.cMoraleInfo.4"),
+     localization::Tr("table.cMoraleInfo.5"),
+     localization::Tr("table.cMoraleInfo.6"),
+     localization::Tr("table.cMoraleInfo.7"),
+     localization::Tr("table.cMoraleInfo.8"),
+     localization::Tr("table.cMoraleInfo.9"),
+     localization::Tr("table.cMoraleInfo.10"),
+     localization::Tr("table.cMoraleInfo.11"),
+     localization::Tr("table.cMoraleInfo.12"),
+     localization::Tr("table.cMoraleInfo.13"),
+     localization::Tr("table.cMoraleInfo.14"),
+     localization::Tr("table.cMoraleInfo.15"),
+     localization::Tr("table.cMoraleInfo.16"),
+     localization::Tr("table.cMoraleInfo.17"),
+     localization::Tr("table.cMoraleInfo.18"),
+     localization::Tr("table.cMoraleInfo.19"),
+     localization::Tr("table.cMoraleInfo.20"),
+     localization::Tr("table.cMoraleInfo.21"),
+     localization::Tr("table.cMoraleInfo.22"),
+     localization::Tr("table.cMoraleInfo.23"),
+     localization::Tr("table.cMoraleInfo.24"),
+     localization::Tr("table.cMoraleInfo.25"),
+     localization::Tr("table.cMoraleInfo.26"),
+     localization::Tr("table.cMoraleInfo.27"),
+     localization::Tr("table.cMoraleInfo.28"),
+     localization::Tr("table.cMoraleInfo.29"),
+     localization::Tr("table.cMoraleInfo.30"),
+     localization::Tr("table.cMoraleInfo.31")
+};
+DATA(0x00481ddc) H2_CONST char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = { localization::Tr("table.cMapSize.0"), localization::Tr("table.cMapSize.1"), localization::Tr("table.cMapSize.2"), localization::Tr("table.cMapSize.3")};
+DATA(0x00481dec) H2_CONST char* cDifficulty[IDX(DIFFICULTY_COUNT)] =
+    { localization::Tr("table.cDifficulty.0"), localization::Tr("table.cDifficulty.1"), localization::Tr("table.cDifficulty.2"), localization::Tr("table.cDifficulty.3"), localization::Tr("table.cDifficulty.4")};
+DATA(0x00481e00) H2_CONST char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = { localization::Tr("table.cStartDifficulty.0"), localization::Tr("table.cStartDifficulty.1"), localization::Tr("table.cStartDifficulty.2"), localization::Tr("table.cStartDifficulty.3")};
+DATA(0x00481e10) H2_CONST char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
+    { localization::Tr("table.cCampaignLeaders.0"), localization::Tr("table.cCampaignLeaders.1"), localization::Tr("table.cCampaignLeaders.2"), localization::Tr("table.cCampaignLeaders.3")};
+DATA(0x00481e20) H2_CONST char* cWinText[KB_WIN_TEXT_COUNT] =
+    { localization::Tr("table.cWinText.0"), localization::Tr("table.cWinText.1"), localization::Tr("table.cWinText.2"), localization::Tr("table.cWinText.3"), localization::Tr("table.cWinText.4")};
+DATA(0x00481e34) H2_CONST char* cHumanDifficulty[IDX(DIFFICULTY_COUNT)] =
+    { localization::Tr("table.cHumanDifficulty.0"), localization::Tr("table.cHumanDifficulty.1"), localization::Tr("table.cHumanDifficulty.2"), localization::Tr("table.cHumanDifficulty.3"), localization::Tr("table.cHumanDifficulty.4")};
+DATA(0x00481e48) H2_CONST char* cHumanInfoDifficulty[IDX(DIFFICULTY_COUNT)] =
+    { localization::Tr("table.cHumanInfoDifficulty.0"), localization::Tr("table.cHumanInfoDifficulty.1"), localization::Tr("table.cHumanInfoDifficulty.2"), localization::Tr("table.cHumanInfoDifficulty.3"), localization::Tr("table.cHumanInfoDifficulty.4")};
+DATA(0x00481e5c) H2_CONST char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
+    {/* MIDI */ "MIDI", localization::Tr("table.musicQualityText.1"), localization::Tr("table.musicQualityText.2")};
+DATA(0x00481e68) H2_CONST char* gSpellDesc[IDX(SPELL_COUNT)] = {
+     localization::Tr("table.gSpellDesc.0"),
+     localization::Tr("table.gSpellDesc.1"),
+     localization::Tr("table.gSpellDesc.2"),
+     localization::Tr("table.gSpellDesc.3"),
+     localization::Tr("table.gSpellDesc.4"),
+     localization::Tr("table.gSpellDesc.5"),
+     localization::Tr("table.gSpellDesc.6"),
+     localization::Tr("table.gSpellDesc.7"),
+     localization::Tr("table.gSpellDesc.8"),
+     localization::Tr("table.gSpellDesc.9"),
+     localization::Tr("table.gSpellDesc.10"),
+     localization::Tr("table.gSpellDesc.11"),
+     localization::Tr("table.gSpellDesc.12"),
+     localization::Tr("table.gSpellDesc.13"),
+     localization::Tr("table.gSpellDesc.14"),
+     localization::Tr("table.gSpellDesc.15"),
+     localization::Tr("table.gSpellDesc.16"),
+     localization::Tr("table.gSpellDesc.17"),
+     localization::Tr("table.gSpellDesc.18"),
+     localization::Tr("table.gSpellDesc.19"),
+     localization::Tr("table.gSpellDesc.20"),
+     localization::Tr("table.gSpellDesc.21"),
+     localization::Tr("table.gSpellDesc.22"),
+     localization::Tr("table.gSpellDesc.23"),
+     localization::Tr("table.gSpellDesc.24"),
+     localization::Tr("table.gSpellDesc.25"),
+     localization::Tr("table.gSpellDesc.26"),
+     localization::Tr("table.gSpellDesc.27"),
+     localization::Tr("table.gSpellDesc.28"),
+     localization::Tr("table.gSpellDesc.29"),
+     localization::Tr("table.gSpellDesc.30"),
+     localization::Tr("table.gSpellDesc.31"),
+     localization::Tr("table.gSpellDesc.32"),
+     localization::Tr("table.gSpellDesc.33"),
+     localization::Tr("table.gSpellDesc.34"),
+     localization::Tr("table.gSpellDesc.35"),
+     localization::Tr("table.gSpellDesc.36"),
+     localization::Tr("table.gSpellDesc.37"),
+     localization::Tr("table.gSpellDesc.38"),
+     localization::Tr("table.gSpellDesc.39"),
+     localization::Tr("table.gSpellDesc.40"),
+     localization::Tr("table.gSpellDesc.41"),
+     localization::Tr("table.gSpellDesc.42"),
+     localization::Tr("table.gSpellDesc.43"),
+     localization::Tr("table.gSpellDesc.44"),
+     localization::Tr("table.gSpellDesc.45"),
+     localization::Tr("table.gSpellDesc.46"),
+     localization::Tr("table.gSpellDesc.47"),
+     localization::Tr("table.gSpellDesc.48"),
+     localization::Tr("table.gSpellDesc.49"),
+     localization::Tr("table.gSpellDesc.50"),
+     localization::Tr("table.gSpellDesc.51"),
+     localization::Tr("table.gSpellDesc.52"),
+     localization::Tr("table.gSpellDesc.53"),
+     localization::Tr("table.gSpellDesc.54"),
+     localization::Tr("table.gSpellDesc.55"),
+     localization::Tr("table.gSpellDesc.56"),
+     localization::Tr("table.gSpellDesc.57"),
+     localization::Tr("table.gSpellDesc.58"),
+     localization::Tr("table.gSpellDesc.59"),
+     localization::Tr("table.gSpellDesc.60"),
+     localization::Tr("table.gSpellDesc.61"),
+     localization::Tr("table.gSpellDesc.62"),
+     localization::Tr("table.gSpellDesc.63"),
+     localization::Tr("table.gSpellDesc.64")
+};
+DATA(0x00481f6c) H2_CONST char* gSpellNames[IDX(SPELL_COUNT)] = {
+     localization::Tr("table.gSpellNames.0"),
+     localization::Tr("table.gSpellNames.1"),
+     localization::Tr("table.gSpellNames.2"),
+     localization::Tr("table.gSpellNames.3"),
+     localization::Tr("table.gSpellNames.4"),
+     localization::Tr("table.gSpellNames.5"),
+     localization::Tr("table.gSpellNames.6"),
+     localization::Tr("table.gSpellNames.7"),
+     localization::Tr("table.gSpellNames.8"),
+     localization::Tr("table.gSpellNames.9"),
+     localization::Tr("table.gSpellNames.10"),
+     localization::Tr("table.gSpellNames.11"),
+     localization::Tr("table.gSpellNames.12"),
+     localization::Tr("table.gSpellNames.13"),
+     localization::Tr("table.gSpellNames.14"),
+     localization::Tr("table.gSpellNames.15"),
+     localization::Tr("table.gSpellNames.16"),
+     localization::Tr("table.gSpellNames.17"),
+     localization::Tr("table.gSpellNames.18"),
+     localization::Tr("table.gSpellNames.19"),
+     localization::Tr("table.gSpellNames.20"),
+     localization::Tr("table.gSpellNames.21"),
+     localization::Tr("table.gSpellNames.22"),
+     localization::Tr("table.gSpellNames.23"),
+     localization::Tr("table.gSpellNames.24"),
+     localization::Tr("table.gSpellNames.25"),
+     localization::Tr("table.gSpellNames.26"),
+     localization::Tr("table.gSpellNames.27"),
+     localization::Tr("table.gSpellNames.28"),
+     localization::Tr("table.gSpellNames.29"),
+     localization::Tr("table.gSpellNames.30"),
+     localization::Tr("table.gSpellNames.31"),
+     localization::Tr("table.gSpellNames.32"),
+     localization::Tr("table.gSpellNames.33"),
+     localization::Tr("table.gSpellNames.34"),
+     localization::Tr("table.gSpellNames.35"),
+     localization::Tr("table.gSpellNames.36"),
+     localization::Tr("table.gSpellNames.37"),
+     localization::Tr("table.gSpellNames.38"),
+     localization::Tr("table.gSpellNames.39"),
+     localization::Tr("table.gSpellNames.40"),
+     localization::Tr("table.gSpellNames.41"),
+     localization::Tr("table.gSpellNames.42"),
+     localization::Tr("table.gSpellNames.43"),
+     localization::Tr("table.gSpellNames.44"),
+     localization::Tr("table.gSpellNames.45"),
+     localization::Tr("table.gSpellNames.46"),
+     localization::Tr("table.gSpellNames.47"),
+     localization::Tr("table.gSpellNames.48"),
+     localization::Tr("table.gSpellNames.49"),
+     localization::Tr("table.gSpellNames.50"),
+     localization::Tr("table.gSpellNames.51"),
+     localization::Tr("table.gSpellNames.52"),
+     localization::Tr("table.gSpellNames.53"),
+     localization::Tr("table.gSpellNames.54"),
+     localization::Tr("table.gSpellNames.55"),
+     localization::Tr("table.gSpellNames.56"),
+     localization::Tr("table.gSpellNames.57"),
+     localization::Tr("table.gSpellNames.58"),
+     localization::Tr("table.gSpellNames.59"),
+     localization::Tr("table.gSpellNames.60"),
+     localization::Tr("table.gSpellNames.61"),
+     localization::Tr("table.gSpellNames.62"),
+     localization::Tr("table.gSpellNames.63"),
+     localization::Tr("table.gSpellNames.64")
+};
+DATA(0x00482070) H2_CONST char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
+    { localization::Tr("table.gSecondarySkillLevels.0"), localization::Tr("table.gSecondarySkillLevels.1"), localization::Tr("table.gSecondarySkillLevels.2")};
+DATA(0x0048207c) H2_CONST char* gSecondarySkills[IDX(HERO_SKILL_COUNT)] = {
+     localization::Tr("table.gSecondarySkills.0"),
+     localization::Tr("table.gSecondarySkills.1"),
+     localization::Tr("table.gSecondarySkills.2"),
+     localization::Tr("table.gSecondarySkills.3"),
+     localization::Tr("table.gSecondarySkills.4"),
+     localization::Tr("table.gSecondarySkills.5"),
+     localization::Tr("table.gSecondarySkills.6"),
+     localization::Tr("table.gSecondarySkills.7"),
+     localization::Tr("table.gSecondarySkills.8"),
+     localization::Tr("table.gSecondarySkills.9"),
+     localization::Tr("table.gSecondarySkills.10"),
+     localization::Tr("table.gSecondarySkills.11"),
+     localization::Tr("table.gSecondarySkills.12"),
+     localization::Tr("table.gSecondarySkills.13")
+};
+DATA(0x004820b4) H2_CONST char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+     localization::Tr("table.gNeutralBuildingNames.0"),
+     localization::Tr("table.gNeutralBuildingNames.1"),
+     localization::Tr("table.gNeutralBuildingNames.2"),
+     localization::Tr("table.gNeutralBuildingNames.3"),
+     localization::Tr("table.gNeutralBuildingNames.4"),
+     localization::Tr("table.gNeutralBuildingNames.5"),
+     localization::Tr("table.gNeutralBuildingNames.6"),
+     localization::Tr("table.gNeutralBuildingNames.7"),
+     localization::Tr("table.gNeutralBuildingNames.8"),
+     localization::Tr("table.gNeutralBuildingNames.9"),
+     localization::Tr("table.gNeutralBuildingNames.10"),
+    /*  */ "",
+     localization::Tr("table.gNeutralBuildingNames.12"),
+    /*  */ "",
+     localization::Tr("table.gNeutralBuildingNames.14"),
+     localization::Tr("table.gNeutralBuildingNames.15"),
+    /*  */ "",
+    /*  */ "",
+    /*  */ ""
+};
+DATA(0x00482100) H2_CONST char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+     localization::Tr("table.gWellExtraNames.0"),
+     localization::Tr("table.gWellExtraNames.1"),
+     localization::Tr("table.gWellExtraNames.2"),
+     localization::Tr("table.gWellExtraNames.3"),
+     localization::Tr("table.gWellExtraNames.4"),
+     localization::Tr("table.gWellExtraNames.5"),
+     localization::Tr("table.gWellExtraNames.6")
+};
+DATA(0x0048211c) H2_CONST char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
+    { localization::Tr("table.gSpecialBuildingNames.0"), localization::Tr("table.gSpecialBuildingNames.1"), localization::Tr("table.gSpecialBuildingNames.2"), localization::Tr("table.gSpecialBuildingNames.3"), localization::Tr("table.gSpecialBuildingNames.4"), localization::Tr("table.gSpecialBuildingNames.5"), localization::Tr("table.gSpecialBuildingNames.6")};
+DATA(0x00482138) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
+    {localization::Tr("table.gDwellingNames.0.0"),
+     localization::Tr("table.gDwellingNames.0.1"),
+     localization::Tr("table.gDwellingNames.0.2"),
+     localization::Tr("table.gDwellingNames.0.3"),
+     localization::Tr("table.gDwellingNames.0.4"),
+     localization::Tr("table.gDwellingNames.0.5"),
+     localization::Tr("table.gDwellingNames.0.6"),
+     localization::Tr("table.gDwellingNames.0.7"),
+     localization::Tr("table.gDwellingNames.0.8"),
+     localization::Tr("table.gDwellingNames.0.9"),
+     localization::Tr("table.gDwellingNames.0.10"),
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.1.0"),
+     localization::Tr("table.gDwellingNames.1.1"),
+     localization::Tr("table.gDwellingNames.1.2"),
+     localization::Tr("table.gDwellingNames.1.3"),
+     localization::Tr("table.gDwellingNames.1.4"),
+     localization::Tr("table.gDwellingNames.1.5"),
+     localization::Tr("table.gDwellingNames.1.6"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.1.8"),
+     localization::Tr("table.gDwellingNames.1.9"),
+     /*  */ "",
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.2.0"),
+     localization::Tr("table.gDwellingNames.2.1"),
+     localization::Tr("table.gDwellingNames.2.2"),
+     localization::Tr("table.gDwellingNames.2.3"),
+     localization::Tr("table.gDwellingNames.2.4"),
+     localization::Tr("table.gDwellingNames.2.5"),
+     localization::Tr("table.gDwellingNames.2.6"),
+     localization::Tr("table.gDwellingNames.2.7"),
+     localization::Tr("table.gDwellingNames.2.8"),
+     /*  */ "",
+     /*  */ "",
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.3.0"),
+     localization::Tr("table.gDwellingNames.3.1"),
+     localization::Tr("table.gDwellingNames.3.2"),
+     localization::Tr("table.gDwellingNames.3.3"),
+     localization::Tr("table.gDwellingNames.3.4"),
+     localization::Tr("table.gDwellingNames.3.5"),
+     /*  */ "",
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.8"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.3.10"),
+     localization::Tr("table.gDwellingNames.3.11")},
+    {localization::Tr("table.gDwellingNames.4.0"),
+     localization::Tr("table.gDwellingNames.4.1"),
+     localization::Tr("table.gDwellingNames.4.2"),
+     localization::Tr("table.gDwellingNames.4.3"),
+     localization::Tr("table.gDwellingNames.4.4"),
+     localization::Tr("table.gDwellingNames.4.5"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.7"),
+     /*  */ "",
+     localization::Tr("table.gDwellingNames.4.9"),
+     localization::Tr("table.gDwellingNames.4.10"),
+     /*  */ ""},
+    {localization::Tr("table.gDwellingNames.5.0"),
+     localization::Tr("table.gDwellingNames.5.1"),
+     localization::Tr("table.gDwellingNames.5.2"),
+     localization::Tr("table.gDwellingNames.5.3"),
+     localization::Tr("table.gDwellingNames.5.4"),
+     localization::Tr("table.gDwellingNames.5.5"),
+     localization::Tr("table.gDwellingNames.5.6"),
+     localization::Tr("table.gDwellingNames.5.7"),
+     localization::Tr("table.gDwellingNames.5.8"),
+     localization::Tr("table.gDwellingNames.5.9"),
+     /*  */ "",
+     /*  */ ""}
+};
+DATA(0x00482258) H2_CONST char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+    { localization::Tr("table.cSecSkillDesc.0.0"),
+      localization::Tr("table.cSecSkillDesc.0.1"),
+      localization::Tr("table.cSecSkillDesc.0.2")},
+    { localization::Tr("table.cSecSkillDesc.1.0"),
+      localization::Tr("table.cSecSkillDesc.1.1"),
+      localization::Tr("table.cSecSkillDesc.1.2")},
+    { localization::Tr("table.cSecSkillDesc.2.0"),
+      localization::Tr("table.cSecSkillDesc.2.1"),
+      localization::Tr("table.cSecSkillDesc.2.2")},
+    { localization::Tr("table.cSecSkillDesc.3.0"),
+      localization::Tr("table.cSecSkillDesc.3.1"),
+      localization::Tr("table.cSecSkillDesc.3.2")},
+    { localization::Tr("table.cSecSkillDesc.4.0"),
+      localization::Tr("table.cSecSkillDesc.4.1"),
+      localization::Tr("table.cSecSkillDesc.4.2")},
+    { localization::Tr("table.cSecSkillDesc.5.0"),
+      localization::Tr("table.cSecSkillDesc.5.1"),
+      localization::Tr("table.cSecSkillDesc.5.2")},
+    { localization::Tr("table.cSecSkillDesc.6.0"),
+      localization::Tr("table.cSecSkillDesc.6.1"),
+      localization::Tr("table.cSecSkillDesc.6.2")},
+    { localization::Tr("table.cSecSkillDesc.7.0"),
+      localization::Tr("table.cSecSkillDesc.7.1"),
+      localization::Tr("table.cSecSkillDesc.7.2")},
+    { localization::Tr("table.cSecSkillDesc.8.0"),
+      localization::Tr("table.cSecSkillDesc.8.1"),
+      localization::Tr("table.cSecSkillDesc.8.2")},
+    { localization::Tr("table.cSecSkillDesc.9.0"),
+      localization::Tr("table.cSecSkillDesc.9.1"),
+      localization::Tr("table.cSecSkillDesc.9.2")},
+    { localization::Tr("table.cSecSkillDesc.10.0"),
+      localization::Tr("table.cSecSkillDesc.10.1"),
+      localization::Tr("table.cSecSkillDesc.10.2")},
+    { localization::Tr("table.cSecSkillDesc.11.0"),
+      localization::Tr("table.cSecSkillDesc.11.1"),
+      localization::Tr("table.cSecSkillDesc.11.2")},
+    { localization::Tr("table.cSecSkillDesc.12.0"),
+      localization::Tr("table.cSecSkillDesc.12.1"),
+      localization::Tr("table.cSecSkillDesc.12.2")},
+    { localization::Tr("table.cSecSkillDesc.13.0"),
+      localization::Tr("table.cSecSkillDesc.13.1"),
+      localization::Tr("table.cSecSkillDesc.13.2")}
+};
+DATA(0x00482300) H2_CONST char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+     localization::Tr("table.cBuildingInfoNeutral.0"),
+     localization::Tr("table.cBuildingInfoNeutral.1"),
+     localization::Tr("table.cBuildingInfoNeutral.2"),
+     localization::Tr("table.cBuildingInfoNeutral.3"),
+     localization::Tr("table.cBuildingInfoNeutral.4"),
+     localization::Tr("table.cBuildingInfoNeutral.5"),
+     localization::Tr("table.cBuildingInfoNeutral.6"),
+     localization::Tr("table.cBuildingInfoNeutral.7"),
+     localization::Tr("table.cBuildingInfoNeutral.8"),
+     localization::Tr("table.cBuildingInfoNeutral.9"),
+     localization::Tr("table.cBuildingInfoNeutral.10"),
+    /*  */ "",
+     localization::Tr("table.cBuildingInfoNeutral.12"),
+    /*  */ "",
+     localization::Tr("table.cBuildingInfoNeutral.14"),
+     localization::Tr("table.cBuildingInfoNeutral.15"),
+    /*  */ "",
+    /*  */ "",
+    /*  */ ""
+};
+DATA(0x0048234c) H2_CONST char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+     localization::Tr("table.gBuildingInfoSpecial.0"),
+     localization::Tr("table.gBuildingInfoSpecial.1"),
+     localization::Tr("table.gBuildingInfoSpecial.2"),
+     localization::Tr("table.gBuildingInfoSpecial.3"),
+     localization::Tr("table.gBuildingInfoSpecial.4"),
+     localization::Tr("table.gBuildingInfoSpecial.5")
+};
+DATA(0x00482364) H2_CONST char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
+     localization::Tr("table.cDirections.0"),
+     localization::Tr("table.cDirections.1"),
+     localization::Tr("table.cDirections.2"),
+     localization::Tr("table.cDirections.3"),
+     localization::Tr("table.cDirections.4"),
+     localization::Tr("table.cDirections.5"),
+     localization::Tr("table.cDirections.6"),
+     localization::Tr("table.cDirections.7"),
+     localization::Tr("table.cDirections.8")
+};
+DATA(0x00482388) H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+     localization::Tr("table.cRumourTerrainDescriptions.0"),
+     localization::Tr("table.cRumourTerrainDescriptions.1"),
+     localization::Tr("table.cRumourTerrainDescriptions.2"),
+     localization::Tr("table.cRumourTerrainDescriptions.3"),
+     localization::Tr("table.cRumourTerrainDescriptions.4"),
+     localization::Tr("table.cRumourTerrainDescriptions.5"),
+     localization::Tr("table.cRumourTerrainDescriptions.6"),
+     localization::Tr("table.cRumourTerrainDescriptions.7"),
+     localization::Tr("table.cRumourTerrainDescriptions.8")
+};
+DATA(0x004823ac) H2_CONST char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = { localization::Tr("table.gInterfaceTypeText.0"), localization::Tr("table.gInterfaceTypeText.1"), localization::Tr("table.gInterfaceTypeText.2")};
+DATA(0x004823b8) H2_CONST char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = { localization::Tr("table.cBWMouseText.0"), localization::Tr("table.cBWMouseText.1")};
+DATA(0x004823c0) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_COUNT] = { localization::Tr("table.combatSpeedText.0"), localization::Tr("table.combatSpeedText.1"), localization::Tr("table.combatSpeedText.2")};
+DATA(0x004823cc) H2_CONST char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = { localization::Tr("table.combatMiniInfoText.0"), localization::Tr("table.combatMiniInfoText.1"), localization::Tr("table.combatMiniInfoText.2")};
+DATA(0x004823d8) H2_CONST char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+    /* \n\n\n***Command Line Help***\n */ "\n\n\n***Command Line Help***\n",
+    /* \n */ "\n",
+     localization::Tr("system.command_line.disable_digital_sound"),
+     localization::Tr("system.command_line.disable_midi"),
+     localization::Tr("system.command_line.disable_music"),
+     localization::Tr("system.command_line.skip_intro"),
+    /* \n */ "\n",
+    /* \n */ "\n",
+     localization::Tr("system.command_line.example"),
+    /* \n */ "\n",
+    /* HEROES2D /R0 /I0\n */ "HEROES2D /R0 /I0\n",
+    /* \n */ "\n",
+     localization::Tr("system.command_line.dos_example"),
+     localization::Tr("system.command_line.disabled_example")
+};
+DATA(0x00482410) H2_CONST char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
+    { localization::Tr("table.cOverviewText.0"), localization::Tr("table.cOverviewText.1"), localization::Tr("table.cOverviewText.2"), localization::Tr("table.cOverviewText.3"), localization::Tr("table.cOverviewText.4"), localization::Tr("table.cOverviewText.5")};
+DATA(0x00482428) H2_CONST char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+     localization::Tr("table.cWinComError.0"),
+     localization::Tr("table.cWinComError.1"),
+     localization::Tr("table.cWinComError.2"),
+     localization::Tr("table.cWinComError.3"),
+     localization::Tr("table.cWinComError.4"),
+     localization::Tr("table.cWinComError.5")
+};
+DATA(0x00482440) H2_CONST char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
+    { localization::Tr("table.cMiniViewText.0"), localization::Tr("table.cMiniViewText.1"), localization::Tr("table.cMiniViewText.2"), localization::Tr("table.cMiniViewText.3"), localization::Tr("table.cMiniViewText.4"), localization::Tr("table.cMiniViewText.5"), localization::Tr("table.cMiniViewText.6"), localization::Tr("table.cMiniViewText.7"), localization::Tr("table.cMiniViewText.8")};
+DATA(0x00482464) H2_CONST char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+     localization::Tr("table.gFileRequestHelp.0"),
+     localization::Tr("table.gFileRequestHelp.1"),
+     localization::Tr("table.gFileRequestHelp.2"),
+     localization::Tr("table.gFileRequestHelp.3"),
+     localization::Tr("table.gFileRequestHelp.4"),
+     localization::Tr("table.gFileRequestHelp.5"),
+     localization::Tr("table.gFileRequestHelp.6"),
+     localization::Tr("table.gFileRequestHelp.7"),
+     localization::Tr("table.gFileRequestHelp.8"),
+     localization::Tr("table.gFileRequestHelp.9"),
+     localization::Tr("table.gFileRequestHelp.10"),
+     localization::Tr("table.gFileRequestHelp.11"),
+     localization::Tr("table.gFileRequestHelp.12"),
+     localization::Tr("table.gFileRequestHelp.13"),
+     localization::Tr("table.gFileRequestHelp.14")
+};
+DATA(0x004824a0) H2_CONST char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = { localization::Tr("table.cPersonality.0"), localization::Tr("table.cPersonality.1"), localization::Tr("table.cPersonality.2"), localization::Tr("table.cPersonality.3")};
+DATA(0x004824b0) H2_CONST char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+    { localization::Tr("table.gArmySizeNames.0.0"), localization::Tr("table.gArmySizeNames.0.1"), localization::Tr("table.gArmySizeNames.0.2")},
+    { localization::Tr("table.gArmySizeNames.1.0"), localization::Tr("table.gArmySizeNames.1.1"), localization::Tr("table.gArmySizeNames.1.2")},
+    { localization::Tr("table.gArmySizeNames.2.0"), localization::Tr("table.gArmySizeNames.2.1"), localization::Tr("table.gArmySizeNames.2.2")},
+    { localization::Tr("table.gArmySizeNames.3.0"), localization::Tr("table.gArmySizeNames.3.1"), localization::Tr("table.gArmySizeNames.3.2")},
+    { localization::Tr("table.gArmySizeNames.4.0"), localization::Tr("table.gArmySizeNames.4.1"), localization::Tr("table.gArmySizeNames.4.2")},
+    { localization::Tr("table.gArmySizeNames.5.0"), localization::Tr("table.gArmySizeNames.5.1"), localization::Tr("table.gArmySizeNames.5.2")},
+    { localization::Tr("table.gArmySizeNames.6.0"), localization::Tr("table.gArmySizeNames.6.1"), localization::Tr("table.gArmySizeNames.6.2")},
+    { localization::Tr("table.gArmySizeNames.7.0"), localization::Tr("table.gArmySizeNames.7.1"), localization::Tr("table.gArmySizeNames.7.2")},
+    { localization::Tr("table.gArmySizeNames.8.0"), localization::Tr("table.gArmySizeNames.8.1"), localization::Tr("table.gArmySizeNames.8.2")}
+};
+DATA(0x0048251c) H2_CONST char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+     localization::Tr("table.cRandomTavernText.0"),
+     localization::Tr("table.cRandomTavernText.1"),
+     localization::Tr("table.cRandomTavernText.2"),
+     localization::Tr("table.cRandomTavernText.3"),
+     localization::Tr("table.cRandomTavernText.4"),
+     localization::Tr("table.cRandomTavernText.5"),
+     localization::Tr("table.cRandomTavernText.6"),
+     localization::Tr("table.cRandomTavernText.7")
+};
+DATA(0x0048253c) H2_CONST char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
+    { localization::Tr("table.cRandomSignText.0"), localization::Tr("table.cRandomSignText.1"), localization::Tr("table.cRandomSignText.2"), localization::Tr("table.cRandomSignText.3")};
+DATA(0x0048254c) H2_CONST char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+     localization::Tr("table.cCampaignAwards.0"),
+     localization::Tr("table.cCampaignAwards.1"),
+     localization::Tr("table.cCampaignAwards.2"),
+     localization::Tr("table.cCampaignAwards.3"),
+     localization::Tr("table.cCampaignAwards.4"),
+     localization::Tr("table.cCampaignAwards.5"),
+     localization::Tr("table.cCampaignAwards.6"),
+     localization::Tr("table.cCampaignAwards.7"),
+     localization::Tr("table.cCampaignAwards.8"),
+     localization::Tr("table.cCampaignAwards.9"),
+     localization::Tr("table.cCampaignAwards.10"),
+     localization::Tr("table.cCampaignAwards.11")
+};
+DATA(0x0048257c) H2_CONST char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+    { localization::Tr("table.cCampaignName.0.0"),
+      localization::Tr("table.cCampaignName.0.1"),
+      localization::Tr("table.cCampaignName.0.2"),
+      localization::Tr("table.cCampaignName.0.3"),
+      localization::Tr("table.cCampaignName.0.4"),
+      localization::Tr("table.cCampaignName.0.5"),
+      localization::Tr("table.cCampaignName.0.6"),
+      localization::Tr("table.cCampaignName.0.7"),
+      localization::Tr("table.cCampaignName.0.8"),
+      localization::Tr("table.cCampaignName.0.9"),
+     /*  */ "",
+      localization::Tr("table.cCampaignName.0.11")},
+    { localization::Tr("table.cCampaignName.1.0"),
+      localization::Tr("table.cCampaignName.1.1"),
+      localization::Tr("table.cCampaignName.1.2"),
+      localization::Tr("table.cCampaignName.1.3"),
+      localization::Tr("table.cCampaignName.1.4"),
+      localization::Tr("table.cCampaignName.1.5"),
+      localization::Tr("table.cCampaignName.1.6"),
+      localization::Tr("table.cCampaignName.1.7"),
+      localization::Tr("table.cCampaignName.1.8"),
+      localization::Tr("table.cCampaignName.1.9"),
+      localization::Tr("table.cCampaignName.1.10"),
+      localization::Tr("table.cCampaignName.1.11")}
+};
+DATA(0x004825dc) H2_CONST char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+    { localization::Tr("table.cCampaignDescription.0.0"),
+      localization::Tr("table.cCampaignDescription.0.1"),
+      localization::Tr("table.cCampaignDescription.0.2"),
+      localization::Tr("table.cCampaignDescription.0.3"),
+      localization::Tr("table.cCampaignDescription.0.4"),
+      localization::Tr("table.cCampaignDescription.0.5"),
+      localization::Tr("table.cCampaignDescription.0.6"),
+      localization::Tr("table.cCampaignDescription.0.7"),
+      localization::Tr("table.cCampaignDescription.0.8"),
+      localization::Tr("table.cCampaignDescription.0.9"),
+     /*  */ "",
+      localization::Tr("table.cCampaignDescription.0.11")},
+    { localization::Tr("table.cCampaignDescription.1.0"),
+      localization::Tr("table.cCampaignDescription.1.1"),
+      localization::Tr("table.cCampaignDescription.1.2"),
+      localization::Tr("table.cCampaignDescription.1.3"),
+      localization::Tr("table.cCampaignDescription.1.4"),
+      localization::Tr("table.cCampaignDescription.1.5"),
+      localization::Tr("table.cCampaignDescription.1.6"),
+      localization::Tr("table.cCampaignDescription.1.7"),
+      localization::Tr("table.cCampaignDescription.1.8"),
+      localization::Tr("table.cCampaignDescription.1.9"),
+      localization::Tr("table.cCampaignDescription.1.10"),
+      localization::Tr("table.cCampaignDescription.1.11")}
+};
+DATA(0x0048263c) H2_CONST char* cOutOfMemory =
+     localization::Tr("system.memory.requirement");
+DATA(0x00482640) H2_CONST char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = { localization::Tr("table.cSlowVideoLevelText.0"), localization::Tr("table.cSlowVideoLevelText.1")};
+DATA(0x00482648) H2_CONST char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+     localization::Tr("table.gSPanelHelp.0"),
+     localization::Tr("table.gSPanelHelp.1"),
+     localization::Tr("table.gSPanelHelp.2"),
+     localization::Tr("table.gSPanelHelp.3"),
+     localization::Tr("table.gSPanelHelp.4"),
+     localization::Tr("table.gSPanelHelp.5"),
+     localization::Tr("table.gSPanelHelp.6"),
+     localization::Tr("table.gSPanelHelp.7"),
+     localization::Tr("table.gSPanelHelp.8"),
+     localization::Tr("table.gSPanelHelp.9")
+};
+DATA(0x00482670) H2_CONST char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
+    { localization::Tr("table.xBarrierColor.0"), localization::Tr("table.xBarrierColor.1"), localization::Tr("table.xBarrierColor.2"), localization::Tr("table.xBarrierColor.3"), localization::Tr("table.xBarrierColor.4"), localization::Tr("table.xBarrierColor.5"), localization::Tr("table.xBarrierColor.6"), localization::Tr("table.xBarrierColor.7")};
+DATA(0x00482690) H2_CONST char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+     localization::Tr("table.xGenericSiteNames.0"),
+     localization::Tr("table.xGenericSiteNames.1"),
+     localization::Tr("table.xGenericSiteNames.2"),
+     localization::Tr("table.xGenericSiteNames.3"),
+     localization::Tr("table.xGenericSiteNames.4"),
+     localization::Tr("table.xGenericSiteNames.5"),
+     localization::Tr("table.xGenericSiteNames.6")
+};
+DATA(0x004826ac) H2_CONST char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+     localization::Tr("table.xRecruitmentSiteNames.0"),
+     localization::Tr("table.xRecruitmentSiteNames.1"),
+     localization::Tr("table.xRecruitmentSiteNames.2"),
+     localization::Tr("table.xRecruitmentSiteNames.3"),
+     localization::Tr("table.xRecruitmentSiteNames.4")
+};
+// No retail code reads this; it keeps its retail .data place.
+DATA(0x004826c0) i32 gUnusedData4826c0 = 250;
 // The maps shipped with the game and the names an edited copy takes.
 DATA(0x004826c4)
 char gShippedMaps[EDITOR_SHIPPED_MAP_COUNT][EDITOR_SHIPPED_MAP_NAMES][EDITOR_SHIPPED_MAP_NAME_SIZE] = {
@@ -959,18 +3467,32 @@ char gShippedMaps[EDITOR_SHIPPED_MAP_COUNT][EDITOR_SHIPPED_MAP_NAMES][EDITOR_SHI
 };
 DATA(0x004a49d4) b32 gbComputeExtent = false;
 DATA(0x004a49d8) b32 gbCurrArmyDrawn = false;
+i32 gUnusedData4a49dc = 0;
 DATA(0x004a49e0) b32 gbLimitToExtent = false;
 DATA(0x004a49e4) b32 gbLoadingMonoIcon = false;
 DATA(0x004a49e8) b32 gbSaveBiggestExtent = false;
+i32 gUnusedData4a49ec = 0;
 DATA(0x004a49f0) i32 giScrollX = 0;
 DATA(0x004a49f4) i32 giScrollY = 0;
+// The object tool's selected object class.
+DATA(0x004a49f8) i32 gObjectClass = 0;
+i32 gUnusedData4a49fc = 0;
 DATA(0x004a4a00) b32 gStatusTextShown = false;
 DATA(0x004a4a04) b32 gbInDialog = false;
 DATA(0x004a4a08) b32 gbMinimized = false;
 DATA(0x004a4a0c) b32 gbInSetupDialog = false;
+// The random map generator draws the map only when it is done
+// (gGenerateUnseen); gGeneratingMap holds the map view while it works.
+DATA(0x004a4a10) b32 gGenerateUnseen = false;
+DATA(0x004a4a14) b32 gGeneratingMap = false;
+i32 gUnusedData4a4a18 = 0;
 DATA(0x004a4a1c) b32 gbInSmackMgr = false;
 DATA(0x004a4a20) i32 gStatusTextClearTime = 0;
 DATA(0x004a4a24) HMENU hmnuDflt = NULL;
+HMENU hmnuCmbt = NULL;
+HMENU hmnuAdv = NULL;
+HMENU hmnuTown = NULL;
+i32 gUnusedData4a4a34 = 0;
 DATA(0x004a4a38) b32 gbFirstTimeThrough = false;
 DATA(0x004a4a3c) b32 gbInPollSound = false;
 DATA(0x004a4a40) b32 bInShutDown = false;
