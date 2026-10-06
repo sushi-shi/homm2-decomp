@@ -3,12 +3,12 @@
 The maintained branch chain is:
 
 ```text
-decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist
+decomp-gold-2.1-buka -> source-gold-2.1-buka -> port -> source-ironfist
 ```
 
-`master` is the portable Gold 2.1 line. Matching-only changes stay on the
+`port` is the portable Gold 2.1 line. Matching-only changes stay on the
 decomp branches; portable platform, localization, and runtime changes belong
-here and flow onward to `ironfist`.
+here and flow onward to `source-ironfist`.
 
 Proven retail defects and deliberately replaced subsystems are tracked in
 [Intentional retail divergences](retail-divergences.md).
@@ -93,7 +93,7 @@ and crash reports go there instead of SDL's preference folder. The store copy
 is read-only and never written. The package overrides as
 `.override { game = ...; locale = "ru"; stateName = "..."; }`; the module's
 options (`programs.homm2.game`, `.locale`, `.package`, and `.edition`, which
-only offers `gold` here; ironfist-master provides `ironfist`) do the same.
+only offers `gold` here; `port-ironfist` provides `ironfist`) do the same.
 The bare program stays available as `nix run .#native`.
 
 ## Web

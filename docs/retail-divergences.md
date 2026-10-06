@@ -1,7 +1,7 @@
 # Intentional retail divergences
 
 The reconstruction branches preserve the behavior and code generation observed
-in the retail executables. `master` starts from that evidence but may correct a
+in the retail executables. `port` starts from that evidence but may correct a
 proven defect or replace a platform-bound subsystem when retaining it would make
 the maintained port less safe or less portable.
 
@@ -11,7 +11,7 @@ or other new portable facilities that have no retail counterpart. Cross-version
 differences between PoL 2.0 and Gold 2.1 remain in the retail evidence ledger
 linked from [Retail version differences](version-differences.md).
 
-Any future `master` change that intentionally alters a retail game-source
+Any future `port` change that intentionally alters a retail game-source
 outcome must update this ledger in the same commit. Source-only restructuring
 belongs in the section below; observable defect corrections belong in the
 table.
@@ -28,11 +28,11 @@ icon object rather than being discarded after loading.
 The exact Gold/Buka reconstruction retains a few source shapes solely because
 they reproduce the Visual C++ 6 executable: redundant labels, explicit Boolean
 materialization, and casts at boundaries whose underlying retail value is an
-integer. `master` does not preserve those compiler-sensitive spellings when the
+integer. `port` does not preserve those compiler-sensitive spellings when the
 same behavior has a clearer portable representation.
 
 In particular, the castle dialog's selection value can hold either a
-`BuildingSlotType` value or a UI control identifier. `master` models that mixed
+`BuildingSlotType` value or a UI control identifier. `port` models that mixed
 discriminant as an integer and converts to `BuildingSlotType` only when entering
 a building API. The overview return path also tests its occupied-town pointer
 with `!= nullptr`; the exact branch retains the retail pointer-to-integer truth
@@ -43,7 +43,7 @@ still represent a real shared tail, cleanup path, retry loop, or multi-loop exit
 remain explicit.
 
 Retail also reaches a few logically distinct palette and campaign-name tables
-through their linker-defined adjacency. `master` names those tables explicitly,
+through their linker-defined adjacency. `port` names those tables explicitly,
 preserving the selected values without relying on out-of-bounds pointer or
 array arithmetic. Dim-palette selection indexes the set and level separately;
 it does not reach other levels by indexing beyond the first 256-color subarray.
@@ -51,7 +51,7 @@ Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 
-Numeric enum construction is also explicit on `master`. Public domains cross
+Numeric enum construction is also explicit on `port`. Public domains cross
 integer storage through the named `FromCode` and `FromOrdinal` entry points in
 `EnumCode.h`; private protocol enums keep an equivalent decoder next to their
 definition. Packed enum storage exposes an already-typed `enum_value()` instead
@@ -59,7 +59,7 @@ of re-decoding it. A source-policy test rejects direct numeric enum casts and
 bypasses of the shared low-level conversion.
 
 The Overview's dynamic widget tables use their existing 70-slot row types on
-`master`, with direct `[row][slot]` access and declarations in `Overview.h`.
+`port`, with direct `[row][slot]` access and declarations in `Overview.h`.
 Initialization, replacement and cleanup still use four rows; the original
 11200-byte allocations and allocation/free pairing are unchanged. This is a
 source-ownership improvement, not a claim of an original-game defect. The
@@ -68,7 +68,7 @@ from multiply-by-70 plus scaled LEA to multiply-by-280 plus ADD, so it was not
 retained on the matching branch. `overview_rows` checks every slot of both row
 types and their declared global pointer types without depending on a display.
 
-A review of the inherited cast and pointer findings left master with direct
+A review of the inherited cast and pointer findings left `port` with direct
 indexing for flat AI arrays and without redundant destination-type casts;
 numeric/API conversions, including every narrowing conversion, remain
 explicit. Palette byte access uses an unsigned object-representation
@@ -85,7 +85,7 @@ every malformed network command is safe or make portable multiplayer supported.
 
 ## Corrected defects
 
-| Area | Retail behavior | `master` behavior |
+| Area | Retail behavior | `port` behavior |
 | --- | --- | --- |
 | Diff/join file extents | The terminal diff literal uses the old file's remaining length, overreading a shorter new file or omitting a longer new tail; join skip commands can select bytes beyond the old file. | Uses the new file's remaining length, bounds source file allocations and encoded input, and requires skip commands to stay within initialized old-file bytes. Empty files still have valid allocated storage for zero-length operations. |
 | Unrepresentable packet length | Encoding copies a payload before narrowing its length to a single wire byte, allowing a mismatched length or oversized copy. | Rejects negative lengths, lengths above 255, and nonempty null payloads before mutation; valid packet bytes and CRC are retained. No wider wire-length format is invented. |
@@ -156,7 +156,7 @@ describe the installed Ogg tracks and is no longer applied to their playback.
 ### Network-save compression
 
 Retail uses the recovered legacy Bzip codec through temporary files and exposes
-its implementation globally. `master` instead uses libbz2 1.0.x in memory
+its implementation globally. `port` instead uses libbz2 1.0.x in memory
 through the small `compression::Bzip2*` interface. Callers provide explicit
 source and destination capacities, compression uses the documented worst-case
 bound, and failures do not continue with an indeterminate length.
@@ -171,11 +171,11 @@ and generated retail-source branches retain the original codec and format.
 Retail looked for the expansion archive in the installation, then for the CD by
 opening `\Tracks2\02-AudioTrack 02.ogg` on each CD drive; without that file it
 disabled sound, movies, the campaigns and multiplayer. The Buka disc layout
-leaked into `master` as a startup requirement: an installation without a
+leaked into `port` as a startup requirement: an installation without a
 `Tracks2` folder, such as GOG's or one copied from an English disc, stopped with
 "Unable to find the Heroes II data files" even though both archives were there.
 
-`master` treats the installation as the CD. Startup requires only
+`port` treats the installation as the CD. Startup requires only
 `DATA\HEROES2X.AGG`. Music is optional and looked up per track in
 `MUSIC\NN-AudioTrack NN.ogg`, `MUSIC\TrackNN.ogg` (GOG) and
 `TRACKS2\NN-AudioTrack NN.ogg` (the Buka disc). A movie missing from

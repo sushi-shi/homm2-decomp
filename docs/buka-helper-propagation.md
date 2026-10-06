@@ -39,5 +39,5 @@ writes, and packed-map-cell shadow/object semantics. Existing source-policy,
 localization, map layout, binary I/O, platform, and presentation checks remain
 enabled. No gameplay/GUI validation is claimed by this propagation.
 
-The helper commit is carried onward by cherry-pick through `ironfist` and
-`ironfist-master`, preserving each branch's extension behavior.
+The helper commit is carried onward by cherry-pick through `source-ironfist` and
+`port-ironfist`, preserving each branch's extension behavior.
