@@ -39,6 +39,9 @@ from homm2.core.pe import Pe
 FILL = (0x90, 0xCC)
 #: Compiler-private literal names derived from the game's own layout.
 LAYOUT_NAMED = re.compile(r"^(?:\$SG|\$T|\?\?_C@|const_|string_|data_|bss_)")
+#: The identification modules of a game claim (runtime members, import
+#: thunks): not reconstruction targets in either program.
+IDENTIFIED_MODULES = ("(libcmt)", "(imports)")
 
 
 def _text(pe: Pe) -> tuple[bytes, int]:
@@ -220,7 +223,7 @@ class Placer:
         votes = self.call_votes()
         claims = {c["rva"]: c for c in self.claims if c["kind"] == "func"}
         placed_at = {erva: grva for grva, (erva, _w) in self.functions.items()}
-        self.callees: dict[int, tuple[str, str]] = {}
+        self.callees: dict[int, tuple[str, str, str]] = {}
         for gt, counter in sorted(votes.items()):
             if gt not in claims:
                 continue
@@ -245,7 +248,8 @@ class Placer:
             if et in placed_at:
                 continue
             self.callees[et] = (claims[gt]["name"], f"callee of {n} placed call(s); game "
-                                                   f"callee 0x{gt:x} ({claims[gt]['unit']})")
+                                                   f"callee 0x{gt:x} ({claims[gt]['unit']})",
+                                claims[gt]["unit"])
 
     # -- data ---------------------------------------------------------------
     def place_data(self) -> None:
@@ -306,14 +310,17 @@ class Placer:
                         "kind": "func", "name": c["name"], "unit": c["unit"],
                         "game_rva": grva, "evidence": why})
         names = {r["name"] for r in out}
-        for erva, (name, why) in self.callees.items():
+        for erva, (name, why, unit) in self.callees.items():
             if name in names:
                 continue        # one name, one address
             # Named for its callers only: the body differs from the game's,
             # so it stays a residual of the image until its unit links here.
+            # A runtime or import callee is the same library member or import
+            # thunk in both programs and keeps its identification module.
             out.append({"rva": erva, "size": self._image_size(erva), "kind": "func",
-                        "name": name, "unit": "(unmatched)", "game_rva": 0,
-                        "evidence": why})
+                        "name": name,
+                        "unit": unit if unit in IDENTIFIED_MODULES else "(unmatched)",
+                        "game_rva": 0, "evidence": why})
         for grva, (erva, why) in self.data.items():
             c = claims[grva]
             out.append({"rva": erva, "size": c["size"], "kind": "data", "name": c["name"],

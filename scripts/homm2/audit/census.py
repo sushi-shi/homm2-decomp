@@ -22,6 +22,9 @@ Outputs, all keyed to the selected image (`homm2 --image`):
                                 entries, and initialized data words that are
                                 code addresses
   absolute_reference_evidence.tsv  one evidence row per field
+  functions_static_libs.csv     LIBCMT/OLDNAMES bodies matched with their
+                                relocations masked (the (libcmt) carve-out)
+  functions_imports.csv         import thunks (the (imports) carve-out)
   <image build>/gen/census.json  the report: counts, switch tables, EH
                                 groups, thunks and rejected candidates
 
@@ -301,6 +304,9 @@ class Census:
         self.lib_starts: dict[int, str] = {}
         self.lib_labels: dict[int, str] = {}   # every function-typed member symbol
         self.lib_names: dict[int, str] = {}    # public LIBCMT symbol at a start
+        # every (library, member, public symbol) whose masked body hit a start:
+        # byte-identical members (memcpy/memmove, the lock wrappers) collide
+        self.lib_candidates: dict[int, set[tuple[str, str, str]]] = defaultdict(set)
         self.lib_data_code: list[tuple[int, int]] = []
         self.library_data_ranges: list[tuple[int, int]] = []
         for library in ("libcmt.lib", "oldnames.lib"):
@@ -379,6 +385,8 @@ class Census:
             if sym.section == section.index and sym.storage_class == 2 \
                     and sym.value < len(body) and name.startswith("libcmt"):
                 self.lib_names.setdefault(lo + sym.value, sym.name)
+                library, member = name.split(":", 1)
+                self.lib_candidates[lo + sym.value].add((library, member, sym.name))
         for sym in coff.symbols.values():
             if sym.section == section.index and sym.typ == 0x20 and sym.value < len(body):
                 self.lib_labels[lo + sym.value] = name
@@ -752,13 +760,22 @@ def _ar_members(path: Path):
     if data[:8] != b"!<arch>\n":
         return
     i = 8
+    longnames = b""
     while i + 60 <= len(data):
         name = data[i:i + 16].decode("latin1").strip()
         try:
             size = int(data[i + 48:i + 58].decode("latin1").strip() or 0)
         except ValueError:
             return
-        yield name, data[i + 60:i + 60 + size]
+        body = data[i + 60:i + 60 + size]
+        if name == "//":
+            longnames = body
+        elif name[:1] == "/" and name[1:].isdigit() and longnames:
+            # a long member name: an offset into the `//` member's
+            # NUL-terminated name table
+            start = int(name[1:])
+            name = longnames[start:longnames.find(b"\0", start)].decode("latin1")
+        yield name, body
         i += 60 + size + (size & 1)
 
 
@@ -807,6 +824,8 @@ def write_tables(census: Census, out: Path) -> dict:
         "# to its parent function.",
         "entry_rva,size,name",
     ] + [f"0x{rva:x},{size},Unwind@{census.base + rva:08x}" for rva, size in funclets]) + "\n")
+    sizes = dict(zip(starts, (end - rva for rva, end in zip(starts, ends))))
+    write_identifications(census, out, sizes)
     fields = sorted(census.fields.values(), key=lambda r: r["site"])
     (out / "absolute_relocations.tsv").write_text("\n".join([
         f"# image-sha256: {digest}",
@@ -834,6 +853,88 @@ def write_tables(census: Census, out: Path) -> dict:
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps(payload, indent=1) + "\n")
     return summary
+
+
+def _import_coff_names(dlls) -> dict[tuple[str, str], str]:
+    """(dll, import key) -> the thunk's COFF symbol, from the pinned SDK import
+    libraries' short import records (`__imp__CloseHandle@4` -> `_CloseHandle@4`)."""
+    from homm2.graph.vendor_imports import import_specs
+    from homm2.retail_labels.providers import _short_import_records
+    from homm2.tool.wine import find_ci, msvc_dir
+    names = {(spec.dll.lower(), spec.lookup_name or spec.symbol): spec.symbol
+             for spec in import_specs() if not spec.noname}
+    # A reviewed vendor ABI (imports/*.def) exports decorated names verbatim.
+    for definition in sorted((REPO / "imports").glob("*.def")):
+        dll, exports = None, False
+        for line in definition.read_text().splitlines():
+            words = line.split(";", 1)[0].split()
+            if not words:
+                continue
+            if words[0] == "LIBRARY":
+                dll = words[1].lower()
+            elif words[0] == "EXPORTS":
+                exports = True
+            elif exports and dll and words[0].startswith("_") and "@" in words[0]:
+                names.setdefault((dll, words[0]), words[0])
+    for dll in sorted(set(dlls)):
+        library = find_ci(msvc_dir() / "lib", Path(dll).stem + ".lib")
+        if library is None or not library.is_file():
+            continue
+        lookups, _ordinals = _short_import_records(library, dll)
+        for lookup, name in lookups.items():
+            names.setdefault((dll.lower(), lookup), name.removeprefix("__imp_"))
+    return names
+
+
+def write_identifications(census: Census, out: Path, sizes: dict[int, int]) -> None:
+    """The image's identified non-target code, in the game's reviewed schemas:
+    functions_static_libs.csv (LIBCMT/OLDNAMES bodies matched with their
+    relocations masked) and functions_imports.csv (`jmp [IAT]` thunks).
+    Both are retail facts of the image, so the (libcmt) and (imports) carve-outs
+    do not depend on a generated report."""
+    lines = [
+        "# CRT bodies identified in the retail image by masked-byte evidence against",
+        "# the VC6 toolchain archives (homm2 audit census). Byte-identical members",
+        "# collide: review rows whose alternates list them.",
+        "entry_rva,size,symbol,member,library,evidence,alternates",
+    ]
+    for rva in sorted(census.lib_names):
+        if rva not in sizes:
+            continue
+        candidates = sorted(census.lib_candidates.get(rva, ()))
+        symbol = census.lib_names[rva]
+        library, member = next(((lib, mem) for lib, mem, sym in candidates if sym == symbol),
+                                ("libcmt.lib", ""))
+        lo, hi, _name = census.library_member(rva)
+        alternates = ""
+        if len(candidates) > 1:
+            alternates = f"{len(candidates)} identical candidates: " + "|".join(
+                f"{lib}:{mem}!{sym}" for lib, mem, sym in candidates)
+        lines.append(f"0x{rva:x},{sizes[rva]},{symbol},{member.rsplit(chr(92), 1)[-1]},"
+                     f"{library},census masked-bytes contribution 0x{lo:x}+0x{hi - lo:x},"
+                     f"{alternates}")
+    (out / "functions_static_libs.csv").write_text("\n".join(lines) + "\n")
+    coff = _import_coff_names(t["dll"] for t in census.thunks)
+    lines = [
+        "# Import thunks (jmp [IAT]) resolved through the retail import directory",
+        "# (homm2 audit census); coff is the SDK import library's thunk symbol.",
+        "entry_rva,size,dll,symbol,iat_rva,coff",
+    ]
+    named = set()
+    for thunk in sorted(census.thunks, key=lambda t: int(t["rva"], 16)):
+        rva = int(thunk["rva"], 16)
+        if rva not in sizes:
+            continue
+        # One COFF symbol per import: a second thunk of the same IAT slot
+        # (KERNEL32's thread queries after the runtime's tidtable) keeps the
+        # reviewed `symbol@dll` spelling.
+        name = coff.get((thunk["dll"].lower(), thunk["import_key"]), "")
+        if name in named:
+            name = ""
+        named.add(name)
+        lines.append(f"0x{rva:x},{sizes[rva]},{thunk['dll']},{thunk['import_key']},"
+                     f"{thunk['slot_rva']},{name}")
+    (out / "functions_imports.csv").write_text("\n".join(lines) + "\n")
 
 
 def summarize(census: Census) -> dict:

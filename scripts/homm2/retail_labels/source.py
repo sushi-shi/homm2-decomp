@@ -617,27 +617,6 @@ def placement_claims(image: str) -> list[SourceSymbol]:
     return rows
 
 
-def census_library_claims(image: str) -> list[SourceSymbol]:
-    """LIBCMT/OLDNAMES entries the image's census matched by masked bytes."""
-    import json
-    path = gen_dir(image) / "census.json"
-    if not path.is_file():
-        return []
-    import csv as _csv
-    sizes = {}
-    inventory = retail_dir(image) / "functions.csv"
-    if inventory.is_file():
-        with inventory.open(newline="") as stream:
-            for row in _csv.DictReader(line for line in stream
-                                       if not line.lstrip().startswith("#")):
-                sizes[int(row["entry_rva"], 16)] = int(row["byte_size"], 0)
-    starts = json.loads(path.read_text()).get("starts", [])
-    return [SourceSymbol(rva=int(row["rva"], 16), name=row["library_symbol"],
-                         unit="(libcmt)", size=sizes.get(int(row["rva"], 16), 0),
-                         kind="func", provenance="census-libcmt")
-            for row in starts if row.get("library_symbol")]
-
-
 def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     """The claimed inventory of an image other than the game.
 
@@ -664,10 +643,6 @@ def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     # (the editor's copies of KB.cpp's functions and globals).
     claimed = {row.rva for row in rows}
     rows.extend(row for row in placement_claims(image) if row.rva not in claimed)
-    # A LIBCMT body the game does not link (the census matched it against the
-    # archive with relocations masked) keeps its library name.
-    claimed = {row.rva for row in rows}
-    rows.extend(row for row in census_library_claims(image) if row.rva not in claimed)
     # The scanners below read the selected image's claim space (its own units).
     for vtable in source_vtables(source_root, repo):
         rows.append(SourceSymbol(

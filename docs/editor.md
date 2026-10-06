@@ -52,7 +52,8 @@ identities.
 ## Census
 
 `homm2 --image editor audit census --write-config` writes the editor's
-`functions.csv`, `functions_eh.csv`, `absolute_relocations.tsv` and
+`functions.csv`, `functions_eh.csv`, `functions_static_libs.csv`,
+`functions_imports.csv`, `absolute_relocations.tsv` and
 `absolute_reference_evidence.tsv` from retail instructions alone: recursive
 descent from the entry point, call targets, code addresses in operands and
 data words, import thunks, C++ `FuncInfo` unwind and catch entries, switch
@@ -61,6 +62,11 @@ dispatch and index tables, unreached bodies at a `/Od` frame prologue or a
 with their relocations masked. Run on the game as a control it recovers 2,455
 of the 2,474 inventory starts and 30,504 of the 30,675 reviewed DIR32 sites.
 EH registration stubs are not functions (as in the game's inventory).
+The runtime members and import thunks it identifies are the editor's
+`(libcmt)` and `(imports)` carve-outs; they live in `config/retail/editor`, so
+the README's function total does not depend on a generated report. A placed
+body's callee whose game claim is a runtime member or an import thunk keeps
+that module.
 
 | Editor census | Count |
 | --- | ---: |
