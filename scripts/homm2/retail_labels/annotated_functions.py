@@ -7,6 +7,7 @@ the definition's semantic signature.
 """
 
 from __future__ import annotations
+from homm2.manifest import claim_files
 
 import argparse
 import csv
@@ -139,7 +140,7 @@ def source_private_functions(source_root: Path,
     source_root = Path(source_root).resolve()
     repo = Path(repo).resolve()
     rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root):
         blob = path.read_bytes()
         if STATIC_VA_TOKEN.search(_mask_lexical_noise(blob)):
             definitions = definitions_for_file(path, source_root, repo)
@@ -157,7 +158,7 @@ def source_function_spans(source_root: Path,
     source_root = Path(source_root).resolve()
     repo = Path(repo).resolve()
     rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root):
         blob = path.read_bytes()
         masked = _mask_lexical_noise(blob)
         unit = path.relative_to(source_root).with_suffix("").as_posix()

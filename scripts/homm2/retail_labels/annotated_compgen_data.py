@@ -1,6 +1,7 @@
 """Recover source-bound compiler-generated literal data claims."""
 
 from __future__ import annotations
+from homm2.manifest import claim_files
 from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
 import ast
@@ -520,7 +521,8 @@ def _write_cache(path: Path, entries: dict) -> None:
 
 def source_compgen_data(source_root: Path,
                         repo: Path,
-                        cache_path: Path | None = None) -> list[CompgenDataClaim]:
+                        cache_path: Path | None = None,
+                        image: str | None = None) -> list[CompgenDataClaim]:
     source_root = Path(source_root).resolve()
     repo = Path(repo).resolve()
     canonical = source_root == (repo / "src").resolve()
@@ -531,7 +533,7 @@ def source_compgen_data(source_root: Path,
     rows = []
     clang_paths = []
     keys = {}
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root, image):
         resolved = path.resolve()
         key = _cache_key(resolved, repo) if cache_path is not None else None
         unit = resolved.relative_to(source_root).with_suffix("").as_posix()

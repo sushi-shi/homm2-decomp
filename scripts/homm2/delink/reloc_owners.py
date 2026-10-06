@@ -54,7 +54,12 @@ def load_definition_rvas(source_glob="src/**/*.cpp"):
     pattern = re.compile(
         r"DATA\(0x([0-9a-fA-F]+)\).*?\b([A-Za-z_]\w*)\s*(?:\[|;|=)"
     )
-    for path in glob.glob(source_glob, recursive=True):
+    if source_glob == "src/**/*.cpp":
+        from homm2.manifest import claim_files
+        paths = [str(path) for path in claim_files()]
+    else:
+        paths = glob.glob(source_glob, recursive=True)
+    for path in paths:
         with open(path, encoding="latin-1") as stream:
             for line in stream:
                 match = pattern.search(line)

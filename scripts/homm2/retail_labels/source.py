@@ -19,6 +19,7 @@ nothing else will.
     python3 -m homm2.retail_labels.source --check    # report, write nothing
 """
 from __future__ import annotations
+from homm2.manifest import claim_files
 
 import argparse
 from concurrent.futures import ProcessPoolExecutor
@@ -121,7 +122,7 @@ def compgen_functions_for_file(
 def source_compgen_functions(
         source_root: Path, repo: Path) -> list[SourceCompgenFunction]:
     rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root):
         rows.extend(compgen_functions_for_file(path.resolve(), source_root, repo))
     names = set()
     rvas = set()
@@ -388,7 +389,7 @@ def reviewed_claims(repo: Path, image: str = DEFAULT_IMAGE) -> list[SourceSymbol
 def collect(source_root: Path, repo: Path,
             include_binary_providers: bool | None = None) -> list[SourceSymbol]:
     rows: list[SourceSymbol] = []
-    paths = [path.resolve() for path in sorted(source_root.rglob("*.cpp"))]
+    paths = [path.resolve() for path in claim_files(source_root)]
     if len(paths) <= 1:
         # Keep the small-fixture path direct so failures are easy to debug and
         # callers can substitute the parser in unit tests.
@@ -584,6 +585,21 @@ def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     source_root = repo / "src"
     for path in own:
         rows.extend(symbols_for_file(path.resolve(), source_root, repo))
+    # The scanners below read the selected image's claim space (its own units).
+    for vtable in source_vtables(source_root, repo):
+        rows.append(SourceSymbol(
+            rva=vtable.rva, name=vtable.mangled_name, unit=vtable.unit,
+            size=0, kind="data", provenance="source-vtable"))
+    for claim in source_compgen_data(source_root, repo):
+        rows.append(SourceSymbol(
+            rva=claim.rva,
+            name=compgen_data_symbol_name(claim.unit, claim.semantic_name),
+            unit=claim.unit, size=claim.size, kind="data",
+            provenance=f"source-DATA_COMPGEN:{claim.location}"))
+    for claim in source_compgen_functions(source_root, repo):
+        rows.append(SourceSymbol(
+            rva=claim.rva, name=claim.name, unit=claim.unit, size=claim.size,
+            kind="func", provenance=f"source-VA_COMPGEN:{claim.kind}"))
     rows += [SourceSymbol(r.rva, r.name, r.unit, r.size, r.kind, r.provenance)
              for r in import_claims(retail_exe(image), image_build(image) / "objdiff/base",
                                     repo / "build/toolchain/msvc/lib")]

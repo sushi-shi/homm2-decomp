@@ -76,3 +76,30 @@ def unit_flags(unit: dict, manifest: dict | None = None,
     if unit["unit"].startswith("BASE/"):
         flags.extend(("/Gy", "/YX"))
     return flags + image_defines(key, manifest)
+
+
+def claim_files(source_root: Path | None = None, image: str | None = None,
+                pattern: str = "*.cpp") -> list[Path]:
+    """The source files whose `VA`/`DATA`/`VTBL` markers spell the image's
+    addresses (its claim space), in sorted order.
+
+    A unit linked into the game spells game addresses, even when another image
+    links it too (that image reads its identities through placements). A unit
+    linked only into other images spells that image's addresses. A tree other
+    than the repository's src/ (a fixture, a clean export) is returned whole.
+    """
+    root = Path(source_root) if source_root is not None else REPO / "src"
+    files = sorted(root.rglob(pattern))
+    if root.resolve() != (REPO / "src").resolve():
+        return files
+    key = image or image_key()
+    owner = {(REPO / u["source"]).resolve(): unit_images(u) for u in all_units()}
+
+    def ours(path: Path) -> bool:
+        images = owner.get(path.resolve())
+        if images is None:                  # not a manifest unit: a game-tree file
+            return key == DEFAULT_IMAGE
+        if key == DEFAULT_IMAGE:
+            return DEFAULT_IMAGE in images
+        return key in images and DEFAULT_IMAGE not in images
+    return [path for path in files if ours(path)]

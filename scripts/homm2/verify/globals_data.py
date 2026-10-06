@@ -6,6 +6,8 @@ the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces
   * every header global extern has an inventory symbol and an owner TU;
   * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
+from homm2.manifest import claim_files
+from homm2.core.paths import REPO
 import csv, re, sys, glob
 
 from homm2.core.usage import logged
@@ -59,7 +61,7 @@ def main(argv=None) -> int:
 
     # (1) .cpp DEFINITIONS: every inventory-global def carries DATA(exact VA). Unclaimed defs may carry
     #     DATA too (Phase-B module-private synthetic globals) — those just claim their VA for uniqueness.
-    for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
+    for c in [str(p.relative_to(REPO)) for p in claim_files()]:
         unit = c[len("src/"):-len(".cpp")]
         for i, line in enumerate(open(c), 1):
             loc = "%s:%d" % (c, i)
@@ -83,7 +85,18 @@ def main(argv=None) -> int:
 
     # (2) HEADERS: declarations never claim storage, and every cross-TU global must have a retained
     #     inventory symbol. Anonymous/synthetic storage is module-private in its owning .cpp.
-    for h in sorted(glob.glob("include/**/*.h", recursive=True)):
+    # Only the headers this image's claim space includes: another image's
+    # globals live in that image's inventory.
+    include_re = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]')
+    reachable, pending = set(), [p for p in claim_files()]
+    while pending:
+        for line in open(pending.pop(), encoding="latin-1"):
+            m = include_re.match(line)
+            header = REPO / "include" / m.group(1) if m else None
+            if header is not None and header.is_file() and header not in reachable:
+                reachable.add(header)
+                pending.append(header)
+    for h in sorted(str(path.relative_to(REPO)) for path in reachable):
         for i, line in enumerate(open(h), 1):
             loc = "%s:%d" % (h, i)
             dm = DATA_RE.match(line)

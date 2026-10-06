@@ -35,6 +35,8 @@ Compare raw relocation identities and encoded addends in every function:
     homm2 relocs --addends [SOURCE|BASE|EDITOR]
 Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
+from homm2.manifest import claim_files
+from homm2.core.paths import REPO
 import sys, os, re, csv, json, glob, struct, subprocess, hashlib
 from collections import Counter
 from pathlib import Path
@@ -166,7 +168,7 @@ def load_symbols():
                     sym.setdefault(name, v)
                     dups.setdefault(name, set()).add(v)
     data = {}                                    # C++ DATA() lexical fallback; assembly DATA
-    for f in glob.glob("src/**/*.cpp", recursive=True) + glob.glob("include/**/*.h", recursive=True):
+    for f in [str(p.relative_to(REPO)) for p in claim_files()] + glob.glob("include/**/*.h", recursive=True):
         for ln in open(f, encoding="latin-1"):   # headers are scanned to diagnose stale violations
             m = re.search(r'DATA\(0x([0-9a-fA-F]+)\).*?\b([A-Za-z_]\w*)\s*(?:\[|;|=)', ln)
             if m:

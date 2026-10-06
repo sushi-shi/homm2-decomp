@@ -1,6 +1,7 @@
 """Recover source-owned primary and secondary vtable identities."""
 
 from __future__ import annotations
+from homm2.manifest import claim_files
 
 import re
 from collections import Counter
@@ -111,11 +112,12 @@ def _record_encodings(path: Path, blob: bytes, matches: list,
     return result
 
 
-def source_vtables(source_root: Path, repo: Path) -> list[AnnotatedVtable]:
+def source_vtables(source_root: Path, repo: Path,
+                   image: str | None = None) -> list[AnnotatedVtable]:
     source_root = Path(source_root).resolve()
     repo = Path(repo).resolve()
     rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root, image):
         blob = path.read_bytes()
         masked = _mask_lexical_noise(blob)
         unit = path.relative_to(source_root).with_suffix("").as_posix()

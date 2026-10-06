@@ -1,4 +1,5 @@
 """Normalized effective-source hashes used to scope retained function maxima."""
+from homm2.manifest import claim_files
 import csv, hashlib, os, re
 from pathlib import Path
 
@@ -358,7 +359,7 @@ def source_hashes():
     from homm2.graph.localization import Catalog
     catalog = Catalog.load(REPO) if (REPO / 'locales/messages.def').is_file() else None
     out = {}
-    for cpp in sorted((REPO / "src").rglob("*.cpp")):
+    for cpp in claim_files():
         text = cpp.read_text(errors="replace")
         if catalog is not None:
             # Retained evidence belongs to the compiled Russian text, not just

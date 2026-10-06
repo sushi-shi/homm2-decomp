@@ -1,6 +1,7 @@
 """Shared Clang VarDecl inventory for source ``DATA()`` definitions."""
 
 from __future__ import annotations
+from homm2.manifest import claim_files
 
 import glob
 import hashlib
@@ -353,7 +354,10 @@ def _write_inventory_cache(path: Path, entries: dict) -> None:
 
 
 def source_definitions(source_root: Path, repo: Path, object_root: Path | None = None,
-                       cache_path: Path | None = None) -> list[AnnotatedDataDefinition]:
+                       cache_path: Path | None = None,
+                       image: str | None = None) -> list[AnnotatedDataDefinition]:
+    """`DATA` definitions of the image's claim space (homm2.manifest.claim_files);
+    `image` selects another claim space than the current image's."""
     source_root = Path(source_root)
     repo = Path(repo)
     if object_root is None and source_root.resolve() == (repo / "src").resolve():
@@ -373,7 +377,7 @@ def source_definitions(source_root: Path, repo: Path, object_root: Path | None =
     cached = _load_inventory_cache(cache_path) if cache_path is not None else {}
     retained = {}
     rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
+    for path in claim_files(source_root, image):
         unit = path.relative_to(source_root).with_suffix("").as_posix()
         key = (_inventory_cache_key(path, unit, object_root, compile_database, include_roots)
                if object_root is not None else None)
@@ -390,7 +394,10 @@ def source_definitions(source_root: Path, repo: Path, object_root: Path | None =
                           for field in AnnotatedDataDefinition.__dataclass_fields__}
                          for row in values],
             }
-    if source_root.resolve() == (repo / "src").resolve():
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    if (source_root.resolve() == (repo / "src").resolve()
+            and (image or image_key()) == DEFAULT_IMAGE):
+        # The fixed MASM claims spell game addresses.
         for unit, source, claim in fixed_asm_claims("data"):
             if (repo / source).is_file():
                 name = claim.name.removeprefix("_")

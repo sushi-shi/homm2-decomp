@@ -1152,9 +1152,15 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
     definitions = source_definitions(source_root, base_root)
     compgen = source_compgen_data(source_root, repo)
     vtables = source_vtables(source_root, repo)
-    if image_key() != DEFAULT_IMAGE:
-        definitions, compgen, vtables = (
-            placed_claims(rows) for rows in (definitions, compgen, vtables))
+    if image_key() != DEFAULT_IMAGE and source_root.resolve() == SOURCE_ROOT.resolve():
+        # The image's own units spell its addresses; the shared units spell
+        # the game's, which move through the placements.
+        definitions = definitions + placed_claims(annotated_source_definitions(
+            source_root, REPO, Path(base_root), image=DEFAULT_IMAGE))
+        compgen = compgen + placed_claims(
+            source_compgen_data(source_root, repo, image=DEFAULT_IMAGE))
+        vtables = vtables + placed_claims(
+            source_vtables(source_root, repo, image=DEFAULT_IMAGE))
     claim_units = {row.unit for row in [*definitions, *compgen, *vtables]}
     document = tomllib.loads(Path(UNITS).read_text())
     configured_units = {

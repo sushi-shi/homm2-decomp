@@ -1279,7 +1279,12 @@ def validate_out_root(requested: Path) -> Path:
 
 
 def write_ninja(out_root: Path, locale: str = 'ru') -> None:
-    sources = sorted((out_root / "src").rglob("*.cpp"))
+    # The generated build links the game: a unit linked only into another
+    # image (the scenario editor) is not one of its objects.
+    from homm2.manifest import all_units, unit_images
+    other_images = {u["source"] for u in all_units() if "game" not in unit_images(u)}
+    sources = [path for path in sorted((out_root / "src").rglob("*.cpp"))
+               if path.relative_to(out_root).as_posix() not in other_images]
     localized = (out_root / 'locales/messages.def').is_file()
     include_flags = [
         f"-Ibuild/{locale}/localized/include" if localized else "-Iinclude",
