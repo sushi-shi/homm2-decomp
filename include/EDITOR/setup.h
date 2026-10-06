@@ -8,6 +8,9 @@
 #include <va.h>
 #include <BASE/message.h>
 
+// The new map's width and height (stpesize.bin).
+extern i32 gNewMapSize;
+
 MessageDispatchResult SetupMainHandler(struct tag_message& message);
 i32 SetupNewMap(void);
 

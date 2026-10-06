@@ -184,6 +184,7 @@ src/BASE/listbox.cpp	pending
 src/BASE/miscwin.cpp	pending	
 src/BASE/soundmgr.cpp	pending	
 src/EDITOR/CLEARMGR.cpp	pending	
+src/EDITOR/EDITMGR.cpp	pending	
 src/EDITOR/EDITOR.cpp	pending	
 src/EDITOR/mapcell.cpp	pending	
 src/SOURCE/ADVMGR.cpp	pending	

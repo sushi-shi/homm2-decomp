@@ -63,6 +63,13 @@ def va2off(secs, rva):
     return None
 
 
+def section_name(secs, rva):
+    for nm, va, en, _pr in secs:
+        if va <= rva < en:
+            return nm
+    return None
+
+
 def image_end(d):
     e = struct.unpack_from("<I", d, 0x3c)[0]
     return struct.unpack_from("<I", d, e + 0x50)[0]
@@ -120,6 +127,11 @@ def main():
             pointers += 1
             continue
         if s is None:
+            continue
+        if (section_name(secs, rva) == ".rdata"
+                and s + b"\0" not in candidate_strings):
+            # VC6 keeps string literals in .data; an .rdata cell is a float
+            # constant (__real@) unless a candidate object proves a string.
             continue
         digest = hashlib.sha256(s + b"\0").hexdigest()
         occurrence = occurrences.get(digest, 0)

@@ -80,14 +80,35 @@ public:
     virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    // Copies the map into the undo map.
     void SaveUndo(void);
-    i32 LoadMap(char* name);
-    void SelectTool(i32 tool);
+    // Copies the map view to the screen.
     void UpdateMapView(void);
+    // Redraws the rulers' cursor marks.
     void UpdateCursor(void);
+    void DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY);
+    // Turns screen coordinates into the map cell under them (clamped).
     void ScreenToCell(i32& x, i32& y);
+    // Redraws the map view at the current view origin.
     void DrawMap(void);
+    void DrawView(i32 viewX, i32 viewY);
     void DrawRadar(b32 updateScreen);
+    // Draws one map cell into a view cell: the layers are EditCellLayer bits.
+    void DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers);
+    void ToggleZoom(void);
+    void SelectTool(i32 tool);
+    void Scroll(i32 dx, i32 dy);
+    // Moves the scroll knobs to the view origin (and redraws them).
+    void UpdateKnobs(i32 update);
+    i32 LoadMap(char* name);
+    void ClearErrors(void);
+    void ResetArea(i32 x, i32 y, i32 width, i32 height);
+    // Clears the cells and gives them the terrain's tiles: PaintGround in
+    // view cells, FillGround in map cells.
+    void PaintGround(i32 column, i32 row, i32 width, i32 height, i32 terrain);
+    void FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain);
+    // Starts an empty (or random) map of the given size.
+    void InitializeMap(b32 random, i32 width, i32 height);
     void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 layer, i32 keepObjects);
 };
 #pragma pack(pop)
@@ -96,6 +117,14 @@ SIZE(editManager, 0xea2);
 extern editManager* gEditManager;
 // The header of the edited map (its name, size and players).
 extern SMapHeader gEditMapHeader;
+
+// A ground tile of the terrain and shape for the map cell (random among
+// equivalent tiles when `random`).
+i32 SelectTerrainTile(i32 terrain, i32 shape, i32 random, i32 x, i32 y, i32 mode, float weight);
+void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
+
+// Rebuilds the overlay tiles of the whole map.
+void FillInOverlayTiles(void);
 
 // The map file requester: loads or saves (`mode`) and stores the chosen
 // file name in gMapFileName.

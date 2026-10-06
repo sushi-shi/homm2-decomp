@@ -79,6 +79,7 @@ extern b32 gScatterTowns;
 extern b32 gGenerateUnseen;
 extern b32 gGeneratingMap;
 extern i32 gObjectClass;
+extern i32 gNextObjectLink;
 extern i32 gZoomScale[EDIT_ZOOM_COUNT];
 extern i32 gZoomCellSize[EDIT_ZOOM_COUNT];
 extern i32 gZoomViewCells[EDIT_ZOOM_COUNT];

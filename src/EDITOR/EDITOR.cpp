@@ -3529,6 +3529,8 @@ DATA(0x004a4470) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a45d0) i32 giMaxExtentX;
 DATA(0x004a45d4) i32 giMaxExtentY;
 DATA(0x004a45e0) inputManager* gpInputManager;
+// The placement link the next placed object's parts share (mapCell).
+DATA(0x004a45f4) i32 gNextObjectLink;
 DATA(0x004a45f8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 DATA(0x004a4638) configStruct gConfig;
 DATA(0x004a47dc) i32 giMinExtentX;
