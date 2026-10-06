@@ -1,8 +1,8 @@
-# Heroes of Might and Magic II Gold — Linux / Windows / WebAssembly source port
+# Heroes of Might and Magic II — native port
 
-A native port of Heroes of Might and Magic II Gold 2.1 (Buka), rebuilt from
-reconstructed source. Supply your own installed copy of the game; game data is
-not bundled.
+A Linux, Windows and browser port of Heroes of Might and Magic II Gold 2.1
+(Buka), built from the reconstructed C++ source. Supply your own copy of the
+game; game data is not bundled.
 
 ## Branches
 
@@ -17,29 +17,18 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master (you are here) --------> ironfist --------> ironfist-master
+                    port (you are here) --------> source-ironfist --------> port-ironfist
 ```
 
-| Branch | Purpose |
-| --- | --- |
-| `decomp-pol-2.0` | Price of Loyalty 2.0 reconstruction |
-| `source-pol-2.0` | Its generated source tree, without matching machinery |
-| `classic-pol-2.0` | The same tree with the original integer-enum and name-mangling model |
-| `decomp-gold-2.1-buka` | Gold 2.1 (Buka) reconstruction, the preferred retail target |
-| `source-gold-2.1-buka` | Its generated clean source tree, the source base of `master` |
-| `classic-gold-2.1-buka` | Legacy-mangling view, with Windows-1251 strings rendered as UTF-8 Russian |
-| `master` | Cross-platform Linux, Windows and browser port |
-| `ironfist` | Project Ironfist applied to the cross-platform source |
-| `ironfist-master` | Maintained Ironfist integration |
-
-The classic branches are terminal views of their reconstruction; they do not
-feed Gold or `master`. The Gold decompilation branch matches all 1,727
-reconstructed retail functions and all 291,995 reviewed data bytes, and its
-audited exact-link path reproduces the retail executable byte for byte. The
-generated source branches remove RVA annotations, delinking metadata and other
-matching machinery. Cross-version behavior is recorded in
-[Retail version differences](docs/version-differences.md); changes made only by
-this port are in [Intentional retail divergences](docs/retail-divergences.md).
+- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
+- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0) — Clean source, PoL 2.0
+- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0) — Reading view, PoL 2.0
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka) — Clean source, Gold 2.1 (ru/en)
+- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka) — Reading view, UTF-8 Russian
+- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port) — Native port: Linux, Windows, browser
+- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
+- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
 
 ## Play on Linux
 
@@ -164,8 +153,7 @@ in {
 The 1 GB archive is downloaded into the store once. `system.extraDependencies`
 (`home.extraDependencies` with home-manager) keeps it through garbage
 collection, so a rebuild that imports the game again does not download it
-again. The same archive holds Heroes I for the
-[HoMM1 port](https://github.com/sushi-shi/homm1-decomp/tree/port).
+again.
 
 With home-manager, the same options install the game for one user:
 
@@ -214,7 +202,7 @@ Display settings persist between runs; see
 
 ## Build from source
 
-From the `master` branch:
+From the `port` branch:
 
 ```sh
 nix develop
@@ -241,6 +229,35 @@ nix build .#homm2-windows
 nix build .#homm2-web
 nix flake check
 ```
+
+## Browser
+
+### Linux
+
+Inside `nix develop .#web`:
+
+```sh
+emcmake cmake --preset wasm
+cmake --build --preset wasm
+HOMM2_DATA=/path/to/heroes2 homm2-web-package build/wasm
+python3 -m http.server --directory build/wasm
+```
+
+`homm2-web-package` packs the installation into `build/wasm/homm2.data`. The
+same steps, served with `emrun`, are one command:
+`HOMM2_DATA=/path/to/heroes2 nix run .#web` (port `HOMM2_WEB_PORT`, default
+8080; bundle in `~/.cache/homm2-web` or `HOMM2_WEB_OUTPUT`).
+
+### Windows
+
+Not supported yet: the browser build needs Emscripten builds of FFmpeg and
+libbz2, which are made with Nix. Use the Linux steps in WSL.
+
+### Play
+
+Open [the game](http://localhost:8000/homm2.html) and press **Start Heroes II**.
+The game data is part of the page's `homm2.data`. Saves and preferences stay in
+browser storage; clearing it removes them.
 
 ## Windows (native)
 
@@ -280,34 +297,15 @@ On Windows, saves and preferences stay in the game folder, as they did in
 `HOMM2_DATA=/path/to/heroes2 nix run .#windows-smoke` checks the Windows build
 under Wine from a folder laid out like the one above.
 
-## Browser
+## Documentation
 
-### Linux
-
-Inside `nix develop .#web`:
-
-```sh
-emcmake cmake --preset wasm
-cmake --build --preset wasm
-HOMM2_DATA=/path/to/heroes2 homm2-web-package build/wasm
-python3 -m http.server --directory build/wasm
-```
-
-`homm2-web-package` packs the installation into `build/wasm/homm2.data`. The
-same steps, served with `emrun`, are one command:
-`HOMM2_DATA=/path/to/heroes2 nix run .#web` (port `HOMM2_WEB_PORT`, default
-8080; bundle in `~/.cache/homm2-web` or `HOMM2_WEB_OUTPUT`).
-
-### Windows
-
-Not supported yet: the browser build needs Emscripten builds of FFmpeg and
-libbz2, which are made with Nix. Use the Linux steps in WSL.
-
-### Play
-
-Open [the game](http://localhost:8000/homm2.html) and press **Start Heroes II**.
-The game data is part of the page's `homm2.data`. Saves and preferences stay in
-browser storage; clearing it removes them.
+- [Port guide](docs/porting.md): variables, display controls, the install and
+  the screenshot and input-replay hooks
+- [Localization architecture](docs/localization.md)
+- [Retail version differences](docs/version-differences.md): cross-version
+  behavior
+- [Intentional retail divergences](docs/retail-divergences.md): what only this
+  port changes
 
 ## License
 
