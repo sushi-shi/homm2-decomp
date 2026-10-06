@@ -50,10 +50,6 @@ da08a14cc545f6708bd2b746edd7ea7fa0eb7d0ed26f6e54ab8e6ccb2e735e19  heroes2.agg   
 68f12a2ca2dd1a000e1136ad70f38b19116686c2a7a0e9a0860528d998b52afd  heroes2x.agg  (Buka, Russian)
 ```
 
-The Buka disc is on archive.org as the Heroes anthology
-[***REMOVED***](https://archive.org/details/***REMOVED***),
-a `.rar` of its CD image; the flake install below takes it as it is.
-
 The first launch builds the game. The installation is only read: preferences,
 saves and high scores go to `~/.local/share/homm2/homm2` (under
 `$XDG_DATA_HOME`), so the game directory may stay read-only. Music is read from
@@ -131,44 +127,6 @@ then launch:
 ```sh
 sudo nixos-rebuild switch --flake '.#<host>'
 heroes2
-```
-
-Instead of a local copy, a module of the configuration can fetch the Buka
-anthology from archive.org:
-
-```nix
-{ pkgs, ... }:
-let
-  heroes-buka = pkgs.fetchurl {
-    name = "heroes-platinum-buka.rar";   # the importer goes by the extension
-    url = "https://archive.org/download/***REMOVED***/%D0%93%D0%B5%D1%80%D0%BE%D0%B8.%20%D0%9F%D0%BB%D0%B0%D1%82%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20%5B%D0%91%D1%83%D0%BA%D0%B0%5D.rar";
-    hash = "sha256-YWAmitzQ5TozJxS8Jph6ATp7KB0BRjJFS7+JOjnQBPk=";
-  };
-in {
-  programs.homm2 = { enable = true; game = heroes-buka; };
-  system.extraDependencies = [ heroes-buka ];
-}
-```
-
-The 1 GB archive is downloaded into the store once. `system.extraDependencies`
-(`home.extraDependencies` with home-manager) keeps it through garbage
-collection, so a rebuild that imports the game again does not download it
-again.
-
-With home-manager, the same options install the game for one user:
-
-```nix
-homeConfigurations."<user>" = home-manager.lib.homeManagerConfiguration {
-  pkgs = nixpkgs.legacyPackages.x86_64-linux;
-  modules = [
-    homm2.homeManagerModules.default
-    { programs.homm2 = { enable = true; game = "${homm2-game}"; }; }
-  ];
-};
-```
-
-```sh
-home-manager switch --flake '.#<user>'
 ```
 
 `heroes2` keeps saves, high scores and settings in

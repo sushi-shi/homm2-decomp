@@ -7,9 +7,8 @@ PATH is an installed game folder (GOG's, a Windows or DOS installation), the
 Buka disc (its files, or the files its installer unpacks), or a
 .zip/.7z/.iso/.rar of one of them, or a folder holding only such an archive.
 Archives are unpacked with 7z, a .rar with unar (7-Zip's RAR decoder is not
-free), and an archive holding only another archive is unpacked in turn:
-archive.org's `***REMOVED***` holds the Buka anthology's
-CD image. The installation is the shallowest folder below PATH with
+free), and an archive holding only another archive is unpacked in turn.
+The installation is the shallowest folder below PATH with
 DATA/HEROES2.AGG; names are matched case-insensitively, as the game matches
 them. Without one, the InstallShield installer whose cabinet lists
 HEROES2.AGG is unpacked with unshield (the anthology's disc holds Heroes I,
