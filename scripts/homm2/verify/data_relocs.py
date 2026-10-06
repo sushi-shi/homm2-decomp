@@ -669,7 +669,8 @@ def load_homm2_provenance(root: Path) -> dict:
     )
     actual_vtables = Counter(
         (_unit_from_object(row["object"]), int(row["rva"], 0), row["name"],
-         row["provenance"].removesuffix(":candidate-coff-alias"))
+         row["provenance"].removesuffix(":candidate-coff-alias")
+         .removesuffix(":candidate-coff-folded-comdat"))
         for row in source_rows
         if row["provenance"].startswith(("source-VTBL:", "source-VTBL2:"))
     )
@@ -686,7 +687,8 @@ def load_homm2_provenance(root: Path) -> dict:
         row for row in source_rows if not row["provenance"].startswith(
             ("source-DATA:", "source-DATA_COMPGEN:",
              "source-VTBL:", "source-VTBL2:",
-             "candidate-COFF-string:", "candidate-COFF-real:"))
+             "candidate-COFF-string:", "candidate-COFF-real:",
+             "candidate-COFF-vtable:"))
     ]
     if unknown_source_rows:
         diagnostics.append({

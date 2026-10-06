@@ -8,9 +8,9 @@
     homm2 verify all           run every gate of the `homm2 build verify` tier
 
 A gate exits non-zero on a finding and writes nothing but build/ scratch.
-`homm2 build verify` runs the tier after an ordinary build. Gates outside the
-tier carry known findings in the current tree (docs/tooling-convergence.md);
-they stay runnable so the findings remain visible.
+Every `homm2 build` runs the build gates (and the staged ones, advisory);
+`homm2 build verify` adds the tier. Gates outside both carry known findings or
+are reports; they stay runnable so the findings remain visible.
 """
 from __future__ import annotations
 
@@ -35,8 +35,10 @@ GATES = {
                      "every used text ID resolves in the catalog"),
     "strict-allocations": ([PY, "-m", "homm2.verify.strict_allocations"],
                            "reviewed initialized storage under objdiff's strict schema"),
-    "assert-relocs": ([PY, "-m", "homm2.verify.assert_relocs", "--fields"],
-                      "ordered relocation fields of every exact function"),
+    "assert-relocs": ([PY, "-m", "homm2.verify.assert_relocs", "--resolved"],
+                      "ordered resolved relocation sites and owner offsets"),
+    "reloc-fields": ([PY, "-m", "homm2.verify.assert_relocs", "--fields"],
+                     "ordered relocation fields of every exact function"),
     "no-fake-labels": ([PY, "-m", "homm2.verify.no_fake_labels"],
                        "every emitted function symbol is a reviewed identity"),
     "globals-data": ([PY, "-m", "homm2.verify.globals_data"],
@@ -49,20 +51,26 @@ GATES = {
                          "game code uses the Ints.h aliases"),
     "usage": ([PY, "-m", "homm2.audit.usage"],
               "every tooling entry point keeps usage logging"),
-    # Outside the tier: known findings in the current tree.
     "decls": ([PY, "-m", "homm2.verify.decls"],
               "no type or extern declarations in a .cpp"),
-    "defs-declared": ([PY, "-m", "homm2.verify.defs_declared"],
-                      "every free function is declared in its owner header"),
     "annotated-functions": ([PY, "-m", "homm2.retail_labels.annotated_functions", "--check",
                              "--objects", "build/objdiff/base"],
-                            "source VA spans and private identities"),
+                            "source VA spans and private identities in the objects"),
+    "annotated-sources": ([PY, "-m", "homm2.retail_labels.annotated_functions", "--check"],
+                          "source VA spans and private identities"),
+    # Staged: they run in every build and report, but carry findings that
+    # predate their enforcement (docs/match-provenance-audit.md).
+    "defs-declared": ([PY, "-m", "homm2.verify.defs_declared"],
+                      "every free function is declared in its owner header"),
+    "reloc-identities": ([PY, "-m", "homm2.verify.assert_relocs"],
+                         "unordered relocation identities of near-exact functions"),
+    # Outside the build and the tier: known findings or reports.
     "text-coverage": ([PY, "-m", "homm2.verify.text_coverage"],
                       "every .text byte is claimed, padding or reviewed"),
     "constants": ([PY, "-m", "homm2.verify.constants"],
                   "numeric literals reviewed"),
     "relocs": ([PY, "-m", "homm2.verify.assert_relocs"],
-               "relocation targets of near-exact functions (review; `relocs 0x<rva>`)"),
+               "focused relocation review (`relocs 0x<rva>`)"),
     "od-frames": ([PY, "-m", "homm2.verify.od_frames"],
                   "/Od frame and slot drift (report)"),
     "model-drift": ([PY, "-m", "homm2.verify.model_drift"],
@@ -73,10 +81,17 @@ GATES = {
                       "candidate and target data-symbol topology"),
 }
 
-#: The `homm2 build verify` tier, in run order.
+#: Hard gates every `homm2 build` runs after Ninja, in order (`annotated-sources`
+#: runs before configuring). A score is not evidence that declarations, data
+#: owners or relocations are sound.
+BUILD_GATES = ("annotated-functions", "decls", "no-fake-labels", "globals-data",
+               "globals-defined", "vtables", "assert-relocs", "fixed-width-ints")
+#: Run by every build; a failure is reported, not fatal, until its recorded
+#: findings are resolved.
+STAGED = ("defs-declared", "reloc-identities")
+#: Added by `homm2 build verify`, in run order.
 TIER = ("check", "link-diff", "behaviour", "localization", "strict-allocations",
-        "assert-relocs", "no-fake-labels", "globals-data", "globals-defined",
-        "vtables", "fixed-width-ints", "usage")
+        "reloc-fields", "usage")
 
 VERBS = {"status": [], "bank": ["update"], "readme": ["--write-readme"]}
 
@@ -84,15 +99,28 @@ VERBS = {"status": [], "bank": ["update"], "readme": ["--write-readme"]}
 def usage(stream=sys.stderr) -> None:
     print(__doc__.strip(), file=stream)
     width = max(map(len, GATES))
-    print("\ngates (* = in the build verify tier):", file=stream)
+    print("\ngates (b = every build, s = staged, * = build verify tier):", file=stream)
     for name, (_argv, blurb) in GATES.items():
-        mark = "*" if name in TIER else " "
+        mark = ("b" if name in BUILD_GATES or name == "annotated-sources" else
+                "s" if name in STAGED else "*" if name in TIER else " ")
         print(f"  {mark} {name:<{width}}  {blurb}", file=stream)
 
 
 def run_gate(name: str, extra: list[str] = ()) -> int:
     argv, _ = GATES[name]
     return run_process([*argv, *extra], cwd=REPO)
+
+
+def run_gates(names, *, advisory: bool = False) -> int:
+    """Run gates in order; a hard failure stops at once, an advisory one is
+    reported and the run continues."""
+    for name in names:
+        if run_gate(name):
+            if not advisory:
+                print(f"[verify] {name}: FAIL; rerun with `homm2 verify {name}`")
+                return 1
+            print(f"[verify] staged gate {name} failed (advisory)", file=sys.stderr)
+    return 0
 
 
 def run_tier() -> int:
@@ -120,7 +148,7 @@ def main(argv=None) -> int:
         return 0 if argv else 2
     verb, rest = argv[0], argv[1:]
     if verb == "all":
-        return run_tier()
+        return run_gates(BUILD_GATES) or run_gates(STAGED, advisory=True) or run_tier()
     if verb in VERBS:
         from homm2.verify.status import main as status
         return status([*VERBS[verb], *rest])

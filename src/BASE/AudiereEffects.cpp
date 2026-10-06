@@ -7,18 +7,6 @@
 
 SIZE(AudiereSampleNode, 0xc);
 
-struct AudiereEffectsState {
-    void* buffer;
-    i32 frameCount;
-    i32 channelCount;
-    i32 sampleRate;
-    audiere::SampleFormat sampleFormat;
-    AudiereSampleNode* sampleList;
-    i32 sampleIterationDepth;
-};
-
-SIZE(AudiereEffectsState, 0x1c);
-
 DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = H2_ZERO_INIT;
 
 VA(0x004cc740, 0x162)

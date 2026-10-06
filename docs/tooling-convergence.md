@@ -192,25 +192,23 @@ guides are skills under `.agents/skills/` (`.claude/skills` links there);
 
 ## Gate tier
 
-`homm2 build verify` builds, then runs the tier in `homm2.verify.TIER`:
-`check` (every function and data byte exact), `link-diff`, `behaviour`,
-`localization`, `strict-allocations`, `assert-relocs`, `no-fake-labels`,
-`globals-data`, `globals-defined`, `vtables`, `fixed-width-ints` and `usage`.
-Until this step the `assert_*` gates were switched off in `homm2 build`
-(`AUDITS = False`, written while the inventory was still empty), so nothing
-ran them. Five registered gates carry findings in the current tree and stay
-outside the tier until those are fixed:
+Every `homm2 build` runs `annotated-sources` before configuring and, after
+Ninja, the build gates in `homm2.verify.BUILD_GATES`: `annotated-functions`,
+`decls`, `no-fake-labels`, `globals-data`, `globals-defined`, `vtables`,
+`assert-relocs` (ordered resolved sites) and `fixed-width-ints`, with
+`model-drift` as a warning. The staged gates `defs-declared` (74 free
+functions without an owner-header declaration) and `reloc-identities` (the
+unordered identity audit's `$SG` reports) run and report without failing until
+their findings are resolved (`docs/match-provenance-audit.md`).
 
-| Gate | Findings |
-| --- | --- |
-| `decls` | 1: `struct AudiereEffectsState` is defined in `src/BASE/AudiereEffects.cpp` |
-| `defs-declared` | 74 free-function definitions have no owner-header declaration |
-| `annotated-functions` | Clang cannot recover the private functions of `src/SOURCE/netwin.cpp` (VC6 `<utility>` error) |
-| `text-coverage` | 516 unreviewed nested entry candidates and overlap reports |
-| `constants` | clang-tidy fails on every unit in the build shell |
+`homm2 build verify` adds the tier in `homm2.verify.TIER`: `check` (every
+function and data byte exact), `link-diff`, `behaviour`, `localization`,
+`strict-allocations`, `reloc-fields` and `usage`.
 
-`od-frames`, `model-drift`, `relocs`, `data-relocs` and `data-topology` are
-reports, not gates.
+Outside both: `text-coverage` (516 unreviewed nested entry candidates and
+overlap reports) and `constants` (clang-tidy fails on every unit in the build
+shell) carry findings; `od-frames`, `relocs`, `data-relocs` and
+`data-topology` are reports.
 
 ## Tests
 

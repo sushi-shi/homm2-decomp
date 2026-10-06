@@ -117,6 +117,9 @@ def _build(rest):
         return 1
     if py("homm2.graph.localization"):
         return 1
+    from homm2.verify import BUILD_GATES, STAGED, run_gate, run_gates
+    if run_gate("annotated-sources"):
+        return 1
     if sh(sys.executable, "configure.py"):
         return 1
     from homm2.core.paths import ninja_jobs
@@ -124,11 +127,16 @@ def _build(rest):
     if sh("ninja", *jobs, *rest):
         return 1
     # The report is generated after Ninja has rebuilt every input, so a clean
-    # build is self-contained.
+    # build is self-contained; relocation gates consume it.
     from homm2.verify.status import load_report, main as status
     report = load_report()
     if report is None:
         return 1
+    # Fast and warning-only: half-built units may intentionally need a delink.
+    py("homm2.verify.model_drift")
+    if run_gates(BUILD_GATES):
+        return 1
+    run_gates(STAGED, advisory=True)
     status(["--write-readme"], report)
     return status([], report)
 

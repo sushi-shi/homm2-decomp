@@ -47,6 +47,8 @@ def main(argv=None):
         return 1
     if run("python3", "-m", "homm2.retail_labels.source"):
         return 1
+    if run("python3", "-m", "homm2.retail_labels.annotated_functions"):
+        return 1
     if run("python3", "-m", "homm2.retail_labels.name_strings"):
         return 1
     if run("python3", "-m", "homm2.delink.pdb_synth"):

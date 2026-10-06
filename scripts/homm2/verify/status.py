@@ -44,6 +44,7 @@ def _report_inputs_identity(objdiff_dir, executable):
     objects = []
     stale = []
     for unit in config.get("units", []):
+        unit_paths = {}
         for role in ("base", "target"):
             reference = unit.get(role + "_path")
             if not reference:
@@ -52,6 +53,7 @@ def _report_inputs_identity(objdiff_dir, executable):
             path = (objdiff_dir / reference).resolve()
             if not path.is_file():
                 raise RuntimeError("objdiff %s object is missing: %s" % (role, path))
+            unit_paths[role] = path
             key = str(path)
             if key not in digests:
                 digests[key] = _sha256(path)
@@ -65,6 +67,9 @@ def _report_inputs_identity(objdiff_dir, executable):
                 "reference": reference,
                 "sha256": digests[key],
             })
+        if unit_paths["base"].samefile(unit_paths["target"]):
+            raise RuntimeError("objdiff unit %s compares an object to itself: %s" %
+                               (unit.get("name", "?"), unit_paths["base"]))
     if stale:
         preview = "\n  ".join(stale[:10])
         if len(stale) > 10:
@@ -498,12 +503,16 @@ def readme_block(data, maxima):
            f"{overall_z:.2f}% fuzzy &middot; {overall_m:.2f}% fuzzy-max &middot; "
            f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
            f"{DE} / {DU} data-bearing units exact.**", "",
-           "_**Functions exact** = byte-identical now. **Functions exact-max** = observed at "
+           "_**Functions exact** = 100% in the current normalized object comparison, "
+           "not a raw linked-image equality claim. Unbuilt source edits are not measured. "
+           "**Functions exact-max** = observed at "
            "100% at least once for the current effective-source hash, including audited exact "
            "disposable TU-state probes. **Fuzzy** is the live size-weighted instruction match; "
            "**fuzzy-max** retains each function's best observed score for its current "
            "effective-source hash. "
-           "Maxima are historical navigation data, not correctness proof or enforcement._", "",
+           "Maxima are historical navigation data, not correctness proof or enforcement. "
+           "`homm2 build` runs separate raw-object audit gates, and its `link-diff` step "
+           "compares the whole linked image with retail._", "",
            *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
                        "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows)]
     if carved_units:
@@ -609,6 +618,9 @@ def main(argv=None, data=None):
           f"functions-exact-max: {exact_max}/{total_functions}  "
           f"fuzzy-max: {fuzzy_max:.2f}%  "
           f"data: {matched_data}/{total_data} ({data_percent:.3f}%)")
+    print("[status] normalized compiled-object scores only; unbuilt source edits are not "
+          "measured. Raw-object gates and whole-image equality: `homm2 build` "
+          "(`link-diff`).")
     if carved_units:
         print(f"[status] identified carve-outs: {carved_functions} functions in "
               f"{len(carved_units)} modules "

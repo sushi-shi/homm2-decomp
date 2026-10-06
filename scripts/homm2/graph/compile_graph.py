@@ -20,6 +20,7 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
     weak_external_stamp = (
         "build/objdiff/normalized/weak-external-link-set.stamp")
     normalizer = ["scripts/homm2/compare/canonicalize_data_symbols.py",
+                  "scripts/homm2/compare/normalized_freshness.py",
                   "build/gen/compiler_generated_functions.csv",
                   "build/gen/delink_data_from_source.tsv",
                   weak_external_stamp]
@@ -68,6 +69,7 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
                 f"build/objdiff/paired/target/{u['unit']}.c.obj")
             w.build(paired_target, "canonicalize_relocs", inputs=target_input,
                     implicit=[obj, reloc_normalizer,
+                              "scripts/homm2/compare/normalized_freshness.py",
                               "scripts/homm2/verify/assert_relocs.py",
                               "scripts/homm2/graph/vendor_imports.py",
                               "build/gen/symbol_names.csv",
