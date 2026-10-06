@@ -2,7 +2,7 @@
 """homm2.tool.wine - the era-toolchain wine plumbing, in one place.
 
 Everything CL/LINK/LIB/RC/ML need to run under wine: toolchain lookup, path
-translation, the persistent wineserver, the environment doctrine, and the two
+translation, the shared wineserver, the environment doctrine, and the two
 runners. Callers above this module never spell "wine".
 
 The doctrine, stated once:
@@ -93,7 +93,9 @@ def ensure_wineserver() -> None:
         return
     ws = shutil.which("wineserver")
     if ws:
-        subprocess.run([ws, "-p"], check=False, env=child_env(), stdin=subprocess.DEVNULL,
+        # One server serves a whole build; it exits 60 s after its last client
+        # instead of persisting after the build is gone.
+        subprocess.run([ws, "-p60"], check=False, env=child_env(), stdin=subprocess.DEVNULL,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     _WINESERVER_ENSURED = True
 
@@ -103,7 +105,7 @@ _ENV_READY = False
 
 def prepare_env() -> None:
     """Apply the doctrine to this process once: wine presence, WINEDEBUG,
-    the WINEPREFIX anchor, and the persistent wineserver."""
+    the WINEPREFIX anchor, and the shared wineserver."""
     global _ENV_READY
     if _ENV_READY:
         return
