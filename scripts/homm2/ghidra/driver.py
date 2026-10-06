@@ -35,7 +35,7 @@ REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
 from homm2.core.paths import gen_dir, image_build, image_key, retail_exe
 
 IMAGE = image_key()
-EXE = Path(os.environ.get("HOMM2_EXE") or retail_exe(IMAGE))
+EXE = retail_exe(IMAGE)  # honours the pin's own environment variable
 PROJ_DIR = image_build(IMAGE) / "ghidra"
 PROJ_NAME = "homm2" if IMAGE == "game" else f"homm2-{IMAGE}"
 SYMBOLS_CSV = gen_dir(IMAGE) / "symbol_names.csv"
