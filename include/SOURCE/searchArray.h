@@ -8,15 +8,11 @@ class army;
 extern i32 MAP_WIDTH;
 
 typedef enum SearchConstant {
-    SEARCH_DIRECTION_COUNT            = 8,
     SEARCH_QUEUE_CAPACITY             = 1024,
     SEARCH_PATH_CAPACITY              = 256,
     SEARCH_FLAG_BIT_COUNT             = 1,
     SEARCH_DIRECTION_BIT_COUNT        = 4,
     SEARCH_CELL_PAD_SIZE              = 4,
-    SEARCH_PATH_HEADER_SIZE           = 3,
-    SEARCH_AI_PATH_HEADER_SIZE        = 4,
-    SEARCH_COMBAT_HEX_COUNT           = 117,
     SEARCH_MAX_COST                   = 999999,
     SEARCH_TARGET_COST_WINDOW         = 75,
     SEARCH_MONSTER_RESEED_WINDOW      = 300,
@@ -24,7 +20,6 @@ typedef enum SearchConstant {
     SEARCH_CELL_UNREACHABLE           = 0x08,
     SEARCH_MAP_BLOCKED                = 0x80,
     SEARCH_CELL_BLOCKED               = 0x80,
-    SEARCH_CLEAR_GROUND_TILESET       = 0x2f,
     SEARCH_INVALID_COORDINATE         = -1,
     SEARCH_NO_OBJECT                  = 0xFF,
     SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
@@ -40,17 +35,12 @@ struct searchCell {
 };
 #pragma pack(pop)
 
-union searchStorage {
-    struct searchCell* cells;
-    struct searchNode* nodes;
-    struct {
-        char pad[SEARCH_PATH_HEADER_SIZE];
-        u8 directions[SEARCH_PATH_CAPACITY + 1];
-    } path;
-    struct {
-        char pad[SEARCH_AI_PATH_HEADER_SIZE];
-        u8 directions[SEARCH_PATH_CAPACITY];
-    } aiPath;
+struct searchStorage {
+    union {
+        struct searchCell* cells;
+        struct searchNode* nodes;
+    };
+    u8 directions[SEARCH_PATH_CAPACITY];
 };
 
 #pragma pack(push, 1)
@@ -83,27 +73,11 @@ struct searchNode {
 #pragma pack(push, 1)
 class searchArray {
 public:
-    union {
-        struct {
-            i32 m_queueSize;
-            i32 m_queueCursor;
-        };
-        struct {
-            u32 m_queueCount;
-            u32 m_maxQueueCount;
-        };
-    };
+    u32 m_queueCount;
+    u32 m_maxQueueCount;
     i32 m_pathLength;
-    union {
-        struct {
-            i32 m_lastY;
-            i32 m_lastX;
-        };
-        struct {
-            i32 m_specialTargetX;
-            i32 m_specialTargetY;
-        };
-    };
+    i32 m_specialTargetX;
+    i32 m_specialTargetY;
     searchNode m_queue[SEARCH_QUEUE_CAPACITY];
     searchStorage m_storage;
     searchNode* GetRow(i32 y, i32 width) {
@@ -166,6 +140,6 @@ public:
     }
 };
 #pragma pack(pop)
-extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
+extern u8 bIsMoatSlowed[COMBAT_HEX_COUNT];
 
 #endif

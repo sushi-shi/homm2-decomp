@@ -26,7 +26,7 @@ typedef enum WinsockPrivateConstant {
 
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
-    i32 plr;
+    i32 player;
 
     if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
         NormalDialog(localization::Tr("network.tcp.fullscreen_warning"), 1);
@@ -111,10 +111,10 @@ i16 wsnet_init(void) {
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
-        for (plr = 1; plr < giNumHumanPlayers; plr++) {
-            startup.netPosition = static_cast<u8>(plr);
+        for (player = 1; player < giNumHumanPlayers; player++) {
+            startup.netPosition = static_cast<u8>(player);
             wsSendMessage(
-                giNetPosToDCOPos[plr],
+                giNetPosToDCOPos[player],
                 NETWORK_PACKET_STARTUP,
                 sizeof(startup),
                 &startup
@@ -431,7 +431,7 @@ i32 wsWaitForHost(void) {
                     localization::Tr("network.tcp.host.not_responding")
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5)
                     ShutDown(NULL);
                 iWSAttempts = 0;
             }

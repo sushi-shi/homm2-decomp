@@ -24,16 +24,16 @@ enum class WidgetFlag : i16 {
     WIDGET_FLAG_ENABLED  = 2,
     WIDGET_FLAG_DRAW     = 4,
     WIDGET_FLAG_DIMMED   = 8,
-    WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
 };
 using enum WidgetFlag;
 ENABLE_ENUM_FLAGS(WidgetFlag)
 
-enum class WidgetCommandArgument : i32 {
-    WIDGET_COMMAND_DIMMED = 0x1000
+enum class WidgetFlagArgument : i32 {
+
+    WIDGET_FLAGS_ARGUMENT_DIMMED = 0x1000
 };
-using enum WidgetCommandArgument;
+using enum WidgetFlagArgument;
 
 #pragma pack(push, 1)
 class widget {

@@ -23,6 +23,8 @@
 #include <SOURCE/SaveNames.h>
 
 #include <string>
+#include <BASE/font.h>
+#include <BASE/dialog.h>
 
 enum class FileRequesterHelpIndex : i32 {
     REQUESTER_HELP_NONE          = -1,
@@ -73,8 +75,7 @@ typedef enum FileRequesterPrivateConstant {
     FILENAME_ENTRY_LIMIT        = 201,
     FILTER_FRAME_STEP           = 2,
     FILTER_FRAME_BASE           = 9,
-    SELECTED_FILL_COLOR         = 2,
-    SCROLL_CENTER_DIVISOR       = 2
+    SCROLL_CENTER_DIVISOR       = 2,
 } FileRequesterPrivateConstant;
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
@@ -116,12 +117,12 @@ i32 ShowThisMapGame(const char* filename) {
     return 1;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
-    i32 ix;
+    i32 index;
     strcpy(mapName, filename);
     mapName[LEGACY_MAP_BASENAME_SIZE] = 0;
-    for (ix = 0; ix < LEGACY_MAP_BASENAME_SIZE; ++ix) {
-        if (mapName[ix] == '.') {
-            mapName[ix] = 0;
+    for (index = 0; index < LEGACY_MAP_BASENAME_SIZE; ++index) {
+        if (mapName[index] == '.') {
+            mapName[index] = 0;
         }
     }
     if (platform::CompareIgnoringCase(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
@@ -138,9 +139,9 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
     SMapHeader header;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
-    char* dotPtr;
+    char* dotPointer;
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
-    i32 indexData5;
+    i32 indexData;
     i32 moveValue;
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", directory, pattern);
@@ -187,14 +188,16 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
         }
     }
 
-    for (indexData5 = 0; indexData5 < m_fileCount; ++indexData5) {
+    for (indexData = 0; indexData < m_fileCount; ++indexData) {
+        static char emptyFileName[1] = "";
         strcpy(
-            m_fileNames[indexData5].text,
-            ""
+            m_fileNames[indexData].text,
+            emptyFileName
         );
+        static char emptyExtension[1] = "";
         strcpy(
-            m_extensions[indexData5].text,
-            ""
+            m_extensions[indexData].text,
+            emptyExtension
         );
     }
 
@@ -205,32 +208,32 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
 
         strcpy(nameBuffer, foundFile.c_str());
         extension[0] = 0;
-        dotPtr = FindLastToken(nameBuffer, '.');
-        if (dotPtr != NULL) {
-            strcpy(extension, dotPtr);
-            *dotPtr = 0;
+        dotPointer = FindLastToken(nameBuffer, '.');
+        if (dotPointer != NULL) {
+            strcpy(extension, dotPointer);
+            *dotPointer = 0;
         }
 
-        for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            if (platform::CompareIgnoringCase(nameBuffer, m_fileNames[indexData5].text) < 0) {
-                for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
+        for (indexData = 0; indexData < insertCount; ++indexData) {
+            if (platform::CompareIgnoringCase(nameBuffer, m_fileNames[indexData].text) < 0) {
+                for (moveValue = insertCount; moveValue > indexData; --moveValue) {
                     strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
                     strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
                 }
                 break;
             }
         }
-        strcpy(m_fileNames[indexData5].text, nameBuffer);
-        strcpy(m_extensions[indexData5].text, extension);
+        strcpy(m_fileNames[indexData].text, nameBuffer);
+        strcpy(m_extensions[indexData].text, extension);
         ++insertCount;
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
+        for (indexData = 0; indexData < insertCount; ++indexData) {
             const std::string fullPath =
-                std::string(m_fileNames[indexData5].text) + m_extensions[indexData5].text;
-            if (!GetMapHeader(fullPath.c_str(), &m_mapHeaders[indexData5]))
-                memset(&m_mapHeaders[indexData5], 0, sizeof(m_mapHeaders[indexData5]));
+                std::string(m_fileNames[indexData].text) + m_extensions[indexData].text;
+            if (!GetMapHeader(fullPath.c_str(), &m_mapHeaders[indexData]))
+                memset(&m_mapHeaders[indexData], 0, sizeof(m_mapHeaders[indexData]));
         }
     }
     return m_fileCount;
@@ -317,9 +320,10 @@ void fileRequester::Close(void) {
 }
 
 i32 fileRequester::Open(i32 id) {
+    static char emptyLastFilename[1] = "";
     strcpy(
         gLastFilename,
-        ""
+        emptyLastFilename
     );
     m_previousMenu = platform::CurrentMenu();
     platform::ChangeMenu(hmnuDflt);
@@ -336,7 +340,7 @@ i32 fileRequester::Open(i32 id) {
 
     m_scrollKnob = new iconWidget(
         SCROLL_KNOB_X,
-        static_cast<i16>(fGutterMinY),
+        (fGutterMinY),
         SCROLL_KNOB_WIDTH,
         SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
@@ -379,7 +383,7 @@ i32 fileRequester::Open(i32 id) {
     } else {
         enabled = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
-            char mapName[CURRENT_MAP_NAME_CAPACITY];
+            char mapName[CURRENT_MAP_NAME_CLEAR_SIZE];
             fileSlot = 0;
             memset(mapName, 0, CURRENT_MAP_NAME_CLEAR_SIZE);
             while (fileSlot < LEGACY_MAP_BASENAME_SIZE && gMapName[fileSlot] != 0
@@ -435,7 +439,7 @@ void fileRequester::SetOK(i32 enabled) {
         enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
         FILE_REQUESTER_OK
     );
-    message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAG_GRAYED);
+    message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
@@ -464,9 +468,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
+                        static char emptyCycleName[1] = "";
                         strcpy(
                             cycleNameBuffer,
-                            ""
+                            emptyCycleName
                         );
                     }
                     giMapSizeFilter = FileRequesterMapSizeFilterFromCode(
@@ -505,7 +510,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             break;
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_DESELECT:
+                case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case FILE_REQUESTER_SCROLL_UP:
                             if (m_topIndex > 0) {
@@ -542,8 +547,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             break;
                     }
                     break;
-                case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
                     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                         helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {
@@ -599,25 +604,25 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
                                            < FILE_REQUESTER_MAP_SIZE_ICON_FIRST
-                                                 + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                 + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_VICTORY;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_LOSS_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                        + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE)) {
                                     helpIndexMouse = REQUESTER_HELP_LOSS;
                                 }
                                 break;
@@ -654,9 +659,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                     strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                 } else {
+                                    static char emptyFilteredName[1] = "";
                                     strcpy(
                                         filteredNameMap,
-                                        ""
+                                        emptyFilteredName
                                     );
                                 }
                                 SetupFiles();
@@ -725,14 +731,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 positions = m_fileCount - (iMaxListSize - 1);
                                 if (positions < 1)
                                     positions = 1;
-                                stepScreen = static_cast<i32>(
+                                stepScreen = (
                                     (fGutterTravelLength
                                      * H2EnumIndex(FILE_REQUESTER_GUTTER_SCALE))
                                     / positions
                                 );
 
                                 screenY = message.payload.widget.screenY;
-                                screenY = static_cast<i32>(screenY - (m_y + fGutterMinY));
+                                screenY = (screenY - (m_y + fGutterMinY));
                                 screenY -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                                 topIndexValue =
                                     (screenY * FILE_REQUESTER_GUTTER_SCALE) / stepScreen;
@@ -751,7 +757,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                                     goto SelectListItem;
@@ -760,7 +766,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                                     goto SelectListItem;
@@ -769,7 +775,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                                     goto SelectListItem;
@@ -777,7 +783,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                                     goto SelectListItem;
@@ -785,7 +791,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (message.payload.widget.id >= FILE_REQUESTER_LIST_TEXT_FIRST
                                     && message.payload.widget.id
                                            <= FILE_REQUESTER_LIST_TEXT_FIRST
-                                                  + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
+                                                  + H2EnumIndex(FILE_REQUESTER_LIST_RANGE_SIZE) - 1) {
                                     iResult =
                                         message.payload.widget.id - FILE_REQUESTER_LIST_TEXT_FIRST;
                                     goto SelectListItem;
@@ -842,14 +848,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult - giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
+                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5) {
                     acceptStep = false;
                 }
             }
         }
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;
+            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
         }
     }
@@ -858,34 +864,34 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
 
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex;
-    double gutterStep7;
-    i32 mouseX7;
+    double gutterStep;
+    i32 mouseX;
     i32 knobOffset;
-    i32 mouseY7;
+    i32 mouseY;
     tag_message knobMessage;
     i32 topIndex;
 
     oldTopIndex = m_topIndex;
-    gutterStep7 = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
-    gpMouseManager->MouseCoords(mouseX7, mouseY7);
-    knobOffset = mouseY7 - m_scrollKnob->m_y;
+    gutterStep = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
+    gpMouseManager->MouseCoords(mouseX, mouseY);
+    knobOffset = mouseY - m_scrollKnob->m_y;
     gpInputManager->Flush();
     knobMessage = gpInputManager->GetEvent();
     while (knobMessage.type != MESSAGE_LEFT_BUTTON_UP
            && knobMessage.type != MESSAGE_RIGHT_BUTTON_UP) {
         if (knobMessage.type == MESSAGE_MOUSE_MOVE) {
-            if (static_cast<float>(knobMessage.payload.mouse.y) < knobOffset + fGutterMinY) {
-                knobMessage.payload.mouse.y = static_cast<i32>(knobOffset + fGutterMinY);
+            if ((knobMessage.payload.mouse.y) < knobOffset + fGutterMinY) {
+                knobMessage.payload.mouse.y = (knobOffset + fGutterMinY);
             }
-            if (static_cast<float>(knobMessage.payload.mouse.y)
+            if ((knobMessage.payload.mouse.y)
                 > knobOffset + fGutterMinY + fGutterTravelLength) {
                 knobMessage.payload.mouse.y =
-                    static_cast<i32>(knobOffset + fGutterMinY + fGutterTravelLength);
+                    (knobOffset + fGutterMinY + fGutterTravelLength);
             }
             gpMouseManager->Main(knobMessage);
             m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
             if (m_fileCount > iMaxListSize) {
-                topIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep7);
+                topIndex = ((m_scrollKnob->m_y - fGutterMinY) / gutterStep);
                 if (topIndex != oldTopIndex) {
                     if (topIndex > m_fileCount - iMaxListSize) {
                         topIndex = m_fileCount - iMaxListSize;
@@ -896,13 +902,13 @@ void fileRequester::DoKnob(void) {
                     m_topIndex = topIndex;
                     Update(0);
                     m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                     oldTopIndex = topIndex;
                 } else {
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             } else {
-                m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
         platform::PumpEvents();
@@ -917,7 +923,7 @@ void fileRequester::Update(i32 drawWindow) {
     tag_message message;
 
     i32 i;
-    double gutterStepCount1;
+    double gutterStepCount;
 
     message.type = MESSAGE_WIDGET;
 
@@ -1061,9 +1067,9 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_selectedIndex == m_topIndex + i) {
-            message.payload.widget.data.value = SELECTED_FILL_COLOR;
+            message.payload.widget.data.value = H2EnumIndex(FONT_DRAW_YELLOW);
         } else {
-            message.payload.widget.data.value = 1;
+            message.payload.widget.data.value = H2EnumIndex(FONT_DRAW_DEFAULT);
         }
         m_window->BroadcastMessage(message);
     }
@@ -1094,17 +1100,13 @@ void fileRequester::Update(i32 drawWindow) {
 
     if (m_fileCount <= iMaxListSize) {
         m_scrollKnob->m_y =
-            static_cast<i16>(
-                fGutterTravelLength
-                    / H2EnumIndex(SCROLL_CENTER_DIVISOR)
-                + fGutterMinY
-            );
+            (fGutterTravelLength / H2EnumIndex(SCROLL_CENTER_DIVISOR) + fGutterMinY);
     } else {
-        gutterStepCount1 = fGutterTravelLength / (m_fileCount - iMaxListSize);
-        m_scrollKnob->m_y = static_cast<i16>(fGutterMinY + m_topIndex * gutterStepCount1);
+        gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
+        m_scrollKnob->m_y = (fGutterMinY + m_topIndex * gutterStepCount);
     }
     if (drawWindow) {
-        m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
 

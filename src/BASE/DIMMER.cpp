@@ -21,8 +21,8 @@ void dimmerWidget::Read(void) {
     m_kind = gpResourceManager->ReadWord();
 }
 
-MessageDispatchResult dimmerWidget::Main(struct tag_message& msg) {
-    return widget::Main(msg);
+MessageDispatchResult dimmerWidget::Main(struct tag_message& message) {
+    return widget::Main(message);
 }
 
 void dimmerWidget::Draw(void) {

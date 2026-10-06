@@ -17,6 +17,8 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 #include <SOURCE/Localization.h>
+#include <BASE/dialog.h>
+#include <SOURCE/KB_TYPES.h>
 
 typedef enum TradingPostWidgetId {
     POST_LEFT_OFFER_ICON  = 0x14,
@@ -96,7 +98,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
 
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
-    i32 idx;
+    i32 index;
     OfferSide sideCurrent;
     i32 offeredValue;
     i32 requestedValue;
@@ -144,29 +146,29 @@ void UpdateTradingPost(i32 draw) {
             tradingPlace
         );
     }
-    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
+    SET_WIDGET_MESSAGE(messageTemp, WIDGET_COMMAND_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
-    for (idx = TRADING_POST_CONTROL_FIRST; idx <= TRADING_POST_CONTROL_LAST; idx++) {
+    for (index = TRADING_POST_CONTROL_FIRST; index <= TRADING_POST_CONTROL_LAST; index++) {
         messageTemp.payload.widget.command =
             leftResource != -1 && rightResource != -1 && leftResource != rightResource
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
-        messageTemp.payload.widget.id = idx;
+        messageTemp.payload.widget.id = index;
         messageTemp.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         tpWindow->BroadcastMessage(messageTemp);
     }
 
     for (sideCurrent = OFFER_LEFT; sideCurrent < OFFER_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             messageTemp.payload.widget.id =
                 sideCurrent == OFFER_LEFT ? POST_LEFT_OFFER_ICON : POST_RIGHT_OFFER_ICON;
             messageTemp.payload.widget.data.value =
                 sideCurrent == OFFER_LEFT ? leftResource : rightResource;
             tpWindow->BroadcastMessage(messageTemp);
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
@@ -184,21 +186,21 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
         }
 
-        for (idx = 0; idx < TRADING_POST_RESOURCE_COUNT; idx++) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+        for (index = 0; index < H2EnumIndex(RES_COUNT); index++) {
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + idx;
-                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[idx]);
+                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + index;
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[index]);
             } else {
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
+                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + index;
                 if (leftResource != -1) {
-                    if (leftResource == idx) {
+                    if (leftResource == index) {
                         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("common.not_applicable")  );
                     } else {
                         ComputeTradeRatios(
                             leftResource,
-                            idx,
+                            index,
                             &ratioLocal,
                             &leftDenominatedLocal,
                             &nMax
@@ -213,14 +215,14 @@ void UpdateTradingPost(i32 draw) {
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
-            if ((sideCurrent == OFFER_LEFT && leftResource == idx)
-                || (sideCurrent == OFFER_RIGHT && rightResource == idx))
+            if ((sideCurrent == OFFER_LEFT && leftResource == index)
+                || (sideCurrent == OFFER_RIGHT && rightResource == index))
                 messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             else
                 messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             messageTemp.payload.widget.id = sideCurrent == OFFER_LEFT
-                                                ? TRADING_POST_LEFT_ICON_FIRST + idx
-                                                : TRADING_POST_RIGHT_ICON_FIRST + idx;
+                                                ? TRADING_POST_LEFT_ICON_FIRST + index
+                                                : TRADING_POST_RIGHT_ICON_FIRST + index;
             messageTemp.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
             tpWindow->BroadcastMessage(messageTemp);
         }
@@ -232,7 +234,7 @@ void UpdateTradingPost(i32 draw) {
     else
         tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
-        tpWindow->DrawWindow(0);
+        tpWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             tpX + REDRAW_X_OFFSET,
             tpY,
@@ -252,13 +254,13 @@ void ComputeTradeRatios(
     *ratio = 1;
     *leftDenominated = 0;
     *maxTrade = 0;
-    if (sourceResource < 0 || sourceResource >= TRADING_POST_RESOURCE_COUNT
-        || destinationResource < 0 || destinationResource >= TRADING_POST_RESOURCE_COUNT
+    if (sourceResource < 0 || sourceResource >= H2EnumIndex(RES_COUNT)
+        || destinationResource < 0 || destinationResource >= H2EnumIndex(RES_COUNT)
         || fTradingPostEfficiency <= 0.0f)
         return;
-    float srcVal = coreRatio[sourceResource] * fTradingPostEfficiency;
-    float dstVal = coreRatio[destinationResource];
-    float tRatio = dstVal / srcVal;
+    float sourceValue = coreRatio[sourceResource] * fTradingPostEfficiency;
+    float destinationValue = coreRatio[destinationResource];
+    float tRatio = destinationValue / sourceValue;
 
     if (tRatio >= 1.0f) {
         *leftDenominated = 0;
@@ -318,7 +320,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
+            case WIDGET_NOTIFY_SELECT:
                 switch (message.payload.widget.id) {
                     case POST_TRACK:
                         if (iMaxUnitsToTrade == 0)
@@ -367,9 +369,9 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
-                    case NORMAL_DIALOG_BUTTON_TWO:
+                    case DIALOG_BUTTON_2:
                         exitFlag = true;
                         break;
                     case POST_EXECUTE:
@@ -414,4 +416,4 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
+u16 coreRatio[H2EnumIndex(RES_COUNT)] = {250, 500, 250, 500, 500, 500, 1};

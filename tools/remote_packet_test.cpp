@@ -1,5 +1,5 @@
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/ADVMGR_TYPES.h>
+#include <SOURCE/REMOTE_TYPES.h>
 #include <array>
 #include <cstring>
 
@@ -11,14 +11,14 @@ int main() {
     outgoing.sender = 4;
     outgoing.id = 123456;
     outgoing.type = REMOTE_MESSAGE_RELIABLE;
-    outgoing.payloadSize = sizeof(AdventureRemoteSave);
-    const AdventureRemoteSave save{1234, -123, 456, 1};
+    outgoing.payloadSize = sizeof(RemoteSaveInitialization);
+    const RemoteSaveInitialization save{1234, -123, 456, 1};
     std::memcpy(outgoing.payload, &save, sizeof(save));
     // Deliberately odd-addressed wire storage; readers must copy, not alias.
     std::array<char, REMOTE_MESSAGE_SIZE + 1> wire{};
     std::memcpy(wire.data() + 1, &outgoing, sizeof(outgoing));
     const auto incoming = ReadRemoteMessage(wire.data() + 1);
-    const auto restored = ReadRemotePayload<AdventureRemoteSave>(incoming);
+    const auto restored = ReadRemotePayload<RemoteSaveInitialization>(incoming);
     if (incoming.sender != 4 || incoming.id != 123456
         || incoming.type != REMOTE_MESSAGE_RELIABLE
         || std::memcmp(&save, &restored, sizeof(save)) != 0)

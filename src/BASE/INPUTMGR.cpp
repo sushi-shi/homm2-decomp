@@ -12,6 +12,8 @@
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
+#include <BASE/baseManager.h>
+#include <BASE/display.h>
 
 enum class InputManagerScanCodeEncoding : i32 {
     SCAN_CODE_MASK          = 0xff,
@@ -151,11 +153,16 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 gpWindowManager->ScreenShot();
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
-                SetFullScreenStatus(false);
+                // Retail left fullscreen to open WinHelp. The portable help
+                // notice is a message box parented to the game window, so the
+                // display mode is kept.
                 platform::ShowHelp();
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(!CURRENT_GRAPHICS_CONFIG.fullScreen);
+                ChangeDisplaySettings(
+                    (event->payload.keyboard.modifiers
+                        & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != MESSAGE_MODIFIER_NONE,
+                    (event->payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL) != MESSAGE_MODIFIER_NONE);
         }
     }
     return event->type == MESSAGE_NONE;
@@ -345,7 +352,7 @@ i32 inputManager::Open(i32 priority) {
     m_modifiers = MESSAGE_MODIFIER_NONE;
     MakeScanCodeTable();
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
-    m_priority = INPUT_MANAGER_PRIORITY;
+    m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_active = true;
     platform::SetEventHandler(PlatformEventHandler);
     strcpy(
@@ -611,7 +618,7 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
         return;
 
     bInCheckChangeCursor = true;
-    if (force != 0 || (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
+    if (force != 0 || (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
             bLastMouseOffscreen = false;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);

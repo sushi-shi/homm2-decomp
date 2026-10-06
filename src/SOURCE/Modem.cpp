@@ -16,7 +16,7 @@ typedef enum ModemPrivateConstant {
     SETUP_TEXT_CAPACITY = 104,
     RESET_ATTEMPT_COUNT = 2,
     PRINTABLE_CHARACTER_FIRST = 32,
-    READ_STORAGE_SIZE = 4,
+
     HANDSHAKE_TEXT_CAPACITY = 20,
     HANDSHAKE_PACKET_SIZE = 10,
     HANDSHAKE_PREFIX_SIZE = 2,
@@ -27,8 +27,8 @@ typedef enum ModemPrivateConstant {
 } ModemPrivateConstant;
 
 void ModemSetup(i32 mode) {
-    char directConnectMessage3[SETUP_TEXT_CAPACITY];
-    i32 resetAttempt9;
+    char directConnectMessage[SETUP_TEXT_CAPACITY];
+    i32 resetAttempt;
     char command[SETUP_TEXT_CAPACITY];
 
     LogStr("MS1");
@@ -42,7 +42,7 @@ void ModemSetup(i32 mode) {
     LogStr("MS2");
 
     if (gbDirectConnect == 0) {
-        for (resetAttempt9 = 0; resetAttempt9 < RESET_ATTEMPT_COUNT; ++resetAttempt9) {
+        for (resetAttempt = 0; resetAttempt < RESET_ATTEMPT_COUNT; ++resetAttempt) {
             if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
                 utf8::Copy(command, sizeof(command), gConfig.modemInitString);
             else
@@ -79,10 +79,10 @@ void ModemSetup(i32 mode) {
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         utf8::Copy(
-            directConnectMessage3,
+            directConnectMessage,
             localization::Tr("network.modem.direct_wait")
         );
-        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(directConnectMessage, NORMAL_DIALOG_WAIT_LAST);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         LogStr("MS5");
@@ -152,9 +152,9 @@ i8 GUIModemCommandExec(void) {
 
 void ModemCommand(const char* command) {
     i32 commandLength = strlen(command);
-    i32 commandPosition0;
-    for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
-        write_buffer(command + commandPosition0, 1);
+    i32 commandPosition;
+    for (commandPosition = 0; commandPosition < commandLength; ++commandPosition) {
+        write_buffer(command + commandPosition, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
     }
     write_buffer("\r", 1);
@@ -203,10 +203,10 @@ i32 write_buffer(const char* buffer, i32 length) {
 }
 
 i32 read_byte(void) {
-    u8 value[READ_STORAGE_SIZE];
-    i32 received = com_rcv(0, 1, value);
+    u8 value;
+    i32 received = com_rcv(0, 1, &value);
     if (received == 1)
-        return value[0];
+        return value;
     else
         return -1;
 }

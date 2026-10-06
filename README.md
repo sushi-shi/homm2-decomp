@@ -112,12 +112,22 @@ Requirements:
 2. A C++20 compiler with 32-bit support.
 3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
    `libavutil`, and `libswresample`).
+4. Python 3.10+ and GNU gettext tools (`msgfmt`, `msgcat`, and `xgettext`).
 
 ```sh
 cmake -S . -B build -G Ninja
 cmake --build build
+ctest --test-dir build --output-on-failure
 HOMM2_DATA=/path/to/heroes2 ./build/homm2
 ```
+
+Single-configuration generators such as Ninja default to `RelWithDebInfo`.
+Select another configuration explicitly with `-DCMAKE_BUILD_TYPE=Debug` or
+`-DCMAKE_BUILD_TYPE=Release`. Multi-configuration generators use their normal
+`cmake --build build --config <configuration>` selection.
+
+The native CTests use synthetic fixtures and do not require retail game data.
+For the supported Nix build and test matrix, run `nix flake check`.
 
 ## Installation
 
@@ -197,3 +207,7 @@ domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
 Files carrying separate copyright or license notices retain those terms. No
 binary game assets are stored in this repository; retail inputs and build
 outputs incorporating them are not covered by this dedication.
+
+Display shortcuts: **F4** toggles fullscreen, **Shift+F4** cycles scaling, and
+**Ctrl+F4** toggles VSync. Settings persist between runs; see
+[display controls](docs/porting.md#display-controls).

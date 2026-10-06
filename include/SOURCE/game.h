@@ -13,6 +13,7 @@
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/armyGroup.h>
 
 class army;
 class armyGroup;
@@ -62,7 +63,7 @@ typedef enum GameStateStorageConstant {
     GAME_SAVE_NAME_SIZE                  = 0x15f,
     GAME_MAP_FILENAME_SIZE               = 13,
     GAME_SETUP_STATE_PAD_SIZE            = 0x12,
-    GAME_DAILY_EVENT_FLAG_COUNT          = GAME_TOWN_COUNT / 8,
+    GAME_TOWN_BUILD_FLAG_BYTE_COUNT      = GAME_TOWN_COUNT / 8,
     GAME_OBELISK_VISITOR_COUNT           = 48,
     GAME_DEFAULT_PLAYER_NAME_SIZE        = 4,
     GAME_DEFAULT_PLAYER_NAMES_SIZE       = GAME_PLAYER_COUNT * GAME_DEFAULT_PLAYER_NAME_SIZE,
@@ -91,20 +92,20 @@ public:
     u8 m_campaignChoice[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScore;
-    H2EnumStorage<CreatureType, i16> m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
-    i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
+    H2EnumStorage<CreatureType, i16> m_campaignCarryoverCreatureTypes[ARMY_GROUP_SLOT_COUNT];
+    i16 m_campaignCarryoverCreatureCounts[ARMY_GROUP_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
     char _pad_0xd2[GAME_CAMPAIGN_STATE_PAD_SIZE];
     char m_saveName[GAME_SAVE_NAME_SIZE];
     SMapHeader m_mapHeader;
-    i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
-    H2SteppedEnumStorage<PlayerHandicap, i8> m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
-    H2SteppedEnumStorage<FactionType, i8> m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
-    i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerColor[GAME_PLAYER_COUNT];
+    H2SteppedEnumStorage<PlayerHandicap, i8> m_playerHandicap[GAME_PLAYER_COUNT];
+    H2SteppedEnumStorage<FactionType, i8> m_setupPlayerRace[GAME_PLAYER_COUNT];
+    i8 m_setupPlayerNetworkId[GAME_PLAYER_COUNT];
     H2EnumStorage<GameDifficulty, i8> m_difficulty;
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];
-    i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerType[GAME_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
     b8 m_newGameInitialized;
     i8 m_newGameHumanCount;
@@ -119,14 +120,8 @@ public:
     class fullMap m_worldMap;
     i8 m_obeliskCount;
     town m_castleRecs[H2EnumIndex(GAME_TOWN_COUNT)];
-    union {
-        i8 m_castleOwners[H2EnumIndex(GAME_TOWN_COUNT)];
-        i8 m_townOwners[H2EnumIndex(GAME_TOWN_COUNT)];
-    };
-    union {
-        char m_dailyEventFlags[GAME_DAILY_EVENT_FLAG_COUNT];
-        u8 m_knownTowns[GAME_DAILY_EVENT_FLAG_COUNT];
-    };
+    i8 m_townOwners[H2EnumIndex(GAME_TOWN_COUNT)];
+    u8 m_townBuiltToday[GAME_TOWN_BUILD_FLAG_BYTE_COUNT];
     hero m_heroRecs[H2EnumIndex(GAME_HERO_COUNT)];
     i8 m_availableHeroes[H2EnumIndex(GAME_HERO_COUNT)];
     mineRecord m_mines[H2EnumIndex(GAME_MINE_COUNT)];
@@ -141,7 +136,7 @@ public:
     H2EnumStorage<ArtifactType, i8> m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
-    u8 m_cheated;
+    b8 m_cheated;
     char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
     char m_rumour[GAME_RUMOUR_TEXT_SIZE];
     u16 m_rumourEventCount;
@@ -151,7 +146,7 @@ public:
     u16 m_mapEventCount;
     u16 m_mapEventIndices[GAME_MAP_EVENT_CAPACITY];
     class heroWindow* m_viewArmyWindow;
-    i32 m_viewArmyResult;
+    i32 m_dialogAnimationCounter;
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
     HeroSpellType m_viewSpellsType;
@@ -191,7 +186,7 @@ public:
     i32 Scan(i8* array, i32 start, i32 length);
     i32 RandomScan(i8* array, i32 start, i32 range, i32, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
-    i32 GetTownId(i32 col, i32 row);
+    i32 GetTownId(i32 column, i32 row);
     hero* GetHero(i32 id) {
         return &m_heroRecs[id];
     }
@@ -207,7 +202,7 @@ public:
     i32 GetPlayerColor(i32 player) {
         return m_players[player].m_color;
     }
-    i32 GetMineId(i32 col, i32 row);
+    i32 GetMineId(i32 column, i32 row);
     i32 SaveGame(const char* filename, i32 generateName, i8 expansionFormat);
     void SetupOrigData(void);
     void LoadGame(const char* filename, i32 loadFromFile, i32);
@@ -270,17 +265,17 @@ public:
     void SetVisibility(i32 x, i32 y, i32 player, i32 radius);
     void MakeAllWaterVisible(i32 player);
     void GiveArmy(class armyGroup* group, CreatureType type, i32 count, i32 slot);
-    i32 ExperienceValueOfStack(class armyGroup* group, class hero* h);
-    i32 GetLuck(class hero* h, class army*, class town* castle);
+    i32 ExperienceValueOfStack(class armyGroup* group, class hero* heroPointer);
+    i32 GetLuck(class hero* heroPointer, class army*, class town* castle);
     void SetupAdjacentMons(void);
     void CancelComputerScreen(void);
     void ShowComputerScreen(void);
     void ShowHeroesLogo(void);
     void WaitForPlayer(const char* text, i32 player);
-    i32 HasLateOverlay(i32 col, i32 row);
-    void ConvertFlagToLateOverlay(i32 col, i32 row);
-    i32 HasObjectTilesetIndex(i32 col, i32 row, TilesetId tileset, i32 index);
-    void ConvertAllToLateOverlay(i32 col, i32 row);
+    i32 HasLateOverlay(i32 column, i32 row);
+    void ConvertFlagToLateOverlay(i32 column, i32 row);
+    i32 HasObjectTilesetIndex(i32 column, i32 row, TilesetId tileset, i32 index);
+    void ConvertAllToLateOverlay(i32 column, i32 row);
     void ProcessMapExtra(void);
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
@@ -299,14 +294,14 @@ public:
         class mapCell* passedCell,
         i32
     );
-    void SetMapSize(i32 w, i32 h);
-    i32 HeroIDToHeroPos(class playerData* pd, i32 heroId);
-    i32 TownIDToTownPos(class playerData* pd, i32 townId);
+    void SetMapSize(i32 width, i32 height);
+    i32 HeroIDToHeroPos(class playerData* player, i32 heroId);
+    i32 TownIDToTownPos(class playerData* player, i32 townId);
     void SetupNewRumour(void);
     void CheckForTimeEvent(void);
     i32 CountShrines(i32 player);
-    void ShowMoraleInfo(class hero* h, i32 dialogType);
-    void ShowLuckInfo(class hero* h, i32 dialogType);
+    void ShowMoraleInfo(class hero* heroPointer, i32 dialogType);
+    void ShowLuckInfo(class hero* heroPointer, i32 dialogType);
     void GetMap(void);
     void ProcessNewMap(struct SMapHeader* header);
     void InitNewGame(struct SMapHeader* header);

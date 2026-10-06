@@ -14,6 +14,10 @@
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <BASE/INPUTMGR.h>
+#include <BASE/display.h>
+#include <BASE/MonochromeCursor.h>
+
+#include <array>
 
 #define MOUSE_CURSOR_MASK_SHIFT 3
 #define MOUSE_MANAGER_SOURCE_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\MOUSEMGR.CPP"
@@ -34,6 +38,55 @@ static i32 gOldMouseLeft = 0;
 static i32 gOldMouseTop = 0;
 static i32 gOldMouseRight = 0;
 static i32 gOldMouseBottom = 0;
+static std::array<platform::MonochromeCursor, MOUSE_CURSOR_COUNT> gMonochromeCursors;
+static std::array<bool, MOUSE_CURSOR_COUNT> gMonochromeCursorLoaded {};
+static std::array<bool, MOUSE_CURSOR_COUNT> gMonochromeCursorUnavailable {};
+
+// A malformed monochrome cursor is not worth ending the game over: report it
+// once and show the system cursor for that pointer.
+static void RejectMonochromeCursor(i32 index, const char* filename, const char* reason) {
+    gMonochromeCursorUnavailable[index] = true;
+    char message[GLOBAL_TEXT_BUFFER_SIZE];
+    utf8::Format(message, sizeof(message), "Monochrome cursor %s: %s; using the system cursor.",
+                 filename, reason);
+    platform::Host().Log(platform::LogLevel::Warning, message);
+    platform::Video().ResetCursor();
+}
+
+// Rendering adapter only: role/frame selection is shared by both cursor modes
+// in mouseManager::SetPointer. Do not duplicate adventure/combat action logic here.
+static void SelectMonochromeCursor(MouseCursorType type, i32 frame, i32 index) {
+    auto& cursor = gMonochromeCursors[index];
+    if (gMonochromeCursorUnavailable[index]) {
+        platform::Video().ResetCursor();
+        return;
+    }
+    if (!gMonochromeCursorLoaded[index]) {
+        char filename[RESOURCE_NAME_CAPACITY];
+        const char* pattern = type == MOUSE_CURSOR_ADVENTURE
+            ? MOUSE_MANAGER_ADVENTURE_BITMAP
+            : type == MOUSE_CURSOR_SPELL ? MOUSE_MANAGER_SPELL_BITMAP : MOUSE_MANAGER_COMBAT_BITMAP;
+        utf8::Format(filename, pattern, frame + (type == MOUSE_CURSOR_SPELL ? 0 : 1));
+        const u32l id = gpResourceManager->MakeId(filename, 1);
+        std::array<u8, mouse_cursor::ResourceBytes> bytes {};
+        if (gpResourceManager->GetFileSize(id) != bytes.size()) {
+            RejectMonochromeCursor(index, filename, "unexpected resource size");
+            return;
+        }
+        gpResourceManager->PointToFile(id);
+        gpResourceManager->ReadBlock(bytes.data(), static_cast<u32l>(bytes.size()));
+        const platform::Point hotspot = type == MOUSE_CURSOR_SPELL
+            ? platform::Point{MOUSE_SPELL_CURSOR_HOTSPOT, MOUSE_SPELL_CURSOR_HOTSPOT}
+            : platform::Point{iHotSpot[index][MOUSE_CURSOR_HORIZONTAL], iHotSpot[index][MOUSE_CURSOR_VERTICAL]};
+        if (!mouse_cursor::Decode(bytes, hotspot, cursor)) {
+            RejectMonochromeCursor(index, filename, "invalid bitmap");
+            return;
+        }
+        gMonochromeCursorLoaded[index] = true;
+    }
+    platform::Video().SetMonochromeCursor(cursor);
+}
+
 b32 gbInSetPointer = false;
 b32 bInNewMouseUpdate = false;
 
@@ -116,7 +169,9 @@ void mouseManager::Close(void) {
     if (m_savedUnderlying != NULL)
         delete m_savedUnderlying;
     m_savedUnderlying = NULL;
+    platform::Video().ResetCursor();
     platform::Video().ShowCursor(true);
+    gMonochromeCursorLoaded.fill(false);
     if (m_cursorIcon != NULL)
         gpResourceManager->Dispose(m_cursorIcon);
     m_cursorIcon = NULL;
@@ -130,6 +185,8 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
     MouseCursorType type;
     if (m_forcePointerUpdate != 0)
         return;
+    if (frame == MOUSE_KEEP_CURRENT_FRAME)
+        frame = m_cursorFrame;
     {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
@@ -143,32 +200,37 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
         } else {
             type = cursorType;
         }
-        if (type != m_cursorType && (m_cursorType = type, gbColorMice != 0)) {
-            b32 saved82 = m_cursorReady;
+        const bool typeChanged = type != m_cursorType;
+        m_cursorType = type;
+        if (typeChanged && gbColorMice != 0) {
+            b32 wasCursorReady = m_cursorReady;
             m_cursorReady = false;
             if (m_cursorIcon != NULL)
                 gpResourceManager->Dispose(m_cursorIcon);
-            char local_10[RESOURCE_NAME_CAPACITY];
+            char cursorResourceName[RESOURCE_NAME_CAPACITY];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 utf8::Format(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_ADVENTURE_ICON
                 );
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 utf8::Format(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_SPELL_ICON
                 );
             else
                 utf8::Format(
-                    local_10,
+                    cursorResourceName,
                     MOUSE_MANAGER_COMBAT_ICON
                 );
-            m_cursorIcon = gpResourceManager->GetIcon(local_10);
+            m_cursorIcon = gpResourceManager->GetIcon(cursorResourceName);
             H2_ASSERT(frame != MOUSE_KEEP_CURRENT_FRAME);
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
-            m_cursorReady = saved82;
+            m_cursorReady = wasCursorReady;
         }
+        // Adventure/combat/spell can share a frame number but not an image.
+        if (typeChanged)
+            m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
         SetPointer(frame);
         gpResourceManager->RestorePosition();
         gbPutzingWithMouseCtr--;
@@ -202,7 +264,7 @@ void mouseManager::SetPointer(i32 frame) {
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
-        platform::Video().ShowCursor(true);
+        SelectMonochromeCursor(m_cursorType, frame, m_cursorSizeIndex);
     }
     gpResourceManager->RestorePosition();
     gbPutzingWithMouseCtr--;
@@ -237,10 +299,10 @@ void mouseManager::NewUpdate(i32 force) {
                 m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
             m_cursorBottom =
                 m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
-            if (m_cursorRight > MOUSE_SCREEN_WIDTH - 1)
-                m_cursorRight = MOUSE_SCREEN_WIDTH - 1;
-            if (m_cursorBottom > MOUSE_SCREEN_HEIGHT - 1)
-                m_cursorBottom = MOUSE_SCREEN_HEIGHT - 1;
+            if (m_cursorRight > LOGICAL_SCREEN_WIDTH - 1)
+                m_cursorRight = LOGICAL_SCREEN_WIDTH - 1;
+            if (m_cursorBottom > LOGICAL_SCREEN_HEIGHT - 1)
+                m_cursorBottom = LOGICAL_SCREEN_HEIGHT - 1;
             if (m_cursorLeft < 0)
                 m_savedLeft = 0;
             else
@@ -251,8 +313,8 @@ void mouseManager::NewUpdate(i32 force) {
                 m_savedTop = m_cursorTop;
 
             const b32 oldCursorWasVisible =
-                gOldMouseLeft <= MOUSE_SCREEN_WIDTH - 1
-                && gOldMouseTop <= MOUSE_SCREEN_HEIGHT - 1 && gOldMouseRight >= 0
+                gOldMouseLeft <= LOGICAL_SCREEN_WIDTH - 1
+                && gOldMouseTop <= LOGICAL_SCREEN_HEIGHT - 1 && gOldMouseRight >= 0
                 && gOldMouseBottom >= 0;
             const b32 cursorRegionsDoNotOverlap =
                 m_savedLeft > gOldMouseRight || m_cursorRight < gOldMouseLeft
@@ -260,10 +322,10 @@ void mouseManager::NewUpdate(i32 force) {
 
             if (!oldCursorWasVisible || cursorRegionsDoNotOverlap) {
                 if (oldCursorWasVisible) {
-                    if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
-                        gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
-                    if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
-                        gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
+                    if (gOldMouseRight > LOGICAL_SCREEN_WIDTH - 1)
+                        gOldMouseRight = LOGICAL_SCREEN_WIDTH - 1;
+                    if (gOldMouseBottom > LOGICAL_SCREEN_HEIGHT - 1)
+                        gOldMouseBottom = LOGICAL_SCREEN_HEIGHT - 1;
                     BlitBitmapToScreenNoMouseCheck(
                         gpWindowManager->m_screen,
                         gOldMouseLeft,
@@ -295,23 +357,23 @@ void mouseManager::NewUpdate(i32 force) {
                         m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
             }
 
-            if (gOldMouseLeft > MOUSE_SCREEN_WIDTH - 1 || gOldMouseTop > MOUSE_SCREEN_HEIGHT - 1
+            if (gOldMouseLeft > LOGICAL_SCREEN_WIDTH - 1 || gOldMouseTop > LOGICAL_SCREEN_HEIGHT - 1
                 || gOldMouseRight < 0 || gOldMouseBottom < 0)
                 goto finishUpdate;
 
-            if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
-                gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
-            if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
-                gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
+            if (gOldMouseRight > LOGICAL_SCREEN_WIDTH - 1)
+                gOldMouseRight = LOGICAL_SCREEN_WIDTH - 1;
+            if (gOldMouseBottom > LOGICAL_SCREEN_HEIGHT - 1)
+                gOldMouseBottom = LOGICAL_SCREEN_HEIGHT - 1;
 
             if (m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
-                > MOUSE_SCREEN_WIDTH)
-                m_savedWidth = MOUSE_SCREEN_WIDTH - m_savedLeft;
+                > LOGICAL_SCREEN_WIDTH)
+                m_savedWidth = LOGICAL_SCREEN_WIDTH - m_savedLeft;
             else
                 m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
             if (m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
-                > MOUSE_SCREEN_HEIGHT)
-                m_savedHeight = MOUSE_SCREEN_HEIGHT - m_savedTop;
+                > LOGICAL_SCREEN_HEIGHT)
+                m_savedHeight = LOGICAL_SCREEN_HEIGHT - m_savedTop;
             else
                 m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
 
@@ -334,8 +396,8 @@ void mouseManager::NewUpdate(i32 force) {
                     ICON_DRAW_CLIP,
                     0,
                     0,
-                    MOUSE_SCREEN_WIDTH,
-                    MOUSE_SCREEN_HEIGHT,
+                    LOGICAL_SCREEN_WIDTH,
+                    LOGICAL_SCREEN_HEIGHT,
                     0
                 );
             BlitBitmapToScreenNoMouseCheck(
@@ -372,13 +434,13 @@ void mouseManager::MouseCoords(i32& x, i32& y) {
 
 void mouseManager::SaveAndDraw(void) {
     if (m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
-        > MOUSE_SCREEN_WIDTH)
-        m_savedWidth = MOUSE_SCREEN_WIDTH - m_cursorLeft;
+        > LOGICAL_SCREEN_WIDTH)
+        m_savedWidth = LOGICAL_SCREEN_WIDTH - m_cursorLeft;
     else
         m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
     if (m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
-        > MOUSE_SCREEN_HEIGHT)
-        m_savedHeight = MOUSE_SCREEN_HEIGHT - m_cursorTop;
+        > LOGICAL_SCREEN_HEIGHT)
+        m_savedHeight = LOGICAL_SCREEN_HEIGHT - m_cursorTop;
     else
         m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
     gpWindowManager->m_screen->CopyToCareful(
@@ -399,8 +461,8 @@ void mouseManager::SaveAndDraw(void) {
         ICON_DRAW_CLIP,
         0,
         0,
-        MOUSE_SCREEN_WIDTH,
-        MOUSE_SCREEN_HEIGHT,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
         0
     );
 }
@@ -467,8 +529,16 @@ void mouseManager::CheckUpdateMousePos(void) {
 void mouseManager::SetColorMice(b32 enabled) {
     if (enabled == gbColorMice)
         return;
+    // Resource loading can fail before the first cursor has been selected.
+    // Do not reload the initial -1 type through iMouseOffset during shutdown.
+    if (!m_active || H2EnumIndex(m_cursorType) < 0
+        || H2EnumIndex(m_cursorType) >= MOUSE_CURSOR_TYPE_SLOT_COUNT) {
+        gbColorMice = enabled;
+        platform::Video().ShowCursor(enabled == 0);
+        return;
+    }
     {
-        i32 savedWM56 = gpWindowManager->m_updateFlags;
+        i32 savedWindowUpdateFlags = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         gbPutzingWithMouseCtr++;
         b32 wasInNew = bInNewMouseUpdate;
@@ -477,7 +547,7 @@ void mouseManager::SetColorMice(b32 enabled) {
         m_cursorReady = false;
         i32 savedX = m_cursorFrame;
         MouseCursorType oldType = m_cursorType;
-        b32 saved7e = m_forcePointerUpdate;
+        b32 savedForcePointerUpdate = m_forcePointerUpdate;
         gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
@@ -487,11 +557,11 @@ void mouseManager::SetColorMice(b32 enabled) {
             savedX,
             oldType
         );
-        m_forcePointerUpdate = saved7e;
+        m_forcePointerUpdate = savedForcePointerUpdate;
         m_cursorReady = true;
         ReallyShowPointer();
         bInNewMouseUpdate = wasInNew;
         gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
-        gpWindowManager->m_updateFlags = savedWM56;
+        gpWindowManager->m_updateFlags = savedWindowUpdateFlags;
     }
 }

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 #include <SDL3/SDL.h>
 
@@ -25,6 +26,13 @@ public:
     void Blit(const Rect& source, Point destination) override;
     void Present() override;
     void ShowCursor(bool visible) override;
+    bool SetMonochromeCursor(const MonochromeCursor& cursor) override;
+    void ResetCursor() override;
+
+    DisplaySettings Settings() const override;
+    bool SetFullscreen(bool fullscreen) override;
+    bool SetScaling(Scaling scaling) override;
+    bool SetVSync(bool enabled) override;
 
     SDL_Window* Window() const { return m_window; }
     SDL_Renderer* Renderer() const { return m_renderer; }
@@ -34,11 +42,19 @@ private:
     bool CreateTexture();
     void MaybeCapture();
     void LogPresentationFailure();
+    void UpdateTitle();
 
     SDL_Window* m_window = nullptr;
     SDL_Renderer* m_renderer = nullptr;
     SDL_Texture* m_texture = nullptr;
+    struct CachedCursor {
+        MonochromeCursor image;
+        SDL_Cursor* handle;
+    };
+    std::vector<CachedCursor> m_cursors;
     Size m_size;
+    std::string m_title;
+    Scaling m_scaling = Scaling::Nearest;
     std::vector<std::uint8_t> m_indexed;
     std::vector<std::uint8_t> m_presented;
     std::vector<std::uint32_t> m_expanded;

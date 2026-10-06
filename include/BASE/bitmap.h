@@ -7,7 +7,6 @@
 enum class BitmapType : i16 {
     BITMAP_TYPE_NONE           = 0,
     BITMAP_TYPE_MEMORY         = 0x21,
-    COMBAT_MISSILE_BITMAP_TYPE = BITMAP_TYPE_MEMORY
 };
 using enum BitmapType;
 
@@ -26,7 +25,7 @@ public:
     void DrawToBuffer(i16 x, i16 y);
     void DrawToScreen(i16 x, i16 y);
     void GrabScreen(i16 x, i16 y);
-    void GrabBitmap(class bitmap* src, i16 x, i16 y);
+    void GrabBitmap(class bitmap* source, i16 x, i16 y);
     void GrabBitmapCareful(class bitmap* source, i16 x, i16 y);
     void CopyTo(
         class bitmap* destination,

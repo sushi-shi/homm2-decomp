@@ -4,18 +4,20 @@
 #include <Ints.h>
 #include <BASE/message.h>
 
-enum class CDRomSetupResult : i32;
 
 class bitmap;
 class heroWindow;
 class icon;
 struct tag_message;
 
-typedef enum MiscRecordConstant {
-    MEM_ENTRY_FILE_CAPACITY    = 0x3d,
+typedef enum MemoryDebugRecordConstant {
+    MEM_ENTRY_FILE_CAPACITY = 0x3d,
+} MemoryDebugRecordConstant;
+
+typedef enum PcxHeaderConstant {
     PCX_HEADER_PALETTE16_BYTES = 48,
-    PCX_HEADER_FILLER_BYTES    = 54
-} MiscRecordConstant;
+    PCX_HEADER_FILLER_BYTES    = 54,
+} PcxHeaderConstant;
 
 typedef enum LogConstant {
     LOG_UNUSED_VALUE = -999
@@ -24,7 +26,7 @@ typedef enum LogConstant {
 
 #define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
 #define INTEGER_VECTOR_LENGTH(dx, dy) \
-    (static_cast<i32>(sqrt(static_cast<double>((dx) * (dx) + (dy) * (dy)))))
+    (static_cast<i32>(sqrt((dx) * (dx) + (dy) * (dy))))
 
 struct indexArray {
     u16 key;
@@ -70,7 +72,7 @@ struct PCXHeader {
 
 void InitMemEntry(void);
 void* BaseAlloc(u32 size, const char* originalFile, i32 originalLine);
-void BaseFree(void* ptr, const char* originalFile, i32 originalLine);
+void BaseFree(void* pointer, const char* originalFile, i32 originalLine);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
 u32l MAKEFILEID(const char* text);
@@ -108,16 +110,13 @@ const char* FindLastToken(const char* text, char token);
 void SetInstallDefaults(void);
 void SetGameDefaults(void);
 void ReadPrefsFromFile(void);
-void ReadPrefsFromRegistry(void);
 void ReadPrefs(void);
 void WritePrefsToFile(void);
-void WritePrefsToRegistry(void);
 void WritePrefs(void);
-CDRomSetupResult SetupCDDrive(void);
-void BitmapToScreen(class bitmap* bmp);
+void BitmapToScreen(class bitmap* image);
 void SetPalette(i8* paletteData, i32 updateDisplay);
-void BlitBitmapToScreenNoMouseCheck(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
-void BlitBitmapToScreen(class bitmap* bmp, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
+void BlitBitmapToScreenNoMouseCheck(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
+void BlitBitmapToScreen(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
 void LogTruncate(void);
 void LogStr(const char* text);
 void LogInt(
@@ -150,7 +149,7 @@ void FadeToColorTable(u8* colorTable, i32 increment);
 i32 IsCycleColor(i32 color);
 void CreatePCXFile(const char* filename, u8* pixels, i32 width, i32 height, u8* paletteData);
 i32l FileSize(const char* filename);
-struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index);
+struct IconEntry* GetIconEntry(class icon* iconPointer, i32 index);
 i32 SRandom(i32 low, i32 high);
 void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);

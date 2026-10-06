@@ -18,7 +18,7 @@ public:
     fullMap(void);
     ~fullMap();
     void Close(void);
-    void Init(i32 w, i32 h);
+    void Init(i32 mapWidth, i32 mapHeight);
     void ClearCellExtra(i32 index);
     i32 GetNewCellExtraIndex(void);
     struct mapCellExtra* GetNewCellExtraOverlay(i32 x, i32 y);
