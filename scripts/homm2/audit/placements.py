@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import bisect
 import csv
+import hashlib
 import json
 import re
 from collections import Counter, defaultdict
@@ -39,9 +40,21 @@ from homm2.core.pe import Pe
 FILL = (0x90, 0xCC)
 #: Compiler-private literal names derived from the game's own layout.
 LAYOUT_NAMED = re.compile(r"^(?:\$SG|\$T|\?\?_C@|const_|string_|data_|bss_)")
+#: A string literal named by the SHA-256 of its bytes (`homm2.retail_labels.name_strings`).
+ANON_STR = re.compile(r"^\$anon_str_([0-9a-f]{64})_[0-9]+$")
 #: The identification modules of a game claim (runtime members, import
 #: thunks): not reconstruction targets in either program.
 IDENTIFIED_MODULES = ("(libcmt)", "(imports)")
+
+
+#: A function-local static: `?name@?<scope>??<function>`; VC6 numbers the
+#: scope per compile (`?BP@`), the claims spell the source scope (`?1`).
+LOCAL_STATIC = re.compile(r"^_?(\?[^@]+@\?)(?:[0-9]|[A-P]+@)(\?\?.*)$")
+
+
+def _local_static_key(name: str) -> str:
+    match = LOCAL_STATIC.match(name)
+    return f"{match.group(1)}#@{match.group(2)}" if match else name
 
 
 def _text(pe: Pe) -> tuple[bytes, int]:
@@ -294,9 +307,210 @@ class Placer:
             (erva, n), = counter.items()
             if self.pe.read(erva, 1) is None:
                 continue
+            if not self._same_content_name(by_rva[grva]["name"], erva):
+                continue
             self.data[grva] = (erva, f"{n} field(s) of placed bodies")
+        self.place_variant_users(data)
         self.place_pointees(data, owner)
         self.place_bracketed(data)
+        self.place_by_candidate_sections(data)
+
+    def _same_content_name(self, name: str, erva: int) -> bool:
+        """A content-named string (`$anon_str_<sha256 of its bytes>_<n>`) names
+        the image's cell only when the cell holds those bytes: a variant
+        literal (the editor's own assertion path) keeps its own content name."""
+        match = ANON_STR.match(name)
+        if match is None or self.eva <= erva < self.eva + len(self.etext):
+            return True         # a code label the game's string pass misnamed
+        raw = self.pe.read(erva, 1)
+        text = b""
+        while raw not in (None, b"\0"):
+            text += raw
+            raw = self.pe.read(erva + len(text), 1)
+        return raw is not None and hashlib.sha256(text + b"\0").hexdigest() == match.group(1)
+
+    def _same_datum(self, claim, erva: int) -> bool:
+        """The datum's game bytes, pointer fields masked on both sides, equal
+        the image's bytes at the candidate address."""
+        size = claim["size"]
+        gbytes, ebytes = self.game.read(claim["rva"], size), self.pe.read(erva, size)
+        if not size or gbytes is None or ebytes is None:
+            return False
+        gmask, emask = bytearray(gbytes), bytearray(ebytes)
+        i = bisect.bisect_left(self.gsites, claim["rva"] - 3)
+        for site in self.gsites[i:]:
+            if site >= claim["rva"] + size:
+                break
+            for k in range(max(0, site - claim["rva"]), min(size, site - claim["rva"] + 4)):
+                gmask[k] = emask[k] = 0
+        return gmask == emask
+
+    def place_variant_users(self, data) -> None:
+        """A shared unit's own body in this image (`VA_AT`: an editor variant
+        such as kbwin's AppWndProc) is a code user as well, once its compiled
+        object equals the image: every DIR32 field of the candidate object
+        names its datum, and the image field at the same body offset gives the
+        datum's address. All users must agree."""
+        from homm2.core.coff import CoffObject
+        from homm2.core.paths import gen_dir, image_build
+        symbols = gen_dir(self.image) / "symbol_names.csv"
+        if not symbols.is_file():
+            return
+        shared = {c["unit"] for c in self.claims if c["kind"] == "func"}
+        variants = [r for r in csv.DictReader(open(symbols))
+                    if r["kind"] == "func" and r["unit"] in shared
+                    and r["provenance"] == f"source-annotation:{self.image}"]
+        by_name = defaultdict(list)
+        for c in data:
+            by_name[_local_static_key(c["name"])].append(c)
+        votes: dict[int, Counter] = defaultdict(Counter)
+        for row in variants:
+            path = image_build(self.image) / "objdiff/base" / f"{row['unit']}.obj"
+            if not path.is_file():
+                continue
+            coff = CoffObject(path.read_bytes())
+            symbol = next((sym for sym in coff.symbols.values()
+                           if sym.name == row["name"] and sym.section > 0), None)
+            if symbol is None:
+                continue
+            section = coff.sections[symbol.section - 1]
+            ends = [sym.value for sym in coff.symbols.values()
+                    if sym.section == symbol.section and sym.typ == 0x20
+                    and sym.value > symbol.value]
+            body = coff.section_bytes(section)[symbol.value:min(ends, default=section.raw_size)]
+            rva = int(row["rva"], 16)
+            relocs = [r for r in coff.relocations if r.section == symbol.section
+                      and symbol.value <= r.site < symbol.value + len(body)]
+            image = self.pe.read(rva, len(body))
+            if image is None or len(body) != int(row["size"], 16):
+                continue
+            masked = bytearray(body), bytearray(image)
+            for r in relocs:
+                for k in range(r.site - symbol.value, r.site - symbol.value + 4):
+                    masked[0][k] = masked[1][k] = 0
+            if masked[0] != masked[1]:
+                continue        # not yet exact: its fields prove nothing
+            for r in relocs:
+                if r.typ != 0x6:
+                    continue
+                target = _local_static_key(coff.symbols[r.symbol_index].name)
+                claims = [c for c in by_name.get(target, ())
+                          if c["unit"] == row["unit"]] or by_name.get(target, [])
+                if len(claims) != 1:
+                    continue
+                offset = r.site - symbol.value
+                addend = int.from_bytes(body[offset:offset + 4], "little")
+                field = int.from_bytes(image[offset:offset + 4], "little") - self.base
+                votes[claims[0]["rva"]][field - addend] += 1
+        for grva, counter in votes.items():
+            if grva in self.data:
+                (erva, _n), = counter.most_common(1)
+                if len(counter) != 1 or erva != self.data[grva][0]:
+                    self.problems.append(f"data 0x{grva:x}: variant users disagree")
+                continue
+            if len(counter) != 1:
+                self.problems.append(f"data 0x{grva:x}: variant users disagree")
+                continue
+            (erva, n), = counter.items()
+            self.data[grva] = (erva, f"{n} field(s) of this image's exact variant bodies")
+
+    def place_by_candidate_sections(self, data) -> None:
+        """This image's own compile of a shared unit fixes each data section's
+        layout (the editor's kbwin titles are longer than the game's, so the
+        game's offsets do not carry over). A section whose placed members all
+        give one base places its other members at their candidate offsets
+        when their candidate bytes equal the image's, relocated fields masked."""
+        from homm2.core.coff import CoffObject
+        from homm2.core.paths import image_build
+        shared = sorted({c["unit"] for c in self.claims if c["kind"] == "func"})
+        by_unit_name = {(c["unit"], c["name"]): c for c in data}
+        for unit in shared:
+            path = image_build(self.image) / "objdiff/base" / f"{unit}.obj"
+            if not path.is_file():
+                continue
+            coff = CoffObject(path.read_bytes())
+            for section in coff.sections:
+                if section.characteristics & 0x20000000 or section.name not in (
+                        ".data", ".bss", ".rdata"):
+                    continue
+                members = [(sym, by_unit_name.get((unit, sym.name)))
+                           for sym in coff.symbols.values()
+                           if sym.section == section.index and sym.storage_class in (2, 3)
+                           and not sym.name.startswith(".")]
+                members = [(sym, claim) for sym, claim in members if claim is not None]
+                bases = {self.data[claim["rva"]][0] - sym.value
+                         for sym, claim in members if claim["rva"] in self.data}
+                if len(bases) != 1:
+                    continue
+                (base,) = bases
+                raw = coff.section_bytes(section)
+                fields = {r.site for r in coff.relocations if r.section == section.index}
+                for sym, claim in members:
+                    if claim["rva"] in self.data or not claim["size"]:
+                        continue
+                    size = claim["size"]
+                    candidate = bytearray(raw[sym.value:sym.value + size])
+                    image = self.pe.read(base + sym.value, size)
+                    if image is None or len(candidate) != size:
+                        continue
+                    image = bytearray(image)
+                    for site in fields:
+                        for k in range(site - sym.value, site - sym.value + 4):
+                            if 0 <= k < size:
+                                candidate[k] = image[k] = 0
+                    if candidate != image:
+                        continue
+                    self.data[claim["rva"]] = (
+                        base + sym.value, f"{unit} candidate section layout, bytes equal")
+
+    def place_bracketed(self, data) -> None:
+        """Data nothing addresses (`i32 iCurSwapPalette = 0;`) still sit in
+        their object's section: a run of a unit's unplaced data is placed when
+        the unit's data immediately before and after the run are placed with
+        one delta and every datum's bytes equal the game's. An object's
+        section moves as a block."""
+        i = 0
+        while i < len(data):
+            if data[i]["rva"] in self.data:
+                i += 1
+                continue
+            j = i
+            while j < len(data) and data[j]["rva"] not in self.data:
+                j += 1
+            run = data[i:j]
+            i = j
+            if i - len(run) == 0 or j >= len(data):
+                continue
+            before, after = data[i - len(run) - 1], data[j]
+            unit = before["unit"]
+            if after["unit"] != unit or any(c["unit"] != unit for c in run):
+                continue
+            delta = self.data[before["rva"]][0] - before["rva"]
+            if self.data[after["rva"]][0] - after["rva"] != delta:
+                continue
+            ends = [c["rva"] + c["size"] for c in (before, *run)]
+            starts = [c["rva"] for c in (*run, after)]
+            if any(end > start for end, start in zip(ends, starts)):
+                continue
+            if not all(c["size"] and self._same_datum(c, c["rva"] + delta) for c in run):
+                continue
+            for c in run:
+                self.data[c["rva"]] = (c["rva"] + delta,
+                                       "between its unit's placed neighbours, bytes equal")
+
+    def _same_content_name(self, name: str, erva: int) -> bool:
+        """A content-named string (`$anon_str_<sha256 of its bytes>_<n>`) names
+        the image's cell only when the cell holds those bytes: a variant
+        literal (the editor's own assertion path) keeps its own content name."""
+        match = ANON_STR.match(name)
+        if match is None or self.eva <= erva < self.eva + len(self.etext):
+            return True         # a code label the game's string pass misnamed
+        raw = self.pe.read(erva, 1)
+        text = b""
+        while raw not in (None, b"\0"):
+            text += raw
+            raw = self.pe.read(erva + len(text), 1)
+        return raw is not None and hashlib.sha256(text + b"\0").hexdigest() == match.group(1)
 
     def _same_datum(self, claim, erva: int) -> bool:
         """The datum's game bytes, pointer fields masked on both sides, equal
