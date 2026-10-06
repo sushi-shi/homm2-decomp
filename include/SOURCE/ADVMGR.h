@@ -5,9 +5,33 @@
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 class mapCell;
 struct tag_message;
+
+typedef enum AdventureViewportConstant {
+    ADVENTURE_VIEWPORT_EXTENT = 480
+} AdventureViewportConstant;
+
+
+#define DRAW_ADVENTURE_ICON(pic, x, y, frame, clip)                                                \
+    IconToBitmap(                                                                                  \
+        (pic),                                                                                     \
+        gpWindowManager->m_screen,                                                                 \
+        (x),                                                                                       \
+        (y),                                                                                       \
+        (frame),                                                                                   \
+        (clip),                                                                                    \
+        0,                                                                                         \
+        0,                                                                                         \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        0                                                                                          \
+    )
+#define DRAW_FLIPPED_ADVENTURE_ICON(pic, x, y, frame, clip) \
+    FlipIconToBitmap((pic), gpWindowManager->m_screen, (x), (y), (frame), (clip), \
+                     0, 0, ADVENTURE_VIEWPORT_EXTENT, ADVENTURE_VIEWPORT_EXTENT, 0)
 
 typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
@@ -17,7 +41,6 @@ typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_COMMAND_PLAYER_EXIT      = 31,
     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
-    ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = 16
 } AdventureRemoteConstant;
 
 typedef enum AdventureBottomViewSharedConstant {
@@ -95,7 +118,6 @@ typedef enum AdventureSystemOptionsConstant {
     ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE        = 18,
     ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE       = 20,
     ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET          = 10,
-    ADVMGR_SYSTEM_OPTIONS_DRAW_MASK               = 0x7fff
 } AdventureSystemOptionsConstant;
 
 typedef enum AdventureAIStorageConstant {
@@ -104,17 +126,17 @@ typedef enum AdventureAIStorageConstant {
 } AdventureAIStorageConstant;
 
 i32 SaveGame(void);
-MessageDispatchResult DimensionDoorHandler(struct tag_message&);
-MessageDispatchResult TownPortalHandler(struct tag_message&);
+MessageDispatchResult DimensionDoorHandler(struct tag_message& message);
+MessageDispatchResult TownPortalHandler(struct tag_message& message);
 void ComputeAdvNetControl(void);
-i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
-MessageDispatchResult APanelHandler(struct tag_message&);
-MessageDispatchResult CPanelHandler(struct tag_message&);
-void UpdateSystemOptions(i32);
-MessageDispatchResult SystemOptionsHandler(struct tag_message&);
-i32 GetMobilityFrame(i32);
-i32 GetManaFrame(i32);
-u8 StopOnTrigger(class mapCell*);
+i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask);
+MessageDispatchResult APanelHandler(struct tag_message& message);
+MessageDispatchResult CPanelHandler(struct tag_message& message);
+void UpdateSystemOptions(i32 initialDraw);
+MessageDispatchResult SystemOptionsHandler(struct tag_message& message);
+i32 GetMobilityFrame(i32 mobility);
+i32 GetManaFrame(i32 mana);
+u8 StopOnTrigger(class mapCell* cell);
 
 extern float fFirstWeekTownFV;
 extern i32 iVepCacheHits;

@@ -15,10 +15,6 @@ typedef enum MidiVolumeConstant {
 } MidiVolumeConstant;
 
 i32 CurrentMidiFile = MIDI_NO_TRACK;
-u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
-                                 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 u8 gMusicFlagA = 0;
 u8 gMusicFlagB = 0;
 
@@ -42,7 +38,7 @@ void MIDIShutdown(void) {
 void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
     if (!GetMusicFlagA() || gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    if (midiTrack < 0 || bGotMidi[midiTrack] == 0) {
+    if (midiTrack < 0 || midiTrack >= MIDI_TRACK_COUNT) {
         MIDIStop(currentTrack);
         return;
     }

@@ -200,7 +200,7 @@ bool IsUserState(const char* retailPath) {
     if (slash == std::string::npos) {
         // Preferences, screenshots, and the debug log are things the game
         // produces, not things the installation came with.
-        return path == "HEROES2.CFG" || path.ends_with(".PCX") || path.ends_with(".LOG");
+        return path == "HEROES2.CFG" || path == "HEROES2.DISPLAY" || path.ends_with(".PCX") || path.ends_with(".LOG");
     }
 
     if (!Under(path, "DATA")) {

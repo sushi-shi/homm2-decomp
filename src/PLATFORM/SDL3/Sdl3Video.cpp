@@ -8,6 +8,10 @@
 #include <cstring>
 #include <limits>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/html5.h>
+#endif
+
 namespace platform::sdl3 {
 
 Video::~Video() {
@@ -22,7 +26,8 @@ bool Video::Open(const DisplayMode& mode) {
     }
 
     const int scale = mode.scale > 0 ? mode.scale : 2;
-    if (mode.width > std::numeric_limits<int>::max() / scale
+    if (mode.width > std::numeric_limits<int>::max() / static_cast<int>(sizeof(std::uint32_t))
+        || mode.width > std::numeric_limits<int>::max() / scale
         || mode.height > std::numeric_limits<int>::max() / scale
         || static_cast<std::size_t>(mode.height)
                > std::numeric_limits<std::size_t>::max()
@@ -38,21 +43,18 @@ bool Video::Open(const DisplayMode& mode) {
     m_videoInitialized = true;
 
     m_size = {mode.width, mode.height};
+    m_scaling = Scaling::Nearest;
+    m_title = mode.title != nullptr ? mode.title : "Heroes of Might and Magic II";
     const int windowWidth = mode.width * scale;
     const int windowHeight = mode.height * scale;
     m_window = SDL_CreateWindow(
-        mode.title != nullptr ? mode.title : "Heroes of Might and Magic II",
+        m_title.c_str(),
         windowWidth,
         windowHeight,
         SDL_WINDOW_RESIZABLE
     );
     if (m_window == nullptr) {
         std::fprintf(stderr, "[homm2] SDL_CreateWindow: %s\n", SDL_GetError());
-        Close();
-        return false;
-    }
-    if (mode.fullscreen && !SDL_SetWindowFullscreen(m_window, true)) {
-        std::fprintf(stderr, "[homm2] SDL_SetWindowFullscreen: %s\n", SDL_GetError());
         Close();
         return false;
     }
@@ -91,6 +93,15 @@ bool Video::Open(const DisplayMode& mode) {
     std::fill_n(m_palette, 256, 0u);
     m_frame = 0;
     m_presentationFailureLogged = false;
+    if (!SetScaling(mode.scaling)) {
+        Close();
+        return false;
+    }
+    if (mode.vsync) SetVSync(true);
+#ifndef __EMSCRIPTEN__
+    // Browsers require a user gesture; only native startup restores fullscreen.
+    if (mode.fullscreen) SetFullscreen(true);
+#endif
     return true;
 }
 
@@ -129,13 +140,72 @@ bool Video::CreateTexture() {
         std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
         return false;
     }
-    if (!SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST)) {
+    if (!SDL_SetTextureScaleMode(m_texture, m_scaling == Scaling::Linear
+            ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST)) {
         std::fprintf(stderr, "[homm2] SDL_SetTextureScaleMode: %s\n", SDL_GetError());
         SDL_DestroyTexture(m_texture);
         m_texture = nullptr;
         return false;
     }
     return true;
+}
+
+DisplaySettings Video::Settings() const {
+    DisplaySettings settings;
+    settings.scaling = m_scaling;
+    if (m_window != nullptr)
+        settings.fullscreen = (SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) != 0;
+    int interval = 0;
+    if (m_renderer != nullptr && SDL_GetRenderVSync(m_renderer, &interval))
+        settings.vsync = interval != 0;
+    return settings;
+}
+
+bool Video::SetFullscreen(bool fullscreen) {
+    if (m_window == nullptr) return false;
+    if (!SDL_SetWindowFullscreen(m_window, fullscreen)) {
+        std::fprintf(stderr, "[homm2] fullscreen unavailable: %s\n", SDL_GetError());
+        return false;
+    }
+#ifndef __EMSCRIPTEN__
+    if (!SDL_SyncWindow(m_window) || Settings().fullscreen != fullscreen) {
+        std::fprintf(stderr, "[homm2] fullscreen request was not applied: %s\n", SDL_GetError());
+        return false;
+    }
+#endif
+    UpdateTitle();
+    Present();
+    return true;
+}
+
+bool Video::SetScaling(Scaling scaling) {
+    if (m_renderer == nullptr || m_texture == nullptr) return false;
+    if (scaling != Scaling::Nearest && scaling != Scaling::Linear
+        && scaling != Scaling::Integer) return false;
+    const SDL_ScaleMode filter = scaling == Scaling::Linear
+        ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST;
+    if (!SDL_SetTextureScaleMode(m_texture, filter)) return false;
+    if (!SDL_SetRenderLogicalPresentation(m_renderer, m_size.width, m_size.height,
+            scaling == Scaling::Integer ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE
+                                       : SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
+        SDL_SetTextureScaleMode(m_texture, m_scaling == Scaling::Linear
+            ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+        return false;
+    }
+    m_scaling = scaling;
+    UpdateTitle();
+    Present();
+    return true;
+}
+
+bool Video::SetVSync(bool enabled) {
+    if (m_renderer == nullptr) return false;
+    if (!SDL_SetRenderVSync(m_renderer, enabled ? 1 : 0)) {
+        std::fprintf(stderr, "[homm2] VSync unavailable: %s\n", SDL_GetError());
+        return false;
+    }
+    UpdateTitle();
+    return Settings().vsync == enabled;
 }
 
 bool Video::HandleRenderEvent(Uint32 type, SDL_WindowID windowId) {
@@ -156,6 +226,7 @@ bool Video::HandleRenderEvent(Uint32 type, SDL_WindowID windowId) {
         }
         m_presentationFailureLogged = false;
     }
+    UpdateTitle();
     Present();
     return true;
 }
@@ -215,6 +286,34 @@ void Video::Present() {
     if (m_renderer == nullptr || m_texture == nullptr) {
         return;
     }
+
+#ifdef __EMSCRIPTEN__
+    // Fullscreen exit restores the canvas backing store after SDL's resize
+    // callback. CSS may give SDL a different window size; reconcile those
+    // dimensions at presentation time, once the browser has finished restoring.
+    int canvasWidth = 0, canvasHeight = 0;
+    int pixelWidth = 0, pixelHeight = 0;
+    const char* canvas = SDL_GetStringProperty(SDL_GetWindowProperties(m_window),
+        SDL_PROP_WINDOW_EMSCRIPTEN_CANVAS_ID_STRING, "#canvas");
+    if (emscripten_get_canvas_element_size(canvas, &canvasWidth, &canvasHeight)
+            != EMSCRIPTEN_RESULT_SUCCESS
+        || !SDL_GetWindowSizeInPixels(m_window, &pixelWidth, &pixelHeight)) {
+        SDL_SetError("could not read browser canvas dimensions");
+        LogPresentationFailure();
+        return;
+    }
+    if (canvasWidth != pixelWidth || canvasHeight != pixelHeight) {
+        int width = 0, height = 0;
+        if (!SDL_GetWindowSize(m_window, &width, &height)
+            || !SDL_SetWindowSize(m_window, width, height)
+            || !SDL_SetRenderLogicalPresentation(m_renderer, m_size.width, m_size.height,
+                m_scaling == Scaling::Integer ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE
+                                             : SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
+            LogPresentationFailure();
+            return;
+        }
+    }
+#endif
 
     const std::size_t count = m_presented.size();
     const std::uint8_t* source = m_presented.data();
@@ -284,6 +383,16 @@ void Video::MaybeCapture() {
     if (!written) {
         std::fprintf(stderr, "[homm2] unable to write screenshot: %s\n", path);
     }
+}
+
+void Video::UpdateTitle() {
+    if (m_window == nullptr) return;
+    const DisplaySettings settings = Settings();
+    const char* scale = settings.scaling == Scaling::Nearest ? "nearest"
+        : settings.scaling == Scaling::Linear ? "linear" : "integer";
+    const std::string title = m_title + (settings.fullscreen ? " - fullscreen" : " - windowed")
+        + " | " + scale + (settings.vsync ? " | VSync on" : " | VSync off");
+    SDL_SetWindowTitle(m_window, title.c_str());
 }
 
 void Video::LogPresentationFailure() {

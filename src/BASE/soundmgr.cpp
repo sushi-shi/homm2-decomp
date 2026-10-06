@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <string.h>
 #include <vector>
-
+#include <BASE/baseManager.h>
 typedef enum SoundConstant {
     SAMPLE_VOLUME_MAX          = 0x40,
     MIDI_VOLUME_MAX            = 0x7f,
@@ -159,7 +159,7 @@ i32 soundManager::Open(i32) {
     }
 
     m_messageMask = BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP;
-    m_priority = SOUND_MANAGER_PRIORITY;
+    m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_active = true;
     strcpy(m_name, "soundManager");
     return 0;
@@ -327,7 +327,7 @@ void soundManager::MemorySample(class sample* sampleResource) {
     sound.sampleRate = H2EnumIndex(playback.sampleRate);
     sound.channels = playback.stereo != 0 ? 2 : 1;
     sound.bitsPerSample = playback.sampleFormat == FORMAT_16_BIT ? 16 : 8;
-    const i32 loops = playback.loopCount != 0 ? -1 : 0;
+    const i32 loops = playback.looping != 0 ? -1 : 0;
     playback.activeSample = platform::Audio().PlaySound(
         sound,
         ConvertVolume(playback.volume, SOUND_VOLUME_EFFECT),
