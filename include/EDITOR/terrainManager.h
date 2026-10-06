@@ -116,7 +116,5 @@ extern TerrainButtonPosition gTerrainButtonPositions[IDX(TERRAIN_COUNT)];
 // The terrain the tool last selected; Open restores it.
 extern H2_ENUM_STORAGE(TerrainType, i32) gTerrainChoice;
 extern i32 gTerrainCursorMoves;
-// Right-click help for the terrain and brush buttons (EDITOR's text table).
-extern H2_CONST char* gTerrainHelp[];
 
 #endif

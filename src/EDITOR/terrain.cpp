@@ -6,6 +6,7 @@
 #include <EDITOR/terrainManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/clearManager.h>
+#include <EDITOR/EDITOR.h>
 #include <BASE/border.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>

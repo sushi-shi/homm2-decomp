@@ -64,11 +64,14 @@ include/BASE/tileset.h	pending
 include/BASE/widget.h	pending	
 include/BASE/widgetKind.h	pending	
 include/EDITOR/EDITOR.h	pending	
+include/EDITOR/RANDOM.h	pending	
 include/EDITOR/clearManager.h	pending	
 include/EDITOR/editManager.h	pending	
 include/EDITOR/fullMap.h	pending	
 include/EDITOR/mapcell.h	pending	
+include/EDITOR/overlayType.h	pending	
 include/EDITOR/setup.h	pending	
+include/EDITOR/terrainManager.h	pending	
 include/SOURCE/ADVMGR.h	pending	
 include/SOURCE/ADVMGR_TYPES.h	pending	
 include/SOURCE/ARMY.h	pending	
@@ -185,7 +188,9 @@ src/BASE/miscwin.cpp	pending
 src/BASE/soundmgr.cpp	pending	
 src/EDITOR/CLEARMGR.cpp	pending	
 src/EDITOR/EDITOR.cpp	pending	
+src/EDITOR/RANDOM.cpp	pending	
 src/EDITOR/mapcell.cpp	pending	
+src/EDITOR/terrain.cpp	pending	
 src/SOURCE/ADVMGR.cpp	pending	
 src/SOURCE/AI.cpp	pending	
 src/SOURCE/ARMY.cpp	pending	
