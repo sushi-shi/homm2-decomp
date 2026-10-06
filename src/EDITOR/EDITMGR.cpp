@@ -8,6 +8,9 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
 #include <EDITOR/townedit.h>
+#include <EDITOR/lineManager.h>
+#include <SOURCE/fileRequester.h>
+#include <BASE/executive.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -57,6 +60,13 @@ H2_ENUM_BEGIN(EditViewGeometry)
     EDIT_CONTROL_VERTICAL_TRACK   = 0xb,
     EDIT_CONTROL_HORIZONTAL_KNOB  = 0xc,
     EDIT_CONTROL_VERTICAL_KNOB    = 0xd,
+    // The view's scroll arrows (PickMap disables the up and down ones).
+    EDIT_CONTROL_SCROLL_UP        = 0xe,
+    EDIT_CONTROL_SCROLL_DOWN      = 0xf,
+    // The map file requester: its position and its pattern buffers.
+    EDIT_FILE_REQUESTER_X         = 0x83,
+    EDIT_FILE_REQUESTER_Y         = 9,
+    EDIT_FILE_PATTERN_SIZE        = 8,
     // A map the editor closes to (72x72, a medium map).
     EDIT_DEFAULT_MAP_SIZE = 0x48
 H2_ENUM_END(EditViewGeometry)
@@ -193,6 +203,13 @@ H2_ENUM_BEGIN(EditMapFile)
     EDIT_MINE_TYPE_EYE_OF_MAGI    = 102,
     EDIT_MINE_TYPE_ABANDONED_MINE = 103
 H2_ENUM_END(EditMapFile)
+
+// ClearArea's tileset filter, the edited map's header, whether an erase
+// removed a road or stream part, and whether BlendTerrain varies tiles.
+DATA(0x0049f598) u8 gClearTilesets[TILESET_COUNT];
+DATA(0x0049f5f8) SMapHeader gEditMapHeader;
+DATA(0x0049f7a8) b32 gLinesRemoved;
+DATA(0x004a3a4c) b32 gVaryTiles;
 
 // The drag selection's outline colour and the tick the view last animated.
 DATA(0x0049f5f0) i32 gSelectionColor;
@@ -1616,6 +1633,50 @@ void editManager::WriteObelisks(i32 file) {
     }
 }
 
+// The map file requester: lists both map formats and stores the chosen
+// name in gMapFileName. The view's up and down scroll arrows are disabled
+// while it is open.
+VA(0x00409740, 0x1cc)
+i32 PickMap(i32 mode) {
+    fileRequester* requester;
+    char pattern[EDIT_FILE_PATTERN_SIZE];
+    i32 picked;
+    tag_message msg;
+    i32 button;
+    char ext[EDIT_FILE_PATTERN_SIZE];
+
+    picked = false;
+    if (gEditManager && gEditManager->m_window) {
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        msg.payload.widget.id = EDIT_CONTROL_SCROLL_UP;
+        gEditManager->m_window->BroadcastMessage(msg);
+        msg.payload.widget.id = EDIT_CONTROL_SCROLL_DOWN;
+        gEditManager->m_window->BroadcastMessage(msg);
+    }
+    sprintf(pattern, "*.%s", "M*2");
+    sprintf(ext, ".%s", "MP2");
+    requester = new fileRequester(EDIT_FILE_REQUESTER_X, EDIT_FILE_REQUESTER_Y,
+                                  static_cast<FileRequesterMode>(mode), pattern, ".\\MAPS\\", ext);
+    button = gpExec->DoDialog(requester);
+    if (button == FILE_REQUESTER_OK) {
+        picked = true;
+        strcpy(gMapFileName, gLastFilename);
+    }
+    delete requester;
+    if (gEditManager && gEditManager->m_window) {
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        msg.payload.widget.id = EDIT_CONTROL_SCROLL_UP;
+        gEditManager->m_window->BroadcastMessage(msg);
+        msg.payload.widget.id = EDIT_CONTROL_SCROLL_DOWN;
+        gEditManager->m_window->BroadcastMessage(msg);
+    }
+    return picked;
+}
+
 VA(0x0040990c, 0x4d)
 void editManager::ClearErrors(void) {
     for (; gEditErrorCount > 0; gEditErrorCount--)
@@ -1655,5 +1716,113 @@ void editManager::AddError(char* text) {
         gEditErrors[gEditErrorCount] = new char[length];
         strcpy(gEditErrors[gEditErrorCount], text);
         gEditErrorCount++;
+    }
+}
+
+// Erases the objects in the area (clipped to the map): every placement a
+// cell's object or extra part belongs to, the overhanging layer's only with
+// allLayers (which also erases the cells' overlays), and with `filtered`
+// only the objects of gClearTilesets. Roads and streams it erased are
+// redrawn.
+VA(0x00409aa8, 0x29f)
+void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(mask),
+                            i32 allLayers, i32 filtered) {
+    mapCellExtra* part;
+    u16 nextIndex;
+    i32 i;
+    i32 j;
+    i32 pass;
+    i32 oy;
+    mapCell* cell;
+
+    gLinesRemoved = false;
+    if (x < 0)
+        x = 0;
+    if (x + width > MAP_WIDTH)
+        width = MAP_WIDTH - x;
+    if (y < 0)
+        y = 0;
+    if (y + height > MAP_HEIGHT)
+        height = MAP_HEIGHT - y;
+    for (i = x; i < x + width; i++) {
+        for (j = y; j < y + height; j++) {
+            cell = gMap.CellAt(i, j);
+            while (cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                   && (!cell->m_objectLayerBit1 || cell->m_objectLayerBit0 || allLayers)
+                   && (!filtered || gClearTilesets[cell->m_objectTileset]))
+                RemoveLinkedObject(cell->m_objectLink);
+            if (cell->m_extraIndex
+                && gMap.Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
+                part = gMap.Extra(cell->m_extraIndex);
+            else
+                part = NULL;
+            while (part) {
+                nextIndex = part->nextIndex;
+                if ((!part->objectLayerBit1 || part->objectLayerBit0 || allLayers)
+                    && (!filtered || gClearTilesets[part->objectTileset]))
+                    RemoveLinkedObject(part->objectLink);
+                if (nextIndex && gMap.Extra(nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
+                    part = gMap.Extra(nextIndex);
+                else
+                    part = NULL;
+            }
+            if (allLayers) {
+                while (cell->m_overlayLink)
+                    RemoveLinkedObject(cell->m_overlayLink);
+            }
+        }
+    }
+    if (gLinesRemoved)
+        RedrawLines(x, y, x + width - 1, y + height - 1);
+}
+
+// Erases every cell part and extra part of the placement `link` (scanning
+// the map until nothing is left), noting roads and streams for ClearArea.
+VA(0x00409d47, 0x1c6)
+void editManager::RemoveLinkedObject(i32 link) {
+    i32 idx;
+    b32 changed;
+    mapCellExtra* extra;
+    i32 x;
+    i32 y;
+    mapCell* cell;
+
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_WIDTH; y++) {
+            changed = true;
+            while (changed) {
+                changed = false;
+                cell = gMap.CellAt(x, y);
+                if (cell->m_objectLink == link) {
+                    if (cell->m_objectTileset == TILESET_ROAD
+                        || cell->m_objectTileset == TILESET_STREAM)
+                        gLinesRemoved = true;
+                    gMap.RemoveCellObject(x, y);
+                    changed = true;
+                }
+                if (cell->m_overlayLink == link) {
+                    gMap.RemoveCellOverlay(x, y);
+                    changed = true;
+                }
+                idx = cell->m_extraIndex;
+                while (idx) {
+                    extra = gMap.extras + idx;
+                    if (extra->objectLink == link) {
+                        if (extra->objectTileset == TILESET_ROAD
+                            || extra->objectTileset == TILESET_STREAM)
+                            gLinesRemoved = true;
+                        gMap.RemoveExtraObject(idx);
+                        changed = true;
+                        break;
+                    }
+                    if (extra->overlayLink == link) {
+                        gMap.RemoveExtraOverlay(idx);
+                        changed = true;
+                        break;
+                    }
+                    idx = extra->nextIndex;
+                }
+            }
+        }
     }
 }
