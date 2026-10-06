@@ -1,5 +1,5 @@
 ---
-description: Run the HoMM2 matching campaign as a fan-out pipeline — N matchers always in flight across a reused worktree pool, every result integrated SERIALLY into a single linear master history.
+description: Run the HoMM2 matching campaign as a fan-out pipeline — N matchers always in flight across a reused worktree pool, every result integrated SERIALLY into a single linear `decomp-pol-2.0` history.
 argument-hint: [n-matchers]
 allowed-tools: Agent, Bash, Read, Write, Edit, Grep, Glob
 ---
@@ -19,7 +19,7 @@ shell — never `nix develop … --command 'cd <dir> && …'`.
 In short (full rules in the two agent docs):
 
 1. **Pool (persistent, reused):** slots `matcher-1 … matcher-N` under `.claude/worktrees/`.
-   On startup, reuse any that exist (`git -C … reset --hard master`; their `build/`
+   On startup, reuse any that exist (`git -C … reset --hard decomp-pol-2.0`; their `build/`
    survives — no cold re-provision); only create + provision missing slots
    (`orchestrator.md` § Pool setup). A restart does NOT regenerate the pool.
 2. **Queue:** regenerate objdiff, then select **every live non-100% function** in ascending
@@ -39,12 +39,12 @@ In short (full rules in the two agent docs):
    TU-safe batch.
    **Any new `docs/patterns/*.md` MUST carry real asm (retail vs ours, side by side) +
    what made it match** — never prose alone (`docs/patterns/INDEX.md` header).
-4. **Integrate SERIALLY:** one at a time — guard master clean → apply only that matcher's
+4. **Integrate SERIALLY:** one at a time — guard the main checkout clean → apply only that matcher's
    file(s) → `homm2 build` (recompiles + regenerates README's match block) → confirm % →
    commit those files + **`README.md`** (ALWAYS stage the
    regenerated README so the scoreboard never drifts; do NOT stage `config/match-queue.md`)
    as `match: <fn> -> <result>`. One matcher = one commit.
-   **Refill immediately:** reset the slot to master, pick next, dispatch.
+   **Refill immediately:** reset the slot to `decomp-pol-2.0`, pick next, dispatch.
 5. **Stop** when no live non-100% function remains or the user winds down: let in-flight matchers
    finish, integrate, print the ledger (`fn -> result -> commit`) + a regressions summary.
    **Leave the `matcher-N` worktrees in place**.
