@@ -12,6 +12,8 @@
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
+#include <BASE/baseManager.h>
+#include <BASE/display.h>
 
 enum class InputManagerScanCodeEncoding : i32 {
     SCAN_CODE_MASK          = 0xff,
@@ -151,11 +153,16 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 gpWindowManager->ScreenShot();
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
-                SetFullScreenStatus(false);
+                // Retail left fullscreen to open WinHelp. The portable help
+                // notice is a message box parented to the game window, so the
+                // display mode is kept.
                 platform::ShowHelp();
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(!gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
+                ChangeDisplaySettings(
+                    (event->payload.keyboard.modifiers
+                        & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != MESSAGE_MODIFIER_NONE,
+                    (event->payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL) != MESSAGE_MODIFIER_NONE);
         }
     }
     return event->type == MESSAGE_NONE;
@@ -207,8 +214,8 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->payload.mouse.screenX = event->payload.mouse.x;
             event->payload.mouse.screenY = event->payload.mouse.y;
 
-            if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0
-                && gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor == 0
+            if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0
+                && CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0
                 && iLastBWOnScreenCheck < platform::Ticks()
                 && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
                 && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
@@ -345,7 +352,7 @@ i32 inputManager::Open(i32 priority) {
     m_modifiers = MESSAGE_MODIFIER_NONE;
     MakeScanCodeTable();
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
-    m_priority = INPUT_MANAGER_PRIORITY;
+    m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_active = true;
     platform::SetEventHandler(PlatformEventHandler);
     strcpy(
@@ -605,13 +612,13 @@ void inputManager::MakeScanCodeTable(void) {
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0 && force == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0 && force == 0)
         return;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor == 0)
+    if (CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0)
         return;
 
     bInCheckChangeCursor = true;
-    if (force != 0 || (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
+    if (force != 0 || (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
             bLastMouseOffscreen = false;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);

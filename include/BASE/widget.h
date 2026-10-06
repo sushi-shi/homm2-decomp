@@ -8,22 +8,32 @@
 class heroWindow;
 struct tag_message;
 
+
+#define WIDGET_CONTAINS_LOCAL_POINT(w, x, y)                                                       \
+    ((x) >= (w).m_x && (y) >= (w).m_y && (x) < (w).m_x + (w).m_width                               \
+     && (y) < (w).m_y + (w).m_height)
+
+
+#define READ_WIDGET_GEOMETRY(w, resources) \
+    ((w).m_x = (resources)->ReadWord(), (w).m_y = (resources)->ReadWord(), \
+     (w).m_width = (resources)->ReadWord(), (w).m_height = (resources)->ReadWord())
+
 enum class WidgetFlag : i16 {
     WIDGET_FLAG_NONE     = 0,
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED  = 2,
     WIDGET_FLAG_DRAW     = 4,
     WIDGET_FLAG_DIMMED   = 8,
-    WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
 };
 using enum WidgetFlag;
 ENABLE_ENUM_FLAGS(WidgetFlag)
 
-enum class WidgetCommandArgument : i32 {
-    WIDGET_COMMAND_DIMMED = 0x1000
+enum class WidgetFlagArgument : i32 {
+
+    WIDGET_FLAGS_ARGUMENT_DIMMED = 0x1000
 };
-using enum WidgetCommandArgument;
+using enum WidgetFlagArgument;
 
 #pragma pack(push, 1)
 class widget {

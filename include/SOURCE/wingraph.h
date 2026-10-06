@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_WINGRAPH_H
 
 #include <Ints.h>
+#include <BASE/display.h>
 
 enum GraphicsConstant : i32 {
     GRAPHICS_WIDTH = 640,
@@ -19,9 +20,10 @@ using enum WingraphGraphicsType;
 
 void GetGraphicsInfo();
 void InitGraphics();
-void UpdatePalette(i8* palette);
+void UpdatePalette(i8* paletteData);
 void CleanUpWinGraphics();
-void SetFullScreenStatus(b32 fullscreen);
+void SetFullScreenStatus(b32 fullScreen);
+void ChangeDisplaySettings(bool scaling, bool vsync);
 
 extern WingraphGraphicsType giGraphicsType;
 

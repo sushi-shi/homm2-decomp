@@ -4,7 +4,7 @@
 #include <Ints.h>
 #include <PLATFORM/Movie.h>
 
-void ConvertSmackerPalette(u8*);
+void ConvertSmackerPalette(u8* paletteData);
 class icon;
 enum class ExpansionCampaignId : i32;
 
@@ -37,12 +37,12 @@ struct SSmackOptions {
 
 #pragma pack(pop)
 
-void DoAdvance(platform::MovieId, i32, i32, i32, i32);
+void DoAdvance(platform::MovieId movie, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
-i32 PlaySmacker(i32);
-ExpansionCampaignId ExpansionCampaignRect(i32, i32);
-i8 PointInRect(i32, i32, struct tag_rect*);
+i32 PlaySmacker(i32 smackNumber);
+ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y);
+i8 PointInRect(i32 x, i32 y, struct tag_rect* rect);
 
 extern b32 bSmackSound;
 extern class icon* brotherIcon;

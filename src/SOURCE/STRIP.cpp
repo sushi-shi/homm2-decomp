@@ -13,6 +13,7 @@
 #include <SOURCE/bankBox.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/strip.h>
+#include <BASE/message.h>
 
 typedef enum BankBoxConstant {
     BOX_TEXT_SIZE               = 12,
@@ -43,7 +44,7 @@ strip::strip(
     m_army = army;
     m_stripIcon = gpResourceManager->GetIcon("strip.icn");
 
-    for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         m_creatureIcons[slot] = NULL;
         m_cachedCreatureTypes[slot] = CREATURE_NONE;
     }
@@ -75,7 +76,7 @@ strip::strip(
             MemError();
         m_window->AddWidget(m_borders[0], -1);
 
-        for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+        for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
             m_borders[slot + 1] = new border(
                 slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 STRIP_CONTENT_Y,
@@ -101,13 +102,13 @@ strip::~strip() {
 
     gpWindowManager->RemoveWindow(m_window);
     if (m_army != NULL) {
-        for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++)
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++)
             delete m_borders[slot];
-        delete m_borders[STRIP_ARMY_SLOT_COUNT];
+        delete m_borders[ARMY_GROUP_SLOT_COUNT];
     }
     delete m_window;
     gpResourceManager->Dispose(m_stripIcon);
-    for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         if (m_creatureIcons[slot] != NULL)
             gpResourceManager->Dispose(m_creatureIcons[slot]);
     }
@@ -121,9 +122,9 @@ void strip::Draw(void) {
 }
 
 void strip::DrawIcons(i32 drawWindow) {
-    icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
-    CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
-    b32 iconsCurrent_8;
+    icon* oldIcons[ARMY_GROUP_SLOT_COUNT];
+    CreatureType oldCreatureTypes[ARMY_GROUP_SLOT_COUNT];
+    b32 iconsCurrent;
     i32 slot;
     CreatureType creatureType;
 
@@ -137,15 +138,15 @@ void strip::DrawIcons(i32 drawWindow) {
         m_window->DrawWindow(drawWindow);
         return;
     }
-    iconsCurrent_8 = true;
-    for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    iconsCurrent = true;
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         if (m_army->m_creatureTypes[slot] != CREATURE_NONE
             && m_cachedCreatureTypes[slot] != m_army->m_creatureTypes[slot])
-            iconsCurrent_8 = false;
+            iconsCurrent = false;
     }
 
-    if (iconsCurrent_8 == 0) {
-        for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    if (iconsCurrent == 0) {
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
             if (m_army->m_creatureTypes[slot] == CREATURE_NONE) {
@@ -157,13 +158,13 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
         }
-        for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
             if (oldCreatureTypes[slot] != CREATURE_PEASANT)
                 gpResourceManager->Dispose(oldIcons[slot]);
         }
     }
 
-    for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
         creatureType = m_army->m_creatureTypes[slot];
         if (creatureType != CREATURE_NONE) {
             m_stripIcon->DrawToBuffer(
@@ -229,21 +230,21 @@ bankBox::~bankBox() {
 }
 
 void bankBox::Update(i32 drawWindow) {
-    char str[BOX_TEXT_SIZE];
+    char currentText[BOX_TEXT_SIZE];
     tag_message message;
     i32 resource;
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     for (resource = 0; resource < BOX_NON_GOLD_RESOURCE_COUNT; resource++) {
-        utf8::Format(str, "%d", m_player->m_resources[resource]);
+        utf8::Format(currentText, "%d", m_player->m_resources[resource]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource;
-        message.payload.widget.data.text = str;
+        message.payload.widget.data.text = currentText;
         m_window->BroadcastMessage(message);
     }
-    utf8::Format(str, "%d", m_player->m_resources[H2EnumIndex(RES_GOLD)]);
+    utf8::Format(currentText, "%d", m_player->m_resources[H2EnumIndex(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
-    message.payload.widget.data.text = str;
+    message.payload.widget.data.text = currentText;
     m_window->BroadcastMessage(message);
     m_window->DrawWindow(drawWindow);
 }

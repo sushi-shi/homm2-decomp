@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <limits>
+#include <iomanip>
 #include <sstream>
 #include <utility>
 
@@ -79,11 +80,16 @@ bool InputReplay::Load(
             replay.event.button = MouseButton::Right;
         } else if (action == "key-down" || action == "key-up") {
             std::string name;
-            std::getline(fields >> std::ws, name);
-            while (!name.empty() && std::isspace(static_cast<unsigned char>(name.back()))) {
-                name.pop_back();
+            fields >> std::ws;
+            if (fields.peek() == '"') {
+                fields >> std::quoted(name);
+            } else {
+                std::getline(fields, name);
+                while (!name.empty() && std::isspace(static_cast<unsigned char>(name.back()))) {
+                    name.pop_back();
+                }
             }
-            if (name.empty() || resolveKey == nullptr
+            if (!fields || name.empty() || resolveKey == nullptr
                 || !resolveKey(
                     name,
                     replay.event.key,
@@ -92,6 +98,10 @@ bool InputReplay::Load(
                     replay.event.character
                 )) {
                 error = {lineNumber, "unknown or missing key name"};
+                return false;
+            }
+            if (HasTrailingField(fields)) {
+                error = {lineNumber, "unexpected field after key name"};
                 return false;
             }
             replay.event.type =
