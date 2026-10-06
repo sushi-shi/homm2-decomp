@@ -49,6 +49,14 @@ helpers and the extra-pool compaction. All 20 bodies compile exactly; two wait
 for the owners of `gMap` and `MAP_WIDTH`/`MAP_HEIGHT` (EDITOR) for their data
 identities.
 
+The object tool (EDITOR/OVERLAY) places objects from the editor's object
+catalogue, `gOverlayTypes` (956 records of 0x82 bytes: an 8 x 6 grid of
+part frames and bit masks per object). The catalogue and the tool's class
+tables (`gObjectClassCategories`, `gObjectClassTerrains`) open EDITMGR's
+.data contribution right after CLEARMGR's, so EDITMGR.cpp defines them;
+OVERLAY's own .data (the class buttons, `gSelectedOverlay`, its strings)
+sits between mapcell's and RANDOM's.
+
 ## Census
 
 `homm2 --image editor audit census --write-config` writes the editor's
@@ -61,6 +69,9 @@ dispatch and index tables, unreached bodies at a `/Od` frame prologue or a
 with their relocations masked. Run on the game as a control it recovers 2,455
 of the 2,474 inventory starts and 30,504 of the 30,675 reviewed DIR32 sites.
 EH registration stubs are not functions (as in the game's inventory).
+Data words it would admit as pointers but that are ordinary payload (packed
+`gOverlayTypes` fields whose dwords happen to name image addresses) are
+reviewed out in `config/retail/editor/reloc_exclusions.tsv`.
 
 | Editor census | Count |
 | --- | ---: |
@@ -69,7 +80,7 @@ EH registration stubs are not functions (as in the game's inventory).
 | EH funclets | 197 |
 | Import thunks | 200 |
 | Alignment fill | 552 |
-| Absolute fields | 14,566 |
+| Absolute fields | 14,560 |
 
 ## Placements
 

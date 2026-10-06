@@ -10,7 +10,7 @@ H2_ENUM_BEGIN(MapHeaderConstant)
     MAP_HEADER_PLAYER_DATA_SIZE     = 0x12,
     MAP_HEADER_VICTORY_DATA_SIZE    = 4,
     MAP_HEADER_CONDITION_DATA_SIZE  = 0x17,
-    MAP_HEADER_RESERVED_SIZE        = 8,
+    MAP_HEADER_RESERVED_SIZE        = 6,
     MAP_HEADER_NAME_SIZE            = 0x3c,
     MAP_HEADER_DESCRIPTION_OFFSET   = 0x76,
     MAP_HEADER_DESCRIPTION_SIZE     = 300,
@@ -66,6 +66,11 @@ struct SMapHeader {
     u16 lossTownY;
     u16 victorySideThreshold;
     u8 reserved32[MAP_HEADER_RESERVED_SIZE];
+    // The scenario editor's own bytes: the gTownNames entry its next town
+    // is named after, and whether the next save names the file after the
+    // map (set for a new map).
+    u8 townNameIndex;
+    u8 nameFileOnSave;
     char name[MAP_HEADER_NAME_SIZE];
     char description[MAP_HEADER_DESCRIPTION_SIZE];
     u8 rumourCount;

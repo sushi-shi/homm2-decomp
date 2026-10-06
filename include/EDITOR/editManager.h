@@ -37,6 +37,15 @@ H2_ENUM_BEGIN(EditManagerLayout)
 H2_ENUM_END(EditManagerLayout)
 
 #pragma pack(push, 1)
+// A town or capturable-site record of the map file.
+struct EditMapRecord {
+    u8 x;
+    u8 y;
+    u8 type;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
 class editManager : public baseManager {
 public:
     // The selected tool (-1: none).
@@ -135,7 +144,7 @@ public:
     void InitializeMap(b32 random, i32 width, i32 height);
     // Fits the terrain's edge tiles to their neighbours over the whole map.
     void BlendTerrain(i32 terrain, b32 unused, b32 fromUndo, b32 skipBorders, b32 skipFill);
-    void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 layer, i32 keepObjects);
+    void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 allLayers, i32 filtered);
     i32 SaveMap(char* name);
     // Rerolls every plain ground tile to one of its variants, more often at
     // a higher variety (0-9).
@@ -178,6 +187,8 @@ extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
 extern i32 gEditErrorCount;
 // Set while BlendTerrain may pick ground variants.
 extern b32 gVaryTiles;
+// Set when ClearArea erased a road or stream part (to redraw the lines).
+extern b32 gLinesRemoved;
 // ClearArea's object filter: the tilesets whose objects it erases.
 extern u8 gClearTilesets[TILESET_COUNT];
 

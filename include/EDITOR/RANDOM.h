@@ -211,13 +211,6 @@ H2_ENUM_BEGIN(RandomMapDensity)
     RANDOM_MAP_DENSITY_MONSTERS  = 4
 H2_ENUM_END(RandomMapDensity)
 
-// The overlay grid an object's 8 x 6 icon cells fill: an object is placed by
-// the grid cell its anchor sits in.
-H2_ENUM_BEGIN(OverlayGridAnchor)
-    OVERLAY_ANCHOR_X = 7,
-    OVERLAY_ANCHOR_Y = 5
-H2_ENUM_END(OverlayGridAnchor)
-
 // Places the object type with its anchor on cell (x, y); the second form
 // asks whether it fits there.
 i32 PlaceOverlayAt(overlayType* type, i32 x, i32 y);

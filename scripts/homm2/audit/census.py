@@ -724,6 +724,7 @@ class Census:
             return raw[0] if raw else 0
         code_targets = {r["target"] for r in self.fields.values()
                         if r["channel"] == "instruction"}
+        reviewed = _reviewed_exclusions()
         cand = {}
         for s in regions:
             raw = self.pe.data[s["rptr"]:s["rptr"] + s["rsize"]]
@@ -733,6 +734,9 @@ class Census:
                     cand[s["va"] + off] = value
         for site, value in sorted(cand.items()):
             if site in self.fields or any(lo <= site < hi for lo, hi in ranges):
+                continue
+            if site in reviewed:
+                self.rejected.append({"rva": f"0x{site:x}", "reason": "reviewed: " + reviewed[site]})
                 continue
             string = byte(value - 1) == 0 and 32 <= byte(value) < 127 and 32 <= byte(value + 1) < 127
             why = ("neighbouring pointer word" if site - 4 in cand or site + 4 in cand
@@ -744,6 +748,20 @@ class Census:
                 continue
             self.fields[site] = {"site": site, "target": value, "channel": "data-pointer",
                                  "instruction": None, "evidence": why}
+
+
+def _reviewed_exclusions() -> dict[int, str]:
+    """Data words the image's reloc_exclusions.tsv reviews as ordinary payload
+    whose value merely falls inside the image (site_rva, reason)."""
+    path = retail_dir() / "reloc_exclusions.tsv"
+    rows = {}
+    if path.exists():
+        for line in path.read_text().splitlines():
+            if not line.startswith("0x"):
+                continue
+            site, reason = line.split("\t")[:2]
+            rows[int(site, 16)] = reason
+    return rows
 
 
 def _ar_members(path: Path):
