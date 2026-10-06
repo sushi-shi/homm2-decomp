@@ -294,3 +294,33 @@ Each step is one or more commits; every commit holds the invariants above.
 Steps 1-3 are prerequisites of the editor work; steps 4-7 can interleave with
 it. A step that cannot hold an invariant stops and is recorded here before
 anything else changes.
+
+## Status
+
+Steps 1-7 are done; step 8 is started (see [editor.md](editor.md)). Each step
+held the invariants: 1727 / 1727 functions and 291,995 data bytes exact, the
+linked image byte-identical, `homm2 build verify` and `homm2 clean --verify`.
+
+Done beyond the plan: the historical link runs with a frozen clock (absolute
+faketime spec, real monotonic clock) and every wine tool in UTC, after a
+loaded machine stamped the PDB signature one second late; `HOMM2_JOBS` caps
+ninja; the fresh-checkout header-mirror race is fixed; the census rewrite of
+the import-thunk table keeps its reviewed `coff` column.
+
+Open, in order:
+
+- The editor: its own units (EDITMGR first), its data claims, its gates,
+  link graph and `link_diff.tsv`, its clean export, and `homm2 build`
+  building both images as HoMM1's does. Until then `homm2 build` builds the
+  game and `homm2 --image editor build` the editor; the README block has a
+  section per image with a report.
+- `audit dna-bands` (the census classifies the LIBCMT contributions, but the
+  runtime and compiler-helper bands are not tabulated per image).
+- `walls` (the residual queue) and `permute campaign` have no editor users
+  yet; `sema` subcommands beyond HoMM2's (`-` batch, `vtable`, `gaps`, `map`)
+  are not ported. `sema` and `verify` read the game's paths in several
+  modules; `--image editor` is refused where they are not keyed.
+- The five gates outside the tier (see "Gate tier") and the broken
+  `audit version-delta`.
+- `workflow setup` (git hooks and the manifest merge driver) is not adopted.
+- Behaviour coverage, and mirroring the behaviour gate in HoMM1.

@@ -5,7 +5,7 @@ Byte-matching C++ reconstruction of Buka's Heroes of Might and Magic II
 pinned Visual C++ 6.0 SP5 toolchain under Wine. Retail bytes are the authority.
 Every function and data byte matches and the linked executable is
 byte-identical to retail; the scenario editor (`EDT2PL.exe`) is the second
-image (`homm2 --image editor`).
+image (`homm2 --image editor`, [docs/editor.md](docs/editor.md)).
 
 ## Build and gates
 

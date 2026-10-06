@@ -31,7 +31,7 @@ ALIASES = {
 #: Commands that read the selected image (`--image`); the rest refuse another
 #: image instead of silently answering for the game.
 IMAGE_AWARE = {"inspect", "configure", "delink", "labels", "build", "match", "compare",
-               "sema", "help", "-h", "--help"}
+               "help", "-h", "--help"}
 IMAGE_AUDITS = {"census", "placements", "usage"}
 
 TOOLS = ("wine", "cl", "ml", "link", "rc", "objdiff", "delinker")
@@ -140,6 +140,7 @@ def _build(rest):
     if report is None:
         return 1
     if not game:
+        status(["--write-readme"], report)
         return status([], report)
     # Fast and warning-only: half-built units may intentionally need a delink.
     py("homm2.verify.model_drift")

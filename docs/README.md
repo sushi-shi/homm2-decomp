@@ -17,6 +17,8 @@ Their successors grow here from VC6-measured evidence.
 - `builds.md` covers locale builds without retail inputs, the native link modes and
   the toolchain; `play.md` the Wine play environment.
 - `build-asserts.md` explains every gate of `homm2 build verify`.
+- `editor.md` is the scenario editor image: keying, census, placements, objects,
+  compiler profile and open work.
 - `tooling-convergence.md` is the ledger of the tooling convergence with the HoMM1
   reconstruction and its open items.
 

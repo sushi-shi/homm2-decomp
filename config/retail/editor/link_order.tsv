@@ -1,0 +1,71 @@
+# EDT2PL.exe object contributions in link order, from each object's closing
+# std::ctype<wchar_t>::id registration (`push offset ?id@?$ctype@G@std@@$E`).
+# Editor objects link in file-name order, then the BASE library (from BASEMGR)
+# and the C runtime. unit names an existing or planned [[unit]]; evidence says
+# why. Spans run to the next object's first function; padding is not assigned.
+start	end	unit	functions	evidence
+0x01000	0x01a30	EDITOR/CLEARMGR	9	string clearManager; descriptive name
+0x01a30	0x10160	EDITOR/EDITMGR	90	string editManager; PoL editor assertion editmgr.cpp
+0x10160	0x11630	EDITOR/EDITOR	37	system start-up (heroes2.agg, BELTWAY.MP2); PoL editor.cpp
+0x11630	0x134b0	EDITOR/EVENTMGR	16	string eventsManager; descriptive name
+0x134b0	0x13f50	EDITOR/evntedit	5	evntedit.bin; PoL evntedit.cpp
+0x13f50	0x150d0	EDITOR/heroedit	5	heroedit.bin; descriptive name
+0x150d0	0x16300	SOURCE/kbwin	18	placed game unit
+0x16300	0x176f0	EDITOR/line	15	string lineManager; PoL line.cpp
+0x176f0	0x18dc0	EDITOR/mapcell	20	3 placed mapcell bodies; PoL mapcell.cpp (shared tier)
+0x18dc0	0x1cd70	EDITOR/OVERLAY	23	string overlayManager; PoL overlay.cpp
+0x1cd70	0x223f0	EDITOR/RANDOM	17	assertion e:\Users\igorl\VSS\HMM\HMM2\Source\Editor\RANDOM.CPP
+0x223f0	0x24ef0	SOURCE/REQUEST	18	placed game unit
+0x24ef0	0x25820	EDITOR/ridledit	5	ridledit.bin; PoL ridledit.cpp
+0x25820	0x25bf0	EDITOR/rumredit	5	rumredit.bin; PoL rumredit.cpp
+0x25bf0	0x26110	EDITOR/setup	8	stpenew.bin, stpesize.bin; descriptive name
+0x26110	0x26640	EDITOR/signedit	5	sign and bottle text; PoL signedit.cpp
+0x26640	0x28b20	EDITOR/specedit	15	specedit.bin; PoL specedit.cpp
+0x28b20	0x29e80	EDITOR/terrain	12	string terrainManager; PoL terrain.cpp
+0x29e80	0x2af30	EDITOR/townedit	5	townedit.bin; descriptive name
+0x2af30	0x2d010	SOURCE/wingraph	34	placed game unit; assertion Editor\wingraph.cpp
+0x2d010	0x2d4e0	EDITOR/x_spedit	4	x_spedit.bin; descriptive name
+0x2d4e0	0x2d590	BASE/BASEMGR	3	placed game unit
+0x2d590	0x2e640	BASE/WINDOW	17	placed game unit
+0x2e640	0x2ef10	BASE/ICONWDGT	10	placed game unit
+0x2ef10	0x30270	BASE/WINMGR	23	placed game unit
+0x30270	0x317e0	BASE/INPUTMGR	18	placed game unit
+0x317e0	0x32d50	BASE/MOUSEMGR	19	placed game unit
+0x32d50	0x33ec0	BASE/RESMGR	33	placed game unit
+0x33ec0	0x357c0	BASE/FONT	13	placed game unit
+0x357c0	0x35fb0	BASE/ICON	10	placed game unit
+0x35fb0	0x36310	BASE/bmap2	6	placed game unit
+0x36310	0x39b00	BASE/Misc	49	placed game unit
+0x39b00	0x39d50	(unknown)	3	a BASE-library object the game does not link
+0x39d50	0x39fb0	BASE/icon2bs	3	placed game unit
+0x39fb0	0x3a530	(unknown)	3	a BASE-library object the game does not link
+0x3a530	0x3ad80	BASE/EXEC	12	placed game unit
+0x3ad80	0x3af80	BASE/PALETTE	7	placed game unit
+0x3af80	0x3c3f0	BASE/soundmgr	26	placed game unit
+0x3c3f0	0x3cac0	BASE/TEXTWDGT	11	placed game unit
+0x3cac0	0x3d0d0	BASE/BORDER	9	placed game unit
+0x3d0d0	0x3d410	BASE/Iconm2b	3	placed game unit
+0x3d410	0x3eb20	BASE/listbox	11	placed game unit
+0x3eb20	0x40a30	BASE/droplist	13	placed game unit
+0x40a30	0x42080	BASE/Textntry	10	placed game unit
+0x42080	0x42250	BASE/DIMMER	9	placed game unit
+0x42250	0x42d80	BASE/BUTTON	12	placed game unit
+0x42d80	0x43380	BASE/WIDGET	9	placed game unit
+0x43380	0x43b00	BASE/BITMAP	15	placed game unit
+0x43b00	0x442a0	BASE/Icon2b	3	placed game unit
+0x442a0	0x44460	BASE/TILESET	5	placed game unit
+0x44460	0x448b0	BASE/SAMPLE	8	placed game unit
+0x448b0	0x449b0	BASE/RESOURCE	5	placed game unit
+0x449b0	0x451d0	BASE/icon2bc	3	placed game unit
+0x451d0	0x45ad0	BASE/Iconf2b	3	placed game unit
+0x45ad0	0x463e0	BASE/iconf2bc	3	placed game unit
+0x463e0	0x46bc0	BASE/iconf2by	3	placed game unit
+0x46bc0	0x472a0	BASE/icon2by	3	placed game unit
+0x472a0	0x47620	BASE/Iconmf2b	3	placed game unit
+0x47620	0x47a40	BASE/Icondf2b	3	placed game unit
+0x47a40	0x47df0	BASE/Icond2b	3	placed game unit
+0x47df0	0x48034	BASE/miscwin	4	placed game unit
+0x48034	0x48ae0	BASE/TILE + BASE/AudiereEffects	17	placed game units (TILE.asm, then AudiereEffects)
+0x48ae0	0x495c0	BASE/AudiereMusic	20	placed game unit (AudiereEffects tail bodies placed by block offset)
+0x495c0	0x49b20	BASE/MilesSound	13	placed game unit
+0x49b20	0x4a072	BASE/Midi	11	placed game unit
