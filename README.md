@@ -99,10 +99,69 @@ screenshot and input-replay hooks.
 
 ## Install with a NixOS flake
 
-There is no NixOS module yet. Until there is, add this flake as an input and
-put `inputs.homm2.packages.x86_64-linux.default` in
-`environment.systemPackages`; the program is `homm2` and still reads
-`HOMM2_DATA`.
+Add the port and a local folder holding your copy of the game to your flake
+inputs:
+
+```nix
+inputs.homm2.url = "github:sushi-shi/homm2-decomp/master";
+inputs.homm2-game = {
+  url = "path:/path/to/heroes2";
+  flake = false;
+};
+```
+
+The folder is the installed game, the one that contains `DATA`, or the Buka
+disc's files, or a folder holding a `.zip`, `.7z` or `.iso` of either. Import
+the module and name your copy:
+
+```nix
+outputs = { nixpkgs, homm2, homm2-game, ... }: {
+  nixosConfigurations."<host>" = nixpkgs.lib.nixosSystem {
+    modules = [
+      ./configuration.nix
+      homm2.nixosModules.default
+      {
+        programs.homm2 = {
+          enable = true;
+          game = "${homm2-game}";
+        };
+      }
+    ];
+  };
+};
+```
+
+Nix checks the copy and lays its data out in its store when the
+configuration is built. Rebuild, replacing `<host>` with your host's name,
+then launch:
+
+```sh
+sudo nixos-rebuild switch --flake '.#<host>'
+heroes2
+```
+
+With home-manager, the same options install the game for one user:
+
+```nix
+homeConfigurations."<user>" = home-manager.lib.homeManagerConfiguration {
+  pkgs = nixpkgs.legacyPackages.x86_64-linux;
+  modules = [
+    homm2.homeManagerModules.default
+    { programs.homm2 = { enable = true; game = "${homm2-game}"; }; }
+  ];
+};
+```
+
+```sh
+home-manager switch --flake '.#<user>'
+```
+
+`heroes2` keeps saves, high scores and settings in
+`~/.local/share/homm2/homm2`, as the program does. `programs.homm2.locale =
+"ru"` starts the game in Russian whatever your locale (it needs a Buka copy's
+Cyrillic font). Without `game`, `heroes2` reads `HOMM2_DATA`. There is no
+native scenario editor yet, so only the game is installed;
+[more about the install](docs/porting.md#install-with-nix).
 
 ## Controls
 

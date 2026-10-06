@@ -569,6 +569,9 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     NAME web_data_paths
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_package_web_data.py)
   add_test(
+    NAME game_data_import
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_game_data.py)
+  add_test(
     NAME catalog_validation
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_validate_catalog.py)
 endif()

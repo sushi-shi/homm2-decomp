@@ -56,13 +56,18 @@ public:
             m_dataRoot = FindDataRoot(m_programRoot);
         }
         m_localeDataRoot = ConfiguredDirectory(SDL_getenv("HOMM2_LOCALE_DATA"));
+        // A launcher that keeps one build's saves apart from another's names
+        // the folder itself (README, "Install with a NixOS flake").
+        m_userRoot = ConfiguredDirectory(SDL_getenv("HOMM2_USER_DATA"));
 #endif
 
-        if (char* preferences = SDL_GetPrefPath("homm2", "homm2")) {
-            m_userRoot = preferences;
-            SDL_free(preferences);
-        } else {
-            m_userRoot = m_dataRoot;
+        if (m_userRoot.empty()) {
+            if (char* preferences = SDL_GetPrefPath("homm2", "homm2")) {
+                m_userRoot = preferences;
+                SDL_free(preferences);
+            } else {
+                m_userRoot = m_dataRoot;
+            }
         }
         if (!PrepareUserState(m_userRoot)) {
             std::fprintf(
