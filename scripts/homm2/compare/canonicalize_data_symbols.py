@@ -58,6 +58,7 @@ from homm2.core.coff import (  # noqa: F401  (re-exported)
 VOLATILE_SG = re.compile(r"^\$SG[0-9]+$")
 ANON_STR = re.compile(r"^(\$anon_str_[0-9a-f]{64})_[0-9]+$")
 VOLATILE_T = re.compile(r"^\$T[0-9]+$")
+CONST_CELL = re.compile(r"^const_([0-9a-f]{8})$")
 NAMED_STATIC = re.compile(r"^(?P<prefix>.+\$S)[0-9]+$")
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 COMPGEN_PREFIX = "__h2cg$"
@@ -863,6 +864,7 @@ def canonicalize_coff(payload: bytes,
                       compgen: tuple[CompgenClaim, ...] = (),
                       compgen_data: tuple[CompgenDataClaim, ...] = (),
                       real_literal_references: dict[str, str] | None = None,
+                      string_targets: dict[int, int] | None = None,
                       ) -> CanonicalizedObject:
     """Return a normalized comparison copy and its readable rename records."""
     coff = CoffObject(payload)
@@ -1161,6 +1163,24 @@ def canonicalize_coff(payload: bytes,
     # symbol they see - defined candidate or external reference - by order
     # of first executable-section reference: a per-object, code-ordered
     # identity that byte-proven pairs share.
+    # A delinked string cell no content pass could name - VC6's empty literal
+    # `""`, which it places in .bss - keeps its `const_<rva>` name although the
+    # data manifest binds it to a candidate string of this unit. Its bytes in
+    # this object are its content identity, as for every other string.
+    for definition in definitions:
+        match = CONST_CELL.fullmatch(definition.symbol.name)
+        if match is None or definition.symbol.index in renames:
+            continue
+        size = (string_targets or {}).get(int(match.group(1), 16))
+        if size is None:
+            continue
+        cell = coff.section_bytes(definition.section)[
+            definition.start:definition.start + size]
+        if len(cell) != size or cell[-1:] != b"\0" or b"\0" in cell[:-1]:
+            continue
+        renames[definition.symbol.index] = (
+            f"$anon_str_{hashlib.sha256(cell).hexdigest()}_0")
+
     anon_stems = {}
     for index, symbol in coff.symbols.items():
         match = ANON_STR.fullmatch(renames.get(index, symbol.name))
@@ -1274,6 +1294,25 @@ def load_compgen_claims(path: Path | None, unit: str | None):
         return tuple(CompgenClaim(
             row["name"], row["kind"], row["owner"], int(row["size"], 0))
             for row in rows if row["unit"] == unit)
+
+
+def load_candidate_string_targets(path: Path | None, unit: str | None) -> dict[int, int]:
+    """{rva: size} of the compiler strings the data manifest binds in `unit`."""
+    if path is None or unit is None or not path.exists():
+        return {}
+    targets = {}
+    with path.open(newline="") as stream:
+        for row in csv.DictReader(
+                (line for line in stream if not line.lstrip().startswith("#")),
+                delimiter="\t"):
+            if not row["provenance"].startswith("candidate-COFF-string:"):
+                continue
+            object_unit = row["object"].replace("\\", "/")
+            if object_unit.lower().endswith(".c"):
+                object_unit = object_unit[:-2]
+            if object_unit == unit:
+                targets[int(row["rva"], 16)] = int(row["size"], 16)
+    return targets
 
 
 def load_compgen_data_claims(path: Path | None, unit: str | None):
@@ -1415,7 +1454,8 @@ def main(argv=None):
         args.data_manifest, args.data_base_root)
     result = canonicalize_coff(
         args.input.read_bytes(), claims, data_claims,
-        real_literal_references)
+        real_literal_references,
+        load_candidate_string_targets(args.data_manifest, args.unit))
     payload = result.data
     if args.defer_data:
         payload = defer_data_comparison(payload)
