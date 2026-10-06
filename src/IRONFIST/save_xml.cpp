@@ -14,6 +14,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <IRONFIST/artifacts.h>
@@ -38,6 +39,40 @@
 #include <SOURCE/X_GLOBAL.h>
 
 namespace ironfist::save {
+
+template <size_t Count>
+static void WriteRelations(
+    tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root, const char* groupName,
+    const char* entryName, const bool (&relations)[Count][Count]
+) {
+    auto* group = doc->NewElement(groupName);
+    for (size_t source = 0; source < Count; ++source) {
+        for (size_t destination = 0; destination < Count; ++destination) {
+            if (!relations[source][destination])
+                continue;
+            auto* entry = doc->NewElement(entryName);
+            entry->SetAttribute("source", static_cast<i32>(source));
+            entry->SetAttribute("destination", static_cast<i32>(destination));
+            group->InsertEndChild(entry);
+        }
+    }
+    // An empty group is a complete snapshot too: it cancels script defaults.
+    root->InsertEndChild(group);
+}
+
+using Relations = std::vector<std::pair<i32, i32>>;
+
+static Relations ReadRelations(tinyxml2::XMLNode* root, const char* entryName, i32 count) {
+    Relations result;
+    for (auto* entry = root->FirstChildElement(entryName); entry;
+         entry = entry->NextSiblingElement(entryName)) {
+        const i32 source = entry->IntAttribute("source", -1);
+        const i32 destination = entry->IntAttribute("destination", -1);
+        if (source >= 0 && source < count && destination >= 0 && destination < count)
+            result.emplace_back(source, destination);
+    }
+    return result;
+}
 
 i32 GetCampaignType(void) {
     if (gbInCampaign)
@@ -544,8 +579,11 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
     pRoot->InsertEndChild(pElement);
 
+    const auto& adventure = state::Get().adventure;
+    WriteRelations(tempDoc, pRoot, "sharedVision", "share", adventure.sharePlayerVision);
+    WriteRelations(tempDoc, pRoot, "forcedHeroChases", "chase", adventure.forcedComputerPlayerChases);
     WriteMapVariables(pRoot);
-    std::string script = script::ScriptContents(gMapName);
+    const std::string& script = script::ActiveScriptContents();
     if (script.length())
         xml::PushBack(tempDoc, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
@@ -608,9 +646,8 @@ void XmlFile::WriteMapVarTable(
 
 void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest) {
     script::LuaTable mapVariables = script::LoadMapVariablesFromLua();
-    if (!mapVariables.size())
-        return;
 
+    // Keep the upstream records for older readers, even without user variables.
     for (i32 i = 0; i != H2EnumIndex(GAME_HERO_COUNT); ++i) {
         for (i32 j = 0; j != H2EnumIndex(GAME_HERO_COUNT); ++j) {
             if (gpGame->IsHeroChaseForced(i, j)) {
@@ -757,8 +794,11 @@ void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
 
     gpGame->m_worldMap.extraCount = root->ToElement()->IntAttribute("numCellExtras");
     if (gpGame->m_worldMap.extraCount) {
-        delete[] gpGame->m_worldMap.extras;
-        gpGame->m_worldMap.extras = new mapCellExtra[gpGame->m_worldMap.extraCount];
+        // Init already released the previous map. Match fullMap's tracked
+        // allocation owner, including later growth and Close().
+        gpGame->m_worldMap.extras = static_cast<mapCellExtra*>(
+            H2_ALLOC(gpGame->m_worldMap.extraCount * sizeof(mapCellExtra))
+        );
     }
 
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
@@ -1005,16 +1045,29 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
 }
 
 void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
+    script::Shutdown();
+    std::string savedScript;
     i32 campaignType = CAMPAIGN_NONE;
     char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
     std::vector<i32> xmlArtifacts;
     script::LuaTable mapVariables;
+    Relations savedVision;
+    Relations savedChases;
+    Relations legacyChases;
+    bool hasSavedVision = false;
+    bool hasSavedChases = false;
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
-        if (name == "allowAIArmySharing") {
+        if (name == "sharedVision") {
+            savedVision = ReadRelations(elem, "share", GAME_PLAYER_COUNT);
+            hasSavedVision = true;
+        } else if (name == "forcedHeroChases") {
+            savedChases = ReadRelations(elem, "chase", GAME_HERO_COUNT);
+            hasSavedChases = true;
+        } else if (name == "allowAIArmySharing") {
             bool allow = true;
             elem->QueryBoolText(&allow);
             gpGame->SetAIArmySharing(allow);
@@ -1074,14 +1127,28 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             memset(pwSizeOfMapExtra, 0, sizeof(i16) * iMaxMapExtra);
         }
         else if (name == "difficulty") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
-        else if (name == "mapFilename") xml::QueryText(elem, gpGame->m_mapFilename);
+        else if (name == "mapFilename") {
+            xml::QueryText(elem, gpGame->m_mapFilename);
+            utf8::Copy(gMapName, GLOBAL_MAP_NAME_SIZE, gpGame->m_mapFilename);
+        }
         else if (name == "relatedToNewGameSelection") xml::QueryCharText(elem, &gpGame->m_selectedSetupPlayer);
         else if (name == "relatedToNewGameInit") xml::QueryCharText(elem, &gpGame->m_newGameInitialized);
         else if (name == "numHumanPlayers") xml::QueryCharText(elem, &gpGame->m_newGameHumanCount);
         else if (name == "gbIAmGreatest") elem->QueryIntText(&gbIAmGreatest);
         else if (name == "campaignType") elem->QueryIntText(&campaignType);
         else if (name == "mapHeader") ReadMapHeader(elem);
-        else if (name == "playerNames") xml::QueryText(elem, cPlayerNames[index]);
+        else if (name == "playerNames") {
+            i32 playerIndex;
+            if (elem->QueryIntAttribute("index", &playerIndex) == tinyxml2::XML_SUCCESS
+                && playerIndex >= 0 && playerIndex < GAME_PLAYER_COUNT) {
+                // WriteArray stores names in attributes. Accept the text form
+                // from older/handwritten saves as a fallback.
+                const char* playerName = elem->Attribute("value");
+                if (!playerName)
+                    playerName = elem->GetText();
+                utf8::Copy(cPlayerNames[playerIndex], sizeof(cPlayerNames[playerIndex]), playerName);
+            }
+        }
         else if (name == "deadPlayers") gpGame->m_playerDead[index] = value;
         else if (name == "alivePlayers") hasPlayer[index] = value;
         else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;
@@ -1133,10 +1200,8 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
         }
         else if (name == "script") {
             const char* script = elem->GetText();
-            if (script) {
-                std::string scriptText(script);
-                script::InitializeFromSave(scriptText);
-            }
+            if (script)
+                savedScript = script;
         }
         else if (name == "mapExtra") ReadMapExtra(elem);
         else if (name == "playerData") ReadPlayerData(elem, index);
@@ -1151,10 +1216,15 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             script::MapVariableType mapVariableType = script::ParseMapVariableType(elem->Attribute("type"));
             i32 x;
             i32 y;
+            i32 end = 0;
             if ((mapVariableType == script::MapVariableType::Boolean)
-                && (std::string(elem->Attribute("value")) == "true")
-                && (sscanf(mapVariableId.c_str(), "_AICHASE_%d_%d_", &x, &y) == 2)) {
-                gpGame->ForceHeroChase(x, y, true);
+                && (sscanf(mapVariableId.c_str(), "_AICHASE_%d_%d_%n", &x, &y, &end) == 2)
+                && static_cast<size_t>(end) == mapVariableId.size()) {
+                const std::string chaseValue = xml::QueryTextAttribute(elem, "value");
+                if (chaseValue == "true" || chaseValue == "1")
+                    legacyChases.emplace_back(x, y);
+                // These are engine records, not variables to inject into Lua.
+                continue;
             }
             script::MapVariable& variable = mapVariables[mapVariableId];
             variable.type = mapVariableType;
@@ -1186,8 +1256,29 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
     }
     giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
     DeserializeGeneratedArtifacts(xmlArtifacts);
+    // Execute against the restored game, then restore its saved Lua values.
+    // Scriptless saves still need a fresh generic artifact state.
+    if (savedScript.empty())
+        script::InitializeWithoutMap();
+    else
+        script::InitializeFromSave(std::move(savedScript));
     if (mapVariables.size())
         script::WriteMapVariablesToLua(mapVariables);
+
+    // Restore runtime decisions after script initialization, independent of
+    // element order. Missing groups in older saves retain script defaults.
+    if (hasSavedVision) {
+        auto& vision = state::Get().adventure.sharePlayerVision;
+        std::memset(vision, 0, sizeof(vision));
+        for (const auto& [source, destination] : savedVision)
+            vision[source][destination] = true;
+    }
+    if (hasSavedChases) {
+        auto& chases = state::Get().adventure.forcedComputerPlayerChases;
+        std::memset(chases, 0, sizeof(chases));
+    }
+    for (const auto& [source, destination] : hasSavedChases ? savedChases : legacyChases)
+        gpGame->ForceHeroChase(source, destination, true);
 }
 
 std::string FileExtension(b32 isPickLoad) {
@@ -1218,6 +1309,12 @@ std::string FileExtension(b32 isPickLoad) {
     }
 }
 
+static std::string SaveFilePath(const std::string& name) {
+    const char* directory = platform::CompareIgnoringCase(name.c_str(), "RMT", 3) == 0
+        ? ".\\DATA\\" : ".\\GAMES\\";
+    return directory + name;
+}
+
 i32 SaveGame(const char* saveFile, i32 autosave) {
     gpAdvManager->DemobilizeCurrHero();
     std::string filePath;
@@ -1228,14 +1325,11 @@ i32 SaveGame(const char* saveFile, i32 autosave) {
     else
         filePath = saveName;
 
-    if (platform::CompareIgnoringCase(filePath.c_str(), "RMT", 3)) {
-        filePath = ".\\GAMES\\" + filePath;
-        if (platform::CompareIgnoringCase(filePath.c_str(), ".\\GAMES\\AUTOSAVE", 16)
-            && platform::CompareIgnoringCase(filePath.c_str(), ".\\GAMES\\PLYREXIT", 16))
-            strcpy(gpGame->m_saveName, saveName.c_str());
-    } else {
-        filePath = ".\\DATA\\" + filePath;
-    }
+    if (platform::CompareIgnoringCase(filePath.c_str(), "RMT", 3)
+        && platform::CompareIgnoringCase(filePath.c_str(), "AUTOSAVE", 8)
+        && platform::CompareIgnoringCase(filePath.c_str(), "PLYREXIT", 8))
+        strcpy(gpGame->m_saveName, saveName.c_str());
+    filePath = SaveFilePath(filePath);
 
     XmlFile xml;
     tinyxml2::XMLError err = xml.Save(filePath.c_str());
@@ -1254,8 +1348,7 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
         return false;
     }
 
-    std::string filePath = ".\\GAMES\\";
-    filePath += fileName;
+    const std::string filePath = SaveFilePath(fileName);
 
     // Check if original save format
     i32 fd = platform::FileOpen(filePath.c_str(), platform::FileMode::Read);
@@ -1264,11 +1357,12 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
         const bool hasFirstByte = platform::FileReadExact(fd, &firstByte, sizeof(firstByte));
         platform::FileClose(fd);
         if (!hasFirstByte)
-            return false;
+            firstByte = 0;
     }
 
     if (firstByte != '<') {
         runtime::ResetAdventureState();
+        script::InitializeWithoutMap();
         return false;
     }
 

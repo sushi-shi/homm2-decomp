@@ -10,6 +10,7 @@
 #include <IRONFIST/state.h>
 
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/army.h>
@@ -144,16 +145,16 @@ b32 OverrideTooltip(mapCell* cell, i32 x, i32 y, std::string& text) {
 void AppendLuckInfo(hero* h) {
     const auto result = script::InvokeResult<std::string>("OnShowLuckInfo", script::Binding<hero*>(h));
     if (result.has_value()) {
-        std::strcat(gText, "\n");
-        std::strcat(gText, result->c_str());
+        utf8::Append(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n");
+        utf8::Append(gText, GLOBAL_TEXT_BUFFER_SIZE, result->c_str());
     }
 }
 
 void AppendMoraleInfo(hero* h) {
     const auto result = script::InvokeResult<std::string>("OnShowMoraleInfo", script::Binding<hero*>(h));
     if (result.has_value()) {
-        std::strcat(gText, "\n");
-        std::strcat(gText, result->c_str());
+        utf8::Append(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n");
+        utf8::Append(gText, GLOBAL_TEXT_BUFFER_SIZE, result->c_str());
     }
 }
 
