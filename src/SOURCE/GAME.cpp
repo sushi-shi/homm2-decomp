@@ -12,6 +12,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/FileTransaction.h>
 #include <SOURCE/REMOTE_SAVE.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>

@@ -7,6 +7,7 @@
 #include <BASE/Misc.h>
 #include <BASE/Utf8.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/FileTransaction.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
 #include <SOURCE/netwin.h>
@@ -586,8 +587,15 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     const std::string& script = script::ActiveScriptContents();
     if (script.length())
         xml::PushBack(tempDoc, pRoot, "script", script.c_str());
-    const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
-    return tempDoc->SaveFile(path.c_str());
+    // Replace the previous save only once the complete document is written.
+    tinyxml2::XMLPrinter printer;
+    tempDoc->Print(&printer);
+    platform::FileTransaction transaction(platform::Files(), fileName);
+    if (transaction.Handle() == -1)
+        return tinyxml2::XML_ERROR_FILE_COULD_NOT_BE_OPENED;
+    if (!transaction.Write(printer.CStr(), printer.CStrSize() - 1) || !transaction.Commit())
+        return tinyxml2::XML_ERROR_FILE_COULD_NOT_BE_OPENED;
+    return tinyxml2::XML_SUCCESS;
 }
 
 tinyxml2::XMLError XmlFile::Read(const char* fileName) {
