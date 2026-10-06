@@ -203,12 +203,22 @@ their findings are resolved (`docs/match-provenance-audit.md`).
 
 `homm2 build verify` adds the tier in `homm2.verify.TIER`: `check` (every
 function and data byte exact), `link-diff`, `behaviour`, `localization`,
-`strict-allocations`, `reloc-fields` and `usage`.
+`strict-allocations`, `reloc-fields`, `text-coverage`, `constants` and
+`usage`, then each other image's tier (see [editor.md](editor.md)).
 
-Outside both: `text-coverage` (516 unreviewed nested entry candidates and
-overlap reports) and `constants` (clang-tidy fails on every unit in the build
-shell) carry findings; `od-frames`, `relocs`, `data-relocs` and
-`data-topology` are reports.
+`text-coverage` joined the tier once it judged every claimed function as an
+owner (it had counted only `VA` claims, so 495 compiler-generated and library
+entries looked nested), recognized LINK's import-thunk runs and EH
+registration stubs, treated the identified runtime band's internal gaps as
+the library's, and read reviewed entries from `config/reviews/text_entries.tsv`
+(three rows). `constants` joined it once clang-tidy's errors in VC6's
+pre-standard STL headers were tolerated as the source-claim scanner does,
+its review ledger was restored as `config/reviews/constants.tsv` (every file
+`pending` on this branch, the two imported codecs `third-party`), and the 53
+null pointers spelled `0` became `NULL`.
+
+`od-frames`, `relocs`, `data-relocs` and `data-topology` are reports, not
+gates.
 
 ## Tests
 
@@ -320,8 +330,7 @@ Open, in order:
   yet; `sema` subcommands beyond HoMM2's (`-` batch, `vtable`, `gaps`, `map`)
   are not ported. `sema` and `verify` read the game's paths in several
   modules; `--image editor` is refused where they are not keyed.
-- The five gates outside the tier (see "Gate tier") and the broken
-  `audit version-delta`.
+- The broken `audit version-delta`.
 - `workflow setup` (git hooks and the manifest merge driver) is not adopted.
 - Behaviour coverage, and mirroring the behaviour gate in HoMM1.
 - Claim spaces are keyed by the units.toml `images` list

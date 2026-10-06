@@ -13,6 +13,9 @@ from homm2.delink.reloc_owners import load_reviewed_highlow_sites
 
 
 PADDING = {0x00, 0x90, 0xcc}
+# Identified library contributions: an entry point inside one (LIBCMT's
+# shared string bodies, its exception helpers) belongs to the library.
+LIBRARY_UNITS = {"(libcmt)", "(imports)", "(funclets)"}
 
 # LINK also aligns the next function with the multi-byte NOP encodings, which no
 # single-byte set can express. A gap made only of these is alignment fill, not
@@ -25,6 +28,36 @@ ALIGNMENT_NOPS = (
     bytes.fromhex("6690"),            # xchg ax, ax
     bytes.fromhex("8bff"),            # mov edi, edi
 )
+
+
+def import_slot_range(exe):
+    """[lo, hi) RVAs of the import address table (data directory 12)."""
+    data = Path(exe).read_bytes()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    rva, size = struct.unpack_from("<II", data, pe + 24 + 96 + 12 * 8)
+    return rva, rva + size
+
+
+def is_import_thunk_run(body, slots, image_base):
+    """True when *body* is LINK's import thunks: `jmp dword ptr [IAT slot]`."""
+    if not body or len(body) % 6:
+        return False
+    for offset in range(0, len(body), 6):
+        if body[offset:offset + 2] != b"\xff\x25":
+            return False
+        slot = struct.unpack_from("<I", body, offset + 2)[0] - image_base
+        if not slots[0] <= slot < slots[1]:
+            return False
+    return True
+
+
+def is_eh_stub_run(body):
+    """True when *body* is C++ EH registration stubs (`mov eax, FuncInfo;
+    jmp __CxxFrameHandler`): compiler-local .text$x of their parents."""
+    if not body or len(body) % 10:
+        return False
+    return all(body[offset] == 0xB8 and body[offset + 5] == 0xE9
+               for offset in range(0, len(body), 10))
 
 
 def is_alignment_fill(body):
@@ -231,6 +264,12 @@ def main(argv=None):
     library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")
     exclusion_path = Path("config/retail/text_exclusions.csv")
+    reviewed_entries = {}
+    review_path = Path("config/reviews/text_entries.tsv")
+    if review_path.exists():
+        for row in csv.DictReader((line for line in open(review_path) if not line.startswith("#")),
+                                  delimiter="\t"):
+            reviewed_entries[int(row["rva"], 16)] = row["reason"]
     jump_table_path = Path("build/gen/jump_tables.csv")
     output_path = Path(argv[2]) if len(argv) > 2 else None
 
@@ -255,11 +294,16 @@ def main(argv=None):
         if size and text_rva <= start < text_end:
             intervals.append((start, start + size, row["name"], provenance))
             unit_by_name[row["name"]] = row["unit"]
-        if provenance.startswith("source-annotation"):
+        if size and text_rva <= start < text_end:
+            # Every claimed function bounds the one before it; a nested
+            # candidate is judged inside its own owner (a CRT contribution's
+            # internal entry points are LIBCMT's, not a source function's).
             public_by_rva.setdefault(start, (row["name"], row["unit"]))
+        if provenance.startswith("source-annotation"):
             claimed_starts.add(start)
-        elif (provenance.startswith("source-compgen") or
-              provenance.startswith("source-private")):
+        elif size and text_rva <= start < text_end:
+            # Every other claimed function (VA_COMPGEN, private, reviewed
+            # compiler-generated, CRT, import, funclet) is a configured entry.
             source_configured[start] = (size, row["name"], row["unit"], provenance)
 
     configured = dict(source_configured)
@@ -310,7 +354,15 @@ def main(argv=None):
         boundary = boundary_description(rva, text_rva, text, instruction_starts,
                                         instructions, exclusions)
         gh_size, gh_name = ghidra.get(rva, (0, "-"))
-        if rva in configured:
+        if rva in reviewed_entries and rva not in configured:
+            disposition = "reviewed: " + reviewed_entries[rva]
+            accepted_count += 1
+            unit_display = owner_unit
+        elif rva not in configured and owner_unit in LIBRARY_UNITS:
+            disposition = "library-internal"
+            accepted_count += 1
+            unit_display = owner_unit
+        elif rva in configured:
             size, _name, unit, provenance = configured[rva]
             disposition = "accepted"
             accepted_count += 1
@@ -341,12 +393,17 @@ def main(argv=None):
                boundary, extent,
                unit_display, owned_tables, disposition))
 
-    for rva, (size, name, _unit, provenance) in configured.items():
+    for rva, (size, name, unit, provenance) in configured.items():
         end = rva + size
-        if (rva not in claimed_starts and rva not in pointer_targets and
-                rva not in {candidate[0] for candidate in candidates}):
+        # Library rows are identified by their masked bytes; any other entry
+        # needs a decoded caller, a stored pointer or analysis evidence.
+        if (unit not in LIBRARY_UNITS and rva not in claimed_starts
+                and rva not in pointer_targets and rva not in calls
+                and rva not in ghidra and rva not in reviewed_entries):
             candidate_failures.append((
                 rva, "%s has no direct-call, stored-pointer, or Ghidra entry evidence" % name))
+        if unit in LIBRARY_UNITS:
+            continue        # identified by masked bytes; embedded data desyncs linear decoding
         if end not in instructions and end != text_end:
             previous_index = bisect.bisect_left(instruction_starts, end) - 1
             if previous_index < 0 or instruction_starts[previous_index] + \
@@ -392,15 +449,38 @@ def main(argv=None):
     if cursor < text_end:
         gaps.append((cursor, text_end))
 
+    # The identified library band: from the first library row to the last one's
+    # end, provided no source-claimed function lies inside it. A gap or overlap
+    # there is the library's own (its data tables, internal labels and shared
+    # bodies), identified with the whole contribution.
+    library_rows = [(start, end) for start, end, name, _p in intervals
+                    if unit_by_name.get(name) in LIBRARY_UNITS]
+    runtime = [start for start, end, name, _p in intervals
+               if unit_by_name.get(name) == "(libcmt)"]
+    band = (min(runtime), max(end for start, end in library_rows if start >= min(runtime))) \
+        if runtime else (0, 0)
+    if any(band[0] <= rva < band[1] for rva in claimed_starts):
+        band = (0, 0)
+    import_slots = import_slot_range(exe)
+
     unexplained = []
     padding_count = 0
+    library_gaps = thunk_gaps = 0
     for start, end in gaps:
         for piece_start, piece_end in subtract_ranges(start, end, exclusions):
             body = text[piece_start - text_rva:piece_end - text_rva]
             if is_alignment_fill(body):
                 padding_count += 1
+            elif is_import_thunk_run(body.strip(b"\x90\xcc"), import_slots, image_base):
+                thunk_gaps += 1
+            elif is_eh_stub_run(body.strip(b"\x90\xcc")):
+                thunk_gaps += 1
+            elif band[0] <= piece_start and piece_end <= band[1]:
+                library_gaps += 1
             else:
                 unexplained.append((piece_start, piece_end, len(body)))
+    overlap = [row for row in overlap
+               if not (band[0] <= row[0] and row[3] <= band[1])]
 
     exclusion_failures = []
     for index, (start, end, kind, reason) in enumerate(exclusions):
@@ -421,6 +501,8 @@ def main(argv=None):
         print("  EXCLUDED 0x%x..0x%x %s jump_tables=%d (%s)" %
               (start, end, kind, contained_tables, reason))
 
+    print("library band 0x%x..0x%x: %d internal gaps; import-thunk and EH-stub runs: %d" %
+          (band[0], band[1], library_gaps, thunk_gaps))
     print("coverage: functions=%d unique_spans=%d padding_gaps=%d unexplained_gaps=%d "
           "overlaps=%d candidates=%d accepted=%d exclusions=%d jump_tables=%d "
           "failures=%d" %

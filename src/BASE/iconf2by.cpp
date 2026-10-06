@@ -11,20 +11,20 @@
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-DATA(0x005397f0) static IconEntry* s_entry = 0;
+DATA(0x005397f0) static IconEntry* s_entry = NULL;
 DATA(0x005397f4) static i32 s_loopCount = 0;
-DATA(0x005397f8) static u8* s_src = 0;
+DATA(0x005397f8) static u8* s_src = NULL;
 DATA(0x005397fc) static i32 s_right = 0;
 DATA(0x00539800) static i32 s_x = 0;
 DATA(0x00539804) static i32 s_clipR = 0;
-DATA(0x00539808) static u8* s_dst = 0;
+DATA(0x00539808) static u8* s_dst = NULL;
 DATA(0x0053980c) static i32 s_spanCount = 0;
 DATA(0x00539810) static i32 s_srcSkip = 0;
 DATA(0x00539814) static i32 s_run = 0;
 DATA(0x00539818) static i32 s_y = 0;
-DATA(0x0053981c) static u8* s_row = 0;
-DATA(0x00539820) static u8* s_dimPal = 0;
-DATA(0x00539824) static u8* s_copyDst = 0;
+DATA(0x0053981c) static u8* s_row = NULL;
+DATA(0x00539820) static u8* s_dimPal = NULL;
+DATA(0x00539824) static u8* s_copyDst = NULL;
 DATA(0x00539828) static i32 s_dimLen = 0;
 DATA(0x0053982c) static i32 s_left = 0;
 DATA(0x00539830) static u8 s_color = 0;

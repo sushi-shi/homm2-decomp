@@ -13,20 +13,20 @@
 // the decoder lives in a file static, not a local.
 DATA(0x005360d4) static i32 s_left = 0;
 DATA(0x005360d8) static i32 s_clipR = 0;
-DATA(0x005360dc) static u8* s_dimPal = 0;
+DATA(0x005360dc) static u8* s_dimPal = NULL;
 DATA(0x005360e0) static u8 s_color = 0;
 DATA(0x005360e4) static i32 s_spanCount = 0;
-DATA(0x005360e8) static u8* s_dst = 0;
-DATA(0x005360ec) static u8* s_row = 0;
+DATA(0x005360e8) static u8* s_dst = NULL;
+DATA(0x005360ec) static u8* s_row = NULL;
 DATA(0x005360f0) static i32 s_y = 0;
-DATA(0x005360f4) static IconEntry* s_entry = 0;
+DATA(0x005360f4) static IconEntry* s_entry = NULL;
 DATA(0x005360f8) static i32 s_run = 0;
 DATA(0x005360fc) static i32 s_x = 0;
 DATA(0x00536100) static i32 s_clipB = 0;
-DATA(0x00536104) static u8* s_src = 0;
+DATA(0x00536104) static u8* s_src = NULL;
 DATA(0x00536108) static i32 s_dimLen = 0;
 DATA(0x0053610c) static i32 s_loopCount = 0;
-DATA(0x00536110) static u8* s_literalSource = 0;
+DATA(0x00536110) static u8* s_literalSource = NULL;
 DATA(0x00536114) static i32 s_pitch = 0;
 
 VA(0x004c0ca0, 0x7cf)

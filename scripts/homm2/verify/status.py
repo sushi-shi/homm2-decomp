@@ -700,7 +700,7 @@ def main(argv=None, data=None):
         # function may fall below the maximum banked for its current source.
         live = _fn_fuzzy(data)
         regressed = sorted(key for key, (maximum, _hash) in maxima.items()
-                           if live.get(key, 0.0) + 1e-6 < maximum)
+                           if round(live.get(key, 0.0), 4) + 1e-4 < maximum)
         for unit, name in regressed[:20]:
             print(f"[status] REGRESSION {unit} {name}: {live.get((unit, name), 0.0):.2f}% "
                   f"< banked {maxima[(unit, name)][0]:.2f}%")

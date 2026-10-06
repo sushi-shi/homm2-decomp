@@ -11,7 +11,7 @@ the complete occurrence list to `build/constants/literals.tsv` and a semantic un
 list to `build/constants/magic-numbers.tsv`. `build/constants/null-zero.tsv` must remain empty.
 The generated `build/constants/README.md` summarizes contexts and orders the current review queue.
 
-The durable checklist is `config/constants_review.tsv`. Every reconstructed source and project
+The durable checklist is `config/reviews/constants.tsv`. Every reconstructed source and project
 header has exactly one row. A reconstructed file stays `pending` until every occurrence has been
 reviewed; the audit rejects a `reviewed` source file while it still has an unexplained code,
 declaration, or local-table literal. Imported implementations that are intentionally preserved

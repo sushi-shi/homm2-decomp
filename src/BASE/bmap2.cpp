@@ -6,14 +6,14 @@
 #include <SOURCE/KB.h>
 
 DATA(0x00536388) static i32 gFillRow = 0;
-DATA(0x0053638c) static u8* gFillPtr = 0;
+DATA(0x0053638c) static u8* gFillPtr = NULL;
 DATA(0x00536390) static i32 gDimRow = 0;
-DATA(0x00536394) static u8* gDimPtr = 0;
+DATA(0x00536394) static u8* gDimPtr = NULL;
 DATA(0x00536398) static i32 gDimCol = 0;
 DATA(0x0053639c) static i32 gBlitRow = 0;
-DATA(0x005363a0) static u8* gDimNext = 0;
-DATA(0x005363a4) static u8* gBlitSrc = 0;
-DATA(0x005363a8) static u8* gBlitDst = 0;
+DATA(0x005363a0) static u8* gDimNext = NULL;
+DATA(0x005363a4) static u8* gBlitSrc = NULL;
+DATA(0x005363a8) static u8* gBlitDst = NULL;
 
 #if H2_RETAIL_COMPILER
 #define height h

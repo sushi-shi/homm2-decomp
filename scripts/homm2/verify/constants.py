@@ -19,7 +19,7 @@ from homm2.verify.constants_syntax import lex, parse_enum_declarations
 REPO = next(path for path in Path(__file__).resolve().parents if (path / "flake.nix").exists())
 OUTPUT = REPO / "build" / "constants"
 DATABASE = REPO / "build" / "clangd" / "compile_commands.json"
-REVIEW_MANIFEST = REPO / "config" / "constants_review.tsv"
+REVIEW_MANIFEST = REPO / "config" / "reviews" / "constants.tsv"
 SOURCE_PATTERN = r"src/(BASE|SOURCE|EDITOR)/.*\.cpp"
 ANNOTATION_MACROS = {
     "DATA", "DATA_COMPGEN", "DATA_COMPGEN_GUARD", "SIZE", "VA", "VA_COMPGEN",
@@ -200,13 +200,24 @@ def _diagnostic_rows(log: str, pattern: re.Pattern, lexical: list[Literal]) -> l
     return sorted(result, key=lambda item: (item["path"], item["line"], item["column"]))
 
 
+DIAGNOSTIC_ERROR_RE = re.compile(r"^(?P<path>/[^:]+):\d+:\d+: error: ")
+
+
 def _unexpected_failures(log: str) -> list[str]:
-    failures = []
-    for raw in log.splitlines():
-        match = PROCESS_ERROR_RE.match(raw)
-        if match:
-            failures.append(match.group("path"))
-    return failures
+    """Files clang-tidy could not process because of an error in OUR code.
+
+    VC6's pre-standard STL headers do not parse as modern C++ (template
+    default arguments, iostream manipulators); clang recovers and the game
+    cursors survive, as in the source-claim scanner. Errors confined to
+    system or vendor headers are tolerated; one in src/ or include/ fails."""
+    own = sorted({match.group("path") for match in map(DIAGNOSTIC_ERROR_RE.match,
+                                                       log.splitlines())
+                  if match and (Path(match.group("path")).resolve().is_relative_to(REPO / "src")
+                                or Path(match.group("path")).resolve()
+                                .is_relative_to(REPO / "include"))})
+    if own:
+        return own
+    return []
 
 
 def _is_zero_null_spelling(spelling: str) -> bool:

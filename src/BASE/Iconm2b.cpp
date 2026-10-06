@@ -15,11 +15,11 @@ DATA(0x005363ac) static i32 s_x = 0;
 DATA(0x005363b0) static i32 s_run = 0;
 DATA(0x005363b4) static i32 s_y = 0;
 DATA(0x005363b8) static i32 s_left = 0;
-DATA(0x005363bc) static u8* s_src = 0;
-DATA(0x005363c0) static u8* s_row = 0;
+DATA(0x005363bc) static u8* s_src = NULL;
+DATA(0x005363c0) static u8* s_row = NULL;
 DATA(0x005363c4) static i32 s_clipR = 0;
 DATA(0x005363c8) static i32 s_clipB = 0;
-DATA(0x005363cc) static IconEntry* s_entry = 0;
+DATA(0x005363cc) static IconEntry* s_entry = NULL;
 
 VA(0x004c67b0, 0x2e8)
 void MonoIconToBitmap(

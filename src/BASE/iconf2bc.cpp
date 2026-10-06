@@ -12,18 +12,18 @@
 // the decoder lives in a file static, not a local.
 DATA(0x005397a8) static i32 s_loopCount = 0;
 DATA(0x005397ac) static i32 s_clipR = 0;
-DATA(0x005397b0) static IconEntry* s_entry = 0;
-DATA(0x005397b4) static u8* s_dimPal = 0;
+DATA(0x005397b0) static IconEntry* s_entry = NULL;
+DATA(0x005397b4) static u8* s_dimPal = NULL;
 DATA(0x005397b8) static i32 s_right = 0;
 DATA(0x005397bc) static i32 s_y = 0;
 DATA(0x005397c0) static i32 s_srcSkip = 0;
-DATA(0x005397c4) static u8* s_dst = 0;
+DATA(0x005397c4) static u8* s_dst = NULL;
 DATA(0x005397c8) static i32 s_spanCount = 0;
 DATA(0x005397cc) static i32 s_clipB = 0;
-DATA(0x005397d0) static u8* s_row = 0;
-DATA(0x005397d4) static u8* s_copyDst = 0;
+DATA(0x005397d0) static u8* s_row = NULL;
+DATA(0x005397d4) static u8* s_copyDst = NULL;
 DATA(0x005397d8) static i32 s_x = 0;
-DATA(0x005397dc) static u8* s_src = 0;
+DATA(0x005397dc) static u8* s_src = NULL;
 DATA(0x005397e0) static i32 s_left = 0;
 DATA(0x005397e4) static i32 s_run = 0;
 DATA(0x005397e8) static i32 s_dimLen = 0;

@@ -69,8 +69,8 @@ GATES = {
     # Outside the build and the tier: known findings or reports.
     "text-coverage": ([PY, "-m", "homm2.verify.text_coverage"],
                       "every .text byte is claimed, padding or reviewed"),
-    "constants": ([PY, "-m", "homm2.verify.constants"],
-                  "numeric literals reviewed"),
+    "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4"],
+                  "numeric-literal inventory; no 0 spelled for a null pointer"),
     "relocs": ([PY, "-m", "homm2.verify.assert_relocs"],
                "focused relocation review (`relocs 0x<rva>`)"),
     "od-frames": ([PY, "-m", "homm2.verify.od_frames"],
@@ -93,7 +93,7 @@ BUILD_GATES = ("annotated-functions", "decls", "no-fake-labels", "globals-data",
 STAGED = ("defs-declared", "reloc-identities")
 #: Added by `homm2 build verify`, in run order.
 TIER = ("check", "link-diff", "behaviour", "localization", "strict-allocations",
-        "reloc-fields", "usage")
+        "reloc-fields", "text-coverage", "constants", "usage")
 
 #: Another image's gates. Its source gates (declarations, the source-function
 #: inventory, integer spelling, the catalog) read the whole tree and run with

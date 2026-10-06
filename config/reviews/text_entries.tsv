@@ -1,0 +1,6 @@
+# Reviewed .text entries that the coverage audit cannot attribute by
+# decoded callers, stored pointers or analysis (homm2 verify text-coverage).
+rva	reason
+0x70d42	UpdateNormalDialog's `call` lands one byte into the next instruction (VC6 /Od SEH local-unwind call); the overlapping decode is the function's own
+0x2b820	compiler-generated `vector constructor iterator` (??_H) kept by /OPT:NOREF; no code or data references it
+0xc2f22	BITS.asm exports _BitClear beside its callers; the image keeps the unreferenced procedure (assembled unit, no /OPT:REF)
