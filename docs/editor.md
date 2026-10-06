@@ -118,6 +118,24 @@ editor's report and its README section. The first numbers: 510 of 1,121
 functions exact, 509 of 523 in the shared units; the editor-only code is in
 `(unmatched)` until its units are reconstructed.
 
+## Build and gates
+
+`homm2 build` builds the game and then every other staged image (each in its
+own process with `$HOMM2_IMAGE`); `homm2 --image editor build` builds the
+editor alone. `homm2 build verify` runs the game's tier and then the
+editor's. The editor's gates:
+
+| Gate | Role for the editor |
+| --- | --- |
+| `vtables` | build gate: every vtable the editor's inventory names has a source marker (own or placed) |
+| `no-fake-labels`, `globals-data`, `globals-defined` | staged (advisory): their findings are the editor variants and owner units not yet written - REQUEST's editor `Main`/`Open`, EDITMGR's globals, the KB data the editor's own objects define |
+| `check` | tier: no function below the maximum banked in `config/match_baseline.editor.tsv` |
+| `image-link-diff` | tier: pending until the editor links; the first `--update` banks `config/retail/editor/link_diff.tsv` and the gate holds it from then on |
+| `strict-allocations`, `reloc-fields` | tier |
+
+The editor's link graph waits for a link that can resolve: every census
+function needs a source owner first (no `/FORCE`, no retail stand-ins).
+
 ## Open work
 
 - Reconstruct the editor-only units in link order, starting from EDITMGR,
@@ -129,5 +147,5 @@ functions exact, 509 of 523 in the shared units; the editor-only code is in
   initializers, OLDNAMES aliases (`_lseek`/`__lseek`, `_access`, `_strrev`),
   one string identity in Misc and one data identity in SAMPLE.
 - Data: the editor's data bytes (31%) wait for its own units' `DATA` claims.
-- The editor's gates, link graph and `link_diff.tsv`, its clean export and a
-  `homm2 build` that builds both images.
+- The editor's link graph and `link_diff.tsv` (when it can link), and its
+  clean export.

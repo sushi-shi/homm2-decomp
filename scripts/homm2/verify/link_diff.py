@@ -22,11 +22,14 @@ import struct
 import sys
 from pathlib import Path
 
-from homm2.core.paths import REPO
+from homm2.core.paths import DEFAULT_IMAGE, REPO, image_build, image_key, retail_dir, retail_exe
 
-RETAIL = REPO / "build/orig/HMM2PL.exe"
-CANDIDATE = REPO / "build/link/historical/HMM2PL.exe"
-CEILING = REPO / "config/link_diff.tsv"
+# The game keeps its historical paths; another image's candidate is
+# build/<image>/link/historical/<EXE> and its ceiling config/retail/<image>/link_diff.tsv.
+GAME = image_key() == DEFAULT_IMAGE
+RETAIL = retail_exe()
+CANDIDATE = image_build() / "link/historical" / RETAIL.name
+CEILING = REPO / "config/link_diff.tsv" if GAME else retail_dir() / "link_diff.tsv"
 HEADER = ("# Highest differing byte count per region of the historical native link\n"
           "# against retail. Written by `python3 -m homm2.verify.link_diff --update`;\n"
           "# lower it when the residual shrinks, never raise it to admit a regression.\n"
@@ -113,6 +116,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--update", action="store_true",
                         help="bank the current counts as the ceiling")
     args = parser.parse_args(argv)
+    if not GAME and not args.update and not args.ceiling.is_file():
+        # An image becomes linkable when every census function has a source
+        # owner; until then it has no candidate and no ceiling to hold.
+        print(f"link diff: {image_key()} pending - no ceiling yet "
+              f"({args.ceiling.relative_to(REPO)} is banked by the first --update)")
+        return 0
     counts = regions(args.retail.read_bytes(), args.candidate.read_bytes())
     total = sum(counts.values())
     summary = ", ".join(f"{name} {count}" for name, count in counts.items())

@@ -37,12 +37,12 @@ _Excluded from the % above — identified generated/library code, not independen
 
 ### EDT2PL.exe
 
-**Overall: 510 / 1121 functions exact (45.50%) &middot; 510 / 1121 functions exact-max (45.50%) &middot; 42.60% fuzzy &middot; 42.60% fuzzy-max &middot; 8,003 / 25,989 data bytes (30.794%) &middot; 4 / 49 data-bearing units exact.** A separate image with its own delink, comparison and scores; shared units compile once per image.
+**Overall: 513 / 1121 functions exact (45.76%) &middot; 513 / 1121 functions exact-max (45.76%) &middot; 42.61% fuzzy &middot; 42.61% fuzzy-max &middot; 8,015 / 25,989 data bytes (30.840%) &middot; 4 / 49 data-bearing units exact.** A separate image with its own delink, comparison and scores; shared units compile once per image.
 
 | Module        | Units |   Functions exact | Functions exact-max |  Fuzzy | Fuzzy-max | Data exact |              Data bytes |
 | :------------ | ----: | ----------------: | ------------------: | -----: | --------: | ---------: | ----------------------: |
-| `(unmatched)` |     1 |    0 / 591 (0.0%) |      0 / 591 (0.0%) |   0.0% |      0.0% |      0 / 1 |       0 / 3,484 (0.00%) |
-| `BASE`        |    44 | 445 / 458 (97.2%) |   445 / 458 (97.2%) |  99.6% |     99.6% |     4 / 44 | 7,979 / 14,960 (53.34%) |
+| `(unmatched)` |     1 |    0 / 588 (0.0%) |      0 / 588 (0.0%) |   0.0% |      0.0% |      0 / 1 |       0 / 3,484 (0.00%) |
+| `BASE`        |    44 | 448 / 461 (97.2%) |   448 / 461 (97.2%) |  99.6% |     99.6% |     4 / 44 | 7,991 / 14,960 (53.42%) |
 | `SOURCE`      |     3 |   64 / 65 (98.5%) |     64 / 65 (98.5%) | 100.0% |    100.0% |      0 / 3 |      12 / 7,449 (0.16%) |
 | `EDITOR`      |     1 |     1 / 7 (14.3%) |       1 / 7 (14.3%) |  98.0% |     98.0% |      0 / 1 |        12 / 96 (12.50%) |
 

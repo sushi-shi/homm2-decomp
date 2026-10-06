@@ -166,6 +166,8 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0002fd30	0x5	func	?CreateFizzleTables@@YIXXZ	BASE/WINMGR	0x000b79a0	masked game body (5 bytes) at its unit's block offset, shared by 23 bodies (7 occurrence(s))
 0x0002fd40	0x46d	func	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	BASE/WINMGR	0x000b79b0	masked game body (1133 bytes, 37 fields masked) unique at a census start
 0x000301b0	0x4d	func	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	BASE/WINMGR	0x000b7e20	masked game body (77 bytes, 0 fields masked) unique at a census start
+0x00030200	0x5	func	?CreateColorTables@@YIXXZ	BASE/WINMGR	0x000b7e70	masked game body (5 bytes) at its unit's block offset, shared by 23 bodies (7 occurrence(s)); the only identical body whose unit this image links
+0x00030210	0x5	func	?CreateColorLookupTables@@YIXXZ	BASE/WINMGR	0x000b7e80	masked game body (5 bytes) at its unit's block offset, shared by 23 bodies (7 occurrence(s)); the only identical body whose unit this image links
 0x00030220	0x27	func	_$E19	BASE/WINMGR	0x000b7e90	masked game body (39 bytes) at its unit's block offset, shared by 23 bodies (65 occurrence(s))
 0x00030250	0x12	func	_$E18	BASE/WINMGR	0x000b7ec0	masked game body (18 bytes) at its unit's block offset, shared by 23 bodies (68 occurrence(s))
 0x00030270	0x44c	func	?KeyboardMessageHandler@@YIHPAXIIJ@Z	BASE/INPUTMGR	0x000bbf40	masked game body (1100 bytes, 63 fields masked) unique at a census start
@@ -443,6 +445,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00042080	0x2b	func	??0dimmerWidget@@QAE@XZ	BASE/DIMMER	0x000d3310	masked game body (43 bytes, 2 fields masked) unique at a census start
 0x000420b0	0x3f	func	??0dimmerWidget@@QAE@FFFFFF@Z	BASE/DIMMER	0x000d3340	masked game body (63 bytes, 2 fields masked) unique at a census start
 0x000420f0	0x77	func	?Read@dimmerWidget@@QAEXXZ	BASE/DIMMER	0x000d3380	masked game body (119 bytes, 12 fields masked) unique at a census start
+0x00042170	0x19	func	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	BASE/DIMMER	0x000d3400	masked game body (25 bytes, 1 fields masked) unique at a census start; the only identical body whose unit this image links
 0x00042190	0x13	func	?Draw@dimmerWidget@@UAEXXZ	BASE/DIMMER	0x000d3420	masked game body (19 bytes) at its unit's block offset, shared by 9 bodies (2 occurrence(s))
 0x000421b0	0x2e	func	??_GdimmerWidget@@UAEPAXI@Z	BASE/DIMMER	0x000d3440	masked game body (46 bytes) at its unit's block offset, shared by 9 bodies (15 occurrence(s))
 0x000421e0	0x1c	func	??1dimmerWidget@@UAE@XZ	BASE/DIMMER	0x000d3470	masked game body (28 bytes, 2 fields masked) unique at a census start

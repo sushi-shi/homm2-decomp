@@ -324,3 +324,9 @@ Open, in order:
   `audit version-delta`.
 - `workflow setup` (git hooks and the manifest merge driver) is not adopted.
 - Behaviour coverage, and mirroring the behaviour gate in HoMM1.
+- Claim spaces are keyed by the units.toml `images` list
+  (`homm2.manifest.claim_files`), not by source directory: `src/EDITOR/mapcell.cpp`
+  is game code the original tree kept in its Editor directory (the assertion
+  paths show it) and stays there. HoMM1 keys claims by directory
+  (`retail_labels.source.claim_space`); adopting the units.toml rule there is
+  open for convergence.

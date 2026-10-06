@@ -563,9 +563,32 @@ def image_sections() -> list[str]:
         result = subprocess.run([sys.executable, "-m", "homm2.verify.status", "--image-section"],
                                 env=env, capture_output=True, text=True, cwd=REPO)
         if result.returncode != 0:
-            raise SystemExit(f"README section of image {image} failed:\n{result.stderr[-2000:]}")
+            # A stale or missing report (the image is rebuilt after the game)
+            # keeps the section the README already has.
+            previous = _readme_section(image)
+            if previous:
+                out += ["", *previous]
+            continue
         out += ["", *result.stdout.rstrip("\n").splitlines()]
     return out
+
+
+def _readme_section(image: str) -> list[str]:
+    """The README's current section for `image`, or []."""
+    readme = REPO / "README.md"
+    if not readme.is_file():
+        return []
+    lines = readme.read_text().splitlines()
+    title = f"### {retail_exe(image).name}"
+    if title not in lines:
+        return []
+    start = lines.index(title)
+    end = start + 1
+    while end < len(lines) and not lines[end].startswith("### ") and lines[end] != RM_END:
+        end += 1
+    while end > start and not lines[end - 1].strip():
+        end -= 1
+    return lines[start:end]
 
 
 from homm2.core.usage import logged
@@ -599,6 +622,7 @@ def main(argv=None, data=None):
         return 0
     if "--write-readme" in argv:
         if image_key() != DEFAULT_IMAGE:
+            record_maxima(data)
             # The README block is the game's; it renders this image's section.
             from homm2.core.paths import IMAGE_ENV
             env = dict(os.environ, **{IMAGE_ENV: DEFAULT_IMAGE})
@@ -671,6 +695,19 @@ def main(argv=None, data=None):
         print(f"[status] identified carve-outs: {carved_functions} functions in "
               f"{len(carved_units)} modules "
               f"({', '.join(sorted(u.get('name', '?') for u in carved_units))})")
+    if check and image_key() != DEFAULT_IMAGE:
+        # An image still under reconstruction is held to its own record: no
+        # function may fall below the maximum banked for its current source.
+        live = _fn_fuzzy(data)
+        regressed = sorted(key for key, (maximum, _hash) in maxima.items()
+                           if live.get(key, 0.0) + 1e-6 < maximum)
+        for unit, name in regressed[:20]:
+            print(f"[status] REGRESSION {unit} {name}: {live.get((unit, name), 0.0):.2f}% "
+                  f"< banked {maxima[(unit, name)][0]:.2f}%")
+        if regressed:
+            print(f"[status] FAIL: {len(regressed)} function(s) below their banked maximum")
+            return 1
+        return 0
     if check and (matched_functions < total_functions or matched_data < total_data):
         print(f"[status] FAIL: {total_functions - matched_functions} function(s) and "
               f"{total_data - matched_data} data byte(s) are not exact")

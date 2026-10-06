@@ -4,6 +4,8 @@ have a DEFINITION in its owner TU's object, so the project links (no unresolved 
 each inventory-owned global declared in a header, checks its symbol is DEFINED (section > 0) in
 build/objdiff/base/<owner-unit>.obj. Only the _const pseudo-unit is exempt. Runs after
 ninja (needs the built objs + llvm-objdump). Run from repo root; exits 1 on any violation."""
+from homm2.core.paths import image_paths
+B = image_paths().build
 import csv, re, sys, glob, os, subprocess
 
 from homm2.core.usage import logged
@@ -13,7 +15,7 @@ from homm2.core.usage import logged
 def main(argv=None) -> int:
     # inventory data symbol: demangled identifier -> (owner unit, mangled name)
     info = {}
-    for r in csv.DictReader(open("build/gen/symbol_names.csv")):
+    for r in csv.DictReader(open(B + "/gen/symbol_names.csv")):
         if r["kind"] != "data":
             continue
         m = re.match(r'\?([A-Za-z_]\w*)@@', r["name"]) or re.match(r'[_@]?([A-Za-z_]\w*)', r["name"])
@@ -37,7 +39,7 @@ def main(argv=None) -> int:
     _defcache = {}
     def defined_in(unit):
         if unit not in _defcache:
-            obj = "build/objdiff/base/%s.obj" % unit
+            obj = B + "/objdiff/base/%s.obj" % unit
             syms = set()
             if os.path.exists(obj):
                 out = subprocess.run(["llvm-objdump", "-t", obj], capture_output=True, text=True).stdout

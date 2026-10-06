@@ -8,6 +8,8 @@ symbol absent from the inventory.
 A defined, external, function-typed COFF symbol (llvm-objdump: sec>0, ty 20, scl 2) is a
 "label". FAKE = not in the inventory at all. MISATTRIBUTED = present but under a different
 unit (usually a wrong-TU definition)."""
+from homm2.core.paths import image_paths
+B = image_paths().build
 import csv, subprocess, os, sys, glob, re
 
 from homm2.core.usage import logged
@@ -15,7 +17,7 @@ from homm2.core.usage import logged
 
 @logged
 def main(argv=None) -> int:
-    rows = list(csv.DictReader(open("build/gen/symbol_names.csv")))
+    rows = list(csv.DictReader(open(B + "/gen/symbol_names.csv")))
     global_funcs = {r["name"] for r in rows if r["kind"] == "func"}
     unit_funcs = {}
     for r in rows:
@@ -40,9 +42,9 @@ def main(argv=None) -> int:
         return names
 
     fake = {}; misattr = {}
-    objs = sorted(glob.glob("build/objdiff/base/**/*.obj", recursive=True))
+    objs = sorted(glob.glob(B + "/objdiff/base/**/*.obj", recursive=True))
     for obj in objs:
-        unit = os.path.relpath(obj, "build/objdiff/base")[:-4]   # e.g. BASE/BITS
+        unit = os.path.relpath(obj, B + "/objdiff/base")[:-4]   # e.g. BASE/BITS
         for s in defined_funcs(obj):
             if s not in global_funcs:
                 fake.setdefault(unit, []).append(s)

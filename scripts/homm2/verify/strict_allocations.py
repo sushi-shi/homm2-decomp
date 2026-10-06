@@ -1,5 +1,6 @@
 """Audit reviewed HoMM2 data allocations with objdiff's strict symbol schema."""
 
+from homm2.core.paths import gen_dir, objdiff_dir, retail_dir, retail_exe
 import argparse
 import base64
 import csv
@@ -21,11 +22,11 @@ from homm2.delink.reviewed_data import ensure_reviewed_targets
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
-LEDGER = REPO / "config/retail/data_initialized_storage.tsv"
-SYMBOLS = REPO / "build/gen/symbol_names.csv"
-RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
-OBJDIFF_PROJECT = REPO / "build/objdiff"
-OUTPUT = REPO / "build/gen/strict-allocations"
+LEDGER = retail_dir() / "data_initialized_storage.tsv"
+SYMBOLS = gen_dir() / "symbol_names.csv"
+RETAIL_EXE = retail_exe()
+OBJDIFF_PROJECT = objdiff_dir()
+OUTPUT = gen_dir() / "strict-allocations"
 GENERIC_CHECKER = "homm2.audit.strict_allocation_diff"
 
 

@@ -160,12 +160,24 @@ class Placer:
         at = defaultdict(list)
         for grva, (erva, _why) in self.functions.items():
             at[erva].append(grva)
+        from homm2.manifest import units as image_units
+        linked = {u["unit"] for u in image_units(image=self.image)}
         for erva, grvas in at.items():
             if len(grvas) > 1:
+                # Identical game bodies: the one whose unit this image links
+                # names the address; otherwise the bytes cannot choose.
+                own = [g for g in grvas if meta[g][0]["unit"] in linked]
+                keep = own[0] if len(own) == 1 else None
                 names = ", ".join(meta[g][0]["name"] for g in grvas)
-                self.problems.append(f"0x{erva:x}: identical game bodies {names}; unnamed")
+                if keep is None:
+                    self.problems.append(f"0x{erva:x}: identical game bodies {names}; unnamed")
                 for g in grvas:
-                    del self.functions[g]
+                    if g != keep:
+                        del self.functions[g]
+                if keep is not None:
+                    erva_, why = self.functions[keep]
+                    self.functions[keep] = (erva_, why + "; the only identical body "
+                                            "whose unit this image links")
 
     # -- calls --------------------------------------------------------------
     def call_votes(self) -> dict[int, Counter]:

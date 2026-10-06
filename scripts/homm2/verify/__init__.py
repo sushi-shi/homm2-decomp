@@ -31,6 +31,8 @@ GATES = {
               "every function and every data byte exact"),
     "link-diff": (["ninja", "link-diff"],
                   "historical link byte-identical within config/link_diff.tsv"),
+    "image-link-diff": ([PY, "-m", "homm2.verify.link_diff"],
+                        "another image's link within its ceiling (pending until it links)"),
     "localization": ([PY, "-m", "homm2.graph.localization"],
                      "every used text ID resolves in the catalog"),
     "strict-allocations": ([PY, "-m", "homm2.verify.strict_allocations"],
@@ -93,6 +95,35 @@ STAGED = ("defs-declared", "reloc-identities")
 TIER = ("check", "link-diff", "behaviour", "localization", "strict-allocations",
         "reloc-fields", "usage")
 
+#: Another image's gates. Its source gates (declarations, the source-function
+#: inventory, integer spelling, the catalog) read the whole tree and run with
+#: the game; its build gates check the image's own inventory and objects; its
+#: tier holds it to its banked maxima (`check`) and, once it links, its
+#: link-diff ceiling.
+IMAGE_BUILD_GATES = ("vtables",)
+#: Staged for another image while its units are reconstructed: a shared
+#: unit's body the image compiles differently (an editor variant not yet
+#: reconstructed) has no identity yet, and a header extern whose owner unit
+#: is not yet written (an editor unit, or the game's KB data the editor's own
+#: objects define) has no DATA claim or definition.
+IMAGE_STAGED = ("no-fake-labels", "globals-data", "globals-defined")
+IMAGE_TIER = ("check", "image-link-diff", "strict-allocations", "reloc-fields")
+
+
+def build_gates() -> tuple[str, ...]:
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    return BUILD_GATES if image_key() == DEFAULT_IMAGE else IMAGE_BUILD_GATES
+
+
+def staged_gates() -> tuple[str, ...]:
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    return STAGED if image_key() == DEFAULT_IMAGE else IMAGE_STAGED
+
+
+def tier() -> tuple[str, ...]:
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    return TIER if image_key() == DEFAULT_IMAGE else IMAGE_TIER
+
 VERBS = {"status": [], "bank": ["update"], "readme": ["--write-readme"]}
 
 
@@ -101,8 +132,8 @@ def usage(stream=sys.stderr) -> None:
     width = max(map(len, GATES))
     print("\ngates (b = every build, s = staged, * = build verify tier):", file=stream)
     for name, (_argv, blurb) in GATES.items():
-        mark = ("b" if name in BUILD_GATES or name == "annotated-sources" else
-                "s" if name in STAGED else "*" if name in TIER else " ")
+        mark = ("b" if name in build_gates() or name == "annotated-sources" else
+                "s" if name in staged_gates() else "*" if name in tier() else " ")
         print(f"  {mark} {name:<{width}}  {blurb}", file=stream)
 
 
@@ -124,8 +155,11 @@ def run_gates(names, *, advisory: bool = False) -> int:
 
 
 def run_tier() -> int:
+    from homm2.core.paths import image_key
     failed = []
-    for name in TIER:
+    names = tier()
+    print(f"[verify] {image_key()} tier", flush=True)
+    for name in names:
         started = time.monotonic()
         rc = run_gate(name)
         verdict = "OK" if rc == 0 else f"FAIL (rc={rc})"
@@ -136,7 +170,7 @@ def run_tier() -> int:
         print(f"[verify] {len(failed)} gate(s) failed: {', '.join(failed)}; "
               f"rerun one with `homm2 verify <gate>`")
         return 1
-    print(f"[verify] all {len(TIER)} gates pass")
+    print(f"[verify] all {len(names)} {image_key()} gates pass")
     return 0
 
 
@@ -148,7 +182,8 @@ def main(argv=None) -> int:
         return 0 if argv else 2
     verb, rest = argv[0], argv[1:]
     if verb == "all":
-        return run_gates(BUILD_GATES) or run_gates(STAGED, advisory=True) or run_tier()
+        return (run_gates(build_gates()) or run_gates(staged_gates(), advisory=True)
+                or run_tier())
     if verb in VERBS:
         from homm2.verify.status import main as status
         return status([*VERBS[verb], *rest])

@@ -31,7 +31,7 @@ ALIASES = {
 #: Commands that read the selected image (`--image`); the rest refuse another
 #: image instead of silently answering for the game.
 IMAGE_AWARE = {"inspect", "configure", "delink", "labels", "build", "match", "compare",
-               "help", "-h", "--help"}
+               "sema", "verify", "help", "-h", "--help"}
 IMAGE_AUDITS = {"census", "placements", "usage"}
 
 TOOLS = ("wine", "cl", "ml", "link", "rc", "objdiff", "delinker")
@@ -90,12 +90,54 @@ def _toolchain(argv):
     return toolchain(["--force"] if a.force else [])
 
 
+def _other_images() -> list[str]:
+    """Images `homm2 build` builds after the game: every pinned image whose
+    executable is staged, unless `--image` selected one."""
+    from homm2.core.inputs import targets
+    from homm2.core.paths import DEFAULT_IMAGE, IMAGE_ENV
+    if os.environ.get(IMAGE_ENV):
+        return []
+    return [key for key, pin in targets(REPO).items()
+            if key != DEFAULT_IMAGE and pin.destination.is_file()]
+
+
+def _in_image(image, argv) -> int:
+    """Run `homm2 <argv>` for another image in its own process."""
+    from homm2.core.paths import IMAGE_ENV
+    from homm2.core.usage import run_process
+    env_before = os.environ.get(IMAGE_ENV)
+    os.environ[IMAGE_ENV] = image
+    try:
+        return run_process([sys.executable, "-m", "homm2", *argv], cwd=REPO)
+    finally:
+        if env_before is None:
+            os.environ.pop(IMAGE_ENV, None)
+        else:
+            os.environ[IMAGE_ENV] = env_before
+
+
 def _build(rest):
     if rest[:1] == ["verify"]:
-        if _build(rest[1:]):
+        others = _other_images()
+        if _build_one(rest[1:]):
             return 1
         from homm2.verify import run_tier
-        return run_tier()
+        rc = run_tier()
+        for image in others:
+            rc |= _in_image(image, ["build", "verify", *rest[1:]])
+        return rc
+    if any(a in rest for a in ("--no-match", "--help", "-h")):
+        return _build_one(rest)
+    others = _other_images()
+    rc = _build_one(rest)
+    for image in others:
+        if rc:
+            break
+        rc = _in_image(image, ["build", *rest])
+    return rc
+
+
+def _build_one(rest):
     if '--ru' in rest and '--en' in rest:
         print('choose only one locale: --ru or --en', file=sys.stderr)
         return 1
@@ -120,7 +162,7 @@ def _build(rest):
     if py("homm2.graph.localization"):
         return 1
     from homm2.core.paths import DEFAULT_IMAGE, image_key
-    from homm2.verify import BUILD_GATES, STAGED, run_gate, run_gates
+    from homm2.verify import build_gates, run_gate, run_gates, staged_gates
     game = image_key() == DEFAULT_IMAGE
     # The source gates read game claims; another image's gates are open work.
     if game and run_gate("annotated-sources"):
@@ -139,14 +181,12 @@ def _build(rest):
     report = load_report()
     if report is None:
         return 1
-    if not game:
-        status(["--write-readme"], report)
-        return status([], report)
-    # Fast and warning-only: half-built units may intentionally need a delink.
-    py("homm2.verify.model_drift")
-    if run_gates(BUILD_GATES):
+    if game:
+        # Fast and warning-only: half-built units may intentionally need a delink.
+        py("homm2.verify.model_drift")
+    if run_gates(build_gates()):
         return 1
-    run_gates(STAGED, advisory=True)
+    run_gates(staged_gates(), advisory=True)
     status(["--write-readme"], report)
     return status([], report)
 

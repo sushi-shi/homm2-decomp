@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Hard build gate for source-owned primary and secondary vtables."""
 
+from homm2.core.paths import gen_dir, objdiff_dir
 import csv
 import sys
 from collections import defaultdict
@@ -11,8 +12,8 @@ from homm2.delink.data_manifest_adapter import candidate_topology
 
 
 REPO = Path.cwd()
-BASE = REPO / "build/objdiff/base"
-SYMBOLS = REPO / "build/gen/symbol_names.csv"
+BASE = objdiff_dir() / "base"
+SYMBOLS = gen_dir() / "symbol_names.csv"
 
 
 def inventory_vtables():
@@ -46,6 +47,13 @@ from homm2.core.usage import logged
 @logged
 def main() -> int:
     claims = source_vtables(REPO / "src", REPO)
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
+    if image_key() != DEFAULT_IMAGE:
+        # Shared units spell game addresses; they reach this image through
+        # its placements.
+        from homm2.delink.data_manifest_adapter import placed_claims
+        claims = claims + placed_claims(
+            source_vtables(REPO / "src", REPO, image=DEFAULT_IMAGE))
     source = {claim.mangled_name: claim for claim in claims}
     inventory = inventory_vtables()
     emitted = emitted_vtables()

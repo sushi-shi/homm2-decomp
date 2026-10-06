@@ -11,15 +11,16 @@ a value >= the image base is treated as a full VA and reduced to its RVA.
 Usage:
     python3 -m homm2.sema.rva 0x0004a3c0
 """
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
 import csv, json, os, re, sys
 from pathlib import Path
 
 REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
-SYMCSV = REPO / "build/gen/symbol_names.csv"
-GHIDRA_FUNCS = REPO / "build/ghidra/exports/functions.csv"
-REPORT = REPO / "build/objdiff/report.json"
+SYMCSV = gen_dir() / "symbol_names.csv"
+GHIDRA_FUNCS = image_build() / "ghidra/exports/functions.csv"
+REPORT = objdiff_dir() / "report.json"
 IMAGEBASE = 0x400000
 
 

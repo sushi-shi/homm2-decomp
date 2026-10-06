@@ -27,17 +27,18 @@ Usage:
     python3 -m homm2.sema.disasm ?initialiseCRC@@YIXXZ --base
     python3 -m homm2.sema.disasm 0x000d4050 --diff
 """
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
 import csv, json, os, re, subprocess, sys
 from pathlib import Path
 
 REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
-SYMCSV = REPO / "build/gen/symbol_names.csv"
-DELINK = REPO / "build/delink"
-BASE = REPO / "build/objdiff/base"
-NORMAL_BASE = REPO / "build/objdiff/normalized/base"
-NORMAL_TARGET = REPO / "build/objdiff/normalized/target"
+SYMCSV = gen_dir() / "symbol_names.csv"
+DELINK = delink_dir()
+BASE = objdiff_dir() / "base"
+NORMAL_BASE = objdiff_dir() / "normalized" / "base"
+NORMAL_TARGET = objdiff_dir() / "normalized" / "target"
 LINES = REPO / "build/lines"
 
 
@@ -706,7 +707,7 @@ def _hint_branches(rva: int, name: str, unit: str) -> None:
     `--branches` names. Fires only on the already-clean path, reads report.json
     lazily, and swallows every failure so the normal path is unchanged."""
     try:
-        rep = json.loads((REPO / "build/objdiff/report.json").read_text())
+        rep = json.loads((objdiff_dir() / "report.json").read_text())
         pct = None
         for u in rep.get("units", []):
             if u.get("name") == unit:

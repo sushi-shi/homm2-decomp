@@ -34,14 +34,15 @@ Usage (reads files + $HOMM2_EXE only):
     python3 -m homm2.sema.xref --tree 0x00069120        # caller ancestry (depth 4)
     python3 -m homm2.sema.xref --tree --depth 0 0x...    # unlimited (can be huge)
 """
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
 import os, sys, struct, csv, bisect
 from pathlib import Path
 
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
             Path(__file__).resolve().parents[3])
-EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HMM2PL.exe")
-SYMCSV = REPO / "build/gen/symbol_names.csv"
-FUNCS = REPO / "build/ghidra/exports/functions.csv"
+EXE = retail_exe()
+SYMCSV = gen_dir() / "symbol_names.csv"
+FUNCS = image_build() / "ghidra/exports/functions.csv"
 IMAGEBASE = 0x400000
 
 
