@@ -187,8 +187,7 @@ void SmackManagerMain(void) {
                && bSmackNum != BUKA_CREDITS;
 
     const std::string movieDirectory =
-        bSmackNum == EXPANSION_CAMPAIGN ? ".\\DATA\\"
-                                        : std::string(gcRegCDRomPath) + gcAnimPath;
+        bSmackNum == EXPANSION_CAMPAIGN ? ".\\DATA\\" : ".\\HEROES2\\ANIM\\";
     const auto moviePath = [&](const char* name) {
         return movieDirectory + name + ".SMK";
     };
@@ -552,9 +551,6 @@ i32 PlaySmacker(i32 smackNumber) {
     i8 savedPalette[PALETTE_DATA_SIZE];
 
     xLastChoice = EXPANSION_CAMPAIGN_NONE;
-    if (gbNoCDRom)
-        return 0;
-
     gbInSmackMgr = true;
     gbPlayedThrough = false;
     memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
