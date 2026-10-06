@@ -199,6 +199,74 @@ On Linux and Web, installed game data may be read-only. Preferences, saves,
 high scores, and network exchange files are stored under the user data root.
 Windows retains the original writable game-directory behavior.
 
+### Install with a NixOS flake
+
+Add this branch and a local folder holding your copy of the game to your
+flake inputs:
+
+```nix
+inputs.homm2.url = "github:sushi-shi/homm2-decomp/ironfist-master";
+inputs.homm2-game = {
+  url = "path:/path/to/heroes2";
+  flake = false;
+};
+```
+
+The folder is the installed game, the one that contains `DATA`, or the Buka
+disc's files, or a folder holding a `.zip`, `.7z` or `.iso` of either. Import
+the module and name your copy:
+
+```nix
+outputs = { nixpkgs, homm2, homm2-game, ... }: {
+  nixosConfigurations."<host>" = nixpkgs.lib.nixosSystem {
+    modules = [
+      ./configuration.nix
+      homm2.nixosModules.default
+      {
+        programs.homm2 = {
+          enable = true;
+          edition = "ironfist";
+          game = "${homm2-game}";
+        };
+      }
+    ];
+  };
+};
+```
+
+Nix checks the copy, lays its data out in its store and installs the pinned
+Ironfist resources over it when the configuration is built. Rebuild,
+replacing `<host>` with your host's name, then launch:
+
+```sh
+sudo nixos-rebuild switch --flake '.#<host>'
+heroes2-ironfist
+```
+
+With home-manager, the same options install the game for one user:
+
+```nix
+homeConfigurations."<user>" = home-manager.lib.homeManagerConfiguration {
+  pkgs = nixpkgs.legacyPackages.x86_64-linux;
+  modules = [
+    homm2.homeManagerModules.default
+    { programs.homm2 = { enable = true; edition = "ironfist"; game = "${homm2-game}"; }; }
+  ];
+};
+```
+
+```sh
+home-manager switch --flake '.#<user>'
+```
+
+`edition = "ironfist"` is this branch's only edition and its default; the
+`master` branch's is `gold`. Ironfist keeps saves, high scores and settings in
+`~/.local/share/homm2/ironfist`, apart from the Gold port's. `locale = "ru"`
+starts the game in Russian whatever your locale (it needs a Buka copy's
+Cyrillic font). Without `game`, `heroes2-ironfist` reads `HOMM2_DATA`, which
+must already hold the Ironfist resources; see
+[the port guide](docs/porting.md#install-with-nix).
+
 ### Linux
 
 After setting `HOMM2_DATA`, run:

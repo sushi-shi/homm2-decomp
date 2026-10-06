@@ -346,16 +346,23 @@
       game = pkgs.lib.makeOverridable (import ./nix/game.nix {
         inherit pkgs importer languages;
         programs = homm2;
+        # Ironfist's saves are not Gold's, so they keep their own folder,
+        # and its resources join the player's data in the store.
         edition = {
-          name = "heroes2";
-          title = "Heroes of Might and Magic II";
-          comment = "Turn-based strategy (native port of Heroes II Gold 2.1)";
-          stateName = "homm2";
+          name = "heroes2-ironfist";
+          title = "Heroes of Might and Magic II: Project Ironfist";
+          comment = "Turn-based strategy (Project Ironfist on the native Heroes II port)";
+          stateName = "ironfist";
+          prepareData = ''
+            chmod -R u+w "$out/game"
+            HOMM2_IRONFIST_RESOURCE_PAYLOAD=${ironfist-resource-payload} \
+              bash ${./scripts/install-ironfist-resources.sh} "$out/game"
+          '';
         };
       }) { };
       # The game as a NixOS or home-manager option set. `edition` picks the
-      # programs; ironfist-master offers its own edition the same way.
-      editions = system: { gold = self.packages.${system}.default; };
+      # programs: this branch's are Project Ironfist; master's are gold.
+      editions = system: { ironfist = self.packages.${system}.default; };
       module = target: { config, lib, pkgs, ... }:
         let
           cfg = config.programs.homm2;
@@ -364,11 +371,11 @@
           options.programs.homm2 = {
             enable = lib.mkEnableOption "Heroes of Might and Magic II (native port)";
             edition = lib.mkOption {
-              type = lib.types.enum [ "gold" ];
-              default = "gold";
+              type = lib.types.enum [ "ironfist" ];
+              default = "ironfist";
               description = ''
-                The programs to install: gold (Heroes II Gold 2.1, the `heroes2` launcher).
-                Project Ironfist is the ironfist edition of the ironfist-master branch.
+                The programs to install: ironfist (Project Ironfist, the `heroes2-ironfist`
+                launcher). Heroes II Gold 2.1 alone is the gold edition of the master branch.
               '';
             };
             game = lib.mkOption {
@@ -652,11 +659,11 @@
       homeManagerModules.default = module "home-manager";
 
       apps.${system} = {
-        default = self.apps.${system}.heroes2;
-        heroes2 = {
+        default = self.apps.${system}.heroes2-ironfist;
+        heroes2-ironfist = {
           type = "app";
-          program = "${game}/bin/heroes2";
-          meta.description = "The native game; set HOMM2_DATA to your installed game";
+          program = "${game}/bin/heroes2-ironfist";
+          meta.description = "The native Ironfist game; set HOMM2_DATA to your installed game";
         };
         native = {
           type = "app";
