@@ -396,8 +396,8 @@ EDITOR/RANDOM	?PlaceObstacleChains@editManager@@QAEXHH@Z	100.0000	cf8682705ba9
 EDITOR/RANDOM	?PlaceOverlayAt@@YIHPAUoverlayType@@HH@Z	99.6875	670ad3aaf353
 EDITOR/RANDOM	?PlaceRandomObjects@editManager@@QAEXHH@Z	99.8588	21a327d05e4b
 EDITOR/RANDOM	?PlaceResourceSite@editManager@@QAEHHHH@Z	99.4014	3af01535306a
-EDITOR/RANDOM	?PlaceTowns@editManager@@QAEXXZ	99.9358	21a848199572
-EDITOR/RANDOM	?PlaceTreasures@editManager@@QAEXHH@Z	99.8906	8c8c7acee0ae
+EDITOR/RANDOM	?PlaceTowns@editManager@@QAEXXZ	99.9358	7d063dd18491
+EDITOR/RANDOM	?PlaceTreasures@editManager@@QAEXHH@Z	99.8906	c8b8c11592e6
 EDITOR/RANDOM	?RemoveSmallRegions@editManager@@QAEXXZ	99.9519	14e3aaddd124
 EDITOR/RANDOM	?ScaleByDensity@@YIXPAHH@Z	100.0000	fa43aa14c170
 EDITOR/RANDOM	?ScatterDecorations@editManager@@QAEXXZ	99.9669	0a394922ef42

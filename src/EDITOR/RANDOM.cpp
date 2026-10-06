@@ -20,7 +20,8 @@
 // The generator's own data: the chain directions' steps and turns, then the
 // five mines' resources.
 DATA(0x00498ecc)
-static MapStepPair gChainSteps[CHAIN_DIRECTION_COUNT] = {{1, -2}, {1, -1}, {1, 1}, {1, 2}, {-1, 2}, {-1, 1}, {-1, -1}, {-1, -2}};
+static MapStepPair gChainSteps[CHAIN_DIRECTION_COUNT] =
+    {{1, -2}, {1, -1}, {1, 1}, {1, 2}, {-1, 2}, {-1, 1}, {-1, -1}, {-1, -2}};
 
 DATA(0x00498f0c)
 static MapStepPair gChainTurns[CHAIN_DIRECTION_COUNT][CHAIN_TURN_COUNT] = {
@@ -1137,7 +1138,8 @@ void editManager::PlaceTowns(void) {
                             && (gMap.CellAt(tileX, tileY)->m_objectTileset == TILESET_NONE
                                 || gMap.CellAt(tileX, tileY)->m_objectTileset == TILESET_MONS32)
                             && !*(reachedGrids[slot] + tileX + tileY * MAP_WIDTH)) {
-                            if (tileX > 0 && *(reachedGrids[slot] + tileX - 1 + tileY * MAP_WIDTH) > 0)
+                            if (tileX > 0
+                                && *(reachedGrids[slot] + tileX - 1 + tileY * MAP_WIDTH) > 0)
                                 *(reachedGrids[slot] + tileX + tileY * MAP_WIDTH)
                                     = *(reachedGrids[slot] + tileX - 1 + tileY * MAP_WIDTH);
                             else if (tileX < MAP_WIDTH - 1
@@ -1614,14 +1616,16 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
                        && !gMap.CellAt(x + 1, y)->m_objectLayerBit0
                        && !gMap.CellAt(x + 1, y)->m_objectLayerBit1)
                 east = 1;
-            if (x < MAP_WIDTH + 1 && y > 0 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != TERRAIN_WATER
+            if (x < MAP_WIDTH + 1 && y > 0
+                && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != TERRAIN_WATER
                 && gMap.CellAt(x + 1, y - 1)->m_objectTileset == TILESET_NONE)
                 northEast = 1;
             if (x < MAP_WIDTH + 1 && y < MAP_HEIGHT - 1
                 && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) != TERRAIN_WATER
                 && gMap.CellAt(x + 1, y + 1)->m_objectTileset == TILESET_NONE)
                 southEast = 1;
-            if (x > 0 && y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) != TERRAIN_WATER
+            if (x > 0 && y < MAP_HEIGHT - 1
+                && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) != TERRAIN_WATER
                 && gMap.CellAt(x - 1, y + 1)->m_objectTileset == TILESET_NONE)
                 southWest = 1;
             if (x > 0 && y > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) != TERRAIN_WATER
