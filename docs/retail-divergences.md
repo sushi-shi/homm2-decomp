@@ -1,7 +1,7 @@
 # Intentional retail divergences
 
 The reconstruction branches preserve the behavior and code generation observed
-in the retail executables. `master` starts from that evidence but may correct a
+in the retail executables. `port` starts from that evidence but may correct a
 proven defect or replace a platform-bound subsystem when retaining it would make
 the maintained port less safe or less portable.
 
@@ -11,7 +11,7 @@ or other new portable facilities that have no retail counterpart. Cross-version
 differences between PoL 2.0 and Gold 2.1 remain in the retail evidence ledger
 linked from [Retail version differences](version-differences.md).
 
-Any future `master` change that intentionally alters a retail game-source
+Any future `port` change that intentionally alters a retail game-source
 outcome must update this ledger in the same commit. Source-only restructuring
 belongs in the section below; observable defect corrections belong in the
 table.
@@ -21,11 +21,11 @@ table.
 The exact Gold/Buka reconstruction retains a few source shapes solely because
 they reproduce the Visual C++ 6 executable: redundant labels, explicit Boolean
 materialization, and casts at boundaries whose underlying retail value is an
-integer. `master` does not preserve those compiler-sensitive spellings when the
+integer. `port` does not preserve those compiler-sensitive spellings when the
 same behavior has a clearer portable representation.
 
 In particular, the castle dialog's selection value can hold either a
-`BuildingSlotType` value or a UI control identifier. `master` models that mixed
+`BuildingSlotType` value or a UI control identifier. `port` models that mixed
 discriminant as an integer and converts to `BuildingSlotType` only when entering
 a building API. The overview return path also tests its occupied-town pointer
 with `!= nullptr`; the exact branch retains the retail pointer-to-integer truth
@@ -36,13 +36,13 @@ still represent a real shared tail, cleanup path, retry loop, or multi-loop exit
 remain explicit.
 
 Retail also reaches a few logically distinct palette and campaign-name tables
-through their linker-defined adjacency. `master` names those tables explicitly,
+through their linker-defined adjacency. `port` names those tables explicitly,
 preserving the selected values without relying on out-of-bounds pointer or
 array arithmetic. Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 
-Numeric enum construction is also explicit on `master`. Public domains cross
+Numeric enum construction is also explicit on `port`. Public domains cross
 integer storage through the named `FromCode` and `FromOrdinal` entry points in
 `EnumCode.h`; private protocol enums keep an equivalent decoder next to their
 definition. Packed enum storage exposes an already-typed `enum_value()` instead
@@ -51,7 +51,7 @@ bypasses of the shared low-level conversion.
 
 ## Corrected defects
 
-| Area | Retail behavior | `master` behavior |
+| Area | Retail behavior | `port` behavior |
 | --- | --- | --- |
 | Campaign table bounds | The enabled-map table indices are reversed after switching campaign sides, and the 13-point campaign track reads the 12-entry enabled-map table at its final point. | Indexes the table as `[campaign side][scenario]` and checks the map-table bound before reading track state. |
 | Aggregate lookup failure | `resourceManager::PointToFile` and `GetFileSize` continue with an invalid aggregate entry after calling the shutdown path. A shutdown implementation that returns or re-enters can dereference that invalid state. | Returns immediately after reporting the fatal lookup error. |
@@ -76,7 +76,7 @@ bypasses of the shared low-level conversion.
 ### Network-save compression
 
 Retail uses the recovered legacy Bzip codec through temporary files and exposes
-its implementation globally. `master` instead uses libbz2 1.0.x in memory
+its implementation globally. `port` instead uses libbz2 1.0.x in memory
 through the small `compression::Bzip2*` interface. Callers provide explicit
 source and destination capacities, compression uses the documented worst-case
 bound, and failures do not continue with an indeterminate length.

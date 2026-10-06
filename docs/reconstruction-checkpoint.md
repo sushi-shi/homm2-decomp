@@ -9,7 +9,7 @@ The Gold reconstruction checkpoint was squash-merged in order:
 
 The portable integration applies the first-parent delta from generated source
 `830658dec` to `a2c70f14c`. Its downstream route is
-`master` → `ironfist` → `ironfist-master`, using cherry-picks. The corresponding
+`port` → `source-ironfist` → `port-ironfist`, using cherry-picks. The corresponding
 Russian UTF-8 classic view is `fdd70881c`; classic is not a build input.
 
 ## Portable adaptation

@@ -1,7 +1,7 @@
 # Ironfist Port
 
-This branch (`ironfist`) carries Project Ironfist's features on top of the
-Gold 2.1/Buka-based cross-platform `master`. The original PoL-based port is
+This branch (`source-ironfist`) carries Project Ironfist's features on top of the
+Gold 2.1/Buka-based cross-platform `port`. The original PoL-based port is
 retained in the backup history as migration evidence, but it is not a base of
 this branch.
 

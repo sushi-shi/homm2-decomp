@@ -1,6 +1,6 @@
 # Ironfist equivalence audit
 
-The portable `ironfist` branch is a port of Project Ironfist's game changes,
+The portable `source-ironfist` branch is a port of Project Ironfist's game changes,
 not a byte-identical rebuild of an Ironfist Windows executable. It keeps the
 recovered Heroes II Gold 2.1 engine and expresses Ironfist's changes through
 recovered fields, full function integrations, and narrow hooks.
