@@ -35,7 +35,7 @@ DEFAULT_SPANS_OUTPUT = REPO / "build/gen/source_function_spans.csv"
 DEFAULT_SYMBOLS = REPO / "build/gen/symbol_names.csv"
 VA_TOKEN = re.compile(rb"\bVA\s*\(")
 VA_MARKER = re.compile(
-    rb"^[ \t]*VA\(\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*\)",
+    rb"\bVA\s*\(\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*\)",
     re.M)
 STATIC_VA_TOKEN = re.compile(
     rb"\bVA\s*\([^)]*\)\s*(?:(?!\{).){0,1024}\bstatic\b", re.S)
