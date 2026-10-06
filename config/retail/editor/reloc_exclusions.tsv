@@ -1,0 +1,11 @@
+# Reviewed false positives of the census's data-pointer heuristic: each site
+# is ordinary retail payload whose dword value happens to fall inside the
+# image (and has a neighbouring word that does too). `homm2 audit census`
+# rejects these sites.
+site_rva	reason
+0x615cc	packed-gOverlayTypes-fields-form-image-va
+0x615d0	packed-gOverlayTypes-fields-form-image-va
+0x615d4	packed-gOverlayTypes-fields-form-image-va
+0x616d0	packed-gOverlayTypes-fields-form-image-va
+0x616d4	packed-gOverlayTypes-fields-form-image-va
+0x616d8	packed-gOverlayTypes-fields-form-image-va
