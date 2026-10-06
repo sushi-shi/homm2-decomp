@@ -1,16 +1,16 @@
 # homm2-decomp
 
-> **The decompilation is complete.** Every function and data byte of `HMM2PL.exe`
-> matches, and the pinned `LINK.EXE` rebuilds it byte-identical to retail. The
-> scenario editor `EDT2PL.exe` is the second image under reconstruction.
+> **The game's decompilation is complete.** Every function and data byte of
+> `HMM2PL.exe` matches, and it rebuilds byte-identical to retail. The scenario
+> editor `EDT2PL.exe` is in progress.
 
-C++ reconstruction of Buka's **Heroes of Might and Magic II** (`HMM2PL.exe`,
-HoMM2 Gold 2.1 tree, New World Computing 1997 / Бука 2003) and its scenario
-editor (`EDT2PL.exe`), rebuilt with the original **Visual C++ 6.0 SP5**
-toolchain under Wine. The retail images are stripped, so every symbol is a
-claim made by the source's own markers and every relocation site comes from a
-reviewed manifest. Retail bytes are authoritative. Supply your own executables
-and game assets.
+C++ reconstruction of **Heroes of Might and Magic II Gold 2.1 — Buka 2003**
+(`HMM2PL.exe` and the scenario editor `EDT2PL.exe`), built with the original
+Visual C++ 6.0 SP5 toolchain under Wine. Text lives in a catalog (English and
+Russian). The retail images are stripped, so every symbol is a claim made by
+the source's own markers and every relocation site comes from a reviewed
+manifest. Retail bytes are authoritative. Supply your own executables and game
+assets.
 
 <!-- match-score:start -->
 ## Match status
@@ -61,21 +61,18 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist --------> ironfist-master
+                    port --------> source-ironfist --------> port-ironfist
 ```
 
-- `decomp-gold-2.1-buka` — this branch: the Gold 2.1/Buka reconstruction.
-- `decomp-pol-2.0` — the Price of Loyalty reconstruction; cross-reference for
-  names and semantics, never byte evidence here.
-- `source-pol-2.0` / `classic-pol-2.0` — generated PoL source-only trees.
-- `source-gold-2.1-buka` / `classic-gold-2.1-buka` — generated Gold/Buka
-  source-only trees; the clean source branch is the primary base of `master`.
-- `master` — the cross-platform Linux/Windows/Web port.
-- `ironfist` — Project Ironfist applied to the reconstructed source.
-- `ironfist-master` — the maintained integration with narrow extension
-  boundaries and mechanics in their owning engine classes.
-
-<!-- match-score:start -->
+- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
+- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0) — Clean source, PoL 2.0
+- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0) — Reading view, PoL 2.0
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka) — Clean source, Gold 2.1 (ru/en)
+- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka) — Reading view, UTF-8 Russian
+- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port) — Native port: Linux, Windows, browser
+- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
+- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
 
 ## Quickstart
 
@@ -85,7 +82,8 @@ byte-for-byte comparison of the linked executable with retail:
 
 ```sh
 nix develop .#build
-homm2 init --exe /path/to/HMM2PL.exe     # stage, fetch the toolchain, delink
+homm2 init --exe /path/to/HMM2PL.exe
+homm2 toolchain install
 homm2 build
 homm2 build verify
 homm2 match SOURCE/KB
@@ -95,12 +93,21 @@ homm2 play --game /path/to/installed/game   # optional: run the rebuilt game
 
 The editor is supplied with `init --editor-exe /path/to/EDT2PL.exe`. Retail
 inputs, the toolchain, Wine state and generated reports stay in ignored
-`build/`. Locale builds without retail inputs, the link modes and the toolchain
-are described in [builds](docs/builds.md); playing in [play](docs/play.md).
+`build/`.
 
-See [the matching tooling](docs/tooling.md), [the command map](docs/tooling-map.md),
-[the matching workflow](docs/workflow.md) and the [documentation index](docs/README.md).
-Contributor rules and verification commands are in [AGENTS.md](AGENTS.md).
+## Versions
+
+The Price of Loyalty 2.0 reconstruction lives on `decomp-pol-2.0`; what Gold
+2.1 and Buka changed is in [PoL 2.0 → Gold 2.1 → Buka changes](docs/version-changes.md).
+
+## Documentation
+
+- [Matching tooling](docs/tooling.md), [command map](docs/tooling-map.md) and
+  [repository workflow](docs/workflow.md)
+- [Other builds](docs/builds.md) (locale builds, link modes, the toolchain) and
+  [playing the build](docs/play.md)
+- [Documentation index](docs/README.md); contributor rules and verification
+  commands are in [AGENTS.md](AGENTS.md)
 
 ## Trust and provenance
 
