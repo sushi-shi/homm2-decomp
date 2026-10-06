@@ -174,6 +174,18 @@
         '';
       });
 
+      homm2-sanitized = homm2-check.overrideAttrs (previous: {
+        pname = "homm2-sanitized";
+        cmakeFlags = previous.cmakeFlags ++ [ "-DHOMM2_SANITIZERS=ON" ];
+        # LeakSanitizer stops the world through ptrace, which hosts with Yama
+        # ptrace_scope >= 2 forbid. The check is for memory and undefined
+        # behaviour errors, so leak detection stays off for reproducibility.
+        preCheck = (previous.preCheck or "") + ''
+          export ASAN_OPTIONS=detect_leaks=0
+          export UBSAN_OPTIONS=print_stacktrace=1
+        '';
+      });
+
       icon-check = pkgs.stdenv.mkDerivation {
         pname = "homm2-icon-check";
         version = "0.1.0";
@@ -304,14 +316,10 @@
 
       homm2-web-run = pkgs.writeShellApplication {
         name = "homm2-web";
-        runtimeInputs = [ pkgs.coreutils pkgs.emscripten ];
+        runtimeInputs = [ pkgs.coreutils pkgs.emscripten pkgs.python3 ];
         text = ''
           data="''${HOMM2_DATA:-}"
-          if [ -z "$data" ] \
-            || { [ ! -e "$data/DATA/HEROES2.AGG" ] && [ ! -e "$data/DATA/heroes2.agg" ]; }; then
-            echo "homm2-web: set HOMM2_DATA to the installed game directory" >&2
-            exit 1
-          fi
+          python3 ${source}/tools/package_web_data.py --game-data "$data" --check
 
           destination="''${HOMM2_WEB_OUTPUT:-''${XDG_CACHE_HOME:-$HOME/.cache}/homm2-web}"
           mkdir -p "$destination"
@@ -319,23 +327,11 @@
           cp -R ${homm2-web}/share/homm2-web/. "$destination/"
           chmod -R u+w "$destination"
 
-          preload=()
-          for name in DATA GAMES HELP HEROES2 MAPS MUSIC; do
-            if [ -e "$data/$name" ]; then
-              preload+=(--preload "$data/$name@/game/$name")
-            fi
-          done
-          for name in H2CAMP.TXT POLCAMP.TXT HEROES2.CFG; do
-            if [ -e "$data/$name" ]; then
-              preload+=(--preload "$data/$name@/game/$name")
-            fi
-          done
-
-          ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
-            "$destination/homm2.data" \
-            --preload "${homm2-web}/share/homm2-web/lang@/lang" \
-            "''${preload[@]}" \
-            --js-output="$destination/homm2.data.js"
+          python3 ${source}/tools/package_web_data.py \
+            --game-data "$data" \
+            --packager ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
+            --lang "${homm2-web}/share/homm2-web/lang" \
+            --output "$destination"
 
           if [ "''${HOMM2_WEB_PACK_ONLY:-0}" = 1 ]; then
             echo "$destination/homm2.html"
@@ -353,6 +349,7 @@
         inherit
           homm2
           homm2-debug
+          homm2-sanitized
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -362,6 +359,7 @@
 
       checks.${system} = {
         native = homm2-check;
+        sanitized = homm2-sanitized;
         windows = windows;
         web = homm2-web;
         icon = icon-check;

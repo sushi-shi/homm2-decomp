@@ -11,7 +11,7 @@
 // this translation unit so the migration registry can derive their bounds.
 extern const char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT];
 extern const char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT];
-extern const char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT];
+extern const char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT];
 extern const char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT];
 extern const char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT];
 extern const char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT];

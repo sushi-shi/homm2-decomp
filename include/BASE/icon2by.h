@@ -7,8 +7,8 @@ class bitmap;
 class icon;
 
 void IconToBitmapYModify(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,

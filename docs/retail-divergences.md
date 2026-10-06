@@ -38,7 +38,9 @@ remain explicit.
 Retail also reaches a few logically distinct palette and campaign-name tables
 through their linker-defined adjacency. `master` names those tables explicitly,
 preserving the selected values without relying on out-of-bounds pointer or
-array arithmetic. Repeated UI formatting tails in adventure quick info, radar,
+array arithmetic. Dim-palette selection indexes the set and level separately;
+it does not reach other levels by indexing beyond the first 256-color subarray.
+Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 
@@ -61,10 +63,12 @@ bypasses of the shared low-level conversion.
 | Invalid encoded game domains | Unknown recruit-site and town-faction values can leave a creature type uninitialized before it is indexed or added to an army. | Rejects invalid values at the owning switch instead of continuing with indeterminate state. |
 | AI special-direction movement | The shortcut into the movement loop bypasses initialization of the stop/notification arguments passed to `MoveHero`. | Initializes the movement arguments before either normal or shortcut entry. |
 | Spell edge paths | Hero-cast spells assume the current side has a hero, targeted spells assume an occupied source hex, and Armageddon's headless path uses target and palette pointers that may never have been initialized. | Rejects a missing hero at the cast boundary, cancels any targeted spell with no living army target, rejects the same impossible target state during AI evaluation, guards the optional visual target, and skips palette restoration when no visual palette was created. |
+| Sphinx answer text | Answers are matched by their first four single-byte characters, ignoring case. | Matches the first four Unicode characters after UTF-8 decoding, retaining the legacy prefix and trailing-space rules. |
 | Fixed-size paths, names, and formats | Several retail `sprintf` calls treat external or localized text as a format string or assume campaign, dialog, map, and movie paths fit their local buffers. The map/save requester also copies `"*.MP2"` or a similar six-byte pattern into a five-byte default-extension field. | Routes portable formatting through a capacity-aware UTF-8 helper, copies plain text without interpreting it, builds temporary names dynamically, validates the one fixed-size serialized campaign filename, and passes only the extension (`".MP2"`) to the requester. A source-policy test rejects unbounded formatting from the portable tree. |
 | Serialized save filename | The extensionless path copies the complete input into a 100-byte scratch buffer; the extension path also copies an unbounded suffix. | Constructs a terminated, zero-padded 14-byte wire field directly, with an eight-character uppercase ASCII stem and at most three ASCII extension characters. Normal retail filenames retain their bytes. Long, extensionless and Unicode names are normalized only in this informational legacy field; the native save path is unaffected. |
 | Truncated external records | Retail generally ignores host read/write counts, so a truncated AGG header, map header, or preferences file can leave partially initialized state and an AGG entry count can drive an invalid allocation. | Exact-transfer helpers complete short host operations without spinning; the AGG loader bounds the directory by the file length, map headers reject short records, preferences fall back to defaults, and incomplete resource payloads are logged and zeroed. |
 | Direct-connect identifier | A six-byte identifier copied with `strncpy` is not terminated when all six source bytes are nonzero. | Copies the fixed-width field and explicitly terminates its seven-byte destination. |
+| High-score record transfers | The recovered update loop requests the size of the complete ten-entry table at each individual entry and ignores end-of-file. Excess data can overwrite the destination array. Stored names are also consumed without verifying terminators. | Reads and writes one explicit 100-byte little-endian record per entry, retains complete preceding records on a short tail, reads an entry with an unterminated name as empty while keeping the records after it, and bounds newly entered names to their UTF-8 field capacities. This also avoids the previous portable exact-read fallback discarding entries after the first whole-table read. |
 | Remote duplicate-filter reset | Startup clears only 30 bytes of the 30-element `i32` recent-message-ID array, leaving most entries from a previous session intact. | Clears the complete array with `sizeof(iLastIds)`. This belongs to retained legacy transport code; portable multiplayer is not currently supported. |
 | UDP send failure | A failed broadcast send tests `attemptCount` but never increments it, so a persistent socket error retries forever; both send-error exits also leak the packet buffer. | Makes at most 20 send attempts, delaying only between attempts, frees the packet on either error path, then reports the error. This belongs to retained legacy transport code; portable multiplayer is not currently supported. |
 | Millisecond, cursor, and fizzle timing | Signed absolute comparisons against the wrapping 32-bit tick counter can suppress cursor repaint, palette cycling, and sound polling after the signed boundary, while other signed comparisons can terminate a wait early or extend it across a wrap boundary. `FizzleForward` also starts its first frame from tick zero, so that frame normally receives no delay. | Uses modular deadline comparisons for polling and waits, and starts the fizzle cadence from the current tick. |
@@ -75,6 +79,22 @@ bypasses of the shared low-level conversion.
 | Animated-map redraw boundary | Marking a monster in the leftmost visible map column also marks the nonexistent column to its left, writing before the redraw grid. Instrumented portable builds abort when a monster reaches that boundary. | Clips the missing left neighbor while retaining all in-view redraw marks. |
 
 ## Replaced subsystem
+
+### Installed media
+
+The portable startup no longer checks a CD-drive status or requires the obsolete
+`Tracks2/02-AudioTrack 02.ogg` marker. The resource manager checks the required
+installed AGG archives, music is read from `MUSIC`, and movies use the installed
+`HEROES2/ANIM` and `DATA` directories. Missing optional music does not prevent
+startup. CD-dependent host/single-player menu restrictions, disc-insertion
+messages, unused drive-path globals and registry-forwarding wrappers are
+removed. The portable tree contains no floppy-drive implementation.
+
+### Numbered music
+
+Portable playback resolves numbered music through the audio backend for both
+legacy music-source settings. The old MIDI-only availability mask does not
+describe the installed Ogg tracks and is no longer applied to their playback.
 
 ### Network-save compression
 

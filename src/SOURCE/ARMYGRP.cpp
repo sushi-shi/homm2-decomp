@@ -5,6 +5,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
+#include <SOURCE/KB_TYPES.h>
 
 typedef enum MoraleConstant {
     FIZBIN_MORALE_PENALTY = 2,
@@ -22,8 +23,7 @@ void SwapValues(Value& lhs, Value& rhs) {
 }
 
 armyGroup::armyGroup(void) {
-    memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
-    memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
+    CLEAR_ARMY_GROUP(*this);
 }
 
 void armyGroup::View(i32) {}
@@ -32,7 +32,7 @@ i32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && !(gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes
-                 & MONSTER_ATTRIBUTE_UNDEAD))
+                 & MONSTER_FLAGS_UNDEAD))
             return 0;
     }
     return 1;
@@ -41,7 +41,7 @@ i32 armyGroup::HasAllUndead(void) {
 i32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
-            && (H2EnumIndex((gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes) & (MONSTER_ATTRIBUTE_UNDEAD))))
+            && (H2EnumIndex((gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes) & (MONSTER_FLAGS_UNDEAD))))
             return 1;
     }
     return 0;
@@ -91,8 +91,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
             moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = true;
-        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
-            && (H2EnumIndex((armyHero->m_eventFlags) & (HERO_EVENT_EMBARKED))))
+        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD) && armyHero->IsEmbarked())
             ++moraleCount;
     }
 
@@ -103,10 +102,10 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     moraleCount += H2EnumIndex(alignValue);
 
     if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER
-        && (occupiedTown->m_buildings & H2EnumIndex(TOWN_BUILDING_TAVERN)))
+        && (H2EnumIndex((occupiedTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_TAVERN)))))
         ++moraleCount;
     if (occupiedTown != NULL && occupiedTown->m_type == FACTION_BARBARIAN
-        && (occupiedTown->m_buildings & H2EnumIndex(TOWN_BUILDING_COLISEUM)))
+        && (H2EnumIndex((occupiedTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_COLISEUM)))))
         moraleCount += COLISEUM_MORALE_BONUS;
 
     if (moraleCount < ARMY_GROUP_MORALE_MIN)
@@ -130,25 +129,25 @@ i32 armyGroup::IsMember(CreatureType creatureType) {
     return 0;
 }
 
-ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
-    i32 numCreatureTypes = 0;
+ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
+    i32 creatureTypeRuns = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
-    CreatureType prev = CREATURE_NONE;
+    CreatureType previous = CREATURE_NONE;
     i32 numRaces;
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
-            if (countRaces == ARMY_GROUP_EMPTY_SLOT)
+            if (alignmentMode == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[H2EnumIndex(gMonsterDatabase[H2EnumIndex(m_creatureTypes[i])].race)];
-            if (m_creatureTypes[i] != prev) {
-                ++numCreatureTypes;
-                prev = m_creatureTypes[i];
+            if (m_creatureTypes[i] != previous) {
+                ++creatureTypeRuns;
+                previous = m_creatureTypes[i];
             }
         }
     }
 
-    if (numCreatureTypes <= 1)
+    if (creatureTypeRuns <= 1)
         return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 
     numRaces = 0;
@@ -221,10 +220,10 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
     SwapValues(m_creatureCounts[slot], otherGroup->m_creatureCounts[otherSlot]);
 }
 
-void armyGroup::DamageGroup(float damagePercent) {
+void armyGroup::DamageGroup(float casualtyFraction) {
     i32 killed;
     i32 killChance = static_cast<i32>(
-        damagePercent
+        casualtyFraction
         * H2EnumIndex(ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
     i32 i;
@@ -239,10 +238,10 @@ void armyGroup::DamageGroup(float damagePercent) {
                     ++killed;
             }
             if (isFirstTroop && killed == m_creatureCounts[i]
-                && damagePercent < 0.999)
+                && casualtyFraction < 0.999)
                 --killed;
             m_creatureCounts[i] -= killed;
-            if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
+            if (m_creatureCounts[i] <= 0 || casualtyFraction >= 1.0) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }
