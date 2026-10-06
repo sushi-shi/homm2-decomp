@@ -16,18 +16,18 @@ public:
     i16 m_fillColor;
     border(void);
     border(
-        i16,
-        i16,
-        i16,
-        i16,
-        i16,
-        WidgetKind,
-        i16,
-        const char*
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        i16 widgetId,
+        WidgetKind kind,
+        i16 fillColor,
+        const char* name
     );
     virtual ~border() override;
     virtual void Draw(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Read(void);
 };
 #pragma pack(pop)

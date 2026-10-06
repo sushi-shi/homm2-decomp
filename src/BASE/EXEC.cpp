@@ -16,32 +16,17 @@
 #include <SOURCE/Localization.h>
 
 typedef enum ExecutiveManagerConstant {
-    MANAGER_DEFAULT_PRIORITY = -1,
     MANAGER_SUCCESS          = 0,
     MANAGER_ERROR            = 3,
     DIALOG_MANAGER_CAPACITY  = 20
 } ExecutiveManagerConstant;
 
-static SExecutiveText gExecutiveText = {
-    "Unable to initialize resources - possible disk problem.",
-    "Unable to initialize input devices - possible problem with mouse or keyboard.",
-    "Unable to initialize sound.",
-    "Unable to initialize mouse.",
-    "Unable to initialize windows - possible memory or disk error.",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Can't add manager!",
-    "-----Manager List Start-----",
-    "-----",
-    "Head %d   Tail %d",
-    "-----",
-    "Manager %20s  this %d   prev %d  next %d",
-    "--*--Manager List Stop --*--\n\n",
-    "Can't add manager!",
-    "Can't add manager!",
-    "Terminated"
-};
+static const char gExecutiveManagerListStart[] = "-----Manager List Start-----";
+static const char gExecutiveManagerListDivider1[] = "-----";
+static const char gExecutiveManagerListHeaderFormat[] = "Head %d   Tail %d";
+static const char gExecutiveManagerListDivider2[] = "-----";
+static const char gExecutiveManagerListEntryFormat[] = "Manager %20s  this %d   prev %d  next %d";
+static const char gExecutiveManagerListStop[] = "--*--Manager List Stop --*--\n\n";
 
 executive::executive(void) {
     m_managerListHead = NULL;
@@ -51,17 +36,17 @@ executive::executive(void) {
 }
 
 i32 executive::InitSystem(void) {
-    if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpResourceManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.resources.initialization_failed"));
-    if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpInputManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.input.initialization_failed"));
     if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
-        if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
+        if (gpSoundManager->Open(BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
             ShutDown(localization::Tr("system.sound.initialization_failed"));
     }
-    if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.mouse.initialization_failed"));
-    if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.window.initialization_failed"));
     return 0;
 }
@@ -70,12 +55,12 @@ void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
     baseManager* next;
-    baseManager* cur = m_managerListHead;
-    while (cur != NULL) {
-        next = cur->m_next;
-        if (cur != gpWindowManager && cur != gpMouseManager)
-            RemoveManager(cur);
-        cur = next;
+    baseManager* manager = m_managerListHead;
+    while (manager != NULL) {
+        next = manager->m_next;
+        if (manager != gpWindowManager && manager != gpMouseManager)
+            RemoveManager(manager);
+        manager = next;
     }
     if (gpWindowManager->m_active == 1)
         RemoveManager(gpWindowManager);
@@ -86,124 +71,124 @@ void executive::ShutDownSystem(void) {
 }
 
 i32 executive::DoDialog(class baseManager* manager) {
-    baseManager* savePrev[DIALOG_MANAGER_CAPACITY];
-    i32 idx;
-    baseManager* p;
-    baseManager* saveMgr[DIALOG_MANAGER_CAPACITY];
-    baseManager* saveNext[DIALOG_MANAGER_CAPACITY];
-    executive ex;
+    baseManager* savedPreviousManagers[DIALOG_MANAGER_CAPACITY];
+    i32 index;
+    baseManager* currentManager;
+    baseManager* savedManagers[DIALOG_MANAGER_CAPACITY];
+    baseManager* savedNextManagers[DIALOG_MANAGER_CAPACITY];
+    executive dialogExecutive;
     i32 count = 0;
 
-    p = m_managerListHead;
-    while (p != NULL) {
-        saveMgr[count] = p;
-        savePrev[count] = p->m_prev;
-        saveNext[count] = p->m_next;
-        p = p->m_next;
+    currentManager = m_managerListHead;
+    while (currentManager != NULL) {
+        savedManagers[count] = currentManager;
+        savedPreviousManagers[count] = currentManager->m_prev;
+        savedNextManagers[count] = currentManager->m_next;
+        currentManager = currentManager->m_next;
         count++;
     }
-    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (ex.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpMouseManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (ex.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(gpWindowManager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (ex.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialogExecutive.AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
-    ex.MainLoop();
+    dialogExecutive.MainLoop();
     RemoveManager(manager);
-    for (idx = 0; idx < count; idx++) {
-        saveMgr[idx]->m_prev = savePrev[idx];
-        saveMgr[idx]->m_next = saveNext[idx];
+    for (index = 0; index < count; index++) {
+        savedManagers[index]->m_prev = savedPreviousManagers[index];
+        savedManagers[index]->m_next = savedNextManagers[index];
     }
-    return ex.m_result;
+    return dialogExecutive.m_result;
 }
 
 void executive::PrintManagerList(void) {
-    LogStr(gExecutiveText.managerListStart);
-    LogStr(gExecutiveText.managerListDivider1);
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
+    LogStr(gExecutiveManagerListStart);
+    LogStr(gExecutiveManagerListDivider1);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveManagerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
-    LogStr(gExecutiveText.managerListDivider2);
-    baseManager* m = m_managerListHead;
-    while (m != NULL) {
-        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
+    LogStr(gExecutiveManagerListDivider2);
+    baseManager* currentManager = m_managerListHead;
+    while (currentManager != NULL) {
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveManagerListEntryFormat, currentManager->m_name, currentManager, currentManager->m_prev, currentManager->m_next);
         LogStr(gText);
-        m = m->m_next;
+        currentManager = currentManager->m_next;
     }
-    LogStr(gExecutiveText.managerListStop);
+    LogStr(gExecutiveManagerListStop);
 }
 
-i32 executive::AddManager(class baseManager* mgr, i32 priority) {
-    if (mgr == NULL)
+i32 executive::AddManager(class baseManager* manager, i32 priority) {
+    if (manager == NULL)
         return MANAGER_ERROR;
-    if (priority == MANAGER_DEFAULT_PRIORITY) {
+    if (priority == BASE_MANAGER_PRIORITY_UNASSIGNED) {
         if (m_managerListTail == NULL)
             priority = 0;
         else
             priority = m_managerListTail->m_priority + 1;
     }
-    if (!mgr->m_active && mgr->Open(priority) != 0)
+    if (!manager->m_active && manager->Open(priority) != 0)
         return MANAGER_ERROR;
-    baseManager* cur = m_managerListTail;
-    while (cur != NULL && cur->m_priority > priority)
-        cur = cur->m_prev;
-    if (cur == NULL) {
-        mgr->m_next = m_managerListHead;
-        mgr->m_prev = NULL;
+    baseManager* currentManager = m_managerListTail;
+    while (currentManager != NULL && currentManager->m_priority > priority)
+        currentManager = currentManager->m_prev;
+    if (currentManager == NULL) {
+        manager->m_next = m_managerListHead;
+        manager->m_prev = NULL;
         if (m_managerListHead != NULL)
-            m_managerListHead->m_prev = mgr;
-        m_managerListHead = mgr;
+            m_managerListHead->m_prev = manager;
+        m_managerListHead = manager;
         if (m_managerListTail == NULL)
-            m_managerListTail = mgr;
-    } else if (cur->m_next == NULL) {
-        mgr->m_prev = m_managerListTail;
-        mgr->m_next = NULL;
-        m_managerListTail->m_next = mgr;
-        m_managerListTail = mgr;
+            m_managerListTail = manager;
+    } else if (currentManager->m_next == NULL) {
+        manager->m_prev = m_managerListTail;
+        manager->m_next = NULL;
+        m_managerListTail->m_next = manager;
+        m_managerListTail = manager;
     } else {
-        mgr->m_prev = cur;
-        mgr->m_next = cur->m_next;
-        cur->m_next->m_prev = mgr;
-        cur->m_next = mgr;
+        manager->m_prev = currentManager;
+        manager->m_next = currentManager->m_next;
+        currentManager->m_next->m_prev = manager;
+        currentManager->m_next = manager;
     }
     return MANAGER_SUCCESS;
 }
 
-void executive::RemoveManager(class baseManager* mgr) {
-    if (mgr == NULL)
+void executive::RemoveManager(class baseManager* manager) {
+    if (manager == NULL)
         return;
-    mgr->Close();
-    baseManager* prev = mgr->m_prev;
-    if (prev == NULL) {
+    manager->Close();
+    baseManager* previous = manager->m_prev;
+    if (previous == NULL) {
         if (m_managerListHead == m_managerListTail) {
             m_managerListTail = NULL;
             m_managerListHead = NULL;
         } else {
-            m_managerListHead = mgr->m_next;
+            m_managerListHead = manager->m_next;
             m_managerListHead->m_prev = NULL;
         }
-        mgr->m_prev = NULL;
-        mgr->m_next = NULL;
+        manager->m_prev = NULL;
+        manager->m_next = NULL;
         return;
     }
-    prev->m_next = mgr->m_next;
-    if (prev->m_next == NULL)
-        m_managerListTail = prev;
+    previous->m_next = manager->m_next;
+    if (previous->m_next == NULL)
+        m_managerListTail = previous;
     else
-        prev->m_next->m_prev = prev;
-    mgr->m_prev = NULL;
-    mgr->m_next = NULL;
+        previous->m_next->m_prev = previous;
+    manager->m_prev = NULL;
+    manager->m_next = NULL;
 }
 
-void executive::CallManager(class baseManager* mgr) {
+void executive::CallManager(class baseManager* manager) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
-    if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
     MainLoop();
-    RemoveManager(mgr);
-    if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
+    RemoveManager(manager);
+    if (AddManager(saved, BASE_MANAGER_PRIORITY_UNASSIGNED) != 0)
         ShutDown(localization::Tr("system.manager.add_failed"));
     m_activeManager = saved;
 }

@@ -5,6 +5,7 @@ include(CTest)
 
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
+option(HOMM2_SANITIZERS "Instrument native builds with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
@@ -15,6 +16,15 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(HOMM2_SANITIZERS)
+  if(WIN32 OR EMSCRIPTEN OR NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    message(FATAL_ERROR "HOMM2_SANITIZERS requires a native GCC or Clang build")
+  endif()
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer
+    -fno-sanitize-recover=all)
+  add_link_options(-fsanitize=address,undefined)
+endif()
 
 # Retail pointer width and packed layouts are load-bearing, so the game is
 # built 32-bit. On a 64-bit host that means -m32, and a toolchain that cannot
@@ -302,6 +312,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME enum_code COMMAND homm2_enum_code_test)
+  add_executable(homm2_common_helpers_test tools/common_helpers_test.cpp)
+  target_include_directories(homm2_common_helpers_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME common_helpers COMMAND homm2_common_helpers_test)
   add_executable(homm2_combat_cursor_test tools/combat_cursor_test.cpp)
   target_include_directories(homm2_combat_cursor_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
@@ -406,6 +420,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_mapcell_layout_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME mapcell_layout COMMAND homm2_mapcell_layout_test)
+  add_executable(homm2_checkpoint_layout_test tools/checkpoint_layout_test.cpp)
+  target_include_directories(homm2_checkpoint_layout_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME checkpoint_layout COMMAND homm2_checkpoint_layout_test)
   add_test(
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)

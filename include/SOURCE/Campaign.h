@@ -1,6 +1,7 @@
 #ifndef HOMM2_CAMPAIGN_H
 #define HOMM2_CAMPAIGN_H
 
+#include <BASE/dialog.h>
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
@@ -23,10 +24,9 @@ enum class CampaignAward : i32 {
 };
 using enum CampaignAward;
 
-typedef enum CampaignMessageConstant {
-    CAMPAIGN_CLOSE_COMMAND               = 10,
-    CAMPAIGN_DIALOG_CANCEL               = 0x7801,
-    CAMPAIGN_DIALOG_ACCEPT               = 0x7802,
+typedef enum CampaignControlId {
+    CAMPAIGN_DIALOG_ACCEPT               = DIALOG_BUTTON_2,
+    CAMPAIGN_DIALOG_CANCEL               = DIALOG_BUTTON_1,
     CAMPAIGN_DIALOG_RESTART              = 0x385,
     CAMPAIGN_DIALOG_REPLAY               = 0x386,
     CAMPAIGN_TRACK_WIDGET_0              = 0x352,
@@ -55,10 +55,12 @@ typedef enum CampaignMessageConstant {
     CAMPAIGN_SCENARIO_BONUS_WIDGET       = 0x324,
     CAMPAIGN_AWARDS_WIDGET               = 0x325,
     CAMPAIGN_BONUS_TEXT_WIDGET_FIRST     = 0x326,
-    CAMPAIGN_WIDGET_ENABLE_FRAME         = 8,
-    CAMPAIGN_WIDGET_DISABLE_FRAME        = 9,
-    CAMPAIGN_WIDGET_REFRESH_FRAME        = 4
-} CampaignMessageConstant;
+} CampaignControlId;
+
+typedef enum CampaignBonusFrame {
+    CAMPAIGN_WIDGET_ENABLE_FRAME  = 8,
+    CAMPAIGN_WIDGET_DISABLE_FRAME = 9,
+} CampaignBonusFrame;
 
 typedef enum CampaignDisplayConstant {
     CAMPAIGN_TRACK_ICON_SIZE       = 41,
@@ -74,6 +76,13 @@ typedef enum CampaignDisplayConstant {
     CAMPAIGN_EVIL_MUSIC            = 22
 } CampaignDisplayConstant;
 
-MessageDispatchResult CampaignHandler(struct tag_message&);
+
+#define PRESENT_RESTARTED_CAMPAIGN_MAP() \
+    (gpAdvManager->m_visibilityMapValid = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
+     gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette), \
+     gpAdvManager->SetInitialMapOrigin(), gpAdvManager->RedrawAdvScreen(1, 0), \
+     gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette))
+
+MessageDispatchResult CampaignHandler(struct tag_message& message);
 
 #endif

@@ -174,6 +174,18 @@
         '';
       });
 
+      homm2-sanitized = homm2-check.overrideAttrs (previous: {
+        pname = "homm2-sanitized";
+        cmakeFlags = previous.cmakeFlags ++ [ "-DHOMM2_SANITIZERS=ON" ];
+        # LeakSanitizer stops the world through ptrace, which hosts with Yama
+        # ptrace_scope >= 2 forbid. The check is for memory and undefined
+        # behaviour errors, so leak detection stays off for reproducibility.
+        preCheck = (previous.preCheck or "") + ''
+          export ASAN_OPTIONS=detect_leaks=0
+          export UBSAN_OPTIONS=print_stacktrace=1
+        '';
+      });
+
       icon-check = pkgs.stdenv.mkDerivation {
         pname = "homm2-icon-check";
         version = "0.1.0";
@@ -353,6 +365,7 @@
         inherit
           homm2
           homm2-debug
+          homm2-sanitized
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -362,6 +375,7 @@
 
       checks.${system} = {
         native = homm2-check;
+        sanitized = homm2-sanitized;
         windows = windows;
         web = homm2-web;
         icon = icon-check;

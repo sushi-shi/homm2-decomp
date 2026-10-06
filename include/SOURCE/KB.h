@@ -1,6 +1,7 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
 
+#include <BASE/dialog.h>
 #include <Ints.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/armyGroup.h>
@@ -38,6 +39,8 @@ class townManager;
 #include <BASE/message.h>
 #include <BASE/soundManager.h>
 #include <BASE/WINMGR.h>
+#include <SOURCE/GAME.h>
+#include <SOURCE/town.h>
 
 typedef enum GlobalTimerConstant {
     GLOBAL_TIMER_COUNT               = 10,
@@ -103,12 +106,10 @@ typedef enum CampaignConstant {
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
     CAMPAIGN_SETUP_RESET_SIZE         = 0x41,
     CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
-    CAMPAIGN_ARMY_SLOT_COUNT          = 5,
     CAMPAIGN_CARRYOVER_PLAYER         = 3,
     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
     CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
     CAMPAIGN_NORMAL_SCENARIO_LIMIT    = 5,
-    CAMPAIGN_HERO_COUNT               = 54,
     CAMPAIGN_HERO_PRIORITY_HIGH       = 100,
     CAMPAIGN_HERO_PRIORITY_NORMAL     = 90,
     CAMPAIGN_EXPERIENCE_BONUS         = 5000,
@@ -147,19 +148,10 @@ struct SPlayerExit {
 };
 
 typedef enum EventWindowConstant {
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
-    EVENT_WINDOW_CLOSE_COMMAND          = 10,
     EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
     EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
-    EVENT_WINDOW_FIRST_BUTTON           = 0x7800,
-    EVENT_WINDOW_SECOND_BUTTON          = 0x7801,
-    EVENT_WINDOW_THIRD_BUTTON           = 0x7802,
-    EVENT_WINDOW_FOURTH_BUTTON          = 0x7803,
-    EVENT_WINDOW_IGNORED_BUTTON         = 0x7804,
-    EVENT_WINDOW_FIFTH_BUTTON           = 0x7805,
-    EVENT_WINDOW_SIXTH_BUTTON           = 0x7806,
-    EVENT_WINDOW_SEVENTH_BUTTON         = 0x7807,
-    EVENT_WINDOW_EIGHTH_BUTTON          = 0x7808,
     EVENT_WINDOW_LUCK                   = 10,
     EVENT_WINDOW_BAD_LUCK               = 11,
     EVENT_WINDOW_MORALE                 = 12,
@@ -169,27 +161,8 @@ typedef enum EventWindowConstant {
 
 typedef enum KbBuildingConstant {
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
-    KB_BUILDING_RESOURCE_COUNT = 7,
-    KB_MAGE_GUILD_MAX_LEVEL    = 5,
-    KB_MAGE_GUILD_LEVEL_COUNT  = KB_MAGE_GUILD_MAX_LEVEL + 1,
-    KB_DWELLING_TYPE_COUNT     =
-        H2EnumIndex(BUILDING_SLOT_DWELLING_LAST) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST) + 1
+    KB_MAGE_GUILD_LEVEL_COUNT  = TOWN_MAGE_GUILD_LEVEL_COUNT + 1,
 } KbBuildingConstant;
-
-enum class KbDwellingFlag : i32 {
-    KB_DWELLING_FIRST_FLAG          = 0x00100000,
-    KB_DWELLING_SECOND_FLAG         = 0x00200000,
-    KB_DWELLING_THIRD_FLAG          = 0x00400000,
-    KB_DWELLING_FOURTH_FLAG         = 0x00800000,
-    KB_DWELLING_FIFTH_FLAG          = 0x01000000,
-    KB_DWELLING_UPGRADE_FIRST_FLAG  = 0x02000000,
-    KB_DWELLING_UPGRADE_SECOND_FLAG = 0x04000000,
-    KB_DWELLING_UPGRADE_THIRD_FLAG  = 0x08000000,
-    KB_DWELLING_UPGRADE_FOURTH_FLAG = 0x10000000,
-    KB_DWELLING_UPGRADE_FIFTH_FLAG  = 0x20000000,
-    KB_DWELLING_UPGRADE_SIXTH_FLAG  = 0x40000000
-};
-using enum KbDwellingFlag;
 
 typedef enum NormalDialogResourceType {
     NORMAL_DIALOG_NO_RESOURCE      = -1,
@@ -218,6 +191,12 @@ typedef enum NormalDialogResourceType {
     NORMAL_DIALOG_PRIMARY_SKILL    = 25
 } NormalDialogResourceType;
 
+
+typedef enum NormalDialogAnswer {
+    NORMAL_DIALOG_YES = DIALOG_BUTTON_5,
+    NORMAL_DIALOG_NO  = DIALOG_BUTTON_6,
+} NormalDialogAnswer;
+
 typedef enum NormalDialogConstant {
     NORMAL_DIALOG_INFO                     = 1,
     NORMAL_DIALOG_CONFIRM                  = 2,
@@ -240,21 +219,12 @@ typedef enum NormalDialogConstant {
     NORMAL_DIALOG_MAX_ROWS                 = 6,
     NORMAL_DIALOG_TEXT_LINE_WIDTH          = 244,
     NORMAL_DIALOG_TEXT_LINE_HEIGHT         = 16,
-    NORMAL_DIALOG_SCREEN_RIGHT             = 639,
-    NORMAL_DIALOG_SCREEN_BOTTOM            = 479,
-    NORMAL_DIALOG_SCREEN_HEIGHT            = 480,
     NORMAL_DIALOG_MAX_TOP                  = 28,
     NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID     = 100,
     NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID = 0x1e14,
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
     NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
     NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
-    NORMAL_DIALOG_BUTTON_ONE               = 0x7801,
-    NORMAL_DIALOG_BUTTON_TWO               = 0x7802,
-    NORMAL_DIALOG_BUTTON_FIVE              = 0x7805,
-    NORMAL_DIALOG_BUTTON_SIX               = 0x7806,
-    NORMAL_DIALOG_BUTTON_SEVEN             = 0x7807,
-    NORMAL_DIALOG_BUTTON_EIGHT             = 0x7808,
 } NormalDialogConstant;
 
 enum class CheckEndGameForcedResult : i32 {
@@ -353,13 +323,10 @@ enum class DialogWaitType : i32 {
 using enum DialogWaitType;
 
 typedef enum OldMainConstant {
-    OLD_MAIN_PLAYER_COUNT                     = 6,
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
     OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
     OLD_MAIN_DEFAULT_NAME_STRIDE              = 4,
-    OLD_MAIN_SCREEN_WIDTH                     = 640,
-    OLD_MAIN_SCREEN_HEIGHT                    = 480,
     OLD_MAIN_MAIN_MUSIC                       = 42,
     OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
     OLD_MAIN_FADE_SPEED                       = 8,
@@ -388,17 +355,14 @@ typedef enum OldMainConstant {
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
     OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
     OLD_MAIN_DIALOG_WAIT                      = 6,
-    OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
-    OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
-    OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE         = 1
 } OldMainConstant;
 
 #pragma pack(push, 1)
 struct OldMainNetSetup {
-    i8 gamePosToNetPos[OLD_MAIN_PLAYER_COUNT];
+    i8 gamePosToNetPos[GAME_PLAYER_COUNT];
     i8 useBzip2Compression;
     i8 useDiffCompression;
-    SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
+    SNetPlayerInfo players[GAME_PLAYER_COUNT];
 };
 #pragma pack(pop)
 
@@ -410,30 +374,25 @@ union OldMainNetBuffer {
 #pragma pack(push, 1)
 struct KbRemotePacket {
     i8 sender;
-    char reserved1[OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE];
+    i32 id;
     H2EnumStorage<RemoteMessageType, i8> type;
     i8 command;
-    char reserved2[OLD_MAIN_REMOTE_BODY_RESERVED_SIZE];
+    i16 payloadSize;
     union {
         OldMainNetSetup setup;
-        struct {
-            i32 saveId;
-            i32 saveOffset;
-            i32 saveSize;
-        } save;
-        char data[OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE];
+        RemoteSaveInitialization save;
+        char data[REMOTE_MESSAGE_PAYLOAD_SIZE];
     } payload;
 };
 #pragma pack(pop)
 
 typedef enum AppMenuConstant {
+    APP_MENU_CONFIRM_OK          = DIALOG_BUTTON_5,
     APP_MENU_CHECKED             = 8,
     APP_MENU_UNCHECKED           = 0,
     APP_MENU_CONFIRM_DIALOG      = 2,
-    APP_MENU_CONFIRM_OK          = 0x7805,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
-    APP_MENU_MAX_SPELLS          = 0x41,
     APP_MENU_SPELL_COUNT         = 10,
     APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
@@ -446,7 +405,6 @@ typedef enum AppMenuConstant {
     APP_MENU_ARMY_LAST           = 41066,
     APP_MENU_SECONDARY_FIRST     = 42000,
     APP_MENU_SECONDARY_LAST      = 42056,
-    APP_MENU_SECONDARY_LEVELS    = 4,
     APP_MENU_BUILDING_FIRST      = 43000,
     APP_MENU_BUILDING_LAST       = 43101,
     APP_MENU_COMBAT_FIRST        = 44000,
@@ -467,95 +425,115 @@ void EarlyShutdown(const char* caption, const char* text);
 void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
-char toupper(char c);
+char toupper(char character);
+typedef enum Cp1251CaseConstant {
+    CYRILLIC_CASE_OFFSET = 0x20,
+    CYRILLIC_CAPITAL_YO = 0xa8,
+    CYRILLIC_SMALL_YO = 0xb8,
+    CYRILLIC_CAPITAL_A = 0xc0,
+    CYRILLIC_CAPITAL_YA = 0xdf,
+    CYRILLIC_SMALL_A = 0xe0,
+    CYRILLIC_SMALL_YA = 0xff
+} Cp1251CaseConstant;
 
 
 inline char CyrillicToUpper(char c) {
     const u8 encodedByte = static_cast<u8>(c);
     if (encodedByte >= 'a' && encodedByte <= 'z')
-        return static_cast<char>(encodedByte - ' ');
-    if (encodedByte >= 0xE0)
-        return static_cast<char>(encodedByte - 0x20);
-    if (encodedByte == 0xB8)
-        return static_cast<char>(0xA8);
+        return static_cast<char>(encodedByte - CYRILLIC_CASE_OFFSET);
+    if (encodedByte >= CYRILLIC_SMALL_A)
+        return static_cast<char>(encodedByte - CYRILLIC_CASE_OFFSET);
+    if (encodedByte == CYRILLIC_SMALL_YO)
+        return static_cast<char>(CYRILLIC_CAPITAL_YO);
     return c;
 }
 i32 InterpretCommandLine(void);
-MessageDispatchResult InitMenuHandler(struct tag_message&);
-MessageDispatchResult NullHandler(struct tag_message& msg);
-MessageDispatchResult RecruitHeroHandler(tag_message& msg);
+MessageDispatchResult InitMenuHandler(struct tag_message& message);
+MessageDispatchResult NullHandler(struct tag_message& message);
+MessageDispatchResult RecruitHeroHandler(tag_message& message);
 const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
 const char* GetBuildingName(FactionType race, BuildingSlotType building);
-void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
-const char* GetMonsterName(CreatureType);
-const char* GetMonsterPluralName(CreatureType);
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
+const char* GetMonsterName(CreatureType monster);
+const char* GetMonsterPluralName(CreatureType monster);
 void GetMonsterCost(CreatureType monster, i32* const cost);
-i32 CanBuild(town* t, BuildingSlotType building);
-i32 CanBuy(town* t, BuildingSlotType type);
+i32 CanBuild(town* townPointer, BuildingSlotType building);
+i32 CanBuy(town* townPointer, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
-MessageDispatchResult WaitHandler(tag_message& msg);
-MessageDispatchResult EventWindowHandler(struct tag_message&);
-MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg);
+MessageDispatchResult WaitHandler(tag_message& message);
+MessageDispatchResult EventWindowHandler(struct tag_message& message);
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& message);
 void PlayerDead(i32 player);
-void CheckEndGame(CheckEndGameForcedResult, b32);
+void CheckEndGame(CheckEndGameForcedResult forcedResult, b32 dragonCityCaptured);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
-i32 GetMonType(i32 score, HighScoreType type);
-i32 AddScoreToHighScore(i32, i32, i32, HighScoreType, const char*);
-void BVResMsg(const char* s, ResourceType res, i32 qty);
-void GOut(const char* str);
-i32 NetPosToGamePos(i32 netPos);
+i32 GetMonType(i32 score, HighScoreType highScoreType);
+i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, const char* scenarioName);
+void BVResMsg(const char* text, ResourceType resourceType, i32 quantity);
+void GOut(const char* text);
+i32 NetPosToGamePos(i32 netPosition);
 i32 WaitForOtherPlayer(void);
-void PopNetBox(char*, i32);
-void AddNetBoxLine(const char* str, char color);
-void ShutDown(const char* msg);
+void PopNetBox(char* text, i32 netPlayer);
+void AddNetBoxLine(const char* text, char color);
+void ShutDown(const char* message);
 void FileError(const char* filename);
-void SmackFade(u8* src, u8* dst);
-void ShowCongrats(HighScoreType);
+void SmackFade(u8* source, u8* destination);
+void ShowCongrats(HighScoreType highScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(const char* name);
-void WaitEndSample(SAMPLE2* s, i32 waitTime);
+void WaitEndSample(SAMPLE2* sample, i32 waitTime = -1);
 void MemError(void);
 const char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
 void UnloadSystemwideIcons(void);
 void EarlyShutDownSystem(void);
 i32 GameUnsaved(void);
-i32 HandleAppSpecificMenuCommands(i32);
+i32 HandleAppSpecificMenuCommands(i32 command);
 void UpdateSystemOptionsMenu(void);
 void CleanUpMenus(void);
 void UpdateAppSpecificMenus(void* hMenu);
 void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h);
 i32 InMapArea(i32 x, i32 y);
 void SetupDynamicWindow(
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32*,
-    i32*,
-    i32*,
-    i32*,
-    i32*,
-    i32*,
-    class heroWindow**,
-    i32
+    i32 x,
+    i32 y,
+    i32 centered,
+    i32 boundsWidth,
+    i32 boundsHeight,
+    i32 contentWidth,
+    i32 contentHeight,
+    i32* windowWidth,
+    i32* windowHeight,
+    i32* contentLeft,
+    i32* contentTop,
+    i32* contentRight,
+    i32* contentBottom,
+    class heroWindow** window,
+    i32 windowType
 );
-void TestDynamicWindow(i32 p1, i32 p2);
-void HandleRemoteDeadPlayerExit(i32 pos);
+void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles);
+void HandleRemoteDeadPlayerExit(i32 position);
 void HandleRemoteSuddenExit(void);
 void DropDownToOnePlayer(void);
-void ReceiveHostReportsPlayerExit(i32, struct SPlayerExit, i32);
-void ReceiveRemotePlayerExit(struct SPlayerExit);
+void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, i32 forwardedReport);
+void ReceiveRemotePlayerExit(struct SPlayerExit exitInfo);
 i32 CheckMem(void);
-i32 GetManaCost(SpellType spell, hero* h);
-void SetWinText(heroWindow* j, i32 id);
+i32 GetManaCost(SpellType spell, hero* heroPointer);
+void SetWinText(heroWindow* window, i32 id);
 void CheckShingleUpdate(void);
-void NormalDialog(const char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void NormalDialog(
+    const char* text,
+    i32 dialogType,
+    i32 windowX = -1,
+    i32 windowY = -1,
+    i32 firstResourceType = -1,
+    i32 firstResourceValue = 0,
+    i32 secondResourceType = -1,
+    i32 secondResourceValue = 0,
+    i32 showOrText = -1,
+    i32 timeout = 0
+);
 void UpdateNormalDialog(const char* text);
 
 extern b32 bDoColorCycle;
@@ -571,6 +549,9 @@ extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern const char* cOutOfMemory;
 extern const char* gArmyNames[H2EnumIndex(CREATURE_COUNT)];
 extern const char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)];
+
+#define CREATURE_DISPLAY_NAME(type, count)                                                         \
+    ((count) <= 1 ? gArmyNames[H2EnumIndex(type)] : gArmyNamesPlural[H2EnumIndex(type)])
 extern const char* cMonFilename[H2EnumIndex(CREATURE_COUNT)];
 extern const char* cArmyFrameFileNames[H2EnumIndex(CREATURE_COUNT)];
 extern const char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)];
@@ -606,14 +587,16 @@ extern const char* gBuildingInfoSpecial[];
 extern icon* gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
+
+#define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[H2EnumIndex(giCurExe)])
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
-extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
-extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
-extern const char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
-extern H2EnumStorage<CreatureType, i8> gDwellingType[][KB_DWELLING_TYPE_COUNT];
+extern i32 gDwellingBaseResourceValues[][DWELLING_TYPE_COUNT];
+extern i32 gDwellingCosts[][DWELLING_TYPE_COUNT][H2EnumIndex(RES_COUNT)];
+extern const char* gDwellingNames[][DWELLING_TYPE_COUNT];
+extern H2EnumStorage<CreatureType, i8> gDwellingType[][DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
-extern u32l gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
+extern u32l gHierarchyMask[][DWELLING_TYPE_COUNT];
 extern H2EnumStorage<BottomViewMode, i32> giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
 extern H2EnumStorage<ResourceType, i32> giBottomViewResource;
@@ -622,6 +605,7 @@ extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern H2EnumStorage<TerrainType, u8> giGroundToTerrain[];
+#define CELL_TERRAIN(cell) (giGroundToTerrain[(cell)->m_terrainImageIndex])
 extern i32 giHighMemBuffer;
 extern i32 giMainVideoModeColorDepth;
 extern i32 giNumHumanPlayers;
@@ -634,11 +618,11 @@ extern i32 giTotalHighMem;
 extern DialogWaitType giWaitType;
 extern i32 glTimers[GLOBAL_TIMER_COUNT];
 extern i32 gMageBaseResourceValues[];
-extern i32 gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gMageBuildingCosts[][H2EnumIndex(RES_COUNT)];
 extern tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)];
 extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern i32 gNeutralBaseResourceValues[];
-extern i32 gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gNeutralBuildingCosts[][H2EnumIndex(RES_COUNT)];
 extern const char* gNeutralBuildingNames[];
 extern advManager* gpAdvManager;
 extern palette* gPalette;
@@ -657,7 +641,7 @@ extern class heroWindowManager* gpWindowManager;
 extern i32 gResourceBaseValue[];
 extern icon* gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
-extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
+extern i32 gSpecialBuildingCosts[][H2EnumIndex(RES_COUNT)];
 extern const char* gSpecialBuildingNames[];
 extern SSpellInfo gsSpellInfo[H2EnumIndex(SPELL_COUNT)];
 extern icon* gSystemIcons;
