@@ -1,26 +1,5 @@
-#include <Ints.h>
-#include <BASE/IconRle.h>
 #include <BASE/Icond2b.h>
-#include <BASE/IconEntry.h>
-#include <BASE/IconMonoRle.h>
-#include <BASE/icon.h>
-#include <BASE/bitmap.h>
-#include <SOURCE/dimPalette.h>
-#include <SOURCE/KB.h>
-
-
-static i32 s_loopCount = 0;
-static i32 s_y = 0;
-static IconEntry* s_entry = 0;
-static i32 s_left = 0;
-static i32 s_x = 0;
-static u8* s_src = 0;
-static u8* s_dst = 0;
-static u8* s_row = 0;
-static i32 s_clipR = 0;
-static i32 s_clipB = 0;
-static i32 s_spanCount = 0;
-static i32 s_run = 0;
+#include <BASE/ImageDecode.h>
 
 void DimIconToBitmap(
     class icon* sourceIcon,
@@ -35,63 +14,8 @@ void DimIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
-    s_src = sourceIcon->m_data + s_entry->srcOffset;
-    s_left = x + s_entry->x;
-    s_x = s_left;
-    s_y = y + s_entry->y;
-
-    if (clip != ICON_DRAW_NO_CLIP) {
-        if (ICON_FITS_CLIP(s_left, s_y, s_entry->w, s_entry->h, clipX, clipY, clipW, clipH)) {
-            clip = ICON_DRAW_NO_CLIP;
-        } else {
-            clip = ICON_DRAW_CLIP;
-            s_clipR = clipX + clipW - 1;
-            s_clipB = clipY + clipH - 1;
-        }
-    }
-
-    s_row = destination->m_pixels + s_y * destination->m_width;
-
-    for (;;) {
-        s_run = *s_src;
-        s_src++;
-        if (static_cast<i8>(s_run) < 0) {
-            if ((s_run & ICON_RLE_MONO_RUN_MASK) != ICON_RLE_MONO_END_COUNT)
-                s_x += s_run & ICON_RLE_MONO_RUN_MASK;
-            else
-                return;
-        } else if (s_run != ICON_RLE_MONO_NEWLINE_COMMAND) {
-            if (clip == ICON_DRAW_NO_CLIP) {
-                s_dst = s_row + s_x;
-                for (s_loopCount = 0; s_loopCount < s_run; s_loopCount++) {
-                    *s_dst = uDimPal[0][color][*s_dst];
-                    s_dst++;
-                }
-            } else if (s_y >= clipY && s_y <= s_clipB && s_x + s_run > clipX && s_x <= s_clipR) {
-                if (s_x >= clipX) {
-                    if (s_x + s_run <= s_clipR)
-                        s_spanCount = s_run;
-                    else
-                        s_spanCount = s_clipR - s_x + 1;
-                    s_dst = s_row + s_x;
-                } else {
-                    if (s_x + s_run <= s_clipR)
-                        s_spanCount = s_x + s_run - clipX;
-                    else
-                        s_spanCount = clipW;
-                    s_dst = s_row + clipX;
-                }
-                for (s_loopCount = 0; s_loopCount < s_spanCount; s_loopCount++) {
-                    *s_dst = uDimPal[0][color][*s_dst];
-                    s_dst++;
-                }
-            }
-            s_x = s_x + s_run;
-        } else {
-            s_x = s_left;
-            s_y = s_y + 1;
-            s_row = s_row + destination->m_width;
-        }
-    }
+    images::IconOptions options;
+    options.color = color;
+    options.paint = images::IconPaint::MaskDim;
+    images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }
