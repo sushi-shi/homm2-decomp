@@ -15,6 +15,7 @@
 #include <EDITOR/clearManager.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/terrainManager.h>
+#include <EDITOR/RANDOM.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -11873,4 +11874,903 @@ void editManager::RemoveLinkedObject(i32 link) {
             }
         }
     }
+}
+H2_ENUM_BEGIN(EditMapCode)
+    // MakeMapCode: one of five letters from 'V', then three letters of the
+    // map serial (base 26).
+    EDIT_MAP_CODE_LENGTH        = 4,
+    EDIT_MAP_CODE_LETTER_COUNT  = 26,
+    EDIT_MAP_CODE_FIRST_LETTERS = 5,
+    EDIT_MAP_CODE_FIRST_LETTER  = 'V'
+H2_ENUM_END(EditMapCode)
+
+H2_ENUM_BEGIN(EditNewMap)
+    // The map serial wraps when the first map offset plus it passes this;
+    // the map names number it modulo 1000.
+    EDIT_MAP_SERIAL_LIMIT         = 65000,
+    EDIT_MAP_NAME_SERIAL_MODULUS  = 1000,
+    // A warning stays on the status bar for one and a half seconds.
+    EDIT_STATUS_WARNING_MILLISECONDS = 1500
+H2_ENUM_END(EditNewMap)
+
+H2_ENUM_BEGIN(EditGroundShape)
+    // giGroundShape: a terrain's plain tile, its border runs against water
+    // (the edges and corners take the cell's flip flags), the second edge
+    // runs and the decorated plain tiles.
+    EDIT_SHAPE_PLAIN              = 0,
+    EDIT_SHAPE_NORTH_EDGE         = 1,
+    EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
+    EDIT_SHAPE_EAST_EDGE          = 3,
+    EDIT_SHAPE_NORTH_EAST_INNER   = 4,
+    EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
+    EDIT_SHAPE_EAST_EDGE_ALT      = 17,
+    EDIT_SHAPE_DECORATED_FIRST    = 18,
+    EDIT_SHAPE_DECORATED_SECOND   = 19,
+    EDIT_SHAPE_DECORATED_THIRD    = 20,
+    EDIT_SHAPE_DECORATED_FOURTH   = 21,
+    EDIT_SHAPE_COUNT              = 22,
+    EDIT_SHAPE_MASK               = 0x7f,
+    // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
+    // each per terrain and shape.
+    EDIT_GROUND_VARIANTS          = 2,
+    EDIT_GROUND_TILES_PER_SHAPE   = 20,
+    // A cell's ground flip flags (mapCell::m_flags).
+    EDIT_CELL_FLIP_VERTICAL       = 0x01,
+    EDIT_CELL_FLIP_HORIZONTAL     = 0x02
+H2_ENUM_END(EditGroundShape)
+
+VA(0x00409f0d, 0x258)
+void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
+    i32 i;
+    i32 j;
+
+    for (i = x; i < x + width; i++) {
+        for (j = y; j < y + height; j++) {
+            memset(gMap.CellAt(i, j), 0, sizeof(mapCell));
+            gMap.CellAt(i, j)->m_objectLink = 0;
+            gMap.CellAt(i, j)->m_overlayLink = 0;
+            gMap.CellAt(i, j)->m_extraIndex = 0;
+            gMap.CellAt(i, j)->m_terrainImageIndex
+                = ChooseGroundTile(TERRAIN_WATER, EDIT_SHAPE_PLAIN, 1, i, j, 0, 1.0f);
+            gMap.CellAt(i, j)->m_objectTileset = TILESET_NONE;
+            gMap.CellAt(i, j)->m_objectIndex = MAPCELL_SPRITE_NONE;
+            gMap.CellAt(i, j)->m_overlayTileset = TILESET_NONE;
+            gMap.CellAt(i, j)->m_overlayIndex = MAPCELL_SPRITE_NONE;
+            gMap.CellAt(i, j)->m_triggerType = MAP_OBJECT_NONE;
+            gMap.CellAt(i, j)->m_flags = 0;
+            gMap.CellAt(i, j)->m_triggerType = MAP_OBJECT_NONE;
+            gMap.CellAt(i, j)->m_objectMetadata = 0;
+        }
+    }
+}
+
+// The letters of a map code.
+DATA(0x0047d738)
+char* gMapCodeLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+// A map code of the serial: a letter from 'V' to 'Z' and three letters.
+VA(0x0040a165, 0xe5)
+char* MakeMapCode(i32 serial) {
+    DATA(0x0049f5e0)
+    static char code[EDIT_MAP_CODE_LENGTH + 1];
+    i32 H2_UNUSED(unused);
+
+    memset(code, 0, sizeof(code));
+    code[3] = gMapCodeLetters[serial % EDIT_MAP_CODE_LETTER_COUNT];
+    serial -= serial % EDIT_MAP_CODE_LETTER_COUNT;
+    serial /= EDIT_MAP_CODE_LETTER_COUNT;
+    code[2] = gMapCodeLetters[serial % EDIT_MAP_CODE_LETTER_COUNT];
+    serial -= serial % EDIT_MAP_CODE_LETTER_COUNT;
+    serial /= EDIT_MAP_CODE_LETTER_COUNT;
+    code[1] = gMapCodeLetters[serial % EDIT_MAP_CODE_LETTER_COUNT];
+    serial -= serial % EDIT_MAP_CODE_LETTER_COUNT;
+    serial /= EDIT_MAP_CODE_LETTER_COUNT;
+    code[0] = serial % EDIT_MAP_CODE_FIRST_LETTERS + EDIT_MAP_CODE_FIRST_LETTER;
+    return code;
+}
+
+VA(0x0040a24a, 0x58)
+void editManager::FreeMapExtras(void) {
+    i32 i;
+
+    for (i = 1; i < m_extraCount; i++)
+        delete m_extras[i];
+    m_extraCount = 1;
+}
+
+// A new map: normal difficulty, no rumours or events, named after the next
+// map serial.
+VA(0x0040a2a2, 0x1ab)
+void editManager::InitializeMap(b32 random, i32 width, i32 height) {
+    i32 H2_UNUSED(unused);
+
+    if (width != MAP_WIDTH || height != MAP_HEIGHT) {
+        MAP_HEIGHT = height;
+        MAP_WIDTH = width;
+        gMap.Init(MAP_HEIGHT, MAP_WIDTH);
+        gUndoMap.Init(MAP_HEIGHT, MAP_WIDTH);
+        ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
+        m_viewX = m_viewY = 0;
+    }
+    memset(&gEditMapHeader, 0, sizeof(gEditMapHeader));
+    gEditMapHeader.difficulty = DIFFICULTY_NORMAL;
+    gEditMapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
+    gEditMapHeader.width = width;
+    gEditMapHeader.height = height;
+    gEditMapHeader.rumourCount = 0;
+    gEditMapHeader.timeEventCount = 0;
+    gEditMapHeader.timeEventCount = 0;
+    gEditMapHeader.townNameIndex = Random(0, EDITOR_TOWN_NAME_COUNT - 1);
+    gEditMapHeader.nameFileOnSave = true;
+    gConfig.currentMapOffset++;
+    if (gConfig.firstMapOffset + gConfig.currentMapOffset > EDIT_MAP_SERIAL_LIMIT)
+        gConfig.currentMapOffset = 0;
+    if (random)
+        sprintf(
+            gEditMapHeader.name,
+            localization::Tr("editor.map.random.name"),
+            gConfig.currentMapOffset % EDIT_MAP_NAME_SERIAL_MODULUS
+        );
+    else
+        sprintf(
+            gEditMapHeader.name,
+            localization::Tr("editor.map.unnamed"),
+            gConfig.currentMapOffset % EDIT_MAP_NAME_SERIAL_MODULUS
+        );
+    sprintf(gEditMapHeader.description, localization::Tr("editor.map.no_description"));
+    sprintf(gMapFileName, "Map_%04d.%s", gConfig.currentMapOffset, "MP2");
+    WritePrefs();
+    FreeMapExtras();
+}
+
+// Whether a boat may land on the cell: inside the map, no town or castle,
+// and no object but shadows.
+VA(0x0040a44d, 0x147)
+b32 editManager::CanBeCoast(i32 x, i32 y) {
+    i32 shadowsOnly;
+    mapCellExtra* extra;
+    mapCell* cell;
+    i32 extraIndex;
+
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
+        return false;
+    cell = gMap.CellAt(x, y);
+    if (!(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) && cell->m_triggerType != MAP_OBJECT_CASTLE
+        && cell->m_triggerType != MAP_OBJECT_RANDOM_TOWN && cell->m_triggerType != MAP_OBJECT_RANDOM_CASTLE) {
+        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
+            shadowsOnly = false;
+            if (cell->m_objectLayerBit1) {
+                shadowsOnly = true;
+                extraIndex = cell->m_extraIndex;
+                while (extraIndex) {
+                    extra = gMap.Extra(extraIndex);
+                    if (extra->objectIndex != MAPCELL_SPRITE_NONE && !extra->objectLayerBit1)
+                        shadowsOnly = false;
+                    extraIndex = extra->nextIndex;
+                }
+            }
+            if (!shadowsOnly)
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+// Marks the land cells a water cell's coast tile borders as coast (where a
+// boat lands).
+VA(0x0040a594, 0x726)
+void editManager::SetCoast(i32 x, i32 y) {
+    mapCell* cell;
+
+    cell = gMap.CellAt(x, y);
+    if (CELL_TERRAIN(cell) != TERRAIN_WATER)
+        return;
+    switch (giGroundShape[cell->m_terrainImageIndex]) {
+        case EDIT_SHAPE_PLAIN:
+        case EDIT_SHAPE_DECORATED_FIRST:
+        case EDIT_SHAPE_DECORATED_SECOND:
+        case EDIT_SHAPE_DECORATED_THIRD:
+        case EDIT_SHAPE_DECORATED_FOURTH:
+            return;
+        case EDIT_SHAPE_NORTH_EDGE:
+        case EDIT_SHAPE_NORTH_EDGE_ALT:
+            if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+                if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
+                    gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else {
+                if (y > 0 && CanBeCoast(x, y - 1))
+                    gMap.CellAt(x, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+            }
+            break;
+        case EDIT_SHAPE_NORTH_EAST_CORNER:
+            if ((cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL))
+                == (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) {
+                if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
+                    gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+                if (x > 0 && CanBeCoast(x - 1, y))
+                    gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
+                if (y < MAP_HEIGHT - 1 && x > 0 && CanBeCoast(x - 1, y + 1))
+                    gMap.CellAt(x - 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+                if (y > 0 && CanBeCoast(x, y - 1))
+                    gMap.CellAt(x, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+                if (x > 0 && CanBeCoast(x - 1, y))
+                    gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
+                if (y > 0 && x > 0 && CanBeCoast(x - 1, y - 1))
+                    gMap.CellAt(x - 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+                if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
+                    gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+                if (x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y))
+                    gMap.CellAt(x + 1, y)->m_triggerType = MAP_OBJECT_COAST;
+                if (y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y + 1))
+                    gMap.CellAt(x + 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else {
+                if (y > 0 && CanBeCoast(x, y - 1))
+                    gMap.CellAt(x, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+                if (x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y))
+                    gMap.CellAt(x + 1, y)->m_triggerType = MAP_OBJECT_COAST;
+                if (y > 0 && x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y - 1))
+                    gMap.CellAt(x + 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+            }
+            break;
+        case EDIT_SHAPE_EAST_EDGE:
+        case EDIT_SHAPE_EAST_EDGE_ALT:
+            if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+                if (x > 0 && CanBeCoast(x - 1, y))
+                    gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
+            } else {
+                if (x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y))
+                    gMap.CellAt(x + 1, y)->m_triggerType = MAP_OBJECT_COAST;
+            }
+            break;
+        case EDIT_SHAPE_NORTH_EAST_INNER:
+            if ((cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL))
+                == (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) {
+                if (y < MAP_HEIGHT - 1 && x > 0 && CanBeCoast(x - 1, y + 1))
+                    gMap.CellAt(x - 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+                if (y > 0 && x > 0 && CanBeCoast(x - 1, y - 1))
+                    gMap.CellAt(x - 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+                if (y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y + 1))
+                    gMap.CellAt(x + 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
+            } else {
+                if (y > 0 && x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y - 1))
+                    gMap.CellAt(x + 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
+            }
+            break;
+    }
+}
+
+// Shows a warning on the status bar with a beep (not while the random map
+// generator runs).
+VA(0x0040acba, 0x35)
+void ShowStatusWarning(char* text) {
+    if (gGeneratingRandomMap)
+        return;
+    ShowStatusText(text);
+    MessageBeep(MB_OK);
+    gStatusTextClearTime = KBTickCount() + EDIT_STATUS_WARNING_MILLISECONDS;
+}
+
+// The ground tiles of each terrain and shape, plain and varied, indexed on
+// the first call.
+DATA(0x0047d73c)
+i32 gGroundVariantChance[TERRAIN_COUNT] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
+DATA(0x004a3a54)
+b32 gGroundTilesIndexed;
+DATA(0x0049f94c)
+u16 gGroundTiles[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
+DATA(0x004a372c)
+u16 gGroundTileCounts[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
+DATA(0x0049f948)
+i32 gGroundTileCount;
+DATA(0x0049f5ec)
+i32 gGroundTileChoice;
+
+VA(0x0040acef, 0x3ce)
+i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance) {
+    i32 variant;
+    i32 shapeIndex;
+    i32 terrainIndex;
+    i32 tile;
+
+    variant = 0;
+    if (!gGroundTilesIndexed) {
+        gGroundTilesIndexed = true;
+        for (terrainIndex = 0; terrainIndex < TERRAIN_COUNT; terrainIndex++)
+            for (shapeIndex = 0; shapeIndex < EDIT_SHAPE_COUNT; shapeIndex++)
+                for (variant = 0; variant < EDIT_GROUND_VARIANTS; variant++)
+                    gGroundTileCounts[terrainIndex][shapeIndex][variant] = 0;
+        for (tile = 0; tile < GROUND_TILE_IMAGE_COUNT; tile++) {
+            variant = (giGroundShape[tile] & GROUND_SHAPE_FLIPPED) != 0;
+            gGroundTiles[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]
+                        [gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK]
+                                          [variant]]
+                = tile;
+            gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]++;
+        }
+    }
+    if (vary) {
+        if (shape & GROUND_SHAPE_FLIPPED) {
+            variant = 1;
+        } else if ((gGroundVariantChance[terrain] && force)
+                   || (Random(0, 100) < gGroundVariantChance[terrain] * chance
+                       && gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][1] > 0)) {
+            if ((x <= 0
+                 || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                && (x >= MAP_WIDTH - 2
+                    || !(giGroundShape[gMap.CellAt(x + 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                && (y <= 0
+                    || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                && (y >= MAP_HEIGHT - 2
+                    || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED)))
+                variant = 1;
+        }
+        gGroundTileCount = gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][variant];
+        if (gGroundTileCount) {
+            if (gGroundTileCount > 1)
+                gGroundTileChoice = Random(0, gGroundTileCount - 1);
+            else
+                gGroundTileChoice = 0;
+        } else {
+            gGroundTileChoice = 0;
+            variant = 0;
+        }
+        return gGroundTiles[terrain][shape][variant][gGroundTileChoice];
+    }
+    return gGroundTiles[terrain][shape][0][0];
+}
+
+H2_ENUM_BEGIN(EditMapArea)
+    // The map view's screen square.
+    EDIT_MAP_AREA_ORIGIN = 16,
+    EDIT_MAP_AREA_LIMIT  = 448
+H2_ENUM_END(EditMapArea)
+
+VA(0x0040b0bd, 0x41)
+i32 InMapArea(i32 x, i32 y) {
+    return x >= EDIT_MAP_AREA_ORIGIN && x < EDIT_MAP_AREA_LIMIT && y >= EDIT_MAP_AREA_ORIGIN
+        && y < EDIT_MAP_AREA_LIMIT;
+}
+
+H2_ENUM_BEGIN(EditScreenScroll)
+    // The pointer scrolls the view every 70 ms while it rests within 8
+    // pixels of a screen edge, showing the scroll pointer of the direction.
+    EDIT_SCROLL_TICK_INTERVAL = 70,
+    EDIT_SCROLL_BORDER        = 8,
+    EDIT_SCROLL_POINTER_FIRST = 32,
+    EDIT_SCROLL_POINTER_END   = 40,
+    EDIT_SCROLL_POINTER_NONE  = 0
+H2_ENUM_END(EditScreenScroll)
+
+// The tick the view last scrolled.
+DATA(0x004a3a58)
+i32 iLastScrollTime;
+
+// Scrolls the view one cell in the direction (a MapDirection).
+VA(0x0040e053, 0x1c9)
+void editManager::ScreenScroll(i32 direction, b32 updatePointer) {
+    i32 yOrigin;
+    i32 xOrigin;
+
+    xOrigin = m_viewX;
+    yOrigin = m_viewY;
+    iLastScrollTime = KBTickCount();
+    switch (direction) {
+        case MAP_DIRECTION_NORTH:
+            yOrigin--;
+            break;
+        case MAP_DIRECTION_NORTH_EAST:
+            xOrigin++;
+            yOrigin--;
+            break;
+        case MAP_DIRECTION_EAST:
+            xOrigin++;
+            break;
+        case MAP_DIRECTION_SOUTH_EAST:
+            xOrigin++;
+            yOrigin++;
+            break;
+        case MAP_DIRECTION_SOUTH:
+            yOrigin++;
+            break;
+        case MAP_DIRECTION_SOUTH_WEST:
+            xOrigin--;
+            yOrigin++;
+            break;
+        case MAP_DIRECTION_WEST:
+            xOrigin--;
+            break;
+        case MAP_DIRECTION_NORTH_WEST:
+            xOrigin--;
+            yOrigin--;
+            break;
+    }
+    if (updatePointer)
+        gpMouseManager->SetPointer(direction + EDIT_SCROLL_POINTER_FIRST);
+    if (xOrigin < 0)
+        xOrigin = 0;
+    if (xOrigin > MAP_WIDTH - gZoomViewCells[m_zoomLevel])
+        xOrigin = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
+    if (yOrigin < 0)
+        yOrigin = 0;
+    if (yOrigin > MAP_HEIGHT - gZoomViewCells[m_zoomLevel])
+        yOrigin = MAP_HEIGHT - gZoomViewCells[m_zoomLevel];
+    if (xOrigin != m_viewX || yOrigin != m_viewY) {
+        m_viewX = xOrigin;
+        m_viewY = yOrigin;
+        DrawRadar(true);
+        DrawMap();
+        UpdateMapView();
+    }
+}
+
+// Scrolls the view while the pointer rests at a screen edge.
+VA(0x0040e21c, 0x186)
+void editManager::CheckScreenScroll(void) {
+    i16 leftSide;
+    i16 bottomSide;
+    i16 rightSide;
+    i16 topSide;
+
+    leftSide = EDIT_SCROLL_BORDER;
+    rightSide = LOGICAL_SCREEN_WIDTH - EDIT_SCROLL_BORDER - 1;
+    topSide = EDIT_SCROLL_BORDER;
+    bottomSide = LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER;
+    if (KBTickCount() - iLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
+        i32 mouseX;
+        i32 mouseY;
+        i32 oldMapY;
+        i32 oldMapX;
+
+        iLastScrollTime = KBTickCount();
+        oldMapX = m_viewX;
+        oldMapY = m_viewY;
+        gpMouseManager->MouseCoords(mouseX, mouseY);
+        if (mouseX >= 0 && mouseX < LOGICAL_SCREEN_WIDTH && mouseY >= 0 && mouseY < LOGICAL_SCREEN_HEIGHT) {
+            if (mouseX < EDIT_SCROLL_BORDER) {
+                if (mouseY < EDIT_SCROLL_BORDER)
+                    ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
+                else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER)
+                    ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
+                else
+                    ScreenScroll(MAP_DIRECTION_WEST, 1);
+            } else if (mouseX > LOGICAL_SCREEN_WIDTH - EDIT_SCROLL_BORDER - 1) {
+                if (mouseY < EDIT_SCROLL_BORDER)
+                    ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
+                else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER)
+                    ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
+                else
+                    ScreenScroll(MAP_DIRECTION_EAST, 1);
+            } else if (mouseY < EDIT_SCROLL_BORDER) {
+                ScreenScroll(MAP_DIRECTION_NORTH, 1);
+            } else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER) {
+                ScreenScroll(MAP_DIRECTION_SOUTH, 1);
+            }
+        }
+        if (gpMouseManager->m_cursorFrame >= EDIT_SCROLL_POINTER_FIRST
+            && gpMouseManager->m_cursorFrame < EDIT_SCROLL_POINTER_END && oldMapX == m_viewX
+            && oldMapY == m_viewY)
+            gpMouseManager->SetPointer(EDIT_SCROLL_POINTER_NONE);
+    }
+}
+
+H2_ENUM_BEGIN(EditOverlayFrames)
+    // overlayType::reserved4e: a type that reuses the previous type's
+    // frames, and one that numbers its own from frame 0 (a negative value
+    // leaves the frames alone).
+    EDIT_OVERLAY_FRAMES_SHARED = 1111,
+    EDIT_OVERLAY_FRAMES_OWN    = 0
+H2_ENUM_END(EditOverlayFrames)
+
+// Numbers the parts of every catalogue entry: each occupied grid cell takes
+// the next frame of its tileset (an animated one its animation's frames as
+// well), and the entry's width is the widest occupied row.
+VA(0x0040e3a2, 0x1a8)
+void FillInOverlayTiles(void) {
+    i32 nextFrame;
+    i32 width;
+    i32 runFrame;
+    i32 curTileset;
+    i32 i;
+    i32 gx;
+    i32 cellIndex;
+    i32 gy;
+    overlayType* shape;
+    i32 baseFrame;
+
+    curTileset = -1;
+    baseFrame = 0;
+    runFrame = 0;
+    for (i = 0; i < OVERLAY_TYPE_COUNT; i++) {
+        width = 0;
+        shape = &gOverlayTypes[i];
+        if (shape->tileset != curTileset)
+            baseFrame = 0;
+        curTileset = shape->tileset;
+        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_SHARED)
+            baseFrame = runFrame;
+        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_OWN)
+            baseFrame = 0;
+        nextFrame = baseFrame;
+        runFrame = baseFrame;
+        cellIndex = 0;
+        for (gy = 0; gy < OVERLAY_GRID_HEIGHT; gy++) {
+            for (gx = 0; gx < OVERLAY_GRID_WIDTH; gx++) {
+                if (OverlayGridHas(shape->occupiedRows, gx, gy)) {
+                    if (OVERLAY_GRID_WIDTH - gx > width)
+                        width = OVERLAY_GRID_WIDTH - gx;
+                    if (shape->reserved4e >= 0)
+                        shape->frames[cellIndex] = nextFrame;
+                    if (OverlayGridHas(shape->animatedRows, gx, gy)) {
+                        nextFrame += shape->reserved10 + 1;
+                        baseFrame += shape->reserved10 + 1;
+                    } else {
+                        nextFrame++;
+                        baseFrame++;
+                    }
+                } else if (shape->reserved4e >= 0) {
+                    shape->frames[cellIndex] = OVERLAY_NO_FRAME;
+                }
+                cellIndex++;
+            }
+        }
+        shape->reserved4d = width;
+    }
+}
+
+// Whether a cell's object (its trigger) keeps a map-extra record: towns,
+// castles, signs, sphinxes, bottles, events, heroes and jails.
+VA(0x0040e54a, 0x71)
+b32 HasExtraObjectData(i32 triggerType) {
+    return triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SIGN)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_JAIL);
+}
+
+VA(0x0040e5bb, 0xb8)
+b32 LocationHasSpecialDetails(i32 triggerType) {
+    return triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SIGN)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_WEAK)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_MEDIUM)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_STRONG)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG)
+        || triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_JAIL);
+}
+
+// Frees a map-extra record and closes the gap: later records, and the
+// rumours, events and cells that name them, move down one.
+VA(0x0040e673, 0x245)
+void DeleteExtraObjectData(u32 index) {
+    i32 i;
+    i32 j;
+    i32 k;
+    mapCell* cell;
+
+    delete gEditManager->m_extras[index];
+    if (index + 1 < gEditManager->m_extraCount) {
+        memmove(
+            &gEditManager->m_extras[index],
+            &gEditManager->m_extras[index + 1],
+            (gEditManager->m_extraCount - (index + 1)) * sizeof(void*)
+        );
+        memmove(
+            &gEditManager->m_extraSizes[index],
+            &gEditManager->m_extraSizes[index + 1],
+            (gEditManager->m_extraCount - (index + 1)) * sizeof(i16)
+        );
+    }
+    gEditManager->m_extraCount--;
+    for (k = 0; k < gEditMapHeader.rumourCount; k++) {
+        if (gRumourExtras[k] >= index)
+            gRumourExtras[k]--;
+    }
+    for (k = 0; k < gEditMapHeader.timeEventCount; k++) {
+        if (gTimeEventExtras[k] >= index)
+            gTimeEventExtras[k]--;
+    }
+    for (i = 0; i < MAP_WIDTH; i++) {
+        for (j = 0; j < MAP_HEIGHT; j++) {
+            cell = gMap.CellAt(i, j);
+            if (HasExtraObjectData(cell->m_triggerType) && cell->m_objectMetadata >= index)
+                cell->m_objectMetadata--;
+        }
+    }
+}
+
+// Drops the map-extra records no event, rumour or cell names any more.
+VA(0x0040e8b8, 0x176)
+void editManager::CoalesceObjectData(void) {
+    i32 i;
+    i32 j;
+    i32 index;
+    mapCell* cell;
+    u8 usedExtras[EDIT_MANAGER_EXTRA_CAPACITY];
+
+    memset(usedExtras, 0, sizeof(usedExtras));
+    for (index = 0; index < gEditMapHeader.timeEventCount; index++)
+        usedExtras[gTimeEventExtras[index]] = true;
+    for (index = 0; index < gEditMapHeader.rumourCount; index++)
+        usedExtras[gRumourExtras[index]] = true;
+    for (i = 0; i < MAP_WIDTH; i++) {
+        for (j = 0; j < MAP_HEIGHT; j++) {
+            cell = gMap.CellAt(i, j);
+            if (HasExtraObjectData(cell->m_triggerType))
+                usedExtras[cell->m_objectMetadata] = true;
+        }
+    }
+    for (index = m_extraCount - 1; index >= 1; index--) {
+        if (!usedExtras[index])
+            DeleteExtraObjectData(index);
+    }
+    SaveUndo();
+}
+
+H2_ENUM_BEGIN(EditPlayerFactions)
+    // A hero's sprite is its player's colour times seven plus its faction;
+    // a player's faction slots are the six factions and the random one.
+    EDIT_HERO_SPRITES_PER_PLAYER = 7,
+    EDIT_PLAYER_FACTION_SLOTS    = 7
+H2_ENUM_END(EditPlayerFactions)
+
+// Counts the players who may play (and as humans) and gives each one the
+// faction all its towns and heroes share (random, several or none).
+VA(0x0040ea2e, 0x37c)
+void CalculatePlayerNumbers(void) {
+    i32 onlyFaction;
+    i32 humanMin;
+    i32 humanCount;
+    i32 player;
+    i32 cellFaction;
+    i32 x;
+    i32 i;
+    i32 y;
+    i32 k;
+    i32 numPlayers;
+    i32 nFactions;
+    mapCell* cell;
+    u8 factionSeen[GAME_PLAYER_COUNT][EDIT_PLAYER_FACTION_SLOTS];
+
+    humanCount = 0;
+    numPlayers = 0;
+    humanMin = 0;
+    for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+        if (!gEditMapHeader.playerEnabled[i]) {
+            gEditMapHeader.playerCanHuman[i] = false;
+            gEditMapHeader.playerCanComputer[i] = false;
+        } else {
+            if (!gEditMapHeader.playerCanHuman[i] && !gEditMapHeader.playerCanComputer[i])
+                gEditMapHeader.playerCanComputer[i] = true;
+            if (gEditMapHeader.playerCanHuman[i])
+                humanCount++;
+            if (gEditMapHeader.playerCanHuman[i] || gEditMapHeader.playerCanComputer[i])
+                numPlayers++;
+            if (gEditMapHeader.playerCanHuman[i] && !gEditMapHeader.playerCanComputer[i])
+                humanMin++;
+        }
+    }
+    if (!humanCount) {
+        for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+            if (gEditMapHeader.playerEnabled[i]) {
+                gEditMapHeader.playerCanHuman[i] = true;
+                humanCount = 1;
+                humanMin = 1;
+                break;
+            }
+        }
+    }
+    gEditMapHeader.playerCount = numPlayers;
+    gEditMapHeader.minHumanPlayers = humanMin;
+    gEditMapHeader.maxHumanPlayers = humanCount;
+    for (i = 0; i < GAME_PLAYER_COUNT; i++)
+        gEditMapHeader.playerRace[i] = FACTION_NONE;
+    memset(factionSeen, 0, sizeof(factionSeen));
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO)) {
+                player = cell->m_objectIndex / EDIT_HERO_SPRITES_PER_PLAYER;
+                cellFaction = cell->m_objectIndex % EDIT_HERO_SPRITES_PER_PLAYER;
+                factionSeen[player][cellFaction] = true;
+            }
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)) {
+                TownExtra* town;
+
+                town = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                if (town->owner != -1) {
+                    player = town->owner;
+                    cellFaction = town->faction;
+                    factionSeen[player][cellFaction] = true;
+                }
+            }
+        }
+    }
+    onlyFaction = 0;
+    for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+        if (!gEditMapHeader.playerEnabled[i])
+            continue;
+        if (factionSeen[i][FACTION_NEUTRAL]) {
+            gEditMapHeader.playerRace[i] = FACTION_RANDOM;
+        } else {
+            nFactions = 0;
+            for (k = 0; k < IDX(FACTION_COUNT); k++) {
+                if (factionSeen[i][k]) {
+                    nFactions++;
+                    onlyFaction = k;
+                }
+            }
+            if (nFactions == 1)
+                gEditMapHeader.playerRace[i] = static_cast<FactionType>(onlyFaction);
+            else
+                gEditMapHeader.playerRace[i] = FACTION_NEUTRAL;
+        }
+    }
+}
+
+// Marks the players whose heroes or towns the map holds, then recounts.
+VA(0x0040edaa, 0x11f)
+void ResetPlayerAvailability(void) {
+    i32 H2_UNUSED(unusedIndex);
+    i32 i;
+    i32 j;
+    mapCell* cell;
+
+    memset(gEditMapHeader.playerEnabled, 0, sizeof(gEditMapHeader.playerEnabled));
+    for (i = 0; i < MAP_WIDTH; i++) {
+        for (j = 0; j < MAP_HEIGHT; j++) {
+            cell = gMap.CellAt(i, j);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO))
+                gEditMapHeader.playerEnabled[cell->m_objectIndex / EDIT_HERO_SPRITES_PER_PLAYER] = true;
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)) {
+                TownExtra* town;
+
+                town = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                if (town->owner != -1)
+                    gEditMapHeader.playerEnabled[town->owner] = true;
+            }
+        }
+    }
+    CalculatePlayerNumbers();
+}
+
+// Gives each town a name no other town has: a town keeping a catalogue
+// name another town took (or a Dusk/Necr name) draws a free one.
+VA(0x0040eec9, 0x1e2)
+void editManager::RandomizeTownNames(void) {
+    i32 H2_UNUSED(unusedA);
+    i32 H2_UNUSED(unusedB);
+    i32 choice;
+    i32 i;
+    i32 j;
+    TownExtra* townExtra;
+    u8 namesTaken[EDITOR_TOWN_NAME_COUNT];
+    mapCell* cell;
+
+    memset(namesTaken, 0, sizeof(namesTaken));
+    for (i = 0; i < MAP_WIDTH; i++) {
+        for (j = 0; j < MAP_HEIGHT; j++) {
+            cell = gMap.CellAt(i, j);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)) {
+                townExtra = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                for (choice = 0; choice < EDITOR_TOWN_NAME_COUNT; choice++) {
+                    if (!strcmp(townExtra->name, gTownNames[choice]) || !_strnicmp(townExtra->name, "dusk", 4)
+                        || !_strnicmp(townExtra->name, "necr", 4)) {
+                        if (!_strnicmp(townExtra->name, "dusk", 4) || !_strnicmp(townExtra->name, "necr", 4))
+                            namesTaken[choice] = true;
+                        if (namesTaken[choice]) {
+                            while (namesTaken[choice])
+                                choice = Random(0, EDITOR_TOWN_NAME_COUNT - 1);
+                            strcpy(townExtra->name, gTownNames[choice]);
+                        }
+                        namesTaken[choice] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// The map cell of the index-th artifact in row order; false (and -1, -1)
+// when there are fewer.
+VA(0x0040f0ab, 0xc2)
+b32 editManager::FindArtifact(i32 index, i32* x, i32* y) {
+    i32 count;
+    i32 i;
+    i32 j;
+    mapCell* cell;
+
+    count = 0;
+    for (j = 0; j < MAP_HEIGHT; j++) {
+        for (i = 0; i < MAP_WIDTH; i++) {
+            cell = gMap.CellAt(i, j);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)) {
+                if (count == index) {
+                    *x = i;
+                    *y = j;
+                    return true;
+                }
+                count++;
+            }
+        }
+    }
+    *x = *y = -1;
+    return false;
+}
+
+VA(0x0040f16d, 0xe8)
+b32 editManager::FindTown(i32 index, i32* x, i32* y) {
+    i32 i;
+    i32 j;
+    mapCell* cell;
+    i32 numTowns;
+
+    numTowns = 0;
+    for (j = 0; j < MAP_HEIGHT; j++) {
+        for (i = 0; i < MAP_WIDTH; i++) {
+            cell = gMap.CellAt(i, j);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)) {
+                if (numTowns == index) {
+                    *x = i;
+                    *y = j;
+                    return true;
+                }
+                numTowns++;
+            }
+        }
+    }
+    *x = *y = -1;
+    return false;
+}
+
+VA(0x0040f255, 0xc2)
+b32 editManager::FindHero(i32 index, i32* x, i32* y) {
+    i32 i;
+    i32 j;
+    i32 heroOrdinal;
+    mapCell* cell;
+
+    heroOrdinal = 0;
+    for (j = 0; j < MAP_HEIGHT; j++) {
+        for (i = 0; i < MAP_WIDTH; i++) {
+            cell = gMap.CellAt(i, j);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO)) {
+                if (heroOrdinal == index) {
+                    *x = i;
+                    *y = j;
+                    return true;
+                }
+                heroOrdinal++;
+            }
+        }
+    }
+    *x = *y = -1;
+    return false;
 }
