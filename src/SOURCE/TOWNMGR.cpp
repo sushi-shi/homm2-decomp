@@ -2026,8 +2026,8 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
         for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (xShrineBuildingCost[index] > 0) {
-                resourceTypes[costCount] = index;
-                costs[costCount] = xShrineBuildingCost[index];
+                resourceTypes[costCount] = static_cast<i8>(index);
+                costs[costCount] = static_cast<i16>(xShrineBuildingCost[index]);
                 ++costCount;
             }
         }
@@ -2035,33 +2035,39 @@ i32 townManager::BuyBuild(
         mageLevel = gpTownManager->m_town->m_mageGuildLevel;
         for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel)][index] > 0) {
-                resourceTypes[costCount] = index;
-                costs[costCount] = gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel)][index];
+                resourceTypes[costCount] = static_cast<i8>(index);
+                costs[costCount] = static_cast<i16>(
+                    gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel)][index]
+                );
                 ++costCount;
             }
         }
     } else if (building == BUILDING_SLOT_SPECIAL) {
         for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index] > 0) {
-                resourceTypes[costCount] = index;
-                costs[costCount] = gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index];
+                resourceTypes[costCount] = static_cast<i8>(index);
+                costs[costCount] = static_cast<i16>(
+                    gSpecialBuildingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][index]
+                );
                 ++costCount;
             }
         }
     } else if (building <= BUILDING_SLOT_NEUTRAL_LAST) {
         for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gNeutralBuildingCosts[H2EnumIndex(building)][index] > 0) {
-                resourceTypes[costCount] = index;
+                resourceTypes[costCount] = static_cast<i8>(index);
                 costs[costCount] =
-                    gNeutralBuildingCosts[H2EnumIndex(building)][index];
+                    static_cast<i16>(gNeutralBuildingCosts[H2EnumIndex(building)][index]);
                 ++costCount;
             }
         }
     } else {
         for (index = 0; index < H2EnumIndex(RES_COUNT); ++index) {
             if (gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling][index] > 0) {
-                resourceTypes[costCount] = index;
-                costs[costCount] = gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling][index];
+                resourceTypes[costCount] = static_cast<i8>(index);
+                costs[costCount] = static_cast<i16>(
+                    gDwellingCosts[H2EnumIndex(gpTownManager->m_town->m_type)][dwelling][index]
+                );
                 ++costCount;
             }
         }
@@ -3293,7 +3299,7 @@ void GetCategoryStats(
     for (player = 0; player < gpGame->m_playerCount; ++player) {
         townCount = 0;
         castleCount = 0;
-        order[player] = player;
+        order[player] = static_cast<i8>(player);
         if (gpGame->m_playerDead[player]) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {

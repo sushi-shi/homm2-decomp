@@ -8631,7 +8631,7 @@ char* advManager::CheckHandleNet(void) {
                 }
                 if (remotePlayerExited) {
                     exitInfo.netPosition = incomingMessage.sender;
-                    exitInfo.gamePosition = NetPosToGamePos(incomingMessage.sender);
+                    exitInfo.gamePosition = static_cast<i8>(NetPosToGamePos(incomingMessage.sender));
                     exitInfo.updateNetworkControl = false;
                     exitInfo.eliminated = true;
                     exitInfo.hostReported = true;

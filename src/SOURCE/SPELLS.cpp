@@ -849,23 +849,23 @@ void combatManager::CastSpell(
                     case ARMY_FACING_RIGHT:
                         m_hexCells[teleportArmy->m_hex].m_occupantSide = teleportArmy->m_side;
                         m_hexCells[teleportArmy->m_hex].m_occupantIndex =
-                            teleportArmy->m_index;
+                            static_cast<i8>(teleportArmy->m_index);
                         m_hexCells[teleportArmy->m_hex].m_occupantFootprintHalf = ARMY_FACING_LEFT;
                         m_hexCells[teleportArmy->m_hex + 1].m_occupantSide =
                             teleportArmy->m_side;
                         m_hexCells[teleportArmy->m_hex + 1].m_occupantIndex =
-                            teleportArmy->m_index;
+                            static_cast<i8>(teleportArmy->m_index);
                         m_hexCells[teleportArmy->m_hex + 1].m_occupantFootprintHalf = ARMY_FACING_RIGHT;
                         break;
                     case ARMY_FACING_LEFT:
                         m_hexCells[teleportArmy->m_hex].m_occupantSide = teleportArmy->m_side;
                         m_hexCells[teleportArmy->m_hex].m_occupantIndex =
-                            teleportArmy->m_index;
+                            static_cast<i8>(teleportArmy->m_index);
                         m_hexCells[teleportArmy->m_hex].m_occupantFootprintHalf = ARMY_FACING_RIGHT;
                         m_hexCells[teleportArmy->m_hex - 1].m_occupantSide =
                             teleportArmy->m_side;
                         m_hexCells[teleportArmy->m_hex - 1].m_occupantIndex =
-                            teleportArmy->m_index;
+                            static_cast<i8>(teleportArmy->m_index);
                         m_hexCells[teleportArmy->m_hex - 1].m_occupantFootprintHalf = ARMY_FACING_LEFT;
                         break;
                     default:
@@ -880,7 +880,7 @@ void combatManager::CastSpell(
                 teleportArmy->m_hex = targetHex;
                 m_hexCells[teleportArmy->m_hex].m_occupantSide = teleportArmy->m_side;
                 m_hexCells[teleportArmy->m_hex].m_occupantIndex =
-                    teleportArmy->m_index;
+                    static_cast<i8>(teleportArmy->m_index);
                 m_hexCells[teleportArmy->m_hex].m_occupantFootprintHalf = ARMY_FACING_NONE;
                 RippleCreature(
                     teleportArmy->m_side,
@@ -1288,46 +1288,48 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     for (frame = 0; frame < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame)
         affectedHexes[frame] = COMBAT_HEX_EMPTY;
     if (spell != SPELL_COLD_RING)
-        affectedHexes[0] = targetHex;
+        affectedHexes[0] = static_cast<i16>(targetHex);
 
     for (frame = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); frame < COMBAT_DIRECTION_ADJACENT_COUNT;
          ++frame) {
-        affectedHexes[frame + 1] = GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame));
+        affectedHexes[frame + 1] = static_cast<i16>(
+            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame))
+        );
         if (spell == SPELL_FIREBLAST) {
             affectedHexes[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
-                target->GetAdjacentCellIndex(
+                static_cast<i16>(target->GetAdjacentCellIndex(
                     affectedHexes[frame + 1],
                     CombatHexDirectionFromOrdinal(frame)
-                );
+                ));
         }
     }
     if (spell == SPELL_FIREBLAST) {
         affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] =
-            targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE;
+            static_cast<i16>(targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE);
         if (affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
             affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
         affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] =
-            targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE;
+            static_cast<i16>(targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE);
         if (affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
             affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST] = GetAdjacentCellIndexNoArmy(
+        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<i16>(GetAdjacentCellIndexNoArmy(
             affectedHexes[FIREBLAST_EAST_FIRST_RING],
             COMBAT_DIRECTION_NORTHEAST
-        );
+        ));
         affectedHexes[SPELL_FIREBLAST_CORNER_SECOND] =
-            GetAdjacentCellIndexNoArmy(
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
                 affectedHexes[FIREBLAST_EAST_FIRST_RING],
                 COMBAT_DIRECTION_SOUTHEAST
-            );
-        affectedHexes[SPELL_FIREBLAST_CORNER_THIRD] = GetAdjacentCellIndexNoArmy(
+            ));
+        affectedHexes[SPELL_FIREBLAST_CORNER_THIRD] = static_cast<i16>(GetAdjacentCellIndexNoArmy(
             affectedHexes[FIREBLAST_WEST_FIRST_RING],
             COMBAT_DIRECTION_NORTHWEST
-        );
+        ));
         affectedHexes[SPELL_FIREBLAST_CORNER_FOURTH] =
-            GetAdjacentCellIndexNoArmy(
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
                 affectedHexes[FIREBLAST_WEST_FIRST_RING],
                 COMBAT_DIRECTION_SOUTHWEST
-            );
+            ));
     }
 
     baseDamage = m_spellPower[H2EnumIndex(m_currentSide)] * SPELL_FIREBALL_DAMAGE_PER_POWER;
@@ -1628,7 +1630,9 @@ void combatManager::Armageddon(void) {
         );
 
         for (shakePass = 0; shakePass < SPELL_ARMAGEDDON_SHAKE_PASS_COUNT; ++shakePass) {
-            scale = (SPELL_ARMAGEDDON_SHAKE_PASS_COUNT - shakePass) * SPELL_ARMAGEDDON_SHAKE_SCALE;
+            scale = static_cast<float>(
+                (SPELL_ARMAGEDDON_SHAKE_PASS_COUNT - shakePass) * SPELL_ARMAGEDDON_SHAKE_SCALE
+            );
             for (frame = 0; frame < SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT; ++frame) {
                 if (shakePass == 0) {
                     for (color = 0; color < PALETTE_COLOR_COUNT; ++color) {

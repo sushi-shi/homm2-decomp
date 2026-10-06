@@ -16,11 +16,11 @@ extern "C" i32 __cdecl H2BitTest(const void* bits, BitIndex bitIndex) {
 extern "C" void __cdecl H2BitSet(void* bits, BitIndex bitIndex) {
     BitByte* bytes = static_cast<BitByte*>(bits);
     const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
-    bytes[bitIndex >> INDEX_BYTE_SHIFT] |= mask;
+    bytes[bitIndex >> INDEX_BYTE_SHIFT] |= static_cast<BitByte>(mask);
 }
 
 extern "C" void __cdecl H2BitClear(void* bits, BitIndex bitIndex) {
     BitByte* bytes = static_cast<BitByte*>(bits);
     const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
-    bytes[bitIndex >> INDEX_BYTE_SHIFT] &= ~mask;
+    bytes[bitIndex >> INDEX_BYTE_SHIFT] &= static_cast<BitByte>(~mask);
 }

@@ -14,7 +14,7 @@ void BuildTempWalkSeq(SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDraw
         std::memcpy(frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)] + count,
                     frameInfo->animationFrames[source], length);
         std::memcpy(frameInfo->walkXOffsets + count, frameInfo->animationXOffsets[source], length);
-        count += length;
+        count = static_cast<i8>(count + length);
     };
     if (!skipDrawing && finishStanding) {
         append(ARMY_ANIMATION_WALK_STAND);

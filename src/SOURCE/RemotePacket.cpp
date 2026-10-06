@@ -41,7 +41,7 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     PacketSend.header.source = source;
     PacketSend.header.destination = destination;
     PacketSend.header.reserved = 0;
-    PacketSend.header.payloadSize = length;
+    PacketSend.header.payloadSize = static_cast<u8>(length);
     crc[0] = 0;
     PacketSend.header.crc = crc[0];
     if (length > 0)

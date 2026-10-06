@@ -564,13 +564,14 @@ void PollRemote(void) {
     oldInPoll = gbInPollSound;
     qFull = false;
     if (platform::Ticks() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
-        sndBuf.sender = giThisNetPos;
+        sndBuf.sender = static_cast<i8>(giThisNetPos);
         sndBuf.type = REMOTE_MESSAGE_HEARTBEAT;
         sndBuf.payloadSize = 0;
         if (gbThisNetGotAdventureControl != 0) {
-            sndBuf.command =
+            sndBuf.command = static_cast<i8>(
                 ((giCurPlayer + 1) << REMOTE_HEARTBEAT_PLAYER_SHIFT)
-                | REMOTE_HEARTBEAT_CONTROL_FLAG | iCurHourGlassPhase;
+                | REMOTE_HEARTBEAT_CONTROL_FLAG | iCurHourGlassPhase
+            );
         } else {
             sndBuf.command = 0;
         }
@@ -601,8 +602,8 @@ void PollRemote(void) {
                 if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                     lLastHeartbeatReceive[queueIndex] = platform::Ticks();
                 } else {
-                    hostExit.netPosition = queueIndex;
-                    hostExit.gamePosition = NetPosToGamePos(queueIndex);
+                    hostExit.netPosition = static_cast<i8>(queueIndex);
+                    hostExit.gamePosition = static_cast<i8>(NetPosToGamePos(queueIndex));
                     hostExit.updateNetworkControl = true;
                     hostExit.timedOut = true;
                     hostExit.eliminated = false;
@@ -636,7 +637,7 @@ void PollRemote(void) {
                 lLastHeartbeatReceive[0] = platform::Ticks();
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
-                guestExit.gamePosition = NetPosToGamePos(0);
+                guestExit.gamePosition = static_cast<i8>(NetPosToGamePos(0));
                 guestExit.updateNetworkControl = true;
                 guestExit.timedOut = true;
                 guestExit.eliminated = false;
@@ -685,7 +686,7 @@ void PollRemote(void) {
                 goto done;
             }
             if (ReadRemoteMessage(rcvBufIn).type == REMOTE_MESSAGE_RELIABLE) {
-                sndBuf.sender = giThisNetPos;
+                sndBuf.sender = static_cast<i8>(giThisNetPos);
                 sndBuf.id = ReadRemoteMessage(rcvBufIn).id;
                 sndBuf.type = REMOTE_MESSAGE_CONFIRM;
                 sndBuf.payloadSize = 0;

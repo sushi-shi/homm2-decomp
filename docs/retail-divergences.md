@@ -63,16 +63,15 @@ The Overview's dynamic widget tables use their existing 70-slot row types on
 Initialization, replacement and cleanup still use four rows; the original
 11200-byte allocations and allocation/free pairing are unchanged. This is a
 source-ownership improvement, not a claim of an original-game defect. The
-corresponding decomp experiment (PR #60, CP03) changed VC6's stride calculation
+corresponding decomp experiment changed VC6's stride calculation
 from multiply-by-70 plus scaled LEA to multiply-by-280 plus ADD, so it was not
 retained on the matching branch. `overview_rows` checks every slot of both row
 types and their declared global pointer types without depending on a display.
 
-The [complete cast/pointer review](casts-pointers-master.md) records all 148
-inherited functions, including dependencies on other open portable PRs and
-remaining caller contracts. On master, flat AI arrays use direct indexing,
-redundant destination-type casts are removed, and real numeric/API conversions
-remain explicit. Palette byte access uses an unsigned object-representation
+A review of the inherited cast and pointer findings left master with direct
+indexing for flat AI arrays and without redundant destination-type casts;
+numeric/API conversions, including every narrowing conversion, remain
+explicit. Palette byte access uses an unsigned object-representation
 view where the algorithm requires unsigned channels; the signed brighten path
 is unchanged.
 

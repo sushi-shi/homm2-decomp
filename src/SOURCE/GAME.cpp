@@ -901,7 +901,7 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCount = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float fraction = m_obeliskCount > 0
-        ? GetNumObelisks(player) / static_cast<double>(m_obeliskCount) : 0.0f;
+        ? static_cast<float>(GetNumObelisks(player) / static_cast<double>(m_obeliskCount)) : 0.0f;
     float interp =
         (fraction * fraction + fraction)
         / H2EnumIndex(PUZZLE_INTERPOLATION_TERM_COUNT)
@@ -1090,13 +1090,18 @@ void EncodeGameFileText(
 }
 
 i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
-    RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY
-                    && m_timeEventCount <= GAME_TIME_EVENT_CAPACITY
-                    && m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
-    RequireGameData(iMaxMapExtra > 0 && ppMapExtra != nullptr && pwSizeOfMapExtra != nullptr);
+    // Unsaveable runtime state is a save failure, not a load (read) error.
+    const auto requireSaveableState = [](bool condition) {
+        if (!condition)
+            ShutDown(localization::Tr("system.file.write_error"));
+    };
+    requireSaveableState(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY
+                         && m_timeEventCount <= GAME_TIME_EVENT_CAPACITY
+                         && m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
+    requireSaveableState(iMaxMapExtra > 0 && ppMapExtra != nullptr && pwSizeOfMapExtra != nullptr);
     for (i32 index = 1; index < iMaxMapExtra; ++index)
-        RequireGameData(pwSizeOfMapExtra[index] >= 0
-                        && pwSizeOfMapExtra[index] <= GAME_SAVE_BUFFER_SIZE);
+        requireSaveableState(pwSizeOfMapExtra[index] >= 0
+                             && pwSizeOfMapExtra[index] <= GAME_SAVE_BUFFER_SIZE);
     i32 nHuman;
 
     char workBuffer[SAVE_LEGACY_SCRATCH_SIZE];
@@ -4730,7 +4735,7 @@ void game::PerMonth(void) {
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
                         spot->SetObjectTileset(TILESET_MONS32);
-                        spot->m_objectIndex = giMonthTypeExtra;
+                        spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
                             GetRandomNumTroops(CreatureTypeFromCode(giMonthTypeExtra))
                             + GetRandomNumTroops(CreatureTypeFromCode(giMonthTypeExtra));
@@ -7645,7 +7650,7 @@ void CheckValidAvailableHeroes(void) {
                     if (gpGame->m_players[candidatePlayer].m_availableHeroIds[availableSlot]
                         == gpGame->m_players[heroPlayer].m_heroIds[heroIndex]) {
                         gpGame->m_players[candidatePlayer].m_availableHeroIds[availableSlot] =
-                            gpGame->GetNewHeroId(heroPlayer, FACTION_ANY, 0);
+                            static_cast<i8>(gpGame->GetNewHeroId(heroPlayer, FACTION_ANY, 0));
                     }
                 }
             }
