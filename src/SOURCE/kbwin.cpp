@@ -13,6 +13,9 @@
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
+#ifdef HOMM2_EDITOR
+#include <EDITOR/EDITOR.h>
+#endif
 
 H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -29,14 +32,22 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
+#ifdef HOMM2_EDITOR
+        localization::Tr("editor.title")
+#else
         localization::Tr("system.title.short")
+#endif
     );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
             localization::Tr("system.single_instance"),
+#ifdef HOMM2_EDITOR
+            localization::Tr("editor.title")
+#else
             localization::Tr("system.title.full")
+#endif
         ); /* "Только одна копия %s может быть запущена одновременно", "Герои Меча и Магии II" */
         MessageBoxA(
             NULL,
@@ -113,7 +124,11 @@ i32 AppInit(
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
+#ifdef HOMM2_EDITOR
+            localization::Tr("editor.title.short")
+#else
             localization::Tr("system.title.short")
+#endif
         );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
@@ -156,7 +171,11 @@ i32 AppInit(
             ICON_SMALL,
             reinterpret_cast<LPARAM>(LoadIconA(
                 instance,
+#ifdef HOMM2_EDITOR
+                "Editor"
+#else
                 "Heroes"
+#endif
             ))
         );
         ShowWindow(hwndApp, showCommand);
@@ -184,6 +203,7 @@ i32 AppIdle(void) {
 }
 
 VA(0x00471248, 0x63b)
+VA_AT(editor, 0x004154e8, 0x656)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
         return DefWindowProcA(window, message, messageParam, messageData);
@@ -215,6 +235,11 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (lTemp > lLastGTimerTickCount + TIMER_UPDATE_MIN_INTERVAL) {
                 lLastGTimerTickCount = lTemp;
             }
+#ifdef HOMM2_EDITOR
+            // The editor's status bar text expires on the timer.
+            if (gStatusTextClearTime != EDITOR_STATUS_TEXT_KEPT && lTemp > gStatusTextClearTime)
+                ClearStatusText();
+#endif
             return 0;
         case WM_ACTIVATEAPP:
             gbForegroundApp = messageParam;
@@ -406,7 +431,11 @@ LRESULT AppCommand(
             lpfnDlgProc = reinterpret_cast<DLGPROC>(AppAbout);
             DialogBoxParamA(
                 hInstApp,
+#ifdef HOMM2_EDITOR
+                "EDITOR",
+#else
                 "HEROES",
+#endif
                 window,
                 lpfnDlgProc,
                 0
@@ -575,9 +604,16 @@ void InitVideo(void) {
     return;
 }
 
-DATA(0x005157dc) char szAppName[] = localization::Tr("system.title.short");
-DATA(0x005157e8) char szTitle[] =
-    localization::Tr("system.title.full");
+// The editor registers its window class under its full title as well.
+#ifdef HOMM2_EDITOR
+#define KBWIN_APP_NAME localization::Tr("editor.title")
+#define KBWIN_TITLE localization::Tr("editor.title")
+#else
+#define KBWIN_APP_NAME localization::Tr("system.title.short")
+#define KBWIN_TITLE localization::Tr("system.title.full")
+#endif
+DATA(0x005157dc) char szAppName[] = KBWIN_APP_NAME;
+DATA(0x005157e8) char szTitle[] = KBWIN_TITLE;
 DATA(0x00526cd4) HWND hwndApp = NULL;
 DATA(0x00526cd8) HMENU hmnuApp = NULL;
 DATA(0x00526cdc) HANDLE gEventHandle = NULL;

@@ -123,6 +123,7 @@ i32 ShowThisMap(char*) {
 #define indexData indexData5
 #endif
 VA(0x0048e836, 0x723)
+VA_AT(editor, 0x004224f6, 0x608)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     HANDLE findHandleWork;
     SMapHeader header;
@@ -142,6 +143,8 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     findHandleWork = FindFirstFile(gText, &findFileData);
     if (findHandleWork != INVALID_HANDLE_VALUE) {
         while (haveMore) {
+            // The editor has no scenario requester: it filters maps by size only.
+#ifndef HOMM2_EDITOR
             if (m_mode == FILE_REQUESTER_MAP_GAME) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
@@ -152,6 +155,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto CountNextFile;
             }
+#endif
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
@@ -205,6 +209,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     if (findHandleWork != INVALID_HANDLE_VALUE) {
         haveMore = 1;
         while (haveMore) {
+#ifndef HOMM2_EDITOR
             if (m_mode == FILE_REQUESTER_MAP_GAME) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
@@ -215,6 +220,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto InsertNextFile;
             }
+#endif
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
@@ -349,6 +355,7 @@ void fileRequester::Close(void) {
 }
 
 VA(0x0048f275, 0x44b)
+VA_AT(editor, 0x00422e1a, 0x298)
 i32 fileRequester::Open(i32 id) {
     DATA(0x00533d8c) static char emptyLastFilename[1] = "";
     strcpy(
@@ -393,6 +400,18 @@ i32 fileRequester::Open(i32 id) {
     u8 enabled;
     i32 fileSlot;
     char* dot;
+#ifdef HOMM2_EDITOR
+    // The editor's requester only loads maps: nothing to preselect. Its
+    // frame keeps the game's selection locals.
+    enabled = 1;
+    message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
+    sprintf(
+        gText,
+         localization::Tr("requester.file_to_load")
+    );
+    message.payload.widget.data.text = gText;
+    m_window->BroadcastMessage(message);
+#else
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
         enabled = 1;
         strcpy(m_filename, gpGame->m_saveName);
@@ -441,6 +460,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
+#endif
 
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
@@ -486,6 +506,7 @@ void fileRequester::SetOK(i32 enabled) {
 }
 
 VA(0x0048f737, 0x1124)
+VA_AT(editor, 0x00423129, 0xf6a)
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
@@ -687,6 +708,13 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (!MapExistsForFilter(
                                         static_cast<FileRequesterMapSizeFilter>(iResult)
                                     )) {
+#ifdef HOMM2_EDITOR
+                                    // The editor lists maps for every player count.
+                                    sprintf(
+                                        gText,
+                                        localization::Tr("editor.requester.map.size_mismatch")
+                                    );
+#else
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
@@ -704,6 +732,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                             giNumHumanPlayers
                                         );
                                     }
+#endif
                                     NormalDialog(gText, NORMAL_DIALOG_INFO);
                                     break;
                                 }
@@ -868,6 +897,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     }
 
     if (acceptStep == 1) {
+#ifndef HOMM2_EDITOR
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
             && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
@@ -904,6 +934,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 }
             }
         }
+#endif
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
