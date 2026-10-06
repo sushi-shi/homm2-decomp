@@ -49,10 +49,39 @@ def resolve_msvc_include():
 
 def build_lowercase_mirror(real: Path, mirror: Path) -> Path:
     """Recursive lowercase-symlink mirror of `real`, so `<string.h>` resolves onto
-    the on-disk `STRING.H`. Rebuilt only when `real` changes (marker-guarded)."""
+    the on-disk `STRING.H`. Rebuilt only when `real` changes (marker-guarded).
+
+    Parallel compiles of a fresh checkout all ask for the mirror at once, so the
+    rebuild holds an exclusive lock and publishes a complete tree by rename: a
+    reader never sees a half-populated mirror."""
+    import fcntl
+    import tempfile
     marker = mirror.parent / (mirror.name + ".src")
-    if mirror.is_dir() and marker.is_file() and marker.read_text() == str(real):
+
+    def current() -> bool:
+        return mirror.is_dir() and marker.is_file() and marker.read_text() == str(real)
+
+    if current():
         return mirror
+    mirror.parent.mkdir(parents=True, exist_ok=True)
+    with open(mirror.parent / (mirror.name + ".lock"), "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if current():
+            return mirror
+        staging = Path(tempfile.mkdtemp(prefix=mirror.name + ".", dir=mirror.parent))
+        for root, _dirs, files in os.walk(real):
+            rel = os.path.relpath(root, real)
+            low = staging if rel == "." else staging / rel.lower()
+            low.mkdir(parents=True, exist_ok=True)
+            for fn in files:
+                link = low / fn.lower()
+                if not link.exists():
+                    link.symlink_to(os.path.join(root, fn))
+        if mirror.exists():
+            shutil.rmtree(mirror)
+        staging.rename(mirror)
+        marker.write_text(str(real))
+    return mirror
     if mirror.exists():
         shutil.rmtree(mirror)
     for root, _dirs, files in os.walk(real):
