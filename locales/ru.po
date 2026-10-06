@@ -567,6 +567,30 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.check.barrier.no_tent"
+msgid "There is a %s barrier on the map, but no matching %s tent.  A tent is needed because that is where the password is given to remove a barrier."
+msgstr "На карте есть %s барьер, %s шатер не установлен на карте. Необходимо установить такой шатер, потому что только там можно получить пароль для барьера."
+
+msgctxt "editor.check.log"
+msgid "MAP ERROR : %s"
+msgstr "ОШИБКА КАРТЫ: %s"
+
+msgctxt "editor.check.next"
+msgid "%s\n\nShow next error?"
+msgstr "%s\n\nПоказать следующую ошибку?"
+
+msgctxt "editor.check.obelisks.many"
+msgid "%d obelisks on map.  There should be no more than 48 obelisks."
+msgstr "%d обелисков на карте.  Максимально допустимое количество обелисков 48."
+
+msgctxt "editor.check.travel_gate.single"
+msgid "You have at least one travel gate on the map without a partner.  Each of the 3 different travel gates only goes to others of the same type and needs at least one other to work properly."
+msgstr "У вас на карте как минимум один телепорт без пары. Все 3 типа телепортов соединяются только с телепортами того же типа и нужен как минимум один такой для нормального функционирования."
+
+msgctxt "editor.check.whirlpool.single"
+msgid "Only 1 whirlpool on map.  Another whirlpool is needed so there is someplace to travel to."
+msgstr "На карте только 1 водоворот. Необходим второй водоворот, чтобы можно было куда-либо путешествовать."
+
 msgctxt "editor.events.cell.details_unavailable"
 msgid "Details are available only for cells containing a monster, hero, or the front door to a town or castle."
 msgstr "Дополнительная информация доступна только в клетках, содержащих монстров, героев, врата городов или замков, а также сфинксов, бутылки с посланиями и указатели."
