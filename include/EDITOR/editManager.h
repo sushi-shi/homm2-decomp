@@ -98,6 +98,10 @@ public:
     void ToggleZoom(void);
     void SelectTool(i32 tool);
     void Scroll(i32 dx, i32 dy);
+    // The radar and the scroll knobs follow the pointer while it drags.
+    void DoRadar(void);
+    void DoHorizontalKnob(void);
+    void DoVerticalKnob(void);
     // Moves the scroll knobs to the view origin (and redraws them).
     void UpdateKnobs(i32 update);
     i32 LoadMap(char* name);

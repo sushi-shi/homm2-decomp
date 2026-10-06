@@ -25,6 +25,9 @@
 #include <BASE/IconDraw.h>
 #include <BASE/iconWidget.h>
 #include <BASE/mouseManager.h>
+#include <BASE/inputManager.h>
+#include <BASE/message.h>
+#include <BASE/widget.h>
 #include <BASE/resourceManager.h>
 #include <BASE/widgetKind.h>
 #include <stdio.h>
@@ -147,6 +150,12 @@ H2_ENUM_BEGIN(EditKnobGeometry)
     // A ground cell's overlay-extra and hero-cursor flags.
     EDIT_CELL_GROUND_KEEP = 0x9f
 H2_ENUM_END(EditKnobGeometry)
+
+H2_ENUM_BEGIN(EditRadarDrag)
+    // The radar's 144-pixel square; a knob's drag measures from its centre.
+    EDIT_RADAR_SIZE      = 0x90,
+    EDIT_KNOB_DRAG_ORIGIN = 0x27
+H2_ENUM_END(EditRadarDrag)
 
 H2_ENUM_BEGIN(EditManagerSetting)
     // Every editor manager's Main accepts these messages.
@@ -1072,6 +1081,171 @@ void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape) {
         && (giGroundShape[cell->m_terrainImageIndex] & 0x7f) == (shape & 0x7f))
         return;
     cell->m_terrainImageIndex = SelectTerrainTile(terrain, shape, 1, x, y, 0, 1.0f);
+}
+
+// Centres the view on the radar cell under the pointer while the button is
+// held.
+VA(0x00405a26, 0x44c)
+void editManager::DoRadar(void) {
+    tag_message input;
+    i32 x;
+    tag_message mouseMove;
+    i32 y;
+    float scale;
+
+    gpMouseManager->MouseCoords(x, y);
+    if (x < EDIT_RADAR_LEFT || x > EDIT_RADAR_LEFT + EDIT_RADAR_SIZE || y < EDIT_RADAR_TOP
+        || y > EDIT_RADAR_TOP + EDIT_RADAR_SIZE)
+        return;
+    switch (MAP_HEIGHT) {
+        case EDIT_MAP_SMALL:
+            scale = 4.0f;
+            break;
+        case EDIT_MAP_MEDIUM:
+            scale = 2.0f;
+            break;
+        case EDIT_MAP_LARGE:
+            scale = 1.3333f;
+            break;
+        default:
+            scale = 1.0f;
+            break;
+    }
+    x = (x - EDIT_RADAR_LEFT) / scale;
+    y = (y - EDIT_RADAR_TOP) / scale;
+    m_viewX = x - gZoomViewCells[m_zoomLevel] / 2;
+    if (m_viewX + gZoomViewCells[m_zoomLevel] > MAP_WIDTH)
+        m_viewX = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
+    m_viewY = y - gZoomViewCells[m_zoomLevel] / 2;
+    if (m_viewY + gZoomViewCells[m_zoomLevel] > MAP_HEIGHT)
+        m_viewY = MAP_HEIGHT - gZoomViewCells[m_zoomLevel];
+    if (m_viewX < 0)
+        m_viewX = 0;
+    if (m_viewY < 0)
+        m_viewY = 0;
+    DrawMap();
+    DrawRadar(true);
+    UpdateMapView();
+    input = gpInputManager->GetEvent();
+    while (input.type != MESSAGE_LEFT_BUTTON_UP && input.type != MESSAGE_RIGHT_BUTTON_UP) {
+        Process1WindowsMessage();
+        if (input.type == MESSAGE_MOUSE_MOVE) {
+            while (input.type == MESSAGE_MOUSE_MOVE) {
+                mouseMove = input;
+                input = gpInputManager->GetEvent();
+            }
+            gpMouseManager->Main(mouseMove);
+            x = (mouseMove.payload.mouse.x - EDIT_RADAR_LEFT) / scale;
+            y = (mouseMove.payload.mouse.y - EDIT_RADAR_TOP) / scale;
+            m_viewX = x - gZoomViewCells[m_zoomLevel] / 2;
+            if (m_viewX + gZoomViewCells[m_zoomLevel] > MAP_WIDTH)
+                m_viewX = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
+            m_viewY = y - gZoomViewCells[m_zoomLevel] / 2;
+            if (m_viewY + gZoomViewCells[m_zoomLevel] > MAP_HEIGHT)
+                m_viewY = MAP_HEIGHT - gZoomViewCells[m_zoomLevel];
+            if (m_viewX < 0)
+                m_viewX = 0;
+            if (m_viewY < 0)
+                m_viewY = 0;
+            DrawMap();
+            DrawRadar(true);
+            UpdateMapView();
+        } else {
+            input = gpInputManager->GetEvent();
+        }
+    }
+}
+
+VA(0x00405e72, 0x227)
+void editManager::DoHorizontalKnob(void) {
+    double scale;
+    tag_message latest;
+    i32 x;
+    tag_message message;
+    i32 y;
+    i32 newX;
+
+    scale = 402.0 / (MAP_WIDTH - gZoomViewCells[m_zoomLevel] + 1);
+    gpMouseManager->MouseCoords(x, y);
+    gpInputManager->Flush();
+    message.type = MESSAGE_MOUSE_MOVE;
+    message.payload.mouse.x = x;
+    message.payload.mouse.y = y;
+    while (message.type != MESSAGE_LEFT_BUTTON_UP && message.type != MESSAGE_RIGHT_BUTTON_UP) {
+        Process1WindowsMessage();
+        if (message.type == MESSAGE_MOUSE_MOVE) {
+            latest = message;
+            while (message.type == MESSAGE_MOUSE_MOVE) {
+                latest = message;
+                message = gpInputManager->GetEvent();
+            }
+            gpMouseManager->Main(latest);
+            m_horizontalKnob->m_x = latest.payload.mouse.x;
+            newX = latest.payload.mouse.x;
+            newX = (newX - EDIT_KNOB_DRAG_ORIGIN) / scale;
+            newX = newX + 0.5;
+            if (m_viewX != newX) {
+                if (newX > MAP_WIDTH - gZoomViewCells[m_zoomLevel])
+                    newX = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
+                if (newX < 0)
+                    newX = 0;
+                m_viewX = newX;
+                DrawMap();
+                UpdateMapView();
+                DrawRadar(true);
+            }
+        } else {
+            message = gpInputManager->GetEvent();
+        }
+    }
+    m_horizontalKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
+    m_horizontalTrack->m_flags &= ~WIDGET_FLAG_SELECTED;
+}
+
+VA(0x00406099, 0x227)
+void editManager::DoVerticalKnob(void) {
+    double scale;
+    tag_message latest;
+    i32 x;
+    tag_message message;
+    i32 y;
+    i32 newY;
+
+    scale = 402.0 / (MAP_HEIGHT - gZoomViewCells[m_zoomLevel] + 1);
+    gpMouseManager->MouseCoords(x, y);
+    gpInputManager->Flush();
+    message.type = MESSAGE_MOUSE_MOVE;
+    message.payload.mouse.x = x;
+    message.payload.mouse.y = y;
+    while (message.type != MESSAGE_LEFT_BUTTON_UP && message.type != MESSAGE_RIGHT_BUTTON_UP) {
+        Process1WindowsMessage();
+        if (message.type == MESSAGE_MOUSE_MOVE) {
+            latest = message;
+            while (message.type == MESSAGE_MOUSE_MOVE) {
+                latest = message;
+                message = gpInputManager->GetEvent();
+            }
+            gpMouseManager->Main(latest);
+            m_verticalKnob->m_y = latest.payload.mouse.y;
+            newY = latest.payload.mouse.y;
+            newY = (newY - EDIT_KNOB_DRAG_ORIGIN) / scale;
+            newY = newY + 0.5;
+            if (m_viewY != newY) {
+                if (newY > MAP_HEIGHT - gZoomViewCells[m_zoomLevel])
+                    newY = MAP_HEIGHT - gZoomViewCells[m_zoomLevel];
+                if (newY < 0)
+                    newY = 0;
+                m_viewY = newY;
+                DrawMap();
+                UpdateMapView();
+                DrawRadar(true);
+            }
+        } else {
+            message = gpInputManager->GetEvent();
+        }
+    }
+    m_verticalKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
+    m_verticalTrack->m_flags &= ~WIDGET_FLAG_SELECTED;
 }
 
 VTBL(editManager, 0x0045b368)
