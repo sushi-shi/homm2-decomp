@@ -567,6 +567,70 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.events.cell.details_unavailable"
+msgid "Details are available only for cells containing a monster, hero, or the front door to a town or castle."
+msgstr "Дополнительная информация доступна только в клетках, содержащих монстров, героев, врата городов или замков, а также сфинксов, бутылки с посланиями и указатели."
+
+msgctxt "editor.events.empty_entry"
+msgid "-empty-"
+msgstr "-пусто-"
+
+msgctxt "editor.events.event.no_artifact"
+msgid "-none-"
+msgstr "-нет-"
+
+msgctxt "editor.events.hero.class_label"
+msgid "Type"
+msgstr "Тип"
+
+msgctxt "editor.events.hero.patrol_radius"
+msgid "Radius %d squares"
+msgstr "Радиус %d клеток"
+
+msgctxt "editor.events.hero.patrol_radius_one"
+msgid "Radius %d square"
+msgstr "Радиус %d клеток"
+
+msgctxt "editor.events.hero.stand_still"
+msgid "Stand still"
+msgstr "Стоять на месте"
+
+msgctxt "editor.events.monster.count_range"
+msgid "Must be between 0 and 4000.  (0 lets the computer determine the number randomly.)"
+msgstr "Значение должно быть от 0 до 4000. (0 позволяет компьютеру определять количество случайным образом.)"
+
+msgctxt "editor.events.town.mage_guild.level_1"
+msgid "Level 1"
+msgstr "1 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_2"
+msgid "Level 2"
+msgstr "2 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_3"
+msgid "Level 3"
+msgstr "3 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_4"
+msgid "Level 4"
+msgstr "4 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_5"
+msgid "Level 5"
+msgstr "5 этаж"
+
+msgctxt "editor.events.town.mage_guild.none"
+msgid "-None-"
+msgstr "-Нет-"
+
+msgctxt "editor.events.town.old_editor"
+msgid "Unable to edit town - created under old editor"
+msgstr "Нельзя редактировать город. Объект создан старым редактором."
+
+msgctxt "editor.events.ultimate_artifact.radius_range"
+msgid "Must be between 0 and 127."
+msgstr "Значение должно быть от 0 до 127. "
+
 msgctxt "editor.startup.cd_required"
 msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
 msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."

@@ -2,3 +2,10 @@
 # (--reloc-alias-manifest): sites whose data or function relocation must use a
 # specific existing owner symbol and addend. Empty until aliases are reviewed in.
 function_rva	target_rva	site_rva	owner	addend	occurrences
+0x149d3	0xa4a8b	0x14c5b	?gHeroEdit@@3UHeroExtra@@A	0xfffffe3b	1
+0x149d3	0xa4b76	0x14c95	?gHeroEdit@@3UHeroExtra@@A	0xffffff26	1
+0x149d3	0xa4b2f	0x14cec	?gHeroEdit@@3UHeroExtra@@A	0xfffffedf	1
+0x149d3	0xa4a64	0x14dd3	?gHeroEdit@@3UHeroExtra@@A	0xfffffe14	1
+0x149d3	0xa4a6c	0x14de0	?gHeroEdit@@3UHeroExtra@@A	0xfffffe1c	1
+0x149d3	0xa4a64	0x14e00	?gHeroEdit@@3UHeroExtra@@A	0xfffffe14	1
+0x149d3	0xa4a6c	0x14e20	?gHeroEdit@@3UHeroExtra@@A	0xfffffe1c	1

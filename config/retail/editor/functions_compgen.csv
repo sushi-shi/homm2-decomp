@@ -13,3 +13,11 @@ entry_rva,size,symbol,unit,source_object,evidence
 0x1019e,24,_$E15,EDITOR/EDITOR,EDITOR/EDITOR,masked-exact
 0x115ed,39,_$E24,EDITOR/EDITOR,EDITOR/EDITOR,masked-exact
 0x11614,18,_$E23,EDITOR/EDITOR,EDITOR/EDITOR,masked-exact
+0x1346e,39,_$E19,EDITOR/EVENTMGR,EDITOR/EVENTMGR,masked-exact
+0x13495,18,_$E18,EDITOR/EVENTMGR,EDITOR/EVENTMGR,masked-exact
+0x13f11,39,_$E19,EDITOR/evntedit,EDITOR/evntedit,masked-exact
+0x13f38,18,_$E18,EDITOR/evntedit,EDITOR/evntedit,masked-exact
+0x1508d,39,_$E19,EDITOR/heroedit,EDITOR/heroedit,masked-exact
+0x150b4,18,_$E18,EDITOR/heroedit,EDITOR/heroedit,masked-exact
+0x2aef3,39,_$E19,EDITOR/townedit,EDITOR/townedit,masked-exact
+0x2af1a,18,_$E18,EDITOR/townedit,EDITOR/townedit,masked-exact

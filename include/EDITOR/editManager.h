@@ -97,6 +97,15 @@ extern editManager* gEditManager;
 // The header of the edited map (its name, size and players).
 extern SMapHeader gEditMapHeader;
 
+// Whether a cell's object (its trigger type) has a detail editor: towns,
+// signs, events, sphinxes, monsters, the ultimate artifact, heroes, jails
+// and artifacts.
+b32 LocationHasSpecialDetails(i32 triggerType);
+
+// Marks the players whose towns or heroes the map holds
+// (gEditMapHeader.playerEnabled).
+void ResetPlayerAvailability(void);
+
 // The map file requester: loads or saves (`mode`) and stores the chosen
 // file name in gMapFileName.
 i32 PickMap(i32 mode);
