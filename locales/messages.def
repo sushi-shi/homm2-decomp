@@ -1155,23 +1155,6 @@ HOMM2_MESSAGE(
     "You enter the arena and face a pack of vicious lions.  You handily defeat them, to the wild cheers of the crowd.  Impressed by your skill, the aged trainer of gladiators agrees to train you in a skill of your choice."
 )
 
-HOMM2_MESSAGE(
-    "system.cdrom.unavailable_guest_only",
-    "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game."
-)
-HOMM2_MESSAGE(
-    "system.cdrom.expansion_disc_missing",
-    "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game.  If you have the CD, then exit the program, put the CD in, and try again."
-)
-HOMM2_MESSAGE("system.startup_error.title", "Startup Error")
-HOMM2_MESSAGE(
-    "system.startup_error.game_directory_missing",
-    "Unable to change to the Heroes II directory.  Please run the installation program."
-)
-HOMM2_MESSAGE(
-    "system.startup_error.data_files_missing",
-    "Unable to find the Heroes II data files.  Please run the installation program."
-)
 HOMM2_MESSAGE("map.default.chaos", "Chaos")
 HOMM2_MESSAGE("resource.per_day", "%d/day")
 HOMM2_MESSAGE(
