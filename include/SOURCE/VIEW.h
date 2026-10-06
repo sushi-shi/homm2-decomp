@@ -7,7 +7,7 @@
 
 struct tag_message;
 
-MessageDispatchResult HandleViewGeneral(struct tag_message&);
+MessageDispatchResult HandleViewGeneral(struct tag_message& message);
 extern H2EnumStorage<CombatSide, i32> iViewGeneralWhichSide;
 
 #endif

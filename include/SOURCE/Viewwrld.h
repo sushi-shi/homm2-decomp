@@ -13,6 +13,6 @@ enum class ViewWorldScale : i32 {
 };
 using enum ViewWorldScale;
 
-MessageDispatchResult ViewWorldDialogHandler(struct tag_message&);
+MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message);
 
 #endif

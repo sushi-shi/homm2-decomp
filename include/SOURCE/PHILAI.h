@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/GAME.h>
 
 class army;
 class hero;
@@ -29,8 +30,6 @@ struct BHC {
 };
 
 typedef enum AIPurchaseConstant {
-    AI_PURCHASE_RESOURCE_COUNT     = H2EnumIndex(RES_COUNT),
-    AI_PLAYER_COUNT                = 6,
     AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_LEVEL        = 3,
     AI_PURCHASE_DEBUG_DELAY        = 1500,
@@ -41,7 +40,6 @@ typedef enum AIPurchaseConstant {
 
 typedef enum AIBattleConstant {
     AI_BATTLE_NO_PLAYER              = -1,
-    AI_BATTLE_ARTIFACT_SLOT_COUNT    = 14,
     AI_BATTLE_BASE_ARTIFACT_LIMIT    = 37,
     AI_BATTLE_ATTACKER_ARTIFACT_BASE = 1400,
     AI_BATTLE_DEFENDER_ARTIFACT_BASE = 1250,
@@ -53,31 +51,30 @@ typedef enum AIGenericSiteConstant {
     AI_GENERIC_SITE_GOLD_THRESHOLD        = 1500,
     AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE = 500,
     AI_GENERIC_SITE_MAX_LUCK              = 3,
-    AI_GENERIC_SITE_ARMY_SLOTS            = 5,
     AI_GENERIC_SITE_WEEK_END              = 8
 } AIGenericSiteConstant;
 
 #define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
-void ResetHeroRVs(i32, i32, i32);
-void CheckDoMain(i32 a1, i32 doMain);
+void ResetHeroRVs(i32 resetAll, i32 x, i32 y);
+void CheckDoMain(i32 unused, i32 doMain);
 void ShowStatus(void);
 void ValidateHero(hero* pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
-i32 OnMySide(i32);
+i32 OnMySide(i32 player);
 
 extern b32 bHeroBuiltThisTurn;
-extern float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
+extern float gafAITurnCostResource[H2EnumIndex(RES_COUNT)];
 extern i8* gaiEnemyHeroReachable;
 extern i16* gaiHeroEventStratRVOfPos;
 extern i16* gaiHeroStrategicRVOfPos;
 extern i16* gaiLiveChanceOfPos;
 extern i8* gaiTurnValueOfMine;
 extern b32 gbReduceByReload;
-extern i8 giBuildBoat[AI_PLAYER_COUNT];
-extern i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
-extern i8 giBuildShipyard[AI_PLAYER_COUNT];
+extern i8 giBuildBoat[GAME_PLAYER_COUNT];
+extern i8 giBuildBoatStuffTurn[GAME_PLAYER_COUNT];
+extern i8 giBuildShipyard[GAME_PLAYER_COUNT];
 extern i32 giCurPlayer;
 extern u8 giCurPlayerBit;
 extern i32 giCurTurn;
