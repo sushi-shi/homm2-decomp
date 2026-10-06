@@ -572,3 +572,9 @@ flags = "base_nogf"
 unit = "SOURCE/x_arena"
 source = "src/SOURCE/x_arena.cpp"
 flags = "base_nogf"
+
+# EDT2PL.exe's own objects (images = ["editor"]) spell the editor's addresses.
+[[unit]]
+unit = "EDITOR/CLEARMGR"
+source = "src/EDITOR/CLEARMGR.cpp"
+images = ["editor"]
