@@ -122,39 +122,6 @@ typedef enum ExpansionCampaignSaveConstant {
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 } ExpansionCampaignSaveConstant;
 
-
-namespace {
-
-
-    inline char ToUpperCp1251(u8 letter) {
-        char capital;
-
-        if (letter >= 'a' && letter <= 'z')
-            capital = letter - ('a' - 'A');
-        else if (letter >= CYRILLIC_SMALL_A && letter <= CYRILLIC_SMALL_YA)
-            capital = letter - (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
-        else if (letter == CYRILLIC_SMALL_YO)
-            capital = CYRILLIC_CAPITAL_YO;
-        else
-            capital = letter;
-        return capital;
-    }
-
-    inline char ToLowerCp1251(u8 letter) {
-        char lowerFirst;
-        if (letter >= 'A' && letter <= 'Z')
-            lowerFirst = letter + ('a' - 'A');
-        else if (letter >= CYRILLIC_CAPITAL_A && letter <= CYRILLIC_CAPITAL_YA)
-            lowerFirst = letter + (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
-        else if (letter == CYRILLIC_CAPITAL_YO)
-            lowerFirst = CYRILLIC_SMALL_YO;
-        else
-            lowerFirst = letter;
-        return lowerFirst;
-    }
-
-}
-
 typedef enum GameSaveFormatConstant {
     SAVE_PATH_CAPACITY                 = 452,
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
