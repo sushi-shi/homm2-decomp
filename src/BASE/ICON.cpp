@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <BASE/icon.h>
 #include <BASE/IconDraw.h>
+#include <BASE/ImageDecode.h>
 #include <BASE/resource.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
@@ -30,14 +31,29 @@ typedef enum IconDrawExtentConstant {
 } IconDrawExtentConstant;
 
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
+    m_data = nullptr;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 length = gpResourceManager->ReadLong();
+    const u32 memberSize = gpResourceManager->GetFileSize(id);
+    if (memberSize < 6 || length > memberSize - 6 || m_frameCount <= 0
+        || static_cast<u32>(m_frameCount) > length / images::IconFrameBytes) {
+        ShutDown("Invalid ICN frame count or payload length.");
+        return;
+    }
     m_data = static_cast<u8*>(H2_ALLOC(length));
+    m_dataSize = length;
     gpResourceManager->ReadBlock(m_data, length);
+    const char* error = nullptr;
+    if (!images::ValidateIconPayload({m_data, m_dataSize}, m_frameCount, error)) {
+        H2_FREE(m_data);
+        m_data = nullptr;
+        m_dataSize = 0;
+        ShutDown(error);
+    }
 }
 
-inline icon::~icon() {
+icon::~icon() {
     H2_FREE(m_data);
 }
 
@@ -87,15 +103,15 @@ IconDrawResult icon::CombatClipDrawToBuffer(
 ) {
     if (gbComputeExtent != 0) {
         if (orientation != ICON_DRAW_NORMAL) {
-            limits->right = x - reinterpret_cast<IconEntry*>(m_data)[frame].x;
-            limits->left = limits->right - reinterpret_cast<IconEntry*>(m_data)[frame].w + 1;
-            limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
-            limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
+            limits->right = x - GetIconEntry(this, frame)->x;
+            limits->left = limits->right - GetIconEntry(this, frame)->w + 1;
+            limits->top = y + GetIconEntry(this, frame)->y;
+            limits->bottom = limits->top + GetIconEntry(this, frame)->h - 1;
         } else {
-            limits->left = x + reinterpret_cast<IconEntry*>(m_data)[frame].x;
-            limits->right = limits->left + reinterpret_cast<IconEntry*>(m_data)[frame].w - 1;
-            limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
-            limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
+            limits->left = x + GetIconEntry(this, frame)->x;
+            limits->right = limits->left + GetIconEntry(this, frame)->w - 1;
+            limits->top = y + GetIconEntry(this, frame)->y;
+            limits->bottom = limits->top + GetIconEntry(this, frame)->h - 1;
         }
         if (gbSaveBiggestExtent != 0) {
             if (limits->left < giMinExtentX)
@@ -130,7 +146,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
-                yModify
+                {yModify, LOGICAL_SCREEN_HEIGHT}
             );
         else
             FlipIconToBitmapYModify(
@@ -145,7 +161,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
                 offset,
-                yModify
+                {yModify, LOGICAL_SCREEN_HEIGHT}
             );
     } else if (colorTable != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
@@ -291,10 +307,10 @@ void icon::FillToBuffer(
         return;
     }
     if (gbLimitToExtent != 0 && limits != NULL) {
-        limits->left = x + reinterpret_cast<IconEntry*>(m_data)[frame].x;
-        limits->right = limits->left + reinterpret_cast<IconEntry*>(m_data)[frame].w - 1;
-        limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
-        limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
+        limits->left = x + GetIconEntry(this, frame)->x;
+        limits->right = limits->left + GetIconEntry(this, frame)->w - 1;
+        limits->top = y + GetIconEntry(this, frame)->y;
+        limits->bottom = limits->top + GetIconEntry(this, frame)->h - 1;
         if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY)
             return;

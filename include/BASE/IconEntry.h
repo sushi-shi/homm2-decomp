@@ -11,11 +11,13 @@ struct IconEntry {
     i16 y;
     i16 w;
     i16 h;
-    u8 flags : 5;
+    u8 flags;
     i32 srcOffset;
 };
 #pragma pack(pop)
 #ifndef HOMM2_BASE_ICONENTRY_NO_SIZE
+static_assert(sizeof(IconEntry) == 13);
+static_assert(offsetof(IconEntry, srcOffset) == 9);
 #endif
 
 #endif
