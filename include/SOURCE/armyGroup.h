@@ -28,28 +28,28 @@ using enum ArmyGroupAlignmentResult;
 #pragma pack(push, 1)
 class armyGroup {
 public:
-    union {
-        H2EnumStorage<CreatureType, i8> m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
-        H2EnumStorage<CreatureType, i8> m_troopTypes[ARMY_GROUP_SLOT_COUNT];
-    };
-    union {
-        i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
-        u16 m_troopCounts[ARMY_GROUP_SLOT_COUNT];
-        i16 m_quantities[ARMY_GROUP_SLOT_COUNT];
-    };
+    H2EnumStorage<CreatureType, i8> m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
+    i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
     armyGroup(void);
     void View(i32);
     i32 HasAllUndead(void);
     i32 HasSomeUndead(void);
-    i32 GetMorale(class hero*, class town*, class armyGroup*);
-    void Dismiss(i32);
-    i32 IsMember(CreatureType);
-    ArmyGroupAlignmentResult IsHomogeneous(i32);
-    i32 CanJoin(CreatureType);
+    i32 GetMorale(class hero* armyHero, class town* occupiedTown, class armyGroup* enemyGroup);
+    void Dismiss(i32 slot);
+    i32 IsMember(CreatureType creatureType);
+    ArmyGroupAlignmentResult IsHomogeneous(i32 alignmentMode);
+    i32 CanJoin(CreatureType creatureType);
     i32 GetNumArmies(void);
-    i32 Add(CreatureType, i32, i32);
-    void Swap(i32, class armyGroup*, i32);
-    void DamageGroup(float);
+    i32 Add(CreatureType creatureType, i32 quantity, i32 slot);
+    void Swap(i32 slot, class armyGroup* otherGroup, i32 otherSlot);
+    void DamageGroup(float casualtyFraction);
 };
 #pragma pack(pop)
+
+#define CLEAR_ARMY_GROUP(group)                                                                    \
+    (memset((group).m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof((group).m_creatureTypes)),      \
+     memset((group).m_creatureCounts, 0, sizeof((group).m_creatureCounts)))
+
+#define ARMY_GROUP_HAS_POSITIVE_STACK(group, slot)                                                 \
+    ((group).m_creatureTypes[slot] != CREATURE_NONE && (group).m_creatureCounts[slot] > 0)
 #endif

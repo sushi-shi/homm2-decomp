@@ -244,7 +244,7 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             sizeof(info.spriteName),
             QueryTextAttribute(crElem, "short-name")
         );
-        info.flags.all = MonsterFlagsFromCode(creatureFlags);
+        info.attributes = MonsterFlagsFromCode(creatureFlags);
         gMonsterDatabase[id] = info;
     }
     CreatureCount++;

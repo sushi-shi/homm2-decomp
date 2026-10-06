@@ -34,7 +34,7 @@ struct Point {
 
     Point() : x(0), y(0) {}
     Point(i32 px, i32 py) : x(px), y(py) {}
-    Point ClipToRect(const H2RECT&) const;
+    Point ClipToRect(const H2RECT& rect) const;
 };
 
 struct H2RECT {
@@ -47,8 +47,8 @@ struct H2RECT {
     H2RECT(RectTop t, RectBottom b, RectLeft l, RectRight r)
         : left(l.value), right(r.value), top(t.value), bottom(b.value) {}
 
-    H2RECT ClipToBounds(const H2RECT&) const;
-    H2RECT UnionWith(const H2RECT&) const;
+    H2RECT ClipToBounds(const H2RECT& other) const;
+    H2RECT UnionWith(const H2RECT& other) const;
 
     i32 Width() const {
         return right - left + 1;
@@ -58,6 +58,6 @@ struct H2RECT {
     }
 };
 
-H2RECT RectAroundPoint(const Point&, i32 halfWidth, i32 halfHeight);
+H2RECT RectAroundPoint(const Point& point, i32 halfWidth, i32 halfHeight);
 
 #endif

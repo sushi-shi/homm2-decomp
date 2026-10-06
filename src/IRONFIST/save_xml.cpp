@@ -254,8 +254,8 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     );
     xml::WriteArray(tempDoc, pRoot, "somePlayerNumData", gpGame->m_setupPlayerType);
     xml::WriteArray(tempDoc, pRoot, "field_47C", gpGame->_pad_0x47c);
-    xml::WriteArray(tempDoc, pRoot, "field_2773", gpGame->m_castleOwners);
-    xml::WriteArray(tempDoc, pRoot, "builtToday", gpGame->m_dailyEventFlags);
+    xml::WriteArray(tempDoc, pRoot, "field_2773", gpGame->m_townOwners);
+    xml::WriteArray(tempDoc, pRoot, "builtToday", gpGame->m_townBuiltToday);
     xml::WriteArray(tempDoc, pRoot, "field_60A6", gpGame->m_mineOwners);
     xml::WriteArray(tempDoc, pRoot, "randomArtifacts", SerializeGeneratedArtifacts());
     xml::WriteArray(tempDoc, pRoot, "boatBuilt", gpGame->m_boatSlots);
@@ -293,8 +293,8 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             static_cast<i32>(player->m_heroLocatorPage)
         );
         xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
-        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
-        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
+        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_bonusPuzzlePieces));
+        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiPersonality));
         xml::PushBack(
             tempDoc, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
         );
@@ -341,7 +341,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         xml::PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
         xml::PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
         xml::PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
-        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
+        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_mageGuildLevel));
         xml::PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
         xml::PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
         xml::PushBack(
@@ -354,10 +354,10 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         xml::PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
         xml::PushBack(tempDoc, townElem, "name", twn->m_name);
 
-        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
+        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_dwellingAvailable);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
-            numSpellsOfLevel[j] = twn->m_spellCounts[j + TOWN_MAGE_GUILD_FIRST_LEVEL];
+            numSpellsOfLevel[j] = twn->m_spellCounts[j];
         xml::WriteArray(tempDoc, townElem, "numSpellsOfLevel", numSpellsOfLevel);
 
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL;
@@ -375,7 +375,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             tinyxml2::XMLElement* creatElem = tempDoc->NewElement("garrisonCreature");
             creatElem->SetAttribute("index", j);
             creatElem->SetAttribute("type", static_cast<i32>(twn->m_army.m_creatureTypes[j].value()));
-            creatElem->SetAttribute("quantity", twn->m_army.m_quantities[j]);
+            creatElem->SetAttribute("quantity", twn->m_army.m_creatureCounts[j]);
             townElem->InsertEndChild(creatElem);
         }
 
@@ -536,7 +536,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             tinyxml2::XMLElement* armyElem = tempDoc->NewElement("army");
             armyElem->SetAttribute("index", j);
             armyElem->SetAttribute("type", static_cast<i32>(hro->m_army.m_creatureTypes[j].value()));
-            armyElem->SetAttribute("quantity", hro->m_army.m_quantities[j]);
+            armyElem->SetAttribute("quantity", hro->m_army.m_creatureCounts[j]);
             heroElement->InsertEndChild(armyElem);
         }
 
@@ -874,11 +874,11 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "curHeroIdx") xml::QueryCharText(elem, &pdata->m_currentHero);
         else if (name == "relatedToSomeSortOfHeroCountOrIdx") xml::QueryCharText(elem, &pdata->m_heroLocatorPage);
         else if (name == "hasCheated") xml::QueryCharText(elem, &gpGame->m_cheated);
-        else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_cheatValue);
+        else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_bonusPuzzlePieces);
         else if (name == "personality") {
             i32 personality;
             elem->QueryIntText(&personality);
-            pdata->m_aiDifficulty = PlayerPersonalityFromCode(personality);
+            pdata->m_aiPersonality = PlayerPersonalityFromCode(personality);
         }
         else if (name == "relatedToMaxOrNumHeroes") xml::QueryCharText(elem, &pdata->m_minimumHeroCount);
         else if (name == "hasEvilFaction") xml::QueryCharText(elem, &pdata->m_evilInterface);
@@ -968,7 +968,7 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "aiParamFV") elem->QueryFloatText(&hro->m_aiFightValue);
         else if (name == "army") {
             hro->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
-            hro->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
+            hro->m_army.m_creatureCounts[index] = static_cast<i16>(elem->IntAttribute("quantity"));
         } else if (name == "secondarySkill") {
             hro->m_secondarySkills[index] =
                 HeroSkillLevelFromCode(elem->IntAttribute("level"));
@@ -1010,7 +1010,7 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             elem->QueryUnsignedText(&buildings);
             twn->m_buildings = buildings;
         }
-        else if (name == "mageGuildLevel") xml::QueryCharText(elem, &twn->m_buildState);
+        else if (name == "mageGuildLevel") xml::QueryCharText(elem, &twn->m_mageGuildLevel);
         else if (name == "field_1D") xml::QueryCharText(elem, &twn->m_unknown1d);
         else if (name == "exists") xml::QueryCharText(elem, &twn->m_onMap);
         else if (name == "mayNotBeUpgradedToCastle") xml::QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
@@ -1030,16 +1030,16 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
         else if (name == "name") xml::QueryText(elem, twn->m_name);
         else if (name == "garrisonCreature") {
             twn->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
-            twn->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
+            twn->m_army.m_creatureCounts[index] = static_cast<i16>(elem->IntAttribute("quantity"));
         } else if (name == "mageGuildSpell") {
             i32 level = elem->IntAttribute("level");
             i32 idx = elem->IntAttribute("idx");
             i32 spell = elem->IntAttribute("spell");
             twn->m_spells[level][idx] = static_cast<i8>(spell);
         } else if (name == "numCreaturesInDwelling")
-            twn->m_garrison[index] = static_cast<i16>(value);
+            twn->m_dwellingAvailable[index] = static_cast<i16>(value);
         else if (name == "numSpellsOfLevel")
-            twn->m_spellCounts[index + TOWN_MAGE_GUILD_FIRST_LEVEL] = static_cast<i8>(value);
+            twn->m_spellCounts[index] = static_cast<i8>(value);
     }
     twn->m_turnsOwned = static_cast<u16>(turnsOwnedLow | (turnsOwnedHigh << 8));
 }
@@ -1158,8 +1158,8 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "somePlayerCodeOr10IfMayBeHuman") gpGame->m_setupPlayerNetworkId[index] = value;
         else if (name == "somePlayerNumData") gpGame->m_setupPlayerType[index] = value;
         else if (name == "field_47C") gpGame->_pad_0x47c[index] = value;
-        else if (name == "field_2773") gpGame->m_castleOwners[index] = value;
-        else if (name == "builtToday") gpGame->m_dailyEventFlags[index] = value;
+        else if (name == "field_2773") gpGame->m_townOwners[index] = value;
+        else if (name == "builtToday") gpGame->m_townBuiltToday[index] = value;
         else if (name == "field_60A6") gpGame->m_mineOwners[index] = value;
         else if (name == "randomArtifacts") xmlArtifacts.push_back(value);
         else if (name == "boatBuilt") gpGame->m_boatSlots[index] = value;

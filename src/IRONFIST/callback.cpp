@@ -7,28 +7,28 @@
 
 namespace ironfist::script {
 
-void PushLuaValue(lua_State* ls, i32 arg) {
-    lua_pushinteger(ls, arg);
+void PushLuaValue(lua_State* state, i32 value) {
+    lua_pushinteger(state, value);
 }
 
-void PushLuaValue(lua_State* ls, void* arg) {
-    lua_pushlightuserdata(ls, arg);
+void PushLuaValue(lua_State* state, void* value) {
+    lua_pushlightuserdata(state, value);
 }
 
-void PushLuaValue(lua_State* ls, bool arg) {
-    lua_pushboolean(ls, arg);
+void PushLuaValue(lua_State* state, bool value) {
+    lua_pushboolean(state, value);
 }
 
-void PushLuaValue(lua_State* ls, const std::string& arg) {
-    lua_pushstring(ls, arg.c_str());
+void PushLuaValue(lua_State* state, const std::string& value) {
+    lua_pushstring(state, value.c_str());
 }
 
-void PushLuaValue(lua_State* ls, char* arg) {
-    lua_pushstring(ls, arg);
+void PushLuaValue(lua_State* state, char* value) {
+    lua_pushstring(state, value);
 }
 
-void PushLuaValue(lua_State* ls, double arg) {
-    lua_pushnumber(ls, arg);
+void PushLuaValue(lua_State* state, double value) {
+    lua_pushnumber(state, value);
 }
 
 void PushLuaValues(lua_State*) {

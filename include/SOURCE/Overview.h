@@ -28,10 +28,6 @@ typedef enum OverviewLayoutConstant {
     OVERVIEW_DYNAMIC_WIDGETS_PER_ROW = 70,
     OVERVIEW_ROW_HEIGHT              = 86,
     OVERVIEW_ROW_ID_STRIDE           = 200,
-    OVERVIEW_TROOP_SLOTS             = 5,
-    OVERVIEW_DWELLING_SLOTS          = 12,
-    OVERVIEW_SECONDARY_SKILL_SLOTS   = 8,
-    OVERVIEW_ARTIFACT_SLOTS          = 14,
     OVERVIEW_SECONDARY_SKILL_COLUMNS = 4,
     OVERVIEW_ARTIFACT_COLUMNS        = 7
 } OverviewLayoutConstant;
@@ -39,6 +35,6 @@ typedef enum OverviewLayoutConstant {
 typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
-MessageDispatchResult OverviewHandler(struct tag_message&);
+MessageDispatchResult OverviewHandler(struct tag_message& message);
 
 #endif
