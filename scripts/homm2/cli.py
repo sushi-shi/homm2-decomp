@@ -31,7 +31,7 @@ ALIASES = {
 #: Commands that read the selected image (`--image`); the rest refuse another
 #: image instead of silently answering for the game.
 IMAGE_AWARE = {"inspect", "configure", "delink", "labels", "build", "match", "compare",
-               "sema", "verify", "help", "-h", "--help"}
+               "sema", "verify", "ghidra", "help", "-h", "--help"}
 IMAGE_AUDITS = {"census", "placements", "usage"}
 
 TOOLS = ("wine", "cl", "ml", "link", "rc", "objdiff", "delinker")
@@ -236,6 +236,10 @@ def _match(rest):
         if (REPO / root / "delink" / f"{name}.c.obj").exists():
             targets.append(f"{root}/objdiff/normalized/target/{name}.c.obj")
     if sh("ninja", *ninja_args(), *targets):
+        return 1
+    # Anything else a header edit made stale (the report requires every
+    # comparison copy fresh); a no-op when only the selected units changed.
+    if sh("ninja", *ninja_args(), "all"):
         return 1
     from homm2.verify.status import load_report
     if load_report() is None:

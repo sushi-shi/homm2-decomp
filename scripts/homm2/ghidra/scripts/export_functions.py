@@ -16,7 +16,7 @@ prog = currentProgram
 fm = prog.getFunctionManager()
 
 ROOT = os.environ.get("HOMM2_DIR", ".")
-OUT = ROOT + "/build/ghidra/exports"
+OUT = os.environ.get("HOMM2_GHIDRA_EXPORTS") or ROOT + "/build/ghidra/exports"
 from java.io import File as _File
 _File(OUT).mkdirs()
 

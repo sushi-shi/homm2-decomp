@@ -25,7 +25,7 @@ from ghidra.app.cmd.label import DemanglerCmd
 from ghidra.util.task import TaskMonitor
 
 ROOT = os.environ.get("HOMM2_DIR", ".")
-SYM = ROOT + "/build/gen/symbol_names.csv"
+SYM = os.environ.get("HOMM2_GHIDRA_SYMBOLS") or ROOT + "/build/gen/symbol_names.csv"
 
 created = named = missing = 0
 tx = prog.startTransaction("homm2-apply-names")

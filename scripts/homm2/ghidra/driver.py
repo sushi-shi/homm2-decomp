@@ -9,12 +9,15 @@ also:
   1. gives xref the WHOLE-.text function-boundary map, and
   2. backs `python3 -m homm2.sema.decomp` with our names applied so the C reads well.
 
-`homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HMM2PL.exe into a
-cached project (build/ghidra/homm2.{gpr,rep}), auto-analyzes it once (SEVERAL MINUTES;
-skipped on re-runs), then runs two GhidraScripts:
+`homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports the selected
+image's retail executable into a cached project (build/ghidra/homm2.{gpr,rep}; another
+image under build/<image>/ghidra), auto-analyzes it once (SEVERAL MINUTES; skipped on
+re-runs), then runs two GhidraScripts:
   - apply_names.py      : create a function at every symbol_names.csv RVA Ghidra missed and
                           apply the source-claimed name - "set the symbols we know".
-  - export_functions.py : dump build/ghidra/exports/functions.csv (entry_rva,byte_size,name).
+  - export_functions.py : dump <ghidra>/exports/functions.csv (entry_rva,byte_size,name).
+
+`homm2 --image editor ghidra` and `homm2 --image editor sema decomp` work on EDT2PL.exe.
 
 Re-run `homm2 ghidra --no-analyze` to re-apply/re-export instantly (no re-analysis).
 The decomp module reopens the same project without analysis and runs decomp_export.py.
@@ -29,9 +32,13 @@ from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
-EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HMM2PL.exe")
-PROJ_DIR = REPO / "build/ghidra"
-PROJ_NAME = "homm2"
+from homm2.core.paths import gen_dir, image_build, image_key, retail_exe
+
+IMAGE = image_key()
+EXE = Path(os.environ.get("HOMM2_EXE") or retail_exe(IMAGE))
+PROJ_DIR = image_build(IMAGE) / "ghidra"
+PROJ_NAME = "homm2" if IMAGE == "game" else f"homm2-{IMAGE}"
+SYMBOLS_CSV = gen_dir(IMAGE) / "symbol_names.csv"
 SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
 APPLY_NAMES = SCRIPTS_DIR / "apply_names.py"
 EXPORT_FUNCS = SCRIPTS_DIR / "export_functions.py"
@@ -47,7 +54,7 @@ def _preflight() -> None:
     if not os.environ.get("GHIDRA_INSTALL_DIR"):
         sys.exit("[homm2 ghidra] GHIDRA_INSTALL_DIR unset - enter the dev shell (`nix develop`)")
     if not EXE.is_file():
-        sys.exit(f"[homm2 ghidra] target EXE not found: {EXE} (copy HMM2PL.exe into build/orig/)")
+        sys.exit(f"[homm2 ghidra] target EXE not found: {EXE} (run `homm2 inputs`)")
     try:
         import pyghidra  # noqa: F401
     except Exception as e:
@@ -59,6 +66,9 @@ def run_scripts(scripts, analyze: bool) -> int:
     each GhidraScript in order with currentProgram bound. Persists the project on exit."""
     _preflight()
     PROJ_DIR.mkdir(parents=True, exist_ok=True)
+    # The GhidraScripts read the image's names and write its exports here.
+    os.environ["HOMM2_GHIDRA_SYMBOLS"] = str(SYMBOLS_CSV)
+    os.environ["HOMM2_GHIDRA_EXPORTS"] = str(PROJ_DIR / "exports")
     import pyghidra
     pyghidra.start()
     # _setup_project is what open_program calls internally; it imports the EXE (or reuses an
@@ -116,7 +126,7 @@ def cli_main(argv) -> int:
     else:
         analyze = not _project_exists()  # analyze once on first build
     if analyze:
-        print("[homm2 ghidra] importing + auto-analyzing HMM2PL.exe (SEVERAL MINUTES, "
+        print(f"[homm2 ghidra] importing + auto-analyzing {EXE.name} (SEVERAL MINUTES, "
               "one-time) ...", flush=True)
     else:
         print("[homm2 ghidra] reusing analyzed project (--no-analyze) ...", flush=True)
