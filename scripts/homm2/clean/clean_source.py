@@ -60,6 +60,8 @@ PROJECT_FILES = (
     ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
     ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
+# The classic reading view carries its own README instead of the source tree's.
+CLASSIC_README = "scripts/homm2/clean/project/classic/README.md"
 GENERATED_BRANCHES = frozenset((
     "source-pol-2.0",
     "classic-pol-2.0",
@@ -1642,6 +1644,7 @@ def generate_classic(
         else:
             shutil.copyfile(source, target)
             target.chmod(source.stat().st_mode)
+    shutil.copyfile(REPO / CLASSIC_README, out_root / "README.md")
 
     if readable_russian:
         if materialized == 0:

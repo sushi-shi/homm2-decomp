@@ -1,57 +1,12 @@
 # homm2-decomp
 
-Binary-matching decompilation of **Heroes of Might and Magic II — The Price of Loyalty**
-(`HEROES2W.EXE`, New World Computing, 1997), the only HoMM2 build that ships a **CodeView
-NB09** debug stream. The goal is to recover the C++ structure and behavior and, where retail
-evidence permits, reproduce the original code, data, and relocations with the **MSVC 4.2**
-toolchain. Retail executable bytes, relocations, and public RVAs are authoritative.
-[objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
-not proof of correctness.
-
-This repository does **not** contain the original game's executable or resources. Supply a
-legally obtained `HEROES2W.EXE` locally to initialize the matching workspace; the playable port
-branches also require an installed copy of the game data.
-
-The embedded minimal CodeView stream proves retained public names and start RVAs only. Function
-sizes, private helpers, types, classes, and vtables are reconstructed from executable bytes,
-relocations, candidate objects, and reviewed manifests. The synthesized PDB used by the delinker
-contains those reconstruction results; it is not shipping debug information.
-
-## Trust and provenance
-
-Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An exact function is
-still independently checkable against retail bytes and ordered relocations, so accepting it does
-not require trusting the model's prose or intent. The cross-platform port is a semantic rewrite,
-not a byte-matching result, and therefore still requires ordinary code review and play-testing.
-
-## Repository branches
-
-```text
-decomp-pol-2.0 (you are here) ----> decomp-gold-2.1-buka
-    |                                   |
-    +------------------+                +------------------------+
-    |                  |                |                        |
-    v                  v                v                        v
-source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
-    |                                   |
-    +-----------------+-----------------+
-                      |
-                      v
-                    master --------> ironfist --------> ironfist-master
-```
-
-- `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
-  branches.
-- `source-pol-2.0` is generated from decomp with matching-only machinery removed.
-- `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
-- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction and preferred
-  non-incrementally-linked retail target.
-- `source-gold-2.1-buka` is its generated clean source and the primary base of
-  `master`; `classic-gold-2.1-buka` preserves the legacy mangling model.
-- `master` is the cross-platform Linux, Windows, and Web port.
-- `ironfist` applies the Project Ironfist changes to the reconstructed source.
-- `ironfist-master` is the maintained integration with narrow extension
-  boundaries and mechanics in their owning engine classes.
+C++ reconstruction of **Heroes of Might and Magic II — The Price of Loyalty 2.0**
+(`HEROES2W.EXE`, New World Computing, 1997), built with the pinned MSVC 4.2
+toolchain under Wine. It is the only HoMM2 build that ships a **CodeView NB09**
+debug stream: that stream proves retained public names and start RVAs only;
+sizes, helpers, types, classes and vtables are reconstructed from executable
+bytes, relocations and reviewed manifests. Retail bytes are authoritative.
+Supply your own executable and game assets.
 
 <!-- match-score:start -->
 ## Match status
@@ -70,107 +25,67 @@ _**Functions exact** = byte-identical now. **Functions exact-max** = observed at
 
 <!-- match-score:end -->
 
-## Layout
+## Branches
 
-```
-src/      {BASE,SOURCE,EDITOR}   reconstructed C++ (carcass: RVA-annotated stubs -> real bodies)
-include/  {BASE,SOURCE,EDITOR}   recovered class headers (vtables, OVERRIDE) + va.h / Ints.h
-build/orig/   your HEROES2W.EXE (gitignored; copy it here before `homm2 init`)
-config/   units.toml             per-TU build manifest
-scripts/homm2/    the CLI package - one role per subpackage, mirroring the commands:
-          core/ analysis/ permute/ audit/ match/ build/ clean/ format/ init/ ghidra/
-          tests live beside what they test; `homm2 selftest` runs them
-scripts/toolchain/  VC 4.2 + LINK 3.00 provisioning from preserved media (run once)
-scripts/archive/    retired tooling, kept only to reproduce old audit-ledger commands
-build/    (gitignored)           toolchain, synth PDB, delinked targets, base objs, objdiff report
-flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
+```text
+decomp-pol-2.0 (you are here) ----> decomp-gold-2.1-buka
+    |                                   |
+    +------------------+                +------------------------+
+    |                  |                |                        |
+    v                  v                v                        v
+source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
+    |                                   |
+    +-----------------+-----------------+
+                      |
+                      v
+                    port --------> source-ironfist --------> port-ironfist
 ```
 
-The documentation map and retention policy are in [`docs/README.md`](docs/README.md).
+- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
+- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0) — Clean source, PoL 2.0
+- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0) — Reading view, PoL 2.0
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka) — Clean source, Gold 2.1 (ru/en)
+- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka) — Reading view, UTF-8 Russian
+- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port) — Native port: Linux, Windows, browser
+- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
+- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
 
 ## Quickstart
 
-```sh
-nix develop .#build            # MSVC 4.2 under wine + the tools
-homm2 init                     # ONE-TIME: CodeView -> manifest -> ??_C@ names -> PDB -> delink -> configure
-homm2 redelink                 # EXPLICIT: refresh all symbol models and atomically rebuild delinked targets
-homm2 build                    # compile src (wine cl) -> comparisons + hard gates -> refresh status
-homm2 link                     # strict final link + section/RVA audit in build/link/
-homm2 status                   # per-unit + overall match %
-homm2 format --check           # verify header and enum formatting
-```
-
-The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`
-(NB09 `sstModule` object order), `link-imports` (exact middleware import archives), a direct
-VC 4.2 `LIB.EXE` BASE-archive rule, a direct pinned `LINK.EXE` response rule, and `link-map`
-(PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics). The preparation
-boundary and measured link-order experiments are documented in
-[`docs/native-link-pipeline.md`](docs/native-link-pipeline.md).
-
-`homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
-`DATA`, `DATA_COMPGEN`, `DATA_COMPGEN_GUARD`, `VTBL`, or `VTBL2` identity, run
-`homm2 redelink` when you want to replace the fixed target, then run `homm2 build`.
-The build performs only a fast warning-only model-drift census, so a half-built TU
-does not force an immediate redelink.
-
-The matching toolchain lives in `build/toolchain/` and has two components: the VC 4.2
-compiler/header tree and the older VC 4.0 final-link tree. **`homm2 init` fetches both**
-from the pinned `toolchain-vc42-link300` release, checks the archive against its
-recorded SHA-256, and validates the unpacked tree against the pinned per-artifact
-hashes. Nothing to do by hand:
+With Nix flakes enabled, run from the repository root:
 
 ```sh
-homm2 init                                    # fetches the toolchain, then redelinks
-python3 -m homm2.init.toolchain --check       # re-validate an existing tree
-python3 -m homm2.init.toolchain --force       # refetch over it
+nix develop .#build
+homm2 init                     # stage build/orig/HEROES2W.EXE, fetch the toolchain, delink
+homm2 build
+homm2 link
+homm2 status
 ```
 
-Provisioning from your own media stays supported, and is the only option for an
-edition the release does not pin. Both provisioners validate the compiler, linker,
-headers, import libraries, and both CRT archives before publishing a tree atomically:
+Copy your `HEROES2W.EXE` to `build/orig/` first. Retail inputs, the toolchain,
+Wine state and generated reports stay in ignored `build/`.
 
-```sh
-scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe
-scripts/toolchain/make_linker.py /path/to/MSVC40.iso
-scripts/toolchain/make_toolchain.py --check build/toolchain/msvc
-scripts/toolchain/make_linker.py --check build/toolchain/link300
-```
+## Versions
 
-Object compilation always uses VC 4.2. When the separately pinned `link300`
-component is present, `homm2 link` uses VC 4.0 LINK 3.00.5270 and its sibling
-CVPACK/CVTRES tools and `LIBCMT.LIB`. The VC 4.0 runtime archive supplies the
-retail CRT members; in particular, its `testfdiv.obj` carries private literal
-identities absent from the VC 4.2 archive. The deterministic Gruntz-style release
-builder is `scripts/toolchain/create-toolchain-release.nix`; provenance, the release hash,
-and recovery history are in
-[`docs/toolchain-vc42.md`](docs/toolchain-vc42.md). `clang`/`clangd` is editor tooling only;
-the Wine MSVC 4.2 build is the sole verdict on a match.
+Gold 2.1 and the Buka release are reconstructed on `decomp-gold-2.1-buka`; its
+[version ledger](https://github.com/sushi-shi/homm2-decomp/blob/decomp-gold-2.1-buka/docs/version-changes.md)
+records what changed after Price of Loyalty 2.0.
 
-ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
-so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
-then runs **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
-forward-decls locally (all come from headers), no object emits a function symbol absent from
-CodeView, every global carries a unique `DATA(<its VA>)`, every free function is declared in its
-owner header, and every extern global has a definition in its owner TU (link-completeness), and every class
-vtable is claimed by a `VTBL()` census marker in its owner TU. Full catalog: `docs/build-asserts.md`.
+## Documentation
 
-## Navigate (`homm2 sema`)
+- [Workflow](docs/workflow.md): layout, commands, toolchain and `homm2 sema`
+- [Toolchain](docs/toolchain-vc42.md) and [native link](docs/native-link-pipeline.md)
+- [Build gates](docs/build-asserts.md)
+- [Documentation index](docs/README.md); contributor rules and verification
+  commands are in [AGENTS.md](AGENTS.md)
 
-Semantic questions about the source/target — grep is lexical only. `homm2 sema -h` lists all;
-addresses are RVAs (a full `VA(0x..)` also works for `rva`):
+## Trust and provenance
 
-```sh
-homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree)
-homm2 sema disasm 0x0004a3c0 --diff # our (compiled) vs retail asm, side by side
-homm2 sema strings 0x0004a3c0       # a fn's string set (--find TEXT = reverse lookup)
-homm2 sema match  SOURCE/KB         # per-fn match % of a unit (or an 0x RVA)
-homm2 sema rva    0x0004a3c0        # dossier: claim / src loc / ghidra / match %
-homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
-homm2 sema def|refs|hover src/… L C # clangd LSP at a point
-```
-
-xref/disasm/strings/match/rva/clangd need no Ghidra; xref library boundaries need
-a one-time `homm2 ghidra` project (imports the EXE, applies our CodeView names).
+Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An exact function is
+still independently checkable against retail bytes and ordered relocations, so accepting it does
+not require trusting the model's prose or intent. The cross-platform port is a semantic rewrite,
+not a byte-matching result, and therefore still requires ordinary code review and play-testing.
 
 ## License
 

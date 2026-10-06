@@ -31,6 +31,8 @@ one-run progress summaries belong under `build/`, not here.
 
 ## Matching and proof
 
+- `workflow.md` holds the repository layout, the command reference, and `homm2 sema`
+  navigation.
 - `build-asserts.md`, `od-stack-layout.md`, `jump-tables.md`, and `patterns/` are reusable
   matching references.
 - `msvc42-tu-state-noise-search.md` defines the controlled disposable compiler-state probe

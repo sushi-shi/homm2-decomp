@@ -1,9 +1,8 @@
-# Heroes of Might and Magic II — Price of Loyalty 2.0 source
+# Heroes of Might and Magic II — Price of Loyalty 2.0 source, reading view
 
-C++ source for Heroes of Might and Magic II — The Price of Loyalty 2.0
-(`HEROES2W.EXE`, Windows, New World Computing, 1997), generated from the
-reconstruction with its matching machinery removed. It builds a 32-bit Windows
-program with Clang and MinGW.
+The generated C++ source of Heroes of Might and Magic II — The Price of Loyalty
+2.0 (`HEROES2W.EXE`) with the original integer-enum and name-mangling model.
+Code is that of `source-pol-2.0`.
 
 ## Branches
 
@@ -31,41 +30,16 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 - [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
 - [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
 
-## Build and play
+## Reading, not building
 
-On x86-64 Linux with Nix flakes enabled, from this directory, with your PoL
-installation (its original `DATA`, `MAPS`, music and video files):
-
-```sh
-nix build
-cp result/HEROES2W.EXE result/run-game.sh /path/to/pol-installation/
-cd /path/to/pol-installation
-./run-game.sh
-```
-
-The runner uses Wine and creates `.wineprefix` beside the game. Set
-`HOMM2_WINEPREFIX` to choose another prefix. No retail assets are stored in
-this repository.
-
-## Build
-
-In the supplied development shell:
-
-```sh
-nix develop
-ninja game
-```
-
-The executable is written to `build/HEROES2W.EXE`. A non-Nix environment needs
-Ninja, Clang, LLD, LLVM dlltool and a 32-bit MinGW toolchain.
-
-What Gold 2.1 and Buka changed is in the
-[version ledger](https://github.com/sushi-shi/homm2-decomp/blob/decomp-gold-2.1-buka/docs/version-changes.md).
+This view is for reading and is not a supported build target. To build, use
+`source-pol-2.0`.
 
 ## Regeneration
 
-`decomp-pol-2.0` generates this branch with `homm2 clean`. Make source changes
-there and regenerate; do not edit this branch by hand.
+`decomp-pol-2.0` generates this branch with `homm2 clean --classic-from` from
+`source-pol-2.0`. Make source changes there and regenerate; do not edit this
+branch by hand.
 
 ## License
 
