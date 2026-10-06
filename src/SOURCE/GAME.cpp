@@ -127,8 +127,6 @@ typedef enum GameSaveFormatConstant {
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
     SAVE_LEGACY_CLEAR_SIZE             = 40,
     SAVE_LEGACY_SERIALIZED_SIZE        = 36,
-    SAVE_STANDARD_FILENAME_SIZE        = 14,
-    STANDARD_FILENAME_BASENAME_SIZE    = 8,
     SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
     SAVE_SPARE_SLOT_COUNT              = 6,
@@ -1055,33 +1053,6 @@ i32 game::GetMineId(i32 column, i32 row) {
     return -1;
 }
 
-void GenerateStandardFileName(char* source, char* destination) {
-    char* extension = FindLastToken(source, '.');
-    if (extension == NULL) {
-        strcpy(destination, source);
-        return;
-    }
-
-    *extension = '\0';
-    i32 indexOut = 0;
-    i32 length = strlen(source);
-    i32 i;
-    char character;
-    for (i = 0; i < length; i++) {
-        character = source[i];
-        if (character >= 'a' && character <= 'z')
-            character -= 'a' - 'A';
-        if ((character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9') || character == '_') {
-            destination[indexOut] = character;
-            indexOut++;
-        }
-        if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
-            i = 999;
-    }
-    *extension = '.';
-    strcpy(destination + indexOut, extension);
-}
-
 void EncodeGameFileText(
     const char* source,
     char* destination,
@@ -1209,8 +1180,8 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
 
     gpAdvManager->PurgeMapChangeQueue();
     WriteGameData(outFile, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    GenerateStandardFileName(m_saveName, workBuffer);
-    WriteGameData(outFile, workBuffer, SAVE_STANDARD_FILENAME_SIZE);
+    const save_names::LegacyFilename serializedName = save_names::ToLegacyFilename(m_saveName);
+    WriteGameData(outFile, serializedName.data(), serializedName.size());
     WriteGameData(outFile, &m_playerCount, sizeof(m_playerCount));
     playerBuffer[0] = giCurPlayer;
     WriteGameData(outFile, playerBuffer, sizeof(playerBuffer[0]));
@@ -1538,7 +1509,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
 
     gpAdvManager->PurgeMapChangeQueue();
     ReadGameData(fileDescriptor, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    ReadGameData(fileDescriptor, workData, SAVE_STANDARD_FILENAME_SIZE);
+    ReadGameData(fileDescriptor, workData, save_names::LegacyFilenameSize);
     if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     ReadGameData(fileDescriptor, &m_playerCount, sizeof(m_playerCount));
