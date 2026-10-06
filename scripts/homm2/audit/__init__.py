@@ -1,7 +1,7 @@
 """homm2.audit - `homm2 audit <tool>` - campaign audits, run on demand.
 
-Nothing here is a build gate. The always-on gates live in homm2/build/ (assert_*)
-and run inside `homm2 build`; these are the read-only diagnostics you reach for
+Nothing here is a build gate. The gates live in homm2/verify/ and run in
+`homm2 build verify`; these are the read-only diagnostics you reach for
 when a residual will not explain itself, grouped by the question they answer:
 
   regression  ledger - match_baseline.tsv rows banked against source that no longer
@@ -22,7 +22,7 @@ when a residual will not explain itself, grouped by the question they answer:
               gotos - resolves goto/label edges and separates loops, cleanup
               exits, shared tails, and one-off forward jumps.
   data        strict_allocation_diff - strict reviewed-allocation comparison from
-              objdiff one-shot JSON. Also the checker homm2.build.strict_allocations
+              objdiff one-shot JSON. Also the checker homm2.verify.strict_allocations
               shells out to, so it is a library as much as a command.
               data_claims - derive a global's retail address from the donation
               evidence transposed per symbol, check it against the retail payload,

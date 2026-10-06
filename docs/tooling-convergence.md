@@ -67,13 +67,13 @@ Steps run with at most four parallel jobs (`HOMM2_JOBS=4`, nix `--max-jobs 1
 | --- | --- | --- |
 | `init --exe --editor-exe` | `init` (toolchain fetch, redelink, clangd) | merge: HoMM1 options and `targets.json` staging; keep the toolchain fetch, delink and clangd steps |
 | `inspect [--target]` | none | adopt |
-| `toolchain install\|check` | `python3 -m homm2.init.toolchain [--force\|--check]` | merge: verb adopted; keep the pinned VC6 SP5 release fetch |
+| `toolchain install\|check` | `python3 -m homm2.toolchain [--force\|--check]` | merge: verb adopted; keep the pinned VC6 SP5 release fetch |
 | `configure` | `configure` (`configure.py`) | keep; image-aware |
 | `build` (all images), `build verify` | `build` (ninja, gates, status, README) | merge: `build` builds every image; `build verify` runs the gate tiers; keep `--no-match --ru/--en` (locale builds have no HoMM1 counterpart) |
 | `link` | `link [--rsrc\|--historical]` | merge: keep the three modes (the historical link is the byte-identical one); image-aware |
 | `match UNIT` | `ninja <obj>` then `homm2 status` | adopt: selected-unit compile, compare and per-function report |
 | `play` | `nix run`, `scripts/toolchain/create-wine-prefix.py` | adopt verb over the existing runner |
-| `labels` | `homm2.build.source_symbols` (inside redelink) | merge: verb over the existing claim extraction |
+| `labels` | `homm2.retail_labels.source` (inside redelink) | merge: verb over the existing claim extraction |
 | `model` | `model-drift` | merge: `model` reports the claimed inventory; drift check kept |
 | `delink` | `redelink [--force]` | merge: `delink` is the name; `redelink` stays an alias while other branches use it |
 | `compare` | objdiff run inside `status` | merge: verb over the existing report step |
@@ -86,7 +86,7 @@ Steps run with at most four parallel jobs (`HOMM2_JOBS=4`, nix `--max-jobs 1
 | `ghidra` | `ghidra` | keep |
 | `workflow setup\|format-staged` | `format [--check]` | merge: `workflow format` keeps the header/enum formatter |
 | `clean` | `clean` (`--verify`, publish) | keep the implementation; editor export added with the editor |
-| `localization` | `homm2.build.localization` (run by build) | adopt verb |
+| `localization` | `homm2.graph.localization` (run by build) | adopt verb |
 | `tool <name>` | `core.wine`, `cc_wrap`, `ml_wrap`, `native_link` | adopt thin drivers: `wine cl ml link rc objdiff delinker` |
 | `audit usage\|census\|dna-bands\|placements` | `audit` (16 campaign audits) | merge: add the four HoMM1 audits; keep every existing audit |
 | (none) | `selftest` | removed (see "Tests" below); `verify behaviour` replaces it |
@@ -113,6 +113,26 @@ Steps run with at most four parallel jobs (`HOMM2_JOBS=4`, nix `--max-jobs 1
 | `clean` | `clean` | keep |
 | `ghidra` | `ghidra` | keep |
 | `model` | none | inapplicable: `build/gen/symbol_names.csv` is the claimed model |
+
+### Package moves (done)
+
+| Was | Now |
+| --- | --- |
+| `analysis/` | `sema/` (`analysis/sema.py` is `sema/__init__.py`, `string_xref` is `sema/strings`); `clangd_query` is `lsp/query` |
+| `build/configure/` | `graph/emit.py`, `graph/compile_graph.py`, `graph/link_graph.py`, `graph/rules.py` |
+| `build/cc_wrap`, `ml_wrap`, `native_link`, `rc_res`, `gen_vendor_imports` | `graph/cc`, `graph/ml`, `graph/link`, `graph/rc`, `graph/vendor_imports` |
+| `build/` link, import-library, resource, localization, catalog and locale-build modules | `graph/` (same names) |
+| `build/source_symbols`, `symbol_providers`, `annotated_*`, `name_strings` | `retail_labels/source`, `retail_labels/providers`, `retail_labels/annotated_*`, `retail_labels/name_strings` |
+| `redelink.py`, `build/synth_pdb`, `detect_jump_tables`, data and relocation manifests | `delink/run`, `delink/pdb_synth`, `delink/jump_tables`, `delink/` (same names) |
+| `build/canonicalize_*`, `normalized_freshness` | `compare/` (same names) |
+| `build/assert_*`, `audit_text_coverage`, `od_frame_audit`, `symbol_model_drift`, `coff_reloc_topology`, `data_topology_census`, `link_diff`, `strict_allocations`, `clang_cxx11`; `constants_audit`, `constants_syntax`; `match/status`, `match/source_hashes` | `verify/` named by gate (`decls`, `defs_declared`, `globals_data`, `globals_defined`, `no_fake_labels`, `vtables`, `fixed_width_ints`, `assert_relocs`, `text_coverage`, `od_frames`, `model_drift`, `data_relocs`, `data_topology`, `link_diff`, `strict_allocations`, `clang_cxx11`, `constants`, `constants_syntax`, `status`, `fingerprints`) |
+| `match/residual_queue` | `walls/inventory` |
+| `core/manifest`, `core/wine` | `manifest`, `tool/wine` |
+| `init/__init__`, `init/toolchain`, `init/clangd` | `init`, `toolchain`, `lsp/compdb` |
+| `format/headers`, `format/enums`, `build/gen_module_header` | `workflow/format_headers`, `workflow/format_enums`, `workflow/gen_module_header` |
+
+Known breakage carried over: `homm2 audit version-delta` imports `pe_sections`
+from `audit/reloc_donation`, which no longer defines it.
 
 ## Configuration
 

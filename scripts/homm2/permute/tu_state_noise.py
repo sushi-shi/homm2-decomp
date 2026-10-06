@@ -48,10 +48,10 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
-from homm2.core import manifest
+from homm2 import manifest
 from homm2.permute.tu_state_metrics import read_coff
-from homm2.build.assert_relocs import load_symbols
-from homm2.build.canonicalize_data_symbols import (
+from homm2.verify.assert_relocs import load_symbols
+from homm2.compare.canonicalize_data_symbols import (
     CoffObject,
     CompgenDataClaim,
     _definitions,
@@ -59,13 +59,13 @@ from homm2.build.canonicalize_data_symbols import (
     load_compgen_claims,
     load_compgen_data_claims,
 )
-from homm2.build.canonicalize_relocs import (
+from homm2.compare.canonicalize_relocs import (
     canonicalize_unit,
     function_inventory,
     load_import_iat_symbols,
     load_retail_symbols,
 )
-from homm2.analysis.disasm import _branch_kind, _cfg
+from homm2.sema.disasm import _branch_kind, _cfg
 
 
 IMAGE_BASE = 0x400000
@@ -352,7 +352,7 @@ def load_units(root: Path) -> dict[str, dict]:
         out[unit["unit"]] = {
             "source": Path(unit["source"]),
             # The complete production flags, identical to ninja's compile
-            # edges (profile + tier rules) - see homm2.core.manifest.
+            # edges (profile + tier rules) - see homm2.manifest.
             "flags": manifest.unit_flags(unit, raw),
             "profile": unit.get("flags", "base"),
         }
@@ -1222,7 +1222,7 @@ def compile_object(
     Probe objects never emit ninja depfiles. cc_wrap kills the compiler
     process group itself when the per-call timeout expires.
     """
-    from homm2.build.cc_wrap import run_compile
+    from homm2.graph.cc import run_compile
 
     try:
         returncode, log, timed_out = run_compile(
@@ -1816,7 +1816,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(str(exc))
     original_bytes = target.source.read_bytes()
     original = original_bytes.decode("utf-8")
-    from homm2.match.status import source_hashes as project_source_hashes
+    from homm2.verify.status import source_hashes as project_source_hashes
 
     target_key = (target.unit, target.symbol)
     canonical_target_hash = project_source_hashes().get(target_key)

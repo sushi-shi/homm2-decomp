@@ -5,7 +5,7 @@ MSVC gives compiler-private data symbols counter-based names such as
 and are not stable identities. Comparing those names directly makes equivalent
 data and code relocations look different.
 
-`scripts/homm2/build/canonicalize_data_symbols.py` rewrites those names in
+`scripts/homm2/compare/canonicalize_data_symbols.py` rewrites those names in
 disposable COFF copies under `build/objdiff/normalized/`. The generic
 anonymous-data pass processes each object independently and uses no source,
 manifest, retail RVA, or paired-object information. Reviewed `DATA_COMPGEN`
@@ -29,7 +29,7 @@ identity. Those names are supplied by the reconstruction pipeline, so such a
 spelling is not retail evidence and must not create a comparison residual.
 
 Before anonymous-data normalization,
-`scripts/homm2/build/canonicalize_relocs.py` makes a disposable paired target
+`scripts/homm2/compare/canonicalize_relocs.py` makes a disposable paired target
 under `build/objdiff/paired/`. At the same function-relative relocation site it
 accepts the candidate spelling only when the claimed owner RVA plus the
 candidate addend equals the raw retail operand address exactly. It then adds a
@@ -153,7 +153,7 @@ Each normalized object has a readable `.symbols.tsv` sidecar. A corpus census
 can be regenerated with:
 
 ```sh
-python3 -m homm2.build.canonicalize_data_symbols \
+python3 -m homm2.compare.canonicalize_data_symbols \
   --summary-root build/objdiff/base \
   --summary-root build/delink \
   --summary-output build/gen/data_symbol_canonicalization_summary.json

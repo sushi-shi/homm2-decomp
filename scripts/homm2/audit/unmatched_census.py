@@ -31,7 +31,7 @@ import struct
 from collections import defaultdict
 from pathlib import Path
 
-from homm2.build.canonicalize_relocs import CoffFile
+from homm2.compare.canonicalize_relocs import CoffFile
 from homm2.core.paths import REPO
 
 

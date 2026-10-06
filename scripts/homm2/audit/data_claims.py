@@ -46,7 +46,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from homm2.build.canonicalize_relocs import CoffFile
+from homm2.compare.canonicalize_relocs import CoffFile
 from homm2.core.paths import REPO
 
 IMAGE_BASE = 0x400000
@@ -538,7 +538,7 @@ def source_vardecls(cache_path: Path | None, refresh: bool = False):
     """
     import clang.cindex as ci
 
-    from homm2.build.annotated_data import (
+    from homm2.retail_labels.annotated_data import (
         _clang_args, _declaration_end, _mask_lexical_noise, configure_libclang)
     from homm2.clang_options import ClangMode
 

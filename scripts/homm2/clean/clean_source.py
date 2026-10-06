@@ -1574,11 +1574,11 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
     (out_root / "run-game.sh").chmod(0o755)
 
     if (REPO / 'locales/messages.def').is_file():
-        from homm2.build.catalog import Catalog
+        from homm2.graph.catalog import Catalog
         Catalog.load(REPO)  # Do not publish an invalid catalog.
         shutil.copytree(REPO / 'locales', out_root / 'locales')
         (out_root / 'tools').mkdir()
-        shutil.copyfile(REPO / 'scripts/homm2/build/catalog.py', out_root / 'tools/catalog.py')
+        shutil.copyfile(REPO / 'scripts/homm2/graph/catalog.py', out_root / 'tools/catalog.py')
         shutil.copyfile(REPO / 'scripts/homm2/clean/project/build.py', out_root / 'build.py')
         (out_root / 'build.py').chmod(0o755)
 
@@ -1646,7 +1646,7 @@ def generate_classic(
     modern_enums = scoped_enums(source_root, set(domains))
     transformed = 0
     materialized = 0
-    from homm2.build.catalog import Catalog
+    from homm2.graph.catalog import Catalog
     catalog = (Catalog.load(source_root)
                if readable_russian and (source_root / 'locales/messages.def').is_file()
                else None)

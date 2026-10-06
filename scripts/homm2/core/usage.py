@@ -184,7 +184,7 @@ def logged(fn):
                 "command": shlex.join([*prefix, *argv])})
         token = _active.set(invocation)
         stdout, stderr = _Tee(sys.stdout), _Tee(sys.stderr)
-        query = (module == "homm2.cli" and argv and argv[0] in {"sema", "walls"}) or module.startswith(("homm2.sema", "homm2.walls", "homm2.analysis"))
+        query = (module == "homm2.cli" and argv and argv[0] in {"sema", "walls"}) or module.startswith(("homm2.sema", "homm2.walls"))
         failure_rc = 2 if query else 1
         rc, error = 1, None
         diagnostic = None

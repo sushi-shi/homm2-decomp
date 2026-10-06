@@ -34,7 +34,7 @@ from typing import Iterable
 import clang.cindex as ci
 
 from homm2.audit.bool_fields import _entries, _portable_clang_args, _project_relative
-from homm2.build.annotated_data import _clang_args, _mask_lexical_noise, configure_libclang
+from homm2.retail_labels.annotated_data import _clang_args, _mask_lexical_noise, configure_libclang
 from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 

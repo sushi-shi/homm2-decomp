@@ -46,7 +46,7 @@ from homm2.audit.bool_fields import (
     _portable_clang_args,
     _project_relative,
 )
-from homm2.build.annotated_data import (
+from homm2.retail_labels.annotated_data import (
     _clang_args,
     _mask_lexical_noise,
     configure_libclang,

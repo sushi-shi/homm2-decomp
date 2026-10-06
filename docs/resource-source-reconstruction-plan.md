@@ -22,7 +22,7 @@ of the gate comparison.
   beside a temporary copy of `HMM2PL.rc` only while `rc.exe` runs; the staging
   directory is then removed. `rc.exe` splits it back into exactly those two
   records.
-- `scripts/homm2/build/rc_res.py` — compiles the `.rc` with the era
+- `scripts/homm2/graph/rc.py` — compiles the `.rc` with the era
   `RC.EXE` 5.00 + `RCDLL.DLL` (from the pinned VS6 Enterprise base disc)
   under wine, then byte-compares every compiled payload (type, name,
   language, bytes, order) against `build/orig/HMM2PL.exe` in both

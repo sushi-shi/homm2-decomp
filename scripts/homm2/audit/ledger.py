@@ -30,7 +30,7 @@ import argparse
 import sys
 
 from homm2.core.paths import REPO
-from homm2.match.source_hashes import source_hashes
+from homm2.verify.fingerprints import source_hashes
 
 LEDGER = REPO / "config/match_baseline.tsv"
 

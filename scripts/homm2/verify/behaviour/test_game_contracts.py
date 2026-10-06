@@ -2,10 +2,10 @@
 import unittest
 from pathlib import Path
 
-from homm2.build.cc_wrap import run_compile
-from homm2.core.manifest import unit_flags, units
+from homm2.graph.cc import run_compile
+from homm2.manifest import unit_flags, units
 from homm2.core.paths import REPO
-from homm2.core.wine import msvc_dir, run, tool, winepath_w
+from homm2.tool.wine import msvc_dir, run, tool, winepath_w
 
 FIXTURE = Path(__file__).resolve().with_name("game_contracts.cpp")
 EXPECTED = (

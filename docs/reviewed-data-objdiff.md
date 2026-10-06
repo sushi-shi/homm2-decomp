@@ -16,9 +16,9 @@ namespace cookie, which rerolled on any recompile until the second tranche gave
 `gTargetName` internal linkage the ordinary way), and all 2,473 objdiff
 function rows unchanged.
 
-`homm2.build.source_symbols.symbols_for_file` walks both marker families in one
+`homm2.retail_labels.source.symbols_for_file` walks both marker families in one
 parse: `VA` cursors become `kind=func` rows, and every `DATA()` marker is bound
-to its `VarDecl` by `homm2.build.annotated_data.definitions_for_file` (the same
+to its `VarDecl` by `homm2.retail_labels.annotated_data.definitions_for_file` (the same
 binding the data-topology and link audits already use) and emitted as a
 `kind=data` row carrying the decorated linker name Clang's MS mangler produces —
 `?name@@3<type>A` for external linkage, `_name` for internal. Both families
@@ -35,7 +35,7 @@ a donation vote; the delinked retail object names the real global, and
 
 `VTBL(Class, addr)` and `VTBL2(Derived, Base, addr)` reconstruct the identities
 `??_7Class@@6B@` and `??_7Derived@@6BBase@@@`, which
-`homm2.build.annotated_vtables` and `source_symbols.collect` have always
+`homm2.retail_labels.annotated_vtables` and `source_symbols.collect` have always
 consumed. Nothing in the source *defines* a vtable, so unlike `DATA()` the
 marker stands alone at file scope in the owning `.cpp`; the `__clang__` branch
 spends it on an `extern const char Class__vtbl;` declaration that allocates
@@ -123,7 +123,7 @@ masks relocations (see `docs/patterns/byte-identical-wrong-global.md`):
   retail reads a distinct seven-entry `gMineNames` table at 0x4fe018.
 
 **14 were delinker and compiler artifacts the audit could not express**, now
-handled in `homm2.build.assert_relocs` with unit tests beside it:
+handled in `homm2.verify.assert_relocs` with unit tests beside it:
 
 - 5 rows (`army::DoAttack` ×2, `army::ProcessDeath`, `army::SpecialAttack`,
   `HandleCastSpell`, `SetMenus`): a recursive call keeps its destination inside
@@ -280,7 +280,7 @@ Two reviewed ledgers provide exact extents. `config/retail/data_initialized_stor
 records allocations whose initializer payload has been audited. The narrower
 `config/retail/reloc_data_owners.tsv` records public owner regions whose source `DATA()` RVA
 and type-derived size are independently proven, including loader-zero `.bss` storage.
-`scripts/homm2/build/reviewed_data.py` joins both to the public inventory, validates
+`scripts/homm2/delink/reviewed_data.py` joins both to the public inventory, validates
 address, compiland ownership, and PE storage, and writes
 `build/gen/reviewed_delink_data.tsv`. Initialized rows additionally validate the retail
 payload hash and relocation count. The generator never promotes a provisional

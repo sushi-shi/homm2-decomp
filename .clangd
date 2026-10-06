@@ -1,7 +1,7 @@
 # clangd over the GENERATED clang compilation database. ADDITIVE editor tooling
 # (go-to-def / completion / hover / diagnostics) that runs ALONGSIDE the real
 # matching build - it does NOT drive or verify it. The Wine MSVC 4.2 build
-# (scripts/homm2/build/cc_wrap.py) is the sole verdict on correctness; clang is
+# (scripts/homm2/graph/cc.py) is the sole verdict on correctness; clang is
 # only a READER of this MSVC4.2-dialect code.
 #
 # Generate the DB first:  homm2 clangd

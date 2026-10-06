@@ -3,7 +3,7 @@
 **Status: resolved for scoring.** The historical artifact described below capped
 switch/dispatch functions slightly under 100% no matter how correct the reconstruction
 was. It is handled since the embedded-switch-table pass in
-`scripts/homm2/build/canonicalize_data_symbols.py` (see
+`scripts/homm2/compare/canonicalize_data_symbols.py` (see
 [`data-symbol-normalization.md`](data-symbol-normalization.md), "Embedded switch
 tables"): both objects are compared through disposable normalized copies under
 `build/objdiff/normalized/`, where label-relative table references are rewritten to a
@@ -68,10 +68,10 @@ no extent risk.
 
 ## Detector (kept; useful beyond scoring)
 
-`scripts/homm2/build/detect_jump_tables.py` scans `build/delink/**/*.c.obj` for
+`scripts/homm2/delink/jump_tables.py` scans `build/delink/**/*.c.obj` for
 `ff 24 8d <disp32>` dispatches and runs of 4-byte-spaced DIR32 self-relocs, writing
 `build/gen/jump_tables.csv` (`func_rva,func_name,table_rva,table_size`). Regenerate with
-`python3 -m homm2.build.detect_jump_tables`. When reconstructing a large `switch`,
+`python3 -m homm2.delink.jump_tables`. When reconstructing a large `switch`,
 recover body order separately from case values and compare the ordered table
 destinations against the detector output.
 

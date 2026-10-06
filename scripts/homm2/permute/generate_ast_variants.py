@@ -119,7 +119,7 @@ def configure_libclang() -> None:
 
 
 def clang_args(root: Path, source: Path) -> list[str]:
-    from homm2.build.localization import clang_args as localization_args
+    from homm2.graph.localization import clang_args as localization_args
     database_path = root / "build/clangd/compile_commands.json"
     database = json.loads(database_path.read_text()) if database_path.is_file() else []
     source_resolved = source.resolve()
@@ -1693,7 +1693,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
     configure_libclang()
     blob = source.read_bytes()
     text = blob.decode("utf-8")
-    from homm2.build.localization import Catalog
+    from homm2.graph.localization import Catalog
     if (root / 'locales/messages.def').is_file():
         text = Catalog.load(root).render(text)
     index = ci.Index.create()

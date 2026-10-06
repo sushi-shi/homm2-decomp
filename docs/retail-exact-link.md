@@ -32,7 +32,7 @@ ninja link-audit
   links the historical image and fails if any region (headers, a section, the
   overlay, the file size) differs from retail in more bytes than
   `config/link_diff.tsv` allows. Bank a lower count with
-  `python3 -m homm2.build.link_diff --update`; never raise it to admit a
+  `python3 -m homm2.verify.link_diff --update`; never raise it to admit a
   regression.
 - `ninja link-audit`: read-only comparison of the historical native image
   against retail. It writes `build/link/historical/HMM2PL.link.json` and reports
@@ -58,7 +58,7 @@ on the BASE library and header-inline destructors for `dimmerWidget` and
 LINK's import slot order depends on the C runtime that Wine loads for it
 (`docs/patterns/import-slot-order-follows-linker-runtime.md`). The ordinary
 build keeps Wine's builtin `msvcrt`, which reproduces retail; every Wine child
-runs with `TZ=UTC0` (`homm2.core.wine`).
+runs with `TZ=UTC0` (`homm2.tool.wine`).
 
 ## Source and build evidence
 
@@ -98,7 +98,7 @@ path explicitly. Use current output/report bytes rather than historical totals.
 For a strict read-only final comparison:
 
 ```sh
-python3 -m homm2.build.link_exe --audit-existing --strict \
+python3 -m homm2.graph.link_exe --audit-existing --strict \
   --out build/link/historical/HMM2PL.exe
 sha256sum build/orig/HMM2PL.exe build/link/historical/HMM2PL.exe
 ```

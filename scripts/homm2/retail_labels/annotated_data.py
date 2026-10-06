@@ -1,0 +1,406 @@
+"""Shared Clang VarDecl inventory for source ``DATA()`` definitions."""
+
+from __future__ import annotations
+
+import glob
+import hashlib
+import json
+import os
+import re
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+
+import clang.cindex as ci
+
+from homm2.clang_options import ClangMode
+from homm2.graph.fixed_asm import claims as fixed_asm_claims
+
+
+IMAGE_BASE = 0x400000
+DATA_TOKEN = re.compile(rb"\bDATA\s*\(\s*(0x[0-9a-fA-F]+)\s*\)")
+INCLUDE_TOKEN = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
+INVENTORY_CACHE_SCHEMA = 3
+RETAIL_COMPILER_IF = re.compile(rb"^[ \t]*#[ \t]*if[ \t]+H2_RETAIL_COMPILER[ \t]*$", re.M)
+PREPROCESSOR_LINE = re.compile(
+    rb"^[ \t]*#[ \t]*(if|ifdef|ifndef|else|elif|endif|define|undef)\b[ \t]*(.*)$", re.M)
+ALIAS_DEFINE = re.compile(rb"^([A-Za-z_]\w*)[ \t]+([A-Za-z_]\w*)[ \t]*$")
+
+
+@dataclass(frozen=True, order=True)
+class AnnotatedDataDefinition:
+    unit: str
+    name: str
+    qualified_name: str
+    rva: int
+    size: int
+    location: str
+    is_static: bool
+    # The decorated linker name. The image is stripped, so a claim is only
+    # usable by the delinker and the relocation audits when it carries the
+    # spelling the compiler actually emits; MSVC decorates an internal-linkage
+    # object as ``_name`` and an external one with the full ``?name@@3...``.
+    symbol: str = ""
+
+
+def configure_libclang() -> None:
+    libraries = glob.glob("/nix/store/*clang*-lib/lib/libclang.so")
+    if libraries:
+        try:
+            ci.Config.set_library_file(libraries[0])
+        except Exception:
+            pass
+
+
+def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> list[str]:
+    from homm2.graph.localization import clang_args as localization_args
+    database_path = repo / "build/clangd/compile_commands.json"
+    database = json.loads(database_path.read_text()) if database_path.is_file() else []
+    source = source.resolve()
+    raw = []
+    for entry in database:
+        value = Path(entry.get("file", ""))
+        if not value.is_absolute():
+            value = Path(entry.get("directory", repo)) / value
+        if value.resolve() == source:
+            raw = entry.get("arguments", [])
+            break
+    args = [
+        "-x", "c++", mode.driver_flag, "--target=i386-pc-windows-msvc",
+        "-fms-compatibility-version=10.20", "-fms-extensions",
+        "-fdelayed-template-parsing", "-ferror-limit=0",
+        "-Xclang", "-fdefault-calling-conv=fastcall",
+        "-D_X86_", "-DWIN32", "-D_WINDOWS", "-D_MT", "-DNO_STRICT",
+    ]
+    project_includes = [repo / "include"]
+    vendor = repo / "vendor"
+    if vendor.is_dir():
+        project_includes.extend(sorted(path for path in vendor.iterdir() if path.is_dir()))
+    for include in project_includes:
+        args.extend(("-I", str(include)))
+    if not raw:
+        msvc_include = repo / "build/toolchain/msvc/include"
+        if msvc_include.is_dir():
+            from homm2.lsp.compdb import build_lowercase_mirror
+            lowercase = build_lowercase_mirror(
+                msvc_include, repo / "build/clangd/inc-lower/msvc")
+            args.extend(("-isystem", str(lowercase),
+                         "-isystem", str(msvc_include)))
+    index = 0
+    while index < len(raw):
+        value = raw[index]
+        if value in ("/I", "/imsvc") and index + 1 < len(raw):
+            args.extend(("-I" if value == "/I" else "-isystem", raw[index + 1]))
+            index += 2
+            continue
+        if value.startswith("/D"):
+            args.append("-D" + value[2:])
+        elif value.startswith(("--target=", "-fms", "-fdelayed")):
+            args.append(value)
+        index += 1
+    return args + localization_args(repo, source, locale=locale)
+
+
+def _mask_lexical_noise(blob: bytes) -> bytes:
+    out = bytearray(blob)
+    index = 0
+    state = "code"
+    quote = 0
+    while index < len(blob):
+        byte = blob[index]
+        following = blob[index + 1] if index + 1 < len(blob) else 0
+        if state == "code":
+            if byte == 47 and following == 47:
+                out[index:index + 2] = b"  "; index += 2; state = "line"; continue
+            if byte == 47 and following == 42:
+                out[index:index + 2] = b"  "; index += 2; state = "block"; continue
+            if byte in (34, 39):
+                quote = byte; out[index] = 32; index += 1; state = "literal"; continue
+        elif state == "line":
+            if byte == 10:
+                state = "code"
+            else:
+                out[index] = 32
+            index += 1; continue
+        elif state == "block":
+            if byte == 42 and following == 47:
+                out[index:index + 2] = b"  "; index += 2; state = "code"; continue
+            if byte != 10:
+                out[index] = 32
+            index += 1; continue
+        else:
+            if byte == 92 and index + 1 < len(blob):
+                out[index:index + 2] = b"  "; index += 2; continue
+            if byte == quote:
+                state = "code"
+            if byte != 10:
+                out[index] = 32
+            index += 1; continue
+        index += 1
+    if state in ("block", "literal"):
+        raise ValueError("unterminated source comment or literal")
+    return bytes(out)
+
+
+def _declaration_end(masked: bytes, start: int) -> int:
+    depth = {40: 0, 91: 0, 123: 0}
+    closing = {41: 40, 93: 91, 125: 123}
+    for index in range(start, len(masked)):
+        byte = masked[index]
+        if byte in depth:
+            depth[byte] += 1
+        elif byte in closing:
+            depth[closing[byte]] -= 1
+        elif byte == 59 and not any(depth.values()):
+            return index + 1
+    raise ValueError("unterminated DATA declaration")
+
+
+def retail_spellings(masked: bytes) -> list[tuple[int, bytes, bytes | None]]:
+    """Return ``(offset, name, alias)`` events of retail-only identifier aliases.
+
+    VC6 orders an object's ``.bss`` by a hash of each storage name, so a readable
+    identifier may be compiled under a ``#if H2_RETAIL_COMPILER`` ``#define``
+    that supplies the hash-fitting spelling (an ``#undef`` there ends it; alias
+    is then ``None``). Clang analyses the readable name; the candidate COFF and
+    retail claims carry the retail spelling. Only identifier-to-identifier
+    defines directly inside such a block are aliases.
+    """
+    events = []
+    stack = []
+    for match in PREPROCESSOR_LINE.finditer(masked):
+        directive, rest = match.group(1), match.group(2).strip()
+        if directive in (b"if", b"ifdef", b"ifndef"):
+            stack.append(bool(RETAIL_COMPILER_IF.match(match.group(0))))
+        elif directive in (b"else", b"elif"):
+            if stack:
+                stack[-1] = False
+        elif directive == b"endif":
+            if stack:
+                stack.pop()
+        elif stack and stack[-1]:
+            if directive == b"define":
+                alias = ALIAS_DEFINE.match(rest)
+                if alias:
+                    events.append((match.start(), alias.group(1), alias.group(2)))
+            elif directive == b"undef" and re.fullmatch(rb"[A-Za-z_]\w*", rest):
+                events.append((match.start(), rest, None))
+    return events
+
+
+def retail_spelling(events, name: str, offset: int) -> str:
+    spelling = name
+    for event_offset, alias_name, alias in events:
+        if event_offset >= offset:
+            break
+        if alias_name.decode("ascii") == name:
+            spelling = name if alias is None else alias.decode("ascii")
+    return spelling
+
+
+def _retail_symbol(symbol: str, name: str, spelling: str) -> str:
+    if spelling == name or not symbol:
+        return symbol
+    for prefix in ("?", "_"):
+        if symbol.startswith(prefix + name + "@") or symbol == prefix + name:
+            return prefix + spelling + symbol[len(prefix) + len(name):]
+    raise ValueError(f"cannot apply retail spelling {spelling} to {symbol}")
+
+
+def _qualified_name(cursor) -> str:
+    owners = []
+    parent = cursor.semantic_parent
+    owner_kinds = {
+        ci.CursorKind.CLASS_DECL, ci.CursorKind.STRUCT_DECL,
+        ci.CursorKind.CLASS_TEMPLATE, ci.CursorKind.NAMESPACE,
+    }
+    while parent is not None and parent.kind in owner_kinds:
+        if parent.spelling:
+            owners.append(parent.spelling)
+        parent = parent.semantic_parent
+    return "::".join([*reversed(owners), cursor.spelling])
+
+
+def definitions_for_file(path: Path, source_root: Path, repo: Path,
+                         translation=None) -> list[AnnotatedDataDefinition]:
+    """Bind every ``DATA()`` marker in one file to the object it defines.
+
+    ``translation`` lets a caller that has already parsed the file hand its
+    translation unit over instead of paying for a second parse; the marker
+    binding below is the same either way.
+    """
+    path = path.resolve()
+    blob = path.read_bytes()
+    masked = _mask_lexical_noise(blob)
+    markers = [(match, _declaration_end(masked, match.end()))
+               for match in DATA_TOKEN.finditer(masked)]
+    if not markers:
+        return []
+    tu = translation
+    if tu is None:
+        configure_libclang()
+        index = ci.Index.create()
+        # libclang offsets are UTF-8 byte offsets. Decoding as latin-1 would
+        # re-encode non-ASCII comments and shift every later cursor.
+        tu = index.parse(
+            str(path),
+            args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
+                     options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
+    variables = []
+    for cursor in tu.cursor.walk_preorder():
+        if cursor.kind != ci.CursorKind.VAR_DECL or not cursor.is_definition():
+            continue
+        if cursor.location.file is None or Path(str(cursor.location.file)).resolve() != path:
+            continue
+        variables.append(cursor)
+    rows = []
+    aliases = retail_spellings(masked)
+    unit = path.relative_to(source_root.resolve()).with_suffix("").as_posix()
+    for marker, end in markers:
+        matches = [cursor for cursor in variables
+                   if marker.start() <= cursor.extent.start.offset < end
+                   and cursor.extent.end.offset <= end]
+        if len(matches) != 1:
+            line = blob.count(b"\n", 0, marker.start()) + 1
+            raise ValueError(f"{path}:{line}: DATA marker covers {len(matches)} VarDecls")
+        cursor = matches[0]
+        size = cursor.type.get_size()
+        if size <= 0:
+            raise ValueError(f"{path}:{cursor.location.line}: incomplete DATA type")
+        try:
+            display = path.relative_to(repo)
+        except ValueError:
+            display = path.relative_to(source_root.resolve())
+        marker_line = blob.count(b"\n", 0, marker.start()) + 1
+        name = cursor.spelling
+        spelling = retail_spelling(aliases, name, marker.start())
+        qualified = _qualified_name(cursor)
+        if spelling != name:
+            qualified = qualified[:len(qualified) - len(name)] + spelling
+        rows.append(AnnotatedDataDefinition(
+            unit, spelling, qualified,
+            int(marker.group(1), 16) - IMAGE_BASE, size,
+            f"{display.as_posix()}:{marker_line}",
+            cursor.storage_class == ci.StorageClass.STATIC,
+            _retail_symbol(cursor.mangled_name, name, spelling),
+        ))
+    return rows
+
+
+def _source_dependencies(path: Path, include_roots: list[Path]) -> list[Path]:
+    seen = set()
+    stack = [path.resolve()]
+    while stack:
+        current = stack.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        try:
+            text = current.read_text(errors="replace")
+        except OSError:
+            continue
+        for include in INCLUDE_TOKEN.findall(text):
+            for candidate in (current.parent / include,
+                              *(root / include for root in include_roots)):
+                if candidate.is_file():
+                    stack.append(candidate.resolve())
+                    break
+    seen.discard(path.resolve())
+    return sorted(seen)
+
+
+def _inventory_cache_key(path: Path, unit: str, object_root: Path,
+                         compile_database: bytes, include_roots: list[Path]) -> str | None:
+    object_path = object_root / f"{unit}.obj"
+    if not object_path.is_file():
+        return None
+    digest = hashlib.sha256()
+    digest.update(f"annotated-data-v{INVENTORY_CACHE_SCHEMA}\0".encode("ascii"))
+    digest.update(Path(__file__).read_bytes())
+    digest.update(compile_database)
+    digest.update(path.read_bytes())
+    for name in ('messages.def', 'ru.po'):
+        catalog = path.parents[len(Path(unit).parts)] / 'locales' / name
+        if catalog.is_file():
+            digest.update(catalog.read_bytes())
+    digest.update(object_path.read_bytes())
+    for dependency in _source_dependencies(path, include_roots):
+        digest.update(str(dependency).encode("utf-8"))
+        digest.update(dependency.read_bytes())
+    return digest.hexdigest()
+
+
+def _load_inventory_cache(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+    if data.get("schema") != INVENTORY_CACHE_SCHEMA:
+        return {}
+    entries = data.get("entries")
+    return entries if isinstance(entries, dict) else {}
+
+
+def _write_inventory_cache(path: Path, entries: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", prefix=f".{path.name}.",
+                                     dir=path.parent, delete=False) as stream:
+        temporary = Path(stream.name)
+        json.dump({"schema": INVENTORY_CACHE_SCHEMA, "entries": entries},
+                  stream, separators=(",", ":"))
+    os.replace(temporary, path)
+
+
+def source_definitions(source_root: Path, repo: Path, object_root: Path | None = None,
+                       cache_path: Path | None = None) -> list[AnnotatedDataDefinition]:
+    source_root = Path(source_root)
+    repo = Path(repo)
+    if object_root is None and source_root.resolve() == (repo / "src").resolve():
+        candidate = repo / "build/objdiff/base"
+        if candidate.is_dir():
+            object_root = candidate
+    if cache_path is None and object_root is not None:
+        cache_path = repo / "build/gen/annotated_data_cache.json"
+    object_root = Path(object_root) if object_root is not None else None
+    cache_path = Path(cache_path) if cache_path is not None else None
+    compile_path = repo / "build/clangd/compile_commands.json"
+    compile_database = compile_path.read_bytes() if compile_path.is_file() else b""
+    include_roots = [repo / "include"]
+    vendor = repo / "vendor"
+    if vendor.is_dir():
+        include_roots.extend(sorted(path for path in vendor.iterdir() if path.is_dir()))
+    cached = _load_inventory_cache(cache_path) if cache_path is not None else {}
+    retained = {}
+    rows = []
+    for path in sorted(source_root.rglob("*.cpp")):
+        unit = path.relative_to(source_root).with_suffix("").as_posix()
+        key = (_inventory_cache_key(path, unit, object_root, compile_database, include_roots)
+               if object_root is not None else None)
+        entry = cached.get(unit) if key is not None else None
+        if isinstance(entry, dict) and entry.get("key") == key:
+            values = [AnnotatedDataDefinition(**row) for row in entry.get("rows", [])]
+        else:
+            values = definitions_for_file(path, source_root, repo)
+        rows.extend(values)
+        if key is not None:
+            retained[unit] = {
+                "key": key,
+                "rows": [{field: getattr(row, field)
+                          for field in AnnotatedDataDefinition.__dataclass_fields__}
+                         for row in values],
+            }
+    if source_root.resolve() == (repo / "src").resolve():
+        for unit, source, claim in fixed_asm_claims("data"):
+            if (repo / source).is_file():
+                name = claim.name.removeprefix("_")
+                rows.append(AnnotatedDataDefinition(
+                    unit=unit, name=name, qualified_name=name,
+                    rva=claim.rva, size=claim.size, location=source,
+                    is_static=True, symbol=claim.name,
+                ))
+    if cache_path is not None:
+        _write_inventory_cache(cache_path, retained)
+    identities = {(row.unit, row.rva) for row in rows}
+    if len(identities) != len(rows):
+        raise ValueError("duplicate DATA RVA within a translation unit")
+    return rows

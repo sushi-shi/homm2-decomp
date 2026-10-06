@@ -38,7 +38,7 @@ repository already does for name-hashed `/Od` locals:
 ```
 
 The `DATA()` inventory resolves such an alias at each marker
-(`homm2.build.annotated_data.retail_spelling`), so claims bind to the
+(`homm2.retail_labels.annotated_data.retail_spelling`), so claims bind to the
 compiled symbol while Clang and the clean export see the readable name.
 
 A hole that is neither alignment nor a claimed owner is evidence of an

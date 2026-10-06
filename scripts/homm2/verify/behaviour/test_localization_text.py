@@ -1,7 +1,7 @@
 """The shipped text catalog renders the game's sentences."""
 import unittest
 
-from homm2.build import localization as loc
+from homm2.graph import localization as loc
 from homm2.core.paths import REPO
 
 

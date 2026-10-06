@@ -4,7 +4,7 @@ HMM2PL.exe dynamically imports three closed third-party middleware DLLs. Their *
 is not in the EXE (only PE import thunks), so we do not reconstruct it — we only need the
 **API headers** so the NWC translation units that CALL them compile and byte-match. Those
 headers are vendored under `vendor/<sdk>-<version>/` and put on the compiler's `INCLUDE`
-path by `scripts/homm2/build/cc_wrap.py` (see *Build wiring* at the end).
+path by `scripts/homm2/graph/cc.py` (see *Build wiring* at the end).
 
 The middleware identification below was established on the PoL line, whose retail EXE
 (md5 `900aa22c4e88221e7ebac524cd4172c9`) is byte-identical to the English "Price of
@@ -110,7 +110,7 @@ PE hints. Correct names and hints are not sufficient for final-image matching: t
 short-import form and the older regular-COFF form have the same linked ABI but different
 contribution metadata.
 The retail Rich-header census and a raw final-image A/B test select conventional regular
-i386 COFF members for Miles. `homm2.build.regular_import_lib` emits that measured form,
+i386 COFF members for Miles. `homm2.graph.regular_import_lib` emits that measured form,
 stores each retail hint directly in its used member, and re-reads the finished archive to
 verify all 29 records. No complete Miles export surface is a build input. Relative to the
 semantically equivalent short-import library, this changes no project-function placement
@@ -205,7 +205,7 @@ from `WING32.LI_` in `WING10.EXE` (installer SHA-1
 `f27081b91fabd8202ec48eb32e17c0a1dd3a0e84`; expanded library SHA-256
 `c71def88227f517ab6ede7bf2f3e0f06fc45d2758e38ca53dad9201e06f0aef1`).  It is not
 stored in this repository.  `imports/wing32.def` records all ten exports and their
-true one-based export ordinals.  `homm2.build.legacy_import_lib` derives the PE
+true one-based export ordinals.  `homm2.graph.legacy_import_lib` derives the PE
 hints by sorting that complete export surface and generates the pre-VC6 regular
 COFF import members used by the final link.  Every generated archive member is
 named `wing32.def`, which is the legacy marker VC6 LINK uses for retail-compatible
@@ -238,7 +238,7 @@ The full documented API surface (incl. the non-imported `WinGGetDIBPointer`,
 
 ## Build wiring
 
-`scripts/homm2/build/cc_wrap.py` appends every `vendor/<sdk>/` directory to the compiler's
+`scripts/homm2/graph/cc.py` appends every `vendor/<sdk>/` directory to the compiler's
 `INCLUDE` (after the MSVC headers and repo `include/`), mirroring the sibling Gruntz decomp.
 This makes `#include <mss.h>`, `#include <smack.h>` and `#include <wing.h>` resolve like the
 original toolchain's SDK dirs. These are **headers only** — never build units, and not in

@@ -7,7 +7,7 @@ export_functions.py is the refresh path when analysis improves. Boundaries stay
 analysis opinion - source VA() markers are what turn them into claims. The project
 also:
   1. gives xref the WHOLE-.text function-boundary map, and
-  2. backs `python3 -m homm2.analysis.decomp` with our names applied so the C reads well.
+  2. backs `python3 -m homm2.sema.decomp` with our names applied so the C reads well.
 
 `homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HMM2PL.exe into a
 cached project (build/ghidra/homm2.{gpr,rep}), auto-analyzes it once (SEVERAL MINUTES;
@@ -126,7 +126,7 @@ def cli_main(argv) -> int:
         print(f"[homm2 ghidra] done - {n} function boundaries -> "
               f"{FUNCTIONS_CSV.relative_to(REPO)}")
         print("[homm2 ghidra] xref now attributes library callers; "
-              "`python3 -m homm2.analysis.decomp <rva>` ready.")
+              "`python3 -m homm2.sema.decomp <rva>` ready.")
     return rc
 
 

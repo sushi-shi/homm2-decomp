@@ -50,7 +50,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from homm2.analysis.disasm import _branch_kind, _cfg, _objdump
+from homm2.sema.disasm import _branch_kind, _cfg, _objdump
 from homm2.permute.tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,

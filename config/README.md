@@ -10,7 +10,7 @@ in `build/`.
   command line; each `[[unit]]` selects one source and profile, in link order.
 - `match_baseline.tsv`: the hash-scoped MAX ledger (`homm2 status update`).
 - `link_diff.tsv`: the linked image's per-region ceiling against retail
-  (`python3 -m homm2.build.link_diff --update`); every region is 0.
+  (`python3 -m homm2.verify.link_diff --update`); every region is 0.
 
 ## Retail facts (`retail/`)
 

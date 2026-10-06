@@ -48,7 +48,7 @@ manifests, results and objects stay under `build/readability/`.
   for its literal ternary. This fixes annotation parsing without changing the API
   or authorizing mutation. All 11 KB non-debug sections and 5,085 ordered
   relocations were unchanged before/after this prerequisite.
-- Initialize the lowercase SDK mirror once with `python3 -m homm2.init.clangd`
+- Initialize the lowercase SDK mirror once with `python3 -m homm2.lsp.compdb`
   before parallel annotation jobs on a fresh setup.
 
 ## Verification

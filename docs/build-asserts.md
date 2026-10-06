@@ -1,9 +1,11 @@
-# What `homm2 build` asserts
+# What `homm2 build verify` asserts
 
 `homm2 build` is `configure.py` → `ninja` (compile every TU with wine VC6 SP5 via
-`cc_wrap.py`) → **hard gates** → objdiff/README refresh. A **red gate exits non-zero and fails
-the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
-from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
+`homm2.graph.cc`) → objdiff/README refresh, with the localization and link-diff gates.
+`homm2 build verify` then runs the gate tier (`homm2.verify.TIER`). A **red gate exits
+non-zero** — gates are not warnings. The gate modules live in `scripts/homm2/verify/` and
+run from the repo root; each is runnable as `homm2 verify <gate>`. The gates below that
+are not yet in the tier carry findings listed in `docs/tooling-convergence.md`.
 
 Ordering in `cli.py`: the source-private inventory is verified first,
 then compilation must succeed (ninja), followed by the source/object gates below.
@@ -21,27 +23,27 @@ function definition in the owning candidate COFF.
 ## 1. Compile + header-dependency tracking (ninja)
 
 Every `config/units.toml` unit must compile to `build/objdiff/base/<unit>.obj`; a compile
-error fails the build. `cc_wrap.py` scans each TU's `#include` graph and writes a depfile
+error fails the build. `graph/cc.py` scans each TU's `#include` graph and writes a depfile
 (`deps=gcc` in `build.ninja`; VC6's `/showIncludes` is unused) — **editing a shared
 header recompiles exactly its includers**, so a header change can never leave a stale object
-(this previously masked drift). See `docs/patterns/` and the `cc_wrap.py` header.
+(this previously masked drift). See `docs/patterns/` and the `graph/cc.py` header.
 
 ## The post-compile hard gates
 
-### 2. `assert_decls` — header discipline (no local declarations)
+### 2. `decls` — header discipline (no local declarations)
 No `.cpp` may carry its own `class` / `struct` / `enum` definition, `extern` declaration, or
 file-scope function forward-declaration. Everything is declared in a header so two TUs cannot
 drift by declaring the same entity differently (the retail already had `_open` 2-arg vs 3-arg,
 `gDwellingType[][12]` vs `[20][12]`). Allowed in a `.cpp`: function **definitions** (incl.
 `extern "C" T f(){}` and linkage blocks) and `#include`s.
 
-### 3. `assert_no_fake_labels` — no invented symbols
+### 3. `no-fake-labels` — no invented symbols
 Every external **function** symbol a `.cpp` emits (defined, `.text`) must exist in the
 retained-public/recovered inventory (`build/gen/symbol_names.csv`). Catches hand-written
 functions/labels that don't correspond to a reviewed retail symbol. File-local `static`
 functions follow the separate source-private `VA` inventory described above.
 
-### 4. `assert_globals_data` — DATA(VA) discipline
+### 4. `globals-data` — DATA(VA) discipline
 `DATA(0x<VA>)` rides the global's **definition** in its owner `.cpp`, not the header `extern`:
 - every file-scope **definition** of an inventory data symbol carries `DATA(0x<its exact VA>)`;
 - **no `DATA()` on a header `extern`**;
@@ -56,20 +58,20 @@ symbol is a `DATA(VA) static T g;` definition in the sole owning module. A real 
 necessarily has a retained public symbol and uses its owner header; def-less synthetic externs are
 rejected.
 
-### 5. `assert_defs_declared` — every definition has a header declaration
+### 5. `defs-declared` — every definition has a header declaration
 Every free function **defined** in a `.cpp` is **declared** in that TU's owner header
 `include/<TIER>/<TU>.h`, and the `.cpp` `#include`s its own header. Member functions are
 exempt (declared in their class header). Closes the loop with gate 1: a definition's prototype
 lives in a header, so callers share the one canonical declaration. Owner headers are
 bootstrapped by `gen_module_header.py`.
 
-### 6. `assert_globals_defined` — link-completeness
+### 6. `globals-defined` — link-completeness
 Every global **declared** `extern` in a header has a **definition** in its owner TU's object
 (symbol defined, section > 0, in `build/objdiff/base/<owner>.obj`) — so the project has no
 unresolved externals and can link. Only the `_const` pseudo-unit is exempt. The completed migration
 generated definitions in retail-RVA order; current definitions are maintained in source.
 
-### 7. `assert_vtables` — source-owned vtable census
+### 7. `vtables` — source-owned vtable census
 Primary vtables use `VTBL(Class, 0xVA)`, which reconstructs the MSVC identity
 `??_7Class@@6B@`. A base-specific secondary vtable uses
 `VTBL2(Derived, Base, 0xVA)`, which reconstructs `??_7Derived@@6BBase@@@`. Both macros
@@ -83,7 +85,7 @@ candidate object, and every emitted primary or secondary vtable to be modeled. A
 secondary vtable need not have an inventory row because its source marker and candidate
 definition provide the missing identity evidence.
 
-### 8. `assert_relocs --fields` — ordered DATA-owner field offsets
+### 8. `assert-relocs` (`--fields`) — ordered DATA-owner field offsets
 
 The generated objdiff project uses `functionRelocDiffs=all`, so the normal report compares
 relocation target identity/address and referenced data values instead of accepting every relocation
@@ -111,7 +113,7 @@ an accidentally equal section-relative address when its owner-relative addend di
 score is still not a substitute for the gate: objdiff has no project-specific public-owner extent
 map, and normalization can make different raw identities comparable by design.
 
-### 9. `assert_fixed_width_ints` — explicit game integer widths
+### 9. `fixed-width-ints` — explicit game integer widths
 
 Reconstructed code under `src/{SOURCE,BASE,EDITOR}` and
 `include/{SOURCE,BASE,EDITOR}` uses `i8`/`u8` through `i64`/`u64` from `Ints.h`
@@ -136,7 +138,7 @@ the retail control at fixed file offsets: headers, each section's raw data, the
 overlay, and the file-size difference. `config/link_diff.tsv` holds the
 highest count each region may have; a rise, or a region without a banked ceiling,
 fails the build. A lower count passes and is reported as bankable; bank it with
-`python3 -m homm2.build.link_diff --update`. This is a regression ceiling, not
+`python3 -m homm2.verify.link_diff --update`. This is a regression ceiling, not
 closure: `link_exe --audit-existing --strict` remains the exact-executable check
 and `ninja link-audit` attributes the residual.
 
@@ -170,7 +172,7 @@ and `ninja link-audit` attributes the residual.
   real folded-function identities; synthetic relocation identities are errors.
   `homm2 relocs 0x<rva>` reviews one function. Full rationale:
   memory `[[objdiff-masks-all-relocs]]`.
-- **`python3 -m homm2.build.assert_relocs --pe-data`** — opt-in final-image
+- **`python3 -m homm2.verify.assert_relocs --pe-data`** — opt-in final-image
   `.rdata`/`.data` audit. For every unique configured function it compares the
   complete retail and candidate target-identity multisets without assuming code
   site alignment, so a shifted instruction or payload-equivalent compiler local

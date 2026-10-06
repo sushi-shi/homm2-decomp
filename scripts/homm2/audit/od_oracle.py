@@ -16,7 +16,7 @@ import os, struct, subprocess, sys, hashlib
 from pathlib import Path
 
 from homm2.core.coff import CoffObject
-from homm2.core.wine import child_env
+from homm2.tool.wine import child_env
 
 MSVC = Path(os.environ["MSVC_DIR"]); CL = MSVC / "bin" / "CL.EXE"
 WORK = Path(os.environ.get("OD_ORACLE_WORK", "/tmp/od_oracle")); WORK.mkdir(parents=True, exist_ok=True)

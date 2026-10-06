@@ -87,7 +87,7 @@ homm2 relocs 0x<RVA>
 homm2 relocs --addends SOURCE
 ```
 
-`python3 -m homm2.analysis.decomp 0x<RVA>` provides cached Ghidra-assisted structure
+`python3 -m homm2.sema.decomp 0x<RVA>` provides cached Ghidra-assisted structure
 when ordinary disassembly is unclear. `homm2 ghidra` creates the optional project;
 `homm2 ghidra --no-analyze` reapplies names without reanalysis.
 

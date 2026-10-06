@@ -18,9 +18,9 @@ import sys
 import clang.cindex as ci
 
 from homm2.audit.bool_fields import _entries, _project_relative, _reviewed_exceptions
-from homm2.build.annotated_data import _clang_args, configure_libclang
+from homm2.retail_labels.annotated_data import _clang_args, configure_libclang
 from homm2.clang_options import ClangMode
-from homm2.constants_syntax import lex, parse_enum_declarations
+from homm2.verify.constants_syntax import lex, parse_enum_declarations
 from homm2.core.paths import REPO
 
 

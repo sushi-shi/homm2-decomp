@@ -21,7 +21,7 @@ Run the strict check with:
 ```sh
 nix develop .#build --command homm2 clangd
 nix develop .#build --command \
-  python -m homm2.build.clang_cxx11 --errors-only
+  python -m homm2.verify.clang_cxx11 --errors-only
 ```
 
 The matching-tree audit checks the 96 C++ translation units. `BASE/BITS` and

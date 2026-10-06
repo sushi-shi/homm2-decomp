@@ -4,7 +4,7 @@
 four bytes of every DIR32 operand were masked on both sides: a function that read
 `gArmyNames` where retail read `gArmyNamesPlural` was *byte-identical* and could
 report 100.00%. The project now uses `data_value`, which exposes differing
-referenced values in the ordinary score. `python3 -m homm2.build.assert_relocs`
+referenced values in the ordinary score. `python3 -m homm2.verify.assert_relocs`
 remains authoritative because equal-valued storage and owner-relative addends can
 still evade value-only comparison.
 

@@ -153,7 +153,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Build through `homm2 build` after retained edits. It configures the affected units,
   compiles raw objects, and refreshes the normalized objdiff copies. If source line
   movement makes function spans stale, first run
-  `python3 -m homm2.build.annotated_functions`. A raw `ninja` compile without normalized
+  `python3 -m homm2.retail_labels.annotated_functions`. A raw `ninja` compile without normalized
   refresh can leave `homm2 sema`/objdiff reading stale objects. Run `homm2 status` before
   quoting live repository totals.
 - Describe reviewed source products in a schema-1 exact-span axes file and run them with

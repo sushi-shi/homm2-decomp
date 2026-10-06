@@ -16,7 +16,7 @@
 -- BASE side only (vb, and the base pane of vd): each source STATEMENT is floated as
 -- a virtual line above the asm it lowered to, and each `[ebp±off]` access is tagged
 -- end-of-line with its local/param NAME (`mov eax, [ebp-0x10] ; cell`). Data:
--- build/lines/<unit>.json from homm2.analysis.gen_lines (compiles the TU /Z7 -
+-- build/lines/<unit>.json from homm2.sema.gen_lines (compiles the TU /Z7 -
 -- codegen-neutral - and reads its COFF line table + .debug$S S_BPREL32 locals; needs
 -- the `nix develop .#build` shell for wine cl). Retail has no debug info, so
 -- target/diff-target panes are never annotated.
@@ -325,7 +325,7 @@ local function pct(x) return string.format("%.2f%%", x or 0) end
 -- BASE-only (our /Z7 build carries line info; retail has none). For vb and the
 -- base pane of vd we float each source STATEMENT above the asm it lowered to, as
 -- transient virtual lines (the buffer text is unchanged). Data: build/lines/
--- <unit>.json from homm2.analysis.gen_lines (compiles the TU /Z7 - codegen-neutral, so
+-- <unit>.json from homm2.sema.gen_lines (compiles the TU /Z7 - codegen-neutral, so
 -- the COFF line-table offsets equal objdiff's base-side instruction addresses).
 local SRC_NS = vim.api.nvim_create_namespace("homm2_source")
 local source_cache = {}    -- "root|unit" -> { mtime, map = {mangled -> {offset -> "Lnnn  text"}} }
@@ -370,7 +370,7 @@ local function source_map(root, unit, cb)
   end
   source_pending[key] = true
   log("gen_lines " .. unit .. "  [" .. root .. "]")
-  vim.system({ "python3", "-m", "homm2.analysis.gen_lines", unit },
+  vim.system({ "python3", "-m", "homm2.sema.gen_lines", unit },
     { cwd = root, text = true, env = { PYTHONPATH = root .. "/scripts" } },
     function(res)
       vim.schedule(function()
@@ -1205,13 +1205,13 @@ function M.format_on_save(buf)
   end
 
   if file:match("%.h%w*$") then
-    out = pipe_through_module(root, "homm2.format.headers", table.concat(out, "\n"))
+    out = pipe_through_module(root, "homm2.workflow.format_headers", table.concat(out, "\n"))
     if not out then
       return notify("header formatting failed", vim.log.levels.ERROR)
     end
   end
 
-  out = pipe_through_module(root, "homm2.format.enums", table.concat(out, "\n"))
+  out = pipe_through_module(root, "homm2.workflow.format_enums", table.concat(out, "\n"))
   if not out then
     return notify("enum formatting failed", vim.log.levels.ERROR)
   end

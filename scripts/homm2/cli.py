@@ -82,7 +82,7 @@ def _toolchain(argv):
     ap.add_argument("action", choices=("install", "check"))
     ap.add_argument("--force", action="store_true", help="refetch over an existing tree")
     a = ap.parse_args(argv)
-    from homm2.init.toolchain import main as toolchain
+    from homm2.toolchain import main as toolchain
     if a.action == "check":
         return toolchain(["--check"])
     return toolchain(["--force"] if a.force else [])
@@ -98,7 +98,7 @@ def _build(rest):
         print('choose only one locale: --ru or --en', file=sys.stderr)
         return 1
     if '--no-match' in rest:
-        return py('homm2.build.ordinary', *(arg for arg in rest if arg != '--no-match'))
+        return py('homm2.graph.ordinary', *(arg for arg in rest if arg != '--no-match'))
     if '--en' in rest:
         print('English is not a matching target; use homm2 build --no-match --en',
               file=sys.stderr)
@@ -115,7 +115,7 @@ def _build(rest):
     except (OSError, ValueError) as error:
         print(f"[build] {error}", file=sys.stderr)
         return 1
-    if py("homm2.build.localization"):
+    if py("homm2.graph.localization"):
         return 1
     if sh(sys.executable, "configure.py"):
         return 1
@@ -125,7 +125,7 @@ def _build(rest):
         return 1
     # The report is generated after Ninja has rebuilt every input, so a clean
     # build is self-contained.
-    from homm2.match.status import load_report, main as status
+    from homm2.verify.status import load_report, main as status
     report = load_report()
     if report is None:
         return 1
@@ -152,7 +152,7 @@ def _match(rest):
     """Compile the selected units, refresh their comparison and print them."""
     import argparse
     from pathlib import Path
-    from homm2.core.manifest import units
+    from homm2.manifest import units
     ap = argparse.ArgumentParser(prog="homm2 match",
                                  description="the selected-unit compile and compare loop")
     ap.add_argument("unit", nargs="+", help="a unit (SOURCE/KB) or its source path")
@@ -178,12 +178,12 @@ def _match(rest):
             targets.append(f"build/objdiff/normalized/target/{name}.c.obj")
     if sh("ninja", *ninja_jobs(), *targets):
         return 1
-    from homm2.match.status import load_report
+    from homm2.verify.status import load_report
     if load_report() is None:
         return 1
     rc = 0
     for name in selected:
-        rc |= py("homm2.analysis.sema", "match", name)
+        rc |= py("homm2.sema", "match", name)
     return rc
 
 
@@ -226,8 +226,8 @@ def _lsp(rest):
               "homm2 lsp index | symbol QUERY | def|refs|hover FILE LINE [COL] | rename ...")
         return 0 if rest else 2
     if rest[0] == "compdb":
-        return py("homm2.init.clangd", *rest[1:])
-    return py("homm2.analysis.clangd_query", *rest)
+        return py("homm2.lsp.compdb", *rest[1:])
+    return py("homm2.lsp.query", *rest)
 
 
 def _workflow(rest):
@@ -237,8 +237,8 @@ def _workflow(rest):
     check = rest[1:]
     headers = sorted(REPO.glob("include/**/*.h"))
     sources = sorted(REPO.glob("src/**/*.cpp"))
-    header_status = py("homm2.format.headers", *check, *headers)
-    enum_status = py("homm2.format.enums", *check, *headers, *sources)
+    header_status = py("homm2.workflow.format_headers", *check, *headers)
+    enum_status = py("homm2.workflow.format_enums", *check, *headers, *sources)
     return int(bool(header_status or enum_status))
 
 
@@ -252,7 +252,7 @@ def _tool(rest):
     if name == "delinker":
         return sh("vostok-delinker", *args)
     import subprocess
-    from homm2.core.wine import child_env, prepare_env, tool
+    from homm2.tool.wine import child_env, prepare_env, tool
     prepare_env()
     program = ["wine", *args] if name == "wine" else ["wine", str(tool(f"{name}.exe")), *args]
     return subprocess.run(program, env=child_env()).returncode
@@ -307,20 +307,20 @@ def main(argv=None):
     if cmd == "play":
         return _play(rest)
     if cmd == "labels":
-        return py("homm2.build.source_symbols", *rest)
+        return py("homm2.retail_labels.source", *rest)
     if cmd == "model":
-        return py("homm2.build.symbol_model_drift", *rest)
+        return py("homm2.verify.model_drift", *rest)
     if cmd == "delink":
-        from homm2.redelink import main as m
+        from homm2.delink.run import main as m
         return m(rest)
     if cmd == "compare":
-        from homm2.match.status import main as m
+        from homm2.verify.status import main as m
         return m(["--force-refresh", *rest])
     if cmd == "audit":
         from homm2.audit import main as m
         return m(rest)
     if cmd == "sema":
-        from homm2.analysis.sema import main as m
+        from homm2.sema import main as m
         return m(rest)
     if cmd == "permute":
         return _permute(rest)
@@ -339,7 +339,7 @@ def main(argv=None):
         from homm2.clean.clean_source import main as m
         return m(rest)
     if cmd == "localization":
-        return py("homm2.build.localization", *rest)
+        return py("homm2.graph.localization", *rest)
     if cmd == "tool":
         return _tool(rest)
     print(f"homm2: unknown command {cmd!r}\ncommands: {COMMANDS}", file=sys.stderr)

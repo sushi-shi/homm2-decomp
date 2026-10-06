@@ -20,7 +20,7 @@ change; only section order does.
 
 ## Use
 
-BASE compiles with `/YX` (tier rule in `homm2.core.manifest.unit_flags`); the
+BASE compiles with `/YX` (tier rule in `homm2.manifest.unit_flags`); the
 flag is byte-neutral for every other unit. Put the inline body in the header
 (in-class), then let the include order select the side of the ctype pair:
 

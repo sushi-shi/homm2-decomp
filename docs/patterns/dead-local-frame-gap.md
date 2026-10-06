@@ -36,7 +36,7 @@ rounded up to 4. That is how `TRANSMIT_FILENAME_CAPACITY` was corrected from 456
 compiler will name our own slots:
 
 ```sh
-python3 -m homm2.build.cc_wrap --out /tmp/u.obj --src src/SOURCE/GAME.cpp -- \
+python3 -m homm2.graph.cc --out /tmp/u.obj --src src/SOURCE/GAME.cpp -- \
     /nologo /c /Od /MT /Gr /G5 /Ob1 /Gi- /GX /Z7 /DNO_STRICT
 # then read .debug$S: CV5 S_GPROC32 = 0x100b, S_LPROC32 = 0x100a, S_END = 0x0006,
 # S_BPREL32 = 0x1006 with body = off(i32) typind(u32) namelen(u8) name

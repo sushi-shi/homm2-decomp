@@ -52,13 +52,14 @@ their Russian translations and generated compiler literals are unchanged.
 
 ## Validation
 
-`homm2 build` always runs the localization source/catalog gate, independently of
-the older branch's disabled general audit gates. `homm2 selftest` includes the
-whole-tree no-hidden-text test and real-Clang formatting/array-layout tests.
+`homm2 build` always runs the localization source/catalog gate (also `homm2
+localization` and `homm2 verify localization`). `homm2 verify behaviour` checks
+the shipped catalog's text: the original English wording, fragments that render
+complete sentences, and no text outside the catalog.
 
 ```sh
-python3 -m homm2.build.localization
-python3 -m unittest homm2.build.test_localization -v
+homm2 localization
+homm2 verify behaviour
 homm2 build
 ```
 

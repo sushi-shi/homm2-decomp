@@ -64,7 +64,7 @@ from typing import Iterable
 
 import clang.cindex as ci
 
-from homm2.build.annotated_data import (
+from homm2.retail_labels.annotated_data import (
     _clang_args,
     configure_libclang,
 )

@@ -18,7 +18,7 @@ linker-owned import arrays, ordinary read-only data, exception metadata, initial
 data, and alignment tails separate. The retail image has no MAP, so these are explicitly
 candidate-boundary projections; the raw whole-section result remains authoritative.
 
-`python3 -m homm2.build.assert_relocs --pe-data` supplies the complementary
+`python3 -m homm2.verify.assert_relocs --pe-data` supplies the complementary
 code-site audit for all uniquely identifiable configured functions. Its exhaustive
 pass reads every retail DIR32 operand from the shipping PE and compares the resulting
 `.rdata`/`.data` identity multiset with candidate identities, independent of code

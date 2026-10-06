@@ -1,7 +1,7 @@
 import re, sys, json, os, concurrent.futures, shlex
 from pathlib import Path
 sys.path.insert(0, 'scripts')
-from homm2.core import wine
+from homm2.tool import wine
 from homm2.permute.tu_state_noise import compile_object
 from homm2.permute.emission_order import object_functions
 extra = sys.argv[1:]

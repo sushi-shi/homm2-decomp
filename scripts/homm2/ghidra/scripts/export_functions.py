@@ -2,7 +2,7 @@
 # export_functions.py - dump build/ghidra/exports/functions.csv from the analyzed DB.
 #
 # functions.csv (entry_rva hex, byte_size decimal, name) is the WHOLE-.text function
-# boundary map homm2.analysis.xref reads, and the refresh path for the candidate
+# boundary map homm2.sema.xref reads, and the refresh path for the candidate
 # inventory config/retail/functions.csv when analysis improves (boundaries stay
 # analysis opinion until a VA() marker claims them). Read-only over the
 # FunctionManager.

@@ -25,7 +25,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from homm2.match.source_hashes import source_hashes
+from homm2.verify.fingerprints import source_hashes
 from homm2.permute.recover_historical_exact import (
     RESULT_FIELDS,
     append_result,
@@ -65,7 +65,7 @@ def run_checked(root: Path, command: list[str]) -> None:
 
 def refresh_live_report_and_queue(root: Path) -> Path:
     run_checked(root, ["homm2", "status", "--force-refresh"])
-    run_checked(root, [sys.executable, "-m", "homm2.match.residual_queue"])
+    run_checked(root, [sys.executable, "-m", "homm2.walls.inventory"])
     return root / "build/gen/residual_function_queue.tsv"
 
 

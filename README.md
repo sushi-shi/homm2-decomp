@@ -119,7 +119,7 @@ For an ordinary executable, with no retail executable or delinked targets needed
 
 ```sh
 nix develop .#build
-python3 -m homm2.init.toolchain     # one-time compiler setup; no matching setup
+python3 -m homm2.toolchain     # one-time compiler setup; no matching setup
 homm2 build --no-match --ru        # compile and link Russian (default)
 homm2 build --no-match --en        # compile and link English
 ```

@@ -128,7 +128,7 @@ def read_coff(path: Path):
 
 def source_hashes():
     try:
-        from homm2.match.status import source_hashes as project_source_hashes
+        from homm2.verify.status import source_hashes as project_source_hashes
     except ImportError:
         return {}
     return project_source_hashes()

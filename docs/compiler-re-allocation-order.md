@@ -527,7 +527,7 @@ PyGhidra instead (`GhidraProject.openProject` + `project.openProgram`, and wrap
 every Java iterator with `hasNext()/next()` — bare `for` over them yields
 nothing and silently looks like "no xrefs").
 
-Probes were compiled with `scripts/homm2/build/cc_wrap.py` under
+Probes were compiled with `scripts/homm2/graph/cc.py` under
 `nix develop .#build`; the COFF topology dumper and the option sweep are small
 standalone scripts (section table + symbol table walk, no external deps).
 
@@ -903,7 +903,7 @@ several call sites and slots share. That would dissolve the ordering problem
 without any source change, because the object's tail COMDAT *count and order*
 would stop mattering; only the post-fold image layout would.
 
-This is **not a new axis for the campaign**: `scripts/homm2/build/link_exe.py`
+This is **not a new axis for the campaign**: `scripts/homm2/graph/link_exe.py`
 already links with `/OPT:NOREF` (which suppresses REF and hence ICF), and
 `scripts/homm2/build/exact_link/orchestrate.py:505` already has a conditional
 `/OPT:ICF` prefix. So the folding path is present and was evidently settled

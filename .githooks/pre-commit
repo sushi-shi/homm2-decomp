@@ -11,4 +11,4 @@ fi
 
 echo "[pre-commit] checking strict enum types"
 nix develop .#build --command bash -lc \
-    'set -e; homm2 clangd >/dev/null; python -m homm2.build.clang_cxx11 --errors-only'
+    'set -e; homm2 clangd >/dev/null; python -m homm2.verify.clang_cxx11 --errors-only'

@@ -206,7 +206,7 @@ def run_variant(manifest: dict, root: Path, index: int, choices, timeout: float)
     for file_name, text in files.items():
         (work / file_name).parent.mkdir(parents=True, exist_ok=True)
         (work / file_name).write_text(text, encoding="latin-1")
-    from homm2.core.wine import winepath_w
+    from homm2.tool.wine import winepath_w
     flags = [flag.replace("{work}", winepath_w(work)) for flag in flags]
     aliases = [(re.compile(p), a) for p, a in manifest["aliases"]]
     result = {"index": index, "variant": name,
@@ -261,7 +261,7 @@ def run_variant(manifest: dict, root: Path, index: int, choices, timeout: float)
 
 
 def link_variant(spec: dict, work: Path, objects: list[Path], aliases) -> dict:
-    from homm2.core import wine
+    from homm2.tool import wine
 
     output, map_path = work / "probe.exe", work / "probe.map"
     lib = wine.msvc_dir() / "lib"
@@ -318,7 +318,7 @@ def main(argv=None) -> int:
         print(f"emission-order: {len(product)} variants exceed --limit {args.limit}",
               file=sys.stderr)
         return 2
-    from homm2.core import wine
+    from homm2.tool import wine
     wine.prepare_env()
     args.output.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(args.manifest, args.output / "manifest.json")

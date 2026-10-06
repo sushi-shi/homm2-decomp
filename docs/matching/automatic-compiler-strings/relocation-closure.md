@@ -71,5 +71,5 @@ does not claim linked-executable closure.
 - forced `homm2 redelink` with the pinned Vostok delinker;
 - `homm2 build` and refreshed `homm2 status`;
 - `homm2 data-relocs` for `BASE/Misc` with full HoMM2 provenance checking;
-- `python3 -m homm2.build.assert_relocs --pe-data` and focused `BASE/Misc` extraction;
+- `python3 -m homm2.verify.assert_relocs --pe-data` and focused `BASE/Misc` extraction;
 - `git diff --check`.
