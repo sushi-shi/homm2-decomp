@@ -1,29 +1,49 @@
-"""homm2 reconstruction CLI."""
-import os, subprocess, sys
-from pathlib import Path
+"""HoMM2 matching-decompilation command line.
+
+    homm2 [--image {game,editor}] <command> [args]
+
+The retail executables and compiler media cannot be fetched by the repository;
+`init` stages and verifies them (config/retail/targets.json).
+"""
+import os
+import sys
+
 from homm2.core.paths import REPO
 
-# Every audit is off while the reconstruction is unmarked. They were written for a
-# COMPLETE inventory, and here the inventory starts empty and grows one proven
-# address at a time, so the same checks report the whole image as broken and say
-# nothing: audit_text_coverage calls all 951,827 bytes of .text unexplained, and
-# every assert_* keyed on a symbol model has no model to read.
-#
-# They come back on as the campaign earns them, and several could return early: the
-# source-only ones (assert_decls, assert_defs_declared, assert_globals_defined,
-# assert_no_fake_labels, assert_fixed_width_ints) check the tree against itself and
-# do not depend on the target at all.
-AUDITS = False
+COMMANDS = ("init inspect toolchain configure build link match play labels model delink "
+            "compare audit sema permute lsp ghidra verify workflow clean localization tool")
+
+#: Older spellings kept while other branches and notes use them.
+ALIASES = {
+    "redelink": ["delink"],
+    "status": ["verify", "status"],
+    "relocs": ["verify", "relocs"],
+    "data-topology": ["verify", "data-topology"],
+    "constants": ["verify", "constants"],
+    "strict-allocations": ["verify", "strict-allocations"],
+    "od-frames": ["verify", "od-frames"],
+    "data-relocs": ["verify", "data-relocs"],
+    "model-drift": ["model"],
+    "clangd": ["lsp", "compdb"],
+    "format": ["workflow", "format"],
+}
 
 #: Commands that read the selected image (`--image`); the rest refuse another
 #: image instead of silently answering for the game.
 IMAGE_AWARE = {"inspect", "help", "-h", "--help"}
+
+TOOLS = ("wine", "cl", "ml", "link", "rc", "objdiff", "delinker")
 
 
 def sh(*cmd):
     """Run a child with its output streamed through the usage log."""
     from homm2.core.usage import run_process
     return run_process([str(c) for c in cmd], cwd=REPO)
+
+
+def py(module, *args):
+    return sh(sys.executable, "-m", module, *args)
+
 
 def _inspect(argv):
     import argparse, json
@@ -55,6 +75,189 @@ def _inspect(argv):
     return 0
 
 
+def _toolchain(argv):
+    import argparse
+    ap = argparse.ArgumentParser(prog="homm2 toolchain",
+                                 description="the pinned VC6 SP5 release in build/toolchain")
+    ap.add_argument("action", choices=("install", "check"))
+    ap.add_argument("--force", action="store_true", help="refetch over an existing tree")
+    a = ap.parse_args(argv)
+    from homm2.init.toolchain import main as toolchain
+    if a.action == "check":
+        return toolchain(["--check"])
+    return toolchain(["--force"] if a.force else [])
+
+
+def _build(rest):
+    if rest[:1] == ["verify"]:
+        if _build(rest[1:]):
+            return 1
+        from homm2.verify import run_tier
+        return run_tier()
+    if '--ru' in rest and '--en' in rest:
+        print('choose only one locale: --ru or --en', file=sys.stderr)
+        return 1
+    if '--no-match' in rest:
+        return py('homm2.build.ordinary', *(arg for arg in rest if arg != '--no-match'))
+    if '--en' in rest:
+        print('English is not a matching target; use homm2 build --no-match --en',
+              file=sys.stderr)
+        return 1
+    if '--help' in rest or '-h' in rest:
+        print('homm2 build [--ru] [Ninja options/targets]   Russian matching build\n'
+              'homm2 build verify                          build, then every gate\n'
+              'homm2 build --no-match [--ru|--en] [-j JOBS] [-v]   compile + link')
+        return 0
+    rest = [arg for arg in rest if arg != '--ru']
+    from homm2.core.retail import verify_retail
+    try:
+        verify_retail()
+    except (OSError, ValueError) as error:
+        print(f"[build] {error}", file=sys.stderr)
+        return 1
+    if py("homm2.build.localization"):
+        return 1
+    if sh(sys.executable, "configure.py"):
+        return 1
+    from homm2.core.paths import ninja_jobs
+    jobs = [] if any(a.startswith("-j") for a in rest) else ninja_jobs()
+    if sh("ninja", *jobs, *rest):
+        return 1
+    # The report is generated after Ninja has rebuilt every input, so a clean
+    # build is self-contained.
+    from homm2.match.status import load_report, main as status
+    report = load_report()
+    if report is None:
+        return 1
+    status(["--write-readme"], report)
+    return status([], report)
+
+
+def _link(rest):
+    if rest in (["--help"], ["-h"]):
+        print("usage: homm2 link [--rsrc | --historical] (native raw-object link)")
+        return 0
+    if rest not in ([], ["--rsrc"], ["--historical"]):
+        print("usage: homm2 link [--rsrc | --historical]; layout corrections are not supported",
+              file=sys.stderr)
+        return 1
+    if sh(sys.executable, "configure.py"):
+        return 1
+    from homm2.core.paths import ninja_jobs
+    target = {"--rsrc": "link-rsrc", "--historical": "link-historical"}
+    return sh("ninja", *ninja_jobs(), target[rest[0]] if rest else "link")
+
+
+def _match(rest):
+    """Compile the selected units, refresh their comparison and print them."""
+    import argparse
+    from pathlib import Path
+    from homm2.core.manifest import units
+    ap = argparse.ArgumentParser(prog="homm2 match",
+                                 description="the selected-unit compile and compare loop")
+    ap.add_argument("unit", nargs="+", help="a unit (SOURCE/KB) or its source path")
+    a = ap.parse_args(rest)
+    known = {u["unit"] for u in units()}
+    by_source = {str(Path(u["source"])): u["unit"] for u in units()}
+    selected = []
+    for spec in a.unit:
+        name = spec if spec in known else None
+        if name is None and Path(spec).exists():
+            name = by_source.get(str(Path(spec).resolve().relative_to(REPO)))
+        if name is None:
+            print(f"homm2 match: {spec!r} is not a unit or unit source", file=sys.stderr)
+            return 2
+        selected.append(name)
+    if sh(sys.executable, "configure.py"):
+        return 1
+    from homm2.core.paths import ninja_jobs
+    targets = []
+    for name in selected:
+        targets.append(f"build/objdiff/normalized/base/{name}.obj")
+        if (REPO / "build/delink" / f"{name}.c.obj").exists():
+            targets.append(f"build/objdiff/normalized/target/{name}.c.obj")
+    if sh("ninja", *ninja_jobs(), *targets):
+        return 1
+    from homm2.match.status import load_report
+    if load_report() is None:
+        return 1
+    rc = 0
+    for name in selected:
+        rc |= py("homm2.analysis.sema", "match", name)
+    return rc
+
+
+def _play(rest):
+    import argparse
+    ap = argparse.ArgumentParser(prog="homm2 play",
+                                 description="build, link with resources and run the game under Wine")
+    ap.add_argument("--game", help="a legally obtained Buka installation ($HOMM2_DATA)")
+    ap.add_argument("--prepare-only", action="store_true")
+    a, game_arguments = ap.parse_known_args(rest)
+    if a.game:
+        os.environ["HOMM2_DATA"] = a.game
+    return sh(sys.executable, "scripts/toolchain/run-rebuilt-game.py",
+              *(["--prepare-only"] if a.prepare_only else []), *game_arguments)
+
+
+def _permute(rest):
+    verbs = {
+        "variants": "homm2.permute.match_variants",
+        "state": "homm2.permute.tu_state_noise",
+        "emission-order": "homm2.permute.emission_order",
+        "recover-residual": "homm2.permute.recover_residual_functions",
+        "recover-historical": "homm2.permute.recover_historical_exact",
+    }
+    if not rest or rest[0] in ("-h", "--help"):
+        print("homm2 permute variants <tu.cpp> <rva> [options]   reviewed axes x AST x TU state\n"
+              "homm2 permute state --source <tu.cpp> --rva <rva> [options]   TU-state census\n"
+              "homm2 permute emission-order [options]   emission-order probe campaigns\n"
+              "homm2 permute recover-residual | recover-historical   queue drivers")
+        return 0 if rest else 2
+    if rest[0] in verbs:
+        return py(verbs[rest[0]], *rest[1:])
+    # The original spelling: `homm2 permute <tu.cpp> <rva> ...` is `variants`.
+    return py(verbs["variants"], *rest)
+
+
+def _lsp(rest):
+    if not rest or rest[0] in ("-h", "--help"):
+        print("homm2 lsp compdb                     write build/clangd/compile_commands.json\n"
+              "homm2 lsp index | symbol QUERY | def|refs|hover FILE LINE [COL] | rename ...")
+        return 0 if rest else 2
+    if rest[0] == "compdb":
+        return py("homm2.init.clangd", *rest[1:])
+    return py("homm2.analysis.clangd_query", *rest)
+
+
+def _workflow(rest):
+    if rest[:1] != ["format"] or rest[1:] not in ([], ["--check"]):
+        print("usage: homm2 workflow format [--check]", file=sys.stderr)
+        return 2
+    check = rest[1:]
+    headers = sorted(REPO.glob("include/**/*.h"))
+    sources = sorted(REPO.glob("src/**/*.cpp"))
+    header_status = py("homm2.format.headers", *check, *headers)
+    enum_status = py("homm2.format.enums", *check, *headers, *sources)
+    return int(bool(header_status or enum_status))
+
+
+def _tool(rest):
+    if not rest or rest[0] not in TOOLS:
+        print(f"homm2 tool: pick one of {', '.join(TOOLS)}", file=sys.stderr)
+        return 2
+    name, args = rest[0], rest[1:]
+    if name == "objdiff":
+        return sh("objdiff-cli", *args)
+    if name == "delinker":
+        return sh("vostok-delinker", *args)
+    import subprocess
+    from homm2.core.wine import child_env, prepare_env, tool
+    prepare_env()
+    program = ["wine", *args] if name == "wine" else ["wine", str(tool(f"{name}.exe")), *args]
+    return subprocess.run(program, env=child_env()).returncode
+
+
 from homm2.core.usage import logged
 
 
@@ -71,7 +274,16 @@ def main(argv=None):
             print(f"homm2: --image expects one of {images()}", file=sys.stderr)
             return 2
         os.environ[IMAGE_ENV] = key
-    cmd = argv[0] if argv else "help"; rest = argv[1:]
+    if not argv or argv[0] in ("help", "-h", "--help"):
+        print(__doc__.strip())
+        print(f"\ncommands: {COMMANDS}")
+        print("aliases: " + ", ".join(f"{k} = {' '.join(v)}" for k, v in ALIASES.items()))
+        return 0 if argv else 2
+    cmd, rest = argv[0], argv[1:]
+    if cmd == "data-topology" and rest[:1] == ["census"]:
+        rest = rest[1:]
+    if cmd in ALIASES:
+        cmd, rest = ALIASES[cmd][0], [*ALIASES[cmd][1:], *rest]
     from homm2.core.paths import DEFAULT_IMAGE, image_key
     if image_key() != DEFAULT_IMAGE and cmd not in IMAGE_AWARE:
         print(f"homm2 {cmd}: not yet keyed by image; it reads the game only "
@@ -80,130 +292,59 @@ def main(argv=None):
     if cmd == "inspect":
         return _inspect(rest)
     if cmd == "init":
-        from homm2.init import main as m; return m(rest)
-    if cmd == "redelink":
-        from homm2.redelink import main as m; return m(rest)
-    if cmd == "model-drift":
-        from homm2.build.symbol_model_drift import main as m; return m(rest)
+        from homm2.init import main as m
+        return m(rest)
+    if cmd == "toolchain":
+        return _toolchain(rest)
     if cmd == "configure":
-        return sh("python3", "configure.py")
-    if cmd == "clangd":
-        from homm2.init.clangd import main as m; return m()
-    if cmd == "format":
-        if any(argument != "--check" for argument in rest) or len(rest) > 1:
-            print("usage: homm2 format [--check]", file=sys.stderr)
-            return 1
-        headers = sorted(REPO.glob("include/**/*.h"))
-        sources = sorted(REPO.glob("src/**/*.cpp"))
-        header_status = sh(
-            "python3", "-m", "homm2.format.headers", *rest, *headers)
-        enum_status = sh(
-            "python3", "-m", "homm2.format.enums", *rest, *headers, *sources)
-        return int(bool(header_status or enum_status))
-    if cmd == "constants":
-        from homm2.constants_audit import main as m; return m(rest)
-    if cmd == "strict-allocations":
-        from homm2.build.strict_allocations import main as m; return m(rest)
-    if cmd == "od-frames":
-        from homm2.build.od_frame_audit import main as m; return m(rest)
-    if cmd == "data-relocs":
-        from homm2.build.coff_reloc_topology import main as m; return m(rest)
-    if cmd == "data-topology":
-        # Target regeneration lives in `homm2 redelink`; the census is the
-        # candidate-COFF inspection tool that stays meaningful without it.
-        if rest and rest[0] == "census":
-            from homm2.build.data_topology_census import main as m
-            return m(rest[1:])
-        print("usage: homm2 data-topology census", file=sys.stderr)
-        return 1
+        return sh(sys.executable, "configure.py", *rest)
     if cmd == "build":
-        if '--ru' in rest and '--en' in rest:
-            print('choose only one locale: --ru or --en', file=sys.stderr)
-            return 1
-        if '--no-match' in rest:
-            return sh('python3', '-m', 'homm2.build.ordinary',
-                      *(arg for arg in rest if arg != '--no-match'))
-        if '--en' in rest:
-            print('English is not a matching target; use homm2 build --no-match --en',
-                  file=sys.stderr)
-            return 1
-        if '--help' in rest or '-h' in rest:
-            print('homm2 build [--ru] [Ninja options/targets] (Russian matching build)\n'
-                  'homm2 build --no-match [--ru|--en] [-j JOBS] [-v] (compile + link)')
-            return 0
-        rest = [arg for arg in rest if arg != '--ru']
-        from homm2.core.retail import verify_retail
-        try:
-            verify_retail()
-        except (OSError, ValueError) as error:
-            print(f"[build] {error}", file=sys.stderr)
-            return 1
-        if sh("python3", "-m", "homm2.build.localization"): return 1
-        if AUDITS:
-            if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
-        if sh("python3", "configure.py"): return 1
-        from homm2.core.paths import ninja_jobs
-        jobs = [] if any(a.startswith("-j") for a in rest) else ninja_jobs()
-        if sh("ninja", *jobs, *rest): return 1
-        # Relocation field validation consumes the objdiff report. Generate it
-        # after Ninja has rebuilt every input so a clean build is self-contained.
-        from homm2.match.status import load_report, main as st
-        report = load_report()
-        if report is None:
-            return 1
-        if AUDITS:
-            # Fast and warning-only: half-built TUs may intentionally need a later redelink.
-            sh("python3", "-m", "homm2.build.symbol_model_drift")
-            if sh("python3", "-m", "homm2.build.annotated_functions", "--check",
-                  "--objects", "build/objdiff/base"): return 1
-            # HARD gates: every declaration comes from a header (no drift), and every emitted
-            # function symbol exists in the retained-public/recovered-private inventory.
-            if sh("python3", "-m", "homm2.build.assert_decls"): return 1
-            if sh("python3", "-m", "homm2.build.assert_no_fake_labels"): return 1
-            if sh("python3", "-m", "homm2.build.assert_globals_data"): return 1
-            if sh("python3", "-m", "homm2.build.assert_defs_declared"): return 1
-            if sh("python3", "-m", "homm2.build.assert_globals_defined"): return 1
-            if sh("python3", "-m", "homm2.build.assert_vtables"): return 1
-            if sh("python3", "-m", "homm2.build.assert_relocs", "--fields"): return 1
-            if sh("python3", "-m", "homm2.build.assert_fixed_width_ints"): return 1
-        st(["--write-readme"], report)
-        return st([], report)   # refresh README % block + print summary
+        return _build(rest)
     if cmd == "link":
-        if rest in (["--help"], ["-h"]):
-            print("usage: homm2 link [--rsrc | --historical] (native raw-object link)")
-            return 0
-        if rest not in ([], ["--rsrc"], ["--historical"]):
-            print("usage: homm2 link [--rsrc | --historical]; layout corrections are not supported",
-                  file=sys.stderr)
-            return 1
-        if sh("python3", "configure.py"): return 1
-        target = {"--rsrc": "link-rsrc", "--historical": "link-historical"}
-        return sh("ninja", target[rest[0]] if rest else "link")
-    if cmd == "relocs":
-        # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
-        # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks
-        # each near-exact fn's reloc targets against retail. Off by default because it also surfaces
-        # incomplete-function relocation shape. `homm2 relocs 0x<rva>` reviews one.
-        return sh("python3", "-m", "homm2.build.assert_relocs", *rest)
-    if cmd == "status":
-        from homm2.match.status import main as st; return st(rest)
+        return _link(rest)
+    if cmd == "match":
+        return _match(rest)
+    if cmd == "play":
+        return _play(rest)
+    if cmd == "labels":
+        return py("homm2.build.source_symbols", *rest)
+    if cmd == "model":
+        return py("homm2.build.symbol_model_drift", *rest)
+    if cmd == "delink":
+        from homm2.redelink import main as m
+        return m(rest)
+    if cmd == "compare":
+        from homm2.match.status import main as m
+        return m(["--force-refresh", *rest])
+    if cmd == "audit":
+        from homm2.audit import main as m
+        return m(rest)
     if cmd == "sema":
-        from homm2.analysis.sema import main as m; return m(rest)
+        from homm2.analysis.sema import main as m
+        return m(rest)
+    if cmd == "permute":
+        return _permute(rest)
+    if cmd == "lsp":
+        return _lsp(rest)
+    if cmd == "ghidra":
+        from homm2.ghidra.driver import cli_main as m
+        return m(rest)
     if cmd == "verify":
-        from homm2.verify import main as m; return m(rest)
+        from homm2.verify import main as m
+        return m(rest)
+    if cmd == "workflow":
+        return _workflow(rest)
     if cmd == "clean":
         # Derive the shipped tree from the matching tree; see homm2/clean/__init__.py.
-        from homm2.clean.clean_source import main as m; return m(rest)
-    if cmd == "audit":
-        # On-demand campaign diagnostics. NOT build gates - those are the assert_*
-        # modules run inside `homm2 build`. No argument lists the tools.
-        from homm2.audit import main as m; return m(rest)
-    if cmd == "permute":
-        # The measured source-variant search; see homm2/permute/__init__.py for the
-        # layering. This is the frontend, never a lower stage.
-        from homm2.permute.match_variants import main as m; return m(rest)
-    if cmd == "ghidra":
-        from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 [--image {game,editor}] {inspect|init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|audit|clean|verify|ghidra}",
-          file=sys.stderr)
-    return 0 if cmd in ("help", "-h", "--help") else 1
+        from homm2.clean.clean_source import main as m
+        return m(rest)
+    if cmd == "localization":
+        return py("homm2.build.localization", *rest)
+    if cmd == "tool":
+        return _tool(rest)
+    print(f"homm2: unknown command {cmd!r}\ncommands: {COMMANDS}", file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

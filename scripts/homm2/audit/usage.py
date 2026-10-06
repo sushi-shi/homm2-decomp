@@ -4,8 +4,10 @@ Every module-level ``main``/``cli_main`` under scripts/homm2 must carry the
 ``homm2.core.usage.logged`` decorator, so direct module runs, ninja-invoked
 wrappers and batch commands are recorded like CLI commands. A module that runs
 as a program (``if __name__ == "__main__":``) must do so through such a
-``main``. Test modules are exempt, and so is ``clean/project/``: it is copied
-into the generated source tree, which has no homm2 package.
+``main``, and no module runs a script body (top-level loops, conditionals or
+``with`` blocks) outside one. Test modules are exempt, and so are
+``clean/project/`` (copied into the generated source tree, which has no homm2
+package) and ``ghidra/scripts/`` (run inside Ghidra).
 """
 from __future__ import annotations
 
@@ -17,6 +19,8 @@ from homm2.core.paths import REPO
 from homm2.core.usage import logged
 
 ENTRY_POINTS = ("main", "cli_main")
+EXEMPT = ("clean/project", "ghidra/scripts")
+SCRIPT_BODY = (ast.For, ast.While, ast.If, ast.With, ast.Try)
 
 
 def _is_main_guard(node: ast.stmt) -> bool:
@@ -36,7 +40,7 @@ def uninstrumented() -> list[str]:
     for path in sorted((REPO / "scripts/homm2").rglob("*.py")):
         if path.name.startswith("test_"):
             continue
-        if path.is_relative_to(REPO / "scripts/homm2/clean/project"):
+        if any(path.is_relative_to(REPO / "scripts/homm2" / exempt) for exempt in EXEMPT):
             continue
         tree = ast.parse(path.read_text())
         relative = str(path.relative_to(REPO))
@@ -47,6 +51,10 @@ def uninstrumented() -> list[str]:
                 missing.append(f"{relative}: {node.name}() lacks @logged")
         if not entries and any(_is_main_guard(n) for n in tree.body):
             missing.append(f"{relative}: runs as a program without a logged main()")
+        for node in tree.body:
+            if isinstance(node, SCRIPT_BODY) and not _is_main_guard(node):
+                missing.append(f"{relative}:{node.lineno}: script body outside a logged main()")
+                break
     return missing
 
 

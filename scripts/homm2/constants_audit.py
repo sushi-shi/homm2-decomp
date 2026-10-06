@@ -8,6 +8,7 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -377,3 +378,7 @@ def main(argv: list[str]) -> int:
         print("--magic-log and --null-log must be supplied together")
         return 1
     return run(jobs=jobs, magic_log=magic_log, null_log=null_log)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

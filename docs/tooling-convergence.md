@@ -162,6 +162,28 @@ Steps run with at most four parallel jobs (`HOMM2_JOBS=4`, nix `--max-jobs 1
 | usage coverage | none | adopt (`audit usage`) |
 | (none) | tool test suite (`selftest`) | removed; the game-behaviour tests are the `verify behaviour` gate |
 
+## Gate tier
+
+`homm2 build verify` builds, then runs the tier in `homm2.verify.TIER`:
+`check` (every function and data byte exact), `link-diff`, `behaviour`,
+`localization`, `strict-allocations`, `assert-relocs`, `no-fake-labels`,
+`globals-data`, `globals-defined`, `vtables`, `fixed-width-ints` and `usage`.
+Until this step the `assert_*` gates were switched off in `homm2 build`
+(`AUDITS = False`, written while the inventory was still empty), so nothing
+ran them. Five registered gates carry findings in the current tree and stay
+outside the tier until those are fixed:
+
+| Gate | Findings |
+| --- | --- |
+| `decls` | 1: `struct AudiereEffectsState` is defined in `src/BASE/AudiereEffects.cpp` |
+| `defs-declared` | 74 free-function definitions have no owner-header declaration |
+| `annotated-functions` | Clang cannot recover the private functions of `src/SOURCE/netwin.cpp` (VC6 `<utility>` error) |
+| `text-coverage` | 516 unreviewed nested entry candidates and overlap reports |
+| `constants` | clang-tidy fails on every unit in the build shell |
+
+`od-frames`, `model-drift`, `relocs`, `data-relocs` and `data-topology` are
+reports, not gates.
+
 ## Tests
 
 The tool test suite (`homm2 selftest`, 81 `test_*.py` modules, 986 cases) is

@@ -4,6 +4,8 @@
   homm2 status update          record maxima for the current normalized source hashes
   homm2 status --force-refresh regenerate report.json even when its inputs are unchanged
   homm2 status --write-readme  refresh the generated match block in README.md
+  homm2 status check           as plain status; exit 1 unless every function and
+                               every data byte is exact (`homm2 verify check`)
 
 Builds and explicit updates record the current source-hash epoch and raise its
 per-function maximum when appropriate. The maxima are never gates.
@@ -530,8 +532,11 @@ def main(argv=None, data=None):
     argv = list(argv or [])
     force_refresh = "--force-refresh" in argv
     argv = [arg for arg in argv if arg != "--force-refresh"]
+    check = argv == ["check"]
+    if check:
+        argv = []
     if argv not in ([], ["update"], ["--write-readme"]):
-        print("usage: homm2 status [update] [--force-refresh] [--write-readme]",
+        print("usage: homm2 status [update|check] [--force-refresh] [--write-readme]",
               file=sys.stderr)
         return 1
     if data is None:
@@ -607,4 +612,12 @@ def main(argv=None, data=None):
         print(f"[status] identified carve-outs: {carved_functions} functions in "
               f"{len(carved_units)} modules "
               f"({', '.join(sorted(u.get('name', '?') for u in carved_units))})")
+    if check and (matched_functions < total_functions or matched_data < total_data):
+        print(f"[status] FAIL: {total_functions - matched_functions} function(s) and "
+              f"{total_data - matched_data} data byte(s) are not exact")
+        return 1
     return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
