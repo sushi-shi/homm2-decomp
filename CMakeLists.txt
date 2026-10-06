@@ -340,6 +340,7 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_combat_sprite_test
     tools/combat_sprite_test.cpp
     src/BASE/ICON.cpp
+    src/BASE/ImageDecode.cpp
     src/BASE/Icon2b.cpp src/BASE/Iconf2b.cpp
     src/BASE/icon2bc.cpp src/BASE/iconf2bc.cpp
     src/BASE/icon2by.cpp src/BASE/iconf2by.cpp
@@ -350,6 +351,8 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_font_clip_test
     tools/font_clip_test.cpp
     src/BASE/FONT.cpp
+    src/BASE/FontGlyph.cpp
+    src/BASE/ImageDecode.cpp
     src/BASE/Utf8.cpp
     src/BASE/Icon2b.cpp
     src/BASE/icon2bc.cpp)

@@ -73,6 +73,15 @@ void resourceManager::ReadBlock(void* dest, u32l size) {
         std::abort();
     std::memcpy(dest, IconBody, size);
 }
+// The ICN member holds the 6-byte count/length header and the frame body.
+u32l resourceManager::GetFileSize(u32l) { return sizeof(IconBody) + 6; }
+IconEntry* GetIconEntry(icon* iconPointer, i32 index) {
+    return reinterpret_cast<IconEntry*>(iconPointer->m_data + index * sizeof(IconEntry));
+}
+void ShutDown(const char* message) {
+    std::fprintf(stderr, "combat sprite shutdown: %s\n", message != nullptr ? message : "");
+    std::abort();
+}
 void* BaseAlloc(u32 size, const char*, i32) { return std::malloc(size); }
 void BaseFree(void* ptr, const char*, i32) { std::free(ptr); }
 

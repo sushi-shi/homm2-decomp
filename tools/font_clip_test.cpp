@@ -50,6 +50,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, 1, nullptr) {
     m_frameCount = GlyphCount;
     const auto headerSize = sizeof(IconEntry) * GlyphCount;
     m_data = new u8[headerSize + sizeof(GlyphPixels)];
+    m_dataSize = static_cast<u32>(headerSize + sizeof(GlyphPixels));
     for (int index = 0; index < GlyphCount; ++index) {
         const IconEntry entry{0, 0, 4, GlyphHeight, 0, static_cast<i32>(headerSize)};
         std::memcpy(m_data + index * sizeof(IconEntry), &entry, sizeof(entry));
@@ -72,7 +73,7 @@ void resourceManager::Close() {}
 MessageDispatchResult resourceManager::Main(tag_message&) { return MESSAGE_DISPATCH_CONTINUE; }
 void resourceManager::PointToFile(u32l) {}
 i16 resourceManager::ReadWord() { return GlyphHeight; }
-void resourceManager::Read13(void* dest) { std::memcpy(dest, "testfont.icn", 13); }
+void resourceManager::Read13(char* destination) { std::memcpy(destination, "testfont.icn", 13); }
 icon* resourceManager::GetIcon(const char*) { return new icon(0); }
 void resourceManager::Dispose(resource* item) { delete item; }
 void resourceManager::DisableLocaleAggregates() { std::abort(); }
