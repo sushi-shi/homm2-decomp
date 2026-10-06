@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/IconRle.h>
 #include <BASE/Iconm2b.h>
 #include <BASE/IconDraw.h>
 #include <BASE/icon.h>
@@ -20,8 +21,8 @@ static i32 s_clipB = 0;
 static IconEntry* s_entry = 0;
 
 void MonoIconToBitmap(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -32,15 +33,14 @@ void MonoIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
+    s_src = sourceIcon->m_data + s_entry->srcOffset;
     s_left = x + s_entry->x;
     s_x = s_left;
     s_y = y + s_entry->y;
 
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (s_left >= clipX && s_left + s_entry->w <= clipX + clipW && s_y >= clipY
-            && s_y + s_entry->h <= clipY + clipH) {
+        if (ICON_FITS_CLIP(s_left, s_y, s_entry->w, s_entry->h, clipX, clipY, clipW, clipH)) {
             clip = ICON_DRAW_NO_CLIP;
         } else {
             clip = ICON_DRAW_CLIP;
@@ -49,7 +49,7 @@ void MonoIconToBitmap(
         }
     }
 
-    s_row = dest->m_pixels + s_y * dest->m_width;
+    s_row = destination->m_pixels + s_y * destination->m_width;
 
     for (;;) {
         s_run = *s_src;
@@ -78,7 +78,7 @@ void MonoIconToBitmap(
             s_x = s_x + s_run;
         } else {
             s_x = s_left;
-            s_row = s_row + dest->m_width;
+            s_row = s_row + destination->m_width;
             s_y = s_y + 1;
         }
     }

@@ -5,14 +5,26 @@ include(CTest)
 
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
+option(HOMM2_SANITIZERS "Instrument native builds with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "")
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build configuration" FORCE)
+endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(HOMM2_SANITIZERS)
+  if(WIN32 OR EMSCRIPTEN OR NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    message(FATAL_ERROR "HOMM2_SANITIZERS requires a native GCC or Clang build")
+  endif()
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer
+    -fno-sanitize-recover=all)
+  add_link_options(-fsanitize=address,undefined)
+endif()
 
 # Retail pointer width and packed layouts are load-bearing, so the game is
 # built 32-bit. On a 64-bit host that means -m32, and a toolchain that cannot
@@ -162,7 +174,7 @@ add_executable(homm2
 find_program(HOMM2_MSGFMT msgfmt)
 find_program(HOMM2_MSGCAT msgcat)
 find_program(HOMM2_XGETTEXT xgettext)
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(Python3 3.10 COMPONENTS Interpreter REQUIRED)
 file(GLOB HOMM2_PO_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/locales/*.po)
 set(HOMM2_COMPILED_CATALOGS)
 if(HOMM2_PO_FILES)
@@ -184,6 +196,7 @@ if(HOMM2_PO_FILES)
     VERBATIM)
   add_custom_command(
     OUTPUT ${tableTemplate}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/lang
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/localization_tables.py
       template ${CMAKE_SOURCE_DIR} ${tableTemplate}
     DEPENDS
@@ -299,6 +312,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME enum_code COMMAND homm2_enum_code_test)
+  add_executable(homm2_common_helpers_test tools/common_helpers_test.cpp)
+  target_include_directories(homm2_common_helpers_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME common_helpers COMMAND homm2_common_helpers_test)
   add_executable(homm2_combat_cursor_test tools/combat_cursor_test.cpp)
   target_include_directories(homm2_combat_cursor_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
@@ -316,6 +333,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME binary_io COMMAND homm2_binary_io_test)
+  add_executable(homm2_music_playback_test
+    tools/music_playback_test.cpp
+    src/BASE/Midi.cpp src/BASE/MusicFlags.cpp
+    src/BASE/soundmgr.cpp src/BASE/BASEMGR.cpp)
+  target_include_directories(homm2_music_playback_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_options(homm2_music_playback_test PRIVATE -ffunction-sections -fdata-sections)
+  target_link_options(homm2_music_playback_test PRIVATE -Wl,--gc-sections)
+  add_test(NAME music_playback COMMAND homm2_music_playback_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE
@@ -403,6 +428,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_mapcell_layout_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME mapcell_layout COMMAND homm2_mapcell_layout_test)
+  add_executable(homm2_checkpoint_layout_test tools/checkpoint_layout_test.cpp)
+  target_include_directories(homm2_checkpoint_layout_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME checkpoint_layout COMMAND homm2_checkpoint_layout_test)
   add_test(
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)
