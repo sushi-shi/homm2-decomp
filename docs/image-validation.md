@@ -12,7 +12,9 @@ destination surface, including `ICON_DRAW_NO_CLIP` calls. Geometry uses widened
 arithmetic and invisible rows never form pixel pointers. Shear reads use a
 span; the combat adapter supplies its actual 480-row allocation contract.
 
-The mirrored partial-run and previous-row shear quirks remain intentional.
+Mirrored runs that cross a clip edge are clipped like unmirrored runs (see
+"Mirrored sprite clipping" in the divergence ledger); the previous-row shear
+quirk remains intentional.
 Scaled drawing keeps the retail sample positions, rejects invalid scales and
 clips its writes. The native `image_decode` CTest exercises the production
 validator and all eleven entry points, including the audit's missing-stream

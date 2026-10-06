@@ -682,6 +682,12 @@ void army::DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly) {
         }
         if (drawn != ICON_DRAW_SKIPPED) {
             utf8::Format(countText, "%d", m_displayQuantityOverride != -1 ? m_displayQuantityOverride : m_quantity);
+            // Match the status bar's damage clipping. Otherwise digits can
+            // overwrite an occluding neighbour outside the restored area;
+            // a later cursor blit exposes them as white marks on its sprite.
+            const SLimitData textClip{
+                giMinExtentX, giMaxExtentX, giMinExtentY, giMaxExtentY
+            };
             smallFont->DrawBoundedString(
                 countText,
                 quantX,
@@ -689,7 +695,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly) {
                 QUANTITY_TEXT_WIDTH,
                 QUANTITY_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
-                FONT_ALIGN_CENTER
+                FONT_ALIGN_CENTER,
+                gbLimitToExtent ? &textClip : nullptr
             );
         }
     }

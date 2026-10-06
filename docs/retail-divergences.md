@@ -19,8 +19,8 @@ table.
 ## Maintained source structure
 
 The eleven ICN drawing entry points share a bounded colour/mask decoder.
-Mirrored nonliteral runs still drop at a requested clip edge, and sheared rows
-retain retail's previous-row displacement. The 13-byte frame wire record uses
+Sheared rows retain retail's previous-row displacement; mirrored clipping is
+corrected (see the table). The 13-byte frame wire record uses
 the complete kind byte, including the mask tag 32, and the drawing path reads
 its little-endian fields explicitly. Payload length belongs to the runtime
 icon object rather than being discarded after loading.
@@ -63,6 +63,9 @@ bypasses of the shared low-level conversion.
 | Area | Retail behavior | `master` behavior |
 | --- | --- | --- |
 | Display presentation | F4 switches the legacy fullscreen mode; filtering and VSync are not player preferences. | F4 switches the SDL window in place; Shift/Ctrl+F4 select scaling/VSync. Separate text preferences preserve the retail configuration layout. The `display_settings` CTest checks buffer/cursor preservation, coordinate mapping and persistence. |
+| Combat background-cache rebuild | Matching-source lineage clears the entire working screen after rebuilding terrain, even when the next attack redraws only its dirty rectangle. Whether this is visible through the original Windows backend is not yet verified. The native backend's enlarged updates demonstrably expose bare background to the right and below. | Rebuilds the terrain cache separately, then restores only the same rectangle used for sprite redraws. The optional real-asset `homm2_combat_redraw_test` compares attack frames after cache invalidation with complete renders. |
+| Mirrored sprite clipping | Solid, shadow, recolour and mask runs crossing a clip edge disappear entirely, leaving background-coloured gaps when battle animations redraw only part of a neighbouring sprite. Attack redraw bounds accumulate a one-pixel expansion each frame, making these gaps follow outward-moving rectangular edges. | Clips the visible portion of mirrored runs in the shared ICN decoder, for every colour, shadow, recolour and mask variant. |
+| Combat effect redraw bounds | Recoloured and row-distorted sprites ignore the partial redraw rectangle. Their shadows can be applied repeatedly to pixels whose background was not restored, producing dark fringes. | Uses the same restored rectangle for normal, recoloured and distorted combat sprites. The `combat_sprite` regression compares partial redraws, including expanding rectangles, with a fresh full render in both orientations. |
 | Initial mouse cursor | A newly created configuration starts with the monochrome system cursor, reflecting the original hardware-cursor fallback. | New portable configurations start with the original color cursor artwork. Existing saved preferences remain authoritative. |
 | Campaign table bounds | The enabled-map table indices are reversed after switching campaign sides, and the 13-point campaign track reads the 12-entry enabled-map table at its final point. | Indexes the table as `[campaign side][scenario]` and checks the map-table bound before reading track state. |
 | Aggregate lookup failure | `resourceManager::PointToFile` and `GetFileSize` continue with an invalid aggregate entry after calling the shutdown path. A shutdown implementation that returns or re-enters can dereference that invalid state. | Returns immediately after reporting the fatal lookup error. |
@@ -88,6 +91,7 @@ bypasses of the shared low-level conversion.
 | Wagon and lean-to sound | Their event-sound cases select the pickup sound and then fall through, overwriting it with the experience sound. | Stops after selecting the pickup sound, as the otherwise-dead assignment and the event category indicate. |
 | AI single-creature stack value | Two consecutive strength thresholds both test for more than two creatures, leaving the `-0.4` modifier unreachable and assigning a one-creature stack the zero-creature modifier. | Uses the evident descending threshold of more than one creature, preserving distinct modifiers for stacks of two, one, and zero creatures. |
 | Combat obstacle sentinel | The random obstacle roll includes value 32 although the table and `cobj` resources end at 31. Retail indexes one record past the table, where the adjacent Estates table happens to begin with zero, and retries. | Preserves the same inclusive random roll and random-generator state, but treats 32 explicitly as the retry sentinel before indexing the obstacle table. |
+| Combat stack-count damage clipping | The status bar respects the animation's dirty rectangle, but its digits paint their entire text box. Digits outside the restored area can overwrite an occluding creature; cursor updates then expose white vertical fragments on that neighbour. Reproduced with two adjacent peasants and a Cyclops below them. | Clips count text to the same dirty rectangle as the bar, while retaining the original text box for centering and wrapping. Ordinary full redraws and other text callers are unchanged. |
 | Neutral-town human lookup | Random dwelling setup indexes the human-player table with the neutral-owner sentinel `-1`. The retail image happens to read adjacent storage, while instrumented portable builds diagnose a global buffer overflow. | Treats the neutral owner as nonhuman before consulting the player-indexed table. |
 | Animated-map redraw boundary | Marking a monster in the leftmost visible map column also marks the nonexistent column to its left, writing before the redraw grid. Instrumented portable builds abort when a monster reaches that boundary. | Clips the missing left neighbor while retaining all in-view redraw marks. |
 
