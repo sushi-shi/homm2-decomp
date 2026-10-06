@@ -74,7 +74,8 @@ MessageDispatchResult widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_SET_FLAGS:
                     if (message.payload.widget.id == m_id) {
-                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value
+                            == H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
@@ -104,7 +105,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                             static_cast<H2EnumStorage<WidgetFlag, i16>>(
                                 message.payload.widget.data.value & WIDGET_FLAG_MASK
                             );
-                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED)) {
                             flags = WIDGET_FLAG_DIMMED;
                             m_flags &= ~flags;
                             return MESSAGE_DISPATCH_CONSUME;
@@ -149,7 +150,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
         case MESSAGE_MOUSE_MOVE:
             x = message.payload.mouse.x - m_owner->m_posX;
             y = message.payload.mouse.y - m_owner->m_posY;
-            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, x, y)) {
                 message.payload.hover.id = m_id;
                 return MESSAGE_DISPATCH_FORWARD;
             }

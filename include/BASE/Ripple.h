@@ -5,6 +5,6 @@
 
 class bitmap;
 
-void DoRipple(class bitmap*, class bitmap*, i32, i32);
+void DoRipple(class bitmap* source, class bitmap* destination, i32 height, i32 strength);
 
 #endif

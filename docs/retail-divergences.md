@@ -38,7 +38,9 @@ remain explicit.
 Retail also reaches a few logically distinct palette and campaign-name tables
 through their linker-defined adjacency. `master` names those tables explicitly,
 preserving the selected values without relying on out-of-bounds pointer or
-array arithmetic. Repeated UI formatting tails in adventure quick info, radar,
+array arithmetic. Dim-palette selection indexes the set and level separately;
+it does not reach other levels by indexing beyond the first 256-color subarray.
+Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 
@@ -75,6 +77,22 @@ bypasses of the shared low-level conversion.
 | Animated-map redraw boundary | Marking a monster in the leftmost visible map column also marks the nonexistent column to its left, writing before the redraw grid. Instrumented portable builds abort when a monster reaches that boundary. | Clips the missing left neighbor while retaining all in-view redraw marks. |
 
 ## Replaced subsystem
+
+### Installed media
+
+The portable startup no longer checks a CD-drive status or requires the obsolete
+`Tracks2/02-AudioTrack 02.ogg` marker. The resource manager checks the required
+installed AGG archives, music is read from `MUSIC`, and movies use the installed
+`HEROES2/ANIM` and `DATA` directories. Missing optional music does not prevent
+startup. CD-dependent host/single-player menu restrictions, disc-insertion
+messages, unused drive-path globals and registry-forwarding wrappers are
+removed. The portable tree contains no floppy-drive implementation.
+
+### Numbered music
+
+Portable playback resolves numbered music through the audio backend for both
+legacy music-source settings. The old MIDI-only availability mask does not
+describe the installed Ogg tracks and is no longer applied to their playback.
 
 ### Network-save compression
 

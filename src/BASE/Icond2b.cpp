@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/IconRle.h>
 #include <BASE/Icond2b.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconMonoRle.h>
@@ -6,10 +7,6 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/KB.h>
-
-typedef enum IconDimConstant {
-    DIM_PALETTE_LEVEL_STRIDE = 0x100
-} IconDimConstant;
 
 
 static i32 s_loopCount = 0;
@@ -26,8 +23,8 @@ static i32 s_spanCount = 0;
 static i32 s_run = 0;
 
 void DimIconToBitmap(
-    class icon* srcIcon,
-    class bitmap* dest,
+    class icon* sourceIcon,
+    class bitmap* destination,
     i32 x,
     i32 y,
     i32 frame,
@@ -38,15 +35,14 @@ void DimIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
+    s_src = sourceIcon->m_data + s_entry->srcOffset;
     s_left = x + s_entry->x;
     s_x = s_left;
     s_y = y + s_entry->y;
 
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (s_left >= clipX && s_left + s_entry->w <= clipX + clipW && s_y >= clipY
-            && s_y + s_entry->h <= clipY + clipH) {
+        if (ICON_FITS_CLIP(s_left, s_y, s_entry->w, s_entry->h, clipX, clipY, clipW, clipH)) {
             clip = ICON_DRAW_NO_CLIP;
         } else {
             clip = ICON_DRAW_CLIP;
@@ -55,7 +51,7 @@ void DimIconToBitmap(
         }
     }
 
-    s_row = dest->m_pixels + s_y * dest->m_width;
+    s_row = destination->m_pixels + s_y * destination->m_width;
 
     for (;;) {
         s_run = *s_src;
@@ -69,7 +65,7 @@ void DimIconToBitmap(
             if (clip == ICON_DRAW_NO_CLIP) {
                 s_dst = s_row + s_x;
                 for (s_loopCount = 0; s_loopCount < s_run; s_loopCount++) {
-                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    *s_dst = uDimPal[0][color][*s_dst];
                     s_dst++;
                 }
             } else if (s_y >= clipY && s_y <= s_clipB && s_x + s_run > clipX && s_x <= s_clipR) {
@@ -87,7 +83,7 @@ void DimIconToBitmap(
                     s_dst = s_row + clipX;
                 }
                 for (s_loopCount = 0; s_loopCount < s_spanCount; s_loopCount++) {
-                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    *s_dst = uDimPal[0][color][*s_dst];
                     s_dst++;
                 }
             }
@@ -95,7 +91,7 @@ void DimIconToBitmap(
         } else {
             s_x = s_left;
             s_y = s_y + 1;
-            s_row = s_row + dest->m_width;
+            s_row = s_row + destination->m_width;
         }
     }
 }

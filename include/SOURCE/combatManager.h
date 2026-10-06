@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_COMBATMANAGER_H
 
 #include <Ints.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/baseManager.h>
 #include <BASE/WINMGR.h>
 #include <BASE/icon.h>
@@ -11,6 +12,8 @@
 #include "hero.h"
 #include "hexcell.h"
 #include "SPELLS.h"
+#include <SOURCE/combatTypes.h>
+#include <BASE/palette.h>
 
 class armyGroup;
 class hero;
@@ -52,24 +55,6 @@ struct SBolt {
     i32 forceAngle;
 };
 struct tag_message;
-
-enum class CombatCastleHex : i32 {
-    COMBAT_CASTLE_HEX_NONE           = -1,
-    COMBAT_CASTLE_HEX_TOP_TOWER      = 9,
-    COMBAT_CASTLE_HEX_TOP_WALL       = 22,
-    COMBAT_CASTLE_HEX_SECOND_TOWER   = 34,
-    COMBAT_CASTLE_HEX_SECOND_WALL    = 47,
-    COMBAT_CASTLE_HEX_GATE           = 59,
-    COMBAT_CASTLE_HEX_THIRD_WALL     = 73,
-    COMBAT_CASTLE_HEX_KEEP           = 77,
-    COMBAT_CASTLE_HEX_THIRD_TOWER    = 86,
-    COMBAT_CASTLE_HEX_MOAT           = 92,
-    COMBAT_CASTLE_HEX_BOTTOM_WALL    = 100,
-    COMBAT_CASTLE_HEX_BOTTOM_TOWER   = 113,
-    COMBAT_CASTLE_SPECIAL_HEX_FIRST  = 114,
-    COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
-};
-using enum CombatCastleHex;
 
 enum class CombatWinLoseAnimation : i32 {
     WIN_LOSE_ANIMATION_CYCLE_FIRST  = 1,
@@ -168,7 +153,6 @@ typedef enum CombatCatapultConstant {
     COMBAT_CATAPULT_CLOUD_Y_OFFSET            = 25,
     COMBAT_CATAPULT_KEEP_IMPACT_X             = 600,
     COMBAT_CATAPULT_KEEP_IMPACT_Y             = 160,
-    COMBAT_KEEP_FACTION_COUNT                 = H2EnumIndex(FACTION_COUNT),
     COMBAT_KEEP_TOWER_COUNT                   = 3,
     COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
     COMBAT_KEEP_TOWER_DAMAGE_BONUS            = 2,
@@ -181,174 +165,181 @@ typedef enum CombatCatapultConstant {
 } CombatCatapultConstant;
 
 typedef enum CombatGridConstant {
-    COMBAT_GRID_ROW_COUNT                   = 9,
-    COMBAT_GRID_ROW_LENGTH                  = 13,
-    COMBAT_GRID_FIRST_COLUMN                = 1,
-    COMBAT_GRID_COLUMN_END                  = 12,
-    COMBAT_GRID_REVERSE_FIRST_COLUMN        = 11,
-    COMBAT_GRID_REVERSE_COLUMN_END          = 0,
-    COMBAT_ARMY_SLOT_COUNT                  = 20,
-    COMBAT_ARMY_STORAGE_SLOT_COUNT          = 21,
-    COMBAT_RUNTIME_ALIGNMENT_SIZE           = 4,
-    COMBAT_MESSAGE_STATE_PAD_SIZE           = 0x64,
-    COMBAT_RUNTIME_DOUBLE_PAD_SIZE          = 0x8,
-    COMBAT_SMALL_VIEW_PAD_SIZE              = 0x10,
-    COMBAT_WIN_LOSE_WIDGET_COUNT            = 25,
-    COMBAT_DIRECTION_MAP_COUNT              = 24,
-    COMBAT_BACKGROUND_NAME_SIZE             = 13,
-    COMBAT_DURATION_MOD_COUNT               = 11,
-    COMBAT_CANCEL_DURATION_MOD_COUNT        = 11,
-    COMBAT_TRANSFER_ARTIFACT_COUNT          = 16,
-    COMBAT_CASTLE_REVERSE_ROW               = 5,
-    COMBAT_CASTLE_GATE_ROW                  = 4,
-    COMBAT_CASTLE_GATE_APPROACH_HEX         = 58,
-    COMBAT_ARMY_SLOT_COUNT_DRAWING          = COMBAT_ARMY_SLOT_COUNT,
-    COMBAT_HERO_LEFT_X                      = 30,
-    COMBAT_HERO_LEFT_Y                      = 183,
-    COMBAT_HERO_RIGHT_X                     = 610,
-    COMBAT_HERO_RIGHT_Y                     = 148,
-    COMBAT_HERO_RIGHT_ALT_X                 = 615,
-    COMBAT_HERO_RIGHT_ALT_Y                 = 135,
+    COMBAT_GRID_ROW_COUNT              = 9,
+    COMBAT_GRID_FIRST_COLUMN           = 1,
+    COMBAT_GRID_COLUMN_END             = 12,
+    COMBAT_GRID_REVERSE_FIRST_COLUMN   = 11,
+    COMBAT_GRID_REVERSE_COLUMN_END     = 0,
+    COMBAT_CASTLE_REVERSE_ROW          = 5,
+    COMBAT_CASTLE_GATE_ROW             = 4,
+    COMBAT_CASTLE_GATE_APPROACH_HEX    = 58,
+    COMBAT_BALLISTA_HEX                = 77,
+    COMBAT_GRID_COPY_LEFT              = 67,
+    COMBAT_GRID_COPY_TOP               = 63,
+    COMBAT_GRID_COPY_RIGHT             = 573,
+    COMBAT_GRID_COPY_BOTTOM            = 442,
+    COMBAT_GRID_LINE_FRAME             = 0,
+    COMBAT_GRID_LINE_COLOR             = 0xe2,
+    COMBAT_GRID_MOUSE_FRAME            = 2,
+    COMBAT_MOUSE_HEX_WIDTH             = 44,
+    COMBAT_MOUSE_HEX_HEIGHT            = 52,
+    COMBAT_MOUSE_HEX_MAX_X_OFFSET      = 43,
+    COMBAT_MOUSE_HEX_MAX_Y_OFFSET      = 51,
+    COMBAT_MOUSE_REDRAW_DELAY          = 75,
+    COMBAT_BACKGROUND_COPY_WIDTH       = 507,
+    COMBAT_BACKGROUND_COPY_HEIGHT      = 380,
+    COMBAT_HEX_HORIZONTAL_STEP         = 44,
+    COMBAT_HEX_VERTICAL_STEP           = 42,
+    COMBAT_HEX_ROW_STAGGER             = 22,
+    COMBAT_HEX_CENTER_X_ORIGIN         = 89,
+    COMBAT_HEX_CENTER_Y_ORIGIN         = 63,
+    COMBAT_HEX_GRID_LEFT_ORIGIN        = 67,
+    COMBAT_HEX_GRID_TOP_ORIGIN         = 63,
+    COMBAT_GRID_INDEX_X_ORIGIN         = 23,
+    COMBAT_GRID_DIAGONAL_HEIGHT        = 10,
+    COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR = 2,
+    COMBAT_GRID_RIGHT_HERO_HEX         = 25,
+    COMBAT_GRID_LEFT_SPECIAL_X_MAX     = 74,
+    COMBAT_GRID_LEFT_SPECIAL_Y_MIN     = 80,
+    COMBAT_GRID_LEFT_SPECIAL_Y_MAX     = 196,
+    COMBAT_GRID_LEFT_SPECIAL_HEX       = 26,
+    COMBAT_GRID_RIGHT_SPECIAL_X_MIN    = 566,
+    COMBAT_GRID_RIGHT_UPPER_Y_MIN      = 37,
+    COMBAT_GRID_RIGHT_UPPER_Y_MAX      = 153,
+    COMBAT_GRID_RIGHT_UPPER_HEX        = 25,
+    COMBAT_GRID_RIGHT_LOWER_Y_MIN      = 154,
+    COMBAT_GRID_RIGHT_LOWER_Y_MAX      = 310,
+    COMBAT_VALID_HEX_MAX               = 125,
+    COMBAT_SPREAD_HEX_STEP             = 26,
+    COMBAT_ATTACKER_GROUPED_HEX        = 27,
+    COMBAT_ATTACKER_SPREAD_HEX         = 1,
+    COMBAT_DEFENDER_GROUPED_HEX        = 37,
+    COMBAT_DEFENDER_SPREAD_HEX         = 11,
+} CombatGridConstant;
+
+typedef enum CombatManagerStorageConstant {
+    COMBAT_ARMY_SLOT_COUNT           = 20,
+    COMBAT_ARMY_STORAGE_SLOT_COUNT   = 21,
+    COMBAT_RUNTIME_ALIGNMENT_SIZE    = 4,
+    COMBAT_MESSAGE_STATE_PAD_SIZE    = 0x64,
+    COMBAT_RUNTIME_DOUBLE_PAD_SIZE   = 0x8,
+    COMBAT_SMALL_VIEW_PAD_SIZE       = 0x10,
+    COMBAT_DIRECTION_MAP_COUNT       = 24,
+    COMBAT_BACKGROUND_NAME_SIZE      = 13,
+    COMBAT_DURATION_MOD_COUNT        = 11,
+    COMBAT_CANCEL_DURATION_MOD_COUNT = 11,
+    COMBAT_TRANSFER_ARTIFACT_COUNT   = 16,
+    COMBAT_MESSAGE_LINE_SIZE         = 120,
+    COMBAT_MESSAGE_WRAP_BUFFER_SIZE  = 400,
+    COMBAT_MESSAGE_LOG_BUFFER_SIZE   = 700,
+} CombatManagerStorageConstant;
+
+typedef enum CombatHeroPlacementConstant {
+    COMBAT_HERO_LEFT_X      = 30,
+    COMBAT_HERO_LEFT_Y      = 183,
+    COMBAT_HERO_RIGHT_X     = 610,
+    COMBAT_HERO_RIGHT_Y     = 148,
+    COMBAT_HERO_RIGHT_ALT_X = 615,
+    COMBAT_HERO_RIGHT_ALT_Y = 135,
+} CombatHeroPlacementConstant;
+
+typedef enum CombatSiegeDrawingConstant {
     COMBAT_CATAPULT_X                       = 22,
     COMBAT_CATAPULT_Y                       = 390,
     COMBAT_CASTLE_TOP_LAYER_FRAME           = 0x19,
     COMBAT_CASTLE_GATE_FRAME                = 0x1a,
     COMBAT_CASTLE_GATE_CLOSED_FRAME         = 0x14,
     COMBAT_CASTLE_WALL_BASE_FRAME           = 0x11,
-    COMBAT_SCREEN_WIDTH                     = 0x280,
-    COMBAT_SCREEN_HEIGHT                    = 480,
-    COMBAT_AREA_HEIGHT                      = 0x1bb,
-    COMBAT_MAX_EXTENT_X                     = 0x27f,
-    COMBAT_MAX_EXTENT_Y                     = 0x1ba,
-    COMBAT_OBSTACLE_TYPE_COUNT              = 32,
-    COMBAT_OBSTACLE_RANDOM_SENTINEL         = COMBAT_OBSTACLE_TYPE_COUNT,
-    COMBAT_OBSTACLE_CELL_ROLL_MAX           = 116,
-    COMBAT_OBSTACLE_TRY_LIMIT               = 500,
-    COMBAT_OBSTACLE_MIN_COLUMN_OFFSET       = 1,
-    COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT       = 3,
-    COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST      = 10,
-    COMBAT_ELEVATION_OVERLAY_COUNT          = 25,
-    COMBAT_ELEVATION_OVERLAY_CELL_COUNT     = 15,
-    COMBAT_ELEVATION_OVERLAY_CHANCE         = 40,
-    COMBAT_ELEVATION_OVERLAY_TRY_LIMIT      = 100,
-    COMBAT_RANDOM_PERCENT_MAX               = 99,
-    COMBAT_RANDOM_OBSTACLE_MIN              = 3,
-    COMBAT_RANDOM_OBSTACLE_MAX              = 7,
-    COMBAT_CASTLE_STRUCTURE_COUNT           = 4,
     COMBAT_DOOR_ANIMATION_DELAY             = 75,
     COMBAT_DOOR_EXTENT_MIN_X                = 304,
     COMBAT_DOOR_EXTENT_MIN_Y                = 218,
     COMBAT_DOOR_EXTENT_MAX_X                = 384,
     COMBAT_DOOR_EXTENT_MAX_Y                = 294,
     COMBAT_WALL_TRACE_SUBDIVISIONS          = 10,
-    COMBAT_MISSILE_DIRECTION_COUNT          = 9,
-    COMBAT_MISSILE_LAST_DIRECTION           = 8,
-    COMBAT_MISSILE_HALF_WIDTH               = 25,
-    COMBAT_MISSILE_HALF_HEIGHT              = 25,
-    COMBAT_MISSILE_SPACING                  = 31,
-    COMBAT_MISSILE_SPACING_ROUND            = 15,
-    COMBAT_MISSILE_TIMER_DELAY              = 25,
-    COMBAT_SMALL_VIEW_FULL_INFO             = 2,
-    COMBAT_SMALL_VIEW_LEFT_X                = 5,
-    COMBAT_SMALL_VIEW_RIGHT_X               = 555,
-    COMBAT_SMALL_VIEW_FULL_Y                = 299,
-    COMBAT_SMALL_VIEW_FULL_RIGHT_Y          = 154,
-    COMBAT_SMALL_VIEW_COMPACT_Y             = 366,
-    COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y       = 288,
-    COMBAT_SMALL_VIEW_WIDTH                 = 83,
-    COMBAT_SMALL_VIEW_FULL_HEIGHT           = 141,
-    COMBAT_SMALL_VIEW_COMPACT_HEIGHT        = 74,
-    COMBAT_SMALL_VIEW_ICON_SIZE             = 19,
-    COMBAT_SMALL_VIEW_MAX_SPELLS            = 6,
-    COMBAT_SMALL_VIEW_UNUSED_POSITION       = 255,
-    COMBAT_SMALL_VIEW_SPELL_X_FIRST         = 1,
-    COMBAT_SMALL_VIEW_SPELL_X_SECOND        = 11,
-    COMBAT_SMALL_VIEW_SPELL_X_THIRD         = 22,
-    COMBAT_SMALL_VIEW_SPELL_X_FOURTH        = 32,
-    COMBAT_SMALL_VIEW_SPELL_X_FIFTH         = 43,
-    COMBAT_SMALL_VIEW_SPELL_Y_FIRST         = 0,
-    COMBAT_SMALL_VIEW_SPELL_Y_SECOND        = 10,
-    COMBAT_SMALL_VIEW_SPELL_Y_THIRD         = 21,
-    COMBAT_SMALL_VIEW_INSET_X               = 6,
-    COMBAT_SMALL_VIEW_TEXT_X                = 8,
-    COMBAT_SMALL_VIEW_TEXT_WIDTH            = 57,
-    COMBAT_SMALL_VIEW_TEXT_HEIGHT           = 12,
-    COMBAT_SMALL_VIEW_QUANTITY_Y            = 7,
-    COMBAT_SMALL_VIEW_FIRST_STAT_Y          = 20,
-    COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT       = 9,
-    COMBAT_SMALL_VIEW_SHOTS_Y               = 74,
-    COMBAT_SMALL_VIEW_FULL_SPELL_Y          = 86,
-    COMBAT_SMALL_VIEW_COMPACT_SPELL_Y       = 19,
-    COMBAT_SMALL_VIEW_MODIFIER_STEP         = 10,
-    COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X      = 57,
-    COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X      = 45,
-    COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X        = 50,
-    COMBAT_MESSAGE_LINE_SIZE                = 120,
-    COMBAT_MESSAGE_WRAP_BUFFER_SIZE         = 400,
-    COMBAT_MESSAGE_LOG_BUFFER_SIZE          = 700,
-    COMBAT_MESSAGE_TIMEOUT                  = 2500,
-    COMBAT_MESSAGE_LINE_WIDTH               = 474,
-    COMBAT_MESSAGE_WINDOW_X                 = 83,
-    COMBAT_MESSAGE_WINDOW_Y                 = 446,
-    COMBAT_MESSAGE_WINDOW_HEIGHT            = 33,
-    COMBAT_MESSAGE_WIDGET_FIRST             = 12,
-    COMBAT_MESSAGE_WIDGET_SECOND            = 13,
-    COMBAT_MESSAGE_DRAW_FIRST_WIDGET        = 10,
-    COMBAT_BALLISTA_HEX                     = 77,
-    COMBAT_HEX_COUNT                        = 117,
-    COMBAT_GRID_COPY_LEFT                   = 67,
-    COMBAT_GRID_COPY_TOP                    = 63,
-    COMBAT_GRID_COPY_RIGHT                  = 573,
-    COMBAT_GRID_COPY_BOTTOM                 = 442,
-    COMBAT_GRID_LINE_FRAME                  = 0,
-    COMBAT_GRID_LINE_COLOR                  = 0xe2,
-    COMBAT_GRID_MOUSE_FRAME                 = 2,
-    COMBAT_MOUSE_HEX_WIDTH                  = 44,
-    COMBAT_MOUSE_HEX_HEIGHT                 = 52,
-    COMBAT_MOUSE_HEX_MAX_X_OFFSET           = 43,
-    COMBAT_MOUSE_HEX_MAX_Y_OFFSET           = 51,
-    COMBAT_MOUSE_REDRAW_DELAY               = 75,
-    COMBAT_BACKGROUND_COPY_WIDTH            = 507,
-    COMBAT_BACKGROUND_COPY_HEIGHT           = 380,
-    COMBAT_PALETTE_DATA_SIZE                = 0x300,
-    COMBAT_HEX_HORIZONTAL_STEP              = 44,
-    COMBAT_HEX_VERTICAL_STEP                = 42,
-    COMBAT_HEX_ROW_STAGGER                  = 22,
-    COMBAT_HEX_CENTER_X_ORIGIN              = 89,
-    COMBAT_HEX_CENTER_Y_ORIGIN              = 63,
-    COMBAT_HEX_GRID_LEFT_ORIGIN             = 67,
-    COMBAT_HEX_GRID_TOP_ORIGIN              = 63,
-    COMBAT_GRID_INDEX_X_ORIGIN              = 23,
-    COMBAT_GRID_DIAGONAL_HEIGHT             = 10,
-    COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR      = 2,
-    COMBAT_GRID_RIGHT_HERO_HEX              = 25,
-    COMBAT_GRID_LEFT_SPECIAL_X_MAX          = 74,
-    COMBAT_GRID_LEFT_SPECIAL_Y_MIN          = 80,
-    COMBAT_GRID_LEFT_SPECIAL_Y_MAX          = 196,
-    COMBAT_GRID_LEFT_SPECIAL_HEX            = 26,
-    COMBAT_GRID_RIGHT_SPECIAL_X_MIN         = 566,
-    COMBAT_GRID_RIGHT_UPPER_Y_MIN           = 37,
-    COMBAT_GRID_RIGHT_UPPER_Y_MAX           = 153,
-    COMBAT_GRID_RIGHT_UPPER_HEX             = 25,
-    COMBAT_GRID_RIGHT_LOWER_Y_MIN           = 154,
-    COMBAT_GRID_RIGHT_LOWER_Y_MAX           = 310,
-    COMBAT_VALID_HEX_MAX                    = 125,
-    COMBAT_FIXED_ICON_COUNT                 = 15,
-    COMBAT_OBSTACLE_ICON_LOAD_COUNT         = 8,
-    COMBAT_ARMY_CAPACITY                    = 20,
-    COMBAT_SPEED_LEVEL_COUNT                = 15,
-    COMBAT_MAX_SPEED                        = 14,
-    COMBAT_HERO_EXPERIENCE_VALUE            = 500,
-    COMBAT_GROUPED_HEX_STEP                 = 13,
-    COMBAT_SPREAD_HEX_STEP                  = 26,
-    COMBAT_ATTACKER_GROUPED_HEX             = 27,
-    COMBAT_ATTACKER_SPREAD_HEX              = 1,
-    COMBAT_DEFENDER_GROUPED_HEX             = 37,
-    COMBAT_DEFENDER_SPREAD_HEX              = 11,
     COMBAT_CASTLE_BACKGROUND_BASE_FRAME     = 1,
     COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME = 4,
-    COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME  = 3
-} CombatGridConstant;
+    COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME  = 3,
+} CombatSiegeDrawingConstant;
+
+typedef enum CombatObstaclePlacementConstant {
+    COMBAT_OBSTACLE_TYPE_COUNT          = 32,
+    COMBAT_OBSTACLE_RANDOM_SENTINEL = COMBAT_OBSTACLE_TYPE_COUNT,
+    COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH = 32,
+    COMBAT_OBSTACLE_CELL_ROLL_MAX       = 116,
+    COMBAT_OBSTACLE_TRY_LIMIT           = 500,
+    COMBAT_OBSTACLE_MIN_COLUMN_OFFSET   = 1,
+    COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT   = 3,
+    COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST  = 10,
+    COMBAT_ELEVATION_OVERLAY_CHANCE     = 40,
+    COMBAT_ELEVATION_OVERLAY_TRY_LIMIT  = 100,
+    COMBAT_RANDOM_OBSTACLE_MIN          = 3,
+    COMBAT_RANDOM_OBSTACLE_MAX          = 7,
+    COMBAT_OBSTACLE_ICON_LOAD_COUNT     = 8,
+} CombatObstaclePlacementConstant;
+
+typedef enum CombatBattleSetupConstant {
+    COMBAT_RANDOM_PERCENT_MAX     = 99,
+    COMBAT_CASTLE_STRUCTURE_COUNT = 4,
+    COMBAT_FIXED_ICON_COUNT       = 15,
+    COMBAT_SPEED_LEVEL_COUNT      = 15,
+    COMBAT_MAX_SPEED              = 14,
+    COMBAT_HERO_EXPERIENCE_VALUE  = 500,
+} CombatBattleSetupConstant;
+
+typedef enum CombatMissileDirectionConstant {
+    COMBAT_MISSILE_DIRECTION_COUNT = 9,
+    COMBAT_MISSILE_LAST_DIRECTION  = 8,
+    COMBAT_MISSILE_SPACING_ROUND   = 15,
+} CombatMissileDirectionConstant;
+
+typedef enum CombatSmallViewConstant {
+    COMBAT_SMALL_VIEW_FULL_INFO        = 2,
+    COMBAT_SMALL_VIEW_LEFT_X           = 5,
+    COMBAT_SMALL_VIEW_RIGHT_X          = 555,
+    COMBAT_SMALL_VIEW_FULL_Y           = 299,
+    COMBAT_SMALL_VIEW_FULL_RIGHT_Y     = 154,
+    COMBAT_SMALL_VIEW_COMPACT_Y        = 366,
+    COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y  = 288,
+    COMBAT_SMALL_VIEW_WIDTH            = 83,
+    COMBAT_SMALL_VIEW_FULL_HEIGHT      = 141,
+    COMBAT_SMALL_VIEW_COMPACT_HEIGHT   = 74,
+    COMBAT_SMALL_VIEW_ICON_SIZE        = 19,
+    COMBAT_SMALL_VIEW_MAX_SPELLS       = 6,
+    COMBAT_SMALL_VIEW_UNUSED_POSITION  = 255,
+    COMBAT_SMALL_VIEW_SPELL_X_FIRST    = 1,
+    COMBAT_SMALL_VIEW_SPELL_X_SECOND   = 11,
+    COMBAT_SMALL_VIEW_SPELL_X_THIRD    = 22,
+    COMBAT_SMALL_VIEW_SPELL_X_FOURTH   = 32,
+    COMBAT_SMALL_VIEW_SPELL_X_FIFTH    = 43,
+    COMBAT_SMALL_VIEW_SPELL_Y_FIRST    = 0,
+    COMBAT_SMALL_VIEW_SPELL_Y_SECOND   = 10,
+    COMBAT_SMALL_VIEW_SPELL_Y_THIRD    = 21,
+    COMBAT_SMALL_VIEW_INSET_X          = 6,
+    COMBAT_SMALL_VIEW_TEXT_X           = 8,
+    COMBAT_SMALL_VIEW_TEXT_WIDTH       = 57,
+    COMBAT_SMALL_VIEW_TEXT_HEIGHT      = 12,
+    COMBAT_SMALL_VIEW_QUANTITY_Y       = 7,
+    COMBAT_SMALL_VIEW_FIRST_STAT_Y     = 20,
+    COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT  = 9,
+    COMBAT_SMALL_VIEW_SHOTS_Y          = 74,
+    COMBAT_SMALL_VIEW_FULL_SPELL_Y     = 86,
+    COMBAT_SMALL_VIEW_COMPACT_SPELL_Y  = 19,
+    COMBAT_SMALL_VIEW_MODIFIER_STEP    = 10,
+    COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X = 57,
+    COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X = 45,
+    COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X   = 50,
+} CombatSmallViewConstant;
+
+typedef enum CombatMessageDisplayConstant {
+    COMBAT_MESSAGE_TIMEOUT           = 2500,
+    COMBAT_MESSAGE_LINE_WIDTH        = 474,
+    COMBAT_MESSAGE_WINDOW_X          = 83,
+    COMBAT_MESSAGE_WINDOW_Y          = 446,
+    COMBAT_MESSAGE_WINDOW_HEIGHT     = 33,
+    COMBAT_MESSAGE_WIDGET_FIRST      = 12,
+    COMBAT_MESSAGE_WIDGET_SECOND     = 13,
+    COMBAT_MESSAGE_DRAW_FIRST_WIDGET = 10,
+} CombatMessageDisplayConstant;
 
 enum class BattlefieldFringeFrame : i32 {
     FRINGE_NONE        = -1,
@@ -398,7 +389,6 @@ using enum CombatIconIndex;
 
 typedef enum CombatRuntimeConstant {
     COMBAT_RANDOM_X_MULTIPLIER            = 100,
-    COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER = 10,
     COMBAT_CAPTAIN_SPRITE_OFFSET          = H2EnumIndex(FACTION_COUNT),
     COMBAT_NEUTRAL_HERO_COLOR             = H2EnumIndex(FACTION_COUNT),
     COMBAT_HERO_OVERLAY_FRAME_COUNT       = 5,
@@ -408,75 +398,54 @@ typedef enum CombatRuntimeConstant {
 } CombatRuntimeConstant;
 
 typedef enum CombatAIConstant {
-    COMBAT_AI_ARMY_SLOT_COUNT          = 20,
-    COMBAT_AI_GROUP_SLOT_COUNT         = 5,
-    COMBAT_AI_GROUP_SCAN_DONE          = 999,
-    COMBAT_AI_LAST_HERO_COUNT          = 1,
-    COMBAT_AI_MAX_DIFFICULTY           = 4,
-    COMBAT_AI_FIGHT_VALUE_MODE         = 1,
-    COMBAT_AI_STRENGTH_ROUNDING        = 4,
-    COMBAT_AI_STRENGTH_FRACTION        = 5,
-    COMBAT_AI_ATTACK_NONE              = 0,
-    COMBAT_AI_ATTACK_SHOOT             = 1,
-    COMBAT_AI_ATTACK_FLY               = 2,
-    COMBAT_AI_ATTACK_WALK              = 3,
-    COMBAT_AI_MASK_FIRST_BIT           = 1,
-    COMBAT_AI_NO_ARMY                  = -1,
-    COMBAT_AI_LICH_DAMAGE_PER_CREATURE = 9,
-    COMBAT_AI_LICH_HIT_POINT_BONUS     = 100,
-    COMBAT_AI_ATTACK_DIRECTION_COUNT   = 8,
-    COMBAT_AI_ALL_ATTACK_DIRECTIONS    = 0xFF,
-    COMBAT_AI_UNLIMITED_PATH_SPEED     = 0x7f,
-    COMBAT_AI_DISTANCE_WEIGHT          = 1000,
-    COMBAT_AI_WORST_STRENGTH_LIMIT     = 999999999,
-    COMBAT_AI_CLOSEST_ARMY_LIMIT       = 9999999,
-    COMBAT_AI_ADJACENT_DIRECTION_COUNT = 6,
-    COMBAT_AI_CASTLE_BOUNDARY_COUNT    = 12,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_0    = 8,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_1    = 0x15,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_2    = 0x21,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_3    = 0x2e,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_4    = 0x3a,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_5    = 0x48,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_6    = 0x55,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_7    = 99,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_8    = 0x70,
-    COMBAT_AI_TOWER_STRENGTH           = 300,
-    COMBAT_AI_MIN_ARTIFACT_VALUE       = 1000,
-    COMBAT_AI_MIN_HERO_EXPERIENCE      = 2000,
-    COMBAT_AI_MEDIUM_ARTIFACT_VALUE    = 5000,
-    COMBAT_AI_HIGH_ARTIFACT_VALUE      = 10000,
-    COMBAT_AI_STRENGTH_2500            = 2500,
-    COMBAT_AI_STRENGTH_5000            = 5000,
-    COMBAT_AI_STRENGTH_15000           = 15000,
-    COMBAT_AI_STRENGTH_20000           = 20000,
-    COMBAT_AI_STRENGTH_30000           = 30000,
-    COMBAT_AI_STRENGTH_40000           = 40000,
-    COMBAT_AI_EXPERIENCE_DIVISOR       = 200000
+    COMBAT_AI_GROUP_SCAN_DONE                  = 999,
+    COMBAT_AI_LAST_HERO_COUNT                  = 1,
+    COMBAT_AI_MAX_DIFFICULTY                   = 4,
+    COMBAT_AI_FIGHT_VALUE_MODE                 = 1,
+    COMBAT_AI_STRENGTH_ROUNDING                = 4,
+    COMBAT_AI_STRENGTH_FRACTION                = 5,
+    COMBAT_AI_ATTACK_NONE                      = 0,
+    COMBAT_AI_ATTACK_SHOOT                     = 1,
+    COMBAT_AI_ATTACK_FLY                       = 2,
+    COMBAT_AI_ATTACK_WALK                      = 3,
+    COMBAT_AI_MASK_FIRST_BIT                   = 1,
+    COMBAT_AI_NO_ARMY                          = -1,
+    COMBAT_AI_LICH_DAMAGE_PER_CREATURE         = 9,
+    COMBAT_AI_LICH_HIT_POINT_BONUS             = 100,
+    COMBAT_AI_UNLIMITED_PATH_SPEED             = 0x7f,
+    COMBAT_AI_DISTANCE_WEIGHT                  = 1000,
+    COMBAT_AI_WORST_STRENGTH_LIMIT             = 999999999,
+    COMBAT_AI_CLOSEST_ARMY_LIMIT               = 9999999,
+    COMBAT_AI_CASTLE_BOUNDARY_COUNT            = 9,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_0            = 8,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_1            = 0x15,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_2            = 0x21,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_3            = 0x2e,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_4            = 0x3a,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_5            = 0x48,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_6            = 0x55,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_7            = 99,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_8            = 0x70,
+    COMBAT_AI_TOWER_STRENGTH                   = 300,
+    COMBAT_AI_MIN_ARTIFACT_VALUE               = 1000,
+    COMBAT_AI_MIN_HERO_EXPERIENCE              = 2000,
+    COMBAT_AI_MEDIUM_ARTIFACT_VALUE            = 5000,
+    COMBAT_AI_HIGH_ARTIFACT_VALUE              = 10000,
+    COMBAT_AI_RETREAT_TIER_1_THRESHOLD         = 2500,
+    COMBAT_AI_RETREAT_TIER_2_THRESHOLD         = 5000,
+    COMBAT_AI_RETREAT_TIER_3_THRESHOLD         = 15000,
+    COMBAT_AI_RETREAT_STRENGTH_DIVISOR         = 20000,
+    COMBAT_AI_RETREAT_TIER_4_THRESHOLD         = 30000,
+    COMBAT_AI_RETREAT_SCALED_PENALTY_THRESHOLD = 40000,
+    COMBAT_AI_EXPERIENCE_DIVISOR               = 200000
 } CombatAIConstant;
 
 typedef enum CombatSpellAIConstant {
     COMBAT_SPELL_AI_MIRROR_POWER_ONE                 = 1,
     COMBAT_SPELL_AI_MIRROR_POWER_TWO                 = 2,
-    COMBAT_SPELL_AI_HASTE_SPEED_BONUS                = 2,
     COMBAT_SPELL_AI_MINIMUM_DISTANCE                 = 2,
     COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS            = 3,
     COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN            = 10,
-    COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS            = 0xFF,
-    COMBAT_SPELL_AI_CURE_POINTS_PER_POWER            = 5,
-    COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER       = 50,
-    COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER            = 10,
-    COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER       = 25,
-    COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER = 40,
-    COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER       = 10,
-    COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER      = 20,
-    COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER     = 10,
-    COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER      = 50,
-    COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER = 25,
-    COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER        = 20,
-    COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER       = 10,
-    COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER    = 5,
-    COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER      = 10,
     COMBAT_SPELL_AI_DECISIVE_EFFECT                  = 100000000,
     COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE             = 999999
 } CombatSpellAIConstant;
@@ -492,7 +461,7 @@ using enum CombatGridShade;
 class combatManager : public baseManager {
 public:
     class palette* m_combatPalette;
-    i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];
+    i8 m_savedPalette[PALETTE_DATA_SIZE];
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
     H2EnumStorage<CombatGridShade, u8> m_previousGridState[COMBAT_HEX_COUNT];
@@ -503,7 +472,7 @@ public:
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;
     char _pad_0x31ee[COMBAT_RUNTIME_ALIGNMENT_SIZE];
-    i32 m_debugFormation;
+    i32 m_elevationOverlayIndex;
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];
     class icon* m_obstacleIcons[COMBAT_OBSTACLE_ICON_LOAD_COUNT];
     i32 m_obstacleCount;
@@ -523,10 +492,10 @@ public:
     i32 m_spellPower[COMBAT_SIDE_COUNT];
     class armyGroup* m_armyGroups[COMBAT_SIDE_COUNT];
     i32 m_mouseGridHex;
-    u8 m_heroDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathPending[COMBAT_SIDE_COUNT];
-    u8 m_heroDeathAnimationPlayed[COMBAT_SIDE_COUNT];
-    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPending[COMBAT_SIDE_COUNT];
+    u8 m_heroLossReactionPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroOpponentLossReactionPlayed[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationState[COMBAT_SIDE_COUNT];
     i32 m_heroAnimationFrame[COMBAT_SIDE_COUNT];
     i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
@@ -542,8 +511,8 @@ public:
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
     H2EnumStorage<CreatureType, u8> m_summonedCreatureType[COMBAT_SIDE_COUNT];
-    b32 m_sideDefeated[COMBAT_SIDE_COUNT];
-    b32 m_networkArmyPresent[COMBAT_SIDE_COUNT];
+    b32 m_sideSurrendered[COMBAT_SIDE_COUNT];
+    b32 m_humanPlayerSide[COMBAT_SIDE_COUNT];
     i32 m_playerId[COMBAT_SIDE_COUNT];
     i32 m_experienceValue[COMBAT_SIDE_COUNT];
     b32 m_heroCastSpell[COMBAT_SIDE_COUNT];
@@ -606,124 +575,124 @@ public:
     u8 m_removedArmies[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     u8 m_removedArmyPresent;
     char m_battlefieldBackgroundName[COMBAT_BACKGROUND_NAME_SIZE];
-    i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
+    i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_DIRECTION_ADJACENT_COUNT];
     class heroWindow* m_winLoseWindow;
     H2EnumStorage<SpellType, i32> m_selectedSpell;
     H2EnumStorage<CombatResult, i32> m_combatResult;
     combatManager(void);
-    virtual i32 Open(i32) override;
+    virtual i32 Open(i32 openFlags) override;
     virtual void Close(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
-    void NoShowCombatLog(const char*);
-    void ClearCombatMessages(i32);
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
+    void NoShowCombatLog(const char* message);
+    void ClearCombatMessages(i32 force);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(const char*, i32, i32, i32);
-    void CombatMessage(CombatMessageCommand);
+    void CombatMessage(const char* message, i32 updateScreen, i32 retainPrevious, i32 clear);
+    void CombatMessage(CombatMessageCommand messageType);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
-    void SetupGridForArmy(class army*);
-    i32 UpdateGrid(i32, i32);
+    void SetupGridForArmy(class army* armyPointer);
+    i32 UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid);
     void DrawBackground(void);
-    void UpdateMouseGrid(i32, i32);
-    void DrawFrame(i32, i32, i32, i32, i32, i32, i32);
-    void DrawSmallView(i32, i32);
-    i32 ViewGeneral(CombatSide, i32, i32);
-    void ViewArmy(class army*, i32);
-    i32 HasValidSpellTarget(SpellType);
+    void UpdateMouseGrid(i32 hexIndex, i32 forceUpdate);
+    void DrawFrame(i32 updateScreen, i32 computeExtent, i32 redrawExtent, i32 extentOnly, i32 delay, i32 drawBackground, i32 waitForTimer);
+    void DrawSmallView(i32 viewIndex, i32 updateScreen);
+    i32 ViewGeneral(CombatSide side, i32 allowActions, i32 quickView);
+    void ViewArmy(class army* viewedArmy, i32 quickView);
+    i32 HasValidSpellTarget(SpellType spell);
     i32 ViewSpells(i32);
     i32 FindResurrectArmyIndex(
-        CombatSide, SpellType, i32
+        CombatSide side, SpellType spell, i32 hex
     );
-    i32 ValidSpellTarget(SpellType, i32);
-    void SpellMessage(SpellType, i32);
-    void CastSpell(SpellType, i32, i32, i32);
-    void DefaultSpell(i32);
-    void Fireball(i32, SpellType);
-    void MeteorShower(i32);
+    i32 ValidSpellTarget(SpellType spell, i32 hex);
+    void SpellMessage(SpellType spell, i32 hex);
+    void CastSpell(SpellType spell, i32 targetHex, i32 castByCreature, i32 teleportDestination);
+    void DefaultSpell(i32 targetHex);
+    void Fireball(i32 targetHex, SpellType spell);
+    void MeteorShower(i32 targetHex);
     void ElementalStorm(void);
     void Armageddon(void);
-    void TurnToStone(class army*);
-    void BloodLustEffect(class army*, MonsterFlags);
-    void Ripple(i32);
-    void Blur(i32, i32, i32);
-    void ResetBoltAngle(struct SBolt*);
-    void DrawBolt(struct SBolt*, i32);
+    void TurnToStone(class army* target);
+    void BloodLustEffect(class army* target, MonsterFlags effect);
+    void Ripple(i32 strength);
+    void Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust);
+    void ResetBoltAngle(struct SBolt* bolt);
+    void DrawBolt(struct SBolt* bolt, i32 stepCount);
     void AddBolt(
-        struct SBolt*,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        BoltColorMode,
-        i32,
-        i32,
-        i32,
-        i32
+        struct SBolt* bolt,
+        i32 startX,
+        i32 startY,
+        i32 endX,
+        i32 endY,
+        i32 branchDistance,
+        i32 startWidth,
+        i32 endWidth,
+        BoltColorMode colorMode,
+        i32 minAngle,
+        i32 maxAngle,
+        i32 angleDistance,
+        i32 forceAngle
     );
     void DoBolt(
+        i32 managePointer,
+        i32 startX,
+        i32 startY,
+        i32 endX,
+        i32 endY,
+        i32 branchDistance,
+        i32 branchLength,
+        i32 startWidth,
+        i32 endWidth,
+        BoltColorMode colorMode,
+        i32 minAngle,
+        i32 maxAngle,
+        i32 angleDistance,
         i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        BoltColorMode,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32,
-        i32
+        i32 forceAngle,
+        i32 frameDelay,
+        i32 brightenPalette
     );
-    i32 GetNextChainLightningTarget(class army*, i32);
-    void ChainLightning(i32, i32);
-    void VaporizeCreature(CombatSide, i32);
-    void RippleCreature(CombatSide, i32, CombatRippleMode);
+    i32 GetNextChainLightningTarget(class army* source, i32 requireWorks);
+    void ChainLightning(i32 targetHex, i32 spellPower);
+    void VaporizeCreature(CombatSide side, i32 armyIndex);
+    void RippleCreature(CombatSide side, i32 armyIndex, CombatRippleMode mode);
     void ShowMassSpell(
-        i8 (*const)[COMBAT_ARMY_SLOT_COUNT],
-        CombatEffectType,
-        i32
+        i8 (*const affected)[COMBAT_ARMY_SLOT_COUNT],
+        CombatEffectType effect,
+        i32 animateCreatures
     );
-    void CastMassSpell(SpellType, i32);
-    void MirrorImage(i32);
-    void SummonElemental(CreatureType, i32);
-    void DoLuck(CombatSide, i32);
-    void DoBlast(i32, SpellType);
-    void Resurrect(SpellType, i32, i32);
+    void CastMassSpell(SpellType spell, i32 spellPower);
+    void MirrorImage(i32 targetHex);
+    void SummonElemental(CreatureType monsterType, i32 spellPower);
+    void DoLuck(CombatSide side, i32 armyIndex);
+    void DoBlast(i32 targetHex, SpellType spell);
+    void Resurrect(SpellType spell, i32 targetHex, i32 spellPower);
     i32 SpaceForElementalExists(void);
-    void ShowSpellCastFailure(class army*, i32);
+    void ShowSpellCastFailure(class army* target, i32);
     void ModifyDamageForArtifacts(
-        i32l*,
-        SpellType,
-        class hero*,
-        class hero*
+        i32l* damage,
+        SpellType spell,
+        class hero* attacker,
+        class hero* defender
     );
     void Earthquake(void);
-    void ShowSpellMessage(i32, SpellType, class army*);
-    i32 ValidHexToStandOn(i32);
-    void SetCombatDirections(i32);
-    void CheckSetMouseDirection(i32, i32, i32);
-    CombatCursorFrame GetPointer(CombatMessageCommand, i32);
-    MessageDispatchResult ProcessCombatMsg(struct tag_message&);
+    void ShowSpellMessage(i32 castByCreature, SpellType spell, class army* target);
+    i32 ValidHexToStandOn(i32 hexIndex);
+    void SetCombatDirections(i32 targetHex);
+    void CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex);
+    CombatCursorFrame GetPointer(CombatMessageCommand command, i32);
+    MessageDispatchResult ProcessCombatMsg(struct tag_message& message);
     i32 IsNegationSphereInEffect(void);
     void ResetRound(void);
-    i32 CheckWin(struct tag_message*);
-    CombatMessageCommand GetCommand(i32);
-    i32 RightClick(i32);
-    void DoCommand(CombatMessageCommand);
-    void ClearWinLoseBottom(class heroWindow*);
-    void ShowWinLoseArtifact(class heroWindow*, ArtifactType);
-    void ShowSkeletons(class heroWindow*);
-    void ShowEagleEyeSpell(class heroWindow*);
-    void ShowDeadArmies(class heroWindow*);
-    void DoVictory(CombatResult);
+    i32 CheckWin(struct tag_message* message);
+    CombatMessageCommand GetCommand(i32 hexIndex);
+    i32 RightClick(i32 hexIndex);
+    void DoCommand(CombatMessageCommand command);
+    void ClearWinLoseBottom(class heroWindow* window);
+    void ShowWinLoseArtifact(class heroWindow* window, ArtifactType artifact);
+    void ShowSkeletons(class heroWindow* window);
+    void ShowEagleEyeSpell(class heroWindow* window);
+    void ShowDeadArmies(class heroWindow* window);
+    void DoVictory(CombatResult winningSide);
     void DoLoseWindow(void);
     i32 DoSurrender(void);
     void CheckChangeSelector(void);
@@ -731,49 +700,49 @@ public:
     void CheckGetAIMove(void);
     void GetControl(void);
     void ResetMouse(void);
-    MessageDispatchResult ProcessNextAction(struct tag_message&);
+    MessageDispatchResult ProcessNextAction(struct tag_message& message);
     void ResetCyclingCreatures(void);
     void ResetCycleTimers(void);
     void CycleCombatScreen(void);
-    void SetCombatViewArmySmallLevel(i32);
-    void SetCombatGrid(i32, i32, i32);
+    void SetCombatViewArmySmallLevel(i32 level);
+    void SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel);
     void AddArmy(
-        CombatSide,
-        CreatureType,
-        i32,
-        i32,
-        MonsterFlags,
-        i32
+        CombatSide side,
+        CreatureType monsterType,
+        i32 quantity,
+        i32 hex,
+        MonsterFlags flags,
+        i32 animate
     );
     void SetupSmallView(void);
-    void ViewBallista(i32);
-    i32 DoSpellAI(CombatSide, i32);
-    void DetermineEffectOfSpell(SpellType, i32*, i32*);
-    i32 EffectSpellCreateCreature(i32, SpellType);
-    i32 RawEffectSpellInfluence(class army*, ArmySpellInfluence);
+    void ViewBallista(i32 quickView);
+    i32 DoSpellAI(CombatSide side, i32 restricted);
+    void DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex);
+    i32 EffectSpellCreateCreature(i32 hex, SpellType spell);
+    i32 RawEffectSpellInfluence(class army* target, ArmySpellInfluence influence);
     void ClearEffects(void);
-    void NextPos(i32*);
-    i32 FirstArmy(i32, i32, i32*);
-    i32 FirstResurrectable(i32, i32*, SpellType);
-    void EffectSpellCure(i32*, i32, i32, i32);
-    void EffectSpellResurrect(i32*, i32, SpellType);
-    void EffectSpellDamage(i32*, SpellType, i32);
-    void CombineGroups(class armyGroup*, class armyGroup*);
+    void NextPos(i32* hex);
+    i32 FirstArmy(i32 startHex, i32 side, i32* hex);
+    i32 FirstResurrectable(i32 startHex, i32* hex, SpellType spell);
+    void EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure);
+    void EffectSpellResurrect(i32* effect, i32 hex, SpellType spell);
+    void EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex);
+    void CombineGroups(class armyGroup* sourceGroup, class armyGroup* targetGroup);
     void SetupCombat(
-        i32,
-        i32,
-        class hero*,
-        class armyGroup*,
-        class town*,
-        class hero*,
-        class armyGroup*,
-        i32,
-        i32,
-        i32
+        i32 mapX,
+        i32 mapY,
+        class hero* attackerHero,
+        class armyGroup* attackerGroup,
+        class town* defenderTown,
+        class hero* defenderHero,
+        class armyGroup* defenderGroup,
+        i32 combatX,
+        i32 combatY,
+        i32 randomSeed
     );
     void InitNonVisualVars(void);
     void SetupAdjacencyArray(void);
-    void UpdateArmyGroup(CombatSide);
+    void UpdateArmyGroup(CombatSide side);
     void GenerateMap(void);
     const char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
@@ -781,14 +750,14 @@ public:
     void FreeIcons(void);
     void LoadArmies(void);
     void FreeArmies(void);
-    i32 GetGridIndex(i32, i32);
-    void CheckApplyGoodMorale(CombatSide, i32);
-    i32 CheckApplyBadMorale(CombatSide, i32);
-    i32 GetNextArmy(i32);
-    i32 IsWinner(CombatSide);
-    void CatAttack(CombatSide);
-    void KeepAttack(CombatTowerSelector);
-    i32 ExperienceValueOfStack(CombatSide);
+    i32 GetGridIndex(i32 x, i32 y);
+    void CheckApplyGoodMorale(CombatSide side, i32 index);
+    i32 CheckApplyBadMorale(CombatSide side, i32 index);
+    i32 GetNextArmy(i32 checkMorale);
+    i32 IsWinner(CombatSide side);
+    void CatAttack(CombatSide side);
+    void KeepAttack(CombatTowerSelector tower);
+    i32 ExperienceValueOfStack(CombatSide side);
     void ResetHitByCreature(void);
     void SaveCombatBorder(void);
     void DrawCombatBorder(void);
@@ -797,29 +766,29 @@ public:
     void LowerDoor(void);
     void RaiseDoor(void);
     void TestRaiseDoor(void);
-    i32 InCastle(i32);
-    i32 ShotIsThroughWall(CombatSide, i32, i32);
-    void ShootMissile(i32, i32, i32, i32, float*, class icon*);
+    i32 InCastle(i32 hex);
+    i32 ShotIsThroughWall(CombatSide side, i32 sourceHex, i32 targetHex);
+    void ShootMissile(i32 sourceX, i32 sourceY, i32 targetX, i32 targetY, float* directionAngles, class icon* missileIcon);
     void CombatSystemOptions(void);
     i32 AICheckRetreat(void);
     void DoCompAI(CombatSide);
-    float GetModLichDamage(class army*, float);
-    void DoLichShot(class army*);
-    i32 GetShooterMask(CombatSide);
-    i32 GetMirrorImageMask(CombatSide);
-    i32 GetFlyerMask(CombatSide);
-    i32 GetAllMask(CombatSide);
-    i32 GetWalkerMask(CombatSide);
-    i32 GetOutOfItMask(CombatSide);
-    i32 GetTraitorMask(CombatSide);
-    i32 GetBestArmy(CombatSide, i32);
-    i32 GetWorstArmy(CombatSide, i32);
-    i32 GetClosestArmy(class army*, CombatSide, i32);
-    u32l GetStrength(CombatSide, i32);
-    i32 AttemptAttack(class army*, CombatSide, i32);
-    i32 AttemptAdjacentAttack(class army*);
-    i32 WalkTowardArmyFront(class army*, CombatSide, i32);
-    i32 WalkTowardArmy(class army*, CombatSide, i32);
+    float GetModLichDamage(class army* target, float damage);
+    void DoLichShot(class army* lich);
+    i32 GetShooterMask(CombatSide side);
+    i32 GetMirrorImageMask(CombatSide side);
+    i32 GetFlyerMask(CombatSide side);
+    i32 GetAllMask(CombatSide side);
+    i32 GetWalkerMask(CombatSide side);
+    i32 GetOutOfItMask(CombatSide side);
+    i32 GetTraitorMask(CombatSide side);
+    i32 GetBestArmy(CombatSide side, i32 mask);
+    i32 GetWorstArmy(CombatSide side, i32 mask);
+    i32 GetClosestArmy(class army* currentArmy, CombatSide side, i32 mask);
+    u32l GetStrength(CombatSide side, i32 mask);
+    i32 AttemptAttack(class army* currentArmy, CombatSide side, i32 mask);
+    i32 AttemptAdjacentAttack(class army* currentArmy);
+    i32 WalkTowardArmyFront(class army* currentArmy, CombatSide side, i32 mask);
+    i32 WalkTowardArmy(class army* currentArmy, CombatSide side, i32 mask);
 };
 #pragma pack(pop)
 extern b32 bGridWasShowing;
@@ -851,7 +820,26 @@ extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
 extern H2EnumStorage<ArtifactType, i8> iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern H2EnumStorage<CombatAction, i32> giNextAction;
+
+#define SET_NEXT_COMBAT_MOVE(hex) (giNextAction = ACTION_MOVE, giNextActionGridIndex = (hex))
+
+#define COMBAT_DEADLINE(delay)                                                                     \
+    (static_cast<i32>(platform::Ticks() + (delay) * gfCombatSpeedMod[gConfig.combatSpeed]))
 extern i32 giNextActionGridIndex2;
+
+#define IS_INTERIOR_COMBAT_HEX(hex)                                                                \
+    ((hex) >= 0 && (hex) < COMBAT_HEX_COUNT && (hex) % COMBAT_GRID_ROW_LENGTH != 0                 \
+     && (hex) % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1)
+
+#define CAN_PASS_CASTLE_GATE(hex)                                                                  \
+    (gpCombatManager->m_inCastleCombat                                                             \
+     && ((hex) == COMBAT_CASTLE_GATE_APPROACH_HEX || (hex) == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))         \
+     && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED                            \
+         || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE                                \
+             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide        \
+                    == COMBAT_SIDE_NONE                                                            \
+             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_deadOccupantCount   \
+                    == 0)))
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
