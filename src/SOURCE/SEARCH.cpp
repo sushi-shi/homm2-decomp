@@ -12,37 +12,6 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/KB_TYPES.h>
 
-// Persistent search scratch has independently addressed owners, not one record.
-DATA(0x00533dc4) static i32 s_currentWater;
-DATA(0x00533dfc) static i32 s_candidateY;
-DATA(0x00533e20) static i32 s_adjacentY;
-DATA(0x00533dc8) static i32 s_adjacentX;
-DATA(0x00533de8) static mapCell* s_targetCell;
-DATA(0x00533e0c) static i32 s_targetStepCost;
-DATA(0x00533e04) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
-DATA(0x00533df8) static mapCell* s_neighborCell;
-DATA(0x00533da4) static b32 s_hasAdjacentMonster;
-DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
-DATA(0x00533dd0) static searchNode s_currentNode;
-DATA(0x00533de4) static i32 s_neighborY;
-DATA(0x00533db0) static i32 s_neighborX;
-DATA(0x00533dbc) static i32 s_targetWater;
-DATA(0x00533e08) static i32 s_adjacentMonsterX;
-DATA(0x00533db4) static i32 s_remainingMobility;
-DATA(0x00533de0) static b32 s_directionBlocked;
-DATA(0x00533e18) static searchNode* s_neighborNode;
-DATA(0x00533dc0) static i32 s_adjacentCost;
-DATA(0x00533e00) static i32 s_mapX;
-DATA(0x00533ddc) static i32 s_mapY;
-DATA(0x00533dec) static i8 s_directionCosts[IDX(MAP_DIRECTION_COUNT)];
-DATA(0x00533df4) static i32 s_currentCost;
-DATA(0x00533da0) static b32 s_hasTarget;
-DATA(0x00533e14) static i32 s_processedPointCount;
-DATA(0x00533e28) static hero* s_currentHero;
-DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[IDX(MAP_DIRECTION_COUNT)];
-DATA(0x00533e1c) static i32 s_bestTargetCost;
-DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
-
 #if H2_RETAIL_COMPILER
 #define backDirection backDir
 #endif
@@ -80,6 +49,32 @@ i32 searchArray::BuildPath(
 #undef backDirection
 #endif
 
+// SeedPosition's scratch statics are emitted in VC6's .bss hash order
+// (ascending key of each decorated name); these spellings give retail's order.
+#if H2_RETAIL_COMPILER
+#define s_hasTarget s_hasTarget_a
+#define s_hasAdjacentMonster sk_hasAdjacentMonster
+#define s_neighborX s_neighborX_o
+#define s_remainingMobility s_remainingMobility_8
+#define s_targetWater s_targetWater_6
+#define s_mapY s_mapY_9
+#define s_directionBlocked s_directionBlocked_i
+#define s_neighborY sg_neighborY
+#define s_targetCell s1_targetCell
+#define s_directionCosts s2_directionCosts
+#define s_currentCost sr_currentCost
+#define s_candidateY s_candidateY_q
+#define s_mapX s_mapX_o
+#define s_adjacentMonsterX s_adjacentMonsterX_g
+#define s_targetStepCost s_targetStepCost_9
+#define s_direction sj_direction
+#define s_processedPointCount s_processedPointCount_m
+#define s_neighborNode sq_neighborNode
+#define s_bestTargetCost s_bestTargetCost_g
+#define s_adjacentY s_adjacentY_b
+#define s_terrain s_terrain_3
+#define s_currentHero s_currentHero_4
+#endif
 VA(0x004917d6, 0xcc2)
 void searchArray::SeedPosition(
     i32 seedX,
@@ -95,6 +90,39 @@ void searchArray::SeedPosition(
     i32 continueSeed,
     i32 scanMap
 ) {
+    DATA(0x00533da0) static b32 s_hasTarget;
+    DATA(0x00533da4) static b32 s_hasAdjacentMonster;
+    DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[IDX(MAP_DIRECTION_COUNT)];
+    DATA(0x00533db0) static i32 s_neighborX;
+    DATA(0x00533db4) static i32 s_remainingMobility;
+    // Retail 0x00533db8: no code reads this cell. VC6 allocates an unreferenced
+    // local static in the hash-ordered run but emits no symbol for it.
+    static i32 s_unusedInt;
+    DATA(0x00533dbc) static i32 s_targetWater;
+    DATA(0x00533dc0) static i32 s_adjacentCost;
+    DATA(0x00533dc4) static i32 s_currentWater;
+    DATA(0x00533dc8) static i32 s_adjacentX;
+    DATA(0x00533dd0) static searchNode s_currentNode;
+    DATA(0x00533ddc) static i32 s_mapY;
+    DATA(0x00533de0) static b32 s_directionBlocked;
+    DATA(0x00533de4) static i32 s_neighborY;
+    DATA(0x00533de8) static mapCell* s_targetCell;
+    DATA(0x00533dec) static i8 s_directionCosts[IDX(MAP_DIRECTION_COUNT)];
+    DATA(0x00533df4) static i32 s_currentCost;
+    DATA(0x00533df8) static mapCell* s_neighborCell;
+    DATA(0x00533dfc) static i32 s_candidateY;
+    DATA(0x00533e00) static i32 s_mapX;
+    DATA(0x00533e04) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
+    DATA(0x00533e08) static i32 s_adjacentMonsterX;
+    DATA(0x00533e0c) static i32 s_targetStepCost;
+    DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
+    DATA(0x00533e14) static i32 s_processedPointCount;
+    DATA(0x00533e18) static searchNode* s_neighborNode;
+    DATA(0x00533e1c) static i32 s_bestTargetCost;
+    DATA(0x00533e20) static i32 s_adjacentY;
+    DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
+    DATA(0x00533e28) static hero* s_currentHero;
+
     H2_ENUM_STORAGE(TerrainType, i32) targetTerrain;
 
     if (!continueSeed) {
@@ -388,3 +416,27 @@ void searchArray::SeedPosition(
     }
     giFullySeeded = true;
 }
+#if H2_RETAIL_COMPILER
+#undef s_hasTarget
+#undef s_hasAdjacentMonster
+#undef s_neighborX
+#undef s_remainingMobility
+#undef s_targetWater
+#undef s_mapY
+#undef s_directionBlocked
+#undef s_neighborY
+#undef s_targetCell
+#undef s_directionCosts
+#undef s_currentCost
+#undef s_candidateY
+#undef s_mapX
+#undef s_adjacentMonsterX
+#undef s_targetStepCost
+#undef s_direction
+#undef s_processedPointCount
+#undef s_neighborNode
+#undef s_bestTargetCost
+#undef s_adjacentY
+#undef s_terrain
+#undef s_currentHero
+#endif

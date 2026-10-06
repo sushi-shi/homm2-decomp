@@ -151,6 +151,25 @@ class DefinitionsForFileTest(unittest.TestCase):
         self.assertEqual([(r.symbol, r.is_static) for r in rows],
                          [("_value", True)])
 
+    def test_a_retail_only_alias_supplies_the_storage_spelling(self):
+        # VC6 hashes the spelling it compiles; Clang sees the readable name.
+        text = ("#if H2_RETAIL_COMPILER\n#define value value_q\n#endif\n"
+                "DATA(0x00400100) static int value;\n")
+        rows, _index = self._definitions(
+            text, mangled="?value@?1??f@@YAXXZ@4HA",
+            storage=ci.StorageClass.STATIC)
+        self.assertEqual([(r.name, r.qualified_name, r.symbol) for r in rows],
+                         [("value_q", "value_q", "?value_q@?1??f@@YAXXZ@4HA")])
+
+    def test_an_undefined_or_inactive_alias_keeps_the_readable_name(self):
+        text = ("#if H2_RETAIL_COMPILER\n#define value value_q\n#endif\n"
+                "#if H2_RETAIL_COMPILER\n#undef value\n#endif\n"
+                "#if 0\n#define value other\n#endif\n"
+                "DATA(0x00400100) int value;\n")
+        rows, _index = self._definitions(text)
+        self.assertEqual([(r.name, r.symbol) for r in rows],
+                         [("value", "?value@@3HA")])
+
     def test_a_supplied_translation_unit_is_not_reparsed(self):
         _rows, index = self._definitions("DATA(0x00400100) int value;\n")
         index.assert_not_called()

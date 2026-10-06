@@ -20,7 +20,11 @@ from homm2.build.fixed_asm import claims as fixed_asm_claims
 IMAGE_BASE = 0x400000
 DATA_TOKEN = re.compile(rb"\bDATA\s*\(\s*(0x[0-9a-fA-F]+)\s*\)")
 INCLUDE_TOKEN = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
-INVENTORY_CACHE_SCHEMA = 2
+INVENTORY_CACHE_SCHEMA = 3
+RETAIL_COMPILER_IF = re.compile(rb"^[ \t]*#[ \t]*if[ \t]+H2_RETAIL_COMPILER[ \t]*$", re.M)
+PREPROCESSOR_LINE = re.compile(
+    rb"^[ \t]*#[ \t]*(if|ifdef|ifndef|else|elif|endif|define|undef)\b[ \t]*(.*)$", re.M)
+ALIAS_DEFINE = re.compile(rb"^([A-Za-z_]\w*)[ \t]+([A-Za-z_]\w*)[ \t]*$")
 
 
 @dataclass(frozen=True, order=True)
@@ -152,6 +156,57 @@ def _declaration_end(masked: bytes, start: int) -> int:
     raise ValueError("unterminated DATA declaration")
 
 
+def retail_spellings(masked: bytes) -> list[tuple[int, bytes, bytes | None]]:
+    """Return ``(offset, name, alias)`` events of retail-only identifier aliases.
+
+    VC6 orders an object's ``.bss`` by a hash of each storage name, so a readable
+    identifier may be compiled under a ``#if H2_RETAIL_COMPILER`` ``#define``
+    that supplies the hash-fitting spelling (an ``#undef`` there ends it; alias
+    is then ``None``). Clang analyses the readable name; the candidate COFF and
+    retail claims carry the retail spelling. Only identifier-to-identifier
+    defines directly inside such a block are aliases.
+    """
+    events = []
+    stack = []
+    for match in PREPROCESSOR_LINE.finditer(masked):
+        directive, rest = match.group(1), match.group(2).strip()
+        if directive in (b"if", b"ifdef", b"ifndef"):
+            stack.append(bool(RETAIL_COMPILER_IF.match(match.group(0))))
+        elif directive in (b"else", b"elif"):
+            if stack:
+                stack[-1] = False
+        elif directive == b"endif":
+            if stack:
+                stack.pop()
+        elif stack and stack[-1]:
+            if directive == b"define":
+                alias = ALIAS_DEFINE.match(rest)
+                if alias:
+                    events.append((match.start(), alias.group(1), alias.group(2)))
+            elif directive == b"undef" and re.fullmatch(rb"[A-Za-z_]\w*", rest):
+                events.append((match.start(), rest, None))
+    return events
+
+
+def retail_spelling(events, name: str, offset: int) -> str:
+    spelling = name
+    for event_offset, alias_name, alias in events:
+        if event_offset >= offset:
+            break
+        if alias_name.decode("ascii") == name:
+            spelling = name if alias is None else alias.decode("ascii")
+    return spelling
+
+
+def _retail_symbol(symbol: str, name: str, spelling: str) -> str:
+    if spelling == name or not symbol:
+        return symbol
+    for prefix in ("?", "_"):
+        if symbol.startswith(prefix + name + "@") or symbol == prefix + name:
+            return prefix + spelling + symbol[len(prefix) + len(name):]
+    raise ValueError(f"cannot apply retail spelling {spelling} to {symbol}")
+
+
 def _qualified_name(cursor) -> str:
     owners = []
     parent = cursor.semantic_parent
@@ -199,6 +254,7 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path,
             continue
         variables.append(cursor)
     rows = []
+    aliases = retail_spellings(masked)
     unit = path.relative_to(source_root.resolve()).with_suffix("").as_posix()
     for marker, end in markers:
         matches = [cursor for cursor in variables
@@ -216,12 +272,17 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path,
         except ValueError:
             display = path.relative_to(source_root.resolve())
         marker_line = blob.count(b"\n", 0, marker.start()) + 1
+        name = cursor.spelling
+        spelling = retail_spelling(aliases, name, marker.start())
+        qualified = _qualified_name(cursor)
+        if spelling != name:
+            qualified = qualified[:len(qualified) - len(name)] + spelling
         rows.append(AnnotatedDataDefinition(
-            unit, cursor.spelling, _qualified_name(cursor),
+            unit, spelling, qualified,
             int(marker.group(1), 16) - IMAGE_BASE, size,
             f"{display.as_posix()}:{marker_line}",
             cursor.storage_class == ci.StorageClass.STATIC,
-            cursor.mangled_name,
+            _retail_symbol(cursor.mangled_name, name, spelling),
         ))
     return rows
 
