@@ -1,6 +1,7 @@
 #ifndef HOMM2_PLATFORM_FILESYSTEM_H
 #define HOMM2_PLATFORM_FILESYSTEM_H
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -79,6 +80,23 @@ bool IsUserState(const char* retailPath);
 // already there over the one asked for. Ambiguous case-folded names fail with
 // an empty result instead of depending on host directory enumeration order.
 std::string ResolveIn(const std::string& root, const char* retailPath);
+
+// Host paths are UTF-8 strings everywhere in the port. These convert them to
+// and from std::filesystem without going through the Windows ANSI code page,
+// so a game folder below a non-ASCII user name still opens.
+std::filesystem::path HostPath(const std::string& utf8);
+std::string HostString(const std::filesystem::path& path);
+
+// A directory named by the user, as an environment variable. cmd keeps the
+// quotes of `set HOMM2_DATA="C:\Games\Heroes II"` in the value, and a trailing
+// separator or surrounding blanks are easy to type, so those are removed.
+std::string ConfiguredDirectory(const char* value);
+
+// Whether directory is a Heroes II installation: DATA\HEROES2.AGG, in any case.
+bool HoldsGameData(const std::string& directory);
+
+// The first candidate holding game data, or an empty string.
+std::string FindGameData(const std::vector<std::string>& candidates);
 
 }
 

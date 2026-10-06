@@ -175,19 +175,37 @@ nix run
 
 ### Windows
 
-The Windows package is statically linked and does not require the retail
-Audiere, Miles, Smacker, or Wing DLLs. Copy `HMM2PL.exe` into the writable game
-directory and run it. For Wine:
+Build on Linux or in WSL, then copy the contents of `result/bin` into the game
+folder, the one that contains `DATA`:
 
 ```sh
 nix build .#homm2-windows
-cp result/bin/HMM2PL.exe /path/to/heroes2/
-cd /path/to/heroes2
-wine HMM2PL.exe
+ls result/bin        # HMM2PL.exe  lang/
 ```
 
-The SDL3 port does not need retail registry keys, CD-drive mappings, or a
-special Wine prefix.
+```text
+C:\Games\Heroes of Might and Magic II\
+    HMM2PL.exe
+    lang\           (Russian translation; optional)
+    DATA\HEROES2.AGG
+    DATA\HEROES2X.AGG
+    MAPS\ ...
+```
+
+The program is statically linked and needs no other DLL. Double-click
+`HMM2PL.exe`. It finds `DATA` next to itself, whatever the working directory
+and whatever the case of the file names. To keep the program elsewhere, point
+`HOMM2_DATA` at the game folder; quotes are accepted:
+
+```bat
+set HOMM2_DATA=C:\Games\Heroes of Might and Magic II
+C:\Tools\HMM2PL.exe
+```
+
+Music is read from `MUSIC` (GOG's `TrackNN.ogg`) or `TRACKS2` (the Buka disc)
+and movies from `HEROES2\ANIM`; without them the game runs silent or skips the
+movie. Saves and preferences stay in the game folder, so it must be writable
+(not under `Program Files`). Under Wine, run `wine HMM2PL.exe` from the folder.
 
 ### Web
 

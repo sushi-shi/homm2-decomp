@@ -488,11 +488,6 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_SOURCE_DIR}/tools/legacy_presentation_policy.py
       ${CMAKE_SOURCE_DIR})
-  add_executable(homm2_filesystem_test tools/filesystem_test.cpp)
-  target_include_directories(homm2_filesystem_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/include)
-  target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
-  add_test(NAME filesystem COMMAND homm2_filesystem_test)
   add_executable(homm2_file_transaction_test tools/file_transaction_test.cpp)
   target_include_directories(homm2_file_transaction_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_file_transaction_test PRIVATE homm2_platform)
@@ -578,8 +573,27 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_validate_catalog.py)
 endif()
 
+# Host path handling, built for Windows too so that it can be run under Wine.
+if(BUILD_TESTING AND NOT EMSCRIPTEN)
+  add_executable(homm2_filesystem_test tools/filesystem_test.cpp)
+  target_include_directories(homm2_filesystem_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
+  add_test(NAME filesystem COMMAND homm2_filesystem_test)
+
+  # The test puts a game folder beside itself, so it gets a directory of its own.
+  add_executable(homm2_data_root_test tools/data_root_test.cpp)
+  target_include_directories(homm2_data_root_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  target_link_libraries(homm2_data_root_test PRIVATE homm2_platform)
+  set_target_properties(homm2_data_root_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/data-root-test)
+  add_test(NAME data_root COMMAND homm2_data_root_test)
+endif()
+
 if(WIN32)
-  target_link_libraries(homm2 PRIVATE ws2_32)
+  target_link_libraries(homm2_platform PUBLIC ws2_32)
   # A game, not a console program: retail came up without one behind it.
   set_target_properties(homm2 PROPERTIES WIN32_EXECUTABLE ON)
 endif()
