@@ -326,10 +326,15 @@ i32 resourceManager::LoadAggregateHeader(
     if (aggregateFp == INVALID_FILE) {
         if (!required)
             return LOAD_ERROR;
+        char searched[GLOBAL_TEXT_BUFFER_SIZE];
+        platform::FileResolve(
+            aggregateName, platform::FileMode::Read, searched, sizeof(searched)
+        );
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("resource.file.open_failed"),
-            aggregateName
+            aggregateName,
+            searched
         );
         ShutDown(gText);
         return LOAD_ERROR;

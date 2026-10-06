@@ -18,6 +18,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/wingraph.h>
 #include <PLATFORM/Movie.h>
+#include <PLATFORM/Platform.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/dialog.h>

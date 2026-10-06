@@ -37,9 +37,14 @@ resource payload into the same writable game directory first:
 nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
-`HOMM2_DATA` wins when it is set. Otherwise the engine looks for a directory
+`HOMM2_DATA` wins when it is set. Surrounding blanks, one pair of surrounding
+double quotes (cmd keeps them in `set HOMM2_DATA="C:\Games\Heroes II"`) and a
+trailing separator are removed. Otherwise the engine looks for a directory
 holding `DATA/HEROES2.AGG`, in order: next to the executable, the current
-directory, `$XDG_DATA_HOME/homm2`, `~/.local/share/homm2/data`, `~/games/homm2`.
+directory, and on Linux `$XDG_DATA_HOME/homm2`, `$XDG_DATA_HOME/homm2/data`,
+`~/games/homm2`. Names below the root are matched case-insensitively on every
+host, and host paths are UTF-8 (the wide API on Windows). When an archive
+cannot be opened, the error names the host path that was tried.
 
 Other targets:
 
@@ -52,8 +57,22 @@ nix build .#homm2-web
 ```
 
 The Windows package cross-compiles and statically links the SDL3 platform,
-libbz2, and minimal FFmpeg. It includes a Wine launcher; no retail Audiere,
-Miles, Smacker, or Wing DLLs are required.
+libbz2, and minimal FFmpeg: `result/bin` holds `HMM2PL.exe` and `lang/` and
+nothing else, and the build fails if a program imports a DLL that is neither
+part of Windows nor shipped beside it. No retail Audiere, Miles, Smacker, or
+Wing DLLs are required.
+
+`nix build .#checks.x86_64-linux.windows-tests` runs the Windows build's path
+tests under Wine. With an installed game,
+
+```sh
+HOMM2_DATA=/path/to/heroes2 nix run .#windows-smoke
+```
+
+copies `result/bin` into a game folder holding only `DATA/HEROES2.AGG` and
+`HEROES2X.AGG`, and checks under Wine and Xvfb that the game reaches its main
+menu when started from that folder, from another folder, and with a quoted
+`HOMM2_DATA`.
 
 ## Web
 

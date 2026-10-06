@@ -10,16 +10,30 @@
 #include <system_error>
 #include <vector>
 
-#include <dirent.h>
-#include <strings.h>
-#include <sys/stat.h>
-
 namespace platform {
 namespace {
 
+#ifdef _WIN32
+constexpr char kSeparator = '\\';
+
+bool IsSeparator(char character) { return character == '\\' || character == '/'; }
+#else
+constexpr char kSeparator = '/';
+
+bool IsSeparator(char character) { return character == '/'; }
+#endif
+
 bool Present(const std::string& path) {
-    struct stat info;
-    return ::stat(path.c_str(), &info) == 0;
+    std::error_code error;
+    return !path.empty() && std::filesystem::exists(HostPath(path), error);
+}
+
+bool SameIgnoringCase(const std::string& left, const std::string& right) {
+    return left.size() == right.size()
+        && std::equal(left.begin(), left.end(), right.begin(), [](char a, char b) {
+               return std::tolower(static_cast<unsigned char>(a))
+                   == std::tolower(static_cast<unsigned char>(b));
+           });
 }
 
 struct CaseInsensitiveMatch {
@@ -31,22 +45,23 @@ CaseInsensitiveMatch MatchIgnoringCase(
     const std::string& directory,
     const std::string& wanted
 ) {
-    DIR* handle = ::opendir(directory.empty() ? "." : directory.c_str());
-    if (handle == nullptr) {
-        return {};
-    }
-
     CaseInsensitiveMatch match;
-    while (dirent* entry = ::readdir(handle)) {
-        if (::strcasecmp(entry->d_name, wanted.c_str()) == 0) {
-            if (!match.name.empty() && match.name != entry->d_name) {
-                match.ambiguous = true;
-                break;
-            }
-            match.name = entry->d_name;
+    std::error_code error;
+    std::filesystem::directory_iterator entry(
+        HostPath(directory.empty() ? std::string(".") : directory),
+        error
+    );
+    for (; !error && entry != std::filesystem::directory_iterator(); entry.increment(error)) {
+        const std::string name = HostString(entry->path().filename());
+        if (!SameIgnoringCase(name, wanted)) {
+            continue;
         }
+        if (!match.name.empty() && match.name != name) {
+            match.ambiguous = true;
+            break;
+        }
+        match.name = name;
     }
-    ::closedir(handle);
     return match;
 }
 
@@ -242,7 +257,8 @@ std::string ResolveIn(const std::string& root, const char* retailPath) {
     // the top of the game directory rather than the top of the host.
     std::string resolved = root;
     for (const std::string& component : SplitPath(relative)) {
-        const std::string separator = (resolved.empty() || resolved.back() == '/') ? "" : "/";
+        const bool joined = resolved.empty() || IsSeparator(resolved.back());
+        const std::string separator = joined ? "" : std::string(1, kSeparator);
         const std::string candidate = resolved + separator + component;
         if (Present(candidate)) {
             resolved = candidate;
@@ -255,6 +271,59 @@ std::string ResolveIn(const std::string& root, const char* retailPath) {
         resolved += separator + (match.name.empty() ? component : match.name);
     }
     return resolved;
+}
+
+std::filesystem::path HostPath(const std::string& utf8) {
+    return std::filesystem::path(std::u8string(utf8.begin(), utf8.end()));
+}
+
+std::string HostString(const std::filesystem::path& path) {
+    const std::u8string text = path.u8string();
+    return std::string(text.begin(), text.end());
+}
+
+std::string ConfiguredDirectory(const char* value) {
+    std::string text = value != nullptr ? value : "";
+    const auto trim = [&text] {
+        const auto blank = [](char character) {
+            return std::isspace(static_cast<unsigned char>(character)) != 0;
+        };
+        while (!text.empty() && blank(text.back())) {
+            text.pop_back();
+        }
+        const auto first = std::find_if_not(text.begin(), text.end(), blank);
+        text.erase(text.begin(), first);
+    };
+    trim();
+    if (text.size() >= 2 && text.front() == '"' && text.back() == '"') {
+        text = text.substr(1, text.size() - 2);
+        trim();
+    }
+
+    // Keep a root: "/" here, "C:\" on Windows.
+    std::size_t keep = 1;
+#ifdef _WIN32
+    if (text.size() >= 3 && text[1] == ':') {
+        keep = 3;
+    }
+#endif
+    while (text.size() > keep && IsSeparator(text.back())) {
+        text.pop_back();
+    }
+    return text;
+}
+
+bool HoldsGameData(const std::string& directory) {
+    return !directory.empty() && Present(ResolveIn(directory, "DATA\\HEROES2.AGG"));
+}
+
+std::string FindGameData(const std::vector<std::string>& candidates) {
+    for (const std::string& candidate : candidates) {
+        if (HoldsGameData(candidate)) {
+            return candidate;
+        }
+    }
+    return std::string();
 }
 
 }

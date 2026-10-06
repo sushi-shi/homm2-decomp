@@ -165,3 +165,19 @@ The resulting compressed stream is a standard bzip2 stream and is not promised
 to be wire-compatible with the retail network-save protocol. Network transports
 are not currently supported by the portable platform. The exact reconstruction
 and generated retail-source branches retain the original codec and format.
+
+### CD-ROM detection
+
+Retail looked for the expansion archive in the installation, then for the CD by
+opening `\Tracks2\02-AudioTrack 02.ogg` on each CD drive; without that file it
+disabled sound, movies, the campaigns and multiplayer. The Buka disc layout
+leaked into `master` as a startup requirement: an installation without a
+`Tracks2` folder, such as GOG's or one copied from an English disc, stopped with
+"Unable to find the Heroes II data files" even though both archives were there.
+
+`master` treats the installation as the CD. Startup requires only
+`DATA\HEROES2X.AGG`. Music is optional and looked up per track in
+`MUSIC\NN-AudioTrack NN.ogg`, `MUSIC\TrackNN.ogg` (GOG) and
+`TRACKS2\NN-AudioTrack NN.ogg` (the Buka disc). A movie missing from
+`HEROES2\ANIM` is logged and skipped instead of ending the game with "Unable to
+open animation file".

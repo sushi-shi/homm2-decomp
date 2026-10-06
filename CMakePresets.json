@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {"name": "linux", "generator": "Ninja", "binaryDir": "${sourceDir}/build/linux", "cacheVariables": {"CMAKE_BUILD_TYPE": "RelWithDebInfo", "HOMM2_PLATFORM_WARNINGS_AS_ERRORS": "ON"}},
+    {"name": "wasm", "generator": "Ninja", "binaryDir": "${sourceDir}/build/wasm", "cacheVariables": {"CMAKE_BUILD_TYPE": "Release", "HOMM2_PLATFORM_WARNINGS_AS_ERRORS": "ON", "SDL3_DIR": "$env{HOMM2_WEB_SDL3}/lib/cmake/SDL3", "HOMM2_BZIP2_ROOT": "$env{HOMM2_WEB_BZIP2}", "HOMM2_FFMPEG_ROOT": "$env{HOMM2_WEB_FFMPEG}"}}
+  ],
+  "buildPresets": [{"name": "linux", "configurePreset": "linux"}, {"name": "wasm", "configurePreset": "wasm"}]
+}

@@ -19,6 +19,12 @@
 namespace platform::sdl3 {
 namespace {
 
+#ifdef _WIN32
+constexpr char kSeparator = '\\';
+#else
+constexpr char kSeparator = '/';
+#endif
+
 class FileSystem final : public IFileSystem {
 public:
     FileSystem() {
@@ -26,30 +32,30 @@ public:
         m_programRoot = "/";
         m_dataRoot = "/game";
 #else
-        if (const char* base = SDL_GetBasePath()) {
-            m_programRoot = base;
-        }
+        m_programRoot = ConfiguredDirectory(SDL_GetBasePath());
         if (m_programRoot.empty()) {
             std::error_code error;
-            m_programRoot = std::filesystem::current_path(error).string();
-            if (error) {
-                m_programRoot = ".";
-            }
-        }
-        while (m_programRoot.size() > 1 && m_programRoot.back() == '/') {
-            m_programRoot.pop_back();
+            const std::filesystem::path working = std::filesystem::current_path(error);
+            m_programRoot = error ? std::string(".") : HostString(working);
         }
 
-        if (const char* configured = SDL_getenv("HOMM2_DATA");
-            configured != nullptr && *configured != '\0') {
+        const std::string configured = ConfiguredDirectory(SDL_getenv("HOMM2_DATA"));
+        if (!configured.empty()) {
+            // An explicit choice wins even when it is wrong; the archive open
+            // then names the path it tried.
             m_dataRoot = configured;
+            if (!HoldsGameData(m_dataRoot)) {
+                std::fprintf(
+                    stderr,
+                    "[homm2] HOMM2_DATA is %s, which has no DATA%cHEROES2.AGG\n",
+                    m_dataRoot.c_str(),
+                    kSeparator
+                );
+            }
         } else {
-            m_dataRoot = FindDataRoot();
+            m_dataRoot = FindDataRoot(m_programRoot);
         }
-        if (const char* localeData = SDL_getenv("HOMM2_LOCALE_DATA");
-            localeData != nullptr && *localeData != '\0') {
-            m_localeDataRoot = localeData;
-        }
+        m_localeDataRoot = ConfiguredDirectory(SDL_getenv("HOMM2_LOCALE_DATA"));
 #endif
 
         if (char* preferences = SDL_GetPrefPath("homm2", "homm2")) {
@@ -225,7 +231,7 @@ public:
 private:
     static bool Present(const std::string& path) {
         std::error_code error;
-        return !path.empty() && std::filesystem::exists(path, error);
+        return !path.empty() && std::filesystem::exists(HostPath(path), error);
     }
 
     static i32 NarrowPosition(Sint64 position) {
@@ -271,15 +277,17 @@ private:
         return found != m_streams.end() ? found->second : nullptr;
     }
 
-    static std::string FindDataRoot() {
+    // The program's own folder first: a Windows player puts the executable
+    // into the game folder and starts it from Explorer, whatever the
+    // current directory then is.
+    static std::string FindDataRoot(const std::string& programRoot) {
         std::vector<std::string> candidates;
-        if (const char* base = SDL_GetBasePath()) {
-            candidates.emplace_back(base);
-        }
+        candidates.push_back(programRoot);
         std::error_code error;
         const std::filesystem::path working = std::filesystem::current_path(error);
-        candidates.emplace_back(error ? std::string(".") : working.string());
+        candidates.push_back(error ? std::string(".") : HostString(working));
 
+#ifndef _WIN32
         std::string dataHome;
         if (const char* data = SDL_getenv("XDG_DATA_HOME"); data != nullptr && *data != '\0') {
             dataHome = data;
@@ -287,40 +295,34 @@ private:
             dataHome = std::string(home) + "/.local/share";
         }
         if (!dataHome.empty()) {
-            candidates.emplace_back(dataHome + "/homm2");
-            candidates.emplace_back(dataHome + "/homm2/data");
+            candidates.push_back(dataHome + "/homm2");
+            candidates.push_back(dataHome + "/homm2/data");
         }
         if (const char* home = SDL_getenv("HOME"); home != nullptr && *home != '\0') {
-            candidates.emplace_back(std::string(home) + "/games/homm2");
+            candidates.push_back(std::string(home) + "/games/homm2");
         }
+#endif
 
+        const std::string found = FindGameData(candidates);
+        if (!found.empty()) {
+            return found;
+        }
+        std::fprintf(stderr, "[homm2] no game data found; looked for DATA%cHEROES2.AGG in:\n", kSeparator);
         for (const std::string& candidate : candidates) {
-            if (HoldsGameData(candidate)) {
-                return candidate;
-            }
+            std::fprintf(stderr, "[homm2]   %s\n", candidate.c_str());
         }
         std::fprintf(
             stderr,
-            "[homm2] no game data found, set HOMM2_DATA to the directory holding "
-            "DATA/HEROES2.AGG\n"
+            "[homm2] put the game next to its DATA folder, or set HOMM2_DATA to that folder\n"
         );
         return candidates.front();
-    }
-
-    static bool HoldsGameData(const std::string& directory) {
-        std::error_code error;
-        return std::filesystem::exists(
-            ResolveIn(directory, "DATA\\HEROES2.AGG"),
-            error
-        );
     }
 
     static std::filesystem::path Directory(
         const std::string& root,
         const std::string& directory
     ) {
-        return directory.empty() ? std::filesystem::path(root)
-                                 : std::filesystem::path(ResolveIn(root, directory.c_str()));
+        return HostPath(directory.empty() ? root : ResolveIn(root, directory.c_str()));
     }
 
     static void Collect(
@@ -331,7 +333,7 @@ private:
         std::vector<std::string> found;
         std::error_code error;
         for (const auto& entry : std::filesystem::directory_iterator(root, error)) {
-            const std::string name = entry.path().filename().string();
+            const std::string name = HostString(entry.path().filename());
             if (!Matches(wildcard.c_str(), name.c_str())) {
                 continue;
             }

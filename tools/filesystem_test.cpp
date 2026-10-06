@@ -1,6 +1,7 @@
 #include <PLATFORM/FileSystem.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
@@ -8,8 +9,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <unistd.h>
 
 namespace {
 
@@ -82,25 +81,85 @@ private:
     i32 m_chunk;
 };
 
+#ifdef _WIN32
+#define SEPARATOR "\\"
+#else
+#define SEPARATOR "/"
+#endif
+
+bool ExpectConfigured(const char* value, const char* expected, const char* description) {
+    return Expect(platform::ConfiguredDirectory(value), expected, description);
+}
+
+bool CheckConfiguredDirectories() {
+    bool valid = true;
+    valid &= ExpectConfigured(nullptr, "", "unset directory");
+    valid &= ExpectConfigured("", "", "empty directory");
+    valid &= ExpectConfigured("  ", "", "blank directory");
+    valid &= ExpectConfigured("\"\"", "", "quoted empty directory");
+    valid &= ExpectConfigured("/games/homm2", "/games/homm2", "plain directory");
+    valid &= ExpectConfigured("\"/games/homm 2\"", "/games/homm 2", "cmd keeps quotes in set");
+    valid &= ExpectConfigured(" \"/games/homm2\" ", "/games/homm2", "blanks around quotes");
+    valid &= ExpectConfigured("/games/homm2/", "/games/homm2", "trailing separator");
+    valid &= ExpectConfigured("/", "/", "root survives");
+    valid &= ExpectConfigured("\"/games/homm2", "\"/games/homm2", "unbalanced quote is kept");
+#ifdef _WIN32
+    valid &= ExpectConfigured(
+        "\"C:\\Games\\Heroes of Might and Magic II\"",
+        "C:\\Games\\Heroes of Might and Magic II",
+        "quoted drive path"
+    );
+    valid &= ExpectConfigured("C:\\Games\\Heroes II\\", "C:\\Games\\Heroes II", "drive path trailing separator");
+    valid &= ExpectConfigured("C:\\", "C:\\", "drive root survives");
+#endif
+    return valid;
+}
+
+bool CheckHostPaths() {
+    bool valid = true;
+    const std::string name = "Герои II/DATA";
+    valid &= Expect(platform::HostString(platform::HostPath(name)) == name
+            || platform::HostString(platform::HostPath(name)) == "Герои II\\DATA",
+        true, "UTF-8 host path round trip");
+    valid &= Expect(
+        platform::HostPath("Герои").u8string() == u8"Герои",
+        true,
+        "UTF-8 host path is not read in the ANSI code page"
+    );
+    return valid;
+}
+
 }
 
 int main() {
     bool valid = true;
     valid &= Expect(
         platform::ResolveIn("/game", ".\\GAMES\\AUTOSAVE.GIC"),
-        "/game/GAMES/AUTOSAVE.GIC",
+        "/game" SEPARATOR "GAMES" SEPARATOR "AUTOSAVE.GIC",
         "retail separators"
     );
     valid &= Expect(
         platform::ResolveIn("/game", "DATA/../MAPS/TEST.MP2"),
-        "/game/MAPS/TEST.MP2",
+        "/game" SEPARATOR "MAPS" SEPARATOR "TEST.MP2",
         "parent component inside root"
     );
     valid &= Expect(
         platform::ResolveIn("/game", "../../outside"),
-        "/game/outside",
+        "/game" SEPARATOR "outside",
         "parent component cannot escape root"
     );
+    valid &= Expect(
+        platform::ResolveIn("/game/", "C:\\DATA\\HEROES2.AGG"),
+        "/game/DATA" SEPARATOR "HEROES2.AGG",
+        "drive letter and trailing root separator"
+    );
+#ifdef _WIN32
+    valid &= Expect(
+        platform::ResolveIn("C:\\Games\\Heroes II\\", ".\\DATA\\heroes2x.agg"),
+        "C:\\Games\\Heroes II\\DATA\\heroes2x.agg",
+        "Windows root with a trailing backslash"
+    );
+#else
     valid &= Expect(platform::IsUserState("HEROES2.CFG"), true, "preferences are user state");
     valid &= Expect(
         platform::IsUserState(".\\GAMES\\AUTOSAVE.GIC"),
@@ -122,22 +181,51 @@ int main() {
         false,
         "state classification normalizes parent components"
     );
+#endif
+    valid &= CheckConfiguredDirectories();
+    valid &= CheckHostPaths();
 
+    const std::string stamp =
+        std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     const std::filesystem::path caseRoot = std::filesystem::temp_directory_path()
-        / ("homm2-filesystem-test-" + std::to_string(::getpid()));
+        / platform::HostPath("homm2-filesystem-тест-" + stamp);
+    const std::string caseText = platform::HostString(caseRoot);
     std::error_code fileError;
     std::filesystem::remove_all(caseRoot, fileError);
     std::filesystem::create_directories(caseRoot / "DATA", fileError);
-    std::filesystem::create_directories(caseRoot / "data", fileError);
-    valid &= Expect(!fileError, true, "case-collision fixture creation");
+    valid &= Expect(!fileError, true, "case fixture creation");
+    std::ofstream(caseRoot / "DATA" / "HEROES2.AGG").put('x');
+
+    valid &= Expect(platform::HoldsGameData(caseText), true, "uppercase installation holds game data");
     valid &= Expect(
-        platform::ResolveIn(caseRoot.string(), "DaTa/HEROES2.AGG"),
+        platform::FindGameData({"", caseText + SEPARATOR "missing", caseText}),
+        caseText.c_str(),
+        "first candidate holding game data wins"
+    );
+    valid &= Expect(
+        platform::FindGameData({caseText + SEPARATOR "missing"}),
+        "",
+        "no candidate holds game data"
+    );
+    valid &= Expect(
+        std::filesystem::exists(
+            platform::HostPath(platform::ResolveIn(caseText, ".\\data\\heroes2.agg"))
+        ),
+        true,
+        "lowercase request finds uppercase archive below a non-ASCII root"
+    );
+
+#ifndef _WIN32
+    // Windows folders are case-insensitive, so a collision cannot be made there.
+    std::filesystem::create_directories(caseRoot / "data", fileError);
+    valid &= Expect(
+        platform::ResolveIn(caseText, "DaTa/HEROES2.AGG"),
         "",
         "ambiguous case-folded path fails deterministically"
     );
     std::filesystem::remove_all(caseRoot / "data", fileError);
     valid &= Expect(
-        platform::ResolveIn(caseRoot.string(), "data/HEROES2.AGG"),
+        platform::ResolveIn(caseText, "data/HEROES2.AGG"),
         (caseRoot / "DATA" / "HEROES2.AGG").string().c_str(),
         "single case-folded path uses existing spelling"
     );
@@ -148,6 +236,7 @@ int main() {
         false,
         "unwritable state root reports failure"
     );
+#endif
     std::filesystem::remove_all(caseRoot, fileError);
 
     ChunkedFileSystem chunked({1, 2, 3, 4, 5}, 2);
