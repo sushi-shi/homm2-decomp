@@ -655,6 +655,18 @@ msgctxt "editor.events.ultimate_artifact.radius_range"
 msgid "Must be between 0 and 127."
 msgstr "Значение должно быть от 0 до 127. "
 
+msgctxt "editor.file.confirm_load"
+msgid "Are you sure you want to load a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите загрузить новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
+msgctxt "editor.file.confirm_new"
+msgid "Are you sure you want to create a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите создать новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
+msgctxt "editor.file.confirm_quit"
+msgid "Are you sure you want to quit?"
+msgstr "Вы действительно хотите выйти?"
+
 msgctxt "editor.grab.failed"
 msgid "Couldn't grab object!"
 msgstr "Нельзя схватить объект!"

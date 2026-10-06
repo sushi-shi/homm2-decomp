@@ -12776,6 +12776,267 @@ b32 editManager::FindHero(i32 index, i32* x, i32* y) {
     return false;
 }
 
+H2_ENUM_BEGIN(EditFileMenu)
+    // The file menu (ecpanel.bin) at (144, 40): new map, load, quit, save
+    // and the close button, and their help rows (gFileMenuHelp).
+    EDIT_FILE_MENU_X      = 144,
+    EDIT_FILE_MENU_Y      = 40,
+    EDIT_FILE_MENU_NEW    = 101,
+    EDIT_FILE_MENU_LOAD   = 102,
+    EDIT_FILE_MENU_QUIT   = 105,
+    EDIT_FILE_MENU_SAVE   = 106,
+    EDIT_FILE_MENU_CLOSE  = DIALOG_BUTTON_0,
+    EDIT_FILE_MENU_NONE   = -1,
+    EDIT_MENU_HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
+    EDIT_MENU_QUESTION_SIZE = 200
+H2_ENUM_END(EditFileMenu)
+
+// The file menu: the button chosen (EDIT_FILE_MENU_NONE when closed).
+VA(0x0040f317, 0xfb)
+i32 FileOptions(void) {
+    i32 result;
+    heroWindow* window;
+    tag_message H2_UNUSED(message);
+
+    window = new heroWindow(EDIT_FILE_MENU_X, EDIT_FILE_MENU_Y, "ecpanel.bin");
+    if (window == NULL)
+        MemError();
+    gpWindowManager->DoDialog(window, FileOptionsHandler, 0);
+    delete window;
+    result = EDIT_FILE_MENU_NONE;
+    switch (gpWindowManager->m_dialogResult) {
+        case EDIT_FILE_MENU_NEW:
+        case EDIT_FILE_MENU_LOAD:
+        case EDIT_FILE_MENU_QUIT:
+        case EDIT_FILE_MENU_SAVE:
+            result = gpWindowManager->m_dialogResult;
+            break;
+    }
+    return result;
+}
+
+// New map, load and quit ask first; save and close close the menu at once.
+VA(0x0040f412, 0x270)
+MessageDispatchResult FileOptionsHandler(struct tag_message& message) {
+    b32 bDone;
+    char text[EDIT_MENU_QUESTION_SIZE];
+
+    bDone = false;
+    if (message.type == MESSAGE_WIDGET) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
+                i32 helpIndex;
+
+                helpIndex = -1;
+                switch (message.payload.widget.id) {
+                    case EDIT_FILE_MENU_NEW:
+                        helpIndex = 0;
+                        break;
+                    case EDIT_FILE_MENU_LOAD:
+                        helpIndex = 1;
+                        break;
+                    case EDIT_FILE_MENU_SAVE:
+                        helpIndex = 2;
+                        break;
+                    case EDIT_FILE_MENU_QUIT:
+                        helpIndex = 3;
+                        break;
+                    case EDIT_FILE_MENU_CLOSE:
+                        helpIndex = 4;
+                        break;
+                }
+                if (helpIndex >= 0)
+                    NormalDialog(gFileMenuHelp[helpIndex], EDIT_MENU_HELP_DIALOG);
+            }
+        } else {
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_DESELECT:
+                    switch (message.payload.widget.id) {
+                        case EDIT_FILE_MENU_NEW:
+                            strcpy(text, localization::Tr("editor.file.confirm_new"));
+                            goto confirm;
+                        case EDIT_FILE_MENU_LOAD:
+                            strcpy(text, localization::Tr("editor.file.confirm_load"));
+                            goto confirm;
+                        case EDIT_FILE_MENU_QUIT:
+                            strcpy(text, localization::Tr("editor.file.confirm_quit"));
+                        confirm:
+                            bDone = true;
+                            NormalDialog(text, NORMAL_DIALOG_CONFIRM);
+                            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_NO)
+                                bDone = false;
+                            break;
+                        case EDIT_FILE_MENU_SAVE:
+                        case EDIT_FILE_MENU_CLOSE:
+                            bDone = true;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    if (bDone) {
+        FINISH_DIALOG_MESSAGE(message);
+        return MESSAGE_DISPATCH_FORWARD;
+    }
+    return MESSAGE_DISPATCH_CONSUME;
+}
+
+H2_ENUM_BEGIN(EditSystemOptions)
+    // The system options (espanel.bin) at (160, 33): the toggles' buttons
+    // and texts, the frame offset of each toggle's on/off pair, and the
+    // help rows (gSystemOptionsHelp).
+    EDIT_OPTIONS_X                    = 160,
+    EDIT_OPTIONS_Y                    = 33,
+    EDIT_OPTIONS_TITLE                = 3,
+    EDIT_OPTIONS_ANIMATION_BUTTON     = 10,
+    EDIT_OPTIONS_CYCLING_BUTTON       = 11,
+    EDIT_OPTIONS_OBJECT_BOXES_BUTTON  = 13,
+    EDIT_OPTIONS_COLOR_MICE_BUTTON    = 14,
+    EDIT_OPTIONS_ANIMATION_TEXT       = 20,
+    EDIT_OPTIONS_CYCLING_TEXT         = 21,
+    EDIT_OPTIONS_OBJECT_BOXES_TEXT    = 23,
+    EDIT_OPTIONS_COLOR_MICE_TEXT      = 24,
+    EDIT_OPTIONS_ANIMATION_FRAMES     = 0,
+    EDIT_OPTIONS_CYCLING_FRAMES       = 2,
+    EDIT_OPTIONS_OBJECT_BOXES_FRAMES  = 4,
+    EDIT_OPTIONS_COLOR_MICE_FRAMES    = 6,
+    EDIT_OPTIONS_CLOSE                = DIALOG_BUTTON_0
+H2_ENUM_END(EditSystemOptions)
+
+// The system options window, and whether a toggle changed the preferences.
+DATA(0x004a3a44)
+heroWindow* ESPanel;
+DATA(0x0049f5dc)
+b32 bEPrefsChanged;
+
+VA(0x0040f682, 0xe9)
+void editManager::SystemOptions(void) {
+    tag_message H2_UNUSED(message);
+
+    bEPrefsChanged = false;
+    ESPanel = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
+    if (!ESPanel)
+        MemError();
+    SetWinText(ESPanel, EDIT_OPTIONS_TITLE);
+    UpdateEditorSystemOptions(1);
+    gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
+    delete ESPanel;
+    if (bEPrefsChanged)
+        WritePrefs();
+}
+
+VA(0x0040f76b, 0x165)
+void UpdateEditorSystemOptions(i32 initialDraw) {
+    tag_message message;
+
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, EDIT_OPTIONS_ANIMATION_BUTTON);
+    message.payload.widget.data.value = gConfig.editorScreenAnimation + EDIT_OPTIONS_ANIMATION_FRAMES;
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_CYCLING_BUTTON;
+    message.payload.widget.data.value = gConfig.editorPaletteCycling + EDIT_OPTIONS_CYCLING_FRAMES;
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_BUTTON;
+    message.payload.widget.data.value = gConfig.showObjectBoxes + EDIT_OPTIONS_OBJECT_BOXES_FRAMES;
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_BUTTON;
+    message.payload.widget.data.value
+        = CURRENT_GRAPHICS_CONFIG.colorMouseCursor + EDIT_OPTIONS_COLOR_MICE_FRAMES;
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = EDIT_OPTIONS_ANIMATION_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.editorScreenAnimation];
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_CYCLING_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.editorPaletteCycling];
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.showObjectBoxes];
+    ESPanel->BroadcastMessage(message);
+    message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_TEXT;
+    message.payload.widget.data.text = onOffText[CURRENT_GRAPHICS_CONFIG.colorMouseCursor];
+    ESPanel->BroadcastMessage(message);
+    if (!initialDraw)
+        ESPanel->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
+}
+
+VA(0x0040f8d0, 0x269)
+MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
+    b32 bRedraw = false;
+    b32 bDone = false;
+
+    if (message.type == MESSAGE_WIDGET) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
+                i32 helpIndex = -1;
+                switch (message.payload.widget.id) {
+                    case EDIT_OPTIONS_CLOSE:
+                        helpIndex = 0;
+                        break;
+                    case EDIT_OPTIONS_ANIMATION_BUTTON:
+                        helpIndex = 1;
+                        break;
+                    case EDIT_OPTIONS_CYCLING_BUTTON:
+                        helpIndex = 2;
+                        break;
+                    case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
+                        helpIndex = 3;
+                        break;
+                    case EDIT_OPTIONS_COLOR_MICE_BUTTON:
+                        helpIndex = 4;
+                        break;
+                }
+                if (helpIndex >= 0)
+                    NormalDialog(gSystemOptionsHelp[helpIndex], EDIT_MENU_HELP_DIALOG);
+            }
+        } else {
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_DESELECT:
+                    switch (message.payload.widget.id) {
+                        case EDIT_OPTIONS_CLOSE:
+                            bDone = true;
+                            break;
+                    }
+                    break;
+                case WIDGET_NOTIFY_SELECT:
+                    switch (message.payload.widget.id) {
+                        case EDIT_OPTIONS_ANIMATION_BUTTON:
+                            gConfig.editorScreenAnimation = 1 - gConfig.editorScreenAnimation;
+                            bRedraw = true;
+                            bEPrefsChanged = true;
+                            break;
+                        case EDIT_OPTIONS_CYCLING_BUTTON:
+                            gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
+                            gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+                            bRedraw = true;
+                            bEPrefsChanged = true;
+                            break;
+                        case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
+                            gConfig.showObjectBoxes = 1 - gConfig.showObjectBoxes;
+                            bRedraw = true;
+                            bEPrefsChanged = true;
+                            break;
+                        case EDIT_OPTIONS_COLOR_MICE_BUTTON:
+                            CURRENT_GRAPHICS_CONFIG.colorMouseCursor
+                                = 1 - CURRENT_GRAPHICS_CONFIG.colorMouseCursor;
+                            bRedraw = true;
+                            bEPrefsChanged = true;
+                            gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    if (bRedraw)
+        UpdateEditorSystemOptions(0);
+    if (bDone) {
+        FINISH_DIALOG_MESSAGE(message);
+        return MESSAGE_DISPATCH_FORWARD;
+    }
+    return MESSAGE_DISPATCH_CONSUME;
+}
+
 // Switches the ground under the pointer between its plain and a varied
 // tile.
 VA(0x0040fb39, 0x11b)
