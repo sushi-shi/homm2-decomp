@@ -9,6 +9,7 @@
 #include <va.h>
 #include <BASE/baseManager.h>
 #include <SOURCE/REQUEST.h>
+#include <EDITOR/mapcell.h>
 
 class heroWindow;
 class icon;
@@ -113,18 +114,48 @@ public:
     void FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain);
     // Starts an empty (or random) map of the given size.
     void InitializeMap(b32 random, i32 width, i32 height);
+    // Fits the terrain's edge tiles to their neighbours over the whole map.
+    void BlendTerrain(i32 terrain, b32 unused, b32 fromUndo, b32 skipBorders, b32 skipFill);
     void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 layer, i32 keepObjects);
+    i32 SaveMap(char* name);
+    // Rerolls every plain ground tile to one of its variants, more often at
+    // a higher variety (0-9).
+    void RandomizeGround(i32 variety);
+    // The random map generator (RANDOM).
+    void GenerateRandomMap(void);
+    b32 HasEnoughCastles(void);
+    void PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain);
+    void RemoveSmallRegions(void);
+    i32 CountNearbyObstacles(i32 x, i32 y);
+    void PlaceObstacleChains(i32 density, b32 mountains);
+    b32 PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset);
+    void PlaceTowns(void);
+    i32 PlaceResourceSite(i32 x, i32 y, i32 resource);
+    void PlaceRandomObjects(i32 density, i32 monsterDensity);
+    void PlaceTreasures(i32 density, i32 monsterDensity);
+    void ScatterDecorations(void);
 };
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
 
 extern editManager* gEditManager;
+// Set while BlendTerrain may pick ground variants.
+extern b32 gVaryTiles;
+// ClearArea's object filter: the tilesets whose objects it erases.
+extern u8 gClearTilesets[TILESET_COUNT];
+
+H2_ENUM_BEGIN(EditClearMask)
+    // ClearArea's layer masks: everything, or what a road may cross.
+    EDIT_CLEAR_ALL       = 0xffff,
+    EDIT_CLEAR_ROAD_MASK = 0xfc7f
+H2_ENUM_END(EditClearMask)
+
+// The ground tile of a terrain and shape: the plain or a varied tile (vary),
+// whose variant is rolled at (x, y) with the given chance.
+u16 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
 // The header of the edited map (its name, size and players).
 extern SMapHeader gEditMapHeader;
 
-// A ground tile of the terrain and shape for the map cell (random among
-// equivalent tiles when `random`).
-i32 SelectTerrainTile(i32 terrain, i32 shape, i32 random, i32 x, i32 y, i32 mode, float weight);
 void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
 
 // Rebuilds the overlay tiles of the whole map.

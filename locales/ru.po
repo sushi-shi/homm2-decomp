@@ -567,6 +567,50 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.random.castles_failed"
+msgid "Unable to place castles"
+msgstr "Невозможно установить замки"
+
+msgctxt "editor.random.saved"
+msgid "'%s' saved successfully"
+msgstr "Карта '%s' успешно сохранена."
+
+msgctxt "editor.random.status.castles"
+msgid "Generating map - Placing Castles..."
+msgstr "Генерация карты - размещаю замки..."
+
+msgctxt "editor.random.status.land"
+msgid "Generating map - Analyzing Land Mass..."
+msgstr "Генерация карты - анализирую земной массив..."
+
+msgctxt "editor.random.status.mountains"
+msgid "Generating map - Placing mountains..."
+msgstr "Генерация карты - размещаю горы..."
+
+msgctxt "editor.random.status.objects"
+msgid "Generating map - Placing objects..."
+msgstr "Генерация карты - размещаю объекты..."
+
+msgctxt "editor.random.status.roads"
+msgid "Generating map - Connecting Castles..."
+msgstr "Генерация карты - соединяю замки..."
+
+msgctxt "editor.random.status.smoothing"
+msgid "Generating map - Cleaning up ground..."
+msgstr "Генерация карты - шлифую рельеф..."
+
+msgctxt "editor.random.status.terrain"
+msgid "Generating map - Drawing ground type - %s"
+msgstr "Генерация карты - рисую землю, тип - %s"
+
+msgctxt "editor.random.status.treasure"
+msgid "Generating map - Placing treasures..."
+msgstr "Генерация карты - размещаю сокровища..."
+
+msgctxt "editor.random.status.trees"
+msgid "Generating map - Placing trees..."
+msgstr "Генерация карты - размещаю деревья..."
+
 msgctxt "editor.startup.cd_required"
 msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
 msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."

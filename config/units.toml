@@ -591,3 +591,14 @@ unit = "EDITOR/EDITMGR"
 source = "src/EDITOR/EDITMGR.cpp"
 images = ["editor"]
 flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/terrain"
+source = "src/EDITOR/terrain.cpp"
+images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/RANDOM"
+source = "src/EDITOR/RANDOM.cpp"
+images = ["editor"]
+flags = "base_nogf"

@@ -145,8 +145,6 @@ H2_ENUM_BEGIN(EditKnobGeometry)
     EDIT_ZOOM_SHIFT_SMALL = 7,
     EDIT_ZOOM_SHIFT_LARGE = 21,
     EDIT_ZOOM_SHIFT_BACK  = 14,
-    // ClearArea's masks: every object class.
-    EDIT_CLEAR_ALL = 0xffff,
     // A ground cell's overlay-extra and hero-cursor flags.
     EDIT_CELL_GROUND_KEEP = 0x9f
 H2_ENUM_END(EditKnobGeometry)
@@ -1052,8 +1050,8 @@ void editManager::PaintGround(i32 column, i32 row, i32 width, i32 height, i32 te
     gEditManager->ClearArea(startX, startY, width, height, EDIT_CLEAR_ALL, 0, 0);
     for (i = 0; i < width; i++)
         for (j = 0; j < height; j++)
-            gMap.Cell(startX + i, startY + j)->m_terrainImageIndex
-                = SelectTerrainTile(terrain, 0, 1, startX + i, startY + j, 0, 1.0f);
+            gMap.CellAt(startX + i, startY + j)->m_terrainImageIndex
+                = ChooseGroundTile(terrain, 0, 1, startX + i, startY + j, 0, 1.0f);
 }
 
 VA(0x004058b5, 0xe9)
@@ -1064,8 +1062,8 @@ void editManager::FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain) {
     gEditManager->ClearArea(x, y, width, height, EDIT_CLEAR_ALL, 0, 0);
     for (i = x; i < x + width; i++) {
         for (j = y; j < y + height; j++) {
-            gMap.Cell(i, j)->m_terrainImageIndex
-                = SelectTerrainTile(terrain, 0, 1, i, j, 0, 1.0f);
+            gMap.CellAt(i, j)->m_terrainImageIndex
+                = ChooseGroundTile(terrain, 0, 1, i, j, 0, 1.0f);
             gMap.Column(i)[j * gMap.width].m_flags &= EDIT_CELL_GROUND_KEEP;
         }
     }
@@ -1080,7 +1078,7 @@ void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape) {
     if (giGroundToTerrain[cell->m_terrainImageIndex] == terrain
         && (giGroundShape[cell->m_terrainImageIndex] & 0x7f) == (shape & 0x7f))
         return;
-    cell->m_terrainImageIndex = SelectTerrainTile(terrain, shape, 1, x, y, 0, 1.0f);
+    cell->m_terrainImageIndex = ChooseGroundTile(terrain, shape, 1, x, y, 0, 1.0f);
 }
 
 // Centres the view on the radar cell under the pointer while the button is

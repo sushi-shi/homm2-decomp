@@ -61,12 +61,10 @@ public:
     mapCell* GetCell(i32 x, i32 y) {
         return &Column(x)[y * width];
     }
-#ifdef HOMM2_EDITOR
-    // The editor's cell accessor: the column first, then the row.
-    mapCell* Cell(i32 x, i32 y) {
+    // The editor's cell accessor: its address is formed column first.
+    mapCell* CellAt(i32 x, i32 y) {
         return cells + x + y * width;
     }
-#endif
     mapCellExtra* Extra(i32 i) {
         return &extras[i];
     }

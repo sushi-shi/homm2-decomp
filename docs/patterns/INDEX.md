@@ -27,6 +27,8 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [paren-suppresses-fp-commute](paren-suppresses-fp-commute.md) | `fld`/`fmul` on the wrong float operands and no source order helps → parenthesise the indexed operand |
 | [sret-copy-vs-elided-init](sret-copy-vs-elided-init.md) | `rep movsl` after a struct-returning call → the local was declared first and assigned, not initialised |
 | [fidiv-vs-fild-fdivp](fidiv-vs-fild-fdivp.md) | `fild;fild;fdivp` instead of `fidiv` → the division itself is `double`, whatever the operand casts say |
+| [parenthesized-float-cast-divisor](parenthesized-float-cast-divisor.md) | `fild;fild;fdivp` with a `dword` multiply after it → the divisor's float cast is parenthesized, `a / (static_cast<float>(b))` |
+| [column-first-cell-accessor](column-first-cell-accessor.md) | editor cell addresses row-first when read but column-first when kept across the value's call → the inline `cells + x + y * width` accessor (`fullMap::CellAt`), not `GetCell` |
 | [narrow-inline-accessor-spill](narrow-inline-accessor-spill.md) | extra byte-store + `movsx` off a frame slot, frame one slot too big → retail read the member, not the `i8` inline accessor |
 | [duplicate-string-cells-no-gf](duplicate-string-cells-no-gf.md) | target has `$anon_str_<hash>_0.._N` where we have one → that unit compiled without `/Gf`; move it to `base_nogf` |
 | [goto-label-jump-stub](goto-label-jump-stub.md) | loop exit reaches its join through a `jmp` stub parked before the epilogue → source `goto`, not `break` |
