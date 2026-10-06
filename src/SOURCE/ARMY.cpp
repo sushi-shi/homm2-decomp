@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -731,7 +732,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly) {
             spellY + m_spellEffectYOffset,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            IconDrawOrientationFromOrdinal(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
+            m_facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
             0,
             NULL,
             NULL
@@ -3875,22 +3876,19 @@ i32 army::SpellCastWorks(SpellType spell) {
 }
 
 static void AppendWalkAnimation(struct SMonFrameInfo* frameInfo, ArmyAnimationSequence source) {
-    if (frameInfo->animationFrameCount[H2EnumIndex(source)] <= 0) {
+    // Bounded like BuildTempWalkSeq: the walk row holds ARMY_ANIMATION_FRAME_COUNT frames.
+    auto& count = frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)];
+    const i32 available = ARMY_ANIMATION_FRAME_COUNT - count;
+    const i32 length = std::clamp<i32>(frameInfo->animationFrameCount[H2EnumIndex(source)], 0, available);
+    if (length == 0)
         return;
-    }
     memcpy(
-        &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                   [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
+        &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][count],
         frameInfo->animationFrames[H2EnumIndex(source)],
-        frameInfo->animationFrameCount[H2EnumIndex(source)]
+        length
     );
-    memcpy(
-        &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-        frameInfo->animationXOffsets[H2EnumIndex(source)],
-        frameInfo->animationFrameCount[H2EnumIndex(source)]
-    );
-    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-        frameInfo->animationFrameCount[H2EnumIndex(source)];
+    memcpy(&frameInfo->walkXOffsets[count], frameInfo->animationXOffsets[H2EnumIndex(source)], length);
+    count = static_cast<i8>(count + length);
 }
 
 // The teleporter's walk sequence: on a far move it winds up, blinks, and
@@ -3919,108 +3917,6 @@ void BuildTeleporterTempWalkSeq(
     }
 }
 
-void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing) {
-    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] = 0;
-    if (!skipDrawing && finishStanding) {
-        if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_STAND)];
-        }
-    } else {
-        if (!skipDrawing) {
-            if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)] > 0) {
-                memcpy(
-                    &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)]
-                );
-                memcpy(
-                    &frameInfo
-                         ->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)]
-                );
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)];
-            }
-        } else if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)];
-        }
-        if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)];
-        }
-        if (finishStanding) {
-            if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)] > 0) {
-                memcpy(
-                    &frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)]
-                );
-                memcpy(
-                    &frameInfo
-                         ->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                    frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)],
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)]
-                );
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                    frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END_STANDING)];
-            }
-        } else if (frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)] > 0) {
-            memcpy(
-                &frameInfo
-                     ->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)]
-                                      [frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_END)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)]
-            );
-            memcpy(
-                &frameInfo->walkXOffsets[frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]],
-                frameInfo->animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_END)],
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)]
-            );
-            frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] +=
-                frameInfo->animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)];
-        }
-    }
-}
 
 void army::DispelGood(void) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);

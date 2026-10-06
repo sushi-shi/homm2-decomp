@@ -23,6 +23,12 @@ typedef enum RippleConstant {
 } RippleConstant;
 
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
+    if (source == nullptr || destination == nullptr || source->m_pixels == nullptr
+        || destination->m_pixels == nullptr || source->m_width != LOGICAL_SCREEN_WIDTH
+        || destination->m_width != LOGICAL_SCREEN_WIDTH || height <= 0
+        || height > source->m_height || height > destination->m_height
+        || strength < 0 || strength > height / 7)
+        return;
     i32 index;
     u8 previous[LOGICAL_SCREEN_WIDTH];
     i32 deadline;
@@ -53,11 +59,13 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
             if (rippleProfile[index] == previous[column])
                 continue;
 
+            sourceRow = rippleProfile[index] * strength;
+            if (sourceRow >= height)
+                continue;
             u8* destinationPixel = destination->m_pixels + column;
             u8* sourcePixel =
                 source->m_pixels + column + rippleProfile[index] * LOGICAL_SCREEN_WIDTH * strength;
 
-            sourceRow = rippleProfile[index] * strength;
             for (; sourceRow < height; sourceRow++) {
                 *destinationPixel = *sourcePixel;
                 if (sourceRow + 1 == height)

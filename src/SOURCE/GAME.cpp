@@ -20,6 +20,7 @@
 #include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
+#include <limits>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -66,6 +67,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
 #include <SOURCE/SaveNames.h>
+#include <SOURCE/SaveEventHeader.h>
 #include <BASE/Utf8.h>
 
 #include <string>
@@ -80,6 +82,17 @@ void ReadGameData(i32 file, void* buffer, i32 count) {
 void WriteGameData(i32 file, const void* buffer, i32 count) {
     if (!platform::FileWriteExact(file, buffer, count))
         ShutDown(localization::Tr("system.file.write_error"));
+}
+
+void WriteEventHeader(i32 file, u16 count, u16 firstIndex) {
+    const auto record = EncodeSaveEventHeader(count, firstIndex);
+    WriteGameData(file, record.data(), record.size());
+}
+
+void ReadEventHeader(i32 file, u16& count, u16& firstIndex) {
+    SaveEventHeader record{};
+    ReadGameData(file, record.data(), record.size());
+    DecodeSaveEventHeader(record, count, firstIndex);
 }
 
 void RequireGameData(bool condition) {
@@ -141,7 +154,6 @@ typedef enum GameSaveFormatConstant {
     SAVE_SPARE_SLOT_COUNT              = 6,
     LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_TRUNCATED_SCALAR_SIZE         = sizeof(i8),
-    SAVE_EVENT_HEADER_SIZE             = sizeof(u16) * 2,
     SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
 } GameSaveFormatConstant;
 
@@ -897,7 +909,8 @@ typedef enum PuzzleSetupConstant {
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCount = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
-    float fraction = GetNumObelisks(player) / static_cast<double>(m_obeliskCount);
+    float fraction = m_obeliskCount > 0
+        ? static_cast<float>(GetNumObelisks(player) / static_cast<double>(m_obeliskCount)) : 0.0f;
     float interp =
         (fraction * fraction + fraction)
         / H2EnumIndex(PUZZLE_INTERPOLATION_TERM_COUNT)
@@ -1377,17 +1390,17 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
     }
     ReadGameData(fileDescriptor, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    ReadGameData(fileDescriptor, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    ReadEventHeader(fileDescriptor, m_rumourEventCount, m_rumourEventIndices[0]);
     RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
     ReadGameData(
         fileDescriptor,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    ReadGameData(fileDescriptor, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    ReadEventHeader(fileDescriptor, m_timeEventCount, m_timeEventIndices[0]);
     RequireGameData(m_timeEventCount <= GAME_TIME_EVENT_CAPACITY);
     ReadGameData(fileDescriptor, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    ReadGameData(fileDescriptor, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    ReadEventHeader(fileDescriptor, m_mapEventCount, m_mapEventIndices[0]);
     RequireGameData(m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
     ReadGameData(fileDescriptor, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
@@ -5032,7 +5045,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     i32 i;
     i32 cutoff;
     i32 j;
-    u8 mask = static_cast<u8>(1 << player);
+    u8 mask = 1 << player;
     i32 visibilityRange;
     i32 distance;
 
@@ -5087,7 +5100,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
 }
 
 void game::MakeAllWaterVisible(i32 player) {
-    char mask = static_cast<char>(1 << player);
+    char mask = 1 << player;
     i32 x;
     i32 y;
     for (x = 0; x < MAP_WIDTH; x++) {
@@ -6924,7 +6937,8 @@ void CreateDiffFile(
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", joinName);
     joinSize = FileSize(gText);
-    fullData = static_cast<u8*>(H2_ALLOC(joinSize));
+    RequireGameData(joinSize >= 0 && joinSize <= JOIN_BUFFER_SIZE);
+    fullData = static_cast<u8*>(H2_ALLOC(joinSize > 0 ? joinSize : 1));
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", joinName);
     readFile = platform::FileOpen(gText, platform::FileMode::Read);
     if (readFile == -1)
@@ -6936,7 +6950,8 @@ void CreateDiffFile(
     if (!forceWhole) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         oldSize = FileSize(gText);
-        prevData = static_cast<u8*>(H2_ALLOC(oldSize));
+        RequireGameData(oldSize >= 0 && oldSize <= JOIN_BUFFER_SIZE);
+        prevData = static_cast<u8*>(H2_ALLOC(oldSize > 0 ? oldSize : 1));
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         inFd = platform::FileOpen(gText, platform::FileMode::Read);
         if (inFd == -1)
@@ -6963,7 +6978,7 @@ void CreateDiffFile(
         matchLength = length;
         while (1) {
             if (position + length >= oldSize || position + length >= joinSize) {
-                length = oldSize - position;
+                length = joinSize - position;
                 RequireGameData(
                     WriteDiffHeaderInfo(1, length, diffOut, diffCapacity, &diffTotal)
                 );
@@ -7048,6 +7063,8 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", diffName);
     diffLength = FileSize(gText);
+    RequireGameData(diffLength >= JOIN_HEADER_SIZE
+                    && diffLength <= H2EnumIndex(JOIN_BUFFER_SIZE) + H2EnumIndex(DIFF_BUFFER_EXTRA));
     diffData = static_cast<u8*>(H2_ALLOC(diffLength));
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", diffName);
     diffFile = platform::FileOpen(gText, platform::FileMode::Read);
@@ -7065,7 +7082,8 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     } else {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         oldSize = FileSize(gText);
-        oldBuffer = static_cast<u8*>(H2_ALLOC(oldSize));
+        RequireGameData(oldSize >= 0 && oldSize <= JOIN_BUFFER_SIZE);
+        oldBuffer = static_cast<u8*>(H2_ALLOC(oldSize > 0 ? oldSize : 1));
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         diffFile = platform::FileOpen(gText, platform::FileMode::Read);
         if (diffFile == -1)
@@ -7091,7 +7109,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
                 position += copyLength;
             } else {
                 RequireGameData(
-                    copyLength >= 0 && copyLength <= JOIN_BUFFER_SIZE - outSize
+                    copyLength >= 0 && outSize <= oldSize && copyLength <= oldSize - outSize
                 );
                 outSize += copyLength;
             }
@@ -7275,7 +7293,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     for (i = 0; i < gpGame->m_mapEventCount; i++) {
         event = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEventIndices[i]]);
         if (event->x == x && event->y == y && event->active != 0
-            && event->players[gpGame->m_players[static_cast<i8>(giCurPlayer)].m_color] != 0)
+            && event->players[gpGame->m_players[giCurPlayer].m_color] != 0)
             return event;
     }
     return NULL;
@@ -7297,7 +7315,7 @@ void game::CheckForTimeEvent(void) {
         event = static_cast<timeEventExtra*>(ppMapExtra[m_timeEventIndices[eventIndex]]);
         if (((gbHumanPlayer[giCurPlayer] && event->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event->appliesToComputer))
-            && event->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]
+            && event->players[GetPlayerColor(giCurPlayer)]
             && (event->firstDay == dayNumber
                 || (event->repeatInterval != 0 && dayNumber > event->firstDay
                     && (dayNumber - event->firstDay) % event->repeatInterval == 0))) {
