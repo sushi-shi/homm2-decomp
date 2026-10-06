@@ -61,8 +61,7 @@ homm2 build
 python3 -m homm2.audit.object_equivalence \
   /path/to/pre-edit-objects build/objdiff/base
 homm2 relocs --fields
-python3 -m homm2.audit.readability_contracts
-homm2 selftest
+homm2 verify behaviour
 python3 -m homm2.audit.readability --write
 python3 -m homm2.audit.readability --check
 ```

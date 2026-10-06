@@ -22,6 +22,6 @@ Sweep drivers, for running the above unattended over a queue:
   recover_historical_exact     re-earns MAX for functions that were exact historically.
 
 Everything here can WRITE: the engines edit src/ in place and the drivers touch
-config/match_baseline.tsv. Their restore and ledger-integrity contracts are pinned
-by the colocated tests - run `homm2 selftest permute` after changing any of them.
+config/match_baseline.tsv. After a run, `git status` must show src/ unchanged and
+a ledger change only from an audited exact closure.
 """

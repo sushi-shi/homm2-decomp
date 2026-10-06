@@ -34,7 +34,7 @@ def _has_logged(node: ast.FunctionDef) -> bool:
 def uninstrumented() -> list[str]:
     missing = []
     for path in sorted((REPO / "scripts/homm2").rglob("*.py")):
-        if path.name.startswith("test_") or "testdata" in path.parts or "fixtures" in path.parts:
+        if path.name.startswith("test_"):
             continue
         if path.is_relative_to(REPO / "scripts/homm2/clean/project"):
             continue

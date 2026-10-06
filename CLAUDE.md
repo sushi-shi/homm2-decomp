@@ -60,7 +60,7 @@ homm2 build                # configure, compile, compare, and run hard gates
 homm2 status               # current metrics plus observation-only retained maxima
 homm2 status update        # explicitly record maxima for current function hashes
 homm2 status --force-refresh
-homm2 selftest             # the tool test suite (run after changing anything in scripts/)
+homm2 verify behaviour     # game-behaviour tests of the reconstructed code
 ```
 
 `homm2 build` validates the delink stamp against every input (exe, PDB,
@@ -102,9 +102,9 @@ always-on gates; `build/configure/` generates build.ninja behind the root shim),
 `clean/` (`homm2 clean`), `format/`, `init/`, `ghidra/`. Provisioning lives in
 `scripts/toolchain/`, retired tooling in `scripts/archive/`.
 
-Tests live beside what they test; `homm2 selftest` runs them and asserts a case-count
-floor, because a package missing `__init__.py` is skipped by discovery silently rather
-than failing. Add a tool to its role package, not to a new top-level file.
+The only tests are game-behaviour tests (`scripts/homm2/verify/behaviour/`, run by
+`homm2 verify behaviour`): they check what the reconstructed code does, not how the
+tooling matches it. Add a tool to its role package, not to a new top-level file.
 
 ## Repository Model
 

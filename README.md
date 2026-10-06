@@ -100,7 +100,7 @@ homm2 link                # source-only link; never opens the retail executable
 homm2 link --rsrc         # + reconstructed resources and retail-extracted icon
 homm2 link --historical   # native resources + observed PDB path and link times
 homm2 status              # per-unit and overall match %
-homm2 selftest            # tool test suite
+homm2 verify behaviour    # game-behaviour tests
 ```
 
 After changing a `VA`/`DATA`/`VTBL` claim, function signature, or data-owner

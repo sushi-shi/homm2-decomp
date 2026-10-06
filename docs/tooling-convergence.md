@@ -22,8 +22,8 @@ This document is the migration ledger. Each row records a decision:
 
 - The `homm2` CLI has the `homm1` command surface: `init inspect toolchain
   configure build link match play labels model delink compare audit sema walls
-  permute lsp ghidra verify workflow clean localization tool`, plus the
-  commands this repository has no counterpart for (`selftest`).
+  permute lsp ghidra verify workflow clean localization tool`, with
+  each old spelling kept as an alias while other branches use it.
 - `homm2 --image editor <command>` selects the editor for any command and is
   exported to child processes as `$HOMM2_IMAGE`. Every authoritative fact is
   keyed by `(image, rva)`: the game keeps `config/retail/` and `build/`; the
@@ -51,11 +51,15 @@ Every migration step is committed only when all of these hold on the game:
 
 | Guarantee | Check |
 | --- | --- |
+| the build and its hard gates | `homm2 build` |
 | 1727 / 1727 functions exact, 291,995 / 291,995 data bytes, 97 / 97 data units | `homm2 build` (README block and `homm2 status`/`verify status`) |
-| strict data allocations | the build's data gates (`strict-allocations`) |
+| strict data allocations | `homm2 strict-allocations` (later `homm2 verify strict-allocations`) |
 | linked `HMM2PL.exe` byte-identical to retail (ceiling 0 in every region) | `ninja link-diff` (later `homm2 verify link-diff`) |
-| tool tests | `homm2 selftest` (case floor in `selftest.py`) |
+| game behaviour | `homm2 verify behaviour` (later run by `homm2 build verify`) |
 | generated source | `homm2 clean --verify` |
+
+Steps run with at most four parallel jobs (`HOMM2_JOBS=4`, nix `--max-jobs 1
+--cores 4`): the machine is shared.
 
 ## Commands
 
@@ -85,7 +89,7 @@ Every migration step is committed only when all of these hold on the game:
 | `localization` | `homm2.build.localization` (run by build) | adopt verb |
 | `tool <name>` | `core.wine`, `cc_wrap`, `ml_wrap`, `native_link` | adopt thin drivers: `wine cl ml link rc objdiff delinker` |
 | `audit usage\|census\|dna-bands\|placements` | `audit` (16 campaign audits) | merge: add the four HoMM1 audits; keep every existing audit |
-| (none) | `selftest` | keep: HoMM1 has no test runner; the case floor guards silent loss |
+| (none) | `selftest` | removed (see "Tests" below); `verify behaviour` replaces it |
 
 ## Packages
 
@@ -156,6 +160,57 @@ Every migration step is committed only when all of these hold on the game:
 | play runner | `run-rebuilt-game.py` | merge verb |
 | `assert_*` hard gates | `build/assert_*` | keep; reachable as `verify <gate>` |
 | usage coverage | none | adopt (`audit usage`) |
+| (none) | tool test suite (`selftest`) | removed; the game-behaviour tests are the `verify behaviour` gate |
+
+## Tests
+
+The tool test suite (`homm2 selftest`, 81 `test_*.py` modules, 986 cases) is
+removed with its runner. It tested matching and tooling internals; the gates
+above, which check the reconstruction itself, are the guarantees. Removed:
+
+- `analysis`: disasm, od_frame_names
+- `audit`: bool_fields, casts, cross_version, cross_version_bodies, data_claims,
+  enums, gotos, historical_exact_losses, ledger, object_equivalence, od_oracle,
+  pattern_catalog, readability, reconstruction, reloc_donation, reloc_sweep,
+  scan_bitfield_residuals, strict_allocation_diff, unmatched_census
+- `build`: annotated_compgen_data, annotated_data, annotated_functions,
+  annotated_vtables, assert_fixed_width_ints, assert_relocs,
+  candidate_data_manifest, canonicalize_data_symbols, canonicalize_relocs,
+  clang_cxx11, coff_reloc_topology, configure_link_graph,
+  data_manifest_adapter, data_topology_census, extract_resources,
+  gen_vendor_imports, import_lib, legacy_import_lib, link_diff, link_exe,
+  localization (tool mechanics), ml_wrap, native_link, normalized_freshness,
+  od_frame_audit, ordinary, rc_res, regular_import_lib,
+  regular_vendor_import_lib, reloc_owners, reviewed_data, source_symbols,
+  strict_allocations, symbol_model_drift, symbol_providers, synth_pdb
+- `clean`: clean_source; `core`: coff, manifest, retail, wine; `format`: enums,
+  headers; `init`: clangd, init, toolchain; `match`: residual_queue,
+  source_hashes, status
+- `permute`: batch_source_variants, emission_order, generate_ast_variants,
+  match_variants, recover_historical_exact, recover_residual_functions,
+  tu_state_noise (and `permute/testdata/`)
+- top level: cli, constants_audit, redelink, wine_launch_contract
+
+Kept as game-behaviour tests under `scripts/homm2/verify/behaviour/`, run by
+`homm2 verify behaviour`:
+
+- `test_game_contracts` (was `homm2.audit.readability_contracts` and its
+  fixture, now `game_contracts.cpp`): compiled against the game headers with
+  the SOURCE/KB profile, linked with VC6 and run under wine. It checks enum
+  protocol values, CP1251 case folding, creature classification, the map-cell
+  sprite predicate, the barrier-tent mask, combat-hex and mage-guild formulas,
+  Manhattan and integer vector lengths, and the file-value record round trip.
+- `test_localization_text` (four cases from the former localization tests):
+  original English wording, fragments that render complete combat, trading
+  and requester sentences, and no text outside the catalog.
+
+Open items:
+
+- More behaviour coverage: save and map record round trips, the creature,
+  spell and artifact tables, damage, cost and experience formulas, and
+  pathing and AI decisions on fixtures.
+- HoMM1 has no behaviour gate. The same `verify behaviour` gate could be
+  mirrored there. That repository is not changed by this plan.
 
 ## Migration order
 
