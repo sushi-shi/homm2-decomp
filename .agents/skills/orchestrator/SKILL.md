@@ -1,12 +1,12 @@
 ---
 name: orchestrator
-description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into master so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with the matcher skill (reconstruction doctrine). Parallel is the default — there is no separate "simple" orchestrator.
+description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into the integration branch so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with the matcher skill (reconstruction doctrine). Parallel is the default — there is no separate "simple" orchestrator.
 ---
 
 # orchestrator — fan out the work, serialize the history
 
 You drive the matching campaign with **parallelism in the work** and a **single
-linear commit history** on `master`. You select targets, keep N matchers in flight
+linear commit history** on `decomp-gold-2.1-buka`. You select targets, keep N matchers in flight
 across a reused worktree pool, and integrate their results one at a time.
 
 ## The invariant
@@ -17,17 +17,17 @@ across a reused worktree pool, and integrate their results one at a time.
 - **Whole-TU lanes, simple-first:** each lane owns **one TU** and works it in **20+
   function batches** until that TU is fully matched, then takes the next simplest TU.
   Drain all `/Od` ("base") TUs before any `/O2` ("o2") TU (see Target selection).
-- **Serialize integration:** results land in **master one at a time**. Only ONE
-  integration (apply → build → commit) at a time → master is a single linear
+- **Serialize integration:** results land on **`decomp-gold-2.1-buka` one at a time**. Only ONE
+  integration (apply → build → commit) at a time → `decomp-gold-2.1-buka` is a single linear
   line of `match:` commits, even though the work was fanned out.
 - **Refill immediately:** the instant a result is integrated, reset its worktree to
-  the new master HEAD and launch the next target into that same slot.
+  the new `decomp-gold-2.1-buka` HEAD and launch the next target into that same slot.
 
 ```
    matcher-1 ─ fn A ─┐
-   matcher-2 ─ fn B ─┼─► integration queue (SERIAL) ─► master: c1─c2─c3─…
+   matcher-2 ─ fn B ─┼─► integration queue (SERIAL) ─► decomp-gold-2.1-buka: c1─c2─c3─…
    matcher-3 ─ fn C ─┤        build → commit
-   matcher-4 ─ fn D ─┘   (as A lands, reset matcher-1 to master, launch fn E into it)
+   matcher-4 ─ fn D ─┘   (as A lands, reset matcher-1 to decomp-gold-2.1-buka, launch fn E into it)
 ```
 
 ## Pool setup (provision once — worktrees PERSIST across restarts)
@@ -41,18 +41,18 @@ gitignored `build/` (incl. its own wineprefix — `HOMM2_DIR=$PWD` ⇒
 for n in 1 2 3 4; do
   wt=.claude/worktrees/matcher-$n
   if [ -d "$wt" ]; then
-    git -C "$wt" reset --hard master            # REUSE: build/ (+ wineprefix) survives
+    git -C "$wt" reset --hard decomp-gold-2.1-buka            # REUSE: build/ (+ wineprefix) survives
   else
-    git worktree add -B matcher/$n "$wt" master
+    git worktree add -B matcher/$n "$wt" decomp-gold-2.1-buka
     cp -a build "$wt"/build                      # provision heavy gitignored state ONCE
   fi
 done
 ```
 
 Verify a slot builds before dispatching — **cd-first** so `HOMM2_DIR`/`REPO` resolve
-to the worktree, not master:
+to the worktree, not the main checkout:
 `cd .claude/worktrees/matcher-1 && nix develop .#build --command homm2 build`.
-**`cd` AFTER `nix develop` builds master** (`HOMM2_DIR` is fixed at shell entry).
+**`cd` AFTER `nix develop` builds the main checkout** (`HOMM2_DIR` is fixed at shell entry).
 Better: open ONE `nix develop .#build` shell per slot.
 
 ## Target selection — exhaustive residual audit, least-matched-first
@@ -82,7 +82,7 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
 1. Name the assigned **absolute** worktree path; do ALL work there, never the repo root.
 2. **Work cd-first, in ONE open shell:** `cd <abs worktree>` FIRST, then a single
    `nix develop .#build` shell, every `homm2 build`/`status` inside it. Absolute paths
-   everywhere (relative paths can leak into master).
+   everywhere (relative paths can leak into the main checkout).
 3. Carry a **whole-TU batch — each as RVA / mangled+demangled name / size** — plus the
    TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
    the scaffold already show it), the **`homm2/core/od_slots.py` stack-naming workflow**, and
@@ -114,24 +114,24 @@ just-landed one.
 
 ## Integration protocol (SERIAL — the heart)
 
-Process completed matchers **one at a time** (master has one `build/`, one HEAD):
+Process completed matchers **one at a time** (the main checkout has one `build/`, one HEAD):
 
-1. **Guard:** `git -C <master> status --porcelain` clean before you start. If a
-   matcher leaked into master (relative-path bug), `git restore` the stray files first.
-2. **Apply** the matcher's TU file(s) to master (`cp <worktree>/<file> <master>/<file>`).
-   **Never copy the worktree's `README.md`** — it is regenerated in master. Touch only that
+1. **Guard:** `git -C <main checkout> status --porcelain` clean before you start. If a
+   matcher leaked into the main checkout (relative-path bug), `git restore` the stray files first.
+2. **Apply** the matcher's TU file(s) to the main checkout (`cp <worktree>/<file> <main checkout>/<file>`).
+   **Never copy the worktree's `README.md`** — it is regenerated in the main checkout. Touch only that
    matcher's file(s).
-3. **Build + measure** in master: `nix develop .#build --command homm2 build`. This
-   recompiles, re-objdiffs, **and regenerates master's `README.md` match block** (via
+3. **Build + measure** in the main checkout: `nix develop .#build --command homm2 build`. This
+   recompiles, re-objdiffs, **and regenerates the main checkout's `README.md` match block** (via
    `homm2 status --write-readme`). Confirm the target hit its reported %, read the
    before→after exact count.
-4. **Commit** atomically: `git add` this matcher's file(s) + **`README.md`** (master's
+4. **Commit** atomically: `git add` this matcher's file(s) + **`README.md`** (the main checkout's
    freshly-regenerated match block — ALWAYS stage it so the
    scoreboard never drifts from the commits), message `match: <fn> -> <result>`.
    One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
    regenerated worklist — `git checkout --` it if it's dirty). Integrate only correct modeled
    structure and semantics with current byte/relocation evidence; a wrong-shape reconstruction is not acceptable.
-5. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
+5. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard decomp-gold-2.1-buka` (its `build/`
    survives), pick the next target (cross-check skip), dispatch a new background matcher.
 
 Repeat until the queue is dry/parked. **Leave the `matcher-N` worktrees in place**;
@@ -144,8 +144,8 @@ diffs, or source into this session beyond the file(s) you integrate.
 
 ## Don't
 
-- Don't let two integrations build master at once.
+- Don't let two integrations build the main checkout at once.
 - Don't `isolation: worktree` (that's a throwaway worktree per spawn — the opposite of
   the reused pool).
 - Don't `git add -A` during integration — stage only the current matcher's files.
-- Don't merge worker branches into master (no merge commits) — apply diffs onto a linear master.
+- Don't merge worker branches into `decomp-gold-2.1-buka` (no merge commits) — apply diffs onto a linear `decomp-gold-2.1-buka`.

@@ -70,7 +70,8 @@ boundary, are recorded here rather than presented as part of this PR diff:
   The expanded naming review is committed separately in PR #65.
 - Generated exports, already pushed: `1eb6bc513` (PoL source), `1c7cd09be`
   (PoL classic), `6ccd8bd62` (Gold source), `2a4ff4a20` (Gold classic).
-- The divergent `master`, `ironfist`, and `ironfist-master` branches were
+- The divergent `port`, `source-ironfist`, and `port-ironfist` branches (then
+  `master`, `ironfist` and `ironfist-master`) were
   reconciled and pushed at `c89cf4058`, `2cb93a6a7`, and `c0c754804`.
 
 This PR does not rewrite those published histories. All further corrections
