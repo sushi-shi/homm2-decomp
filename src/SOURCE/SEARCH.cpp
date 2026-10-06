@@ -97,7 +97,7 @@ void searchArray::SeedPosition(
     DATA(0x00533db4) static i32 s_remainingMobility;
     // Retail 0x00533db8: no code reads this cell. VC6 allocates an unreferenced
     // local static in the hash-ordered run but emits no symbol for it.
-    static i32 s_unusedInt;
+    static i32 H2_UNUSED(s_unusedInt);
     DATA(0x00533dbc) static i32 s_targetWater;
     DATA(0x00533dc0) static i32 s_adjacentCost;
     DATA(0x00533dc4) static i32 s_currentWater;
@@ -116,12 +116,12 @@ void searchArray::SeedPosition(
     DATA(0x00533e08) static i32 s_adjacentMonsterX;
     DATA(0x00533e0c) static i32 s_targetStepCost;
     DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
-    DATA(0x00533e14) static i32 s_processedPointCount;
+    DATA(0x00533e14) static i32 H2_UNUSED(s_processedPointCount);
     DATA(0x00533e18) static searchNode* s_neighborNode;
     DATA(0x00533e1c) static i32 s_bestTargetCost;
     DATA(0x00533e20) static i32 s_adjacentY;
     DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
-    DATA(0x00533e28) static hero* s_currentHero;
+    DATA(0x00533e28) static hero* H2_UNUSED(s_currentHero);
 
     H2_ENUM_STORAGE(TerrainType, i32) targetTerrain;
 
