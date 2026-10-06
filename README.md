@@ -23,15 +23,15 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                     port --------> source-ironfist --------> port-ironfist (you are here)
 ```
 
-- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
-- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0) — Clean source, PoL 2.0
-- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0) — Reading view, PoL 2.0
-- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka) — Gold 2.1 (Buka) game, byte-identical; editor in progress
-- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka) — Clean source, Gold 2.1 (ru/en)
-- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka) — Reading view, UTF-8 Russian
-- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port) — Native port: Linux, Windows, browser
-- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist) — Project Ironfist on the source
-- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist) — Project Ironfist on the port
+- [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0#branches) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
+- [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0#branches) — Clean source, PoL 2.0
+- [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0#branches) — Reading view, PoL 2.0
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka#branches) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka#branches) — Clean source, Gold 2.1 (ru/en)
+- [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka#branches) — Reading view, UTF-8 Russian
+- [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port#branches) — Native port: Linux, Windows, browser
+- [`source-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/source-ironfist#branches) — Project Ironfist on the source
+- [`port-ironfist`](https://github.com/sushi-shi/homm2-decomp/tree/port-ironfist#branches) — Project Ironfist on the port
 
 ## Play on Linux
 
