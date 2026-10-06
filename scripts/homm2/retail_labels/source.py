@@ -48,10 +48,10 @@ from homm2.retail_labels.providers import (
     compiler_data_claims,
     import_claims,
 )
-from homm2.core.paths import REPO
+from homm2.core.paths import DEFAULT_IMAGE, REPO, gen_dir, image_build, image_key, retail_dir, retail_exe
 
-OUTPUT = REPO / "build/gen/symbol_names.csv"
-COMPGEN_OUTPUT = REPO / "build/gen/compiler_generated_functions.csv"
+OUTPUT = gen_dir() / "symbol_names.csv"
+COMPGEN_OUTPUT = gen_dir() / "compiler_generated_functions.csv"
 HEADER = "rva,name,unit,size,kind,provenance\n"
 COMPGEN_HEADER = "rva,name,unit,size,kind,owner,source,line\n"
 COMPGEN_MARKER = re.compile(
@@ -363,12 +363,13 @@ REVIEWED_CLAIMS = (
 )
 
 
-def reviewed_claims(repo: Path) -> list[SourceSymbol]:
-    """Function claims carried by the reviewed identification CSVs."""
+def reviewed_claims(repo: Path, image: str = DEFAULT_IMAGE) -> list[SourceSymbol]:
+    """Function claims carried by the image's reviewed identification CSVs."""
     import csv as _csv
     rows: list[SourceSymbol] = []
     for name, provenance, build in REVIEWED_CLAIMS:
-        path = repo / name
+        path = (repo / name if image == DEFAULT_IMAGE
+                else retail_dir(image) / Path(name).name)
         if not path.is_file():
             continue
         provenance = provenance or "reviewed-compgen"
@@ -492,11 +493,11 @@ def collect(source_root: Path, repo: Path,
     return sorted(seen.values())
 
 
-def _manifest_targets(repo: Path) -> list[int]:
+def _manifest_targets(repo: Path, image: str = DEFAULT_IMAGE) -> list[int]:
     """RVAs the reviewed DIR32 sites point at (read from the retail image)."""
     import struct as _struct
-    manifest = repo / "config/retail/absolute_relocations.tsv"
-    exe = repo / "build/orig/HMM2PL.exe"
+    manifest = retail_dir(image) / "absolute_relocations.tsv"
+    exe = retail_exe(image)
     if not manifest.is_file() or not exe.is_file():
         return []
     data = exe.read_bytes()
@@ -549,6 +550,60 @@ def render_compgen(rows: list[SourceCompgenFunction]) -> str:
 from homm2.core.usage import logged
 
 
+def placement_claims(image: str) -> list[SourceSymbol]:
+    """The game identities a shared unit spells, at this image's addresses
+    (config/retail/<image>/placements.tsv, `homm2 audit placements`)."""
+    import csv as _csv
+    path = retail_dir(image) / "placements.tsv"
+    if not path.is_file():
+        return []
+    rows = []
+    with path.open(newline="") as stream:
+        for row in _csv.DictReader((line for line in stream if not line.startswith("#")),
+                                   delimiter="\t"):
+            rows.append(SourceSymbol(
+                rva=int(row["rva"], 16), name=row["name"], unit=row["unit"],
+                size=int(row["size"], 16), kind=row["kind"],
+                provenance=f"placement:0x{int(row['game_rva'], 16):x}"))
+    return rows
+
+
+def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
+    """The claimed inventory of an image other than the game.
+
+    Units that link only into this image spell its addresses in their own `VA`
+    and `DATA` markers. Shared units spell game addresses; their identities
+    come through the image's placements. Imports are named from the image's
+    own import table; every reviewed DIR32 target nobody claims gets a
+    `const_` alias, as for the game."""
+    from homm2.manifest import all_units, unit_images
+    rows: list[SourceSymbol] = list(placement_claims(image))
+    own = [repo / u["source"] for u in all_units()
+           if image in unit_images(u) and DEFAULT_IMAGE not in unit_images(u)
+           and u["source"].endswith(".cpp")]
+    source_root = repo / "src"
+    for path in own:
+        rows.extend(symbols_for_file(path.resolve(), source_root, repo))
+    rows += [SourceSymbol(r.rva, r.name, r.unit, r.size, r.kind, r.provenance)
+             for r in import_claims(retail_exe(image), image_build(image) / "objdiff/base",
+                                    repo / "build/toolchain/msvc/lib")]
+    seen: dict[int, SourceSymbol] = {}
+    for row in sorted(rows):
+        clash = seen.get(row.rva)
+        if clash is not None and clash.name != row.name:
+            raise ValueError(f"0x{row.rva:x} is claimed by both {clash.name} ({clash.unit}) "
+                             f"and {row.name} ({row.unit})")
+        seen[row.rva] = row
+    for row in sorted(reviewed_claims(repo, image)):
+        seen.setdefault(row.rva, row)
+    for rva in _manifest_targets(repo, image):
+        if rva not in seen:
+            seen[rva] = SourceSymbol(
+                rva=rva, name="const_%08x" % rva, unit="_const",
+                size=0, kind="data", provenance="reloc-manifest-target")
+    return sorted(seen.values())
+
+
 @logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -560,8 +615,12 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     source_root = args.source.resolve()
-    compgen = source_compgen_functions(source_root, REPO)
-    rows = collect(source_root, REPO)
+    if image_key() == DEFAULT_IMAGE:
+        compgen = source_compgen_functions(source_root, REPO)
+        rows = collect(source_root, REPO)
+    else:
+        compgen = []
+        rows = collect_image(image_key(), REPO)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")

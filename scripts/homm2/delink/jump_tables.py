@@ -12,6 +12,10 @@ delinked target stops folding the table in and matches our MSVC-compiled `$L`-sp
 does not surface these, so we recover them ourselves. Run from repo root (needs build/delink)."""
 import csv, re, glob, subprocess, struct, os
 
+from homm2.core.paths import delink_dir, gen_dir
+
+GEN = gen_dir()
+
 import sys
 
 from homm2.core.usage import logged
@@ -21,7 +25,7 @@ from homm2.core.usage import logged
 def main(argv=None) -> int:
     IMG = 0x400000
     name_rva, rva_size = {}, {}
-    for r in csv.DictReader(open("build/gen/symbol_names.csv")):
+    for r in csv.DictReader(open(GEN / "symbol_names.csv")):
         if r["kind"] == "func":
             try:
                 rva = int(r["rva"], 16)
@@ -33,7 +37,7 @@ def main(argv=None) -> int:
         return s.replace('\xef\xbf\xbd', '_')
 
     tables = []
-    for obj in sorted(glob.glob("build/delink/**/*.c.obj", recursive=True)):
+    for obj in sorted(glob.glob(str(delink_dir() / "**/*.c.obj"), recursive=True)):
         out = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True).stdout
         # pass 1: per-defined-function section offset; and every DIR32 reloc: offset -> target name
         func_off, dir32, jmps, cur_off = {}, {}, [], None
@@ -69,8 +73,8 @@ def main(argv=None) -> int:
             tables.append((frva, fname, frva + K, 4 * n))
 
     tables = sorted(set(tables))
-    os.makedirs("build/gen", exist_ok=True)
-    with open("build/gen/jump_tables.csv", "w", newline="") as f:
+    os.makedirs(GEN, exist_ok=True)
+    with open(GEN / "jump_tables.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["func_rva", "func_name", "table_rva", "table_size"])
         for frva, fname, trva, tsz in tables:

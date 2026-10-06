@@ -25,14 +25,15 @@ from homm2.retail_labels.annotated_data import (
     configure_libclang,
 )
 from homm2.compare.canonicalize_data_symbols import CoffObject
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
 
 IMAGE_BASE = 0x400000
 REPO = next((parent for parent in Path(__file__).resolve().parents
              if (parent / "flake.nix").exists()), Path.cwd())
-DEFAULT_OUTPUT = REPO / "build/gen/source_private_functions.csv"
-DEFAULT_SPANS_OUTPUT = REPO / "build/gen/source_function_spans.csv"
-DEFAULT_SYMBOLS = REPO / "build/gen/symbol_names.csv"
+DEFAULT_OUTPUT = gen_dir() / "source_private_functions.csv"
+DEFAULT_SPANS_OUTPUT = gen_dir() / "source_function_spans.csv"
+DEFAULT_SYMBOLS = gen_dir() / "symbol_names.csv"
 VA_TOKEN = re.compile(rb"\bVA\s*\(")
 VA_MARKER = re.compile(
     rb"\bVA\s*\(\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*\)",

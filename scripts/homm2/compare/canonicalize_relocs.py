@@ -783,18 +783,20 @@ from homm2.core.usage import logged
 
 @logged
 def main(argv=None):
+    from homm2.core.paths import image_paths
+    image = image_paths()
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base-dir", default="build/objdiff/base")
-    parser.add_argument("--target-dir", default="build/delink")
-    parser.add_argument("--output-dir", default="build/delink-paired")
-    parser.add_argument("--symbols", default="build/gen/symbol_names.csv")
+    parser.add_argument("--base-dir", default=f"{image.build}/objdiff/base")
+    parser.add_argument("--target-dir", default=f"{image.build}/delink")
+    parser.add_argument("--output-dir", default=f"{image.build}/delink-paired")
+    parser.add_argument("--symbols", default=f"{image.build}/gen/symbol_names.csv")
     parser.add_argument(
-        "--rel32-aliases", default="config/retail/reloc_rel32_aliases.tsv")
+        "--rel32-aliases", default=f"{image.retail}/reloc_rel32_aliases.tsv")
     parser.add_argument("--unit")
     parser.add_argument("--base")
     parser.add_argument("--target")
     parser.add_argument("--output")
-    parser.add_argument("--retail-exe", default="build/orig/HMM2PL.exe")
+    parser.add_argument("--retail-exe", default=image.exe)
     args = parser.parse_args(argv)
     import_iat = load_import_iat_symbols(args.retail_exe)
     single_paths = (args.base, args.target, args.output)

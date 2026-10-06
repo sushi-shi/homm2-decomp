@@ -17,11 +17,12 @@ from pathlib import Path
 from homm2.compare.canonicalize_relocs import CoffFile
 from homm2.delink.data_manifest_adapter import candidate_topology, _string_payload
 from homm2.core.paths import REPO
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
-EXE = REPO / "build/orig/HMM2PL.exe"
-CSV = REPO / "build/gen/symbol_names.csv"
+EXE = retail_exe()
+CSV = gen_dir() / "symbol_names.csv"
 IMAGE_BASE = 0x400000
-BASE_OBJS = REPO / "build/objdiff/base"
+BASE_OBJS = objdiff_dir() / "base"
 
 
 def candidate_string_payloads(base_root=BASE_OBJS):

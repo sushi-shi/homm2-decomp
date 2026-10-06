@@ -8,6 +8,7 @@ config/.  Regeneration is deterministic and idempotent: rerunning it with
 unchanged inputs is a no-op, and every build validates the stamp against the
 same identity, so a stale target is refused rather than silently compared.
 """
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 import argparse
 import csv
 import hashlib
@@ -39,19 +40,19 @@ from homm2.delink.reloc_owners import (
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
-SYMBOLS = REPO / "build/gen/symbol_names.csv"
-RETAIL_FUNCTIONS = REPO / "config/retail/functions.csv"
-LEDGER = REPO / "config/retail/data_initialized_storage.tsv"
-EXE = REPO / "build/orig/HMM2PL.exe"
-PDB = REPO / "build/pdb/HMM2PL.pdb"
-RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
-RELOC_ALIASES = REPO / "config/retail/reloc_aliases.tsv"
-MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
-DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
-SOURCE_DATA_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
-DATA_SECTION_MANIFEST = REPO / "build/gen/delink_data_sections.tsv"
-COMMON_MANIFEST = REPO / "build/gen/delink_common_symbols.tsv"
-TARGET = REPO / "build/delink"
+SYMBOLS = gen_dir() / "symbol_names.csv"
+RETAIL_FUNCTIONS = retail_dir() / "functions.csv"
+LEDGER = retail_dir() / "data_initialized_storage.tsv"
+EXE = retail_exe()
+PDB = image_build() / "pdb" / (retail_exe().stem + ".pdb")
+RELOC_MANIFEST = retail_dir() / "absolute_relocations.tsv"
+RELOC_ALIASES = retail_dir() / "reloc_aliases.tsv"
+MANIFEST = gen_dir() / "reviewed_delink_data.tsv"
+DATA_MANIFEST = gen_dir() / "delink_data_manifest.tsv"
+SOURCE_DATA_MANIFEST = gen_dir() / "delink_data_from_source.tsv"
+DATA_SECTION_MANIFEST = gen_dir() / "delink_data_sections.tsv"
+COMMON_MANIFEST = gen_dir() / "delink_common_symbols.tsv"
+TARGET = delink_dir()
 STAMP = TARGET / ".reviewed-data-stamp.json"
 DATA_ADAPTER = Path(__file__).with_name("data_manifest_adapter.py")
 

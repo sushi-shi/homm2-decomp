@@ -21,9 +21,13 @@ from pathlib import Path
 from typing import NamedTuple
 
 
+from homm2.core.paths import REPO, gen_dir, retail_dir
+
 IMAGE_BASE = 0x400000
-OWNER_EXTENTS = "config/retail/reloc_data_owners.tsv"
-RELOC_MANIFEST = "config/retail/absolute_relocations.tsv"
+# Repository-relative, keyed by the selected image (homm2 --image).
+OWNER_EXTENTS = (retail_dir() / "reloc_data_owners.tsv").relative_to(REPO).as_posix()
+RELOC_MANIFEST = (retail_dir() / "absolute_relocations.tsv").relative_to(REPO).as_posix()
+SYMBOLS = (gen_dir() / "symbol_names.csv").relative_to(REPO).as_posix()
 
 
 class DataOwner(NamedTuple):
@@ -125,7 +129,7 @@ def owners_from_rows(rows, definitions, extents):
     return sorted(owners, key=lambda owner: (owner.rva, owner.size, owner.symbol))
 
 
-def load_owner_ranges(symbols_path="build/gen/symbol_names.csv",
+def load_owner_ranges(symbols_path=SYMBOLS,
                       source_glob="src/**/*.cpp"):
     with open(symbols_path, encoding="latin-1", newline="") as stream:
         rows = list(csv.DictReader(stream))

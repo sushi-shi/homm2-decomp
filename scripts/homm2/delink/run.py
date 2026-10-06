@@ -42,12 +42,14 @@ def main(argv=None):
         return 1
     if run("python3", "configure.py"):
         return 1
-    from homm2.core.paths import ninja_jobs
-    if run("ninja", *ninja_jobs(), "base"):
+    from homm2.core.paths import DEFAULT_IMAGE, image_key, ninja_args
+    if run("ninja", *ninja_args(), "base"):
         return 1
     if run("python3", "-m", "homm2.retail_labels.source"):
         return 1
-    if run("python3", "-m", "homm2.retail_labels.annotated_functions"):
+    # Source-private identities are spelled in game addresses.
+    if image_key() == DEFAULT_IMAGE and run(
+            "python3", "-m", "homm2.retail_labels.annotated_functions"):
         return 1
     if run("python3", "-m", "homm2.retail_labels.name_strings"):
         return 1

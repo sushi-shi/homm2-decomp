@@ -3,6 +3,7 @@ import csv, hashlib, os, re
 from pathlib import Path
 
 from homm2.graph.fixed_asm import UNITS as FIXED_ASM_UNITS
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RVA_BASE = 0x400000
@@ -11,7 +12,7 @@ RVA_BASE = 0x400000
 def _rva_to_sym():
     """rva -> (unit, mangled_name) for .text functions, from the generated CSV."""
     out = {}
-    csvp = REPO / "build/gen/symbol_names.csv"
+    csvp = gen_dir() / "symbol_names.csv"
     if not csvp.exists():
         return out
     with csvp.open() as stream:

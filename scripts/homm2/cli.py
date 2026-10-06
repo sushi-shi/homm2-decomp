@@ -30,7 +30,9 @@ ALIASES = {
 
 #: Commands that read the selected image (`--image`); the rest refuse another
 #: image instead of silently answering for the game.
-IMAGE_AWARE = {"inspect", "help", "-h", "--help"}
+IMAGE_AWARE = {"inspect", "configure", "delink", "labels", "build", "match", "compare",
+               "sema", "help", "-h", "--help"}
+IMAGE_AUDITS = {"census", "placements", "usage"}
 
 TOOLS = ("wine", "cl", "ml", "link", "rc", "objdiff", "delinker")
 
@@ -117,13 +119,18 @@ def _build(rest):
         return 1
     if py("homm2.graph.localization"):
         return 1
+    from homm2.core.paths import DEFAULT_IMAGE, image_key
     from homm2.verify import BUILD_GATES, STAGED, run_gate, run_gates
-    if run_gate("annotated-sources"):
+    game = image_key() == DEFAULT_IMAGE
+    # The source gates read game claims; another image's gates are open work.
+    if game and run_gate("annotated-sources"):
         return 1
     if sh(sys.executable, "configure.py"):
         return 1
-    from homm2.core.paths import ninja_jobs
-    jobs = [] if any(a.startswith("-j") for a in rest) else ninja_jobs()
+    from homm2.core.paths import ninja_args, ninja_jobs
+    jobs = ninja_args()
+    if any(a.startswith("-j") for a in rest):
+        jobs = [a for a in jobs if a not in ninja_jobs()]
     if sh("ninja", *jobs, *rest):
         return 1
     # The report is generated after Ninja has rebuilt every input, so a clean
@@ -132,6 +139,8 @@ def _build(rest):
     report = load_report()
     if report is None:
         return 1
+    if not game:
+        return status([], report)
     # Fast and warning-only: half-built units may intentionally need a delink.
     py("homm2.verify.model_drift")
     if run_gates(BUILD_GATES):
@@ -178,13 +187,14 @@ def _match(rest):
         selected.append(name)
     if sh(sys.executable, "configure.py"):
         return 1
-    from homm2.core.paths import ninja_jobs
+    from homm2.core.paths import image_paths, ninja_args
+    root = image_paths().build
     targets = []
     for name in selected:
-        targets.append(f"build/objdiff/normalized/base/{name}.obj")
-        if (REPO / "build/delink" / f"{name}.c.obj").exists():
-            targets.append(f"build/objdiff/normalized/target/{name}.c.obj")
-    if sh("ninja", *ninja_jobs(), *targets):
+        targets.append(f"{root}/objdiff/normalized/base/{name}.obj")
+        if (REPO / root / "delink" / f"{name}.c.obj").exists():
+            targets.append(f"{root}/objdiff/normalized/target/{name}.c.obj")
+    if sh("ninja", *ninja_args(), *targets):
         return 1
     from homm2.verify.status import load_report
     if load_report() is None:
@@ -293,7 +303,8 @@ def main(argv=None):
     if cmd in ALIASES:
         cmd, rest = ALIASES[cmd][0], [*ALIASES[cmd][1:], *rest]
     from homm2.core.paths import DEFAULT_IMAGE, image_key
-    if image_key() != DEFAULT_IMAGE and cmd not in IMAGE_AWARE:
+    image_aware = cmd in IMAGE_AWARE or (cmd == "audit" and rest[:1] and rest[0] in IMAGE_AUDITS)
+    if image_key() != DEFAULT_IMAGE and not image_aware:
         print(f"homm2 {cmd}: not yet keyed by image; it reads the game only "
               f"(image-aware: {', '.join(sorted(IMAGE_AWARE))})", file=sys.stderr)
         return 2

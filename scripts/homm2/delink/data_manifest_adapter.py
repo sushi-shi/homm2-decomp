@@ -45,15 +45,16 @@ from homm2.delink.candidate_data_manifest import (
     derive_allocations,
 )
 from homm2.delink.reloc_owners import load_reviewed_highlow_sites
+from homm2.core.paths import DEFAULT_IMAGE, delink_dir, gen_dir, image_build, image_key, objdiff_dir, retail_dir, retail_exe
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 SOURCE_ROOT = REPO / "src"
-BASE_ROOT = REPO / "build/objdiff/base"
-SYMBOLS = REPO / "build/gen/symbol_names.csv"
+BASE_ROOT = objdiff_dir() / "base"
+SYMBOLS = gen_dir() / "symbol_names.csv"
 UNITS = REPO / "config/units.toml"
-EXE = REPO / "build/orig/HMM2PL.exe"
-RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+EXE = retail_exe()
+RELOC_MANIFEST = retail_dir() / "absolute_relocations.tsv"
 IMAGE_REL_I386_DIR32 = 0x0006
 SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",
@@ -1115,6 +1116,32 @@ def redundant_compgen_claims(bindings, topology_by_unit, automatic_rows):
     return redundant
 
 
+def _image_units(document):
+    """The selected image's [[unit]] rows of a loaded units.toml."""
+    from homm2.manifest import units as image_units
+    return image_units(document)
+
+
+def placed_claims(rows):
+    """Source data claims of the selected image's shared units at this image's
+    addresses. Shared sources spell game addresses; each claim moves to the
+    address config/retail/<image>/placements.tsv proves for it, and a claim
+    with no placement is not this image's."""
+    import dataclasses
+    from homm2.manifest import units as image_units
+    placements = retail_dir() / "placements.tsv"
+    moved = {}
+    if placements.is_file():
+        with placements.open(newline="") as stream:
+            for row in csv.DictReader((line for line in stream if not line.startswith("#")),
+                                      delimiter="\t"):
+                if row["kind"] == "data":
+                    moved[int(row["game_rva"], 16)] = int(row["rva"], 16)
+    linked = {u["unit"] for u in image_units()}
+    return [dataclasses.replace(row, rva=moved[row.rva]) for row in rows
+            if row.unit in linked and row.rva in moved]
+
+
 def source_manifest_rows(source_root: Path = SOURCE_ROOT,
                          base_root: Path = BASE_ROOT,
                          exe: Path = EXE, strict=False):
@@ -1125,10 +1152,13 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
     definitions = source_definitions(source_root, base_root)
     compgen = source_compgen_data(source_root, repo)
     vtables = source_vtables(source_root, repo)
+    if image_key() != DEFAULT_IMAGE:
+        definitions, compgen, vtables = (
+            placed_claims(rows) for rows in (definitions, compgen, vtables))
     claim_units = {row.unit for row in [*definitions, *compgen, *vtables]}
     document = tomllib.loads(Path(UNITS).read_text())
     configured_units = {
-        row["unit"] for row in document.get("unit", ())
+        row["unit"] for row in _image_units(document)
         if (base_root / f'{row["unit"]}.obj').is_file()
     }
     units = sorted(claim_units | configured_units)
@@ -1404,7 +1434,7 @@ def candidate_section_manifest_bytes(base_root: Path = BASE_ROOT,
     """Serialize candidate data-section and COMDAT topology for Vostok."""
     base_root = Path(base_root)
     document = tomllib.loads(Path(units).read_text())
-    unit_names = [row["unit"] for row in document.get("unit", ())]
+    unit_names = [row["unit"] for row in _image_units(document)]
     if len(unit_names) != len(set(unit_names)):
         raise ValueError("duplicate units in candidate section manifest")
     crt_rvas = _derive_crt_section_rvas(
@@ -1472,7 +1502,7 @@ def candidate_common_manifest_bytes(base_root: Path = BASE_ROOT,
     """
     base_root = Path(base_root)
     document = tomllib.loads(Path(units).read_text())
-    unit_names = [row["unit"] for row in document.get("unit", ())]
+    unit_names = [row["unit"] for row in _image_units(document)]
     if len(unit_names) != len(set(unit_names)):
         raise ValueError("duplicate units in candidate COMMON manifest")
     rows = []

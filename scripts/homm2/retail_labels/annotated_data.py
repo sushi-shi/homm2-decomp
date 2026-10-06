@@ -15,6 +15,7 @@ import clang.cindex as ci
 
 from homm2.clang_options import ClangMode
 from homm2.graph.fixed_asm import claims as fixed_asm_claims
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
 
 IMAGE_BASE = 0x400000
@@ -356,11 +357,11 @@ def source_definitions(source_root: Path, repo: Path, object_root: Path | None =
     source_root = Path(source_root)
     repo = Path(repo)
     if object_root is None and source_root.resolve() == (repo / "src").resolve():
-        candidate = repo / "build/objdiff/base"
+        candidate = objdiff_dir() / "base"
         if candidate.is_dir():
             object_root = candidate
     if cache_path is None and object_root is not None:
-        cache_path = repo / "build/gen/annotated_data_cache.json"
+        cache_path = gen_dir() / "annotated_data_cache.json"
     object_root = Path(object_root) if object_root is not None else None
     cache_path = Path(cache_path) if cache_path is not None else None
     compile_path = repo / "build/clangd/compile_commands.json"

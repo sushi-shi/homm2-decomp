@@ -42,6 +42,12 @@ from typing import NamedTuple
 
 from homm2.delink.reloc_owners import load_owner_ranges, owner_for_rva
 
+from homm2.core.paths import image_paths
+
+# The selected image's repository-relative roots (homm2 --image).
+IMAGE = image_paths()
+B = IMAGE.build
+
 IMAGE_BASE = 0x400000
 _PARSE_CACHE = {}
 # Bump only when parse_obj's serialized relocation representation changes.
@@ -132,7 +138,7 @@ def _key(s):    # encoding-stable key for ??_C@ strings: the ASCII "??_C@_<len>@
 
 def load_symbols():
     sym, dups = {}, {}
-    for r in csv.reader(open("build/gen/symbol_names.csv", encoding="latin-1")):
+    for r in csv.reader(open(B + "/gen/symbol_names.csv", encoding="latin-1")):
         if len(r) >= 2:
             try:
                 v = int(r[0], 16)
@@ -143,7 +149,7 @@ def load_symbols():
                 # name (e.g. two "!" literals). Record every address per name so an ambiguous target
                 # reloc can match ANY of them (they're value-identical), not just the last one loaded.
                 sym.setdefault(k, v); dups.setdefault(k, set()).add(v)
-    manifest = Path("build/gen/delink_data_from_source.tsv")
+    manifest = Path(B + "/gen/delink_data_from_source.tsv")
     if manifest.is_file():
         with manifest.open(newline="", encoding="latin-1") as stream:
             rows = csv.DictReader(
@@ -249,7 +255,7 @@ def parse_obj(obj, with_sites=False, include_imports=False):
     if cache_key in _PARSE_CACHE:
         return _PARSE_CACHE[cache_key]
     cache_name = hashlib.sha256(cache_key.encode("utf-8")).hexdigest() + ".json"
-    cache_path = Path("build/cache/relocs") / cache_name
+    cache_path = Path(B + "/cache/relocs") / cache_name
     try:
         cached = json.loads(cache_path.read_text(encoding="utf-8"))
         funcs = {name: [tuple(reloc) for reloc in relocs]
@@ -367,8 +373,8 @@ def compare_function_reloc_addends(base_relocs, target_relocs,
 
 
 def load_canonical_data_names(
-        symbols_path="build/gen/symbol_names.csv",
-        manifest_path="build/gen/delink_data_from_source.tsv"):
+        symbols_path=B + "/gen/symbol_names.csv",
+        manifest_path=B + "/gen/delink_data_from_source.tsv"):
     names = set()
     if os.path.isfile(symbols_path):
         with open(symbols_path, encoding="latin-1", newline="") as stream:
@@ -384,8 +390,8 @@ def load_canonical_data_names(
 
 
 def load_candidate_local_rvas(
-        manifests=("build/gen/delink_data_from_source.tsv",),
-        base_root="build/objdiff/base"):
+        manifests=(B + "/gen/delink_data_from_source.tsv",),
+        base_root=B + "/objdiff/base"):
     """Map current candidate local spellings to canonical retail RVAs.
 
     Generated semantic identities are deliberately stable while an MSVC rebuild may
@@ -464,7 +470,7 @@ def _pe_sections():
     if _PE_SECTIONS is not None:
         return _PE_SECTIONS
 
-    data = open("build/orig/HMM2PL.exe", "rb").read()
+    data = open(IMAGE.exe, "rb").read()
     pe = struct.unpack_from("<L", data, 0x3c)[0]
     section_count = struct.unpack_from("<H", data, pe + 6)[0]
     optional_header_size = struct.unpack_from("<H", data, pe + 20)[0]
@@ -1284,7 +1290,7 @@ def review_fields(resolved_addresses=False):
     """
     sym, data, dups = load_symbols()
     owners = load_owner_ranges()
-    report = json.load(open("build/objdiff/report.json"))
+    report = json.load(open(B + "/objdiff/report.json"))
     bad = []
     review = []
     checked_functions = 0
@@ -1297,8 +1303,8 @@ def review_fields(resolved_addresses=False):
                      for function in unit_record.get("functions", [])}
         if not functions:
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
-        target_obj = "build/delink/%s.c.obj" % unit
+        base_obj = B + "/objdiff/base/%s.obj" % unit
+        target_obj = B + "/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             for name, percent in functions.items():
                 if percent >= FIELD_AUDIT_THRESHOLD:
@@ -1315,10 +1321,10 @@ def review_fields(resolved_addresses=False):
                     (name not in selected_base or name not in selected_target)):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        B + "/objdiff/normalized/base/%s.obj" % unit,
                         with_sites=True)
                     normalized_target = parse_obj(
-                        "build/objdiff/normalized/target/%s.c.obj" % unit,
+                        B + "/objdiff/normalized/target/%s.c.obj" % unit,
                         with_sites=True)
                 selected_base = normalized_base
                 selected_target = normalized_target
@@ -1369,13 +1375,13 @@ def review_pe_data_targets():
         parse_map_symbol_records,
     )
 
-    retail_image = _load_pe_image("build/orig/HMM2PL.exe")
+    retail_image = _load_pe_image(IMAGE.exe)
     candidate_image = _load_pe_image("build/link/HMM2PL.exe")
     sym, data, dups = load_symbols()
     local_rvas = load_candidate_local_rvas()
     section_ranges = _pe_named_section_ranges()
     map_records = parse_map_symbol_records("build/link/HMM2PL.map")
-    retail_import_iat = _pe_import_iat_identities("build/orig/HMM2PL.exe")
+    retail_import_iat = _pe_import_iat_identities(IMAGE.exe)
     candidate_import_iat = _pe_import_iat_identities("build/link/HMM2PL.exe")
     import_rvas = semantic_import_rvas(
         retail_import_iat, candidate_import_iat, map_records,
@@ -1389,7 +1395,7 @@ def review_pe_data_targets():
         candidate_functions.setdefault(record["name"], []).append(record)
     compgen_aliases = load_compgen_function_aliases()
     function_rvas = {}
-    with open("build/gen/symbol_names.csv", encoding="latin-1", newline="") as stream:
+    with open(B + "/gen/symbol_names.csv", encoding="latin-1", newline="") as stream:
         for row in csv.DictReader(stream):
             if row.get("kind") != "func":
                 continue
@@ -1398,7 +1404,7 @@ def review_pe_data_targets():
             except (KeyError, ValueError):
                 continue
 
-    report = json.load(open("build/objdiff/report.json"))
+    report = json.load(open(B + "/objdiff/report.json"))
     bad = []
     identity_bad = []
     multiset_identity_bad = []
@@ -1416,8 +1422,8 @@ def review_pe_data_targets():
     audit_stats = Counter()
     for unit_record in report["units"]:
         unit = unit_record["name"]
-        base_obj = "build/objdiff/base/%s.obj" % unit
-        target_obj = "build/delink/%s.c.obj" % unit
+        base_obj = B + "/objdiff/base/%s.obj" % unit
+        target_obj = B + "/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             continue
         base_functions = parse_obj(
@@ -1448,10 +1454,10 @@ def review_pe_data_targets():
             if name.startswith("__h2cg$"):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        B + "/objdiff/normalized/base/%s.obj" % unit,
                         with_sites=True, include_imports=True)
                     normalized_target = parse_obj(
-                        "build/objdiff/normalized/target/%s.c.obj" % unit,
+                        B + "/objdiff/normalized/target/%s.c.obj" % unit,
                         with_sites=True, include_imports=True)
                 selected_base = normalized_base
                 selected_target = normalized_target
@@ -1639,7 +1645,7 @@ def review_pe_data_targets():
         "skipped_volatile_ordinal_functions": len(skipped_volatile_ordinals),
         "duplicate_report_records": len(duplicate_report_records),
     }
-    output_path = Path("build/gen/linked_data_relocs.json")
+    output_path = Path(B + "/gen/linked_data_relocs.json")
     temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
     temporary.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
     os.replace(str(temporary), str(output_path))
@@ -1689,7 +1695,7 @@ def _function_for_arg(arg):
         wanted_rva = int(arg, 0)
     except ValueError:
         wanted_rva = None
-    with open("build/gen/symbol_names.csv", encoding="latin-1") as f:
+    with open(B + "/gen/symbol_names.csv", encoding="latin-1") as f:
         for row in csv.DictReader(f):
             if row.get("kind") != "func":
                 continue
@@ -1705,8 +1711,8 @@ def review(rva):
     """Single-function normalized multiset review (usable on <100% walls)."""
     sym, data, dups = load_symbols()
     unit, name, _function_rva = _function_for_arg(rva)
-    base_obj = "build/objdiff/normalized/base/%s.obj" % unit
-    target_obj = "build/objdiff/normalized/target/%s.c.obj" % unit
+    base_obj = B + "/objdiff/normalized/base/%s.obj" % unit
+    target_obj = B + "/objdiff/normalized/target/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
     candidate_bodies = _function_bytes(base_obj)
@@ -1739,14 +1745,14 @@ def review_counts(scope="BASE"):
     objdiff report is the sole source of comparison state.
     """
     prefix = scope.rstrip("/") + "/"
-    report = json.load(open("build/objdiff/report.json"))
+    report = json.load(open(B + "/objdiff/report.json"))
     rows = []
     for unit in report["units"]:
         unit_name = unit["name"]
         if not unit_name.startswith(prefix):
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit_name
-        target_obj = "build/delink/%s.c.obj" % unit_name
+        base_obj = B + "/objdiff/base/%s.obj" % unit_name
+        target_obj = B + "/delink/%s.c.obj" % unit_name
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             continue
         base_functions, target_functions = parse_obj(base_obj), parse_obj(target_obj)
@@ -1788,7 +1794,7 @@ def review_addends(scope=None):
     """
     prefix = scope.rstrip("/") + "/" if scope else None
     canonical_data_names = load_canonical_data_names()
-    report = json.load(open("build/objdiff/report.json"))
+    report = json.load(open(B + "/objdiff/report.json"))
     output = {
         "schema": 3,
         "scope": scope or "all",
@@ -1801,8 +1807,8 @@ def review_addends(scope=None):
         unit = unit_record["name"]
         if prefix and not unit.startswith(prefix):
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
-        target_obj = "build/delink/%s.c.obj" % unit
+        base_obj = B + "/objdiff/base/%s.obj" % unit
+        target_obj = B + "/delink/%s.c.obj" % unit
         missing = [path for path in (base_obj, target_obj) if not os.path.exists(path)]
         if missing:
             output["missing_objects"].extend(missing)
@@ -1867,7 +1873,7 @@ def review_addends(scope=None):
         for difference in function["differences"])
     output["canonical_data_one_sided_functions"] = len(
         canonical_one_sided_functions)
-    output_path = Path("build/gen/function_reloc_addends.json")
+    output_path = Path(B + "/gen/function_reloc_addends.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
     temporary.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
@@ -1923,7 +1929,7 @@ def main():
     if len(sys.argv) > 1:                        # single-function review mode
         review(sys.argv[1]); return 0
     sym, data, dups = load_symbols()
-    report = json.load(open("build/objdiff/report.json"))
+    report = json.load(open(B + "/objdiff/report.json"))
     bad = []
     # A WRONG reloc doesn't drop objdiff to a low %, it costs a TINY fraction (~0.005%/reloc) that
     # rounds to "100.00%" in the display — so we must audit near-exact fns, not just == 100. The
@@ -1939,8 +1945,8 @@ def main():
         }
         if not near_exact_audited:
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
-        tgt_obj = "build/delink/%s.c.obj" % unit
+        base_obj = B + "/objdiff/base/%s.obj" % unit
+        tgt_obj = B + "/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             for name in sorted(near_exact_audited):
                 bad.append((unit, name, "UNVERIFIED: missing candidate or retail object"))
@@ -1961,9 +1967,9 @@ def main():
                     (name not in selected_base or name not in selected_target)):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit)
+                        B + "/objdiff/normalized/base/%s.obj" % unit)
                     normalized_target = parse_obj(
-                        "build/objdiff/normalized/target/%s.c.obj" % unit)
+                        B + "/objdiff/normalized/target/%s.c.obj" % unit)
                 selected_base = normalized_base
                 selected_target = normalized_target
             if name not in selected_base or name not in selected_target:
@@ -1980,8 +1986,8 @@ def main():
                 base_obj_used = base_obj
                 target_obj_used = tgt_obj
                 if selected_base is normalized_base:
-                    base_obj_used = "build/objdiff/normalized/base/%s.obj" % unit
-                    target_obj_used = "build/objdiff/normalized/target/%s.c.obj" % unit
+                    base_obj_used = B + "/objdiff/normalized/base/%s.obj" % unit
+                    target_obj_used = B + "/objdiff/normalized/target/%s.c.obj" % unit
                 base_sites = parse_obj(base_obj_used, with_sites=True).get(name, [])
                 target_sites = parse_obj(target_obj_used, with_sites=True).get(name, [])
                 problems = check_fn(

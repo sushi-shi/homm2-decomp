@@ -16,8 +16,8 @@ import struct
 
 from homm2.graph import ninja_syntax
 from homm2.retail_labels.annotated_functions import source_function_spans
-from homm2.manifest import load as load_manifest
-from homm2.core.paths import REPO
+from homm2.manifest import load as load_manifest, units as image_units
+from homm2.core.paths import DEFAULT_IMAGE, REPO, image_build, image_paths, retail_dir
 
 from .compile_graph import emit_compile_graph
 from .link_graph import LINK_DIFF_STAMP, emit_link_graph
@@ -29,11 +29,17 @@ from homm2.core.usage import logged
 
 @logged
 def main() -> None:
+    """Emit the selected image's graph: build.ninja at the root for the game,
+    build/<image>/build.ninja for another image (`ninja -f`). Another image
+    has no link graph yet; its rules select it through $HOMM2_IMAGE."""
     manifest = load_manifest()
     build = manifest.get("build", {})
-    units = manifest.get("unit", [])
+    image = image_paths()
+    game = image.key == DEFAULT_IMAGE
+    units = image_units(manifest)
+    root = image_build()
 
-    od = REPO / "build/objdiff"
+    od = root / "objdiff"
     od.mkdir(parents=True, exist_ok=True)
     # Minimal valid i386 COFF for units without a delinked target.
     dummy = (struct.pack("<HHIIIHH", 0x14C, 1, 0, 20 + 40, 0, 0, 0)
@@ -43,9 +49,9 @@ def main() -> None:
     dummy_path = od / "dummy.obj"
     if not dummy_path.exists() or dummy_path.read_bytes() != dummy:
         dummy_path.write_bytes(dummy)
-    delink = REPO / "build/delink"
+    delink = root / "delink"
     reviewed_units = set()
-    reviewed = REPO / "config/retail/data_initialized_storage.tsv"
+    reviewed = retail_dir() / "data_initialized_storage.tsv"
     if reviewed.exists():
         with reviewed.open() as stream:
             for row in csv.DictReader(
@@ -54,7 +60,7 @@ def main() -> None:
                 reviewed_units.add(row["unit"])
     first_function_rva = {}
     first_compgen_rva = {}
-    symbols = REPO / "build/gen/symbol_names.csv"
+    symbols = root / "gen/symbol_names.csv"
     if symbols.exists():
         with symbols.open() as stream:
             for row in csv.DictReader(stream):
@@ -68,18 +74,26 @@ def main() -> None:
     # Source owns function boundaries; an owner split must configure before
     # redelink regenerates the previous symbol inventory.
     source_rvas = {}
-    for span in source_function_spans(REPO / "src", REPO):
+    for span in (source_function_spans(REPO / "src", REPO) if game else ()):
         source_rvas[span.unit] = min(span.rva, source_rvas.get(span.unit, span.rva))
     first_function_rva.update(source_rvas)
 
-    with open(REPO / "build.ninja", "w") as f:
+    ninja_file = REPO / "build.ninja" if game else root / "build.ninja"
+    ninja_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(ninja_file, "w") as f:
         w = ninja_syntax.Writer(f)
-        emit_rules(w)
+        if game:
+            emit_rules(w)
+        else:
+            emit_rules(w, builddir=image.build, image=image)
         objs, base_symbol_sidecars, comparison_paths = emit_compile_graph(
-            w, manifest, units, delink, reviewed_units)
-        emit_link_graph(w, units, objs, base_symbol_sidecars,
-                        first_function_rva, first_compgen_rva)
-        w.default(["all", LINK_DIFF_STAMP])
+            w, manifest, units, delink, reviewed_units, image)
+        if game:
+            emit_link_graph(w, units, objs, base_symbol_sidecars,
+                            first_function_rva, first_compgen_rva)
+            w.default(["all", LINK_DIFF_STAMP])
+        else:
+            w.default(["all"])
 
     units_j = []
     for u in units:
@@ -112,4 +126,5 @@ def main() -> None:
         "options": {"functionRelocDiffs": "all"},
         "watch_patterns": ["*.obj"], "units": units_j,
     }, indent=2) + "\n")
-    print(f"configure: {len(units)} units -> build.ninja + build/objdiff/objdiff.json")
+    print(f"configure: {len(units)} units -> {ninja_file.relative_to(REPO)} + "
+          f"{(od / 'objdiff.json').relative_to(REPO)}")

@@ -15,6 +15,7 @@ import hashlib, json, os, shutil, struct, subprocess, sys, tempfile
 from pathlib import Path
 from homm2.compare.normalized_freshness import freshness_problems
 from homm2.verify.fingerprints import source_hashes
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
 REPORT_CACHE_SCHEMA = 1
@@ -290,7 +291,7 @@ def _merge_partial_report(previous, partial, unit_order, changed_units):
 def load_report(force_refresh=False):
     from homm2.delink.reviewed_data import ensure_reviewed_targets
     reviewed_targets_refreshed = ensure_reviewed_targets()
-    od = REPO / "build/objdiff"
+    od = objdiff_dir()
     rep = od / "report.json"
     stamp = od / REPORT_STAMP
     executable_name = shutil.which("objdiff-cli")

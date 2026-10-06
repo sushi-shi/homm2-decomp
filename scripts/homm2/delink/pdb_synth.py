@@ -18,6 +18,7 @@ Pipeline:
       -> byte-patch DBIHeader.symbol_records_stream (0x14) to an empty stream so
          pdb2's global_symbols() returns empty (yaml2pdb writes 0xFFFF nil there).
 """
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 import argparse, csv, hashlib, os, re, struct, subprocess, sys
 from pathlib import Path
 
@@ -85,10 +86,10 @@ from homm2.core.usage import logged
 @logged
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HMM2PL.exe")))
-    ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
-    ap.add_argument("--retail-functions", default=str(REPO / "config/retail/functions.csv"))
-    ap.add_argument("--out", default=str(REPO / "build/pdb/HMM2PL.pdb"))
+    ap.add_argument("--exe", default=str(retail_exe()))
+    ap.add_argument("--csv", default=str(gen_dir() / "symbol_names.csv"))
+    ap.add_argument("--retail-functions", default=str(retail_dir() / "functions.csv"))
+    ap.add_argument("--out", default=str(image_build() / "pdb" / (retail_exe().stem + ".pdb")))
     a = ap.parse_args(argv)
     exe, out = Path(a.exe), Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -141,7 +142,7 @@ def main(argv=None):
           "  Signature:       0\n  Features:        [ VC140 ]\n  Version:         VC70\n")
         W("DbiStream:\n  VerHeader:       V70\n  Age:             1\n  BuildNumber:     0\n"
           "  PdbDllVersion:   0\n  PdbDllRbld:      0\n  Flags:           0\n  MachineType:     x86\n")
-        mod = r"c:\proj\HMM2PL"
+        mod = "c:\\proj\\" + exe.stem
         W("  Modules:\n    - Module:          '%s'\n      ObjFile:         '%s'\n" % (mod, mod))
         W("      SourceFiles:\n")
         for sf in files:

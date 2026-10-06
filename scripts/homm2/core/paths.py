@@ -103,6 +103,22 @@ def retail_exe(image: str | None = None) -> Path:
     return Path(os.environ.get(pin.env_var) or pin.destination)
 
 
+def image_paths(image: str | None = None):
+    """Repository-relative spellings of the image's roots, for generated build
+    files: `build` (generated state), `retail` (config tables), `exe` (the
+    staged retail executable) and `env` (the shell prefix that selects the
+    image for a child; empty for the game)."""
+    from types import SimpleNamespace
+    key = image or image_key()
+    return SimpleNamespace(
+        key=key,
+        build=image_build(key).relative_to(REPO).as_posix(),
+        retail=retail_dir(key).relative_to(REPO).as_posix(),
+        exe=retail_exe(key).relative_to(REPO).as_posix()
+        if retail_exe(key).is_relative_to(REPO) else str(retail_exe(key)),
+        env="" if key == DEFAULT_IMAGE else f"{IMAGE_ENV}={key} ")
+
+
 def __getattr__(name: str):
     # `from homm2.core.paths import RETAIL` binds the selected image's table
     # directory (IMAGE_BUILD: its generated-state root) at import time, after
@@ -112,6 +128,15 @@ def __getattr__(name: str):
     if name == "IMAGE_BUILD":
         return image_build()
     raise AttributeError(name)
+
+
+def ninja_args(image: str | None = None) -> list[str]:
+    """`ninja` arguments for the selected image: its graph file (the game's is
+    the root build.ninja) and the $HOMM2_JOBS cap."""
+    key = image or image_key()
+    graph = [] if key == DEFAULT_IMAGE else [
+        "-f", (image_build(key) / "build.ninja").relative_to(REPO).as_posix()]
+    return graph + ninja_jobs()
 
 
 def ninja_jobs() -> list[str]:

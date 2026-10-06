@@ -1,6 +1,7 @@
 """Recover source-bound compiler-generated literal data claims."""
 
 from __future__ import annotations
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 
 import ast
 import argparse
@@ -524,7 +525,7 @@ def source_compgen_data(source_root: Path,
     repo = Path(repo).resolve()
     canonical = source_root == (repo / "src").resolve()
     if cache_path is None and canonical:
-        cache_path = repo / "build/gen/annotated_compgen_data_cache.json"
+        cache_path = gen_dir() / "annotated_compgen_data_cache.json"
     cache = _load_cache(cache_path) if cache_path is not None else {}
     updated_cache = dict(cache)
     rows = []

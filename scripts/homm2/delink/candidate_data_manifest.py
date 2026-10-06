@@ -21,15 +21,17 @@ from pathlib import Path
 
 from homm2.compare.canonicalize_relocs import CoffFile
 from homm2.delink.reloc_owners import load_reviewed_highlow_sites
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
+from homm2.manifest import units as image_units
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 IMAGE_BASE = 0x400000
 DIR32 = 0x0006
 DATA_SECTIONS = {".rdata": "rdata", ".data": "data", ".bss": "bss"}
-OUTPUT = REPO / "build/gen/candidate_delink_data.tsv"
-DIAGNOSTICS_OUTPUT = REPO / "build/gen/candidate_data_diagnostics.json"
-RELOC_MANIFEST = REPO / "config/retail/absolute_relocations.tsv"
+OUTPUT = gen_dir() / "candidate_delink_data.tsv"
+DIAGNOSTICS_OUTPUT = gen_dir() / "candidate_data_diagnostics.json"
+RELOC_MANIFEST = retail_dir() / "absolute_relocations.tsv"
 
 
 @dataclass(frozen=True)
@@ -739,9 +741,9 @@ def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
     return _payload_rvas(row, coff, intervals, highlow, read_bytes, cache)
 
 
-def derive_allocations(base_dir=REPO / "build/objdiff/base",
-                       exe=REPO / "build/orig/HMM2PL.exe",
-                       symbols_path=REPO / "build/gen/symbol_names.csv",
+def derive_allocations(base_dir=objdiff_dir() / "base",
+                       exe=retail_exe(),
+                       symbols_path=gen_dir() / "symbol_names.csv",
                        units_path=REPO / "config/units.toml",
                        reviewed_rows=(), contributions=None):
     """Return allocations only for object/storage groups proved complete."""
@@ -772,7 +774,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
     storage_intervals = defaultdict(list)
     for (_unit, storage), intervals in contributions.items():
         storage_intervals[storage].extend(intervals)
-    units = tomllib.loads(Path(units_path).read_text()).get("unit", [])
+    units = image_units(tomllib.loads(Path(units_path).read_text()))
     allocations = []
     diagnostics = []
     stats = DerivationStats()
@@ -1064,9 +1066,9 @@ from homm2.core.usage import logged
 @logged
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base-dir", type=Path, default=REPO / "build/objdiff/base")
-    parser.add_argument("--exe", type=Path, default=REPO / "build/orig/HMM2PL.exe")
-    parser.add_argument("--symbols", type=Path, default=REPO / "build/gen/symbol_names.csv")
+    parser.add_argument("--base-dir", type=Path, default=objdiff_dir() / "base")
+    parser.add_argument("--exe", type=Path, default=retail_exe())
+    parser.add_argument("--symbols", type=Path, default=gen_dir() / "symbol_names.csv")
     parser.add_argument("--units", type=Path, default=REPO / "config/units.toml")
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--diagnostics-output", type=Path, default=DIAGNOSTICS_OUTPUT)
