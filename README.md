@@ -47,7 +47,7 @@ On x86_64 Linux with Nix flakes enabled, point `HOMM2_DATA` at an installed game
 directory, the one that contains `DATA`:
 
 ```sh
-HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/port
 ```
 
 A Gold or Price of Loyalty installation works: `DATA/HEROES2.AGG` and
@@ -60,6 +60,10 @@ Tested archives, SHA-256:
 da08a14cc545f6708bd2b746edd7ea7fa0eb7d0ed26f6e54ab8e6ccb2e735e19  heroes2.agg   (Buka, Russian)
 68f12a2ca2dd1a000e1136ad70f38b19116686c2a7a0e9a0860528d998b52afd  heroes2x.agg  (Buka, Russian)
 ```
+
+The Buka disc is on archive.org as the Heroes anthology
+[***REMOVED***](https://archive.org/details/***REMOVED***),
+a `.rar` of its CD image; the flake install below takes it as it is.
 
 The first launch builds the game. The installation is only read: preferences,
 saves and high scores go to `~/.local/share/homm2/homm2` (under
@@ -74,13 +78,13 @@ English data:
 ```sh
 HOMM2_DATA=/path/to/heroes2-english \
 HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
-HOMM2_LANGUAGE=ru nix run github:sushi-shi/homm2-decomp/master
+HOMM2_LANGUAGE=ru nix run github:sushi-shi/homm2-decomp/port
 ```
 
 With `nix run`, pass game options after `--`. For example:
 
 ```sh
-HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master -- /I0
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/port -- /I0
 ```
 
 | Option | Purpose |
@@ -103,7 +107,7 @@ Add the port and a local folder holding your copy of the game to your flake
 inputs:
 
 ```nix
-inputs.homm2.url = "github:sushi-shi/homm2-decomp/master";
+inputs.homm2.url = "github:sushi-shi/homm2-decomp/port";
 inputs.homm2-game = {
   url = "path:/path/to/heroes2";
   flake = false;
@@ -111,8 +115,8 @@ inputs.homm2-game = {
 ```
 
 The folder is the installed game, the one that contains `DATA`, or the Buka
-disc's files, or a folder holding a `.zip`, `.7z` or `.iso` of either. Import
-the module and name your copy:
+disc's files, or a folder holding a `.zip`, `.7z`, `.iso` or `.rar` of either.
+Import the module and name your copy:
 
 ```nix
 outputs = { nixpkgs, homm2, homm2-game, ... }: {
@@ -139,6 +143,29 @@ then launch:
 sudo nixos-rebuild switch --flake '.#<host>'
 heroes2
 ```
+
+Instead of a local copy, a module of the configuration can fetch the Buka
+anthology from archive.org:
+
+```nix
+{ pkgs, ... }:
+let
+  heroes-buka = pkgs.fetchurl {
+    name = "heroes-platinum-buka.rar";   # the importer goes by the extension
+    url = "https://archive.org/download/***REMOVED***/%D0%93%D0%B5%D1%80%D0%BE%D0%B8.%20%D0%9F%D0%BB%D0%B0%D1%82%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20%5B%D0%91%D1%83%D0%BA%D0%B0%5D.rar";
+    hash = "sha256-YWAmitzQ5TozJxS8Jph6ATp7KB0BRjJFS7+JOjnQBPk=";
+  };
+in {
+  programs.homm2 = { enable = true; game = heroes-buka; };
+  system.extraDependencies = [ heroes-buka ];
+}
+```
+
+The 1 GB archive is downloaded into the store once. `system.extraDependencies`
+(`home.extraDependencies` with home-manager) keeps it through garbage
+collection, so a rebuild that imports the game again does not download it
+again. The same archive holds Heroes I for the
+[HoMM1 port](https://github.com/sushi-shi/homm1-decomp/tree/port).
 
 With home-manager, the same options install the game for one user:
 
