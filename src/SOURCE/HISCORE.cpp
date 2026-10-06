@@ -171,7 +171,7 @@ void highScoreManager::Update(void) {
     for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
-        else if (!ReadHighScoreEntry(inputFile, highScore)) {
+        else if (ReadHighScoreEntry(inputFile, highScore) == HIGH_SCORE_READ_TRUNCATED) {
             noScoreFile = true;
             memset(&highScore, 0, sizeof(highScore));
             highScore.score = HIGH_SCORE_EMPTY;

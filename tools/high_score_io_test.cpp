@@ -67,7 +67,8 @@ int main() {
         u32 canary = 0x1234abcd;
     } table{};
     for (i32 index = 0; index < HIGH_SCORE_ENTRY_COUNT; ++index) {
-        valid &= Expect(ReadHighScoreEntry(file, table.entries[index]), "read complete record");
+        valid &= Expect(ReadHighScoreEntry(file, table.entries[index]) == HIGH_SCORE_READ_COMPLETE,
+                        "read complete record");
         valid &= Expect(table.entries[index].score == index + 1
             && table.entries[index].days == 15 && table.entries[index].scenario == 2
             && std::strcmp(table.entries[index].playerName, "Player") == 0,
@@ -83,18 +84,25 @@ int main() {
     file = platform::FileOpen("DATA/scores.bin", platform::FileMode::Read);
     HighScoreEntry first{};
     HighScoreEntry incomplete{};
-    valid &= Expect(ReadHighScoreEntry(file, first) && first.score == 1, "complete prefix");
-    valid &= Expect(!ReadHighScoreEntry(file, incomplete) && incomplete.score == HIGH_SCORE_EMPTY
+    valid &= Expect(ReadHighScoreEntry(file, first) == HIGH_SCORE_READ_COMPLETE && first.score == 1,
+                    "complete prefix");
+    valid &= Expect(ReadHighScoreEntry(file, incomplete) == HIGH_SCORE_READ_TRUNCATED
+        && incomplete.score == HIGH_SCORE_EMPTY
         && incomplete.playerName[0] == 0 && first.score == 1, "short tail becomes empty");
     platform::FileClose(file);
 
     auto record = Record(42);
     std::fill_n(record.data(), 17, 'X');
-    valid &= Expect(WriteFixture(root / "DATA" / "scores.bin", {record.begin(), record.end()}),
+    const auto following = Record(43);
+    std::vector<u8> invalidFirst(record.begin(), record.end());
+    invalidFirst.insert(invalidFirst.end(), following.begin(), following.end());
+    valid &= Expect(WriteFixture(root / "DATA" / "scores.bin", invalidFirst),
                     "write unterminated name");
     file = platform::FileOpen("DATA/scores.bin", platform::FileMode::Read);
-    valid &= Expect(!ReadHighScoreEntry(file, first) && first.score == HIGH_SCORE_EMPTY,
-                    "reject unterminated name");
+    valid &= Expect(ReadHighScoreEntry(file, first) == HIGH_SCORE_READ_INVALID
+        && first.score == HIGH_SCORE_EMPTY, "reject unterminated name");
+    valid &= Expect(ReadHighScoreEntry(file, incomplete) == HIGH_SCORE_READ_COMPLETE
+        && incomplete.score == 43, "keep the record after an invalid one");
     platform::FileClose(file);
 
     record = Record(42);
@@ -102,7 +110,8 @@ int main() {
     valid &= Expect(WriteFixture(root / "DATA" / "scores.bin", {record.begin(), record.end()}),
                     "write unterminated scenario");
     file = platform::FileOpen("DATA/scores.bin", platform::FileMode::Read);
-    valid &= Expect(!ReadHighScoreEntry(file, first), "reject unterminated scenario");
+    valid &= Expect(ReadHighScoreEntry(file, first) == HIGH_SCORE_READ_INVALID,
+                    "reject unterminated scenario");
     platform::FileClose(file);
 
     HighScoreEntry entry{};
@@ -124,7 +133,8 @@ int main() {
     expected[62] = 0xfe; expected[63] = expected[64] = expected[65] = 0xff;
     valid &= Expect(written == expected, "little-endian wire record");
     platform::FileSeek(file, 0);
-    valid &= Expect(ReadHighScoreEntry(file, first) && first.score == entry.score
+    valid &= Expect(ReadHighScoreEntry(file, first) == HIGH_SCORE_READ_COMPLETE
+        && first.score == entry.score
         && first.days == -2, "signed fields round trip");
     platform::FileClose(file);
 

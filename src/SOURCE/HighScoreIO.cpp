@@ -5,6 +5,7 @@
 
 #include <array>
 #include <bit>
+#include <cstddef>
 #include <cstring>
 
 namespace {
@@ -16,6 +17,16 @@ constexpr std::size_t DaysOffset = 62;
 constexpr std::size_t ScenarioOffset = 66;
 constexpr std::size_t CheatedOffset = 70;
 constexpr std::size_t ReservedOffset = 71;
+
+// The wire offsets are the retail packed layout of HighScoreEntry.
+static_assert(sizeof(HighScoreEntry) == std::tuple_size_v<Record>);
+static_assert(offsetof(HighScoreEntry, scenarioName) == ScenarioNameOffset);
+static_assert(offsetof(HighScoreEntry, score) == ScoreOffset);
+static_assert(offsetof(HighScoreEntry, days) == DaysOffset);
+static_assert(offsetof(HighScoreEntry, scenario) == ScenarioOffset);
+static_assert(offsetof(HighScoreEntry, cheated) == CheatedOffset);
+static_assert(offsetof(HighScoreEntry, reserved) == ReservedOffset);
+static_assert(ReservedOffset + sizeof(HighScoreEntry::reserved) == std::tuple_size_v<Record>);
 
 bool TerminatedNames(const HighScoreEntry& entry) {
     return std::memchr(entry.playerName, 0, sizeof(entry.playerName)) != nullptr
@@ -30,12 +41,12 @@ i32 ReadInteger(const Record& bytes, std::size_t offset) {
 
 }
 
-bool ReadHighScoreEntry(i32 file, HighScoreEntry& entry) {
+HighScoreReadResult ReadHighScoreEntry(i32 file, HighScoreEntry& entry) {
     entry = {};
     entry.score = HIGH_SCORE_EMPTY;
     Record bytes{};
     if (!platform::FileReadExact(file, bytes.data(), bytes.size()))
-        return false;
+        return HIGH_SCORE_READ_TRUNCATED;
     HighScoreEntry parsed{};
     std::memcpy(parsed.playerName, bytes.data(), sizeof(parsed.playerName));
     std::memcpy(parsed.scenarioName, bytes.data() + ScenarioNameOffset, sizeof(parsed.scenarioName));
@@ -45,11 +56,11 @@ bool ReadHighScoreEntry(i32 file, HighScoreEntry& entry) {
     parsed.cheated = static_cast<char>(bytes[CheatedOffset]);
     std::memcpy(parsed.reserved, bytes.data() + ReservedOffset, sizeof(parsed.reserved));
     if (parsed.score == HIGH_SCORE_EMPTY)
-        return true;
+        return HIGH_SCORE_READ_COMPLETE;
     if (!TerminatedNames(parsed))
-        return false;
+        return HIGH_SCORE_READ_INVALID;
     entry = parsed;
-    return true;
+    return HIGH_SCORE_READ_COMPLETE;
 }
 
 bool WriteHighScoreEntry(i32 file, const HighScoreEntry& entry) {
