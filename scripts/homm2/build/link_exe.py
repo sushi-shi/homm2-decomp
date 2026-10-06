@@ -174,6 +174,7 @@ def resolve_link_executable(toolchain, override=None):
 
 def link_environment(library_path, tool_directory, environ=None):
     environment = dict(os.environ if environ is None else environ)
+    environment["TZ"] = "UTC0"
     environment["LIB"] = str(library_path)
     existing_path = environment.get("PATH")
     environment["PATH"] = (str(tool_directory) + os.pathsep + existing_path

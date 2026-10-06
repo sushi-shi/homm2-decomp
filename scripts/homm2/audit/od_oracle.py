@@ -16,6 +16,7 @@ import os, struct, subprocess, sys, hashlib
 from pathlib import Path
 
 from homm2.core.coff import CoffObject
+from homm2.core.wine import child_env
 
 MSVC = Path(os.environ["MSVC_DIR"]); CL = MSVC / "bin" / "CL.EXE"
 WORK = Path(os.environ.get("OD_ORACLE_WORK", "/tmp/od_oracle")); WORK.mkdir(parents=True, exist_ok=True)
@@ -113,7 +114,7 @@ def slots(names):
     d = WORK / tag; d.mkdir(exist_ok=True)
     (d / "probe.cpp").write_text(_emit(names))
     r = subprocess.run(["wine", str(CL), "/nologo", "/c", "/Od", "/MT", "/Gr", "/Z7", "probe.cpp"],
-                       cwd=d, env=dict(os.environ, WINEDEBUG="-all"), capture_output=True, text=True)
+                       cwd=d, env=child_env({"WINEDEBUG": "-all"}), capture_output=True, text=True)
     obj = d / "probe.obj"
     if not obj.exists():
         raise RuntimeError(f"cl failed for {names}:\n{r.stdout}\n{r.stderr}")

@@ -129,7 +129,7 @@ class NativeLinkTests(unittest.TestCase):
                 self.assertEqual(native_link.main(["--historical"]), 0)
                 prepare.assert_called_once()
                 self.assertEqual([call.kwargs["faketime_spec"] for call in run.call_args_list],
-                                 ["@2003-02-26 14:51:33"] + ["@2003-04-04 08:19:23"] * 3)
+                                 ["2003-02-26 14:51:33"] + ["2003-04-04 08:19:23"] * 3)
                 self.assertEqual(len({call.args for call in run.call_args_list}), 1)
             self.assertEqual(output.read_bytes(), b"native history output")
             response = output.with_suffix(".rsp").read_text()

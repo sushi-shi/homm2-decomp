@@ -80,7 +80,8 @@ def winepath_w(path) -> str:
     if _Z_DRIVE_IS_ROOT:
         return "Z:" + text.replace("/", "\\")
     return subprocess.check_output(
-        ["winepath", "-w", text], text=True, stderr=subprocess.DEVNULL).strip()
+        ["winepath", "-w", text], text=True, env=child_env(),
+        stderr=subprocess.DEVNULL).strip()
 
 
 _WINESERVER_ENSURED = False
@@ -92,7 +93,7 @@ def ensure_wineserver() -> None:
         return
     ws = shutil.which("wineserver")
     if ws:
-        subprocess.run([ws, "-p"], check=False, stdin=subprocess.DEVNULL,
+        subprocess.run([ws, "-p"], check=False, env=child_env(), stdin=subprocess.DEVNULL,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     _WINESERVER_ENSURED = True
 
@@ -159,17 +160,23 @@ def run(program: Path | str, *args: str, cwd: Path | None = None,
         quiet: bool = False) -> str:
     """Run one era tool under wine; raise on failure.
 
-    `faketime_spec` wraps the invocation in ``faketime -f <spec>`` (the
-    historical-PDB link path). Output goes to `log` when given, to stdout
-    otherwise (suppressed when `quiet`). Returns the captured output.
+    `faketime_spec` freezes the tool's wall clock at that UTC second
+    (``YYYY-MM-DD hh:mm:ss``, the historical-PDB link path). The monotonic
+    clock stays real, so wine's internal waits and timeouts still progress.
+    Output goes to `log` when given, to stdout otherwise (suppressed when
+    `quiet`). Returns the captured output.
     """
     prepare_env()
     command = ["wine", str(program), *args]
+    extra = None
     if faketime_spec is not None:
+        if faketime_spec.startswith(("@", "+", "-")):
+            raise ValueError(f"faketime spec {faketime_spec!r} is not an absolute frozen time")
         faketime = shutil.which("faketime")
         if faketime is None:
             raise RuntimeError("faketime is required; enter `nix develop .#build`")
         command = [faketime, "-f", faketime_spec, *command]
+        extra = {"FAKETIME_DONT_FAKE_MONOTONIC": "1"}
     # Do not capture through a pipe.  Wine services started alongside the
     # requested tool can inherit that pipe and keep it open after the tool has
     # exited, leaving subprocess.run() blocked in communicate().  A regular
@@ -178,7 +185,7 @@ def run(program: Path | str, *args: str, cwd: Path | None = None,
     with tempfile.TemporaryFile() as logf:
         completed = subprocess.run(
             command, cwd=None if cwd is None else str(cwd),
-            env=child_env(), stdin=subprocess.DEVNULL,
+            env=child_env(extra), stdin=subprocess.DEVNULL,
             stdout=logf, stderr=subprocess.STDOUT)
         logf.seek(0)
         output = logf.read().decode("latin1", "replace")

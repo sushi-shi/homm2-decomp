@@ -26,7 +26,10 @@ RETAIL = ROOT / "build/orig/HMM2PL.exe"
 RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
 PDB_WINDOWS_PATH = r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb"
 PDB_RELATIVE_PATH = Path("Users/igorl/VSS/HMM/HMM2/temp/release/game/HMM2PL.pdb")
-LINK_TIMES = ("@2003-02-26 14:51:33",) + ("@2003-04-04 08:19:23",) * 3
+# Each historical LINK runs with its clock frozen at one observed UTC second
+# (an absolute libfaketime spec, no '@'): a running clock let a slow start on a
+# loaded machine stamp the PDB signature one second late.
+LINK_TIMES = ("2003-02-26 14:51:33",) + ("2003-04-04 08:19:23",) * 3
 
 
 def relative(path: Path) -> str:
