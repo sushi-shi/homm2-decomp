@@ -655,6 +655,18 @@ msgctxt "editor.events.ultimate_artifact.radius_range"
 msgid "Must be between 0 and 127."
 msgstr "Значение должно быть от 0 до 127. "
 
+msgctxt "editor.map.no_description"
+msgid "No Description"
+msgstr "Нет описания"
+
+msgctxt "editor.map.random.name"
+msgid "Random Map %d"
+msgstr "Случ. карта %d"
+
+msgctxt "editor.map.unnamed"
+msgid "No Name %d"
+msgstr "Нет имени %d"
+
 msgctxt "editor.overlay.invalid_placement"
 msgid "Invalid Placement"
 msgstr "Неподходящее место"

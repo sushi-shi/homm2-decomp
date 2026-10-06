@@ -171,6 +171,12 @@ public:
     void CoalesceObjectData(void);
     // Gives the map's towns distinct random names.
     void RandomizeTownNames(void);
+    // Scrolls the view one cell in a MapDirection, and while the pointer
+    // rests at a screen edge.
+    void ScreenScroll(i32 direction, b32 updatePointer);
+    void CheckScreenScroll(void);
+    // The map cell of the index-th artifact in row order (see FindTown).
+    b32 FindArtifact(i32 index, i32* x, i32* y);
     // The map cell of the index-th town or castle, or of the index-th hero,
     // in row order; false (and -1, -1) when there are fewer.
     b32 FindTown(i32 index, i32* x, i32* y);
@@ -200,7 +206,7 @@ H2_ENUM_END(EditClearMask)
 
 // The ground tile of a terrain and shape: the plain or a varied tile (vary),
 // whose variant is rolled at (x, y) with the given chance.
-u16 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
+i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
 // The header of the edited map (its name, size and players).
 extern SMapHeader gEditMapHeader;
 
@@ -212,7 +218,11 @@ char* MakeMapCode(i32 serial);
 void ShowStatusWarning(char* text);
 // Whether the map needs the expansion (an event, sphinx, castle, hero,
 // artifact or object only the expansion has): it then saves as .MX2.
-u8 UsesExpansionObjects(void);
+b8 UsesExpansionObjects(void);
+// Whether a cell's object (its trigger) keeps a map-extra record, and
+// freeing one record (the later ones and their users move down).
+b32 HasExtraObjectData(i32 triggerType);
+void DeleteExtraObjectData(u32 index);
 
 // Rebuilds the overlay tiles of the whole map.
 void FillInOverlayTiles(void);
