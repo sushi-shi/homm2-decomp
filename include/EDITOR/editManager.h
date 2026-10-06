@@ -179,6 +179,8 @@ public:
     b32 FindArtifact(i32 index, i32* x, i32* y);
     // Switches the ground under the pointer between plain and varied.
     void ToggleGroundVariant(void);
+    // The system options dialog (espanel.bin).
+    void SystemOptions(void);
     // The map cell of the index-th town or castle, or of the index-th hero,
     // in row order; false (and -1, -1) when there are fewer.
     b32 FindTown(i32 index, i32* x, i32* y);
@@ -225,6 +227,12 @@ b8 UsesExpansionObjects(void);
 // freeing one record (the later ones and their users move down).
 b32 HasExtraObjectData(i32 triggerType);
 void DeleteExtraObjectData(u32 index);
+// The file menu (ecpanel.bin): the button chosen, or -1.
+i32 FileOptions(void);
+MessageDispatchResult FileOptionsHandler(struct tag_message& message);
+// The system options dialog's toggles and handler.
+void UpdateEditorSystemOptions(i32 initialDraw);
+MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message);
 
 // Rebuilds the overlay tiles of the whole map.
 void FillInOverlayTiles(void);
