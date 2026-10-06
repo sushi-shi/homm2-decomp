@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include "baseManager.h"
 #include <BASE/message.h>
+#include <BASE/display.h>
 
 struct tag_message;
 
@@ -105,6 +106,10 @@ typedef enum InputManagerScanCode {
     INPUT_SCAN_F12             = 0x58
 } InputManagerScanCode;
 
+constexpr InputManagerScanCode InputManagerScanCodeFromCode(i32 value) {
+    return static_cast<InputManagerScanCode>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 typedef enum InputManagerCapacity {
     INPUT_EVENT_RING_CAPACITY = 64,
     INPUT_SCAN_CODE_CAPACITY  = 128
@@ -129,15 +134,15 @@ public:
     i32 field_0x862;
     i32 field_0x866;
     inputManager(void);
-    virtual i32 Open(i32) override;
+    virtual i32 Open(i32 priority) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
     void SetMouseCoords(i32, i32);
-    void SetKeyCodeType(InputManagerKeyCodeType);
-    void AsciiConvert(struct tag_message&);
+    void SetKeyCodeType(InputManagerKeyCodeType keyCodeType);
+    void AsciiConvert(struct tag_message& event);
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
 };
