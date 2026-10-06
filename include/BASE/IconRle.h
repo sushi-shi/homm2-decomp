@@ -13,6 +13,11 @@ typedef enum IconRleCommandConstant {
     ICON_RLE_DIM_RECOLOR_FLAG         = 0x80
 } IconRleCommandConstant;
 
+
+#define ICON_FITS_CLIP(left, top, width, height, clipX, clipY, clipW, clipH) \
+    ((left) >= (clipX) && (left) + (width) <= (clipX) + (clipW) \
+     && (top) >= (clipY) && (top) + (height) <= (clipY) + (clipH))
+
 inline u8 ReadIconRleByte(u8*& cursor) {
     cursor++;
     return cursor[-1];

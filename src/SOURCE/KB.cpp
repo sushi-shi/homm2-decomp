@@ -1,15 +1,16 @@
 #include <Ints.h>
+#include <SOURCE/HighScoreIO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/ARMY.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
-#include <BASE/MiscEnums.h>
 #include <BASE/MiscGraphicsConstants.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
@@ -58,6 +59,12 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
+#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/armyGroup.h>
+#include <BASE/dialog.h>
+#include <BASE/display.h>
+#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/combatTypes.h>
 
 typedef enum CampaignChoiceValue {
     CHOICE_VALUE_NONE = -1
@@ -234,18 +241,10 @@ typedef enum InitMenuConstant {
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_KEY_EXIT = 0x10,
-    MENU_KEY_HIGH_SCORES = 0x23,
-    MENU_KEY_LOAD = 0x26,
-    MENU_KEY_CREDITS = 0x2e,
-    MENU_KEY_NEW = 0x31,
     MENU_DISABLE_MASK = 0x200,
-    MENU_CLOSE_COMMAND = 10,
     MENU_HELP_DIALOG = 4,
     MENU_MOVIE_SMACKER = 0x26,
     MENU_MAIN_MUSIC = 0x2a,
-    MENU_SCREEN_WIDTH = 640,
-    MENU_SCREEN_HEIGHT = 480,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
     MENU_IDLE_FRAME = 1,
@@ -406,71 +405,6 @@ void DeleteMainClasses(void) {
     gpResourceManager = NULL;
 }
 
-void EarlyShutdown(const char* caption, const char* text) {
-    platform::ShowMessage(caption, text);
-    exit(0);
-}
-
-void SetupCDRom(void) {
-    if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
-        soundManager* sound;
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        sound = gpSoundManager;
-        sound->ShutdownSoundBackends();
-        gSoundDisabled = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.unavailable_guest_only"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
-        soundManager* sound;
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        sound = gpSoundManager;
-        sound->ShutdownSoundBackends();
-        gSoundDisabled = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.expansion_disc_missing"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    }
-    if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
-        EarlyShutdown(
-            localization::Tr("system.startup_error.title"),
-            localization::Tr("system.startup_error.game_directory_missing")
-        );
-        exit(0);
-    }
-    if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
-        EarlyShutdown(
-            localization::Tr("system.startup_error.title"),
-            localization::Tr("system.startup_error.data_files_missing")
-        );
-        exit(0);
-    }
-}
-
 i32 EarlySetup(void) {
     if (bEarlySetupDone)
         return 0;
@@ -481,34 +415,33 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     LogStr("ES1");
-    iCDRomErr = SetupCDDrive();
     InitVars();
     LogStr("ES2");
     return 1;
 }
 
 i32 oldmain(void) {
-    i32 command_c;
+    i32 command;
     b32 quit;
-    b32 mainScreenLoaded_h;
-    b32 firstMainScreen_h;
-    i32 savedUpdateFlags_l;
-    i32 player_h;
+    b32 mainScreenLoaded;
+    b32 firstMainScreen;
+    i32 savedUpdateFlags;
+    i32 player;
 
-    i32 netPlayer_k;
-    i32 gamePlayer_m;
-    i32 result_i;
-    i32 transmissionResult_d;
-    char matchedNetPlayers_d[OLD_MAIN_MATCH_BUFFER_SIZE];
-    char matchedGamePlayers_c[OLD_MAIN_MATCH_BUFFER_SIZE];
-    OldMainNetBuffer netBuffer_f;
+    i32 netPlayer;
+    i32 gamePlayer;
+    i32 result;
+    i32 transmissionResult;
+    char matchedNetPlayers[GAME_PLAYER_COUNT];
+    char matchedGamePlayers[GAME_PLAYER_COUNT];
+    OldMainNetBuffer netBuffer;
 
     if (bKBDone)
         return 0;
     bKBDone = true;
     LogStr("OM1");
     LogStr("OM2");
-    command_c = -1;
+    command = -1;
     if (gpExec->InitSystem())
         ShutDown(localization::Tr("system.initialization_failed"));
     LogStr("OM3");
@@ -522,9 +455,8 @@ i32 oldmain(void) {
         0,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    gpMouseManager->SetColorMice(gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor);
+    gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
     LogStr("OM4");
-    SetupCDRom();
     LogStr("OM5");
     if (gpSoundManager->Open(-1))
         ShutDown(localization::Tr("system.sound.initialization_failed"));
@@ -537,36 +469,36 @@ i32 oldmain(void) {
             gpWindowManager->m_screen,
             0,
             0,
-            OLD_MAIN_SCREEN_WIDTH,
-            OLD_MAIN_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            OLD_MAIN_SCREEN_WIDTH,
-            OLD_MAIN_SCREEN_HEIGHT,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
             0,
             0
         );
         if (!gbSkipIntro) {
-            savedUpdateFlags_l = gpWindowManager->m_updateFlags;
+            savedUpdateFlags = gpWindowManager->m_updateFlags;
             gpWindowManager->m_updateFlags = 0;
             if (PlaySmacker(OLD_MAIN_INTRO_PUBLISHER_VIDEO)
                 && PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO)
                 && PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO))
                 PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
-            gpWindowManager->m_updateFlags = savedUpdateFlags_l;
+            gpWindowManager->m_updateFlags = savedUpdateFlags;
         }
     }
 
     LoadSystemwideIcons();
-    memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+    memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
     quit = false;
-    mainScreenLoaded_h = false;
-    firstMainScreen_h = true;
+    mainScreenLoaded = false;
+    firstMainScreen = true;
 
     while (!quit) {
     main_menu:
@@ -577,7 +509,7 @@ i32 oldmain(void) {
         if (gGameCommand != OLD_MAIN_EXIT)
             gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
 
-        if (!mainScreenLoaded_h) {
+        if (!mainScreenLoaded) {
             if (gGameCommand != OLD_MAIN_EXIT) {
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
@@ -585,12 +517,12 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
-                if (firstMainScreen_h)
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
+                if (firstMainScreen)
                     SetPalette(gPalette->m_data, 1);
                 else
                     gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                firstMainScreen_h = false;
+                firstMainScreen = false;
             }
             gpMouseManager->SetPointer(
                 "advmice.mse",
@@ -598,7 +530,7 @@ i32 oldmain(void) {
                 MOUSE_AUTO_CURSOR_TYPE
             );
         }
-        mainScreenLoaded_h = true;
+        mainScreenLoaded = true;
         if (gGameCommand != OLD_MAIN_EXIT)
             gpWindowManager->m_updateFlags = 1;
 
@@ -606,7 +538,7 @@ i32 oldmain(void) {
             gbTCPFirstTime = false;
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-            iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
+            iMPNetProtocol = REMOTE_PROTOCOL_WINSOCK;
             if (giTCPHostStatus)
                 iMPExtendedType = REMOTE_GAME_NETWORK_HOST;
             else
@@ -669,7 +601,7 @@ i32 oldmain(void) {
             }
 
             if (gGameCommand != -1) {
-                command_c = gGameCommand;
+                command = gGameCommand;
                 gGameCommand = -1;
             } else {
                 gpInitWin = new heroWindow(
@@ -683,14 +615,14 @@ i32 oldmain(void) {
                 gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
                 delete gpInitWin;
                 gpInitWin = NULL;
-                command_c = gpWindowManager->m_dialogResult;
+                command = gpWindowManager->m_dialogResult;
                 gbInSetupDialog = false;
             }
         }
         if (giMenuCommand != -1)
             goto process_menu_command;
 
-        switch (command_c) {
+        switch (command) {
             case OLD_MAIN_LOAD_GAME:
                 giSetupGameType = OLD_MAIN_SETUP_LOAD;
                 goto setup_selected;
@@ -698,8 +630,8 @@ i32 oldmain(void) {
                 giSetupGameType = OLD_MAIN_SETUP_NEW;
 
             setup_selected:
-                for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                    cPlayerNames[player_h][0] = 0;
+                for (player = 0; player < GAME_PLAYER_COUNT; player++)
+                    cPlayerNames[player][0] = 0;
                 if (!gpGame->SetupGame())
                     goto main_menu;
 
@@ -707,14 +639,14 @@ i32 oldmain(void) {
                     case OLD_MAIN_SETUP_NEW:
                         if (gbInCampaign) {
                             gpGame->InitEntireCampaign(gbCampaignSideChoice);
-                            result_i = gpGame->HandleCampaignWin();
-                            if (result_i) {
+                            result = gpGame->HandleCampaignWin();
+                            if (result) {
                                 gpGame->InitCampaignMap();
                                 goto initialize_game;
                             } else {
                                 gpWindowManager
                                     ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                mainScreenLoaded_h = false;
+                                mainScreenLoaded = false;
                                 goto main_menu;
                             }
                         } else {
@@ -725,7 +657,7 @@ i32 oldmain(void) {
                                 } else {
                                     gpWindowManager
                                         ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                    mainScreenLoaded_h = false;
+                                    mainScreenLoaded = false;
                                     goto main_menu;
                                 }
                             } else {
@@ -749,14 +681,14 @@ i32 oldmain(void) {
                     ShutDown(localization::Tr("system.manager.add_failed"));
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
-                mainScreenLoaded_h = false;
+                mainScreenLoaded = false;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_THIRD_VIDEO);
-                mainScreenLoaded_h = false;
+                mainScreenLoaded = false;
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
@@ -772,85 +704,83 @@ i32 oldmain(void) {
             LogStr("DWM 2");
             if (gbRemoteOn && giThisNetPos == 0) {
                 LogStr("DWM 3");
-                memset(matchedGamePlayers_c, 0, OLD_MAIN_PLAYER_COUNT);
-                memset(matchedNetPlayers_d, 0, OLD_MAIN_PLAYER_COUNT);
-                for (netPlayer_k = 0; netPlayer_k < OLD_MAIN_PLAYER_COUNT; netPlayer_k++) {
-                    if (!gbHumanPlayer[netPlayer_k])
+                memset(matchedGamePlayers, 0, GAME_PLAYER_COUNT);
+                memset(matchedNetPlayers, 0, GAME_PLAYER_COUNT);
+                for (netPlayer = 0; netPlayer < GAME_PLAYER_COUNT; netPlayer++) {
+                    if (!gbHumanPlayer[netPlayer])
                         continue;
-                    for (gamePlayer_m = 0; gamePlayer_m < OLD_MAIN_PLAYER_COUNT; gamePlayer_m++) {
+                    for (gamePlayer = 0; gamePlayer < GAME_PLAYER_COUNT; gamePlayer++) {
                         if (strlen(&gpGame->m_defaultPlayerNames
-                                        [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE])
+                                        [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE])
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
                             && !strcmp(
                                 &gpGame->m_defaultPlayerNames
-                                     [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE],
-                                gsNetPlayerInfo[netPlayer_k].uniqueSystemID
+                                     [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                gsNetPlayerInfo[netPlayer].uniqueSystemID
                             )
-                            && !gpGame->m_playerDead[gamePlayer_m]
-                            && !matchedGamePlayers_c[gamePlayer_m]
-                            && !matchedNetPlayers_d[netPlayer_k]) {
-                            matchedGamePlayers_c[gamePlayer_m] = 1;
-                            matchedNetPlayers_d[netPlayer_k] = 1;
-                            gbGamePosToNetPos[gamePlayer_m] = static_cast<i8>(netPlayer_k);
+                            && !gpGame->m_playerDead[gamePlayer]
+                            && !matchedGamePlayers[gamePlayer]
+                            && !matchedNetPlayers[netPlayer]) {
+                            matchedGamePlayers[gamePlayer] = 1;
+                            matchedNetPlayers[netPlayer] = 1;
+                            gbGamePosToNetPos[gamePlayer] = static_cast<i8>(netPlayer);
                         }
                     }
                 }
-                gamePlayer_m = 0;
-                while (gamePlayer_m < OLD_MAIN_PLAYER_COUNT && matchedGamePlayers_c[gamePlayer_m])
-                    gamePlayer_m++;
-                for (netPlayer_k = 0; netPlayer_k < OLD_MAIN_PLAYER_COUNT; netPlayer_k++) {
-                    if (matchedNetPlayers_d[netPlayer_k])
+                gamePlayer = 0;
+                while (gamePlayer < GAME_PLAYER_COUNT && matchedGamePlayers[gamePlayer])
+                    gamePlayer++;
+                for (netPlayer = 0; netPlayer < GAME_PLAYER_COUNT; netPlayer++) {
+                    if (matchedNetPlayers[netPlayer])
                         continue;
-                    if (gbHumanPlayer[netPlayer_k]) {
-                        gbGamePosToNetPos[netPlayer_k] = static_cast<i8>(gamePlayer_m);
+                    if (gbHumanPlayer[netPlayer]) {
+                        gbGamePosToNetPos[netPlayer] = static_cast<i8>(gamePlayer);
                         strcpy(
                             &gpGame->m_defaultPlayerNames
-                                 [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE],
-                            gsNetPlayerInfo[netPlayer_k].uniqueSystemID
+                                 [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                            gsNetPlayerInfo[netPlayer].uniqueSystemID
                         );
-                        gamePlayer_m++;
-                        while (gamePlayer_m < OLD_MAIN_PLAYER_COUNT
-                               && matchedGamePlayers_c[gamePlayer_m])
-                            gamePlayer_m++;
+                        gamePlayer++;
+                        while (gamePlayer < GAME_PLAYER_COUNT
+                               && matchedGamePlayers[gamePlayer])
+                            gamePlayer++;
                     } else {
-                        gbGamePosToNetPos[netPlayer_k] = -1;
+                        gbGamePosToNetPos[netPlayer] = -1;
                     }
                 }
 
-                memcpy(netBuffer_f.setup.gamePosToNetPos, gbGamePosToNetPos, OLD_MAIN_PLAYER_COUNT);
+                memcpy(netBuffer.setup.gamePosToNetPos, gbGamePosToNetPos, GAME_PLAYER_COUNT);
                 memcpy(
-                    netBuffer_f.setup.players,
+                    netBuffer.setup.players,
                     gsNetPlayerInfo,
-                    sizeof(netBuffer_f.setup.players)
+                    sizeof(netBuffer.setup.players)
                 );
                 giThisGamePos = NetPosToGamePos(0);
                 gbUseBzip2Compression = gbUseDiffCompression = 1;
-                for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
-                    if (!gsNetPlayerInfo[player_h].useBzip2Compression)
+                for (player = 0; player < giNumHumanPlayers; player++) {
+                    if (!gsNetPlayerInfo[player].useBzip2Compression)
                         gbUseBzip2Compression = 0;
-                    if (!gsNetPlayerInfo[player_h].useDiffCompression)
+                    if (!gsNetPlayerInfo[player].useDiffCompression)
                         gbUseDiffCompression = 0;
                 }
-                netBuffer_f.setup.useBzip2Compression = gbUseBzip2Compression;
-                netBuffer_f.setup.useDiffCompression = gbUseDiffCompression;
-                for (player_h = 1; player_h < giNumHumanPlayers; player_h++) {
-                    transmissionResult_d = TransmitRemoteData(
-                        netBuffer_f.bytes,
-                        player_h,
+                netBuffer.setup.useBzip2Compression = gbUseBzip2Compression;
+                netBuffer.setup.useDiffCompression = gbUseDiffCompression;
+                for (player = 1; player < giNumHumanPlayers; player++) {
+                    transmissionResult = TransmitRemoteData(
+                        netBuffer.bytes,
+                        player,
                         sizeof(OldMainNetSetup),
                         OLD_MAIN_NETWORK_PACKET,
-                        1,
-                        1,
-                        REMOTE_MESSAGE_DEFAULT
+                        1
                     );
-                    if (!transmissionResult_d)
+                    if (!transmissionResult)
                         ShutDown(NULL);
                 }
-                for (player_h = 1; player_h < giNumHumanPlayers; player_h++) {
-                    if (!gpGame->TransmitSaveGame(player_h, 0, 1))
+                for (player = 1; player < giNumHumanPlayers; player++) {
+                    if (!gpGame->TransmitSaveGame(player, 0, 1))
                         ShutDown(NULL);
                 }
-                memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+                memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
@@ -859,18 +789,7 @@ i32 oldmain(void) {
             if (gbRemoteOn && gbWaitForRemoteReceive) {
                 LogStr("DWM 5");
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
-                NormalDialog(
-                    localization::Tr("network.data.waiting_to_receive"),
-                    OLD_MAIN_DIALOG_WAIT,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(localization::Tr("network.data.waiting_to_receive"), OLD_MAIN_DIALOG_WAIT);
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
                 gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -886,32 +805,32 @@ i32 oldmain(void) {
             gShingleAnim = NULL;
 
             if (giNumHumanPlayers > 1) {
-                for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
+                for (player = 0; player < giNumHumanPlayers; player++) {
                     if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
                         strcpy(
-                            cPlayerNames[NetPosToGamePos(player_h)],
-                            gsNetPlayerInfo[player_h].name
+                            cPlayerNames[NetPosToGamePos(player)],
+                            gsNetPlayerInfo[player].name
                         );
                 }
             }
-            for (player_h = 0; player_h < gpGame->m_playerCount; player_h++) {
-                if (!strlen(cPlayerNames[player_h])) {
+            for (player = 0; player < gpGame->m_playerCount; player++) {
+                if (!strlen(cPlayerNames[player])) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("player.color_default_name"),
-                        gColors[gpGame->m_players[player_h].m_color]
+                        gColors[gpGame->m_players[player].m_color]
                     );
                     utf8::Copy(
-                        cPlayerNames[player_h],
-                        sizeof(cPlayerNames[player_h]),
+                        cPlayerNames[player],
+                        sizeof(cPlayerNames[player]),
                         gText
                     );
-                    utf8::UppercaseFirst(cPlayerNames[player_h]);
+                    utf8::UppercaseFirst(cPlayerNames[player]);
                 }
             }
             ComputeAdvNetControl();
             gbGameInitialized = true;
-            mainScreenLoaded_h = false;
+            mainScreenLoaded = false;
             gpSoundManager->StopAllSamples(1);
             gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
             gMapX = 0;
@@ -930,10 +849,10 @@ i32 oldmain(void) {
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
                     ShutDown(localization::Tr("system.manager.add_failed"));
-                if (command_c == OLD_MAIN_NEW_GAME) {
+                if (command == OLD_MAIN_NEW_GAME) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
-                if (command_c == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
+                if (command == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
                     bForceCheckTimeEvent = false;
                     gpGame->CheckForTimeEvent();
                 }
@@ -973,10 +892,10 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
-                mainScreenLoaded_h = true;
+                mainScreenLoaded = true;
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
             } else {
                 i32 campaignResult = 0;
@@ -1003,8 +922,8 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                            cPlayerNames[player_h][0] = 0;
+                        for (player = 0; player < GAME_PLAYER_COUNT; player++)
+                            cPlayerNames[player][0] = 0;
                         gpGame->InitCampaignMap();
                         gbGameOver = false;
                         bForceCheckTimeEvent = true;
@@ -1024,8 +943,8 @@ i32 oldmain(void) {
                         );
                     }
                     if (campaignResult) {
-                        for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                            cPlayerNames[player_h][0] = 0;
+                        for (player = 0; player < GAME_PLAYER_COUNT; player++)
+                            cPlayerNames[player][0] = 0;
                         xCampaign.InitMap();
                         gbGameOver = false;
                         bForceCheckTimeEvent = true;
@@ -1043,12 +962,12 @@ i32 oldmain(void) {
                         gpWindowManager->UpdateScreenRegion(
                             0,
                             0,
-                            OLD_MAIN_SCREEN_WIDTH,
-                            OLD_MAIN_SCREEN_HEIGHT
+                            LOGICAL_SCREEN_WIDTH,
+                            LOGICAL_SCREEN_HEIGHT
                         );
                         gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                         gpWindowManager->m_updateFlags = 1;
-                        mainScreenLoaded_h = true;
+                        mainScreenLoaded = true;
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
                     } else {
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
@@ -1071,9 +990,9 @@ i32 oldmain(void) {
                     1
                 );
                 gpWindowManager
-                    ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                    ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                mainScreenLoaded_h = true;
+                mainScreenLoaded = true;
             }
         }
 
@@ -1085,8 +1004,8 @@ i32 oldmain(void) {
     return 0;
 }
 
-char toupper(char c) {
-    return static_cast<char>(utf8::ToUpper(static_cast<unsigned char>(c)));
+char toupper(char character) {
+    return static_cast<char>(utf8::ToUpper(static_cast<unsigned char>(character)));
 }
 
 i32 InterpretCommandLine(void) {
@@ -1172,31 +1091,31 @@ i32 InterpretCommandLine(void) {
                             }
                             case 'A': {
                                 if (i + 3 < size) {
-                                    i32 dstIndex = 0;
-                                    i32 srcIndex = i + 3;
-                                    while (dstIndex < LINE_TCP_TEXT_LENGTH
-                                           && gcCommandLine[srcIndex]
-                                           && gcCommandLine[srcIndex] != ' ') {
-                                        gcTCPAddress[dstIndex] = gcCommandLine[srcIndex];
-                                        srcIndex++;
-                                        dstIndex++;
+                                    i32 destinationIndex = 0;
+                                    i32 sourceIndex = i + 3;
+                                    while (destinationIndex < LINE_TCP_TEXT_LENGTH
+                                           && gcCommandLine[sourceIndex]
+                                           && gcCommandLine[sourceIndex] != ' ') {
+                                        gcTCPAddress[destinationIndex] = gcCommandLine[sourceIndex];
+                                        sourceIndex++;
+                                        destinationIndex++;
                                     }
-                                    gcTCPAddress[dstIndex] = 0;
+                                    gcTCPAddress[destinationIndex] = 0;
                                 }
                                 break;
                             }
                             case 'N': {
                                 if (i + 3 < size) {
-                                    i32 dstIndex = 0;
-                                    i32 srcIndex = i + 3;
-                                    while (dstIndex < LINE_TCP_TEXT_LENGTH
-                                           && gcCommandLine[srcIndex]
-                                           && gcCommandLine[srcIndex] != ' ') {
-                                        gcTCPName[dstIndex] = gcCommandLine[srcIndex];
-                                        srcIndex++;
-                                        dstIndex++;
+                                    i32 destinationIndex = 0;
+                                    i32 sourceIndex = i + 3;
+                                    while (destinationIndex < LINE_TCP_TEXT_LENGTH
+                                           && gcCommandLine[sourceIndex]
+                                           && gcCommandLine[sourceIndex] != ' ') {
+                                        gcTCPName[destinationIndex] = gcCommandLine[sourceIndex];
+                                        sourceIndex++;
+                                        destinationIndex++;
                                     }
-                                    gcTCPName[dstIndex] = 0;
+                                    gcTCPName[destinationIndex] = 0;
                                 }
                                 break;
                             }
@@ -1245,19 +1164,19 @@ i32 InterpretCommandLine(void) {
     return 1;
 }
 
-MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
+MessageDispatchResult InitMenuHandler(struct tag_message& message) {
     b32 handled = false;
-    i32 idx;
+    i32 index;
     i32 menu;
     i32 helpIndex;
     i32 hoverIndex;
 
     PollSound();
-    if (msg.payload.widget.parameter & MENU_DISABLE_MASK) {
-        if (msg.payload.widget.command == INIT_MENU_HOVER_COMMAND
-            || msg.payload.widget.command == INIT_MENU_HELP_COMMAND) {
+    if (message.payload.widget.parameter & MENU_DISABLE_MASK) {
+        if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
+            || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
             helpIndex = -1;
-            switch (msg.payload.widget.id) {
+            switch (message.payload.widget.id) {
                 case MENU_NEW_GAME:
                     helpIndex = MENU_HELP_NEW_GAME;
                     break;
@@ -1275,61 +1194,50 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(
-                    gInitMenuHelp[helpIndex],
-                    MENU_HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
             }
         }
     } else {
-        if (msg.type == INIT_MENU_KEY_PRESS) {
-            switch (msg.payload.keyboard.keyCode) {
-                case MENU_KEY_NEW:
+        if (message.type == MESSAGE_KEY_DOWN) {
+            switch (message.payload.keyboard.keyCode) {
+                case H2EnumIndex(INPUT_SCAN_N):
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
                     handled = true;
                     break;
-                case MENU_KEY_LOAD:
+                case H2EnumIndex(INPUT_SCAN_L):
                     gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
                     handled = true;
                     break;
-                case MENU_KEY_CREDITS:
+                case H2EnumIndex(INPUT_SCAN_C):
                     gpWindowManager->m_dialogResult = MENU_CREDITS;
                     handled = true;
                     break;
-                case MENU_KEY_HIGH_SCORES:
+                case H2EnumIndex(INPUT_SCAN_H):
                     gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
                     handled = true;
                     break;
-                case MENU_KEY_EXIT:
+                case H2EnumIndex(INPUT_SCAN_Q):
                     gpWindowManager->m_dialogResult = MENU_EXIT;
                     handled = true;
                     break;
             }
-        } else if (msg.type == INIT_MENU_MESSAGE) {
-            if (msg.payload.widget.id < MENU_FIRST_COMMAND
-                || msg.payload.widget.id > MENU_LAST_ACTION) {
+        } else if (message.type == MESSAGE_WIDGET) {
+            if (message.payload.widget.id < MENU_FIRST_COMMAND
+                || message.payload.widget.id > MENU_LAST_ACTION) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
-            switch (msg.payload.widget.command) {
-                case INIT_MENU_HOVER_COMMAND:
-                    if (msg.payload.widget.id == MENU_MOVIE)
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_SELECT:
+                    if (message.payload.widget.id == MENU_MOVIE)
                         break;
-                    menu = msg.payload.widget.id - MENU_FIRST_COMMAND;
-                    idx = menu + MENU_WIDGET_OFFSET;
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = idx;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
-                    gpInitWin->DrawWindow(0, idx, idx);
+                    menu = message.payload.widget.id - MENU_FIRST_COMMAND;
+                    index = menu + MENU_WIDGET_OFFSET;
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.id = index;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+                    message.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
+                    gpInitWin->BroadcastMessage(message);
+                    gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, index, index);
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[menu][H2EnumIndex(INIT_MENU_HOTSPOT_X)],
                         IMHotSpots[menu][H2EnumIndex(INIT_MENU_HOTSPOT_Y)],
@@ -1337,30 +1245,34 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         IMHotSpots[menu][H2EnumIndex(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                     break;
-                case INIT_MENU_CLICK_COMMAND:
-                    if (msg.payload.widget.id == MENU_MOVIE) {
+                case WIDGET_NOTIFY_DESELECT:
+                    if (message.payload.widget.id == MENU_MOVIE) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
                             gpWindowManager->m_screen,
                             1
                         );
-                        gpInitWin->DrawWindow(0);
+                        gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                         gpWindowManager
-                            ->UpdateScreenRegion(0, 0, MENU_SCREEN_WIDTH, MENU_SCREEN_HEIGHT);
+                            ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                         gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
                         break;
                     } else {
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        for (idx = MENU_FIRST_WIDGET; idx <= MENU_LAST_WIDGET; idx++) {
-                            msg.type = INIT_MENU_MESSAGE;
-                            msg.payload.widget.id = idx;
-                            msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                            msg.payload.widget.data.value =
-                                (idx - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
-                            gpInitWin->BroadcastMessage(msg);
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        for (index = MENU_FIRST_WIDGET; index <= MENU_LAST_WIDGET; index++) {
+                            message.type = MESSAGE_WIDGET;
+                            message.payload.widget.id = index;
+                            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+                            message.payload.widget.data.value =
+                                (index - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
+                            gpInitWin->BroadcastMessage(message);
                         }
-                        gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
+                        gpInitWin->DrawWindow(
+                            WINDOW_DRAW_BUFFER_ONLY,
+                            MENU_FIRST_WIDGET,
+                            MENU_LAST_WIDGET
+                        );
                         gpWindowManager->UpdateScreenRegion(
                             MENU_REDRAW_LEFT,
                             MENU_REDRAW_TOP,
@@ -1371,30 +1283,30 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     }
                     break;
             }
-        } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
+        } else if (message.type == MESSAGE_MOUSE_MOVE) {
             hoverIndex = -1;
-            for (idx = 0; idx < MENU_HOTSPOT_COUNT; idx++) {
-                if (msg.payload.mouse.screenX >= IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_X)]
-                    && msg.payload.mouse.screenY >= IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_Y)]
-                    && msg.payload.mouse.screenX
-                           < IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_X)]
-                                 + IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_WIDTH)]
-                    && msg.payload.mouse.screenY
-                           < IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_Y)]
-                                 + IMHotSpots[idx][H2EnumIndex(INIT_MENU_HOTSPOT_HEIGHT)]) {
-                    hoverIndex = idx;
+            for (index = 0; index < MENU_HOTSPOT_COUNT; index++) {
+                if (message.payload.mouse.screenX >= IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_X)]
+                    && message.payload.mouse.screenY >= IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_Y)]
+                    && message.payload.mouse.screenX
+                           < IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_X)]
+                                 + IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_WIDTH)]
+                    && message.payload.mouse.screenY
+                           < IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_Y)]
+                                 + IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_HEIGHT)]) {
+                    hoverIndex = index;
                 }
             }
             if (hoverIndex != lastIMHoverID) {
                 if (lastIMHoverID != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value =
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+                    message.payload.widget.data.value =
                         lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         lastIMHoverID + MENU_WIDGET_OFFSET,
                         lastIMHoverID + MENU_WIDGET_OFFSET
                     );
@@ -1406,14 +1318,14 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     );
                 }
                 if (hoverIndex != -1) {
-                    msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
-                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value =
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
+                    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+                    message.payload.widget.data.value =
                         hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
-                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->BroadcastMessage(message);
                     gpInitWin->DrawWindow(
-                        0,
+                        WINDOW_DRAW_BUFFER_ONLY,
                         hoverIndex + MENU_WIDGET_OFFSET,
                         hoverIndex + MENU_WIDGET_OFFSET
                     );
@@ -1430,9 +1342,9 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     }
 
     if (handled || giMenuCommand != -1) {
-        msg.type = INIT_MENU_MESSAGE;
-        msg.payload.widget.id = MENU_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     CheckShingleUpdate();
@@ -1443,14 +1355,14 @@ MessageDispatchResult NullHandler(struct tag_message&) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
+MessageDispatchResult RecruitHeroHandler(tag_message& message) {
 
     b32 shouldClose = false;
 
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-                switch (msg.payload.widget.id) {
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
+            case WIDGET_NOTIFY_SELECT:
+                switch (message.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
@@ -1462,15 +1374,15 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
                         break;
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
-                    case EVENT_WINDOW_SECOND_BUTTON:
+            case WIDGET_NOTIFY_DESELECT:
+                switch (message.payload.widget.id) {
+                    case DIALOG_BUTTON_1:
                         gpTownManager->m_recruitState = -1;
                         shouldClose = true;
                         break;
-                    case EVENT_WINDOW_THIRD_BUTTON:
+                    case DIALOG_BUTTON_2:
                         gpTownManager->m_recruitState = 0;
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
                         break;
                 }
@@ -1480,28 +1392,28 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
         }
     }
     if (shouldClose == 1) {
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
-    char buf[BUILDING_INFO_BUFFER_SIZE];
+    char buffer[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
-        utf8::Copy(buf, sizeof(buf), xNecromancerShrineDesc);
+        utf8::Copy(buffer, sizeof(buffer), xNecromancerShrineDesc);
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         utf8::Format(
-            buf,
+            buffer,
             localization::Tr("town.building.weekly_growth")  ,
             GetBuildingName(race, building),
             gArmyNamesPlural[H2EnumIndex(gDwellingType[H2EnumIndex(race)][0])]
         );
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        utf8::Copy(buf, sizeof(buf), gBuildingInfoSpecial[H2EnumIndex(race)]);
+        utf8::Copy(buffer, sizeof(buffer), gBuildingInfoSpecial[H2EnumIndex(race)]);
     } else if (building < BUILDING_SLOT_DWELLING_FIRST) {
-        utf8::Copy(buf, sizeof(buf), cBuildingInfoNeutral[H2EnumIndex(building)]);
+        utf8::Copy(buffer, sizeof(buffer), cBuildingInfoNeutral[H2EnumIndex(building)]);
     } else {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -1517,10 +1429,10 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             "{%s}\n\n%s",
             GetBuildingName(race, building),
-            buf
+            buffer
         );
     } else {
-        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, buf);
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, buffer);
     }
     return gText;
 }
@@ -1538,31 +1450,31 @@ const char* GetBuildingName(FactionType race, BuildingSlotType building) {
         return gDwellingNames[H2EnumIndex(race)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
 }
 
-void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel) {
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel) {
     i32 level;
     if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
-        memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, xShrineBuildingCost, H2EnumIndex(RES_COUNT) * sizeof(i32));
     } else if (building >= BUILDING_SLOT_DWELLING_FIRST
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
-            dest,
+            destination,
             gDwellingCosts[H2EnumIndex(race)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)],
-            KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
+            H2EnumIndex(RES_COUNT) * sizeof(i32)
         );
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         level = mageLevel + 1;
-        if (level > KB_MAGE_GUILD_MAX_LEVEL)
-            level = KB_MAGE_GUILD_MAX_LEVEL;
-        memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        if (level > TOWN_MAGE_GUILD_LEVEL_COUNT)
+            level = TOWN_MAGE_GUILD_LEVEL_COUNT;
+        memcpy(destination, gMageBuildingCosts[mageLevel + 1], H2EnumIndex(RES_COUNT) * sizeof(i32));
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        memcpy(dest, gSpecialBuildingCosts[H2EnumIndex(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(destination, gSpecialBuildingCosts[H2EnumIndex(race)], H2EnumIndex(RES_COUNT) * sizeof(i32));
     } else {
         if (building >= BUILDING_SLOT_DISABLED_SECOND)
             return;
         memcpy(
-            dest,
+            destination,
             gNeutralBuildingCosts[H2EnumIndex(building)],
-            KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
+            H2EnumIndex(RES_COUNT) * sizeof(i32)
         );
     }
 }
@@ -1576,9 +1488,9 @@ const char* GetMonsterPluralName(CreatureType monster) {
 }
 
 void GetMonsterCost(CreatureType monster, i32* const cost) {
-    i32 idx;
-    for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
-        cost[idx] = 0;
+    i32 index;
+    for (index = 0; index < H2EnumIndex(RES_COUNT); index++)
+        cost[index] = 0;
     cost[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[H2EnumIndex(monster)].cost;
     switch (monster) {
         case CREATURE_GENIE:
@@ -1608,23 +1520,23 @@ void GetMonsterCost(CreatureType monster, i32* const cost) {
     }
 }
 
-i32 CanBuild(town* t, BuildingSlotType building) {
+i32 CanBuild(town* townPointer, BuildingSlotType building) {
     i32 reqBits;
     i32 curMask;
-    if (H2BitTest(gpGame->m_knownTowns, t->m_id))
+    if (H2BitTest(gpGame->m_townBuiltToday, townPointer->m_id))
         return 0;
-    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE)))
+    if (building != BUILDING_SLOT_CASTLE && !(H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
-        && t->m_type == FACTION_NECROMANCER)
+        && townPointer->m_type == FACTION_NECROMANCER)
         return 0;
     if (building == BUILDING_SLOT_DOCK) {
-        if (t->CanBuildDock())
+        if (townPointer->CanBuildDock())
             return 1;
         else
             return 0;
     }
-    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
+    if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
     if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
@@ -1633,50 +1545,50 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
-         && (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_FIRST_FLAG)))
+         && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_2)))))
         || (building == BUILDING_SLOT_DWELLING_THIRD
-            && (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_SECOND_FLAG)))
+            && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_3)))))
         || (building == BUILDING_SLOT_DWELLING_FOURTH
-            && (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_THIRD_FLAG)))
+            && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_4)))))
         || (building == BUILDING_SLOT_DWELLING_FIFTH
-            && (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_FOURTH_FLAG)))
+            && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_5)))))
         || (building == BUILDING_SLOT_DWELLING_SIXTH
-            && ((t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-                || (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && ((H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6))))
+                || (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
-            && (t->m_buildings & H2EnumIndex(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
+            && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
         return 0;
-    reqBits = gHierarchyMask[H2EnumIndex(t->m_type)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
-    curMask = t->m_buildings;
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_FIRST_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_FIRST_FLAG);
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_SECOND_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_SECOND_FLAG);
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_THIRD_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_THIRD_FLAG);
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_FOURTH_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_FOURTH_FLAG);
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_SIXTH_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_UPGRADE_FIFTH_FLAG);
-    if (curMask & H2EnumIndex(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-        curMask |= H2EnumIndex(KB_DWELLING_FIFTH_FLAG);
+    reqBits = gHierarchyMask[H2EnumIndex(townPointer->m_type)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
+    curMask = townPointer->m_buildings;
+    if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_2))
+        curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_2);
+    if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_3))
+        curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_3);
+    if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_4))
+        curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_4);
+    if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_5))
+        curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_5);
+    if (curMask & H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))
+        curMask |= H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6);
+    if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6))
+        curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
-        if (t->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
+        if (townPointer->m_type == FACTION_NECROMANCER
+            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
     return 0;
 }
 
-i32 CanBuy(town* t, BuildingSlotType type) {
-    i32 buf[KB_BUILDING_RESOURCE_COUNT];
-    playerData* ptr;
-    i32 r;
-    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
-    ptr = &gpGame->m_players[giCurPlayer];
-    for (r = 0; r < KB_BUILDING_RESOURCE_COUNT; r++)
-        if (ptr->m_resources[r] < buf[r])
+i32 CanBuy(town* townPointer, BuildingSlotType type) {
+    i32 buffer[H2EnumIndex(RES_COUNT)];
+    playerData* player;
+    i32 resourceIndex;
+    GetBuildingCost(townPointer->m_type, type, buffer, townPointer->m_mageGuildLevel);
+    player = &gpGame->m_players[giCurPlayer];
+    for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_COUNT); resourceIndex++)
+        if (player->m_resources[resourceIndex] < buffer[resourceIndex])
             return 0;
     return 1;
 }
@@ -1699,17 +1611,17 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
     }
 }
 
-MessageDispatchResult WaitHandler(tag_message& msg) {
+MessageDispatchResult WaitHandler(tag_message& message) {
     i32 result = 0;
     gbFunctionComplete = true;
     PollSound();
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
-                    case EVENT_WINDOW_THIRD_BUTTON:
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
+            case WIDGET_NOTIFY_DESELECT:
+                switch (message.payload.widget.id) {
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
+                    case DIALOG_BUTTON_2:
                         gbFunctionComplete = false;
                         result = 1;
                         break;
@@ -1764,16 +1676,16 @@ MessageDispatchResult WaitHandler(tag_message& msg) {
     }
     CheckShingleUpdate();
     if (result != 0) {
-        gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        gpWindowManager->m_dialogResult = DIALOG_BUTTON_1;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
+MessageDispatchResult EventWindowHandler(struct tag_message& message) {
     i32 resType;
     i32 resExtra;
 
@@ -1782,21 +1694,21 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
-        msg.type = MESSAGE_WIDGET;
-        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = MESSAGE_WIDGET;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
-    if (msg.type == MESSAGE_WIDGET) {
-        switch (msg.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-            case WIDGET_COMMAND_ALTERNATE_SELECT:
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
+            case WIDGET_NOTIFY_SELECT:
+            case WIDGET_NOTIFY_RIGHT_CLICK:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
-                if (msg.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
-                    switch (msg.payload.widget.id) {
+                if (message.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                    switch (message.payload.widget.id) {
                         case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
                             resType = giResType1;
                             resExtra = giResExtra1;
@@ -1808,147 +1720,46 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     }
                     switch (resType) {
                         case EVENT_WINDOW_LUCK:
-                            NormalDialog(
-                                cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_BAD_LUCK:
-                            NormalDialog(
-                                cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_MORALE:
                             NormalDialog(
                                 cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_BAD_MORALE:
                             NormalDialog(
                                 cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
-                            NormalDialog(
-                                localization::Tr("help.experience"),
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("help.experience"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
                             if (resExtra == H2EnumIndex(ARTIFACT_SPELL_SCROLL)) {
                                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
-                                NormalDialog(
-                                    gText,
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             } else {
-                                NormalDialog(
-                                    gArtifactDesc[resExtra],
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gArtifactDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             }
                             break;
                         case NORMAL_DIALOG_SPELL:
-                            NormalDialog(
-                                gSpellDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gSpellDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
                                 cSecSkillDesc[resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
                                              [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case NORMAL_DIALOG_PRIMARY_SKILL:
-                            NormalDialog(
-                                gStatDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gStatDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_RESOURCE_WOOD:
                         case NORMAL_DIALOG_RESOURCE_MERCURY:
@@ -1957,35 +1768,24 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_RESOURCE_CRYSTAL:
                         case NORMAL_DIALOG_RESOURCE_GEMS:
                         case NORMAL_DIALOG_RESOURCE_GOLD:
-                            NormalDialog(
-                                localization::Tr("help.resources"),
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(localization::Tr("help.resources"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
                 }
                 break;
-            case WIDGET_COMMAND_DESELECT:
-                switch (msg.payload.widget.id) {
-                    case EVENT_WINDOW_FIRST_BUTTON:
-                    case EVENT_WINDOW_SECOND_BUTTON:
-                    case EVENT_WINDOW_THIRD_BUTTON:
-                    case EVENT_WINDOW_FOURTH_BUTTON:
-                    case EVENT_WINDOW_FIFTH_BUTTON:
-                    case EVENT_WINDOW_SIXTH_BUTTON:
-                    case EVENT_WINDOW_SEVENTH_BUTTON:
-                    case EVENT_WINDOW_EIGHTH_BUTTON:
-                        gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-                        msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+            case WIDGET_NOTIFY_DESELECT:
+                switch (message.payload.widget.id) {
+                    case DIALOG_BUTTON_0:
+                    case DIALOG_BUTTON_1:
+                    case DIALOG_BUTTON_2:
+                    case DIALOG_BUTTON_3:
+                    case DIALOG_BUTTON_5:
+                    case DIALOG_BUTTON_6:
+                    case DIALOG_BUTTON_7:
+                    case DIALOG_BUTTON_8:
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_IGNORED_BUTTON:
@@ -2000,27 +1800,27 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg) {
-    return EventWindowHandler(msg);
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& message) {
+    return EventWindowHandler(message);
 }
 
 void PlayerDead(i32 player) {
-    playerData* rec;
+    playerData* currentPlayer;
     i32 i;
     gbRetreatWin = false;
-    rec = &gpGame->m_players[player];
+    currentPlayer = &gpGame->m_players[player];
     gpGame->m_playerDead[player] = 1;
     ++gpGame->m_deadPlayerCount;
     for (i = 0; i < GAME_MINE_COUNT; i++) {
         if (gpGame->m_mineOwners[i] == player)
             gpGame->ClaimMine(i, -1);
     }
-    for (i = rec->m_heroCount - 1; i >= 0; i--) {
-        GetHeroSlot(rec->m_heroIds[i])->Deallocate(1);
+    for (i = currentPlayer->m_heroCount - 1; i >= 0; i--) {
+        GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
     }
-    for (i = 0; i < AVAILABLE_HERO_SLOTS; i++) {
-        if (gpGame->m_availableHeroes[rec->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
-            gpGame->m_availableHeroes[rec->m_availableHeroIds[i]] = -1;
+    for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
+        if (gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
+            gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] = -1;
     }
     if (gbRemoteOn) {
         if (gbHumanPlayer[player])
@@ -2042,34 +1842,34 @@ void CheckEndGame(
     CheckEndGameForcedResult forcedResult,
     b32 dragonCityCaptured
 ) {
-    b32 showedDialog_o;
-    b32 defeated_m;
+    b32 showedDialog;
+    b32 defeated;
     b32 allowNormalVictory;
 
-    i32 survivingHumans_a;
-    i32 lastHuman_a;
+    i32 survivingHumans;
+    i32 lastHuman;
     i32 netHumanCount;
     i32 player;
-    i32 heroIndex_m;
+    i32 heroIndex;
     b32 winFlag;
-    playerData* rec_n;
-    b32 savedRemoteOn_o;
+    playerData* currentPlayer;
+    b32 savedRemoteOn;
     i32 numAlive;
-    i32 sideBelow_i;
+    i32 sideBelow;
     i32 sideAbove;
     i32 bestGold;
     town* lossTown;
     town* victoryTownData;
     i32 currentDayIndex;
     b32 enemyRemaining;
-    b32 hasRoland_j;
+    b32 hasRoland;
     b32 hasDwarfTown;
     char artifactName[END_GAME_TEXT_BUFFER_SIZE];
-    hero* artifactHeroPtr_c;
+    hero* artifactHeroPointer;
     i32 artifactWinnerPerson;
-    hero* lossHero_k;
-    hero* winningHeroEntry_g;
-    i32 winnerPlayer_m;
+    hero* lossHero;
+    hero* winningHeroEntry;
+    i32 winnerPlayer;
     char campaignSaveName[END_GAME_CAMPAIGN_SAVE_NAME_SIZE];
     i32 campaignHeroIndex;
     i32 carryoverHeroId;
@@ -2084,19 +1884,19 @@ void CheckEndGame(
         return;
 
     bInCheckEndGame = true;
-    savedRemoteOn_o = gbRemoteOn;
-    showedDialog_o = false;
+    savedRemoteOn = gbRemoteOn;
+    showedDialog = false;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         if (!gpGame->m_playerDead[player]) {
-            rec_n = &gpGame->m_players[player];
-            if ((rec_n->m_heroCount == 0 && rec_n->m_townCount == 0)
+            currentPlayer = &gpGame->m_players[player];
+            if ((currentPlayer->m_heroCount == 0 && currentPlayer->m_townCount == 0)
                 || (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
                 PlayerDead(player);
                 if (player == giThisGamePos) {
-                    showedDialog_o = true;
+                    showedDialog = true;
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 } else {
                     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), cPlayerNames[player]);
                     NormalDialog(
@@ -2112,33 +1912,22 @@ void CheckEndGame(
                         END_GAME_REMOTE_DIALOG_TIME
                     );
                 }
-            } else if (rec_n->m_townCount == 0) {
-                if (rec_n->m_daysLeft == -1) {
+            } else if (currentPlayer->m_townCount == 0) {
+                if (currentPlayer->m_daysLeft == -1) {
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("player.last_town_warning"),
                             cPlayerNames[player]
                         );
-                        NormalDialog(
-                            gText,
-                            1,
-                            -1,
-                            -1,
-                            END_GAME_PLAYER_DIALOG_ICON,
-                            gpGame->m_players[static_cast<i8>(player)].m_color,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
                     }
-                    rec_n->m_daysLeft = END_GAME_GRACE_DAYS;
-                } else if (rec_n->m_daysLeft == 0) {
+                    currentPlayer->m_daysLeft = END_GAME_GRACE_DAYS;
+                } else if (currentPlayer->m_daysLeft == 0) {
                     PlayerDead(player);
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
-                        if (!showedDialog_o) {
-                            showedDialog_o = true;
+                        if (!showedDialog) {
+                            showedDialog = true;
                             utf8::Format(
                                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 localization::Tr("player.banished.self"),
@@ -2152,29 +1941,18 @@ void CheckEndGame(
                             cPlayerNames[player]
                         );
                     }
-                    NormalDialog(
-                        gText,
-                        1,
-                        -1,
-                        -1,
-                        END_GAME_PLAYER_DIALOG_ICON,
-                        gpGame->m_players[static_cast<i8>(player)].m_color,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[static_cast<i8>(player)].m_color);
                 }
             } else {
-                rec_n->m_daysLeft = -1;
+                currentPlayer->m_daysLeft = -1;
             }
         }
     }
 
     numAlive = 0;
 
-    survivingHumans_a = 0;
-    lastHuman_a = 0;
+    survivingHumans = 0;
+    lastHuman = 0;
     netHumanCount = 0;
     for (player = 0; player < gpGame->m_playerCount; player++) {
         if (!gpGame->m_playerDead[player]) {
@@ -2184,14 +1962,14 @@ void CheckEndGame(
                 netHumanCount++;
             }
             if (gbHumanPlayer[player]) {
-                survivingHumans_a++;
-                lastHuman_a = player;
+                survivingHumans++;
+                lastHuman = player;
             }
         }
     }
 
     winFlag = false;
-    defeated_m = false;
+    defeated = false;
     allowNormalVictory = true;
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
@@ -2204,18 +1982,18 @@ void CheckEndGame(
         && gpGame->m_mapHeader.victoryConditionValue != CAMPAIGN_SWITCH_VICTORY_VALUE
         && (!gbInCampaign || gpGame->m_campaignType != CAMPAIGN_ARCHIBALD
             || gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET != END_GAME_SIDE_SCENARIO)) {
-        sideBelow_i = 0;
+        sideBelow = 0;
         sideAbove = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
                 if (gpGame->m_players[player].m_color < gpGame->m_mapHeader.victorySideThreshold) {
-                    sideBelow_i++;
+                    sideBelow++;
                 } else {
                     sideAbove++;
                 }
             }
         }
-        if (sideBelow_i == 0) {
+        if (sideBelow == 0) {
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player]
                     && gpGame->m_players[player].m_color
@@ -2232,14 +2010,14 @@ void CheckEndGame(
                 }
             }
         }
-        if (sideBelow_i == 0 || sideAbove == 0) {
+        if (sideBelow == 0 || sideAbove == 0) {
             if (!winFlag) {
-                defeated_m = true;
+                defeated = true;
             }
-            if (!showedDialog_o && winFlag) {
-                showedDialog_o = true;
+            if (!showedDialog && winFlag) {
+                showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2254,10 +2032,10 @@ void CheckEndGame(
             if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
                 winFlag = true;
             } else {
-                defeated_m = true;
+                defeated = true;
             }
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 if (winFlag) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -2271,7 +2049,7 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2281,34 +2059,34 @@ void CheckEndGame(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
         if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[lossTown->m_owner]) {
-            defeated_m = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+            defeated = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.town_fallen"), lossTown->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_ACCUMULATE_GOLD) {
         bestGold = 0;
-        winnerPlayer_m = END_GAME_NO_PLAYER;
+        winnerPlayer = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
                 && gpGame->m_players[player].m_resources[H2EnumIndex(RES_GOLD)]
                        >= gpGame->m_mapHeader.victoryConditionValue * END_GAME_GOLD_SCALE
                 && gpGame->m_players[player].m_resources[H2EnumIndex(RES_GOLD)] >= bestGold) {
                 bestGold = gpGame->m_players[player].m_resources[H2EnumIndex(RES_GOLD)];
-                winnerPlayer_m = player;
+                winnerPlayer = player;
             }
-            if (winnerPlayer_m != END_GAME_NO_PLAYER) {
-                if (gbThisNetHumanPlayer[H2EnumIndex(winnerPlayer_m)]) {
+            if (winnerPlayer != END_GAME_NO_PLAYER) {
+                if (gbThisNetHumanPlayer[H2EnumIndex(winnerPlayer)]) {
                     winFlag = true;
                 } else {
-                    defeated_m = true;
+                    defeated = true;
                 }
-                if (!showedDialog_o) {
-                    showedDialog_o = true;
+                if (!showedDialog) {
+                    showedDialog = true;
                     if (winFlag) {
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -2322,51 +2100,49 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 }
             }
         }
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
-        winningHeroEntry_g = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
-        if (winningHeroEntry_g->m_owner < 0 || winningHeroEntry_g->m_owner >= GAME_PLAYER_COUNT
-            || gbHumanPlayer[winningHeroEntry_g->m_owner]) {
+        winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
+        if (winningHeroEntry->m_owner < 0 || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
+            || gbHumanPlayer[winningHeroEntry->m_owner]) {
             winFlag = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 utf8::Format(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("victory.hero_captured"),
-                    winningHeroEntry_g->m_name
+                    winningHeroEntry->m_name
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
-        lossHero_k = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
-        if (lossHero_k->m_owner < 0 || lossHero_k->m_owner >= GAME_PLAYER_COUNT
-            || !gbHumanPlayer[lossHero_k->m_owner]) {
-            defeated_m = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
-                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.hero"), lossHero_k->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
+        if (lossHero->m_owner < 0 || lossHero->m_owner >= GAME_PLAYER_COUNT
+            || !gbHumanPlayer[lossHero->m_owner]) {
+            defeated = true;
+            if (!showedDialog) {
+                showedDialog = true;
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.hero"), lossHero->m_name);
+                NormalDialog(gText, 1);
             }
         }
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
-        if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
-            > gpGame->m_mapHeader.lossConditionValue) {
-            defeated_m = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+        if (GAME_DAY_NUMBER(*gpGame) > gpGame->m_mapHeader.lossConditionValue) {
+            defeated = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.time_expired"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2375,24 +2151,24 @@ void CheckEndGame(
         artifactWinnerPerson = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
-                for (heroIndex_m = 0; heroIndex_m < gpGame->m_players[player].m_heroCount;
-                     heroIndex_m++) {
-                    artifactHeroPtr_c = gpGame->GetPlayerHero(player, heroIndex_m);
+                for (heroIndex = 0; heroIndex < gpGame->m_players[player].m_heroCount;
+                     heroIndex++) {
+                    artifactHeroPointer = gpGame->GetPlayerHero(player, heroIndex);
                     if (gpGame->m_mapHeader.victoryConditionValue > END_GAME_ULTIMATE_ARTIFACT) {
-                        if (artifactHeroPtr_c->HasArtifact(
+                        if (artifactHeroPointer->HasArtifact(
                                 ArtifactType(gpGame->m_mapHeader.victoryConditionValue - 1)
                             )) {
                             artifactWinnerPerson = player;
                         }
                     } else {
-                        if (artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_BOOK)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_SWORD)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_CLOAK)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_WAND)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_SHIELD)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_STAFF)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_ULTIMATE_CROWN)
-                            || artifactHeroPtr_c->HasArtifact(ARTIFACT_GOLDEN_GOOSE)) {
+                        if (artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_BOOK)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_SWORD)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_CLOAK)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_WAND)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_SHIELD)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_STAFF)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_ULTIMATE_CROWN)
+                            || artifactHeroPointer->HasArtifact(ARTIFACT_GOLDEN_GOOSE)) {
                             artifactWinnerPerson = player;
                         }
                     }
@@ -2403,10 +2179,10 @@ void CheckEndGame(
             if (gbThisNetHumanPlayer[artifactWinnerPerson]) {
                 winFlag = true;
             } else {
-                defeated_m = true;
+                defeated = true;
             }
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
                     utf8::Copy(
                         artifactName, sizeof(artifactName),
@@ -2428,7 +2204,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2443,14 +2219,14 @@ void CheckEndGame(
             }
         }
         if (!hasDwarfTown) {
-            defeated_m = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+            defeated = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 utf8::Copy(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.loss.dwarf_towns")
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2459,30 +2235,30 @@ void CheckEndGame(
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO
         && dragonCityCaptured) {
         winFlag = true;
-        if (!showedDialog_o) {
-            showedDialog_o = true;
+        if (!showedDialog) {
+            showedDialog = true;
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.victory.dragon_city"));
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
         }
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                == END_GAME_ROLAND_CAPTURE_SCENARIO) {
-        hasRoland_j = false;
+        hasRoland = false;
         for (player = 0; player < GAME_HERO_COUNT; player++) {
             if (gpGame->m_heroRecs[player].m_portrait == CAMPAIGN_HERO_ROLAND
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= GAME_PLAYER_COUNT - 1) {
-                hasRoland_j = true;
+                hasRoland = true;
             }
         }
-        if (!hasRoland_j) {
-            defeated_m = true;
-            if (!showedDialog_o) {
-                showedDialog_o = true;
+        if (!hasRoland) {
+            defeated = true;
+            if (!showedDialog) {
+                showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.loss.roland_captured"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2500,15 +2276,15 @@ void CheckEndGame(
         }
         if (!enemyRemaining) {
             winFlag = true;
-            if (!showedDialog_o && winFlag) {
-                showedDialog_o = true;
+            if (!showedDialog && winFlag) {
+                showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
 
-    if (defeated_m) {
+    if (defeated) {
         gbGameOver = true;
         giEndSequence = false;
     }
@@ -2517,9 +2293,9 @@ void CheckEndGame(
         giEndSequence = true;
     }
 
-    if (numAlive == 1 || survivingHumans_a == 0
-        || (survivingHumans_a == 1 && !gbThisNetHumanPlayer[lastHuman_a])) {
-        if (survivingHumans_a == 1 && gbThisNetHumanPlayer[lastHuman_a]) {
+    if (numAlive == 1 || survivingHumans == 0
+        || (survivingHumans == 1 && !gbThisNetHumanPlayer[lastHuman])) {
+        if (survivingHumans == 1 && gbThisNetHumanPlayer[lastHuman]) {
             if (allowNormalVictory) {
                 gbGameOver = true;
                 giEndSequence = true;
@@ -2530,7 +2306,7 @@ void CheckEndGame(
         }
     }
 
-    if (savedRemoteOn_o && netHumanCount == 0) {
+    if (savedRemoteOn && netHumanCount == 0) {
         gbGameOver = true;
         giEndSequence = false;
     }
@@ -2540,7 +2316,7 @@ void CheckEndGame(
         giEndSequence = true;
     }
     if (forcedResult == END_GAME_FORCE_DEFEAT) {
-        defeated_m = true;
+        defeated = true;
         gbGameOver = true;
         giEndSequence = false;
     }
@@ -2549,7 +2325,7 @@ void CheckEndGame(
         winFlag = true;
     }
     if (giEndSequence == 0 && gbGameOver) {
-        defeated_m = true;
+        defeated = true;
     }
 
     if (gbInCampaign && winFlag) {
@@ -2578,7 +2354,7 @@ void CheckEndGame(
         }
 
         if (carryoverHeroId != END_GAME_NO_PLAYER) {
-            for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+            for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
@@ -2595,7 +2371,7 @@ void CheckEndGame(
                 gpGame->m_campaignCarryoverCreatureTypes[0] = CREATURE_PEASANT;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
+                for (player = 0; player < ARMY_GROUP_SLOT_COUNT; player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];
@@ -2647,7 +2423,7 @@ void InitVars(void) {
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
-    gpGame->m_viewArmyResult = 0;
+    gpGame->m_dialogAnimationCounter = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = false;
     gbInNewGameSetup = false;
@@ -2677,181 +2453,181 @@ void InitVars(void) {
     }
 }
 
-void game::ShowMoraleInfo(hero* h, i32 dialogType) {
-    b32 mixedUndead4;
-    i32 alignment_e;
-    ArmyGroupAlignmentResult homogeneous5;
-    i32 modifierStart;
-    char description7[MORALE_LUCK_DESCRIPTION_SIZE];
-    i32 slot8;
+void game::ShowMoraleInfo(hero* heroPointer, i32 dialogType) {
+    b32 mixedUndead;
+    i32 alignment;
+    ArmyGroupAlignmentResult homogeneous;
+    u32 modifierStart;
+    char description[MORALE_LUCK_DESCRIPTION_SIZE];
+    i32 slot;
 
-    mixedUndead4 = false;
-    if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) > 0)
-        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)]);
+    mixedUndead = false;
+    if (heroPointer->m_army.GetMorale(heroPointer, heroPointer->GetOccupiedTown(), NULL) > 0)
+        utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)]);
     else {
-        if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) == 0)
-            utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_NEUTRAL)]);
+        if (heroPointer->m_army.GetMorale(heroPointer, heroPointer->GetOccupiedTown(), NULL) == 0)
+            utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(MORALE_INFO_NEUTRAL)]);
         else
-            utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)]);
+            utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)]);
     }
 
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cMoraleInfo[H2EnumIndex(MORALE_INFO_HEADER)], description7);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cMoraleInfo[H2EnumIndex(MORALE_INFO_HEADER)], description);
     modifierStart = strlen(gText);
-    if (h->m_army.HasAllUndead()) {
+    if (heroPointer->m_army.HasAllUndead()) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_ALL_UNDEAD)]);
         goto showDialog;
     }
-    if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
+    if (heroPointer->m_army.HasSomeUndead() || heroPointer->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_SOME_UNDEAD)]);
-        mixedUndead4 = true;
+        mixedUndead = true;
     }
 
-    homogeneous5 = h->m_army.IsHomogeneous(-1);
-    if (mixedUndead4 && homogeneous5 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
-        homogeneous5 = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
+    homogeneous = heroPointer->m_army.IsHomogeneous(-1);
+    if (mixedUndead && homogeneous > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
+        homogeneous = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
     }
-    if (homogeneous5 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
-        alignment_e = 0;
-        for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
-            if (h->m_army.m_creatureTypes[slot8] != CREATURE_NONE) {
-                alignment_e = H2EnumIndex(gMonsterDatabase[H2EnumIndex(h->m_army.m_creatureTypes[slot8])].race);
+    if (homogeneous > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
+        alignment = 0;
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
+            if (heroPointer->m_army.m_creatureTypes[slot] != CREATURE_NONE) {
+                alignment = H2EnumIndex(gMonsterDatabase[H2EnumIndex(heroPointer->m_army.m_creatureTypes[slot])].race);
             }
         }
-        utf8::Format(description7, cMoraleInfo[H2EnumIndex(INFO_SAME_ALIGNMENT)], gAlignmentNames[alignment_e]);
-        strcat(gText, description7);
+        utf8::Format(description, cMoraleInfo[H2EnumIndex(INFO_SAME_ALIGNMENT)], gAlignmentNames[alignment]);
+        strcat(gText, description);
     }
-    if (homogeneous5 == ARMY_GROUP_ALIGNMENT_THREE) {
-        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_THREE_ALIGNMENTS)]);
-        strcat(gText, description7);
+    if (homogeneous == ARMY_GROUP_ALIGNMENT_THREE) {
+        utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(INFO_THREE_ALIGNMENTS)]);
+        strcat(gText, description);
     }
-    if (homogeneous5 == ARMY_GROUP_ALIGNMENT_FOUR) {
-        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_FOUR_ALIGNMENTS)]);
-        strcat(gText, description7);
+    if (homogeneous == ARMY_GROUP_ALIGNMENT_FOUR) {
+        utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(INFO_FOUR_ALIGNMENTS)]);
+        strcat(gText, description);
     }
-    if (homogeneous5 == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
-        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_FIVE_ALIGNMENTS)]);
-        strcat(gText, description7);
+    if (homogeneous == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
+        utf8::Copy(description, sizeof(description), cMoraleInfo[H2EnumIndex(INFO_FIVE_ALIGNMENTS)]);
+        strcat(gText, description);
     }
 
-    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
-        && (h->GetOccupiedTown()->m_buildings & H2EnumIndex(TOWN_BUILDING_COLISEUM))) {
+    if (heroPointer->GetOccupiedTown() != NULL && heroPointer->GetOccupiedTown()->m_type == FACTION_BARBARIAN
+        && (H2EnumIndex((heroPointer->GetOccupiedTown()->m_buildings) & (H2EnumIndex(TOWN_BUILDING_COLISEUM))))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_COLISEUM)]);
     }
-    if (h->GetOccupiedTown() != NULL
-        && (h->GetOccupiedTown()->m_buildings & H2EnumIndex(TOWN_BUILDING_TAVERN))) {
+    if (heroPointer->GetOccupiedTown() != NULL
+        && (H2EnumIndex((heroPointer->GetOccupiedTown()->m_buildings) & (H2EnumIndex(TOWN_BUILDING_TAVERN))))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_TAVERN)]);
     }
 
-    if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
+    if (heroPointer->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_MEDAL_OF_VALOR)]);
     }
-    if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
+    if (heroPointer->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_MEDAL_OF_COURAGE)]);
     }
-    if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
+    if (heroPointer->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_MEDAL_OF_HONOR)]);
     }
-    if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
+    if (heroPointer->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_MEDAL_OF_DISTINCTION)]);
     }
-    if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
+    if (heroPointer->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_FIZBIN)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_BUOY)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_BUOY)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_BUOY)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_OASIS)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_OASIS)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_OASIS)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_TEMPLE)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_GRAVEYARD)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_GRAVEYARD)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_GRAVEYARD)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_SHIPWRECK)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_SHIPWRECK)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_SHIPWRECK)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_WATERING_HOLE)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_WATERING_HOLE)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_WATERING_HOLE)]);
     }
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_DERELICT_SHIP)))) {
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_DERELICT_SHIP)))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_DERELICT_SHIP)]);
     }
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_BASIC_LEADERSHIP)]);
     }
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_ADVANCED_LEADERSHIP)]);
     }
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_EXPERT_LEADERSHIP)]);
     }
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+    if (heroPointer->HasArtifact(ARTIFACT_MASTHEAD) && heroPointer->IsEmbarked()) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_MASTHEAD)]);
     }
-    if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
+    if (heroPointer->HasArtifact(ARTIFACT_BATTLE_GARB)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_BATTLE_GARB)]);
     }
-    if (modifierStart == static_cast<i32>(strlen(gText))) {
+    if (modifierStart == strlen(gText)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_NONE)]);
     }
 
 showDialog:
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
-void game::ShowLuckInfo(hero* h, i32 dialogType) {
-    char description4[MORALE_LUCK_DESCRIPTION_SIZE];
+void game::ShowLuckInfo(hero* heroPointer, i32 dialogType) {
+    char description[MORALE_LUCK_DESCRIPTION_SIZE];
 
-    i32 modifierStart;
+    u32 modifierStart;
 
-    if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
-        utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)]);
+    if (gpGame->GetLuck(heroPointer, NULL, heroPointer->GetOccupiedTown()) > 0)
+        utf8::Copy(description, sizeof(description), cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)]);
     else {
-        if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) == 0)
-            utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_NEUTRAL)]);
+        if (gpGame->GetLuck(heroPointer, NULL, heroPointer->GetOccupiedTown()) == 0)
+            utf8::Copy(description, sizeof(description), cLuckInfo[H2EnumIndex(LUCK_INFO_NEUTRAL)]);
         else
-            utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)]);
+            utf8::Copy(description, sizeof(description), cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)]);
     }
 
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cLuckInfo[H2EnumIndex(LUCK_INFO_HEADER)], description4);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cLuckInfo[H2EnumIndex(LUCK_INFO_HEADER)], description);
     modifierStart = strlen(gText);
-    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
-        && (h->GetOccupiedTown()->m_buildings & H2EnumIndex(TOWN_BUILDING_RAINBOW)))
+    if (heroPointer->GetOccupiedTown() != NULL && heroPointer->GetOccupiedTown()->m_type == FACTION_SORCERESS
+        && (H2EnumIndex((heroPointer->GetOccupiedTown()->m_buildings) & (H2EnumIndex(TOWN_BUILDING_RAINBOW)))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_RAINBOW)]);
-    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
+    if (heroPointer->HasArtifact(ARTIFACT_RABBIT_FOOT))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_RABBIT_FOOT)]);
-    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
+    if (heroPointer->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_HORSESHOE)]);
-    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
+    if (heroPointer->HasArtifact(ARTIFACT_GAMBLERS_COIN))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_LUCKY_COIN)]);
-    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
+    if (heroPointer->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_CLOVER)]);
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_FAERIE_RING))))
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_FAERIE_RING))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_FAERIE_RING)]);
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_IDOL))))
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_IDOL))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_IDOL)]);
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_FOUNTAIN))))
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_FOUNTAIN))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_FOUNTAIN)]);
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_PYRAMID))))
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_PYRAMID))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_PYRAMID)]);
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_BASIC)
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_BASIC)
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_BASIC_SKILL)]);
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_ADVANCED)
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_ADVANCED)
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_ADVANCED_SKILL)]);
-    if (h->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
+    if (heroPointer->m_secondarySkills[H2EnumIndex(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_EXPERT_SKILL)]);
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_EMBARKED))))
+    if (heroPointer->HasArtifact(ARTIFACT_MASTHEAD) && heroPointer->IsEmbarked())
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_MASTHEAD)]);
-    if ((H2EnumIndex((h->m_eventFlags) & (HERO_EVENT_MERMAID))))
+    if ((H2EnumIndex((heroPointer->m_eventFlags) & (HERO_EVENT_MERMAID))))
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_MERMAID)]);
-    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
+    if (heroPointer->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_BATTLE_GARB)]);
-    if (modifierStart == static_cast<i32>(strlen(gText)))
+    if (modifierStart == strlen(gText))
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_NONE)]);
 
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 void ClearMapExtra(void) {
@@ -2869,15 +2645,15 @@ void ClearMapExtra(void) {
     iMaxMapExtra = 0;
 }
 
-i32 GetMonType(i32 score, HighScoreType campaign) {
-    i32 idx;
-    for (idx = H2EnumIndex(CREATURE_COUNT) - 1; idx >= 0; idx--) {
-        if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
-            if (score <= giScoreCampaignMon[idx][H2EnumIndex(MONSTER_SCORE_THRESHOLD)])
-                return giScoreCampaignMon[idx][H2EnumIndex(MONSTER_SCORE_TYPE)];
+i32 GetMonType(i32 score, HighScoreType highScoreType) {
+    i32 index;
+    for (index = H2EnumIndex(CREATURE_COUNT) - 1; index >= 0; index--) {
+        if (highScoreType == HIGH_SCORE_CAMPAIGN || highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
+            if (score <= giScoreCampaignMon[index][H2EnumIndex(MONSTER_SCORE_THRESHOLD)])
+                return giScoreCampaignMon[index][H2EnumIndex(MONSTER_SCORE_TYPE)];
         } else {
-            if (score >= giScoreMon[idx][H2EnumIndex(MONSTER_SCORE_THRESHOLD)])
-                return giScoreMon[idx][H2EnumIndex(MONSTER_SCORE_TYPE)];
+            if (score >= giScoreMon[index][H2EnumIndex(MONSTER_SCORE_THRESHOLD)])
+                return giScoreMon[index][H2EnumIndex(MONSTER_SCORE_TYPE)];
         }
     }
     return giScoreMon[0][H2EnumIndex(MONSTER_SCORE_TYPE)];
@@ -2890,116 +2666,117 @@ i32 AddScoreToHighScore(
     HighScoreType highScoreType,
     const char* scenarioName
 ) {
-    i32 dest_o;
-    HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
-    i32 file_c;
-    i32 entry_a;
-    char filename_h[HIGH_SCORE_FILENAME_LENGTH];
-    char playerName_c[HIGH_SCORE_INPUT_NAME_SIZE];
-    b32 missingFile_e;
+    i32 destinationIndex;
+    HighScoreEntry entries[HIGH_SCORE_ENTRY_COUNT];
+    i32 file;
+    i32 entry;
+    char filename[HIGH_SCORE_FILENAME_LENGTH];
+    char enteredPlayerName[HIGH_SCORE_INPUT_NAME_SIZE];
+    b32 missingFile;
 
-    missingFile_e = false;
+    missingFile = false;
     if (highScoreType == HIGH_SCORE_STANDARD)
         utf8::Format(
-            filename_h,
+            filename,
             "%sSTANDARD.HS",
             ".\\DATA\\"
         );
     else
         utf8::Format(
-            filename_h,
+            filename,
             "%sCAMPAIGN.HS",
             ".\\DATA\\"
         );
 
-    file_c = platform::FileOpen(filename_h, platform::FileMode::Read);
-    if (file_c == -1)
-        missingFile_e = true;
-    if (missingFile_e) {
-        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-            memset(&entries_a[entry_a], 0, sizeof(HighScoreEntry));
-            entries_a[entry_a].score = HIGH_SCORE_EMPTY;
+    file = platform::FileOpen(filename, platform::FileMode::Read);
+    if (file == -1)
+        missingFile = true;
+    if (missingFile) {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+            memset(&entries[entry], 0, sizeof(HighScoreEntry));
+            entries[entry].score = HIGH_SCORE_EMPTY;
         }
     } else {
-        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-            if (!platform::FileReadExact(file_c, &entries_a[entry_a], sizeof(entries_a))) {
-                for (; entry_a < HIGH_SCORE_ENTRY_COUNT; ++entry_a) {
-                    memset(&entries_a[entry_a], 0, sizeof(entries_a[entry_a]));
-                    entries_a[entry_a].score = HIGH_SCORE_EMPTY;
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+            // An invalid record reads back empty; only a short file ends the table.
+            if (ReadHighScoreEntry(file, entries[entry]) == HIGH_SCORE_READ_TRUNCATED) {
+                for (; entry < HIGH_SCORE_ENTRY_COUNT; ++entry) {
+                    memset(&entries[entry], 0, sizeof(entries[entry]));
+                    entries[entry].score = HIGH_SCORE_EMPTY;
                 }
                 break;
             }
         }
-        platform::FileClose(file_c);
+        platform::FileClose(file);
     }
 
     gbShowHighScore = true;
     giHighScoreType = highScoreType;
     giHighScoreRank = HIGH_SCORE_EMPTY;
     giScore = score;
-    for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-        if ((score >= entries_a[entry_a].score && highScoreType == HIGH_SCORE_STANDARD)
-            || (score <= entries_a[entry_a].score && highScoreType == HIGH_SCORE_CAMPAIGN)
-            || (score <= entries_a[entry_a].score && highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN)
-            || entries_a[entry_a].score == HIGH_SCORE_EMPTY) {
-            giHighScoreRank = entry_a;
+    for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+        if ((score >= entries[entry].score && highScoreType == HIGH_SCORE_STANDARD)
+            || (score <= entries[entry].score && highScoreType == HIGH_SCORE_CAMPAIGN)
+            || (score <= entries[entry].score && highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN)
+            || entries[entry].score == HIGH_SCORE_EMPTY) {
+            giHighScoreRank = entry;
             break;
         }
     }
 
-    if (entry_a < HIGH_SCORE_ENTRY_COUNT) {
-        for (dest_o = HIGH_SCORE_LAST_SHIFT_SOURCE; dest_o >= entry_a; dest_o--)
-            entries_a[dest_o + 1] = entries_a[dest_o];
+    if (entry < HIGH_SCORE_ENTRY_COUNT) {
+        for (destinationIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; destinationIndex >= entry; destinationIndex--)
+            entries[destinationIndex + 1] = entries[destinationIndex];
 
         GetDataEntry(
             localization::Tr("high_score.name_prompt"),
-            playerName_c,
+            enteredPlayerName,
             HIGH_SCORE_NAME_LENGTH,
             NULL,
             0,
             1
         );
-        memset(&entries_a[entry_a], 0, sizeof(HighScoreEntry));
-        strcpy(entries_a[entry_a].playerName, playerName_c);
-        strcpy(entries_a[entry_a].scenarioName, scenarioName);
-        entries_a[entry_a].score = score;
-        entries_a[entry_a].days = days;
-        entries_a[entry_a].scenario = scenario;
-        entries_a[entry_a].cheated = gpGame->m_cheated;
+        memset(&entries[entry], 0, sizeof(HighScoreEntry));
+        utf8::Copy(entries[entry].playerName, enteredPlayerName);
+        utf8::Copy(entries[entry].scenarioName, scenarioName);
+        entries[entry].score = score;
+        entries[entry].days = days;
+        entries[entry].scenario = scenario;
+        entries[entry].cheated = gpGame->m_cheated;
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
-            entries_a[entry_a].cheated = 1;
+            entries[entry].cheated = 1;
 
-        file_c = platform::FileOpen(filename_h, platform::FileMode::Write);
-        if (file_c == -1)
-            FileError(filename_h);
-        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-            if (!platform::FileWriteExact(file_c, &entries_a[entry_a], sizeof(HighScoreEntry)))
+        file = platform::FileOpen(filename, platform::FileMode::Write);
+        if (file == -1)
+            FileError(filename);
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+            if (!WriteHighScoreEntry(file, entries[entry]))
                 ShutDown(localization::Tr("system.file.write_error"));
         }
-        platform::FileClose(file_c);
+        platform::FileClose(file);
     } else {
         gbShowHighScore = false;
     }
     return 0;
 }
 
-void BVResMsg(const char* s, ResourceType res, i32 qty) {
+void BVResMsg(const char* text, ResourceType resourceType, i32 quantity) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = platform::Ticks() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
-    giBottomViewResource = res;
-    giBottomViewResourceQty = qty;
-    strcpy(gcBottomViewText, s);
+    giBottomViewResource = resourceType;
+    giBottomViewResourceQty = quantity;
+    strcpy(gcBottomViewText, text);
     gpAdvManager->UpdBottomView(true, true, true);
 }
 
-void GOut(const char* str) {
+void GOut(const char* text) {
     if (gpAdvManager->m_active == 1)
-        AiPrint(str);
+        AiPrint(text);
 }
 
-i32 NetPosToGamePos(i32 netPos) {
+i32 NetPosToGamePos(i32 netPosition) {
     for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
-        if (gbGamePosToNetPos[i] == netPos)
+        if (gbGamePosToNetPos[i] == netPosition)
             return i;
     return -1;
 }
@@ -3015,7 +2792,7 @@ i32 WaitForOtherPlayer(void) {
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
-                    OLD_MAIN_PLAYER_COUNT
+                    GAME_PLAYER_COUNT
                 );
                 gbUseBzip2Compression = data->payload.setup.useBzip2Compression;
                 gbUseDiffCompression = data->payload.setup.useDiffCompression;
@@ -3028,9 +2805,9 @@ i32 WaitForOtherPlayer(void) {
                 break;
             case BOX_REMOTE_SAVE:
                 result = gpGame->ReceiveSaveGame(
-                    data->payload.save.saveId,
-                    data->payload.save.saveOffset,
-                    data->payload.save.saveSize,
+                    data->payload.save.dataSize,
+                    data->payload.save.crc,
+                    data->payload.save.wireCrc,
                     data->sender
                 );
                 break;
@@ -3041,32 +2818,32 @@ i32 WaitForOtherPlayer(void) {
 
 void PopNetBox(char* text, i32 netPlayer) {
 
-    i32l messageTime_b;
-    heroWindow* netWindow_j;
-    i32 result_p;
-    i32 textWidth_b;
-    b32 savedShowIt_p;
-    b32 updateInput_f;
-    i32 inputLength_a;
-    char inputText_b[BOX_TEXT_LENGTH];
-    b32 exitForIncomingData_c;
-    b32 sendText_b;
-    tag_message event_o;
-    tag_message updateMessage_i;
+    i32l messageTime;
+    heroWindow* netWindow;
+    i32 result;
+    i32 textWidth;
+    b32 savedShowIt;
+    b32 updateInput;
+    i32 inputLength;
+    char inputText[BOX_TEXT_LENGTH];
+    b32 exitForIncomingData;
+    b32 sendText;
+    tag_message event;
+    tag_message updateMessage;
 
-    i32 delay_e;
+    i32 delay;
 
-    b32 done_a;
-    b32 redrawLines_l;
-    b32 redrawSavedShowIt_a;
-    KbRemotePacket* remoteData_g;
-    b32 redrawAdventure_o;
-    i32 cursorState_j;
+    b32 done;
+    b32 redrawLines;
+    b32 redrawSavedShowIt;
+    KbRemotePacket* remoteData;
+    b32 redrawAdventure;
+    i32 cursorState;
 
     if (!gbRemoteOn)
         return;
 
-    messageTime_b = 0;
+    messageTime = 0;
     if (text != NULL) {
         if (netPlayer >= 0) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
@@ -3077,262 +2854,254 @@ void PopNetBox(char* text, i32 netPlayer) {
             gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, BOX_DEFAULT_COLOR);
         }
-        messageTime_b = platform::Ticks();
+        messageTime = platform::Ticks();
     }
 
-    inputLength_a = 0;
-    savedShowIt_p = bShowIt;
+    inputLength = 0;
+    savedShowIt = bShowIt;
     bShowIt = true;
     gbMoveShown = false;
-    netWindow_j = new heroWindow(
+    netWindow = new heroWindow(
         0,
         BOX_WINDOW_Y,
         "netbox.bin"
     );
-    if (netWindow_j == NULL)
+    if (netWindow == NULL)
         MemError();
 
-    updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-    updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
-    updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
-    updateMessage_i.payload.widget.data.text = cNetBoxLine[1];
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 2;
-    updateMessage_i.payload.widget.data.text = cNetBoxLine[2];
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 3;
-    updateMessage_i.payload.widget.data.text = cNetBoxLine[3];
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.command = NET_BOX_COLOR_COMMAND;
-    updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID;
-    updateMessage_i.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
-    updateMessage_i.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
-    updateMessage_i.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
-    updateMessage_i.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
-    netWindow_j->BroadcastMessage(updateMessage_i);
-    updateMessage_i.payload.widget.id = BOX_THIS_PLAYER_COLOR_ID;
-    updateMessage_i.payload.widget.data.value =
+    SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
+    updateMessage.payload.widget.data.text = cNetBoxLine[0];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 1;
+    updateMessage.payload.widget.data.text = cNetBoxLine[1];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 2;
+    updateMessage.payload.widget.data.text = cNetBoxLine[2];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 3;
+    updateMessage.payload.widget.data.text = cNetBoxLine[3];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+    updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID;
+    updateMessage.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
+    updateMessage.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
+    updateMessage.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
+    updateMessage.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.payload.widget.id = BOX_THIS_PLAYER_COLOR_ID;
+    updateMessage.payload.widget.data.value =
         gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + BOX_COLOR_FRAME_OFFSET;
-    netWindow_j->BroadcastMessage(updateMessage_i);
+    netWindow->BroadcastMessage(updateMessage);
 
-    gpWindowManager->AddWindow(netWindow_j, -1, 1);
-    exitForIncomingData_c = false;
-    done_a = false;
-    updateInput_f = true;
-    cursorState_j = 0;
-    sendText_b = false;
-    redrawLines_l = true;
-    redrawAdventure_o = false;
-    strcpy(inputText_b, "");
+    gpWindowManager->AddWindow(netWindow, -1, 1);
+    exitForIncomingData = false;
+    done = false;
+    updateInput = true;
+    cursorState = 0;
+    sendText = false;
+    redrawLines = true;
+    redrawAdventure = false;
+    strcpy(inputText, "");
     gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_ASCII);
 
-    while (!done_a) {
+    while (!done) {
         PollSound();
-        remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(0));
-        if (remoteData_g != NULL) {
-            if (remoteData_g->type == REMOTE_MESSAGE_UNRELIABLE) {
-                remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
-                switch (remoteData_g->command) {
+        remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(0));
+        if (remoteData != NULL) {
+            if (remoteData->type == REMOTE_MESSAGE_UNRELIABLE) {
+                remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
+                switch (remoteData->command) {
                     case BOX_REMOTE_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active == 1) {
-                            bShowIt = savedShowIt_p;
-                            gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
+                            bShowIt = savedShowIt;
+                            gpAdvManager->ProcessIncomingGroupMapChange(remoteData->payload.data);
                             bShowIt = true;
-                            redrawAdventure_o = true;
+                            redrawAdventure = true;
                         }
                         gbLeaveNetBoxAlone = false;
-                        updateInput_f = true;
+                        updateInput = true;
                         break;
                 }
-            } else if (remoteData_g->type != REMOTE_MESSAGE_RELIABLE) {
-                remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
+            } else if (remoteData->type != REMOTE_MESSAGE_RELIABLE) {
+                remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
-                switch (remoteData_g->command) {
+                switch (remoteData->command) {
                     case BOX_REMOTE_CHAT:
-                        remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
+                        remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s:  %s",
-                            gsNetPlayerInfo[remoteData_g->sender].name,
-                            remoteData_g->payload.data
+                            gsNetPlayerInfo[remoteData->sender].name,
+                            remoteData->payload.data
                         );
                         AddNetBoxLine(
                             gText,
-                            gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].m_color
+                            gpGame->m_players[NetPosToGamePos(remoteData->sender)].m_color
                         );
-                        redrawLines_l = true;
-                        if (messageTime_b != 0)
-                            messageTime_b = platform::Ticks();
+                        redrawLines = true;
+                        if (messageTime != 0)
+                            messageTime = platform::Ticks();
                         break;
                     default:
                         AddNetBoxLine(
                             localization::Tr("network.incoming_data.must_exit"),
                             BOX_DEFAULT_COLOR
                         );
-                        redrawLines_l = true;
-                        exitForIncomingData_c = true;
+                        redrawLines = true;
+                        exitForIncomingData = true;
                         break;
                 }
             }
         }
 
         platform::PumpEvents();
-        event_o = gpInputManager->GetEvent();
-        switch (event_o.type) {
+        event = gpInputManager->GetEvent();
+        switch (event.type) {
             case MESSAGE_KEY_DOWN:
-                messageTime_b = 0;
-                switch (event_o.payload.keyboard.keyCode) {
+                messageTime = 0;
+                switch (event.payload.keyboard.keyCode) {
                     case BOX_KEY_ESCAPE:
                     case BOX_KEY_F1:
-                        done_a = true;
+                        done = true;
                         break;
                     case BOX_KEY_BACKSPACE:
-                        if (inputLength_a > 0)
-                            inputLength_a--;
-                        updateInput_f = true;
-                        cursorState_j = 1;
+                        if (inputLength > 0)
+                            inputLength--;
+                        updateInput = true;
+                        cursorState = 1;
                         break;
                     case BOX_KEY_ENTER:
-                        sendText_b = true;
+                        sendText = true;
                         break;
                     default:
-                        if (event_o.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
-                            || event_o.payload.keyboard.keyByte > BOX_LAST_PRINTABLE)
+                        if (event.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
+                            || event.payload.keyboard.keyByte > BOX_LAST_PRINTABLE)
                             break;
-                        if (inputLength_a < BOX_MAX_INPUT
-                            && event_o.payload.keyboard.keyCode != 0) {
-                            inputText_b[inputLength_a] = 0;
-                            textWidth_b = smallFont->LineWidth(inputText_b);
-                            if (textWidth_b + BOX_CURSOR_WIDTH_PADDING < BOX_CURSOR_WIDTH_LIMIT) {
-                                inputText_b[inputLength_a] =
-                                    static_cast<char>(event_o.payload.keyboard.keyCode & 0xff);
-                                inputLength_a++;
-                                updateInput_f = true;
-                                cursorState_j = 0;
+                        if (inputLength < BOX_MAX_INPUT
+                            && event.payload.keyboard.keyCode != 0) {
+                            inputText[inputLength] = 0;
+                            textWidth = smallFont->LineWidth(inputText);
+                            if (textWidth + BOX_CURSOR_WIDTH_PADDING < BOX_CURSOR_WIDTH_LIMIT) {
+                                inputText[inputLength] =
+                                    static_cast<char>(event.payload.keyboard.keyCode & 0xff);
+                                inputLength++;
+                                updateInput = true;
+                                cursorState = 0;
                             }
                         }
                 }
         }
 
-        if (!updateInput_f && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < platform::Ticks()) {
-            cursorState_j = 1 - cursorState_j;
-            updateInput_f = true;
+        if (!updateInput && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < platform::Ticks()) {
+            cursorState = 1 - cursorState;
+            updateInput = true;
         }
-        if (sendText_b) {
-            sendText_b = false;
-            inputText_b[inputLength_a] = 0;
-            AddNetBoxLine(inputText_b, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
-            result_p = TransmitRemoteData(
-                inputText_b,
+        if (sendText) {
+            sendText = false;
+            inputText[inputLength] = 0;
+            AddNetBoxLine(inputText, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
+            result = TransmitRemoteData(
+                inputText,
                 BOX_PACKET_BUFFER_SIZE,
-                strlen(inputText_b) + 1,
+                strlen(inputText) + 1,
                 BOX_REMOTE_CHAT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
-            if (!result_p)
+            if (!result)
                 ShutDown(NULL);
-            inputLength_a = 0;
-            strcpy(inputText_b, "");
-            updateInput_f = true;
-            redrawLines_l = true;
+            inputLength = 0;
+            strcpy(inputText, "");
+            updateInput = true;
+            redrawLines = true;
         }
 
-        if (redrawLines_l) {
-            redrawLines_l = false;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
-            updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
-            updateMessage_i.payload.widget.data.text = cNetBoxLine[1];
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 2;
-            updateMessage_i.payload.widget.data.text = cNetBoxLine[2];
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 3;
-            updateMessage_i.payload.widget.data.text = cNetBoxLine[3];
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.command = NET_BOX_COLOR_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID;
-            updateMessage_i.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
-            updateMessage_i.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
-            updateMessage_i.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            updateMessage_i.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
-            updateMessage_i.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            netWindow_j->DrawWindow();
+        if (redrawLines) {
+            redrawLines = false;
+            SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_FIRST_LINE_ID);
+            updateMessage.payload.widget.data.text = cNetBoxLine[0];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 1;
+            updateMessage.payload.widget.data.text = cNetBoxLine[1];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 2;
+            updateMessage.payload.widget.data.text = cNetBoxLine[2];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_LINE_ID + 3;
+            updateMessage.payload.widget.data.text = cNetBoxLine[3];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+            updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID;
+            updateMessage.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
+            updateMessage.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
+            updateMessage.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
+            updateMessage.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
+            netWindow->BroadcastMessage(updateMessage);
+            netWindow->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
         }
 
-        if (updateInput_f) {
-            updateInput_f = false;
+        if (updateInput) {
+            updateInput = false;
             glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = platform::Ticks() + BOX_CURSOR_DELAY;
-            if (cursorState_j)
-                inputText_b[inputLength_a] = '_';
+            if (cursorState)
+                inputText[inputLength] = '_';
             else
-                inputText_b[inputLength_a] = BOX_CURSOR_GLYPH;
-            inputText_b[inputLength_a + 1] = 0;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_INPUT_ID;
-            updateMessage_i.payload.widget.data.text = inputText_b;
-            netWindow_j->BroadcastMessage(updateMessage_i);
-            netWindow_j->DrawWindow();
+                inputText[inputLength] = BOX_CURSOR_GLYPH;
+            inputText[inputLength + 1] = 0;
+            SET_WIDGET_MESSAGE(updateMessage, WIDGET_COMMAND_SET_TEXT, BOX_INPUT_ID);
+            updateMessage.payload.widget.data.text = inputText;
+            netWindow->BroadcastMessage(updateMessage);
+            netWindow->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
         }
 
-        if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < platform::Ticks())
-            done_a = true;
-        if (exitForIncomingData_c) {
-            for (delay_e = 0; delay_e < BOX_EXIT_DELAY_STEPS; delay_e++) {
+        if (messageTime != 0 && messageTime + BOX_MESSAGE_TIMEOUT < platform::Ticks())
+            done = true;
+        if (exitForIncomingData) {
+            for (delay = 0; delay < BOX_EXIT_DELAY_STEPS; delay++) {
                 PollSound();
                 DelayMilli(BOX_EXIT_DELAY);
             }
-            done_a = true;
+            done = true;
         }
     }
 
     gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_SCAN);
-    if (redrawAdventure_o && gbMoveShown) {
+    if (redrawAdventure && gbMoveShown) {
         gbDrawWindowBackground = false;
-        gpWindowManager->RemoveWindow(netWindow_j);
+        gpWindowManager->RemoveWindow(netWindow);
         gbDrawWindowBackground = true;
-        redrawSavedShowIt_a = bShowIt;
+        redrawSavedShowIt = bShowIt;
         bShowIt = true;
         gpAdvManager->RedrawAdvScreen(1, 0);
-        bShowIt = redrawSavedShowIt_a;
+        bShowIt = redrawSavedShowIt;
     } else {
-        gpWindowManager->RemoveWindow(netWindow_j);
+        gpWindowManager->RemoveWindow(netWindow);
     }
-    bShowIt = savedShowIt_p;
+    bShowIt = savedShowIt;
 }
 
-void AddNetBoxLine(const char* str, char color) {
+void AddNetBoxLine(const char* text, char color) {
     if (color < 0 || color > BOX_MAX_COLOR)
         color = BOX_DEFAULT_COLOR;
 
     strcpy(cNetBoxLine[0], cNetBoxLine[1]);
     strcpy(cNetBoxLine[1], cNetBoxLine[2]);
     strcpy(cNetBoxLine[2], cNetBoxLine[3]);
-    strcpy(cNetBoxLine[BOX_LINE_COUNT - 1], str);
+    strcpy(cNetBoxLine[BOX_LINE_COUNT - 1], text);
 
     cNetBoxColor[0] = cNetBoxColor[1];
     cNetBoxColor[1] = cNetBoxColor[2];
@@ -3340,25 +3109,25 @@ void AddNetBoxLine(const char* str, char color) {
     cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
 
-void ShutDown(const char* msg) {
-    char buf[GLOBAL_TEXT_BUFFER_SIZE];
+void ShutDown(const char* message) {
+    char buffer[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
     LogStr("Shutdown");
     bInShutDown = true;
     gbClosingApp = true;
-    buf[0] = 0;
+    buffer[0] = 0;
     gpMouseManager->SetColorMice(false);
-    if (msg) {
-        strcpy(buf, msg);
+    if (message) {
+        strcpy(buffer, message);
         SetFullScreenStatus(false);
-        LogStr(buf);
+        LogStr(buffer);
         platform::ShowMessage(
             localization::Tr("system.unexpected_termination"),
-            buf
+            buffer
         );
     } else {
-        utf8::Copy(buf, sizeof(buf), localization::Tr("system.goodbye"));
+        utf8::Copy(buffer, sizeof(buffer), localization::Tr("system.goodbye"));
     }
     ShutDownSmacker();
     ClearMapExtra();
@@ -3398,27 +3167,18 @@ typedef enum FileErrorConstant {
 } FileErrorConstant;
 
 void FileError(const char* filename) {
-    char buf[FILE_ERROR_BUFFER_SIZE];
-    i32 err;
-    char buf1[FILE_ERROR_BUFFER_SIZE];
-    err = errno;
-    utf8::Format(buf1, "File Error %s", strerror(err));
-    LogInt(
-        buf1,
-        err,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    char buffer[FILE_ERROR_BUFFER_SIZE];
+    i32 error;
+    char errorMessage[FILE_ERROR_BUFFER_SIZE];
+    error = errno;
+    utf8::Format(errorMessage, "File Error %s", strerror(error));
+    LogInt(errorMessage, error);
     utf8::Format(
-        buf,
+        buffer,
         localization::Tr("system.file.open_error"),
         filename
     );
-    ShutDown(buf);
+    ShutDown(buffer);
 }
 
 typedef enum SmackFadeConstant {
@@ -3426,78 +3186,73 @@ typedef enum SmackFadeConstant {
     SMACK_FADE_COLOR_LIMIT = GRAPHICS_PALETTE_SIZE - GRAPHICS_SYSTEM_PALETTE_SIZE,
     SMACK_FADE_MATCH_COLOR_LIMIT = 36,
     SMACK_FADE_DISTANCE_SENTINEL = 999,
-    SMACK_FADE_SCREEN_WIDTH = 640,
-    SMACK_FADE_SCREEN_HEIGHT = 480,
-    SMACK_FADE_BLUE_COMPONENT = 2,
-    SMACK_FADE_GREEN_COMPONENT = 1,
-    SMACK_FADE_RED_COMPONENT = 0
 } SmackFadeConstant;
 
-void SmackFade(u8* src, u8* dst) {
-    u8* l;
-    u8* g;
-    i32 a;
-    i32 f, h;
-    i32 b, c;
-    i32 k;
-    i32 j;
-    u8* i;
-    i32 d, e;
+void SmackFade(u8* source, u8* destination) {
+    u8* transitionPalette;
+    u8* colorMap;
+    i32 bestColor;
+    i32 sourceColor, destinationColor;
+    i32 sourceBrightness, destinationBrightness;
+    i32 bestDistance;
+    i32 brightnessDistance;
+    u8* pixel;
+    i32 column, row;
 
-    l = NULL;
-    g = NULL;
-    a = -1;
-    l = static_cast<u8*>(H2_ALLOC(MISC_PALETTE_BYTE_COUNT));
-    g = static_cast<u8*>(H2_ALLOC(GRAPHICS_PALETTE_SIZE));
-    memset(l, 0, MISC_PALETTE_BYTE_COUNT);
-    memset(g, 0, GRAPHICS_PALETTE_SIZE);
-    for (f = SMACK_FADE_FIRST_COLOR; f < SMACK_FADE_COLOR_LIMIT; f++) {
-        b = (src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-             + src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-             + src[f * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-            / MISC_PALETTE_COMPONENT_BYTES;
-        k = SMACK_FADE_DISTANCE_SENTINEL;
-        for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_MATCH_COLOR_LIMIT; h++) {
-            c = (dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
-                 + dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT]
-                 + dst[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-                / MISC_PALETTE_COMPONENT_BYTES;
-            j = abs(b - c);
-            if (j < k) {
-                k = j;
-                a = h;
+    transitionPalette = NULL;
+    colorMap = NULL;
+    bestColor = -1;
+    transitionPalette = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    colorMap = static_cast<u8*>(H2_ALLOC(PALETTE_COLOR_COUNT));
+    memset(transitionPalette, 0, PALETTE_DATA_SIZE);
+    memset(colorMap, 0, PALETTE_COLOR_COUNT);
+    for (sourceColor = SMACK_FADE_FIRST_COLOR; sourceColor < SMACK_FADE_COLOR_LIMIT; sourceColor++) {
+        sourceBrightness = (source[sourceColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)]
+             + source[sourceColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_GREEN)]
+             + source[sourceColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_BLUE)])
+            / H2EnumIndex(PALETTE_CHANNEL_COUNT);
+        bestDistance = SMACK_FADE_DISTANCE_SENTINEL;
+        for (destinationColor = SMACK_FADE_FIRST_COLOR; destinationColor < SMACK_FADE_MATCH_COLOR_LIMIT; destinationColor++) {
+            destinationBrightness = (destination[destinationColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)]
+                 + destination[destinationColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_GREEN)]
+                 + destination[destinationColor * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_BLUE)])
+                / H2EnumIndex(PALETTE_CHANNEL_COUNT);
+            brightnessDistance = abs(sourceBrightness - destinationBrightness);
+            if (brightnessDistance < bestDistance) {
+                bestDistance = brightnessDistance;
+                bestColor = destinationColor;
             }
         }
         memcpy(
-            l + f * MISC_PALETTE_COMPONENT_BYTES,
-            dst + a * MISC_PALETTE_COMPONENT_BYTES,
-            MISC_PALETTE_COMPONENT_BYTES
+            transitionPalette + sourceColor * H2EnumIndex(PALETTE_CHANNEL_COUNT),
+            destination + bestColor * H2EnumIndex(PALETTE_CHANNEL_COUNT),
+            H2EnumIndex(PALETTE_CHANNEL_COUNT)
         );
-        g[f] = static_cast<u8>(a);
+        colorMap[sourceColor] = static_cast<u8>(bestColor);
     }
-    FadeTo(src, l, HIGH_SCORE_FADE_STEPS);
-    i = gpWindowManager->m_screen->m_pixels;
-    for (d = 0; d < SMACK_FADE_SCREEN_WIDTH; d++) {
-        for (e = 0; e < SMACK_FADE_SCREEN_HEIGHT; e++) {
-            *i = g[*i];
-            i++;
+    FadeTo(source, transitionPalette, HIGH_SCORE_FADE_STEPS);
+    pixel = gpWindowManager->m_screen->m_pixels;
+    for (column = 0; column < LOGICAL_SCREEN_WIDTH; column++) {
+        for (row = 0; row < LOGICAL_SCREEN_HEIGHT; row++) {
+            *pixel = colorMap[*pixel];
+            pixel++;
         }
     }
     gpWindowManager->UpdateScreen();
-    UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE(l);
-    H2_FREE(g);
+    UpdatePalette(reinterpret_cast<i8*>(destination));
+    H2_FREE(transitionPalette);
+    H2_FREE(colorMap);
 }
 
 void ShowCongrats(HighScoreType highScoreType) {
-    u8 palette[MISC_PALETTE_BYTE_COUNT];
+    u8 palette[PALETTE_DATA_SIZE];
 
     i32 baseScore;
     i32 realScore;
     char ratingText[CONGRATS_RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
-    memcpy(palette, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(palette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     gpWindowManager->m_updateFlags = 0;
     congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
@@ -3557,10 +3312,10 @@ void ShowCongrats(HighScoreType highScoreType) {
     }
 
     PlaySmacker(CONGRATS_SMACKER);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), palette);
-    memcpy(gPalette->m_data, palette, MISC_PALETTE_BYTE_COUNT);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gPalette->m_data, palette, PALETTE_DATA_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     gpMouseManager->ShowColorPointer();
     AddScoreToHighScore(
         realScore,
@@ -3572,21 +3327,21 @@ void ShowCongrats(HighScoreType highScoreType) {
     H2_FREE(congratsText);
     congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
 }
 
 void CongratsWait(void) {
 
     b32 done = false;
-    tag_message msg;
+    tag_message message;
     gpInputManager->Flush();
     while (!done) {
         PollSound();
         platform::PumpEvents();
-        msg = gpInputManager->GetEvent();
-        if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN
-            || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN
-            || msg.type == MESSAGE_RIGHT_BUTTON_UP)
+        message = gpInputManager->GetEvent();
+        if (message.type == MESSAGE_KEY_DOWN || message.type == MESSAGE_LEFT_BUTTON_DOWN
+            || message.type == MESSAGE_LEFT_BUTTON_UP || message.type == MESSAGE_RIGHT_BUTTON_DOWN
+            || message.type == MESSAGE_RIGHT_BUTTON_UP)
             done = true;
     }
 }
@@ -3597,30 +3352,30 @@ typedef enum SamplePlaybackConstant {
 } SamplePlaybackConstant;
 
 SAMPLE2 LoadPlaySample(const char* name) {
-    SAMPLE2 ss;
-    ss = gpResourceManager->GetSample(name);
-    if (ss) {
-        ss->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
-        gpSoundManager->MemorySample(ss);
+    SAMPLE2 sample;
+    sample = gpResourceManager->GetSample(name);
+    if (sample) {
+        sample->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
+        gpSoundManager->MemorySample(sample);
     }
-    return ss;
+    return sample;
 }
 
-void WaitEndSample(SAMPLE2* s, i32 waitTime) {
+void WaitEndSample(SAMPLE2* sample, i32 waitTime) {
     i32l endTime;
-    if (!s)
+    if (!sample)
         return;
-    if (!*s)
+    if (!*sample)
         return;
     if (waitTime < 0)
         waitTime = SAMPLE_DEFAULT_WAIT_TIME;
     endTime = platform::Ticks() + waitTime;
-    while (gpSoundManager->DigitalReport(*s) && platform::Ticks() < endTime) {
+    while (gpSoundManager->DigitalReport(*sample) && platform::Ticks() < endTime) {
         platform::PumpEvents();
         PollSound();
     }
-    gpResourceManager->Dispose(static_cast<resource*>(*s));
-    *s = NULL;
+    gpResourceManager->Dispose(static_cast<resource*>(*sample));
+    *sample = NULL;
 }
 
 typedef enum MemoryErrorConstant {
@@ -3642,8 +3397,8 @@ void MemError(void) {
 }
 
 const char* GetTownName(i32 i) {
-    town* t = GetCastleRec(i);
-    return t->m_name;
+    town* townPointer = GetCastleRec(i);
+    return townPointer->m_name;
 }
 
 void LoadSystemwideIcons(void) {
@@ -3737,7 +3492,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
                 if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
             }
@@ -3803,7 +3558,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL) {
-                for (loopIndex = H2EnumIndex(SPELL_FIREBALL); loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
+                for (loopIndex = H2EnumIndex(SPELL_FIREBALL); loopIndex < H2EnumIndex(SPELL_COUNT); loopIndex++)
                     currentHeroRec->AddSpell(
                         SpellTypeFromOrdinal(loopIndex),
                         APP_MENU_SPELL_COUNT
@@ -3851,16 +3606,16 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
                 secondarySkillIndex = HeroSecondarySkillFromOrdinal(
-                    (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS
+                    (command - APP_MENU_SECONDARY_FIRST) / H2EnumIndex(HERO_SKILL_LEVEL_COUNT)
                 );
                 ssLevel = HeroSkillLevelFromOrdinal(
-                    (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS
+                    (command - APP_MENU_SECONDARY_FIRST) % H2EnumIndex(HERO_SKILL_LEVEL_COUNT)
                 );
                 if (currentHeroRec != NULL)
                     currentHeroRec->SetSS(secondarySkillIndex, ssLevel);
             }
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
-                gpCombatManager->m_debugFormation = command - APP_MENU_COMBAT_FIRST;
+                gpCombatManager->m_elevationOverlayIndex = command - APP_MENU_COMBAT_FIRST;
                 gpCombatManager->m_backgroundDrawn = false;
                 for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
@@ -3868,7 +3623,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 }
                 for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
                     formationHexIndex =
-                        sElevationOverlay[gpCombatManager->m_debugFormation].cellOffsets[loopIndex];
+                        sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
                     if (formationHexIndex != -1)
                         gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
                 }
@@ -3890,7 +3645,7 @@ void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
 
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
+    if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
         return;
     const platform::MenuHandle currentMenu = platform::CurrentMenu();
     if (currentMenu != hmnuAdv)
@@ -4052,38 +3807,38 @@ void SetupDynamicWindow(
     heroWindow** window,
     i32 windowType
 ) {
-    i32 leftOffset_p;
+    i32 leftOffset;
 
     i32 numRows;
-    widget* newWidgetTemp_p;
-    i32 columnsSize_h;
-    i32 topOffsetNum_n;
+    widget* newWidgetTemp;
+    i32 columnsSize;
+    i32 topOffsetNum;
 
-    i32 centeredHeightCount_k;
+    i32 centeredHeightCount;
 
-    i32 bottomOffsetLocal_p;
-    i32 rightOffset_p;
+    i32 bottomOffsetLocal;
+    i32 rightOffset;
 
-    i32 edge_d;
-    i32 tileRowPos_k;
-    i32 centeredWidthValue_b;
+    i32 edge;
+    i32 tileRowPosition;
+    i32 centeredWidthValue;
 
-    i32 columnIndex_k;
+    i32 columnIndex;
 
-    newWidgetTemp_p = NULL;
-    columnsSize_h = (contentWidth - 1) / TILE_SIZE + 1;
+    newWidgetTemp = NULL;
+    columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
-    *windowWidth = columnsSize_h * TILE_SIZE + WINDOW_PADDING;
+    *windowWidth = columnsSize * TILE_SIZE + WINDOW_PADDING;
     *windowHeight = numRows * TILE_SIZE + WINDOW_PADDING;
-    centeredWidthValue_b = columnsSize_h * TILE_SIZE + CONTENT_LEFT;
-    centeredHeightCount_k = numRows * TILE_SIZE + CONTENT_LEFT;
+    centeredWidthValue = columnsSize * TILE_SIZE + CONTENT_LEFT;
+    centeredHeightCount = numRows * TILE_SIZE + CONTENT_LEFT;
     if (centered) {
-        x += ((boundsWidth - centeredWidthValue_b) >> 1) - CONTENT_TOP;
-        y += (boundsHeight - centeredHeightCount_k) >> 1;
+        x += ((boundsWidth - centeredWidthValue) >> 1) - CONTENT_TOP;
+        y += (boundsHeight - centeredHeightCount) >> 1;
     }
     *contentLeft = x + CONTENT_LEFT;
     *contentTop = y + CONTENT_TOP;
-    *contentRight = *contentLeft + columnsSize_h * TILE_SIZE - 1;
+    *contentRight = *contentLeft + columnsSize * TILE_SIZE - 1;
     *contentBottom = *contentTop + numRows * TILE_SIZE - 1;
 
     if (windowType != DYNAMIC_WINDOW_STONE)
@@ -4095,16 +3850,16 @@ void SetupDynamicWindow(
         *windowHeight,
         WINDOW_FLAG_SAVE_BACKGROUND | WINDOW_FLAG_OWNS_WIDGETS
     );
-    leftOffset_p = *contentLeft - x;
-    topOffsetNum_n = *contentTop - y;
-    rightOffset_p = *contentRight - x;
-    bottomOffsetLocal_p = *contentBottom - y;
+    leftOffset = *contentLeft - x;
+    topOffsetNum = *contentTop - y;
+    rightOffset = *contentRight - x;
+    bottomOffsetLocal = *contentBottom - y;
 
-    for (tileRowPos_k = 0; tileRowPos_k < numRows; tileRowPos_k++) {
-        for (columnIndex_k = 0; columnIndex_k < columnsSize_h; columnIndex_k++) {
-            newWidgetTemp_p = new iconWidget(
-                leftOffset_p + columnIndex_k * TILE_SIZE,
-                topOffsetNum_n + tileRowPos_k * TILE_SIZE,
+    for (tileRowPosition = 0; tileRowPosition < numRows; tileRowPosition++) {
+        for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
+            newWidgetTemp = new iconWidget(
+                leftOffset + columnIndex * TILE_SIZE,
+                topOffsetNum + tileRowPosition * TILE_SIZE,
                 TILE_SIZE,
                 TILE_SIZE,
                 "stonebk2.icn",
@@ -4114,15 +3869,15 @@ void SetupDynamicWindow(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (newWidgetTemp_p == NULL)
+            if (newWidgetTemp == NULL)
                 MemError();
-            (*window)->AddWidget(newWidgetTemp_p, -1);
+            (*window)->AddWidget(newWidgetTemp, -1);
         }
     }
 
-    newWidgetTemp_p = new iconWidget(
-        leftOffset_p - CORNER_LEFT,
-        topOffsetNum_n - CORNER_LEFT,
+    newWidgetTemp = new iconWidget(
+        leftOffset - CORNER_LEFT,
+        topOffsetNum - CORNER_LEFT,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4132,13 +3887,13 @@ void SetupDynamicWindow(
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (newWidgetTemp_p == NULL)
+    if (newWidgetTemp == NULL)
         MemError();
-    (*window)->AddWidget(newWidgetTemp_p, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidgetTemp_p = new iconWidget(
-        rightOffset_p - CORNER_RIGHT,
-        topOffsetNum_n - CORNER_LEFT,
+    newWidgetTemp = new iconWidget(
+        rightOffset - CORNER_RIGHT,
+        topOffsetNum - CORNER_LEFT,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4148,13 +3903,13 @@ void SetupDynamicWindow(
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (newWidgetTemp_p == NULL)
+    if (newWidgetTemp == NULL)
         MemError();
-    (*window)->AddWidget(newWidgetTemp_p, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidgetTemp_p = new iconWidget(
-        rightOffset_p - CORNER_RIGHT,
-        bottomOffsetLocal_p - CORNER_RIGHT,
+    newWidgetTemp = new iconWidget(
+        rightOffset - CORNER_RIGHT,
+        bottomOffsetLocal - CORNER_RIGHT,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4164,13 +3919,13 @@ void SetupDynamicWindow(
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (newWidgetTemp_p == NULL)
+    if (newWidgetTemp == NULL)
         MemError();
-    (*window)->AddWidget(newWidgetTemp_p, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidgetTemp_p = new iconWidget(
-        leftOffset_p - CORNER_LEFT,
-        bottomOffsetLocal_p - CORNER_RIGHT,
+    newWidgetTemp = new iconWidget(
+        leftOffset - CORNER_LEFT,
+        bottomOffsetLocal - CORNER_RIGHT,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4180,14 +3935,14 @@ void SetupDynamicWindow(
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (newWidgetTemp_p == NULL)
+    if (newWidgetTemp == NULL)
         MemError();
-    (*window)->AddWidget(newWidgetTemp_p, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge_d = 0; edge_d < columnsSize_h; edge_d++) {
-        newWidgetTemp_p = new iconWidget(
-            leftOffset_p + edge_d * TILE_SIZE - EDGE_OFFSET,
-            topOffsetNum_n - CORNER_LEFT,
+    for (edge = 0; edge < columnsSize; edge++) {
+        newWidgetTemp = new iconWidget(
+            leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
+            topOffsetNum - CORNER_LEFT,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4197,13 +3952,13 @@ void SetupDynamicWindow(
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (newWidgetTemp_p == NULL)
+        if (newWidgetTemp == NULL)
             MemError();
-        (*window)->AddWidget(newWidgetTemp_p, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
 
-        newWidgetTemp_p = new iconWidget(
-            leftOffset_p + edge_d * TILE_SIZE - EDGE_OFFSET,
-            bottomOffsetLocal_p - CORNER_RIGHT,
+        newWidgetTemp = new iconWidget(
+            leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
+            bottomOffsetLocal - CORNER_RIGHT,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4213,15 +3968,15 @@ void SetupDynamicWindow(
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (newWidgetTemp_p == NULL)
+        if (newWidgetTemp == NULL)
             MemError();
-        (*window)->AddWidget(newWidgetTemp_p, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
     }
 
-    for (edge_d = 0; edge_d < numRows; edge_d++) {
-        newWidgetTemp_p = new iconWidget(
-            leftOffset_p - CORNER_LEFT,
-            topOffsetNum_n + edge_d * TILE_SIZE - EDGE_OFFSET,
+    for (edge = 0; edge < numRows; edge++) {
+        newWidgetTemp = new iconWidget(
+            leftOffset - CORNER_LEFT,
+            topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4231,13 +3986,13 @@ void SetupDynamicWindow(
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (newWidgetTemp_p == NULL)
+        if (newWidgetTemp == NULL)
             MemError();
-        (*window)->AddWidget(newWidgetTemp_p, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
 
-        newWidgetTemp_p = new iconWidget(
-            rightOffset_p - CORNER_RIGHT,
-            topOffsetNum_n + edge_d * TILE_SIZE - EDGE_OFFSET,
+        newWidgetTemp = new iconWidget(
+            rightOffset - CORNER_RIGHT,
+            topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4247,63 +4002,63 @@ void SetupDynamicWindow(
             WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (newWidgetTemp_p == NULL)
+        if (newWidgetTemp == NULL)
             MemError();
-        (*window)->AddWidget(newWidgetTemp_p, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
     }
 }
 
-void TestDynamicWindow(i32 p1, i32 p2) {
-    heroWindow* d;
-    i32 e, a, b, u, r, c;
-    b32 t;
+void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles) {
+    heroWindow* window;
+    i32 contentRight, contentBottom, windowWidth, windowHeight, contentLeft, contentTop;
+    b32 done;
     SetupDynamicWindow(
         0,
         0,
         1,
-        GRAPHICS_WIDTH,
-        GRAPHICS_HEIGHT,
-        p1 * TILE_SIZE,
-        p2 * TILE_SIZE,
-        &b,
-        &u,
-        &r,
-        &c,
-        &e,
-        &a,
-        &d,
+        LOGICAL_SCREEN_WIDTH,
+        LOGICAL_SCREEN_HEIGHT,
+        widthInTiles * TILE_SIZE,
+        heightInTiles * TILE_SIZE,
+        &windowWidth,
+        &windowHeight,
+        &contentLeft,
+        &contentTop,
+        &contentRight,
+        &contentBottom,
+        &window,
         DYNAMIC_WINDOW_STONE
     );
-    gpWindowManager->AddWindow(d, -1, 1);
-    t = false;
+    gpWindowManager->AddWindow(window, -1, 1);
+    done = false;
     gpInputManager->Flush();
-    while (!t) {
+    while (!done) {
         platform::PumpEvents();
         switch (gpInputManager->GetEvent().type) {
             case MESSAGE_KEY_DOWN:
             case MESSAGE_LEFT_BUTTON_DOWN:
             case MESSAGE_RIGHT_BUTTON_DOWN:
-                t = true;
+                done = true;
         }
     }
-    gpWindowManager->RemoveWindow(d);
-    delete d;
+    gpWindowManager->RemoveWindow(window);
+    delete window;
 }
 
-void HandleRemoteDeadPlayerExit(i32 pos) {
-    SPlayerExit pe;
-    if (pos == giThisGamePos) {
+void HandleRemoteDeadPlayerExit(i32 position) {
+    SPlayerExit exitInfo;
+    if (position == giThisGamePos) {
         if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, 1, 0))
             ShutDown(NULL);
         RemoteCleanup();
     } else {
-        pe.netPosition = gbGamePosToNetPos[pos];
-        pe.gamePosition = pos;
-        pe.updateNetworkControl = false;
-        pe.timedOut = false;
-        pe.eliminated = true;
-        pe.hostReported = false;
-        ReceiveRemotePlayerExit(pe);
+        exitInfo.netPosition = gbGamePosToNetPos[position];
+        exitInfo.gamePosition = position;
+        exitInfo.updateNetworkControl = false;
+        exitInfo.timedOut = false;
+        exitInfo.eliminated = true;
+        exitInfo.hostReported = false;
+        ReceiveRemotePlayerExit(exitInfo);
     }
 }
 
@@ -4350,24 +4105,24 @@ void HandleRemoteSuddenExit(void) {
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
-    for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
+    for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
         if (i != giThisNetPos)
             gbHumanPlayer[i] = false;
     ComputeAdvNetControl();
 }
 
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32 forwardedReport) {
-    b32 showExitMessage_i;
-    char playerExitMessage_k[PLAYER_EXIT_MESSAGE_LENGTH];
+    b32 showExitMessage;
+    char playerExitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
     i32 netPosition;
 
-    showExitMessage_i = false;
+    showExitMessage = false;
     if (!forwardedReport) {
         if (exitInfo.eliminated) {
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 gbGameOver = true;
                 giEndSequence = false;
                 return;
@@ -4395,8 +4150,8 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[hostNetPosition].name,
                 save_names::PlayerExit
             );
-            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
-            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
                 DropDownToOnePlayer();
             } else {
                 RemoteCleanup();
@@ -4405,7 +4160,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         } else {
             if (exitInfo.timedOut) {
                 utf8::Format(
-                    playerExitMessage_k,
+                    playerExitMessage,
                     localization::Tr("network.player_exit.host_reports_timeout"),
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
@@ -4413,14 +4168,14 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 );
             } else {
                 utf8::Format(
-                    playerExitMessage_k,
+                    playerExitMessage,
                     localization::Tr("network.player_exit.host_reports_exit"),
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name
                 );
             }
-            showExitMessage_i = true;
+            showExitMessage = true;
         }
     }
 
@@ -4429,12 +4184,12 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
     gbHumanPlayer[exitInfo.gamePosition] = false;
     network_remove_player(exitInfo.netPosition);
 
-    for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
+    for (netPosition = exitInfo.netPosition; netPosition < GAME_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
         strcpy(gsNetPlayerInfo[netPosition].name, gsNetPlayerInfo[netPosition + 1].name);
     }
 
-    for (netPosition = 0; netPosition < REMOTE_PLAYER_COUNT; netPosition++) {
+    for (netPosition = 0; netPosition < GAME_PLAYER_COUNT; netPosition++) {
         if (gbGamePosToNetPos[netPosition] == exitInfo.netPosition)
             gbGamePosToNetPos[netPosition] = -1;
         else if (gbGamePosToNetPos[netPosition] > exitInfo.netPosition)
@@ -4446,9 +4201,9 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
     if (exitInfo.updateNetworkControl)
         ComputeAdvNetControl();
 
-    if (showExitMessage_i)
+    if (showExitMessage)
         NormalDialog(
-            playerExitMessage_k,
+            playerExitMessage,
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4462,18 +4217,18 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
 }
 
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
-    b32 localPlayerLost_e;
+    b32 localPlayerLost;
 
     i32 recipient;
 
-    localPlayerLost_e = false;
+    localPlayerLost = false;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
     gpGame->SaveGame(save_names::PlayerExit, 1, 0);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = true;
         if (exitInfo.netPosition == giThisNetPos) {
-            localPlayerLost_e = true;
+            localPlayerLost = true;
             goto exitInfoProcessed;
         }
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), gsNetPlayerInfo[exitInfo.netPosition].name);
@@ -4508,8 +4263,8 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         }
-        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
-        exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE;
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
+        exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES;
     }
 
 exitInfoProcessed:
@@ -4520,19 +4275,17 @@ exitInfoProcessed:
                 1 - giThisNetPos,
                 sizeof(exitInfo),
                 ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
         }
-        if (localPlayerLost_e)
+        if (localPlayerLost)
             goto playerExitHandled;
         giNumHumanPlayers--;
         gbHumanPlayer[exitInfo.gamePosition] = false;
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
-        for (recipient = 0; recipient < REMOTE_PLAYER_COUNT; recipient++) {
+        for (recipient = 0; recipient < GAME_PLAYER_COUNT; recipient++) {
             if ((recipient == exitInfo.netPosition && exitInfo.eliminated && !exitInfo.hostReported)
                 || (recipient != exitInfo.netPosition && recipient < giNumHumanPlayers
                     && recipient != giThisNetPos)) {
@@ -4541,22 +4294,20 @@ exitInfoProcessed:
                     recipient,
                     sizeof(exitInfo),
                     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                    1,
-                    1,
-                    REMOTE_MESSAGE_DEFAULT
+                    1
                 );
             }
         }
-        if (localPlayerLost_e)
+        if (localPlayerLost)
             goto playerExitHandled;
         ReceiveHostReportsPlayerExit(0, exitInfo, 1);
     }
 
 playerExitHandled:
-    if (localPlayerLost_e) {
+    if (localPlayerLost) {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
         RemoteCleanup();
-        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         gbGameOver = true;
         giEndSequence = false;
         return;
@@ -4578,37 +4329,35 @@ i32 CheckMem(void) {
     return 1;
 }
 
-i32 GetManaCost(SpellType spell, hero* h) {
-    i32 c = gsSpellInfo[H2EnumIndex(spell)].cost;
-    if (h != NULL) {
-        if (h->HasArtifact(ARTIFACT_EVIL_EYE)
+i32 GetManaCost(SpellType spell, hero* heroPointer) {
+    i32 currentCost = gsSpellInfo[H2EnumIndex(spell)].cost;
+    if (heroPointer != NULL) {
+        if (heroPointer->HasArtifact(ARTIFACT_EVIL_EYE)
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE))
-            c >>= 1;
-        if (h->HasArtifact(ARTIFACT_SKULLCAP)
+            currentCost >>= 1;
+        if (heroPointer->HasArtifact(ARTIFACT_SKULLCAP)
             && (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE || spell == SPELL_PARALYZE
                 || spell == SPELL_BLIND))
-            c >>= 1;
-        if (h->HasArtifact(ARTIFACT_SNAKE_RING)
+            currentCost >>= 1;
+        if (heroPointer->HasArtifact(ARTIFACT_SNAKE_RING)
             && (spell == SPELL_BLESS || spell == SPELL_MASS_BLESS))
-            c >>= 1;
-        if (h->HasArtifact(ARTIFACT_ELEMENTAL_RING)
+            currentCost >>= 1;
+        if (heroPointer->HasArtifact(ARTIFACT_ELEMENTAL_RING)
             && (spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
                 || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL))
-            c >>= 1;
+            currentCost >>= 1;
     }
-    return c;
+    return currentCost;
 }
 
-void SetWinText(heroWindow* j, i32 id) {
+void SetWinText(heroWindow* window, i32 id) {
     i32 i;
-    tag_message msg;
+    tag_message message;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            msg.payload.widget.id = gWinSetup[i].widgetId;
-            msg.payload.widget.data.text = gWinSetup[i].text;
-            j->BroadcastMessage(msg);
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
+            message.payload.widget.data.text = gWinSetup[i].text;
+            window->BroadcastMessage(message);
         }
     }
 }
@@ -4737,40 +4486,40 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    i32 imageHeight_p;
-    i32 labelY_k;
-    widget* borderWidget_k;
-    i32 resourceFrame_n;
+    i32 imageHeight;
+    i32 labelY;
+    widget* borderWidget;
+    i32 resourceFrame;
 
     i32 textWidgetId;
     heroWindow* savedNormalDialogWindow;
     i32 savedPointerFrame;
-    i32 windowHeight_h;
+    i32 windowHeight;
     char* orText;
     b32 showPrimaryBonus;
-    tag_message message_b;
-    i32 savedSecondResourceValue_n;
+    tag_message message;
+    i32 savedSecondResourceValue;
     i32 savedFirstResourceValue;
-    widget* textPanel_j;
+    widget* textPanel;
     i32 resourceSlot;
-    i32 resourceY_f;
+    i32 resourceY;
 
     i32 lineCount;
     i32 dialogContentHeight;
-    i32 resourceCenterX_c;
+    i32 resourceCenterX;
     i32 resourceImageWidth;
     i32 sizingIconHeight;
-    i32 savedFirstResourceType_k;
+    i32 savedFirstResourceType;
     i32 maxIconHeight;
-    i32 savedSecondResourceType_m;
-    i32 windowRows_b;
-    char iconFile_a[NORMAL_DIALOG_FILENAME_LENGTH];
-    i32 resourceValue_c[NORMAL_DIALOG_RESOURCE_COUNT];
-    i32 windowWidth_f;
-    char* resourceText_p[NORMAL_DIALOG_RESOURCE_COUNT];
-    i32 resourceType_a[NORMAL_DIALOG_RESOURCE_COUNT];
-    MouseCursorType savedPointerType_o;
-    widget* iconPanel_a;
+    i32 savedSecondResourceType;
+    i32 windowRows;
+    char iconFile[NORMAL_DIALOG_FILENAME_LENGTH];
+    i32 resourceValue[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 windowWidth;
+    char* resourceText[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 resourceType[NORMAL_DIALOG_RESOURCE_COUNT];
+    MouseCursorType savedPointerType;
+    widget* iconPanel;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4780,9 +4529,9 @@ void NormalDialog(
         giDialogTimeout = timeout;
     }
 
-    resourceCenterX_c = 0;
-    resourceY_f = 0;
-    resourceFrame_n = 0;
+    resourceCenterX = 0;
+    resourceY = 0;
+    resourceFrame = 0;
     textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
     resourceImageWidth = 0;
 
@@ -4799,19 +4548,19 @@ void NormalDialog(
     }
 
     savedNormalDialogWindow = pNormalDialogWindow;
-    savedFirstResourceType_k = giResType1;
+    savedFirstResourceType = giResType1;
     savedFirstResourceValue = giResExtra1;
-    savedSecondResourceType_m = giResType2;
-    savedSecondResourceValue_n = giResExtra2;
+    savedSecondResourceType = giResType2;
+    savedSecondResourceValue = giResExtra2;
     giResType1 = firstResourceType;
     giResExtra1 = firstResourceValue;
     giResType2 = secondResourceType;
     giResExtra2 = secondResourceValue;
 
-    resourceType_a[0] = firstResourceType;
-    resourceValue_c[0] = firstResourceValue;
-    resourceType_a[1] = secondResourceType;
-    resourceValue_c[1] = secondResourceValue;
+    resourceType[0] = firstResourceType;
+    resourceValue[0] = firstResourceValue;
+    resourceType[1] = secondResourceType;
+    resourceValue[1] = secondResourceValue;
 
     lineCount = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
     dialogContentHeight = lineCount * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
@@ -4820,7 +4569,7 @@ void NormalDialog(
         dialogContentHeight += NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
 
     for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot++) {
-        switch (resourceType_a[resourceSlot]) {
+        switch (resourceType[resourceSlot]) {
             case NORMAL_DIALOG_ARTIFACT:
                 sizingIconHeight = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
                 break;
@@ -4837,7 +4586,7 @@ void NormalDialog(
                 sizingIconHeight = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_EXPERIENCE:
-                sizingIconHeight = resourceValue_c[resourceSlot] == NORMAL_DIALOG_NO_VALUE
+                sizingIconHeight = resourceValue[resourceSlot] == NORMAL_DIALOG_NO_VALUE
                     ? NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
                     : NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
                 break;
@@ -4880,159 +4629,159 @@ void NormalDialog(
 
     if (maxIconHeight > 0)
         dialogContentHeight += maxIconHeight + NORMAL_DIALOG_RESOURCE_VERTICAL_GAP;
-    windowRows_b = (dialogContentHeight - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
+    windowRows = (dialogContentHeight - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
                    / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
-    if (windowRows_b > NORMAL_DIALOG_MAX_ROWS)
-        windowRows_b = NORMAL_DIALOG_MAX_ROWS;
-    windowWidth_f = NORMAL_DIALOG_WINDOW_WIDTH;
-    windowHeight_h =
-        windowRows_b * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
+    if (windowRows > NORMAL_DIALOG_MAX_ROWS)
+        windowRows = NORMAL_DIALOG_MAX_ROWS;
+    windowWidth = NORMAL_DIALOG_WINDOW_WIDTH;
+    windowHeight =
+        windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
-    if (windowX == -1 || windowWidth_f + windowX >= NORMAL_DIALOG_SCREEN_RIGHT)
+    if (windowX == -1 || windowWidth + windowX >= LOGICAL_SCREEN_MAX_X)
         windowX = NORMAL_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowHeight_h + windowY >= NORMAL_DIALOG_SCREEN_BOTTOM) {
-        windowY = NormalDialogCenterOffset(NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_h);
+    if (windowY == -1 || windowHeight + windowY >= LOGICAL_SCREEN_MAX_Y) {
+        windowY = NormalDialogCenterOffset(LOGICAL_SCREEN_HEIGHT - windowHeight);
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
     }
 
-    const std::string iconFile = "evntwin" + std::to_string(windowRows_b) + ".bin";
-    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile.c_str());
+    const std::string dialogResourcePath = "evntwin" + std::to_string(windowRows) + ".bin";
+    pNormalDialogWindow = new heroWindow(windowX, windowY, dialogResourcePath.c_str());
     if (!pNormalDialogWindow)
         MemError();
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_b.payload.widget.data.value = H2EnumIndex(NORMAL_DIALOG_DISABLE_COMMAND);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_CLEAR_FLAGS);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
-        pNormalDialogWindow->BroadcastMessage(message_b);
+        message.payload.widget.id = DIALOG_BUTTON_7;
+        pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
-        pNormalDialogWindow->BroadcastMessage(message_b);
+        message.payload.widget.id = DIALOG_BUTTON_8;
+        pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
-        pNormalDialogWindow->BroadcastMessage(message_b);
+        message.payload.widget.id = DIALOG_BUTTON_1;
+        pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
         && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
-        pNormalDialogWindow->BroadcastMessage(message_b);
+        message.payload.widget.id = DIALOG_BUTTON_2;
+        pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
-        pNormalDialogWindow->BroadcastMessage(message_b);
-        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
-        pNormalDialogWindow->BroadcastMessage(message_b);
+        message.payload.widget.id = NORMAL_DIALOG_YES;
+        pNormalDialogWindow->BroadcastMessage(message);
+        message.payload.widget.id = NORMAL_DIALOG_NO;
+        pNormalDialogWindow->BroadcastMessage(message);
     }
 
     for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot++) {
-        iconPanel_a = NULL;
-        textPanel_j = NULL;
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_NO_RESOURCE)
+        iconPanel = NULL;
+        textPanel = NULL;
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_p[resourceSlot] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
-        if (resourceType_a[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
-            if (resourceValue_c[resourceSlot] > 0) {
-                utf8::Format(resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue_c[resourceSlot]);
-            } else if (resourceValue_c[resourceSlot] == 0) {
+        resourceText[resourceSlot] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
+        if (resourceType[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue[resourceSlot] > 0) {
+                utf8::Format(resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue[resourceSlot]);
+            } else if (resourceValue[resourceSlot] == 0) {
                 strcpy(
-                    resourceText_p[resourceSlot],
+                    resourceText[resourceSlot],
                     ""
                 );
-            } else if (resourceValue_c[resourceSlot] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+            } else if (resourceValue[resourceSlot] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
                 utf8::Format(
-                    resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                    resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                     "%d",
-                    resourceValue_c[resourceSlot] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
+                    resourceValue[resourceSlot] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
                 );
             } else {
                 utf8::Format(
-                    resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                    resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                     localization::Tr("resource.per_day"),
-                    -resourceValue_c[resourceSlot]
+                    -resourceValue[resourceSlot]
                 );
             }
-            strcpy(iconFile_a, "resource.icn");
-            resourceFrame_n = resourceType_a[resourceSlot];
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL) {
+            strcpy(iconFile, "resource.icn");
+            resourceFrame = resourceType[resourceSlot];
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) {
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
-                gSpellNames[resourceValue_c[resourceSlot]]
+                gSpellNames[resourceValue[resourceSlot]]
             );
-            strcpy(iconFile_a, "spells.icn");
-            resourceFrame_n = gsSpellInfo[resourceValue_c[resourceSlot]].iconIndex;
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_CREST) {
+            strcpy(iconFile, "spells.icn");
+            resourceFrame = gsSpellInfo[resourceValue[resourceSlot]].iconIndex;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
-                "%s",
-                ""
-            );
-            strcpy(iconFile_a, "brcrest.icn");
-            resourceFrame_n = resourceValue_c[resourceSlot];
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
-            strcpy(iconFile_a, "primskil.icn");
-            resourceFrame_n = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            strcpy(iconFile, "brcrest.icn");
+            resourceFrame = resourceValue[resourceSlot];
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
-            strcpy(iconFile_a, "strip.icn");
-            resourceFrame_n = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            strcpy(iconFile, "primskil.icn");
+            resourceFrame = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                "%s",
+                ""
+            );
+            strcpy(iconFile, "strip.icn");
+            resourceFrame = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            utf8::Format(
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 gSecondarySkills
-                    [resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                    [resourceValue[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
-            strcpy(iconFile_a, "secskill.icn");
-            resourceFrame_n = resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+            strcpy(iconFile, "secskill.icn");
+            resourceFrame = resourceValue[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
                               + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
-            utf8::Format(iconFile_a, "surrendr.icn");
-            resourceFrame_n = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPERIENCE
-                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_MORALE_BONUS
-                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_MORALE_PENALTY
-                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_LUCK_BONUS
-                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_LUCK_PENALTY) {
+            utf8::Format(iconFile, "surrendr.icn");
+            resourceFrame = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_EXPERIENCE
+                   || resourceType[resourceSlot] == NORMAL_DIALOG_MORALE_BONUS
+                   || resourceType[resourceSlot] == NORMAL_DIALOG_MORALE_PENALTY
+                   || resourceType[resourceSlot] == NORMAL_DIALOG_LUCK_BONUS
+                   || resourceType[resourceSlot] == NORMAL_DIALOG_LUCK_PENALTY) {
             strcpy(
-                resourceText_p[resourceSlot],
+                resourceText[resourceSlot],
                 ""
             );
-            strcpy(iconFile_a, "expmrl.icn");
-            resourceFrame_n = resourceType_a[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
-            if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST
-                && resourceValue_c[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
-                utf8::Format(resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue_c[resourceSlot]);
+            strcpy(iconFile, "expmrl.icn");
+            resourceFrame = resourceType[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
+            if (resourceType[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST
+                && resourceValue[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
+                utf8::Format(resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue[resourceSlot]);
             }
         } else {
             strcpy(
-                resourceText_p[resourceSlot],
+                resourceText[resourceSlot],
                 ""
             );
-            strcpy(iconFile_a, "resource.icn");
-            resourceFrame_n = resourceType_a[resourceSlot];
+            strcpy(iconFile, "resource.icn");
+            resourceFrame = resourceType[resourceSlot];
         }
 
-        switch (resourceType_a[resourceSlot]) {
+        switch (resourceType[resourceSlot]) {
             case NORMAL_DIALOG_PRIMARY_SKILL:
                 resourceImageWidth = NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH;
                 sizingIconHeight = NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT;
@@ -5096,115 +4845,115 @@ void NormalDialog(
                 break;
         }
 
-        imageHeight_p = sizingIconHeight;
-        if (strlen(resourceText_p[resourceSlot]) > 0)
+        imageHeight = sizingIconHeight;
+        if (strlen(resourceText[resourceSlot]) > 0)
             sizingIconHeight += NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
 
         if (resourceSlot == 0) {
-            resourceCenterX_c = resourceType_a[1] == NORMAL_DIALOG_NO_RESOURCE
+            resourceCenterX = resourceType[1] == NORMAL_DIALOG_NO_RESOURCE
                 ? NormalDialogCenterOffset(
-                      windowWidth_f - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
+                      windowWidth - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
                   ) + NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
                 : NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X;
         } else {
-            resourceCenterX_c = windowWidth_f - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
+            resourceCenterX = windowWidth - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
         }
-        resourceY_f = windowHeight_h - sizingIconHeight - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
+        resourceY = windowHeight - sizingIconHeight - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-            resourceY_f -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
-        if (resourceType_a[0] == NORMAL_DIALOG_SECONDARY_SKILL
-            && resourceType_a[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            resourceY -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
+        if (resourceType[0] == NORMAL_DIALOG_SECONDARY_SKILL
+            && resourceType[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
             if (resourceSlot == 0)
-                resourceCenterX_c -= NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
+                resourceCenterX -= NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
             else
-                resourceCenterX_c += NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
+                resourceCenterX += NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
         }
 
-        iconPanel_a = new iconWidget(
-            resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
-                + (resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
+        iconPanel = new iconWidget(
+            resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
+                + (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL
                        ? NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET
                        : 0),
-            resourceY_f,
+            resourceY,
             resourceImageWidth,
-            imageHeight_p,
-            iconFile_a,
-            resourceFrame_n,
+            imageHeight,
+            iconFile,
+            resourceFrame,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
                                                                   : WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (!iconPanel_a)
+        if (!iconPanel)
             MemError();
-        pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+        pNormalDialogWindow->AddWidget(iconPanel, -1);
 
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_ARTIFACT) {
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_ARTIFACT) {
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_LARGE_ICON_WIDTH,
                 NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT,
                 "artifact.icn",
-                resourceValue_c[resourceSlot] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
+                resourceValue[resourceSlot] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
         }
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "primskil.icn",
-                resourceValue_c[resourceSlot],
+                resourceValue[resourceSlot],
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
-            strcpy(resourceText_p[resourceSlot], gStatNames[resourceValue_c[resourceSlot]]);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            strcpy(resourceText[resourceSlot], gStatNames[resourceValue[resourceSlot]]);
         }
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_MONSTER) {
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "strip.icn",
-                H2EnumIndex(gMonsterDatabase[resourceValue_c[resourceSlot]].race)
+                H2EnumIndex(gMonsterDatabase[resourceValue[resourceSlot]].race)
                     + NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
 
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "monh%04d.icn",
-                resourceValue_c[resourceSlot]
+                resourceValue[resourceSlot]
             );
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 gText,
@@ -5214,15 +4963,15 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
         }
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_CREST) {
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
-                resourceY_f - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
+                resourceY - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
                 NORMAL_DIALOG_CREST_OVERLAY_WIDTH,
                 NORMAL_DIALOG_CREST_OVERLAY_HEIGHT,
                 "brcrest.icn",
@@ -5232,15 +4981,15 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
         }
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
-                resourceY_f - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
+                resourceY - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
                 NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH,
                 NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT,
                 "secskill.icn",
@@ -5250,93 +4999,93 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
         }
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
             utf8::Format(
-                iconFile_a,
+                iconFile,
                 "port%04d.icn",
-                resourceValue_c[resourceSlot]
+                resourceValue[resourceSlot]
             );
-            iconPanel_a = new iconWidget(
-                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+            iconPanel = new iconWidget(
+                resourceCenterX - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_HERO_OVERLAY_INSET,
-                resourceY_f + NORMAL_DIALOG_HERO_OVERLAY_INSET,
+                resourceY + NORMAL_DIALOG_HERO_OVERLAY_INSET,
                 NORMAL_DIALOG_HERO_OVERLAY_WIDTH,
                 NORMAL_DIALOG_HERO_OVERLAY_HEIGHT,
-                iconFile_a,
+                iconFile,
                 0,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_a)
+            if (!iconPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
         }
 
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
-            textPanel_j = new textWidget(
-                resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                labelY_k,
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            labelY = resourceY + sizingIconHeight - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
+            textPanel = new textWidget(
+                resourceCenterX - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+                labelY,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
-                resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
+                resourceType[resourceSlot] == NORMAL_DIALOG_SPELL
                     ? NORMAL_DIALOG_SPELL_LABEL_HEIGHT
                     : NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
-                resourceText_p[resourceSlot],
+                resourceText[resourceSlot],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 textWidgetId++,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
-            if (!textPanel_j)
+            if (!textPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel_j, -1);
+            pNormalDialogWindow->AddWidget(textPanel, -1);
 
-            resourceText_p[resourceSlot] =
+            resourceText[resourceSlot] =
                 static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
-            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
+            labelY = resourceY + sizingIconHeight - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             utf8::Format(
-                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
+                resourceText[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 gSecondarySkillLevels
-                    [resourceValue_c[resourceSlot] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                    [resourceValue[resourceSlot] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
-        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            labelY = resourceY + sizingIconHeight - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
         } else {
-            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
+            labelY = resourceY + sizingIconHeight - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
         }
 
-        textPanel_j = new textWidget(
-            resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-            labelY_k,
+        textPanel = new textWidget(
+            resourceCenterX - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+            labelY,
             NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
-            resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
+            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL
                 ? NORMAL_DIALOG_SPELL_LABEL_HEIGHT
                 : NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
-            resourceText_p[resourceSlot],
+            resourceText[resourceSlot],
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             textWidgetId++,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (!textPanel_j)
+        if (!textPanel)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel_j, -1);
+        pNormalDialogWindow->AddWidget(textPanel, -1);
 
-        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus) {
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus) {
             char* bonusText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH));
             strcpy(bonusText, "+1 ");
-            textPanel_j = new textWidget(
-                resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                resourceY_f + sizingIconHeight - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
+            textPanel = new textWidget(
+                resourceCenterX - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+                resourceY + sizingIconHeight - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
                 NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT,
                 bonusText,
@@ -5346,14 +5095,14 @@ void NormalDialog(
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
-            if (!textPanel_j)
+            if (!textPanel)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel_j, -1);
+            pNormalDialogWindow->AddWidget(textPanel, -1);
         }
 
-        borderWidget_k = new border(
-            resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth),
-            resourceY_f,
+        borderWidget = new border(
+            resourceCenterX - NormalDialogCenterOffset(resourceImageWidth),
+            resourceY,
             resourceImageWidth,
             sizingIconHeight,
             resourceSlot + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
@@ -5361,14 +5110,12 @@ void NormalDialog(
             0,
             NULL
         );
-        pNormalDialogWindow->AddWidget(borderWidget_k, -1);
+        pNormalDialogWindow->AddWidget(borderWidget, -1);
     }
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
-    message_b.payload.widget.data.text = text;
-    pNormalDialogWindow->BroadcastMessage(message_b);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, NORMAL_DIALOG_TEXT_WIDGET_ID);
+    message.payload.widget.data.text = text;
+    pNormalDialogWindow->BroadcastMessage(message);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
         orText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_OR_TEXT_LENGTH));
@@ -5377,10 +5124,10 @@ void NormalDialog(
             NORMAL_DIALOG_OR_TEXT_LENGTH,
             localization::Tr("common.or")
         );
-        textPanel_j = new textWidget(
-            windowWidth_f / NORMAL_DIALOG_CENTER_PART_COUNT
+        textPanel = new textWidget(
+            windowWidth / NORMAL_DIALOG_CENTER_PART_COUNT
                 - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
-            resourceY_f + NORMAL_DIALOG_OR_TEXT_Y_OFFSET,
+            resourceY + NORMAL_DIALOG_OR_TEXT_Y_OFFSET,
             NORMAL_DIALOG_OR_TEXT_WIDTH,
             NORMAL_DIALOG_OR_TEXT_HEIGHT,
             orText,
@@ -5390,12 +5137,12 @@ void NormalDialog(
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (!textPanel_j)
+        if (!textPanel)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel_j, -1);
+        pNormalDialogWindow->AddWidget(textPanel, -1);
     }
 
-    savedPointerType_o = gpMouseManager->m_cursorType;
+    savedPointerType = gpMouseManager->m_cursorType;
     savedPointerFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
@@ -5419,26 +5166,28 @@ void NormalDialog(
     gpMouseManager->SetPointer(
         "",
         savedPointerFrame,
-        savedPointerType_o
+        savedPointerType
     );
-    giResType1 = savedFirstResourceType_k;
+    giResType1 = savedFirstResourceType;
     giResExtra1 = savedFirstResourceValue;
-    giResType2 = savedSecondResourceType_m;
-    giResExtra2 = savedSecondResourceValue_n;
+    giResType2 = savedSecondResourceType;
+    giResExtra2 = savedSecondResourceValue;
     pNormalDialogWindow = savedNormalDialogWindow;
 }
 
 void UpdateNormalDialog(const char* text) {
 
-    tag_message evt;
-    evt.type = MESSAGE_WIDGET;
-    evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    evt.payload.widget.id = 1;
-    evt.payload.widget.data.text = text;
-    pNormalDialogWindow->BroadcastMessage(evt);
-    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
+    tag_message message;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
+    message.payload.widget.data.text = text;
+    pNormalDialogWindow->BroadcastMessage(message);
     pNormalDialogWindow
-        ->DrawWindow(1, WINDOW_ALL_WIDGETS_LOW, NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID);
+        ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
+    pNormalDialogWindow->DrawWindow(
+        WINDOW_DRAW_UPDATE_SCREEN,
+        WINDOW_ALL_WIDGETS_LOW,
+        NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
+    );
 }
 
 #define GROUND_REPEAT_2(value) value, value
@@ -5533,7 +5282,7 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
 
-u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableTan[PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
     0xd3, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
@@ -5551,7 +5300,7 @@ u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xc6, 0xc8, 0xcb, 0xcc, 0xcf, 0xd0, 0xd1, 0xc9, 0xcb, 0xcf, 0xd1, 0xce, 0xd1, 0xd0, 0xc6, 0xc6,
     0xcf, 0xd5, 0xc6, 0xc9, 0xce, 0xd0, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5
 };
-u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableGray[PALETTE_COLOR_COUNT] = {
     0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x0a, 0x0b, 0x0c, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x12,
@@ -5569,7 +5318,7 @@ u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x14, 0x15, 0x16, 0x17, 0x19, 0x1a, 0x1b, 0x1b, 0x18, 0x15, 0x16, 0x1a, 0x1a, 0x1b, 0x24, 0x0c,
     0x12, 0x19, 0x13, 0x15, 0x18, 0x1a, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24
 };
-u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableYellow[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x73, 0x73, 0x74, 0x75, 0x75,
     0x76, 0x77, 0x77, 0x78, 0x79, 0x79, 0x7a, 0x7b, 0x7b, 0x7c, 0x7d, 0x7d, 0x7e, 0x7f, 0x7f, 0x80,
     0x81, 0x81, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5587,7 +5336,7 @@ u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableScenWin[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5605,7 +5354,7 @@ u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableDarkGray[PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
     0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24,
     0x24, 0x24, 0x24, 0x24, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5623,7 +5372,7 @@ u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableRed[PALETTE_COLOR_COUNT] = {
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb6, 0xb8, 0xba, 0xd0, 0xd1,
     0xd2, 0xd2, 0xd3, 0xd3, 0xd4, 0xd5, 0xd5, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb4, 0xb6, 0xb6, 0xb8, 0xba, 0xd0, 0xd1, 0xd1, 0xd2, 0xd2,
@@ -5641,7 +5390,7 @@ u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc0, 0xc1, 0xc2, 0xd5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xd3, 0xc5, 0xd3, 0xd4, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5
 };
-u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableDarkBrown[PALETTE_COLOR_COUNT] = {
     0x32, 0x2a, 0x2a, 0x2a, 0x2a, 0x32, 0x32, 0x32, 0x32, 0x35, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d,
     0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
     0x3c, 0x3e, 0x3e, 0x3e, 0x3e, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -5666,8 +5415,8 @@ b32 gbClosingApp = false;
 // The window comes up focused, and the first focus change corrects this.
 b32 gbForegroundApp = true;
 i32 giMainVideoModeColorDepth = GRAPHICS_COLOR_DEPTH;
-i32 giMainVideoModeWidth = GRAPHICS_WIDTH;
-i32 giMainVideoModeHeight = GRAPHICS_HEIGHT;
+i32 giMainVideoModeWidth = LOGICAL_SCREEN_WIDTH;
+i32 giMainVideoModeHeight = LOGICAL_SCREEN_HEIGHT;
 u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0};
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
@@ -5744,7 +5493,7 @@ u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
 };
-u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
+u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][PALETTE_COLOR_COUNT] = {
     {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
       0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
       0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
@@ -5962,7 +5711,7 @@ u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COU
       0x00, 0x4b, 0xf2, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x0a}}
 };
-u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableLighten[PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0b,
     0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b,
     0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x25, 0x25, 0x25, 0x25, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
@@ -5980,7 +5729,7 @@ u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0xdf, 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xee,
     0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
-u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
+u8 gColorTableNoCycle[PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -6007,7 +5756,7 @@ i32 giScreenScroll = 1;
 i32 giMenuCommand = -1;
 b32 gbSendMouseMoveMessages = false;
 b32 gbColorMice = true;
-u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
+u32l gTownEligibleBuildMask[H2EnumIndex(FACTION_COUNT)] = {
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
     TOWN_ELIGIBLE_BUILD_SORCERESS_MASK,
@@ -6168,7 +5917,6 @@ const char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] 
         "campxtre.ICN"
     }
 };
-char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\ANIM2\\";
 char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
 char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\TRACKS2\\";
@@ -6178,12 +5926,11 @@ icon* gShingleAnim = NULL;
 i32 iNextShingleAnim = 0;
 i32 giDialogTimeout = 0;
 i32 giNewMonsterCycleFrame = 0;
-b32 gbNoCDRom = false;
 b32 gbLeaveNetBoxAlone = false;
 b32 gbDrawWindowBackground = true;
 b32 gbCheatMenus = false;
 b32 gbShowAllMaps = false;
-const char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+const char* gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_COUNT)] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6227,7 +5974,7 @@ i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
 i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
     {640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0};
-tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
+tag_tilePoint normalDirTable[H2EnumIndex(MAP_DIRECTION_COUNT)] = {
     {0, -1, 16},
     {1, -1, 16},
     {1, 0, 16},
@@ -6237,22 +5984,22 @@ tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {-1, 0, 16},
     {-1, -1, 16}
 };
-i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1};
-i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+i32 gResourceBaseValue[H2EnumIndex(RES_COUNT)] = {200, 300, 200, 300, 300, 300, 1};
+i32 gInitResourcesHuman[H2EnumIndex(DIFFICULTY_COUNT)][H2EnumIndex(RES_COUNT)] = {
     {30, 10, 30, 10, 10, 10, 10000},
     {20, 5, 20, 5, 5, 5, 7500},
     {10, 2, 10, 2, 2, 2, 5000},
     {5, 0, 5, 0, 0, 0, 2500},
     {0, 0, 0, 0, 0, 0, 0}
 };
-i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+i32 gInitResourcesComputer[H2EnumIndex(DIFFICULTY_COUNT)][H2EnumIndex(RES_COUNT)] = {
     {20, 5, 20, 5, 5, 5, 7500},
     {20, 5, 20, 5, 5, 5, 7500},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000}
 };
-i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000};
+i32 gMineCharacteristics[H2EnumIndex(RES_COUNT)] = {2, 1, 2, 1, 1, 1, 1000};
 i32 gSSValues[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {400, 750, 1000},
     {200, 450, 850},
@@ -6279,7 +6026,7 @@ gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x10, 0x20, 0x20, 0x20, 0x20, 0x02, 0x08, 0x02, 0x08,
     0x02, 0x02, 0x08, 0x08, 0x02, 0x02, 0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x04, 0x00
 };
-i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
+i32 gArtifactBaseRV[H2EnumIndex(ARTIFACT_COUNT)] = {
     13600, 22000, 18000, 14000, 19000, 18500, 22200, 25000, 6000,  4000, 4000,  5600,  1200,
     1200,  1200,  1200,  -1200, 2000,  1800,  1800,  2000,  1000,  3600, 5600,  4000,  5040,
     3060,  4420,  5610,  6630,  7000,  6000,  4000,  4500,  2250,  1200, 1200,  1200,  1200,
@@ -6293,24 +6040,24 @@ i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
 i32 giDebugLevel = 0;
 i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
-    {{20, {33}}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", {MONSTER_FLAGS_NONE}},
-    {{150, {312}}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", {MONSTER_ATTRIBUTE_RANGED}},
-    {{200, {463}}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", {MONSTER_ATTRIBUTE_RANGED}},
-    {{200, {639}}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
-    {{250, {824}}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
-    {{250, {1130}}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
-    {{300, {1350}}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
-    {{300, {1830}}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
-    {{375, {2273}}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
-    {{600, {4704}}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
-    {{1000, {5822}}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
-    {{40, {109}}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", {MONSTER_FLAGS_NONE}},
-    {{140, {299}}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
-    {{175, {512}}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
-    {{200, {865}}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", {MONSTER_ATTRIBUTE_WIDE}},
-    {{300, {1065}}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", {MONSTER_FLAGS_NONE}},
-    {{500, {2070}}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", {MONSTER_FLAGS_NONE}},
-    {{600, {1921}},
+    {20, 33, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
+    {150, 312, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_FLAGS_SHOOTER},
+    {200, 463, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_FLAGS_SHOOTER},
+    {200, 639, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
+    {250, 824, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
+    {250, 1130, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
+    {300, 1350, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
+    {300, 1830, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
+    {375, 2273, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_FLAGS_WIDE},
+    {600, 4704, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
+    {1000, 5822, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
+    {40, 109, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MONSTER_FLAGS_NONE},
+    {140, 299, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_FLAGS_SHOOTER},
+    {175, 512, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_FLAGS_SHOOTER},
+    {200, 865, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_FLAGS_WIDE},
+    {300, 1065, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
+    {500, 2070, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
+    {600, 1921,
      32,
      3,
      40,
@@ -6322,8 +6069,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      7,
      8,
      "trll",
-     {MONSTER_ATTRIBUTE_RANGED}},
-    {{700, {2337}},
+     MONSTER_FLAGS_SHOOTER},
+    {700, 2337,
      33,
      3,
      40,
@@ -6335,8 +6082,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      9,
      16,
      "trll",
-     {MONSTER_ATTRIBUTE_RANGED}},
-    {{750, {6074}},
+     MONSTER_FLAGS_SHOOTER},
+    {750, 6074,
      58,
      2,
      80,
@@ -6348,14 +6095,14 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      24,
      0,
      "cycl",
-     {MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
-    {{50, {129}}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", {MONSTER_ATTRIBUTE_FLYING}},
-    {{200, {500}}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
-    {{250, {716}}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
-    {{250, {554}}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
-    {{300, {658}}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
-    {{350, {1290}}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", {MONSTER_ATTRIBUTE_RANGED}},
-    {{400, {1428}},
+     MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 129, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_FLAGS_FLYING},
+    {200, 500, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
+    {250, 716, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
+    {250, 554, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {300, 658, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_FLAGS_SHOOTER},
+    {350, 1290, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_FLAGS_SHOOTER},
+    {400, 1428,
      36,
      3,
      25,
@@ -6367,9 +6114,9 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      8,
      16,
      "drui",
-     {MONSTER_ATTRIBUTE_RANGED}},
-    {{500, {2702}}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", {MONSTER_ATTRIBUTE_WIDE}},
-    {{1500, {10114}},
+     MONSTER_FLAGS_SHOOTER},
+    {500, 2702, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_FLAGS_WIDE},
+    {1500, 10114,
      56,
      1,
      100,
@@ -6381,8 +6128,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
-    {{60, {154}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {60, 154,
      26,
      8,
      5,
@@ -6394,9 +6141,9 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED}},
-    {{200, {579}}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", {MONSTER_ATTRIBUTE_FLYING}},
-    {{300, {1101}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_SHOOTER},
+    {200, 579, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_FLAGS_FLYING},
+    {300, 1101,
      37,
      4,
      25,
@@ -6408,11 +6155,11 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
-    {{400, {1751}}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
-    {{500, {2252}}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
-    {{800, {2878}}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", {MONSTER_ATTRIBUTE_WIDE}},
-    {{3000, {18153}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
+    {400, 1751, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
+    {500, 2252, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
+    {800, 2878, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_FLAGS_WIDE},
+    {3000, 18153,
      55,
      1,
      200,
@@ -6424,8 +6171,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
-    {{3500, {22962}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {3500, 22962,
      68,
      1,
      250,
@@ -6437,8 +6184,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
-    {{4000, {28144}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {4000, 28144,
      74,
      1,
      300,
@@ -6450,12 +6197,12 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
-    {{50, {134}}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", {MONSTER_ATTRIBUTE_RANGED}},
-    {{150, {493}}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", {MONSTER_ATTRIBUTE_WIDE}},
-    {{300, {951}}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
-    {{350, {1324}}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
-    {{400, {1739}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_BREATH_ATTACK},
+    {50, 134, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_FLAGS_SHOOTER},
+    {150, 493, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_FLAGS_WIDE},
+    {300, 951, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
+    {350, 1324, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
+    {400, 1739,
      43,
      3,
      40,
@@ -6467,11 +6214,11 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
-    {{600, {1935}}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", {MONSTER_ATTRIBUTE_RANGED}},
-    {{700, {2469}}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", {MONSTER_ATTRIBUTE_RANGED}},
-    {{2000, {9589}}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", {MONSTER_FLAGS_NONE}},
-    {{5000, {22933}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING},
+    {600, 1935, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_FLAGS_SHOOTER},
+    {700, 2469, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_FLAGS_SHOOTER},
+    {2000, 9589, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
+    {5000, 22933,
      79,
      1,
      300,
@@ -6483,9 +6230,9 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      30,
      24,
      "titn",
-     {MONSTER_ATTRIBUTE_RANGED}},
-    {{75, {203}}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", {MONSTER_ATTRIBUTE_UNDEAD}},
-    {{150, {310}},
+     MONSTER_FLAGS_SHOOTER},
+    {75, 203, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_FLAGS_UNDEAD},
+    {150, 310,
      21,
      6,
      15,
@@ -6497,8 +6244,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     {MONSTER_ATTRIBUTE_UNDEAD}},
-    {{200, {506}},
+     MONSTER_FLAGS_UNDEAD},
+    {200, 506,
      25,
      6,
      20,
@@ -6510,8 +6257,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     {MONSTER_ATTRIBUTE_UNDEAD}},
-    {{250, {868}},
+     MONSTER_FLAGS_UNDEAD},
+    {250, 868,
      35,
      4,
      25,
@@ -6523,8 +6270,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     {MONSTER_ATTRIBUTE_UNDEAD}},
-    {{300, {1056}},
+     MONSTER_FLAGS_UNDEAD},
+    {300, 1056,
      35,
      4,
      30,
@@ -6536,8 +6283,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     {MONSTER_ATTRIBUTE_UNDEAD}},
-    {{500, {1685}},
+     MONSTER_FLAGS_UNDEAD},
+    {500, 1685,
      42,
      3,
      30,
@@ -6549,8 +6296,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{650, {2461}},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
+    {650, 2461,
      45,
      3,
      40,
@@ -6562,8 +6309,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{750, {2069}},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
+    {750, 2069,
      28,
      2,
      25,
@@ -6575,8 +6322,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{900, {2625}},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
+    {900, 2625,
      29,
      2,
      35,
@@ -6588,8 +6335,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{1500, {11744}},
+     MONSTER_FLAGS_SHOOTER | MONSTER_FLAGS_UNDEAD},
+    {1500, 11744,
      78,
      1,
      150,
@@ -6601,10 +6348,10 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{50, {177}}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", {MONSTER_FLAGS_NONE}},
-    {{200, {805}}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", {MONSTER_ATTRIBUTE_WIDE}},
-    {{1000, {1545}},
+     MONSTER_FLAGS_WIDE | MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
+    {50, 177, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MONSTER_FLAGS_NONE},
+    {200, 805, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_FLAGS_WIDE},
+    {1000, 1545,
      62,
      3,
      20,
@@ -6616,8 +6363,8 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
-    {{650, {5692}},
+     MONSTER_FLAGS_FLYING | MONSTER_FLAGS_UNDEAD},
+    {650, 5692,
      60,
      2,
      50,
@@ -6629,12 +6376,12 @@ tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
      30,
      0,
      "geni",
-     {MONSTER_ATTRIBUTE_FLYING}},
-    {{500, {1979}}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", {MONSTER_ATTRIBUTE_WIDE}},
-    {{500, {1732}}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", {MONSTER_FLAGS_NONE}},
-    {{500, {1412}}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", {MONSTER_FLAGS_NONE}},
-    {{500, {1501}}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", {MONSTER_FLAGS_NONE}},
-    {{500, {1690}}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", {MONSTER_FLAGS_NONE}}
+     MONSTER_FLAGS_FLYING},
+    {500, 1979, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_FLAGS_WIDE},
+    {500, 1732, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
+    {500, 1412, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
+    {500, 1501, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
+    {500, 1690, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MONSTER_FLAGS_NONE}
 };
 float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
                                           0.58f, 0.6f,  0.62f, 0.64f, 0.67f, 0.7f,  0.74f,
@@ -6659,7 +6406,7 @@ float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
 float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
 b32 gbDrawSavedCursor = false;
-i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+i8 gbArrow[H2EnumIndex(MAP_DIRECTION_COUNT)][H2EnumIndex(MAP_DIRECTION_COUNT)] = {
     {8, false, false, false, 8, 16, 16, 16},
     {17, 9, true, true, true, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -7343,25 +7090,25 @@ u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x0a,
     0x00
 };
-u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
-    0x09,
-    0x0b,
-    0x0d,
-    0x0e,
-    0x12,
-    0x1a,
-    0x1e,
-    0x1f,
-    0x25,
-    0x26,
-    0x29,
-    0x65,
-    0x16,
-    0x10,
-    0x11,
-    0x00
+H2EnumStorage<SpellType, u8> giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+    SPELL_HASTE,
+    SPELL_SLOW,
+    SPELL_BLIND,
+    SPELL_BLESS,
+    SPELL_CURSE,
+    SPELL_BERSERKER,
+    SPELL_PARALYZE,
+    SPELL_HYPNOTIZE,
+    SPELL_DRAGON_SLAYER,
+    SPELL_BLOOD_LUST,
+    SPELL_SHIELD,
+    CREATURE_SPELL_PETRIFY,
+    SPELL_ANTI_MAGIC,
+    SPELL_STONE_SKIN,
+    SPELL_STEEL_SKIN,
+    SPELL_FIREBALL
 };
-u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
+u8 giNumPowFrames[H2EnumIndex(COMBAT_EFFECT_COUNT)] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
                                             10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
 SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
@@ -7442,7 +7189,7 @@ const char* gTownPrefixNames[H2EnumIndex(FACTION_COUNT)] = {
     "twnw",
     "twnz",
     "twnn"};
-const char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+const char* gTownObjNames[H2EnumIndex(BUILDING_SLOT_COUNT)] = {
     "mage",
     "thie",
     "tvrn",
@@ -7476,8 +7223,7 @@ const char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "up5b",
     "ext3"
 };
-H2EnumStorage<CreatureType, i8>
-gDwellingType[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+H2EnumStorage<CreatureType, i8> gDwellingType[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {H2EnumIndex(CREATURE_PEASANT),
      H2EnumIndex(CREATURE_ARCHER),
      H2EnumIndex(CREATURE_PIKEMAN),
@@ -7551,7 +7297,7 @@ gDwellingType[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      ARMY_GROUP_EMPTY_SLOT,
      ARMY_GROUP_EMPTY_SLOT}
 };
-i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][H2EnumIndex(RES_COUNT)] = {
     {0, 0, 0, 0, 0, 0, 0},
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 4, 5, 4, 4, 4, 1000},
@@ -7559,7 +7305,7 @@ i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = 
     {5, 8, 5, 8, 8, 8, 1000},
     {5, 10, 5, 10, 10, 10, 1000}
 };
-i32 gSpecialBuildingCosts[H2EnumIndex(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gSpecialBuildingCosts[H2EnumIndex(FACTION_COUNT)][H2EnumIndex(RES_COUNT)] = {
     {5, 0, 15, 0, 0, 0, 1500},
     {10, 0, 10, 0, 0, 0, 2000},
     {0, 0, 0, 0, 10, 0, 1500},
@@ -7567,7 +7313,7 @@ i32 gSpecialBuildingCosts[H2EnumIndex(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT
     {5, 5, 5, 5, 5, 5, 1500},
     {0, 10, 0, 10, 0, 0, 1000}
 };
-i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][H2EnumIndex(RES_COUNT)] = {
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 0, 0, 0, 0, 0, 750},
     {5, 0, 0, 0, 0, 0, 500},
@@ -7590,7 +7336,7 @@ i32 gNeutralBaseResourceValues[H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0
 };
 i32 gSpecialBuildingBaseResourceValues[H2EnumIndex(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
-i32 gDwellingBaseResourceValues[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+i32 gDwellingBaseResourceValues[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
@@ -7598,7 +7344,7 @@ i32 gDwellingBaseResourceValues[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COU
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
-i32 gDwellingCosts[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gDwellingCosts[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT][H2EnumIndex(RES_COUNT)] = {
     {{0, 0, 0, 0, 0, 0, 200},
      {0, 0, 0, 0, 0, 0, 1000},
      {0, 0, 5, 0, 0, 0, 1000},
@@ -7672,7 +7418,7 @@ i32 gDwellingCosts[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDI
      {0, 0, 0, 0, 0, 0, 0},
      {0, 0, 0, 0, 0, 0, 0}}
 };
-u32l gHierarchyMask[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+u32l gHierarchyMask[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -7755,7 +7501,7 @@ const char* cHeroTypeShortName[H2EnumIndex(FACTION_COUNT)] = {
     "wrlk",
     "wzrd",
     "necr"};
-char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
+char cHeroTypeInitial[H2EnumIndex(FACTION_COUNT)] = {'k', 'b', 's', 'w', 'z', 'n'};
 i32 giDeferObjDrawX = -1;
 i32 giDeferObjDrawY = -1;
 class heroWindow* gpInitWin = NULL;
@@ -7969,8 +7715,18 @@ struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
       {9, 10, -1, -1, -1, -1, -1, -1, -1},
       {-1, -1, -1, -1, -1, -1, -1, -1, -1}}}
 };
-u8 iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {9, 34, 86, 113};
-u8 iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {22, 47, 73, 100};
+H2EnumStorage<CombatCastleHex, u8> iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {
+    COMBAT_CASTLE_HEX_TOP_TOWER,
+    COMBAT_CASTLE_HEX_SECOND_TOWER,
+    COMBAT_CASTLE_HEX_THIRD_TOWER,
+    COMBAT_CASTLE_HEX_BOTTOM_TOWER
+};
+H2EnumStorage<CombatCastleHex, u8> iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
+    COMBAT_CASTLE_HEX_TOP_WALL,
+    COMBAT_CASTLE_HEX_SECOND_WALL,
+    COMBAT_CASTLE_HEX_THIRD_WALL,
+    COMBAT_CASTLE_HEX_BOTTOM_WALL
+};
 u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][H2EnumIndex(COORDINATE_AXIS_COUNT)] =
     {{468, 58}, {421, 128}, {417, 291}, {498, 402}};
 u16 towerPos[KB_CASTLE_TOWER_COUNT][H2EnumIndex(COORDINATE_AXIS_COUNT)] =
@@ -7978,7 +7734,7 @@ u16 towerPos[KB_CASTLE_TOWER_COUNT][H2EnumIndex(COORDINATE_AXIS_COUNT)] =
 u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][H2EnumIndex(COORDINATE_AXIS_COUNT)] = {{393, 192}, {348, 262}};
 float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] =
     {0.0f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.5f};
-struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
+struct SElevationOverlay sElevationOverlay[COMBAT_ELEVATION_OVERLAY_COUNT] = {
     {0x0000, {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {30, 31, 32, 33, 47, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {56, 57, 58, 59, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
@@ -8797,10 +8553,10 @@ const char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)] = {
 };
 const char* gTerrainNames[H2EnumIndex(TERRAIN_COUNT)] = {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach"
 };
-const char* gResourceNames[RESOURCE_VALUE_COUNT] = {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold"
+const char* gResourceNames[H2EnumIndex(RES_COUNT)] = {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold"
 };
 
-const char* gMineNames[KB_MINE_NAME_COUNT] = {
+const char* gMineNames[H2EnumIndex(RES_COUNT)] = {
     "Sawmill",
     "Alchemist Lab",
     "Ore Mine",
@@ -9393,7 +9149,7 @@ const char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Marketplace",
     "Captain's Quarters"
 };
-const char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+const char* gHeroDefaultNames[GAME_HERO_COUNT] = {
     "Lord Kilburn", "Sir Gallant", "Ector",    "Gwenneth", "Tyro",    "Ambrose",   "Ruby",
     "Maximus",      "Dimitri",     "Thundax",  "Fineous",  "Jojosh",  "Crag Hack", "Jezebel",
     "Jaclyn",       "Ergon",       "Tsabu",    "Atlas",    "Astra",   "Natasha",   "Troyan",
@@ -9576,7 +9332,7 @@ const char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "\nBattle Garb of Anduran gives you maximum morale."
 };
 const char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
-const char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+const char* cDifficulty[H2EnumIndex(DIFFICULTY_COUNT)] =
     {"Easy", "Normal", "Hard", "Expert", "Impossible"
 };
 const char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
@@ -9585,15 +9341,15 @@ const char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
 const char* cWinText[KB_WIN_TEXT_COUNT] =
     {"Days Spent:", "Base Score:", "Difficulty Rating:", "Final Score:", "Ranking:"
 };
-const char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanDifficulty[H2EnumIndex(DIFFICULTY_COUNT)] =
     {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert"
 };
-const char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanInfoDifficulty[H2EnumIndex(DIFFICULTY_COUNT)] =
     {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert"
 };
 const char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera"};
-const char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+const char* gSpellDesc[H2EnumIndex(SPELL_COUNT)] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
     "{Fireblast}\n\nAn improved version of fireball, fireblast affects two hexes around the center "
@@ -9677,7 +9433,7 @@ const char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Set Fire Guardian}\n\nSets Fire Elementals to guard a mine against enemy armies.",
     "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies."
 };
-const char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+const char* gSpellNames[H2EnumIndex(SPELL_COUNT)] = {
     "Fireball",
     "Fireblast",
     "Lightning Bolt",
@@ -9747,7 +9503,7 @@ const char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
 const char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {"Basic", "Advanced", "Expert"
 };
-const char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+const char* gSecondarySkills[H2EnumIndex(HERO_SKILL_COUNT)] = {
     "Pathfinding",
     "Archery",
     "Logistics",
@@ -9796,7 +9552,7 @@ const char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
 const char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special"
 };
-const char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+const char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
      "Blacksmith",
@@ -10010,7 +9766,7 @@ const char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
 const char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil"
 };
 const char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
-const char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast"
+const char* combatSpeedText[KB_COMBAT_SPEED_COUNT] = {"Normal", "Fast", "Very Fast"
 };
 const char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full"
 };
@@ -10355,7 +10111,6 @@ b32 gbLowMemory = false;
 i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
 void* gLowPage = NULL;
 b32 gbInPollSound = false;
-H2EnumStorage<CDRomSetupResult, i32> iCDRomErr = CD_ROM_READY;
 i32 bEarlySetupDone = 0;
 b32 bKBDone = false;
 struct _REDBOOK* hRedbookz = NULL;
@@ -10437,10 +10192,9 @@ i32 glTimers[GLOBAL_TIMER_COUNT];
 i32 giScore;
 armyGroup* gpMonGroup;
 configStruct gConfig;
-char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 u32l gTimeMark;
 char* EXPANSION_AGGREGATE_NAME;
-char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 game* gpGame;
 b8 gbRetreatWin;
 DialogWaitType giWaitType;
@@ -10459,7 +10213,6 @@ void** ppMapExtra;
 char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 i32 giThisNetPos;
 i8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
-char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 class heroWindow* heroWin;
 i32 giOverviewReturnActionExtra;
 H2EnumStorage<CombatSide, i32> giCurGeneral;

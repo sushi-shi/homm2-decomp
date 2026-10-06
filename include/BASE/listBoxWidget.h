@@ -70,11 +70,11 @@ public:
     listBoxWidget(void);
     virtual ~listBoxWidget() override;
     virtual void Draw(void) override;
-    virtual MessageDispatchResult Main(struct tag_message&) override;
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Read(void);
-    void DeleteItem(i32);
-    void DrawLBStuff(i32);
-    MessageDispatchResult ProcessMouseMessage(struct tag_message&);
+    void DeleteItem(i32 index);
+    void DrawLBStuff(i32 doUpdate);
+    MessageDispatchResult ProcessMouseMessage(struct tag_message& message);
 };
 #pragma pack(pop)
 #endif
