@@ -38,7 +38,9 @@ remain explicit.
 Retail also reaches a few logically distinct palette and campaign-name tables
 through their linker-defined adjacency. `master` names those tables explicitly,
 preserving the selected values without relying on out-of-bounds pointer or
-array arithmetic. Repeated UI formatting tails in adventure quick info, radar,
+array arithmetic. Dim-palette selection indexes the set and level separately;
+it does not reach other levels by indexing beyond the first 256-color subarray.
+Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 

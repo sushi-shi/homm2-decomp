@@ -12,6 +12,6 @@ typedef enum TileFlag {
     TILE_FLIP_HORIZONTAL = 0x8000
 } TileFlag;
 
-extern "C" void __cdecl TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y);
+extern "C" void __cdecl TileToBitmap(tileset* source, u32 flags, bitmap* destination, i32 x, i32 y);
 
 #endif

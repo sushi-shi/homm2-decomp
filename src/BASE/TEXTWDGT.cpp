@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <BASE/widget.h>
+#include <BASE/message.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -69,13 +71,10 @@ textWidget::textWidget(
 
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
-    i16 len = gpResourceManager->ReadWord();
-    std::vector<char> legacyText(static_cast<std::size_t>(len) + 1, 0);
-    gpResourceManager->ReadBlock(legacyText.data(), len);
+    READ_WIDGET_GEOMETRY(*this, gpResourceManager);
+    i16 length = gpResourceManager->ReadWord();
+    std::vector<char> legacyText(static_cast<std::size_t>(length) + 1, 0);
+    gpResourceManager->ReadBlock(legacyText.data(), length);
     const std::string decodedText = localization::DecodeResourceText(legacyText.data());
     m_text = static_cast<char*>(H2_ALLOC(decodedText.size() + 1));
     memcpy(m_text, decodedText.c_str(), decodedText.size() + 1);
@@ -95,31 +94,26 @@ textWidget::~textWidget() {
     H2_FREE(m_text);
 }
 
-#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
-    messageValue.type = MESSAGE_WIDGET;                                                          \
-    messageValue.payload.widget.command = commandValue;                                          \
-    messageValue.payload.widget.id = idValue
-
-MessageDispatchResult textWidget::Main(tag_message& msg) {
+MessageDispatchResult textWidget::Main(tag_message& message) {
     if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED)))) {
-        if (msg.type == MESSAGE_WIDGET)
-            return widget::Main(msg);
+        if (message.type == MESSAGE_WIDGET)
+            return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    switch (msg.type) {
+    switch (message.type) {
         case MESSAGE_WIDGET:
-            switch (msg.payload.widget.command) {
+            switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SET_TEXT:
-                    if (msg.payload.widget.id == m_id) {
-                        SetText(msg.payload.widget.data.text);
+                    if (message.payload.widget.id == m_id) {
+                        SetText(message.payload.widget.data.text);
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
-                    if (msg.payload.widget.id == m_id) {
-                        SetColorIndex(FontDrawModeFromCode(msg.payload.widget.data.value));
+                    if (message.payload.widget.id == m_id) {
+                        SetColorIndex(FontDrawModeFromCode(message.payload.widget.data.value));
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
@@ -128,14 +122,13 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            i16 relativeX = msg.payload.mouse.x - m_owner->m_posX;
-            i16 relativeY = msg.payload.mouse.y - m_owner->m_posY;
-            if (relativeX >= m_x && relativeY >= m_y && relativeX < m_x + m_width
-                && relativeY < m_y + m_height) {
+            i16 relativeX = message.payload.mouse.x - m_owner->m_posX;
+            i16 relativeY = message.payload.mouse.y - m_owner->m_posY;
+            if (WIDGET_CONTAINS_LOCAL_POINT(*this, relativeX, relativeY)) {
                 m_flags |= WIDGET_FLAG_SELECTED;
-                if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                    msg.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
+                if (message.type == MESSAGE_RIGHT_BUTTON_DOWN)
+                    message.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
@@ -145,18 +138,17 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
+                if (message.type == MESSAGE_RIGHT_BUTTON_UP)
+                    message.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                SET_WIDGET_MESSAGE(message, WIDGET_NOTIFY_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
     }
 
-    return widget::Main(msg);
+    return widget::Main(message);
 }
 
-#undef SET_WIDGET_MESSAGE
 
 void textWidget::Draw(void) {
     m_font->DrawBoundedString(
@@ -176,10 +168,10 @@ void textWidget::SetColorIndex(FontDrawMode color) {
 
 void textWidget::SetText(const char* text) {
     if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
-        u16 newLen = strlen(text);
-        if (newLen > strlen(m_text)) {
+        u16 newLength = strlen(text);
+        if (newLength > strlen(m_text)) {
             H2_FREE(m_text);
-            m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
+            m_text = static_cast<char*>(H2_ALLOC(newLength + TEXT_BUFFER_GROWTH));
         }
         strcpy(m_text, text);
     }
