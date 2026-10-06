@@ -898,7 +898,7 @@ adjacentDone:
 #if H2_RETAIL_COMPILER
 #define currentHero currentHero_f
 #define heroCell heroCell_f
-#define killed killed_e
+#define removeMonster killed_e
 #define monsterCell monsterCell_d
 #define monsterX monsterX_e
 #define monsterY monsterY_f
@@ -906,14 +906,14 @@ adjacentDone:
 VA(0x004351c5, 0x156)
 void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     hero* currentHero;
-    i32 killed;
+    i32 removeMonster;
     i32 monsterX;
     i32 monsterY;
     mapCell* monsterCell;
     mapCell* heroCell;
 
     currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
-    killed = 0;
+    removeMonster = 0;
     if (FindAdjacentMonster(
             currentHero->m_x,
             currentHero->m_y,
@@ -932,7 +932,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
                 monsterCell,
                 heroCell,
                 currentHero,
-                &killed,
+                &removeMonster,
                 currentHero->m_x,
                 currentHero->m_y,
                 1,
@@ -940,8 +940,8 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
                 monsterY
             );
         else
-            ComputerMonsterInteract(monsterCell, currentHero, &killed);
-        if (killed) {
+            ComputerMonsterInteract(monsterCell, currentHero, &removeMonster);
+        if (removeMonster) {
             EraseObj(monsterCell, monsterX, monsterY);
             if (gbThisNetHumanPlayer[giCurPlayer])
                 FizzleCenter(EVENT_FIZZLE_HERO_LOSS);
@@ -952,7 +952,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
 #if H2_RETAIL_COMPILER
 #undef currentHero
 #undef heroCell
-#undef killed
+#undef removeMonster
 #undef monsterCell
 #undef monsterX
 #undef monsterY

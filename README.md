@@ -103,8 +103,11 @@ homm2 status              # per-unit and overall match %
 homm2 selftest            # tool test suite
 ```
 
-After changing a `VA`/`DATA`/`VTBL` claim, run `homm2 redelink` to rebuild the
-delinked target, then `homm2 build`.
+After changing a `VA`/`DATA`/`VTBL` claim, function signature, or data-owner
+identity (including changes brought in by a merge), run `homm2 redelink` to
+rebuild the delinked target, then `homm2 build`. Refresh source-owned comparison
+identities before evaluating matching totals; a stale model can report losses
+for unchanged instructions.
 
 ## Build without matching
 

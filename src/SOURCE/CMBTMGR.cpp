@@ -181,8 +181,8 @@ H2_ENUM_BEGIN(CombatMoraleConstant)
     MORALE_ROLL_MIN              = 1,
     GOOD_MORALE_ROLL_MAX         = 24,
     BAD_MORALE_ROLL_MAX          = 12,
-    BAD_MORALE_NETWORK_ROLL_MAX  = 4,
-    BAD_MORALE_NETWORK_SKIP_ROLL = 1,
+    BAD_MORALE_AI_ROLL_MAX  = 4,
+    BAD_MORALE_AI_SKIP_ROLL = 1,
     MORALE_EFFECT_DURATION       = 180
 H2_ENUM_END(CombatMoraleConstant)
 
@@ -293,9 +293,9 @@ void combatManager::SetupCombat(
     i32 index;
     for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++) {
         if (m_playerId[index] >= 0)
-            m_networkArmyPresent[index] = gbHumanPlayer[m_playerId[index]];
+            m_humanPlayerSide[index] = gbHumanPlayer[m_playerId[index]];
         else
-            m_networkArmyPresent[index] = false;
+            m_humanPlayerSide[index] = false;
 
         m_heroes[index] = index == IDX(COMBAT_ATTACKER_SIDE) ? attackerHero : defenderHero;
 
@@ -394,10 +394,10 @@ void combatManager::InitNonVisualVars(void) {
     m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] = false;
     m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] = false;
     m_combatResult = COMBAT_RESULT_PENDING;
-    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
-    m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
-    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
-    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
+    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
     m_eagleEyeSpell[IDX(COMBAT_ATTACKER_SIDE)] = SPELL_NONE;
     m_eagleEyeSpell[IDX(COMBAT_DEFENDER_SIDE)] = SPELL_NONE;
     giNextAction = ACTION_NONE;
@@ -411,8 +411,8 @@ void combatManager::InitNonVisualVars(void) {
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
     gbRetreatWin = false;
     gbCombatSurrender = false;
-    m_sideDefeated[IDX(COMBAT_ATTACKER_SIDE)] = false;
-    m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE)] = false;
+    m_sideSurrendered[IDX(COMBAT_ATTACKER_SIDE)] = false;
+    m_sideSurrendered[IDX(COMBAT_DEFENDER_SIDE)] = false;
     m_limitCreature = true;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
@@ -674,7 +674,7 @@ void combatManager::GenerateMap(void) {
                 m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop + COMBAT_MOUSE_HEX_HEIGHT;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantSide = COMBAT_SIDE_NONE;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantIndex = -1;
-            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantFrame = ARMY_FACING_NONE;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantFootprintHalf = ARMY_FACING_NONE;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_obstacleIndex = -1;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_blocked = 0;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_deadOccupantCount = 0;
@@ -1123,9 +1123,9 @@ i32 combatManager::CheckApplyBadMorale(
     if (activeArmy->m_morale >= 0
         || SRandom(MORALE_ROLL_MIN, BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
         return 0;
-    if (!m_networkArmyPresent[IDX(side)]
-        && SRandom(MORALE_ROLL_MIN, BAD_MORALE_NETWORK_ROLL_MAX)
-               == BAD_MORALE_NETWORK_SKIP_ROLL)
+    if (!m_humanPlayerSide[IDX(side)]
+        && SRandom(MORALE_ROLL_MIN, BAD_MORALE_AI_ROLL_MAX)
+               == BAD_MORALE_AI_SKIP_ROLL)
         return 0;
 
     SAMPLE2 moraleSample = NULL;
@@ -1247,7 +1247,7 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     b32 result;
     i32 index;
 
-    if (m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
+    if (m_sideSurrendered[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
         return 1;
     if (m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
         return 1;
@@ -1916,7 +1916,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     i32 placedCells;
     i32 obstacleHex;
 
-    m_debugFormation = 0;
+    m_elevationOverlayIndex = 0;
     if (m_inCastleCombat) {
         m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
         for (cellIndex = 0; cellIndex < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex++) {
@@ -1960,11 +1960,11 @@ void combatManager::SetupAndLoadObstacles(void) {
             while (misses++ < COMBAT_ELEVATION_OVERLAY_TRY_LIMIT) {
                 elevation = SRandom(0, COMBAT_ELEVATION_OVERLAY_COUNT - 1);
                 if (sElevationOverlay[elevation].terrainMask & groundMask) {
-                    m_debugFormation = elevation;
+                    m_elevationOverlayIndex = elevation;
                     for (cellIndex = 0; cellIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT;
                          cellIndex++) {
-                        if (sElevationOverlay[m_debugFormation].cellOffsets[cellIndex] != -1) {
-                            m_hexCells[sElevationOverlay[m_debugFormation].cellOffsets[cellIndex]]
+                        if (sElevationOverlay[m_elevationOverlayIndex].cellOffsets[cellIndex] != -1) {
+                            m_hexCells[sElevationOverlay[m_elevationOverlayIndex].cellOffsets[cellIndex]]
                                 .m_blocked = 1;
                             elevCells++;
                         }

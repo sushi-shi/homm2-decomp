@@ -143,10 +143,12 @@ i32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
 
 #if H2_RETAIL_COMPILER
 #define previous prev
+#define alignmentMode countRaces
+#define creatureTypeRuns numCreatureTypes
 #endif
 VA(0x00421a96, 0x124)
-ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
-    i32 numCreatureTypes = 0;
+ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
+    i32 creatureTypeRuns = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
     CreatureType previous = CREATURE_NONE;
@@ -154,16 +156,16 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
-            if (countRaces == ARMY_GROUP_EMPTY_SLOT)
+            if (alignmentMode == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[IDX(gMonsterDatabase[IDX(m_creatureTypes[i])].race)];
             if (m_creatureTypes[i] != previous) {
-                ++numCreatureTypes;
+                ++creatureTypeRuns;
                 previous = m_creatureTypes[i];
             }
         }
     }
 
-    if (numCreatureTypes <= 1)
+    if (creatureTypeRuns <= 1)
         return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 
     numRaces = 0;
@@ -184,6 +186,8 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
 }
 #if H2_RETAIL_COMPILER
 #undef previous
+#undef alignmentMode
+#undef creatureTypeRuns
 #endif
 
 VA(0x00421bba, 0x3b)
@@ -253,11 +257,14 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 #endif
 }
 
+#if H2_RETAIL_COMPILER
+#define casualtyFraction damagePercent
+#endif
 VA(0x00421d87, 0x133)
-void armyGroup::DamageGroup(float damagePercent) {
+void armyGroup::DamageGroup(float casualtyFraction) {
     i32 killed;
     i32 killChance = static_cast<i32>(
-        damagePercent
+        casualtyFraction
         * IDX(ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
     i32 i;
@@ -272,10 +279,10 @@ void armyGroup::DamageGroup(float damagePercent) {
                     ++killed;
             }
             if (isFirstTroop && killed == m_creatureCounts[i]
-                && damagePercent < 0.999)
+                && casualtyFraction < 0.999)
                 --killed;
             m_creatureCounts[i] -= killed;
-            if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
+            if (m_creatureCounts[i] <= 0 || casualtyFraction >= 1.0) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }
@@ -285,3 +292,6 @@ void armyGroup::DamageGroup(float damagePercent) {
         }
     }
 }
+#if H2_RETAIL_COMPILER
+#undef casualtyFraction
+#endif

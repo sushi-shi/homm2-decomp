@@ -56,7 +56,8 @@ i32 searchArray::BuildPath(
 #define s_hasAdjacentMonster sk_hasAdjacentMonster
 #define s_neighborX s_neighborX_o
 #define s_remainingMobility s_remainingMobility_8
-#define s_targetWater s_targetWater_6
+#define s_targetHasRoad s_targetWater_6
+#define s_currentHasRoad s_currentWater
 #define s_mapY s_mapY_9
 #define s_directionBlocked s_directionBlocked_i
 #define s_neighborY sg_neighborY
@@ -98,9 +99,9 @@ void searchArray::SeedPosition(
     // Retail 0x00533db8: no code reads this cell. VC6 allocates an unreferenced
     // local static in the hash-ordered run but emits no symbol for it.
     static i32 H2_UNUSED(s_unusedInt);
-    DATA(0x00533dbc) static i32 s_targetWater;
+    DATA(0x00533dbc) static i32 s_targetHasRoad;
     DATA(0x00533dc0) static i32 s_adjacentCost;
-    DATA(0x00533dc4) static i32 s_currentWater;
+    DATA(0x00533dc4) static i32 s_currentHasRoad;
     DATA(0x00533dc8) static i32 s_adjacentX;
     DATA(0x00533dd0) static searchNode s_currentNode;
     DATA(0x00533ddc) static i32 s_mapY;
@@ -160,7 +161,7 @@ void searchArray::SeedPosition(
         }
 
         s_hasTarget = true;
-        s_targetWater = s_targetCell->m_isRoad;
+        s_targetHasRoad = s_targetCell->m_isRoad;
         s_bestTargetCost = SEARCH_MAX_COST;
     } else {
         s_hasTarget = false;
@@ -273,7 +274,7 @@ void searchArray::SeedPosition(
                 waterMode
             );
             s_terrain = CELL_TERRAIN(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y));
-            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
+            s_currentHasRoad = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
                  ++s_direction) {
@@ -311,7 +312,7 @@ void searchArray::SeedPosition(
                                     IDX(s_direction),
                                     s_remainingMobility,
                                     pathfindingSkill,
-                                    s_currentWater,
+                                    s_currentHasRoad,
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
@@ -332,7 +333,7 @@ void searchArray::SeedPosition(
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad,
-                                s_targetWater
+                                s_targetHasRoad
                             );
                             if (s_currentNode.distance + s_targetStepCost < s_bestTargetCost)
                                 s_bestTargetCost = s_currentNode.distance + s_targetStepCost;
@@ -421,7 +422,8 @@ void searchArray::SeedPosition(
 #undef s_hasAdjacentMonster
 #undef s_neighborX
 #undef s_remainingMobility
-#undef s_targetWater
+#undef s_targetHasRoad
+#undef s_currentHasRoad
 #undef s_mapY
 #undef s_directionBlocked
 #undef s_neighborY
