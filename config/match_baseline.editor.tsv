@@ -313,6 +313,7 @@ BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	ee512841a99
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	a20e3ef2d96b
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	100.0000	a78a4e25043a
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	2f15e51ccbc5
+BASE/icon2bss	?IconToBitmapScaleShadow@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	3b0e7fd2912c
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	a5fd52c40400
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	100.0000	1a5f535828f9
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	d46d700c890a
@@ -348,6 +349,7 @@ BASE/soundmgr	?StartupMilesBackend@soundManager@@QAE_NXZ	100.0000	7d0e5dca39e9
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	100.0000	ea4df5b0a1e9
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAVsample@@@Z	100.0000	ac6d9464b51d
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	2dbb27de9e21
+BASE/tile2bs	?TileToBitmapScale@@YIXPAVtileset@@IPAVbitmap@@HHH@Z	100.0000	10172bbc3fce
 EDITOR/CLEARMGR	??0clearManager@@QAE@XZ	100.0000	3188c60e980e
 EDITOR/CLEARMGR	?Close@clearManager@@UAEXXZ	100.0000	aada4df85f55
 EDITOR/CLEARMGR	?Main@clearManager@@UAEHAAUtag_message@@@Z	98.5058	76b0d569d062
@@ -360,7 +362,7 @@ EDITOR/EDITMGR	?Close@editManager@@UAEXXZ	99.7857	ac1e12070b3e
 EDITOR/EDITMGR	?DoHorizontalKnob@editManager@@QAEXXZ	100.0000	429b480f89a0
 EDITOR/EDITMGR	?DoRadar@editManager@@QAEXXZ	100.0000	81a92defa8f4
 EDITOR/EDITMGR	?DoVerticalKnob@editManager@@QAEXXZ	100.0000	e4473a91bc59
-EDITOR/EDITMGR	?DrawCell@editManager@@QAEXHHHHH@Z	99.9739	b005080e0113
+EDITOR/EDITMGR	?DrawCell@editManager@@QAEXHHHHH@Z	100.0000	b005080e0113
 EDITOR/EDITMGR	?DrawMap@editManager@@QAEXXZ	100.0000	9f349b2bd6af
 EDITOR/EDITMGR	?DrawRadar@editManager@@QAEXH@Z	100.0000	ba772d1a1771
 EDITOR/EDITMGR	?DrawRulers@editManager@@QAEXHHHH@Z	100.0000	725f28b67d60
@@ -457,18 +459,22 @@ SOURCE/REQUEST	?Close@fileRequester@@UAEXXZ	100.0000	a5f0c4cf4140
 SOURCE/REQUEST	?DoKnob@fileRequester@@QAEXXZ	100.0000	74771a5f9025
 SOURCE/REQUEST	?GetFilename@fileRequester@@QAEPADXZ	100.0000	c5f7ed6a50c2
 SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	100.0000	af29e7cf50de
+SOURCE/REQUEST	?InitializeFiles@fileRequester@@QAEHPAD0H@Z	100.0000	70b1b65ca5ac
+SOURCE/REQUEST	?Main@fileRequester@@UAEHAAUtag_message@@@Z	100.0000	d0807e5e3202
 SOURCE/REQUEST	?MapExistsForFilter@fileRequester@@QAEHH@Z	100.0000	17edf3633bb6
+SOURCE/REQUEST	?Open@fileRequester@@UAEHH@Z	100.0000	466d41b887eb
 SOURCE/REQUEST	?SetOK@fileRequester@@QAEXH@Z	100.0000	191053882db8
 SOURCE/REQUEST	?SetupFiles@fileRequester@@QAEXXZ	100.0000	969dc97eda09
 SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	f8e954565b91
-SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	99.9714	a970dc1a781c
+SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	100.0000	a970dc1a781c
 SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	100.0000	402a65b9f639
 SOURCE/kbwin	?AppAbout@@YGHPAXIIJ@Z	100.0000	cebe58086bdb
-SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	100.0000	dfdb121684da
+SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	100.0000	c2e327024b46
 SOURCE/kbwin	?AppExit@@YIXXZ	100.0000	5d5226685dd1
 SOURCE/kbwin	?AppIdle@@YIHXZ	100.0000	3f553df292bd
-SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	100.0000	91d3f3468650
-SOURCE/kbwin	?InitVideo@@YIXXZ	100.0000	d8215287c935
+SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	100.0000	17eef9abcb0b
+SOURCE/kbwin	?AppWndProc@@YGJPAXIIJ@Z	100.0000	64463a5bace2
+SOURCE/kbwin	?InitVideo@@YIXXZ	100.0000	8a6cdef92d87
 SOURCE/kbwin	?KBChangeMenu@@YIXPAX@Z	100.0000	36466bd379d2
 SOURCE/kbwin	?KBTickCount@@YIJXZ	100.0000	6af258c026c4
 SOURCE/kbwin	?Process1WindowsMessage@@YIXXZ	100.0000	cbc38c95dcfe
@@ -477,7 +483,7 @@ SOURCE/kbwin	?SetMenuStatus@@YIXH@Z	100.0000	c5d1599224de
 SOURCE/kbwin	?SetMenus@@YIXPAXH@Z	100.0000	7d0b2cac2b25
 SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	100.0000	db9c2bacc975
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	100.0000	dec10c9993f2
-SOURCE/kbwin	_WinMain@16	100.0000	14e7a8cc8007
+SOURCE/kbwin	_WinMain@16	100.0000	cbd64ec3a8b0
 SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	73d842d152cf
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	186b89cf6807
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	5b5387a59f50
@@ -509,3 +515,4 @@ SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	8af52d636ced
 SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	beabc8c201f8
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	100.0000	ebe36e66900b
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	0711bbf5a0a0
+SOURCE/wingraph	?WGUpdatePalette@@YAXPAC@Z	100.0000	7a19f399526f

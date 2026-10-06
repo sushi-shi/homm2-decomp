@@ -90,9 +90,15 @@ claimed inventory (`build/gen/symbol_names.csv`) to the editor:
   callers reach, and an unplaced callee (an editor variant such as
   `PollSound`, or the folded `std::ctype<wchar_t>::id` initializer) is named
   where the calls land and stays an editor residual;
-- a datum is placed by its code users, every pair agreeing.
+- a datum is placed by its code users, every pair agreeing; a content-named
+  string only where the editor's cell holds the same bytes;
+- a shared unit's own editor body (`VA_AT`) is a code user too once its
+  compiled object equals the image; a placed datum's pointer fields place
+  their pointees; and the editor's own compile of a shared unit fixes the
+  rest of a data section once one member is placed (the editor's longer
+  kbwin titles shift everything after them).
 
-890 functions and 1,026 data are placed from 53 game units. Every BASE unit
+893 functions and 940 data are placed from 53 game units. Every BASE unit
 with placed bodies (44 units, from BASEMGR on) and SOURCE/kbwin, wingraph
 and REQUEST link into the editor; their bodies compile from the game's
 sources with the game's profiles.
@@ -162,10 +168,12 @@ function needs a source owner first (no `/FORCE`, no retail stand-ins).
   whose identities (`gEditManager`, the selection rectangle, the edit
   manager's methods) the CLEARMGR seed waits for; `include/EDITOR/editManager.h`
   declares them provisionally.
-- The two BASE-library objects the game does not link (0x39b00, 0x39fb0).
-- The shared units' 14 residuals: AudiereMusic's compiler-generated static
-  initializers, OLDNAMES aliases (`_lseek`/`__lseek`, `_access`, `_strrev`),
-  one string identity in Misc and one data identity in SAMPLE.
+- The shared units are exact in the editor: BASE (with the two library
+  objects only the editor links, `icon2bss` and `tile2bs`, the zoomed map
+  view's scale-downs) and the editor variants of kbwin (window names, the
+  status-bar timer), wingraph (its own `Source\Editor\wingraph.cpp` copy,
+  the palette refresh without a combat screen) and REQUEST (a map-only
+  requester).
 - Data: the editor's data bytes (31%) wait for its own units' `DATA` claims.
 - The editor's link graph and `link_diff.tsv` (when it can link), and its
   clean export.
