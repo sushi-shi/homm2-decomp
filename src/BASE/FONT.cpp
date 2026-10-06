@@ -1,6 +1,8 @@
 #include <Ints.h>
 #include <string.h>
 #include <BASE/font.h>
+#include <BASE/FontGlyph.h>
+#include <BASE/display.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/IconEntry.h>
@@ -19,8 +21,6 @@
 
 typedef enum FontConstant {
     LARGE_FONT_HEIGHT_THRESHOLD = 14,
-    FONT_DRAW_SCREEN_WIDTH      = 640,
-    FONT_DRAW_SCREEN_HEIGHT     = 480,
     CENTER_DIVISOR              = 2,
     WRAP_HEIGHT_LINE_COUNT      = 2
 } FontConstant;
@@ -53,41 +53,6 @@ font::~font() {
 
 namespace {
 
-i32 CyrillicGlyph(std::uint32_t codePoint) {
-    if (codePoint == 0x0401)
-        return 128;
-    if (codePoint == 0x0451)
-        return 161;
-    if (codePoint >= 0x0410 && codePoint <= 0x042f)
-        return 96 + static_cast<i32>(codePoint - 0x0410);
-    if (codePoint >= 0x0430 && codePoint <= 0x044f)
-        return 129 + static_cast<i32>(codePoint - 0x0430);
-    return FONT_GLYPH_FALLBACK;
-}
-
-i32 GlyphIndex(std::uint32_t codePoint, i32 frameCount) {
-    i32 glyph;
-    if (codePoint == 0x2013 || codePoint == 0x2014)
-        codePoint = '-';
-    if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic) {
-        if (codePoint >= 0x0400)
-            glyph = CyrillicGlyph(codePoint);
-        else if (codePoint >= ' ' && codePoint <= 0x7f)
-            glyph = static_cast<i32>(codePoint - ' ');
-        else
-            glyph = FONT_GLYPH_FALLBACK;
-    } else {
-        if (codePoint >= 'a' && codePoint <= 'z')
-            codePoint -= 'a' - 'A';
-        glyph = codePoint >= ' ' && codePoint <= 0x7f
-            ? static_cast<i32>(codePoint - ' ')
-            : FONT_GLYPH_FALLBACK;
-    }
-    if (frameCount <= 0)
-        return 0;
-    return std::clamp(glyph, 0, frameCount - 1);
-}
-
 bool IsVowel(std::uint32_t codePoint) {
     switch (codePoint) {
         case 'a': case 'e': case 'i': case 'o': case 'u': case 'y':
@@ -105,7 +70,7 @@ bool IsVowel(std::uint32_t codePoint) {
 }
 
 void font::DrawStringExecute(
-    const char* str,
+    const char* text,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -114,13 +79,13 @@ void font::DrawStringExecute(
     i32 clipR,
     i32 clipB
 ) {
-    i32 pos = x;
-    const char* cursor = str;
+    i32 position = x;
+    const char* cursor = text;
     while (cursor != NULL && *cursor != 0) {
         const utf8::Decoded decoded = utf8::Decode(cursor);
         const std::uint32_t codePoint = decoded.codePoint;
         if (codePoint == FONT_SPACER_CHAR) {
-            pos += GetCharacterWidth(codePoint);
+            position += GetCharacterWidth(codePoint);
             cursor += decoded.length;
             continue;
         }
@@ -135,13 +100,13 @@ void font::DrawStringExecute(
             continue;
         }
 
-        const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+        const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
         if (glyph != 0) {
             if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -156,7 +121,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -172,7 +137,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -188,7 +153,7 @@ void font::DrawStringExecute(
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
-                    pos,
+                    position,
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
@@ -201,14 +166,14 @@ void font::DrawStringExecute(
                     1
                 );
         }
-        pos += GetCharacterWidth(codePoint);
+        position += GetCharacterWidth(codePoint);
         cursor += decoded.length;
     }
 }
 
-void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(const char* text, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = false;
-    DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
+    DrawStringExecute(text, x, y, mode, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
 i32 font::GetCharacterWidth(std::uint32_t codePoint) {
@@ -220,7 +185,7 @@ i32 font::GetCharacterWidth(std::uint32_t codePoint) {
     if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic
         && codePoint == '.')
         codePoint = '_';
-    const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+    const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
     return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[glyph].w + m_isLarge;
 }
 
@@ -334,96 +299,96 @@ void font::ExtractLine(
 }
 
 void font::DrawBoundedString(
-    const char* str,
+    const char* text,
     i32 x,
     i32 y,
-    i32 w,
-    i32 h,
+    i32 width,
+    i32 height,
     FontDrawMode mode,
     FontAlignment align,
     const SLimitData* clip
 ) {
-    if (str == NULL)
+    if (text == NULL)
         return;
 
     // The layout box determines alignment and wrapping. An optional damage
     // rectangle limits painting without moving or reflowing the text.
     i32 clipX = x;
     i32 clipY = y;
-    i32 clipW = w;
-    i32 clipH = h;
+    i32 clipWidth = width;
+    i32 clipHeight = height;
     if (clip != nullptr) {
         clipX = std::max(x, clip->left);
         clipY = std::max(y, clip->top);
-        clipW = std::min(x + w - 1, clip->right) - clipX + 1;
-        clipH = std::min(y + h - 1, clip->bottom) - clipY + 1;
-        if (clipW <= 0 || clipH <= 0)
+        clipWidth = std::min(x + width - 1, clip->right) - clipX + 1;
+        clipHeight = std::min(y + height - 1, clip->bottom) - clipY + 1;
+        if (clipWidth <= 0 || clipHeight <= 0)
             return;
     }
 
-    const i32 len = static_cast<i32>(strlen(str));
+    const i32 length = static_cast<i32>(strlen(text));
     i32 xPosition = 0;
     i32 yPosition = 0;
-    i32 pos = 0;
-    i32 lw = 0;
-    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
+    i32 position = 0;
+    i32 lineWidth = 0;
+    std::vector<char> line(static_cast<std::size_t>(length) + 2, 0);
     if ((H2EnumIndex((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
-        i32 lineCount = LineLength(str, w);
+        i32 lineCount = LineLength(text, width);
         i32 totalH = lineCount * m_height;
-        if (totalH < h)
-            yPosition = (h - totalH) / CENTER_DIVISOR;
+        if (totalH < height)
+            yPosition = (height - totalH) / CENTER_DIVISOR;
     }
     m_suppressDraw = false;
-    while (pos < len && str[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
-        if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
-            ExtractLine(str, line.data(), &pos, w, &lw, 1);
+    while (position < length && text[position] != 0 && (yPosition + m_height <= height || yPosition == 0)) {
+        if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > height)
+            ExtractLine(text, line.data(), &position, width, &lineWidth, 1);
         else
-            ExtractLine(str, line.data(), &pos, w, &lw, 0);
+            ExtractLine(text, line.data(), &position, width, &lineWidth, 0);
         switch (align) {
             case FONT_ALIGN_LEFT:
                 xPosition = 0;
                 break;
             case FONT_ALIGN_CENTER:
-                xPosition = (w - lw) / CENTER_DIVISOR + 1;
+                xPosition = (width - lineWidth) / CENTER_DIVISOR + 1;
                 break;
             case FONT_ALIGN_RIGHT:
-                xPosition = w - lw;
+                xPosition = width - lineWidth;
                 break;
             default:
                 xPosition = 0;
                 break;
         }
         DrawStringExecute(
-            line.data(), xPosition + x, yPosition + y, mode, clipX, clipY, clipW, clipH
+            line.data(), xPosition + x, yPosition + y, mode, clipX, clipY, clipWidth, clipHeight
         );
         yPosition += m_height;
-        lw = 0;
+        lineWidth = 0;
     }
 }
 
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-i32 font::LineLength(const char* str, i32 maxW) {
-    if (str == NULL)
+i32 font::LineLength(const char* text, i32 maxW) {
+    if (text == NULL)
         return 0;
-    const i32 len = static_cast<i32>(strlen(str));
+    const i32 length = static_cast<i32>(strlen(text));
     i32 count = 0;
-    i32 pos = 0;
-    i32 lw = 0;
-    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
-    while (pos < len && str[pos] != 0) {
-        ExtractLine(str, line.data(), &pos, maxW, &lw, 0);
+    i32 position = 0;
+    i32 lineWidth = 0;
+    std::vector<char> line(static_cast<std::size_t>(length) + 2, 0);
+    while (position < length && text[position] != 0) {
+        ExtractLine(text, line.data(), &position, maxW, &lineWidth, 0);
         count++;
-        lw = 0;
+        lineWidth = 0;
     }
     return count;
 }
 
-i32 font::LineWidth(const char* str) {
+i32 font::LineWidth(const char* text) {
     i32 width = 0;
-    const char* cursor = str;
+    const char* cursor = text;
     while (cursor != NULL && *cursor != 0) {
         const utf8::Decoded decoded = utf8::Decode(cursor);
         if (decoded.codePoint == '\n')

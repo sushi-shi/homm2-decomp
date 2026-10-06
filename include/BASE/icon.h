@@ -17,8 +17,9 @@ class icon : public resource {
 public:
     i16 m_frameCount;
     u8* m_data;
+    u32 m_dataSize = 0;
     icon(u32l id);
-    virtual inline ~icon();
+    virtual ~icon();
     void DrawToBuffer(
         i32 x, i32 y, i32 frame, IconDrawOrientation orientation
     );
@@ -28,9 +29,9 @@ public:
         i32 frame,
         struct SLimitData* limits,
         IconDrawOrientation orientation,
-        i32 offset,
-        u8* colorTable,
-        i8* yModify
+        i32 offset = 0,
+        u8* colorTable = NULL,
+        i8* yModify = NULL
     );
     void ClipFillToBuffer(
         i32 x,

@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
+#include <SOURCE/KB.h>
 
 class heroWindow;
 struct tag_message;
@@ -68,26 +69,16 @@ using enum ExpansionCampaignAward;
 ENABLE_ENUM_STEPS(ExpansionCampaignAward)
 
 typedef enum ExpansionCampaignConstant {
-    EXPANSION_CAMPAIGN_MAX_MAP_COUNT           = 8,
-    EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT      = 3,
-    EXPANSION_CAMPAIGN_AWARD_COUNT             = 11,
-    EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE        = 4,
-    EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE = 0x41,
-    EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE   = 52,
-    EXPANSION_CAMPAIGN_HERO_COUNT              = 54,
-    EXPANSION_CAMPAIGN_TRACK_ICON_SIZE         = 41,
-    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE       = 13,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL     = 1,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL           = 12,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT_LEVEL = 2,
-    EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT       = 2,
-    EXPANSION_CAMPAIGN_ICON_FRAME_BASE         = 15,
-    EXPANSION_CAMPAIGN_MUSIC                   = 24,
-    EXPANSION_CAMPAIGN_DAYS_PER_WEEK           = 7,
-    EXPANSION_CAMPAIGN_DAYS_PER_MONTH          = 28,
-    EXPANSION_CAMPAIGN_MAIN_PLAYER             = 0,
-    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X      = 5,
-    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y      = 0
+    EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE = 52,
+    EXPANSION_CAMPAIGN_MAX_MAP_COUNT      = 8,
+    EXPANSION_CAMPAIGN_AWARD_COUNT        = 11,
+    EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE   = 4,
+    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE  = 13,
+    EXPANSION_CAMPAIGN_ICON_FRAME_BASE    = 15,
+    EXPANSION_CAMPAIGN_MUSIC              = 24,
+    EXPANSION_CAMPAIGN_MAIN_PLAYER        = 0,
+    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X = 5,
+    EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y = 0
 } ExpansionCampaignConstant;
 
 #pragma pack(push, 1)
@@ -111,14 +102,14 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(ExpansionCampaignAward);
-    void RemoveAward(ExpansionCampaignAward);
-    i8 HasAward(ExpansionCampaignAward);
+    void GrantAward(ExpansionCampaignAward award);
+    void RemoveAward(ExpansionCampaignAward award);
+    i8 HasAward(ExpansionCampaignAward award);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(ExpansionCampaignId);
+    void InitNewCampaign(ExpansionCampaignId campaignId);
     void InitMap(void);
-    void ShowInfo(i32, i32);
-    void UpdateInfo(i32);
+    void ShowInfo(i32 viewOnly, i32);
+    void UpdateInfo(i32 redraw);
     i32 HandleVictory(void);
     void HandleVictory1(void);
     void HandleVictory2(void);
@@ -133,7 +124,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static MessageDispatchResult MessageHandler(struct tag_message&);
+    static MessageDispatchResult MessageHandler(struct tag_message& message);
 
 public:
     void Autosave(void);
@@ -142,13 +133,13 @@ public:
     i32 CampaignID(void);
     const char* JosephName(void);
     const char* IvanName(void);
-    i8 IsSpecialGoldenBow(i32, i32);
+    i8 IsSpecialGoldenBow(i32 x, i32 y);
     i8 IsSpecialUA(void);
-    i8 IsSpecialLossCondition(i32);
+    i8 IsSpecialLossCondition(i32 playerIndex);
 };
 #pragma pack(pop)
 
 extern struct SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
-                                              [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
+                                              [CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif

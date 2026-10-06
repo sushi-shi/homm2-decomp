@@ -40,22 +40,28 @@ public:
     b32 m_isLarge;
     b32 m_suppressDraw;
     icon* m_glyphIcon;
-    font(u32l);
+    font(u32l id);
     virtual ~font();
 
 protected:
-    void DrawStringExecute(const char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void DrawStringExecute(const char* text, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
 
 public:
-    void DrawString(const char*, i32, i32, FontDrawMode);
-    i32 GetCharacterWidth(std::uint32_t);
-    void ExtractLine(const char*, char*, i32*, i32, i32*, u8);
+    void DrawString(const char* text, i32 x, i32 y, FontDrawMode mode);
+    i32 GetCharacterWidth(std::uint32_t codePoint);
+    void ExtractLine(const char* text, char* line, i32* position, i32 maxWidth, i32* lineWidth, u8 lastLine);
     void DrawBoundedString(
-        const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment,
+        const char* text,
+        i32 x,
+        i32 y,
+        i32 width,
+        i32 height,
+        FontDrawMode mode,
+        FontAlignment align,
         const SLimitData* clip = nullptr
     );
-    i32 LineLength(const char*, i32);
-    i32 LineWidth(const char*);
+    i32 LineLength(const char* text, i32 maxW);
+    i32 LineWidth(const char* text);
 };
 #pragma pack(pop)
 #endif
