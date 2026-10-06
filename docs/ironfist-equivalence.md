@@ -174,6 +174,52 @@ the upstream condition would improve bug-for-bug identity while reintroducing
 an apparent upstream defect; this remains an explicit policy decision rather
 than an unnoticed mismatch.
 
+### Force Shield recast
+
+Force Shield's absorption pool is set when the influence is first applied.
+Recasting it on a stack that still has the influence took the
+existing-influence path of `army::SetSpellInfluence`, which returned without
+touching the pool, so a partly consumed shield stayed depleted. The recast now
+refills the pool to the monster type's hit points and reports the spell as
+applied when it did so. Duration and active-effect counting are unchanged, and
+a recast on a full shield remains a no-op.
+
+### XML save contents
+
+The fixes collected for the architecture stack change what an XML save
+records and how a load restores it:
+
+- The active map script is the one stored in the save, not a fresh read of
+  the installed map's script file, so a game keeps running the script it
+  started with. Saved scripts are run after the rest of the game state is
+  restored, with a leading UTF-8 byte-order mark and `#` line skipped as
+  `luaL_loadfile` does. Scriptless saves get a fresh artifact script state
+  instead of inheriting the previous game's.
+- Two new root groups, `sharedVision` (`share` entries) and
+  `forcedHeroChases` (`chase` entries), each holding `source` and
+  `destination` attributes, record the complete vision-sharing and forced
+  hero-chase tables. They are applied after script initialization, so they
+  override script defaults; an empty group clears them. Saves without the
+  groups keep the script defaults, and forced chases still fall back to the
+  upstream `_AICHASE_x_y_` map-variable records, which continue to be
+  written for older readers. Those records are no longer injected into Lua as
+  map variables.
+- `playerNames` entries are read from the `value` attribute that the writer
+  emits; element text is accepted as a fallback for older or hand-edited
+  saves.
+- Remote (`RMT`) saves are written to and loaded from the same `DATA`
+  directory.
+
+### Map-variable number format
+
+Number map variables are written with `std::to_chars`, the shortest
+representation that round-trips to the same Lua number, and integer and
+number values are read back with `std::from_chars`. Both are independent of
+the C locale: upstream's `std::to_string`/`atof` pair wrote and read a comma
+decimal separator under comma locales. Such comma-formatted values, and any
+other value that does not parse completely, are now reported as a script
+error and restored as `nil` rather than silently truncated.
+
 ### Platform substitutions
 
 Registry preferences, Win32 dialog reporting, CD audio, middleware playback,
