@@ -295,6 +295,85 @@ class Placer:
             if self.pe.read(erva, 1) is None:
                 continue
             self.data[grva] = (erva, f"{n} field(s) of placed bodies")
+        self.place_pointees(data, owner)
+        self.place_bracketed(data)
+
+    def _same_datum(self, claim, erva: int) -> bool:
+        """The datum's game bytes, pointer fields masked on both sides, equal
+        the image's bytes at the candidate address."""
+        size = claim["size"]
+        gbytes, ebytes = self.game.read(claim["rva"], size), self.pe.read(erva, size)
+        if not size or gbytes is None or ebytes is None:
+            return False
+        gmask, emask = bytearray(gbytes), bytearray(ebytes)
+        i = bisect.bisect_left(self.gsites, claim["rva"] - 3)
+        for site in self.gsites[i:]:
+            if site >= claim["rva"] + size:
+                break
+            for k in range(max(0, site - claim["rva"]), min(size, site - claim["rva"] + 4)):
+                gmask[k] = emask[k] = 0
+        return gmask == emask
+
+    def place_bracketed(self, data) -> None:
+        """A datum nothing addresses (`i32 iCurSwapPalette = 0;`) still sits in
+        its object's section: it is placed when the unit's data immediately
+        before and after it are placed with one delta and its bytes equal the
+        game's. An object's section moves as a block."""
+        changed = True
+        while changed:
+            changed = False
+            for before, claim, after in zip(data, data[1:], data[2:]):
+                if claim["rva"] in self.data or not claim["size"]:
+                    continue
+                if not (before["unit"] == claim["unit"] == after["unit"]
+                        and before["rva"] in self.data and after["rva"] in self.data
+                        and before["rva"] + before["size"] <= claim["rva"]
+                        and claim["rva"] + claim["size"] <= after["rva"]):
+                    continue
+                delta = self.data[before["rva"]][0] - before["rva"]
+                if self.data[after["rva"]][0] - after["rva"] != delta:
+                    continue
+                if not self._same_datum(claim, claim["rva"] + delta):
+                    continue
+                self.data[claim["rva"]] = (claim["rva"] + delta,
+                                           "between its unit's placed neighbours, bytes equal")
+                changed = True
+
+    def place_pointees(self, data, owner) -> None:
+        """A placed datum's pointer fields name their pointees the way a placed
+        body's fields do (`char *gcCDTrackName = gcCDTrackNameText`). The image
+        field must be one of its own absolute fields, every pointer to a
+        pointee must agree, and the pointee's bytes must equal the game's."""
+        by_rva = {c["rva"]: c for c in data}
+        pending = dict(self.data)
+        while pending:
+            votes: dict[int, Counter] = defaultdict(Counter)
+            for grva, (erva, _why) in pending.items():
+                size = by_rva[grva]["size"]
+                i = bisect.bisect_left(self.gsites, grva)
+                j = bisect.bisect_left(self.gsites, grva + size)
+                for site in self.gsites[i:j]:
+                    esite = erva + site - grva
+                    if esite not in self.esites:
+                        continue
+                    gtarget = int.from_bytes(self.game.read(site, 4), "little") \
+                        - self.game.image_base
+                    etarget = int.from_bytes(self.pe.read(esite, 4), "little") - self.base
+                    datum = owner(gtarget)
+                    if datum is None or datum["rva"] in self.data:
+                        continue
+                    votes[datum["rva"]][etarget - (gtarget - datum["rva"])] += 1
+            pending = {}
+            for grva, counter in votes.items():
+                if len(counter) != 1:
+                    self.problems.append(f"data {by_rva[grva]['name']} (0x{grva:x}): "
+                                         "pointers disagree")
+                    continue
+                (erva, n), = counter.items()
+                if not self._same_datum(by_rva[grva], erva):
+                    continue
+                self.data[grva] = pending[grva] = (
+                    erva, f"{n} pointer field(s) of placed data, bytes equal")
 
     def run(self) -> None:
         self.place_functions()
