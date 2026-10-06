@@ -1,11 +1,11 @@
 # Ironfist equivalence audit
 
-The portable `ironfist-master` branch integrates Project Ironfist's game
+The portable `port-ironfist` branch integrates Project Ironfist's game
 changes; it is not a byte-identical rebuild of an Ironfist Windows executable.
 It keeps the recovered Heroes II Gold 2.1 engine and expresses Ironfist's
 changes through recovered fields, owning game classes, a separate extension
 state sidecar, and narrow callback/runtime boundaries. The preceding
-`ironfist` branch records the direct portability-oriented port.
+`source-ironfist` branch records the direct portability-oriented port.
 
 This distinction matters because Project Ironfist has two different useful
 reference points:

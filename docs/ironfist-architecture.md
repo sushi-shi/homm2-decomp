@@ -1,7 +1,7 @@
 # Ironfist integration architecture
 
-`ironfist-master` is the maintained integration of Project Ironfist's feature
-set with the recovered Gold 2.1 engine. It succeeds the direct `ironfist` port.
+`port-ironfist` is the maintained integration of Project Ironfist's feature
+set with the recovered Gold 2.1 engine. It succeeds the direct `source-ironfist` port.
 The public compatibility target remains the pinned Project Ironfist source at
 `314932011ed5308efb9f35cecc62e8ca638a7375`; the internal C++ architecture is
 native to this repository.
@@ -32,7 +32,7 @@ that rule.
 
 ## Mechanics and owners
 
-| Mechanic | Owner in `ironfist-master` |
+| Mechanic | Owner in `port-ironfist` |
 |---|---|
 | shared visibility and propagation | `game` |
 | AI army-sharing policy | `game` |

@@ -1,8 +1,8 @@
 # Ironfist integration
 
-This branch (`ironfist-master`) carries Project Ironfist's features on top of
-the Gold 2.1/Buka-based cross-platform `master`. It succeeds the direct
-`ironfist` port by integrating true mechanics into their owning recovered game
+This branch (`port-ironfist`) carries Project Ironfist's features on top of
+the Gold 2.1/Buka-based cross-platform `port`. It succeeds the direct
+`source-ironfist` port by integrating true mechanics into their owning recovered game
 classes and retaining narrow boundaries for runtime, callbacks, scripting,
 saves, and extension state. See
 [Ironfist integration architecture](ironfist-architecture.md).
@@ -151,7 +151,7 @@ before this branch (it references TUs removed upstream) and does not build the
 Ironfist layer.
 
 Status: all feature milestones landed on the Gold/Buka base. The maintained
-architecture is on `ironfist-master`; the direct `ironfist` port remains its
+architecture is on `port-ironfist`; the direct `source-ironfist` port remains its
 history. Linux, MinGW/Windows, Emscripten/Web, resources, public-interface, and
 integration-contract checks are the release gates. Interactive Cyborg campaign
 and combat play-testing remains useful runtime coverage.

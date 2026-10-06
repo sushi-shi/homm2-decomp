@@ -39,8 +39,8 @@ writes, and packed-map-cell shadow/object semantics. Existing source-policy,
 localization, map layout, binary I/O, platform, and presentation checks remain
 enabled. No gameplay/GUI validation is claimed by this propagation.
 
-The helper commit is carried onward by cherry-pick through `ironfist` and
-`ironfist-master`, preserving each branch's extension behavior.
+The helper commit is carried onward by cherry-pick through `source-ironfist` and
+`port-ironfist`, preserving each branch's extension behavior.
 
 Ironfist's resolved cherry-pick passes its native Debug build and all 21 CTest
 checks, including the existing Ironfist hook contract. Its extended creature-table
@@ -49,6 +49,6 @@ matching helper expressions and calls are substituted inside those functions.
 Its dialog/sound wrappers and widget-message constructor use the same shared
 helpers and default arguments.
 
-The final `ironfist-master` cherry-pick passes its native Debug build and all 24
+The final `port-ironfist` cherry-pick passes its native Debug build and all 24
 CTest checks. Namespaced Ironfist APIs, bounded UTF-8 operations, boolean
 fullscreen controls, and its additional cursor/I/O tests are retained.

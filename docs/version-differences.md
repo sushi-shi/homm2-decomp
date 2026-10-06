@@ -13,7 +13,7 @@ against retail code while matching. Entries are classified as:
 - **[unclassified]** — not yet separated by comparison with the GOG Gold 2.1
   executable.
 
-`master` and `ironfist` consume the generated source but do not duplicate the
+`port` and `source-ironfist` consume the generated source but do not duplicate the
 ledger: a copied snapshot would immediately drift from matcher evidence. Port-
 specific differences belong in commit history and `docs/porting.md`; they are
 not retail 2.0/2.1 behavior.

@@ -361,7 +361,7 @@
         };
       }) { };
       # The game as a NixOS or home-manager option set. `edition` picks the
-      # programs: this branch's are Project Ironfist; master's are gold.
+      # programs: this branch's are Project Ironfist; port's are gold.
       editions = system: { ironfist = self.packages.${system}.default; };
       module = target: { config, lib, pkgs, ... }:
         let
@@ -375,7 +375,7 @@
               default = "ironfist";
               description = ''
                 The programs to install: ironfist (Project Ironfist, the `heroes2-ironfist`
-                launcher). Heroes II Gold 2.1 alone is the gold edition of the master branch.
+                launcher). Heroes II Gold 2.1 alone is the gold edition of the port branch.
               '';
             };
             game = lib.mkOption {
