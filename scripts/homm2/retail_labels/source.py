@@ -617,6 +617,27 @@ def placement_claims(image: str) -> list[SourceSymbol]:
     return rows
 
 
+def image_compgen_functions(image: str, source_root: Path, repo: Path,
+                            rows: list[SourceSymbol]) -> list[SourceCompgenFunction]:
+    """The semantic compiler-function identities an image's comparison renames:
+    its own units' `VA_COMPGEN` markers, and a shared unit's markers at the
+    address its placement (or `VA_AT`) names in this image. A shared marker
+    whose body is not placed here names nothing in this image."""
+    from dataclasses import replace
+    from homm2.manifest import all_units, unit_images
+    out = list(source_compgen_functions(source_root, repo))
+    at = {(row.unit, row.name): row.rva for row in rows if row.kind == "func"}
+    for unit in all_units():
+        images = unit_images(unit)
+        if image in images and DEFAULT_IMAGE in images and unit["source"].endswith(".cpp"):
+            for claim in compgen_functions_for_file(
+                    (repo / unit["source"]).resolve(), source_root, repo):
+                rva = at.get((claim.unit, claim.name))
+                if rva is not None:
+                    out.append(replace(claim, rva=rva))
+    return sorted(out)
+
+
 def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     """The claimed inventory of an image other than the game.
 
@@ -693,8 +714,8 @@ def main(argv=None) -> int:
         compgen = source_compgen_functions(source_root, REPO)
         rows = collect(source_root, REPO)
     else:
-        compgen = []
         rows = collect_image(image_key(), REPO)
+        compgen = image_compgen_functions(image_key(), source_root, REPO, rows)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")
