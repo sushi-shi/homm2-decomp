@@ -153,11 +153,16 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 gpWindowManager->ScreenShot();
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
-                SetFullScreenStatus(false);
+                // Retail left fullscreen to open WinHelp. The portable help
+                // notice is a message box parented to the game window, so the
+                // display mode is kept.
                 platform::ShowHelp();
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(!CURRENT_GRAPHICS_CONFIG.fullScreen);
+                ChangeDisplaySettings(
+                    (event->payload.keyboard.modifiers
+                        & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != MESSAGE_MODIFIER_NONE,
+                    (event->payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL) != MESSAGE_MODIFIER_NONE);
         }
     }
     return event->type == MESSAGE_NONE;

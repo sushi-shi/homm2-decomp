@@ -236,6 +236,10 @@ the bundle on port 8080 (`HOMM2_WEB_PORT`), and caches it under
 `~/.cache/homm2-web` (`HOMM2_WEB_OUTPUT`). The first build also cross-compiles
 SDL3 and a minimal FFmpeg.
 
+Display shortcuts: **F4** toggles fullscreen, **Shift+F4** cycles scaling, and
+**Ctrl+F4** toggles VSync. Settings persist between runs; see
+[display controls](docs/porting.md#display-controls).
+
 ## License
 
 The only Project Ironfist copyright notice located for this branch is reproduced
