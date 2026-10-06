@@ -103,6 +103,15 @@ extern H2_CONST char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT];
 extern H2_CONST char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT];
 extern H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 
+// The object dialog the detail tool has open, and the map cell it edits.
+// The compiled spellings keep EDITOR's .bss in its name-hash order.
+#if H2_RETAIL_COMPILER
+#define gEditDialog gEditDlg
+#define gEditCell gpCell
+#endif
+extern class heroWindow* gEditDialog;
+extern class mapCell* gEditCell;
+
 extern fullMap gMaps[EDIT_MAP_COPIES];
 #define gMap (gMaps[EDIT_MAP_CURRENT])
 #define gUndoMap (gMaps[EDIT_MAP_UNDO])

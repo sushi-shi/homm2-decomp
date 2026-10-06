@@ -602,3 +602,27 @@ unit = "EDITOR/RANDOM"
 source = "src/EDITOR/RANDOM.cpp"
 images = ["editor"]
 flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/EVENTMGR"
+source = "src/EDITOR/EVENTMGR.cpp"
+images = ["editor"]
+flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/evntedit"
+source = "src/EDITOR/evntedit.cpp"
+images = ["editor"]
+flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/heroedit"
+source = "src/EDITOR/heroedit.cpp"
+images = ["editor"]
+flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/townedit"
+source = "src/EDITOR/townedit.cpp"
+images = ["editor"]
+flags = "base_nogf"

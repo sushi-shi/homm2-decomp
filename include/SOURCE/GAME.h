@@ -37,7 +37,6 @@ H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,
     GAME_BOAT_COUNT              = 48,
-    GAME_EVENT_RUNTIME_GAP_SIZE  = 4,
     GAME_EVENT_MESSAGE_HEAD_SIZE = 1
 H2_ENUM_END(GameSerializationConstant)
 
@@ -51,17 +50,21 @@ H2_ENUM_BEGIN(GameSetupSharedConstant)
 H2_ENUM_END(GameSetupSharedConstant)
 
 #pragma pack(push, 1)
+// A map event's or a time event's record: the editor's event dialog
+// edits both. A map event has isMapEvent set and uses the artifact and the
+// visit options; a time event uses the day fields and appliesToHuman.
 struct EventExtra {
-    u8 unknown00;
+    u8 isMapEvent;
     i32 resources[IDX(RES_COUNT)];
     i16 artifact;
     u8 applyToComputer;
     u8 cancelAfterVisit;
-    char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
+    u16 firstDay;
+    u16 repeatInterval;
     b8 active;
     u16 x;
     u16 y;
-    u8 unknown2a;
+    u8 appliesToHuman;
     u8 players[GAME_PLAYER_COUNT];
     char message[GAME_EVENT_MESSAGE_HEAD_SIZE];
 };
