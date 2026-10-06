@@ -47,7 +47,7 @@ On x86_64 Linux with Nix flakes enabled, point `HOMM2_DATA` at an installed game
 directory, the one that contains `DATA`:
 
 ```sh
-HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/port
 ```
 
 A Gold or Price of Loyalty installation works: `DATA/HEROES2.AGG` and
@@ -78,13 +78,13 @@ English data:
 ```sh
 HOMM2_DATA=/path/to/heroes2-english \
 HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
-HOMM2_LANGUAGE=ru nix run github:sushi-shi/homm2-decomp/master
+HOMM2_LANGUAGE=ru nix run github:sushi-shi/homm2-decomp/port
 ```
 
 With `nix run`, pass game options after `--`. For example:
 
 ```sh
-HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master -- /I0
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/port -- /I0
 ```
 
 | Option | Purpose |
@@ -107,7 +107,7 @@ Add the port and a local folder holding your copy of the game to your flake
 inputs:
 
 ```nix
-inputs.homm2.url = "github:sushi-shi/homm2-decomp/master";
+inputs.homm2.url = "github:sushi-shi/homm2-decomp/port";
 inputs.homm2-game = {
   url = "path:/path/to/heroes2";
   flake = false;
