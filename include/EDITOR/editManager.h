@@ -141,6 +141,9 @@ public:
     // The save checks: CheckObjects reports objects that cannot work, the
     // Count helpers count map objects and the Write helpers write the map
     // file's tables (and report what does not fit).
+    // The map's texts to and from its .TXT (for translating).
+    void ExportMapText(void);
+    bool ImportMapText(void);
     void CheckObjects(void);
     // Before a save: compacts the extras and gives every cell the trigger
     // of its catalogue type, its coast and its line flags.
@@ -217,6 +220,11 @@ public:
 SIZE(editManager, 0xea2);
 
 extern editManager* gEditManager;
+// The map text export's file and its line writers.
+extern char* gTextFileName;
+void ClearTextFile(void);
+void AppendTextLine(H2_CONST char* text);
+void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
 // The save checks' messages (editManager::AddError).
 extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
 extern i32 gEditErrorCount;

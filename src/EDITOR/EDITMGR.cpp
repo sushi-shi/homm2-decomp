@@ -16,6 +16,7 @@
 #include <EDITOR/clearManager.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/terrainManager.h>
+#include <EDITOR/specedit.h>
 #include <EDITOR/RANDOM.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -194,6 +195,106 @@ H2_ENUM_BEGIN(EditMapCheck)
     EDIT_MAP_OBELISK_LIMIT       = 48
 H2_ENUM_END(EditMapCheck)
 
+H2_ENUM_BEGIN(EditFileMenu)
+    // The file menu (ecpanel.bin) at (144, 40): new map, load, quit, save
+    // and the close button, and their help rows (gFileMenuHelp).
+    EDIT_FILE_MENU_X      = 144,
+    EDIT_FILE_MENU_Y      = 40,
+    EDIT_FILE_MENU_NEW    = 101,
+    EDIT_FILE_MENU_LOAD   = 102,
+    EDIT_FILE_MENU_QUIT   = 105,
+    EDIT_FILE_MENU_SAVE   = 106,
+    EDIT_FILE_MENU_CLOSE  = DIALOG_BUTTON_0,
+    EDIT_FILE_MENU_NONE   = -1,
+    EDIT_MENU_HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
+    EDIT_MENU_QUESTION_SIZE = 200
+H2_ENUM_END(EditFileMenu)
+
+H2_ENUM_BEGIN(EditPanelControl)
+    // The panel's widgets Main answers, besides the scroll bars and arrows
+    // and the tool buttons (EDIT_CONTROL_TOOL_FIRST + EditTool).
+    EDIT_CONTROL_SCROLL_RIGHT      = 0x10,
+    EDIT_CONTROL_SCROLL_LEFT       = 0x11,
+    EDIT_CONTROL_SCROLL_UP_LEFT    = 0x12,
+    EDIT_CONTROL_SCROLL_UP_RIGHT   = 0x13,
+    EDIT_CONTROL_SCROLL_DOWN_LEFT  = 0x14,
+    EDIT_CONTROL_SCROLL_DOWN_RIGHT = 0x15,
+    EDIT_CONTROL_RADAR             = 0x27,
+    EDIT_CONTROL_TERRAIN           = 0x65,
+    EDIT_CONTROL_OBJECT            = 0x66,
+    EDIT_CONTROL_DETAIL            = 0x67,
+    EDIT_CONTROL_STREAM            = 0x68,
+    EDIT_CONTROL_ROAD              = 0x69,
+    EDIT_CONTROL_ERASE             = 0x6a,
+    EDIT_CONTROL_ZOOM              = 0x6f,
+    EDIT_CONTROL_UNDO              = 0x70,
+    EDIT_CONTROL_NEW               = 0x71,
+    EDIT_CONTROL_SPECIFICATIONS    = 0x72,
+    EDIT_CONTROL_FILE              = 0x73,
+    EDIT_CONTROL_SYSTEM            = 0x74,
+    EDIT_CONTROL_LOAD              = 0x75,
+    EDIT_CONTROL_SAVE              = 0x76,
+    EDIT_CONTROL_QUIT              = 0x77
+H2_ENUM_END(EditPanelControl)
+
+H2_ENUM_BEGIN(EditPanelHelp)
+    // gEditPanelHelp's rows for the right-clicked widget.
+    EDIT_PANEL_HELP_NONE           = -1,
+    EDIT_PANEL_HELP_RADAR          = 1,
+    EDIT_PANEL_HELP_SCROLL_BARS    = 2,
+    EDIT_PANEL_HELP_TERRAIN        = 3,
+    EDIT_PANEL_HELP_OBJECT         = 4,
+    EDIT_PANEL_HELP_DETAIL         = 5,
+    EDIT_PANEL_HELP_ERASE          = 6,
+    EDIT_PANEL_HELP_STREAM         = 7,
+    EDIT_PANEL_HELP_ROAD           = 8,
+    EDIT_PANEL_HELP_SCROLL_ARROWS  = 9,
+    EDIT_PANEL_HELP_ZOOM           = 10,
+    EDIT_PANEL_HELP_UNDO           = 11,
+    EDIT_PANEL_HELP_SPECIFICATIONS = 12,
+    EDIT_PANEL_HELP_NEW            = 13,
+    EDIT_PANEL_HELP_FILE           = 14,
+    EDIT_PANEL_HELP_SYSTEM         = 15
+H2_ENUM_END(EditPanelHelp)
+
+H2_ENUM_BEGIN(EditMainSetting)
+    // The map animates every 200 ms; the file screens fade in 8 steps and
+    // quitting in 6. A new map clears the 640x480 screen to colour 0x24.
+    EDIT_ANIMATION_TICKS      = 200,
+    EDIT_NEW_MAP_FADE_STEPS   = 8,
+    EDIT_QUIT_FADE_STEPS      = 6,
+    EDIT_SCREEN_CLEAR_COLOR   = 0x24,
+    EDIT_SCREEN_BYTES         = 640 * 480
+H2_ENUM_END(EditMainSetting)
+
+H2_ENUM_BEGIN(EditSiteFrames)
+    // The right-click name of a Price of Loyalty site: its frame ranges in
+    // x_loc1-3 (each range ends before the given frame). One x_loc2 range
+    // reads past xGenericSiteNames' end.
+    EDIT_X_LOC1_ALCHEMIST_TOWER_END = 4,
+    EDIT_X_LOC1_ARENA_END           = 72,
+    EDIT_X_LOC1_DWELLING_1_END      = 78,
+    EDIT_X_LOC1_DWELLING_2_END      = 112,
+    EDIT_X_LOC1_DWELLING_3_END      = 120,
+    EDIT_X_LOC1_DWELLING_4_END      = 129,
+    EDIT_X_LOC1_DWELLING_5_END      = 137,
+    EDIT_X_LOC2_STABLES_END         = 5,
+    EDIT_X_LOC2_STRAY_END           = 10,
+    EDIT_X_LOC2_MERMAID_END         = 47,
+    EDIT_X_LOC2_SIRENS_END          = 111,
+    EDIT_X_LOC3_HUT_OF_MAGI_END     = 32,
+    EDIT_X_LOC3_EYE_OF_MAGI_END     = 59,
+    EDIT_SITE_NAME_STRAY            = 123
+H2_ENUM_END(EditSiteFrames)
+
+H2_ENUM_BEGIN(EditTextExport)
+    // The map text export: its line buffers and the .TXT name's size.
+    EDIT_TEXT_CLEAR_SIZE       = 500,
+    EDIT_TEXT_LINE_SIZE        = 1000,
+    EDIT_TEXT_FILE_NAME_SIZE   = 300,
+    EDIT_TEXT_EXTENSION_LENGTH = 4
+H2_ENUM_END(EditTextExport)
+
 H2_ENUM_BEGIN(EditTriggerType)
     // UpdateTriggers: the catalogue types whose trigger is an action on
     // the entrance (the two abandoned mines) or on every cell (the random
@@ -254,6 +355,8 @@ DATA(0x0049f598) u8 gClearTilesets[TILESET_COUNT];
 DATA(0x0049f5f8) SMapHeader gEditMapHeader;
 DATA(0x0049f7a8) b32 gLinesRemoved;
 DATA(0x004a3a4c) b32 gVaryTiles;
+// The .TXT the map text export writes (set while it runs).
+DATA(0x004a3a50) char* gTextFileName;
 // The object tool's classes: the catalogue category each lists, and the
 // terrains (a TerrainType bit each) it lists them on.
 DATA(0x0045f178)
@@ -10107,6 +10210,483 @@ void editManager::GrabObject(void) {
     }
 }
 
+// The editor's main loop: scrolls the view at the screen edges, animates
+// the map (and lets the tool follow the pointer), runs a pending random
+// map, and dispatches the panel's buttons, the right-click help (on the
+// map: what the object or ground under the pointer is) and the hot keys.
+VA(0x00402530, 0x10f9)
+MessageDispatchResult editManager::Main(tag_message& message) {
+    i32 mouseX;
+    i32 mouseY;
+    i32 amount;
+    fullMap* temp;
+    tag_message move;
+    i32 hint;
+    i32 choice;
+    i32 objectKind;
+    i32 newMap;
+    i32 mapX;
+    i32 cellEvent;
+    i32 mapY;
+    i32 iconIndex;
+    i32 tilesetId;
+    i32 kindIndex;
+    mapCell* cell;
+    char initial;
+
+    hint = EDIT_PANEL_HELP_NONE;
+    if (giScreenScroll && gbForegroundApp)
+        CheckScreenScroll();
+    if (gConfig.editorScreenAnimation && gLastAnimationTick + EDIT_ANIMATION_TICKS < KBTickCount()
+        && message.type == MESSAGE_NONE) {
+        m_animationCounter++;
+        m_animationFrame++;
+        m_animationFrame %= EDIT_ANIMATION_FRAMES;
+        DrawMap();
+        gEditManager->m_cursorX = EDIT_NO_CELL;
+        memset(&move, 0, sizeof(move));
+        move.type = MESSAGE_MOUSE_MOVE;
+        gpMouseManager->MouseCoords(mouseX, mouseY);
+        move.payload.mouse.screenX = move.payload.mouse.x = mouseX;
+        move.payload.mouse.screenY = move.payload.mouse.y = mouseY;
+        m_toolManager->Main(move);
+        UpdateMapView();
+        return MESSAGE_DISPATCH_CONTINUE;
+    }
+    switch (message.type) {
+        case MESSAGE_NONE:
+            if (gbNewRandomMap) {
+                GenerateRandomMap();
+                gbNewRandomMap = false;
+            }
+            break;
+        case MESSAGE_WIDGET:
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_DESELECT:
+                    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+                        break;
+                    switch (message.payload.widget.id) {
+                        case EDIT_CONTROL_TERRAIN:
+                            SelectTool(EDIT_TOOL_TERRAIN);
+                            break;
+                        case EDIT_CONTROL_OBJECT:
+                            SelectTool(EDIT_TOOL_OBJECT);
+                            break;
+                        case EDIT_CONTROL_DETAIL:
+                            SelectTool(EDIT_TOOL_DETAIL);
+                            break;
+                        case EDIT_CONTROL_ERASE:
+                            SelectTool(EDIT_TOOL_ERASE);
+                            break;
+                        case EDIT_CONTROL_STREAM:
+                            SelectTool(EDIT_TOOL_STREAM);
+                            break;
+                        case EDIT_CONTROL_ROAD:
+                            SelectTool(EDIT_TOOL_ROAD);
+                            break;
+                        case EDIT_CONTROL_SPECIFICATIONS:
+                            EditMapSpecifications(false);
+                            break;
+                        case EDIT_CONTROL_ZOOM:
+                            ToggleZoom();
+                            break;
+                        case EDIT_CONTROL_LOAD:
+                        confirmLoad:
+                            if (!Confirm(localization::Tr("editor.map.load.confirm")))
+                                break;
+                        load:
+                            if (!PickMap(FILE_REQUESTER_MAP))
+                                break;
+                            if (!LoadMap(gMapFileName)) {
+                                ProtectShippedMap();
+                                m_mapChanged = false;
+                                m_placedX = m_placedY = EDIT_NO_CELL;
+                            }
+                            m_viewX = m_viewY = 0;
+                            m_window->DrawWindow(false);
+                            DrawRadar(true);
+                            DrawMap();
+                            UpdateMapView();
+                            break;
+                        case EDIT_CONTROL_SAVE:
+                        save:
+                            if (!SaveMap(gMapFileName)) {
+                                sprintf(gText, localization::Tr("editor.map.saved"), gEditMapHeader.name);
+                                if (UsesExpansionObjects())
+                                    strcat(gText, localization::Tr("editor.map.saved.expansion"));
+                                else
+                                    strcat(gText, localization::Tr("editor.map.saved.original"));
+                                NormalDialog(gText, NORMAL_DIALOG_INFO);
+                                m_mapChanged = false;
+                                m_placedX = m_placedY = EDIT_NO_CELL;
+                            }
+                            break;
+                        case EDIT_CONTROL_QUIT:
+                        confirmQuit:
+                            if (Confirm(localization::Tr("editor.quit.confirm")) == true) {
+                            quit:
+                                gpWindowManager->FadeScreen(FADE_OUT, EDIT_QUIT_FADE_STEPS, gPalette);
+                                ShutDown(NULL);
+                            } else {
+                                return MESSAGE_DISPATCH_CONSUME;
+                            }
+                            break;
+                        case EDIT_CONTROL_FILE:
+                            choice = FileOptions();
+                            if (choice == EDIT_FILE_MENU_LOAD)
+                                goto load;
+                            if (choice == EDIT_FILE_MENU_NEW)
+                                goto startNewMap;
+                            if (choice == EDIT_FILE_MENU_SAVE)
+                                goto save;
+                            if (choice == EDIT_FILE_MENU_QUIT)
+                                goto quit;
+                            break;
+                        case EDIT_CONTROL_NEW:
+                        startNewMap:
+                            gpWindowManager->FadeScreen(FADE_OUT, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, 1);
+                            gpWindowManager->UpdateScreen();
+                            gpWindowManager->FadeScreen(FADE_IN, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            newMap = SetupNewMap();
+                            gpWindowManager->FadeScreen(FADE_OUT, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            memset(gpWindowManager->m_screen->m_pixels, EDIT_SCREEN_CLEAR_COLOR,
+                                   EDIT_SCREEN_BYTES);
+                            if (newMap) {
+                                gEditManager->InitializeMap(false, gNewMapSize, gNewMapSize);
+                                ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
+                            }
+                            gpResourceManager->GetBackdrop("bordedit.icn", gpWindowManager->m_screen, 1);
+                            m_window->DrawWindow(false);
+                            DrawMap();
+                            DrawRadar(true);
+                            gpWindowManager->UpdateScreen();
+                            gpWindowManager->FadeScreen(FADE_IN, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            break;
+                        case EDIT_CONTROL_SYSTEM:
+                            SystemOptions();
+                            break;
+                        case EDIT_CONTROL_UNDO:
+                            temp = new fullMap;
+                            temp->Init(MAP_WIDTH, MAP_HEIGHT);
+                            temp->Copy(gMap);
+                            gMap.Copy(gUndoMap);
+                            gUndoMap.Copy(*temp);
+                            delete temp;
+                            DrawView(m_viewX, m_viewY);
+                            UpdateMapView();
+                            DrawRadar(true);
+                            break;
+                        case EDIT_CONTROL_SCROLL_UP:
+                            Scroll(0, -1);
+                            break;
+                        case EDIT_CONTROL_SCROLL_DOWN:
+                            Scroll(0, 1);
+                            break;
+                        case EDIT_CONTROL_SCROLL_RIGHT:
+                            Scroll(1, 0);
+                            break;
+                        case EDIT_CONTROL_SCROLL_LEFT:
+                            Scroll(-1, 0);
+                            break;
+                        case EDIT_CONTROL_SCROLL_UP_LEFT:
+                            Scroll(-1, -1);
+                            break;
+                        case EDIT_CONTROL_SCROLL_UP_RIGHT:
+                            Scroll(1, -1);
+                            break;
+                        case EDIT_CONTROL_SCROLL_DOWN_LEFT:
+                            Scroll(-1, 1);
+                            break;
+                        case EDIT_CONTROL_SCROLL_DOWN_RIGHT:
+                            Scroll(1, 1);
+                            break;
+                    }
+                    break;
+                case WIDGET_NOTIFY_SELECT:
+                case WIDGET_NOTIFY_RIGHT_CLICK:
+                    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                        switch (message.payload.widget.id) {
+                            case EDIT_CONTROL_RADAR:
+                                hint = EDIT_PANEL_HELP_RADAR;
+                                break;
+                            case EDIT_CONTROL_HORIZONTAL_TRACK:
+                                hint = EDIT_PANEL_HELP_SCROLL_BARS;
+                                break;
+                            case EDIT_CONTROL_HORIZONTAL_KNOB:
+                                hint = EDIT_PANEL_HELP_SCROLL_BARS;
+                                break;
+                            case EDIT_CONTROL_VERTICAL_TRACK:
+                                hint = EDIT_PANEL_HELP_SCROLL_BARS;
+                                break;
+                            case EDIT_CONTROL_VERTICAL_KNOB:
+                                hint = EDIT_PANEL_HELP_SCROLL_BARS;
+                                break;
+                            case EDIT_CONTROL_TERRAIN:
+                                hint = EDIT_PANEL_HELP_TERRAIN;
+                                break;
+                            case EDIT_CONTROL_OBJECT:
+                                hint = EDIT_PANEL_HELP_OBJECT;
+                                break;
+                            case EDIT_CONTROL_DETAIL:
+                                hint = EDIT_PANEL_HELP_DETAIL;
+                                break;
+                            case EDIT_CONTROL_ERASE:
+                                hint = EDIT_PANEL_HELP_ERASE;
+                                break;
+                            case EDIT_CONTROL_STREAM:
+                                hint = EDIT_PANEL_HELP_STREAM;
+                                break;
+                            case EDIT_CONTROL_ROAD:
+                                hint = EDIT_PANEL_HELP_ROAD;
+                                break;
+                            case EDIT_CONTROL_SCROLL_UP:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_DOWN:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_RIGHT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_LEFT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_UP_LEFT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_UP_RIGHT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_DOWN_LEFT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_SCROLL_DOWN_RIGHT:
+                                hint = EDIT_PANEL_HELP_SCROLL_ARROWS;
+                                break;
+                            case EDIT_CONTROL_ZOOM:
+                                hint = EDIT_PANEL_HELP_ZOOM;
+                                break;
+                            case EDIT_CONTROL_UNDO:
+                                hint = EDIT_PANEL_HELP_UNDO;
+                                break;
+                            case EDIT_CONTROL_SPECIFICATIONS:
+                                hint = EDIT_PANEL_HELP_SPECIFICATIONS;
+                                break;
+                            case EDIT_CONTROL_NEW:
+                                hint = EDIT_PANEL_HELP_NEW;
+                                break;
+                            case EDIT_CONTROL_FILE:
+                                hint = EDIT_PANEL_HELP_FILE;
+                                break;
+                            case EDIT_CONTROL_SYSTEM:
+                                hint = EDIT_PANEL_HELP_SYSTEM;
+                                break;
+                        }
+                        if (message.payload.widget.id == EDIT_CONTROL_MAP) {
+                            mapX = message.payload.widget.screenX;
+                            mapY = message.payload.widget.screenY;
+                            ScreenToCell(mapX, mapY);
+                            mapX += gEditManager->m_viewX;
+                            mapY += gEditManager->m_viewY;
+                            objectKind = OverlayTypeAt(mapX, mapY);
+                            cellEvent = OVERLAY_NONE;
+                            if (objectKind != OVERLAY_NONE)
+                                cellEvent = gOverlayTypes[objectKind].trigger;
+                            if (cellEvent == OVERLAY_NONE || cellEvent == MAP_OBJECT_NOTHING_SPECIAL
+                                || cellEvent == MAP_OBJECT_MOSSY_ROCK) {
+                                sprintf(gText,
+                                        gTerrainNames[giGroundToTerrain[gMap.CellAt(mapX, mapY)
+                                                                            ->m_terrainImageIndex]]);
+                            } else {
+                                cell = gMap.CellAt(mapX, mapY);
+                                switch (cellEvent) {
+                                    case MAP_OBJECT_BARRIER:
+                                    case MAP_OBJECT_TRAVELER_TENT:
+                                        sprintf(gText,
+                                                gQuickViewText[MAP_TRIGGER_OBJECT(cell->m_triggerType)],
+                                                xBarrierColor[cell->m_objectMetadata
+                                                              & EDIT_BARRIER_COLOR_MASK]);
+                                        initial = toupper(static_cast<i32>(gText[0]));
+                                        gText[0] = initial;
+                                        break;
+                                    case MAP_OBJECT_EXPANSION_OBJECT:
+                                        if (cell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
+                                            iconIndex = cell->m_objectIndex;
+                                            tilesetId = cell->m_objectTileset;
+                                        } else {
+                                            iconIndex = cell->m_overlayIndex;
+                                            tilesetId = cell->m_overlayTileset;
+                                        }
+                                        kindIndex = GENERIC_SITE_UNKNOWN;
+                                        switch (tilesetId) {
+                                            case TILESET_X_LOC1:
+                                                if (iconIndex < 0)
+                                                    break;
+                                                if (iconIndex < EDIT_X_LOC1_ALCHEMIST_TOWER_END)
+                                                    kindIndex = GENERIC_SITE_ALCHEMIST_TOWER;
+                                                else if (iconIndex < EDIT_X_LOC1_ARENA_END)
+                                                    kindIndex = GENERIC_SITE_ARENA;
+                                                break;
+                                            case TILESET_X_LOC2:
+                                                if (iconIndex < 0)
+                                                    break;
+                                                if (iconIndex < EDIT_X_LOC2_STABLES_END)
+                                                    kindIndex = GENERIC_SITE_STABLES;
+                                                else if (iconIndex < EDIT_X_LOC2_STRAY_END)
+                                                    kindIndex = EDIT_SITE_NAME_STRAY;
+                                                else if (iconIndex < EDIT_X_LOC2_MERMAID_END)
+                                                    kindIndex = GENERIC_SITE_MERMAID;
+                                                else if (iconIndex < EDIT_X_LOC2_SIRENS_END)
+                                                    kindIndex = GENERIC_SITE_SIRENS;
+                                                break;
+                                            case TILESET_X_LOC3:
+                                                if (iconIndex < 0)
+                                                    break;
+                                                if (iconIndex < EDIT_X_LOC3_HUT_OF_MAGI_END)
+                                                    kindIndex = GENERIC_SITE_HUT_OF_MAGI;
+                                                else if (iconIndex < EDIT_X_LOC3_EYE_OF_MAGI_END)
+                                                    kindIndex = GENERIC_SITE_EYE_OF_MAGI;
+                                                break;
+                                        }
+                                        if (kindIndex == GENERIC_SITE_UNKNOWN)
+                                            sprintf(gText, localization::Tr("editor.quick_view.unknown"));
+                                        else
+                                            sprintf(gText, xGenericSiteNames[kindIndex]);
+                                        break;
+                                    case MAP_OBJECT_EXPANSION_DWELLING:
+                                        if (cell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
+                                            iconIndex = cell->m_objectIndex;
+                                            tilesetId = cell->m_objectTileset;
+                                        } else {
+                                            iconIndex = cell->m_overlayIndex;
+                                            tilesetId = cell->m_overlayTileset;
+                                        }
+                                        kindIndex = GENERIC_SITE_UNKNOWN;
+                                        switch (tilesetId) {
+                                            case TILESET_X_LOC1:
+                                                if (iconIndex < EDIT_X_LOC1_ARENA_END)
+                                                    break;
+                                                if (iconIndex < EDIT_X_LOC1_DWELLING_1_END)
+                                                    kindIndex = IDX(RECRUITMENT_SITE_BARROW_MOUNDS);
+                                                else if (iconIndex < EDIT_X_LOC1_DWELLING_2_END)
+                                                    kindIndex = IDX(RECRUITMENT_SITE_EARTH_ALTAR);
+                                                else if (iconIndex < EDIT_X_LOC1_DWELLING_3_END)
+                                                    kindIndex = IDX(RECRUITMENT_SITE_AIR_ALTAR);
+                                                else if (iconIndex < EDIT_X_LOC1_DWELLING_4_END)
+                                                    kindIndex = IDX(RECRUITMENT_SITE_FIRE_ALTAR);
+                                                else if (iconIndex < EDIT_X_LOC1_DWELLING_5_END)
+                                                    kindIndex = IDX(RECRUITMENT_SITE_WATER_ALTAR);
+                                                break;
+                                        }
+                                        if (kindIndex == GENERIC_SITE_UNKNOWN)
+                                            sprintf(gText, localization::Tr("editor.quick_view.unknown"));
+                                        else
+                                            sprintf(gText, xRecruitmentSiteNames[kindIndex]);
+                                        break;
+                                    case MAP_OBJECT_ROCK:
+                                        if (cell->m_objectTileset == TILESET_X_LOC2)
+                                            sprintf(gText, localization::Tr("editor.quick_view.reefs"));
+                                        else
+                                            sprintf(gText, localization::Tr("editor.quick_view.rocks"));
+                                        break;
+                                    default:
+                                        sprintf(gText, gQuickViewText[cellEvent]);
+                                        break;
+                                }
+                            }
+                            NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
+                        } else if (hint >= 0) {
+                            NormalDialog(gEditPanelHelp[hint], NORMAL_DIALOG_QUICK_VIEW);
+                        }
+                    } else {
+                        switch (message.payload.widget.id) {
+                            case EDIT_CONTROL_RADAR:
+                                DoRadar();
+                                break;
+                            case EDIT_CONTROL_HORIZONTAL_TRACK:
+                            case EDIT_CONTROL_HORIZONTAL_KNOB:
+                                DoHorizontalKnob();
+                                break;
+                            case EDIT_CONTROL_VERTICAL_TRACK:
+                            case EDIT_CONTROL_VERTICAL_KNOB:
+                                DoVerticalKnob();
+                                break;
+                        }
+                    }
+                    break;
+            }
+            return MESSAGE_DISPATCH_CONTINUE;
+        case MESSAGE_KEY_DOWN:
+            switch (message.payload.keyboard.keyCode) {
+                case INPUT_SCAN_Q:
+                    goto confirmQuit;
+                case INPUT_SCAN_S:
+                    goto save;
+                case INPUT_SCAN_L:
+                    goto confirmLoad;
+                case INPUT_SCAN_G:
+                    GrabObject();
+                    break;
+                case INPUT_SCAN_T:
+                    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS))
+                        ExportMapText();
+                    else
+                        ToggleGroundVariant();
+                    break;
+                case INPUT_SCAN_R:
+                    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)
+                        && !ImportMapText())
+                        NormalDialog(localization::Tr("editor.text.import_failed"), NORMAL_DIALOG_INFO);
+                    break;
+                case INPUT_SCAN_0:
+                    amount = 0;
+                    goto randomize;
+                case INPUT_SCAN_1:
+                    amount = 1;
+                    goto randomize;
+                case INPUT_SCAN_2:
+                    amount = 2;
+                    goto randomize;
+                case INPUT_SCAN_3:
+                    amount = 3;
+                    goto randomize;
+                case INPUT_SCAN_4:
+                    amount = 4;
+                    goto randomize;
+                case INPUT_SCAN_5:
+                    amount = 5;
+                    goto randomize;
+                case INPUT_SCAN_6:
+                    amount = 6;
+                    goto randomize;
+                case INPUT_SCAN_7:
+                    amount = 7;
+                    goto randomize;
+                case INPUT_SCAN_8:
+                    amount = 8;
+                    goto randomize;
+                case INPUT_SCAN_9:
+                    amount = 9;
+                randomize:
+                    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS))
+                        RandomizeGround(amount);
+                    break;
+                case INPUT_SCAN_TAB:
+                    SelectTool((m_tool + 1) % EDIT_TOOL_COUNT);
+                    break;
+                case INPUT_SCAN_ESCAPE:
+                    if (Confirm(localization::Tr("editor.quit.confirm")) == true)
+                        ShutDown(NULL);
+                    else
+                        return MESSAGE_DISPATCH_CONSUME;
+                    break;
+            }
+            break;
+    }
+    return MESSAGE_DISPATCH_CONTINUE;
+}
+
 VA(0x00403629, 0x1a)
 void editManager::SaveUndo(void) {
     gUndoMap.Copy(gMap);
@@ -11171,6 +11751,148 @@ void editManager::CheckObjects(void) {
             AddError(gText);
         }
     }
+}
+
+// The map text export (ExportMapText): gTextFileName names the .TXT it
+// writes; ClearTextFile empties it, AppendTextLine adds a line and
+// WriteTextHeader a blank line and an object's heading.
+VA(0x0040659e, 0x73)
+void ClearTextFile(void) {
+    i32 handle;
+    char buffer[EDIT_TEXT_CLEAR_SIZE];
+
+    handle = open(gTextFileName, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
+    if (handle == -1)
+        return;
+    strcpy(buffer, " ");
+    write(handle, buffer, strlen(buffer));
+    close(handle);
+}
+
+VA(0x00406611, 0x7a)
+void AppendTextLine(H2_CONST char* text) {
+    FILE* out;
+    char buffer[EDIT_TEXT_LINE_SIZE];
+
+    out = fopen(gTextFileName, "at+");
+    if (!out)
+        return;
+    strcpy(buffer, text);
+    strcat(buffer, "\n");
+    fputs(buffer, out);
+    fclose(out);
+}
+
+VA(0x0040668b, 0x44)
+void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind) {
+    AppendTextLine("");
+    sprintf(gText, "(x:% 3d, y:% 3d)    ***%s***", x, y, kind);
+    AppendTextLine(gText);
+}
+
+// Writes the map's texts (name, description, rumours, timed events, the
+// signs, bottles, map events and sphinxes, and the towns with captains)
+// to the map's .TXT for translating.
+VA(0x004066cf, 0x5ea)
+void editManager::ExportMapText(void) {
+    i32 x;
+    i32 i;
+    i32 y;
+    char textName[EDIT_TEXT_FILE_NAME_SIZE];
+    char* ext;
+    TownExtra* townData;
+    mapCell* cell;
+
+    gTextFileName = textName;
+    strcpy(textName, gMapFileName);
+    ext = textName + strlen(gMapFileName) - EDIT_TEXT_EXTENSION_LENGTH;
+    strcpy(ext, ".TXT");
+    ClearTextFile();
+    AppendTextLine("========================================");
+    sprintf(gText, "Text for file:  %s", gMapFileName);
+    AppendTextLine(gText);
+    AppendTextLine("");
+    sprintf(gText, "Map Name: %s", gEditMapHeader.name);
+    AppendTextLine(gText);
+    AppendTextLine("");
+    AppendTextLine("Map Description:");
+    AppendTextLine(gEditMapHeader.description);
+    AppendTextLine("");
+    AppendTextLine("");
+    AppendTextLine("Rumours:");
+    for (i = 0; i < gEditMapHeader.rumourCount; i++) {
+        AppendTextLine(static_cast<rumourEventExtra*>(gEditManager->m_extras[gRumourExtras[i]])->text);
+        AppendTextLine("");
+    }
+    AppendTextLine("");
+    AppendTextLine("");
+    AppendTextLine("Timed Events:");
+    for (i = 0; i < gEditMapHeader.timeEventCount; i++) {
+        sprintf(gText, "Day %d: %s",
+                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
+                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message);
+        AppendTextLine(gText);
+        AppendTextLine("");
+    }
+    AppendTextLine("");
+    AppendTextLine("");
+    AppendTextLine("Map Stuff:");
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            cell = gMap.CellAt(x, y);
+            switch (cell->m_triggerType) {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE):
+                    WriteTextHeader(x, y, "Bottle");
+                    goto message;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIGN):
+                    WriteTextHeader(x, y, "Sign");
+                message:
+                    AppendTextLine(
+                        static_cast<signEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata])->text);
+                    break;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
+                    WriteTextHeader(x, y, "Place Event");
+                    AppendTextLine(
+                        static_cast<EventExtra*>(gEditManager->m_extras[cell->m_objectMetadata])->message);
+                    break;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
+                    WriteTextHeader(x, y, "Sphinx");
+                    AppendTextLine("Riddle:");
+                    AppendTextLine(
+                        static_cast<mapEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata])->riddle);
+                    AppendTextLine("Answers:");
+                    for (i = 0;
+                         i < static_cast<mapEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata])
+                                 ->answerCount;
+                         i++)
+                        AppendTextLine(static_cast<mapEventExtra*>(
+                                           gEditManager->m_extras[cell->m_objectMetadata])
+                                           ->answers[i]);
+                    break;
+            }
+        }
+    }
+    AppendTextLine("");
+    AppendTextLine("");
+    AppendTextLine("Towns with captains:");
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            cell = gMap.CellAt(x, y);
+            switch (cell->m_triggerType) {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
+                    townData = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                    if (!townData->isCastle && townData->hasCaptain) {
+                        sprintf(gText, "Town at x:%d, y:%d", x, y);
+                        AppendTextLine(gText);
+                    }
+                    break;
+            }
+        }
+    }
+    sprintf(gText, "Text successfully saved to %s", textName);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
+    gTextFileName = NULL;
 }
 
 // Before a save: compacts the map's extras, clears the coast triggers and
@@ -12775,21 +13497,6 @@ b32 editManager::FindHero(i32 index, i32* x, i32* y) {
     *x = *y = -1;
     return false;
 }
-
-H2_ENUM_BEGIN(EditFileMenu)
-    // The file menu (ecpanel.bin) at (144, 40): new map, load, quit, save
-    // and the close button, and their help rows (gFileMenuHelp).
-    EDIT_FILE_MENU_X      = 144,
-    EDIT_FILE_MENU_Y      = 40,
-    EDIT_FILE_MENU_NEW    = 101,
-    EDIT_FILE_MENU_LOAD   = 102,
-    EDIT_FILE_MENU_QUIT   = 105,
-    EDIT_FILE_MENU_SAVE   = 106,
-    EDIT_FILE_MENU_CLOSE  = DIALOG_BUTTON_0,
-    EDIT_FILE_MENU_NONE   = -1,
-    EDIT_MENU_HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
-    EDIT_MENU_QUESTION_SIZE = 200
-H2_ENUM_END(EditFileMenu)
 
 // The file menu: the button chosen (EDIT_FILE_MENU_NONE when closed).
 VA(0x0040f317, 0xfb)
