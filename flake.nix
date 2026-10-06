@@ -478,24 +478,40 @@
         '';
       };
 
+      # Packs an installed game into a built web bundle as homm2.data, the
+      # file the page preloads into /game. The bundle's lang/ goes in too.
+      # Installation names are resolved case-insensitively.
+      homm2-web-package = pkgs.writeShellApplication {
+        name = "homm2-web-package";
+        runtimeInputs = [ pkgs.coreutils pkgs.python3 ];
+        text = ''
+          bundle="''${1:-}"
+          data="''${HOMM2_DATA:-}"
+          if [ -z "$bundle" ] || [ ! -e "$bundle/homm2.html" ]; then
+            echo "usage: HOMM2_DATA=/path/to/heroes2 homm2-web-package BUNDLE-DIRECTORY" >&2
+            exit 1
+          fi
+          python3 ${source}/tools/package_web_data.py --game-data "$data" --check
+          python3 ${source}/tools/package_web_data.py \
+            --game-data "$data" \
+            --packager ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
+            --lang "$bundle/lang" \
+            --output "$bundle"
+        '';
+      };
+
       homm2-web-run = pkgs.writeShellApplication {
         name = "homm2-web";
-        runtimeInputs = [ pkgs.coreutils pkgs.emscripten pkgs.python3 ];
+        runtimeInputs = [ pkgs.coreutils pkgs.emscripten pkgs.python3 homm2-web-package ];
         text = ''
-          data="''${HOMM2_DATA:-}"
-          python3 ${source}/tools/package_web_data.py --game-data "$data" --check
+          python3 ${source}/tools/package_web_data.py --game-data "''${HOMM2_DATA:-}" --check
 
           destination="''${HOMM2_WEB_OUTPUT:-''${XDG_CACHE_HOME:-$HOME/.cache}/homm2-web}"
           mkdir -p "$destination"
           chmod -R u+w "$destination"
           cp -R ${homm2-web}/share/homm2-web/. "$destination/"
           chmod -R u+w "$destination"
-
-          python3 ${source}/tools/package_web_data.py \
-            --game-data "$data" \
-            --packager ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
-            --lang "${homm2-web}/share/homm2-web/lang" \
-            --output "$destination"
+          homm2-web-package "$destination"
 
           if [ "''${HOMM2_WEB_PACK_ONLY:-0}" = 1 ]; then
             echo "$destination/homm2.html"
@@ -515,6 +531,7 @@
           homm2-debug
           homm2-sanitized
           homm2-web
+          homm2-web-package
           homm2-web-run
           homm2-windows-smoke;
         homm2-linux = homm2;
@@ -553,6 +570,24 @@
         };
         icon = pkgs.mkShell {
           packages = [ iconRust pkgs.clang ];
+        };
+        # `emcmake cmake --preset wasm`: the preset finds the Emscripten
+        # builds of SDL3, libbz2 and FFmpeg through these variables.
+        web = pkgs.mkShell {
+          packages = [
+            pkgs.cmake
+            pkgs.emscripten
+            pkgs.gettext
+            pkgs.ninja
+            pkgs.python3
+            homm2-web-package
+          ];
+          HOMM2_WEB_SDL3 = sdl3-web;
+          HOMM2_WEB_BZIP2 = bzip2-web;
+          HOMM2_WEB_FFMPEG = ffmpeg-web;
+          shellHook = ''
+            export EM_CACHE="''${XDG_CACHE_HOME:-$HOME/.cache}/homm2-emscripten"
+          '';
         };
       };
     };

@@ -1,47 +1,10 @@
-# Heroes of Might and Magic II Gold reconstructed source
+# Heroes of Might and Magic II Gold — Linux / Windows / WebAssembly source port
 
-This project recovers and modernizes the source code for Heroes of Might and
-Magic II Gold 2.1 as published by Buka. The Price of Loyalty 2.0 reconstruction
-remains available as an independent source reference and contributes verified
-cross-version work.
+A native port of Heroes of Might and Magic II Gold 2.1 (Buka), rebuilt from
+reconstructed source. Supply your own installed copy of the game; game data is
+not bundled.
 
-The repository does not contain the original game resources. An installed copy
-of the game is required to play it.
-
-## Quick start on Linux
-
-You need Git, [Nix](https://nixos.org/download/) with flakes enabled, and an
-installed Heroes II game directory. The file `DATA/HEROES2.AGG` must exist;
-directory and file names are matched case-insensitively.
-
-1. Clone the native port and enter it:
-
-   ```sh
-   git clone --branch master --single-branch \
-     https://github.com/sushi-shi/homm2-decomp.git homm2
-   cd homm2
-   ```
-
-2. Point the engine at your installed game data:
-
-   ```sh
-   export HOMM2_DATA=/absolute/path/to/heroes2
-   find "$HOMM2_DATA" -maxdepth 2 \( -type f -o -type l \) \
-     -iname HEROES2.AGG
-   ```
-
-3. Build and run the native Linux game:
-
-   ```sh
-   nix run
-   ```
-
-Later runs only need `HOMM2_DATA=/absolute/path/to/heroes2 nix run`. Saves and
-configuration are written under the user data directory, so the retail game
-directory may remain read-only. Windows/Wine, Web, localization, manual-build,
-and runtime-option instructions are below.
-
-## Repository branch structure
+## Branches
 
 ```text
 decomp-pol-2.0 -------------------> decomp-gold-2.1-buka
@@ -57,166 +20,208 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                     master (you are here) --------> ironfist --------> ironfist-master
 ```
 
-- `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
-- `source-pol-2.0` is its generated, matching-machinery-free source tree.
-- `classic-pol-2.0` is the same generated tree with the original integer-enum
-  and name-mangling model preserved.
-- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction and preferred
-  non-incrementally-linked retail target.
-- `source-gold-2.1-buka` is its generated clean source tree and the primary
-  source base of `master`.
-- `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
-  with retail Windows-1251 string bytes rendered as readable UTF-8 Russian.
-- `master` is the cross-platform Linux, Windows, and Web port.
-- `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
-- `ironfist-master` is the maintained integration with narrow extension
-  boundaries and mechanics in their owning engine classes.
+| Branch | Purpose |
+| --- | --- |
+| `decomp-pol-2.0` | Price of Loyalty 2.0 reconstruction |
+| `source-pol-2.0` | Its generated source tree, without matching machinery |
+| `classic-pol-2.0` | The same tree with the original integer-enum and name-mangling model |
+| `decomp-gold-2.1-buka` | Gold 2.1 (Buka) reconstruction, the preferred retail target |
+| `source-gold-2.1-buka` | Its generated clean source tree, the source base of `master` |
+| `classic-gold-2.1-buka` | Legacy-mangling view, with Windows-1251 strings rendered as UTF-8 Russian |
+| `master` | Cross-platform Linux, Windows and browser port |
+| `ironfist` | Project Ironfist applied to the cross-platform source |
+| `ironfist-master` | Maintained Ironfist integration |
 
-The classic branches are terminal views of their corresponding reconstruction;
-they do not feed Gold or `master`.
+The classic branches are terminal views of their reconstruction; they do not
+feed Gold or `master`. The Gold decompilation branch matches all 1,727
+reconstructed retail functions and all 291,995 reviewed data bytes, and its
+audited exact-link path reproduces the retail executable byte for byte. The
+generated source branches remove RVA annotations, delinking metadata and other
+matching machinery. Cross-version behavior is recorded in
+[Retail version differences](docs/version-differences.md); changes made only by
+this port are in [Intentional retail divergences](docs/retail-divergences.md).
 
-The cross-version behavioral ledger lives on the evidence-owning Buka
-reconstruction branch; see [Retail version differences](docs/version-differences.md).
-Corrections and subsystem replacements made only by the portable branch are
-listed in [Intentional retail divergences](docs/retail-divergences.md).
+## Play on Linux
 
-## Reconstruction evidence
+On x86_64 Linux with Nix flakes enabled, point `HOMM2_DATA` at an installed game
+directory, the one that contains `DATA`:
 
-The Gold decompilation branch matches all 1,727 reconstructed retail functions
-and all 291,995 reviewed data bytes. Its audited exact-link path also reproduces
-the supported retail executable byte for byte, including resources and import
-layout.
+```sh
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master
+```
 
-Matching is evidence for a reconstruction, not a license to put compiler or
-linker tricks in the source. The decompilation branches retain credible
-developer-shaped C++; unavoidable private-data placement accommodations live in
-disposable comparison/link tooling. The generated source branches remove RVA
-annotations, delinking metadata, reconstruction comments, and other matching
-machinery.
+A Gold or Price of Loyalty installation works: `DATA/HEROES2.AGG` and
+`DATA/HEROES2X.AGG` are required, and names are matched case-insensitively.
+Tested archives, SHA-256:
 
-## Build
+```text
+7a11c86db8ec8fbf19d810c1f7ebf9d8520f63fbdc42d6f51f7538654004315d  HEROES2.AGG   (GOG, English)
+1f3edad1bb88052da50b3fae5d00e8f7e73dd977f356463022aab132b54f4d41  HEROES2X.AGG  (GOG, English)
+da08a14cc545f6708bd2b746edd7ea7fa0eb7d0ed26f6e54ab8e6ccb2e735e19  heroes2.agg   (Buka, Russian)
+68f12a2ca2dd1a000e1136ad70f38b19116686c2a7a0e9a0860528d998b52afd  heroes2x.agg  (Buka, Russian)
+```
 
-The supported builds use Nix:
+The first launch builds the game. The installation is only read: preferences,
+saves and high scores go to `~/.local/share/homm2/homm2` (under
+`$XDG_DATA_HOME`), so the game directory may stay read-only. Music is read from
+`MUSIC` (GOG's `TrackNN.ogg`) or `TRACKS2` (the Buka disc) and movies from
+`HEROES2/ANIM`; without them the game is silent or skips the movie.
+
+The language follows your locale. The Russian translation needs the Cyrillic
+font of a Buka installation, either as `HOMM2_DATA` or as an overlay over
+English data:
+
+```sh
+HOMM2_DATA=/path/to/heroes2-english \
+HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
+HOMM2_LANGUAGE=ru nix run github:sushi-shi/homm2-decomp/master
+```
+
+With `nix run`, pass game options after `--`. For example:
+
+```sh
+HOMM2_DATA=/path/to/heroes2 nix run github:sushi-shi/homm2-decomp/master -- /I0
+```
+
+| Option | Purpose |
+| --- | --- |
+| `/I0` | Skip the intro |
+| `--language=en\|ru` | Choose the language (also `HOMM2_LANGUAGE`) |
+| `--resource-profile=western\|buka-cyrillic` | Override the font and archive profile detected from `FONT.ICN` (also `HOMM2_RESOURCE_PROFILE`) |
+
+Without `HOMM2_DATA`, the game looks for `DATA/HEROES2.AGG` next to the
+executable, in the current directory, then in `$XDG_DATA_HOME/homm2`,
+`$XDG_DATA_HOME/homm2/data` and `~/games/homm2`. In a local checkout, use
+`HOMM2_DATA=/path/to/heroes2 nix run .`. See
+[Localization architecture](docs/localization.md) and the
+[port guide](docs/porting.md) for the remaining variables, including the
+screenshot and input-replay hooks.
+
+## Install with a NixOS flake
+
+There is no NixOS module yet. Until there is, add this flake as an input and
+put `inputs.homm2.packages.x86_64-linux.default` in
+`environment.systemPackages`; the program is `homm2` and still reads
+`HOMM2_DATA`.
+
+## Controls
+
+The game is played with the mouse, as the original was.
+
+| Action | Keyboard / mouse |
+| --- | --- |
+| Select, move, confirm | Left mouse button |
+| Information about anything | Hold the right mouse button |
+| Move the selected hero one step | Arrow keys or keypad |
+| Scroll the map | Ctrl + arrow keys |
+| Next hero / next town | H / T |
+| Open the selected hero or town | Enter |
+| Cast an adventure spell | C |
+| Dig for the artifact / view the puzzle | D / P |
+| View the world | V |
+| Scenario or campaign information | I |
+| Save / load / new game / quit | S / L / N / Q |
+| Fullscreen / scaling / VSync | F4 / Shift+F4 / Ctrl+F4 |
+
+Display settings persist between runs; see
+[display controls](docs/porting.md#display-controls).
+
+## Build from source
+
+From the `master` branch:
+
+```sh
+nix develop
+cmake --preset linux
+cmake --build --preset linux
+HOMM2_DATA=/path/to/heroes2 build/linux/homm2
+```
+
+`ctest --test-dir build/linux` runs the tests; they use synthetic fixtures and
+need no game data. Without Nix, the game needs CMake
+3.21+, Ninja, pkg-config, a C++20 compiler that can target 32-bit x86 (retail
+packed layouts are load-bearing), and 32-bit SDL3, libbz2 and FFmpeg
+(`libavcodec`, `libavformat`, `libavutil`, `libswresample`), plus Python 3.10+
+and the GNU gettext tools (`msgfmt`, `msgcat`, `xgettext`) for the translations.
+CMake names the distribution packages when the 32-bit ones are missing.
+Single-configuration generators default to `RelWithDebInfo`; pass
+`-DCMAKE_BUILD_TYPE=Debug` or `Release` to choose another.
+
+The packaged builds are flake outputs:
 
 ```sh
 nix build .#homm2-linux
 nix build .#homm2-windows
 nix build .#homm2-web
+nix flake check
 ```
 
-### Building without Nix
+## Windows (native)
 
-Requirements:
-
-1. CMake 3.20+, Ninja, and pkg-config.
-2. A C++20 compiler with 32-bit support.
-3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
-   `libavutil`, and `libswresample`).
-4. Python 3.10+ and GNU gettext tools (`msgfmt`, `msgcat`, and `xgettext`).
-
-```sh
-cmake -S . -B build -G Ninja
-cmake --build build
-ctest --test-dir build --output-on-failure
-HOMM2_DATA=/path/to/heroes2 ./build/homm2
-```
-
-Single-configuration generators such as Ninja default to `RelWithDebInfo`.
-Select another configuration explicitly with `-DCMAKE_BUILD_TYPE=Debug` or
-`-DCMAKE_BUILD_TYPE=Release`. Multi-configuration generators use their normal
-`cmake --build build --config <configuration>` selection.
-
-The native CTests use synthetic fixtures and do not require retail game data.
-For the supported Nix build and test matrix, run `nix flake check`.
-
-## Installation
-
-### Game data
-
-`HOMM2_DATA` should point to an installed game directory containing
-`DATA/HEROES2.AGG` (case-insensitive):
-
-```sh
-export HOMM2_DATA=/path/to/heroes2
-```
-
-The game detects the `western` or `buka-cyrillic` resource profile from
-`FONT.ICN`, independently of `HOMM2_LANGUAGE`. To use Russian UI with English
-primary data and a Buka resource overlay:
-
-```sh
-HOMM2_DATA=/path/to/heroes2-english \
-HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
-HOMM2_LANGUAGE=ru nix run
-```
-
-`HOMM2_RESOURCE_PROFILE=western|buka-cyrillic` overrides automatic detection
-for diagnostics. See [Localization architecture](docs/localization.md).
-
-Without `HOMM2_DATA`, the engine searches these locations in order:
-
-1. The executable directory.
-2. The current directory.
-3. `$XDG_DATA_HOME/homm2`.
-4. `$XDG_DATA_HOME/homm2/data`.
-5. `~/games/homm2`.
-
-On Linux and Web, installed game data may be read-only. Preferences, saves,
-high scores, and network exchange files are stored under the user data root.
-Windows retains the original writable game-directory behavior.
-
-### Linux
-
-After setting `HOMM2_DATA`, run:
-
-```sh
-nix run
-```
-
-### Windows
-
-Build on Linux or in WSL, then copy the contents of `result/bin` into the game
-folder, the one that contains `DATA`:
+The Windows build is cross-compiled with Nix, on Linux or in WSL. There is no
+native Windows toolchain build yet.
 
 ```sh
 nix build .#homm2-windows
 ls result/bin        # HMM2PL.exe  lang/
 ```
 
+`HMM2PL.exe` is statically linked and needs no other DLL; the build fails if it
+would import one that is not part of Windows. Copy the contents of
+`result/bin` into the game folder, next to `DATA`:
+
 ```text
 C:\Games\Heroes of Might and Magic II\
     HMM2PL.exe
-    lang\           (Russian translation; optional)
+    lang\            (Russian translation; optional)
     DATA\HEROES2.AGG
     DATA\HEROES2X.AGG
     MAPS\ ...
 ```
 
-The program is statically linked and needs no other DLL. Double-click
-`HMM2PL.exe`. It finds `DATA` next to itself, whatever the working directory
-and whatever the case of the file names. To keep the program elsewhere, point
-`HOMM2_DATA` at the game folder; quotes are accepted:
+Double-click `HMM2PL.exe`. It finds `DATA` next to itself, whatever the working
+directory and whatever the case of the file names. To keep the program
+elsewhere, point `HOMM2_DATA` at the game folder; quotes are accepted:
 
 ```bat
 set HOMM2_DATA=C:\Games\Heroes of Might and Magic II
 C:\Tools\HMM2PL.exe
 ```
 
-Music is read from `MUSIC` (GOG's `TrackNN.ogg`) or `TRACKS2` (the Buka disc)
-and movies from `HEROES2\ANIM`; without them the game runs silent or skips the
-movie. Saves and preferences stay in the game folder, so it must be writable
-(not under `Program Files`). Under Wine, run `wine HMM2PL.exe` from the folder.
+On Windows, saves and preferences stay in the game folder, as they did in
+1996, so it must be writable (not under `Program Files`). Under Wine, run
+`wine HMM2PL.exe` from the game folder. With an installed game,
+`HOMM2_DATA=/path/to/heroes2 nix run .#windows-smoke` checks the Windows build
+under Wine from a folder laid out like the one above.
 
-### Web
+## Browser
+
+### Linux
+
+Inside `nix develop .#web`:
 
 ```sh
-HOMM2_DATA=/path/to/heroes2 nix run .#web
+emcmake cmake --preset wasm
+cmake --build --preset wasm
+HOMM2_DATA=/path/to/heroes2 homm2-web-package build/wasm
+python3 -m http.server --directory build/wasm
 ```
 
-The launcher packages the installed data, serves the bundle on port 8080
-(`HOMM2_WEB_PORT`), and caches it under `~/.cache/homm2-web`
-(`HOMM2_WEB_OUTPUT`). The first build also cross-compiles SDL3 and a minimal
-FFmpeg.
+`homm2-web-package` packs the installation into `build/wasm/homm2.data`. The
+same steps, served with `emrun`, are one command:
+`HOMM2_DATA=/path/to/heroes2 nix run .#web` (port `HOMM2_WEB_PORT`, default
+8080; bundle in `~/.cache/homm2-web` or `HOMM2_WEB_OUTPUT`).
+
+### Windows
+
+Not supported yet: the browser build needs Emscripten builds of FFmpeg and
+libbz2, which are made with Nix. Use the Linux steps in WSL.
+
+### Play
+
+Open [the game](http://localhost:8000/homm2.html) and press **Start Heroes II**.
+The game data is part of the page's `homm2.data`. Saves and preferences stay in
+browser storage; clearing it removes them.
 
 ## License
 
