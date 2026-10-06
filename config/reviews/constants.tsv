@@ -64,6 +64,7 @@ include/BASE/tileset.h	pending
 include/BASE/widget.h	pending	
 include/BASE/widgetKind.h	pending	
 include/EDITOR/EDITOR.h	pending	
+include/EDITOR/OVERLAY.h	pending	
 include/EDITOR/RANDOM.h	pending	
 include/EDITOR/clearManager.h	pending	
 include/EDITOR/editManager.h	pending	
@@ -194,6 +195,7 @@ src/EDITOR/CLEARMGR.cpp	pending
 src/EDITOR/EDITMGR.cpp	pending	
 src/EDITOR/EDITOR.cpp	pending	
 src/EDITOR/EVENTMGR.cpp	pending	
+src/EDITOR/OVERLAY.cpp	pending	
 src/EDITOR/RANDOM.cpp	pending	
 src/EDITOR/evntedit.cpp	pending	
 src/EDITOR/heroedit.cpp	pending	

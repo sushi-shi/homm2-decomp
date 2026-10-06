@@ -134,6 +134,13 @@ public:
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
     void ScatterDecorations(void);
+    // The map's events, towns and castles, and mines with the other sites
+    // the map file keeps in its mine table.
+    i32 CountEvents(void);
+    i32 CountTowns(void);
+    i32 CountMines(void);
+    // Removes every part of the object placed with link.
+    void RemoveObject(i32 link);
 };
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
@@ -157,6 +164,10 @@ u16 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
 extern SMapHeader gEditMapHeader;
 
 void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
+// Shows text on the status line and beeps (not while generating a map).
+void ShowStatusWarning(char* text);
+// The gTownNames entry the editor names its next town after.
+extern u8 gTownNameIndex;
 
 // Rebuilds the overlay tiles of the whole map.
 void FillInOverlayTiles(void);
