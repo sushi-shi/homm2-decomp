@@ -1195,6 +1195,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0007fbcc	0x128	data	?cEvilTranslate@@3PAY01PADA	SOURCE/KB	0x000f9b3c	2 field(s) of placed bodies
 0x0007fe68	0x14	data	?gcMapPath@@3PADA	SOURCE/KB	0x000f9dd8	1 field(s) of placed bodies
 0x0007fe7c	0x160	data	?gcMusicPath@@3PADA	SOURCE/KB	0x000f9dec	1 field(s) of placed bodies
+0x0007ffdc	0xc	data	?gfCombatSpeedMod@@3PAMA	SOURCE/KB	0x000f9f4c	between its unit's placed neighbours, bytes equal
 0x0007ffe8	0x4	data	?gbDrawWindowBackground@@3HA	SOURCE/KB	0x000f9f58	1 field(s) of placed bodies
 0x0007fff8	0x4	data	?bShowIt@@3HA	SOURCE/KB	0x001265ac	2 field(s) of placed bodies
 0x0007fffc	0x4	data	?gbEnlargeScreenBlit@@3HA	SOURCE/KB	0x000fb0bc	3 field(s) of placed bodies
@@ -1456,6 +1457,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009b80c	0x0	data	$anon_str_3070684ac72eeb3ee69f32044ead415ea70ee19d6b243e7e892ab86750d11c14_1	_const	0x0011f0e0	1 field(s) of placed bodies
 0x0009b828	0x0	data	$anon_str_0ec502d020761a964d08653e1c75485bdf3b89a075cb958f10cd24d29fae751a_1	_const	0x0011f0fc	1 field(s) of placed bodies
 0x0009b848	0x0	data	$anon_str_b4e1599c8e1632283b34f6681aa9cd68c2118ddc27aa21a11849f96f548b8373_0	_const	0x0011f11c	1 field(s) of placed bodies
+0x0009b84c	0x1e	data	?gcCDTrackNameText@@3PADA	BASE/MiscRuntime	0x0011f120	1 pointer field(s) of placed data, bytes equal
 0x0009b86c	0x0	data	$anon_str_0db435234ea00c3bc420d8307424daebdcdc97761a1a950a4e87bdc86d72f400_0	_const	0x0011f140	1 field(s) of placed bodies
 0x0009b870	0x0	data	$anon_str_161c22534f7112823436a59e51a6a2216a9d3129dcbc7967b876888f40d8b962_23	_const	0x0011f144	1 field(s) of placed bodies
 0x0009b878	0x0	data	$anon_str_cb44bed5d667878987e9ad4fb4f9889485d1f137c9754318b8658e89ed4aa4b5_0	_const	0x0011f14c	1 field(s) of placed bodies
@@ -1651,6 +1653,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a5d80	0x10	data	_gDDDestinationRect	SOURCE/wingraph	0x00134488	16 field(s) of placed bodies
 0x000a5d90	0x4	data	?gbDDrawAttached@@3HA	SOURCE/wingraph	0x00134498	4 field(s) of placed bodies
 0x000a5d94	0x4	data	?lpInitWin@@3PAXA	SOURCE/wingraph	0x0013449c	8 field(s) of placed bodies
+0x000a5d98	0x4	data	?bPaletteInitialized@@3HA	SOURCE/wingraph	0x001344a0	between its unit's placed neighbours, bytes equal
 0x000a5d9c	0x4	data	?giTtlBlts@@3HA	SOURCE/wingraph	0x001344a4	2 field(s) of placed bodies
 0x000a5da0	0x4	data	?gbWinGraphBusy@@3HA	SOURCE/wingraph	0x001344a8	11 field(s) of placed bodies
 0x000a5da4	0x4	data	?lpDirectDrawCreate@@3P6GJPAU_GUID@@PAPAUIDirectDraw@@PAUIUnknown@@@ZA	SOURCE/wingraph	0x001344ac	3 field(s) of placed bodies
@@ -1664,8 +1667,10 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a5dc4	0x4	data	?hdcImage@@3PAXA	SOURCE/wingraph	0x001344cc	11 field(s) of placed bodies
 0x000a5dc8	0x4	data	?gbmOldMonoBitmap@@3PAXA	SOURCE/wingraph	0x001344d0	2 field(s) of placed bodies
 0x000a5dcc	0x4	data	?hpalApp@@3PAXA	SOURCE/wingraph	0x001344d4	8 field(s) of placed bodies
+0x000a5dd0	0x4	data	?hWinGLibrary@@3PAXA	SOURCE/wingraph	0x001344d8	between its unit's placed neighbours, bytes equal
 0x000a5dd4	0x4	data	?hDDrawLibrary@@3PAXA	SOURCE/wingraph	0x001344dc	5 field(s) of placed bodies
 0x000a5de0	0x60	data	?gCyclePal@@3PACA	BASE/WINMGR	0x001348f4	29 field(s) of placed bodies
+0x000a5e40	0x2	data	?memSelector@@3FA	BASE/WINMGR	0x00134954	between its unit's placed neighbours, bytes equal
 0x000a5e44	0x4	data	?savedUpdate@?1??FadeSavedUpdate@@YIAAIXZ@4IA	BASE/WINMGR	0x00134958	2 field(s) of placed bodies
 0x000a5e48	0x4	data	?iCombatCycleFrame@@3HA	BASE/WINMGR	0x0013495c	15 field(s) of placed bodies
 0x000a5e4c	0x4	data	?iCycle1Count@@3HA	BASE/WINMGR	0x00134960	2 field(s) of placed bodies
@@ -1673,6 +1678,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a5e54	0x4	data	?iCycle3Count@@3HA	BASE/WINMGR	0x00134968	2 field(s) of placed bodies
 0x000a5e58	0x4	data	?iDialogNestCount@@3HA	BASE/WINMGR	0x0013496c	6 field(s) of placed bodies
 0x000a5e5c	0x4	data	?iLastBWOnScreenCheck@@3HA	BASE/INPUTMGR	0x00136074	2 field(s) of placed bodies
+0x000a5e60	0x4	data	?iCurSwapPalette@@3HA	BASE/INPUTMGR	0x00136078	between its unit's placed neighbours, bytes equal
 0x000a5e64	0x4	data	?bLastMouseOffscreen@@3HA	BASE/INPUTMGR	0x0013607c	4 field(s) of placed bodies
 0x000a5e68	0x4	data	?bLastOnscreenMouseColor@@3HA	BASE/INPUTMGR	0x00136080	2 field(s) of placed bodies
 0x000a5e6c	0x4	data	?bInCheckChangeCursor@@3HA	BASE/INPUTMGR	0x00136084	3 field(s) of placed bodies
