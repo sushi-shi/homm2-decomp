@@ -47,3 +47,8 @@
 // Disposition: the retail tail needs N emitted after the initializer pair
 // while Play still sees its body. None of these arms does both. The earlier
 // ownership matrices in this directory bound the remaining forms.
+//
+// Closure (2026-10-06): an in-class destructor plus SOURCE/KB.h included first,
+// compiled with /YX, emits N after the ctype pair while Play keeps 0x39c.
+// Arm 3's cross-object order was a coincidence of the same tail position.
+// See docs/matching/emission-order/pch/results.md.

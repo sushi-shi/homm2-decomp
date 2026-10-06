@@ -31,7 +31,8 @@ Manifest (JSON, schema 1)::
       "expect": {"a.cpp": "S A G R N", "link": "S A G R N"}
     }
 
-`{work}` in a flag is replaced by the variant directory (for example
+`unit_flags` (manifest or option) maps a unit to extra flags, for example
+`/Yc`/`/Yu` precompiled-header pairs. `{work}` in a flag is replaced by the variant directory (for example
 `/I{work}` lets a variant header shadow the repository copy).
 `@@slot@@` markers in `files` take the selected option's text (or the default).
 `files` may instead map a name to `{"path": "src/BASE/X.cpp"}` to read a real
@@ -91,8 +92,15 @@ def load_manifest(path: Path) -> dict:
 
 
 def render(manifest: dict, choices: tuple[dict, ...]) -> tuple[dict, list[str], list[str]]:
-    """Return (files, units, flags) for one combination of axis options."""
+    """Return (files, units, flags) for one combination of axis options.
+
+    Per-unit extra flags (`unit_flags`, from the manifest and then options) are
+    returned in ``flags`` under the key ``"unit:<name>"`` appended as
+    ``"@unit:<name>=<flag>"`` entries; `unit_flag_list` separates them.
+    """
     slots = dict(manifest["defaults"])
+    unit_flags = {unit: list(extra)
+                  for unit, extra in manifest.get("unit_flags", {}).items()}
     flags = list(manifest["flags"])
     units = list(manifest["units"])
     files = dict(manifest["files"])
@@ -105,6 +113,8 @@ def render(manifest: dict, choices: tuple[dict, ...]) -> tuple[dict, list[str], 
         flags.extend(option.get("flags_add", []))
         if "units" in option:
             units = list(option["units"])
+        for unit, extra in option.get("unit_flags", {}).items():
+            unit_flags[unit] = list(extra)
         for edit in option.get("edits", []):
             text = files[edit["file"]]
             if text.count(edit["find"]) != 1:
@@ -124,7 +134,16 @@ def render(manifest: dict, choices: tuple[dict, ...]) -> tuple[dict, list[str], 
         else:
             raise ValueError(f"slot expansion in {name} does not terminate")
         rendered[name] = text
+    for unit, extra in unit_flags.items():
+        flags.extend(f"@unit:{unit}={flag}" for flag in extra)
     return rendered, units, flags
+
+
+def unit_flag_list(flags: list[str], unit: str) -> list[str]:
+    """The common flags plus the per-unit extras for `unit`."""
+    common = [flag for flag in flags if not flag.startswith("@unit:")]
+    prefix = f"@unit:{unit}="
+    return common + [flag[len(prefix):] for flag in flags if flag.startswith(prefix)]
 
 
 def alias_for(name: str, aliases: list[tuple[re.Pattern, str]]) -> str | None:
@@ -134,8 +153,12 @@ def alias_for(name: str, aliases: list[tuple[re.Pattern, str]]) -> str | None:
     return None
 
 
-def object_functions(payload: bytes) -> list[dict]:
-    """Functions in COFF section-table order with size and REL32 callees."""
+def object_functions(payload: bytes, with_bytes: bool = False) -> list[dict]:
+    """Functions in COFF section-table order with size and REL32 callees.
+
+    `with_bytes` adds each body's raw bytes for comparison with a reference
+    object (`reference` in the manifest maps a unit to an object path).
+    """
     coff = CoffObject(payload)
     by_section: dict[int, list] = {}
     for symbol in coff.symbols.values():
@@ -152,9 +175,12 @@ def object_functions(payload: bytes) -> list[dict]:
             callees = [coff.symbols[r.symbol_index].name for r in coff.relocations
                        if r.section == section.index and r.typ == REL32
                        and symbol.value <= r.site < end]
-            rows.append({"name": symbol.name, "section": section.index,
-                         "section_name": section.name, "offset": symbol.value,
-                         "size": end - symbol.value, "callees": callees})
+            row = {"name": symbol.name, "section": section.index,
+                   "section_name": section.name, "offset": symbol.value,
+                   "size": end - symbol.value, "callees": callees}
+            if with_bytes:
+                row["bytes"] = coff.section_bytes(section)[symbol.value:end]
+            rows.append(row)
     return rows
 
 
@@ -190,13 +216,25 @@ def run_variant(manifest: dict, root: Path, index: int, choices, timeout: float)
     objects = []
     for unit in units:
         output = work / (Path(unit).stem + ".obj")
-        ok, log, timed_out = compile_object(REPO, work / unit, output, flags, timeout)
+        ok, log, timed_out = compile_object(REPO, work / unit, output,
+                                            unit_flag_list(flags, unit), timeout)
         if not ok:
             result["ok"] = False
             result["error"] = f"{unit}: " + ("timeout" if timed_out else log.strip()[-600:])
             return result
         objects.append(output)
         functions = object_functions(output.read_bytes())
+        reference = manifest.get("reference", {}).get(unit)
+        if reference:
+            expected = {row["name"]: row for row in object_functions(
+                (REPO / reference).read_bytes(), with_bytes=True)}
+            produced = {row["name"]: row for row in object_functions(
+                output.read_bytes(), with_bytes=True)}
+            result.setdefault("reference_differs", {})[unit] = sorted(
+                name for name in expected
+                if name in produced and expected[name]["bytes"] != produced[name]["bytes"])
+            result.setdefault("reference_missing", {})[unit] = sorted(
+                set(expected) - set(produced))
         for row in functions:
             row["alias"] = alias_for(row["name"], aliases)
             row["callees"] = [alias_for(c, aliases) or c for c in row["callees"]]

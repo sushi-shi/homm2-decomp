@@ -3,7 +3,7 @@
 # Observational only; never an enforcement baseline.
 # Updated by `homm2 status update` and `homm2 build`; do not hand-edit.
 # unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash
-BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	cf43f549e496
+BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	7bf4db3b3ba6
 BASE/AudiereEffects	?AudiereSamplePlaying@@YI_NPAVsample@@@Z	100.0000	5ae38b433ee8
 BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	3ae2727fe2b9
 BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	218f9b8a4984
@@ -144,7 +144,6 @@ BASE/Bzip	?undoReversibleTransformation@@YIXXZ	100.0000	9fbdcf365bc1
 BASE/Bzip	?updateModel@@YIXPAUModel@@H@Z	100.0000	4763e8a0c0f2
 BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	100.0000	27329cefa89d
 BASE/DIMMER	??0dimmerWidget@@QAE@XZ	100.0000	b5405c883323
-BASE/DIMMER	??1dimmerWidget@@UAE@XZ	100.0000	46cac827b41e
 BASE/DIMMER	?Draw@dimmerWidget@@UAEXXZ	100.0000	24d1157a18ef
 BASE/DIMMER	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	100.0000	55b9587ae7b2
 BASE/DIMMER	?Read@dimmerWidget@@QAEXXZ	100.0000	daba2e6dfddc

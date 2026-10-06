@@ -1,6 +1,6 @@
 import unittest
 
-from homm2.permute.emission_order import alias_for, parse_map, render
+from homm2.permute.emission_order import alias_for, parse_map, render, unit_flag_list
 
 
 class EmissionOrderTests(unittest.TestCase):
@@ -20,6 +20,14 @@ class EmissionOrderTests(unittest.TestCase):
         self.assertEqual(files["a.cpp"], "<1> end")
         self.assertEqual(units, ["a.cpp", "b.cpp"])
         self.assertEqual(flags, ["/c", "/Ob2"])
+
+    def test_unit_flags_apply_only_to_their_unit(self):
+        manifest = self.manifest()
+        manifest["unit_flags"] = {"a.cpp": ["/Ycpch.h"]}
+        option = {"name": "use", "unit_flags": {"b.cpp": ["/Yupch.h"]}}
+        _files, _units, flags = render(manifest, (option,))
+        self.assertEqual(unit_flag_list(flags, "a.cpp"), ["/c", "/Gy", "/Ycpch.h"])
+        self.assertEqual(unit_flag_list(flags, "b.cpp"), ["/c", "/Gy", "/Yupch.h"])
 
     def test_removing_an_absent_flag_is_an_error(self):
         with self.assertRaises(ValueError):

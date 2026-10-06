@@ -1,8 +1,8 @@
 #include <va.h>
+#include <SOURCE/KB.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
 #include <BASE/soundManager.h>
-#include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 
 SIZE(AudiereSampleNode, 0xc);
@@ -199,5 +199,3 @@ VA(0x004ccf50, 0x11)
 bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
-
-H2_RETAIL_INLINE AudiereSampleNode::~AudiereSampleNode() {}

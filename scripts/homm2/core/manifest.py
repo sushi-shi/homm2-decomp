@@ -35,11 +35,15 @@ def unit_flags(unit: dict, manifest: dict | None = None) -> list[str]:
 
     Retail linked BASE as a function-packaged static library: /Gy supplies the
     per-function 16-byte section boundaries visible at every BASE VA, while
-    the explicit SOURCE (and EDITOR) objects remain un-packaged. That tier
-    rule lives here and nowhere else.
+    the explicit SOURCE (and EDITOR) objects remain un-packaged. The BASE
+    library also used VC6's automatic precompiled headers (/YX): header-inline
+    functions and a header class's deleting destructor are then emitted at the
+    end of the object, which is the retail DIMMER and AudiereEffects order.
+    /YX is byte-neutral for every other unit (measured on all C++ units). That
+    tier rule lives here and nowhere else.
     """
     profiles = flag_profiles(manifest)
     flags = list(profiles[unit.get("flags", "base")])
     if unit["unit"].startswith("BASE/"):
-        flags.append("/Gy")
+        flags.extend(("/Gy", "/YX"))
     return flags

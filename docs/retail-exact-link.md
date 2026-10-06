@@ -36,7 +36,7 @@ ninja link-audit
   regression.
 - `ninja link-audit`: read-only comparison of the historical native image
   against retail. It writes `build/link/historical/HMM2PL.link.json` and reports
-  unresolved differences. It fails while the executable differs from retail;
+  unresolved differences. It fails if the executable differs from retail;
   the audit never changes inputs or output bytes.
 
 Each output directory also retains the exact response file, unchanged native
@@ -44,16 +44,16 @@ MAP, PDB, and linker log. `--transform` is rejected before building anything.
 Historical `build/link/HMM2PL.exe` artifacts are no longer supported outputs;
 rebuild a supported mode before interpreting a local executable.
 
-## Current residual
+## Current result
 
-The historical image differs from retail in 500 bytes: 496 in `.text`, 3 in
-`.rdata` and 1 in `.data`; headers, section geometry, imports and resources
-are exact. All of it is two placement walls, attributed in
-`docs/linked-function-placement-walls.md` and
-`docs/linked-data-section-walls.md`: DIMMER's scalar deleting destructor is
-emitted after its first constructor instead of after `Draw`, and the
-AudiereEffects node destructor precedes its ctype initializer pair instead of
-following it. The ceiling file records the per-region counts.
+The historical native link is byte-identical to retail: SHA-256
+`bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a`, and
+`link_exe --audit-existing --strict` passes. `config/link_diff_ceiling.tsv` is
+banked at zero in every region, so `homm2 build` fails on any byte of drift.
+
+The last two placement walls closed with automatic precompiled headers (`/YX`)
+on the BASE library and header-inline destructors for `dimmerWidget` and
+`AudiereSampleNode`; see `docs/patterns/yx-defers-header-inline-emission.md`.
 
 LINK's import slot order depends on the C runtime that Wine loads for it
 (`docs/patterns/import-slot-order-follows-linker-runtime.md`). The ordinary
@@ -103,8 +103,8 @@ python3 -m homm2.build.link_exe --audit-existing --strict \
 sha256sum build/orig/HMM2PL.exe build/link/historical/HMM2PL.exe
 ```
 
-The strict audit is expected to fail while native image residuals remain. Only
-verified equality of the requested executable can establish completion.
+Both commands must report equality; the strict audit passes on the current
+source.
 
 ## Historical evidence
 

@@ -64,7 +64,9 @@ inline; Purge calls N. DIMMER: `c0 cA R M D G X`, every function on its own
 ## Disposition
 
 No natural form reproduces either tail inside the Rich-header object budget.
-Both walls therefore remain open; no probe source or flag change is retained.
+Both walls stayed open under these products. They were closed afterwards by
+automatic precompiled headers, which this campaign did not vary; see
+[pch/results.md](pch/results.md).
 
 ## Tables
 ### audiere-owner (216 variants; /Ob1 and /Ob2 identical: True)

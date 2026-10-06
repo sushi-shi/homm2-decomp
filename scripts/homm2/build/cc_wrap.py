@@ -103,6 +103,14 @@ def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeou
             return 1, '\n'.join(errors), False
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists(): out.unlink()
+    flags = list(flags)
+    if any(f.upper().startswith(("/YX", "/YC", "/YU")) for f in flags) and not any(
+            f.upper().startswith("/FP") for f in flags):
+        # One precompiled header per object, created fresh: parallel compiles
+        # must not share vc60.pch, and /YX must not reuse a stale one.
+        pch = out.with_suffix(".pch")
+        pch.unlink(missing_ok=True)
+        flags.append(f"/Fp{winepath_w(pch)}")
     localization_flags = ([f'/FI{winepath_w(header)}',
                            f'/I{winepath_w(header.parent / "include")}',
                            f'/I{winepath_w(src.parent)}'] if header else [])

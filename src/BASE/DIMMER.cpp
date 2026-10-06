@@ -34,8 +34,5 @@ void dimmerWidget::Draw(void) {
     Dim();
 }
 
-VA(0x004d3470, 0x1c)
-dimmerWidget::~dimmerWidget() {}
-
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(dimmerWidget, 0x004eaa04)

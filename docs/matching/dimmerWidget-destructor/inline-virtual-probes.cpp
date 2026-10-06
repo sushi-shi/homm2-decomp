@@ -24,3 +24,7 @@
 // virtuals inline, or defining them after the constructors, does not defer
 // the deleting-destructor COMDAT. This extends matrices 2 and 4 of
 // comdat-order-matrix.cpp to the inline-virtual forms. No source change.
+//
+// Closure (2026-10-06): under /YX the in-class destructor above emits
+// c0 cA R M D G X then the ctype pair, the retail order, with all bodies
+// unchanged. See docs/matching/emission-order/pch/results.md.

@@ -19,14 +19,14 @@ class UnitFlagsTests(unittest.TestCase):
         row = self.MANIFEST["unit"][0]
         self.assertEqual(unit_flags(row, self.MANIFEST), ["/Od", "/MT"])
 
-    def test_base_units_get_the_function_packaging_tier_rule(self):
+    def test_base_units_get_the_library_tier_rule(self):
         row = self.MANIFEST["unit"][1]
-        self.assertEqual(unit_flags(row, self.MANIFEST), ["/Od", "/MT", "/Gy"])
+        self.assertEqual(unit_flags(row, self.MANIFEST), ["/Od", "/MT", "/Gy", "/YX"])
 
     def test_explicit_profiles_still_get_the_tier_rule(self):
         row = self.MANIFEST["unit"][2]
         self.assertEqual(unit_flags(row, self.MANIFEST),
-                         ["/Od", "/MT", "/GX", "/Gy"])
+                         ["/Od", "/MT", "/GX", "/Gy", "/YX"])
 
     def test_flag_profiles_copies_are_independent(self):
         profiles = flag_profiles(self.MANIFEST)
@@ -43,4 +43,4 @@ class UnitFlagsTests(unittest.TestCase):
             self.assertIn("/Od" in flags or "/O1" in flags or "/O2" in flags,
                           (True,))
             self.assertEqual(row["unit"].startswith("BASE/"),
-                             flags[-1] == "/Gy")
+                             flags[-2:] == ["/Gy", "/YX"])
