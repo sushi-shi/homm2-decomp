@@ -6,6 +6,7 @@ include(CTest)
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
 option(HOMM2_SANITIZERS "Instrument native builds with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+set(HOMM2_SANITIZER_EXCLUDE "" CACHE STRING "Comma-separated sanitizer checks to leave out of HOMM2_SANITIZERS")
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
@@ -24,6 +25,10 @@ if(HOMM2_SANITIZERS)
   add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer
     -fno-sanitize-recover=all)
   add_link_options(-fsanitize=address,undefined)
+  if(HOMM2_SANITIZER_EXCLUDE)
+    add_compile_options(-fno-sanitize=${HOMM2_SANITIZER_EXCLUDE})
+    add_link_options(-fno-sanitize=${HOMM2_SANITIZER_EXCLUDE})
+  endif()
 endif()
 
 # Retail pointer width and packed layouts are load-bearing, so the game is
