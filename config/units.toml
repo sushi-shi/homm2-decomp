@@ -579,3 +579,9 @@ flags = "base_nogf"
 unit = "EDITOR/CLEARMGR"
 source = "src/EDITOR/CLEARMGR.cpp"
 images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/EDITOR"
+source = "src/EDITOR/EDITOR.cpp"
+images = ["editor"]
+flags = "base_nogf"

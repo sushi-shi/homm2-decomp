@@ -567,6 +567,18 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.startup.cd_required"
+msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
+msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."
+
+msgctxt "editor.startup.initialize_failed"
+msgid "Can't init system"
+msgstr "Невозможно инициировать систему"
+
+msgctxt "editor.startup.no_cd_drive"
+msgid "Unable to access CD-ROM Drive."
+msgstr "Нет доступа к CD-ROM."
+
 msgctxt "event.inline.021d355fcf4f31af"
 msgid "{Flotsam}\n\nYou search through the flotsam, and find some wood."
 msgstr "{Обломки}\n\nВы исследовали плавающие обломки и добыли немного древесины."

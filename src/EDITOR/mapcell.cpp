@@ -6,7 +6,7 @@
 #include <string.h>
 #include <io.h>
 #ifdef HOMM2_EDITOR
-#include <EDITOR/editManager.h>
+#include <EDITOR/EDITOR.h>
 #endif
 
 H2_ENUM_BEGIN(MapCellExtraConstant)

@@ -8,7 +8,7 @@
 
 #include <va.h>
 #include <BASE/baseManager.h>
-#include <EDITOR/fullMap.h>
+#include <SOURCE/REQUEST.h>
 
 class heroWindow;
 
@@ -44,7 +44,13 @@ public:
     i32 m_cursorX;
     i32 m_cursorY;
 
+    editManager(void);
+    virtual i32 Open(i32 priority) OVERRIDE;
+    virtual void Close(void) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void SaveUndo(void);
+    i32 LoadMap(char* name);
+    void SelectTool(i32 tool);
     void UpdateMapView(void);
     void UpdateCursor(void);
     void ScreenToCell(i32& x, i32& y);
@@ -55,9 +61,12 @@ public:
 #pragma pack(pop)
 
 extern editManager* gEditManager;
-// The map the scenario editor edits, and the copy its undo restores.
-extern fullMap gMap;
-extern fullMap gUndoMap;
+// The header of the edited map (its name, size and players).
+extern SMapHeader gEditMapHeader;
+
+// The map file requester: loads or saves (`mode`) and stores the chosen
+// file name in gMapFileName.
+i32 PickMap(i32 mode);
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 extern i32 gSelectionX;
 extern i32 gSelectionY;
