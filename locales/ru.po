@@ -675,6 +675,78 @@ msgctxt "editor.random.status.trees"
 msgid "Generating map - Placing trees..."
 msgstr "Генерация карты - размещаю деревья..."
 
+msgctxt "editor.sign.bottle_title"
+msgid "Bottle Detail"
+msgstr "Содержание бутылки"
+
+msgctxt "editor.sign.old_editor"
+msgid "Unable to edit sign - created under old editor"
+msgstr "Нельзя редактировать указатель. Объект создан старым редактором."
+
+msgctxt "editor.sign.sign_title"
+msgid "Sign Detail"
+msgstr "Информация указателя"
+
+msgctxt "editor.spec.days"
+msgid "%d days"
+msgstr "%d дней"
+
+msgctxt "editor.spec.event_entry"
+msgid "Day %d - %s"
+msgstr "День %d - %s"
+
+msgctxt "editor.spec.events_full"
+msgid "No more events can be added unless some are deleted."
+msgstr "нельзя добавить новые события, если только удалить старые."
+
+msgctxt "editor.spec.gold"
+msgid "%d Gold"
+msgstr "%d золота"
+
+msgctxt "editor.spec.months"
+msgid "%d months"
+msgstr "%d месяцев"
+
+msgctxt "editor.spec.no_heroes"
+msgid "No heroes on map"
+msgstr "На карте нет героев"
+
+msgctxt "editor.spec.no_towns"
+msgid "No towns on map"
+msgstr "На карте нет городов"
+
+msgctxt "editor.spec.rumours_full"
+msgid "No more rumors can be added unless some are deleted."
+msgstr "Нельзя добавить новые слухи, если только не удалить старые."
+
+msgctxt "editor.spec.versus_others"
+msgid " vs. other(s)"
+msgstr " против других"
+
+msgctxt "editor.spec.weeks"
+msgid "%d weeks"
+msgstr "%d недель"
+
+msgctxt "editor.spell_scroll.prompt"
+msgid "Select Spell"
+msgstr "Выбрать заклинание"
+
+msgctxt "editor.spell_scroll.title"
+msgid "Spell Scroll"
+msgstr "Свиток заклинаний"
+
+msgctxt "editor.sphinx.answers_full"
+msgid "Sorry, you have already entered the maximum number of answers."
+msgstr "Извините, вы уже ввели максимальное число возможных ответов."
+
+msgctxt "editor.sphinx.enter_answer"
+msgid "Please enter the answer.\n\n\nNotes:\n1) Only the first 4 characters are used in checking the answer.\n\n2) Any combination of letters, numbers, and punctuations is ok.\n\n3) The answer comparison is not case sensitive.\n\n4) A user entry matching any answer on the list is ok."
+msgstr "Пожалуйста, введите ответы.\n\n1) Учитываются только первые 4 символа.\n\n2) Допускается любая комбинация слов, букв, цифр и знаков препинания.\n\n3) Система проверки не различает регистры букв.\n\n4) Достаточно совпадения с любым вариантом."
+
+msgctxt "editor.sphinx.no_artifact"
+msgid "-none-"
+msgstr "-нет-"
+
 msgctxt "editor.startup.cd_required"
 msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
 msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."

@@ -2383,7 +2383,7 @@ DATA(0x004817f8) H2_CONST char* gColors[IDX(FACTION_COUNT)] = {
     localization::Tr("table.gColors.4"),
     localization::Tr("table.gColors.5")
 };
-DATA(0x00481810) static H2_CONST char* H2_UNUSED(gColorAbbreviations)[IDX(FACTION_COUNT)] = {
+DATA(0x00481810) H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT] = {
     localization::Tr("color.abbreviated.blue"),
     localization::Tr("color.abbreviated.green"),
     localization::Tr("color.abbreviated.red"),
@@ -3502,6 +3502,7 @@ DATA(0x004a4a48) b32 gbInMemError = false;
 // Uninitialized storage: VC6 orders it by name hash, not by definition.
 DATA(0x004a3ac8) i32 giDebugLevel;
 DATA(0x004a3adc) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+DATA(0x004a3b18) u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 DATA(0x004a3b7c) class mouseManager* gpMouseManager;
 DATA(0x004a3b80) char gText[GLOBAL_TEXT_BUFFER_SIZE];
 DATA(0x004a3e8c) char* EXPANSION_AGGREGATE_NAME;
@@ -3516,6 +3517,7 @@ DATA(0x004a4030) char gMapFileName[EDITOR_MAP_FILE_NAME_SIZE];
 DATA(0x004a4040) char gStatusText[EDITOR_STATUS_TEXT_SIZE];
 DATA(0x004a4108) i32 gSelectionY;
 DATA(0x004a410c) resourceManager* gpResourceManager;
+DATA(0x004a4110) u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 DATA(0x004a414c) heroWindow* pNormalDialogWindow;
 DATA(0x004a4150) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 DATA(0x004a418c) heroWindow* gEditDialog;

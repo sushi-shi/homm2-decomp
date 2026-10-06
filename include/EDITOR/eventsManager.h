@@ -18,6 +18,9 @@ class heroWindow;
 class icon;
 class iconWidget;
 class mapCell;
+struct mapEventExtra;
+struct rumourEventExtra;
+struct signEventExtra;
 struct tag_message;
 
 H2_ENUM_BEGIN(EventsDialogButton)
@@ -142,6 +145,13 @@ H2_ENUM_BEGIN(NewMapTerrain)
     NEW_MAP_TERRAIN_GRASS = 1
 H2_ENUM_END(NewMapTerrain)
 
+H2_ENUM_BEGIN(EventTextConstant)
+    // The buffer a record's message is edited in, and the dialog's text
+    // field (ridledit.bin, rumredit.bin).
+    EVENT_TEXT_CAPACITY = 2000,
+    EVENT_TEXT_FIELD    = 0x78
+H2_ENUM_END(EventTextConstant)
+
 // Closes the running dialog: the dialog manager reads the select command.
 #define FINISH_EDIT_DIALOG(message)                                                                \
     ((message).type = MESSAGE_WIDGET,                                                              \
@@ -173,13 +183,13 @@ public:
     void FillInTownEdit(struct TownExtra* town);
     // ridledit: the sphinx's riddle, answers and reward.
     i32 EditSphinx(i32 extra);
-    void UpdateSphinx(void);
+    void UpdateSphinx(mapEventExtra* sphinx);
     // rumredit: one of the map's rumours.
     i32 EditRumor(i32 extra);
-    void UpdateRumor(char* header);
+    void UpdateRumor(rumourEventExtra* rumor);
     // signedit: a sign's or a bottle's message.
     void EditSign(i32 x, i32 y);
-    void UpdateSign(char* header);
+    void UpdateSign(signEventExtra* sign);
     // x_spedit: a spell scroll's spell.
     void EditSpellScroll(i32* spell);
 };
