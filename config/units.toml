@@ -585,3 +585,28 @@ unit = "EDITOR/EDITOR"
 source = "src/EDITOR/EDITOR.cpp"
 images = ["editor"]
 flags = "base_nogf"
+
+[[unit]]
+unit = "EDITOR/setup"
+source = "src/EDITOR/setup.cpp"
+images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/x_spedit"
+source = "src/EDITOR/x_spedit.cpp"
+images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/ridledit"
+source = "src/EDITOR/ridledit.cpp"
+images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/rumredit"
+source = "src/EDITOR/rumredit.cpp"
+images = ["editor"]
+
+[[unit]]
+unit = "EDITOR/signedit"
+source = "src/EDITOR/signedit.cpp"
+images = ["editor"]

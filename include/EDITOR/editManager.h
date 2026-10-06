@@ -100,6 +100,7 @@ extern SMapHeader gEditMapHeader;
 // The map file requester: loads or saves (`mode`) and stores the chosen
 // file name in gMapFileName.
 i32 PickMap(i32 mode);
+void ResetPlayerAvailability(void);
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 extern i32 gSelectionX;
 extern i32 gSelectionY;

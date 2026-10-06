@@ -115,6 +115,9 @@ extern char gStatusText[EDITOR_STATUS_TEXT_SIZE];
 extern b32 gStatusTextShown;
 extern i32 gStatusTextHoldTime;
 extern i32 gStatusTextClearTime;
+// The object dialog an event editor has open, and the map cell it edits.
+extern class heroWindow* gEditDialog;
+extern class mapCell* gEditCell;
 
 void ProtectShippedMap(void);
 void IncrementArgumentA(i32 value);

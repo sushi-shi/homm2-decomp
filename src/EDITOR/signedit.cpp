@@ -1,0 +1,134 @@
+// The sign and bottle editor: the event tool opens it for a sign or a
+// bottle and edits its message in the rumour dialog. Descriptive names:
+// UpdateSign, EditSignHandler, gSign, gSignText, gSignBlank.
+
+#include <va.h>
+#include <EDITOR/signedit.h>
+#include <EDITOR/EDITOR.h>
+#include <EDITOR/editManager.h>
+#include <EDITOR/eventsManager.h>
+#include <EDITOR/fullMap.h>
+#include <EDITOR/mapcell.h>
+#include <BASE/dialog.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
+#include <BASE/message.h>
+#include <SOURCE/KB.h>
+#include <stdio.h>
+#include <string.h>
+
+H2_ENUM_BEGIN(SignDialog)
+    SIGN_WINDOW_TEXT_ID = 11,
+    SIGN_TITLE          = 0x64,
+H2_ENUM_END(SignDialog)
+
+DATA(0x004a5828) signEventExtra gSign;
+DATA(0x004a5834) char* gSignText;
+DATA(0x004a5838) char gSignBlank[SIGN_BLANK_SIZE];
+
+VA(0x00426110, 0x36e)
+void eventsManager::EditSign(i32 x, i32 y) {
+    mapCell original;
+    i32 unused[3];
+    tag_message message;
+    i32 len;
+    char* newRecord;
+
+    gEditCell = gMap.GetCell(x, y);
+    if (gEditCell->m_objectMetadata == 0) {
+        NormalDialog(localization::Tr("editor.sign.old_editor"), NORMAL_DIALOG_INFO);
+        return;
+    }
+    original = *gEditCell;
+    memcpy(&gSign, gEditManager->m_extras[gEditCell->m_objectMetadata], sizeof(gSign));
+    gSignText = new char[EVENT_TEXT_CAPACITY];
+    strcpy(gSignText, static_cast<signEventExtra*>(gEditManager->m_extras[gEditCell->m_objectMetadata])->text);
+    gEditDialog = new heroWindow(0, 0, "rumredit.bin");
+    SetWinText(gEditDialog, SIGN_WINDOW_TEXT_ID);
+    if (gEditCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)))
+        sprintf(gText, localization::Tr("editor.sign.bottle_title"));
+    else
+        sprintf(gText, localization::Tr("editor.sign.sign_title"));
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.data.text = gText;
+    message.payload.widget.id = SIGN_TITLE;
+    gEditDialog->BroadcastMessage(message);
+    UpdateSign(&gSign);
+    gpWindowManager->DoDialog(gEditDialog, EditSignHandler, 0);
+    delete gEditDialog;
+    if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
+        len = strlen(gSignText) + sizeof(gSign);
+        if (!gSign.pad[0])
+            strcpy(gSignText, gSignBlank);
+        newRecord = new char[len];
+        memcpy(newRecord, &gSign, sizeof(gSign));
+        strcpy(newRecord + EVENT_RECORD_SIGN_HEADER_SIZE, gSignText);
+        delete[] static_cast<char*>(gEditManager->m_extras[gEditCell->m_objectMetadata]);
+        gEditManager->m_extras[gEditCell->m_objectMetadata] = newRecord;
+        gEditManager->m_extraSizes[gEditCell->m_objectMetadata] = len;
+        delete[] gSignText;
+        gSignText = NULL;
+        gEditManager->m_mapChanged = 1;
+    }
+    gEditManager->DrawMap();
+    gEditManager->UpdateMapView();
+}
+
+VA(0x0042647e, 0x3b)
+void eventsManager::UpdateSign(signEventExtra* sign) {
+    i32 unused;
+    tag_message message;
+
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.data.text = gSignText;
+    message.payload.widget.id = EVENT_TEXT_FIELD;
+    gEditDialog->BroadcastMessage(message);
+}
+
+VA(0x004264b9, 0x14d)
+MessageDispatchResult EditSignHandler(struct tag_message& message) {
+    i32 unused[2];
+    b32 modified = false;
+    tag_message reply;
+    i32 unusedIndex;
+
+    switch (message.type) {
+        case MESSAGE_WIDGET:
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_DESELECT:
+                    switch (message.payload.widget.id) {
+                        case EVENTS_DIALOG_CANCEL:
+                        case EVENTS_DIALOG_OK:
+                            gpWindowManager->m_dialogResult = message.payload.widget.id;
+                            FINISH_EDIT_DIALOG(message);
+                            return MESSAGE_DISPATCH_FORWARD;
+                    }
+                    break;
+                case WIDGET_NOTIFY_SELECT:
+                    switch (message.payload.widget.id) {
+                        case EVENT_TEXT_FIELD:
+                            SET_WIDGET_MESSAGE(reply, WIDGET_COMMAND_GET_TEXT, message.payload.widget.id);
+                            gEditDialog->BroadcastMessage(reply);
+                            strcpy(gSignText, reply.payload.widget.data.text);
+                            break;
+                    }
+                    break;
+            }
+            break;
+        case MESSAGE_KEY_DOWN:
+            switch (message.payload.keyboard.keyCode) {
+                case INPUT_SCAN_ESCAPE:
+                    FINISH_EDIT_DIALOG(message);
+                    return MESSAGE_DISPATCH_FORWARD;
+            }
+            break;
+    }
+    if (modified) {
+        static_cast<eventsManager*>(gEditManager->m_toolManager)->UpdateSign(&gSign);
+        gEditDialog->DrawWindow();
+    }
+    return MESSAGE_DISPATCH_CONSUME;
+}
