@@ -34,7 +34,7 @@ Usage (reads files + $HOMM2_EXE only):
     python3 -m homm2.sema.xref --tree 0x00069120        # caller ancestry (depth 4)
     python3 -m homm2.sema.xref --tree --depth 0 0x...    # unlimited (can be huge)
 """
-from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 import os, sys, struct, csv, bisect
 from pathlib import Path
 
@@ -43,6 +43,9 @@ REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").ex
 EXE = retail_exe()
 SYMCSV = gen_dir() / "symbol_names.csv"
 FUNCS = image_build() / "ghidra/exports/functions.csv"
+if not FUNCS.is_file():
+    # The image's reviewed inventory has the export's schema.
+    FUNCS = retail_dir() / "functions.csv"
 IMAGEBASE = 0x400000
 
 
@@ -99,7 +102,7 @@ def _names():
                     fsize[rva] = sz
     if FUNCS.exists():
         with open(FUNCS) as f:
-            for r in csv.DictReader(f):
+            for r in csv.DictReader(line for line in f if not line.startswith('#')):
                 try:
                     rva = int(r["entry_rva"], 16)
                 except Exception:

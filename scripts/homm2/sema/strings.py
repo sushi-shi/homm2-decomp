@@ -15,7 +15,7 @@ Usage (reads $HOMM2_EXE + the CSVs only):
     python3 -m homm2.sema.strings --rva 0x0000126d
     python3 -m homm2.sema.strings --find "too many bits"
 """
-from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 import bisect, csv, os, re, struct, sys
 from pathlib import Path
 
@@ -25,6 +25,9 @@ REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
 EXE = retail_exe()
 SYMCSV = gen_dir() / "symbol_names.csv"
 FUNCS = image_build() / "ghidra/exports/functions.csv"
+if not FUNCS.is_file():
+    # The image's reviewed inventory has the export's schema.
+    FUNCS = retail_dir() / "functions.csv"
 IMAGE_BASE = 0x400000
 
 
@@ -45,7 +48,7 @@ def _funcs():
             except (ValueError, KeyError):
                 pass
     if FUNCS.is_file():
-        for r in csv.DictReader(FUNCS.open()):
+        for r in csv.DictReader(line for line in FUNCS.open() if not line.startswith("#")):
             try:
                 rva = int(r["entry_rva"], 16)
             except (ValueError, KeyError):
@@ -76,13 +79,14 @@ def load():
     trva = text[1]
     # strings (start VA -> text) from non-.text sections
     str_at = {}
-    pat = re.compile(rb"[\x20-\x7e]{4,}")
+    # Printable ASCII and the CP1251 Cyrillic letters the Buka text uses.
+    pat = re.compile(rb"[\x20-\x7e\xa8\xb8\xc0-\xff]{4,}")
     for name, vaddr, vsize, rawp, rawsz in secs:
         if name == ".text":
             continue
         blob = data[rawp:rawp + rawsz]
         for m in pat.finditer(blob):
-            str_at[IMAGE_BASE + vaddr + m.start()] = m.group().decode("latin1")
+            str_at[IMAGE_BASE + vaddr + m.start()] = m.group().decode("cp1251")
 
     starts, fname, fsize = _funcs()
 

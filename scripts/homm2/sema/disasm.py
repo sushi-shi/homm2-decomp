@@ -27,7 +27,7 @@ Usage:
     python3 -m homm2.sema.disasm ?initialiseCRC@@YIXXZ --base
     python3 -m homm2.sema.disasm 0x000d4050 --diff
 """
-from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_exe
+from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
 import csv, json, os, re, subprocess, sys
 from pathlib import Path
 
@@ -88,6 +88,14 @@ def _resolve(arg):
             key=lambda entry: entry[1])
         ordinal = next(i for i, entry in enumerate(same_name) if entry[0] is r)
         return r["name"], unit, rva, size, ordinal
+    # An unclaimed function delinks into "(unmatched)" under its inventory name.
+    inventory = retail_dir() / "functions.csv"
+    if inventory.is_file():
+        for r in csv.DictReader(line for line in inventory.open()
+                                if not line.startswith("#")):
+            rva = int(r["entry_rva"], 16)
+            if (want_rva is not None and rva == want_rva) or r["name"] == arg:
+                return r["name"], "(unmatched)", rva, int(r["byte_size"]), 0
     die(f"'{arg}' is not a known function RVA/name in symbol_names.csv")
 
 
