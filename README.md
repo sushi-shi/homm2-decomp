@@ -166,22 +166,6 @@ sudo nixos-rebuild switch --flake '.#<host>'
 heroes2-ironfist
 ```
 
-With home-manager, the same options install the game for one user:
-
-```nix
-homeConfigurations."<user>" = home-manager.lib.homeManagerConfiguration {
-  pkgs = nixpkgs.legacyPackages.x86_64-linux;
-  modules = [
-    homm2.homeManagerModules.default
-    { programs.homm2 = { enable = true; edition = "ironfist"; game = "${homm2-game}"; }; }
-  ];
-};
-```
-
-```sh
-home-manager switch --flake '.#<user>'
-```
-
 `edition = "ironfist"` is this branch's only edition and its default; the
 `port` branch's is `gold`. Ironfist keeps saves, high scores and settings in
 `~/.local/share/homm2/ironfist`, apart from the Gold port's. `locale = "ru"`

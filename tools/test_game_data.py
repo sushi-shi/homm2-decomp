@@ -200,8 +200,7 @@ class GameDataTest(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("7z"), "7z is not installed")
     def test_archive_inside_an_archive(self):
-        """archive.org's .rar holds the disc's image, which is unpacked in
-        turn."""
+        """A .rar holding the disc's image: the image is unpacked in turn."""
         self.anthology()
         inner = self.root / "inner/disc.zip"
         inner.parent.mkdir()
