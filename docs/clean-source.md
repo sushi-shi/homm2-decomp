@@ -53,7 +53,7 @@ resolve away.
 The verifier reports, but does not promote, `-Wformat-security`. Retail contains
 two-argument `sprintf(destination, text)` calls whose safe replacement changes
 behavior when `text` contains a percent conversion. The exact and generated
-historical trees retain that behavior; portable master replaces those calls and
+historical trees retain that behavior; the portable `port` branch replaces those calls and
 treats this diagnostic as an error.
 
 The lexer distinguishes comments from string and character literals, matches

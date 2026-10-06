@@ -9,7 +9,7 @@ change are in [AGENTS.md](../AGENTS.md); tool details in [tooling.md](tooling.md
   drive every function and data object to exact comparison where retail evidence permits.
 - Continue autonomously while useful work remains. A completed function or batch is a
   checkpoint, not the end of the campaign.
-- Integrate verified work linearly on `master`. Matcher lanes may use persistent
+- Integrate verified work linearly on `decomp-gold-2.1-buka`. Matcher lanes may use persistent
   worktrees, but their generated reports are not integration payloads.
 - Carry each accepted change through build, byte/relocation review, and a focused commit.
 

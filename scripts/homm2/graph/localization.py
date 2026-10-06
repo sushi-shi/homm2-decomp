@@ -1,4 +1,4 @@
-"""Static, byte-preserving Buka localization using master's IDs and PO format.
+"""Static, byte-preserving Buka localization using the port branch's IDs and PO format.
 
 Authored Tr("semantic.id") expressions become literal macros, never runtime calls.
 The compiler view preserves every source byte offset and newline: Clang's source
