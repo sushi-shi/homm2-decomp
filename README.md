@@ -37,14 +37,14 @@ _Excluded from the % above — identified generated/library code, not independen
 
 ### EDT2PL.exe
 
-**Overall: 765 / 1044 functions exact (73.28%) &middot; 765 / 1044 functions exact-max (73.28%) &middot; 86.02% fuzzy &middot; 86.02% fuzzy-max &middot; 159,556 / 283,544 data bytes (56.272%) &middot; 51 / 66 data-bearing units exact.** A separate image with its own delink, comparison and scores; shared units compile once per image.
+**Overall: 796 / 838 functions exact (94.99%) &middot; 796 / 838 functions exact-max (94.99%) &middot; 91.08% fuzzy &middot; 91.08% fuzzy-max &middot; 277,937 / 283,016 data bytes (98.205%) &middot; 60 / 68 data-bearing units exact.** A separate image with its own delink, comparison and scores; shared units compile once per image.
 
-| Module        | Units |   Functions exact | Functions exact-max |  Fuzzy | Fuzzy-max | Data exact |                 Data bytes |
-| :------------ | ----: | ----------------: | ------------------: | -----: | --------: | ---------: | -------------------------: |
-| `BASE`        |    44 | 448 / 461 (97.2%) |   448 / 461 (97.2%) |  99.6% |     99.6% |    39 / 44 |   10,528 / 14,028 (75.05%) |
-| `EDITOR`      |    18 | 253 / 265 (95.5%) |   253 / 265 (95.5%) | 100.0% |    100.0% |    12 / 18 | 149,016 / 261,703 (56.94%) |
-| `(unmatched)` |     1 |    0 / 253 (0.0%) |      0 / 253 (0.0%) |   0.0% |      0.0% |      0 / 1 |            0 / 536 (0.00%) |
-| `SOURCE`      |     3 |   64 / 65 (98.5%) |     64 / 65 (98.5%) | 100.0% |    100.0% |      0 / 3 |         12 / 7,277 (0.16%) |
+| Module        | Units |    Functions exact | Functions exact-max |  Fuzzy | Fuzzy-max | Data exact |                 Data bytes |
+| :------------ | ----: | -----------------: | ------------------: | -----: | --------: | ---------: | -------------------------: |
+| `BASE`        |    46 | 467 / 467 (100.0%) |  467 / 467 (100.0%) | 100.0% |    100.0% |    46 / 46 |  14,076 / 14,076 (100.00%) |
+| `EDITOR`      |    18 |  259 / 268 (96.6%) |   259 / 268 (96.6%) | 100.0% |    100.0% |    12 / 18 | 257,350 / 261,703 (98.34%) |
+| `SOURCE`      |     3 |   70 / 70 (100.0%) |    70 / 70 (100.0%) | 100.0% |    100.0% |      2 / 3 |     6,511 / 6,829 (95.34%) |
+| `(unmatched)` |     1 |      0 / 33 (0.0%) |       0 / 33 (0.0%) |   0.0% |      0.0% |      0 / 1 |            0 / 408 (0.00%) |
 
 <!-- match-score:end -->
 
