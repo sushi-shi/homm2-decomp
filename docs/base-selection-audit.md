@@ -8,7 +8,7 @@ Status: **provisional; behavior gate not passed** (2026-08-24).
 decomp-2.0      -> clean-2.0 -----------+
                        |                |
                        +-> classic-2.0  |
-                           (terminal)   +-> master -> ironfist
+                           (terminal)   +-> port -> source-ironfist
                                         |
 decomp-2.1-buka -> clean-2.1-buka -----+
                        |
@@ -17,12 +17,12 @@ decomp-2.1-buka -> clean-2.1-buka -----+
 ```
 
 - `decomp-*`: binary-matching evidence branches.
-- `clean-*`: generated source without matching machinery; inputs to `master`.
+- `clean-*`: generated source without matching machinery; inputs to `port`.
 - `classic-*`: terminal readable snapshots of each retail source model; never
-  merged into `master`.
-- `master`: Buka structure by default, English default locale, explicit
+  merged into `port`.
+- `port`: Buka structure by default, English default locale, explicit
   edition/locale/platform policies, cross-platform implementation.
-- `ironfist`: downstream gameplay project.
+- `source-ironfist`: downstream gameplay project.
 
 ## Decision gates
 
@@ -60,7 +60,7 @@ Bullet-level provenance census of `docs/version-changes.md`:
 | Bookkeeping/non-delta | 7 |
 | Total | 178 |
 
-| Delta family | Default `master` policy |
+| Delta family | Default `port` policy |
 |---|---|
 | Compiler, `/Od`, `/GX`, allocation/assert state | discard as build provenance |
 | Guards, loops, scopes, accessors, types | take Buka unless contradicted by edition semantics |
@@ -72,12 +72,12 @@ Bullet-level provenance census of `docs/version-changes.md`:
 
 ## Buka defect and risk register
 
-| ID | Status | Risk | Evidence / master action |
+| ID | Status | Risk | Evidence / `port` action |
 |---|---|---|---|
-| BUKA-001 | confirmed Buka regression | high | `CampaignHandler` writes `m_campaignMapEnabled[scenario][side]`; the declared and all other accesses are `[side][scenario]`, so later scenarios write out of bounds. PoL writes the correct order and English Gold lacks the faulty write. Correct in `master`; preserve in `classic-2.1-buka`. |
-| BUKA-002 | confirmed inherited defect | high | `font::LineWidth` never advances past `\n`; fix and test multiline input in `master`. |
-| BUKA-003 | confirmed retail defect family | medium | Five flipped icon decoders discard partially clipped solid/shadow runs. Correct the clean/master implementation; retain exact shape only in decomp/classic. See `docs/icon-format.md` F1. |
-| BUKA-004 | latent unsafe API | medium | `IconToBitmapScale` ignores clip arguments except at scale 32. Current callers request no clipping; enforce bounds in `master`. See `docs/icon-format.md` F3. |
+| BUKA-001 | confirmed Buka regression | high | `CampaignHandler` writes `m_campaignMapEnabled[scenario][side]`; the declared and all other accesses are `[side][scenario]`, so later scenarios write out of bounds. PoL writes the correct order and English Gold lacks the faulty write. Correct in `port`; preserve in `classic-2.1-buka`. |
+| BUKA-002 | confirmed inherited defect | high | `font::LineWidth` never advances past `\n`; fix and test multiline input in `port`. |
+| BUKA-003 | confirmed retail defect family | medium | Five flipped icon decoders discard partially clipped solid/shadow runs. Correct the clean/port implementation; retain exact shape only in decomp/classic. See `docs/icon-format.md` F1. |
+| BUKA-004 | latent unsafe API | medium | `IconToBitmapScale` ignores clip arguments except at scale 32. Current callers request no clipping; enforce bounds in `port`. See `docs/icon-format.md` F3. |
 | BUKA-005 | confirmed Buka regression | medium | `PlaySmacker` removed the speed-test playback but still judges `smksum`, which may describe zero or a previous playback; English Gold retains the PoL test sequence. Restore or replace the first-run benchmark and test it. |
 | BUKA-006 | confirmed localization defect | low | Major and Minor Scroll share the Russian `Minor Scroll` label; fix Buka locale data. |
 | BUKA-007 | confirmed localization defect | low | Genie-half combat text pairs singular/plural noun and verb forms incorrectly; fix Buka locale data. |
@@ -97,7 +97,7 @@ These still require edition policy and tests; they are not matching backports:
 | `SetupNewRumour` | may name artifact `-1` | falls back to ordinary rumour | Gold 2.1 |
 | `DoEvent` obelisk access | direct metadata index | 1-based metadata minus one | unresolved |
 
-## Approval conditions for `master`
+## Approval conditions for `port`
 
 1. Classify every high-risk gameplay/save/network delta against English Gold
    2.1; localization-only and compiler-only rows may remain provenance-only.
@@ -109,4 +109,4 @@ These still require edition policy and tests; they are not matching backports:
    never rewrite the retail record.
 
 Current decision: use Buka as the **source-structure authority**, but do not
-adopt Buka retail behavior wholesale as `master` until these gates pass.
+adopt Buka retail behavior wholesale as `port` until these gates pass.

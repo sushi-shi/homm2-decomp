@@ -64,6 +64,8 @@ PROJECT_FILES = (
     ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
     ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
+# The classic reading view carries its own README instead of the source tree's.
+CLASSIC_README = "scripts/homm2/clean/project/classic/README.md"
 GENERATED_BRANCHES = frozenset((
     "source-pol-2.0",
     "classic-pol-2.0",
@@ -106,7 +108,7 @@ GENERATED_PATCHES = {
     # Retail compares signed GetTickCount values directly. Generated portable
     # builds use modular deadlines so they do not stall between Wine's
     # 24.85-day signed crossing and 49.7-day counter wrap. The matching tree
-    # retains retail's exact comparisons; the native master uses the same rule
+    # retains retail's exact comparisons; the native `port` branch uses the same rule
     # through platform::TickDeadlinePending.
     "src/SOURCE/NOOPT.cpp": [
         (
@@ -1313,7 +1315,7 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
         "-Werror=parentheses",
         "-Werror=write-strings",
         # Two-argument sprintf calls are byte-pinned retail behavior. Keep the
-        # diagnostic visible here; the portable master repairs those calls.
+        # diagnostic visible here; the portable `port` branch repairs those calls.
         "-Wformat-security",
         "-Wno-error=format-security",
         "-Werror=enum-conversion",
@@ -1687,6 +1689,7 @@ def generate_classic(
         else:
             shutil.copyfile(source, target)
             target.chmod(source.stat().st_mode)
+    shutil.copyfile(REPO / CLASSIC_README, out_root / "README.md")
 
     if readable_russian:
         if materialized == 0:
