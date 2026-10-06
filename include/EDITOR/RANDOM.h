@@ -229,13 +229,4 @@ void ScaleByDensity(i32* count, i32 density);
 // The generator's running state.
 extern b32 gGeneratingRandomMap;
 
-// The map's land cells, as RemoveSmallRegions last counted them (EDITOR's
-// .bss, 0x004a47e8; EDITOR does not define it yet).
-extern i32 gLandCellCount;
-
-// The specs dialog (specedit); returns false when cancelled.
-i32 MapDetailsDialog(i32 saving);
-// The random map settings dialog (EVENTMGR); returns false when cancelled.
-b32 NewMapDialog(void);
-
 #endif
