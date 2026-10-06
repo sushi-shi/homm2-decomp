@@ -551,6 +551,54 @@ def render_compgen(rows: list[SourceCompgenFunction]) -> str:
 from homm2.core.usage import logged
 
 
+VA_AT_ANNOTATION = re.compile(
+    r"^va_at:(?P<image>\w+) (?P<va>0x[0-9a-fA-F]+) size:(?P<size>0x[0-9a-fA-F]+|[0-9]+)$")
+VA_AT_MARKER = re.compile(
+    r"\bVA_AT\s*\(\s*(\w+)\s*,\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*\)")
+
+
+def image_claims_for_file(path: Path, source_root: Path, repo: Path,
+                          image: str) -> list[SourceSymbol]:
+    """`VA_AT(image, ...)` claims of one shared source, parsed with the image's
+    defines so its variants are the definitions the markers sit on."""
+    from homm2.manifest import image_defines
+    blob = path.read_bytes()
+    expected = [(int(m[2], 16) - IMAGE_BASE, int(m[3], 0))
+                for m in VA_AT_MARKER.finditer(_mask_lexical_noise(blob).decode("latin-1"))
+                if m[1] == image]
+    if not expected:
+        return []
+    configure_libclang()
+    args = _clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS)
+    args += ["-D" + flag[2:] for flag in image_defines(image)]
+    translation = ci.Index.create().parse(str(path), args=args)
+    unit = path.relative_to(source_root).with_suffix("").as_posix()
+    rows = []
+    for cursor in translation.cursor.walk_preorder():
+        if cursor.kind not in DEFINITION_KINDS or cursor.location.file is None:
+            continue
+        if Path(str(cursor.location.file)).resolve() != path.resolve():
+            continue
+        for child in cursor.get_children():
+            if child.kind != ci.CursorKind.ANNOTATE_ATTR:
+                continue
+            match = VA_AT_ANNOTATION.match(child.spelling)
+            if not match or match["image"] != image or not cursor.is_definition():
+                continue
+            if not cursor.mangled_name:
+                raise ValueError(f"{path}:{cursor.location.line}: unusable VA_AT marker")
+            rows.append(SourceSymbol(
+                rva=int(match["va"], 16) - IMAGE_BASE,
+                name=_vc6_symbol_name(cursor, cursor.mangled_name), unit=unit,
+                size=int(match["size"], 0), kind="func",
+                provenance=f"source-annotation:{image}"))
+    if sorted(expected) != sorted((r.rva, r.size) for r in rows):
+        raise ValueError(f"{path}: VA_AT({image}) markers and recovered definitions disagree")
+    del translation
+    gc.collect()
+    return rows
+
+
 def placement_claims(image: str) -> list[SourceSymbol]:
     """The game identities a shared unit spells, at this image's addresses
     (config/retail/<image>/placements.tsv, `homm2 audit placements`)."""
@@ -578,11 +626,19 @@ def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     own import table; every reviewed DIR32 target nobody claims gets a
     `const_` alias, as for the game."""
     from homm2.manifest import all_units, unit_images
-    rows: list[SourceSymbol] = list(placement_claims(image))
+    rows: list[SourceSymbol] = []
+    # A shared unit's own editor bodies (VA_AT) win over a placement.
+    source_root = repo / "src"
+    for unit in all_units():
+        if image in unit_images(unit) and DEFAULT_IMAGE in unit_images(unit) \
+                and unit["source"].endswith(".cpp"):
+            rows.extend(image_claims_for_file(
+                (repo / unit["source"]).resolve(), source_root, repo, image))
+    claimed = {row.rva for row in rows}
+    rows.extend(row for row in placement_claims(image) if row.rva not in claimed)
     own = [repo / u["source"] for u in all_units()
            if image in unit_images(u) and DEFAULT_IMAGE not in unit_images(u)
            and u["source"].endswith(".cpp")]
-    source_root = repo / "src"
     for path in own:
         rows.extend(symbols_for_file(path.resolve(), source_root, repo))
     # The scanners below read the selected image's claim space (its own units).

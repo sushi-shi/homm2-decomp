@@ -12,6 +12,12 @@
 #ifdef __clang__
 
 #define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
+// Where a shared source's body sits in another linked program (`image` is a
+// key of config/retail/targets.json, e.g. editor), as an absolute VA. A shared
+// unit's VA(...) spells the game's address; a body the other image compiles
+// differently (its own variant, or a function only it has) names its address
+// here. Each image reads only the claims of its own address space.
+#define VA_AT(image, addr, size) __attribute__((annotate("va_at:" #image " " #addr " size:" #size)))
 #define VA_COMPGEN(addr, size, kind, owner)
 // Where a global definition sits in the retail image, as an absolute VA. Like
 // VA(...) this is audit and delinker metadata, never a placement directive:
@@ -43,6 +49,7 @@
 #else
 
 #define VA(addr, size)
+#define VA_AT(image, addr, size)
 #define VA_COMPGEN(addr, size, kind, owner)
 #define DATA(addr)
 #define DATA_COMPGEN(addr, name, value) value

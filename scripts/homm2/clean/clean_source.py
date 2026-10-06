@@ -336,6 +336,7 @@ CALL_RULES = {
     # Retail-address annotations: audit metadata, no expansion at all.
     "VA": _drop,
     "VA_COMPGEN": _drop,
+    "VA_AT": _drop,
     "DATA": _drop,
     "DATA_COMPGEN_GUARD": _drop,
     "VTBL": _drop,

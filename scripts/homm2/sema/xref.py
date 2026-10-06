@@ -42,10 +42,10 @@ REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").ex
             Path(__file__).resolve().parents[3])
 EXE = retail_exe()
 SYMCSV = gen_dir() / "symbol_names.csv"
-FUNCS = image_build() / "ghidra/exports/functions.csv"
-if not FUNCS.is_file():
-    # The image's reviewed inventory has the export's schema.
-    FUNCS = retail_dir() / "functions.csv"
+# The Ghidra export, else the image's reviewed inventory (the same schema).
+FUNCS = next((path for path in (image_build() / "ghidra/exports/functions.csv",
+                                retail_dir() / "functions.csv") if path.is_file()),
+             retail_dir() / "functions.csv")
 IMAGEBASE = 0x400000
 
 

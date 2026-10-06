@@ -1,19 +1,20 @@
 """Normalized effective-source hashes used to scope retained function maxima."""
-from homm2.manifest import claim_files
+from homm2.manifest import all_units, claim_files, unit_images
 import csv, hashlib, os, re
 from pathlib import Path
 
 from homm2.graph.fixed_asm import UNITS as FIXED_ASM_UNITS
-from homm2.core.paths import delink_dir, gen_dir, image_build, objdiff_dir, retail_dir, retail_exe
+from homm2.core.paths import (DEFAULT_IMAGE, delink_dir, gen_dir, image_build, image_key,
+                               objdiff_dir, retail_dir, retail_exe)
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RVA_BASE = 0x400000
 
 
-def _rva_to_sym():
+def _rva_to_sym(image=None):
     """rva -> (unit, mangled_name) for .text functions, from the generated CSV."""
     out = {}
-    csvp = gen_dir() / "symbol_names.csv"
+    csvp = gen_dir(image) / "symbol_names.csv"
     if not csvp.exists():
         return out
     with csvp.open() as stream:
@@ -343,6 +344,34 @@ def _helper_dependencies(block, helpers):
     return [(name, found[name]) for name in sorted(found)]
 
 
+_VA_AT_LINE_RE = re.compile(
+    r"(?m)^[ \t]*VA_AT\((\w+),\s*(0x[0-9a-fA-F]+)\s*,\s*([^)]*)\)[ \t]*\n")
+_VA_LINE_RE = re.compile(r"(?m)^[ \t]*VA\(0x[0-9a-fA-F]+\s*,[^)]*\)[ \t]*\n")
+
+
+def _image_views(text, image):
+    """The texts whose VA markers spell one image's claims, with the RVA
+    table each is read against.
+
+    A shared unit spells game addresses with `VA` and another image's own
+    bodies with `VA_AT(image, ...)`. The game reads the file without the
+    VA_AT lines. Another image reads its VA_AT bodies as VA markers, and the
+    game-placed bodies through the game's names (the same unit and symbol)."""
+    without_va_at = _VA_AT_LINE_RE.sub("", text)
+    if image == DEFAULT_IMAGE:
+        return [(without_va_at, DEFAULT_IMAGE)]
+    own = _VA_AT_LINE_RE.sub(
+        lambda m: "VA(%s, %s)\n" % (m.group(2), m.group(3)) if m.group(1) == image else "",
+        _VA_LINE_RE.sub("", text))
+    return [(without_va_at, DEFAULT_IMAGE), (own, image)]
+
+
+def _shared_files(image):
+    """Game-linked units another image also links (VA_AT-annotated there)."""
+    return sorted((REPO / u["source"]) for u in all_units()
+                  if image in unit_images(u) and DEFAULT_IMAGE in unit_images(u))
+
+
 def source_hashes():
     """Return normalized effective-source hashes keyed by ``(unit, function)``.
 
@@ -355,35 +384,47 @@ def source_hashes():
     complete assembly-unit hash because labels outside one ``PROC`` can affect
     emitted bytes and relocations.
     """
-    sym = _rva_to_sym(); cmap = _class_members()
+    image = image_key()
+    syms = {image: _rva_to_sym(image)}
+    if image != DEFAULT_IMAGE:
+        syms[DEFAULT_IMAGE] = _rva_to_sym(DEFAULT_IMAGE)
+    sym = syms[image]
+    names = set(sym.values())
+    cmap = _class_members()
     from homm2.graph.localization import Catalog
     catalog = Catalog.load(REPO) if (REPO / 'locales/messages.def').is_file() else None
     out = {}
-    for cpp in claim_files():
+    files = [(cpp, False) for cpp in claim_files()]
+    if image != DEFAULT_IMAGE:
+        files += [(cpp, True) for cpp in _shared_files(image)]
+    for cpp, shared in files:
         text = cpp.read_text(errors="replace")
         if catalog is not None:
             # Retained evidence belongs to the compiled Russian text, not just
             # the spelling of its stable ID. Translation edits invalidate it.
             text = catalog.render(text, expanded=True)
         helpers = _static_inline_helpers(text)
-        for absolute_va, block in _source_function_blocks(text):
-            rva = absolute_va - RVA_BASE
-            key = sym.get(rva)
-            if key:
-                norm = _normalize(block, cmap)
-                body_hash = hashlib.sha1(
-                    norm.encode("utf-8", "replace")).hexdigest()[:12]
-                dependencies = _helper_dependencies(block, helpers)
-                if dependencies:
-                    dependency_text = "\n".join(
-                        "\n@static-inline " + name + "\n"
-                        + _normalize(helper, cmap)
-                        for name, helper in dependencies)
-                    dependency_hash = hashlib.sha1(
-                        dependency_text.encode("utf-8", "replace")).hexdigest()[:12]
-                    out[key] = body_hash + "." + dependency_hash
-                else:
-                    out[key] = body_hash
+        views = (_image_views(text, image) if shared or image == DEFAULT_IMAGE
+                 else [(text, image)])
+        for view, space in views:
+            for absolute_va, block in _source_function_blocks(view):
+                rva = absolute_va - RVA_BASE
+                key = syms[space].get(rva)
+                if key and key in names:
+                    norm = _normalize(block, cmap)
+                    body_hash = hashlib.sha1(
+                        norm.encode("utf-8", "replace")).hexdigest()[:12]
+                    dependencies = _helper_dependencies(block, helpers)
+                    if dependencies:
+                        dependency_text = "\n".join(
+                            "\n@static-inline " + name + "\n"
+                            + _normalize(helper, cmap)
+                            for name, helper in dependencies)
+                        dependency_hash = hashlib.sha1(
+                            dependency_text.encode("utf-8", "replace")).hexdigest()[:12]
+                        out[key] = body_hash + "." + dependency_hash
+                    else:
+                        out[key] = body_hash
     for unit, assembly in FIXED_ASM_UNITS.items():
         source = REPO / assembly.source
         if not source.is_file():

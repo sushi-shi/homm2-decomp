@@ -6,7 +6,7 @@ the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces
   * every header global extern has an inventory symbol and an owner TU;
   * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
-from homm2.manifest import claim_files
+from homm2.manifest import claim_files, image_lines
 from homm2.core.paths import REPO
 import csv, re, sys, glob
 
@@ -90,7 +90,7 @@ def main(argv=None) -> int:
     include_re = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]')
     reachable, pending = set(), [p for p in claim_files()]
     while pending:
-        for line in open(pending.pop(), encoding="latin-1"):
+        for line in image_lines(pending.pop()):
             m = include_re.match(line)
             header = REPO / "include" / m.group(1) if m else None
             if header is not None and header.is_file() and header not in reachable:

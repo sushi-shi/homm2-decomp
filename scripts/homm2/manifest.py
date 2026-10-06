@@ -16,6 +16,7 @@ flags (the /Gy tier rule bit two probe campaigns before this module existed).
 
 from __future__ import annotations
 
+import re
 import tomllib
 from pathlib import Path
 
@@ -53,6 +54,39 @@ def image_defines(image: str | None = None, manifest: dict | None = None) -> lis
     manifest = manifest if manifest is not None else load()
     table = manifest.get("images", {}).get(image or image_key(), {})
     return [f"/D{d}" for d in table.get("defines", [])]
+
+
+def image_lines(path, image: str | None = None,
+                manifest: dict | None = None) -> list[str]:
+    """The lines of a source or header file the image compiles: blocks under
+    `#ifdef`/`#ifndef` of an image define (HOMM2_EDITOR) are kept only for the
+    images that define it; every other conditional is left in place."""
+    manifest = manifest if manifest is not None else load()
+    known = {d for table in manifest.get("images", {}).values()
+             for d in table.get("defines", [])}
+    active = {d[2:] for d in image_defines(image, manifest)}
+    directive = re.compile(r"^\s*#\s*(ifdef|ifndef|if|elif|else|endif)\b\s*(\w*)")
+    stack: list[tuple[bool, bool]] = []  # (image conditional, keeping)
+    lines = []
+    for line in open(path, encoding="latin-1"):
+        m = directive.match(line)
+        keeping = all(keep for _, keep in stack)
+        if m:
+            kind, name = m.groups()
+            if kind in ("ifdef", "ifndef") and name in known:
+                stack.append((True, (name in active) == (kind == "ifdef")))
+                continue
+            if kind in ("ifdef", "ifndef", "if"):
+                stack.append((False, True))
+            elif kind == "else" and stack and stack[-1][0]:
+                stack[-1] = (True, not stack[-1][1])
+                continue
+            elif kind == "endif" and stack:
+                if stack.pop()[0]:
+                    continue
+        if keeping:
+            lines.append(line)
+    return lines
 
 
 def unit_flags(unit: dict, manifest: dict | None = None,
