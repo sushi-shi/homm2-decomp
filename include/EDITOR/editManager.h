@@ -31,7 +31,9 @@ H2_ENUM_BEGIN(EditManagerLayout)
     EDIT_MANAGER_TILESET_SLOTS = 2,
     // The map-extra records (towns, heroes, events, signs) cells name, as
     // the map file stores them; record 0 is never allocated.
-    EDIT_MANAGER_EXTRA_CAPACITY = 512
+    EDIT_MANAGER_EXTRA_CAPACITY = 512,
+    // The save checks keep at most this many messages.
+    EDIT_MANAGER_ERROR_CAPACITY = 100
 H2_ENUM_END(EditManagerLayout)
 
 #pragma pack(push, 1)
@@ -105,8 +107,25 @@ public:
     void DoVerticalKnob(void);
     // Moves the scroll knobs to the view origin (and redraws them).
     void UpdateKnobs(i32 update);
+    // The save checks: CheckObjects reports objects that cannot work, the
+    // Count helpers count map objects and the Write helpers write the map
+    // file's tables (and report what does not fit).
+    void CheckObjects(void);
+    b32 Confirm(char* question);
+    b32 HasObject(i32 trigger);
+    i32 CountArtifacts(void);
+    i32 CountEvents(void);
+    i32 CountTowns(void);
+    i32 CountMines(void);
+    void WriteTowns(i32 file);
+    void WriteMines(i32 file);
+    void WriteArtifacts(i32 file);
+    void WriteObelisks(i32 file);
     i32 LoadMap(char* name);
+    // The save checks' message list.
     void ClearErrors(void);
+    void ShowErrors(void);
+    void AddError(char* text);
     void ResetArea(i32 x, i32 y, i32 width, i32 height);
     // Clears the cells and gives them the terrain's tiles: PaintGround in
     // view cells, FillGround in map cells.
@@ -154,6 +173,9 @@ public:
 SIZE(editManager, 0xea2);
 
 extern editManager* gEditManager;
+// The save checks' messages (editManager::AddError).
+extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
+extern i32 gEditErrorCount;
 // Set while BlendTerrain may pick ground variants.
 extern b32 gVaryTiles;
 // ClearArea's object filter: the tilesets whose objects it erases.

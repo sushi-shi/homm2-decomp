@@ -8,6 +8,8 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/overlayType.h>
+#include <EDITOR/eventsManager.h>
+#include <EDITOR/specedit.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -140,7 +142,7 @@ void editManager::GenerateRandomMap(void) {
             continue;
     }
     if (gGeneratingMap) {
-        if (MapDetailsDialog(1) && !SaveMap(gMapFileName)) {
+        if (EditMapSpecifications(1) && !SaveMap(gMapFileName)) {
             sprintf(gText, localization::Tr("editor.random.saved"), gEditMapHeader.name);
             NormalDialog(gText, NORMAL_DIALOG_INFO);
         }

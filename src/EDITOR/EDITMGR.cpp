@@ -7,6 +7,7 @@
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
+#include <EDITOR/townedit.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -30,6 +31,7 @@
 #include <BASE/widget.h>
 #include <BASE/resourceManager.h>
 #include <BASE/widgetKind.h>
+#include <io.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -160,6 +162,46 @@ H2_ENUM_BEGIN(EditManagerSetting)
     EDIT_MANAGER_DISPATCH_MASK = 0x4000,
     EDIT_POINTER_DEFAULT = 0
 H2_ENUM_END(EditManagerSetting)
+
+H2_ENUM_BEGIN(EditMapCheck)
+    // The three kinds of travel gate (stone liths) take three frames each.
+    EDIT_TRAVEL_GATE_KINDS       = 3,
+    EDIT_TRAVEL_GATE_KIND_FRAMES = 3,
+    EDIT_TRAVEL_GATE_FRAMES      = 9,
+    // A whirlpool's second trigger cell, from its first.
+    EDIT_WHIRLPOOL_SECOND_CELL_X = 2,
+    EDIT_WHIRLPOOL_SECOND_CELL_Y = 1,
+    // A barrier's and a tent's colour: the low bits of the cell's metadata.
+    EDIT_BARRIER_COLOR_MASK      = 7,
+    EDIT_MAP_OBELISK_LIMIT       = 48
+H2_ENUM_END(EditMapCheck)
+
+H2_ENUM_BEGIN(EditMapFile)
+    // The map file's town and capturable-site tables: a fixed number of
+    // three-byte records, the unused ones empty.
+    EDIT_MAP_TOWN_RECORDS = 72,
+    EDIT_MAP_MINE_RECORDS = 144,
+    EDIT_MAP_NO_RECORD    = 0xff,
+    EDIT_MAP_CASTLE_FLAG  = 0x80,
+    // A site record's type: the resource of a mine (ore and later from the
+    // mine's overlay frame), or one of the special sites.
+    EDIT_MINE_TYPE_WOOD           = 0,
+    EDIT_MINE_TYPE_MERCURY        = 1,
+    EDIT_MINE_TYPE_FIRST_ORE      = 2,
+    EDIT_MINE_TYPE_LIGHTHOUSE     = 100,
+    EDIT_MINE_TYPE_DRAGON_CITY    = 101,
+    EDIT_MINE_TYPE_EYE_OF_MAGI    = 102,
+    EDIT_MINE_TYPE_ABANDONED_MINE = 103
+H2_ENUM_END(EditMapFile)
+
+#pragma pack(push, 1)
+// A town or site record of the map file.
+struct EditMapRecord {
+    u8 x;
+    u8 y;
+    u8 type;
+};
+#pragma pack(pop)
 
 // The drag selection's outline colour and the tick the view last animated.
 DATA(0x0049f5f0) i32 gSelectionColor;
@@ -1247,3 +1289,380 @@ void editManager::DoVerticalKnob(void) {
 }
 
 VTBL(editManager, 0x0045b368)
+
+// The save checks' messages: AddError keeps a copy of each, ShowErrors
+// shows them one by one and ClearErrors frees them.
+DATA(0x0049f7b0) char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
+DATA(0x004a3a48) i32 gEditErrorCount;
+
+// Reports a travel gate kind with a single gate, a lone whirlpool and a
+// barrier whose tent is missing.
+VA(0x004062c0, 0x2de)
+void editManager::CheckObjects(void) {
+    char barrierColors[KB_BARRIER_COLOR_NAME_COUNT];
+    i32 gates[EDIT_TRAVEL_GATE_KINDS];
+    char tentColors[KB_BARRIER_COLOR_NAME_COUNT];
+    i32 x;
+    i32 whirlpools;
+    i32 y;
+    i32 i;
+
+    whirlpools = 0;
+    for (i = 0; i < KB_BARRIER_COLOR_NAME_COUNT; i++) {
+        barrierColors[i] = 0;
+        tentColors[i] = 0;
+    }
+    gates[0] = 0;
+    gates[1] = 0;
+    gates[2] = 0;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BARRIER))
+                barrierColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = 1;
+            if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_TRAVELER_TENT))
+                tentColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = 1;
+            if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_STONE_LITHS))
+                gates[gMap.CellAt(x, y)->m_objectIndex % EDIT_TRAVEL_GATE_FRAMES
+                      / EDIT_TRAVEL_GATE_KIND_FRAMES]++;
+            if (x < MAP_WIDTH - EDIT_WHIRLPOOL_SECOND_CELL_X
+                && y < MAP_HEIGHT - EDIT_WHIRLPOOL_SECOND_CELL_Y
+                && MAP_TRIGGER_OBJECT(gMap.CellAt(x, y)->m_triggerType) == MAP_OBJECT_WHIRLPOOL
+                && MAP_TRIGGER_OBJECT(gMap.CellAt(x + EDIT_WHIRLPOOL_SECOND_CELL_X,
+                                                  y + EDIT_WHIRLPOOL_SECOND_CELL_Y)
+                                          ->m_triggerType)
+                       == MAP_OBJECT_WHIRLPOOL)
+                whirlpools++;
+        }
+    }
+    if (gates[0] == 1 || gates[1] == 1 || gates[2] == 1)
+        AddError(localization::Tr("editor.check.travel_gate.single"));
+    if (whirlpools == 1)
+        AddError(localization::Tr("editor.check.whirlpool.single"));
+    for (i = 0; i < KB_BARRIER_COLOR_NAME_COUNT; i++) {
+        if (barrierColors[i] && !tentColors[i]) {
+            sprintf(gText, localization::Tr("editor.check.barrier.no_tent"), xBarrierColor[i],
+                    xBarrierColor[i]);
+            AddError(gText);
+        }
+    }
+}
+
+// Asks a yes/no question; true when answered yes.
+VA(0x00408682, 0x41)
+b32 editManager::Confirm(char* question) {
+    NormalDialog(question, NORMAL_DIALOG_CONFIRM);
+    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES)
+        return true;
+    return false;
+}
+
+// Whether any map cell carries the trigger.
+VA(0x004086c3, 0x7b)
+b32 editManager::HasObject(i32 trigger) {
+    i32 x;
+    i32 y;
+
+    for (y = 0; y < MAP_HEIGHT; y++)
+        for (x = 0; x < MAP_WIDTH; x++)
+            if (gMap.CellAt(x, y)->m_triggerType == trigger)
+                return true;
+    return false;
+}
+
+// The artifacts on the map (placed or random), its map events, its towns
+// and castles, and the sites a player can capture.
+VA(0x0040873e, 0xb2)
+i32 editManager::CountArtifacts(void) {
+    i32 count;
+    i32 x;
+    i32 y;
+
+    count = 0;
+    for (y = 0; y < MAP_HEIGHT; y++)
+        for (x = 0; x < MAP_WIDTH; x++)
+            if (MAP_TRIGGER_OBJECT(gMap.CellAt(x, y)->m_triggerType) == MAP_OBJECT_ARTIFACT
+                || MAP_TRIGGER_OBJECT(gMap.CellAt(x, y)->m_triggerType)
+                       == MAP_OBJECT_RANDOM_ARTIFACT)
+                count++;
+    return count;
+}
+
+VA(0x004087f0, 0x8d)
+i32 editManager::CountEvents(void) {
+    i32 count;
+    i32 x;
+    i32 y;
+    mapCell* cell;
+
+    count = 0;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT))
+                count++;
+        }
+    }
+    return count;
+}
+
+VA(0x0040887d, 0xaf)
+i32 editManager::CountTowns(void) {
+    i32 count;
+    i32 x;
+    i32 y;
+    mapCell* cell;
+
+    count = 0;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
+                count++;
+        }
+    }
+    return count;
+}
+
+VA(0x0040892c, 0xf9)
+i32 editManager::CountMines(void) {
+    i32 y;
+    i32 x;
+    i32 mineTotal;
+    mapCell* cell;
+
+    mineTotal = 0;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MINE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE))
+                mineTotal++;
+        }
+    }
+    return mineTotal;
+}
+
+// The map file's town table: x, y and faction per town (castles set bit 7),
+// padded with empty records.
+#define cell spot           // frame-slot spelling
+#define townExtra townData // frame-slot spelling
+VA(0x00408a25, 0x190)
+void editManager::WriteTowns(i32 file) {
+    i32 count;
+    i32 setTowns;
+    i32 type;
+    i32 setCastles;
+    i32 x;
+    mapCell* cell;
+    i32 y;
+    i32 notUsed;
+    EditMapRecord empty;
+    i32 castleCount;
+    i32 index;
+    TownExtra* townExtra;
+
+    count = 0;
+    castleCount = 0;
+    setCastles = 0;
+    setTowns = 0;
+    cell = NULL;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)) {
+                write(file, &x, 1);
+                write(file, &y, 1);
+                townExtra = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                type = townExtra->faction;
+                if (townExtra->isCastle)
+                    type |= EDIT_MAP_CASTLE_FLAG;
+                write(file, &type, 1);
+                count++;
+            }
+        }
+    }
+    empty.x = EDIT_MAP_NO_RECORD;
+    empty.y = EDIT_MAP_NO_RECORD;
+    empty.type = 0;
+    for (x = 0; x < EDIT_MAP_TOWN_RECORDS - count; x++)
+        WRITE_FILE_VALUE(file, empty);
+}
+#undef cell
+#undef townExtra
+
+// The map file's capturable-site table: every mine (its resource from the
+// overlay of its extra chain), sawmill, alchemist lab, lighthouse, dragon
+// city and abandoned mine, padded with empty records.
+#define cell spot                   // frame-slot spelling
+#define lighthouseX beaconX         // frame-slot spelling
+#define lighthouseY beaconY         // frame-slot spelling
+#define lighthouseCount beaconCount // frame-slot spelling
+#define cityCount numCities         // frame-slot spelling
+#define markerCell neighbour        // frame-slot spelling
+#define mineSlot mineNumber         // frame-slot spelling
+#define link extraIndex             // frame-slot spelling
+VA(0x00408bb5, 0x313)
+void editManager::WriteMines(i32 file) {
+    u8 type;
+    i32 lighthouseCount;
+    u8 cityX;
+    u8 cityY;
+    u8 x;
+    mapCell* cell;
+    u8 y;
+    EditMapRecord empty;
+    u8 lighthouseX;
+    i32 mineSlot;
+    u8 lighthouseY;
+    i32 cityCount;
+    mapCell* markerCell;
+    i32 link;
+
+    cityX = EDIT_MAP_NO_RECORD;
+    cityY = EDIT_MAP_NO_RECORD;
+    lighthouseX = EDIT_MAP_NO_RECORD;
+    lighthouseY = EDIT_MAP_NO_RECORD;
+    lighthouseCount = 0;
+    cityCount = 0;
+    cell = NULL;
+    empty.x = EDIT_MAP_NO_RECORD;
+    empty.y = EDIT_MAP_NO_RECORD;
+    empty.type = EDIT_MAP_NO_RECORD;
+    mineSlot = 0;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MINE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE)) {
+                    type = EDIT_MINE_TYPE_LIGHTHOUSE;
+                } else if (cell->m_triggerType
+                           == MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE)) {
+                    type = EDIT_MINE_TYPE_ABANDONED_MINE;
+                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)) {
+                    type = EDIT_MINE_TYPE_DRAGON_CITY;
+                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                    type = EDIT_MINE_TYPE_EYE_OF_MAGI;
+                } else {
+                    markerCell = gMap.CellAt(x, y);
+                    link = markerCell->m_extraIndex;
+                    while (link) {
+                        if (gMap.Extra(link)->objectIndex != MAPCELL_SPRITE_NONE
+                            && gMap.Extra(link)->objectTileset == TILESET_EXTRAOVR) {
+                            type = gMap.Extra(link)->objectIndex + EDIT_MINE_TYPE_FIRST_ORE;
+                            goto write;
+                        }
+                        link = gMap.Extra(link)->nextIndex;
+                    }
+                    if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL))
+                        type = EDIT_MINE_TYPE_WOOD;
+                    else
+                        type = EDIT_MINE_TYPE_MERCURY;
+                }
+            write:
+                WRITE_FILE_VALUE(file, x);
+                WRITE_FILE_VALUE(file, y);
+                WRITE_FILE_VALUE(file, type);
+                sprintf(gText, "Mine %02d: (%02d,%02d) type: %02d\n", mineSlot, x, y, type);
+                LogStr(gText);
+                mineSlot++;
+            }
+        }
+    }
+    for (x = 0; x < EDIT_MAP_MINE_RECORDS - mineSlot; x++)
+        WRITE_FILE_VALUE(file, empty);
+}
+#undef cell
+#undef lighthouseX
+#undef lighthouseY
+#undef lighthouseCount
+#undef cityCount
+#undef markerCell
+#undef mineSlot
+#undef link
+
+// The map file keeps no artifact table.
+VA(0x00408ec8, 0xd)
+void editManager::WriteArtifacts(i32 H2_UNUSED(file)) {
+}
+
+VA(0x00408ed5, 0xed)
+void editManager::WriteObelisks(i32 file) {
+    u8 obeliskCount;
+    i32 x;
+    i32 y;
+    mapCell* cell;
+
+    obeliskCount = 0;
+    cell = NULL;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_OBELISK))
+                obeliskCount++;
+        }
+    }
+    if (!obeliskCount)
+        obeliskCount++;
+    WRITE_FILE_VALUE(file, obeliskCount);
+    if (obeliskCount > EDIT_MAP_OBELISK_LIMIT) {
+        sprintf(gText, localization::Tr("editor.check.obelisks.many"), obeliskCount);
+        AddError(gText);
+    }
+}
+
+VA(0x0040990c, 0x4d)
+void editManager::ClearErrors(void) {
+    for (; gEditErrorCount > 0; gEditErrorCount--)
+        delete gEditErrors[gEditErrorCount - 1];
+    gEditErrorCount = 0;
+}
+
+// Logs every message, then shows them one at a time until one is answered
+// no.
+VA(0x00409959, 0xdd)
+void editManager::ShowErrors(void) {
+    i32 oldDebugLevel;
+    i32 i;
+
+    oldDebugLevel = giDebugLevel;
+    if (gEditErrorCount > 0) {
+        for (i = 0; i < gEditErrorCount; i++) {
+            sprintf(gText, localization::Tr("editor.check.log"), gEditErrors[i]);
+            LogStr(gText);
+        }
+        giDebugLevel = oldDebugLevel;
+        for (i = 0; i < gEditErrorCount; i++) {
+            sprintf(gText, localization::Tr("editor.check.next"), gEditErrors[i]);
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_NO)
+                break;
+        }
+    }
+}
+
+VA(0x00409a36, 0x72)
+void editManager::AddError(char* text) {
+    i32 length;
+
+    if (gEditErrorCount < EDIT_MANAGER_ERROR_CAPACITY) {
+        length = strlen(text) + 1;
+        gEditErrors[gEditErrorCount] = new char[length];
+        strcpy(gEditErrors[gEditErrorCount], text);
+        gEditErrorCount++;
+    }
+}

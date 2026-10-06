@@ -3540,6 +3540,7 @@ DATA(0x004a4638) configStruct gConfig;
 DATA(0x004a47dc) i32 giMinExtentX;
 DATA(0x004a47e0) i32 giMinExtentY;
 DATA(0x004a47e4) executive* gpExec;
+DATA(0x004a47e8) i32 gLandCellCount;
 DATA(0x004a47ec) i32 giCurWindowsStyleFlags;
 DATA(0x004a47f0) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a4950) i32 glTimers[GLOBAL_TIMER_COUNT];
