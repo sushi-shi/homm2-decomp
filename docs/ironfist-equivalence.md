@@ -209,6 +209,9 @@ records and how a load restores it:
   saves.
 - Remote (`RMT`) saves are written to and loaded from the same `DATA`
   directory.
+- The XML document is written to a temporary sibling and replaces the
+  previous save only after the complete write succeeds, so a failed save
+  leaves the earlier file intact (upstream's `SaveFile` truncated it first).
 
 ### Map-variable number format
 
