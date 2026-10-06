@@ -17,7 +17,8 @@ H2_ENUM_BEGIN(ClearBrushSize)
     CLEAR_BRUSH_DOUBLE    = 1,
     CLEAR_BRUSH_QUADRUPLE = 2,
     CLEAR_BRUSH_AREA      = 3,
-    CLEAR_BRUSH_COUNT     = 4
+    CLEAR_BRUSH_COUNT     = 4,
+    CLEAR_HELP_COUNT      = 20
 H2_ENUM_END(ClearBrushSize)
 
 H2_ENUM_BEGIN(ClearManagerLayout)
@@ -66,7 +67,8 @@ SIZE(clearManager, 0x4e);
 
 extern i32 gClearBrush;
 // Right-click help for the four brush buttons.
-extern char* gClearBrushHelp[CLEAR_BRUSH_COUNT];
+// The eraser panel's help: its brushes, then the object classes it erases.
+extern H2_CONST char* gClearHelp[CLEAR_HELP_COUNT];
 extern i32 gClearCursorMoves;
 
 #endif

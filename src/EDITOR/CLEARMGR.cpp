@@ -118,7 +118,7 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                 break;
                         }
                         if (help >= 0)
-                            NormalDialog(gClearBrushHelp[help], NORMAL_DIALOG_QUICK_VIEW);
+                            NormalDialog(gClearHelp[help], NORMAL_DIALOG_QUICK_VIEW);
                     } else {
                         switch (message.payload.widget.id) {
                             case EDIT_CONTROL_MAP:
