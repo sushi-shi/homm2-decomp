@@ -8,6 +8,7 @@
 
 #include <va.h>
 #include <BASE/baseManager.h>
+#include <EDITOR/fullMap.h>
 
 class heroWindow;
 
@@ -54,6 +55,9 @@ public:
 #pragma pack(pop)
 
 extern editManager* gEditManager;
+// The map the scenario editor edits, and the copy its undo restores.
+extern fullMap gMap;
+extern fullMap gUndoMap;
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 extern i32 gSelectionX;
 extern i32 gSelectionY;

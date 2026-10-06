@@ -323,6 +323,7 @@ flags = "base_nogf"
 [[unit]]
 unit = "EDITOR/mapcell"
 source = "src/EDITOR/mapcell.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]

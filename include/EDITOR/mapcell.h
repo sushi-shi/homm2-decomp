@@ -87,9 +87,19 @@ struct mapCellExtra {
     u8 drawOverlayOnTop : 1;
     H2_ENUM_BITFIELD(TilesetId, u8) overlayTileset : 6;
     u8 overlayIndex;
+#ifdef HOMM2_EDITOR
+    // The scenario editor links every placed object part to the placement
+    // it belongs to, so erasing one part erases the whole object.
+    i32 objectLink;
+    i32 overlayLink;
+#endif
 };
 #pragma pack(pop)
+#ifdef HOMM2_EDITOR
+SIZE(mapCellExtra, 15);
+#else
 SIZE(mapCellExtra, 7);
+#endif
 
 class mapCell {
 public:
@@ -124,12 +134,21 @@ public:
     u8 m_flags;
     H2_OPEN_CODE_STORAGE(MapTriggerCode, u8) m_triggerType;
     u16 m_extraIndex;
+#ifdef HOMM2_EDITOR
+    // The placement each part belongs to (see mapCellExtra).
+    i32 m_objectLink;
+    i32 m_overlayLink;
+#endif
 
     inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {
         return (m_flags & IDX(flag)) != 0;
     }
 };
+#ifdef HOMM2_EDITOR
+SIZE(mapCell, 20);
+#else
 SIZE(mapCell, 12);
+#endif
 // This is the stored sprite property, not a passability or tileset-shadow query.
 #define CELL_HAS_NON_SHADOW_OBJECT(cell)                                                           \
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \

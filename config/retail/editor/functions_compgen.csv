@@ -1,0 +1,9 @@
+# Compiler-generated bodies of the editor's own units: each object's
+# std::ctype<wchar_t>::id initializer and registration (_$E19, _$E18), and the
+# folded empty id destructor the first object's registration names.
+entry_rva,size,symbol,unit,source_object,evidence
+0x19f3,39,_$E19,EDITOR/CLEARMGR,EDITOR/CLEARMGR,masked-exact
+0x1a1a,18,_$E18,EDITOR/CLEARMGR,EDITOR/CLEARMGR,masked-exact
+0x1a30,5,?id@?$ctype@G@std@@$E,EDITOR/CLEARMGR,EDITOR/CLEARMGR,masked-exact
+0x18d83,39,_$E19,EDITOR/mapcell,EDITOR/mapcell,masked-exact
+0x18daa,18,_$E18,EDITOR/mapcell,EDITOR/mapcell,masked-exact

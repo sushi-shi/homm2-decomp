@@ -444,8 +444,8 @@ BASE/soundmgr	?StopSample@soundManager@@QAEXPAVsample@@@Z	100.0000	ac6d9464b51d
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	2dbb27de9e21
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	f24847db220b
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	13926594114c
-EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	925b26dfb464
-EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	139ff2a1f496
+EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	33eab9664005
+EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	ab28acab3f58
 EDITOR/mapcell	?Close@fullMap@@QAEXXZ	100.0000	44590acf6616
 EDITOR/mapcell	?GetNewCellExtraIndex@fullMap@@QAEHXZ	100.0000	38b033339fbb
 EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	100.0000	15dce8d87f9e

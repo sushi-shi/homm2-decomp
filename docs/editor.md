@@ -35,6 +35,20 @@ addresses even when the editor links it too; a unit linked only into the
 editor spells editor addresses. The editor reads a shared unit's identities
 through `config/retail/editor/placements.tsv`.
 
+A body only the editor compiles from a shared unit (an `#ifdef HOMM2_EDITOR`
+variant or an editor-only method) carries `VA_AT(editor, addr, size)` instead
+(`include/va.h`); the editor's labels take it ahead of placements. The game
+ignores those lines, the editor's retained maxima fingerprint them as its own
+`VA` markers, and the clean export drops them. Header walks (`globals-data`)
+follow only the `#include`s an image compiles (`homm2.manifest.image_lines`).
+
+EDITOR/mapcell is the first shared unit with editor bodies: the editor's
+`mapCell` and `mapCellExtra` carry each object and overlay part's placement
+link (20 and 15 bytes), and `fullMap` adds the undo copy, the part removal
+helpers and the extra-pool compaction. All 20 bodies compile exactly; two wait
+for the owners of `gMap` and `MAP_WIDTH`/`MAP_HEIGHT` (EDITOR) for their data
+identities.
+
 ## Census
 
 `homm2 --image editor audit census --write-config` writes the editor's
