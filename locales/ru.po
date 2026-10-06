@@ -667,13 +667,41 @@ msgctxt "editor.file.confirm_quit"
 msgid "Are you sure you want to quit?"
 msgstr "Вы действительно хотите выйти?"
 
+msgctxt "editor.grab.failed"
+msgid "Couldn't grab object!"
+msgstr "Нельзя схватить объект!"
+
+msgctxt "editor.grab.nothing"
+msgid "Nothing to grab!"
+msgstr "Нечего подбирать!"
+
+msgctxt "editor.map.load.confirm"
+msgid "Are you sure you want to load a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите загрузить новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
 msgctxt "editor.map.no_description"
 msgid "No Description"
 msgstr "Нет описания"
 
+msgctxt "editor.map.no_name"
+msgid "No Name"
+msgstr "Нет имени"
+
 msgctxt "editor.map.random.name"
 msgid "Random Map %d"
 msgstr "Случ. карта %d"
+
+msgctxt "editor.map.saved"
+msgid "'%s' saved successfully"
+msgstr "Карта '%s' успешно сохранена."
+
+msgctxt "editor.map.saved.expansion"
+msgid "\n\nThe map was saved as an expansion-set map.  It is not compatible with the original Heroes of Might and Magic 2."
+msgstr "\n\nКарта была сохранена в формате Цены Верности. Этот формат карт не совместим с оригинальным форматом карт Героев Меча и Магии 2."
+
+msgctxt "editor.map.saved.original"
+msgid "\n\nThe map was saved as an original Heroes 2 map.  It is compatible with both the original and expansion games."
+msgstr "\n\nКарта была сохранена в оригинальном формате. Эта карта совместима с оригинальной игрой и Ценой Верности."
 
 msgctxt "editor.map.unnamed"
 msgid "No Name %d"
@@ -706,6 +734,22 @@ msgstr "Могущественный артефакт должен быть ра
 msgctxt "editor.overlay.ultimate.placed"
 msgid "The ultimate artifact has already been placed."
 msgstr "Могущественный артефакт уже помещен на карту."
+
+msgctxt "editor.quick_view.reefs"
+msgid "Reefs"
+msgstr "Рифы"
+
+msgctxt "editor.quick_view.rocks"
+msgid "Rocks"
+msgstr "Скалы"
+
+msgctxt "editor.quick_view.unknown"
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgctxt "editor.quit.confirm"
+msgid "Are you sure you want to quit?\n"
+msgstr "Вы действительно хотите выйти?\n"
 
 msgctxt "editor.random.castles_failed"
 msgid "Unable to place castles"
@@ -750,6 +794,10 @@ msgstr "Генерация карты - размещаю сокровища..."
 msgctxt "editor.random.status.trees"
 msgid "Generating map - Placing trees..."
 msgstr "Генерация карты - размещаю деревья..."
+
+msgctxt "editor.requester.map.size_mismatch"
+msgid "No maps exist at that size."
+msgstr "Нет карт такого размера."
 
 msgctxt "editor.sign.bottle_title"
 msgid "Bottle Detail"
@@ -2038,6 +2086,18 @@ msgstr "Выбрать"
 msgctxt "editor.table.gWinSetup.99"
 msgid "Captain"
 msgstr "Капитан"
+
+msgctxt "editor.text.import_failed"
+msgid "Import error!"
+msgstr "Ошибка импорта!"
+
+msgctxt "editor.title"
+msgid "Heroes II Editor"
+msgstr "Редактор Героев II"
+
+msgctxt "editor.title.short"
+msgid "Editor"
+msgstr "Редактор"
 
 msgctxt "event.inline.021d355fcf4f31af"
 msgid "{Flotsam}\n\nYou search through the flotsam, and find some wood."

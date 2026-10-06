@@ -74,6 +74,7 @@ LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
 FOLDABLE_COMDAT_SELECTIONS = frozenset((2, 3, 4, 6, 7))
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
+COMPGEN_FUNCTION_PREFIX = "__h2cg$"
 ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
@@ -125,6 +126,9 @@ class RetailFunction:
     rva: int
     size: int
     provenance: str
+    # a compiler-generated body: a reviewed or VA_COMPGEN claim, or another
+    # image's placement of one (named `__h2cg$...` or a `$E` counter)
+    compiler: bool = False
 
 
 def source_definitions(source_root: Path = SOURCE_ROOT,
@@ -258,9 +262,14 @@ def _load_function_claims(path: Path = SYMBOLS):
     with Path(path).open(newline="", encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
             if row.get("kind") == "func":
+                provenance = row.get("provenance") or ""
                 claim = RetailFunction(
                     int(row["rva"], 0), int(row.get("size") or "0", 0),
-                    row.get("provenance") or "")
+                    provenance,
+                    provenance.startswith(("reviewed-compgen", "source-VA_COMPGEN:"))
+                    or (provenance.startswith("placement:")
+                        and (row["name"].startswith(COMPGEN_FUNCTION_PREFIX)
+                             or VOLATILE_E_FUNCTION.fullmatch(row["name"]) is not None)))
                 by_identity[(row["unit"], row["name"])].append(claim)
                 by_unit[row["unit"]].append(claim)
     return (
@@ -1341,8 +1350,7 @@ def _candidate_function_claims(coff: CoffFile, symbol, unit: str,
     # physical extent; the complete CRT pointer sequence resolves the member.
     compiler_claims = tuple(
         claim for claim in functions_by_unit.get(unit, ())
-        if claim.provenance.startswith(("reviewed-compgen", "source-VA_COMPGEN:"))
-        and compatible(claim))
+        if claim.compiler and compatible(claim))
     return tuple(sorted(set((*exact, *compiler_claims)), key=lambda row: row.rva))
 
 

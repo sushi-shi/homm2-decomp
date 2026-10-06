@@ -291,8 +291,15 @@ def cmd_frames(args) -> None:
     if args.unit in FIXED_ASM_UNITS:
         die(f"{args.unit} is an assembly unit and has no C++ /Z7 frame records")
 
-    obj = REPO / "build/frames" / (args.unit.replace("/", "_") + ".obj")
-    flags = [*units["flags"][entry.get("flags", "base")], "/Z7"]
+    # The unit's own compile for the selected image (an editor-only unit, or
+    # a shared one under --image editor, sees HOMM2_EDITOR), plus /Z7.
+    from homm2.core.paths import image_key
+    from homm2.manifest import unit_flags, unit_images
+    image = image_key()
+    if image not in unit_images(entry):
+        image = unit_images(entry)[0]
+    obj = REPO / "build/frames" / image / (args.unit.replace("/", "_") + ".obj")
+    flags = [*unit_flags(entry, image=image), "/Z7"]
     rc, log, _timed_out = run_compile(REPO / entry["source"], obj, flags, depfile=False)
     if rc:
         die(f"/Z7 compile of {args.unit} failed:\n{log[-2000:]}")

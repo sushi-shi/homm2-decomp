@@ -22,6 +22,24 @@ H2_ENUM_BEGIN(EditManagerConstant)
     EDIT_NO_CELL = -1
 H2_ENUM_END(EditManagerConstant)
 
+H2_ENUM_BEGIN(EditTool)
+    // The tool panel's tools (m_tool); their buttons are widgets
+    // EDIT_CONTROL_TOOL_FIRST on, and EDIT_CONTROL_TOOL_PANEL shows the
+    // selected tool's panel.
+    EDIT_TOOL_NONE          = -1,
+    EDIT_TOOL_TERRAIN       = 0,
+    EDIT_TOOL_OBJECT        = 1,
+    EDIT_TOOL_DETAIL        = 2,
+    EDIT_TOOL_STREAM        = 3,
+    EDIT_TOOL_ROAD          = 4,
+    EDIT_TOOL_ERASE         = 5,
+    EDIT_TOOL_COUNT         = 6,
+    EDIT_CONTROL_TOOL_FIRST = 0x65,
+    EDIT_CONTROL_TOOL_PANEL = 0x78,
+    // A tool manager runs at the executive's default priority.
+    EDIT_TOOL_PRIORITY      = -1
+H2_ENUM_END(EditTool)
+
 H2_ENUM_BEGIN(EditManagerLayout)
     // m_objectIcons: two icons per adventure tileset slot (gTilesetFiles);
     // Open loads the first and clears both.
@@ -92,6 +110,10 @@ public:
     virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    // The catalogue type (gOverlayTypes index) of the object on a map
+    // cell, and the object tool picking it up from under the pointer.
+    i32 OverlayTypeAt(i32 x, i32 y);
+    void GrabObject(void);
     // Copies the map into the undo map.
     void SaveUndo(void);
     // Copies the map view to the screen.
@@ -119,7 +141,13 @@ public:
     // The save checks: CheckObjects reports objects that cannot work, the
     // Count helpers count map objects and the Write helpers write the map
     // file's tables (and report what does not fit).
+    // The map's texts to and from its .TXT (for translating).
+    void ExportMapText(void);
+    bool ImportMapText(void);
     void CheckObjects(void);
+    // Before a save: compacts the extras and gives every cell the trigger
+    // of its catalogue type, its coast and its line flags.
+    void UpdateTriggers(void);
     b32 Confirm(char* question);
     b32 HasObject(i32 trigger);
     i32 CountArtifacts(void);
@@ -194,6 +222,11 @@ public:
 SIZE(editManager, 0xea2);
 
 extern editManager* gEditManager;
+// The map text export's file and its line writers.
+extern char* gTextFileName;
+void ClearTextFile(void);
+void AppendTextLine(H2_CONST char* text);
+void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
 // The save checks' messages (editManager::AddError).
 extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
 extern i32 gEditErrorCount;

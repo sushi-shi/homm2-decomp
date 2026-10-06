@@ -1,0 +1,3 @@
+# Reviewed relocation sites the census channels do not reach.
+site_rva	reason
+0x224b3	ShowThisMapGame dead code after `return 1`: strcmpi(mapName, "BROKENA")
