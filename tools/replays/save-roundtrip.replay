@@ -1,0 +1,28 @@
+# Load the only normal save, enter and leave the selected hero/town view,
+# overwrite that save, return to the main menu, and quit.
+7000 key-down l
+7100 key-up l
+9000 key-down s
+9100 key-up s
+11000 left-down 525 72
+11100 left-up 525 72
+14000 left-down 390 124
+14100 left-up 390 124
+15000 key-down Return
+15100 key-up Return
+20000 key-down Return
+20100 key-up Return
+23000 key-down Escape
+23100 key-up Escape
+27000 key-down s
+27100 key-up s
+31000 key-down Return
+31100 key-up Return
+35000 key-down Return
+35100 key-up Return
+39000 key-down Escape
+39100 key-up Escape
+41000 key-down q
+41100 key-up q
+43000 key-down Return
+43100 key-up Return
