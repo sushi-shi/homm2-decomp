@@ -2,8 +2,8 @@
 # launcher on the native program, with a desktop entry.
 #
 #   game       the player's copy: an installed game folder (GOG's, a Windows
-#              or DOS installation), the Buka disc's files, or a .zip/.7z/.iso
-#              of one (tools/game_data.py). Checked and laid out in the store at
+#              or DOS installation), the Buka disc or its CD image, or a
+#              .zip/.7z/.iso/.rar of one (tools/game_data.py). Checked and laid out in the store at
 #              install time, locally, never substituted from a cache; the icon
 #              comes from its Windows program. Without it the launcher runs on
 #              HOMM2_DATA, or on the folders the game searches by itself.
