@@ -112,6 +112,8 @@ it, so resize the window or select another mode to see the whole game.
 Mouse input follows the current presentation transform. Changing modes preserves
 the screen buffer, palette, and composed software cursor. Holding F4 performs
 one change per press. Shift takes precedence if both Shift and Ctrl are held.
+F1 help keeps the current display mode; only the TCP setup, assertion and
+shutdown messages leave fullscreen.
 
 Settings are saved in `HEROES2.DISPLAY` beside the user's `HEROES2.CFG`; the
 retail binary configuration format is unchanged. Delete that text file to reset
