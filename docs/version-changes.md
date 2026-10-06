@@ -3,7 +3,7 @@
 Living ledger of every functional difference between the Price of Loyalty 2.0
 retail build (the `decomp-pol-2.0` line) and the Buka release reconstructed on
 this branch. A matcher that closes a function whose semantics differ from the
-PoL body adds the entry in the same change (`.claude/agents/matcher.md`).
+PoL body adds the entry in the same change (`.agents/skills/matcher/SKILL.md`).
 
 Classification: entries marked **[2.1]** are upstream NWC Gold 2.1 changes,
 **[Buka]** are localization-era changes, **[unclassified]** have not yet been

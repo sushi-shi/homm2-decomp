@@ -9,6 +9,17 @@ toolchain contracts, the VC4.2 pattern catalog and matching matrices) were
 deliberately not carried over: measured evidence does not port across compilers.
 Their successors grow here from VC6-measured evidence.
 
+## Tooling and workflow
+
+- `tooling.md` is the matching pipeline: ground truth, toolchain, build, navigation,
+  package layout and repository model; `tooling-map.md` maps every command to its
+  implementation; `workflow.md` is the campaign policy and matching loop.
+- `builds.md` covers locale builds without retail inputs, the native link modes and
+  the toolchain; `play.md` the Wine play environment.
+- `build-asserts.md` explains every gate of `homm2 build verify`.
+- `tooling-convergence.md` is the ledger of the tooling convergence with the HoMM1
+  reconstruction and its open items.
+
 ## Binary and toolchain evidence
 
 - `config/retail/functions.csv` (with its header notes) is the candidate function

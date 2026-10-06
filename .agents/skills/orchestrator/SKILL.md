@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into master so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with matcher.md (reconstruction doctrine). Parallel is the default — there is no separate "simple" orchestrator.
+description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into master so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with the matcher skill (reconstruction doctrine). Parallel is the default — there is no separate "simple" orchestrator.
 ---
 
 # orchestrator — fan out the work, serialize the history

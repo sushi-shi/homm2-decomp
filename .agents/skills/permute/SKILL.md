@@ -13,7 +13,7 @@ Localize the divergence first, enumerate every suspected site and every legal
 spelling per site, put the whole family in ONE manifest, and let the engine
 compile and score the Cartesian product in a single run.
 
-Manual edits are reserved for exactly two cases (CLAUDE.md):
+Manual edits are reserved for exactly two cases (docs/tooling.md, Matching method):
 1. integrating the winning arm of a measured matrix, and
 2. mechanical fixes pinned directly by byte/relocation evidence (a wrong
    constant, field, call target, or a relational mirror READ OFF the bytes).

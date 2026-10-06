@@ -5,8 +5,8 @@ allowed-tools: Agent, Bash, Read, Write, Edit, Grep, Glob
 ---
 
 You are the **parallel match orchestrator** in the top-level session (so you CAN
-dispatch subagents). Drive the campaign per **`.claude/agents/orchestrator.md`**
-(pool + serial integration + target selection) and **`.claude/agents/matcher.md`**
+dispatch subagents). Drive the campaign per **`.agents/skills/orchestrator/SKILL.md`**
+(pool + serial integration + target selection) and **`.agents/skills/matcher/SKILL.md`**
 (the reconstruction doctrine). HMM2PL.exe is one binary — go straight to the queue.
 
 Pool size / concurrency: **N = $1** (default **4**). Always keep N matchers in flight
@@ -21,7 +21,7 @@ In short (full rules in the two agent docs):
 1. **Pool (persistent, reused):** slots `matcher-1 … matcher-N` under `.claude/worktrees/`.
    On startup, reuse any that exist (`git -C … reset --hard master`; their `build/`
    survives — no cold re-provision); only create + provision missing slots
-   (`orchestrator.md` § Pool setup). A restart does NOT regenerate the pool.
+   (the orchestrator skill, § Pool setup). A restart does NOT regenerate the pool.
 2. **Queue:** regenerate objdiff, then select **every live non-100% function**, harvest-first (99%+ band before deep residuals), then ascending
    fuzzy-percentage order (least matched first). Source comments never remove a function from
    this residual-audit queue. Note src `VA()` carries
