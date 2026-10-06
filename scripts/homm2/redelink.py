@@ -42,6 +42,8 @@ def main(argv=None):
         return 1
     if run("python3", "-m", "homm2.build.source_symbols"):
         return 1
+    if run("python3", "-m", "homm2.build.annotated_functions"):
+        return 1
     if run("python3", "-m", "homm2.build.name_strings"):
         return 1
     if run("python3", "-m", "homm2.build.synth_pdb"):

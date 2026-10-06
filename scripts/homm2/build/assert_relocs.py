@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Relocation audits for objdiff's relocation-masked blind spots.
 
-``homm2 relocs`` remains the broad, opt-in, order-independent target audit.  The
-``--fields`` mode is a hard build gate for a narrower invariant: in live near-exact
+``homm2 build`` runs both the broad order-independent target audit and the
+``--resolved`` ordered audit. The ``--fields`` mode retains a narrower invariant: in live near-exact
 functions, ordered DIR32 sites that resolve into the same recovered public DATA owner
 must use the same owner-relative offset.  This catches a wrong field even when objdiff
 masks all four relocation bytes.
@@ -21,8 +21,8 @@ NOR a DATA()-pinned definition — i.e. fabricated.
 Data offsets come from symbol_names.csv (the claimed RVAs). Module-private synthetic
 storage has no inventory symbol, so its VA is read from the owning source DATA annotation.
 
-It is OPT-IN (not in `homm2 build`'s hard gates) because incomplete functions can still carry
-legitimate relocation-shape differences. Canonical targets retain real folded-function identities;
+Incomplete functions can still carry legitimate relocation-shape differences and
+are not asserted exact. Canonical targets retain real folded-function identities;
 synthetic relocation names are errors rather than normalized artifacts.
 
 Review one function (order-independent; usable on <100% walls):
@@ -73,6 +73,13 @@ class OwnerOffsetMultisetMismatch(NamedTuple):
     def diagnostic(self):
         return ("WRONG OWNER OFFSETS: %s expected %s, actual %s" %
                 (self.owner_name, self.expected, self.actual))
+
+
+class UnavailableAuditInput(NamedTuple):
+    reason: str
+
+    def diagnostic(self):
+        return "UNVERIFIED: " + self.reason
 
 
 class RelocAddressMismatch(NamedTuple):
@@ -1271,9 +1278,9 @@ def check_ordered_reloc_addresses(sym, data, dups, owners, base_sites, target_si
 def review_fields(resolved_addresses=False):
     """Audit ordered relocations in live near-exact functions.
 
-    The existing build gate checks proven public-owner offsets. ``--resolved``
-    widens this to every relocation whose final retail RVA can be resolved; it is
-    promoted to the hard gate after its initial findings are repaired.
+    ``--resolved`` widens the owner-offset check to every relocation whose final
+    retail RVA can be resolved. Missing near-exact inputs fail closed; target-only
+    runtime/carve-out modules are outside this source-object audit.
     """
     sym, data, dups = load_symbols()
     owners = load_owner_ranges()
@@ -1284,6 +1291,8 @@ def review_fields(resolved_addresses=False):
     checked_sites = 0
     for unit_record in report["units"]:
         unit = unit_record["name"]
+        if unit.startswith("("):
+            continue
         functions = {function["name"]: function.get("fuzzy_match_percent", 0)
                      for function in unit_record.get("functions", [])}
         if not functions:
@@ -1291,6 +1300,10 @@ def review_fields(resolved_addresses=False):
         base_obj = "build/objdiff/base/%s.obj" % unit
         target_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
+            for name, percent in functions.items():
+                if percent >= FIELD_AUDIT_THRESHOLD:
+                    bad.append((unit, name, UnavailableAuditInput(
+                        "missing candidate or retail object")))
             continue
         base_functions = parse_obj(base_obj, with_sites=True)
         target_functions = parse_obj(target_obj, with_sites=True)
@@ -1310,6 +1323,9 @@ def review_fields(resolved_addresses=False):
                 selected_base = normalized_base
                 selected_target = normalized_target
             if name not in selected_base or name not in selected_target:
+                if functions[name] >= FIELD_AUDIT_THRESHOLD:
+                    bad.append((unit, name, UnavailableAuditInput(
+                        "function absent from candidate or retail object")))
                 continue
             checked_functions += 1
             checked_sites += len(selected_base[name])
@@ -1331,7 +1347,7 @@ def review_fields(resolved_addresses=False):
         print("  %s  %s: %s" % (unit, name, problem.diagnostic()))
     if bad:
         label = "ADDRESSES" if resolved_addresses else "FIELDS"
-        print("\nRELOC %s FAIL: %d near-exact audited function(s) use a wrong resolved target."
+        print("\nRELOC %s FAIL: %d near-exact function(s) have wrong or unverifiable targets."
               % (label, len({(unit, name) for unit, name, _problem in bad})))
         return 1
     label = "addresses" if resolved_addresses else "fields"
@@ -1911,6 +1927,8 @@ def main():
     THRESHOLD = 99.5
     for u in report["units"]:
         unit = u["name"]
+        if unit.startswith("("):
+            continue
         near_exact_audited = {
             f["name"] for f in u.get("functions", [])
             if f.get("fuzzy_match_percent", 0) >= THRESHOLD
@@ -1920,6 +1938,8 @@ def main():
         base_obj = "build/objdiff/base/%s.obj" % unit
         tgt_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
+            for name in sorted(near_exact_audited):
+                bad.append((unit, name, "UNVERIFIED: missing candidate or retail object"))
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
         normalized_base = normalized_target = None
@@ -1943,6 +1963,7 @@ def main():
                 selected_base = normalized_base
                 selected_target = normalized_target
             if name not in selected_base or name not in selected_target:
+                bad.append((unit, name, "UNVERIFIED: function absent from candidate or retail object"))
                 continue
             problems = check_fn(
                 sym, data, dups, unit, name,
