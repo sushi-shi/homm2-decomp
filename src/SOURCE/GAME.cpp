@@ -21,6 +21,7 @@
 #include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
+#include <limits>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -1099,9 +1100,10 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
                          && m_timeEventCount <= GAME_TIME_EVENT_CAPACITY
                          && m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
     requireSaveableState(iMaxMapExtra > 0 && ppMapExtra != nullptr && pwSizeOfMapExtra != nullptr);
+    // Record sizes are i16, so a nonnegative size always fits the save buffer.
+    static_assert(GAME_SAVE_BUFFER_SIZE >= std::numeric_limits<i16>::max());
     for (i32 index = 1; index < iMaxMapExtra; ++index)
-        requireSaveableState(pwSizeOfMapExtra[index] >= 0
-                             && pwSizeOfMapExtra[index] <= GAME_SAVE_BUFFER_SIZE);
+        requireSaveableState(pwSizeOfMapExtra[index] >= 0);
     i32 nHuman;
 
     char workBuffer[SAVE_LEGACY_SCRATCH_SIZE];
