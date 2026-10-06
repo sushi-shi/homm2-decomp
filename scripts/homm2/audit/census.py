@@ -687,6 +687,26 @@ class Census:
                                       f"data word 0x{target + self.base:x} is not a census start"})
         self._eh_record_fields()
         self._data_pointer_fields()
+        self._reviewed_fields()
+
+    def _reviewed_fields(self) -> None:
+        """Reviewed DIR32 sites no channel reaches (an operand in the dead code
+        after a /Od `return`), from the image's reloc_inclusions.tsv. Each
+        must hold an address inside a mapped section."""
+        path = retail_dir() / "reloc_inclusions.tsv"
+        if not path.is_file():
+            return
+        for line in path.read_text().splitlines():
+            if line.startswith(("#", "site_rva")) or not line.strip():
+                continue
+            site_text, reason = (line.split("\t") + [""])[:2]
+            site = int(site_text, 16)
+            value = self.u32(site)
+            if value is None or self.section_of(value - self.base) is None:
+                raise ValueError(f"{path}: 0x{site:x} does not hold a mapped address")
+            self.fields.setdefault(site, {
+                "site": site, "target": value - self.base, "channel": "reviewed",
+                "instruction": None, "evidence": f"reviewed: {reason}"})
 
     def _eh_record_fields(self) -> None:
         """Pointer words of each registration stub's typed FuncInfo record:
