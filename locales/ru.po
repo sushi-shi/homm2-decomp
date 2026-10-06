@@ -751,6 +751,10 @@ msgctxt "editor.random.status.trees"
 msgid "Generating map - Placing trees..."
 msgstr "Генерация карты - размещаю деревья..."
 
+msgctxt "editor.requester.map.size_mismatch"
+msgid "No maps exist at that size."
+msgstr "Нет карт такого размера."
+
 msgctxt "editor.sign.bottle_title"
 msgid "Bottle Detail"
 msgstr "Содержание бутылки"
@@ -2038,6 +2042,14 @@ msgstr "Выбрать"
 msgctxt "editor.table.gWinSetup.99"
 msgid "Captain"
 msgstr "Капитан"
+
+msgctxt "editor.title"
+msgid "Heroes II Editor"
+msgstr "Редактор Героев II"
+
+msgctxt "editor.title.short"
+msgid "Editor"
+msgstr "Редактор"
 
 msgctxt "event.inline.021d355fcf4f31af"
 msgid "{Flotsam}\n\nYou search through the flotsam, and find some wood."

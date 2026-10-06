@@ -13,7 +13,12 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/display.h>
 
+#ifdef HOMM2_EDITOR
+// The editor project compiles its own copy, Source\Editor\wingraph.cpp.
+#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Editor\\wingraph.cpp"
+#else
 #define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\WINGRAPH.CPP"
+#endif
 
 H2_ENUM_BEGIN(WingraphPaletteConstant)
     PALETTE_VALUE_SHIFT = 2,
@@ -768,6 +773,7 @@ void WGInitGraphics(void) {
 #define index idx
 #endif
 VA(0x004b1273, 0x1c1)
+VA_AT(editor, 0x0042c5c3, 0x18d)
 void __cdecl WGUpdatePalette(i8* paletteData) {
     HDC deviceContext;
     i32 H2_UNUSED(result);
@@ -810,6 +816,18 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
     result = RealizePalette(deviceContext);
     ReleaseDC(hwndApp, deviceContext);
     if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != NULL) {
+#ifdef HOMM2_EDITOR
+        // The editor has no combat screen: it always redraws the whole screen.
+        BlitBitmapToScreen(
+            gpWindowManager->m_screen,
+            0,
+            0,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
+            0,
+            0
+        );
+#else
         if (gbLimitedCombatUpdatePalette != 0) {
             if (gbFullCombatScreenDrawn != 0)
                 BlitBitmapToScreen(
@@ -832,6 +850,7 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
                 0
             );
         }
+#endif
     }
 }
 #if H2_RETAIL_COMPILER

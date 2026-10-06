@@ -617,25 +617,25 @@ def placement_claims(image: str) -> list[SourceSymbol]:
     return rows
 
 
-def census_library_claims(image: str) -> list[SourceSymbol]:
-    """LIBCMT/OLDNAMES entries the image's census matched by masked bytes."""
-    import json
-    path = gen_dir(image) / "census.json"
-    if not path.is_file():
-        return []
-    import csv as _csv
-    sizes = {}
-    inventory = retail_dir(image) / "functions.csv"
-    if inventory.is_file():
-        with inventory.open(newline="") as stream:
-            for row in _csv.DictReader(line for line in stream
-                                       if not line.lstrip().startswith("#")):
-                sizes[int(row["entry_rva"], 16)] = int(row["byte_size"], 0)
-    starts = json.loads(path.read_text()).get("starts", [])
-    return [SourceSymbol(rva=int(row["rva"], 16), name=row["library_symbol"],
-                         unit="(libcmt)", size=sizes.get(int(row["rva"], 16), 0),
-                         kind="func", provenance="census-libcmt")
-            for row in starts if row.get("library_symbol")]
+def image_compgen_functions(image: str, source_root: Path, repo: Path,
+                            rows: list[SourceSymbol]) -> list[SourceCompgenFunction]:
+    """The semantic compiler-function identities an image's comparison renames:
+    its own units' `VA_COMPGEN` markers, and a shared unit's markers at the
+    address its placement (or `VA_AT`) names in this image. A shared marker
+    whose body is not placed here names nothing in this image."""
+    from dataclasses import replace
+    from homm2.manifest import all_units, unit_images
+    out = list(source_compgen_functions(source_root, repo))
+    at = {(row.unit, row.name): row.rva for row in rows if row.kind == "func"}
+    for unit in all_units():
+        images = unit_images(unit)
+        if image in images and DEFAULT_IMAGE in images and unit["source"].endswith(".cpp"):
+            for claim in compgen_functions_for_file(
+                    (repo / unit["source"]).resolve(), source_root, repo):
+                rva = at.get((claim.unit, claim.name))
+                if rva is not None:
+                    out.append(replace(claim, rva=rva))
+    return sorted(out)
 
 
 def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
@@ -664,10 +664,6 @@ def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     # (the editor's copies of KB.cpp's functions and globals).
     claimed = {row.rva for row in rows}
     rows.extend(row for row in placement_claims(image) if row.rva not in claimed)
-    # A LIBCMT body the game does not link (the census matched it against the
-    # archive with relocations masked) keeps its library name.
-    claimed = {row.rva for row in rows}
-    rows.extend(row for row in census_library_claims(image) if row.rva not in claimed)
     # The scanners below read the selected image's claim space (its own units).
     for vtable in source_vtables(source_root, repo):
         rows.append(SourceSymbol(
@@ -718,8 +714,8 @@ def main(argv=None) -> int:
         compgen = source_compgen_functions(source_root, REPO)
         rows = collect(source_root, REPO)
     else:
-        compgen = []
         rows = collect_image(image_key(), REPO)
+        compgen = image_compgen_functions(image_key(), source_root, REPO, rows)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")

@@ -278,6 +278,21 @@ source = "src/BASE/icon2bs.cpp"
 images = ["game", "editor"]
 flags = "base"
 
+# Two BASE-library objects only the editor links (its zoomed map view): each
+# holds one body and the std::ctype<wchar_t>::id registration, between Misc
+# and EXEC in EDT2PL.exe's BASE run.
+[[unit]]
+unit = "BASE/icon2bss"
+source = "src/BASE/icon2bss.cpp"
+images = ["editor"]
+flags = "base"
+
+[[unit]]
+unit = "BASE/tile2bs"
+source = "src/BASE/tile2bs.cpp"
+images = ["editor"]
+flags = "base"
+
 [[unit]]
 unit = "BASE/icon2by"
 source = "src/BASE/icon2by.cpp"

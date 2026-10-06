@@ -1,12 +1,14 @@
-#ifndef HOMM2_ICON2BS_H
-#define HOMM2_ICON2BS_H
+#ifndef HOMM2_ICON2BSS_H
+#define HOMM2_ICON2BSS_H
 
 #include <BASE/IconDraw.h>
 
 class bitmap;
 class icon;
 
-void IconToBitmapScale(
+// The scale-down of a 64-pixel frame (the editor's monster and hero icons);
+// EDT2PL.exe 0x00439b00, a BASE object the game does not link.
+void IconToBitmapScaleShadow(
     class icon* sourceIcon,
     class bitmap* destination,
     i32 destinationX,
@@ -19,7 +21,5 @@ void IconToBitmapScale(
     i32 clipH,
     i32 scale
 );
-
-#include <BASE/icon2bss.h>
 
 #endif
