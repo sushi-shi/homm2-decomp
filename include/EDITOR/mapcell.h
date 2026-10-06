@@ -87,8 +87,17 @@ struct mapCellExtra {
     u8 drawOverlayOnTop : 1;
     TilesetId overlayTileset : 6;
     u8 overlayIndex;
+#ifdef HOMM2_EDITOR
+
+
+    i32 objectLink;
+    i32 overlayLink;
+#endif
 };
 #pragma pack(pop)
+#ifdef HOMM2_EDITOR
+#else
+#endif
 
 class mapCell {
 public:
@@ -123,11 +132,19 @@ public:
     u8 m_flags;
     H2OpenCodeStorage<MapTriggerCode, u8> m_triggerType;
     u16 m_extraIndex;
+#ifdef HOMM2_EDITOR
+
+    i32 m_objectLink;
+    i32 m_overlayLink;
+#endif
 
     inline b32 HasFlag(MapCellFlag flag) const {
         return (m_flags & (flag)) != 0;
     }
 };
+#ifdef HOMM2_EDITOR
+#else
+#endif
 
 #define CELL_HAS_NON_SHADOW_OBJECT(cell)                                                           \
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \

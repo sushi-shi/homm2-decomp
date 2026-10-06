@@ -1,20 +1,9 @@
 #include <Ints.h>
+#include <SOURCE/KB.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
 #include <BASE/soundManager.h>
-#include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
-
-
-struct AudiereEffectsState {
-    void* buffer;
-    i32 frameCount;
-    i32 channelCount;
-    i32 sampleRate;
-    audiere::SampleFormat sampleFormat;
-    AudiereSampleNode* sampleList;
-    i32 sampleIterationDepth;
-};
 
 
 static AudiereEffectsState gAudiereEffects = {};
@@ -185,5 +174,3 @@ void EndAudiereSampleIteration(void) {
 bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
-
- AudiereSampleNode::~AudiereSampleNode() {}

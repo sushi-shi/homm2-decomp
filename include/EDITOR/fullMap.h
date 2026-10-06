@@ -20,9 +20,20 @@ public:
     void Close(void);
     void Init(i32 mapWidth, i32 mapHeight);
     void ClearCellExtra(i32 index);
+#ifdef HOMM2_EDITOR
+    void Copy(fullMap& source);
+#endif
     i32 GetNewCellExtraIndex(void);
     struct mapCellExtra* GetNewCellExtraOverlay(i32 x, i32 y);
     struct mapCellExtra* GetNewCellExtraObject(i32 x, i32 y);
+#ifdef HOMM2_EDITOR
+    void RemoveExtraObject(i32 index);
+    void RemoveCellObject(i32 x, i32 y);
+    void PushCellObject(i32 x, i32 y);
+    void RemoveExtraOverlay(i32 index);
+    void RemoveCellOverlay(i32 x, i32 y);
+    void Compact(void);
+#endif
     void Write(i32 handle);
     void Read(i32 handle, i32 convert);
     void ChangeTilesetIndex(
@@ -32,7 +43,7 @@ public:
         TilesetId tileset,
         i32 index,
         i32 overlay,
-        i32
+        i32 link
     );
 
     mapCell* Cells(void) {
@@ -54,4 +65,5 @@ public:
         return &extras[i];
     }
 };
+
 #endif

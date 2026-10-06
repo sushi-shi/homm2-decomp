@@ -11,12 +11,12 @@
 
 static i32 s_loopCount = 0;
 static i32 s_x = 0;
-static u8* s_src = 0;
-static u8* s_dst = 0;
+static u8* s_src = NULL;
+static u8* s_dst = NULL;
 static i32 s_y = 0;
-static u8* s_row = 0;
+static u8* s_row = NULL;
 static i32 s_left = 0;
-static IconEntry* s_entry = 0;
+static IconEntry* s_entry = NULL;
 static i32 s_run = 0;
 static i32 s_spanCount = 0;
 static i32 s_clipR = 0;

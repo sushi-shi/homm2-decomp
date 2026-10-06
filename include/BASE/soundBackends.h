@@ -29,7 +29,18 @@ struct AudiereSampleNode {
         next = nextNode;
     }
 
-     ~AudiereSampleNode();
+    ~AudiereSampleNode() {}
+};
+
+
+struct AudiereEffectsState {
+    void* buffer;
+    i32 frameCount;
+    i32 channelCount;
+    i32 sampleRate;
+    audiere::SampleFormat sampleFormat;
+    AudiereSampleNode* sampleList;
+    i32 sampleIterationDepth;
 };
 
 
