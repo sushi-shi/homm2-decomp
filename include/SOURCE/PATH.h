@@ -3,7 +3,7 @@
 
 #include <SOURCE/combatTypes.h>
 
-i32 GetAdjacentCellIndexNoArmy(i32, CombatHexDirection);
-CombatHexDirection OppositeDirection(CombatHexDirection);
+i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction);
+CombatHexDirection OppositeDirection(CombatHexDirection direction);
 
 #endif

@@ -8,7 +8,6 @@
 struct tag_message;
 
 typedef enum TradingPostConstant {
-    TRADING_POST_RESOURCE_COUNT     = H2EnumIndex(RES_COUNT),
     TRADING_POST_WINDOW_X           = 0x9f,
     TRADING_POST_WINDOW_Y           = 0x17,
     TRADING_POST_KNOB_X             = 0x43,
@@ -27,14 +26,14 @@ typedef enum TradingPostConstant {
     TRADING_POST_RIGHT_SELECT_FIRST = 0x6e
 } TradingPostConstant;
 
-void DoTradingPost(i32, float);
-void UpdateTradingPost(i32);
-void ComputeTradeRatios(i32, i32, i32*, i32*, i32*);
-void DoTradeKnob(struct tag_message);
+void DoTradingPost(i32 isMarketplace, float efficiency);
+void UpdateTradingPost(i32 draw);
+void ComputeTradeRatios(i32 sourceResource, i32 destinationResource, i32* ratio, i32* leftDenominated, i32* maxTrade);
+void DoTradeKnob(struct tag_message message);
 void SetupNewTrade(void);
-MessageDispatchResult TradingPostHandler(struct tag_message&);
+MessageDispatchResult TradingPostHandler(struct tag_message& message);
 
-extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
+extern u16 coreRatio[H2EnumIndex(RES_COUNT)];
 extern class iconWidget* tradeKnob;
 extern i32 qtyToTrade;
 extern i32 leftResource;

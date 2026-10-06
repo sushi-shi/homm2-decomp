@@ -55,7 +55,7 @@ using enum HeroPrimaryStat;
 
 typedef enum HeroConstant {
     HERO_OWNER_NONE                           = -1,
-    HERO_BOAT_NONE                            = 0xff,
+    HERO_PATROL_NONE                          = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
     HERO_MAP_CELL_PRESENT                     = 0x40,
@@ -84,6 +84,7 @@ typedef enum HeroConstant {
     HERO_SECONDARY_SKILL_ORDER_BASE           = 1,
     HERO_SECONDARY_SKILL_ICON_FRAME_BASE      = 1,
     HERO_MINIMUM_SPELL_POWER                  = 1,
+    HERO_BASE_LEARNABLE_SPELL_LEVEL           = H2EnumIndex(SPELL_LEVEL_SECOND),
     HERO_SPELL_POINTS_PER_KNOWLEDGE           = 10,
     HERO_NECROMANCY_BONUS_MAX                 = 6,
     HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX       = 9,
@@ -91,40 +92,27 @@ typedef enum HeroConstant {
 } HeroConstant;
 
 enum class HeroEventFlag : u32 {
-    HERO_EVENT_NONE                = 0,
-    HERO_EVENT_BUOY                = 0x2,
-    ADVMGR_VISIT_FORT              = HERO_EVENT_BUOY,
-    HERO_EVENT_FOUNTAIN            = 0x4,
-    ADVMGR_VISIT_GAZEBO            = HERO_EVENT_FOUNTAIN,
-    HERO_EVENT_OASIS               = 0x8,
-    ADVMGR_VISIT_MERCENARY_CAMP    = HERO_EVENT_OASIS,
-    HERO_EVENT_FAERIE_RING         = 0x10,
-    ADVMGR_VISIT_STANDING_STONES   = HERO_EVENT_FAERIE_RING,
-    HERO_EVENT_GRAVEYARD           = 0x20,
-    HERO_EVENT_SHIPWRECK           = 0x40,
-    HERO_EVENT_EMBARKED            = 0x80,
-    HERO_EVENT_TEMPLE              = 0x100,
-    ADVMGR_VISIT_WITCH_DOCTOR      = HERO_EVENT_TEMPLE,
-    HERO_EVENT_WATERING_HOLE       = 0x200,
-    ADVMGR_VISIT_EVENT_SITE        = HERO_EVENT_WATERING_HOLE,
-    HERO_EVENT_DERELICT_SHIP       = 0x400,
-    HERO_EVENT_MAGIC_WELL          = 0x1000,
-    ADVMGR_VISIT_XANADU            = HERO_EVENT_MAGIC_WELL,
-    HERO_EVENT_IDOL                = 0x2000,
-    ADVMGR_VISIT_TREE_OF_KNOWLEDGE = HERO_EVENT_IDOL,
-    HERO_EVENT_PYRAMID             = 0x4000,
-    HERO_EVENT_WEEKLY_VISIT        = 0x10000,
-    WEEKLY_HERO_RESERVED_FLAG      = HERO_EVENT_WEEKLY_VISIT,
-    HERO_EVENT_MERMAID             = 0x100000,
-    ADVMGR_VISIT_GENERIC_TOWER     = HERO_EVENT_MERMAID,
-    HERO_EVENT_SIRENS              = 0x200000,
-    ADVMGR_VISIT_GENERIC_SPRING    = HERO_EVENT_SIRENS,
-    HERO_EVENT_ARENA               = 0x400000,
-    ADVMGR_VISIT_GENERIC_HUT       = HERO_EVENT_ARENA,
-    HERO_EVENT_STABLES             = 0x800000,
-    ADVMGR_VISIT_GENERIC_ALTAR     = HERO_EVENT_STABLES,
-    WEEKLY_HERO_VISIT_FLAG         = HERO_EVENT_STABLES,
-    HERO_EVENT_GROUPED_FORMATION   = 0x00008000
+    HERO_EVENT_NONE                     = 0,
+    HERO_EVENT_BUOY                     = 0x2,
+    HERO_EVENT_FOUNTAIN                 = 0x4,
+    HERO_EVENT_OASIS                    = 0x8,
+    HERO_EVENT_FAERIE_RING              = 0x10,
+    HERO_EVENT_GRAVEYARD                = 0x20,
+    HERO_EVENT_SHIPWRECK                = 0x40,
+    HERO_EVENT_EMBARKED                 = 0x80,
+    HERO_EVENT_TEMPLE                   = 0x100,
+    HERO_EVENT_WATERING_HOLE            = 0x200,
+    HERO_EVENT_DERELICT_SHIP            = 0x400,
+    HERO_EVENT_MAGIC_WELL               = 0x1000,
+    HERO_EVENT_IDOL                     = 0x2000,
+    HERO_EVENT_PYRAMID                  = 0x4000,
+
+    HERO_EVENT_RESERVED_FOR_RECRUITMENT = 0x10000,
+    HERO_EVENT_MERMAID                  = 0x100000,
+    HERO_EVENT_SIRENS                   = 0x200000,
+    HERO_EVENT_ARENA                    = 0x400000,
+    HERO_EVENT_STABLES                  = 0x800000,
+    HERO_EVENT_GROUPED_FORMATION        = 0x00008000
 };
 using enum HeroEventFlag;
 ENABLE_ENUM_FLAGS(HeroEventFlag)
@@ -146,18 +134,9 @@ public:
     i32 m_y;
     i32 m_destinationX;
     i32 m_destinationY;
-    union {
-        struct {
-            u8 m_boatId;
-            char m_boatDestY;
-            i8 m_boatTravelRange;
-        };
-        struct {
-            i8 m_patrolX;
-            i8 m_patrolY;
-            i8 m_patrolRadius;
-        };
-    };
+    u8 m_patrolX;
+    u8 m_patrolY;
+    i8 m_patrolRadius;
     H2EnumStorage<MapDirection, u8> m_direction;
     H2OpenCodeStorage<MapTriggerCode, i16> m_locationType;
     i16 m_occupiedTown;
@@ -192,48 +171,57 @@ public:
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
     hero(void);
-    void Read(i32, i8);
-    void Write(i32, i8);
+    void Read(i32 file, i8 expansion);
+    void Write(i32 file, i8 expansion);
     void GetArmyStrengths(u32l* const);
-    i32 HasArtifact(ArtifactType);
+    i32 HasArtifact(ArtifactType artifact);
     i32 CalcMobility(void);
-    i32 HasSpell(SpellType);
-    SpellType GetNthSpell(HeroSpellType, i32);
-    i32 GetNumSpells(HeroSpellType);
-    void UseSpell(SpellType);
-    void AddSpell(SpellType, i32);
+    i32 HasSpell(SpellType spell);
+    SpellType GetNthSpell(HeroSpellType type, i32 spellNumber);
+    i32 GetNumSpells(HeroSpellType type);
+    void UseSpell(SpellType spell);
+    void AddSpell(SpellType spell, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
-    void ViewStat(i32, i32);
-    void ViewArtifact(ArtifactType, b32, i32);
+    void ViewStat(i32 stat, i32 quickView);
+    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra);
     i32 Dismiss(void);
-    void Deallocate(i32);
-    i32 GetExperience(i32);
-    i32 GetLevel(i32);
+    void Deallocate(i32 updateMap);
+    i32 GetExperience(i32 level);
+    i32 GetLevel(i32 experienceValue);
     void ApplyBattleWinTemps(void);
     void ApplyBattleLossTemps(void);
     void CheckLevel(void);
     i32 NumArtifacts(void);
     void SetSS(
-        HeroSecondarySkill, HeroSkillLevel
+        HeroSecondarySkill skill, HeroSkillLevel level
     );
-    i32 TakeSS(HeroSecondarySkill, i32);
+    i32 TakeSS(HeroSecondarySkill skill, i32 levels);
     i32 GiveSS(
-        HeroSecondarySkill,
-        HeroSkillLevel
+        HeroSecondarySkill skill,
+        HeroSkillLevel levels
     );
-    i32 CreatureTypeCount(CreatureType);
+    i32 CreatureTypeCount(CreatureType creatureType);
     void UpgradeCreatures(
-        CreatureType, CreatureType
+        CreatureType oldCreatureType, CreatureType newCreatureType
     );
-    HeroSecondarySkill GetNthSS(i32);
+    HeroSecondarySkill GetNthSS(i32 ordinal);
     class town* GetOccupiedTown(void);
-    i8 Stats(HeroPrimaryStat);
-    i8 GetSSLevel(HeroSecondarySkill);
-    void DoSSLevelDialog(HeroSecondarySkill, i32);
-    void CheckAnduranPieces(b32);
+    i8 Stats(HeroPrimaryStat stat);
+    i8 GetSSLevel(HeroSecondarySkill skill);
+    void DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView);
+    void CheckAnduranPieces(b32 showDialog);
 };
 #pragma pack(pop)
+
+#define ADD_HERO_EXPERIENCE_AND_CHECK_LEVEL(h, amount)                                             \
+    ((h).m_experience += (amount), (h).CheckLevel())
+
+#define HERO_SCOUTING_VISIBILITY_RADIUS(h)                                                         \
+    (giVisRange[H2EnumIndex((h).m_secondarySkills[H2EnumIndex(HERO_SKILL_SCOUTING)])]                              \
+     + ((h).HasArtifact(ARTIFACT_TELESCOPE) != 0))
+#define HERO_NORMAL_SPELL_POINTS(h)                                                                \
+    ((h).Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE)
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
