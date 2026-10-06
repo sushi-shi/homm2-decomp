@@ -90,7 +90,9 @@ def main(argv=None):
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
         if sh("python3", "configure.py"): return 1
-        if sh("ninja", *rest): return 1
+        from homm2.core.paths import ninja_jobs
+        jobs = [] if any(a.startswith("-j") for a in rest) else ninja_jobs()
+        if sh("ninja", *jobs, *rest): return 1
         # Relocation field validation consumes the objdiff report. Generate it
         # after Ninja has rebuilt every input so a clean build is self-contained.
         from homm2.match.status import load_report, main as st

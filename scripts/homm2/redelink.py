@@ -42,7 +42,8 @@ def main(argv=None):
         return 1
     if run("python3", "configure.py"):
         return 1
-    if run("ninja", "base"):
+    from homm2.core.paths import ninja_jobs
+    if run("ninja", *ninja_jobs(), "base"):
         return 1
     if run("python3", "-m", "homm2.build.source_symbols"):
         return 1

@@ -31,3 +31,10 @@ def find_repo(start=None):
 
 
 REPO = find_repo()
+
+
+def ninja_jobs() -> list[str]:
+    """`-j N` from $HOMM2_JOBS (ninja's own default when unset), so a shared
+    machine can cap every ninja the tooling starts."""
+    jobs = os.environ.get("HOMM2_JOBS", "").strip()
+    return ["-j", jobs] if jobs.isdigit() and int(jobs) > 0 else []
