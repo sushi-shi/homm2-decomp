@@ -180,12 +180,25 @@ class Placer:
                 continue
             raw, _masked = self.body(grva, self.meta[grva][0]["size"])
             for insn in md.disasm(raw, 0x400000 + grva):
-                if insn.mnemonic != "call" or insn.bytes[0] != 0xE8:
-                    continue
+                if insn.bytes[0] not in (0xE8, 0xE9) or insn.size != 5:
+                    continue        # rel32 calls and tail jumps
                 gt = insn.address + 5 + struct.unpack_from("<i", bytes(insn.bytes), 1)[0] - 0x400000
                 esite = erva + insn.address - 0x400000 - grva + 1
                 et = esite + 4 + struct.unpack_from("<i", self.etext, esite - self.eva)[0]
                 votes[gt][et] += 1
+            # Absolute code pointers (`push offset f`, function tables): the
+            # game field and the image field at one body offset name one
+            # function.
+            i = bisect.bisect_left(self.gsites, grva)
+            j = bisect.bisect_left(self.gsites, grva + len(raw))
+            for site in self.gsites[i:j]:
+                esite = erva + site - grva
+                if esite not in self.esites:
+                    continue
+                gt = int.from_bytes(self.game.read(site, 4), "little") - self.game.image_base
+                et = int.from_bytes(self.pe.read(esite, 4), "little") - self.base
+                if self.gva <= gt < self.gva + len(self.gtext):
+                    votes[gt][et] += 1
         return votes
 
     def resolve_calls(self) -> None:

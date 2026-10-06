@@ -2,6 +2,7 @@
 # Game identities placed in this image by retail byte correspondence;
 # game_rva/name/unit join the game claim the shared source spells.
 rva	size	kind	name	unit	game_rva	evidence
+0x00001a30	0x5	func	?id@?$ctype@G@std@@$E	(unmatched)	0x00000000	callee of 45 placed call(s); game callee 0x15a50 (BASE/DIMMER)
 0x000081cc	0x10	func	?CampaignID@ExpCampaign@@QAEHXZ	SOURCE/X_CAMPGN	0x000b51d3	masked game body (16 bytes, 0 fields masked) unique at a census start
 0x0000b0bd	0x41	func	?InMapArea@@YIHHH@Z	SOURCE/KB	0x0006e31d	masked game body (65 bytes, 0 fields masked) unique at a census start
 0x000101b6	0x9b	func	@PollSound@0	(unmatched)	0x00000000	callee of 39 placed call(s); game callee 0x65bf0 (SOURCE/KB)
@@ -27,6 +28,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000150d0	0x112	func	_WinMain@16	SOURCE/kbwin	0x00070e30	masked game body (274 bytes, 26 fields masked) unique at a census start
 0x000151e2	0x2ec	func	?AppInit@@YIHPAX0HPAD@Z	SOURCE/kbwin	0x00070f42	masked game body (748 bytes, 76 fields masked) unique at a census start
 0x000154ce	0x1a	func	?AppIdle@@YIHXZ	SOURCE/kbwin	0x0007122e	masked game body (26 bytes, 1 fields masked) unique at a census start
+0x000154e8	0x656	func	?AppWndProc@@YGJPAXIIJ@Z	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0x71248 (SOURCE/kbwin)
 0x00015b3e	0x67	func	?AppAbout@@YGHPAXIIJ@Z	SOURCE/kbwin	0x00071883	masked game body (103 bytes, 2 fields masked) unique at a census start
 0x00015ba5	0xf	func	?AppExit@@YIXXZ	SOURCE/kbwin	0x000718ea	masked game body (15 bytes) at its unit's block offset, shared by 14 bodies (5 occurrence(s))
 0x00015bb4	0xa1	func	?Process1WindowsMessage@@YIXXZ	SOURCE/kbwin	0x000718f9	masked game body (161 bytes, 13 fields masked) unique at a census start
