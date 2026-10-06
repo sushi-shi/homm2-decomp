@@ -42,6 +42,7 @@ include/BASE/heroWindowManager.h	pending
 include/BASE/icon.h	pending	
 include/BASE/icon2bc.h	pending	
 include/BASE/icon2bs.h	pending	
+include/BASE/icon2bss.h	pending	
 include/BASE/icon2by.h	pending	
 include/BASE/iconWidget.h	pending	
 include/BASE/iconf2bc.h	pending	
@@ -60,6 +61,7 @@ include/BASE/soundBackends.h	pending
 include/BASE/soundManager.h	pending	
 include/BASE/textEntryWidget.h	pending	
 include/BASE/textWidget.h	pending	
+include/BASE/tile2bs.h	pending	
 include/BASE/tileset.h	pending	
 include/BASE/widget.h	pending	
 include/BASE/widgetKind.h	pending	
@@ -180,12 +182,14 @@ src/BASE/bmap2.cpp	pending
 src/BASE/droplist.cpp	pending	
 src/BASE/icon2bc.cpp	pending	
 src/BASE/icon2bs.cpp	pending	
+src/BASE/icon2bss.cpp	pending	
 src/BASE/icon2by.cpp	pending	
 src/BASE/iconf2bc.cpp	pending	
 src/BASE/iconf2by.cpp	pending	
 src/BASE/listbox.cpp	pending	
 src/BASE/miscwin.cpp	pending	
 src/BASE/soundmgr.cpp	pending	
+src/BASE/tile2bs.cpp	pending	
 src/EDITOR/CLEARMGR.cpp	pending	
 src/EDITOR/EDITMGR.cpp	pending	
 src/EDITOR/EDITOR.cpp	pending	
