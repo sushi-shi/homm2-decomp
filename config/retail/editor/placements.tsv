@@ -109,11 +109,11 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0002cdfc	0x1ce	func	?SetGraphicsType@@YIHH@Z	SOURCE/wingraph	0x000b1ae0	masked game body (462 bytes, 40 fields masked) unique at a census start
 0x0002cfca	0x27	func	_$E19	SOURCE/wingraph	0x000b1cae	masked game body (39 bytes) at its unit's block offset, shared by 18 bodies (65 occurrence(s))
 0x0002cff1	0x12	func	_$E18	SOURCE/wingraph	0x000b1cd5	masked game body (18 bytes) at its unit's block offset, shared by 18 bodies (68 occurrence(s))
-0x0002d4ba	0x6	func	_WinGCreateBitmap@12	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xb55f4 ((imports))
-0x0002d4c0	0x6	func	_WinGCreateDC@0	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xb55fa ((imports))
-0x0002d4c6	0x6	func	_WinGRecommendDIBFormat@4	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xb5600 ((imports))
-0x0002d4d2	0x6	func	_WinGStretchBlt@40	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xb560c ((imports))
-0x0002d4d8	0x8	func	_WinGBitBlt@32	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xb5612 ((imports))
+0x0002d4ba	0x6	func	_WinGCreateBitmap@12	(imports)	0x00000000	callee of 1 placed call(s); game callee 0xb55f4 ((imports))
+0x0002d4c0	0x6	func	_WinGCreateDC@0	(imports)	0x00000000	callee of 1 placed call(s); game callee 0xb55fa ((imports))
+0x0002d4c6	0x6	func	_WinGRecommendDIBFormat@4	(imports)	0x00000000	callee of 1 placed call(s); game callee 0xb5600 ((imports))
+0x0002d4d2	0x6	func	_WinGStretchBlt@40	(imports)	0x00000000	callee of 1 placed call(s); game callee 0xb560c ((imports))
+0x0002d4d8	0x8	func	_WinGBitBlt@32	(imports)	0x00000000	callee of 1 placed call(s); game callee 0xb5612 ((imports))
 0x0002d4e0	0x5d	func	??0baseManager@@QAE@XZ	BASE/BASEMGR	0x000b5660	masked game body (93 bytes, 3 fields masked) unique at a census start
 0x0002d540	0x27	func	_$E19	BASE/BASEMGR	0x000b56c0	masked game body (39 bytes) at its unit's block offset, shared by 3 bodies (65 occurrence(s))
 0x0002d570	0x12	func	_$E18	BASE/BASEMGR	0x000b56f0	masked game body (18 bytes) at its unit's block offset, shared by 3 bodies (68 occurrence(s))
@@ -624,7 +624,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0004a532	0x23	func	__abnormal_termination	(libcmt)	0x000d6dfa	masked game body (35 bytes, 1 fields masked) unique at a census start
 0x0004a555	0x9	func	__NLG_Notify1	(libcmt)	0x000d6e1d	masked game body (9 bytes) at its unit's block offset, shared by 5 bodies (1 occurrence(s))
 0x0004a55e	0x18	func	__NLG_Notify	(libcmt)	0x000d6e26	masked game body (24 bytes, 1 fields masked) unique at a census start
-0x0004a576	0xb	func	_abs	(unmatched)	0x00000000	callee of 4 placed call(s); game callee 0xd70bb ((libcmt))
+0x0004a576	0xb	func	_abs	(libcmt)	0x00000000	callee of 4 placed call(s); game callee 0xd70bb ((libcmt))
 0x0004a581	0x7e	func	__onexit	(libcmt)	0x000d74ca	masked game body (126 bytes, 14 fields masked) unique at a census start
 0x0004a5ff	0x12	func	_atexit	(libcmt)	0x000d7548	masked game body (18 bytes, 1 fields masked) unique at a census start
 0x0004a640	0x7b	func	_strlen	(libcmt)	0x000d69c0	masked game body (123 bytes, 0 fields masked) unique at a census start
@@ -640,13 +640,13 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0004a9ac	0x4e	func	_fputs	(libcmt)	0x000d94da	masked game body (78 bytes, 6 fields masked) unique at a census start
 0x0004a9fa	0x31	func	__fsopen	(libcmt)	0x000d9338	masked game body (49 bytes, 3 fields masked) unique at a census start
 0x0004aa2b	0x13	func	_fopen	(libcmt)	0x000d9369	masked game body (19 bytes, 1 fields masked) unique at a census start
-0x0004aab0	0x6	func	_strchr	(unmatched)	0x00000000	callee of 2 placed call(s); game callee 0xe2660 ((libcmt))
+0x0004aab0	0x6	func	_strchr	(libcmt)	0x00000000	callee of 2 placed call(s); game callee 0xe2660 ((libcmt))
 0x0004aba0	0x81	func	_strcmp	(libcmt)	0x000d7ce0	masked game body (129 bytes, 0 fields masked) unique at a census start
-0x0004ac30	0x335	func	_memcpy	(unmatched)	0x00000000	callee of 56 placed call(s); game callee 0xd70d0 ((libcmt))
+0x0004ac30	0x335	func	_memcpy	(libcmt)	0x00000000	callee of 56 placed call(s); game callee 0xd70d0 ((libcmt))
 0x0004af70	0xfe	func	_strncpy	(libcmt)	0x000d7aa0	masked game body (254 bytes, 1 fields masked) unique at a census start
 0x0004b070	0x38	func	_strncmp	(libcmt)	0x000d7f60	masked game body (56 bytes, 0 fields masked) unique at a census start
 0x0004b0b0	0x2f	func	__chkstk	(libcmt)	0x000d9ab0	masked game body (47 bytes, 0 fields masked) unique at a census start
-0x0004b0e0	0x335	func	_memmove	(unmatched)	0x00000000	callee of 11 placed call(s); game callee 0xd7630 ((libcmt))
+0x0004b0e0	0x335	func	_memmove	(libcmt)	0x00000000	callee of 11 placed call(s); game callee 0xd7630 ((libcmt))
 0x0004b58b	0x2d	func	__cinit	(libcmt)	0x000d7b9e	masked game body (45 bytes, 7 fields masked) unique at a census start
 0x0004b5b8	0x11	func	_exit	(libcmt)	0x000d7bcb	masked game body (17 bytes, 1 fields masked) unique at a census start
 0x0004b5c9	0x11	func	__exit	(libcmt)	0x000d7bdc	masked game body (17 bytes, 1 fields masked) unique at a census start
@@ -898,7 +898,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00056f78	0x49	func	__store_number	(libcmt)	0x000e584d	masked game body (73 bytes, 0 fields masked) unique at a census start
 0x00056fc1	0x2cf	func	__store_winword	(libcmt)	0x000e5896	masked game body (719 bytes, 47 fields masked) unique at a census start
 0x00057290	0x138	func	___getlocaleinfo	(libcmt)	0x000e5b65	masked game body (312 bytes, 17 fields masked) unique at a census start
-0x000573ce	0x1c5	func	$locale_internal@0xe5ca3	(unmatched)	0x00000000	callee of 1 placed call(s); game callee 0xe5ca3 ((libcmt))
+0x000573ce	0x1c5	func	$locale_internal@0xe5ca3	(libcmt)	0x00000000	callee of 1 placed call(s); game callee 0xe5ca3 ((libcmt))
 0x00057593	0x2d	func	__itoa	(libcmt)	0x000e5e68	masked game body (45 bytes, 1 fields masked) unique at a census start
 0x000575c0	0x5c	func	_xtoa	(libcmt)	0x000e5e95	masked game body (92 bytes, 0 fields masked) unique at a census start
 0x0005761c	0x2a	func	__ltoa	(libcmt)	0x000e5ef1	masked game body (42 bytes, 1 fields masked) unique at a census start
@@ -931,7 +931,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000590eb	0x67	func	_copy_environ	(libcmt)	0x000e7abb	masked game body (103 bytes, 3 fields masked) unique at a census start
 0x00059152	0x97	func	__mbschr	(libcmt)	0x000e7b22	masked game body (151 bytes, 7 fields masked) unique at a census start
 0x000591e9	0x2b	func	__strdup	(libcmt)	0x000e7bb9	masked game body (43 bytes, 3 fields masked) unique at a census start
-0x00059250	0x6	func	RtlUnwind@KERNEL32	(unmatched)	0x00000000	callee of 2 placed call(s); game callee 0xe7c1a ((imports))
+0x00059250	0x6	func	RtlUnwind@KERNEL32	(imports)	0x00000000	callee of 2 placed call(s); game callee 0xe7c1a ((imports))
 0x00059520	0x11	func	_tell	(libcmt)	0x000e7eba	masked game body (17 bytes, 1 fields masked) unique at a census start
 0x00059531	0x46	func	__access	(libcmt)	0x000e7ecb	masked game body (70 bytes, 5 fields masked) unique at a census start
 0x00059580	0x30	func	__strrev	(libcmt)	0x000e7f20	masked game body (48 bytes, 0 fields masked) unique at a census start
@@ -1181,50 +1181,8 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0005b560	0x0	data	??_7sample@@6B@	BASE/SAMPLE	0x000ea9d8	2 field(s) of placed bodies
 0x0005b564	0x0	data	??_7MIDIWrap@@6B@	BASE/SAMPLE	0x000ea9dc	2 field(s) of placed bodies
 0x0005b568	0x0	data	??_7resource@@6B@	BASE/RESOURCE	0x000eaa28	3 field(s) of placed bodies
-0x0005b5a0	0x0	data	$anon_str_eecc26e2f0b693c2664650faee20c6786c3579da021599f20a1634ed8cced6e9_0	_const	0x000eaa48	1 field(s) of placed bodies
-0x0005b5b0	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_1	_const	0x000eaa58	1 field(s) of placed bodies
-0x0005b5c8	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_0	_const	0x000eaa30	1 field(s) of placed bodies
-0x0005b5e0	0x0	data	$anon_str_75c759df65ec05bd75eab2681b7e4e3388eacbc1256bf25e020b9f5e137746a5_0	_const	0x000eaa78	1 field(s) of placed bodies
-0x0005b5f0	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_2	_const	0x000eaa88	1 field(s) of placed bodies
-0x0005b608	0x0	data	$anon_str_e61ef78300dc922726556a80673cc1f2b71917ef3c546af32e12baa2654d19b1_0	_const	0x000eaaa0	1 field(s) of placed bodies
-0x0005b618	0x0	data	$anon_str_9a77bf1421944e18af70489f052be073d2a7d7c1d8364d71ad9f871b2887600a_0	_const	0x000eaab0	1 field(s) of placed bodies
-0x0005b628	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_3	_const	0x000eaac0	1 field(s) of placed bodies
-0x0005b640	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_4	_const	0x000eaad8	1 field(s) of placed bodies
-0x0005b658	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_5	_const	0x000eac68	1 field(s) of placed bodies
-0x0005b670	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_6	_const	0x000eac80	1 field(s) of placed bodies
-0x0005b6c8	0x0	data	$anon_str_f19928677b2f51ad669b77d49dafc34f42c5ae36c01d954e82be31ccbc6b659f_0	_const	0x000eabe8	2 field(s) of placed bodies
-0x0005b6cc	0x0	data	$anon_str_1942749ba2f69b258d2d0213e628ea48c59f5cf2b5dcd406577d1e6b88a54240_0	_const	0x000eabec	2 field(s) of placed bodies
-0x0005b6d0	0x0	data	$anon_str_e7dac261e841e53eb65ac8c2a0e56544df49c46d71e8002d7764f92c66c4c868_0	_const	0x000eabf0	1 field(s) of placed bodies
-0x0005b6d4	0x0	data	$anon_str_c89016c3ec2725b816c819c8a4e625256d02ed2d471199e91fe1cb753cd739e7_0	_const	0x000eabf4	1 field(s) of placed bodies
 0x0005b6d8	0x0	data	$anon_str_075d3ddf5a3a826e13a92288e853bc4b2cb17fb05367ae865f401a4bb11f05ce_0	_const	0x000eabf8	1 field(s) of placed bodies
-0x0005b6dc	0x0	data	$anon_str_090c554bb6a344300e5690ce6f80c4ef6ee6cf5bd0fef3fde87a079dee2fa70c_0	_const	0x000eabfc	1 field(s) of placed bodies
-0x0005b6e8	0x0	data	$anon_str_6a5801230c36b021eee70285cec3ce2835d3866ce021a11f2d11cbf09ac6296f_0	_const	0x000eac08	1 field(s) of placed bodies
-0x0005b788	0x0	data	$anon_str_55f71f8c1134090f1f8e919d3cc7f3c6112139cafead8b49a41389c8e7203585_0	_const	0x000eab78	1 field(s) of placed bodies
-0x0005b7a4	0x0	data	$anon_str_98aa8d3921926e401edb3be3d14537c79d9f0fde0dddd99af5a012f2586d0d4a_0	_const	0x000eab94	1 field(s) of placed bodies
-0x0005b7b0	0x0	data	$anon_str_143c1d5ed914a97bcccdd9eeb0ddcf4226078502938dde78d1eddc8c20fc0e69_0	_const	0x000eaba0	1 field(s) of placed bodies
-0x0005b7b8	0x0	data	$anon_str_aff6583f72a59c6de2f1ab910cf684bff8dd878f2ef1cde7b5521348886784cb_0	_const	0x000eac98	1 field(s) of placed bodies
-0x0005b7d0	0x0	data	$anon_str_fa86b80d9adb93cb76c0df9695bf4365bec975284fe814bc445d0a62ba224a5a_0	_const	0x000eacb0	1 field(s) of placed bodies
-0x0005ba74	0x0	data	$anon_str_99b02f72dbb42a44bb629693f626a409c12c6c556ab6998fa19ac8a46a896f45_0	_const	0x000eb2bc	1 field(s) of placed bodies
 0x0005ba9c	0x0	data	$anon_str_c1c91a7d882700051cb22bf907cfedf13b133deac2aa913eb68f5690146a9317_0	_const	0x000eb2e4	1 field(s) of placed bodies
-0x0005baa0	0x0	data	$anon_str_465f1d44236bf14ecf37d7200a6c96955cef72403f98afc7b38138c96836c30f_0	_const	0x000eb2e8	1 field(s) of placed bodies
-0x0005babc	0x0	data	$anon_str_2c2b93ab063d64d75b80c9901170ce7ae0d79a64bc7f077ce1a010ab0956a391_0	_const	0x000eb304	1 field(s) of placed bodies
-0x0005bac0	0x0	data	$anon_str_7fd035a12f341287a3c9823243ec8d61c76902a36a01f7de5ae0e2d8f6668676_0	_const	0x000eb308	1 field(s) of placed bodies
-0x0005bad8	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_7	_const	0x000eb320	1 field(s) of placed bodies
-0x0005c178	0x0	data	$anon_str_9b8ee48f5ed1f0854e86a292e2b7ecb77b1937d03c41a5e870a245c13f205402_0	_const	0x000eb9c0	1 field(s) of placed bodies
-0x0005c184	0x0	data	$anon_str_ef2918049080cfeb6b9ab79fecf21f21bb17e626fcbb5da91ab56886de4a625f_0	_const	0x000eb9cc	1 field(s) of placed bodies
-0x0005c198	0x0	data	$anon_str_293f5e20e5576ac1a3f7fdc6ce1e7ed5d9573fc8ab4d9bc3b54a6cd7109919c0_0	_const	0x000eb9e0	1 field(s) of placed bodies
-0x0005c1a8	0x0	data	$anon_str_a15212d1b91c5f8bef604d3acefdbdb471b6133ca74fa569ecc54cc3ba204514_0	_const	0x000eb9f0	1 field(s) of placed bodies
-0x0005c1b4	0x0	data	$anon_str_5071963fd92c1657e2197560508edd5ed1b23df57565c2366696ba9b6d43ba49_0	_const	0x000eb9fc	1 field(s) of placed bodies
-0x0005c2e4	0x0	data	$anon_str_7abcae8340a17c0d6e80adf0c3bd30e1abe5e33fd616cb2caa25be0850773ca8_0	_const	0x000ebb4c	1 field(s) of placed bodies
-0x0005c2e8	0x0	data	$anon_str_2fdfe15e3fd2290149ce59098bb7a05bb24c68ece8ce291c32767bbe6ecd46a7_0	_const	0x000ebb50	1 field(s) of placed bodies
-0x0005c308	0x0	data	$anon_str_17142f57239bb715670c00426b6cb4fd06231187019b9c52f33bc4d9f35cdeb9_0	_const	0x000eba08	1 field(s) of placed bodies
-0x0005c310	0x0	data	$anon_str_b9a5c4c1b053357255463de767026e5fcf23f65fdd49559eb2f441fd5ee45f33_0	_const	0x000eba10	1 field(s) of placed bodies
-0x0005c318	0x0	data	$anon_str_1da8982ec5b42b8cc719788d47c64300b81dc83c9ca36d52e5551be56d344174_0	_const	0x000eba18	1 field(s) of placed bodies
-0x0005c320	0x0	data	$anon_str_84a3ce33114e27588ef29415e6bba22b4d3192298560b7a79c8de25ddc3faf53_0	_const	0x000eba20	1 field(s) of placed bodies
-0x0005c368	0x0	data	$anon_str_c7248b7bc28cedf9bbe6b55e7affa854e3b714e64fd28ba1e927f0c5319010d9_0	_const	0x000ebc64	1 field(s) of placed bodies
-0x0005c370	0x0	data	$anon_str_225dc021803ef0091225490cf0e57c3a686e3eac50f1f0dcd22dde799a96c241_0	_const	0x000ebc68	1 field(s) of placed bodies
-0x0005c380	0x0	data	$anon_str_7abf2f1476bb14b12cf695a638b4119734114c5b7e48fb4f8c1c1fa6314e25a0_0	_const	0x000ebc78	1 field(s) of placed bodies
-0x0005c390	0x0	data	$anon_str_7bc8a1e04c7849cb50a9042d6767050d1e76860f0d053c41186afc68d0b2c113_0	_const	0x000ebc88	1 field(s) of placed bodies
 0x0007e728	0x100	data	?gColorTableYellow@@3PAEA	SOURCE/KB	0x000f8698	1 field(s) of placed bodies
 0x0007e828	0x100	data	?gColorTableScenWin@@3PAEA	SOURCE/KB	0x000f8798	1 field(s) of placed bodies
 0x0007e928	0x100	data	?gColorTableDarkGray@@3PAEA	SOURCE/KB	0x000f8898	1 field(s) of placed bodies
@@ -1567,7 +1525,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009c3e0	0x0	data	$anon_str_075d3ddf5a3a826e13a92288e853bc4b2cb17fb05367ae865f401a4bb11f05ce_3	_const	0x00120840	7 field(s) of placed bodies
 0x0009c720	0x0	data	$anon_str_14f825b2bbc32dd8d196367fa8776873069c12a8954d8da7513aa7704ddd09eb_0	_const	0x00122aa0	2 field(s) of placed bodies
 0x0009c724	0x0	data	$anon_str_102b51b9765a56a3e899f7cf0ee38e5251f9c503b357b330a49183eb7b155604_14	_const	0x00122aa4	3 field(s) of placed bodies
-0x0009c728	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_14	_const	0x00122aa8	2 field(s) of placed bodies
+0x0009c728	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_0	_const	0x00122aa8	2 field(s) of placed bodies
 0x0009c7f0	0x0	data	$anon_str_db34ef1d5ac39ee8fe69e8bce800f3e591e5f96b5c6f6bc0feed73ad7fc7faa4_0	_const	0x00120898	2 field(s) of placed bodies
 0x0009e814	0x0	data	$anon_str_ad16aac61a038b1c4a932c0d4b8c49fe7153075a014d5302c7835de8d36cb998_0	_const	0x00122e14	1 field(s) of placed bodies
 0x0009e82c	0x0	data	$anon_str_f5fd9ef1e8d7f6ef098d35737e9b5cd9f0ba09d7b0957f3683d290fbda09b0d7_0	_const	0x00122e2c	1 field(s) of placed bodies
@@ -1577,8 +1535,8 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009efd8	0x0	data	$anon_str_c6e60f1d6b0b2a9070a17de8fad620be2ea8329fb80da42f1cfcbe852ce8e6aa_0	_const	0x00123730	1 field(s) of placed bodies
 0x0009f1b4	0x0	data	$anon_str_ed78026a0dbe1d820fcd33f729ac2fb26922c54d6c4377016ca18ef2893767b1_0	_const	0x001239fc	8 field(s) of placed bodies
 0x0009f1bc	0x0	data	$anon_str_25255d9232469b63482afd579ecbc0e2585fa8c9fe90527b56373fb126d1f9ec_0	_const	0x00123a04	3 field(s) of placed bodies
-0x0009f248	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_15	_const	0x00123a90	3 field(s) of placed bodies
-0x0009f258	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_16	_const	0x00123aa0	3 field(s) of placed bodies
+0x0009f248	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_1	_const	0x00123a90	3 field(s) of placed bodies
+0x0009f258	0x0	data	$anon_str_eed37189a108c4fcf83a77d93e43d7186d3e37f4ea555eb6c54cc887d2387b93_2	_const	0x00123aa0	3 field(s) of placed bodies
 0x0009f260	0x0	data	$anon_str_fa7299dcd4186b17398ada8e6e2ab848f4b48ff192977c8b44300c13bd0506fb_0	_const	0x00123d68	2 field(s) of placed bodies
 0x0009f264	0x0	data	$anon_str_cb4e02c0f7aa3495abfbc6c109e52e411e0c1d3d0d0561dfbad3ba0dbb518ee5_0	_const	0x00123d6c	1 field(s) of placed bodies
 0x0009f298	0x0	data	$anon_str_cb4e02c0f7aa3495abfbc6c109e52e411e0c1d3d0d0561dfbad3ba0dbb518ee5_1	_const	0x00123da0	1 field(s) of placed bodies
