@@ -10,15 +10,9 @@
 #include <BASE/message.h>
 #include <SOURCE/EVENTS.h>
 
-H2_ENUM_BEGIN(SignEditConstant)
-    SIGN_BLANK_SIZE = 4
-H2_ENUM_END(SignEditConstant)
-
 // The record header and the text the open sign dialog edits.
 extern signEventExtra gSign;
 extern char* gSignText;
-// Never written: the text a sign without a header keeps.
-extern char gSignBlank[SIGN_BLANK_SIZE];
 
 MessageDispatchResult EditSignHandler(struct tag_message& message);
 

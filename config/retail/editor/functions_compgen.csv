@@ -23,3 +23,7 @@ entry_rva,size,symbol,unit,source_object,evidence
 0x25bdb,18,_$E18,EDITOR/rumredit,EDITOR/rumredit,masked-exact
 0x26606,39,_$E19,EDITOR/signedit,EDITOR/signedit,masked-exact
 0x2662d,18,_$E18,EDITOR/signedit,EDITOR/signedit,masked-exact
+0x28ae5,39,_$E19,EDITOR/specedit,EDITOR/specedit,masked-exact
+0x28b0c,18,_$E18,EDITOR/specedit,EDITOR/specedit,masked-exact
+0x176b5,39,_$E19,EDITOR/line,EDITOR/line,masked-exact
+0x176dc,18,_$E18,EDITOR/line,EDITOR/line,masked-exact

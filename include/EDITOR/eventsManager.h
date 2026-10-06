@@ -38,6 +38,8 @@ H2_ENUM_END(EventTextConstant)
 
 class eventsManager : public baseManager {
 public:
+    // evntedit: a map event or a time event.
+    i32 EditEvent(i32 extra);
     // ridledit: the sphinx's riddle, answers and reward.
     i32 EditSphinx(i32 extra);
     void UpdateSphinx(mapEventExtra* sphinx);

@@ -1,0 +1,494 @@
+// The road and stream tools. The unit name comes from the 2.0 editor's
+// line.cpp; Open stores the class name "lineManager". Descriptive names:
+// every free function and global.
+
+#include <va.h>
+#include <EDITOR/lineManager.h>
+#include <EDITOR/EDITOR.h>
+#include <EDITOR/editManager.h>
+#include <EDITOR/fullMap.h>
+#include <EDITOR/mapcell.h>
+#include <EDITOR/overlayType.h>
+#include <BASE/Misc.h>
+#include <BASE/heroWindow.h>
+#include <BASE/icon.h>
+#include <BASE/inputManager.h>
+#include <BASE/message.h>
+#include <BASE/mouseManager.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
+#include <string.h>
+
+H2_ENUM_BEGIN(LineToolConstant)
+    // The map view's widget id, and where its cells start on screen.
+    LINE_CONTROL_MAP      = 9,
+    LINE_VIEW_LEFT        = 16,
+    LINE_VIEW_TOP         = 16,
+    // The hovered cell's outline colour.
+    LINE_CURSOR_COLOR     = 0xb5,
+    // How far around a drawn cell the line map is rebuilt and redrawn.
+    LINE_MAP_MARGIN       = 4,
+    LINE_DRAW_MARGIN      = 2,
+    // A line tile's overlay anchors 7 cells right of and 5 below its grid.
+    LINE_OVERLAY_ANCHOR_X = 7,
+    LINE_OVERLAY_ANCHOR_Y = 5,
+    LINE_VARIANT_PERCENT  = 50
+H2_ENUM_END(LineToolConstant)
+
+H2_ENUM_BEGIN(RoadTile)
+    // A road's tiles by the neighbour mask DrawRoads builds; these are the
+    // special pieces it picks itself, and the alternative pieces the plain
+    // ones may take.
+    ROAD_TILE_PLAIN          = 0,
+    ROAD_TILE_FIRST_VARIANT  = 1,
+    ROAD_TILE_SECOND_VARIANT = 2,
+    ROAD_TILE_FORK_LEFT      = 9,
+    ROAD_TILE_FORK_RIGHT     = 0xc,
+    ROAD_TILE_TURN_RIGHT     = 0x11,
+    ROAD_TILE_TURN_LEFT      = 0x12,
+    ROAD_TILE_PLAIN_ALT      = 0x1a,
+    ROAD_TILE_FIRST_ALT      = 0x1b,
+    ROAD_TILE_SECOND_ALT     = 0x1c,
+    ROAD_TILE_TURN_RIGHT_ALT = 0x1d,
+    ROAD_TILE_TURN_LEFT_ALT  = 0x1e,
+    // The road leaving a town's or castle's gate.
+    ROAD_TILE_GATE           = 0x1f
+H2_ENUM_END(RoadTile)
+
+H2_ENUM_BEGIN(StreamNeighbour)
+    // A stream's neighbour mask, indexing gLineEndTiles.
+    STREAM_RIGHT = 1,
+    STREAM_DOWN  = 2,
+    STREAM_LEFT  = 4,
+    STREAM_UP    = 8
+H2_ENUM_END(StreamNeighbour)
+
+H2_ENUM_BEGIN(StreamTile)
+    STREAM_TILE_BEND         = 2,
+    STREAM_TILE_STRAIGHT     = 3,
+    STREAM_TILE_BEND_ALT     = 5,
+    STREAM_TILE_STRAIGHT_ALT = 0xc
+H2_ENUM_END(StreamTile)
+
+DATA(0x00498c84) i32 gLineTileset = TILESET_ROAD;
+DATA(0x00498c88) i32 gLineOverlayFirst = LINE_ROAD_OVERLAY_FIRST;
+DATA(0x004a50f8) u8* gLineMap;
+DATA(0x004a50fc) i32 gLineType;
+
+VA(0x00416300, 0x33)
+lineManager::lineManager(void) {
+    m_lastY = EDIT_NO_CELL;
+    m_lastX = EDIT_NO_CELL;
+}
+
+VA(0x00416333, 0x67)
+i32 lineManager::Open(i32 priority) {
+    m_cursorIcon = gpResourceManager->GetIcon("overlay.icn");
+    gEditManager->m_window->DrawWindow();
+    m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
+    m_priority = priority;
+    m_active = 1;
+    strcpy(m_name, "lineManager");
+    return 0;
+}
+
+VA(0x0041639a, 0x37)
+void lineManager::Close(void) {
+    gEditManager->m_window->DrawWindow();
+    gpResourceManager->Dispose(m_cursorIcon);
+    m_active = 0;
+}
+
+VA(0x004163d1, 0x36c)
+MessageDispatchResult lineManager::Main(tag_message& message) {
+    mapCell* targetCell;
+    i32 newY;
+    i32 newX;
+    tag_message event;
+    b32 redraw;
+    i32 y;
+    i32 x;
+
+    switch (message.type) {
+        case MESSAGE_WIDGET:
+            switch (message.payload.widget.command) {
+                case WIDGET_NOTIFY_SELECT:
+                    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+                        break;
+                    switch (message.payload.widget.id) {
+                        case LINE_CONTROL_MAP:
+                            redraw = true;
+                            event = message;
+                            gEditManager->SaveUndo();
+                            while (event.type != MESSAGE_LEFT_BUTTON_UP
+                                   && event.type != MESSAGE_RIGHT_BUTTON_UP) {
+                                Process1WindowsMessage();
+                                gpMouseManager->Main(event);
+                                if (event.type == MESSAGE_MOUSE_MOVE || redraw) {
+                                    redraw = false;
+                                    x = event.payload.mouse.screenX;
+                                    y = event.payload.mouse.screenY;
+                                    gEditManager->ScreenToCell(x, y);
+                                    x += gEditManager->m_viewX;
+                                    y += gEditManager->m_viewY;
+                                    if (x != m_lastX || y != m_lastY) {
+                                        m_lastX = x;
+                                        m_lastY = y;
+                                        AddLineCell(x, y);
+                                        gSelectionX = x;
+                                        gSelectionY = y;
+                                        gSelectionWidth = 1;
+                                        gSelectionHeight = 1;
+                                        gEditManager->DrawMap();
+                                        gEditManager->UpdateMapView();
+                                        gEditManager->DrawRadar(1);
+                                    }
+                                }
+                                event = gpInputManager->GetEvent();
+                            }
+                            gSelectionX = EDIT_NO_CELL;
+                            gEditManager->DrawMap();
+                            gEditManager->UpdateMapView();
+                            m_lastY = EDIT_NO_CELL;
+                            m_lastX = EDIT_NO_CELL;
+                            gEditManager->m_mapChanged = 1;
+                            break;
+                    }
+                    break;
+            }
+            break;
+        case MESSAGE_MOUSE_MOVE:
+            if (InMapArea(message.payload.mouse.screenX, message.payload.mouse.screenY)) {
+                newX = message.payload.mouse.screenX;
+                newY = message.payload.mouse.screenY;
+                gEditManager->ScreenToCell(newX, newY);
+                newX += gEditManager->m_viewX;
+                newY += gEditManager->m_viewY;
+                if (gEditManager->m_cursorX != newX || gEditManager->m_cursorY != newY) {
+                    gEditManager->m_cursorX = newX;
+                    gEditManager->m_cursorY = newY;
+                    targetCell = gMap.GetCell(newX, newY);
+                    newX -= gEditManager->m_viewX;
+                    newY -= gEditManager->m_viewY;
+                    newX = newX * gZoomTileSize[gEditManager->m_zoomLevel] + LINE_VIEW_LEFT;
+                    newY = newY * gZoomTileSize[gEditManager->m_zoomLevel] + LINE_VIEW_TOP;
+                    gEditManager->DrawMap();
+                    m_cursorIcon->FillToBuffer(newX, newY, gEditManager->m_zoomLevel,
+                                               LINE_CURSOR_COLOR, ICON_DRAW_NORMAL, NULL);
+                    gEditManager->UpdateMapView();
+                    gEditManager->UpdateCursor();
+                }
+            }
+            return MESSAGE_DISPATCH_CONSUME;
+    }
+    return MESSAGE_DISPATCH_CONTINUE;
+}
+
+VA(0x0041673d, 0x5f)
+void SetLineType(i32 type) {
+    switch (type) {
+        case LINE_ROAD:
+            gLineType = LINE_ROAD;
+            gLineTileset = TILESET_ROAD;
+            gLineOverlayFirst = LINE_ROAD_OVERLAY_FIRST;
+            break;
+        case LINE_STREAM:
+            gLineType = LINE_STREAM;
+            gLineTileset = TILESET_STREAM;
+            gLineOverlayFirst = LINE_STREAM_OVERLAY_FIRST;
+            break;
+    }
+}
+
+VA(0x0041679c, 0x10e)
+void AddLineCell(i32 x, i32 y) {
+    if (x < 0 || x > MAP_WIDTH - 1 || y < 0 || y > MAP_HEIGHT - 1
+        || CELL_TERRAIN(gMap.GetCell(x, y)) == TERRAIN_WATER
+        || (y > 0 && CELL_TERRAIN(gMap.GetCell(x, y - 1)) == TERRAIN_WATER))
+        return;
+    BuildLineMap(x - LINE_MAP_MARGIN, y - LINE_MAP_MARGIN, x + LINE_MAP_MARGIN, y + LINE_MAP_MARGIN,
+                 false);
+    (gLineMap + x)[y * MAP_WIDTH]++;
+    DrawLines(x - LINE_DRAW_MARGIN, y - LINE_DRAW_MARGIN, x + LINE_DRAW_MARGIN, y + LINE_DRAW_MARGIN);
+}
+
+VA(0x004168aa, 0x7a)
+b32 IsLineTile(i32 tileset, i32 index, b32 alternate) {
+    switch (gLineType) {
+        case LINE_ROAD:
+            return tileset == TILESET_ROAD
+                   && ((alternate && gRoadTileJoinsAlt[index]) || (!alternate && gRoadTileJoins[index]));
+        case LINE_STREAM:
+            return tileset == TILESET_STREAM;
+    }
+    return false;
+}
+
+VA(0x00416924, 0x293)
+void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate) {
+    mapCell* cell;
+    i32 y;
+    i32 unusedIndex;
+    i32 x;
+    mapCellExtra* extra;
+
+    if (gLineMap)
+        delete[] gLineMap;
+    gLineMap = NULL;
+    gLineMap = new u8[MAP_WIDTH * MAP_HEIGHT];
+    memset(gLineMap, 0, MAP_WIDTH * MAP_HEIGHT);
+    if (fromX < 0)
+        fromX = 0;
+    if (fromY < 0)
+        fromY = 0;
+    if (toX > MAP_WIDTH - 1)
+        toX = MAP_WIDTH - 1;
+    if (toY > MAP_HEIGHT - 1)
+        toY = MAP_HEIGHT - 1;
+    for (x = fromX; x <= toX; x++) {
+        for (y = fromY; y <= toY; y++) {
+            cell = gMap.GetCell(x, y);
+            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
+                if (IsLineTile(cell->m_objectTileset, cell->m_objectIndex, alternate)) {
+                    (gLineMap + x)[y * MAP_WIDTH]++;
+                    goto nextCell;
+                }
+                if (cell->m_extraIndex && gMap.extras[cell->m_extraIndex].objectIndex != MAPCELL_SPRITE_NONE)
+                    extra = &gMap.extras[cell->m_extraIndex];
+                else
+                    extra = NULL;
+                while (extra) {
+                    if (IsLineTile(extra->objectTileset, extra->objectIndex, false)) {
+                        (gLineMap + x)[y * MAP_WIDTH]++;
+                        goto nextCell;
+                    }
+                    if (extra->nextIndex && gMap.extras[extra->nextIndex].objectIndex != MAPCELL_SPRITE_NONE)
+                        extra = &gMap.extras[extra->nextIndex];
+                    else
+                        extra = NULL;
+                }
+            }
+        nextCell:;
+        }
+    }
+}
+
+// The road's neighbour bits are named locals; their slots follow the names.
+#if H2_RETAIL_COMPILER
+#define upRight upRight_c
+#define up up_a
+#define downRight downRight_i
+#define upLeft upLeft_e
+#define downLeft downLeft_d
+#endif
+VA(0x00416bb7, 0x507)
+void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY) {
+    i32 unusedA;
+    const i32 up = 0x80;
+    const i32 down = 0x40;
+    const i32 left = 0x20;
+    const i32 right = 0x10;
+    const i32 upLeft = 8;
+    const i32 downLeft = 4;
+    const i32 downRight = 2;
+    i32 x;
+    i32 unused1;
+    const i32 upRight = 1;
+    i32 y;
+    i32 unusedIndex;
+    i32 mask;
+    mapCell* cell;
+
+    if (fromX < 0)
+        fromX = 0;
+    if (fromY < 0)
+        fromY = 0;
+    if (toX > MAP_WIDTH - 1)
+        toX = MAP_WIDTH - 1;
+    if (toY > MAP_HEIGHT - 1)
+        toY = MAP_HEIGHT - 1;
+    for (x = fromX; x <= toX; x++) {
+        for (y = fromY; y <= toY; y++) {
+            cell = gMap.GetCell(x, y);
+            if (CELL_TERRAIN(cell) == TERRAIN_WATER)
+                continue;
+            mask = 0;
+            if (y > 0 && (gLineMap + x)[(y - 1) * MAP_WIDTH])
+                mask |= up;
+            if (y < MAP_HEIGHT - 1 && (gLineMap + x)[(y + 1) * MAP_WIDTH])
+                mask |= down;
+            if (x > 0 && (gLineMap + x - 1)[y * MAP_WIDTH])
+                mask |= left;
+            if (x < MAP_WIDTH - 1 && (gLineMap + x + 1)[y * MAP_WIDTH])
+                mask |= right;
+            if (y > 0 && x > 0 && (gLineMap + x - 1)[(y - 1) * MAP_WIDTH])
+                mask |= upLeft;
+            if (y < MAP_HEIGHT - 1 && x > 0 && (gLineMap + x - 1)[(y + 1) * MAP_WIDTH])
+                mask |= downLeft;
+            if (y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1 && (gLineMap + x + 1)[(y + 1) * MAP_WIDTH])
+                mask |= downRight;
+            if (y > 0 && x < MAP_WIDTH - 1 && (gLineMap + x + 1)[(y - 1) * MAP_WIDTH])
+                mask |= upRight;
+            if ((gLineMap + x)[y * MAP_WIDTH]) {
+                if ((mask & up) && (mask & upRight) && !(mask & down) && !(mask & left)
+                    && !(mask & right) && y > 1 && !(gLineMap + x)[(y - 2) * MAP_WIDTH])
+                    SetLineTile(x, y, gLineTileset, ROAD_TILE_TURN_LEFT, LINE_NO_VARIANT);
+                else if ((mask & up) && (mask & upLeft) && !(mask & down) && !(mask & left)
+                         && !(mask & right) && y > 1 && !(gLineMap + x)[(y - 2) * MAP_WIDTH])
+                    SetLineTile(x, y, gLineTileset, ROAD_TILE_TURN_RIGHT, LINE_NO_VARIANT);
+                else if ((mask & up) && (mask & down) && (mask & upRight) && !(mask & upLeft)
+                         && !(mask & left) && !(mask & right) && y > 1
+                         && !(gLineMap + x)[(y - 2) * MAP_WIDTH])
+                    SetLineTile(x, y, gLineTileset, ROAD_TILE_FORK_LEFT, LINE_NO_VARIANT);
+                else if ((mask & up) && (mask & down) && (mask & upLeft) && !(mask & upRight)
+                         && !(mask & left) && !(mask & right) && y > 1
+                         && !(gLineMap + x)[(y - 2) * MAP_WIDTH])
+                    SetLineTile(x, y, gLineTileset, ROAD_TILE_FORK_RIGHT, LINE_NO_VARIANT);
+                else
+                    SetLineTile(x, y, gLineTileset, gLineEdgeTiles[mask], LINE_NO_VARIANT);
+            } else {
+                SetLineTile(x, y, gLineTileset, gLineTiles[mask], LINE_NO_VARIANT);
+            }
+        }
+    }
+}
+#if H2_RETAIL_COMPILER
+#undef upRight
+#undef up
+#undef downRight
+#undef upLeft
+#undef downLeft
+#endif
+
+VA(0x004170be, 0x1fa)
+void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY) {
+    i32 unusedX;
+    i32 mask;
+    i32 y;
+    i32 unusedIndex;
+    i32 x;
+    i32 unused1;
+    i32 unused;
+    i32 variant;
+
+    if (fromX < 0)
+        fromX = 0;
+    if (fromY < 0)
+        fromY = 0;
+    if (toX > MAP_WIDTH - 1)
+        toX = MAP_WIDTH - 1;
+    if (toY > MAP_HEIGHT - 1)
+        toY = MAP_HEIGHT - 1;
+    for (x = fromX; x <= toX; x++) {
+        for (y = fromY; y <= toY; y++) {
+            if ((gLineMap + x)[y * MAP_WIDTH]) {
+                mask = 0;
+                if (y > 0 && (gLineMap + x)[(y - 1) * MAP_WIDTH])
+                    mask |= STREAM_UP;
+                if (y < MAP_HEIGHT - 1 && (gLineMap + x)[(y + 1) * MAP_WIDTH])
+                    mask |= STREAM_DOWN;
+                if (x > 0 && (gLineMap + x - 1)[y * MAP_WIDTH])
+                    mask |= STREAM_LEFT;
+                if (x < MAP_WIDTH - 1 && (gLineMap + x + 1)[y * MAP_WIDTH])
+                    mask |= STREAM_RIGHT;
+                variant = LINE_NO_VARIANT;
+                if (gLineEndTiles[mask] == STREAM_TILE_STRAIGHT)
+                    variant = STREAM_TILE_STRAIGHT_ALT;
+                if (gLineEndTiles[mask] == STREAM_TILE_BEND)
+                    variant = STREAM_TILE_BEND_ALT;
+                SetLineTile(x, y, gLineTileset, gLineEndTiles[mask], variant);
+            } else {
+                SetLineTile(x, y, gLineTileset, LINE_NO_TILE, LINE_NO_VARIANT);
+            }
+        }
+    }
+}
+
+VA(0x004172b8, 0x50)
+void DrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY) {
+    switch (gLineType) {
+        case LINE_ROAD:
+            DrawRoads(fromX, fromY, toX, toY);
+            break;
+        case LINE_STREAM:
+            DrawStreams(fromX, fromY, toX, toY);
+            break;
+    }
+}
+
+VA(0x00417308, 0x2fa)
+void SetLineTile(i32 x, i32 y, i32 tileset, i32 index, i32 variant) {
+    mapCellExtra* extra;
+    mapCell* cell;
+
+    cell = gMap.GetCell(x, y);
+    if (tileset == TILESET_ROAD) {
+        variant = LINE_NO_VARIANT;
+        if (index == ROAD_TILE_PLAIN && y >= 2
+            && (gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
+                || gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN))
+                || gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE))))
+            index = ROAD_TILE_GATE;
+        if (index == ROAD_TILE_PLAIN)
+            variant = ROAD_TILE_PLAIN_ALT;
+        if (index == ROAD_TILE_FIRST_VARIANT)
+            variant = ROAD_TILE_FIRST_ALT;
+        if (index == ROAD_TILE_SECOND_VARIANT)
+            variant = ROAD_TILE_SECOND_ALT;
+        if (index == ROAD_TILE_TURN_RIGHT)
+            variant = ROAD_TILE_TURN_RIGHT_ALT;
+        if (index == ROAD_TILE_TURN_LEFT)
+            variant = ROAD_TILE_TURN_LEFT_ALT;
+    }
+    if (cell->m_objectTileset == gLineTileset && cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
+        if (index == LINE_NO_TILE) {
+            gEditManager->RemoveLinkedObject(cell->m_objectLink);
+            return;
+        }
+        if (cell->m_objectIndex == index || cell->m_objectIndex == variant)
+            return;
+        gEditManager->RemoveLinkedObject(cell->m_objectLink);
+    }
+    if (cell->m_extraIndex && gMap.extras[cell->m_extraIndex].objectIndex != MAPCELL_SPRITE_NONE)
+        extra = &gMap.extras[cell->m_extraIndex];
+    else
+        extra = NULL;
+    while (extra) {
+        if (extra->objectTileset == gLineTileset && extra->objectIndex != MAPCELL_SPRITE_NONE) {
+            if (index == LINE_NO_TILE) {
+                gEditManager->RemoveLinkedObject(extra->objectLink);
+                return;
+            }
+            if (extra->objectIndex == index)
+                return;
+            gEditManager->RemoveLinkedObject(extra->objectLink);
+        }
+        if (extra->nextIndex && gMap.extras[extra->nextIndex].objectIndex != MAPCELL_SPRITE_NONE)
+            extra = &gMap.extras[extra->nextIndex];
+        else
+            extra = NULL;
+    }
+    if (variant != LINE_NO_VARIANT && Random(0, 100) < LINE_VARIANT_PERCENT)
+        index = variant;
+    if (index != LINE_NO_TILE)
+        PlaceOverlay(&gOverlayTypes[gLineOverlayFirst + index], x - LINE_OVERLAY_ANCHOR_X,
+                     y - LINE_OVERLAY_ANCHOR_Y, 1);
+}
+
+VA(0x00417602, 0xb3)
+void RedrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY) {
+    i32 savedType;
+
+    savedType = gLineType;
+    SetLineType(LINE_ROAD);
+    BuildLineMap(fromX - 3, fromY - 3, toX + 3, toY + 3, false);
+    DrawLines(fromX - 2, fromY - 2, toX + 2, toY + 2);
+    SetLineType(LINE_STREAM);
+    BuildLineMap(fromX - 2, fromY - 2, toX + 2, toY + 2, false);
+    DrawLines(fromX - 1, fromY - 1, toX + 1, toY + 1);
+    SetLineType(savedType);
+}
+
+// Compiler-emitted vtable; the marker is a census claim, not a definition.
+VTBL(lineManager, 0x0045b3e8)

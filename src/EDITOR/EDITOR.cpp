@@ -2383,7 +2383,7 @@ DATA(0x004817f8) H2_CONST char* gColors[IDX(FACTION_COUNT)] = {
     localization::Tr("table.gColors.4"),
     localization::Tr("table.gColors.5")
 };
-DATA(0x00481810) static H2_CONST char* H2_UNUSED(gColorAbbreviations)[IDX(FACTION_COUNT)] = {
+DATA(0x00481810) H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT] = {
     localization::Tr("color.abbreviated.blue"),
     localization::Tr("color.abbreviated.green"),
     localization::Tr("color.abbreviated.red"),

@@ -25,7 +25,6 @@ H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE = 1,
     EVENT_RECORD_SIGN_HEADER_SIZE        = 9,
     EVENT_RECORD_RUMOUR_HEADER_SIZE      = 8,
-    EVENT_RECORD_TIME_GAP_FIRST_SIZE     = 2,
     EVENT_RECORD_TIME_GAP_SECOND_SIZE    = 5,
     EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
     EVENT_RECORD_HERO_NAME_SIZE          = 13,
@@ -88,7 +87,7 @@ struct rumourEventExtra {
 struct timeEventExtra {
     char unknown00;
     i32 resources[IDX(RES_COUNT)];
-    char unknown1d[EVENT_RECORD_TIME_GAP_FIRST_SIZE];
+    u16 unknown1d;
     u8 appliesToComputer;
     char unknown20;
     u16 firstDay;
@@ -130,7 +129,7 @@ struct mapTownExtra {
     H2_ENUM_STORAGE(CreatureType, i8) troopTypes[ARMY_GROUP_SLOT_COUNT];
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasShrine;
-    char unused18;
+    u8 hasCustomName;
     char name[EVENT_RECORD_TOWN_NAME_SIZE];
     i8 unknown28;
 };

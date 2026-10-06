@@ -69,7 +69,11 @@ H2_ENUM_BEGIN(EditorTableCount)
     RANDOM_MAP_TERRAIN_COUNT = 8,
     RANDOM_MAP_DENSITY_COUNT = 5,
     // gWinSetup: the editor dialogs' captions.
-    EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74
+    EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74,
+    // The map's time event and rumour capacities, and its player colours.
+    EDITOR_TIME_EVENT_CAPACITY = 50,
+    EDITOR_RUMOUR_CAPACITY = 30,
+    EDITOR_PLAYER_COLOR_COUNT = 6
 H2_ENUM_END(EditorTableCount)
 
 extern i32 gRandomMapPlayers;
@@ -118,6 +122,12 @@ extern i32 gStatusTextClearTime;
 // The object dialog an event editor has open, and the map cell it edits.
 extern class heroWindow* gEditDialog;
 extern class mapCell* gEditCell;
+// The map's time events and rumours: their map-extra record indices, in
+// list order (counted by gEditMapHeader's timeEventCount and rumourCount).
+extern u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
+extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
+// The player colours' short names (the specification dialog's side lists).
+extern H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
 
 void ProtectShippedMap(void);
 void IncrementArgumentA(i32 value);

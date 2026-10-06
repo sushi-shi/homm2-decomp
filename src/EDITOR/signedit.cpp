@@ -1,6 +1,6 @@
 // The sign and bottle editor: the event tool opens it for a sign or a
 // bottle and edits its message in the rumour dialog. Descriptive names:
-// UpdateSign, EditSignHandler, gSign, gSignText, gSignBlank.
+// UpdateSign, EditSignHandler, gSign, gSignText.
 
 #include <va.h>
 #include <EDITOR/signedit.h>
@@ -25,7 +25,6 @@ H2_ENUM_END(SignDialog)
 
 DATA(0x004a5828) signEventExtra gSign;
 DATA(0x004a5834) char* gSignText;
-DATA(0x004a5838) char gSignBlank[SIGN_BLANK_SIZE];
 
 VA(0x00426110, 0x36e)
 void eventsManager::EditSign(i32 x, i32 y) {
@@ -61,7 +60,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         len = strlen(gSignText) + sizeof(gSign);
         if (!gSign.pad[0])
-            strcpy(gSignText, gSignBlank);
+            strcpy(gSignText, "");
         newRecord = new char[len];
         memcpy(newRecord, &gSign, sizeof(gSign));
         strcpy(newRecord + EVENT_RECORD_SIGN_HEADER_SIZE, gSignText);

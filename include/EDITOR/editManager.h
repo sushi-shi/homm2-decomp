@@ -89,6 +89,12 @@ public:
     void DrawMap(void);
     void DrawRadar(b32 updateScreen);
     void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 layer, i32 keepObjects);
+    // The map cell of the index-th town or castle, or of the index-th hero,
+    // in row order; false (and -1, -1) when there are fewer.
+    b32 FindTown(i32 index, i32* x, i32* y);
+    b32 FindHero(i32 index, i32* x, i32* y);
+    // Erases every part of the placed object the link names.
+    void RemoveLinkedObject(i32 link);
 };
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
@@ -100,6 +106,7 @@ extern SMapHeader gEditMapHeader;
 // The map file requester: loads or saves (`mode`) and stores the chosen
 // file name in gMapFileName.
 i32 PickMap(i32 mode);
+void CalculatePlayerNumbers(void);
 void ResetPlayerAvailability(void);
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 extern i32 gSelectionX;

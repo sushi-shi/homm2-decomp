@@ -579,6 +579,46 @@ msgctxt "editor.sign.sign_title"
 msgid "Sign Detail"
 msgstr "Информация указателя"
 
+msgctxt "editor.spec.days"
+msgid "%d days"
+msgstr "%d дней"
+
+msgctxt "editor.spec.event_entry"
+msgid "Day %d - %s"
+msgstr "День %d - %s"
+
+msgctxt "editor.spec.events_full"
+msgid "No more events can be added unless some are deleted."
+msgstr "нельзя добавить новые события, если только удалить старые."
+
+msgctxt "editor.spec.gold"
+msgid "%d Gold"
+msgstr "%d золота"
+
+msgctxt "editor.spec.months"
+msgid "%d months"
+msgstr "%d месяцев"
+
+msgctxt "editor.spec.no_heroes"
+msgid "No heroes on map"
+msgstr "На карте нет героев"
+
+msgctxt "editor.spec.no_towns"
+msgid "No towns on map"
+msgstr "На карте нет городов"
+
+msgctxt "editor.spec.rumours_full"
+msgid "No more rumors can be added unless some are deleted."
+msgstr "Нельзя добавить новые слухи, если только не удалить старые."
+
+msgctxt "editor.spec.versus_others"
+msgid " vs. other(s)"
+msgstr " против других"
+
+msgctxt "editor.spec.weeks"
+msgid "%d weeks"
+msgstr "%d недель"
+
 msgctxt "editor.spell_scroll.prompt"
 msgid "Select Spell"
 msgstr "Выбрать заклинание"

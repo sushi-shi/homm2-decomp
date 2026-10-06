@@ -102,7 +102,7 @@ void eventsManager::UpdateSphinx(mapEventExtra* sphinx) {
     i32 i;
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.data.value = 4;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = text;
     for (i = 0; i < IDX(RES_COUNT); i++) {
