@@ -9,3 +9,4 @@ function_rva	target_rva	site_rva	owner	addend	occurrences
 0x149d3	0xa4a6c	0x14de0	?gHeroEdit@@3UHeroExtra@@A	0xfffffe1c	1
 0x149d3	0xa4a64	0x14e00	?gHeroEdit@@3UHeroExtra@@A	0xfffffe14	1
 0x149d3	0xa4a6c	0x14e20	?gHeroEdit@@3UHeroExtra@@A	0xfffffe1c	1
+0x1936e	0x7fd70	0x19411	?gClearHelp@@3PAPADA	0xfffff844	1

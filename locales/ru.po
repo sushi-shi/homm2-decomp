@@ -655,6 +655,34 @@ msgctxt "editor.events.ultimate_artifact.radius_range"
 msgid "Must be between 0 and 127."
 msgstr "Значение должно быть от 0 до 127. "
 
+msgctxt "editor.overlay.invalid_placement"
+msgid "Invalid Placement"
+msgstr "Неподходящее место"
+
+msgctxt "editor.overlay.limit.events"
+msgid "Max map events (%d) has been reached."
+msgstr "Лимит событий (%d) достигнут."
+
+msgctxt "editor.overlay.limit.mines"
+msgid "Max mines, sawmills and alchemists on map (%d) has been reached."
+msgstr "Лимит шахт, мельниц и алхимических лабораторий (%d) достигнут."
+
+msgctxt "editor.overlay.limit.towns"
+msgid "Max towns on map (%d) has been reached."
+msgstr "Лимит городов (%d) достигнут."
+
+msgctxt "editor.overlay.ultimate.edge"
+msgid "The ultimate artifact must be placed at least 9 squares in from map edge."
+msgstr "Могущественный артефакт следует размещать как минимум в 9 клетках от краев карты."
+
+msgctxt "editor.overlay.ultimate.land"
+msgid "The ultimate artifact must be placed on land."
+msgstr "Могущественный артефакт должен быть размещен на суше."
+
+msgctxt "editor.overlay.ultimate.placed"
+msgid "The ultimate artifact has already been placed."
+msgstr "Могущественный артефакт уже помещен на карту."
+
 msgctxt "editor.random.castles_failed"
 msgid "Unable to place castles"
 msgstr "Невозможно установить замки"

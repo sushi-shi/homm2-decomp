@@ -12205,12 +12205,6 @@ site_rva	target_rva	channel	instruction_rva	evidence
 0x5f128	0x531d7	data		data word names census start 0x531d7
 0x5f134	0x4f2b9	data		data word names census start 0x4f2b9
 0x5f140	0x531e8	data		data word names census start 0x531e8
-0x615cc	0x70000	data-pointer		neighbouring pointer word
-0x615d0	0x70000	data-pointer		neighbouring pointer word
-0x615d4	0x70000	data-pointer		neighbouring pointer word
-0x616d0	0x90000	data-pointer		neighbouring pointer word
-0x616d4	0x90000	data-pointer		neighbouring pointer word
-0x616d8	0x90000	data-pointer		neighbouring pointer word
 0x7d738	0x7e018	data-pointer		target begins a string
 0x7ec60	0xa4a4c	data-pointer		neighbouring pointer word
 0x7ec64	0xa4a50	data-pointer		neighbouring pointer word
