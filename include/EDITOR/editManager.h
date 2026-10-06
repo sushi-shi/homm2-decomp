@@ -134,6 +134,15 @@ public:
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
     void ScatterDecorations(void);
+    // Map maintenance: frees the map-extra records, and marks the land
+    // cells a coast tile borders as coast (where a boat lands).
+    void FreeMapExtras(void);
+    b32 CanBeCoast(i32 x, i32 y);
+    void SetCoast(i32 x, i32 y);
+    // Before a save: drops unused map-extra records and renumbers the rest.
+    void CoalesceObjectData(void);
+    // Gives the map's towns distinct random names.
+    void RandomizeTownNames(void);
     // The map cell of the index-th town or castle, or of the index-th hero,
     // in row order; false (and -1, -1) when there are fewer.
     b32 FindTown(i32 index, i32* x, i32* y);
@@ -163,6 +172,14 @@ u16 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
 extern SMapHeader gEditMapHeader;
 
 void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
+
+// A map code of the serial (a letter from 'V' and three base-26 letters).
+char* MakeMapCode(i32 serial);
+// Shows a warning on the status bar with a beep.
+void ShowStatusWarning(char* text);
+// Whether the map needs the expansion (an event, sphinx, castle, hero,
+// artifact or object only the expansion has): it then saves as .MX2.
+u8 UsesExpansionObjects(void);
 
 // Rebuilds the overlay tiles of the whole map.
 void FillInOverlayTiles(void);
