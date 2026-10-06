@@ -181,6 +181,8 @@ public:
     void ToggleGroundVariant(void);
     // The system options dialog (espanel.bin).
     void SystemOptions(void);
+    // Gives the water along the coast its shallow tiles.
+    void BlendShallowWater(void);
     // The map cell of the index-th town or castle, or of the index-th hero,
     // in row order; false (and -1, -1) when there are fewer.
     b32 FindTown(i32 index, i32* x, i32* y);
@@ -215,6 +217,13 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
 extern SMapHeader gEditMapHeader;
 
 void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
+
+// BlendShallowWater's count of a water cell's shaded neighbours by the coast
+// corner (a flip state, 0-3) they face; `any` tests all four at once.
+union EditCornerCounts {
+    u8 corner[4];
+    u32 any;
+};
 
 // A map code of the serial (a letter from 'V' and three base-26 letters).
 char* MakeMapCode(i32 serial);

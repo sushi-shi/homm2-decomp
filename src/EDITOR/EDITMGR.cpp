@@ -11465,6 +11465,19 @@ H2_ENUM_BEGIN(EditGroundShape)
     EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
     EDIT_SHAPE_EAST_EDGE          = 3,
     EDIT_SHAPE_NORTH_EAST_INNER   = 4,
+    // The coast borders (water or beach on that side), the borders where a
+    // coast and another terrain meet, and an edge or corner with the coast
+    // beyond its corner.
+    EDIT_SHAPE_SHORE_NORTH_EDGE   = 5,
+    EDIT_SHAPE_SHORE_CORNER       = 6,
+    EDIT_SHAPE_SHORE_EAST_EDGE    = 7,
+    EDIT_SHAPE_SHORE_INNER        = 8,
+    EDIT_SHAPE_CORNER_SHORE_FAR   = 10,
+    EDIT_SHAPE_CORNER_SHORE_NEAR  = 11,
+    EDIT_SHAPE_NORTH_EDGE_SHORE   = 12,
+    EDIT_SHAPE_EAST_EDGE_SHORE    = 13,
+    EDIT_SHAPE_SHORE_EDGE_BORDER  = 14,
+    EDIT_SHAPE_SHORE_SIDE_BORDER  = 15,
     EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
     EDIT_SHAPE_EAST_EDGE_ALT      = 17,
     EDIT_SHAPE_DECORATED_FIRST    = 18,
@@ -11479,7 +11492,8 @@ H2_ENUM_BEGIN(EditGroundShape)
     EDIT_GROUND_TILES_PER_SHAPE   = 20,
     // A cell's ground flip flags (mapCell::m_flags).
     EDIT_CELL_FLIP_VERTICAL       = 0x01,
-    EDIT_CELL_FLIP_HORIZONTAL     = 0x02
+    EDIT_CELL_FLIP_HORIZONTAL     = 0x02,
+    EDIT_CELL_FLIP_CLEAR          = 0xfc
 H2_ENUM_END(EditGroundShape)
 
 VA(0x00409f0d, 0x258)
@@ -11797,6 +11811,697 @@ VA(0x0040b0bd, 0x41)
 i32 InMapArea(i32 x, i32 y) {
     return x >= EDIT_MAP_AREA_ORIGIN && x < EDIT_MAP_AREA_LIMIT && y >= EDIT_MAP_AREA_ORIGIN
         && y < EDIT_MAP_AREA_LIMIT;
+}
+
+// Fits every cell's ground to its neighbours: first (unless skipFill) cells
+// a terrain cannot border take the terrain most of their neighbours have,
+// pass after pass until nothing changes; then (unless skipBorders) each
+// cell gets the border tile and flips of the other terrains and the coast
+// around it.
+VA(0x0040b0fe, 0x23af)
+void editManager::BlendTerrain(i32 H2_UNUSED(brushTerrain), b32 H2_UNUSED(ignored), b32 fromUndo, b32 skipBorders, b32 skipFill) {
+    b32 otherUp7;
+    b32 otherUpRight6;
+    mapCell* cell;
+    i32 thisTerrain;
+    b32 otherDown0;
+    i32 passes5;
+    i32 bestCount;
+    b32 waterDownLeft9;
+    b32 sameLeft14;
+    b32 waterRight;
+    b32 sameUp1;
+    b32 sameDownLeft8;
+    b32 waterDownRight9;
+    i32 k;
+    i32 y;
+    b32 sameDown10;
+    i32 x;
+    b32 sameDownRight4;
+    b32 otherRight0;
+    b32 waterUp;
+    b32 waterUpLeft0;
+    i32 H2_UNUSED(unused);
+    b32 repeat;
+    u8 terrainCounts[TERRAIN_COUNT];
+    b32 waterUpRight;
+    i32 newTerrain;
+    b32 sameUpLeft6;
+    b32 otherDownLeft0;
+    b32 sameRight7;
+    b32 sameUpRight3;
+    b32 otherDownRight18;
+    b32 waterLeft2;
+    b32 otherUpLeft2;
+    b32 waterDown0;
+    b32 otherLeft18;
+
+    fromUndo = false;
+    newTerrain = 0;
+    passes5 = 0;
+    if (skipFill)
+        goto borders;
+    LogStr("PB 1");
+    repeat = true;
+    while (repeat && passes5 < 8) {
+        repeat = false;
+        passes5++;
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            for (x = 0; x < MAP_WIDTH; x++) {
+                thisTerrain = CELL_TERRAIN(gMap.CellAt(x, y));
+                if (1) {
+                    waterUp = waterDown0 = waterRight = waterLeft2 = sameUp1 = sameDown10 = sameRight7 = sameLeft14
+                        = sameUpLeft6 = sameUpRight3 = sameDownLeft8 = sameDownRight4 = 0;
+                    if (!y || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == thisTerrain)
+                        sameUp1 = true;
+                    else if (!CELL_TERRAIN(gMap.CellAt(x, y - 1)))
+                        waterUp = true;
+                    if (y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == thisTerrain)
+                        sameDown10 = true;
+                    else if (!CELL_TERRAIN(gMap.CellAt(x, y + 1)))
+                        waterDown0 = true;
+                    if (x == MAP_WIDTH - 1 || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == thisTerrain)
+                        sameRight7 = true;
+                    else if (!CELL_TERRAIN(gMap.CellAt(x + 1, y)))
+                        waterRight = true;
+                    if (!x || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == thisTerrain)
+                        sameLeft14 = true;
+                    else if (!CELL_TERRAIN(gMap.CellAt(x - 1, y)))
+                        waterLeft2 = true;
+                    if (!x || !y || CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) == thisTerrain)
+                        sameUpLeft6 = true;
+                    if (!x || y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) == thisTerrain)
+                        sameDownLeft8 = true;
+                    if (x == MAP_WIDTH - 1 || !y || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == thisTerrain)
+                        sameUpRight3 = true;
+                    if (x == MAP_WIDTH - 1 || y == MAP_HEIGHT - 1
+                        || CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) == thisTerrain)
+                        sameDownRight4 = true;
+                    if (!sameUp1 || !sameDown10 || !sameRight7 || !sameLeft14) {
+                        memset(terrainCounts, 0, sizeof(terrainCounts));
+                        if (x < MAP_WIDTH - 1)
+                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x + 1, y))]++;
+                        if (x > 0)
+                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x - 1, y))]++;
+                        if (y < MAP_HEIGHT - 1)
+                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x, y + 1))]++;
+                        if (y > 0)
+                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x, y - 1))]++;
+                        newTerrain = 0;
+                        bestCount = 0;
+                        for (k = 0; k < TERRAIN_COUNT; k++) {
+                            if (terrainCounts[k] >= bestCount && k != thisTerrain) {
+                                newTerrain = k;
+                                bestCount = terrainCounts[k];
+                            }
+                        }
+                    }
+                    if ((!sameUp1 || !sameLeft14) && (!sameUp1 || !sameRight7) && (!sameDown10 || !sameLeft14)
+                        && (!sameDown10 || !sameRight7)) {
+                        if (thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1) {
+                            if (waterUp + waterDown0 + waterRight + waterLeft2 >= 3) {
+                                SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_PLAIN);
+                            } else if (waterUp && waterRight) {
+                                newTerrain = CELL_TERRAIN(gMap.CellAt(x - 1, y + 1));
+                                SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            } else if (waterUp && waterLeft2) {
+                                newTerrain = CELL_TERRAIN(gMap.CellAt(x + 1, y + 1));
+                                SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            } else if (waterDown0 && waterRight) {
+                                newTerrain = CELL_TERRAIN(gMap.CellAt(x - 1, y - 1));
+                                SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            } else if (waterDown0 && waterLeft2) {
+                                newTerrain = CELL_TERRAIN(gMap.CellAt(x + 1, y - 1));
+                                SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            } else if (thisTerrain != TERRAIN_DIRT) {
+                                SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            }
+                        } else if (!thisTerrain || terrainCounts[newTerrain] >= terrainCounts[thisTerrain]) {
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                        }
+                        repeat = true;
+                    }
+                    if (!thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && sameUp1 && sameDown10
+                        && sameLeft14 && sameRight7) {
+                        if (CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1))) {
+                            SetCellGround(x, y, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x - 1, y, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y - 1, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1))) {
+                            SetCellGround(x, y, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x + 1, y, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y - 1, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                    } else if (!thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && sameUp1
+                               && sameDown10) {
+                        if (!sameRight7 && !sameUpLeft6) {
+                            SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameRight7 && !sameDownLeft8) {
+                            SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameLeft14 && !sameUpRight3) {
+                            SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameLeft14 && !sameDownRight4) {
+                            SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                    } else if (!thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && sameRight7
+                               && sameLeft14) {
+                        if (!sameUp1 && !sameDownLeft8) {
+                            SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameUp1 && !sameDownRight4) {
+                            SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameDown10 && !sameUpLeft6) {
+                            SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                        if (!sameDown10 && !sameUpRight3) {
+                            SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
+                            repeat = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    LogStr("PB 2");
+borders:
+    LogStr("PB 3");
+    if (skipBorders)
+        return;
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = gMap.CellAt(x, y);
+            thisTerrain = CELL_TERRAIN(cell);
+            if (thisTerrain == TERRAIN_BEACH)
+                continue;
+            otherUpRight6 = otherUpLeft2 = otherDownRight18 = otherDownLeft0 = otherUp7 = otherDown0 = otherRight0
+                = otherLeft18 = 0;
+            waterUpRight = waterUpLeft0 = waterDownRight9 = waterDownLeft9 = waterUp = waterDown0 = waterRight
+                = waterLeft2 = 0;
+            if (thisTerrain != TERRAIN_DIRT) {
+                if (y > 0 && CELL_TERRAIN(gMap.CellAt(x, y - 1)) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x, y - 1)))
+                    otherUp7 = true;
+                if (y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x, y + 1)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x, y + 1)))
+                    otherDown0 = true;
+                if (x < MAP_WIDTH - 1 && CELL_TERRAIN(gMap.CellAt(x + 1, y)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x + 1, y)))
+                    otherRight0 = true;
+                if (x > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y)) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x - 1, y)))
+                    otherLeft18 = true;
+                if (x > 0 && y > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)))
+                    otherUpLeft2 = true;
+                if (x > 0 && y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)))
+                    otherDownLeft0 = true;
+                if (x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)))
+                    otherDownRight18 = true;
+                if (x < MAP_WIDTH - 1 && y > 0 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != thisTerrain
+                    && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)))
+                    otherUpRight6 = true;
+            }
+            if (thisTerrain != TERRAIN_WATER && thisTerrain != TERRAIN_BEACH) {
+                if (y > 0
+                    && (!CELL_TERRAIN(gMap.CellAt(x, y - 1)) || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_BEACH))
+                    waterUp = true;
+                if (y < MAP_HEIGHT - 1
+                    && (!CELL_TERRAIN(gMap.CellAt(x, y + 1)) || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == TERRAIN_BEACH))
+                    waterDown0 = true;
+                if (x < MAP_WIDTH - 1
+                    && (!CELL_TERRAIN(gMap.CellAt(x + 1, y)) || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == TERRAIN_BEACH))
+                    waterRight = true;
+                if (x > 0
+                    && (!CELL_TERRAIN(gMap.CellAt(x - 1, y)) || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == TERRAIN_BEACH))
+                    waterLeft2 = true;
+                if (x > 0 && y > 0
+                    && (!CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))
+                        || CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) == TERRAIN_BEACH))
+                    waterUpLeft0 = true;
+                if (x > 0 && y < MAP_HEIGHT - 1
+                    && (!CELL_TERRAIN(gMap.CellAt(x - 1, y + 1))
+                        || CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) == TERRAIN_BEACH))
+                    waterDownLeft9 = true;
+                if (x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1
+                    && (!CELL_TERRAIN(gMap.CellAt(x + 1, y + 1))
+                        || CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) == TERRAIN_BEACH))
+                    waterDownRight9 = true;
+                if (x < MAP_WIDTH - 1 && y > 0
+                    && (!CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))
+                        || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == TERRAIN_BEACH))
+                    waterUpRight = true;
+            }
+            cell->m_flags &= EDIT_CELL_FLIP_CLEAR;
+            if ((otherUpRight6 || otherUpLeft2 || otherDownRight18 || otherDownLeft0 || otherUp7 || otherDown0 || otherRight0
+                 || otherLeft18)
+                && (waterUpRight || waterUpLeft0 || waterDownRight9 || waterDownLeft9 || waterUp || waterDown0
+                    || waterRight || waterLeft2)
+                && (otherUp7 || otherDown0 || otherRight0 || otherLeft18 || waterUp || waterDown0 || waterRight
+                    || waterLeft2)) {
+                if (waterUp) {
+                    if (waterLeft2) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (waterRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                    } else if (otherRight0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
+                    } else if (otherLeft18) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
+                    }
+                } else if (waterDown0) {
+                    if (waterLeft2) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (waterRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else if (otherRight0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else if (otherLeft18) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    }
+                } else if (waterRight) {
+                    if (otherUp7) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
+                    } else if (otherDown0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
+                    }
+                } else if (waterLeft2) {
+                    if (otherUp7) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (otherDown0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    }
+                } else if (otherUp7) {
+                    if (otherLeft18) {
+                        if (waterDownLeft9) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        } else if (waterUpRight) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        } else {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        }
+                    } else if (otherRight0) {
+                        if (waterDownRight9)
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
+                        else if (waterUpLeft0)
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
+                        else
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                    } else if (waterUpRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
+                    } else if (waterUpLeft0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
+                    }
+                } else if (otherDown0) {
+                    if (otherLeft18) {
+                        if (waterUpLeft0) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        } else if (waterDownRight9) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        } else {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        }
+                    } else if (otherRight0) {
+                        if (waterUpRight) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        } else if (waterDownLeft9) {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        } else {
+                            SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        }
+                    } else if (waterDownRight9) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else if (waterDownLeft9) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    }
+                } else if (otherRight0) {
+                    if (waterUpRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
+                    } else if (waterDownRight9) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
+                    }
+                } else if (otherLeft18) {
+                    if (waterUpLeft0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (waterDownLeft9) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    }
+                }
+            } else {
+                if (waterUp) {
+                    if (waterLeft2) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (waterRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
+                    }
+                } else if (waterDown0) {
+                    if (waterLeft2) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (waterRight) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    }
+                } else if (waterLeft2) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
+                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (waterRight) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
+                }
+                if (waterUp | waterDown0 | waterRight | waterLeft2)
+                    continue;
+                if (otherUp7) {
+                    if (otherLeft18) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (otherRight0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
+                    }
+                } else if (otherDown0) {
+                    if (otherLeft18) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    } else if (otherRight0) {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    } else {
+                        SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
+                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    }
+                } else if (otherLeft18) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
+                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (otherRight0) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
+                }
+                if (otherUp7 | otherDown0 | otherRight0 | otherLeft18)
+                    continue;
+                if (waterUpLeft0) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (waterDownLeft9) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (waterDownRight9) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                } else if (waterUpRight) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
+                }
+                if (waterUpLeft0 | waterDownLeft9 | waterDownRight9 | waterUpRight)
+                    continue;
+                if (otherUpLeft2) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (otherDownLeft0) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                } else if (otherDownRight18) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
+                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                } else if (otherUpRight6) {
+                    SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
+                }
+                if (otherUpLeft2 | otherDownLeft0 | otherDownRight18 | otherUpRight6)
+                    continue;
+                SetCellGround(x, y, thisTerrain, EDIT_SHAPE_PLAIN);
+            }
+        }
+    }
+    BlendShallowWater();
+    LogStr("PB 5");
+}
+
+// Shades the water along the coast: each water cell takes the shallow
+// tile of the coast corner most of its shaded neighbours face, spreading
+// outwards from the corner tiles, and open water three cells out stays deep.
+VA(0x0040d4ad, 0xba6)
+void editManager::BlendShallowWater(void) {
+    const i32 maxPass = 3;
+    const u8 unset = 0x80;
+    i32 shape;
+    i8* shoreDistance;
+    i32 limit;
+    const u8 deepSea = 0x40;
+    i32 band;
+    i32 x;
+    EditCornerCounts neighbors;
+    const u8 flat = 0;
+    const u8 tileUpperRight = 0x10;
+    const u8 tileLowerRight = 0x11;
+    const u8 tileUpperLeft = 0x12;
+    const u8 tileLowerLeft = 0x13;
+    mapCell* cell;
+    u8* shade;
+    u8* shadeCopy;
+    i32 rounds;
+    const u8 defaultFlip = 0;
+    const u8 vFlip = 1;
+    const u8 crossFlip = 2;
+    const u8 twoFlips = 3;
+    const u8 shore = 0x10;
+    i32 y;
+    b32 again;
+    i8* oldDistance;
+
+    shadeCopy = new u8[MAP_WIDTH * MAP_HEIGHT];
+    shade = new u8[MAP_WIDTH * MAP_HEIGHT];
+    shoreDistance = new i8[MAP_WIDTH * MAP_HEIGHT];
+    oldDistance = new i8[MAP_WIDTH * MAP_HEIGHT];
+    memset(shade, unset, MAP_WIDTH * MAP_HEIGHT);
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            cell = gMap.CellAt(x, y);
+            if (!CELL_TERRAIN(cell)) {
+                *(shoreDistance + x + y * MAP_WIDTH) = -1;
+                switch (giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK) {
+                    case EDIT_SHAPE_NORTH_EAST_CORNER:
+                    case EDIT_SHAPE_NORTH_EAST_INNER:
+                        *(shade + x + y * MAP_WIDTH)
+                            = (cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) | shore;
+                        break;
+                    default:
+                        *(shade + x + y * MAP_WIDTH) = flat;
+                        break;
+                }
+            } else {
+                *(shoreDistance + x + y * MAP_WIDTH) = 0;
+            }
+        }
+    }
+    for (band = 0; band <= maxPass; band++) {
+        memcpy(oldDistance, shoreDistance, MAP_WIDTH * MAP_HEIGHT);
+        for (x = 0; x < MAP_WIDTH; x++) {
+            for (y = 0; y < MAP_HEIGHT; y++) {
+                if (*(oldDistance + x + y * MAP_WIDTH) & unset) {
+                    if (band == maxPass)
+                        *(shade + x + y * MAP_WIDTH) = deepSea;
+                    else if ((x > 0 && *(oldDistance + x - 1 + y * MAP_WIDTH) >= 0)
+                             || (y > 0 && *(oldDistance + x + (y - 1) * MAP_WIDTH) >= 0)
+                             || (x < MAP_WIDTH - 2 && *(oldDistance + x + 1 + y * MAP_WIDTH) >= 0)
+                             || (y < MAP_HEIGHT - 2 && *(oldDistance + x + (y + 1) * MAP_WIDTH) >= 0))
+                        *(shoreDistance + x + y * MAP_WIDTH) = band;
+                }
+            }
+        }
+    }
+    again = true;
+    rounds = 0;
+    limit = MAP_WIDTH >> 1;
+    while (again && rounds < limit) {
+        memcpy(shadeCopy, shade, MAP_WIDTH * MAP_HEIGHT);
+        again = false;
+        rounds++;
+        for (x = 0; x < MAP_WIDTH; x++) {
+            for (y = 0; y < MAP_HEIGHT; y++) {
+                cell = gMap.CellAt(x, y);
+                shape = giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK;
+                if (!*(shadeCopy + x + y * MAP_WIDTH)) {
+                    again = true;
+                    neighbors.any = 0;
+                    if (x > 0 && *(shadeCopy + x - 1 + y * MAP_WIDTH) & shore)
+                        neighbors.corner[*(shadeCopy + x - 1 + y * MAP_WIDTH) & twoFlips]++;
+                    if (y > 0 && *(shadeCopy + x + (y - 1) * MAP_WIDTH) & shore)
+                        neighbors.corner[*(shadeCopy + x + (y - 1) * MAP_WIDTH) & twoFlips]++;
+                    if (x < MAP_WIDTH - 2 && *(shadeCopy + x + 1 + y * MAP_WIDTH) & shore)
+                        neighbors.corner[*(shadeCopy + x + 1 + y * MAP_WIDTH) & twoFlips]++;
+                    if (y < MAP_HEIGHT - 2 && *(shadeCopy + x + (y + 1) * MAP_WIDTH) & shore)
+                        neighbors.corner[*(shadeCopy + x + (y + 1) * MAP_WIDTH) & twoFlips]++;
+                    if (neighbors.any) {
+                        if (shape == EDIT_SHAPE_EAST_EDGE || shape == EDIT_SHAPE_EAST_EDGE_ALT) {
+                            if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+                                if (neighbors.corner[crossFlip] || neighbors.corner[twoFlips]) {
+                                    if (neighbors.corner[crossFlip] > neighbors.corner[twoFlips])
+                                        *(shade + x + y * MAP_WIDTH) = tileUpperLeft;
+                                    else
+                                        *(shade + x + y * MAP_WIDTH) = tileLowerLeft;
+                                }
+                            } else {
+                                if (neighbors.corner[defaultFlip] || neighbors.corner[vFlip]) {
+                                    if (neighbors.corner[defaultFlip] > neighbors.corner[vFlip])
+                                        *(shade + x + y * MAP_WIDTH) = tileUpperRight;
+                                    else
+                                        *(shade + x + y * MAP_WIDTH) = tileLowerRight;
+                                }
+                            }
+                        } else if (shape == EDIT_SHAPE_NORTH_EDGE || shape == EDIT_SHAPE_NORTH_EDGE_ALT) {
+                            if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+                                if (neighbors.corner[vFlip] || neighbors.corner[twoFlips]) {
+                                    if (neighbors.corner[vFlip] > neighbors.corner[twoFlips])
+                                        *(shade + x + y * MAP_WIDTH) = tileLowerRight;
+                                    else
+                                        *(shade + x + y * MAP_WIDTH) = tileLowerLeft;
+                                }
+                            } else {
+                                if (neighbors.corner[defaultFlip] || neighbors.corner[crossFlip]) {
+                                    if (neighbors.corner[defaultFlip] > neighbors.corner[crossFlip])
+                                        *(shade + x + y * MAP_WIDTH) = tileUpperRight;
+                                    else
+                                        *(shade + x + y * MAP_WIDTH) = tileUpperLeft;
+                                }
+                            }
+                        } else if (neighbors.corner[twoFlips]
+                                   && neighbors.corner[crossFlip] <= neighbors.corner[twoFlips]
+                                   && neighbors.corner[defaultFlip] <= neighbors.corner[twoFlips]
+                                   && neighbors.corner[vFlip] <= neighbors.corner[twoFlips]) {
+                            *(shade + x + y * MAP_WIDTH) = tileLowerLeft;
+                        } else if (neighbors.corner[vFlip]
+                                   && neighbors.corner[crossFlip] <= neighbors.corner[vFlip]
+                                   && neighbors.corner[defaultFlip] <= neighbors.corner[vFlip]) {
+                            *(shade + x + y * MAP_WIDTH) = tileLowerRight;
+                        } else if (neighbors.corner[crossFlip] >= neighbors.corner[defaultFlip]) {
+                            *(shade + x + y * MAP_WIDTH) = tileUpperLeft;
+                        } else {
+                            *(shade + x + y * MAP_WIDTH) = tileUpperRight;
+                        }
+                    }
+                }
+            }
+        }
+        memcpy(shadeCopy, shade, MAP_WIDTH * MAP_HEIGHT);
+    }
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            cell = gMap.CellAt(x, y);
+            shape = giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK;
+            if (*(shadeCopy + x + y * MAP_WIDTH) & shore) {
+                if (shape == EDIT_SHAPE_EAST_EDGE || shape == EDIT_SHAPE_EAST_EDGE_ALT) {
+                    if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperLeft
+                        || *(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_EAST_EDGE);
+                    else
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_EAST_EDGE_ALT);
+                } else if (shape == EDIT_SHAPE_NORTH_EDGE || shape == EDIT_SHAPE_NORTH_EDGE_ALT) {
+                    if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight
+                        || *(shadeCopy + x + y * MAP_WIDTH) == tileLowerRight)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_NORTH_EDGE);
+                    else
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_NORTH_EDGE_ALT);
+                } else if (shape == EDIT_SHAPE_PLAIN || shape == EDIT_SHAPE_DECORATED_FIRST
+                           || shape == EDIT_SHAPE_DECORATED_SECOND || shape == EDIT_SHAPE_DECORATED_THIRD
+                           || shape == EDIT_SHAPE_DECORATED_FOURTH) {
+                    if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_FIRST);
+                    else if (*(shadeCopy + x + y * MAP_WIDTH) == tileLowerRight)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_THIRD);
+                    else if (*(shadeCopy + x + y * MAP_WIDTH) == tileLowerLeft)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_FOURTH);
+                    else if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperLeft)
+                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_SECOND);
+                }
+            } else if (!CELL_TERRAIN(cell)
+                       && (shape == EDIT_SHAPE_PLAIN || shape == EDIT_SHAPE_DECORATED_FIRST
+                           || shape == EDIT_SHAPE_DECORATED_SECOND || shape == EDIT_SHAPE_DECORATED_THIRD
+                           || shape == EDIT_SHAPE_DECORATED_FOURTH)) {
+                SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_PLAIN);
+            }
+        }
+    }
+    delete[] shadeCopy;
+    delete[] shade;
+    delete[] shoreDistance;
+    delete[] oldDistance;
 }
 
 H2_ENUM_BEGIN(EditScreenScroll)
