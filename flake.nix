@@ -345,7 +345,7 @@
         in
         pkgs.writeShellApplication {
           name = "homm2-import";
-          runtimeInputs = [ pkgs.python3 pkgs.p7zip ];
+          runtimeInputs = [ pkgs.python3 pkgs.p7zip pkgs.unar pkgs.unshield ];
           text = ''exec python3 ${scripts}/game_data.py "$@"'';
         };
       # The languages the game can start in: English and each catalog.
@@ -385,8 +385,8 @@
               example = lib.literalExpression ''"''${homm2-game}"'';
               description = ''
                 Your copy of the game: an installed game folder (the one holding DATA), the
-                Buka disc's files, or a .zip/.7z/.iso of one, or a folder holding only that
-                archive. It is checked and its data laid out in the store on installation.
+                Buka disc's files, or a .zip/.7z/.iso/.rar of one, or a folder holding only
+                that archive. It is checked and its data laid out in the store on installation.
                 If unset, set HOMM2_DATA to the installed game when launching.
               '';
             };

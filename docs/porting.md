@@ -73,9 +73,12 @@ The installable package (`packages.x86_64-linux.default`, `nix/game.nix`)
 puts a `heroes2` launcher (`nix/launch.sh`) on the native program, with a menu
 entry and the icon of your copy's Windows program (`HMM2PL.exe` or
 `HEROES2W.EXE`). Its `game` may be an installed game folder, the Buka disc's
-unpacked files, a `.zip`/`.7z`/`.iso` of one, or a folder holding only that
-archive (`game = homm2-game;`). `tools/game_data.py` finds the folder with
-`DATA/HEROES2.AGG`, checks both resource archives (they must parse as AGG
+files, a `.zip`/`.7z`/`.iso`/`.rar` of one, or a folder holding only that
+archive (`game = homm2-game;`). `tools/game_data.py` unpacks archives (a
+`.rar` with unar, and an archive inside one in turn), finds the folder with
+`DATA/HEROES2.AGG` or else unpacks the disc's InstallShield installer that
+lists `HEROES2.AGG` with unshield, taking the disc's `Tracks2` music and
+`Anim2` movies beside it; it then checks both resource archives (they must parse as AGG
 archives; the tested GOG and Buka ones are named) and copies `DATA`, `MAPS`,
 `GAMES`, `HELP`, `HEROES2`, `MUSIC`, `TRACKS2` and the campaign texts into the
 store, locally and never from a binary cache. Without `game` the launcher runs

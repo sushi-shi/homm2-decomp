@@ -4,18 +4,25 @@
     game_data.py --game PATH --out DIR [--program DIR] [--work DIR]
 
 PATH is an installed game folder (GOG's, a Windows or DOS installation), the
-Buka disc's unpacked files, or a .zip/.7z/.iso of one of them, or a folder
-holding only such an archive. The installation is the shallowest folder below
-PATH with DATA/HEROES2.AGG; names are matched case-insensitively, as the game
-matches them. Both archives must be Heroes II resource archives (read with
-agg_manifest.parse); one of the tested editions is named, another is accepted.
-The installation is copied as
+Buka disc (its files, or the files its installer unpacks), or a
+.zip/.7z/.iso/.rar of one of them, or a folder holding only such an archive.
+Archives are unpacked with 7z, a .rar with unar (7-Zip's RAR decoder is not
+free), and an archive holding only another archive is unpacked in turn:
+archive.org's `Герои. Платиновая версия [Бука].rar` holds the Buka anthology's
+CD image. The installation is the shallowest folder below PATH with
+DATA/HEROES2.AGG; names are matched case-insensitively, as the game matches
+them. Without one, the InstallShield installer whose cabinet lists
+HEROES2.AGG is unpacked with unshield (the anthology's disc holds Heroes I,
+II and III installers side by side), and the disc's music (Tracks2) and
+movies (Anim2) are taken beside it. Both archives must be Heroes II resource
+archives (read with agg_manifest.parse); one of the tested editions is named,
+another is accepted. The installation is copied as
 
     DIR/game/DATA, MAPS, GAMES, HELP, HEROES2, MUSIC, TRACKS2,
              H2CAMP.TXT, POLCAMP.TXT, HEROES2.CFG       (the names upper-cased)
 
 which is what the game reads (package_web_data's set, plus the Buka disc's
-music). Nothing else is taken. With --program, the copy's Windows program
+music), the disc's movies as HEROES2/ANIM. Nothing else is taken. With --program, the copy's Windows program
 (HMM2PL.exe or HEROES2W.EXE) is copied there, for its icon. Used by the
 flake's game package (nix/game.nix) at install time.
 """
@@ -50,8 +57,21 @@ KNOWN = {
 #: The Windows programs whose icon the desktop entry shows, preferred first.
 PROGRAMS = ("HMM2PL.EXE", "HEROES2W.EXE")
 
-#: Extensions 7z unpacks for us.
-PACKED = (".zip", ".7z", ".iso")
+#: Archives unpacked for us: by unar, the others by 7z.
+UNAR = (".rar",)
+PACKED = (".zip", ".7z", ".iso", *UNAR)
+#: How many archives inside archives are unpacked.
+NESTING = 3
+
+#: The installer's cabinet, and the folders of the game it and the disc supply
+#: when the installation lacks them: the help book the installer keeps apart,
+#: the disc's music and the disc's movies (HEROES2/ANIM, as the game reads them).
+CABINET = "data1.cab"
+SUPPLEMENTS = (
+    ("HELP", ("Help_Files", "Help")),
+    ("TRACKS2", ("Tracks2",)),
+    ("HEROES2/ANIM", ("Anim2",)),
+)
 
 #: How deep below PATH an installation or a program is looked for.
 DEPTH = 4
@@ -104,27 +124,92 @@ def find_program(root: Path, installation: Path) -> Path | None:
     return None
 
 
-def unpack(given: Path, work: Path) -> Path:
-    """A folder as it is; an archive, or a folder holding only one, unpacked."""
+def unpack(given: Path, work: Path, level: int = 0) -> Path:
+    """A folder as it is; an archive, or a folder holding only one, unpacked,
+    and so on for an archive inside it. Unpacked archives are removed."""
     if given.is_dir():
-        if find_installation(given) is not None:
+        if find_installation(given) is not None or level >= NESTING:
             return given
         packed = [p for p in given.iterdir() if p.is_file() and p.suffix.lower() in PACKED]
         if len(packed) != 1:
             return given
         given = packed[0]
     if not given.is_file() or given.suffix.lower() not in PACKED:
-        raise GameDataError(f"{given}: not a folder or a .zip/.7z/.iso archive")
-    target = work / "unpacked"
+        raise GameDataError(f"{given}: not a folder or a .zip/.7z/.iso/.rar archive")
+    target = work / f"unpacked{level}"
     say(f"unpacking {given}")
-    result = subprocess.run(["7z", "x", "-y", f"-o{target}", str(given)],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+    if given.suffix.lower() in UNAR:
+        command = ["unar", "-quiet", "-no-directory", "-output-directory", str(target), str(given)]
+    else:
+        command = ["7z", "x", "-y", f"-o{target}", str(given)]
+    result = subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                            text=True, errors="replace")
     if result.returncode != 0:
-        raise GameDataError(f"{given}: 7z could not unpack it: {result.stderr.strip()}")
+        raise GameDataError(f"{given}: {command[0]} could not unpack it: "
+                            f"{result.stderr.strip()[-400:]}")
+    if level > 0:
+        given.unlink()      # unpacked from the previous level, in `work`
+    return unpack(target, work, level + 1)
+
+
+def find_installer(root: Path) -> Path | None:
+    """The InstallShield cabinet below `root` that installs the game."""
+    for directory in directories(root, DEPTH):
+        try:
+            cabinet = resolve_name(directory, CABINET)
+        except (OSError, ValueError):
+            continue
+        if cabinet is None or not cabinet.is_file():
+            continue
+        listing = subprocess.run(["unshield", "l", str(cabinet)], capture_output=True,
+                                 text=True, errors="replace")
+        files = {line.strip().replace("\\", "/").rsplit("/", 1)[-1].lower()
+                 for line in listing.stdout.splitlines()}
+        if listing.returncode == 0 and ARCHIVES[0].lower() in files:
+            return cabinet
+    return None
+
+
+def install(cabinet: Path, work: Path) -> Path:
+    """The installer's files, unpacked as the installer's file groups."""
+    target = work / "installer"
+    say(f"unpacking the installer {cabinet}")
+    result = subprocess.run(["unshield", "-d", str(target), "x", str(cabinet)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+                            errors="replace")
+    if result.returncode != 0:
+        raise GameDataError(f"{cabinet}: unshield could not unpack it: "
+                            f"{result.stderr.strip()[-400:]}")
     return target
 
 
-def check(installation: Path) -> list[str]:
+def resolve_path(root: Path, parts) -> Path | None:
+    for part in parts:
+        if not root.is_dir():
+            return None
+        root = resolve_name(root, part)
+        if root is None:
+            return None
+    return root
+
+
+def supplements(installation: Path, roots) -> dict[str, Path]:
+    """The folders the installation lacks, found below `roots` (the installer's
+    files, the disc), shallowest first: the game's name -> the folder."""
+    found = {}
+    for name, parts in SUPPLEMENTS:
+        if resolve_path(installation, name.split("/")) is not None:
+            continue
+        for root in roots:
+            source = next((s for d in directories(root, DEPTH)
+                           if (s := resolve_path(d, parts)) is not None and s.is_dir()), None)
+            if source is not None:
+                found[name] = source
+                break
+    return found
+
+
+def check(installation: Path, supplied: dict[str, Path]) -> list[str]:
     """The archives' problems; notes about the optional parts."""
     errors = []
     data = resolve_name(installation, "DATA")
@@ -146,14 +231,17 @@ def check(installation: Path) -> list[str]:
             say(f"DATA/{name}: {edition}")
     if resolve_name(installation, "MAPS") is None:
         say("warning: no MAPS folder; there will be no scenarios to play")
-    if resolve_name(installation, "MUSIC") is None and resolve_name(installation, "TRACKS2") is None:
+    if resolve_name(installation, "MUSIC") is None and resolve_name(installation, "TRACKS2") is None \
+            and "TRACKS2" not in supplied:
         say("note: no MUSIC or TRACKS2 folder; the game will be silent")
-    if resolve_name(installation, "HEROES2") is None:
+    if resolve_name(installation, "HEROES2") is None and "HEROES2/ANIM" not in supplied:
         say("note: no HEROES2/ANIM folder; the movies will be skipped")
+    for name, source in supplied.items():
+        say(f"{name}: {source}")
     return errors
 
 
-def lay_out(installation: Path, game: Path) -> None:
+def lay_out(installation: Path, game: Path, supplied: dict[str, Path]) -> None:
     game.mkdir(parents=True)
     for name in (*GAME_DIRECTORIES, *GAME_FILES):
         source = resolve_name(installation, name)
@@ -170,6 +258,8 @@ def lay_out(installation: Path, game: Path) -> None:
             if not source.is_file():
                 raise GameDataError(f"expected a file: {source}")
             shutil.copyfile(source, game / name)
+    for name, source in supplied.items():
+        shutil.copytree(source, game / name, ignore_dangling_symlinks=True)
 
 
 def main() -> int:
@@ -187,15 +277,23 @@ def main() -> int:
         given = args.game.expanduser().resolve(strict=True)
         with tempfile.TemporaryDirectory(prefix=".import-", dir=args.work) as work:
             root = unpack(given, Path(work))
+            roots = [root]
             installation = find_installation(root)
             if installation is None:
+                cabinet = find_installer(root)
+                if cabinet is not None:
+                    roots.insert(0, install(cabinet, Path(work)))
+                    installation = find_installation(roots[0])
+            if installation is None:
                 raise GameDataError(f"no DATA/HEROES2.AGG in {args.game}: pass the installed "
-                                    "game folder, the disc's files or an archive of either")
-            errors = check(installation)
+                                    "game folder, the disc or an archive of either")
+            supplied = supplements(installation, roots)
+            errors = check(installation, supplied)
             if errors:
                 raise GameDataError(f"{installation}: " + "; ".join(errors))
             say(f"checked the game in {installation}")
-            lay_out(installation, args.out / "game")
+            lay_out(installation, args.out / "game", supplied)
+            root = roots[0]
             if args.program is not None:
                 program = find_program(root, installation)
                 if program is None:
