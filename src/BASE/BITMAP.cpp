@@ -6,10 +6,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-
-typedef enum BitmapConstant {
-    COPY_STRIDE = 640
-} BitmapConstant;
+#include <BASE/display.h>
 
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
@@ -47,8 +44,8 @@ bitmap::~bitmap(void) {
 }
 
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
-    i32 destX;
-    i32 destY;
+    i32 destinationX;
+    i32 destinationY;
     i32 clipWidth;
     i32 clipHeight;
 
@@ -61,23 +58,23 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     clipHeight = m_height;
     if (x < 0) {
         clipWidth += x;
-        destX = 0;
+        destinationX = 0;
     } else {
-        destX = x;
+        destinationX = x;
     }
     if (y < 0) {
         clipHeight += y;
-        destY = 0;
+        destinationY = 0;
     } else {
-        destY = y;
+        destinationY = y;
     }
-    if (destX + clipWidth > gpWindowManager->m_screen->m_width)
-        clipWidth = gpWindowManager->m_screen->m_width - destX;
-    if (destY + clipHeight > gpWindowManager->m_screen->m_height)
-        clipHeight = gpWindowManager->m_screen->m_height - destY;
+    if (destinationX + clipWidth > gpWindowManager->m_screen->m_width)
+        clipWidth = gpWindowManager->m_screen->m_width - destinationX;
+    if (destinationY + clipHeight > gpWindowManager->m_screen->m_height)
+        clipHeight = gpWindowManager->m_screen->m_height - destinationY;
     if (clipWidth < 0 || clipHeight < 0)
         return;
-    BlitBitmap(this, 0, 0, clipWidth, clipHeight, gpWindowManager->m_screen, destX, destY);
+    BlitBitmap(this, 0, 0, clipWidth, clipHeight, gpWindowManager->m_screen, destinationX, destinationY);
 }
 
 void bitmap::DrawToBuffer(i16 x, i16 y) {
@@ -96,8 +93,8 @@ void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
-void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
-    BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
+void bitmap::GrabBitmap(class bitmap* source, i16 x, i16 y) {
+    BlitBitmap(source, x, y, m_width, m_height, this, 0, 0);
 }
 
 void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
@@ -143,18 +140,18 @@ void bitmap::CopyTo(
     i32 height
 ) {
     PollSound();
-    if (width != COPY_STRIDE) {
+    if (width != LOGICAL_SCREEN_WIDTH) {
         for (i32 row = 0; row < height; row++) {
             memcpy(
-                destination->m_pixels + destinationX + (destinationY + row) * COPY_STRIDE,
-                m_pixels + sourceX + (sourceY + row) * COPY_STRIDE,
+                destination->m_pixels + destinationX + (destinationY + row) * LOGICAL_SCREEN_WIDTH,
+                m_pixels + sourceX + (sourceY + row) * LOGICAL_SCREEN_WIDTH,
                 width
             );
         }
     } else {
         memcpy(
-            destination->m_pixels + destinationX + destinationY * COPY_STRIDE,
-            m_pixels + sourceX + sourceY * COPY_STRIDE,
+            destination->m_pixels + destinationX + destinationY * LOGICAL_SCREEN_WIDTH,
+            m_pixels + sourceX + sourceY * LOGICAL_SCREEN_WIDTH,
             width * height
         );
     }

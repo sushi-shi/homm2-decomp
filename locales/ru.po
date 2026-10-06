@@ -16310,31 +16310,6 @@ msgid "red"
 msgstr "Красный"
 
 #: src/SOURCE/KB.cpp
-msgctxt "system.cdrom.unavailable_guest_only"
-msgid "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game."
-msgstr "Нет доступа к CD-ROM. Без доступа к CD-ROM Герои 2 будут поддерживать только сетевую игру в режиме гостя."
-
-#: src/SOURCE/KB.cpp
-msgctxt "system.cdrom.expansion_disc_missing"
-msgid "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game.  If you have the CD, then exit the program, put the CD in, and try again."
-msgstr "Нет доступа к CD-ROM. Без доступа к CD-ROM Герои 2 будут поддерживать только сетевую игру в режиме гостя. Если у вас есть диск, закройте эту программу, вставьте диск в привод и попробуйте запустить игру еще раз."
-
-#: src/SOURCE/KB.cpp
-msgctxt "system.startup_error.title"
-msgid "Startup Error"
-msgstr "Ошибка загрузки"
-
-#: src/SOURCE/KB.cpp
-msgctxt "system.startup_error.game_directory_missing"
-msgid "Unable to change to the Heroes II directory.  Please run the installation program."
-msgstr "Не могу переключиться в директорию Героев II. Запустите программу установки."
-
-#: src/SOURCE/KB.cpp
-msgctxt "system.startup_error.data_files_missing"
-msgid "Unable to find the Heroes II data files.  Please run the installation program."
-msgstr "Не могу найти файлы данных Героев II. Пожалуйста, запустите программу установки."
-
-#: src/SOURCE/KB.cpp
 msgctxt "map.default.chaos"
 msgid "Chaos"
 msgstr "Хаос"
