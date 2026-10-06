@@ -35,6 +35,10 @@ when a residual will not explain itself, grouped by the question they answer:
   oracle      od_oracle - ground truth for homm2.core.od_slots, read straight from the
               S_BPREL32 debug records our compiler emits under /Z7. Needs wine.
   tooling     usage - every entry point keeps homm2.core.usage.logged.
+  image       census - function starts and absolute fields of an image from its
+              instructions alone (`--image editor ... --write-config`).
+              placements - the game's claimed functions and data placed in
+              another image by masked retail bytes and their code users.
   relocs      reloc_sweep - regenerate config/retail/absolute_relocations.tsv from the image with
               the delinker's find_relocs.py. The primary DIR32 channel.
               reloc_donation - SUPERSEDED by the sweep; kept as a cross-check and
@@ -50,6 +54,8 @@ import sys
 
 TOOLS = {
     "usage": ("usage", "check that every tooling entry point keeps usage logging"),
+    "census": ("census", "structural census of an image: starts and absolute fields"),
+    "placements": ("placements", "game identities placed in another image by retail bytes"),
     "enums": ("enums", "group evaluated enum members by value for semantic reuse review"),
     "ledger": ("ledger",
                "match_baseline rows banked against source that changed"),
