@@ -6,14 +6,14 @@
 #include <SOURCE/KB.h>
 
 static i32 gFillRow = 0;
-static u8* gFillPtr = 0;
+static u8* gFillPtr = NULL;
 static i32 gDimRow = 0;
-static u8* gDimPtr = 0;
+static u8* gDimPtr = NULL;
 static i32 gDimCol = 0;
 static i32 gBlitRow = 0;
-static u8* gDimNext = 0;
-static u8* gBlitSrc = 0;
-static u8* gBlitDst = 0;
+static u8* gDimNext = NULL;
+static u8* gBlitSrc = NULL;
+static u8* gBlitDst = NULL;
 
 void FillBitmapArea(class bitmap* image, i32 x, i32 y, i32 width, i32 height, i32 color) {
     gFillPtr = image->m_pixels + x + y * image->m_width;

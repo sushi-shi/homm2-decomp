@@ -567,6 +567,1222 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.startup.cd_required"
+msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
+msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."
+
+msgctxt "editor.startup.initialize_failed"
+msgid "Can't init system"
+msgstr "Невозможно инициировать систему"
+
+msgctxt "editor.startup.no_cd_drive"
+msgid "Unable to access CD-ROM Drive."
+msgstr "Нет доступа к CD-ROM."
+
+msgctxt "editor.table.gClearHelp.0"
+msgid "{Small Brush}\n\nDraws objects in 1 square increments."
+msgstr "{Малая кисть}\n\nРисует почву в 1 клетке."
+
+msgctxt "editor.table.gClearHelp.1"
+msgid "{Medium Brush}\n\nDraws objects in 2 by 2 square increments."
+msgstr "{Средняя кисть}\n\nЗакрашивает область 2х2 клетки."
+
+msgctxt "editor.table.gClearHelp.10"
+msgid "{Desert Objects}\n\nUsed to select objects most appropriate for use on desert."
+msgstr "{Объекты пустыни}\n\nИспользуется для выбора объектов, чаще всего встречающихся в пустыне."
+
+msgctxt "editor.table.gClearHelp.11"
+msgid "{Dirt Objects}\n\nUsed to select objects most appropriate for use on dirt."
+msgstr "{Объекты грязи}\n\nИспользуется для выбора объектов, чаще всего встречающихся на грязи."
+
+msgctxt "editor.table.gClearHelp.12"
+msgid "{Wasteland Objects}\n\nUsed to select objects most appropriate for use on wasteland."
+msgstr "{Объекты пустоши}\n\nИспользуется для выбора объектов, чаще всего встречающихся в пустоши."
+
+msgctxt "editor.table.gClearHelp.13"
+msgid "{Beach Objects}\n\nUsed to select objects most appropriate for use on beach."
+msgstr "{Объекты побережья}\n\nИспользуется для выбора объектов, чаще всего встречающихся на побережье."
+
+msgctxt "editor.table.gClearHelp.14"
+msgid "{Towns}\n\nUsed to place a town or castle."
+msgstr "{Города}\n\nВыбрать для размещения замки или города."
+
+msgctxt "editor.table.gClearHelp.15"
+msgid "{Monsters}\n\nUsed to place a monster group."
+msgstr "{Монстры}\n\nВыбрать отряды монстров для размещения."
+
+msgctxt "editor.table.gClearHelp.16"
+msgid "{Heroes}\n\nUsed to place a hero."
+msgstr "{Герои}\n\nИспользуется для размещения героев."
+
+msgctxt "editor.table.gClearHelp.17"
+msgid "{Artifact}\n\nUsed to place an artifact."
+msgstr "{Артефакты}\n\nИспользуется для размещения артефактов."
+
+msgctxt "editor.table.gClearHelp.18"
+msgid "{Treasures}\n\nUsed to place a resource or treasure."
+msgstr "{Сокровища}\n\nИспользуется для размещения сокровищ и ресурсов."
+
+msgctxt "editor.table.gClearHelp.2"
+msgid "{Large Brush}\n\nDraws objects in 4 by 4 square increments."
+msgstr "{Большая кисть}\n\nЗакрашивает область 4х4 клетки."
+
+msgctxt "editor.table.gClearHelp.3"
+msgid "{Area Fill}\n\nUsed to click and drag for clearing large areas."
+msgstr "{Заливка}\n\nИспользуется для закраски больших площадей."
+
+msgctxt "editor.table.gClearHelp.5"
+msgid "{Water Objects}\n\nUsed to select objects most appropriate for use on water."
+msgstr "{Объекты воды}\n\nИспользуется для выбора объектов, чаще всего встречающихся на воде."
+
+msgctxt "editor.table.gClearHelp.6"
+msgid "{Grass Objects}\n\nUsed to select objects most appropriate for use on grass."
+msgstr "{Объекты травы}\n\nИспользуется для выбора объектов, чаще всего встречающихся на траве."
+
+msgctxt "editor.table.gClearHelp.7"
+msgid "{Snow Objects}\n\nUsed to select objects most appropriate for use on snow."
+msgstr "{Снежные объекты}\n\nИспользуется для выбора объектов, чаще всего встречающихся на снегу."
+
+msgctxt "editor.table.gClearHelp.8"
+msgid "{Swamp Objects}\n\nUsed to select objects most appropriate for use on swamp."
+msgstr "{Болотные объекты}\n\nИспользуется для выбора объектов, чаще всего встречающихся на болотах."
+
+msgctxt "editor.table.gClearHelp.9"
+msgid "{Lava Objects}\n\nUsed to select objects most appropriate for use on lava."
+msgstr "{Объекты лавы}\n\nИспользуется для выбора объектов, чаще всего встречающихся на лаве."
+
+msgctxt "editor.table.gEditPanelHelp.1"
+msgid "{Radar View}\n\nControls the area of the map being viewed."
+msgstr "{Миникарта}\n\nПозволяет менять точку обзора на карте."
+
+msgctxt "editor.table.gEditPanelHelp.10"
+msgid "{Magnify}\n\nChange between zoom and normal view."
+msgstr "{Лупа}\n\nУправляет режимом масштаба изображения."
+
+msgctxt "editor.table.gEditPanelHelp.11"
+msgid "{Undo}\n\nUndo your last action.  Press again to redo the action."
+msgstr "{Отменить}\n\nОтменить последнее действие."
+
+msgctxt "editor.table.gEditPanelHelp.12"
+msgid "{Specifications}\n\nEdit map title, description, and other general information."
+msgstr "{Настройки}\n\nЗадать название карты, описание и другие параметры."
+
+msgctxt "editor.table.gEditPanelHelp.13"
+msgid "{New}\n\nStart a new map from scratch."
+msgstr "{Новая}\n\nНачать с нуля новую карту."
+
+msgctxt "editor.table.gEditPanelHelp.14"
+msgid "{File Options}\n\nOpen the file options menu, where you can save or load maps, or quit out of the editor."
+msgstr "{Окно файлов}\n\nЗагрузить ранее сохраненную карту."
+
+msgctxt "editor.table.gEditPanelHelp.15"
+msgid "{System Options}\n\nView the editor system options, which let you customize the editor."
+msgstr "{Системные настройки}\n\nОткрыть экран системных настроек редактора."
+
+msgctxt "editor.table.gEditPanelHelp.2"
+msgid "{Slide Control}\n\nUsed to move the screen along the slide axis."
+msgstr "{Скроллинг}\n\nИспользуется для передвижения экрана по карте, вдоль осей экрана дисплея."
+
+msgctxt "editor.table.gEditPanelHelp.3"
+msgid "{Terrain Mode}\n\nUsed to draw the underlying grass, dirt, water, etc. on the map."
+msgstr "{Почва}\n\nИспользуется для отрисовки травы, грязи, воды и т.п.."
+
+msgctxt "editor.table.gEditPanelHelp.4"
+msgid "{Object Mode}\n\nUsed to place objects (mountains, trees, treasure, etc.) on the map."
+msgstr "{Объекты}\n\nИспользуется для размещения объектов (горы, деревья, сокровища и т.п.) на карте."
+
+msgctxt "editor.table.gEditPanelHelp.5"
+msgid "{Detail Mode}\n\nUsed for special editing of monsters, heroes and towns."
+msgstr "{Информация}\n\nИспользуется для определения специальных параметров монстров, героев и городов."
+
+msgctxt "editor.table.gEditPanelHelp.6"
+msgid "{Erase Mode}\n\nUsed to erase objects off the map."
+msgstr "{Ластик}\n\nИспользуется для удаления объектов с карты."
+
+msgctxt "editor.table.gEditPanelHelp.7"
+msgid "{Stream Mode}\n\nAllows you to draw streams by clicking and dragging."
+msgstr "{Потоки}\n\nПозволяет разместить потоки воды и лавы."
+
+msgctxt "editor.table.gEditPanelHelp.8"
+msgid "{Road Mode}\n\nAllows you to draw roads by clicking and dragging."
+msgstr "{Дороги}\n\nПозволяет проложить дороги."
+
+msgctxt "editor.table.gEditPanelHelp.9"
+msgid "Scroll Button\n\nScrolls the screen in the indicated direction."
+msgstr "Скроллинг\n\nПозволяет перемещать экран по карте."
+
+msgctxt "editor.table.gEditTerrainNames.0"
+msgid "Water"
+msgstr "Вода"
+
+msgctxt "editor.table.gEditTerrainNames.1"
+msgid "Grass"
+msgstr "Трава"
+
+msgctxt "editor.table.gEditTerrainNames.2"
+msgid "Snow"
+msgstr "Снег"
+
+msgctxt "editor.table.gEditTerrainNames.3"
+msgid "Swamp"
+msgstr "Болото"
+
+msgctxt "editor.table.gEditTerrainNames.4"
+msgid "Lava"
+msgstr "Лава"
+
+msgctxt "editor.table.gEditTerrainNames.5"
+msgid "Desert"
+msgstr "Пустыня"
+
+msgctxt "editor.table.gEditTerrainNames.6"
+msgid "Dirt"
+msgstr "Грязь"
+
+msgctxt "editor.table.gEditTerrainNames.7"
+msgid "Cracked"
+msgstr "Пустошь"
+
+msgctxt "editor.table.gEditTerrainNames.8"
+msgid "Beach"
+msgstr "Побережье"
+
+msgctxt "editor.table.gEventFrequencyNames.0"
+msgid "Never"
+msgstr "Никогда"
+
+msgctxt "editor.table.gEventFrequencyNames.1"
+msgid "Every Day"
+msgstr "Каждый день"
+
+msgctxt "editor.table.gEventFrequencyNames.10"
+msgid "Every 28 Days"
+msgstr "Каждый 28-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.2"
+msgid "Every 2 Days"
+msgstr "Каждый 2-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.3"
+msgid "Every 3 Days"
+msgstr "Каждый 3-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.4"
+msgid "Every 4 Days"
+msgstr "Каждый 4-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.5"
+msgid "Every 5 Days"
+msgstr "Каждый 5-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.6"
+msgid "Every 6 Days"
+msgstr "Каждый 6-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.7"
+msgid "Every 7 Days"
+msgstr "Каждый 7-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.8"
+msgid "Every 14 Days"
+msgstr "Каждый 14-й день"
+
+msgctxt "editor.table.gEventFrequencyNames.9"
+msgid "Every 21 Days"
+msgstr "Каждый 21-й день"
+
+msgctxt "editor.table.gFileMenuHelp.0"
+msgid "Start a new map."
+msgstr "Начать новую карту."
+
+msgctxt "editor.table.gFileMenuHelp.1"
+msgid "Load a previously saved map."
+msgstr "Загрузить ранее сохраненную карту."
+
+msgctxt "editor.table.gFileMenuHelp.2"
+msgid "Save the current map."
+msgstr "Сохранить текущую карту."
+
+msgctxt "editor.table.gFileMenuHelp.3"
+msgid "Quit out of the Editor."
+msgstr "Выйти из редактора карт."
+
+msgctxt "editor.table.gFileMenuHelp.4"
+msgid "Exit this menu without doing anything."
+msgstr "Закрыть меню, ничего не делая."
+
+msgctxt "editor.table.gLossConditionNames.0"
+msgid "None"
+msgstr "Нет"
+
+msgctxt "editor.table.gLossConditionNames.1"
+msgid "Lose a particular castle"
+msgstr "Потерять замок"
+
+msgctxt "editor.table.gLossConditionNames.2"
+msgid "Lose a particular hero"
+msgstr "Потерять героя"
+
+msgctxt "editor.table.gLossConditionNames.3"
+msgid "Run out of time"
+msgstr "Не успеть"
+
+msgctxt "editor.table.gObjectClassNames.0"
+msgid "Water Objs"
+msgstr "Водные об."
+
+msgctxt "editor.table.gObjectClassNames.1"
+msgid "Grass Objs"
+msgstr "Об. травы"
+
+msgctxt "editor.table.gObjectClassNames.10"
+msgid "Monsters"
+msgstr "Монстры"
+
+msgctxt "editor.table.gObjectClassNames.11"
+msgid "Heroes"
+msgstr "Герои"
+
+msgctxt "editor.table.gObjectClassNames.12"
+msgid "Artifacts"
+msgstr "Артефакты"
+
+msgctxt "editor.table.gObjectClassNames.13"
+msgid "Treasures"
+msgstr "Сокровища"
+
+msgctxt "editor.table.gObjectClassNames.14"
+msgid "Road"
+msgstr "Дорога"
+
+msgctxt "editor.table.gObjectClassNames.15"
+msgid "Stream"
+msgstr "Поток"
+
+msgctxt "editor.table.gObjectClassNames.2"
+msgid "Snow Objs"
+msgstr "Снежные об."
+
+msgctxt "editor.table.gObjectClassNames.3"
+msgid "Swamp Objs"
+msgstr "Болотные об."
+
+msgctxt "editor.table.gObjectClassNames.4"
+msgid "Lava Objs"
+msgstr "Об. лавы"
+
+msgctxt "editor.table.gObjectClassNames.5"
+msgid "Desert Objs"
+msgstr "Пустынные об."
+
+msgctxt "editor.table.gObjectClassNames.6"
+msgid "Dirt Objs"
+msgstr "Об. грязи"
+
+msgctxt "editor.table.gObjectClassNames.7"
+msgid "Cracked Objs"
+msgstr "Об. пустоши"
+
+msgctxt "editor.table.gObjectClassNames.8"
+msgid "Beach Objs"
+msgstr "Об. побережья"
+
+msgctxt "editor.table.gObjectClassNames.9"
+msgid "Towns"
+msgstr "Города"
+
+msgctxt "editor.table.gSetupMainHelp.0"
+msgid "Create a new map, either from scratch or using the random map generator."
+msgstr "Создать новую карту с нуля используя генератор случайных карт."
+
+msgctxt "editor.table.gSetupMainHelp.1"
+msgid "Load an existing map."
+msgstr "Загрузить существующую карту."
+
+msgctxt "editor.table.gSetupMainHelp.2"
+msgid "Quit out of the map editor."
+msgstr "Выйти из редактора карт."
+
+msgctxt "editor.table.gSetupMapSizeHelp.0"
+msgid "Create a map that is 36 squares wide by 36 squares high.  (For reference, all the maps in Heroes 1 were 72 x 72)"
+msgstr "Создать карту размером 36 на 36 клеток. (Для сравнения, в Героях 1 все карты были размером 72 x 72)"
+
+msgctxt "editor.table.gSetupMapSizeHelp.1"
+msgid "Create a map that is 72 squares wide by 72 squares high.  (For reference, all the maps in Heroes 1 were 72 x 72)"
+msgstr " Создать карту размером 72 на 72 клетки. (Для сравнения, в Героях 1 все карты были размером 72 x 72)"
+
+msgctxt "editor.table.gSetupMapSizeHelp.2"
+msgid "Create a map that is 108 squares wide by 108 squares high.  (For reference, all the maps in Heroes 1 were 72 x 72)"
+msgstr " Создать карту размером 108 на 108 клеток. (Для сравнения, в Героях 1 все карты были размером 72 x 72)"
+
+msgctxt "editor.table.gSetupMapSizeHelp.3"
+msgid "Create a map that is 144 squares wide by 144 squares high.  (For reference, all the maps in Heroes 1 were 72 x 72)"
+msgstr " Создать карту размером 144 на 144 клетки. (Для сравнения, в Героях 1 все карты были размером 72 x 72)"
+
+msgctxt "editor.table.gSetupMapSizeHelp.4"
+msgid "Cancel back to the main menu."
+msgstr "Отменить и вернуться в главное меню."
+
+msgctxt "editor.table.gSetupNewMapHelp.0"
+msgid "Start from scratch with a blank map."
+msgstr "Начать карту с нуля."
+
+msgctxt "editor.table.gSetupNewMapHelp.1"
+msgid "Create a randomly generated map."
+msgstr "Создать случайную карту."
+
+msgctxt "editor.table.gSetupNewMapHelp.2"
+msgid "Cancel back to the main menu."
+msgstr "Отменить и вернуться в главное меню."
+
+msgctxt "editor.table.gSystemOptionsHelp.0"
+msgid "{OK}\n\nExit this menu."
+msgstr "{ОК}\n\nЗакрыть это меню."
+
+msgctxt "editor.table.gSystemOptionsHelp.1"
+msgid "{Animation}\n\nToggle object animation on/off.  Object animation may hurt performance, especially if you are working in the zoomed out modes."
+msgstr "{Анимация}\n\nВключить или выключить анимацию объектов."
+
+msgctxt "editor.table.gSystemOptionsHelp.2"
+msgid "{Cycling}\n\nToggle color cycling on/off.  Color cycling may hurt performance if you are running in Windows 95, non full screen, and your system is set to display more than 256 colors."
+msgstr "{Мигание}\n\nВключить или выключить мигание цветов."
+
+msgctxt "editor.table.gSystemOptionsHelp.3"
+msgid "{Grid}\n\nCToggle object grid on/off.  The object grid shows which squares an object occupies, and how each square is classified.\n\nGreen = Overlay\nRed = Object\nPink = Object Trigger\nBlack = Shadow"
+msgstr "{Сетка}\n\nВключить или выключить сетку объектов.\n\nЗеленое = Накладываемо\nКрасное = Объект\nРозовое = Триггер объектов\nЧерное = Тень"
+
+msgctxt "editor.table.gSystemOptionsHelp.4"
+msgid "{Mouse Cursor}\n\nToggles color mouse cursor on/off."
+msgstr "{Курсор}\n\nВключить или отключить цветной курсор."
+
+msgctxt "editor.table.gTerrainHelp.1"
+msgid "{Water}\n\nTraversable only by boat."
+msgstr "{Вода}\n\nПутешествовать только на кораблях."
+
+msgctxt "editor.table.gTerrainHelp.10"
+msgid "{Small Brush}\n\nDraws terrain in 1 square increments."
+msgstr "{Малая кисть}\n\nРисует почву в 1 клетке."
+
+msgctxt "editor.table.gTerrainHelp.11"
+msgid "{Medium Brush}\n\nDraws terrain in 2 by 2 square increments."
+msgstr "{Средняя кисть}\n\nЗакрашивает область 2х2 клетки."
+
+msgctxt "editor.table.gTerrainHelp.12"
+msgid "{Large Brush}\n\nDraws terrain in 4 by 4 square increments."
+msgstr "{Большая кисть}\n\nЗакрашивает область 4х4 клетки."
+
+msgctxt "editor.table.gTerrainHelp.13"
+msgid "{Area Fill}\n\nUsed to click and drag for filling in large areas."
+msgstr "{Заливка}\n\nИспользуется для закраски больших площадей."
+
+msgctxt "editor.table.gTerrainHelp.2"
+msgid "{Grass}\n\nNo special modifiers."
+msgstr "{Трава}\n\nНет особых модификаторов."
+
+msgctxt "editor.table.gTerrainHelp.3"
+msgid "{Snow}\n\nCosts 1.5 times normal movement for all heroes.  (Pathfinding reduces or eliminates the penalty.)"
+msgstr "{Снег}\n\nДля всех героев время на передвижение тратится в 1.5 раза больше. (Навык Следопыта снижает или игнорирует штраф.)"
+
+msgctxt "editor.table.gTerrainHelp.4"
+msgid "{Swamp}\n\nCosts 1.75 times normal movement for all heroes.  (Pathfinding reduces or eliminates the penalty.)"
+msgstr "{Болото}\n\nДля всех героев время на передвижение тратится в 1.75 раза больше. (Навык Следопыта снижает или игнорирует штраф.)"
+
+msgctxt "editor.table.gTerrainHelp.5"
+msgid "{Lava}\n\nNo special modifiers."
+msgstr "{Лава}\n\nНет особых можификаторов."
+
+msgctxt "editor.table.gTerrainHelp.6"
+msgid "{Desert}\n\nCosts 2 times normal movement for all heroes.  (Pathfinding reduces or eliminates the penalty.)"
+msgstr "{Пустыня}\n\nДля всех героев время на передвижение тратится в 2 раза больше. (Навык Следопыта снижает или игнорирует штраф.)"
+
+msgctxt "editor.table.gTerrainHelp.7"
+msgid "{Dirt}\n\nNo special modifiers."
+msgstr "{Грязь}\n\nНет особых модификаторов."
+
+msgctxt "editor.table.gTerrainHelp.8"
+msgid "{Wasteland}\n\nCosts 1.25 times normal movement for all heroes.  (Pathfinding eliminates the penalty.)"
+msgstr "{Пустошь}\n\nДля всех героев время на передвижение тратится в 1.25 раза больше. (Навык Следопыта снижает или игнорирует штраф.)"
+
+msgctxt "editor.table.gTerrainHelp.9"
+msgid "{Beach}\n\nCosts 1.25 times normal movement for all heroes.  (Pathfinding eliminates the penalty.)"
+msgstr "{Побережье}\n\nДля всех героев время на передвижение тратится в 1.25 раза больше. (Навык Следопыта снижает или игнорирует штраф.)"
+
+msgctxt "editor.table.gTownNames.0"
+msgid "Blackridge"
+msgstr "Блэкбридж"
+
+msgctxt "editor.table.gTownNames.1"
+msgid "Pinehurst"
+msgstr "Пайнхёрст"
+
+msgctxt "editor.table.gTownNames.10"
+msgid "Middle Gate"
+msgstr "Мидлгейт"
+
+msgctxt "editor.table.gTownNames.11"
+msgid "Tundara"
+msgstr "Тундара"
+
+msgctxt "editor.table.gTownNames.12"
+msgid "Vulcania"
+msgstr "Вулкания"
+
+msgctxt "editor.table.gTownNames.13"
+msgid "Sansobar"
+msgstr "Занзобар"
+
+msgctxt "editor.table.gTownNames.14"
+msgid "Atlantium"
+msgstr "Атлантиум"
+
+msgctxt "editor.table.gTownNames.15"
+msgid "Baywatch"
+msgstr "Байвоч"
+
+msgctxt "editor.table.gTownNames.16"
+msgid "Wildabar"
+msgstr "Вилдабар"
+
+msgctxt "editor.table.gTownNames.17"
+msgid "Fountainhead"
+msgstr "Фонтанхейд"
+
+msgctxt "editor.table.gTownNames.18"
+msgid "Vertigo"
+msgstr "Вертиго"
+
+msgctxt "editor.table.gTownNames.19"
+msgid "Winterkill"
+msgstr "Винтеркил"
+
+msgctxt "editor.table.gTownNames.2"
+msgid "Woodhaven"
+msgstr "Вудхавен"
+
+msgctxt "editor.table.gTownNames.20"
+msgid "Nightshadow"
+msgstr "Найтшэдоу"
+
+msgctxt "editor.table.gTownNames.21"
+msgid "Sandcaster"
+msgstr "Сэндкастер"
+
+msgctxt "editor.table.gTownNames.22"
+msgid "Lakeside"
+msgstr "Лэйксайт"
+
+msgctxt "editor.table.gTownNames.23"
+msgid "Olympus"
+msgstr "Олимпус"
+
+msgctxt "editor.table.gTownNames.24"
+msgid "Brindamoor"
+msgstr "Бриндамур"
+
+msgctxt "editor.table.gTownNames.25"
+msgid "Burlock"
+msgstr "Бурлок"
+
+msgctxt "editor.table.gTownNames.26"
+msgid "Xabran"
+msgstr "Ксабран"
+
+msgctxt "editor.table.gTownNames.27"
+msgid "Dragadune"
+msgstr "Драгадун"
+
+msgctxt "editor.table.gTownNames.28"
+msgid "Alamar"
+msgstr "Аламар"
+
+msgctxt "editor.table.gTownNames.29"
+msgid "Kalindra"
+msgstr "Калиндра"
+
+msgctxt "editor.table.gTownNames.3"
+msgid "Hillstone"
+msgstr "Хилстон"
+
+msgctxt "editor.table.gTownNames.30"
+msgid "Blackfang"
+msgstr "Блэкфанг"
+
+msgctxt "editor.table.gTownNames.31"
+msgid "Basenji"
+msgstr "Бесенджи"
+
+msgctxt "editor.table.gTownNames.32"
+msgid "Algary"
+msgstr "Алгари"
+
+msgctxt "editor.table.gTownNames.33"
+msgid "Sorpigal"
+msgstr "Сорпигал"
+
+msgctxt "editor.table.gTownNames.34"
+msgid "New Dawn"
+msgstr "Ньюдавн"
+
+msgctxt "editor.table.gTownNames.35"
+msgid "Erliquin"
+msgstr "Эрликиум"
+
+msgctxt "editor.table.gTownNames.36"
+msgid "Avone"
+msgstr "Авон"
+
+msgctxt "editor.table.gTownNames.37"
+msgid "Big Oak"
+msgstr "Биг Оак"
+
+msgctxt "editor.table.gTownNames.38"
+msgid "Hampshire"
+msgstr "Хампшир"
+
+msgctxt "editor.table.gTownNames.39"
+msgid "Chandler"
+msgstr "Чандлер"
+
+msgctxt "editor.table.gTownNames.4"
+msgid "Whiteshield"
+msgstr "Вайтшилд"
+
+msgctxt "editor.table.gTownNames.40"
+msgid "South Mill"
+msgstr "Саусмил"
+
+msgctxt "editor.table.gTownNames.41"
+msgid "Weed Patch"
+msgstr "Видпас"
+
+msgctxt "editor.table.gTownNames.42"
+msgid "Roc Haven"
+msgstr "Рокхавен"
+
+msgctxt "editor.table.gTownNames.43"
+msgid "Avalon"
+msgstr "Авалон"
+
+msgctxt "editor.table.gTownNames.44"
+msgid "Antioch"
+msgstr "Антиох"
+
+msgctxt "editor.table.gTownNames.45"
+msgid "Brownston"
+msgstr "Браунстон"
+
+msgctxt "editor.table.gTownNames.46"
+msgid "Weddington"
+msgstr "Ведингтон"
+
+msgctxt "editor.table.gTownNames.47"
+msgid "Whittingham"
+msgstr "Ватингем"
+
+msgctxt "editor.table.gTownNames.48"
+msgid "Westfork"
+msgstr "Вестфорк"
+
+msgctxt "editor.table.gTownNames.49"
+msgid "Hilltop"
+msgstr "Хилтоп"
+
+msgctxt "editor.table.gTownNames.5"
+msgid "Bloodreign"
+msgstr "Бладрейн"
+
+msgctxt "editor.table.gTownNames.50"
+msgid "Yorksford"
+msgstr "Йорксфорд"
+
+msgctxt "editor.table.gTownNames.51"
+msgid "Sherman"
+msgstr "Шерман"
+
+msgctxt "editor.table.gTownNames.52"
+msgid "Roscomon"
+msgstr "Роскомон"
+
+msgctxt "editor.table.gTownNames.53"
+msgid "Elk's Head"
+msgstr "Элькхеад"
+
+msgctxt "editor.table.gTownNames.54"
+msgid "Cathcart"
+msgstr "Кетчкарт"
+
+msgctxt "editor.table.gTownNames.55"
+msgid "Viper's Nest"
+msgstr "Гнездо гадюк"
+
+msgctxt "editor.table.gTownNames.56"
+msgid "Pig's Eye"
+msgstr "Пигай"
+
+msgctxt "editor.table.gTownNames.57"
+msgid "Blacksford"
+msgstr "Блэксфорд"
+
+msgctxt "editor.table.gTownNames.58"
+msgid "Burton"
+msgstr "Буртон"
+
+msgctxt "editor.table.gTownNames.59"
+msgid "Blackburn"
+msgstr "Блэкбурн"
+
+msgctxt "editor.table.gTownNames.6"
+msgid "Dragontooth"
+msgstr "Драгонтус"
+
+msgctxt "editor.table.gTownNames.60"
+msgid "Lankershire"
+msgstr "Ланкшир"
+
+msgctxt "editor.table.gTownNames.61"
+msgid "Lombard"
+msgstr "Ломбард"
+
+msgctxt "editor.table.gTownNames.62"
+msgid "Timberhill"
+msgstr "Тимберхил"
+
+msgctxt "editor.table.gTownNames.63"
+msgid "Fenton"
+msgstr "Фентон"
+
+msgctxt "editor.table.gTownNames.64"
+msgid "Troy"
+msgstr "Троя"
+
+msgctxt "editor.table.gTownNames.65"
+msgid "Forder Oaks"
+msgstr "Фордер Оак"
+
+msgctxt "editor.table.gTownNames.66"
+msgid "Meramec"
+msgstr "Меремек"
+
+msgctxt "editor.table.gTownNames.67"
+msgid "Quick Silver"
+msgstr "Квиксильвер"
+
+msgctxt "editor.table.gTownNames.68"
+msgid "Westmoor"
+msgstr "Вестмур"
+
+msgctxt "editor.table.gTownNames.69"
+msgid "Willow"
+msgstr "Вилоу"
+
+msgctxt "editor.table.gTownNames.7"
+msgid "Greywind"
+msgstr "Грейвинд"
+
+msgctxt "editor.table.gTownNames.70"
+msgid "Sheltemburg"
+msgstr "Шелтембург"
+
+msgctxt "editor.table.gTownNames.71"
+msgid "Corackston"
+msgstr "Коракстоун"
+
+msgctxt "editor.table.gTownNames.8"
+msgid "Blackwind"
+msgstr "Блэквинд"
+
+msgctxt "editor.table.gTownNames.9"
+msgid "Portsmith"
+msgstr "Портсмис"
+
+msgctxt "editor.table.gVictoryConditionNames.0"
+msgid "None"
+msgstr "Нет"
+
+msgctxt "editor.table.gVictoryConditionNames.1"
+msgid "Capture a particular castle"
+msgstr "Захватить замок"
+
+msgctxt "editor.table.gVictoryConditionNames.2"
+msgid "Defeat a particular hero"
+msgstr "Сразить героя"
+
+msgctxt "editor.table.gVictoryConditionNames.3"
+msgid "Find a particular artifact"
+msgstr "Найти артефакт"
+
+msgctxt "editor.table.gVictoryConditionNames.4"
+msgid "One side defeats another"
+msgstr "Одна сторона сразить другую"
+
+msgctxt "editor.table.gVictoryConditionNames.5"
+msgid "Accumulate gold"
+msgstr "Собрать золото"
+
+msgctxt "editor.table.gWinSetup.0"
+msgid "Ultimate Artifact Detail\n\n\n\nEnter the allowable radius\n\nfrom this location"
+msgstr "Свойства Могущественного артефакта\n\n\n\nУкажите допустимый радиус расположения артефакта от этой локации"
+
+msgctxt "editor.table.gWinSetup.1"
+msgid "Animation"
+msgstr "Анимация"
+
+msgctxt "editor.table.gWinSetup.10"
+msgid "Ore"
+msgstr "Руда"
+
+msgctxt "editor.table.gWinSetup.100"
+msgid "Allow castle"
+msgstr "Можно строить замок"
+
+msgctxt "editor.table.gWinSetup.101"
+msgid "Buildings"
+msgstr "Постройки"
+
+msgctxt "editor.table.gWinSetup.102"
+msgid "Standard"
+msgstr "Обычные"
+
+msgctxt "editor.table.gWinSetup.103"
+msgid "Custom"
+msgstr "Выбрать"
+
+msgctxt "editor.table.gWinSetup.104"
+msgid "Mage Guild"
+msgstr "Гильдия магов"
+
+msgctxt "editor.table.gWinSetup.105"
+msgid "Dwelling 1"
+msgstr "Жилище 1"
+
+msgctxt "editor.table.gWinSetup.106"
+msgid "Dwelling 2"
+msgstr "Жилище 2"
+
+msgctxt "editor.table.gWinSetup.107"
+msgid "Upgd"
+msgstr "Улучш."
+
+msgctxt "editor.table.gWinSetup.108"
+msgid "Dwelling 3"
+msgstr "Жилище 3"
+
+msgctxt "editor.table.gWinSetup.109"
+msgid "Upgd"
+msgstr "Улучш."
+
+msgctxt "editor.table.gWinSetup.11"
+msgid "Sulfur"
+msgstr "Сера"
+
+msgctxt "editor.table.gWinSetup.110"
+msgid "Dwelling 4"
+msgstr "Жилище 4"
+
+msgctxt "editor.table.gWinSetup.111"
+msgid "Upgd"
+msgstr "Улучш."
+
+msgctxt "editor.table.gWinSetup.112"
+msgid "Dwelling 5"
+msgstr "Жилище 5"
+
+msgctxt "editor.table.gWinSetup.113"
+msgid "Upgd"
+msgstr "Улучш."
+
+msgctxt "editor.table.gWinSetup.114"
+msgid "Dwelling 6"
+msgstr "Жилище 6"
+
+msgctxt "editor.table.gWinSetup.115"
+msgid "Upgd"
+msgstr "Улучш."
+
+msgctxt "editor.table.gWinSetup.12"
+msgid "Crystal"
+msgstr "Кристаллы"
+
+msgctxt "editor.table.gWinSetup.13"
+msgid "Gems"
+msgstr "Самоцветы"
+
+msgctxt "editor.table.gWinSetup.14"
+msgid "Gold"
+msgstr "Золото"
+
+msgctxt "editor.table.gWinSetup.15"
+msgid "Day of first occurrence"
+msgstr "День первого появления"
+
+msgctxt "editor.table.gWinSetup.16"
+msgid "Subsequent occurrences"
+msgstr "Повторять событие"
+
+msgctxt "editor.table.gWinSetup.17"
+msgid "Artifact to give"
+msgstr "Дать артефакт"
+
+msgctxt "editor.table.gWinSetup.18"
+msgid "Allow computer to get event"
+msgstr "Событие влияет на компьютер"
+
+msgctxt "editor.table.gWinSetup.19"
+msgid "Cancel event after first visit"
+msgstr "Отменить событие после 1 посещения"
+
+msgctxt "editor.table.gWinSetup.2"
+msgid "Cycling"
+msgstr "По кругу"
+
+msgctxt "editor.table.gWinSetup.20"
+msgid "Colors allowed to get event"
+msgstr "Цвет игроков, на кого действует:"
+
+msgctxt "editor.table.gWinSetup.21"
+msgid "Hero Detail"
+msgstr "Информация о герое"
+
+msgctxt "editor.table.gWinSetup.22"
+msgid "Troops"
+msgstr "Войска"
+
+msgctxt "editor.table.gWinSetup.23"
+msgid "Standard"
+msgstr "Обычные"
+
+msgctxt "editor.table.gWinSetup.24"
+msgid "Custom"
+msgstr "Выбрать"
+
+msgctxt "editor.table.gWinSetup.25"
+msgid "Type"
+msgstr "Тип"
+
+msgctxt "editor.table.gWinSetup.26"
+msgid "Qty"
+msgstr "К-во."
+
+msgctxt "editor.table.gWinSetup.27"
+msgid "Mon 1"
+msgstr "Мон 1"
+
+msgctxt "editor.table.gWinSetup.28"
+msgid "Mon 2"
+msgstr "Мон 2"
+
+msgctxt "editor.table.gWinSetup.29"
+msgid "Mon 3"
+msgstr "Мон 3"
+
+msgctxt "editor.table.gWinSetup.3"
+msgid "Grid"
+msgstr "Сетка"
+
+msgctxt "editor.table.gWinSetup.30"
+msgid "Mon 4"
+msgstr "Мон 4"
+
+msgctxt "editor.table.gWinSetup.31"
+msgid "Mon 5"
+msgstr "Мон 5"
+
+msgctxt "editor.table.gWinSetup.32"
+msgid "Artifacts"
+msgstr "Артефакты"
+
+msgctxt "editor.table.gWinSetup.33"
+msgid "Slot 1"
+msgstr "Слот 1"
+
+msgctxt "editor.table.gWinSetup.34"
+msgid "Slot 2"
+msgstr "Слот 2"
+
+msgctxt "editor.table.gWinSetup.35"
+msgid "Slot 3"
+msgstr "Слот 3"
+
+msgctxt "editor.table.gWinSetup.36"
+msgid "Patrol"
+msgstr "Патрулировать"
+
+msgctxt "editor.table.gWinSetup.37"
+msgid "Experience"
+msgstr "Опыт"
+
+msgctxt "editor.table.gWinSetup.38"
+msgid "Secondary Skills"
+msgstr "Вторичные навыки"
+
+msgctxt "editor.table.gWinSetup.39"
+msgid "Standard"
+msgstr "Обычные"
+
+msgctxt "editor.table.gWinSetup.4"
+msgid "Mouse Cursor"
+msgstr "Курсор мыши"
+
+msgctxt "editor.table.gWinSetup.40"
+msgid "Custom"
+msgstr "Выбрать"
+
+msgctxt "editor.table.gWinSetup.41"
+msgid "Skill 1"
+msgstr "Навык 1"
+
+msgctxt "editor.table.gWinSetup.42"
+msgid "Skill 2"
+msgstr "Навык 2"
+
+msgctxt "editor.table.gWinSetup.43"
+msgid "Skill 3"
+msgstr "Навык 3"
+
+msgctxt "editor.table.gWinSetup.44"
+msgid "Skill 4"
+msgstr "Навык 4"
+
+msgctxt "editor.table.gWinSetup.45"
+msgid "Skill 5"
+msgstr "Навык 5"
+
+msgctxt "editor.table.gWinSetup.46"
+msgid "Skill 6"
+msgstr "Навык 6"
+
+msgctxt "editor.table.gWinSetup.47"
+msgid "Skill 7"
+msgstr "Навык 7"
+
+msgctxt "editor.table.gWinSetup.48"
+msgid "Skill 8"
+msgstr "Навык 8"
+
+msgctxt "editor.table.gWinSetup.49"
+msgid "Name"
+msgstr "Имя"
+
+msgctxt "editor.table.gWinSetup.5"
+msgid "Event Detail"
+msgstr "Событие"
+
+msgctxt "editor.table.gWinSetup.50"
+msgid "Standard"
+msgstr "Обычное"
+
+msgctxt "editor.table.gWinSetup.51"
+msgid "Custom"
+msgstr "Задать"
+
+msgctxt "editor.table.gWinSetup.52"
+msgid "Picture"
+msgstr "Портрет"
+
+msgctxt "editor.table.gWinSetup.53"
+msgid "Monster Detail\n\n\n\n0 for random qty\n\nor enter a positive number"
+msgstr "Монстры\n\n\n\n0 для случайного количества.,\n\nили положительное число."
+
+msgctxt "editor.table.gWinSetup.54"
+msgid "Riddle Detail"
+msgstr "Загадка"
+
+msgctxt "editor.table.gWinSetup.55"
+msgid "Riddle Text"
+msgstr "Текст загадки"
+
+msgctxt "editor.table.gWinSetup.56"
+msgid "Reward for correct answer\n(negative quantities are OK, too)"
+msgstr "Награда за верный ответ\n(отрицательное число тоже подходит)"
+
+msgctxt "editor.table.gWinSetup.57"
+msgid "Wood"
+msgstr "Древесина"
+
+msgctxt "editor.table.gWinSetup.58"
+msgid "Mercury"
+msgstr "Ртуть"
+
+msgctxt "editor.table.gWinSetup.59"
+msgid "Ore"
+msgstr "Руда"
+
+msgctxt "editor.table.gWinSetup.6"
+msgid "Message Text"
+msgstr "Текст сообщения"
+
+msgctxt "editor.table.gWinSetup.60"
+msgid "Sulfur"
+msgstr "Сера"
+
+msgctxt "editor.table.gWinSetup.61"
+msgid "Crystal"
+msgstr "Кристаллы"
+
+msgctxt "editor.table.gWinSetup.62"
+msgid "Gems"
+msgstr "Самоцветы"
+
+msgctxt "editor.table.gWinSetup.63"
+msgid "Gold"
+msgstr "Золото"
+
+msgctxt "editor.table.gWinSetup.64"
+msgid "Artifact to give"
+msgstr "Дать артефакт"
+
+msgctxt "editor.table.gWinSetup.65"
+msgid "Answer(s)"
+msgstr "Ответ(ы)"
+
+msgctxt "editor.table.gWinSetup.66"
+msgid "Rumor Detail"
+msgstr "Слух"
+
+msgctxt "editor.table.gWinSetup.67"
+msgid "Special Victory Condition"
+msgstr "Условие победы"
+
+msgctxt "editor.table.gWinSetup.68"
+msgid "Comp. also wins via Special VC"
+msgstr "Компьютер также выигрывает через особые условия победы"
+
+msgctxt "editor.table.gWinSetup.69"
+msgid "Also allow normal victory"
+msgstr "Также обычные условия победы"
+
+msgctxt "editor.table.gWinSetup.7"
+msgid "Resources to give (or take if a negative qty.)"
+msgstr "Дать ресурсов (или забрать, если отрицательное число.)"
+
+msgctxt "editor.table.gWinSetup.70"
+msgid "Victory Condition Extra"
+msgstr "Особые условия победы"
+
+msgctxt "editor.table.gWinSetup.71"
+msgid "Special Loss Condition"
+msgstr "Условия поражения"
+
+msgctxt "editor.table.gWinSetup.72"
+msgid "Loss Condition Extra"
+msgstr "Особые условия поражения"
+
+msgctxt "editor.table.gWinSetup.73"
+msgid "Map Name"
+msgstr "Название карты"
+
+msgctxt "editor.table.gWinSetup.74"
+msgid "Map Filename:"
+msgstr "Название файла:"
+
+msgctxt "editor.table.gWinSetup.75"
+msgid "Description"
+msgstr "Описание"
+
+msgctxt "editor.table.gWinSetup.76"
+msgid "Difficulty"
+msgstr "Сложность"
+
+msgctxt "editor.table.gWinSetup.77"
+msgid "Easy"
+msgstr "Легкая"
+
+msgctxt "editor.table.gWinSetup.78"
+msgid "Normal"
+msgstr "Обычная"
+
+msgctxt "editor.table.gWinSetup.79"
+msgid "Tough"
+msgstr "Тяжелая"
+
+msgctxt "editor.table.gWinSetup.8"
+msgid "Wood"
+msgstr "Древесина"
+
+msgctxt "editor.table.gWinSetup.80"
+msgid "Expert"
+msgstr "Эксперт"
+
+msgctxt "editor.table.gWinSetup.81"
+msgid "Players"
+msgstr "Игроки"
+
+msgctxt "editor.table.gWinSetup.82"
+msgid "Start with hero in each player's main castle"
+msgstr "Начинать с героем в каждом главном замке"
+
+msgctxt "editor.table.gWinSetup.83"
+msgid "Rumors"
+msgstr "Слухи"
+
+msgctxt "editor.table.gWinSetup.84"
+msgid "Events"
+msgstr "События"
+
+msgctxt "editor.table.gWinSetup.85"
+msgid "Town Detail"
+msgstr "Город"
+
+msgctxt "editor.table.gWinSetup.86"
+msgid "Troops"
+msgstr "Войска"
+
+msgctxt "editor.table.gWinSetup.87"
+msgid "Standard"
+msgstr "Обычные"
+
+msgctxt "editor.table.gWinSetup.88"
+msgid "Custom"
+msgstr "Выбрать"
+
+msgctxt "editor.table.gWinSetup.89"
+msgid "Type"
+msgstr "Тип"
+
+msgctxt "editor.table.gWinSetup.9"
+msgid "Mercury"
+msgstr "Ртуть"
+
+msgctxt "editor.table.gWinSetup.90"
+msgid "Qty"
+msgstr "К-во."
+
+msgctxt "editor.table.gWinSetup.91"
+msgid "Mon 1"
+msgstr "Мон 1"
+
+msgctxt "editor.table.gWinSetup.92"
+msgid "Mon 2"
+msgstr "Мон 2"
+
+msgctxt "editor.table.gWinSetup.93"
+msgid "Mon 3"
+msgstr "Мон 3"
+
+msgctxt "editor.table.gWinSetup.94"
+msgid "Mon 4"
+msgstr "Мон 4"
+
+msgctxt "editor.table.gWinSetup.95"
+msgid "Mon 5"
+msgstr "Мон 5"
+
+msgctxt "editor.table.gWinSetup.96"
+msgid "Name"
+msgstr "Название"
+
+msgctxt "editor.table.gWinSetup.97"
+msgid "Standard"
+msgstr "Обычное"
+
+msgctxt "editor.table.gWinSetup.98"
+msgid "Custom"
+msgstr "Выбрать"
+
+msgctxt "editor.table.gWinSetup.99"
+msgid "Captain"
+msgstr "Капитан"
+
 msgctxt "event.inline.021d355fcf4f31af"
 msgid "{Flotsam}\n\nYou search through the flotsam, and find some wood."
 msgstr "{Обломки}\n\nВы исследовали плавающие обломки и добыли немного древесины."

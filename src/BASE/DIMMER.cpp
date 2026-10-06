@@ -28,5 +28,3 @@ MessageDispatchResult dimmerWidget::Main(struct tag_message& message) {
 void dimmerWidget::Draw(void) {
     Dim();
 }
-
-dimmerWidget::~dimmerWidget() {}

@@ -12,37 +12,6 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/KB_TYPES.h>
 
-
-static i32 s_currentHasRoad;
-static i32 s_candidateY;
-static i32 s_adjacentY;
-static i32 s_adjacentX;
-static mapCell* s_targetCell;
-static i32 s_targetStepCost;
-static H2EnumStorage<MapObjectType, i32> s_triggerType;
-static mapCell* s_neighborCell;
-static b32 s_hasAdjacentMonster;
-static H2EnumStorage<TerrainType, i32> s_terrain;
-static searchNode s_currentNode;
-static i32 s_neighborY;
-static i32 s_neighborX;
-static i32 s_targetHasRoad;
-static i32 s_adjacentMonsterX;
-static i32 s_remainingMobility;
-static b32 s_directionBlocked;
-static searchNode* s_neighborNode;
-static i32 s_adjacentCost;
-static i32 s_mapX;
-static i32 s_mapY;
-static i8 s_directionCosts[H2EnumIndex(MAP_DIRECTION_COUNT)];
-static i32 s_currentCost;
-static b32 s_hasTarget;
-static i32 s_processedPointCount;
-static hero* s_currentHero;
-static H2EnumStorage<TerrainType, i8> s_possibleDirections[H2EnumIndex(MAP_DIRECTION_COUNT)];
-static i32 s_bestTargetCost;
-static H2SteppedEnumStorage<MapDirection, i32> s_direction;
-
 i32 searchArray::BuildPath(
     i32 startX,
     i32 startY,
@@ -73,6 +42,7 @@ i32 searchArray::BuildPath(
     return m_pathLength;
 }
 
+
 void searchArray::SeedPosition(
     i32 seedX,
     i32 seedY,
@@ -87,6 +57,39 @@ void searchArray::SeedPosition(
     i32 continueSeed,
     i32 scanMap
 ) {
+    static b32 s_hasTarget;
+    static b32 s_hasAdjacentMonster;
+    static H2EnumStorage<TerrainType, i8> s_possibleDirections[H2EnumIndex(MAP_DIRECTION_COUNT)];
+    static i32 s_neighborX;
+    static i32 s_remainingMobility;
+
+
+    static i32 s_unusedInt [[maybe_unused]];
+    static i32 s_targetHasRoad;
+    static i32 s_adjacentCost;
+    static i32 s_currentHasRoad;
+    static i32 s_adjacentX;
+    static searchNode s_currentNode;
+    static i32 s_mapY;
+    static b32 s_directionBlocked;
+    static i32 s_neighborY;
+    static mapCell* s_targetCell;
+    static i8 s_directionCosts[H2EnumIndex(MAP_DIRECTION_COUNT)];
+    static i32 s_currentCost;
+    static mapCell* s_neighborCell;
+    static i32 s_candidateY;
+    static i32 s_mapX;
+    static H2EnumStorage<MapObjectType, i32> s_triggerType;
+    static i32 s_adjacentMonsterX;
+    static i32 s_targetStepCost;
+    static H2SteppedEnumStorage<MapDirection, i32> s_direction;
+    static i32 s_processedPointCount [[maybe_unused]];
+    static searchNode* s_neighborNode;
+    static i32 s_bestTargetCost;
+    static i32 s_adjacentY;
+    static H2EnumStorage<TerrainType, i32> s_terrain;
+    static hero* s_currentHero [[maybe_unused]];
+
     H2EnumStorage<TerrainType, i32> targetTerrain;
 
     if (!continueSeed) {
