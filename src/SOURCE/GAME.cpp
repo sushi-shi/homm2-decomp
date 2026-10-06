@@ -1508,8 +1508,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         ReadGameData(fileDescriptor, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    ReadGameData(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    ReadGameData(fd, workData, save_names::LegacyFilenameSize);
+    ReadGameData(fileDescriptor, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    ReadGameData(fileDescriptor, workData, save_names::LegacyFilenameSize);
     if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     ReadGameData(fileDescriptor, &m_playerCount, sizeof(m_playerCount));
