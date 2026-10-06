@@ -84,11 +84,6 @@ void WriteGameData(i32 file, const void* buffer, i32 count) {
         ShutDown(localization::Tr("system.file.write_error"));
 }
 
-void WriteEventHeader(i32 file, u16 count, u16 firstIndex) {
-    const auto record = EncodeSaveEventHeader(count, firstIndex);
-    WriteGameData(file, record.data(), record.size());
-}
-
 void ReadEventHeader(i32 file, u16& count, u16& firstIndex) {
     SaveEventHeader record{};
     ReadGameData(file, record.data(), record.size());
