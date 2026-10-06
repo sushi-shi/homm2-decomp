@@ -19,7 +19,8 @@
 #include <vector>
 
 namespace {
-int failures = 0, resourceDepth = 0, reads = 0, colorDraws = 0;
+int failures = 0, resourceDepth = 0, reads = 0, colorDraws = 0, warnings = 0;
+u32l cursorResourceSize = mouse_cursor::ResourceBytes;
 std::vector<std::string> names;
 std::string colorName;
 
@@ -63,7 +64,20 @@ public:
     void StopTextInput() override {}
 } input;
 
-platform::Backend backend{&video, &input};
+class Host final : public platform::IHost {
+public:
+    std::uint32_t Ticks() const override { return 0; }
+    void Sleep(std::uint32_t) override {}
+    void Yield() override {}
+    void RequestQuit() override {}
+    void Log(platform::LogLevel level, const char*) override {
+        if (level == platform::LogLevel::Warning)
+            ++warnings;
+    }
+    void ShowMessage(const char*, const char*) override {}
+} host;
+
+platform::Backend backend{&video, &input, nullptr, &host};
 }
 
 namespace platform {
@@ -94,7 +108,7 @@ u32l resourceManager::MakeId(const char* name, i32) {
     names.emplace_back(name);
     return 1;
 }
-u32l resourceManager::GetFileSize(u32l) { return mouse_cursor::ResourceBytes; }
+u32l resourceManager::GetFileSize(u32l) { return cursorResourceSize; }
 void resourceManager::PointToFile(u32l) {}
 void resourceManager::ReadBlock(void* output, u32l size) {
     Expect(size == mouse_cursor::ResourceBytes, "bounded bitmap read");
@@ -122,11 +136,11 @@ b32 gbColorMice = false;
 i32 gbPutzingWithMouseCtr = 0;
 ConfigExecutable giCurExe = CONFIG_EXECUTABLE_GAME;
 namespace {
-resourceManager resources;
+resourceManager resourceStore;
 heroWindowManager windows;
 bitmap screen;
 }
-resourceManager* gpResourceManager = &resources;
+resourceManager* gpResourceManager = &resourceStore;
 heroWindowManager* gpWindowManager = &windows;
 
 int main() {
@@ -173,8 +187,21 @@ int main() {
            "mode toggle retains current action");
     Expect(resourceDepth == 0 && gbPutzingWithMouseCtr == 0 && !gbInSetPointer,
            "selection preserves resource and reentrancy state");
+
+    // A malformed cursor resource falls back to the system cursor instead of
+    // ending the game, is reported once, and is not read again.
+    cursorResourceSize = mouse_cursor::ResourceBytes + 1;
+    const int readsBefore = reads, selectedBefore = video.selected, resetsBefore = video.resets;
+    mouse.SetPointer(2);
+    mouse.SetPointer(1);
+    mouse.SetPointer(2);
+    Expect(reads == readsBefore && warnings == 1 && video.resets == resetsBefore + 2
+               && video.selected == selectedBefore + 1,
+           "invalid cursor resource falls back to the system cursor");
+    cursorResourceSize = mouse_cursor::ResourceBytes;
+
     mouse.Close();
-    Expect(video.resets == 1 && video.visible, "close restores OS cursor");
+    Expect(video.resets == resetsBefore + 3 && video.visible, "close restores OS cursor");
     std::printf("mouse cursor selection: %d resource reads, %d shapes, %d failures\n",
                 reads, video.selected, failures);
     return failures != 0;

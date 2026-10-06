@@ -29,6 +29,9 @@ and changes the shape without changing visibility. Mouse-manager shutdown
 restores the desktop cursor; video shutdown deselects and destroys the cached
 handles before shutting down SDL video. Failed native creation/selection is
 reported, leaves the prior cursor in place, and does not cache a failed handle.
+A cursor bitmap with an unexpected size or an undecodable mask is logged once
+as a warning; that pointer then uses the system cursor instead of ending the
+game.
 
 ## Regression provenance
 
