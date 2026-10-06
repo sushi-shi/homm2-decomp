@@ -26,6 +26,8 @@ public:
     void Blit(const Rect& source, Point destination) override;
     void Present() override;
     void ShowCursor(bool visible) override;
+    bool SetMonochromeCursor(const MonochromeCursor& cursor) override;
+    void ResetCursor() override;
 
     DisplaySettings Settings() const override;
     bool SetFullscreen(bool fullscreen) override;
@@ -45,6 +47,11 @@ private:
     SDL_Window* m_window = nullptr;
     SDL_Renderer* m_renderer = nullptr;
     SDL_Texture* m_texture = nullptr;
+    struct CachedCursor {
+        MonochromeCursor image;
+        SDL_Cursor* handle;
+    };
+    std::vector<CachedCursor> m_cursors;
     Size m_size;
     std::string m_title;
     Scaling m_scaling = Scaling::Nearest;

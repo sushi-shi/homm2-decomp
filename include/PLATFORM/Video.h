@@ -2,6 +2,7 @@
 #define HOMM2_PLATFORM_VIDEO_H
 
 #include "Types.h"
+#include "MonochromeCursor.h"
 
 namespace platform {
 
@@ -54,6 +55,11 @@ public:
     virtual bool SetFullscreen(bool) { return false; }
     virtual bool SetScaling(Scaling) { return false; }
     virtual bool SetVSync(bool) { return false; }
+
+    // Selection does not change visibility. Cursor resources belong to the
+    // video backend and are released by Close(). Reset restores the OS default.
+    virtual bool SetMonochromeCursor(const MonochromeCursor& cursor) = 0;
+    virtual void ResetCursor() = 0;
 };
 
 }
