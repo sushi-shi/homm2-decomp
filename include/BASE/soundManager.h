@@ -40,7 +40,6 @@ using enum SoundDigitalReportQuery;
 class sample;
 struct tag_message;
 
-#pragma pack(push, 1)
 struct SampleChannelStruct {
     i32 startChannel;
     i32 endChannel;
@@ -84,7 +83,6 @@ public:
     void ServiceSound(void);
     i32 MusicPlaying(void);
 };
-#pragma pack(pop)
 
 
 extern bool gSoundDisabled;
@@ -122,6 +120,5 @@ inline void soundManager::RestoreBackend(void) {
 
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern i32 CurrentMidiFile;
-extern u8 bGotMidi[MIDI_TRACK_COUNT];
 
 #endif
