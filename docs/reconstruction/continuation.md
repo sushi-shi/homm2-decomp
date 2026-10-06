@@ -128,10 +128,10 @@ The post-merge compatibility commit `2037def88` was used to regenerate
 The portable first-parent source delta was then adapted and cherry-picked
 through the requested chain, preserving each branch's platform and mod changes:
 
-- `master`: `27153a20b`; native Debug build, 23/23 CTest checks.
-- `ironfist`: checkpoint `dbc8c451d`, Cyborg layout follow-up `72c5df764`;
+- `port`: `27153a20b`; native Debug build, 23/23 CTest checks.
+- `source-ironfist`: checkpoint `dbc8c451d`, Cyborg layout follow-up `72c5df764`;
   native Debug build, 24/24 CTest checks.
-- `ironfist-master`: checkpoint `52b89b154`, adapted follow-up `d323df793`;
+- `port-ironfist`: checkpoint `52b89b154`, adapted follow-up `d323df793`;
   strict native Debug build, 26/26 CTest checks.
 
 All three portable tips are published and pass English/Russian startup-and-exit

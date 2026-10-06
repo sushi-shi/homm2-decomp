@@ -142,7 +142,7 @@ compiler-generated data contract lives in `docs/candidate-data-topology.md`.
 
 `decomp-gold-2.1-buka` (this branch) generates `source-gold-2.1-buka` and
 `classic-gold-2.1-buka` with `homm2 clean`; never edit generated branches.
-`master` (the cross-platform port) builds on the generated source branch.
+`port` (the cross-platform port) builds on the generated source branch.
 
 ## Git
 

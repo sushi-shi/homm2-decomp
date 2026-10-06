@@ -1,11 +1,11 @@
 # Buka build-time localization
 
 Game source uses the same `localization::Tr("resource.gold.insufficient")`
-notation and semantic IDs as master. `locales/messages.def` is the authoritative
+notation and semantic IDs as the `port` branch. `locales/messages.def` is the authoritative
 English registry (`HOMM2_MESSAGE(id, text)`); `locales/ru.po` contains readable
 UTF-8 Russian translations and validated English snapshots.
 
-Unlike the portable master branch, this matching branch has **no runtime lookup**,
+Unlike the portable `port` branch, this matching branch has **no runtime lookup**,
 gettext dependency, UTF-8 runtime conversion, or added initialization. The build
 replaces each literal-ID expression with a generated literal macro before Clang
 and VC6 see it. The macro expands to the exact Windows-1251 bytes. Generated
@@ -39,9 +39,9 @@ Windows resources and the retail icon, and neither translates external assets.
 
 Existing table IDs remain `table.<symbol>.<index>`. Buka's original grammatical
 fragments, fixed save names, punctuation, spacing and even spelling mistakes are
-preserved. Where master's whole-message signature is different, an explicit
+preserved. Where the `port` branch's whole-message signature is different, an explicit
 fragment or `.buka` ID represents the original calling convention. Do not silently
-substitute a master translation: matching also covers string bytes and storage.
+substitute a `port` translation: matching also covers string bytes and storage.
 Packed text storage keeps its explicit `"\0"` separators outside the IDs.
 
 English should reuse the original 2.0 wording wherever the corresponding message
