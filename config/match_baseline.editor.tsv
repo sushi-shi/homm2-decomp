@@ -410,11 +410,11 @@ EDITOR/EDITOR	@PollSound@0	100.0000	b1800ae03e04
 EDITOR/EVENTMGR	??0eventsManager@@QAE@XZ	100.0000	6ff021ecc6c1
 EDITOR/EVENTMGR	?BalanceTerrainPercents@@YIXH@Z	100.0000	f69e10eef5d4
 EDITOR/EVENTMGR	?CellWindowHandler@@YIHAAUtag_message@@@Z	100.0000	e6a053213c00
-EDITOR/EVENTMGR	?Close@eventsManager@@UAEXXZ	99.3478	6f6a6a5cf8d4
+EDITOR/EVENTMGR	?Close@eventsManager@@UAEXXZ	100.0000	6f6a6a5cf8d4
 EDITOR/EVENTMGR	?DragNewMapSlider@@YIXHH@Z	100.0000	78a794c9a345
-EDITOR/EVENTMGR	?EditCell@eventsManager@@QAEXHH@Z	99.9677	3b7c971dd008
-EDITOR/EVENTMGR	?EditMonster@eventsManager@@QAEXHHH@Z	99.9231	cc88b7d000e6
-EDITOR/EVENTMGR	?Main@eventsManager@@UAEHAAUtag_message@@@Z	99.8837	b3baea1c4144
+EDITOR/EVENTMGR	?EditCell@eventsManager@@QAEXHH@Z	100.0000	3b7c971dd008
+EDITOR/EVENTMGR	?EditMonster@eventsManager@@QAEXHHH@Z	100.0000	cc88b7d000e6
+EDITOR/EVENTMGR	?Main@eventsManager@@UAEHAAUtag_message@@@Z	99.9419	b3baea1c4144
 EDITOR/EVENTMGR	?MonsterWindowHandler@@YIHAAUtag_message@@@Z	100.0000	3e6edd4d9319
 EDITOR/EVENTMGR	?NewMapDialog@@YIHXZ	100.0000	ebb3a8eaeeba
 EDITOR/EVENTMGR	?NewMapWindowHandler@@YIHAAUtag_message@@@Z	100.0000	490661c0782b
@@ -422,7 +422,7 @@ EDITOR/EVENTMGR	?Open@eventsManager@@UAEHH@Z	100.0000	0e9cec9a5625
 EDITOR/EVENTMGR	?UpdateNewMapWindow@@YIXXZ	100.0000	99f1fc41da9c
 EDITOR/RANDOM	?CanPlaceOverlayAt@@YIHPAUoverlayType@@HHH@Z	99.7059	cdbfb0245754
 EDITOR/RANDOM	?CountNearbyObstacles@editManager@@QAEHHH@Z	100.0000	6a2c89b25ae3
-EDITOR/RANDOM	?GenerateRandomMap@editManager@@QAEXXZ	99.7101	5e4329e72bf4
+EDITOR/RANDOM	?GenerateRandomMap@editManager@@QAEXXZ	99.7283	5e4329e72bf4
 EDITOR/RANDOM	?HasEnoughCastles@editManager@@QAEHXZ	100.0000	a00ea98417e8
 EDITOR/RANDOM	?PaintRandomTerrain@editManager@@QAEXHHH@Z	99.9803	ea125a9dc68f
 EDITOR/RANDOM	?PlaceChainLink@editManager@@QAEHPAH0HHD@Z	99.8837	b92af67414bf
@@ -435,10 +435,10 @@ EDITOR/RANDOM	?PlaceTreasures@editManager@@QAEXHH@Z	99.8906	c8b8c11592e6
 EDITOR/RANDOM	?RemoveSmallRegions@editManager@@QAEXXZ	99.9519	14e3aaddd124
 EDITOR/RANDOM	?ScaleByDensity@@YIXPAHH@Z	100.0000	fa43aa14c170
 EDITOR/RANDOM	?ScatterDecorations@editManager@@QAEXXZ	99.9669	0a394922ef42
-EDITOR/evntedit	?EditEvent@eventsManager@@QAEHH@Z	99.9573	0e6f439a3cbf
+EDITOR/evntedit	?EditEvent@eventsManager@@QAEHH@Z	99.9786	0e6f439a3cbf
 EDITOR/evntedit	?EventEditHandler@@YIHAAUtag_message@@@Z	100.0000	057d42204138
 EDITOR/evntedit	?FillInEventEdit@eventsManager@@QAEXPAUEventExtra@@@Z	99.9444	5fe75553d32c
-EDITOR/heroedit	?EditHero@eventsManager@@QAEXHHH@Z	99.9725	9b86cf165d0f
+EDITOR/heroedit	?EditHero@eventsManager@@QAEXHHH@Z	100.0000	9b86cf165d0f
 EDITOR/heroedit	?FillInHeroEdit@eventsManager@@QAEXPAUHeroExtra@@@Z	100.0000	b88c469fc9b9
 EDITOR/heroedit	?HeroEditHandler@@YIHAAUtag_message@@@Z	100.0000	df7fe486c40f
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	f24847db220b
@@ -469,7 +469,7 @@ EDITOR/terrain	?SelectBrush@terrainManager@@QAEXHHH@Z	100.0000	35265a053b49
 EDITOR/terrain	?SelectTerrain@terrainManager@@QAEXH@Z	100.0000	a63421b534d9
 EDITOR/terrain	?TrackCursor@terrainManager@@QAEXXZ	100.0000	a46f630b5668
 EDITOR/terrain	?UpdateButtons@terrainManager@@QAEXXZ	100.0000	9459d16a6d2c
-EDITOR/townedit	?EditTown@eventsManager@@QAEXHH@Z	99.9669	366031408339
+EDITOR/townedit	?EditTown@eventsManager@@QAEXHH@Z	100.0000	366031408339
 EDITOR/townedit	?FillInTownEdit@eventsManager@@QAEXPAUTownExtra@@@Z	100.0000	a59e070aa86d
 EDITOR/townedit	?TownEditHandler@@YIHAAUtag_message@@@Z	100.0000	fe5afe874a9c
 SOURCE/REQUEST	??0fileRequester@@QAE@HHHPAD00@Z	100.0000	b61318c8df6e
