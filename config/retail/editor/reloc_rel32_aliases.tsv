@@ -1,0 +1,4 @@
+# Reviewed public REL32 aliases which the stripped image cannot distinguish.
+# The canonical name and RVA must resolve uniquely in symbol_names.csv. The
+# alias is admitted only to disposable paired-target normalization.
+alias	canonical	rva	provenance

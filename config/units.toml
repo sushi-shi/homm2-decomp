@@ -27,23 +27,37 @@ base_gf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "
 # funclets come from them); /Gi- pins the incremental-compilation surface off.
 base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
 
+# The scenario editor EDT2PL.exe (config/retail/targets.json `editor`) links the
+# units marked `images = ["game", "editor"]`: each of their claimed bodies occurs
+# in the editor with its relocations masked (config/retail/editor/placements.tsv,
+# `homm2 --image editor audit placements`). Both programs were built from one
+# checkout (e:\Users\igorl\VSS\HMM\HMM2\Source), so the shared units' assertion
+# paths agree; a shared unit still compiles once per image, and its editor
+# variants select HOMM2_EDITOR.
+[images.editor]
+defines = ["HOMM2_EDITOR"]
+
 [[unit]]
 unit = "BASE/AudiereEffects"
 source = "src/BASE/AudiereEffects.cpp"
+images = ["game", "editor"]
 flags = "base_gx"
 
 [[unit]]
 unit = "BASE/AudiereMusic"
 source = "src/BASE/AudiereMusic.cpp"
+images = ["game", "editor"]
 flags = "base_gx"
 
 [[unit]]
 unit = "BASE/MilesSound"
 source = "src/BASE/MilesSound.cpp"
+images = ["game", "editor"]
 
 [[unit]]
 unit = "BASE/BITMAP"
 source = "src/BASE/BITMAP.cpp"
+images = ["game", "editor"]
 flags = "base_gx"
 
 [[unit]]
@@ -54,11 +68,13 @@ flags = "o1_frame"
 [[unit]]
 unit = "BASE/BORDER"
 source = "src/BASE/BORDER.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/BUTTON"
 source = "src/BASE/BUTTON.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
@@ -74,96 +90,115 @@ flags = "base_nogf"
 [[unit]]
 unit = "BASE/DIMMER"
 source = "src/BASE/DIMMER.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/EXEC"
 source = "src/BASE/EXEC.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/FONT"
 source = "src/BASE/FONT.cpp"
+images = ["game", "editor"]
 flags = "base_gf"
 
 [[unit]]
 unit = "BASE/ICON"
 source = "src/BASE/ICON.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/ICONWDGT"
 source = "src/BASE/ICONWDGT.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/INPUTMGR"
 source = "src/BASE/INPUTMGR.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/Icon2b"
 source = "src/BASE/Icon2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Icond2b"
 source = "src/BASE/Icond2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Icondf2b"
 source = "src/BASE/Icondf2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Iconf2b"
 source = "src/BASE/Iconf2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Iconm2b"
 source = "src/BASE/Iconm2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Iconmf2b"
 source = "src/BASE/Iconmf2b.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/MOUSEMGR"
 source = "src/BASE/MOUSEMGR.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/MiscRuntime"
 source = "src/BASE/MiscRuntime.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/PALETTE"
 source = "src/BASE/PALETTE.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/RESMGR"
 source = "src/BASE/RESMGR.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/RESOURCE"
 source = "src/BASE/RESOURCE.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
@@ -174,96 +209,115 @@ flags = "base"
 [[unit]]
 unit = "BASE/SAMPLE"
 source = "src/BASE/SAMPLE.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/TEXTWDGT"
 source = "src/BASE/TEXTWDGT.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/TILE"
 source = "src/BASE/TILE.asm"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/TILESET"
 source = "src/BASE/TILESET.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/Textntry"
 source = "src/BASE/Textntry.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/WIDGET"
 source = "src/BASE/WIDGET.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/WINDOW"
 source = "src/BASE/WINDOW.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/WINMGR"
 source = "src/BASE/WINMGR.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/bmap2"
 source = "src/BASE/bmap2.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/droplist"
 source = "src/BASE/droplist.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/icon2bc"
 source = "src/BASE/icon2bc.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/icon2bs"
 source = "src/BASE/icon2bs.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/icon2by"
 source = "src/BASE/icon2by.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/iconf2bc"
 source = "src/BASE/iconf2bc.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/iconf2by"
 source = "src/BASE/iconf2by.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/listbox"
 source = "src/BASE/listbox.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/miscwin"
 source = "src/BASE/miscwin.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/BASEMGR"
 source = "src/BASE/BASEMGR.cpp"
+images = ["game", "editor"]
 flags = "base"
 
 [[unit]]
 unit = "BASE/soundmgr"
 source = "src/BASE/soundmgr.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
@@ -409,6 +463,7 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/REQUEST"
 source = "src/SOURCE/REQUEST.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
@@ -494,6 +549,7 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/kbwin"
 source = "src/SOURCE/kbwin.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
@@ -509,6 +565,7 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/wingraph"
 source = "src/SOURCE/wingraph.cpp"
+images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
