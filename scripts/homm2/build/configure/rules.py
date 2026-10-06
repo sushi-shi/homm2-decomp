@@ -73,6 +73,10 @@ def emit_rules(w, *, locale='ru', builddir='build') -> None:
            command=(f"{PY} -m homm2.build.link_exe --audit-existing "
                     "--strict --out build/link/historical/HMM2PL.exe"),
            description="link-audit HMM2PL.exe")
+    w.rule("link_diff",
+           command=(f"{PY} -m homm2.build.link_diff --candidate $in "
+                    "--stamp $out"),
+           description="link-diff ceiling $in")
     w.rule("link_resources",
            command=(f"{PY} -m homm2.build.rc_res "
                     "--rc res/HMM2PL.rc --out build/link/HMM2PL.res "

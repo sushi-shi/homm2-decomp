@@ -95,6 +95,13 @@ class ConfigureLinkGraphTests(unittest.TestCase):
                                     "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib",
                                     "build/link/Midi.lib", "build/link/BASE-suffix.lib"])
 
+    def test_historical_image_has_a_ceiling_gate(self):
+        edges = self.edges(["BASE/Before", "BASE/Midi", "SOURCE/GAME"])
+        gate = edges["build/link/historical/HMM2PL.link-diff.tsv"]
+        self.assertEqual(gate["inputs"], "build/link/historical/HMM2PL.exe")
+        self.assertIn("config/link_diff_ceiling.tsv", gate["implicit"])
+        self.assertIn("build/orig/HMM2PL.exe", gate["implicit"])
+
     def test_misc_owner_interleaving_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "must be adjacent"):
             self.edges(["BASE/Misc", "BASE/Between", "BASE/MiscRuntime", "BASE/Midi"])

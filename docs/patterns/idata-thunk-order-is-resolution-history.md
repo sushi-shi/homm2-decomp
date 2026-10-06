@@ -1,5 +1,12 @@
 # Intra-DLL import order is resolution-history evidence
 
+> Status, 2026-10-06: historical. With the reconstructed archive order the
+> historical native link reproduces retail import thunks, hint/name strings and
+> every DLL's ILT/IAT order. The remaining slot-order lever is the linker's C
+> runtime, measured in
+> [import-slot-order-follows-linker-runtime](import-slot-order-follows-linker-runtime.md).
+> The counts below describe the earlier link state.
+
 When the DLL descriptor order and each DLL's complete import ABI agree, a different
 order inside the ILT/IAT is not by itself a missing import or a source defect. Microsoft
 LINK assigns those slots while resolving the global undefined-symbol worklist. The order

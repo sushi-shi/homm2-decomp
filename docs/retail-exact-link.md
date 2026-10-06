@@ -28,6 +28,12 @@ ninja link-audit
 - `homm2 link --historical` / `ninja link-historical`: resource-bearing native
   link with the observed PDB path, creation time, and four-link age history.
   Output: `build/link/historical/HMM2PL.exe`.
+- `ninja link-diff` (part of the default graph, so `homm2 build` runs it):
+  links the historical image and fails if any region (headers, a section, the
+  overlay, the file size) differs from retail in more bytes than
+  `config/link_diff_ceiling.tsv` allows. Bank a lower count with
+  `python3 -m homm2.build.link_diff --update`; never raise it to admit a
+  regression.
 - `ninja link-audit`: read-only comparison of the historical native image
   against retail. It writes `build/link/historical/HMM2PL.link.json` and reports
   unresolved differences. It fails while the executable differs from retail;
@@ -37,6 +43,22 @@ Each output directory also retains the exact response file, unchanged native
 MAP, PDB, and linker log. `--transform` is rejected before building anything.
 Historical `build/link/HMM2PL.exe` artifacts are no longer supported outputs;
 rebuild a supported mode before interpreting a local executable.
+
+## Current residual
+
+The historical image differs from retail in 500 bytes: 496 in `.text`, 3 in
+`.rdata` and 1 in `.data`; headers, section geometry, imports and resources
+are exact. All of it is two placement walls, attributed in
+`docs/linked-function-placement-walls.md` and
+`docs/linked-data-section-walls.md`: DIMMER's scalar deleting destructor is
+emitted after its first constructor instead of after `Draw`, and the
+AudiereEffects node destructor precedes its ctype initializer pair instead of
+following it. The ceiling file records the per-region counts.
+
+LINK's import slot order depends on the C runtime that Wine loads for it
+(`docs/patterns/import-slot-order-follows-linker-runtime.md`). The ordinary
+build keeps Wine's builtin `msvcrt`, which reproduces retail; every Wine child
+runs with `TZ=UTC0` (`homm2.core.wine`).
 
 ## Source and build evidence
 

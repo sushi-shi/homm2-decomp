@@ -20,7 +20,7 @@ from homm2.core.manifest import load as load_manifest
 from homm2.core.paths import REPO
 
 from .compile_graph import emit_compile_graph
-from .link_graph import emit_link_graph
+from .link_graph import LINK_DIFF_STAMP, emit_link_graph
 from .rules import emit_rules
 
 
@@ -75,7 +75,7 @@ def main() -> None:
             w, manifest, units, delink, reviewed_units)
         emit_link_graph(w, units, objs, base_symbol_sidecars,
                         first_function_rva, first_compgen_rva)
-        w.default("all")
+        w.default(["all", LINK_DIFF_STAMP])
 
     units_j = []
     for u in units:

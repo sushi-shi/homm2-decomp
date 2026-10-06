@@ -6,6 +6,15 @@ Microsoft LINK selects an identical COMDAT from another owner or places an exact
 contribution at a different address. The final-link report therefore joins
 functions semantically first and records address placement as a separate result.
 
+Current state (historical native link, 2026-10-06): 1,717 of 1,727 project
+functions land at their retail RVA; the ten displaced ones are the AudiereEffects
+tail (OutputStream `RefPtr` destructor and assignment, the ctype guarded
+initializer and registration, and the node destructor) and the five DIMMER
+contributions around the early scalar deleting destructor. They account for all
+496 differing `.text` bytes, including the REL32 operands of calls to them
+from Purge, Play, WINDOW, AudiereMusic and two EH funclets.
+The rest of this document records how those walls were bounded.
+
 At the natural-link checkpoint, all 1,727 project functions have a unique
 semantic candidate identity. Of those, 1,715 land at the retail RVA and 12 are
 displaced. None are missing or ambiguous. The 12 are confined to three units:

@@ -19,6 +19,9 @@ LINK_LIBRARIES = [
 ]
 
 
+LINK_DIFF_STAMP = "build/link/historical/HMM2PL.link-diff.tsv"
+
+
 def emit_link_graph(w, units: list[dict], objs: list[str],
                     base_symbol_sidecars: list[str],
                     first_function_rva: dict[str, int],
@@ -136,6 +139,13 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
                 "config/delink_relocs.tsv",
                 "build/orig/HMM2PL.exe",
             ] + base_symbol_sidecars)
+    # The regression ceiling runs in the default graph so an ordinary build
+    # cannot move the historical image further from retail unnoticed.
+    w.build(LINK_DIFF_STAMP, "link_diff",
+            inputs="build/link/historical/HMM2PL.exe",
+            implicit=["scripts/homm2/build/link_diff.py",
+                      "config/link_diff_ceiling.tsv", "build/orig/HMM2PL.exe"])
+    w.build("link-diff", "phony", inputs=LINK_DIFF_STAMP)
     w.build("link", "phony", inputs="build/link/generic/HMM2PL.exe")
     w.build("link-rsrc", "phony", inputs="build/link/rsrc/HMM2PL.exe")
     w.build("link-historical", "phony", inputs="build/link/historical/HMM2PL.exe")

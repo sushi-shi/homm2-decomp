@@ -7,7 +7,28 @@ The raw linked sections are not exact because absolute addresses and contributio
 order encode the unresolved final-link history. This ledger partitions every raw
 data-section residual without treating address equality as semantic identity.
 
-## Current raw partition
+## Current residual
+
+Measured on the historical native link at the link-diff ceiling
+(`config/link_diff_ceiling.tsv`): headers, section geometry, resources and the
+overlay are exact; `.rdata` differs in 3 bytes and `.data` in 1.
+
+| Location | Bytes | Cause |
+| --- | ---: | --- |
+| `??_7dimmerWidget@@6B@` slot 0 | 3 | holds the scalar deleting destructor, which DIMMER emits early (see `docs/linked-function-placement-walls.md`) |
+| `.CRT$XCU` cell for AudiereEffects | 1 | points at the ctype guarded initializer, which follows the misplaced node destructor |
+
+Both are address consequences of the two `.text` placement walls. Imports,
+including every DLL's ILT/IAT order, ordinary `.rdata`, `.xdata$x`, project
+`.data`, LIBCMT `.data` and the raw-backed `.bss` prefix are byte-exact. The
+SEARCH `.bss` order that shifted every later `.bss` address by 8 bytes is
+recovered (`docs/patterns/bss-hash-order-names-storage-spelling.md`), and the
+import slot order is explained in
+`docs/patterns/import-slot-order-follows-linker-runtime.md`.
+
+The sections below describe an earlier link state and are kept as history.
+
+## Earlier raw partition
 
 The section geometry and raw sizes agree. `.rdata` has 3,489 differing bytes and
 `.data` has 3,753. The raw-backed BSS prefix, virtual-only BSS extent, alignment
