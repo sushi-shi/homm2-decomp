@@ -137,8 +137,12 @@ def main():
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     cpp_units = [unit for unit in units if unit["unit"] not in FIXED_ASM_UNITS]
+    # An editor-only unit compiles with its image's defines (HOMM2_EDITOR);
+    # a shared unit keeps the game's view here (homm2.manifest.clang_image_defines).
+    from homm2.manifest import clang_image_defines
     entries = [{"directory": str(REPO), "file": u["source"],
-                "arguments": ["clang-cl", "/c", u["source"], *shared]}
+                "arguments": ["clang-cl", "/c", u["source"], *shared,
+                              *clang_image_defines(REPO / u["source"], "game")]}
                for u in cpp_units]
     OUT_FILE.write_text(json.dumps(entries, indent=2) + "\n")
     print(f"[clangd] wrote {OUT_FILE.relative_to(REPO)} ({len(entries)} units)")

@@ -100,6 +100,12 @@ def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> li
         elif value.startswith(("--target=", "-fms", "-fdelayed")):
             args.append(value)
         index += 1
+    # The selected image's view of a shared unit (HOMM2_EDITOR); compdb
+    # entries already carry an editor-only unit's defines.
+    from homm2.manifest import clang_image_defines
+    for define in clang_image_defines(source):
+        if "-D" + define[2:] not in args:
+            args.append("-D" + define[2:])
     return args + localization_args(repo, source, locale=locale)
 
 
