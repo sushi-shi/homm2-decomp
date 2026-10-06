@@ -24,6 +24,10 @@ def run(*command):
     return subprocess.run([str(item) for item in command], cwd=REPO).returncode
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     argv = list(argv or ())
     force = "--force" in argv

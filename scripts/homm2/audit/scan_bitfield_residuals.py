@@ -822,6 +822,10 @@ def parse_args(argv: Sequence[str] | None = None):
     return parser.parse_args(argv)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     if shutil.which(args.objdiff_cli) is None:

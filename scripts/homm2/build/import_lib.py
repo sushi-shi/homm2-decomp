@@ -360,6 +360,10 @@ def synthesize_from_definition(
     return _synthesize_exports(declared_dll, names, output, toolchain_path)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group()

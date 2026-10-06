@@ -99,6 +99,10 @@ def apply_reviewed_site_overrides(
     return (swept - exclusions) | inclusions
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--write", action="store_true",

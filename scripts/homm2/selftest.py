@@ -58,6 +58,10 @@ def _discover(package=None):
         start_dir=start, top_level_dir=str(SCRIPTS), pattern="test_*.py")
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     verbose = "-v" in argv or "--verbose" in argv

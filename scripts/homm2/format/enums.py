@@ -48,6 +48,10 @@ def format_text(text: str) -> str:
     return "".join(lines)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")

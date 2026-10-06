@@ -126,6 +126,10 @@ def mangled_to_qual(m):
     return x.group(1) if x else None
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv):
     unit = argv[0]
     man = tomllib.loads((REPO / "config/units.toml").read_text())

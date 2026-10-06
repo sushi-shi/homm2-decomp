@@ -99,6 +99,10 @@ def compare(counts: dict[str, int], ceiling: dict[str, int]) -> tuple[list[str],
     return regressions, bankable
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--retail", type=Path, default=RETAIL)

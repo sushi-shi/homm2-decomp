@@ -32,6 +32,10 @@ FLAGS = [
 ]
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     only = argv[argv.index("--tu") + 1] if "--tu" in argv else None

@@ -393,6 +393,10 @@ def audit_units(units=None, output=OUTPUT, runner=_run, keep_diffs=False):
     return report
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--unit", action="append", help="audit one ledger unit (repeatable)")

@@ -104,6 +104,10 @@ def extract_heroes_ico(retail: list[dict], destination: Path) -> None:
         destination.write_bytes(container)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rc", type=Path, default=ROOT / "res/HMM2PL.rc")

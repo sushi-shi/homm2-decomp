@@ -125,6 +125,10 @@ def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeou
         Path(str(out) + ".d").write_text(f"{depfile_target or out}: {dep_list}\n")
     return 0, output, timed_out
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     # INCLUDE = MSVC headers + repo include/ + vendored middleware SDK headers (cl reads
     # INCLUDE for <...> system headers). Each vendor/<sdk>/ dir (e.g. vendor/miles-3.6,

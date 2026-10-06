@@ -522,6 +522,10 @@ def readme_block(data, maxima):
     return "\n".join(out)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None, data=None):
     argv = list(argv or [])
     force_refresh = "--force-refresh" in argv

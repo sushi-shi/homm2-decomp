@@ -86,6 +86,10 @@ def looks_like_pointer(d, secs, rva, end):
     return IMAGE_BASE <= value < IMAGE_BASE + end
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     d = EXE.read_bytes()
     secs = sections(d)

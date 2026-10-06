@@ -97,6 +97,10 @@ def run_scripts(scripts, analyze: bool) -> int:
     return 0
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def cli_main(argv) -> int:
     """`homm2 ghidra [--analyze|--no-analyze]` - build/refresh the cached project + export
     functions.csv. First run imports + auto-analyzes (minutes); afterwards it reuses the DB."""

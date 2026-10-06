@@ -127,6 +127,10 @@ def generate_named_alias(
     return output
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group()

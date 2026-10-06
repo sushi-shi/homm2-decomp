@@ -43,8 +43,13 @@ def _kind_map():
                 k.setdefault(m.group(2), m.group(1))
     return k
 
-if __name__ == "__main__":
-    cpp = sys.argv[1]
+from homm2.core.usage import logged
+
+
+@logged
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    cpp = argv[0]
     decls = free_decls(cpp)
     guard = "HOMM2_" + re.sub(r'\W', '_', os.path.basename(cpp)[:-4]).upper() + "_H"
     kind = _kind_map()
@@ -63,3 +68,8 @@ if __name__ == "__main__":
         print(d)
     print()
     print("#endif // %s" % guard)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

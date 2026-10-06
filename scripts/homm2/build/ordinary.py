@@ -82,6 +82,10 @@ def graph(manifest, locale):
     return stream.getvalue()
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     locales = parser.add_mutually_exclusive_group()

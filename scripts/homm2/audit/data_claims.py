@@ -804,6 +804,10 @@ def run_extents(args) -> int:
     return 0
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         prog="homm2 audit data-claims", description=__doc__.splitlines()[0])

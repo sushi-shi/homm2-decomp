@@ -251,6 +251,10 @@ def _render(finding: Finding) -> str:
     ])
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Audit stack-frame evidence in all paired /Od functions.")

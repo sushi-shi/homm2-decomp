@@ -74,6 +74,10 @@ def write_queue(path, rows):
             writer.writerow({field: output.get(field, "") for field in fields})
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     report = json.loads(REPORT.read_text(encoding="utf-8"))
     rows = residual_rows(report, symbol_inventory(SYMBOLS))

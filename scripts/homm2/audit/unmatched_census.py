@@ -818,6 +818,10 @@ def write_config_rows(rows):
     return len(crt_rows), len(thunk_rows)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)

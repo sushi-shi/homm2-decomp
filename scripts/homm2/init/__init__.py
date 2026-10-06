@@ -11,6 +11,10 @@ def run(*cmd):
     print("[init]", " ".join(str(c) for c in cmd), flush=True)
     return subprocess.run([str(c) for c in cmd], cwd=REPO).returncode
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     if argv:
         print("usage: homm2 init")

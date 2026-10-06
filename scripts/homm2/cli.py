@@ -16,8 +16,14 @@ REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
 AUDITS = False
 
 def sh(*cmd):
-    return subprocess.run([str(c) for c in cmd], cwd=REPO).returncode
+    """Run a child with its output streamed through the usage log."""
+    from homm2.core.usage import run_process
+    return run_process([str(c) for c in cmd], cwd=REPO)
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     cmd = argv[0] if argv else "help"; rest = argv[1:]

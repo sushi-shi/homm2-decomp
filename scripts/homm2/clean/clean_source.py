@@ -2060,6 +2060,10 @@ def verify(out_root: Path) -> int:
     return 0
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", default="build/clean", help="output tree root")

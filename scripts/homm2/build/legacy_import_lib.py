@@ -373,6 +373,10 @@ def generate(definition: Path, output: Path) -> Path:
     return output
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--definition", required=True, type=Path)

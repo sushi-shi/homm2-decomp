@@ -315,6 +315,10 @@ def ensure_reviewed_targets(delinker=None):
     return False
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group(required=True)

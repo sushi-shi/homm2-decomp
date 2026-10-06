@@ -142,6 +142,10 @@ def resource_summary(resources):
     }
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--exe", required=True)

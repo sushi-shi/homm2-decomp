@@ -871,6 +871,10 @@ def run(args) -> tuple[dict, int]:
     return report, int(failed)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("base", nargs="?", type=Path, help="candidate base COFF object")

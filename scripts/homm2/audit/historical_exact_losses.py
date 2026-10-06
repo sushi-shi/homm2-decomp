@@ -354,6 +354,10 @@ def write_tsv(path: Path | None, rows: list[dict]) -> None:
             stream.close()
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", default="HEAD", help="Git history tip (default: HEAD)")

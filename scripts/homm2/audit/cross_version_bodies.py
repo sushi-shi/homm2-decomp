@@ -214,6 +214,10 @@ def format_row(row):
     return out
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--reference", help="path to the 2.0 checkout")

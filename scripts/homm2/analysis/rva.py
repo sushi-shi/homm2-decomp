@@ -70,6 +70,10 @@ def _fuzzy(name: str, unit: str):
     return None
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     args = sys.argv[1:]
     if not args:

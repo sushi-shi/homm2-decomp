@@ -312,6 +312,10 @@ def do_rename(lsp: Clangd, path: Path, line: int, col, new_name: str, dry_run: b
     return 0
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)

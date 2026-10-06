@@ -2966,6 +2966,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             (run.returncode or 1))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=str(REPO / "build/link/HMM2PL.exe"))

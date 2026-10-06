@@ -9,8 +9,7 @@ THIN delegation to a homm2.analysis / homm2.match module (all still runnable as
 
 SEMANTIC questions go here; grep is lexical-only.
 
-Every invocation is logged (all subcommands) to build/homm2_sema.log - a usage feed for
-tool improvement.
+Every invocation is recorded by the shared usage log (homm2.core.usage).
 """
 import argparse, json, os, subprocess, sys
 from pathlib import Path
@@ -38,28 +37,6 @@ def _sema_tool(module: str, argv: list) -> int:
     """Stream a read-only navigation tool's output (package on PYTHONPATH)."""
     return subprocess.run([sys.executable, "-m", module, *map(str, argv)],
                           cwd=str(REPO), env=_pkg_env()).returncode
-
-
-# --- usage logging ----------------------------------------------------------------
-def _sema_log(rc: int) -> None:
-    """One line per `homm2 sema` invocation (ALL subcommands); must NEVER break the
-    tool. Metadata first, command after the `: ` (shell-quoted) so it copies straight out:
-        [2026-07-07][19:55:01][0]: homm2 sema xref 0x00069120 --raw
-    """
-    try:
-        import datetime, shlex
-        now = datetime.datetime.now()
-        cmd = shlex.join(["homm2", "sema", *_ARGV])
-        path = REPO / "build" / "homm2_sema.log"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "a") as f:
-            f.write("[{}][{}][{}]: {}\n".format(
-                now.date(), now.strftime("%H:%M:%S"), rc, cmd))
-    except Exception:
-        pass  # logging is best-effort by design
-
-
-_ARGV: list = []  # the raw `sema` argv (set in main), for the log line
 
 
 # --- helpers ----------------------------------------------------------------------
@@ -326,21 +303,15 @@ def cmd_frames(args) -> None:
     print(out)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
-    global _ARGV
     argv = list(sys.argv[1:] if argv is None else argv)
-    _ARGV = argv
-    ap = _build_parser()
-    args = ap.parse_args(argv)
-    rc = 0
-    try:
-        args.func(args)
-    except SystemExit as e:
-        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
-        _sema_log(rc)
-        raise
-    _sema_log(rc)
-    return rc
+    args = _build_parser().parse_args(argv)
+    args.func(args)
+    return 0
 
 
 if __name__ == "__main__":

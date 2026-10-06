@@ -131,6 +131,10 @@ def masked_equal(ours: bytes, retail: bytes, sites) -> bool:
     return bytes(ours) == bytes(retail)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write", action="store_true",

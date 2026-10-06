@@ -150,6 +150,10 @@ def install(archive: Path, root: Path) -> None:
     log(f"installed {'/'.join(COMPONENTS)} into {root}")
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--force", action="store_true",

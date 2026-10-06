@@ -24,6 +24,10 @@ from .link_graph import LINK_DIFF_STAMP, emit_link_graph
 from .rules import emit_rules
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> None:
     manifest = load_manifest()
     build = manifest.get("build", {})

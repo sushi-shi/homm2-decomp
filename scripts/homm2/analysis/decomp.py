@@ -21,6 +21,10 @@ REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
 IMAGEBASE = 0x400000
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     args = sys.argv[1:]
     force = "--force" in args

@@ -230,6 +230,10 @@ def validate_symbol_manifest(spans: list[AnnotatedFunctionSpan], path: Path) -> 
         raise ValueError("source function span validation failed:\n" + "\n".join(failures))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=REPO / "src")

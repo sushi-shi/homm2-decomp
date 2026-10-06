@@ -184,6 +184,10 @@ def collect(repo: Path = REPO, *, filters: tuple[str, ...] = (), strict: bool = 
             "by_value": {str(value): members for value, members in group_values(constants).items()}}
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tu", action="append", default=[], help="TU substring (repeatable)")

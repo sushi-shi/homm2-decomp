@@ -37,8 +37,13 @@ def violations(path):
             out.append((i, s.strip()))                 # local function forward-declaration
     return out
 
-if __name__ == "__main__":
-    files = sys.argv[1:] or sorted(glob.glob("src/**/*.cpp", recursive=True))
+from homm2.core.usage import logged
+
+
+@logged
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    files = argv or sorted(glob.glob("src/**/*.cpp", recursive=True))
     total = 0; bad_files = 0
     for f in files:
         v = violations(f)
@@ -50,5 +55,10 @@ if __name__ == "__main__":
     if total:
         print("\nHEADER-DISCIPLINE FAIL: %d local declarations in %d file(s) — move them to headers."
               % (total, bad_files))
-        sys.exit(1)
+        return 1
     print("header-discipline OK: no local type/extern declarations in any TU.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

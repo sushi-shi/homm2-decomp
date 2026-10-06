@@ -52,6 +52,10 @@ def disassemble(text_hex: str) -> str:
         tmp.unlink(missing_ok=True)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> int:
     OUT_ASM.mkdir(parents=True, exist_ok=True)
     seen = set()

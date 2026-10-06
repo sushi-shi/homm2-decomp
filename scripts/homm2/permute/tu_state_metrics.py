@@ -134,6 +134,10 @@ def source_hashes():
     return project_source_hashes()
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("object", type=Path)

@@ -925,6 +925,10 @@ def _print_summary(payload, output):
                 provenance["candidate_private"]))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="compare candidate and delinked-target COFF data topology")

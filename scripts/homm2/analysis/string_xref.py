@@ -110,6 +110,10 @@ def load():
     return func_strs, fname, fsize
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     args = sys.argv[1:]
     if not EXE.is_file():

@@ -1571,6 +1571,10 @@ def crossed_candidate_payloads(
     return candidates, truncated, len(source_options), state_width
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None, *, prog=None, description=None) -> int:
     parser = argparse.ArgumentParser(prog=prog, description=description or __doc__)
     parser.add_argument("source", type=Path)

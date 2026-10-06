@@ -1058,6 +1058,10 @@ def diagnostics_bytes(stats, diagnostics):
     return (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode()
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-dir", type=Path, default=REPO / "build/objdiff/base")

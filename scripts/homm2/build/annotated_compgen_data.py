@@ -585,6 +585,10 @@ def source_compgen_data(source_root: Path,
     return sorted(rows, key=lambda row: (row.unit, row.rva, row.semantic_name))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--file", type=Path, required=True)

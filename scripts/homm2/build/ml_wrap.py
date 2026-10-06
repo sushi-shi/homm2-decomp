@@ -35,6 +35,10 @@ def assemble(src: Path, out: Path, *, coff: bool = False) -> None:
         raise RuntimeError(f"MASM 6.11 produced no object for {src.name}")
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--src", required=True, type=Path)

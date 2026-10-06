@@ -337,6 +337,10 @@ def callees_of(targets, d, secs, names, fstarts, fsize):
                   "invisible to rel32 xref)")
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     args = sys.argv[1:]
     mode = "callers"

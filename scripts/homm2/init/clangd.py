@@ -123,6 +123,10 @@ def base_flags(msvc_inc: Path, msvc_low: Path):
     ]
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     msvc_inc = resolve_msvc_include()
     msvc_low = build_lowercase_mirror(msvc_inc, MIRROR_DIR / "msvc")

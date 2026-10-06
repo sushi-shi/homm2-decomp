@@ -40,6 +40,10 @@ def emitted_vtables():
     return rows
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> int:
     claims = source_vtables(REPO / "src", REPO)
     source = {claim.mangled_name: claim for claim in claims}

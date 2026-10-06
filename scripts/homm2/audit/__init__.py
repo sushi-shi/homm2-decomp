@@ -34,6 +34,7 @@ when a residual will not explain itself, grouped by the question they answer:
               its evidence and not just its score.
   oracle      od_oracle - ground truth for homm2.core.od_slots, read straight from the
               S_BPREL32 debug records our compiler emits under /Z7. Needs wine.
+  tooling     usage - every entry point keeps homm2.core.usage.logged.
   relocs      reloc_sweep - regenerate config/delink_relocs.tsv from the image with
               the delinker's find_relocs.py. The primary DIR32 channel.
               reloc_donation - SUPERSEDED by the sweep; kept as a cross-check and
@@ -48,6 +49,7 @@ import runpy
 import sys
 
 TOOLS = {
+    "usage": ("usage", "check that every tooling entry point keeps usage logging"),
     "enums": ("enums", "group evaluated enum members by value for semantic reuse review"),
     "ledger": ("ledger",
                "match_baseline rows banked against source that changed"),
@@ -85,6 +87,10 @@ def usage(stream=sys.stderr) -> None:
         print(f"  {name:<{width}}  {blurb}", file=stream)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0] in ("-h", "--help", "help"):

@@ -115,6 +115,10 @@ def default_files():
     return sorted(set(files))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     paths = [Path(value) for value in (sys.argv[1:] if argv is None else argv)]
     files = paths or default_files()

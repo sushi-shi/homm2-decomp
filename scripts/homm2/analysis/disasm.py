@@ -887,6 +887,10 @@ def _rich(name: str, unit: str, size: int, ordinal: int) -> str:
     return "\n".join(out) + "\n"
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     args = sys.argv[1:]
     flags = {a for a in args if a.startswith("--")}

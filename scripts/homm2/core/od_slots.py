@@ -197,7 +197,11 @@ def solve(n_slots):
 
 
 # -------------------------------------------------------------------- CLI ------
-def _main(argv):
+from homm2.core.usage import logged
+
+
+@logged
+def main(argv):
     if not argv:
         print(__doc__); return 0
     cmd, rest = argv[0], argv[1:]
@@ -226,4 +230,4 @@ def _main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(_main(sys.argv[1:]))
+    sys.exit(main())

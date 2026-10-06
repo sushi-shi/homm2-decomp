@@ -146,6 +146,10 @@ def audit_symbol_model(repo=REPO):
     return diagnostics
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args(argv)

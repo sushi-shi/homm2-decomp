@@ -300,6 +300,10 @@ def write_tsv(path: Path, manifest: dict, results: list[dict]) -> None:
     path.write_text("\n".join(lines) + "\n")
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("manifest", type=Path)

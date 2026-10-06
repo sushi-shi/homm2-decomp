@@ -657,6 +657,10 @@ def refresh_status(root: Path) -> None:
     )
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trials", type=positive_int, default=128)

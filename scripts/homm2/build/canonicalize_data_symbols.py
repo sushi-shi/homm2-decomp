@@ -1357,6 +1357,10 @@ def load_real_literal_reference_renames(
     return aliases
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path)

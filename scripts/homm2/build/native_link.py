@@ -110,6 +110,10 @@ def prepare_historical_pdb() -> Path:
     return pdb
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rsrc", action="store_true",

@@ -620,6 +620,10 @@ def _text(report: dict, *, include_all: bool,
     return "\n".join(lines) + "\n"
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--format", choices=("text", "json"), default="text")

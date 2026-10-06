@@ -451,6 +451,10 @@ def render_compgen(rows: list[SourceCompgenFunction]) -> str:
     return "".join(lines)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--source", type=Path, default=REPO / "src")

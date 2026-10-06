@@ -21,6 +21,10 @@ reproduce old audit-ledger commands. New searches should use this frontend.
 from homm2.permute.generate_ast_variants import main as generate_main
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None) -> int:
     return generate_main(argv, prog="homm2 permute", description=__doc__)
 

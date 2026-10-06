@@ -297,6 +297,10 @@ def audit(diff: dict, manifest: dict) -> list[str]:
     return errors
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("diff", type=Path, help="objdiff-cli diff JSON")

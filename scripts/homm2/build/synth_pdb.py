@@ -79,6 +79,10 @@ def merge_unmatched(funcs, retail_rows, text_seg_of):
     return merged
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HMM2PL.exe")))

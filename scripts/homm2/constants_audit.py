@@ -350,6 +350,10 @@ def run(*, jobs: int = 8, magic_log: Path | None = None,
     return 1 if null_zero else 0
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str]) -> int:
     jobs = 8
     magic_log = None

@@ -220,6 +220,10 @@ def write_coverage_partition(path, text_rva, text_end, spans, gaps, exclusions,
     os.replace(temporary, path)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     argv = list(argv or sys.argv[1:])
     exe = argv[0] if argv else "build/orig/HMM2PL.exe"

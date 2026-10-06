@@ -1889,6 +1889,10 @@ def review_addends(scope=None):
               output_path))
     return 1 if output["functions"] or output["missing_objects"] else 0
 
+from homm2.core.usage import logged
+
+
+@logged
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--pe-data":
         return review_pe_data_targets()

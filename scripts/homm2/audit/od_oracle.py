@@ -123,6 +123,16 @@ def slots(names):
     return order
 
 
-if __name__ == "__main__":
-    for i, (n, off) in enumerate(slots(sys.argv[1:] or ["alpha", "bravo", "charlie"])):
+from homm2.core.usage import logged
+
+
+@logged
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    for i, (n, off) in enumerate(slots(argv or ["alpha", "bravo", "charlie"])):
         print(f"  slot{i}  ebp{off:+#06x}  {n}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -482,6 +482,10 @@ def generate_from_definition(definition: Path, dll: str, output: Path) -> Path:
     return output
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group()

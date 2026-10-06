@@ -778,6 +778,10 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
             boundaries, coverage)
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-dir", default="build/objdiff/base")

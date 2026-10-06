@@ -73,6 +73,10 @@ def compare_directories(baseline: Path, current: Path):
                 passed=bool(report) and not added and not any(r['errors'] for r in report.values()))
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('baseline', type=Path)

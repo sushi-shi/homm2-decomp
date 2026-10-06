@@ -11,6 +11,10 @@ from homm2.core.paths import REPO
 from homm2.core.wine import msvc_dir, run, tool, winepath_w
 
 
+from homm2.core.usage import logged
+
+
+@logged
 def main() -> int:
     source = REPO / "scripts/homm2/audit/fixtures/readability_casefold.cpp"
     output = REPO / "build/readability/contracts"
