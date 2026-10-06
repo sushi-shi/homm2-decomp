@@ -18,6 +18,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/wingraph.h>
 #include <PLATFORM/Movie.h>
+#include <PLATFORM/Platform.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/dialog.h>
@@ -199,8 +200,17 @@ void SmackManagerMain(void) {
     smk1 = platform::kInvalidMovie;
     if (bSmackNum != EXPANSION_CAMPAIGN) {
         smk1 = platform::MovieOpen(primaryMoviePath.c_str(), bSmackSound);
-        if (smk1 == platform::kInvalidMovie)
-            ShutDown("Unable to open animation file.");
+        if (smk1 == platform::kInvalidMovie) {
+            // Retail read these from the CD and skipped them without one. An
+            // installation copied from the disc may lack HEROES2\ANIM, which
+            // should cost the movies, not the game.
+            const std::string warning =
+                "movies: cannot open " + platform::Files().Resolve(
+                    primaryMoviePath.c_str(), platform::FileMode::Read
+                ) + "; skipping it";
+            platform::Host().Log(platform::LogLevel::Warning, warning.c_str());
+            goto playbackDone;
+        }
         platform::MovieTarget(
             smk1,
             gpWindowManager->m_screen->m_pixels,

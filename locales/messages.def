@@ -1129,7 +1129,10 @@ HOMM2_MESSAGE(
     "Unable to initialize windows - possible memory or disk error."
 )
 HOMM2_MESSAGE("system.terminated", "Terminated")
-HOMM2_MESSAGE("resource.file.open_failed", "Can't open file: %s")
+HOMM2_MESSAGE(
+    "resource.file.open_failed",
+    "Can't open file: %s\n\nLooked for it at:\n%s\n\nPut the game in the Heroes II folder that contains DATA, or set HOMM2_DATA to that folder."
+)
 HOMM2_MESSAGE("player.unknown_hero_name", "The Unknown Hero")
 HOMM2_MESSAGE("adventure.quick_info.cannot_dig", "(cannot dig)")
 HOMM2_MESSAGE("adventure.quick_info.can_dig", "(can dig)")

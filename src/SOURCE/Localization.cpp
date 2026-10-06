@@ -157,7 +157,7 @@ std::string CommandLineResourceProfile(const char* commandLine) {
 
 std::string ReadLanguageSetting() {
     const std::filesystem::path path =
-        std::filesystem::path(platform::Files().UserRoot()) / "language.cfg";
+        platform::HostPath(platform::Files().UserRoot()) / "language.cfg";
     std::ifstream stream(path);
     std::string language;
     std::getline(stream, language);
@@ -179,10 +179,10 @@ std::vector<std::filesystem::path> CatalogDirectories() {
     std::vector<std::filesystem::path> directories;
     if (const char* configured = std::getenv("HOMM2_LOCALE_PATH");
         configured != nullptr && *configured != '\0') {
-        directories.emplace_back(configured);
+        directories.push_back(platform::HostPath(platform::ConfiguredDirectory(configured)));
     }
 
-    const std::filesystem::path program = platform::Files().ProgramRoot();
+    const std::filesystem::path program = platform::HostPath(platform::Files().ProgramRoot());
     directories.push_back(program / "lang");
     directories.push_back(program / ".." / "share" / "homm2" / "lang");
 #ifdef __EMSCRIPTEN__
@@ -488,7 +488,7 @@ bool DetectRootProfile(
     for (const char* retailPath : archives) {
         const std::string path = platform::ResolveIn(root, retailPath);
         std::string error;
-        if (DetectAggResourceProfile(path, profile, error)) {
+        if (DetectAggResourceProfile(platform::HostPath(path), profile, error)) {
             return true;
         }
     }

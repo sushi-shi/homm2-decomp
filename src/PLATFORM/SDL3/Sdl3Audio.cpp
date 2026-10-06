@@ -133,20 +133,23 @@ public:
 
         DecodedAudio decoded;
         char relativePath[64];
-        std::string path;
+        std::string tried;
         const char* formats[] = {
             "MUSIC/%02d-AudioTrack %02d.ogg",
             "MUSIC/Track%02d.ogg",
+            // The Buka disc's folder, copied as it is.
+            "TRACKS2/%02d-AudioTrack %02d.ogg",
         };
         for (const char* format : formats) {
             SDL_snprintf(relativePath, sizeof(relativePath), format, track, track);
-            path = Files().Resolve(relativePath, FileMode::Read);
+            const std::string path = Files().Resolve(relativePath, FileMode::Read);
             if (DecodeAudioFile(path, 2, decoded)) {
                 break;
             }
+            tried += (tried.empty() ? "" : ", ") + path;
         }
         if (decoded.samples.empty()) {
-            std::fprintf(stderr, "[homm2] unable to decode music: %s\n", path.c_str());
+            std::fprintf(stderr, "[homm2] no music for track %d; tried %s\n", track, tried.c_str());
             return false;
         }
 
