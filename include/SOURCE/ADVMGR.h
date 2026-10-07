@@ -6,12 +6,25 @@
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/REQUEST.h>
 
 class mapCell;
 struct tag_message;
 
+// Adventure screen geometry: the 480-pixel map frame, the 448-pixel map view
+// inside its 16-pixel border, and the radar square to the right of the frame.
 H2_ENUM_BEGIN(AdventureViewportConstant)
-    ADVENTURE_VIEWPORT_EXTENT = 480
+    ADVENTURE_VIEWPORT_EXTENT         = 480,
+    ADVENTURE_VIEW_BORDER             = 16,
+    ADVENTURE_VIEW_SIZE               = 448,
+    ADVENTURE_VIEW_END                = ADVENTURE_VIEW_BORDER + ADVENTURE_VIEW_SIZE,
+    ADVENTURE_RADAR_LEFT              = ADVENTURE_VIEWPORT_EXTENT,
+    ADVENTURE_RADAR_TOP               = ADVENTURE_VIEW_BORDER,
+    ADVENTURE_RADAR_SIZE              = MAP_DIMENSION_XLARGE,
+    ADVENTURE_RADAR_RIGHT             = ADVENTURE_RADAR_LEFT + ADVENTURE_RADAR_SIZE,
+    ADVENTURE_RADAR_BOTTOM            = ADVENTURE_RADAR_TOP + ADVENTURE_RADAR_SIZE,
+    ADVENTURE_RADAR_SMALL_CELL_PIXELS  = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_SMALL,
+    ADVENTURE_RADAR_MEDIUM_CELL_PIXELS = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_MEDIUM
 H2_ENUM_END(AdventureViewportConstant)
 
 // Current screen and fixed adventure viewport; clipping policy remains explicit.

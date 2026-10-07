@@ -1744,7 +1744,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            eventResourceType = static_cast<ResourceType>(cell->m_objectIndex / 2);
+            eventResourceType = static_cast<ResourceType>(cell->m_objectIndex / MAP_ITEM_FRAME_STRIDE);
             GiveResource(
                 eventHero,
                 eventResourceType,
@@ -2469,7 +2469,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT: {
             artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                    >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+            eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / MAP_ITEM_FRAME_STRIDE);
             guardedMonster =
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT) {
@@ -2572,7 +2572,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            cell->m_objectIndex / 2,
+                            cell->m_objectIndex / MAP_ITEM_FRAME_STRIDE,
                             -1,
                             0,
                             -1,
@@ -6204,7 +6204,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            eventResourceType = static_cast<ResourceType>(cell->m_objectIndex / 2);
+            eventResourceType = static_cast<ResourceType>(cell->m_objectIndex / MAP_ITEM_FRAME_STRIDE);
             GiveResource(
                 eventHero,
                 eventResourceType,
@@ -6458,7 +6458,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT:
             artifactResource = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                  >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+            eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / MAP_ITEM_FRAME_STRIDE);
             artifactGuardType = static_cast<CreatureType>(
                 cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK
             );

@@ -80,10 +80,6 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
     VIEW_EDGE_MARGIN = 8,
     VIEW_CENTER_CELL = VIEW_EDGE_MARGIN - 1,
     VIEW_LAST_CELL = VIEW_CELL_COUNT - 1,
-    RADAR_LEFT = 480,
-    RADAR_RIGHT = 624,
-    RADAR_TOP = 16,
-    RADAR_BOTTOM = 160,
     PUZZLE_TILE_SIZE = 32,
     PUZZLE_X_TRIM = 12
 H2_ENUM_END(AdventureScreenConstant)
@@ -130,8 +126,6 @@ H2_ENUM_END(AdventureDrawConstant)
 
 H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
     UPDATE_NONE = -1,
-    UPDATE_VIEWPORT_ORIGIN = 16,
-    UPDATE_VIEWPORT_SIZE = 448,
     UPDATE_ANIMATION_PHASES = 6,
     UPDATE_FRAME_CYCLE = 18
 H2_ENUM_END(AdventureUpdateScreenConstant)
@@ -343,8 +337,6 @@ H2_ENUM_BEGIN(AdventureSummonBoatConstant)
     SUMMON_OCCUPIED_FLAG = 0x80,
     SUMMON_MIN_DISTANCE = 2,
     SUMMON_RESTORE_MODE = 5,
-    SUMMON_SCREEN_MARGIN = 16,
-    SUMMON_SCREEN_LIMIT = 464,
     SUMMON_FIZZLE_X_OFFSET = 48,
     SUMMON_FIZZLE_WIDTH = 112,
     SUMMON_FIZZLE_HEIGHT = 80,
@@ -404,7 +396,6 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
-    RADAR_SIZE = MAP_DIMENSION_XLARGE,
     RADAR_ROW_GROUPS = 5,
     RADAR_GROUP_BYTES = 128,
     RADAR_UNSEEN_COLOR = 0x24,
@@ -414,8 +405,6 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_PARTIAL_MARGIN = 2,
     RADAR_PARTIAL_SPAN = 16,
     RADAR_TOWN_RADIUS = 2,
-    RADAR_SMALL_CELL_PIXELS = 4,
-    RADAR_MEDIUM_CELL_PIXELS = 2,
     RADAR_LARGE_SCALE_DIVISOR = 3,
     RADAR_LARGE_SCALE_ROUNDING = RADAR_LARGE_SCALE_DIVISOR - 1,
     RADAR_FRAME_NONE = -1,
@@ -587,9 +576,9 @@ H2_ENUM_END(AdventureLocatorConstant)
 
 H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
     QUICK_VIEW_MIN_X = 30,
-    QUICK_VIEW_MIN_Y = 16,
+    QUICK_VIEW_MIN_Y = ADVENTURE_VIEW_BORDER,
     QUICK_VIEW_RIGHT = 448,
-    QUICK_VIEW_BOTTOM = 464,
+    QUICK_VIEW_BOTTOM = ADVENTURE_VIEW_END,
     HERO_QUICK_VIEW_X_OFFSET = 73,
     HERO_QUICK_VIEW_Y_OFFSET = 72,
     HERO_QUICK_VIEW_WIDTH = 192,
@@ -748,7 +737,6 @@ H2_ENUM_END(AdventureCloudNeighbor)
 H2_ENUM_BEGIN(AdventureQuickInfoObject)
     OBELISK_INDEX_BASE             = 1,
     RESOURCE_FRAME_PAIR_MASK       = ~1,
-    RESOURCE_FRAME_PAIR_STRIDE     = 2,
     CRYSTAL_BALL_RADIUS            = 8,
     ROUTE_BEYOND_MOBILITY_FLAG     = 0x100,
     HERO_FRAME_MIRROR_FLAG         = 0x80,
@@ -758,7 +746,7 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     QUICK_INFO_X_OFFSET            = 57,
     QUICK_INFO_MIN_X               = QUICK_VIEW_MIN_X,
     QUICK_INFO_WIDTH               = 160,
-    QUICK_INFO_RIGHT               = 464,
+    QUICK_INFO_RIGHT               = ADVENTURE_VIEW_END,
     QUICK_INFO_RIGHT_X             = QUICK_INFO_RIGHT - QUICK_INFO_WIDTH,
     QUICK_INFO_Y_OFFSET            = 25,
     QUICK_INFO_MIN_Y               = QUICK_VIEW_MIN_Y,
@@ -781,6 +769,7 @@ H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_RESOURCE_AMOUNT = 10,
     CHEAT_GOLD_AMOUNT = 1000,
     CHEAT_EXPERIENCE_AMOUNT = 3000,
+    CHEAT_PUZZLE_PIECE_AMOUNT = 12,
     CHEAT_BLACK_DRAGON_COUNT = 5,
     CHEAT_REVEAL_CENTER = 30,
     CHEAT_REVEAL_RADIUS = 180
@@ -826,6 +815,17 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     LOCATOR_PAGE_STEP         = 4
 H2_ENUM_END(AdventurePanelCommand)
 
+H2_ENUM_BEGIN(AdventureMenuHelp)
+    MENU_HELP_NEXT_HERO         = 0,
+    MENU_HELP_CONTINUE_ROUTE    = 1,
+    MENU_HELP_OVERVIEW          = 2,
+    MENU_HELP_END_TURN          = 3,
+    MENU_HELP_ADVENTURE_OPTIONS = 4,
+    MENU_HELP_CONTROL_OPTIONS   = 5,
+    MENU_HELP_SYSTEM_OPTIONS    = 6,
+    MENU_HELP_CAST_SPELL        = 7
+H2_ENUM_END(AdventureMenuHelp)
+
 H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
     ADJACENT_MONSTER_RADIUS = 1,
     ADJACENT_MONSTER_END_OFFSET = 2,
@@ -833,11 +833,8 @@ H2_ENUM_END(AdventureAdjacentMonsterConstant)
 
 H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_MUSIC = 23,
-    PUZZLE_WINDOW_X = ADVENTURE_VIEWPORT_EXTENT,
-    PUZZLE_WINDOW_Y = SCROLL_BORDER,
-    PUZZLE_VIEW_ORIGIN = SCROLL_BORDER,
-    PUZZLE_VIEW_SIZE = UPDATE_VIEWPORT_SIZE,
-    PUZZLE_VIEW_END = IDX(PUZZLE_VIEW_ORIGIN) + IDX(PUZZLE_VIEW_SIZE),
+    PUZZLE_WINDOW_X = ADVENTURE_RADAR_LEFT,
+    PUZZLE_WINDOW_Y = ADVENTURE_RADAR_TOP,
     PUZZLE_COORDINATE_OFFSET = 7,
     PUZZLE_ALIGNMENT_DIVISOR = 3,
     PUZZLE_Y_ADJUST_X_FACTOR = 2,
@@ -898,9 +895,9 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_RADAR_LEFT_FLOAT \
-    static_cast<float>(RADAR_LEFT)
+    static_cast<float>(ADVENTURE_RADAR_LEFT)
 #define ADVMGR_RADAR_TOP_FLOAT \
-    static_cast<float>(RADAR_TOP)
+    static_cast<float>(ADVENTURE_RADAR_TOP)
 #define ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE \
     static_cast<double>(LOCATOR_SCROLL_BASE_Y)
 #define ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE \
@@ -1694,31 +1691,31 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case WIDGET_NOTIFY_SELECT:
                     case WIDGET_NOTIFY_RIGHT_CLICK:
                         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                            helpId = -1;
+                            helpId = PANEL_NO_HELP;
                             switch (message.payload.widget.id) {
                                 case PANEL_NEXT_HERO:
-                                    helpId = 0;
+                                    helpId = MENU_HELP_NEXT_HERO;
                                     break;
                                 case PANEL_CONTINUE_ROUTE:
-                                    helpId = 1;
+                                    helpId = MENU_HELP_CONTINUE_ROUTE;
                                     break;
                                 case PANEL_OVERVIEW:
-                                    helpId = 2;
+                                    helpId = MENU_HELP_OVERVIEW;
                                     break;
                                 case PANEL_END_TURN:
-                                    helpId = 3;
+                                    helpId = MENU_HELP_END_TURN;
                                     break;
                                 case PANEL_ADVENTURE_OPTIONS:
-                                    helpId = 4;
+                                    helpId = MENU_HELP_ADVENTURE_OPTIONS;
                                     break;
                                 case PANEL_CONTROL_OPTIONS:
-                                    helpId = 5;
+                                    helpId = MENU_HELP_CONTROL_OPTIONS;
                                     break;
                                 case PANEL_SYSTEM_OPTIONS:
-                                    helpId = 6;
+                                    helpId = MENU_HELP_SYSTEM_OPTIONS;
                                     break;
                                 case PANEL_CAST_SPELL:
-                                    helpId = 7;
+                                    helpId = MENU_HELP_CAST_SPELL;
                                     break;
                             }
                             if (helpId >= 0) {
@@ -1764,7 +1761,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
-                        gpCurPlayer->m_bonusPuzzlePieces += 12;
+                        gpCurPlayer->m_bonusPuzzlePieces += CHEAT_PUZZLE_PIECE_AMOUNT;
                         if (curHero != NULL) {
                             GiveExperience(curHero, CHEAT_EXPERIENCE_AMOUNT, 1);
                         }
@@ -2377,10 +2374,10 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             DemobilizeCurrHero();
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    fScale = 4.0f;
+                    fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    fScale = 2.0f;
+                    fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     fScale = 1.3333f;
@@ -2389,8 +2386,8 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     fScale = 1.0f;
                     break;
             }
-            mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / fScale);
-            mouseY = static_cast<i32>((mouseY - RADAR_TOP) / fScale);
+            mouseX = static_cast<i32>((mouseX - ADVENTURE_RADAR_LEFT) / fScale);
+            mouseY = static_cast<i32>((mouseY - ADVENTURE_RADAR_TOP) / fScale);
             m_mapOriginX = mouseX - VIEW_CENTER_CELL;
             m_mapOriginY = mouseY - VIEW_CENTER_CELL;
             if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2423,23 +2420,25 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     inputMessage = gpInputManager->GetEvent();
                 }
                 if (radarMessage.type == MESSAGE_MOUSE_MOVE) {
-                    if (radarMessage.payload.mouse.x < RADAR_LEFT) {
-                        radarMessage.payload.mouse.x = RADAR_LEFT;
+                    if (radarMessage.payload.mouse.x < ADVENTURE_RADAR_LEFT) {
+                        radarMessage.payload.mouse.x = ADVENTURE_RADAR_LEFT;
                     }
-                    if (radarMessage.payload.mouse.x >= RADAR_RIGHT) {
-                        radarMessage.payload.mouse.x = RADAR_RIGHT - 1;
+                    if (radarMessage.payload.mouse.x >= ADVENTURE_RADAR_RIGHT) {
+                        radarMessage.payload.mouse.x = ADVENTURE_RADAR_RIGHT - 1;
                     }
-                    if (radarMessage.payload.mouse.y < RADAR_TOP) {
-                        radarMessage.payload.mouse.y = RADAR_TOP;
+                    if (radarMessage.payload.mouse.y < ADVENTURE_RADAR_TOP) {
+                        radarMessage.payload.mouse.y = ADVENTURE_RADAR_TOP;
                     }
-                    if (radarMessage.payload.mouse.y >= RADAR_BOTTOM) {
-                        radarMessage.payload.mouse.y = RADAR_BOTTOM - 1;
+                    if (radarMessage.payload.mouse.y >= ADVENTURE_RADAR_BOTTOM) {
+                        radarMessage.payload.mouse.y = ADVENTURE_RADAR_BOTTOM - 1;
                     }
                     gpMouseManager->Main(radarMessage);
-                    mouseX =
-                        static_cast<i32>((radarMessage.payload.mouse.x - RADAR_LEFT) / fScale);
-                    mouseY =
-                        static_cast<i32>((radarMessage.payload.mouse.y - RADAR_TOP) / fScale);
+                    mouseX = static_cast<i32>(
+                        (radarMessage.payload.mouse.x - ADVENTURE_RADAR_LEFT) / fScale
+                    );
+                    mouseY = static_cast<i32>(
+                        (radarMessage.payload.mouse.y - ADVENTURE_RADAR_TOP) / fScale
+                    );
                     m_mapOriginX = mouseX - VIEW_CENTER_CELL;
                     m_mapOriginY = mouseY - VIEW_CENTER_CELL;
                     if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2999,12 +2998,12 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (giLimitUpdMinX == UPDATE_NONE) {
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER
         );
     } else {
         BlitBitmapToScreen(
@@ -4167,29 +4166,31 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
             line = gpWindowManager->m_screen->m_pixels
-                   + (minY * RADAR_SMALL_CELL_PIXELS + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
-            offX = minX * RADAR_SMALL_CELL_PIXELS;
+                   + (minY * ADVENTURE_RADAR_SMALL_CELL_PIXELS + ADVENTURE_RADAR_TOP)
+                         * LOGICAL_SCREEN_WIDTH
+                   + ADVENTURE_RADAR_LEFT;
+            offX = minX * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
             line = gpWindowManager->m_screen->m_pixels
-                   + (minY * RADAR_MEDIUM_CELL_PIXELS + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
-            offX = minX * RADAR_MEDIUM_CELL_PIXELS;
+                   + (minY * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS + ADVENTURE_RADAR_TOP)
+                         * LOGICAL_SCREEN_WIDTH
+                   + ADVENTURE_RADAR_LEFT;
+            offX = minX * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             line = gpWindowManager->m_screen->m_pixels
                    + (minY + (minY + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR
-                      + RADAR_TOP)
+                      + ADVENTURE_RADAR_TOP)
                          * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
+                   + ADVENTURE_RADAR_LEFT;
             offX = minX + (minX + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR;
             xrem = minX % RADAR_LARGE_SCALE_DIVISOR;
             ymod = minY % RADAR_LARGE_SCALE_DIVISOR;
             break;
         default:
-            line = gpWindowManager->m_screen->m_pixels + (minY + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
+            line = gpWindowManager->m_screen->m_pixels
+                   + (minY + ADVENTURE_RADAR_TOP) * LOGICAL_SCREEN_WIDTH + ADVENTURE_RADAR_LEFT;
             offX = minX;
             break;
     }
@@ -4198,10 +4199,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         pixelPointer = line + offX;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_SMALL_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 ++ymod;
@@ -4211,7 +4212,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 if (ymod != 0) {
                     line += LOGICAL_SCREEN_WIDTH;
                 } else {
-                    line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
+                    line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 }
                 break;
             case MAP_DIMENSION_XLARGE:
@@ -4335,32 +4336,34 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    memset(pixelPointer, color, RADAR_SMALL_CELL_PIXELS);
+                    memset(pixelPointer, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
                     memset(
                         pixelPointer + LOGICAL_SCREEN_WIDTH,
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixelPointer + IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS,
+                        pixelPointer
+                            + IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS,
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixelPointer + LOGICAL_SCREEN_WIDTH * (RADAR_SMALL_CELL_PIXELS - 1),
+                        pixelPointer
+                            + LOGICAL_SCREEN_WIDTH * (ADVENTURE_RADAR_SMALL_CELL_PIXELS - 1),
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
-                    pixelPointer += RADAR_SMALL_CELL_PIXELS;
+                    pixelPointer += ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    memset(pixelPointer, color, RADAR_MEDIUM_CELL_PIXELS);
+                    memset(pixelPointer, color, ADVENTURE_RADAR_MEDIUM_CELL_PIXELS);
                     memset(
                         pixelPointer + LOGICAL_SCREEN_WIDTH,
                         color,
-                        RADAR_MEDIUM_CELL_PIXELS
+                        ADVENTURE_RADAR_MEDIUM_CELL_PIXELS
                     );
-                    pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                    pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     if (xrem != 0) {
@@ -4375,13 +4378,13 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     } else if (ymod != 0) {
                         pixelPointer[0] = color;
                         pixelPointer[1] = color;
-                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     } else {
                         pixelPointer[0] = color;
                         pixelPointer[1] = color;
                         pixelPointer[LOGICAL_SCREEN_WIDTH] = color;
                         pixelPointer[LOGICAL_SCREEN_WIDTH + 1] = color;
-                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     }
                     ++xrem;
                     if (xrem > RADAR_LARGE_SCALE_DIVISOR - 1) {
@@ -4400,11 +4403,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (gbInViewWorld != 0) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                fScale = RADAR_SMALL_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 bNoFrame = true;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                fScale = RADAR_MEDIUM_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
                     bNoFrame = true;
                 } else {
@@ -4436,11 +4439,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
                 frame = RADAR_FRAME_NORMAL_SMALL;
-                fScale = RADAR_SMALL_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
                 frame = RADAR_FRAME_NORMAL_MEDIUM;
-                fScale = RADAR_MEDIUM_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 frame = RADAR_FRAME_NORMAL_LARGE;
@@ -4461,10 +4464,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
-                RADAR_LEFT,
-                RADAR_TOP,
-                RADAR_SIZE,
-                RADAR_SIZE
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
@@ -4473,10 +4476,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
-                RADAR_LEFT,
-                RADAR_TOP,
-                RADAR_SIZE,
-                RADAR_SIZE
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
             );
         }
     }
@@ -4490,7 +4493,12 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 static_cast<i32>((maxY - minY + 1) * fScale)
             );
         } else {
-            gpWindowManager->UpdateScreenRegion(RADAR_LEFT, RADAR_TOP, RADAR_SIZE, RADAR_SIZE);
+            gpWindowManager->UpdateScreenRegion(
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
+            );
         }
     }
 }
@@ -4804,7 +4812,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        gResourceNames[currentCell->m_objectIndex / RESOURCE_FRAME_PAIR_STRIDE]
+                        gResourceNames[currentCell->m_objectIndex / MAP_ITEM_FRAME_STRIDE]
                     );
                     break;
                 case MAP_OBJECT_MONSTER:
@@ -8115,10 +8123,10 @@ void advManager::TeleportTo(
     if (bShowIt != 0) {
         destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
         gpWindowManager->SaveFizzleSource(
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE
         );
         CompleteDraw(0);
         PollSound();
@@ -8127,10 +8135,10 @@ void advManager::TeleportTo(
             fizzleTime -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
         }
         gpWindowManager->FizzleForward(
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
             -1,
             NULL,
             NULL
@@ -8441,21 +8449,21 @@ void advManager::SummonBoat(void) {
             if (boatRec->x >= m_mapOriginX && boatRec->x < m_mapOriginX + VIEW_CELL_COUNT
                 && boatRec->y >= m_mapOriginY && boatRec->y < m_mapOriginY + VIEW_CELL_COUNT) {
                 clipX = (boatRec->x - m_mapOriginX) * CELL_PIXELS - SUMMON_FIZZLE_X_OFFSET;
-                if (clipX < SUMMON_SCREEN_MARGIN) {
-                    clipX = SUMMON_SCREEN_MARGIN;
+                if (clipX < ADVENTURE_VIEW_BORDER) {
+                    clipX = ADVENTURE_VIEW_BORDER;
                 }
                 clipY = (boatRec->y - m_mapOriginY) * CELL_PIXELS - SUMMON_FIZZLE_X_OFFSET;
-                if (clipY < SUMMON_SCREEN_MARGIN) {
-                    clipY = SUMMON_SCREEN_MARGIN;
+                if (clipY < ADVENTURE_VIEW_BORDER) {
+                    clipY = ADVENTURE_VIEW_BORDER;
                 }
 
                 clipWidth = SUMMON_FIZZLE_WIDTH;
                 clipHeight = SUMMON_FIZZLE_HEIGHT;
-                if (clipX + clipWidth >= SUMMON_SCREEN_LIMIT) {
-                    clipWidth = SUMMON_SCREEN_LIMIT - clipX;
+                if (clipX + clipWidth >= ADVENTURE_VIEW_END) {
+                    clipWidth = ADVENTURE_VIEW_END - clipX;
                 }
-                if (clipY + clipHeight >= SUMMON_SCREEN_LIMIT) {
-                    clipHeight = SUMMON_SCREEN_LIMIT - clipY;
+                if (clipY + clipHeight >= ADVENTURE_VIEW_END) {
+                    clipHeight = ADVENTURE_VIEW_END - clipY;
                 }
                 gpWindowManager
                     ->SaveFizzleSource(clipX, clipY, clipWidth, clipHeight);
@@ -9462,16 +9470,16 @@ void advManager::ViewPuzzle(void) {
     }
 
     gpWindowManager->UpdateScreenRegion(
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_SIZE,
-        PUZZLE_VIEW_SIZE
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_SIZE,
+        ADVENTURE_VIEW_SIZE
     );
     gpWindowManager->SaveFizzleSource(
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_SIZE,
-        PUZZLE_VIEW_SIZE
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_SIZE,
+        ADVENTURE_VIEW_SIZE
     );
     pWin = new heroWindow(
         PUZZLE_WINDOW_X,
@@ -9515,10 +9523,10 @@ void advManager::ViewPuzzle(void) {
 
     u8* pixelPointer;
     u8* end;
-    for (i = PUZZLE_VIEW_ORIGIN; i < PUZZLE_VIEW_END; ++i) {
+    for (i = ADVENTURE_VIEW_BORDER; i < ADVENTURE_VIEW_END; ++i) {
         pixelPointer =
-            gpWindowManager->m_screen->m_pixels + i * LOGICAL_SCREEN_WIDTH + PUZZLE_VIEW_ORIGIN;
-        end = pixelPointer + PUZZLE_VIEW_SIZE;
+            gpWindowManager->m_screen->m_pixels + i * LOGICAL_SCREEN_WIDTH + ADVENTURE_VIEW_BORDER;
+        end = pixelPointer + ADVENTURE_VIEW_SIZE;
         for (; pixelPointer < end; ++pixelPointer) {
             *pixelPointer = gColorTableTan[*pixelPointer];
         }
@@ -9532,10 +9540,10 @@ void advManager::ViewPuzzle(void) {
     }
     if (visibleCount != PUZZLE_PIECE_COUNT) {
         gpWindowManager->FizzleForward(
-            PUZZLE_VIEW_ORIGIN,
-            PUZZLE_VIEW_ORIGIN,
-            PUZZLE_VIEW_SIZE,
-            PUZZLE_VIEW_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
             PUZZLE_FIZZLE_TIME,
             NULL,
             NULL

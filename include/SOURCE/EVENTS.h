@@ -127,6 +127,9 @@ struct mapTownExtra {
 #pragma pack(pop)
 
 H2_ENUM_BEGIN(MapObjectEncodingConstant)
+    // Resource and artifact tilesets draw each item as a shadow frame and its image
+    // frame, so a cell's object index divided by the stride is the item.
+    MAP_ITEM_FRAME_STRIDE                = 2,
     MAP_EVENT_DATA_EMPTY                 = 0,
     MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
