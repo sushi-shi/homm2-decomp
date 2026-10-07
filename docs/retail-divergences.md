@@ -93,9 +93,12 @@ misaligned manager messages, music state and resource pointers at compile time.
 Fields of the packed save records can sit at any offset. The typed enum and
 code wrappers (`H2EnumStorage`, `H2OpenCodeStorage`) and `fullMap`, which lives
 inside the packed `game` record, are therefore packed themselves, so member
-calls on them stay defined. On `port-ironfist`, the session snapshot and the XML
-codec copy record fields as bytes instead of binding references to them; the
-sanitized check runs the engine tests that save, load and restore those records.
+calls on them stay defined. The `packed_records` check runs the map's save and
+load code and a field wrapper at their unaligned offsets in `game`, so the
+sanitized build would report a misaligned access there. On `port-ironfist`, the
+session snapshot and the XML codec copy record fields as bytes instead of
+binding references to them; the sanitized check runs the engine tests that
+save, load and restore those records.
 
 ## Corrected defects
 
