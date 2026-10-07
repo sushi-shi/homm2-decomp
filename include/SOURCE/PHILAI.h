@@ -55,7 +55,7 @@ H2_ENUM_END(AIGenericSiteConstant)
 
 #define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
-void ResetHeroRVs(i32 resetAll, i32 x, i32 y);
+void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y);
 void CheckDoMain(i32 unused, i32 doMain);
 void ShowStatus(void);
 void ValidateHero(hero* pHero);

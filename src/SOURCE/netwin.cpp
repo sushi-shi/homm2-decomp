@@ -193,7 +193,7 @@ extern "C" void __fastcall nb_term(void) {
 #define length len
 #endif
 VA(0x0047421c, 0x96)
-extern "C" u16 __cdecl nb_rcv(i16 session, void* buffer) {
+extern "C" u16 __cdecl nb_rcv(i16 maxLength, void* buffer) {
     tag_Node* node;
     i32 length;
 
@@ -201,7 +201,7 @@ extern "C" u16 __cdecl nb_rcv(i16 session, void* buffer) {
     node = pop_node(&gNbRcvQueue);
     LeaveCriticalSection(&gNbRcvLock);
     if (node) {
-        length = node->len < session ? node->len : static_cast<u16>(session);
+        length = node->len < maxLength ? node->len : static_cast<u16>(maxLength);
         memcpy(buffer, node->data, length);
         H2_FREE(node);
         return length;

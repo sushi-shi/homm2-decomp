@@ -560,7 +560,7 @@ void hero::Deallocate(i32 updateMap) {
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         DebugCheck();
         curTown = &gpGame->m_castleRecs[m_occupiedTown];
-        curTown->m_occupyingHeroId = -1;
+        curTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
 
     if (giCurPlayer != m_owner || gpGame->m_players[IDX(m_owner)].m_currentHero != m_id
@@ -831,7 +831,7 @@ void hero::CheckLevel(void) {
             if (slot == 0 && m_cursorType != FACTION_BARBARIAN
                 && m_cursorType != FACTION_KNIGHT
                 && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
-                && nLevel - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
+                && nLevel - m_lastWisdomOfferLevel >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                 choices[slot] = HERO_SKILL_WISDOM;
                 continue;
             }
@@ -861,7 +861,7 @@ void hero::CheckLevel(void) {
 
         if (choices[0] == HERO_SKILL_WISDOM
             || choices[1] == HERO_SKILL_WISDOM) {
-            m_enabled = static_cast<u8>(nLevel);
+            m_lastWisdomOfferLevel = static_cast<u8>(nLevel);
         }
 
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[IDX(m_owner)]) {
@@ -903,7 +903,7 @@ void hero::CheckLevel(void) {
                 strcat(gText, text);
                 NormalDialog(
                     gText,
-                    NORMAL_DIALOG_DISABLE_SEVENTH,
+                    NORMAL_DIALOG_SHOW_BUTTONS_7_8,
                     -1,
                     -1,
                     NORMAL_DIALOG_SECONDARY_SKILL,

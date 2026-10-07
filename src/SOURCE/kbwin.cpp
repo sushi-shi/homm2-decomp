@@ -293,6 +293,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_PALETTECHANGED:
             if (messageParam == reinterpret_cast<u32>(window))
                 break;
+            // fall through
         case WM_QUERYNEWPALETTE:
             return QueryNewPalette();
         case WM_PAINT:
@@ -310,9 +311,11 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                     return 0;
                 }
             }
+            // fall through
         case WM_DESTROY:
             gbClosingApp = true;
             PostQuitMessage(0);
+            // fall through
         case WM_QUIT:
             ShutDown(NULL);
             break;
@@ -551,6 +554,7 @@ void SetNoDialogMenus(b32 menusEnabled) {
 
 #if H2_RETAIL_COMPILER
 #define position pos
+#define updateItem disabled
 #endif
 VA(0x00471eca, 0x12e)
 void SetMenus(HMENU menu, b32 enabled) {
@@ -558,7 +562,7 @@ void SetMenus(HMENU menu, b32 enabled) {
     u32 id;
     i32 match;
     i32 position;
-    i32 disabled;
+    i32 updateItem;
     i32 index;
 
     count = GetMenuItemCount(menu);
@@ -566,11 +570,11 @@ void SetMenus(HMENU menu, b32 enabled) {
         id = GetMenuItemID(menu, index);
         if (id == static_cast<u32>(-1)) {
             SetMenus(GetSubMenu(menu, index), enabled);
-            disabled = 0;
+            updateItem = 0;
         } else {
-            disabled = 0;
+            updateItem = 0;
             if (enabled) {
-                disabled = 1;
+                updateItem = 1;
             } else {
                 match = 0;
                 for (position = 0; position < MENU_ENABLE_STATUS_COUNT; position++) {
@@ -579,12 +583,12 @@ void SetMenus(HMENU menu, b32 enabled) {
                     }
                 }
                 if (gbInSetupDialog)
-                    disabled = 1 - gsMenuEnableStatus[match].setupEnabled;
+                    updateItem = 1 - gsMenuEnableStatus[match].setupEnabled;
                 else
-                    disabled = 1 - gsMenuEnableStatus[match].normalEnabled;
+                    updateItem = 1 - gsMenuEnableStatus[match].normalEnabled;
             }
         }
-        if (disabled != 0) {
+        if (updateItem != 0) {
             EnableMenuItem(menu, id, enabled == 0 ? MF_GRAYED : MF_ENABLED);
         }
     }
@@ -592,6 +596,7 @@ void SetMenus(HMENU menu, b32 enabled) {
 }
 #if H2_RETAIL_COMPILER
 #undef position
+#undef updateItem
 #endif
 
 VA(0x00471ff8, 0xb)

@@ -281,9 +281,9 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_BLACK_PEARL           = 80,
     ARTIFACT_MAGIC_BOOK            = 81,
     ARTIFACT_EDITOR_ANY_ULTIMATE   = 82,
-    ARTIFACT_EDITOR_UNUSED_84      = 83,
-    ARTIFACT_EDITOR_UNUSED_85      = 84,
-    ARTIFACT_EDITOR_UNUSED_86      = 85,
+    ARTIFACT_EDITOR_UNUSED_83      = 83,
+    ARTIFACT_EDITOR_UNUSED_84      = 84,
+    ARTIFACT_EDITOR_UNUSED_85      = 85,
     ARTIFACT_SPELL_SCROLL          = 86,
     ARTIFACT_ARM_OF_MARTYR         = 87,
     ARTIFACT_BREASTPLATE_ANDURAN   = 88,
@@ -631,7 +631,7 @@ template <typename Storage>
 inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator|=(
     H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerActionFlag
 ) {
-    trigger = MapTriggerCode(static_cast<i32>(trigger) | 0x80);
+    trigger = MapTriggerCode(static_cast<i32>(trigger) | MAP_TRIGGER_ACTION_FLAG);
     return trigger;
 }
 
@@ -800,7 +800,6 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
 H2_ENUM_CLASS_END(MonsterFlags)
 H2_ENUM_FLAGS(MonsterFlags)
 
-typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE;
 

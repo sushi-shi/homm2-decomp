@@ -103,16 +103,16 @@ H2_ENUM_END(CastleConstant)
 
 namespace {
 
-    // The recruit slot is refused when the town already spent its hero this
-    // turn, the player cannot pay, the roster is full, or a hero is standing in
-    // the town.
+    // The recruit slot is refused once a hero has been recruited from this
+    // castle dialog, when the player cannot pay, when the roster is full, or
+    // when a hero is standing in the town.
     inline i32 CannotRecruitHero(void) {
         b32 cannot;
 
         if (!(gpTownManager->m_recruitResult != 0
               || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
               || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
-              || gpTownManager->m_town->m_occupyingHeroId != -1))
+              || gpTownManager->m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE))
             cannot = false;
         else
             cannot = true;
@@ -367,7 +367,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost)
         stateFrame = FRAME_CANNOT_AFFORD;
-    else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY || m_town->m_occupyingHeroId != -1)
+    else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY || m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         stateFrame = FRAME_CANNOT_BUILD;
     else if (m_recruitResult != 0)
         stateFrame = FRAME_BUILT;
@@ -654,7 +654,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 cCastleInfo[IDX(INFO_TOO_MANY_HEROES)],
                                 PLAYER_HERO_CAPACITY
                             );
-                        } else if (gpTownManager->m_town->m_occupyingHeroId != -1) {
+                        } else if (gpTownManager->m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
                             strcpy(gText, cCastleInfo[IDX(INFO_TOWN_OCCUPIED)]);
                         } else {
                             sprintf(

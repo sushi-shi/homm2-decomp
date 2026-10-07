@@ -323,7 +323,7 @@ void combatManager::SetupCombat(
 
     m_drawbridgeBackgroundVisible = false;
     if (defenderTown != NULL) {
-        if (defenderTown->m_occupyingHeroId != -1) {
+        if (defenderTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)] = &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army;
             CombineGroups(&defenderTown->m_army, &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army);
             m_visitingHeroPresent[IDX(COMBAT_DEFENDER_SIDE)] = true;
@@ -337,7 +337,7 @@ void combatManager::SetupCombat(
             m_drawbridgeBackgroundVisible =
                 HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_MOAT)) != 0;
 
-        m_drawbridgeState = COMBAT_CASTLE_GATE_OPEN;
+        m_drawbridgeState = COMBAT_CASTLE_GATE_CLOSED;
         m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] = defenderTown;
         m_originalCombatTown = defenderTown;
 
@@ -1047,7 +1047,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
     specialRegion:
         if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX && y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN
             && y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
-            return COMBAT_GRID_LEFT_SPECIAL_HEX;
+            return COMBAT_GRID_LEFT_HERO_HEX;
         if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= LOGICAL_SCREEN_MAX_X
             && y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN && y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
             return COMBAT_GRID_RIGHT_UPPER_HEX;
@@ -1100,7 +1100,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT)
+    if (HAS(activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT))
         H2_ENUM_CLEAR_FLAG(
             activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT
         );
@@ -1358,7 +1358,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             towerIndex = COMBAT_WALL_SLOT_BOTTOM_TOWER;
         else
             towerIndex = COMBAT_WALL_SLOT_TOP_TOWER;
-    } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
+    } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_DESTROYED) {
         gateIndex = 1;
     } else {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING)
@@ -1634,7 +1634,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             } else if (towerIndex != COMBAT_WALL_SLOT_NONE) {
                 m_wallStates[IDX(towerIndex)] = COMBAT_WALL_STATE_DESTROYED;
             } else if (gateIndex != -1) {
-                m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
+                m_drawbridgeState = COMBAT_CASTLE_GATE_DESTROYED;
             } else if (keepIndex != -1) {
                 m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_DESTROYED;
             }
@@ -1887,7 +1887,7 @@ void combatManager::ResetHitByCreature(void) {
 
 VA(0x0042a182, 0x2c)
 i32 ValidHex(i32 hex) {
-    return hex >= 0 && hex < COMBAT_HEX_COUNT ? 1 : 0;
+    return hex >= 0 && hex < COMBAT_HEX_COUNT;
 }
 
 VA(0x0042a1ae, 0xb)
@@ -1940,15 +1940,15 @@ void combatManager::SetupAndLoadObstacles(void) {
             m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
 
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_SECOND_TOWER)].m_blocked = 1;
+        m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_SECOND_WALL)].m_blocked = 1;
+        m_hexCells[IDX(COMBAT_CASTLE_HEX_SECOND_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_TOWER)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
+        m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_TOWER)].m_blocked = 1;
+        m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_MOAT)].m_blocked = 1;
     } else {
         obstacleGoal = SRandom(COMBAT_RANDOM_OBSTACLE_MIN, COMBAT_RANDOM_OBSTACLE_MAX);

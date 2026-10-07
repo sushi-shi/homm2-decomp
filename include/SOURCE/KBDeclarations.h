@@ -172,8 +172,8 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_QUICK_VIEW               = 4,
     NORMAL_DIALOG_WAIT_FIRST               = 5,
     NORMAL_DIALOG_WAIT_LAST                = 6,
-    NORMAL_DIALOG_DISABLE_SEVENTH          = 7,
-    NORMAL_DIALOG_DISABLE_EIGHTH           = 8,
+    NORMAL_DIALOG_SHOW_BUTTONS_7_8         = 7,
+    NORMAL_DIALOG_SHOW_BUTTON_7            = 8,
     NORMAL_DIALOG_RESOURCE_COUNT           = 2,
     NORMAL_DIALOG_PRIMARY_BONUS_OFFSET     = 100,
     NORMAL_DIALOG_DAILY_RESOURCE_OFFSET    = 100000,
@@ -653,13 +653,13 @@ extern u8* mapExtra;
 // arithmetic is `(mapExtra + column) + row * MAP_WIDTH`, and /Od emits it in
 // exactly that order, so the base and the column term must be added as a unit.
 // Writing the natural mapExtra[column + row * MAP_WIDTH] regroups it into
-// `mapExtra + (column + row * MAP_WIDTH)` and cost 19 exact functions when
-// measured. See docs/patterns/flat-index-grouping-is-not-a-trick.md.
+// `mapExtra + (column + row * MAP_WIDTH)`, which emits a different address
+// computation. See docs/patterns/flat-index-grouping-is-not-a-trick.md.
 //
 // `column` is therefore spliced DELIBERATELY UNPARENTHESISED, so that
 // MAP_EXTRA_AT(x + 1, y) keeps retail's `((mapExtra + x) + 1)` chain. Do not
 // "fix" it: wrapping it as `(mapExtra + (column))` groups the column term as a
-// unit instead and drops GetCloudLookup to 78.57%. Pass only additive column
+// unit instead, which changes the emitted chain. Pass only additive column
 // expressions. `row` stays parenthesised for `*` precedence, which is free
 // because the row term is already a factor.
 //
@@ -667,9 +667,9 @@ extern u8* mapExtra;
 // folds into the address computation, whatever its arity.
 //
 // The two spellings below index the same cell and differ ONLY in which side
-// of the row multiply MAP_WIDTH sits on. That is byte-visible: swapping every
-// site to one order cost 11 exact functions when measured. They are NOT
-// interchangeable, so each name spells the operand order it emits. Match the
+// of the row multiply MAP_WIDTH sits on. That is byte-visible: /Od emits the
+// multiply operands in source order, so the two are NOT interchangeable and
+// each name spells the operand order it emits. Match the
 // site you are converting; never pick one for tidiness.
 #define MAP_EXTRA_AT(column, row)        (*(mapExtra + column + (row) * MAP_WIDTH))
 #define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
