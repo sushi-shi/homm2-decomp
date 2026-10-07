@@ -165,7 +165,7 @@ editor's. The editor's gates:
 | Gate | Role for the editor |
 | --- | --- |
 | `vtables` | build gate: every vtable the editor's inventory names has a source marker (own or placed) |
-| `no-fake-labels`, `globals-data`, `globals-defined` | staged (advisory): their findings are the editor variants and owner units not yet written - REQUEST's editor `Main`/`Open`, EDITMGR's globals, the KB data the editor's own objects define |
+| `no-fake-labels`, `globals-data`, `globals-defined` | build gates: the editor's objects name only reviewed functions; every header extern the editor's own sources define carries its DATA claim (read from the editor's inventory, `.bss` spelling aliases resolved) and a definition. Game globals the shared headers declare but the editor never defines are not the editor's |
 | `check` | tier: no function below the maximum banked in `config/match_baseline.editor.tsv` |
 | `image-link-diff` | tier: pending until the editor links; the first `--update` banks `config/retail/editor/link_diff.tsv` and the gate holds it from then on |
 | `strict-allocations`, `reloc-fields` | tier |
