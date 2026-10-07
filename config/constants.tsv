@@ -8,7 +8,8 @@
 # the first matching row wins): file owner spelling group detail reason.
 # owner is the enclosing function, group the finding's category (code,
 # local-table, declaration) and detail its source line.
-#floor	1959
+# adventure, world and AI: ADVMGR, EVENTS, Viewwrld, DRAWING, HERO, AI, ARMYGRP, SPELLAI, PHILAI
+#floor	0
 src/SOURCE/COMMAND.cpp	combatManager::Main	COMBAT_SOUND_POLL_DELAY	code	*COMBAT_DEADLINE(COMBAT_SOUND_POLL_DELAY);	a named float delay (#define 75.0f): clang-tidy reports the macro's floating literal where COMBAT_DEADLINE expands it
 src/SOURCE/SPELLS.cpp	combatManager::*	SPELL_*_DELAY	code	*COMBAT_DEADLINE(SPELL_*_DELAY);	a named float delay (#define ...f): clang-tidy reports the macro's floating literal where COMBAT_DEADLINE expands it
 src/SOURCE/tradpost.cpp	ComputeTradeRatios	0.999	code	*tRatio + 0.999*	rounds the positive trade ratio up to the next whole unit before the i32 truncation
@@ -70,7 +71,6 @@ src/SOURCE/GAME.cpp	game::SetupTowns	500	code	*attempts++ > 500*	the mage-guild 
 src/SOURCE/GAME.cpp	CompressTest2	255	code	fromData[[]index[]] = Random(0, 255);	a random byte of compression test data
 src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	cell->m_objectMetadata = Random(*	a random resource's amount range by kind (wood and ore, gold, the rest), retail values
 src/SOURCE/GAME.cpp	game::SetupTowns	99	code	*defaultDwellingRoll[[]Random(0, 99) / *	a 0..99 percentage roll, bucketed into the ten deciles of defaultDwellingRoll
-# adventure, world and AI: ADVMGR, EVENTS, Viewwrld, DRAWING, HERO, AI, ARMYGRP, SPELLAI, PHILAI
 src/SOURCE/ADVMGR.cpp	advManager::GetCursorSampleSet	*	local-table	*	Retail sample-suffix table: the wsnd sample variant each of the ADVMGR_CURSOR_SAMPLE_COUNT cursor sounds loads.
 src/SOURCE/ADVMGR.cpp	advManager::Main	*	code	commandValue = *;	Cheat digit: the decimal value the INPUT_SCAN_0..INPUT_SCAN_9 key types, folded into giCheatSeq by CHEAT_SEQUENCE_RADIX.
 src/SOURCE/ADVMGR.cpp	advManager::ProcessSelect	1.3333f	code	fScale = 1.3333f;	Large-map radar scale: ADVENTURE_RADAR_SIZE / MAP_DIMENSION_LARGE pixels per cell as the float retail stores (no integer name).
