@@ -1146,7 +1146,15 @@ def placed_claims(rows):
                                       delimiter="\t"):
                 if row["kind"] == "data":
                     moved[int(row["game_rva"], 16)] = int(row["rva"], 16)
+    from homm2.manifest import all_units
+    from homm2.core.paths import image_key as _image_key
+    # A game unit the image compiles inside another of its units
+    # (`compiled_into`) has its claims in that unit's object here.
+    owners = {u["unit"]: u["compiled_into"][_image_key()] for u in all_units()
+              if _image_key() in u.get("compiled_into", {})}
     linked = {u["unit"] for u in image_units()}
+    rows = [dataclasses.replace(row, unit=owners[row.unit]) if row.unit in owners else row
+            for row in rows]
     return [dataclasses.replace(row, rva=moved[row.rva]) for row in rows
             if row.unit in linked and row.rva in moved]
 
