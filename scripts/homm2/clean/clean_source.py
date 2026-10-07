@@ -53,6 +53,8 @@ PUBLISHED_PATHS = (
     "run-game.sh",
     "imports",
     "include",
+    # Retired: the resource scripts moved under src/. Listed so a publish
+    # removes the old directory from an existing generated branch.
     "res",
     "src",
     "vendor",
@@ -1485,7 +1487,7 @@ def validate_out_root(requested: Path) -> Path:
 # resources. Each is a Ninja target of its own; `all` builds both.
 PROGRAMS = (
     ("game", "HMM2PL.exe", None),
-    ("editor", "EDT2PL.exe", "res/EDT2PL.rc"),
+    ("editor", "EDT2PL.exe", "src/EDITOR/EDT2PL.rc"),
 )
 
 

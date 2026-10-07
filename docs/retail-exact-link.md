@@ -22,7 +22,7 @@ ninja link-audit
   manifests. No resources or access to the retail executable are required.
   Output: `build/link/generic/HMM2PL.exe`.
 - `homm2 link --rsrc` / `ninja link-rsrc`: the same inputs plus resources
-  compiled from `res/HMM2PL.rc`. The program icon is extracted from the retail
+  compiled from `src/SOURCE/HMM2PL.rc`. The program icon is extracted from the retail
   control image while the era resource compiler runs; every compiled resource
   payload is compared against retail. Output: `build/link/rsrc/HMM2PL.exe`.
 - `homm2 link --historical` / `ninja link-historical`: resource-bearing native

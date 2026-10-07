@@ -194,11 +194,11 @@ its link-diff stamp are the editor's default build target.
   Audiere import libraries (WINMM leads, as in the game: nothing references
   it before BASE, so its descriptor still follows the first scan's DLLs
   while its thunks open the second block); the BASE library as one archive
-  in retail member order; then `MSVCPRT` and `LIBCMT`; and `res/EDT2PL.rc`. LINK pulls library members in
+  in retail member order; then `MSVCPRT` and `LIBCMT`; and `src/EDITOR/EDT2PL.rc`. LINK pulls library members in
   first-reference order
   ([pattern](patterns/library-pull-order-is-reference-fifo.md)), so source
   definition order and old-name spellings decide the BASE and CRT order.
-- Resources: `res/EDT2PL.rc` holds the five payloads (the `EDITOR` icon and
+- Resources: `src/EDITOR/EDT2PL.rc` holds the five payloads (the `EDITOR` icon and
   About dialog, `MNUDFLT`, `VERSIONINFO`), gated byte-exact by `graph/rc.py`
   with the retail-extracted icon (`--icon editor.ico`).
 - Headers: LINK's defaults for stack and heap; `/DEBUG` with
@@ -243,6 +243,6 @@ is banked at zero in every region).
 `homm2 clean` exports the editor with the game: the generated tree builds
 `EDT2PL.exe` as its `editor` target (`build.py --target editor|all`,
 `nix build .#editor`), compiling every unit whose `images` name the editor,
-the shared ones with `HOMM2_EDITOR`, and `res/EDT2PL.rc`. The editor sources
+the shared ones with `HOMM2_EDITOR`, and `src/EDITOR/EDT2PL.rc`. The editor sources
 compile in the clean tree's strict enum mode, and `homm2 clean --verify`
 builds both programs ([clean source](clean-source.md)).
