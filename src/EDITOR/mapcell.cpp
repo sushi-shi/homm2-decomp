@@ -1,6 +1,6 @@
 #include <Ints.h>
-#include "EDITOR/fullMap.h"
-#include "EDITOR/mapcell.h"
+#include <EDITOR/mapcell.h>
+#include <EDITOR/fullMap.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <string.h>
@@ -70,8 +70,8 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = TILESET_NONE;
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
-    extras[index].objectLayerBit0 = 0;
-    extras[index].objectLayerBit1 = 0;
+    extras[index].objectHighLayer = 0;
+    extras[index].objectShadow = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = TILESET_NONE;
     extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
@@ -181,21 +181,21 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
 
 void fullMap::RemoveExtraObject(i32 index) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCellExtra* next;
 
     extra = &extras[index];
-    nextIndex_ = extra->nextIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].objectIndex != MAPCELL_SPRITE_NONE) {
-        next = &extras[nextIndex_];
+    nextExtraIndex = extra->nextIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].objectIndex != MAPCELL_SPRITE_NONE) {
+        next = &extras[nextExtraIndex];
         extra->objectLink = next->objectLink;
         extra->objectTileset = next->objectTileset;
         extra->objectIndex = next->objectIndex;
         extra->animatedObject = next->animatedObject;
-        extra->objectLayerBit0 = next->objectLayerBit0;
-        extra->objectLayerBit1 = next->objectLayerBit1;
+        extra->objectHighLayer = next->objectHighLayer;
+        extra->objectShadow = next->objectShadow;
         extra->objectDrawnAsOverlay = next->objectDrawnAsOverlay;
-        RemoveExtraObject(nextIndex_);
+        RemoveExtraObject(nextExtraIndex);
         if (next->objectIndex == MAPCELL_SPRITE_NONE && next->overlayIndex == MAPCELL_SPRITE_NONE) {
             extra->nextIndex = 0;
             next->nextIndex = MAPCELL_EXTRA_FREE;
@@ -205,8 +205,8 @@ void fullMap::RemoveExtraObject(i32 index) {
         extra->objectTileset = TILESET_NONE;
         extra->objectIndex = MAPCELL_SPRITE_NONE;
         extra->animatedObject = 0;
-        extra->objectLayerBit0 = 0;
-        extra->objectLayerBit1 = 0;
+        extra->objectHighLayer = 0;
+        extra->objectShadow = 0;
         extra->objectDrawnAsOverlay = 0;
     }
 }
@@ -214,23 +214,23 @@ void fullMap::RemoveExtraObject(i32 index) {
 
 void fullMap::RemoveCellObject(i32 x, i32 y) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCell* cell;
 
     cell = &Column(x)[y * width];
-    nextIndex_ = cell->m_extraIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].objectIndex != MAPCELL_SPRITE_NONE) {
-        extra = &extras[nextIndex_];
+    nextExtraIndex = cell->m_extraIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].objectIndex != MAPCELL_SPRITE_NONE) {
+        extra = &extras[nextExtraIndex];
         cell->m_objectLink = extra->objectLink;
         cell->m_objectTileset = extra->objectTileset;
         cell->m_objectIndex = extra->objectIndex;
         cell->m_animatedObject = extra->animatedObject;
-        cell->m_objectLayerBit0 = extra->objectLayerBit0;
-        cell->m_objectLayerBit1 = extra->objectLayerBit1;
+        cell->m_objectHighLayer = extra->objectHighLayer;
+        cell->m_objectShadow = extra->objectShadow;
         cell->m_objectDrawnAsOverlay = extra->objectDrawnAsOverlay;
         cell->m_triggerType = MAP_OBJECT_NONE;
         cell->m_objectMetadata = 0;
-        RemoveExtraObject(nextIndex_);
+        RemoveExtraObject(nextExtraIndex);
         if (extra->objectIndex == MAPCELL_SPRITE_NONE && extra->overlayIndex == MAPCELL_SPRITE_NONE) {
             cell->m_extraIndex = 0;
             extra->nextIndex = MAPCELL_EXTRA_FREE;
@@ -240,8 +240,8 @@ void fullMap::RemoveCellObject(i32 x, i32 y) {
         cell->m_objectTileset = TILESET_NONE;
         cell->m_objectIndex = MAPCELL_SPRITE_NONE;
         cell->m_animatedObject = 0;
-        cell->m_objectLayerBit0 = 0;
-        cell->m_objectLayerBit1 = 0;
+        cell->m_objectHighLayer = 0;
+        cell->m_objectShadow = 0;
         cell->m_objectDrawnAsOverlay = 0;
         cell->m_objectMetadata = 0;
         cell->m_triggerType = MAP_OBJECT_NONE;
@@ -258,15 +258,15 @@ void fullMap::PushCellObject(i32 x, i32 y) {
     extra->animatedObject = cell->m_animatedObject;
     extra->objectTileset = cell->m_objectTileset;
     extra->objectIndex = cell->m_objectIndex;
-    extra->objectLayerBit0 = cell->m_objectLayerBit0;
-    extra->objectLayerBit1 = cell->m_objectLayerBit1;
+    extra->objectHighLayer = cell->m_objectHighLayer;
+    extra->objectShadow = cell->m_objectShadow;
     extra->objectDrawnAsOverlay = cell->m_objectDrawnAsOverlay;
     extra->objectLink = cell->m_objectLink;
     cell->m_animatedObject = 0;
     cell->m_objectTileset = TILESET_NONE;
     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
-    cell->m_objectLayerBit0 = 0;
-    cell->m_objectLayerBit1 = 0;
+    cell->m_objectHighLayer = 0;
+    cell->m_objectShadow = 0;
     cell->m_objectDrawnAsOverlay = 0;
     cell->m_objectLink = 0;
     cell->m_triggerType = MAP_OBJECT_NONE;
@@ -275,19 +275,19 @@ void fullMap::PushCellObject(i32 x, i32 y) {
 
 void fullMap::RemoveExtraOverlay(i32 index) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCellExtra* next;
 
     extra = &extras[index];
-    nextIndex_ = extra->nextIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].overlayIndex != MAPCELL_SPRITE_NONE) {
-        next = &extras[nextIndex_];
+    nextExtraIndex = extra->nextIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].overlayIndex != MAPCELL_SPRITE_NONE) {
+        next = &extras[nextExtraIndex];
         extra->overlayLink = next->overlayLink;
         extra->overlayTileset = next->overlayTileset;
         extra->overlayIndex = next->overlayIndex;
         extra->animatedOverlay = next->animatedOverlay;
         extra->drawOverlayOnTop = next->drawOverlayOnTop;
-        RemoveExtraOverlay(nextIndex_);
+        RemoveExtraOverlay(nextExtraIndex);
         if (next->overlayIndex == MAPCELL_SPRITE_NONE && next->overlayIndex == MAPCELL_SPRITE_NONE) {
             extra->nextIndex = 0;
             next->nextIndex = MAPCELL_EXTRA_FREE;
@@ -304,19 +304,19 @@ void fullMap::RemoveExtraOverlay(i32 index) {
 
 void fullMap::RemoveCellOverlay(i32 x, i32 y) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCell* cell;
 
     cell = &Column(x)[y * width];
-    nextIndex_ = cell->m_extraIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].overlayIndex != MAPCELL_SPRITE_NONE) {
-        extra = &extras[nextIndex_];
+    nextExtraIndex = cell->m_extraIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].overlayIndex != MAPCELL_SPRITE_NONE) {
+        extra = &extras[nextExtraIndex];
         cell->m_overlayLink = extra->overlayLink;
         cell->m_overlayTileset = extra->overlayTileset;
         cell->m_overlayIndex = extra->overlayIndex;
         cell->m_animatedOverlay = extra->animatedOverlay;
         cell->m_drawOverlayOnTop = extra->drawOverlayOnTop;
-        RemoveExtraOverlay(nextIndex_);
+        RemoveExtraOverlay(nextExtraIndex);
         if (extra->overlayIndex == MAPCELL_SPRITE_NONE && extra->overlayIndex == MAPCELL_SPRITE_NONE) {
             cell->m_extraIndex = 0;
             extra->nextIndex = MAPCELL_EXTRA_FREE;
@@ -332,49 +332,50 @@ void fullMap::RemoveCellOverlay(i32 x, i32 y) {
 
 
 void fullMap::Compact(void) {
-    u16* remap;
-    i32 freeIndex;
-    i32 index;
+    u16* indexMap;
+    i32 newIndex;
+    i32 oldIndex;
     i32 x;
     i32 y;
     i32 i;
-    mapCellExtra* newExtras;
-    i32 slack;
+    mapCellExtra* newCellExtras;
+    i32 spare;
 
-    remap = static_cast<u16*>(H2_ALLOC(EXTRA_REMAP_TABLE_BYTES));
-    freeIndex = 1;
-    for (index = 1; index < extraCount; index++) {
-        if (extras[index].nextIndex != MAPCELL_EXTRA_FREE) {
-            if (freeIndex != index) {
-                for (; freeIndex < EXTRA_POOL_SIZE; freeIndex++) {
-                    if (extras[freeIndex].nextIndex == MAPCELL_EXTRA_FREE)
+    indexMap = static_cast<u16*>(H2_ALLOC(EXTRA_REMAP_TABLE_BYTES));
+    newIndex = 1;
+    for (oldIndex = 1; oldIndex < extraCount; oldIndex++) {
+        if (extras[oldIndex].nextIndex != MAPCELL_EXTRA_FREE) {
+            if (newIndex != oldIndex) {
+                for (; newIndex < EXTRA_POOL_SIZE; newIndex++) {
+                    if (extras[newIndex].nextIndex == MAPCELL_EXTRA_FREE)
                         break;
                 }
-                extras[freeIndex] = extras[index];
-                extras[index].nextIndex = MAPCELL_EXTRA_FREE;
+                extras[newIndex] = extras[oldIndex];
+                extras[oldIndex].nextIndex = MAPCELL_EXTRA_FREE;
             }
-            remap[index] = freeIndex;
-            freeIndex++;
+            indexMap[oldIndex] = newIndex;
+            newIndex++;
         }
     }
-    remap[0] = 0;
-    remap[MAPCELL_EXTRA_FREE] = MAPCELL_EXTRA_FREE;
-    extraCount = freeIndex;
+    indexMap[0] = 0;
+    indexMap[MAPCELL_EXTRA_FREE] = MAPCELL_EXTRA_FREE;
+    extraCount = newIndex;
     for (x = 0; x < MAP_WIDTH; x++)
         for (y = 0; y < MAP_HEIGHT; y++)
-            Column(x)[y * width].m_extraIndex = remap[Column(x)[y * width].m_extraIndex];
+            Column(x)[y * width].m_extraIndex = indexMap[Column(x)[y * width].m_extraIndex];
     for (i = 1; i < extraCount; i++)
-        extras[i].nextIndex = remap[extras[i].nextIndex];
-    delete remap;
-    slack = EXTRA_COMPACT_SLACK;
-    newExtras = static_cast<mapCellExtra*>(H2_ALLOC((extraCount + slack) * sizeof(mapCellExtra)));
-    memcpy(newExtras, extras, extraCount * sizeof(mapCellExtra));
+        extras[i].nextIndex = indexMap[extras[i].nextIndex];
+    delete indexMap;
+    spare = EXTRA_COMPACT_SLACK;
+    newCellExtras
+        = static_cast<mapCellExtra*>(H2_ALLOC((extraCount + spare) * sizeof(mapCellExtra)));
+    memcpy(newCellExtras, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
-    extras = newExtras;
-    for (i = extraCount; i < extraCount + slack; i++)
+    extras = newCellExtras;
+    for (i = extraCount; i < extraCount + spare; i++)
         extras[i].nextIndex = MAPCELL_EXTRA_FREE;
-    extraCount += slack;
-    ClearCellExtra(extraCount - slack);
+    extraCount += spare;
+    ClearCellExtra(extraCount - spare);
 }
 #endif
 
@@ -387,7 +388,7 @@ void fullMap::Write(i32 handle) {
 }
 
 #ifdef HOMM2_EDITOR
-void fullMap::Read(i32 handle, i32) {
+void fullMap::Read(i32 handle, i32 convert [[maybe_unused]]) {
     i32 extraIndex;
 
     READ_FILE_VALUE(handle, width);
@@ -465,8 +466,8 @@ void fullMap::ChangeTilesetIndex(
                     extraIndex = extra->nextIndex;
                 } else {
                     extra->animatedObject = 0;
-                    extra->objectLayerBit0 = 0;
-                    extra->objectLayerBit1 = 0;
+                    extra->objectHighLayer = 0;
+                    extra->objectShadow = 0;
                     extra->objectDrawnAsOverlay = 0;
                     extra->objectTileset = newTileset;
                     extra->objectIndex = index;
@@ -486,8 +487,8 @@ void fullMap::ChangeTilesetIndex(
             }
         } else {
             cell->m_animatedObject = 0;
-            cell->m_objectLayerBit0 = 0;
-            cell->m_objectLayerBit1 = 0;
+            cell->m_objectHighLayer = 0;
+            cell->m_objectShadow = 0;
             cell->m_objectDrawnAsOverlay = 0;
             cell->m_objectTileset = newTileset;
             cell->m_objectIndex = index;

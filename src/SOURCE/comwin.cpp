@@ -192,7 +192,7 @@ i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
 
     state.fParity = 0;
     state.fOutxCtsFlow = 1;
-    state.fOutxDsrFlow = useDtr != 0 ? 1 : 0;
+    state.fOutxDsrFlow = useDtr != 0;
     state.fDtrControl = DTR_CONTROL_ENABLE;
     state.fInX = 0;
     state.fOutX = 0;

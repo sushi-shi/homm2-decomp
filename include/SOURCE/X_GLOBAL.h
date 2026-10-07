@@ -148,7 +148,9 @@ typedef enum RadarColorTableCount {
 
 typedef enum GroundTableConstant {
     GROUND_TILE_IMAGE_COUNT = 432,
-    GROUND_SHAPE_FLIPPED    = 0x80
+
+
+    GROUND_SHAPE_VARIED     = 0x80
 } GroundTableConstant;
 
 typedef enum KbControlTableConstant {

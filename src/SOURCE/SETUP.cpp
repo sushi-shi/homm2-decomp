@@ -179,7 +179,7 @@ i32 game::SetupHotSeatGame(void) {
             ""
         );
 
-    if (giSetupGameType == 0) {
+    if (giSetupGameType == OLD_MAIN_SETUP_NEW) {
         sprintf(
             gText,
              "Желаете задать имена каждому игроку?"

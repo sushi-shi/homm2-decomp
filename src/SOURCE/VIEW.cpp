@@ -90,7 +90,7 @@ i32 combatManager::ViewGeneral(
     i16 captainWidgetId [[maybe_unused]];
     i16 fourteenthControlWidgetId [[maybe_unused]];
     i16 nameWidgetId [[maybe_unused]];
-    i16 closeWidgetId [[maybe_unused]];
+    i16 castSpellWidgetId [[maybe_unused]];
     i16 noControlWidgetId [[maybe_unused]];
     i16 colorWidgetId [[maybe_unused]];
     i32 cost [[maybe_unused]];
@@ -112,7 +112,7 @@ i32 combatManager::ViewGeneral(
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    castSpellWidgetId = GENERAL_ACTION_CAST_SPELL;
     retreatWidgetId = GENERAL_ACTION_RETREAT;
     surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
@@ -220,7 +220,7 @@ i32 combatManager::ViewGeneral(
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
             && m_combatTowns[(COMBAT_DEFENDER_SIDE)] != NULL)
         || m_sideRetreated[(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[1] != 0 || m_heroes[(side)]->m_isCaptain != 0) {
+        || m_sideRetreated[(COMBAT_DEFENDER_SIDE)] != 0 || m_heroes[(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_ACTION_RETREAT;
         message.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
@@ -261,7 +261,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 portraitWidgetId [[maybe_unused]];
     i16 noControlWidgetId [[maybe_unused]];
     i16 eighthControlWidgetId [[maybe_unused]];
-    i16 closeWidgetId [[maybe_unused]];
+    i16 castSpellWidgetId [[maybe_unused]];
     nameWidgetIdCopy = GENERAL_NAME_WIDGET;
     portraitWidgetId = GENERAL_PORTRAIT_WIDGET;
     colorWidgetId = GENERAL_COLOR_WIDGET;
@@ -271,7 +271,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    castSpellWidgetId = GENERAL_ACTION_CAST_SPELL;
     retreatWidgetId = GENERAL_ACTION_RETREAT;
     surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;

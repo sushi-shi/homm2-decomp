@@ -445,7 +445,7 @@ i32 searchArray::FindCombatPath(
                 attackTargetHex
             );
             if (attackMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
-                for (searchDirection = 0; searchDirection < (MAP_DIRECTION_COUNT);
+                for (searchDirection = 0; searchDirection < (COMBAT_DIRECTION_COUNT);
                      searchDirection++) {
                     if ((attackMask & (1 << searchDirection)) == 0) {
                         *path++ = static_cast<u8>(searchDirection);
@@ -466,7 +466,7 @@ i32 searchArray::FindCombatPath(
         }
 
         moveMask = unit->GetMoveMask(node.x);
-        for (searchDirection = 0; searchDirection < (MAP_DIRECTION_COUNT); searchDirection++) {
+        for (searchDirection = 0; searchDirection < (COMBAT_DIRECTION_COUNT); searchDirection++) {
             i32 nextHex;
 
             if ((moveMask & (1 << searchDirection)) != 0)

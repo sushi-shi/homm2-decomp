@@ -108,7 +108,14 @@ public:
     i32 m_result;
     char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
-    fileRequester(i32 x, i32 y, FileRequesterMode mode, char* pattern, char* directory, char* defaultExtension);
+    fileRequester(
+        i32 x,
+        i32 y,
+        FileRequesterMode mode,
+        const char* pattern,
+        const char* directory,
+        const char* defaultExtension
+    );
     virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message& message) override;

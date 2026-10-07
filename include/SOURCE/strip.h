@@ -5,7 +5,6 @@
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/armyGroup.h>
 
-class armyGroup;
 class border;
 class heroWindow;
 class icon;

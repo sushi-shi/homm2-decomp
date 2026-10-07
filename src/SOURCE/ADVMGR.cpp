@@ -958,10 +958,10 @@ advManager::advManager(void) {
     m_puzzleIcon = NULL;
     m_mapOriginX = 0;
     m_mapOriginY = 0;
-    m_updateMinX = 0;
-    m_updateMinY = 0;
-    m_updateMaxX = 0;
-    m_updateMaxY = 0;
+    m_scrollOffsetX = 0;
+    m_scrollOffsetY = 0;
+    m_animationTick = 0;
+    m_animationFrame = 0;
     m_updatePending = 0;
     m_pendingCommand = ADVMGR_COMMAND_NONE;
     m_cursorActive = false;
@@ -2605,8 +2605,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         || cellPointer->m_objectTileset == TILESET_DUMMY) {
         cellPointer->m_objectTileset = TILESET_OBJNDIRT;
         cellPointer->m_objectIndex = DIG_HOLE_FRAME;
-        cellPointer->m_objectLayerBit0 = 1;
-        cellPointer->m_objectLayerBit1 = 1;
+        cellPointer->m_objectHighLayer = 1;
+        cellPointer->m_objectShadow = 1;
         cellPointer->m_flags |= (MAP_CELL_OBJECT_SHADOW_ONLY);
     }
     CompleteDraw(0);
@@ -2643,7 +2643,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                         gArtifactNames[(gpGame->m_ultimateArtifactId)]
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 if (special) {
                     hero->ViewArtifact(ARTIFACT_SPHERE_NEGATION, false, -1);
                 } else {
@@ -2925,8 +2925,8 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
         return;
     }
     PollSound();
-    giScrollX = m_updateMinX;
-    giScrollY = m_updateMinY;
+    giScrollX = m_scrollOffsetX;
+    giScrollY = m_scrollOffsetY;
     if (giLimitUpdMinX == UPDATE_NONE) {
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
@@ -2953,14 +2953,14 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     PollSound();
 
     if (glTimers[0] < KBTickCount()) {
-        ++m_updateMaxY;
-        ++m_updateMaxX;
-        if (m_updateMaxX >= UPDATE_ANIMATION_PHASES) {
-            m_updateMaxX = 0;
+        ++m_animationFrame;
+        ++m_animationTick;
+        if (m_animationTick >= UPDATE_ANIMATION_PHASES) {
+            m_animationTick = 0;
         }
         glTimers[0] = KBTickCount() + TIMER_DELAY;
 
-        if (m_updateMaxX == 1 || m_updateMaxX == 3 || m_updateMaxX == 5) {
+        if (m_animationTick == 1 || m_animationTick == 3 || m_animationTick == 5) {
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_1];
             m_animationPhases[ANIMATION_PHASE_COLUMN_1] %= UPDATE_FRAME_CYCLE;
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_3];
@@ -3380,7 +3380,7 @@ void advManager::DrawCell(
                     s_drawPixelY
                 );
 
-                if (s_drawCell->m_objectLayerBit0
+                if (s_drawCell->m_objectHighLayer
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
@@ -3401,7 +3401,7 @@ void advManager::DrawCell(
                             m_objectIcons[(s_drawCell->m_objectTileset)],
                             s_drawPixelX,
                             s_drawPixelY,
-                            s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                            s_drawCell->m_objectIndex + m_animationFrame % s_drawAnimationLength + 1,
                             ICON_DRAW_NO_CLIP
                         );
                     }
@@ -3415,7 +3415,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (s_drawExtra->objectLayerBit0
+                    if (s_drawExtra->objectHighLayer
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                         DRAW_ADVENTURE_ICON(
                             m_objectIcons[(s_drawExtra->objectTileset)],
@@ -3435,7 +3435,7 @@ void advManager::DrawCell(
                                 m_objectIcons[(s_drawExtra->objectTileset)],
                                 s_drawPixelX,
                                 s_drawPixelY,
-                                s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                                s_drawExtra->objectIndex + m_animationFrame % s_drawAnimationLength + 1,
                                 ICON_DRAW_NO_CLIP
                             );
                         }
@@ -3449,7 +3449,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0
+                if (s_drawCell->m_objectShadow && !s_drawCell->m_objectHighLayer
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
                     DRAW_ADVENTURE_ICON(
                         m_objectIcons[(s_drawCell->m_objectTileset)],
@@ -3468,7 +3468,7 @@ void advManager::DrawCell(
                             m_objectIcons[(s_drawCell->m_objectTileset)],
                             s_drawPixelX,
                             s_drawPixelY,
-                            s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                            s_drawCell->m_objectIndex + m_animationFrame % s_drawAnimationLength + 1,
                             ICON_DRAW_NO_CLIP
                         );
                     }
@@ -3482,7 +3482,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0
+                    if (s_drawExtra->objectShadow && !s_drawExtra->objectHighLayer
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                         DRAW_ADVENTURE_ICON(
                             m_objectIcons[(s_drawExtra->objectTileset)],
@@ -3502,7 +3502,7 @@ void advManager::DrawCell(
                                 m_objectIcons[(s_drawExtra->objectTileset)],
                                 s_drawPixelX,
                                 s_drawPixelY,
-                                s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                                s_drawExtra->objectIndex + m_animationFrame % s_drawAnimationLength + 1,
                                 ICON_DRAW_NO_CLIP
                             );
                         }
@@ -3519,7 +3519,7 @@ void advManager::DrawCell(
 
             if ((((drawMask) & (ADVMGR_DRAW_OBJECT)))) {
                 if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
+                    && !s_drawCell->m_objectHighLayer && !s_drawCell->m_objectShadow
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
@@ -3536,11 +3536,11 @@ void advManager::DrawCell(
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
-                        animFrame = m_updateMaxY % s_drawAnimationLength;
+                        animFrame = m_animationFrame % s_drawAnimationLength;
                         if (s_drawCell->m_triggerType
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN))) {
                             if (s_drawCell->m_objectMetadata != 0) {
-                                animFrame = m_updateMaxY % (s_drawAnimationLength - 1);
+                                animFrame = m_animationFrame % (s_drawAnimationLength - 1);
                             } else {
                                 animFrame = s_drawAnimationLength - 1;
                             }
@@ -3563,7 +3563,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1
+                    if (!s_drawExtra->objectHighLayer && !s_drawExtra->objectShadow
                         && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != TILESET_MONS32
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
@@ -3585,7 +3585,7 @@ void advManager::DrawCell(
                                 m_objectIcons[(s_drawExtra->objectTileset)],
                                 s_drawPixelX,
                                 s_drawPixelY,
-                                s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                                s_drawExtra->objectIndex + m_animationFrame % s_drawAnimationLength + 1,
                                 ICON_DRAW_NO_CLIP
                             );
                         }
@@ -3615,7 +3615,7 @@ void advManager::DrawCell(
                                     m_objectIcons[MINE_GUARDIAN_ICON_SLOT],
                                     s_drawPixelX - CELL_CENTER_PIXEL,
                                     s_drawPixelY,
-                                    (m_updateMaxY + mapX + mapY) % MINE_GHOST_FRAME_COUNT,
+                                    (m_animationFrame + mapX + mapY) % MINE_GHOST_FRAME_COUNT,
                                     ICON_DRAW_CLIP
                                 );
                             } else if (s_drawMine->guardianType != CREATURE_NONE) {
@@ -3774,7 +3774,7 @@ void advManager::DrawCell(
                                         s_drawPixelX + CELL_PIXELS,
                                         s_drawPixelY + CELL_LAST_PIXEL,
                                         (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
-                                            + m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
+                                            + m_animationFrame % PLAYER_FLAG_FRAME_COUNT
                                             + PLAYER_FLAG_FRAME_BASE,
                                         ICON_DRAW_CLIP
                                     );
@@ -3835,7 +3835,7 @@ void advManager::DrawCell(
                                         s_drawPixelX,
                                         s_drawPixelY + CELL_LAST_PIXEL,
                                         (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
-                                            + m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
+                                            + m_animationFrame % PLAYER_FLAG_FRAME_COUNT
                                             + PLAYER_FLAG_FRAME_BASE,
                                         ICON_DRAW_CLIP
                                     );
@@ -3883,7 +3883,7 @@ void advManager::DrawCell(
                                 m_objectIcons[(s_drawCell->m_objectTileset)],
                                 s_drawPixelX,
                                 s_drawPixelY,
-                                s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength
+                                s_drawCell->m_objectIndex + m_animationFrame % s_drawAnimationLength
                                     + 1,
                                 ICON_DRAW_NO_CLIP
                             );
@@ -3919,7 +3919,7 @@ void advManager::DrawCell(
                                     m_objectIcons[(s_drawExtra->objectTileset)],
                                     s_drawPixelX,
                                     s_drawPixelY,
-                                    s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength
+                                    s_drawExtra->objectIndex + m_animationFrame % s_drawAnimationLength
                                         + 1,
                                     ICON_DRAW_NO_CLIP
                                 );
@@ -3959,7 +3959,7 @@ void advManager::DrawCell(
                             m_objectIcons[(s_drawCell->m_overlayTileset)],
                             s_drawPixelX,
                             s_drawPixelY,
-                            s_drawCell->m_overlayIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                            s_drawCell->m_overlayIndex + m_animationFrame % s_drawAnimationLength + 1,
                             ICON_DRAW_NO_CLIP
                         );
                     }
@@ -3996,7 +3996,7 @@ void advManager::DrawCell(
                                     m_objectIcons[(s_drawExtra->overlayTileset)],
                                     s_drawPixelX,
                                     s_drawPixelY,
-                                    s_drawExtra->overlayIndex + m_updateMaxY % s_drawAnimationLength
+                                    s_drawExtra->overlayIndex + m_animationFrame % s_drawAnimationLength
                                         + 1,
                                     ICON_DRAW_NO_CLIP
                                 );
@@ -5252,7 +5252,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 
     if (gbForceUpdate || KBTickCount() - iLastSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
         iLastSandAnimTime = KBTickCount();
-        iLastAnimFrame = m_updateMaxX;
+        iLastAnimFrame = m_animationTick;
         if (KBTickCount() - iLastNewSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
             iLastNewSandAnimTime = KBTickCount();
             ++iSandAnim;
@@ -8860,6 +8860,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
                     return MESSAGE_DISPATCH_FORWARD;
                 }
 
+
             default:
                 break;
         }
@@ -10070,7 +10071,7 @@ creaturesFight:
     goto showVision;
 
 showVision:
-    NormalDialog(gText, 1);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     return 1;
 }
 

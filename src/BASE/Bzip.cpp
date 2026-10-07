@@ -1860,10 +1860,10 @@ i32l EncodeData(char* destination, char* source, u32l sourceLength) {
 
     strcpy(fname, ".\\DATA\\");
     strcat(fname, "H2C");
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
 
     fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
@@ -1874,9 +1874,9 @@ i32l EncodeData(char* destination, char* source, u32l sourceLength) {
 
     strcat(fname, ".nw");
     fp = fopen(fname, "rb");
-    result = fseek(fp, 0, 2);
+    result = fseek(fp, 0, SEEK_END);
     flen = ftell(fp);
-    result = fseek(fp, 0, 0);
+    result = fseek(fp, 0, SEEK_SET);
     result = fread(destination, flen, 1, fp);
     result = fclose(fp);
     result = remove(fname);
@@ -1900,10 +1900,10 @@ i32l DecodeData(char* destination, char* source, u32l sourceLength) {
 
     strcpy(fname, ".\\DATA\\");
     strcat(fname, "H2C");
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
+    fname[strlen(fname)] = (char)Random('A', 'Z');
     strcat(fname, ".nw");
 
     fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
@@ -1915,9 +1915,9 @@ i32l DecodeData(char* destination, char* source, u32l sourceLength) {
 
     fname[strlen(fname) - 3] = '\0';
     fp = fopen(fname, "rb");
-    result = fseek(fp, 0, 2);
+    result = fseek(fp, 0, SEEK_END);
     flen = ftell(fp);
-    result = fseek(fp, 0, 0);
+    result = fseek(fp, 0, SEEK_SET);
     result = fread(destination, flen, 1, fp);
     result = fclose(fp);
     result = remove(fname);

@@ -19,19 +19,19 @@ typedef enum NetbiosResetConstant {
 } NetbiosResetConstant;
 
 
-static tag_Anchor gNbFreeQueueRuntime = {};
-static NetbiosThreadEvents gNbThreadEventsContext = {};
-static tag_Anchor gNbReceiveQueueEntry = {};
-static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT] = {};
-static tag_Anchor gNbSendQueueHead = {};
-static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT] = {};
-static CRITICAL_SECTION gNbReceiveLockCriticalSection = {};
-static NetbiosSessionBuffer gNbSessionBufferContext = {};
-static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT] =
+static tag_Anchor gNbFreeQueue = {};
+static NetbiosThreadEvents gNbEvents = {};
+static tag_Anchor gNbRcvQueue = {};
+static u8 gNbSessLsn[NETBIOS_SESSION_COUNT] = {};
+static tag_Anchor gNbSndQueue = {};
+static NetbiosPayload gNbRcvData[NETBIOS_SESSION_COUNT] = {};
+static CRITICAL_SECTION gNbRcvLock = {};
+static NetbiosSessionBuffer gNbSessBuf = {};
+static NetbiosControlBlock gNbSessNcb[NETBIOS_SESSION_COUNT] =
     {};
-static NetbiosControlBlock gNbControlBlockArena = {};
-static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT] = {};
-static CRITICAL_SECTION gNbSendLockBacking = {};
+static NetbiosControlBlock gNbCtlNcb = {};
+static NetbiosName gNbNameBuf[NETBIOS_SESSION_COUNT] = {};
+static CRITICAL_SECTION gNbSndLock = {};
 static u8 gNbCallRetries = 0;
 static u8 gNetbiosAvail = 0;
 static u8 gNetbiosLana = 0;
@@ -46,18 +46,6 @@ static const char* gNbGroupName =
 static const char* gNbListenName =
     "*";
 
-#define gNbFreeQueue gNbFreeQueueRuntime
-#define gNbSessLsn gNbSessionNumbersEntry
-#define gNbRcvData gNbReceiveDataLocal
-#define gNbNameBuf gNbNameBufferBacking
-#define gNbSessBuf gNbSessionBufferContext
-#define gNbSessNcb gNbSessionControlBlocksArena
-#define gNbCtlNcb gNbControlBlockArena
-#define gNbRcvQueue gNbReceiveQueueEntry
-#define gNbSndQueue gNbSendQueueHead
-#define gNbRcvLock gNbReceiveLockCriticalSection
-#define gNbEvents gNbThreadEventsContext
-#define gNbSndLock gNbSendLockBacking
 
 i32 is_netbios_avail(void) {
     NetbiosControlBlock controlBlock;
@@ -164,7 +152,7 @@ extern "C" void __fastcall nb_term(void) {
     DeleteCriticalSection(&gNbRcvLock);
 }
 
-extern "C" u16 __cdecl nb_rcv(i16 session, void* buffer) {
+extern "C" u16 __cdecl nb_rcv(i16 maxLength, void* buffer) {
     tag_Node* node;
     i32 length;
 
@@ -172,7 +160,7 @@ extern "C" u16 __cdecl nb_rcv(i16 session, void* buffer) {
     node = pop_node(&gNbRcvQueue);
     LeaveCriticalSection(&gNbRcvLock);
     if (node) {
-        length = node->len < session ? node->len : static_cast<u16>(session);
+        length = node->len < maxLength ? node->len : static_cast<u16>(maxLength);
         memcpy(buffer, node->data, length);
         H2_FREE(node);
         return length;

@@ -7,24 +7,33 @@ game_exe=${HOMM2_EXE:-HMM2PL.exe}
 game_locale=${HOMM2_LANG:-ru_RU.UTF-8}
 fullscreen=${HOMM2_FULLSCREEN:-0}
 
-case ${1:-} in
-    --fullscreen)
-        fullscreen=1
-        shift
-        ;;
-    --windowed)
-        fullscreen=0
-        shift
-        ;;
-    --setup-only)
-        HOMM2_SETUP_ONLY=1
-        shift
-        ;;
-    --help)
-        echo "usage: $0 [--windowed|--fullscreen|--setup-only] [game arguments...]"
-        exit 0
-        ;;
-esac
+while [ $# -gt 0 ]; do
+    case $1 in
+        --editor)
+            game_exe=EDT2PL.exe
+            shift
+            ;;
+        --fullscreen)
+            fullscreen=1
+            shift
+            ;;
+        --windowed)
+            fullscreen=0
+            shift
+            ;;
+        --setup-only)
+            HOMM2_SETUP_ONLY=1
+            shift
+            ;;
+        --help)
+            echo "usage: $0 [--editor] [--windowed|--fullscreen|--setup-only] [program arguments...]"
+            exit 0
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 export WINEPREFIX=$wine_prefix
 export WINEDEBUG=${WINEDEBUG:--all}
@@ -167,8 +176,10 @@ trap 'exit 143' TERM
 cd "$game_dir"
 # Smacker startup movies render black under this Wine/display combination.
 # The caller can append /I1 to opt back in; retail command-line processing
-# keeps the last value.
-intro_argument=/I0
+# keeps the last value. The scenario editor has no intro.
+if [ "$game_exe" != EDT2PL.exe ]; then
+    set -- /I0 "$@"
+fi
 
 if [ "$fullscreen" = 1 ]; then
     if ! command -v gamescope >/dev/null 2>&1; then
@@ -178,12 +189,12 @@ if [ "$fullscreen" = 1 ]; then
     if [ -n "${WAYLAND_DISPLAY:-}" ]; then
         gamescope --backend wayland -f -w 640 -h 480 \
             -S stretch -F nearest --force-windows-fullscreen -- \
-            wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
+            wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@"
         exit $?
     fi
     gamescope -f -w 640 -h 480 -S stretch -F nearest \
         --force-windows-fullscreen -- \
-        wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
+        wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@"
     exit $?
 fi
 
@@ -199,7 +210,7 @@ else
     before_ids=
 fi
 
-wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@" &
+wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@" &
 game_pid=$!
 
 if [ -n "$before_ids" ]; then

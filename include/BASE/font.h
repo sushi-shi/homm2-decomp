@@ -39,8 +39,7 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(const char* text, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
-    void PolishBoundedTextLayout(const char*, char*, u32*, i32, i32*, char);
+    void DrawStringExecute(const char* text, i32 x, i32 y, FontDrawMode mode, i32 clipX, i32 clipY, i32 clipW, i32 clipH);
 
 public:
     void DrawString(const char* text, i32 x, i32 y, FontDrawMode mode);

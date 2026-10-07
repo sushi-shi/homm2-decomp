@@ -1,0 +1,64 @@
+#pragma code_page(65001)
+
+LANGUAGE 0x19, 0x1
+
+EDITOR DIALOG DISCARDABLE 22, 17, 144, 75
+STYLE 0x800000C0
+FONT 8, "System"
+BEGIN
+    CTEXT           "Редактор карт Героев Меча и Магии 2", -1, 2, 6, 142, 11
+    CTEXT           "Версия 2.1", -1, 52, 26, 38, 8
+    CTEXT           "Copyright 1995-1997 New World Computing. 2003 Бука.", -1, 7, 38, 132, 16
+    DEFPUSHBUTTON   "ОК", 1, 53, 59, 32, 14, 0x20000
+END
+
+MNUDFLT MENU DISCARDABLE
+BEGIN
+    POPUP "&Файл"
+    BEGIN
+        MENUITEM "&Выйти", 40140
+    END
+    POPUP "&Экран"
+    BEGIN
+        MENUITEM "&640 x 480", 40005
+        MENUITEM "&800 x 600", 40006
+        MENUITEM "&1024 x 768", 40007
+        MENUITEM "1&280 x 1024", 40008
+        MENUITEM "В &полный экран (F4)", 40009
+    END
+    POPUP "&Помощь"
+    BEGIN
+        MENUITEM "&Руководство", 40052
+        MENUITEM SEPARATOR
+        MENUITEM "О программе", 40053
+    END
+END
+
+1 VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "New World Computing\0"
+            VALUE "FileDescription", "EDITOR2W\0"
+            VALUE "FileVersion", "2.1\0"
+            VALUE "InternalName", "EDITOR2W\0"
+            VALUE "LegalCopyright", "Copyright © 1995-1997\0"
+            VALUE "OriginalFilename", "EDITOR2W.EXE\0"
+            VALUE "ProductName", "New World Computing, Heroes of Might and Magic II Editor\0"
+            VALUE "ProductVersion", "2.1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

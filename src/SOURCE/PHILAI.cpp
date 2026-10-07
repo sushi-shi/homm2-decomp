@@ -466,7 +466,7 @@ typedef enum AITownEvaluationConstant {
 
 searchArray SVSearchArray;
 
-void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
+void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
     i32 index;
     i32 node;
 
@@ -474,7 +474,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
         return;
     for (node = 0; node < MAP_WIDTH; node++) {
         for (index = 0; index < MAP_HEIGHT; index++) {
-            if (resetAll != 0) {
+            if (nearbyOnly != 0) {
                 if (MANHATTAN_LENGTH(x - node, y - index) < NEARBY_RADIUS)
                     *(gaiHeroStrategicRVOfPos + node + index * MAP_WIDTH) = (RV_UNSET);
             } else {
@@ -485,7 +485,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     }
     *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) = (RV_UNSET);
     for (node = 0; node < GAME_HERO_COUNT; node++) {
-        if (resetAll == 0
+        if (nearbyOnly == 0
             || MANHATTAN_LENGTH(x - gpGame->m_heroRecs[node].m_x, y - gpGame->m_heroRecs[node].m_x)
                    < NEARBY_RADIUS)
             gaiHeroLiveChance[node] = (RV_UNSET);
@@ -544,7 +544,7 @@ void philAI::DoAllHeroInteractions(void) {
     i32 i;
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
         town* pTown = gpGame->GetTown(gpCurPlayer->m_townIds[i]);
-        if (pTown->m_occupyingHeroId != -1)
+        if (pTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             HeroInteractionAtTown(gpGame->GetHero(pTown->m_occupyingHeroId), pTown, 0, &iDummy);
     }
 }
@@ -569,7 +569,7 @@ void philAI::CheckForCreatureUpgrades(void) {
             if (armyNo == 0)
                 army = &townRef->m_army;
             else {
-                if (townRef->m_occupyingHeroId == -1)
+                if (townRef->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
                     continue;
                 army = &gpGame->GetHero(townRef->m_occupyingHeroId)->m_army;
             }
@@ -1221,7 +1221,7 @@ void philAI::DoAI(i32 player) {
         );
 
         while (!heroDone && gpCurAIHero->m_remainingMobility >= AI_MINIMUM_SITE_MOBILITY) {
-            if (!(gbGameOver == 0)) {
+            if (gbGameOver != 0) {
                 goto aiCleanup;
             } else {
                 if (gpCurAIHero->m_remainingMobility == gpCurAIHero->m_mobility
@@ -1316,7 +1316,7 @@ void philAI::DoAI(i32 player) {
                         stopAfterStep = true;
                         while (pathIndex >= 0 && steps < stepLimit) {
                             stopAfterStep =
-                                (steps + 1 == stepLimit || pathIndex == 0) ? 1 : 0;
+                                steps + 1 == stepLimit || pathIndex == 0;
                             if (pathIndex > 0) {
                                 moveFlagA = 0;
                                 moveFlagB = 0;
@@ -1695,7 +1695,7 @@ firstWeekDone:
 
 void philAI::GetBestBHC(i32 player [[maybe_unused]], BHC& best) {
     float bhcValue = 1.0f;
-    float topVal = -99.0f;
+    float topVal = AI_PURCHASE_INITIAL_VALUE;
     i32 totalStrength = 0;
     i32 totalWeight = 0;
     BHC choice;
@@ -2547,8 +2547,8 @@ void philAI::GetBestBuilding(town* townPointer, BHC& purchase, float& benefitCos
     BuildingSlotType bestBuilding;
     float bestBenefitCost;
     i32 cost;
-    bestBenefitCost = -99.0f;
-    bestScore = -99.0f;
+    bestBenefitCost = AI_PURCHASE_INITIAL_VALUE;
+    bestScore = AI_PURCHASE_INITIAL_VALUE;
     bestBuilding = BUILDING_SLOT_NONE;
     for (currentBuilding = BUILDING_SLOT_MAGE_GUILD; currentBuilding < BUILDING_SLOT_COUNT; currentBuilding++) {
         if (!(((townPointer->m_buildings) & ((1 << (currentBuilding)))))
@@ -4281,7 +4281,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 doI
         if (!hasRoom)
             transferRating = 0;
         *value += transferRating;
-        if (townPointer->m_threat != 0 && townPointer->m_occupyingHeroId == -1)
+        if (townPointer->m_threat != 0 && townPointer->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
             *value += AI_UNGUARDED_TOWN_VALUE;
     } else {
         townPointer->GiveSpells(NULL);
@@ -4450,7 +4450,7 @@ void philAI::RedistributeTroops(
 }
 
 i32 philAI::ChooseGoldOrExperience(i32, i32) {
-    return gpCurPlayer->m_resources[(RES_GOLD)] > 4000 ? 1 : 0;
+    return gpCurPlayer->m_resources[(RES_GOLD)] > 4000;
 }
 
 void philAI::ChooseEvaluateBattle(
@@ -4708,7 +4708,7 @@ i32 philAI::CanBuyBHC(BHC& purchase) {
             break;
         case PURCHASE_HERO:
             if (gpCurPlayer->m_resources[(RES_GOLD)] >= gHeroGoldCost
-                && purchase.pTown->m_occupyingHeroId == -1
+                && purchase.pTown->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
                 && bHeroBuiltThisTurn == 0)
                 return 1;
             break;

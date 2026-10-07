@@ -77,10 +77,10 @@ typedef enum CombatDrawingConstant {
     DRAWBRIDGE_TOWER_FRAME_BASE   = 21,
     WALL_COORDINATE_COUNT         = 8,
     WALL_FRAME_OFFSET_COUNT       = 7,
-    TOP_TOWER_BASE_FRAME          = 5,
-    SECOND_TOWER_BASE_FRAME       = 6,
-    THIRD_TOWER_BASE_FRAME        = 7,
-    BOTTOM_TOWER_BASE_FRAME       = 8,
+    TOP_WALL_BASE_FRAME           = 5,
+    SECOND_WALL_BASE_FRAME        = 6,
+    THIRD_WALL_BASE_FRAME         = 7,
+    BOTTOM_WALL_BASE_FRAME        = 8,
     GATE_VISIBLE_FRAME            = 4,
     DRAWBRIDGE_TOP_CLIP_OFFSET    = 9,
     DRAWBRIDGE_BOTTOM_CLIP_OFFSET = 5,
@@ -1006,18 +1006,18 @@ void combatManager::DrawFrame(
     }
 
     for (row = DRAW_FIRST_LAYER; row < DRAW_LAYER_COUNT; row++) {
-        if (row == DRAW_RIGHT_HERO_LAYER && m_heroes[1] != NULL) {
+        if (row == DRAW_RIGHT_HERO_LAYER && m_heroes[(COMBAT_DEFENDER_SIDE)] != NULL) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
-                ((m_heroes[1]->m_isCaptain ? -1 : 0)
+                ((m_heroes[(COMBAT_DEFENDER_SIDE)]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
                     + COMBAT_HERO_RIGHT_X,
-                ((m_heroes[1]->m_isCaptain ? -1 : 0)
+                ((m_heroes[(COMBAT_DEFENDER_SIDE)]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
                     + COMBAT_HERO_RIGHT_Y,
                 sCmbtHero[m_heroSpriteIndex[(COMBAT_DEFENDER_SIDE)]]
                     .animationFrames[m_heroAnimationState[(COMBAT_DEFENDER_SIDE)]]
                                     [m_heroAnimationFrame[(COMBAT_DEFENDER_SIDE)]],
-                &m_heroLimits[1],
+                &m_heroLimits[(COMBAT_DEFENDER_SIDE)],
                 ICON_DRAW_FLIPPED
             );
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
@@ -1029,14 +1029,14 @@ void combatManager::DrawFrame(
             );
         }
 
-        if (row == DRAW_LEFT_HERO_LAYER && m_heroes[0] != NULL) {
+        if (row == DRAW_LEFT_HERO_LAYER && m_heroes[(COMBAT_ATTACKER_SIDE)] != NULL) {
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
                 sCmbtHero[m_heroSpriteIndex[(COMBAT_ATTACKER_SIDE)]]
                     .animationFrames[m_heroAnimationState[(COMBAT_ATTACKER_SIDE)]]
                                     [m_heroAnimationFrame[(COMBAT_ATTACKER_SIDE)]],
-                &m_heroLimits[0],
+                &m_heroLimits[(COMBAT_ATTACKER_SIDE)],
                 ICON_DRAW_NORMAL
             );
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(
@@ -1067,7 +1067,7 @@ void combatManager::DrawFrame(
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_WALL_TOP_LAYER
-            && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
+            && m_drawbridgeState != COMBAT_CASTLE_GATE_CLOSED) {
             m_combatIcons[(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
@@ -1148,27 +1148,27 @@ void combatManager::DrawFrame(
                     wallX = 0;
                     wallY = 0;
                     switch (castleHex) {
-                        case COMBAT_CASTLE_HEX_TOP_TOWER:
+                        case COMBAT_CASTLE_HEX_TOP_WALL:
                             wallFrame =
                                 wallFrameOffsets[(m_wallStates[(COMBAT_WALL_SLOT_SECTION_FIRST)])]
-                                + TOP_TOWER_BASE_FRAME;
+                                + TOP_WALL_BASE_FRAME;
                             break;
-                        case COMBAT_CASTLE_HEX_SECOND_TOWER:
+                        case COMBAT_CASTLE_HEX_SECOND_WALL:
                             wallFrame =
                                 wallFrameOffsets[(m_wallStates[(COMBAT_WALL_SLOT_SECTION_SECOND)])]
-                                + SECOND_TOWER_BASE_FRAME;
+                                + SECOND_WALL_BASE_FRAME;
                             break;
-                        case COMBAT_CASTLE_HEX_THIRD_TOWER:
+                        case COMBAT_CASTLE_HEX_THIRD_WALL:
                             wallFrame =
                                 wallFrameOffsets[(m_wallStates[(COMBAT_WALL_SLOT_SECTION_THIRD)])]
-                                + THIRD_TOWER_BASE_FRAME;
+                                + THIRD_WALL_BASE_FRAME;
                             break;
-                        case COMBAT_CASTLE_HEX_BOTTOM_TOWER:
+                        case COMBAT_CASTLE_HEX_BOTTOM_WALL:
                             wallFrame =
                                 wallFrameOffsets[(m_wallStates[(COMBAT_WALL_SLOT_SECTION_FOURTH)])]
-                                + BOTTOM_TOWER_BASE_FRAME;
+                                + BOTTOM_WALL_BASE_FRAME;
                             break;
-                        case COMBAT_CASTLE_HEX_TOP_WALL:
+                        case COMBAT_CASTLE_HEX_TOP_TOWER:
                             wallFrame = (m_wallStates[(COMBAT_WALL_SLOT_TOP_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX =
@@ -1178,7 +1178,7 @@ void combatManager::DrawFrame(
                                 wallCoordinates[(m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_TOP_Y];
                             break;
-                        case COMBAT_CASTLE_HEX_SECOND_WALL:
+                        case COMBAT_CASTLE_HEX_SECOND_TOWER:
                             wallFrame = (m_wallStates[(COMBAT_WALL_SLOT_SECOND_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX =
@@ -1188,7 +1188,7 @@ void combatManager::DrawFrame(
                                 wallCoordinates[(m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_SECOND_Y];
                             break;
-                        case COMBAT_CASTLE_HEX_THIRD_WALL:
+                        case COMBAT_CASTLE_HEX_THIRD_TOWER:
                             wallFrame = (m_wallStates[(COMBAT_WALL_SLOT_THIRD_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX =
@@ -1198,7 +1198,7 @@ void combatManager::DrawFrame(
                                 wallCoordinates[(m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_THIRD_Y];
                             break;
-                        case COMBAT_CASTLE_HEX_BOTTOM_WALL:
+                        case COMBAT_CASTLE_HEX_BOTTOM_TOWER:
                             wallFrame = (m_wallStates[(COMBAT_WALL_SLOT_BOTTOM_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX =
@@ -1209,7 +1209,7 @@ void combatManager::DrawFrame(
                                                 [WALL_BOTTOM_Y];
                             break;
                         case COMBAT_CASTLE_HEX_GATE:
-                            if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
+                            if (m_drawbridgeState != COMBAT_CASTLE_GATE_DESTROYED)
                                 wallFrame = GATE_VISIBLE_FRAME;
                             break;
                     }
@@ -1241,7 +1241,7 @@ void combatManager::DrawFrame(
             || (((m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_buildings) & ((TOWN_BUILDING_MOAT))))
                    == 0)
             goto endRow;
-        if ((row) == (COMBAT_CASTLE_GATE_ROW) && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
+        if ((row) == (COMBAT_CASTLE_GATE_ROW) && m_drawbridgeState != COMBAT_CASTLE_GATE_CLOSED)
             goto endRow;
 
         if (giWalkingTo == moatCell[(row)] || giWalkingTo2 == moatCell[(row)]
@@ -1254,7 +1254,7 @@ void combatManager::DrawFrame(
                         : giWalkingFrom / COMBAT_GRID_ROW_LENGTH))
                 goto endRow;
 
-            if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN
+            if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_CLOSED
                 && (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW
                     || giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)) {
                 if (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW

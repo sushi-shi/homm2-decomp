@@ -166,8 +166,8 @@ typedef enum NormalDialogConstant {
     NORMAL_DIALOG_QUICK_VIEW               = 4,
     NORMAL_DIALOG_WAIT_FIRST               = 5,
     NORMAL_DIALOG_WAIT_LAST                = 6,
-    NORMAL_DIALOG_DISABLE_SEVENTH          = 7,
-    NORMAL_DIALOG_DISABLE_EIGHTH           = 8,
+    NORMAL_DIALOG_SHOW_BUTTONS_7_8         = 7,
+    NORMAL_DIALOG_SHOW_BUTTON_7            = 8,
     NORMAL_DIALOG_RESOURCE_COUNT           = 2,
     NORMAL_DIALOG_PRIMARY_BONUS_OFFSET     = 100,
     NORMAL_DIALOG_DAILY_RESOURCE_OFFSET    = 100000,
@@ -643,6 +643,8 @@ extern u8* mapExtra;
 #define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
 extern tag_tilePoint normalDirTable[];
 extern u8 giSetupGameType;
+#ifdef HOMM2_EDITOR
+#endif
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;

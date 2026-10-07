@@ -40,9 +40,9 @@ typedef enum WindowConstant {
 } WindowConstant;
 
 heroWindow::heroWindow(void) {
-    strcpy(name, "Default Construct");
+    strcpy(m_name, "Default Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = m_posY = 0;
     m_winWidth = LOGICAL_SCREEN_WIDTH;
     m_winHeight = LOGICAL_SCREEN_HEIGHT;
@@ -55,9 +55,9 @@ heroWindow::heroWindow(void) {
 heroWindow::heroWindow(
     i32 x, i32 y, i32 width, i32 height, WindowFlag flags
 ) {
-    strcpy(name, "Dynamic Construct");
+    strcpy(m_name, "Dynamic Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = width;
@@ -81,13 +81,13 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
     listBoxWidget* pListBox;
     i32 finishedReading;
     u32l resourceId;
-    strcpy(name, resourceName);
+    strcpy(m_name, resourceName);
     resourceId = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(resourceId);
     m_savedBackground = NULL;
     m_nextWindow = m_prevWindow = NULL;
     m_winState = WINDOW_STATE_CLOSED;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
@@ -166,17 +166,17 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
                 break;
         }
         if (finishedReading == 0 && pWidget != NULL)
-            AddWidget(pWidget, -1);
+            AddWidget(pWidget, WINDOW_Z_ORDER_TOP);
     }
 }
 
-i32 heroWindow::Open(i32 x, i32 flags) {
+i32 heroWindow::Open(i32 zOrder, i32 updateScreen) {
     if ((((m_winState) & (WINDOW_STATE_OPEN))) != 0)
         return OPEN_FAILURE;
     if ((((m_winFlags) & (WINDOW_FLAG_SAVE_BACKGROUND))) != 0 && SaveBackground() != 0)
         return OPEN_FAILURE;
-    m_zOrder = x;
-    DrawWindow(flags);
+    m_zOrder = zOrder;
+    DrawWindow(updateScreen);
     m_winState |= WINDOW_STATE_OPEN;
     return 0;
 }
@@ -214,7 +214,7 @@ void heroWindow::Close(void) {
 
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* currentWidget = m_widgetListHead;
-    if (zOrder == -1) {
+    if (zOrder == WINDOW_Z_ORDER_TOP) {
         if (currentWidget == NULL)
             zOrder = 0;
         else

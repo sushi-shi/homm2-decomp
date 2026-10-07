@@ -286,7 +286,7 @@ void inputManager::Flush(void) {
 static inline void InitializeEmptyEvent(tag_message& event) {
     event.type = MESSAGE_NONE;
     event.payload.widget.id = 0;
-    event.payload.widget.command = BaseWidgetCommand(event.payload.widget.id);
+    event.payload.widget.command = static_cast<BaseWidgetCommand>(event.payload.widget.id);
     event.payload.widget.parameter = (event.payload.widget.command);
 }
 

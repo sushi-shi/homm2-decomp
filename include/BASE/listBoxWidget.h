@@ -7,6 +7,19 @@
 
 struct tag_message;
 
+typedef enum ListBoxSelectionClickCount {
+
+
+    SELECTION_SINGLE_CLICK = 1,
+    SELECTION_DOUBLE_CLICK = 2
+} ListBoxSelectionClickCount;
+
+typedef enum ListBoxSelectedIndex {
+
+
+    LIST_BOX_NO_SELECTION = -1
+} ListBoxSelectedIndex;
+
 #pragma pack(push, 1)
 class font;
 class icon;

@@ -127,6 +127,8 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     findHandleWork = FindFirstFile(gText, &findFileData);
     if (findHandleWork != INVALID_HANDLE_VALUE) {
         while (haveMore) {
+
+#ifndef HOMM2_EDITOR
             if (m_mode == FILE_REQUESTER_MAP_GAME) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
@@ -137,6 +139,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto CountNextFile;
             }
+#endif
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
@@ -190,6 +193,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     if (findHandleWork != INVALID_HANDLE_VALUE) {
         haveMore = 1;
         while (haveMore) {
+#ifndef HOMM2_EDITOR
             if (m_mode == FILE_REQUESTER_MAP_GAME) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
@@ -200,6 +204,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto InsertNextFile;
             }
+#endif
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
@@ -248,9 +253,9 @@ fileRequester::fileRequester(
     i32 x,
     i32 y,
     FileRequesterMode mode,
-    char* pattern,
-    char* directory,
-    char* defaultExtension
+    const char* pattern,
+    const char* directory,
+    const char* defaultExtension
 ) {
     strcpy(m_filePattern, pattern);
     strcpy(m_directory, directory);
@@ -366,8 +371,17 @@ i32 fileRequester::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     u8 enabled;
-    i32 fileSlot;
-    char* dot;
+    i32 fileSlot [[maybe_unused]];
+    char* dot [[maybe_unused]];
+#ifdef HOMM2_EDITOR
+
+
+    enabled = 1;
+    message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
+    sprintf(gText, "Загрузить файл:");
+    message.payload.widget.data.text = gText;
+    m_window->BroadcastMessage(message);
+#else
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
         enabled = 1;
         strcpy(m_filename, gpGame->m_saveName);
@@ -416,6 +430,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
+#endif
 
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
@@ -657,6 +672,13 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (!MapExistsForFilter(
                                         static_cast<FileRequesterMapSizeFilter>(iResult)
                                     )) {
+#ifdef HOMM2_EDITOR
+
+                                    sprintf(
+                                        gText,
+                                        "Нет карт такого размера."
+                                    );
+#else
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
@@ -674,6 +696,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                             giNumHumanPlayers
                                         );
                                     }
+#endif
                                     NormalDialog(gText, NORMAL_DIALOG_INFO);
                                     break;
                                 }
@@ -838,6 +861,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     }
 
     if (acceptStep == 1) {
+#ifndef HOMM2_EDITOR
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
             && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
@@ -869,11 +893,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult - giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES) {
                     acceptStep = false;
                 }
             }
         }
+#endif
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;

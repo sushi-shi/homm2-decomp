@@ -13,6 +13,10 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/display.h>
 
+#ifdef HOMM2_EDITOR
+
+#else
+#endif
 
 typedef enum WingraphPaletteConstant {
     PALETTE_VALUE_SHIFT = 2,
@@ -753,6 +757,18 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
     result = RealizePalette(deviceContext);
     ReleaseDC(hwndApp, deviceContext);
     if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != NULL) {
+#ifdef HOMM2_EDITOR
+
+        BlitBitmapToScreen(
+            gpWindowManager->m_screen,
+            0,
+            0,
+            LOGICAL_SCREEN_WIDTH,
+            LOGICAL_SCREEN_HEIGHT,
+            0,
+            0
+        );
+#else
         if (gbLimitedCombatUpdatePalette != 0) {
             if (gbFullCombatScreenDrawn != 0)
                 BlitBitmapToScreen(
@@ -775,6 +791,7 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
                 0
             );
         }
+#endif
     }
 }
 

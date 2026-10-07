@@ -65,9 +65,9 @@ enum {
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND = 2,
-    COMBAT_CASTLE_GATE_HIDDEN            = 3,
+    COMBAT_CASTLE_GATE_DESTROYED         = 3,
     COMBAT_DRAWBRIDGE_RAISED             = 4,
-    COMBAT_CASTLE_GATE_OPEN              =
+    COMBAT_CASTLE_GATE_CLOSED            =
         COMBAT_DRAWBRIDGE_RAISED
 };
 typedef i32 CombatDrawbridgeState;
@@ -196,7 +196,7 @@ typedef enum CombatGridConstant {
     COMBAT_GRID_LEFT_SPECIAL_X_MAX     = 74,
     COMBAT_GRID_LEFT_SPECIAL_Y_MIN     = 80,
     COMBAT_GRID_LEFT_SPECIAL_Y_MAX     = 196,
-    COMBAT_GRID_LEFT_SPECIAL_HEX       = 26,
+    COMBAT_GRID_LEFT_HERO_HEX          = 26,
     COMBAT_GRID_RIGHT_SPECIAL_X_MIN    = 566,
     COMBAT_GRID_RIGHT_UPPER_Y_MIN      = 37,
     COMBAT_GRID_RIGHT_UPPER_Y_MAX      = 153,
@@ -798,7 +798,6 @@ public:
 #pragma pack(pop)
 extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
-extern i32 iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
 extern b32 bInTeleportGetDest;

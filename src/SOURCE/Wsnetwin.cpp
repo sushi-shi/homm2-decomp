@@ -39,7 +39,7 @@ i16 wsnet_init(void) {
 
             "Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы получили доступ к диалоговым окнам Windows.\n\nКогда соединение будет установлено, вы сможете вернуться в полноэкранный режим нажав 'F4'."
         );
-        NormalDialog(gText, 1);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;

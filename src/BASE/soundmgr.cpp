@@ -31,16 +31,8 @@ typedef enum SoundConstant {
     DEFAULT_SAMPLE_RATE          = 22050,
     DEFAULT_SAMPLE_BITS          = 8,
     DEFAULT_SAMPLE_CHANNELS      = 1,
-    SAMPLE_STOP_ALL_WAIT_COUNT   = 5,
-    SAMPLE_STOP_MUSIC_WAIT_COUNT = 10,
-    FADE_STEP_TICKS              = 60,
-    NO_SAMPLE_CHANNEL_TYPE       = SOUND_CHANNEL_TYPE_COUNT
+    FADE_STEP_TICKS              = 60
 } SoundConstant;
-
-typedef enum SoundSampleStatus {
-    SAMPLE_STATUS_DONE    = 2,
-    SAMPLE_STATUS_PLAYING = 4
-} SoundSampleStatus;
 
 
 static WAVEOUTCAPSA gWaveOutCaps = {};

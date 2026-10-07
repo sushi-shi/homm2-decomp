@@ -5,6 +5,7 @@
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
 #include <BASE/iconWidget.h>
 #include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
@@ -42,9 +43,7 @@ typedef enum ArenaConstant {
     WIDGET_LAST_ID        = 102,
     SELECTED_FRAME_OFFSET = 4,
     TEXT_BACKGROUND       = -1,
-    CYCLE_KEY             = 15,
-    BROADCAST_TEXT_ID     = 1,
-    DRAW_MODE             = 1
+    BROADCAST_TEXT_ID     = 1
 } ArenaConstant;
 
 i32 DoArenaDialog(void) {
@@ -160,7 +159,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     }
 
     if (message_1.type == MESSAGE_KEY_DOWN) {
-        if (message_1.payload.keyboard.keyCode == CYCLE_KEY) {
+        if (message_1.payload.keyboard.keyCode == INPUT_SCAN_TAB) {
             choice++;
             if (choice >= CHOICE_COUNT)
                 choice = 0;
@@ -232,7 +231,7 @@ void UpdateArenaIcons(void) {
             MemError();
         arenaWinPtr->AddWidget(skillWidget[widgetIndex], -1);
     }
-    arenaWinPtr->DrawWindow(DRAW_MODE, WIDGET_FIRST_ID, WIDGET_LAST_ID);
+    arenaWinPtr->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, WIDGET_FIRST_ID, WIDGET_LAST_ID);
 }
 
 i32 choice;

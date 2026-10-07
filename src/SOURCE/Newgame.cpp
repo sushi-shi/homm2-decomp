@@ -419,7 +419,7 @@ i32 game::NewGame(void) {
     }
 
     SetupNetPlayerNames();
-    glTimers[0] = 0;
+    glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = 0;
     for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
@@ -1034,7 +1034,7 @@ cleanup:
                         break;
                 }
             }
-            if (KBTickCount() > glTimers[0]) {
+            if (KBTickCount() > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, NGKPcursorIndex);
                 gpGame->DrawNGKPDisplayString(1);
             }
@@ -1075,9 +1075,9 @@ cleanup:
             if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
-                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
+                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_BUTTON_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_COUNT) - 1)
+                                <= NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
                             && message.payload.widget.id
                                    <= NEW_GAME_DIFFICULTY_FIRST + (DIFFICULTY_COUNT) - 1))
@@ -1169,13 +1169,13 @@ cleanup:
 
                     case WIDGET_NOTIFY_SELECT:
                         switch (message.payload.widget.id) {
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + (DIFFICULTY_IMPOSSIBLE):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + (DIFFICULTY_IMPOSSIBLE):
                                 currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_BUTTON_FIRST;
                                 goto setDifficulty;
 
                             case NEW_GAME_DIFFICULTY_FIRST + (DIFFICULTY_EASY):
@@ -1561,9 +1561,9 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (KBTickCount() > glTimers[0]) {
+    if (KBTickCount() > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
-        glTimers[0] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
+        glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
     }
 
     if (cursor > 0)
@@ -2087,7 +2087,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             localPlayer = i;
     }
 
-    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer ? 1 : 0;
+    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer;
 
     sideCount = lastPlayer - firstPlayer + 1;
     otherPlayerCount = sideCount - (onSide != 0);

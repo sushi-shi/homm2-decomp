@@ -4,6 +4,7 @@
 
 #include <Ints.h>
 #include <Ints.h>
+#include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 
 typedef enum EditorStatusBar {
@@ -61,19 +62,53 @@ typedef enum EditorTableCount {
     SPEC_VICTORY_CONDITION_COUNT = 6,
     SPEC_LOSS_CONDITION_COUNT = 4,
 
+    CLEAR_HELP_COUNT = 20,
+
     RANDOM_MAP_TERRAIN_COUNT = 8,
     RANDOM_MAP_DENSITY_COUNT = 5,
 
-    EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74
+    EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74,
+
+    EDITOR_TIME_EVENT_CAPACITY = 50,
+    EDITOR_RUMOUR_CAPACITY = 30,
+    EDITOR_PLAYER_COLOR_COUNT = 6
 } EditorTableCount;
+
+typedef enum RandomMapDensity {
+
+    RANDOM_MAP_DENSITY_MOUNTAINS = 0,
+    RANDOM_MAP_DENSITY_TREES     = 1,
+    RANDOM_MAP_DENSITY_OBJECTS   = 2,
+    RANDOM_MAP_DENSITY_TREASURE  = 3,
+    RANDOM_MAP_DENSITY_MONSTERS  = 4
+} RandomMapDensity;
+
+typedef enum EditorWinText {
+
+    EDITOR_WIN_TEXT_SYSTEM_OPTIONS    = 3,
+    EDITOR_WIN_TEXT_EVENT             = 4,
+    EDITOR_WIN_TEXT_HERO              = 5,
+    EDITOR_WIN_TEXT_MONSTER           = 8,
+    EDITOR_WIN_TEXT_SPHINX            = 10,
+
+    EDITOR_WIN_TEXT_RUMOUR            = 11,
+    EDITOR_WIN_TEXT_SPECIFICATIONS    = 13,
+    EDITOR_WIN_TEXT_TOWN              = 15,
+    EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT = 16
+} EditorWinText;
 
 extern i32 gRandomMapPlayers;
 extern double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT];
 extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];
-extern b32 gScatterTowns;
+
+
+extern b32 gScatterTerrain;
 extern b32 gGenerateUnseen;
 extern b32 gGeneratingMap;
 extern i32 gObjectClass;
+extern i32 gNextObjectLink;
+
+extern i32 gLandCellCount;
 extern i32 gZoomScale[EDIT_ZOOM_COUNT];
 extern i32 gZoomCellSize[EDIT_ZOOM_COUNT];
 extern i32 gZoomViewCells[EDIT_ZOOM_COUNT];
@@ -97,6 +132,21 @@ extern const char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT];
 extern const char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT];
 extern const char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 
+extern const char* gClearHelp[CLEAR_HELP_COUNT];
+
+
+class editManager;
+extern editManager* gEditManager;
+
+extern i32 gSelectionX;
+extern i32 gSelectionY;
+extern i32 gSelectionWidth;
+extern i32 gSelectionHeight;
+
+
+extern class heroWindow* gEditDialog;
+extern class mapCell* gEditCell;
+
 extern fullMap gMaps[EDIT_MAP_COPIES];
 #define gMap (gMaps[EDIT_MAP_CURRENT])
 #define gUndoMap (gMaps[EDIT_MAP_UNDO])
@@ -111,12 +161,47 @@ extern b32 gStatusTextShown;
 extern i32 gStatusTextHoldTime;
 extern i32 gStatusTextClearTime;
 
+
+extern u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
+extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
+
+extern const char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
+
+class heroWindow;
+struct tag_message;
+
+
+extern "C" void PollSound(void);
+i32 oldmain(void);
+void DelayTil(i32* endTime);
+void DelayMilli(i32l delay);
+void DelayTilMilli(i32l endTime);
+void FileError(const char* filename);
+void ShutDown(const char* message);
+i32 InterpretCommandLine(void);
+void EarlyShutdown(const char* caption, const char* text);
+i32 EarlySetup(void);
+void MemError(void);
+void InitMainClasses(void);
+void DeleteMainClasses(void);
+MessageDispatchResult EventWindowHandler(struct tag_message& message);
+void QuickViewWait(void);
+void UpdateAppSpecificMenus(void* hMenu);
+void CleanUpMenus(void);
+void EarlyShutDownSystem(void);
+i32 GameUnsaved(void);
+i32 HandleAppSpecificMenuCommands(i32 command);
+void EarlyResizeWindow(i32 x, i32 y, i32 width, i32 height);
+void UpdateSystemOptionsMenu(void);
+void SetWinText(heroWindow* window, i32 id);
+
+
 void ProtectShippedMap(void);
 void IncrementArgumentA(i32 value);
 void EditorIdleHook(void);
 void IncrementArgumentB(i32 value);
 void DelayTicks(i32 ticks);
-void ShowStatusText(char* text);
+void ShowStatusText(const char* text);
 void ClearStatusText(void);
 
 #endif

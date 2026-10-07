@@ -14,7 +14,7 @@ enum {
     TOWN_BUILDING_DOCK                          = 0x8,
     TOWN_BUILDING_TENT                          = 0x20,
     TOWN_BUILDING_CASTLE                        = 0x40,
-    TOWN_BUILDING_CAPTAIN                       = 0x80,
+    TOWN_BUILDING_STATUE                        = 0x80,
     TOWN_BUILDING_LEFT_TURRET                   = 0x100,
     TOWN_BUILDING_RIGHT_TURRET                  = 0x200,
     TOWN_BUILDING_MARKETPLACE                   = 0x400,

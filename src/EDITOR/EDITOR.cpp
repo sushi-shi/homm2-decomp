@@ -2,12 +2,15 @@
 
 #include <Ints.h>
 #include <EDITOR/EDITOR.h>
+#include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
+#include <EDITOR/lineManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/NOOPT.h>
+#include <SOURCE/fileRequester.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/Misc.h>
@@ -24,6 +27,7 @@
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
+#include <BASE/widget.h>
 #include <windows.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -38,24 +42,16 @@ typedef enum EditorStartupConstant {
     EDITOR_SETUP_NEW_MAP        = 1,
     EDITOR_SETUP_LOAD_MAP       = 2,
     EDITOR_SETUP_QUIT           = 0x69,
-    EDITOR_SETUP_PICK_LOAD_MODE = 4,
     EDITOR_FADE_STEPS           = 6,
     EDITOR_SLOW_FADE_STEPS      = 8,
 
     EDITOR_BACKGROUND_COLOR     = 0x24,
-    EDITOR_SCREEN_BYTES         = 640 * 480,
-
-    EDITOR_CD_NO_DRIVE          = 1,
-    EDITOR_CD_NOT_FOUND         = 2,
-    EDITOR_CD_NO_APP_PATH       = 3,
-    EDITOR_CD_NO_DATA           = 4,
 
     EDITOR_DELAY_TICK_MILLISECONDS = 15,
     EDITOR_DELAY_TIMER_SLOT     = 1,
     EDITOR_MOUSE_UPDATE_INTERVAL = 13,
     EDITOR_COLOR_CYCLE_INTERVAL = 200,
     EDITOR_NON_PALETTED_CYCLE_DELAY = 300,
-    EDITOR_PALETTED_COLOR_DEPTH = 8,
 
     EDITOR_SHUTDOWN_TEXT_SIZE   = 768,
     EDITOR_FILE_ERROR_TEXT_SIZE = 200
@@ -76,8 +72,6 @@ typedef enum EditorNormalDialogConstant {
     EDITOR_DIALOG_ROW_OFFSET       = 12,
     EDITOR_DIALOG_WINDOW_WIDTH     = 0x11e,
     EDITOR_DIALOG_WINDOW_BASE      = 0x81,
-    EDITOR_DIALOG_SCREEN_MAX_X     = 0x27f,
-    EDITOR_DIALOG_SCREEN_MAX_Y     = 0x1df,
     EDITOR_DIALOG_DEFAULT_X        = 0x9f,
 } EditorNormalDialogConstant;
 
@@ -143,28 +137,28 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(21),
     GROUND_REPEAT_2(19),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_REPEAT_4(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED,
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_REPEAT_4(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED,
     GROUND_REPEAT_4(5),
     GROUND_REPEAT_4(6),
     GROUND_REPEAT_4(7),
     GROUND_REPEAT_4(8),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED
 };
 
 #undef GROUND_SHAPE_STANDARD_FRAME_SET
@@ -840,7 +834,7 @@ i32 gSelectionX = EDIT_NO_CELL;
 i32 gRandomMapPlayers = 4;
 double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT] = {30.0, 30.0, 20.0, 0.0, 0.0, 0.0, 20.0, 0.0};
 double gDensityPercent[RANDOM_MAP_DENSITY_COUNT] = {50.0, 50.0, 50.0, 50.0, 50.0};
-b32 gScatterTowns = true;
+b32 gScatterTerrain = true;
 struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
@@ -1201,122 +1195,122 @@ const char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT] = {
 };
 
 SWinSetup gWinSetup[EDITOR_DIALOG_WIN_SETUP_COUNT] = {
-    {16, 500, "Свойства Могущественного артефакта\n\n\n\nУкажите допустимый радиус расположения артефакта от этой локации"},
-    {3, 100, "Анимация"},
-    {3, 101, "По кругу"},
-    {3, 103, "Сетка"},
-    {3, 105, "Курсор мыши"},
-    {4, 100, "Событие"},
-    {4, 101, "Текст сообщения"},
-    {4, 102, "Дать ресурсов (или забрать, если отрицательное число.)"},
-    {4, 103, "Древесина"},
-    {4, 104, "Ртуть"},
-    {4, 105, "Руда"},
-    {4, 106, "Сера"},
-    {4, 107, "Кристаллы"},
-    {4, 108, "Самоцветы"},
-    {4, 109, "Золото"},
-    {4, 400, "День первого появления"},
-    {4, 420, "Повторять событие"},
-    {4, 300, "Дать артефакт"},
-    {4, 305, "Событие влияет на компьютер"},
-    {4, 302, "Отменить событие после 1 посещения"},
-    {4, 600, "Цвет игроков, на кого действует:"},
-    {5, 100, "Информация о герое"},
-    {5, 200, "Войска"},
-    {5, 201, "Обычные"},
-    {5, 202, "Выбрать"},
-    {5, 210, "Тип"},
-    {5, 211, "К-во."},
-    {5, 212, "Мон 1"},
-    {5, 213, "Мон 2"},
-    {5, 214, "Мон 3"},
-    {5, 215, "Мон 4"},
-    {5, 216, "Мон 5"},
-    {5, 300, "Артефакты"},
-    {5, 304, "Слот 1"},
-    {5, 305, "Слот 2"},
-    {5, 306, "Слот 3"},
-    {5, 800, "Патрулировать"},
-    {5, 400, "Опыт"},
-    {5, 500, "Вторичные навыки"},
-    {5, 501, "Обычные"},
-    {5, 502, "Выбрать"},
-    {5, 510, "Навык 1"},
-    {5, 511, "Навык 2"},
-    {5, 512, "Навык 3"},
-    {5, 513, "Навык 4"},
-    {5, 514, "Навык 5"},
-    {5, 515, "Навык 6"},
-    {5, 516, "Навык 7"},
-    {5, 517, "Навык 8"},
-    {5, 600, "Имя"},
-    {5, 601, "Обычное"},
-    {5, 602, "Задать"},
-    {5, 700, "Портрет"},
-    {8, 500, "Монстры\n\n\n\n0 для случайного количества.,\n\nили положительное число."},
-    {10, 100, "Загадка"},
-    {10, 101, "Текст загадки"},
-    {10, 102, "Награда за верный ответ\n(отрицательное число тоже подходит)"},
-    {10, 103, "Древесина"},
-    {10, 104, "Ртуть"},
-    {10, 105, "Руда"},
-    {10, 106, "Сера"},
-    {10, 107, "Кристаллы"},
-    {10, 108, "Самоцветы"},
-    {10, 109, "Золото"},
-    {10, 300, "Дать артефакт"},
-    {10, 400, "Ответ(ы)"},
-    {11, 100, "Слух"},
-    {13, 200, "Условие победы"},
-    {13, 220, "Компьютер также выигрывает через особые условия победы"},
-    {13, 221, "Также обычные условия победы"},
-    {13, 250, "Особые условия победы"},
-    {13, 300, "Условия поражения"},
-    {13, 320, "Особые условия поражения"},
-    {13, 400, "Название карты"},
-    {13, 401, "Название файла:"},
-    {13, 500, "Описание"},
-    {13, 600, "Сложность"},
-    {13, 610, "Легкая"},
-    {13, 611, "Обычная"},
-    {13, 612, "Тяжелая"},
-    {13, 613, "Эксперт"},
-    {13, 100, "Игроки"},
-    {13, 700, "Начинать с героем в каждом главном замке"},
-    {13, 800, "Слухи"},
-    {13, 900, "События"},
-    {15, 100, "Город"},
-    {15, 200, "Войска"},
-    {15, 201, "Обычные"},
-    {15, 202, "Выбрать"},
-    {15, 210, "Тип"},
-    {15, 211, "К-во."},
-    {15, 212, "Мон 1"},
-    {15, 213, "Мон 2"},
-    {15, 214, "Мон 3"},
-    {15, 215, "Мон 4"},
-    {15, 216, "Мон 5"},
-    {15, 600, "Название"},
-    {15, 601, "Обычное"},
-    {15, 602, "Выбрать"},
-    {15, 300, "Капитан"},
-    {15, 310, "Можно строить замок"},
-    {15, 400, "Постройки"},
-    {15, 401, "Обычные"},
-    {15, 402, "Выбрать"},
-    {15, 470, "Гильдия магов"},
-    {15, 510, "Жилище 1"},
-    {15, 512, "Жилище 2"},
-    {15, 513, "Улучш."},
-    {15, 514, "Жилище 3"},
-    {15, 515, "Улучш."},
-    {15, 516, "Жилище 4"},
-    {15, 517, "Улучш."},
-    {15, 518, "Жилище 5"},
-    {15, 519, "Улучш."},
-    {15, 520, "Жилище 6"},
-    {15, 521, "Улучш."}
+    {EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT, 500, "Свойства Могущественного артефакта\n\n\n\nУкажите допустимый радиус расположения артефакта от этой локации"},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 100, "Анимация"},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 101, "По кругу"},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 103, "Сетка"},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 105, "Курсор мыши"},
+    {EDITOR_WIN_TEXT_EVENT, 100, "Событие"},
+    {EDITOR_WIN_TEXT_EVENT, 101, "Текст сообщения"},
+    {EDITOR_WIN_TEXT_EVENT, 102, "Дать ресурсов (или забрать, если отрицательное число.)"},
+    {EDITOR_WIN_TEXT_EVENT, 103, "Древесина"},
+    {EDITOR_WIN_TEXT_EVENT, 104, "Ртуть"},
+    {EDITOR_WIN_TEXT_EVENT, 105, "Руда"},
+    {EDITOR_WIN_TEXT_EVENT, 106, "Сера"},
+    {EDITOR_WIN_TEXT_EVENT, 107, "Кристаллы"},
+    {EDITOR_WIN_TEXT_EVENT, 108, "Самоцветы"},
+    {EDITOR_WIN_TEXT_EVENT, 109, "Золото"},
+    {EDITOR_WIN_TEXT_EVENT, 400, "День первого появления"},
+    {EDITOR_WIN_TEXT_EVENT, 420, "Повторять событие"},
+    {EDITOR_WIN_TEXT_EVENT, 300, "Дать артефакт"},
+    {EDITOR_WIN_TEXT_EVENT, 305, "Событие влияет на компьютер"},
+    {EDITOR_WIN_TEXT_EVENT, 302, "Отменить событие после 1 посещения"},
+    {EDITOR_WIN_TEXT_EVENT, 600, "Цвет игроков, на кого действует:"},
+    {EDITOR_WIN_TEXT_HERO, 100, "Информация о герое"},
+    {EDITOR_WIN_TEXT_HERO, 200, "Войска"},
+    {EDITOR_WIN_TEXT_HERO, 201, "Обычные"},
+    {EDITOR_WIN_TEXT_HERO, 202, "Выбрать"},
+    {EDITOR_WIN_TEXT_HERO, 210, "Тип"},
+    {EDITOR_WIN_TEXT_HERO, 211, "К-во."},
+    {EDITOR_WIN_TEXT_HERO, 212, "Мон 1"},
+    {EDITOR_WIN_TEXT_HERO, 213, "Мон 2"},
+    {EDITOR_WIN_TEXT_HERO, 214, "Мон 3"},
+    {EDITOR_WIN_TEXT_HERO, 215, "Мон 4"},
+    {EDITOR_WIN_TEXT_HERO, 216, "Мон 5"},
+    {EDITOR_WIN_TEXT_HERO, 300, "Артефакты"},
+    {EDITOR_WIN_TEXT_HERO, 304, "Слот 1"},
+    {EDITOR_WIN_TEXT_HERO, 305, "Слот 2"},
+    {EDITOR_WIN_TEXT_HERO, 306, "Слот 3"},
+    {EDITOR_WIN_TEXT_HERO, 800, "Патрулировать"},
+    {EDITOR_WIN_TEXT_HERO, 400, "Опыт"},
+    {EDITOR_WIN_TEXT_HERO, 500, "Вторичные навыки"},
+    {EDITOR_WIN_TEXT_HERO, 501, "Обычные"},
+    {EDITOR_WIN_TEXT_HERO, 502, "Выбрать"},
+    {EDITOR_WIN_TEXT_HERO, 510, "Навык 1"},
+    {EDITOR_WIN_TEXT_HERO, 511, "Навык 2"},
+    {EDITOR_WIN_TEXT_HERO, 512, "Навык 3"},
+    {EDITOR_WIN_TEXT_HERO, 513, "Навык 4"},
+    {EDITOR_WIN_TEXT_HERO, 514, "Навык 5"},
+    {EDITOR_WIN_TEXT_HERO, 515, "Навык 6"},
+    {EDITOR_WIN_TEXT_HERO, 516, "Навык 7"},
+    {EDITOR_WIN_TEXT_HERO, 517, "Навык 8"},
+    {EDITOR_WIN_TEXT_HERO, 600, "Имя"},
+    {EDITOR_WIN_TEXT_HERO, 601, "Обычное"},
+    {EDITOR_WIN_TEXT_HERO, 602, "Задать"},
+    {EDITOR_WIN_TEXT_HERO, 700, "Портрет"},
+    {EDITOR_WIN_TEXT_MONSTER, 500, "Монстры\n\n\n\n0 для случайного количества.,\n\nили положительное число."},
+    {EDITOR_WIN_TEXT_SPHINX, 100, "Загадка"},
+    {EDITOR_WIN_TEXT_SPHINX, 101, "Текст загадки"},
+    {EDITOR_WIN_TEXT_SPHINX, 102, "Награда за верный ответ\n(отрицательное число тоже подходит)"},
+    {EDITOR_WIN_TEXT_SPHINX, 103, "Древесина"},
+    {EDITOR_WIN_TEXT_SPHINX, 104, "Ртуть"},
+    {EDITOR_WIN_TEXT_SPHINX, 105, "Руда"},
+    {EDITOR_WIN_TEXT_SPHINX, 106, "Сера"},
+    {EDITOR_WIN_TEXT_SPHINX, 107, "Кристаллы"},
+    {EDITOR_WIN_TEXT_SPHINX, 108, "Самоцветы"},
+    {EDITOR_WIN_TEXT_SPHINX, 109, "Золото"},
+    {EDITOR_WIN_TEXT_SPHINX, 300, "Дать артефакт"},
+    {EDITOR_WIN_TEXT_SPHINX, 400, "Ответ(ы)"},
+    {EDITOR_WIN_TEXT_RUMOUR, 100, "Слух"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 200, "Условие победы"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 220, "Компьютер также выигрывает через особые условия победы"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 221, "Также обычные условия победы"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 250, "Особые условия победы"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 300, "Условия поражения"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 320, "Особые условия поражения"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 400, "Название карты"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 401, "Название файла:"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 500, "Описание"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 600, "Сложность"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 610, "Легкая"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 611, "Обычная"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 612, "Тяжелая"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 613, "Эксперт"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 100, "Игроки"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 700, "Начинать с героем в каждом главном замке"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 800, "Слухи"},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 900, "События"},
+    {EDITOR_WIN_TEXT_TOWN, 100, "Город"},
+    {EDITOR_WIN_TEXT_TOWN, 200, "Войска"},
+    {EDITOR_WIN_TEXT_TOWN, 201, "Обычные"},
+    {EDITOR_WIN_TEXT_TOWN, 202, "Выбрать"},
+    {EDITOR_WIN_TEXT_TOWN, 210, "Тип"},
+    {EDITOR_WIN_TEXT_TOWN, 211, "К-во."},
+    {EDITOR_WIN_TEXT_TOWN, 212, "Мон 1"},
+    {EDITOR_WIN_TEXT_TOWN, 213, "Мон 2"},
+    {EDITOR_WIN_TEXT_TOWN, 214, "Мон 3"},
+    {EDITOR_WIN_TEXT_TOWN, 215, "Мон 4"},
+    {EDITOR_WIN_TEXT_TOWN, 216, "Мон 5"},
+    {EDITOR_WIN_TEXT_TOWN, 600, "Название"},
+    {EDITOR_WIN_TEXT_TOWN, 601, "Обычное"},
+    {EDITOR_WIN_TEXT_TOWN, 602, "Выбрать"},
+    {EDITOR_WIN_TEXT_TOWN, 300, "Капитан"},
+    {EDITOR_WIN_TEXT_TOWN, 310, "Можно строить замок"},
+    {EDITOR_WIN_TEXT_TOWN, 400, "Постройки"},
+    {EDITOR_WIN_TEXT_TOWN, 401, "Обычные"},
+    {EDITOR_WIN_TEXT_TOWN, 402, "Выбрать"},
+    {EDITOR_WIN_TEXT_TOWN, 470, "Гильдия магов"},
+    {EDITOR_WIN_TEXT_TOWN, 510, "Жилище 1"},
+    {EDITOR_WIN_TEXT_TOWN, 512, "Жилище 2"},
+    {EDITOR_WIN_TEXT_TOWN, 513, "Улучш."},
+    {EDITOR_WIN_TEXT_TOWN, 514, "Жилище 3"},
+    {EDITOR_WIN_TEXT_TOWN, 515, "Улучш."},
+    {EDITOR_WIN_TEXT_TOWN, 516, "Жилище 4"},
+    {EDITOR_WIN_TEXT_TOWN, 517, "Улучш."},
+    {EDITOR_WIN_TEXT_TOWN, 518, "Жилище 5"},
+    {EDITOR_WIN_TEXT_TOWN, 519, "Улучш."},
+    {EDITOR_WIN_TEXT_TOWN, 520, "Жилище 6"},
+    {EDITOR_WIN_TEXT_TOWN, 521, "Улучш."}
 };
 
 const char* gArtifactNames[(ARTIFACT_COUNT)] = {
@@ -2364,7 +2358,7 @@ const char* gColors[(FACTION_COUNT)] = {
     "оранжевый",
     "фиолетовый"
 };
-static const char* gColorAbbreviations [[maybe_unused]][(FACTION_COUNT)] = {
+const char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT] = {
     "син.",
     "зел.",
     "кр.",
@@ -3481,9 +3475,14 @@ b32 gbInMemError = false;
 
 
 i32 giDebugLevel;
+
+char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
 u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 class mouseManager* gpMouseManager;
 char gText[GLOBAL_TEXT_BUFFER_SIZE];
+
+i32 gUnusedData4a3e80Cache[3];
 char* EXPANSION_AGGREGATE_NAME;
 char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 char* DEFAULT_AGGREGATE_NAME;
@@ -3496,27 +3495,42 @@ char gMapFileName[EDITOR_MAP_FILE_NAME_SIZE];
 char gStatusText[EDITOR_STATUS_TEXT_SIZE];
 i32 gSelectionY;
 resourceManager* gpResourceManager;
+u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 heroWindow* pNormalDialogWindow;
 u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+heroWindow* gEditDialog;
 i32 gSelectionHeight;
 soundManager* gpSoundManager;
 char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 i32 gStatusTextHoldTime;
+
+i32 gUnusedData4a42fcBlock[2];
+mapCell* gEditCell;
 class palette* gpBufferPalette;
 palette* gPalette;
 char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 i32 giMaxExtentX;
 i32 giMaxExtentY;
+
+i32 gUnusedData4a45d8Instance[2];
 inputManager* gpInputManager;
+char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
+
+i32 gNextObjectLink;
 char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 configStruct gConfig;
+
+i32 gUnusedData4a47d8StateBlock;
 i32 giMinExtentX;
 i32 giMinExtentY;
 executive* gpExec;
+i32 gLandCellCount;
 i32 giCurWindowsStyleFlags;
 char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 i32 glTimers[GLOBAL_TIMER_COUNT];
+
+i32 gUnusedData4a4978Runtime[5];
 
 extern "C" void PollSound(void) {
     if (gbInPollSound)
@@ -3529,7 +3543,7 @@ extern "C" void PollSound(void) {
     if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + EDITOR_COLOR_CYCLE_INTERVAL;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
-            && giMainVideoModeColorDepth != EDITOR_PALETTED_COLOR_DEPTH)
+            && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += EDITOR_NON_PALETTED_CYCLE_DELAY;
         CycleColors(0);
     }
@@ -3543,7 +3557,7 @@ void ProtectShippedMap(void) {
     if (gbShowAllMaps)
         return;
     for (i = 0; i < EDITOR_SHIPPED_MAP_COUNT; i++) {
-        if (!strcmpi(gMapFileName, gShippedMaps[i][0])) {
+        if (!stricmp(gMapFileName, gShippedMaps[i][0])) {
             strcpy(gMapFileName, gShippedMaps[i][1]);
             memmove(gEditMapHeader.name + 1, gEditMapHeader.name, sizeof(gEditMapHeader.name) - 1);
             gEditMapHeader.name[sizeof(gEditMapHeader.name) - 1] = 0;
@@ -3555,7 +3569,7 @@ void ProtectShippedMap(void) {
 i32 oldmain(void) {
     heroWindow* window;
     i32 result;
-    i32 keepRunning;
+    b32 keepRunning;
     char loadName[EDITOR_MAP_FILE_NAME_SIZE];
 
     if (gpExec->InitSystem())
@@ -3564,15 +3578,15 @@ i32 oldmain(void) {
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("BIGfont.fnt");
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, true);
     gpWindowManager->UpdateScreen();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_FADE_STEPS, gPalette);
-    gpMouseManager->SetPointer("editor.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("editor.mse", EDIT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[(giCurExe)].colorMouseCursor);
     gpMouseManager->ShowColorPointer();
     window = NULL;
     result = -1;
-    keepRunning = 1;
+    keepRunning = true;
     while (keepRunning) {
         gbInSetupDialog = true;
         window = new heroWindow(EDITOR_SETUP_WINDOW_X, EDITOR_SETUP_WINDOW_Y, "stpemain.bin");
@@ -3584,13 +3598,13 @@ i32 oldmain(void) {
         gbInSetupDialog = false;
         switch (result) {
             case EDITOR_SETUP_LOAD_MAP:
-                if (PickMap(EDITOR_SETUP_PICK_LOAD_MODE))
-                    keepRunning = 0;
+                if (PickMap(FILE_REQUESTER_MAP))
+                    keepRunning = false;
                 sprintf(loadName, gMapFileName);
                 break;
             case EDITOR_SETUP_NEW_MAP:
                 if (SetupNewMap())
-                    keepRunning = 0;
+                    keepRunning = false;
                 break;
             case EDITOR_SETUP_QUIT:
             case DIALOG_BUTTON_1:
@@ -3601,15 +3615,19 @@ i32 oldmain(void) {
     }
     gpMouseManager->HideColorPointer();
     gpWindowManager->FadeScreen(FADE_OUT, EDITOR_SLOW_FADE_STEPS, gPalette);
-    memset(gpWindowManager->m_screen->m_pixels, EDITOR_BACKGROUND_COLOR, EDITOR_SCREEN_BYTES);
-    if (gpExec->AddManager(gEditManager, -1))
+    memset(
+        gpWindowManager->m_screen->m_pixels,
+        EDITOR_BACKGROUND_COLOR,
+        LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
+    );
+    if (gpExec->AddManager(gEditManager, BASE_MANAGER_PRIORITY_UNASSIGNED))
         ShutDown("Не могу добавить менеджера!");
     if (result == EDITOR_SETUP_LOAD_MAP) {
         strcpy(gMapFileName, loadName);
         gEditManager->LoadMap(gMapFileName);
         ProtectShippedMap();
     }
-    gEditManager->DrawRadar(1);
+    gEditManager->DrawRadar(true);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_SLOW_FADE_STEPS, gPalette);
@@ -3682,9 +3700,9 @@ void ShutDown(const char* message) {
         sprintf(buffer, "Пока!");
     }
     gbClosingApp = true;
-    if (mapExtra)
-        delete mapExtra;
-    mapExtra = NULL;
+    if (gLineMap)
+        delete gLineMap;
+    gLineMap = NULL;
     if (bigFont) {
         gpResourceManager->Dispose(bigFont);
         bigFont = NULL;
@@ -3738,7 +3756,7 @@ void EarlyShutdown(const char* caption, const char* text) {
 }
 
 i32 EarlySetup(void) {
-    i32 result;
+    CDRomSetupResult result;
     i32 i;
 
     if (bEarlySetupDone)
@@ -3754,28 +3772,28 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     result = SetupCDDrive();
-    if (result == EDITOR_CD_NO_DRIVE) {
+    if (result == CD_ROM_DRIVE_UNAVAILABLE) {
         EarlyShutdown(
             "Ошибка загрузки",
             "Нет доступа к CD-ROM."
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NOT_FOUND) {
+    if (result == CD_ROM_EXPANSION_DISC_MISSING) {
         EarlyShutdown(
             "Ошибка загрузки",
             "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_APP_PATH) {
+    if (result == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
             "Ошибка загрузки",
             "Не могу переключиться в директорию Героев II.  Запустите программу установки."
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_DATA) {
+    if (result == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
             "Ошибка загрузки",
             "Не могу найти файлы данных Героев II.  Пожалуйста, запустите программу установки."
@@ -3839,16 +3857,16 @@ void NormalDialog(
     i32 dialogType,
     i32 windowX,
     i32 windowY,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    i32 firstResourceType [[maybe_unused]],
+    i32 firstResourceValue [[maybe_unused]],
+    i32 secondResourceType [[maybe_unused]],
+    i32 secondResourceValue [[maybe_unused]],
+    i32 showOrText [[maybe_unused]],
+    i32 timeout [[maybe_unused]]
 ) {
     i32 resourceFrame [[maybe_unused]];
     i16 showMessage [[maybe_unused]];
-    i32 textWidgetId;
+    i32 textWidgetId [[maybe_unused]];
     i32 windowHeight;
     b32 showPrimaryBonus [[maybe_unused]];
     tag_message message;
@@ -3878,9 +3896,9 @@ void NormalDialog(
         windowRows = 1;
     windowWidth = EDITOR_DIALOG_WINDOW_WIDTH;
     windowHeight = windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + EDITOR_DIALOG_WINDOW_BASE;
-    if (windowX == -1 || windowWidth + windowX >= EDITOR_DIALOG_SCREEN_MAX_X)
+    if (windowX == -1 || windowWidth + windowX >= LOGICAL_SCREEN_MAX_X)
         windowX = EDITOR_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowHeight + windowY >= EDITOR_DIALOG_SCREEN_MAX_Y) {
+    if (windowY == -1 || windowHeight + windowY >= LOGICAL_SCREEN_MAX_Y) {
         windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / 2;
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
@@ -3892,7 +3910,7 @@ void NormalDialog(
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = (WIDGET_COMMAND_CLEAR_FLAGS);
+    message.payload.widget.data.value = (WIDGET_FLAG_ENABLED) | (WIDGET_FLAG_DRAW);
     message.payload.widget.id = DIALOG_BUTTON_7;
     pNormalDialogWindow->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_8;
@@ -3963,7 +3981,7 @@ void QuickViewWait(void) {
 }
 
 
-void ShowStatusText(char* text) {
+void ShowStatusText(const char* text) {
     if (gStatusTextShown && !text)
         text = gStatusText;
     else
@@ -3999,7 +4017,7 @@ void ClearStatusText(void) {
     gStatusTextClearTime = EDITOR_STATUS_TEXT_KEPT;
     if (gStatusTextShown) {
         gStatusTextShown = false;
-        gEditManager->m_window->DrawWindow(0);
+        gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             EDITOR_STATUS_BAR_X,
             EDITOR_STATUS_BAR_Y,
@@ -4009,7 +4027,7 @@ void ClearStatusText(void) {
     }
 }
 
-void UpdateAppSpecificMenus(void*) {}
+void UpdateAppSpecificMenus(void* hMenu [[maybe_unused]]) {}
 
 void CleanUpMenus(void) {
     if (hmnuApp) {
@@ -4022,7 +4040,7 @@ void CleanUpMenus(void) {
 
 void EarlyShutDownSystem(void) {
     if (gEditManager)
-        gEditManager->SelectTool(-1);
+        gEditManager->SelectTool(EDIT_TOOL_NONE);
 }
 
 i32 GameUnsaved(void) {
@@ -4053,7 +4071,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     return 0;
 }
 
-void EarlyResizeWindow(i32, i32, i32, i32) {}
+void EarlyResizeWindow(i32 x [[maybe_unused]], i32 y [[maybe_unused]], i32 width [[maybe_unused]],
+                       i32 height [[maybe_unused]]) {}
 
 void UpdateSystemOptionsMenu(void) {}
 

@@ -474,7 +474,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             "Вы действительно хотите начать сначала сценарий?",
             CAMPAIGN_RESTART_CONFIRM
         );
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitCampaignMap();
             PRESENT_RESTARTED_CAMPAIGN_MAP();
         }
@@ -790,6 +790,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 break;
                             }
                         }
+
                     case CAMPAIGN_DIALOG_CANCEL:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;

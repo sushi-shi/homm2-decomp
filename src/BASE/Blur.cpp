@@ -32,8 +32,8 @@ typedef enum BlurConstant {
      + table[(at)[-LOGICAL_SCREEN_WIDTH * 4]])
 
 void DoBlur(
-    bitmap* destination,
-    bitmap* source,
+    bitmap* scratch,
+    bitmap* screen,
     i32 height,
     i32 redAdjust,
     i32 greenAdjust,
@@ -56,29 +56,29 @@ void DoBlur(
     gpWindowManager->SaveFizzleSource(0, 0, LOGICAL_SCREEN_WIDTH, height);
 
     savedBitmap = new bitmap(BITMAP_TYPE_NONE, LOGICAL_SCREEN_WIDTH, static_cast<i16>(height));
-    memcpy(savedBitmap->m_pixels, source->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(savedBitmap->m_pixels, screen->m_pixels, height * LOGICAL_SCREEN_WIDTH);
 
     lookupTable = static_cast<u8*>(H2_ALLOC(LOOKUP_BYTE_COUNT));
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
         redTable[i] =
             static_cast<u8>(gpBufferPalette->m_data[i * (PALETTE_CHANNEL_COUNT)]);
         greenTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * (PALETTE_CHANNEL_COUNT) + 1]);
+            static_cast<u8>(gpBufferPalette->m_data[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)]);
         blueTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * (PALETTE_CHANNEL_COUNT) + 2]);
+            static_cast<u8>(gpBufferPalette->m_data[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)]);
     }
 
     gpResourceManager->PointToFile(gpResourceManager->MakeId("RGBLOOKP.BIN", 1));
     gpResourceManager->ReadBlock(lookupTable, LOOKUP_BYTE_COUNT);
-    memcpy(destination->m_pixels, source->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(scratch->m_pixels, screen->m_pixels, height * LOGICAL_SCREEN_WIDTH);
     PollSound();
 
     for (y = BORDER_RADIUS; y < height - BORDER_RADIUS; y++) {
         if ((y & SOUND_POLL_MASK) == SOUND_POLL_MASK)
             PollSound();
 
-        u8* input   = destination->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
-        u8* outputPixel = source->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
+        u8* input = scratch->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
+        u8* outputPixel = screen->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
 
         for (x = BORDER_RADIUS; x < (LOGICAL_SCREEN_WIDTH) - BORDER_RADIUS; x++) {
             blendIndex = BLUR_TAP_SUM(redTable, input) >> COMPONENT_SHIFT << RED_INDEX_SHIFT;
@@ -93,35 +93,35 @@ void DoBlur(
 
     PollSound();
     oldPalette = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
-    newPalette  = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    newPalette = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     memcpy(oldPalette, gPalette->m_data, PALETTE_DATA_SIZE);
 
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
         newPalette[i * (PALETTE_CHANNEL_COUNT)] =
             oldPalette[i * (PALETTE_CHANNEL_COUNT)] + redAdjust;
-        newPalette[i * (PALETTE_CHANNEL_COUNT) + 1] =
-            oldPalette[i * (PALETTE_CHANNEL_COUNT) + 1] + greenAdjust;
-        newPalette[i * (PALETTE_CHANNEL_COUNT) + 2] =
-            oldPalette[i * (PALETTE_CHANNEL_COUNT) + 2] + blueAdjust;
+        newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] =
+            oldPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] + greenAdjust;
+        newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] =
+            oldPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] + blueAdjust;
         if (newPalette[i * (PALETTE_CHANNEL_COUNT)] > PALETTE_CHANNEL_MAX)
             newPalette[i * (PALETTE_CHANNEL_COUNT)] = PALETTE_CHANNEL_MAX;
         if (newPalette[i * (PALETTE_CHANNEL_COUNT)] < 0)
             newPalette[i * (PALETTE_CHANNEL_COUNT)] = 0;
-        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + 1] > PALETTE_CHANNEL_MAX)
-            newPalette[i * (PALETTE_CHANNEL_COUNT) + 1] = PALETTE_CHANNEL_MAX;
-        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + 1] < 0)
-            newPalette[i * (PALETTE_CHANNEL_COUNT) + 1] = 0;
-        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + 2] > PALETTE_CHANNEL_MAX)
-            newPalette[i * (PALETTE_CHANNEL_COUNT) + 2] = PALETTE_CHANNEL_MAX;
-        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + 2] < 0)
-            newPalette[i * (PALETTE_CHANNEL_COUNT) + 2] = 0;
+        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] > PALETTE_CHANNEL_MAX)
+            newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] = PALETTE_CHANNEL_MAX;
+        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] < 0)
+            newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_GREEN)] = 0;
+        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] > PALETTE_CHANNEL_MAX)
+            newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] = PALETTE_CHANNEL_MAX;
+        if (newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] < 0)
+            newPalette[i * (PALETTE_CHANNEL_COUNT) + (PALETTE_CHANNEL_BLUE)] = 0;
     }
 
     gpWindowManager
         ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, oldPalette, newPalette);
     DelayMilli(static_cast<i32l>(350.0f * gfCombatSpeedMod[gConfig.combatSpeed]));
     gpWindowManager->SaveFizzleSource(0, 0, LOGICAL_SCREEN_WIDTH, height);
-    memcpy(source->m_pixels, savedBitmap->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(screen->m_pixels, savedBitmap->m_pixels, height * LOGICAL_SCREEN_WIDTH);
     gpWindowManager
         ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
     H2_FREE(lookupTable);

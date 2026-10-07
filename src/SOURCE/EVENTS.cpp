@@ -2310,7 +2310,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gText,
                 "%s'%s'.  ",
                 "{Святилище 1-го Круга}\n\nВы набрели на маленькое святилище, где служат молодые послушники.  В обмен на защиту они согласились научить вас простому заклинанию - ",
-                gSpellNames[cell->m_objectMetadata - 1]
+                gSpellNames[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET]
             );
             goto shrineSpell;
 
@@ -2319,7 +2319,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gText,
                 "%s'%s'.  ",
                 "{Святилище 2-го Круга}\n\nВы набрели на богато расписанное святилище, где служат полноправные братья веры.  В обмен на защиту они согласились научить вас новому заклинанию - ",
-                gSpellNames[cell->m_objectMetadata - 1]
+                gSpellNames[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET]
             );
             goto shrineSpell;
 
@@ -2328,16 +2328,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gText,
                 "%s'%s'.  ",
                 "{Святилище 3-го Круга}\n\nВы набрели на роскошное святилище, где служат высшие жрецы.  В обмен на защиту они согласились научить вас премудрому заклинанию - ",
-                gSpellNames[cell->m_objectMetadata - 1]
+                gSpellNames[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET]
             );
         shrineSpell:
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
-                if ((gsSpellInfo[cell->m_objectMetadata - 1].level)
+                if ((gsSpellInfo[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level)
                     <= (eventHero->m_secondarySkills[(HERO_SKILL_WISDOM)])
                            + HERO_BASE_LEARNABLE_SPELL_LEVEL) {
                     EventSound(eventType, cell->m_objectMetadata, &eventSample);
                     eventHero->AddSpell(
-                        static_cast<SpellType>(cell->m_objectMetadata - 1),
+                        static_cast<SpellType>(cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET),
                         eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
                     EventWindow(
@@ -2345,7 +2345,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         NORMAL_DIALOG_INFO,
                         gText,
                         NORMAL_DIALOG_SPELL,
-                        cell->m_objectMetadata - 1,
+                        cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET,
                         -1,
                         0,
                         -1
@@ -3163,7 +3163,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             eventText,
                             "%s'%s'.  ",
                             "Одолев чудовищ, вы расшифровали иероглифы на стене, сообщающие секрет заклинания - ",
-                            gSpellNames[cell->m_objectMetadata - 1]
+                            gSpellNames[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET]
                         );
                         if (!eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
@@ -3174,7 +3174,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         } else if (eventHero->m_secondarySkills[(HERO_SKILL_WISDOM)]
                                    >= HERO_SKILL_LEVEL_EXPERT) {
                             eventHero->AddSpell(
-                                static_cast<SpellType>(cell->m_objectMetadata - 1),
+                                static_cast<SpellType>(cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET),
                                 eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                             );
                             EventWindow(
@@ -3182,7 +3182,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 NORMAL_DIALOG_INFO,
                                 eventText,
                                 NORMAL_DIALOG_SPELL,
-                                cell->m_objectMetadata - 1,
+                                cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET,
                                 -1,
                                 0,
                                 -1
@@ -3503,8 +3503,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         currentCell->m_objectIndex = extra->objectIndex;
         currentCell->m_objectTileset = extra->objectTileset;
         currentCell->m_animatedObject = extra->animatedObject;
-        currentCell->m_objectLayerBit0 = extra->objectLayerBit0;
-        currentCell->m_objectLayerBit1 = extra->objectLayerBit1;
+        currentCell->m_objectHighLayer = extra->objectHighLayer;
+        currentCell->m_objectShadow = extra->objectShadow;
         extra->objectIndex = 0;
         extra->objectTileset = TILESET_DUMMY;
         extra->animatedObject = 0;
@@ -3519,7 +3519,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             continue;
 
         if (currentCell->m_objectTileset != TILESET_DUMMY
-            && currentCell->m_objectIndex != EMPTY_INDEX && !currentCell->m_objectLayerBit1)
+            && currentCell->m_objectIndex != EMPTY_INDEX && !currentCell->m_objectShadow)
             goto cellDone;
 
         if (currentCell->m_extraIndex
@@ -3530,7 +3530,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
         while (extra) {
             if (extra->objectTileset != TILESET_DUMMY && extra->objectIndex != EMPTY_INDEX
-                && !extra->objectLayerBit1)
+                && !extra->objectShadow)
                 goto cellDone;
 
             if (extra->nextIndex
@@ -3987,7 +3987,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
         eventTown->m_occupyingHeroId = gpCurPlayer->CurrentHero();
         eventTown->View(0);
     } else if (eventTown->HasGarrison()) {
-        defendingHero = eventTown->m_occupyingHeroId == -1
+        defendingHero = eventTown->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
                             ? NULL
                             : gpGame->GetHero(eventTown->m_occupyingHeroId);
         combatResult = DoCombat(
@@ -5532,7 +5532,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     boatRecord* boat;
     i32 exitCount;
     ResourceType eventResourceType;
-    i32 artifactGuardResult;
+    i32 artifactGuardCount;
     i32 exitY;
     i32 exitX;
     ArtifactType eventArtifact;
@@ -5540,7 +5540,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* otherHero;
     CombatResult heroCombatResult;
     i32 heroInteractionResult;
-    CreatureType artifactGuardCount;
+    CreatureType artifactGuardType;
     i32 survivingCount;
     mapEventExtra* eventExtra;
     MapObjectType eventType;
@@ -6108,11 +6108,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
-                && (gsSpellInfo[cell->m_objectMetadata - 1].level)
+                && (gsSpellInfo[cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level)
                        <= (eventHero->m_secondarySkills[(HERO_SKILL_WISDOM)])
                               + HERO_BASE_LEARNABLE_SPELL_LEVEL) {
                 eventHero->AddSpell(
-                    static_cast<SpellType>(cell->m_objectMetadata - 1),
+                    static_cast<SpellType>(cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET),
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                 );
             }
@@ -6124,6 +6124,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WHIRLPOOL:
             DoWhirlpool(eventHero);
+
         case MAP_OBJECT_STONE_LITHS:
             exitCount = 0;
             for (exitY = 0; exitY < MAP_HEIGHT; ++exitY) {
@@ -6168,7 +6169,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             artifactResource = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                  >> ARTIFACT_EVENT_RESOURCE_SHIFT;
             eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / 2);
-            artifactGuardCount = static_cast<CreatureType>(
+            artifactGuardType = static_cast<CreatureType>(
                 cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK
             );
             if (eventHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
@@ -6179,17 +6180,17 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 break;
             }
             if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
-                if (artifactGuardCount == CREATURE_ROGUE) {
-                    artifactGuardResult = EVENT_ROGUE_COUNT;
+                if (artifactGuardType == CREATURE_ROGUE) {
+                    artifactGuardCount = EVENT_ROGUE_COUNT;
                     goto artifactFight;
                 }
-                artifactGuardResult = 1;
-                if (gpPhilAI->ChooseToFightForArtifact(eventArtifact, artifactGuardCount, 1)) {
+                artifactGuardCount = 1;
+                if (gpPhilAI->ChooseToFightForArtifact(eventArtifact, artifactGuardType, 1)) {
                 artifactFight:
                     if (gpPhilAI->CombatMonsterEvent(
                             eventHero,
-                            artifactGuardCount,
-                            &artifactGuardResult,
+                            artifactGuardType,
+                            &artifactGuardCount,
                             cell
                         ))
                         goto artifactPickup;
@@ -6352,13 +6353,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_PYRAMID:
             if (cell->m_objectMetadata == 0)
                 break;
-            if (eventHero->HasSpell(SpellType(cell->m_objectMetadata - 1)))
+            if (eventHero->HasSpell(SpellType(cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET)))
                 break;
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
                 gpMonGroup->m_creatureTypes[index] = CREATURE_ROYAL_MUMMY;
                 gpMonGroup->m_creatureCounts[index] = PYRAMID_GUARD_STACK_QUANTITY;
             }
-            index = cell->m_objectMetadata - 1;
+            index = cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET;
             pyramidBattleValue = static_cast<i32>(
                 gsSpellInfo[index].aiValue
                 * ((((gsSpellInfo[index].attributes) & (SPELL_INFO_ATTRIBUTE_POWER)))
@@ -6389,7 +6390,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 );
                 if (combatResult != 0) {
                     eventHero->AddSpell(
-                        static_cast<SpellType>(cell->m_objectMetadata - 1),
+                        static_cast<SpellType>(cell->m_objectMetadata - MAP_EVENT_SPELL_OFFSET),
                         eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
@@ -6837,7 +6838,7 @@ void advManager::PlayerMonsterInteract(
     i32* removeMonsterObject,
     i32 x,
     i32 y,
-    i32 unused,
+    i32 defender,
     i32 combatX,
     i32 combatY
 ) {
@@ -6850,7 +6851,7 @@ void advManager::PlayerMonsterInteract(
     char monsterText[MONSTER_OFFER_BUFFER_SIZE];
     i32 numJoining;
 
-    unused = 0;
+    defender = 0;
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
@@ -6935,7 +6936,7 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > 2.0
+    if (eventHero->m_army.CanJoin(monsterType) && armyRatio > MONSTER_STRENGTH_JOIN
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
         && !IS_ELEMENTAL_CREATURE(monsterType)) {
         if (forceJoin) {
@@ -6974,7 +6975,7 @@ void advManager::PlayerMonsterInteract(
             joiningCost = gMonsterDatabase[(monsterType)].cost * creatureCount;
             if (joiningCost > gpGame->m_players[(eventHero->m_owner)].m_resources[(RES_GOLD)]) {
                 if (armyRatio
-                    > 5.0  )
+                    > MONSTER_STRENGTH_FLEE)
                     goto monstersFlee;
                 else
                     goto fightMonsters;
@@ -7067,7 +7068,7 @@ fightMonsters:
         combatCell,
         x,
         y,
-        unused,
+        defender,
         combatX,
         combatY,
         CREATURE_NONE,
@@ -7143,7 +7144,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* re
                 joiningCost = static_cast<i32>(
                     gMonsterDatabase[(monsterType)].cost
                     * creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                    * 0.75
+                    * MONSTER_AI_JOIN_COST_FRACTION
                 );
                 if (joiningCost
                     > gpGame->m_players[(eventHero->m_owner)].m_resources[(RES_GOLD)]) {
@@ -7191,7 +7192,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* re
                 CREATURE_SKELETON,
                 static_cast<i32>(
                     creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                    * 0.1
+                    * MONSTER_NECROMANCY_FRACTION
                     * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
                 ),
                 -1
