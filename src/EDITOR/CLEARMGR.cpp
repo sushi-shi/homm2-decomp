@@ -89,12 +89,14 @@ void clearManager::UpdateBrushButtons(void) {
         CLEAR_PANEL_REGION_WIDTH, CLEAR_PANEL_REGION_HEIGHT);
 }
 
+#define help helpIdx // frame-slot spelling
 VA(0x004012c3, 0x520)
 MessageDispatchResult clearManager::Main(tag_message& message) {
-    i32 help;
     i32 anchorY;
+    i32 help;
     i32 x;
     i32 y;
+    i32 unusedMask;
     tag_message event;
     i32 anchorX;
 
@@ -121,68 +123,68 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                         }
                         if (help >= 0)
                             NormalDialog(gClearHelp[help], NORMAL_DIALOG_QUICK_VIEW);
-                    } else {
-                        switch (message.payload.widget.id) {
-                            case EDIT_CONTROL_MAP:
-                                anchorX = message.payload.widget.screenX;
-                                anchorY = message.payload.widget.screenY;
-                                gEditManager->ScreenToCell(anchorX, anchorY);
-                                gSelectionX = EDIT_NO_CELL;
-                                anchorX += gEditManager->m_viewX;
-                                anchorY += gEditManager->m_viewY;
-                                gEditManager->SaveUndo();
-                                event = gpInputManager->GetEvent();
-                                while (event.type != MESSAGE_LEFT_BUTTON_UP
-                                       && event.type != MESSAGE_RIGHT_BUTTON_UP) {
-                                    Process1WindowsMessage();
-                                    gpMouseManager->Main(event);
-                                    if (event.type == MESSAGE_MOUSE_MOVE) {
-                                        x = event.payload.mouse.screenX;
-                                        y = event.payload.mouse.screenY;
-                                        gEditManager->ScreenToCell(x, y);
-                                        x += gEditManager->m_viewX;
-                                        y += gEditManager->m_viewY;
-                                        if (x != m_lastX || y != m_lastY) {
-                                            m_lastX = x;
-                                            m_lastY = y;
-                                            if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE) {
-                                                gEditManager->ClearArea(
-                                                    x, y, gClearBrush + 1, gClearBrush + 1,
-                                                    0, 0, 0);
-                                                SelectBrush(gClearBrush, x, y);
-                                                gEditManager->DrawMap();
-                                                gEditManager->UpdateMapView();
-                                                gEditManager->DrawRadar(1);
-                                            } else {
-                                                gSelectionX = x < anchorX ? x : anchorX;
-                                                gSelectionY = y < anchorY ? y : anchorY;
-                                                gSelectionWidth = abs(x - anchorX) + 1;
-                                                gSelectionHeight = abs(y - anchorY) + 1;
-                                                gEditManager->DrawMap();
-                                                gEditManager->UpdateMapView();
-                                                gEditManager->DrawRadar(1);
-                                            }
+                        break;
+                    }
+                    switch (message.payload.widget.id) {
+                        case EDIT_CONTROL_MAP:
+                            anchorX = message.payload.widget.screenX;
+                            anchorY = message.payload.widget.screenY;
+                            gEditManager->ScreenToCell(anchorX, anchorY);
+                            gSelectionX = EDIT_NO_CELL;
+                            anchorX += gEditManager->m_viewX;
+                            anchorY += gEditManager->m_viewY;
+                            gEditManager->SaveUndo();
+                            event = gpInputManager->GetEvent();
+                            while (event.type != MESSAGE_LEFT_BUTTON_UP
+                                   && event.type != MESSAGE_RIGHT_BUTTON_UP) {
+                                Process1WindowsMessage();
+                                gpMouseManager->Main(event);
+                                if (event.type == MESSAGE_MOUSE_MOVE) {
+                                    x = event.payload.mouse.screenX;
+                                    y = event.payload.mouse.screenY;
+                                    gEditManager->ScreenToCell(x, y);
+                                    x += gEditManager->m_viewX;
+                                    y += gEditManager->m_viewY;
+                                    if (x != m_lastX || y != m_lastY) {
+                                        m_lastX = x;
+                                        m_lastY = y;
+                                        if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE) {
+                                            gEditManager->ClearArea(
+                                                x, y, gClearBrush + 1, gClearBrush + 1,
+                                                0, 0, 0);
+                                            SelectBrush(gClearBrush, x, y);
+                                            gEditManager->DrawMap();
+                                            gEditManager->UpdateMapView();
+                                            gEditManager->DrawRadar(1);
+                                        } else {
+                                            gSelectionX = x < anchorX ? x : anchorX;
+                                            gSelectionY = y < anchorY ? y : anchorY;
+                                            gSelectionWidth = abs(x - anchorX) + 1;
+                                            gSelectionHeight = abs(y - anchorY) + 1;
+                                            gEditManager->DrawMap();
+                                            gEditManager->UpdateMapView();
+                                            gEditManager->DrawRadar(1);
                                         }
                                     }
-                                    event = gpInputManager->GetEvent();
                                 }
-                                if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE)
-                                    gEditManager->ClearArea(
-                                        anchorX, anchorY, gClearBrush + 1, gClearBrush + 1,
-                                        0, 0, 0);
-                                else
-                                    gEditManager->ClearArea(
-                                        gSelectionX, gSelectionY,
-                                        gSelectionWidth, gSelectionHeight, 0, 0, 0);
-                                gSelectionX = gSelectionY = EDIT_NO_CELL;
-                                gEditManager->DrawMap();
-                                gEditManager->UpdateMapView();
-                                gEditManager->DrawRadar(1);
-                                m_lastY = EDIT_NO_CELL;
-                                m_lastX = EDIT_NO_CELL;
-                                gEditManager->m_mapChanged = 1;
-                                break;
-                        }
+                                event = gpInputManager->GetEvent();
+                            }
+                            if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE)
+                                gEditManager->ClearArea(
+                                    anchorX, anchorY, gClearBrush + 1, gClearBrush + 1,
+                                    0, 0, 0);
+                            else
+                                gEditManager->ClearArea(
+                                    gSelectionX, gSelectionY,
+                                    gSelectionWidth, gSelectionHeight, 0, 0, 0);
+                            gSelectionX = gSelectionY = EDIT_NO_CELL;
+                            gEditManager->DrawMap();
+                            gEditManager->UpdateMapView();
+                            gEditManager->DrawRadar(1);
+                            m_lastY = EDIT_NO_CELL;
+                            m_lastX = EDIT_NO_CELL;
+                            gEditManager->m_mapChanged = 1;
+                            break;
                     }
                     break;
                 case WIDGET_NOTIFY_DESELECT:
@@ -222,6 +224,7 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONTINUE;
 }
+#undef help
 
 VA(0x004017e3, 0x167)
 void clearManager::TrackCursor(void) {
