@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Compile res/HMM2PL.rc with the era resource compiler and gate it byte-exactly.
+"""Compile an image's .rc with the era resource compiler and gate it byte-exactly.
 
-The retail resources live as SOURCE: `res/HMM2PL.rc` carries the six menus, the
-About dialog, and the VERSIONINFO as reviewed rc grammar.  The one binary
-payload, the 32x32 16-color program icon, is extracted into a temporary build
-directory beside a staged copy of that RC file.  It never becomes a repository
+The retail resources live as SOURCE: `res/HMM2PL.rc` (the game) carries the six
+menus, the About dialog, and the VERSIONINFO as reviewed rc grammar, and
+`res/EDT2PL.rc` (the scenario editor) its menu, About dialog and VERSIONINFO.
+The one binary payload, the 32x32 16-color program icon, is extracted into a
+temporary build directory beside a staged copy of that RC file (`--icon` names
+the file the RC statement reads).  It never becomes a repository
 input.  The driver compiles them with the era RC.EXE 5.00 + RCDLL.DLL under
 wine, then byte-compares every compiled payload (type, name, language, bytes,
 and order) against the retail image in both directions. Any drift fails.
@@ -81,7 +83,7 @@ def compare(ours: list[dict], retail: list[dict]) -> list[str]:
     return problems
 
 
-def extract_heroes_ico(retail: list[dict], destination: Path) -> None:
+def extract_icon(retail: list[dict], destination: Path) -> None:
     """Rebuild heroes.ico from the retail RT_ICON + RT_GROUP_ICON payloads.
 
     The icon is retail artwork, so it exists only inside the caller's temporary
@@ -114,6 +116,8 @@ def main(argv=None) -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--verify-exe", type=Path, default=ROOT / "build/orig/HMM2PL.exe")
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--icon", default="heroes.ico",
+                        help="the icon file name the RC's ICON statement reads")
     args = parser.parse_args(argv)
 
     check_rc_binaries()
@@ -126,7 +130,7 @@ def main(argv=None) -> int:
         stage = Path(stage_name)
         staged_rc = stage / args.rc.name
         staged_rc.write_bytes(args.rc.read_bytes())
-        extract_heroes_ico(retail, stage / "heroes.ico")
+        extract_icon(retail, stage / args.icon)
         out_relative = os.path.relpath(args.out.resolve(), stage.resolve())
         wine.run(
             RC_EXE,

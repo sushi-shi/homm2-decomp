@@ -1,0 +1,80 @@
+// EDT2PL.rc - retail EDT2PL.exe's resources as SOURCE, all 5 of them.
+//
+// The scenario editor's counterpart of HMM2PL.rc, compiled the same way: the
+// era resource compiler (RC.EXE 5.00 + RCDLL.DLL) under the editor's resource
+// link, and every compiled payload (type, name, language, bytes, order)
+// byte-compared against the retail image in both directions.
+//
+// Only documented rc.exe grammar is used. Statement order IS retail payload
+// order. Cyrillic (cp1251) is carried as \ooo octal escapes under
+// #pragma code_page(1251), so this file is pure ASCII. editor.ico is the one
+// retail-extracted binary; the build stages it temporarily beside a copy of
+// this source and removes that staging directory after RC.EXE exits.
+
+#pragma code_page(1251)
+
+LANGUAGE 0x19, 0x1 // LANG_RUSSIAN, SUBLANG_DEFAULT (1049)
+
+EDITOR ICON DISCARDABLE "editor.ico"
+
+EDITOR DIALOG DISCARDABLE 22, 17, 144, 75
+STYLE 0x800000C0 // WS_POPUP | DS_MODALFRAME | DS_SETFONT
+FONT 8, "System"
+BEGIN
+    ICON            "EDITOR", -1, 9, 19, 18, 20
+    CTEXT           "\320\345\344\340\352\362\356\360 \352\340\360\362 \303\345\360\356\345\342 \314\345\367\340 \350 \314\340\343\350\350 2", -1, 2, 6, 142, 11
+    CTEXT           "\302\345\360\361\350\377 2.1", -1, 52, 26, 38, 8
+    CTEXT           "Copyright 1995-1997 New World Computing. 2003 \301\363\352\340.", -1, 7, 38, 132, 16
+    DEFPUSHBUTTON   "\316\312", 1, 53, 59, 32, 14, 0x20000 // + WS_GROUP
+END
+
+MNUDFLT MENU DISCARDABLE
+BEGIN
+    POPUP "&\324\340\351\353"
+    BEGIN
+        MENUITEM "&\302\373\351\362\350", 40140
+    END
+    POPUP "&\335\352\360\340\355"
+    BEGIN
+        MENUITEM "&640 x 480", 40005
+        MENUITEM "&800 x 600", 40006
+        MENUITEM "&1024 x 768", 40007
+        MENUITEM "1&280 x 1024", 40008
+        MENUITEM "\302 &\357\356\353\355\373\351 \375\352\360\340\355 (F4)", 40009
+    END
+    POPUP "&\317\356\354\356\371\374"
+    BEGIN
+        MENUITEM "&\320\363\352\356\342\356\344\361\362\342\356", 40052
+        MENUITEM SEPARATOR
+        MENUITEM "\316 \357\360\356\343\360\340\354\354\345", 40053
+    END
+END
+
+1 VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "New World Computing\0"
+            VALUE "FileDescription", "EDITOR2W\0"
+            VALUE "FileVersion", "2.1\0"
+            VALUE "InternalName", "EDITOR2W\0"
+            VALUE "LegalCopyright", "Copyright \251 1995-1997\0"
+            VALUE "OriginalFilename", "EDITOR2W.EXE\0"
+            VALUE "ProductName", "New World Computing, Heroes of Might and Magic II Editor\0"
+            VALUE "ProductVersion", "2.1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

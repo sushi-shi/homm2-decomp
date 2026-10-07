@@ -154,3 +154,149 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
         w.build(alias, "phony", inputs=generic_import_outputs)
     w.build("link-resources", "phony", inputs=resource_output)
     w.build("link-map", "phony", inputs="build/link/generic/HMM2PL.map")
+
+
+#: Another image's import libraries: (import library, rule, definition, DLL).
+#: The DLL spelling is the one its retail import descriptor names.
+IMAGE_IMPORT_LIBRARIES = {
+    "editor": (
+        ("wing32.lib", "legacy_implib", "imports/wing32.def", "WING32.dll"),
+        ("generic-imports/mss32.lib", "definition_implib", "imports/mss32.def", "mss32.dll"),
+        ("generic-imports/audiere.lib", "native_implib", "imports/audiere.def", "audiere.dll"),
+    ),
+}
+#: Another image's library line, in LINK's search order. Generated import
+#: libraries are named by their path under the image's build/link. As in the
+#: game, WINMM leads: only BASE (soundmgr) references it, so its descriptor
+#: still follows the first scan's DLLs while its thunks lead the second block.
+IMAGE_LINK_LIBRARIES = {
+    "editor": ("WINMM.LIB", "KERNEL32.LIB", "USER32.LIB", "GDI32.LIB", "wing32.lib",
+               "ADVAPI32.LIB", "generic-imports/mss32.lib",
+               "generic-imports/audiere.lib"),
+}
+
+
+#: Another image's BASE archive cuts: the unit that opens each further
+#: archive. LINK resolves one library at a time, pulling members in the order
+#: of the undefined-symbol list (first reference, appended as members are
+#: pulled), so a member's archive decides whether an earlier-referenced member
+#: of a later archive can precede it. In the editor MiscRuntime, though first
+#: referenced (GetIconEntry) before any Misc symbol, links after Misc: as in
+#: the game's archives, it opens the archive after Misc's.
+IMAGE_ARCHIVE_CUTS = {
+    "editor": ("BASE/MiscRuntime",),
+}
+
+
+def image_link_order(image, objs: list[str]) -> list[str]:
+    """Another image's objects in retail link order: each unit's first
+    function in the image's symbol inventory. A unit the inventory has not
+    placed yet sorts last, so a fresh checkout still configures."""
+    from homm2.core.paths import REPO
+    first = {}
+    symbols = REPO / image.build / "gen/symbol_names.csv"
+    if symbols.exists():
+        import csv
+        with symbols.open() as stream:
+            for row in csv.DictReader(stream):
+                if row["kind"] == "func" and not row["unit"].startswith("("):
+                    rva = int(row["rva"], 0)
+                    first[row["unit"]] = min(rva, first.get(row["unit"], rva))
+    prefix = f"{image.build}/objdiff/base/"
+    return sorted(objs, key=lambda obj: first.get(
+        obj.removeprefix(prefix).removesuffix(".obj"), sys.maxsize))
+
+
+def emit_image_link_graph(w, image, units: list[dict], objs: list[str]) -> str:
+    """Link another image the way the game links: its own objects explicitly
+    in retail order, the BASE library, the C runtime, import libraries built
+    from the reviewed ABI manifests, and resources compiled from source.
+    Returns the link-diff stamp (the image's default target)."""
+    from homm2.graph.link import PROFILES
+    B = image.build
+    profile = PROFILES[image.key]
+    stem = profile.stem
+    link_root = f"{B}/link"
+    import_outputs = []
+    for library, rule, definition, dll in IMAGE_IMPORT_LIBRARIES[image.key]:
+        output = f"{link_root}/{library}"
+        implicit = {"legacy_implib": ["scripts/homm2/graph/legacy_import_lib.py"],
+                    "native_implib": ["scripts/homm2/graph/regular_import_lib.py",
+                                      "scripts/homm2/graph/import_lib.py"],
+                    "definition_implib": ["scripts/homm2/graph/regular_import_lib.py",
+                                          "scripts/homm2/graph/import_lib.py"]}[rule]
+        w.build(output, rule, inputs=definition, implicit=implicit,
+                variables={"dll": dll})
+        import_outputs.append(output)
+    resource_output = f"{link_root}/{stem}.res"
+    w.build([resource_output, f"{link_root}/{stem}.resources.json"], "image_link_resources",
+            inputs=[f"res/{stem}.rc", image.exe],
+            implicit=["scripts/homm2/graph/rc.py",
+                      "scripts/homm2/graph/extract_resources.py",
+                      "build/toolchain/msvc/bin/RC.EXE"])
+    ordered = image_link_order(image, objs)
+    base_prefix = f"{B}/objdiff/base/BASE/"
+    source_objects = [obj for obj in ordered if not obj.startswith(base_prefix)]
+    base_objects = [obj for obj in ordered if obj.startswith(base_prefix)]
+    configured = {entry["unit"]: entry["source"] for entry in units}
+    for unit, assembly in FIXED_ASM_UNITS.items():
+        if unit not in configured:
+            continue
+        if configured[unit] != assembly.source:
+            raise ValueError(f"{unit} must use fixed MASM source {assembly.source}")
+        output = f"{link_root}/omf/{unit}.obj"
+        w.build(output, "ml_omf", inputs=assembly.source,
+                implicit="scripts/homm2/graph/ml.py")
+        base_objects = [output if obj == f"{B}/objdiff/base/{unit}.obj" else obj
+                        for obj in base_objects]
+    # The BASE archives, their members in the image's retail order. VC6 LIB
+    # prepends each input member, so feed them backwards.
+    cuts = [index for index, obj in enumerate(base_objects)
+            if obj.removeprefix(f"{B}/objdiff/base/").removesuffix(".obj")
+            in IMAGE_ARCHIVE_CUTS[image.key]]
+    bounds = [0, *cuts, len(base_objects)]
+    names = (["BASE"] if len(bounds) == 2 else
+             ["BASE-prefix", *(f"BASE-{index}" for index in range(2, len(bounds) - 2)),
+              "BASE-suffix"])
+    base_libraries = []
+    for name, start, end in zip(names, bounds, bounds[1:]):
+        library = f"{link_root}/{name}.lib"
+        w.build(library, "archive", inputs=list(reversed(base_objects[start:end])))
+        base_libraries.append(library)
+    generated = {library for library, *_ in IMAGE_IMPORT_LIBRARIES[image.key]}
+    libraries = [f"{link_root}/{name}" if name in generated else name
+                 for name in IMAGE_LINK_LIBRARIES[image.key]]
+    # As in the game's link (homm2.graph.link.final_inputs): the runtime's
+    # default libraries are named explicitly, OLDNAMES searched first. Its
+    # members' empty .text sections (default 16-byte alignment) are the fill
+    # before the first import thunk; MSVCPRT precedes LIBCMT.
+    link_args = (["/NODEFAULTLIB:LIBCMT", "/NODEFAULTLIB:LIBCPMT", "/NODEFAULTLIB:OLDNAMES",
+                  *source_objects, "OLDNAMES.LIB", *libraries, *base_libraries,
+                  "MSVCPRT.LIB", "LIBCMT.LIB", resource_output])
+    for mode in ("generic", "rsrc", "historical"):
+        outputs = [f"{link_root}/{mode}/{profile.exe}", f"{link_root}/{mode}/{stem}.map"]
+        w.build(outputs, "link_exe",
+                inputs=(source_objects + base_libraries
+                        + ([resource_output] if mode != "generic" else [])),
+                implicit=(import_outputs + [
+                    f"{B}/build.ninja",  # The driver reads link_args from this graph.
+                    "scripts/homm2/graph/link.py",
+                    "build/toolchain/msvc/bin/LINK.EXE",
+                    "build/toolchain/msvc/lib/LIBCMT.LIB",
+                    "build/toolchain/msvc/lib/MSVCPRT.LIB",
+                ]),
+                variables={"link_args": " ".join(link_args),
+                           "link_mode": "--" + mode if mode != "generic" else ""})
+    stamp = f"{link_root}/historical/{stem}.link-diff.tsv"
+    from homm2.core.paths import REPO
+    ceiling = f"{image.retail}/link_diff.tsv"
+    w.build(stamp, "link_diff", inputs=f"{link_root}/historical/{profile.exe}",
+            implicit=["scripts/homm2/verify/link_diff.py", image.exe]
+            + ([ceiling] if (REPO / ceiling).exists() else []))
+    w.build("link-diff", "phony", inputs=stamp)
+    w.build("link", "phony", inputs=f"{link_root}/generic/{profile.exe}")
+    w.build("link-rsrc", "phony", inputs=f"{link_root}/rsrc/{profile.exe}")
+    w.build("link-historical", "phony", inputs=f"{link_root}/historical/{profile.exe}")
+    w.build("link-imports", "phony", inputs=import_outputs)
+    w.build("link-resources", "phony", inputs=resource_output)
+    return stamp

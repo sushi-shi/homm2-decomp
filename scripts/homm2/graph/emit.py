@@ -20,7 +20,7 @@ from homm2.manifest import load as load_manifest, units as image_units
 from homm2.core.paths import DEFAULT_IMAGE, REPO, image_build, image_paths, retail_dir
 
 from .compile_graph import emit_compile_graph
-from .link_graph import LINK_DIFF_STAMP, emit_link_graph
+from .link_graph import LINK_DIFF_STAMP, emit_image_link_graph, emit_link_graph
 from .rules import emit_rules
 
 
@@ -30,8 +30,9 @@ from homm2.core.usage import logged
 @logged
 def main() -> None:
     """Emit the selected image's graph: build.ninja at the root for the game,
-    build/<image>/build.ninja for another image (`ninja -f`). Another image
-    has no link graph yet; its rules select it through $HOMM2_IMAGE."""
+    build/<image>/build.ninja for another image (`ninja -f`), whose rules
+    select it through $HOMM2_IMAGE and whose link graph is
+    `link_graph.emit_image_link_graph`."""
     manifest = load_manifest()
     build = manifest.get("build", {})
     image = image_paths()
@@ -93,7 +94,7 @@ def main() -> None:
                             first_function_rva, first_compgen_rva)
             w.default(["all", LINK_DIFF_STAMP])
         else:
-            w.default(["all"])
+            w.default(["all", emit_image_link_graph(w, image, units, objs)])
 
     units_j = []
     for u in units:
