@@ -16,11 +16,11 @@
 #include <BASE/inputManager.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
 H2_ENUM_BEGIN(SignDialog)
-    SIGN_WINDOW_TEXT_ID = 11,
     SIGN_TITLE          = 0x64,
 H2_ENUM_END(SignDialog)
 
@@ -45,7 +45,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     gSignText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gSignText, static_cast<signEventExtra*>(gEditManager->m_extras[gEditCell->m_objectMetadata])->text);
     gEditDialog = new heroWindow(0, 0, "rumredit.bin");
-    SetWinText(gEditDialog, SIGN_WINDOW_TEXT_ID);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_RUMOUR);
     if (gEditCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)))
         sprintf(gText, localization::Tr("editor.sign.bottle_title"));
     else
@@ -60,17 +60,17 @@ void eventsManager::EditSign(i32 x, i32 y) {
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         len = strlen(gSignText) + sizeof(gSign);
-        if (!gSign.pad[0])
+        if (!gSign.active)
             strcpy(gSignText, "");
         newRecord = new char[len];
         memcpy(newRecord, &gSign, sizeof(gSign));
-        strcpy(newRecord + EVENT_RECORD_SIGN_HEADER_SIZE, gSignText);
+        strcpy(newRecord + offsetof(signEventExtra, text), gSignText);
         delete[] static_cast<char*>(gEditManager->m_extras[gEditCell->m_objectMetadata]);
         gEditManager->m_extras[gEditCell->m_objectMetadata] = newRecord;
         gEditManager->m_extraSizes[gEditCell->m_objectMetadata] = len;
         delete[] gSignText;
         gSignText = NULL;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();

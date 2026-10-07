@@ -79,7 +79,10 @@ struct mapEventExtra {
     char riddle[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct signEventExtra {
-    char pad[EVENT_RECORD_SIGN_HEADER_SIZE];
+    // Set as the editor places the sign; a sign saved without it keeps no
+    // text.
+    i8 active;
+    char reserved01[EVENT_RECORD_SIGN_HEADER_SIZE - 1];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct rumourEventExtra {

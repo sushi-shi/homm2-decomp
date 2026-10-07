@@ -13,6 +13,7 @@
 #include <BASE/dialog.h>
 #include <BASE/message.h>
 #include <EDITOR/EDITOR.h>
+#include <SOURCE/KB_TYPES.h>
 
 class heroWindow;
 class icon;
@@ -46,10 +47,25 @@ H2_ENUM_BEGIN(EventsManagerLayout)
 H2_ENUM_END(EventsManagerLayout)
 
 H2_ENUM_BEGIN(EventsWindowText)
-    // SetWinText rows of the dialogs this unit opens.
-    EVENTS_WINDOW_TEXT_MONSTER = 8,
+    // SetWinText rows (gWinSetup) of the object dialogs and the map
+    // specification dialog.
+    EVENTS_WINDOW_TEXT_EVENT             = 4,
+    EVENTS_WINDOW_TEXT_HERO              = 5,
+    EVENTS_WINDOW_TEXT_MONSTER           = 8,
+    EVENTS_WINDOW_TEXT_SPHINX            = 10,
+    // The rumour dialog, which the sign editor reuses.
+    EVENTS_WINDOW_TEXT_RUMOUR            = 11,
+    EVENTS_WINDOW_TEXT_SPECIFICATIONS    = 13,
+    EVENTS_WINDOW_TEXT_TOWN              = 15,
     EVENTS_WINDOW_TEXT_ULTIMATE_ARTIFACT = 16
 H2_ENUM_END(EventsWindowText)
+
+H2_ENUM_BEGIN(EventsArtifactList)
+    // The dialogs' artifact lists leave out the editor-only artifacts from
+    // ARTIFACT_EDITOR_ANY_ULTIMATE through the spell scroll.
+    EVENTS_HIDDEN_ARTIFACT_COUNT =
+        IDX(ARTIFACT_SPELL_SCROLL) - IDX(ARTIFACT_EDITOR_ANY_ULTIMATE) + 1
+H2_ENUM_END(EventsArtifactList)
 
 H2_ENUM_BEGIN(CellWindowConstant)
     // cellwin.bin: a text field per mapCell field from CELL_WINDOW_FIRST_FIELD
@@ -124,6 +140,7 @@ H2_ENUM_BEGIN(NewMapWindowConstant)
     // The scroll bar frames of escroll.icn the rows draw.
     NEW_MAP_TRACK_FRAME            = 20,
     NEW_MAP_KNOB_FRAME             = 2,
+    NEW_MAP_SLIDER_FILL_COLOR      = 1,
     // A knob travels from NEW_MAP_KNOB_LEFT to NEW_MAP_KNOB_RIGHT and is
     // grabbed by its middle; UpdateNewMapWindow places it over
     // NEW_MAP_KNOB_TRAVEL pixels.
@@ -137,6 +154,13 @@ H2_ENUM_BEGIN(NewMapWindowConstant)
     NEW_MAP_MAXIMUM_WATER          = 75
 H2_ENUM_END(NewMapWindowConstant)
 
+// The generator's shares are doubles in percent: the whole map, the arrow
+// buttons' step and the least share a rebalance leaves, and the slack
+// before water counts as over its cap.
+#define NEW_MAP_ALL_PERCENT      100.0
+#define NEW_MAP_ONE_PERCENT      1.0
+#define NEW_MAP_PERCENT_ROUNDING 0.5
+
 H2_ENUM_BEGIN(NewMapTerrain)
     // gTerrainPercent's rows; BalanceTerrainPercents takes NEW_MAP_NO_TERRAIN
     // as the dialog closes.
@@ -147,9 +171,12 @@ H2_ENUM_END(NewMapTerrain)
 
 H2_ENUM_BEGIN(EventTextConstant)
     // The buffer a record's message is edited in, and the dialog's text
-    // field (ridledit.bin, rumredit.bin).
+    // field (evntedit.bin, ridledit.bin, rumredit.bin).
     EVENT_TEXT_CAPACITY = 2000,
-    EVENT_TEXT_FIELD    = 0x78
+    EVENT_TEXT_FIELD    = 0x78,
+    // The buffers the dialogs format a number or a field's text in.
+    EVENTS_NUMBER_TEXT_SIZE = 20,
+    EVENTS_FIELD_TEXT_SIZE  = 50
 H2_ENUM_END(EventTextConstant)
 
 // Closes the running dialog: the dialog manager reads the select command.

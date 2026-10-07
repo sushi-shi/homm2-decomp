@@ -7,6 +7,19 @@
 
 struct tag_message;
 
+H2_ENUM_BEGIN(ListBoxSelectionClickCount)
+    // A list's select notification carries its click count as the widget
+    // message's parameter.
+    SELECTION_SINGLE_CLICK = 1,
+    SELECTION_DOUBLE_CLICK = 2
+H2_ENUM_END(ListBoxSelectionClickCount)
+
+H2_ENUM_BEGIN(ListBoxSelectedIndex)
+    // The selected index of a list without a selection, as
+    // WIDGET_COMMAND_GET_SELECTION reports it.
+    LIST_BOX_NO_SELECTION = -1
+H2_ENUM_END(ListBoxSelectedIndex)
+
 #pragma pack(push, 1)
 class font;
 class icon;

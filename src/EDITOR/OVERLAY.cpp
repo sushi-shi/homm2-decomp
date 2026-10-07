@@ -759,7 +759,7 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                         && OverlayGridHas(type->entranceRows, col, row)) {
                         bottle = new signEventExtra;
                         memset(bottle, 0, sizeof(signEventExtra));
-                        bottle->pad[0] = MAP_EVENT_DATA_AVAILABLE;
+                        bottle->active = MAP_EVENT_DATA_AVAILABLE;
                         dest->m_objectMetadata = gEditManager->m_extraCount;
                         gEditManager->m_extras[gEditManager->m_extraCount] = bottle;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] =

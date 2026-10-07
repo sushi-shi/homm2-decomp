@@ -15,11 +15,8 @@
 #include <BASE/inputManager.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
+#include <stddef.h>
 #include <string.h>
-
-H2_ENUM_BEGIN(RumourDialog)
-    RUMOUR_WINDOW_TEXT_ID = 11,
-H2_ENUM_END(RumourDialog)
 
 DATA(0x004a5810) rumourEventExtra gRumour;
 DATA(0x004a581c) char* gRumourText;
@@ -34,7 +31,7 @@ i32 eventsManager::EditRumour(i32 extra) {
     gRumourText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gRumourText, static_cast<rumourEventExtra*>(gEditManager->m_extras[extra])->text);
     gEditDialog = new heroWindow(0, 0, "rumredit.bin");
-    SetWinText(gEditDialog, RUMOUR_WINDOW_TEXT_ID);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_RUMOUR);
     FillInRumourEdit(&gRumour);
     gpWindowManager->DoDialog(gEditDialog, EditRumourHandler, 0);
     delete gEditDialog;
@@ -42,13 +39,13 @@ i32 eventsManager::EditRumour(i32 extra) {
         len = strlen(gRumourText) + sizeof(gRumour);
         newRecord = new char[len];
         memcpy(newRecord, &gRumour, sizeof(gRumour));
-        strcpy(newRecord + EVENT_RECORD_RUMOUR_HEADER_SIZE, gRumourText);
+        strcpy(newRecord + offsetof(rumourEventExtra, text), gRumourText);
         delete[] static_cast<char*>(gEditManager->m_extras[extra]);
         gEditManager->m_extras[extra] = newRecord;
         gEditManager->m_extraSizes[extra] = len;
         delete[] gRumourText;
         gRumourText = NULL;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->UpdateMapView();
     return gpWindowManager->m_dialogResult;

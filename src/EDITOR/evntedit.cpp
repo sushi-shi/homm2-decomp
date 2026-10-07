@@ -35,10 +35,10 @@ i32 eventsManager::EditEvent(i32 extra) {
 
     ResetPlayerAvailability();
     memcpy(&gEventEdit, gEditManager->m_extras[extra], sizeof(EventExtra));
-    gEventMessage = new char[EVENT_EDIT_MESSAGE_SIZE];
+    gEventMessage = new char[EVENT_TEXT_CAPACITY];
     strcpy(gEventMessage, static_cast<EventExtra*>(gEditManager->m_extras[extra])->message);
     gEditDialog = new heroWindow(0, 0, "evntedit.bin");
-    SetWinText(gEditDialog, EVENT_EDIT_TEXT_ROW);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_EVENT);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     sprintf(gText, localization::Tr("editor.events.event.no_artifact"));
@@ -80,12 +80,12 @@ i32 eventsManager::EditEvent(i32 extra) {
         newExtra = new char[byteCount];
         memcpy(newExtra, &gEventEdit, sizeof(EventExtra));
         strcpy(reinterpret_cast<EventExtra*>(newExtra)->message, gEventMessage);
-        delete gEditManager->m_extras[extra];
+        delete[] static_cast<char*>(gEditManager->m_extras[extra]);
         gEditManager->m_extras[extra] = newExtra;
         gEditManager->m_extraSizes[extra] = byteCount;
-        delete gEventMessage;
+        delete[] gEventMessage;
         gEventMessage = NULL;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->UpdateMapView();
     return gpWindowManager->m_dialogResult;
@@ -93,7 +93,7 @@ i32 eventsManager::EditEvent(i32 extra) {
 
 VA(0x00413842, 0x288)
 void eventsManager::FillInEventEdit(EventExtra* event) {
-    char text[EVENT_EDIT_TEXT_SIZE];
+    char text[EVENTS_FIELD_TEXT_SIZE];
     tag_message message;
     i32 i;
 
@@ -135,12 +135,12 @@ void eventsManager::FillInEventEdit(EventExtra* event) {
     message.payload.widget.id = EVENT_EDIT_FIRST_DAY;
     gEditDialog->BroadcastMessage(message);
     message.payload.widget.data.text = gEventMessage;
-    message.payload.widget.id = EVENT_EDIT_MESSAGE;
+    message.payload.widget.id = EVENT_TEXT_FIELD;
     gEditDialog->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
     message.payload.widget.data.value = gEventEdit.artifact + 1;
     if (gEventEdit.artifact >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-        message.payload.widget.data.value -= EVENT_EDIT_HIDDEN_ARTIFACTS;
+        message.payload.widget.data.value -= EVENTS_HIDDEN_ARTIFACT_COUNT;
     message.payload.widget.id = EVENT_EDIT_ARTIFACT;
     gEditDialog->BroadcastMessage(message);
     message.payload.widget.id = EVENT_EDIT_FREQUENCY;
@@ -180,7 +180,7 @@ MessageDispatchResult EditEventHandler(tag_message& message) {
                 case WIDGET_NOTIFY_SELECT:
                     update = true;
                     switch (message.payload.widget.id) {
-                        case EVENT_EDIT_MESSAGE:
+                        case EVENT_TEXT_FIELD:
                             gEditDialog->BroadcastMessage(query);
                             strcpy(gEventMessage, query.payload.widget.data.text);
                             break;
@@ -208,7 +208,7 @@ MessageDispatchResult EditEventHandler(tag_message& message) {
                             gEditDialog->BroadcastMessage(message);
                             if (message.payload.widget.data.value - 1
                                 >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-                                message.payload.widget.data.value += EVENT_EDIT_HIDDEN_ARTIFACTS;
+                                message.payload.widget.data.value += EVENTS_HIDDEN_ARTIFACT_COUNT;
                             gEventEdit.artifact = message.payload.widget.data.value - 1;
                             update = true;
                             break;

@@ -39,7 +39,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
     original = *gEditCell;
     memcpy(&gHeroEdit, gEditManager->m_extras[gEditCell->m_objectMetadata], sizeof(HeroExtra));
     gEditDialog = new heroWindow(0, 0, "heroedit.bin");
-    SetWinText(gEditDialog, HERO_EDIT_TEXT_ROW);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_HERO);
     if (gEditJailedHero) {
         SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, HERO_EDIT_TYPE_LABEL);
         msg.payload.widget.data.text = localization::Tr("editor.events.hero.class_label");
@@ -91,7 +91,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
         }
     }
     if (gEditJailedHero) {
-        for (k = 0; k < HERO_EDIT_CLASS_COUNT; k++) {
+        for (k = 0; k < IDX(FACTION_COUNT); k++) {
             sprintf(gText, gAlignmentNames[k]);
             msg.type = MESSAGE_WIDGET;
             msg.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
@@ -120,7 +120,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
     gpWindowManager->DoDialog(gEditDialog, EditHeroHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
         memcpy(gEditManager->m_extras[gEditCell->m_objectMetadata], &gHeroEdit, sizeof(HeroExtra));
     }
     gEditManager->DrawMap();
@@ -129,7 +129,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
 
 VA(0x00414511, 0x4c2)
 void eventsManager::FillInHeroEdit(HeroExtra* hero) {
-    char text[HERO_EDIT_TEXT_SIZE];
+    char text[EVENTS_FIELD_TEXT_SIZE];
     tag_message message;
     i32 i;
 
@@ -184,7 +184,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
         message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
         message.payload.widget.data.value = hero->artifacts[i] + 1;
         if (hero->artifacts[i] >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-            message.payload.widget.data.value -= HERO_EDIT_HIDDEN_ARTIFACTS;
+            message.payload.widget.data.value -= EVENTS_HIDDEN_ARTIFACT_COUNT;
         message.payload.widget.id = i + HERO_EDIT_FIRST_ARTIFACT;
         gEditDialog->BroadcastMessage(message);
     }
@@ -215,11 +215,12 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
     for (i = 0; i < HERO_SECONDARY_SKILL_CAPACITY; i++) {
         message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
         message.payload.widget.id = i + HERO_EDIT_FIRST_SKILL;
-        if (hero->skillTypes[i] == -1)
+        if (hero->skillTypes[i] == IDX(HERO_SKILL_NONE))
             message.payload.widget.data.value = 0;
         else
             message.payload.widget.data.value =
-                hero->skillTypes[i] + (hero->skillLevels[i] - 1) * IDX(HERO_SKILL_COUNT) + 1;
+                hero->skillTypes[i]
+                + (hero->skillLevels[i] - IDX(HERO_SKILL_LEVEL_BASIC)) * IDX(HERO_SKILL_COUNT) + 1;
         gEditDialog->BroadcastMessage(message);
     }
     message.payload.widget.data.value = WIDGET_FLAG_DRAW;
@@ -265,8 +266,8 @@ MessageDispatchResult EditHeroHandler(tag_message& message) {
                         case HERO_EDIT_PREVIOUS_PORTRAIT:
                             if (!gHeroEdit.hasCustomPortrait)
                                 break;
-                            if (!gHeroEdit.portrait) {
-                                gHeroEdit.portrait = -1;
+                            if (gHeroEdit.portrait == 0) {
+                                gHeroEdit.portrait = HERO_EDIT_NO_PORTRAIT;
                                 gHeroEdit.hasCustomPortrait = false;
                             } else
                                 gHeroEdit.portrait--;
@@ -321,7 +322,7 @@ MessageDispatchResult EditHeroHandler(tag_message& message) {
                             gEditDialog->BroadcastMessage(message);
                             if (message.payload.widget.data.value - 1
                                 >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-                                message.payload.widget.data.value += HERO_EDIT_HIDDEN_ARTIFACTS;
+                                message.payload.widget.data.value += EVENTS_HIDDEN_ARTIFACT_COUNT;
                             gHeroEdit.artifacts[message.payload.widget.id - HERO_EDIT_FIRST_ARTIFACT] =
                                 message.payload.widget.data.value - 1;
                             update = true;
@@ -359,9 +360,11 @@ MessageDispatchResult EditHeroHandler(tag_message& message) {
                             gEditDialog->BroadcastMessage(message);
                             if (message.payload.widget.data.value == 0) {
                                 gHeroEdit.skillTypes[message.payload.widget.id
-                                                     - HERO_EDIT_FIRST_SKILL] = -1;
+                                                     - HERO_EDIT_FIRST_SKILL] =
+                                    IDX(HERO_SKILL_NONE);
                                 gHeroEdit.skillLevels[message.payload.widget.id
-                                                      - HERO_EDIT_FIRST_SKILL] = 0;
+                                                      - HERO_EDIT_FIRST_SKILL] =
+                                    IDX(HERO_SKILL_LEVEL_NONE);
                             } else {
                                 gHeroEdit.skillTypes[message.payload.widget.id
                                                      - HERO_EDIT_FIRST_SKILL] =
@@ -369,7 +372,7 @@ MessageDispatchResult EditHeroHandler(tag_message& message) {
                                 gHeroEdit.skillLevels[message.payload.widget.id
                                                       - HERO_EDIT_FIRST_SKILL] =
                                     (message.payload.widget.data.value - 1) / IDX(HERO_SKILL_COUNT)
-                                    + 1;
+                                    + IDX(HERO_SKILL_LEVEL_BASIC);
                             }
                             update = true;
                             break;

@@ -38,13 +38,18 @@ H2_ENUM_BEGIN(TownEditConstant)
     TOWN_EDIT_LAST_BUILDING_ROW   = 569,
     // A building's name label, toggle and the rows of a dwelling: the
     // label of building row i is i + 410, its toggle i + 450; a dwelling's
-    // toggle is TOWN_EDIT_FIRST_DWELLING + 2 * level and its upgrade's one
-    // more, with label rows 20 and 40 below.
+    // toggle is TOWN_EDIT_FIRST_DWELLING + TOWN_EDIT_DWELLING_STRIDE * level
+    // and its upgrade's one more, with label rows TOWN_EDIT_LABEL_STEP and
+    // twice that below.
     TOWN_EDIT_FIRST_BUILDING_NAME = 410,
     TOWN_EDIT_FIRST_BUILDING      = 450,
+    // The tavern's toggle (gTownEditBuildings' second row), which a
+    // necromancer town hides.
+    TOWN_EDIT_TAVERN              = TOWN_EDIT_FIRST_BUILDING + 1,
     TOWN_EDIT_MAGE_GUILD          = 471,
     TOWN_EDIT_FIRST_DWELLING      = 550,
-    TOWN_EDIT_DWELLING_LABEL_STEP = 20,
+    TOWN_EDIT_LABEL_STEP          = 20,
+    TOWN_EDIT_DWELLING_STRIDE     = 2,
     TOWN_EDIT_DWELLING_COUNT      = 6,
     TOWN_EDIT_BUILDING_COUNT      = 11,
     TOWN_EDIT_STANDARD_NAME       = 603,
@@ -53,10 +58,7 @@ H2_ENUM_BEGIN(TownEditConstant)
     TOWN_EDIT_CUSTOM_NAME_TOGGLE  = 606,
     TOWN_EDIT_NAME                = 607,
     // A troop count field's limit.
-    TOWN_EDIT_MAX_TROOP_COUNT     = 9999,
-    TOWN_EDIT_TEXT_SIZE           = 50,
-    // SetWinText's row of the dialog.
-    TOWN_EDIT_TEXT_ROW            = 15
+    TOWN_EDIT_MAX_TROOP_COUNT     = 9999
 H2_ENUM_END(TownEditConstant)
 
 #pragma pack(push, 1)

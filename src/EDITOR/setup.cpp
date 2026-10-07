@@ -40,7 +40,7 @@ DATA(0x00499460) i32 gNewMapSize = MAP_DIMENSION_MEDIUM;
 DATA(0x004a5820) b32 gbNewRandomMap;
 
 VA(0x00425bf0, 0xfa)
-i32 SetupNewMap(void) {
+b32 SetupNewMap(void) {
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpenew.bin");
     if (window == NULL)
         MemError();
@@ -55,15 +55,15 @@ i32 SetupNewMap(void) {
             gbNewRandomMap = true;
             break;
         case DIALOG_CANCEL:
-            return 0;
+            return false;
     }
     if (!SetupMapSize())
-        return 0;
-    return 1;
+        return false;
+    return true;
 }
 
 VA(0x00425cea, 0x119)
-i32 SetupMapSize(void) {
+b32 SetupMapSize(void) {
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpesize.bin");
     if (window == NULL)
         MemError();
@@ -84,9 +84,9 @@ i32 SetupMapSize(void) {
             gNewMapSize = MAP_DIMENSION_XLARGE;
             break;
         case DIALOG_CANCEL:
-            return 0;
+            return false;
     }
-    return 1;
+    return true;
 }
 
 VA(0x00425e03, 0xa1)
