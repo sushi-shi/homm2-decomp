@@ -70,7 +70,6 @@ struct searchNode {
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
 class searchArray {
 public:
     u32 m_queueCount;
@@ -139,7 +138,6 @@ public:
         return (m_storage.cells + x)[MAP_WIDTH * y];
     }
 };
-#pragma pack(pop)
 extern u8 bIsMoatSlowed[COMBAT_HEX_COUNT];
 
 #endif

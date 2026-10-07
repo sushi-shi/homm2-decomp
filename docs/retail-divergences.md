@@ -83,6 +83,20 @@ message/payload representations are copied into live objects instead of accessed
 through struct overlays. This models ownership; it does not establish that
 every malformed network command is safe or make portable multiplayer supported.
 
+Runtime manager, widget, resource, audio playback and combat objects also use
+natural alignment. Their pointers, messages and numeric members are passed by
+reference in portable C++; retaining byte packing made input initialization and
+music playback undefined. Packed map cells, resource headers and configuration
+records retain their file layouts. The `runtime_alignment` check rejects
+misaligned manager messages, music state and resource pointers at compile time.
+
+Fields of the packed save records can sit at any offset. The typed enum and
+code wrappers (`H2EnumStorage`, `H2OpenCodeStorage`) and `fullMap`, which lives
+inside the packed `game` record, are therefore packed themselves, so member
+calls on them stay defined. On `port-ironfist`, the session snapshot and the XML
+codec copy record fields as bytes instead of binding references to them; the
+sanitized check runs the engine tests that save, load and restore those records.
+
 ## Corrected defects
 
 | Area | Retail behavior | `port` behavior |
@@ -123,6 +137,8 @@ every malformed network command is safe or make portable multiplayer supported.
 | Serialized text padding | The portable text-encoding scratch buffers for player names and the tavern rumour leave bytes after the terminator uninitialized; whole-field writes include those stack bytes. Retail predates these encoding buffers. | Zero-initializes the serialized fields before encoding, producing deterministic padding without changing their size or decoded text. |
 | Save replacement | Opens the destination with truncation before writing the save and does not check close status. An interrupted or failed save can destroy the previous file. | Writes a unique temporary sibling, checks flush and close, then replaces the destination. Failures before replacement preserve the previous save; native file-data flush and browser persistence semantics are documented separately in [Save replacement](save-transactions.md). |
 | BMP/TIL allocation and drawing | File dimensions and tile counts participate in unchecked allocation products; tile indices, bitmap copies, fills and dim operations can address beyond their surfaces. `bitmap::CopyTo` assumes a 640-byte stride, and negative careful-copy coordinates can select the wrong source pixels. | Raster loaders validate types, positive dimensions and complete member payloads before allocating. Tile reads validate the selected index/span. Drawing clips against source and destination bounds with widened arithmetic; copies use actual strides and preserve overlapping source data. Dim levels use defined nested palette indexing. Backdrops follow the validated BMP path. The explicit fill-clip helper retains its retail edge-exclusion rule. |
+| Invalid map headers and unterminated file text | Fixed-width map/save names and descriptions are consumed as C strings, allowing a missing terminator to read subsequent records. Map header counts and enum values can reach UI arrays without validation. | Bounds text decoding and encoding detection by each field's capacity. Rejects headers with invalid format, dimensions, counts, flags, domains or missing text terminators; save loading also rejects unterminated player, hero, town, rumour and default-player fields before decoding or use. |
+| Variable map records and cell chains | Typed event/hero/town accesses trust record indices and lengths; variable text and fixed sphinx answers can run past their allocations. Invalid skill/creature indices reach tables, and cyclic/out-of-range map-cell chains are followed without validation. | Validates referenced records, text terminators, array-index domains, and reachable cell chains at loading boundaries. Runtime accesses retain allocation bounds, including events beneath heroes in saved games. Preserves decorative tiles, unused editor slots, custom portraits and consumed hero/town save records. |
 | Direct-connect identifier | A six-byte identifier copied with `strncpy` is not terminated when all six source bytes are nonzero. | Copies the fixed-width field and explicitly terminates its seven-byte destination. |
 | High-score record transfers | The recovered update loop requests the size of the complete ten-entry table at each individual entry and ignores end-of-file. Excess data can overwrite the destination array. Stored names are also consumed without verifying terminators. | Reads and writes one explicit 100-byte little-endian record per entry, retains complete preceding records on a short tail, reads an entry with an unterminated name as empty while keeping the records after it, and bounds newly entered names to their UTF-8 field capacities. This also avoids the previous portable exact-read fallback discarding entries after the first whole-table read. |
 | Remote duplicate-filter reset | Startup clears only 30 bytes of the 30-element `i32` recent-message-ID array, leaving most entries from a previous session intact. | Clears the complete array with `sizeof(iLastIds)`. This belongs to retained legacy transport code; portable multiplayer is not currently supported. |

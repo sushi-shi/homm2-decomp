@@ -20,5 +20,5 @@ xml = (ROOT / "src/IRONFIST/save_xml.cpp").read_text()
 assert '"field_2773", data.records.m_townOwners' in xml
 assert '"builtToday", data.records.m_townBuiltToday' in xml
 assert re.search(r"numSpellsOfLevel\[j\]\s*=\s*twn->m_spellCounts\[j\s*\]", xml)
-assert re.search(r"CheckedSlot\(twn->m_spellCounts,\s*index\)\s*=", xml)
+assert re.search(r"StoreSlot\(&twn->m_spellCounts,\s*index,", xml)
 assert not re.search(r"m_spellCounts\[[^]]*\+\s*TOWN_MAGE_GUILD_FIRST_LEVEL", xml)

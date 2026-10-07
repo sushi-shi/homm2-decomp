@@ -39,6 +39,13 @@ installation's Windows-1251/Windows-1252 fallback. That provenance follows the
 active game. It is not taken from a localized AGG overlay, because maps are
 opened from `HOMM2_DATA`.
 
+Fixed-width map/save fields cross that boundary with their explicit capacities.
+Map headers are validated before entering the requester or new-game setup;
+unterminated map descriptions and saved player/hero/town/rumour fields are
+rejected before decoding. Encoding inspection itself is bounded even when
+given an invalid header. Bytes after a field's first NUL are padding and do
+not affect its text or encoding provenance.
+
 When a retail save is written, UTF-8 player, hero, town and rumour strings are
 encoded into temporary fixed-size legacy records. The live objects remain
 UTF-8. An unrepresentable or truncated value becomes `?` at that compatibility

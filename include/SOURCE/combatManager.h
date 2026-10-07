@@ -481,7 +481,6 @@ enum class CombatGridShade : u8 {
 };
 using enum CombatGridShade;
 
-#pragma pack(push, 1)
 class combatManager : public baseManager {
 public:
     class palette* m_combatPalette;
@@ -828,7 +827,6 @@ public:
     i32 WalkTowardArmyFront(class army* currentArmy, CombatSide side, i32 mask);
     i32 WalkTowardArmy(class army* currentArmy, CombatSide side, i32 mask);
 };
-#pragma pack(pop)
 extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
 extern H2EnumStorage<CombatSide, i32> iViewGeneralWhichSide;

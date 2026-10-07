@@ -73,7 +73,6 @@ enum class ArmySizeNameVariant : i32 {
 };
 using enum ArmySizeNameVariant;
 
-#pragma pack(push, 1)
 class advManager : public baseManager {
 public:
     AdventureCommand m_pendingCommand;
@@ -376,7 +375,6 @@ public:
         i32 processLosses
     );
 };
-#pragma pack(pop)
 
 extern b32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];

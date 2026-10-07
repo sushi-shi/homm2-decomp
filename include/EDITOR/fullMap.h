@@ -7,6 +7,9 @@
 class mapCell;
 struct mapCellExtra;
 
+// The map lives inside the packed game record (game::m_worldMap), at an
+// offset with no natural alignment, so its own layout is packed as well.
+#pragma pack(push, 1)
 class fullMap {
 public:
     mapCell* cells;
@@ -54,4 +57,5 @@ public:
         return &extras[i];
     }
 };
+#pragma pack(pop)
 #endif

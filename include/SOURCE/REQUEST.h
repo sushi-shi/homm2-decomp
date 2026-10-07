@@ -77,6 +77,8 @@ struct SMapHeader {
 #pragma pack(pop)
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header);
+// Returns a diagnostic for an invalid record, or nullptr for a valid header.
+const char* MapHeaderError(const SMapHeader&);
 localization::TextEncoding GetMapHeaderTextEncoding(const struct SMapHeader* header);
 i32 CheckSumIsDemoOK(const char*);
 i32 ShowThisMapGame(const char* filename);

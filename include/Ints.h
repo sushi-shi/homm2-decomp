@@ -36,6 +36,10 @@ constexpr long long H2MaskValue(T value) {
 }
 
 
+// Typed storage for the fields of packed retail records. Alignment 1 keeps a
+// member call on a field at an unaligned record offset well defined; inside
+// those records, where the wrappers live, the layout is unchanged.
+#pragma pack(push, 1)
 template <typename Enum, typename Storage>
 class H2EnumStorage {
 public:
@@ -165,6 +169,7 @@ public:
 private:
     Storage m_value;
 };
+#pragma pack(pop)
 
 template <typename Code, typename Storage>
 constexpr bool operator==(H2OpenCodeStorage<Code, Storage> lhs, Code rhs) {

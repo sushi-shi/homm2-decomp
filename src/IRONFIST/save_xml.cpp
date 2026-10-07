@@ -24,6 +24,7 @@
 #include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/MapRecords.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -46,9 +47,48 @@ decltype(auto) CheckedSlot(Container& records, i32 index) {
     return records[index];
 }
 
+// Slots of member arrays of packed records (hero, town, playerData): the
+// element may sit at an offset its type cannot be referenced from, so the
+// value is converted in an aligned temporary and stored as bytes.
+template <typename T, size_t N, typename Value>
+void StoreSlot(T (*records)[N], i32 index, Value value) {
+    if (index < 0 || static_cast<size_t>(index) >= N)
+        throw std::out_of_range("Record index outside session storage");
+    T converted{};
+    converted = value;
+    std::memcpy(reinterpret_cast<char*>(records) + index * sizeof(T), &converted, sizeof(T));
+}
+
 template <size_t Size>
 void ReadText(tinyxml2::XMLElement* element, char (&destination)[Size]) {
     utf8::Copy(destination, Size, element->GetText());
+}
+
+template <size_t Capacity>
+std::span<const u16> EventIndices(const u16 (&indices)[Capacity], u16 count) {
+    if (count > Capacity)
+        throw std::invalid_argument("Too many saved map events");
+    return {indices, count};
+}
+
+// The binary loader's map checks apply to XML worlds as well: cell-extra
+// chains stay inside their table and the event, sign and sphinx records the
+// session still reads are complete before the world replaces the live one.
+void ValidateWorld(const SessionData& data) {
+    const auto& world = data.world;
+    if (const char* error = map_records::CellDataError(world.cells, world.extras))
+        throw std::invalid_argument(std::string("Invalid map cells: ") + error);
+    std::vector<map_records::Record> records(world.objects.size());
+    for (size_t i = 1; i < world.objects.size(); ++i)
+        records[i] = {reinterpret_cast<const u8*>(world.objects[i].data()),
+                      world.objects[i].size()};
+    const auto& game = data.records;
+    if (const char* error = map_records::ExtraTableError(
+            world.cells, records,
+            EventIndices(game.m_rumourEventIndices, game.m_rumourEventCount),
+            EventIndices(game.m_timeEventIndices, game.m_timeEventCount),
+            EventIndices(game.m_mapEventIndices, game.m_mapEventCount), false))
+        throw std::invalid_argument(std::string("Invalid map extras: ") + error);
 }
 
 } // namespace
@@ -323,12 +363,12 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         xml::PushBack(tempDoc, playerElem, "relatedToUnknown", static_cast<i32>(player->m_townLocatorPage));
         xml::PushBack(tempDoc, playerElem, "barrierTentsVisited", static_cast<i32>(player->m_barrierTents));
 
-        xml::WriteArray(tempDoc, playerElem, "heroesOwned", player->m_heroIds);
-        xml::WriteArray(tempDoc, playerElem, "heroesForPurchase", player->m_availableHeroIds);
-        xml::WriteArray(tempDoc, playerElem, "castlesOwned", player->m_townIds);
-        xml::WriteArray(tempDoc, playerElem, "resources", player->m_resources);
-        xml::WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unknownad);
-        xml::WriteArray(tempDoc, playerElem, "resourcesIncome", player->m_aiData.m_income);
+        xml::WritePackedArray(tempDoc, playerElem, "heroesOwned", &player->m_heroIds);
+        xml::WritePackedArray(tempDoc, playerElem, "heroesForPurchase", &player->m_availableHeroIds);
+        xml::WritePackedArray(tempDoc, playerElem, "castlesOwned", &player->m_townIds);
+        xml::WritePackedArray(tempDoc, playerElem, "resources", &player->m_resources);
+        xml::WritePackedArray(tempDoc, playerElem, "_4_2_1", &player->m_unknownad);
+        xml::WritePackedArray(tempDoc, playerElem, "resourcesIncome", &player->m_aiData.m_income);
 
         pRoot->InsertEndChild(playerElem);
     }
@@ -360,7 +400,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         xml::PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
         xml::PushBack(tempDoc, townElem, "name", twn->m_name);
 
-        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_dwellingAvailable);
+        xml::WritePackedArray(tempDoc, townElem, "numCreaturesInDwelling", &twn->m_dwellingAvailable);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
             numSpellsOfLevel[j] = twn->m_spellCounts[j];
@@ -620,6 +660,7 @@ tinyxml2::XMLError XmlFile::Read(const char* fileName, SessionData& data) {
         if (parsed.records.m_playerCount <= 0 || parsed.records.m_playerCount > GAME_PLAYER_COUNT
             || parsed.currentPlayer < 0 || parsed.currentPlayer >= parsed.records.m_playerCount)
             throw std::invalid_argument("Invalid current player in saved game");
+        ValidateWorld(parsed);
         data = std::move(parsed);
         return tinyxml2::XML_SUCCESS;
     } catch (const std::exception& error) {
@@ -915,12 +956,12 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex, SessionData
         else if (name == "mightBeCurCastleIdx") xml::QueryCharText(elem, &pdata->m_currentTown);
         else if (name == "relatedToUnknown") xml::QueryCharText(elem, &pdata->m_townLocatorPage);
         else if (name == "barrierTentsVisited") xml::QueryCharText(elem, &pdata->m_barrierTents);
-        else if (name == "heroesOwned") CheckedSlot(pdata->m_heroIds, index) = value;
-        else if (name == "heroesForPurchase") CheckedSlot(pdata->m_availableHeroIds, index) = value;
-        else if (name == "castlesOwned") CheckedSlot(pdata->m_townIds, index) = value;
-        else if (name == "resources") CheckedSlot(pdata->m_resources, index) = value;
-        else if (name == "resourcesIncome") CheckedSlot(pdata->m_aiData.m_income, index) = value;
-        else if (name == "_4_2_1") CheckedSlot(pdata->m_unknownad, index) = value;
+        else if (name == "heroesOwned") StoreSlot(&pdata->m_heroIds, index, value);
+        else if (name == "heroesForPurchase") StoreSlot(&pdata->m_availableHeroIds, index, value);
+        else if (name == "castlesOwned") StoreSlot(&pdata->m_townIds, index, value);
+        else if (name == "resources") StoreSlot(&pdata->m_resources, index, value);
+        else if (name == "resourcesIncome") StoreSlot(&pdata->m_aiData.m_income, index, value);
+        else if (name == "_4_2_1") StoreSlot(&pdata->m_unknownad, index, value);
     }
 }
 
@@ -948,13 +989,13 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data
         else if (name == "aiLastTownInteractionTurn") xml::QueryShortText(elem, &hro->m_lastTownInteractionTurn);
         else if (name == "aiLastTownInteractionIdx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_visitedTownId));
         else if (name == "name") ReadText(elem, hro->m_name);
-        else if (name == "experience") elem->QueryIntText(&hro->m_experience);
+        else if (name == "experience") xml::QueryIntText(elem, &hro->m_experience);
         else if (name == "factionID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_cursorType));
         else if (name == "heroID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_portrait));
-        else if (name == "x") elem->QueryIntText(&hro->m_x);
-        else if (name == "y") elem->QueryIntText(&hro->m_y);
-        else if (name == "aiTargetX") elem->QueryIntText(&hro->m_destinationX);
-        else if (name == "aiTargetY") elem->QueryIntText(&hro->m_destinationY);
+        else if (name == "x") xml::QueryIntText(elem, &hro->m_x);
+        else if (name == "y") xml::QueryIntText(elem, &hro->m_y);
+        else if (name == "aiTargetX") xml::QueryIntText(elem, &hro->m_destinationX);
+        else if (name == "aiTargetY") xml::QueryIntText(elem, &hro->m_destinationY);
         else if (name == "aiPatrolX") xml::QueryCharText(elem, &hro->m_patrolX);
         else if (name == "aiPatrolY") xml::QueryCharText(elem, &hro->m_patrolY);
         else if (name == "patrolDistance") xml::QueryCharText(elem, &hro->m_patrolRadius);
@@ -965,8 +1006,8 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data
             hro->m_locationType = locationType;
         }
         else if (name == "occupiedObjVal") xml::QueryShortText(elem, &hro->m_occupiedTown);
-        else if (name == "mobility") elem->QueryIntText(&hro->m_mobility);
-        else if (name == "remainingMobility") elem->QueryIntText(&hro->m_remainingMobility);
+        else if (name == "mobility") xml::QueryIntText(elem, &hro->m_mobility);
+        else if (name == "remainingMobility") xml::QueryIntText(elem, &hro->m_remainingMobility);
         else if (name == "oldLevel") xml::QueryShortText(elem, &hro->m_level);
         else if (name == "attack") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 0));
         else if (name == "defense") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 1));
@@ -975,13 +1016,13 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data
         else if (name == "field_43") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 4));
         else if (name == "tempMoraleBonuses") xml::QueryCharText(elem, &hro->m_morale);
         else if (name == "tempLuckBonuses") xml::QueryCharText(elem, &hro->m_luck);
-        else if (name == "gazeboesVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_gazeboVisits));
-        else if (name == "fortsVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_fortVisits));
-        else if (name == "witchDoctorHutsVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_witchDoctorVisits));
-        else if (name == "mercenaryCampsVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_mercenaryCampVisits));
-        else if (name == "standingStonesVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_standingStoneVisits));
-        else if (name == "treesOfKnowledgeVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_treeKnowledgeVisits));
-        else if (name == "xanadusVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_xanaduVisits));
+        else if (name == "gazeboesVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_gazeboVisits));
+        else if (name == "fortsVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_fortVisits));
+        else if (name == "witchDoctorHutsVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_witchDoctorVisits));
+        else if (name == "mercenaryCampsVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_mercenaryCampVisits));
+        else if (name == "standingStonesVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_standingStoneVisits));
+        else if (name == "treesOfKnowledgeVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_treeKnowledgeVisits));
+        else if (name == "xanadusVisited") xml::QueryIntText(elem, reinterpret_cast<i32*>(&hro->m_xanaduVisits));
         else if (name == "randomSeed") xml::QueryCharText(elem, &hro->m_randomSeed);
         else if (name == "wisdomLastOffered") xml::QueryCharText(elem, &hro->m_enabled);
         else if (name == "flags") {
@@ -990,24 +1031,23 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data
             hro->m_eventFlags = HeroEventFlagFromCode(flags);
         }
         else if (name == "isCaptain") xml::QueryCharText(elem, &hro->m_isCaptain);
-        else if (name == "aiParamFV") elem->QueryFloatText(&hro->m_aiFightValue);
+        else if (name == "aiParamFV") xml::QueryFloatText(elem, &hro->m_aiFightValue);
         else if (name == "army") {
-            CheckedSlot(hro->m_army.m_creatureTypes, index) = static_cast<i8>(elem->IntAttribute("type"));
-            CheckedSlot(hro->m_army.m_creatureCounts, index) = static_cast<i16>(elem->IntAttribute("quantity"));
+            StoreSlot(&hro->m_army.m_creatureTypes, index, static_cast<i8>(elem->IntAttribute("type")));
+            StoreSlot(&hro->m_army.m_creatureCounts, index, static_cast<i16>(elem->IntAttribute("quantity")));
         } else if (name == "secondarySkill") {
-            CheckedSlot(hro->m_secondarySkills, index) =
-                HeroSkillLevelFromCode(elem->IntAttribute("level"));
-            CheckedSlot(hro->m_secondarySkillOrder, index) = elem->IntAttribute("idx");
+            StoreSlot(&hro->m_secondarySkills, index, HeroSkillLevelFromCode(elem->IntAttribute("level")));
+            StoreSlot(&hro->m_secondarySkillOrder, index, elem->IntAttribute("idx"));
         } else if (name == "numSecSkillsKnown")
-            elem->QueryIntText(&hro->m_secondarySkillCount);
+            xml::QueryIntText(elem, &hro->m_secondarySkillCount);
         else if (name == "spell") {
             index = elem->IntAttribute("idx");
             if (index >= 0 && index < KB_SPELL_TABLE_CAPACITY)
-                CheckedSlot(hro->m_spells, index) = 1;
+                StoreSlot(&hro->m_spells, index, 1);
         }
         else if (name == "artifact") {
-            CheckedSlot(hro->m_artifacts, index) = static_cast<i8>(elem->IntAttribute("id"));
-            CheckedSlot(hro->m_artifactExtra, index) = static_cast<i8>(elem->IntAttribute("spell"));
+            StoreSlot(&hro->m_artifacts, index, static_cast<i8>(elem->IntAttribute("id")));
+            StoreSlot(&hro->m_artifactExtra, index, static_cast<i8>(elem->IntAttribute("spell")));
         }
     }
 }
@@ -1054,17 +1094,17 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx, SessionData& data) 
         }
         else if (name == "name") ReadText(elem, twn->m_name);
         else if (name == "garrisonCreature") {
-            CheckedSlot(twn->m_army.m_creatureTypes, index) = static_cast<i8>(elem->IntAttribute("type"));
-            CheckedSlot(twn->m_army.m_creatureCounts, index) = static_cast<i16>(elem->IntAttribute("quantity"));
+            StoreSlot(&twn->m_army.m_creatureTypes, index, static_cast<i8>(elem->IntAttribute("type")));
+            StoreSlot(&twn->m_army.m_creatureCounts, index, static_cast<i16>(elem->IntAttribute("quantity")));
         } else if (name == "mageGuildSpell") {
             i32 level = elem->IntAttribute("level");
             i32 idx = elem->IntAttribute("idx");
             i32 spell = elem->IntAttribute("spell");
             CheckedSlot(CheckedSlot(twn->m_spells, level), idx) = static_cast<i8>(spell);
         } else if (name == "numCreaturesInDwelling")
-            CheckedSlot(twn->m_dwellingAvailable, index) = static_cast<i16>(value);
+            StoreSlot(&twn->m_dwellingAvailable, index, static_cast<i16>(value));
         else if (name == "numSpellsOfLevel")
-            CheckedSlot(twn->m_spellCounts, index) = static_cast<i8>(value);
+            StoreSlot(&twn->m_spellCounts, index, static_cast<i8>(value));
     }
     twn->m_turnsOwned = static_cast<u16>(turnsOwnedLow | (turnsOwnedHigh << 8));
 }

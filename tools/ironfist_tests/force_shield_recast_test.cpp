@@ -13,6 +13,10 @@
 static void InitStack(army& stack, CombatSide side, i32 index) {
     ironfist::state::Get().combat.ResetStack(stack);
     stack.m_monsterType = CREATURE_PEASANT;
+    // army::Init would clear these, but it needs game data. Without them the
+    // fixture depends on whatever the heap left in the combat manager.
+    stack.m_killPending = stack.m_deathPending = stack.m_damagePending = false;
+    stack.m_mirrorImageIndex = -1;
     stack.m_spellCount = 0;
     std::memset(stack.m_spellInfluence, 0, sizeof(stack.m_spellInfluence));
     stack.m_monster = {};

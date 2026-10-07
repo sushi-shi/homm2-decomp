@@ -236,7 +236,14 @@ void hero::Read(i32 file, i8 expansion) {
     if (!complete)
         ShutDown(localization::Tr("system.file.read_error"));
     memset(&m_spells[HERO_RETAIL_SPELL_COUNT], 0, sizeof(m_spells) - HERO_RETAIL_SPELL_COUNT);
-    const std::string name = localization::DecodeExternalText(m_name);
+    const auto field = localization::TextField(m_name);
+    if (!localization::HasTextTerminator(field)) {
+        platform::Host().Log(platform::LogLevel::Error,
+            "Invalid save: unterminated hero name");
+        ShutDown(localization::Tr("system.file.read_error"));
+        return;
+    }
+    const std::string name = localization::DecodeExternalText(field);
     utf8::Copy(m_name, sizeof(m_name), name.c_str());
 }
 

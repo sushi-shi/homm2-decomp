@@ -28,7 +28,6 @@ typedef enum ArmyHexConstant {
     ARMY_HEX_INVALID      = -1
 } ArmyHexConstant;
 
-#pragma pack(push, 1)
 class army {
 public:
     u8 m_animationState;
@@ -169,8 +168,6 @@ public:
         return m_monsterType >= CREATURE_PEASANT && m_quantity > 0;
     }
 };
-#pragma pack(pop)
-
 #define CLEAR_ARMY_TARGET(a) ((a).m_targetSide = COMBAT_SIDE_NONE, (a).m_targetIndex = -1)
 
 #define ARMY_HAS_BERSERK_OR_HYPNOTIZE(a)                                                           \

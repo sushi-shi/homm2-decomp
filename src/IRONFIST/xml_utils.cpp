@@ -4,12 +4,31 @@
 
 namespace ironfist::xml {
 
+// Destinations are often members of packed save records, so multi-byte
+// values are stored as bytes rather than through a typed lvalue.
 tinyxml2::XMLError QueryShortText(tinyxml2::XMLElement* el, i16* dest) {
     i32 val;
     tinyxml2::XMLError res = el->QueryIntText(&val);
-    *dest = static_cast<i16>(val);
+    const i16 narrowed = static_cast<i16>(val);
+    std::memcpy(dest, &narrowed, sizeof(narrowed));
     return res;
-} // namespace ironfist::xml
+}
+
+tinyxml2::XMLError QueryIntText(tinyxml2::XMLElement* el, i32* dest) {
+    i32 val;
+    std::memcpy(&val, dest, sizeof(val));
+    tinyxml2::XMLError res = el->QueryIntText(&val);
+    std::memcpy(dest, &val, sizeof(val));
+    return res;
+}
+
+tinyxml2::XMLError QueryFloatText(tinyxml2::XMLElement* el, float* dest) {
+    float val;
+    std::memcpy(&val, dest, sizeof(val));
+    tinyxml2::XMLError res = el->QueryFloatText(&val);
+    std::memcpy(dest, &val, sizeof(val));
+    return res;
+}
 
 tinyxml2::XMLError QueryCharText(tinyxml2::XMLElement* el, char* dest) {
     i32 val;

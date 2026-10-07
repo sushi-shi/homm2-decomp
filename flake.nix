@@ -2,13 +2,22 @@
   description = "Heroes of Might and Magic II - Gold 2.1 (Buka) reconstruction";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/64c08a7ca051951c8eae34e3e3cb1e202fe36786";
+  inputs.rust-overlay = {
+    url = "github:oxalica/rust-overlay";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, rust-overlay }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ rust-overlay.overlays.default ];
+      };
       p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
+      iconRust = pkgs.rust-bin.fromRustupToolchainFile
+        ./tools/homm2-icon-rs/rust-toolchain.toml;
       # Only what the build reads. Everything else - docs, the README, the
       # flake itself - would otherwise rebuild all three targets when touched.
       source = builtins.path {
@@ -421,13 +430,7 @@
 
       homm2-sanitized = homm2-check.overrideAttrs (previous: {
         pname = "homm2-sanitized";
-        # The Ironfist tests link the whole game, whose runtime classes are
-        # still pack(1) (fullMap, army); until those layouts are aligned, the
-        # alignment check would stop every such test at its first object.
-        cmakeFlags = previous.cmakeFlags ++ [
-          "-DHOMM2_SANITIZERS=ON"
-          "-DHOMM2_SANITIZER_EXCLUDE=alignment"
-        ];
+        cmakeFlags = previous.cmakeFlags ++ [ "-DHOMM2_SANITIZERS=ON" ];
         # LeakSanitizer stops the world through ptrace, which hosts with Yama
         # ptrace_scope >= 2 forbid. The check is for memory and undefined
         # behaviour errors, so leak detection stays off for reproducibility.
@@ -436,6 +439,28 @@
           export UBSAN_OPTIONS=print_stacktrace=1
         '';
       });
+
+      icon-check = pkgs.stdenv.mkDerivation {
+        pname = "homm2-icon-check";
+        version = "0.1.0";
+        src = source;
+        nativeBuildInputs = [ iconRust pkgs.clang ];
+        buildPhase = ''
+          runHook preBuild
+          export CARGO_HOME="$TMPDIR/cargo-home"
+          cd tools/homm2-icon-rs
+          cargo test --all-targets --locked
+          cargo test --doc --locked
+          cargo clippy --all-targets --locked -- -D warnings
+          cargo fmt --check
+          runHook postBuild
+        '';
+        installPhase = ''
+          runHook preInstall
+          touch "$out"
+          runHook postInstall
+        '';
+      };
 
       ironfist-revision = "314932011ed5308efb9f35cecc62e8ca638a7375";
       ironfist-source = pkgs.fetchgit {
@@ -653,6 +678,7 @@
         windows = windows;
         windows-tests = windows-tests;
         web = homm2-web;
+        icon = icon-check;
         launcher = game;
       };
 
@@ -689,6 +715,9 @@
         default = p32.mkShell {
           nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
           buildInputs = [ p32.bzip2 p32.ffmpeg-headless p32.sdl3 ];
+        };
+        icon = pkgs.mkShell {
+          packages = [ iconRust pkgs.clang ];
         };
         # `emcmake cmake --preset wasm`: the preset finds the Emscripten
         # builds of SDL3, libbz2 and FFmpeg through these variables.

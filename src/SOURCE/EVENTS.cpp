@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/MapRecords.h>
 #include <PLATFORM/Strings.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -432,7 +433,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SPHINX:
             EventSound(eventType, cell->m_objectMetadata, &eventSample);
-            eventExtra = static_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+            eventExtra = static_cast<mapEventExtra*>(MapExtraRecord(cell->m_objectMetadata, map_records::Kind::Sphinx));
             if (!eventExtra->active) {
                 NormalDialog(localization::Tr("event.inline.1553297e35c659a6"), NORMAL_DIALOG_INFO);
                 break;
@@ -444,7 +445,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
                     const std::string riddle =
-                        localization::DecodeExternalText(eventExtra->riddle);
+                        localization::DecodeExternalText(
+                            MapExtraText(eventExtra, offsetof(mapEventExtra, riddle))
+                        );
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.785dc53c14bdbc91"),
@@ -454,7 +457,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     correctAnswer = false;
                     for (eventValue = 0; eventValue < eventExtra->answerCount; eventValue++) {
                         const std::string answer = localization::DecodeExternalText(
-                            eventExtra->answers[eventValue]
+                            localization::TextField(eventExtra->answers[eventValue])
                         );
                         if (RiddleStringsEqual(
                                 sphinxAnswer,
@@ -2459,9 +2462,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_BOTTLE: {
             if (cell->m_objectMetadata) {
-                signExtra = static_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+                signExtra = static_cast<signEventExtra*>(MapExtraRecord(cell->m_objectMetadata, map_records::Kind::Sign));
                 const std::string signText =
-                    localization::DecodeExternalText(signExtra->text);
+                    localization::DecodeExternalText(MapExtraText(signExtra, offsetof(signEventExtra, text)));
                 if (signText.size() > SIGN_MINIMUM_TEXT_LENGTH)
                     EventWindow(
                         -1,
@@ -2492,9 +2495,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SIGN: {
             if (cell->m_objectMetadata) {
-                signExtra = static_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+                signExtra = static_cast<signEventExtra*>(MapExtraRecord(cell->m_objectMetadata, map_records::Kind::Sign));
                 const std::string signText =
-                    localization::DecodeExternalText(signExtra->text);
+                    localization::DecodeExternalText(MapExtraText(signExtra, offsetof(signEventExtra, text)));
                 if (signText.size() > SIGN_MINIMUM_TEXT_LENGTH)
                     EventWindow(
                         -1,
@@ -6282,7 +6285,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_SPHINX:
-            eventExtra = static_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+            eventExtra = static_cast<mapEventExtra*>(MapExtraRecord(cell->m_objectMetadata, map_records::Kind::Sphinx));
             if (eventExtra->active == 0)
                 break;
             if (Random(0, EVENT_RANDOM_PERCENT_MAX) < EVENT_RANDOM_EVENT_SUCCESS) {

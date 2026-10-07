@@ -12,7 +12,6 @@ enum class ButtonSelectMode : i16 {
 };
 using enum ButtonSelectMode;
 
-#pragma pack(push, 1)
 class button : public widget {
 public:
     icon* m_icon;
@@ -55,7 +54,6 @@ public:
     MessageDispatchResult Select(struct tag_message& message);
     MessageDispatchResult Deselect(struct tag_message& message);
 };
-#pragma pack(pop)
 extern MessageModifier iLeftRightSave;
 
 #endif

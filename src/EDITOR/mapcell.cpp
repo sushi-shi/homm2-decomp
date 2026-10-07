@@ -7,6 +7,8 @@
 #include <SOURCE/REQUEST.h>
 #include <string.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
+#include <SOURCE/MapRecords.h>
 
 typedef enum MapCellExtraConstant {
     EXTRA_ALLOCATION_STEP = 100
@@ -195,6 +197,8 @@ void fullMap::Read(i32 handle, i32 convert) {
         ReadMapData(handle, cells, width * height * sizeof(mapCell));
     }
     ReadMapData(handle, &extraCount, sizeof(extraCount));
+    if (extraCount < 0 || extraCount > map_records::ExtraCapacity)
+        ShutDown(localization::Tr("system.file.read_error"));
     if (extras)
         H2_FREE(extras);
     if (convert) {
@@ -209,6 +213,12 @@ void fullMap::Read(i32 handle, i32 convert) {
         RequireRecordsFit(handle, extraCount, sizeof(mapCellExtra));
         extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
         ReadMapData(handle, extras, extraCount * sizeof(mapCellExtra));
+    }
+    if (const char* error = map_records::CellDataError(
+            {cells, static_cast<std::size_t>(width * height)},
+            {extras, static_cast<std::size_t>(extraCount)})) {
+        platform::Host().Log(platform::LogLevel::Error, error);
+        ShutDown(localization::Tr("system.file.read_error"));
     }
 }
 

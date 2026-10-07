@@ -98,6 +98,17 @@ std::string DecodeText(const char* text, TextEncoding encoding) {
     return result;
 }
 
+bool HasTextTerminator(std::string_view field) {
+    return field.find('\0') != std::string_view::npos;
+}
+
+std::string DecodeText(std::string_view field, TextEncoding encoding) {
+    // The existing runtime decoder expects a C string. Materializing this
+    // bounded field once keeps that contract without scanning the next record.
+    const std::string text(field.substr(0, field.find('\0')));
+    return DecodeText(text.c_str(), encoding);
+}
+
 bool EncodeText(
     const char* text,
     TextEncoding encoding,
@@ -155,6 +166,22 @@ TextEncoding DetectTextEncoding(
              *byte != 0; ++byte) {
             hasUtf8NonAscii = hasUtf8NonAscii || *byte >= 0x80;
         }
+    }
+    return hasUtf8NonAscii ? TextEncoding::Utf8 : fallback;
+}
+
+TextEncoding DetectTextEncoding(
+    const std::string_view* fields,
+    std::size_t count,
+    TextEncoding fallback
+) {
+    bool hasUtf8NonAscii = false;
+    for (std::size_t index = 0; fields != nullptr && index < count; ++index) {
+        const std::string text(fields[index].substr(0, fields[index].find('\0')));
+        if (!utf8::IsValid(text.c_str()))
+            return fallback;
+        for (unsigned char byte : text)
+            hasUtf8NonAscii = hasUtf8NonAscii || byte >= 0x80;
     }
     return hasUtf8NonAscii ? TextEncoding::Utf8 : fallback;
 }

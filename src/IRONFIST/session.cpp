@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 #include <BASE/Misc.h>
@@ -32,6 +33,21 @@ template <typename T, size_t Count>
 void CopyRecord(T (&destination)[Count], const T (&source)[Count]) {
     for (size_t i = 0; i < Count; ++i)
         CopyRecord(destination[i], source[i]);
+}
+
+// game and the expansion campaign are packed save records, so a member may
+// sit at an offset its type cannot be referenced from. Copy those as bytes;
+// the snapshot side is an ordinary, aligned object of the member's type.
+template <typename T>
+void CopyFromPacked(T& destination, const void* source) {
+    static_assert(std::is_trivially_copyable_v<T>);
+    std::memcpy(&destination, source, sizeof(T));
+}
+
+template <typename T>
+void CopyToPacked(void* destination, const T& source) {
+    static_assert(std::is_trivially_copyable_v<T>);
+    std::memcpy(destination, &source, sizeof(T));
 }
 
 struct TrackedDelete {
@@ -96,8 +112,13 @@ struct PreparedWorld {
     void Commit() {
         ClearMapExtra();
         gpGame->m_worldMap.Close();
-        std::swap(gpGame->m_worldMap.cells, map.cells);
-        std::swap(gpGame->m_worldMap.extras, map.extras);
+        // fullMap is packed inside game: exchange by value, not by reference.
+        mapCell* const oldCells = gpGame->m_worldMap.cells;
+        mapCellExtra* const oldExtras = gpGame->m_worldMap.extras;
+        gpGame->m_worldMap.cells = map.cells;
+        gpGame->m_worldMap.extras = map.extras;
+        map.cells = oldCells;
+        map.extras = oldExtras;
         gpGame->m_worldMap.width = map.width;
         gpGame->m_worldMap.height = map.height;
         gpGame->m_worldMap.extraCount = map.extraCount;
@@ -174,8 +195,8 @@ std::string SaveFilePath(const std::string& name) {
 
 SessionData CaptureSession() {
     SessionData data;
-#define IRONFIST_GAME_FIELD(member) CopyRecord(data.records.member, gpGame->member);
-#define IRONFIST_CAMPAIGN_FIELD(member) CopyRecord(data.expansion.member, xCampaign.member);
+#define IRONFIST_GAME_FIELD(member) CopyFromPacked(data.records.member, &gpGame->member);
+#define IRONFIST_CAMPAIGN_FIELD(member) CopyFromPacked(data.expansion.member, &xCampaign.member);
 #include <IRONFIST/session_fields.inc>
 #undef IRONFIST_GAME_FIELD
 #undef IRONFIST_CAMPAIGN_FIELD
@@ -254,8 +275,8 @@ void RestoreSession(const SessionData& data) {
         gpAdvManager->PurgeMapChangeQueue();
     if (world)
         world->Commit();
-#define IRONFIST_GAME_FIELD(member) CopyRecord(gpGame->member, data.records.member);
-#define IRONFIST_CAMPAIGN_FIELD(member) CopyRecord(xCampaign.member, data.expansion.member);
+#define IRONFIST_GAME_FIELD(member) CopyToPacked(&gpGame->member, data.records.member);
+#define IRONFIST_CAMPAIGN_FIELD(member) CopyToPacked(&xCampaign.member, data.expansion.member);
 #include <IRONFIST/session_fields.inc>
 #undef IRONFIST_GAME_FIELD
 #undef IRONFIST_CAMPAIGN_FIELD

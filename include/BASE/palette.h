@@ -16,7 +16,6 @@ enum class PaletteChannel : i32 {
 };
 using enum PaletteChannel;
 
-#pragma pack(push, 1)
 class palette : public resource {
 public:
     i8* m_data;
@@ -27,5 +26,4 @@ public:
     // Color channels are unsigned bytes; keep Data for legacy signed effects.
     u8* UnsignedData(void) { return reinterpret_cast<u8*>(m_data); }
 };
-#pragma pack(pop)
 #endif

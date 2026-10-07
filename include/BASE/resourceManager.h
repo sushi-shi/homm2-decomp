@@ -24,7 +24,6 @@ typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
 
-#pragma pack(push, 1)
 class resourceManager : public baseManager {
 public:
     resource* m_resourceListHead;
@@ -70,7 +69,6 @@ public:
     void Read13(char* destination);
     void ReadBlock(void* destination, u32l size);
 };
-#pragma pack(pop)
 extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];

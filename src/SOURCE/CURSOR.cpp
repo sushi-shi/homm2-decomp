@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/MapRecords.h>
 #include <BASE/Utf8.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -806,7 +807,7 @@ adjacentDone:
                 && secondaryAmount < 0)
                 secondaryAmount -= CURSOR_RESOURCE_DIALOG_PENALTY;
             const std::string eventMessage =
-                localization::DecodeExternalText(mapEvent->message);
+                localization::DecodeExternalText(MapExtraText(mapEvent, offsetof(EventExtra, message)));
             NormalDialog(eventMessage.c_str(), 1, -1, -1, primaryType, primaryAmount, secondaryType, secondaryAmount);
             gbHitEvent = true;
         }
