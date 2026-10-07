@@ -1475,7 +1475,7 @@ void SendMapChange(
         reinterpret_cast<char*>(sMapChangeLastFew),
         CURSOR_REMOTE_PLAYER_ALL,
         sizeof(sMapChangeLastFew),
-        ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE,
+        REMOTE_COMMAND_GROUP_MAP_CHANGE,
         0
     );
 }

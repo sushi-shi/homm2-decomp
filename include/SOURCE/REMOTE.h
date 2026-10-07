@@ -42,6 +42,33 @@ H2_ENUM_BEGIN(RemoteTransportTimingConstant)
     REMOTE_INITIAL_HEARTBEAT             = 1999999999,
 H2_ENUM_END(RemoteTransportTimingConstant)
 
+// A RemoteMessage's command: what the payload carries, for TransmitRemoteData,
+// TransmitAndWait and every receiver's switch.
+H2_ENUM_BEGIN(RemoteCommand)
+    REMOTE_COMMAND_SAVE_GAME          = 1,
+    REMOTE_COMMAND_SAVE_INIT_RESPONSE = 2,
+    REMOTE_COMMAND_SAVE_DATA          = 3,
+    REMOTE_COMMAND_SAVE_ACK_REQUEST   = 4,
+    REMOTE_COMMAND_SAVE_ACK_RESPONSE  = 5,
+    REMOTE_COMMAND_SAVE_FINISH        = 6,
+    REMOTE_COMMAND_POP_NET_BOX        = 11,
+    REMOTE_COMMAND_COMBAT             = 21,
+    REMOTE_COMMAND_COMBAT_CONFIRM     = 22,
+    REMOTE_COMMAND_COMBAT_ACTION      = 23,
+    REMOTE_COMMAND_PLAYER_EXIT        = 31,
+    REMOTE_COMMAND_NET_SETUP          = 32,
+    REMOTE_COMMAND_HOST_PLAYER_EXIT   = 33,
+    REMOTE_COMMAND_SETUP_PLAYER_INFO  = 34,
+    REMOTE_COMMAND_GROUP_MAP_CHANGE   = 41,
+    REMOTE_COMMAND_GAME_SETUP         = 51,
+    REMOTE_COMMAND_MAP_HEADER         = 52,
+    REMOTE_COMMAND_GAME_START         = 53,
+    REMOTE_COMMAND_GAME_CANCEL        = 54,
+    REMOTE_COMMAND_PLAYER_INFO        = 55,
+    REMOTE_COMMAND_NEW_GAME           = 61,
+    REMOTE_COMMAND_LOAD_GAME          = 62
+H2_ENUM_END(RemoteCommand)
+
 H2_ENUM_BEGIN(RemoteQueueSentinel)
     REMOTE_ORDER_SENTINEL = 999999999,
 H2_ENUM_END(RemoteQueueSentinel)

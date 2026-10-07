@@ -807,7 +807,7 @@ i32 oldmain(void) {
                         netBuffer.bytes,
                         player,
                         sizeof(OldMainNetSetup),
-                        OLD_MAIN_NETWORK_PACKET,
+                        REMOTE_COMMAND_NET_SETUP,
                         1
                     );
                     if (!transmissionResult)
@@ -3081,7 +3081,7 @@ i32 WaitForOtherPlayer(void) {
                 );
                 giThisGamePos = NetPosToGamePos(giThisNetPos);
                 break;
-            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
+            case REMOTE_COMMAND_SAVE_GAME:
                 result = gpGame->ReceiveSaveGame(
                     data->payload.save.dataSize,
                     data->payload.save.crc,
@@ -3226,7 +3226,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             if (remoteData->type == REMOTE_MESSAGE_UNRELIABLE) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData->command) {
-                    case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
+                    case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt;
@@ -3242,7 +3242,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData->command) {
-                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+                    case REMOTE_COMMAND_POP_NET_BOX:
                         remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         sprintf(
                             gText,
@@ -3320,7 +3320,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                 inputText,
                 REMOTE_BROADCAST_PLAYER,
                 strlen(inputText) + 1,
-                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
+                REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!result)
@@ -4693,7 +4693,7 @@ void HandleRemoteSuddenExit(void) {
         reinterpret_cast<char*>(&exitInfo),
         destination,
         sizeof(exitInfo),
-        ADVMGR_REMOTE_COMMAND_PLAYER_EXIT,
+        REMOTE_COMMAND_PLAYER_EXIT,
         0,
         0,
         REMOTE_MESSAGE_RELIABLE
@@ -4887,7 +4887,7 @@ exitInfoProcessed:
                 reinterpret_cast<char*>(&exitInfo),
                 1 - giThisNetPos,
                 sizeof(exitInfo),
-                ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                REMOTE_COMMAND_HOST_PLAYER_EXIT,
                 1
             );
         }
@@ -4906,7 +4906,7 @@ exitInfoProcessed:
                     reinterpret_cast<char*>(&exitInfo),
                     recipient,
                     sizeof(exitInfo),
-                    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                    REMOTE_COMMAND_HOST_PLAYER_EXIT,
                     1
                 );
             }

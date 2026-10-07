@@ -9004,7 +9004,7 @@ char* advManager::CheckHandleNet(void) {
         && (receivedPacket->type == REMOTE_MESSAGE_RELIABLE
             || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
         switch (receivedPacket->command) {
-            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
+            case REMOTE_COMMAND_SAVE_GAME:
                 remotePlayerExited = ADVMGR_REMOTE_PAYLOAD(receivedPacket)->save.playerExited;
                 if (!gpGame->ReceiveSaveGame(
                         ADVMGR_REMOTE_PAYLOAD(receivedPacket)->save.dataSize,
@@ -9026,11 +9026,11 @@ char* advManager::CheckHandleNet(void) {
                 LoadRemote();
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+            case REMOTE_COMMAND_POP_NET_BOX:
                 PopNetBox(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes, receivedPacket->sender);
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_COMBAT:
+            case REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
                     return reinterpret_cast<char*>(receivedPacket);
                 } else {
@@ -9038,12 +9038,12 @@ char* advManager::CheckHandleNet(void) {
                 }
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
+            case REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->playerExit);
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
+            case REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
                     receivedPacket->sender,
@@ -9052,7 +9052,7 @@ char* advManager::CheckHandleNet(void) {
                 );
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
+            case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                 ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes);
                 break;
 

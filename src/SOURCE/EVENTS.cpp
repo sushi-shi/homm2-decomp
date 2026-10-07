@@ -50,11 +50,6 @@
 
 namespace {
 
-    H2_ENUM_BEGIN(CombatRemoteCommand)
-        REMOTE_COMMAND = 0x15,
-        REMOTE_CONFIRM_COMMAND = 0x16
-    H2_ENUM_END(CombatRemoteCommand)
-
     H2_ENUM_BEGIN(CombatRemoteFragment)
         REMOTE_FIRST_HERO_FIRST = 1,
         REMOTE_FIRST_HERO_SECOND = 2,
@@ -7787,7 +7782,7 @@ CombatResult advManager::DoCombat(
                     receivedPacket = CheckHandleNet();
                     if (receivedPacket) {
                         switch (EVENTS_REMOTE_MESSAGE(receivedPacket)->command) {
-                            case REMOTE_COMMAND:
+                            case REMOTE_COMMAND_COMBAT:
                                 ReceiveHeroTownData(
                                     receivedPacket,
                                     &remotePlayer,
@@ -7981,8 +7976,8 @@ void advManager::SendHeroTownData(
         reinterpret_cast<char*>(buffer),
         remotePlayer,
         COMBAT_REMOTE_HEADER_SIZE,
-        REMOTE_COMMAND,
-        REMOTE_CONFIRM_COMMAND,
+        REMOTE_COMMAND_COMBAT,
+        REMOTE_COMMAND_COMBAT_CONFIRM,
         &reply
     );
     if (!result)
@@ -7995,7 +7990,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
-            REMOTE_COMMAND,
+            REMOTE_COMMAND_COMBAT,
             COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
@@ -8010,7 +8005,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
-            REMOTE_COMMAND,
+            REMOTE_COMMAND_COMBAT,
             COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
@@ -8023,7 +8018,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
-            REMOTE_COMMAND,
+            REMOTE_COMMAND_COMBAT,
             COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
@@ -8038,7 +8033,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
-            REMOTE_COMMAND,
+            REMOTE_COMMAND_COMBAT,
             COMBAT_REMOTE_FRAGMENT_TYPE
         );
         if (!result)
@@ -8130,7 +8125,7 @@ void advManager::ReceiveHeroTownData(
         NULL,
         *remotePlayer,
         0,
-        REMOTE_CONFIRM_COMMAND,
+        REMOTE_COMMAND_COMBAT_CONFIRM,
         COMBAT_REMOTE_FRAGMENT_TYPE
     );
     if (!result)
@@ -8167,7 +8162,7 @@ void advManager::ReceiveHeroTownData(
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
-            && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND) {
+            && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND_COMBAT) {
             lastPacketTime = KBTickCount();
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {
                 memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);

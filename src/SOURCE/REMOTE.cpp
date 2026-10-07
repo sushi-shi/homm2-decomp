@@ -35,12 +35,6 @@ H2_ENUM_BEGIN(RemoteImplementationConstant)
     POLL_REMOTE_ALLOC_LINE_OFFSET    = 235
 H2_ENUM_END(RemoteImplementationConstant)
 
-H2_ENUM_CLASS_BEGIN(RemoteSetupCommand)
-    SETUP_PLAYER_INFO   = 0x22,
-    SETUP_NEW_GAME      = 0x3d,
-    SETUP_LOAD_GAME     = 0x3e
-H2_ENUM_CLASS_END(RemoteSetupCommand)
-
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
@@ -236,8 +230,8 @@ void RemoteMain(RemoteGameMode gameMode) {
                 LogStr("RM 4");
                 if (recvData != NULL
                     && REMOTE_MESSAGE(recvData)->type == REMOTE_MESSAGE_RELIABLE) {
-                    switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(recvData)->command)) {
-                        case SETUP_PLAYER_INFO:
+                    switch (static_cast<RemoteCommand>(REMOTE_MESSAGE(recvData)->command)) {
+                        case REMOTE_COMMAND_SETUP_PLAYER_INFO:
                             netPlayer = REMOTE_MESSAGE(recvData)->sender;
                             gsNetPlayerInfo[netPlayer] =
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(recvData));
@@ -259,7 +253,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
                 sizeof(SNetPlayerInfo),
-                IDX(SETUP_PLAYER_INFO),
+                REMOTE_COMMAND_SETUP_PLAYER_INFO,
                 1
             );
             LogStr("RM 6");
@@ -271,7 +265,10 @@ void RemoteMain(RemoteGameMode gameMode) {
             NULL,
             REMOTE_BROADCAST_PLAYER,
             0,
-            static_cast<i8>(giSetupGameType == OLD_MAIN_SETUP_LOAD ? SETUP_LOAD_GAME : SETUP_NEW_GAME),
+            static_cast<i8>(
+                giSetupGameType == OLD_MAIN_SETUP_LOAD ? REMOTE_COMMAND_LOAD_GAME
+                                                       : REMOTE_COMMAND_NEW_GAME
+            ),
             1
         );
     } else {
@@ -287,13 +284,13 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
             if (gameMessage != NULL
                 && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMessage)->command == IDX(SETUP_LOAD_GAME)) {
+                && REMOTE_MESSAGE(gameMessage)->command == REMOTE_COMMAND_LOAD_GAME) {
                 bGotGameType = true;
                 giSetupGameType = OLD_MAIN_SETUP_LOAD;
             }
             if (gameMessage != NULL
                 && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMessage)->command == IDX(SETUP_NEW_GAME)) {
+                && REMOTE_MESSAGE(gameMessage)->command == REMOTE_COMMAND_NEW_GAME) {
                 bGotGameType = true;
                 giSetupGameType = OLD_MAIN_SETUP_NEW;
             }

@@ -264,11 +264,6 @@ H2_ENUM_BEGIN(RemoteSaveConstant)
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
-    REMOTE_SAVE_INIT_RESPONSE        = 2,
-    REMOTE_SAVE_DATA_COMMAND         = 3,
-    REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
-    REMOTE_SAVE_ACK_RESPONSE_COMMAND = 5,
-    REMOTE_SAVE_FINISH_COMMAND       = 6
 H2_ENUM_END(RemoteSaveConstant)
 
 H2_ENUM_BEGIN(NewTurnConstant)
@@ -6932,8 +6927,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
             header->bytes,
             remotePlayer,
             REMOTE_SAVE_HEADER_SIZE,
-            ADVMGR_REMOTE_COMMAND_SAVE_GAME,
-            REMOTE_SAVE_INIT_RESPONSE,
+            REMOTE_COMMAND_SAVE_GAME,
+            REMOTE_COMMAND_SAVE_INIT_RESPONSE,
             &reply
         );
         if (!result)
@@ -6969,7 +6964,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                             header->bytes,
                             remotePlayer,
                             chunkSize + REMOTE_PACKET_INDEX_SIZE,
-                            REMOTE_SAVE_DATA_COMMAND,
+                            REMOTE_COMMAND_SAVE_DATA,
                             0
                         );
                         if (!result)
@@ -6983,8 +6978,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                     header->bytes,
                     remotePlayer,
                     REMOTE_PACKET_INDEX_SIZE,
-                    REMOTE_SAVE_ACK_REQUEST_COMMAND,
-                    REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                    REMOTE_COMMAND_SAVE_ACK_REQUEST,
+                    REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                     &reply
                 );
                 LogStr("PostWait");
@@ -7003,7 +6998,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                 }
             }
         }
-        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_FINISH_COMMAND, 1);
+        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_COMMAND_SAVE_FINISH, 1);
         if (!result)
             ShutDown(NULL);
         success = true;
@@ -7128,7 +7123,7 @@ i32 game::ReceiveSaveGame(
     gSoundBackendsReady = samplesReady;
 
     LogStr("Begin Transmit Init Confirm");
-    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_INIT_RESPONSE, 1);
+    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_COMMAND_SAVE_INIT_RESPONSE, 1);
     LogStr("End Transmit Init Confirm");
     if (!result)
         ShutDown(NULL);
@@ -7162,7 +7157,7 @@ i32 game::ReceiveSaveGame(
                 || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = KBTickCount();
             switch (receivedPacket->command) {
-                case REMOTE_SAVE_DATA_COMMAND:
+                case REMOTE_COMMAND_SAVE_DATA:
                     packetStart = receivedPacket->payload.chunk.packetIndex;
                     received[packetStart] = 1;
                     memcpy(
@@ -7171,7 +7166,7 @@ i32 game::ReceiveSaveGame(
                         receivedPacket->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
                     break;
-                case REMOTE_SAVE_ACK_REQUEST_COMMAND:
+                case REMOTE_COMMAND_SAVE_ACK_REQUEST:
                     packetStart = receivedPacket->payload.chunk.packetIndex;
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
@@ -7181,13 +7176,13 @@ i32 game::ReceiveSaveGame(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
                         REMOTE_SAVE_CHUNK_SIZE,
-                        REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                        REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                         1
                     );
                     if (!result)
                         ShutDown(NULL);
                     break;
-                case REMOTE_SAVE_FINISH_COMMAND:
+                case REMOTE_COMMAND_SAVE_FINISH:
                     finished = true;
                     break;
             }
