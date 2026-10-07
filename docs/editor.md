@@ -238,6 +238,11 @@ its link-diff stamp are the editor's default build target.
 The historical link is byte-identical to retail (`config/retail/editor/link_diff.tsv`
 is banked at zero in every region).
 
-## Open work
+## Clean export
 
-- The editor's clean export.
+`homm2 clean` exports the editor with the game: the generated tree builds
+`EDT2PL.exe` as its `editor` target (`build.py --target editor|all`,
+`nix build .#editor`), compiling every unit whose `images` name the editor,
+the shared ones with `HOMM2_EDITOR`, and `res/EDT2PL.rc`. The editor sources
+compile in the clean tree's strict enum mode, and `homm2 clean --verify`
+builds both programs ([clean source](clean-source.md)).

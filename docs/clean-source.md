@@ -96,6 +96,9 @@ valid output target.
 | `localization::Tr("id")`, `locales/*` | preserved in source; Russian UTF-8 literals in classic |
 | `#define readable storage // frame-slot spelling` … `#undef readable` | deleted; the function keeps the readable name |
 | `#define readable storage // spelling fixes .bss order` | deleted; a definition spelled `storage` takes the readable name |
+| `#if H2_RETAIL_COMPILER` blocks | deleted with their retail-only spellings |
+| `#ifdef HOMM2_EDITOR` blocks | preserved; the editor build defines `HOMM2_EDITOR` |
+| `res/EDT2PL.rc` | comments and the retail icon deleted; Windows-1251 escapes become UTF-8 text under code page 65001 |
 
 The matching source keeps readable names and aliases them to the spellings
 VC6's name hashes need: an `/Od` function's frame-slot order and a unit's
@@ -107,10 +110,12 @@ survives. Ported from the HoMM1 exporter (`scripts/homm1/clean/source.py`).
 
 Source Gold retains build-time locale selection: `./build.py --ru` (default)
 or `./build.py --en`, with independent objects and executables under
-`build/<locale>/`. The root Ninja graph builds Russian; `build-en.ninja` builds
+`build/<locale>/`. `--target game` (default), `editor` or `all` selects the
+program. The root Ninja graph builds Russian; `build-en.ninja` builds
 English. Both regenerate disposable literal compiler inputs when source,
 headers, or catalogs change. `nix build` and `nix build .#game-en` package those
-same builds. No runtime lookup or matching tools are added to the source tree.
+same builds; `.#editor`, `.#editor-en`, `.#all` and `.#all-en` package the
+scenario editor and both programs. No runtime lookup or matching tools are added to the source tree.
 
 For classic Gold, `--classic-russian` reads the catalog from the source worktree
 being exported, not the current decomp checkout. It resolves every ID and
@@ -122,10 +127,18 @@ Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
 the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
-The branch carries `include/`, `src/`, vendor SDK headers, import definitions,
-`build.ninja`, and a standalone Nix flake. The Ninja graph builds
-`build/HMM2PL.exe` for 32-bit Windows with Clang at `-O0`, x87 floating point,
-and LLD. The compiler runtime is linked statically.
+The branch carries `include/`, `src/`, `res/EDT2PL.rc`, vendor SDK headers,
+import definitions, `build.ninja`, and a standalone Nix flake. The Ninja graph
+builds `build/<locale>/HMM2PL.exe` and, as its `editor` target,
+`build/<locale>/EDT2PL.exe` for 32-bit Windows with Clang at `-O0`, x87
+floating point, and LLD. The compiler runtime is linked statically. The editor
+compiles every unit `config/units.toml` links into it (`images` naming
+`editor`): its own `src/EDITOR/` units, the editor-only `BASE/icon2bsd` and
+`BASE/tile2bs`, and the shared units again with `HOMM2_EDITOR` defined, which
+also compiles the music flags inside `BASE/Midi` as the editor's BASE library
+did. Its resources compile with `llvm-windres`. The matching build's per-unit
+VC6 profiles, including the editor's `/Ob2` rule (`homm2.manifest.unit_flags`),
+do not apply: every generated unit compiles with the same Clang flags.
 
 The matching toolchain, delinker, objdiff plumbing, and MSVC are absent. A direct
 Ninja build requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW
@@ -152,10 +165,11 @@ instead of rewriting published history.
 trees are transformed from their clean source sibling but are anchored directly
 to the matching decompilation commit, preserving the documented branch graph.
 
-The verifier invokes the generated flake's pinned Nix build, which in turn runs
-the generated Ninja graph with the correct MinGW/Clang cross environment. All
-95 translation units, including portable replacements for the two old
-inline-assembly units, must compile and link into the Windows executable.
+The verifier invokes the generated flake's pinned Nix build of `.#all`, which
+in turn runs the generated Ninja graph with the correct MinGW/Clang cross
+environment. Every game translation unit, including portable replacements for
+the two old inline-assembly units, must compile and link into `HMM2PL.exe`,
+and every editor unit into `EDT2PL.exe`.
 
 ## Type information is preserved, not discarded
 

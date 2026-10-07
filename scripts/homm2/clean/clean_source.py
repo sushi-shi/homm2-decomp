@@ -53,6 +53,7 @@ PUBLISHED_PATHS = (
     "run-game.sh",
     "imports",
     "include",
+    "res",
     "src",
     "vendor",
 )
@@ -1478,13 +1479,71 @@ def validate_out_root(requested: Path) -> Path:
     return out_root
 
 
-def write_ninja(out_root: Path, locale: str = 'ru') -> None:
-    # The generated build links the game: a unit linked only into another
-    # image (the scenario editor) is not one of its objects.
+# The programs the generated tree builds: the game, and the scenario editor
+# with every unit it links compiled again under its image defines (shared
+# units select their editor variants with `#ifdef HOMM2_EDITOR`) and its
+# resources. Each is a Ninja target of its own; `all` builds both.
+PROGRAMS = (
+    ("game", "HMM2PL.exe", None),
+    ("editor", "EDT2PL.exe", "res/EDT2PL.rc"),
+)
+
+
+def program_sources(out_root: Path) -> dict[str, list[str]]:
+    """{image: [generated source path]}, sorted.
+
+    The game builds every source of the tree except those only another image
+    links. The editor builds the manifest's editor units; a source compiled
+    inside another unit for it (`compiled_into`, MusicFlags in Midi) is not
+    one of its objects, and an assembly unit builds from its C++ override
+    (overrides/src/BASE/TILE.cpp).
+    """
     from homm2.manifest import all_units, unit_images
-    other_images = {u["source"] for u in all_units() if "game" not in unit_images(u)}
-    sources = [path for path in sorted((out_root / "src").rglob("*.cpp"))
-               if path.relative_to(out_root).as_posix() not in other_images]
+    units = all_units()
+    other_images = {u["source"] for u in units if "game" not in unit_images(u)}
+    game = [path.relative_to(out_root).as_posix()
+            for path in sorted((out_root / "src").rglob("*.cpp"))
+            if path.relative_to(out_root).as_posix() not in other_images]
+    editor = sorted(str(Path(u["source"]).with_suffix(".cpp"))
+                    for u in units if "editor" in unit_images(u))
+    missing = [source for source in editor if not (out_root / source).is_file()]
+    if missing:
+        raise SystemExit("editor units missing from the generated tree: "
+                         + ", ".join(missing))
+    return {"game": game, "editor": editor}
+
+
+RETAIL_CODE_PAGE = "#pragma code_page(1251)"
+
+
+def clean_resource(text: str, relative: str) -> str:
+    """A resource script for the generated build.
+
+    The matching script spells its Russian text as Windows-1251 octal escapes
+    under `#pragma code_page(1251)` for the era RC.EXE. LLVM's resource
+    compiler reads narrow escapes as Unicode code points and takes no 1251
+    input, so the generated script carries the same text as UTF-8 under code
+    page 65001. The icon is a retail asset outside the tree: its resource and
+    the About box's icon control are left out.
+    """
+    text = strip_comments(text)
+    if text.count(RETAIL_CODE_PAGE) != 1:
+        raise SystemExit(f"[clean] {relative}: expected one {RETAIL_CODE_PAGE}")
+    text = text.replace(RETAIL_CODE_PAGE, "#pragma code_page(65001)")
+    text, _count = materialize_cp1251_literals(text)
+    lines = [DROPPED if re.search(r"\bICON\b", line.split('"')[0]) else line
+             for line in text.split("\n")]
+    return re.sub(r"\n{3,}", "\n\n", tidy("\n".join(lines))).strip("\n") + "\n"
+
+
+def program_defines(image: str) -> list[str]:
+    """`-D` flags an image adds to every unit it compiles (none for the game)."""
+    from homm2.manifest import image_defines
+    return ["-D" + flag.removeprefix("/D") for flag in image_defines(image)]
+
+
+def write_ninja(out_root: Path, locale: str = 'ru') -> None:
+    sources = program_sources(out_root)
     localized = (out_root / 'locales/messages.def').is_file()
     include_flags = [
         f"-Ibuild/{locale}/localized/include" if localized else "-Iinclude",
@@ -1529,6 +1588,7 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
         f"builddir = build/{locale}" if localized else "builddir = build",
         "cxx = clang++",
         "dlltool = llvm-dlltool",
+        "windres = llvm-windres",
         "cxxflags = " + " ".join(flags),
         "ldflags = --target=i686-w64-windows-gnu -fuse-ld=lld -mwindows "
         "-fsjlj-exceptions -static -static-libgcc -static-libstdc++",
@@ -1543,7 +1603,7 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
         "  restat = 1",
         "",
         "rule cxx",
-        "  command = $${CXX:-$cxx} $cxxflags -MMD -MF $out.d -c $in -o $out",
+        "  command = $${CXX:-$cxx} $cxxflags $defines -MMD -MF $out.d -c $in -o $out",
         "  depfile = $out.d",
         "  deps = gcc",
         "  description = CXX $in",
@@ -1552,11 +1612,17 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
         "  command = $dlltool -m i386 $dlltool_flags -d $in -l $out",
         "  description = IMPLIB $in",
         "",
+        "rule rc",
+        "  command = $windres --no-preprocess --codepage=65001 --target=pe-i386 "
+        "-i $in -o $out",
+        "  description = RC $in",
+        "",
         "rule link",
         "  command = $${CXX:-$cxx} $ldflags -o $out $in $system_libs $runtime_libs",
         "  description = LINK $out",
         "",
         "build $builddir/obj: mkdir",
+        "build $builddir/editor/obj: mkdir",
         "build $builddir/imports: mkdir",
     ]
     if localized:
@@ -1573,14 +1639,19 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
             'build ' + ' '.join(outputs) + ': localize ' + ' '.join(inputs)
             + ' | build.py tools/catalog.py locales/messages.def locales/ru.po',
         ]
-    objects = []
-    for source in sources:
-        relative = source.relative_to(out_root).as_posix()
-        name = relative.removeprefix("src/").removesuffix(".cpp").replace("/", "_")
-        obj = f"$builddir/obj/{name}.o"
-        compiler_source = f'build/{locale}/localized/{relative}' if localized else relative
-        lines.append(f"build {obj}: cxx {compiler_source} || $builddir/obj")
-        objects.append(obj)
+    objects: dict[str, list[str]] = {}
+    for image, _executable, _resources in PROGRAMS:
+        directory = "$builddir/obj" if image == "game" else f"$builddir/{image}/obj"
+        defines = " ".join(program_defines(image))
+        objects[image] = []
+        for relative in sources[image]:
+            name = relative.removeprefix("src/").removesuffix(".cpp").replace("/", "_")
+            obj = f"{directory}/{name}.o"
+            compiler_source = f'build/{locale}/localized/{relative}' if localized else relative
+            lines.append(f"build {obj}: cxx {compiler_source} || {directory}")
+            if defines:
+                lines.append(f"  defines = {defines}")
+            objects[image].append(obj)
     import_libraries = []
     for dll, dlltool_flags in (
         ("AUDIERE", ""),
@@ -1603,12 +1674,21 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
     lines.append(
         f"build {mss_aliases}: cxx imports/MSS32_aliases.S || $builddir/imports"
     )
+    lines.append("")
+    for image, executable, resources in PROGRAMS:
+        inputs = list(objects[image])
+        if resources:
+            resource_object = f"$builddir/{image}/{Path(resources).stem}.res.o"
+            lines.append(f"build {resource_object}: rc {resources} || $builddir/{image}/obj")
+            inputs.append(resource_object)
+        lines += [
+            f"build $builddir/{executable}: link "
+            + " ".join(inputs + [audiere_aliases, mss_aliases] + import_libraries),
+            f"build {image}: phony $builddir/{executable}",
+        ]
     lines += [
-        "",
-        "build objects: phony " + " ".join(objects),
-        "build $builddir/HMM2PL.exe: link "
-        + " ".join(objects + [audiere_aliases, mss_aliases] + import_libraries),
-        "build game: phony $builddir/HMM2PL.exe",
+        "build objects: phony " + " ".join(objects["game"]),
+        "build all: phony " + " ".join(image for image, _e, _r in PROGRAMS),
         "default game",
         "",
     ]
@@ -1794,6 +1874,13 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
         shutil.copyfile(REPO / 'scripts/homm2/graph/catalog.py', out_root / 'tools/catalog.py')
         shutil.copyfile(REPO / 'scripts/homm2/clean/project/build.py', out_root / 'build.py')
         (out_root / 'build.py').chmod(0o755)
+
+    for _image, _executable, resources in PROGRAMS:
+        if resources:
+            target = out_root / resources
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(clean_resource((REPO / resources).read_text(), resources),
+                              encoding="utf-8")
 
     write_import_defs(out_root)
     write_ninja(out_root)
@@ -2242,13 +2329,13 @@ def stranded(source: str, cleaned: str) -> list[tuple[int, str]]:
 
 
 def verify(out_root: Path) -> int:
-    """Build the generated Windows executable through its pinned Nix flake."""
+    """Build both generated Windows programs through the tree's pinned flake."""
     import subprocess
 
     result = subprocess.run(
         (
             "nix", "build", "--no-link", "--print-out-paths",
-            f"path:{out_root.resolve()}",
+            f"path:{out_root.resolve()}#all",
         ),
         check=False,
         capture_output=True,
@@ -2263,18 +2350,21 @@ def verify(out_root: Path) -> int:
     if len(outputs) != 1:
         print("[clean] verify: Nix did not return one output path", file=sys.stderr)
         return 1
-    executable = Path(outputs[0]) / "HMM2PL.exe"
-    symbols = subprocess.run(
-        ("llvm-nm", "-C", str(executable)),
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if symbols.returncode != 0 or "H2EnumIndex" in symbols.stdout:
-        print("[clean] verify: H2EnumIndex survived linking", file=sys.stderr)
-        return 1
-
-    print(f"[clean] verify: built {executable}")
+    for _image, name, _resources in PROGRAMS:
+        executable = Path(outputs[0]) / name
+        if not executable.is_file():
+            print(f"[clean] verify: {name} was not built", file=sys.stderr)
+            return 1
+        symbols = subprocess.run(
+            ("llvm-nm", "-C", str(executable)),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if symbols.returncode != 0 or "H2EnumIndex" in symbols.stdout:
+            print(f"[clean] verify: H2EnumIndex survived linking {name}", file=sys.stderr)
+            return 1
+        print(f"[clean] verify: built {executable}")
     return 0
 
 
@@ -2286,7 +2376,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", default="build/clean", help="output tree root")
     parser.add_argument("--verify", action="store_true",
-                        help="build the generated Windows executable with its Nix flake")
+                        help="build the generated game and editor with the tree's Nix flake")
     parser.add_argument("--publish", metavar="BRANCH", nargs="?", const="clean",
                         help="commit the generated tree onto BRANCH (default: clean)")
     parser.add_argument(

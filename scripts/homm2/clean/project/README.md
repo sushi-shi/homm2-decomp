@@ -1,9 +1,10 @@
 # Heroes of Might and Magic II — Gold 2.1 (Buka) source
 
 C++ source for the Buka release of Heroes of Might and Magic II Gold 2.1
-(`HMM2PL.exe`, Windows), built as a 32-bit Windows program with Clang and
-MinGW. The text lives in a catalog: `locales/messages.def` (English) and
-`locales/ru.po` (the retail Russian). Building selects one of them.
+(`HMM2PL.exe`, Windows) and its scenario editor (`EDT2PL.exe`), built as
+32-bit Windows programs with Clang and MinGW. The text lives in a catalog:
+`locales/messages.def` (English) and `locales/ru.po` (the retail Russian).
+Building selects one of them.
 
 ## Branches
 
@@ -49,20 +50,46 @@ cd /path/to/buka-installation
 prefix in `.wineprefix` beside the game (`HOMM2_WINEPREFIX` chooses another).
 No retail assets are stored in this repository.
 
+## Scenario editor
+
+```sh
+nix build .#editor         # Russian (default)
+nix build .#editor-en      # English instead
+cp result/EDT2PL.exe result/run-game.sh /path/to/buka-installation/
+cd /path/to/buka-installation
+./run-game.sh --editor
+```
+
+`nix build .#editor` builds `result/EDT2PL.exe` (`.#all` builds both
+programs), and `run-game.sh --editor` runs it with the same Wine prefix, CD
+drive and registry key as the game. The editor needs the same installation:
+it opens `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG` from the game folder,
+checks for the CD as the game does, reads the game's registry key and loads
+and saves maps in the game's `MAPS` folder. It takes the same options as the
+game's runner.
+
 ## Build
 
 On x86-64 Linux with Nix flakes enabled, from this directory:
 
 ```sh
-nix develop -c python3 build.py --ru   # Russian (default)
-nix develop -c python3 build.py --en   # English
+nix develop -c python3 build.py --ru                   # Russian (default)
+nix develop -c python3 build.py --en                   # English
+nix develop -c python3 build.py --target editor        # the scenario editor
+nix develop -c python3 build.py --en --target all      # both programs
 ```
 
 This writes `build/ru/HMM2PL.exe` or `build/en/HMM2PL.exe`, each locale with its
-own objects. The flake supplies Clang, LLD, LLVM's dlltool, Ninja and a 32-bit
-MinGW toolchain. `-j N` and `-v` select parallel jobs and verbose commands;
-Ninja directly also works (`ninja`, or `ninja -f build-en.ninja` for English).
-These builds do not include Windows resources or the retail icon.
+own objects, and with `--target editor` (or `all`) `build/<locale>/EDT2PL.exe`.
+The flake supplies Clang, LLD, LLVM's dlltool and resource compiler, Ninja and
+a 32-bit MinGW toolchain. `-j N` and `-v` select parallel jobs and verbose
+commands; Ninja directly also works (`ninja game`, `ninja editor` or
+`ninja all`, with `-f build-en.ninja` for English). The editor reuses the
+game's `BASE` sources and its `kbwin`, `REQUEST` and `wingraph` sources,
+compiled a second time with `HOMM2_EDITOR` defined; `src/EDITOR/` holds the
+editor's own units and `res/EDT2PL.rc` its menu, About box and version
+resources (in Russian, as retail, for both languages). Neither program
+includes the retail icon, and the game has no Windows resources.
 
 The source keeps every piece of game text as `localization::Tr("semantic.id")`.
 The build resolves each ID to the selected language as literal Windows-1251
@@ -71,7 +98,7 @@ looked up at run time. Edit the IDs and catalogs, not the copies. English
 selects source text only; the game's data files stay as installed.
 
 `nix build` and `run-game.sh` run the results with your game data; see
-[Build and play](#build-and-play).
+[Build and play](#build-and-play) and [Scenario editor](#scenario-editor).
 
 ## Regeneration
 
