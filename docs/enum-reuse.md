@@ -106,7 +106,7 @@ the edited functions with `homm2 match`.
 ## Starting ledger
 
 At initialization every domain was `pending`: 848 rows (834 enum
-blocks and 14 macro or const groups) over 8,253 keys (8,127 enum members,
-78 macros, 48 consts) evaluated in 161 unit views. The census holds 763
+blocks and 14 macro or const groups) over 8,240 keys (8,114 enum members,
+78 macros, 48 consts) evaluated in 161 unit views. The census holds 764
 distinct values; 371 are held by two or more keys and 361 by two or more
 domains.
