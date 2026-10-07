@@ -362,10 +362,10 @@ void eventsManager::EditMonster(i32 x, i32 y, b32 ultimateArtifact) {
     gEditCell = gMap.GetCell(x, y);
     if (ultimateArtifact) {
         gEditDialog = new heroWindow(EVENTS_DIALOG_X, EVENTS_DIALOG_Y, "ultaedit.bin");
-        SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_ULTIMATE_ARTIFACT);
+        SetWinText(gEditDialog, EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT);
     } else {
         gEditDialog = new heroWindow(EVENTS_DIALOG_X, EVENTS_DIALOG_Y, "monedit.bin");
-        SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_MONSTER);
+        SetWinText(gEditDialog, EDITOR_WIN_TEXT_MONSTER);
     }
     gMonsterCountEdit = gEditCell->m_objectMetadata;
     sprintf(buffer, "%d", gEditCell->m_objectMetadata);

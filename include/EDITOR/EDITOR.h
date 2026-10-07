@@ -88,6 +88,20 @@ H2_ENUM_BEGIN(RandomMapDensity)
     RANDOM_MAP_DENSITY_MONSTERS  = 4
 H2_ENUM_END(RandomMapDensity)
 
+H2_ENUM_BEGIN(EditorWinText)
+    // The dialogs whose texts SetWinText fills from gWinSetup.
+    EDITOR_WIN_TEXT_SYSTEM_OPTIONS    = 3,
+    EDITOR_WIN_TEXT_EVENT             = 4,
+    EDITOR_WIN_TEXT_HERO              = 5,
+    EDITOR_WIN_TEXT_MONSTER           = 8,
+    EDITOR_WIN_TEXT_SPHINX            = 10,
+    // The rumour dialog, which the sign editor reuses.
+    EDITOR_WIN_TEXT_RUMOUR            = 11,
+    EDITOR_WIN_TEXT_SPECIFICATIONS    = 13,
+    EDITOR_WIN_TEXT_TOWN              = 15,
+    EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT = 16
+H2_ENUM_END(EditorWinText)
+
 extern i32 gRandomMapPlayers;
 extern double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT];
 extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];

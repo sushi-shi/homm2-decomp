@@ -31,7 +31,7 @@ i32 eventsManager::EditRumour(i32 extra) {
     gRumourText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gRumourText, static_cast<rumourEventExtra*>(gEditManager->m_extras[extra])->text);
     gEditDialog = new heroWindow(0, 0, "rumredit.bin");
-    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_RUMOUR);
+    SetWinText(gEditDialog, EDITOR_WIN_TEXT_RUMOUR);
     FillInRumourEdit(&gRumour);
     gpWindowManager->DoDialog(gEditDialog, EditRumourHandler, 0);
     delete gEditDialog;

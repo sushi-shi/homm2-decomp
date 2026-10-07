@@ -53,7 +53,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
     gSphinxText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gSphinxText, static_cast<mapEventExtra*>(gEditManager->m_extras[extra])->riddle);
     gEditDialog = new heroWindow(0, 0, "ridledit.bin");
-    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_SPHINX);
+    SetWinText(gEditDialog, EDITOR_WIN_TEXT_SPHINX);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     sprintf(gText, localization::Tr("editor.sphinx.no_artifact"));

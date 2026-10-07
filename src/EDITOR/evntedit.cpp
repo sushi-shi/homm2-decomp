@@ -38,7 +38,7 @@ i32 eventsManager::EditEvent(i32 extra) {
     gEventMessage = new char[EVENT_TEXT_CAPACITY];
     strcpy(gEventMessage, static_cast<EventExtra*>(gEditManager->m_extras[extra])->message);
     gEditDialog = new heroWindow(0, 0, "evntedit.bin");
-    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_EVENT);
+    SetWinText(gEditDialog, EDITOR_WIN_TEXT_EVENT);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     sprintf(gText, localization::Tr("editor.events.event.no_artifact"));

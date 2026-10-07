@@ -14610,7 +14610,6 @@ H2_ENUM_BEGIN(EditSystemOptions)
     // help rows (gSystemOptionsHelp).
     EDIT_OPTIONS_X                    = 160,
     EDIT_OPTIONS_Y                    = 33,
-    EDIT_OPTIONS_TITLE                = 3,
     EDIT_OPTIONS_ANIMATION_BUTTON     = 10,
     EDIT_OPTIONS_CYCLING_BUTTON       = 11,
     EDIT_OPTIONS_OBJECT_BOXES_BUTTON  = 13,
@@ -14644,7 +14643,7 @@ void editManager::SystemOptions(void) {
     ESPanel = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
     if (!ESPanel)
         MemError();
-    SetWinText(ESPanel, EDIT_OPTIONS_TITLE);
+    SetWinText(ESPanel, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
     UpdateEditorSystemOptions(true);
     gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
     delete ESPanel;

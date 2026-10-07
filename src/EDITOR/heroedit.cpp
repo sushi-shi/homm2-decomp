@@ -39,7 +39,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
     original = *gEditCell;
     memcpy(&gHeroEdit, gEditManager->m_extras[gEditCell->m_objectMetadata], sizeof(HeroExtra));
     gEditDialog = new heroWindow(0, 0, "heroedit.bin");
-    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_HERO);
+    SetWinText(gEditDialog, EDITOR_WIN_TEXT_HERO);
     if (gEditJailedHero) {
         SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, HERO_EDIT_TYPE_LABEL);
         msg.payload.widget.data.text = localization::Tr("editor.events.hero.class_label");

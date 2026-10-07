@@ -31,20 +31,6 @@ H2_ENUM_BEGIN(EventsDialogButton)
     EVENTS_DIALOG_OK     = DIALOG_BUTTON_2
 H2_ENUM_END(EventsDialogButton)
 
-H2_ENUM_BEGIN(EventsWindowText)
-    // SetWinText rows (gWinSetup) of the object dialogs and the map
-    // specification dialog.
-    EVENTS_WINDOW_TEXT_EVENT             = 4,
-    EVENTS_WINDOW_TEXT_HERO              = 5,
-    EVENTS_WINDOW_TEXT_MONSTER           = 8,
-    EVENTS_WINDOW_TEXT_SPHINX            = 10,
-    // The rumour dialog, which the sign editor reuses.
-    EVENTS_WINDOW_TEXT_RUMOUR            = 11,
-    EVENTS_WINDOW_TEXT_SPECIFICATIONS    = 13,
-    EVENTS_WINDOW_TEXT_TOWN              = 15,
-    EVENTS_WINDOW_TEXT_ULTIMATE_ARTIFACT = 16
-H2_ENUM_END(EventsWindowText)
-
 H2_ENUM_BEGIN(EventsArtifactList)
     // The dialogs' artifact lists leave out the editor-only artifacts from
     // ARTIFACT_EDITOR_ANY_ULTIMATE through the spell scroll.

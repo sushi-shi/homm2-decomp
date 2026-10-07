@@ -54,7 +54,7 @@ void eventsManager::EditTown(i32 x, i32 y) {
     original = *gEditCell;
     memcpy(&gTownEdit, gEditManager->m_extras[gEditCell->m_objectMetadata], sizeof(TownExtra));
     gEditDialog = new heroWindow(0, 0, "townedit.bin");
-    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_TOWN);
+    SetWinText(gEditDialog, EDITOR_WIN_TEXT_TOWN);
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {

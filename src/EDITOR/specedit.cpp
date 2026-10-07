@@ -117,7 +117,7 @@ b32 EditMapSpecifications(b32 randomMap) {
     gSpecWindow = new heroWindow(0, 0, "specedit.bin");
     if (gSpecWindow == NULL)
         MemError();
-    SetWinText(gSpecWindow, EVENTS_WINDOW_TEXT_SPECIFICATIONS);
+    SetWinText(gSpecWindow, EDITOR_WIN_TEXT_SPECIFICATIONS);
     ResetPlayerAvailability();
     count = 0;
     for (x = 0; x < MAP_WIDTH; x++) {
