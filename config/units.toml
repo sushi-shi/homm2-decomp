@@ -19,6 +19,10 @@ base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX
 # Thirteen TUs keep duplicate string cells in retail (same content, two cells
 # inside the unit block): their compile ran without string pooling.
 base_nogf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
+# Misc: /Ob2 emits gcCDTrackName's literal at its lexical place among the
+# function literals (docs/patterns/ob2-places-initializer-literals-lexically.md);
+# no code changes at /Od.
+base_nogf_ob2 = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob2", "/Gi-", "/GX", "/DNO_STRICT"]
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
 o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
 base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Oi", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
@@ -166,6 +170,12 @@ images = ["game", "editor"]
 flags = "base_nogf"
 
 [[unit]]
+unit = "BASE/MusicFlags"
+source = "src/BASE/MusicFlags.cpp"
+# The editor compiles this source inside BASE/Midi (Midi.cpp, HOMM2_EDITOR).
+compiled_into = { editor = "BASE/Midi" }
+
+[[unit]]
 unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
 images = ["game", "editor"]
@@ -175,13 +185,7 @@ flags = "base"
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
 images = ["game", "editor"]
-flags = "base_nogf"
-
-[[unit]]
-unit = "BASE/MiscRuntime"
-source = "src/BASE/MiscRuntime.cpp"
-images = ["game", "editor"]
-flags = "base_nogf"
+flags = "base_nogf_ob2"
 
 [[unit]]
 unit = "BASE/PALETTE"

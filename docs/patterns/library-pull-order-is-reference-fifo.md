@@ -26,8 +26,7 @@ Consequences:
   directly. One direct spelling pulled `strnicmp.obj` ahead of the OLDNAMES
   group.
 - A member referenced early but placed late in retail lives in a later
-  library. In both images `MiscRuntime` follows `Misc` although `GetIconEntry`
-  is referenced before any `Misc` symbol; it opens the next BASE archive.
+  library (the game's `Midi.lib` between its two BASE archives).
 - OLDNAMES members carry an empty `.text` (default 16-byte alignment): with
   OLDNAMES searched before the import libraries, that fill precedes the first
   import thunk, as retail's 0xcc padding shows.

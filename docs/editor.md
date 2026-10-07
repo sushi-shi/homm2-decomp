@@ -193,9 +193,8 @@ its link-diff stamp are the editor's default build target.
   `WINMM`, `KERNEL32`, `USER32`, `GDI32`, WinG, `ADVAPI32`, Miles and
   Audiere import libraries (WINMM leads, as in the game: nothing references
   it before BASE, so its descriptor still follows the first scan's DLLs
-  while its thunks open the second block); the BASE library as two archives
-  in retail member order, `MiscRuntime` opening the second; then `MSVCPRT`
-  and `LIBCMT`; and `res/EDT2PL.rc`. LINK pulls library members in
+  while its thunks open the second block); the BASE library as one archive
+  in retail member order; then `MSVCPRT` and `LIBCMT`; and `res/EDT2PL.rc`. LINK pulls library members in
   first-reference order
   ([pattern](patterns/library-pull-order-is-reference-fifo.md)), so source
   definition order and old-name spellings decide the BASE and CRT order.
@@ -216,44 +215,29 @@ its link-diff stamp are the editor's default build target.
   KB's `cOverrideMIDIDriver`/`cOverrideDigitalDriver` (exact size and hash
   window) and `gUnusedData...` storage.
 
-`.text` layout, `.rdata` (imports, IAT, debug directory), `.rsrc`, the
-overlay and the file size are byte-identical. The residual (2,465 bytes,
-`config/retail/editor/link_diff.tsv`):
-
-| Region | Bytes | Cause |
-| --- | ---: | --- |
-| `.data` | 2,068 | EDITMGR's literal for `gMapCodeLetters` (`"ABC...Z"`): retail emits it among the function literals at `MakeMapCode`'s place (0x47e018), VC6 SP5 with the object's static data, right after its globals; the 28-byte cell shifts EDITMGR's string block |
-| `.text` | 115 | the same shift: operands that address EDITMGR's strings |
-| headers | 282 | the Rich header: 66 SP5 C++ objects where retail counts 65, so the key and the PE header offset differ |
-
-Measured on the two (`build/exp/lit*`, `build/exp/rich*`):
-
-- VC6 emits every global initializer's literal with the object's static
-  data, after all globals and before every function literal, whatever the
-  definition position, linkage, cv-qualification, aggregate, cast,
-  `selectany`, preceding initializer size (64 B to 128 KB), `/Gf`, `/Gy`,
-  `/YX`, `/Zi`, `/Z7` or `/O1`. A function-local static pointer puts its
-  literal in function order, but the pointer object moves next to it,
-  whereas retail keeps the pointer at 0x47d738 among the globals.
+- The editor's own sources (the EDITOR tier) and BASE's Misc compile with
+  `/Ob2` ([pattern](patterns/ob2-places-initializer-literals-lexically.md)):
+  code is unchanged at `/Od`, and a file-scope initializer's text takes its
+  lexical place among the function literals, as in retail (EDITMGR's
+  `gMapCodeLetters`, Misc's `gcCDTrackName`).
+- Misc is one object, as in the game: every retail editor C++ object
+  registers `std::ctype<wchar_t>::id` (65 sites, 65 objects), and Misc's
+  registration closes its object. The editor's BASE library compiled the
+  music-flag accessors as Midi's prefix (`Midi.cpp` includes
+  `MusicFlags.cpp` under `HOMM2_EDITOR`; `compiled_into` in
+  `config/units.toml` gives their placed identities to `BASE/Midi`); the
+  game links `BASE/MusicFlags` as its own object, the one game object
+  without a registration (95 sites, 96 objects).
 - Retail's alias count (12 OLDNAMES objects) is reached by EDITOR's
   shipped-map test calling `stricmp`, besides the `strcmpi` REQUEST and RESMGR
   call: its alias member pulls `__stricmp`, already pulled by `strcmpi`, so
   no runtime object moves (the HoMM1 Buka game shows the same second
-  spelling).
-- LINK's zero padding after the Rich key depends only on the Rich entries
-  (not on time, object names, order or library packaging), so it follows
-  from the counts.
-- Every retail editor C++ object registers `std::ctype<wchar_t>::id`
-  (65 sites, 65 objects), while Misc, which has no registration, is a
-  separate 66th object here. The game has 95 sites for 96 objects, Misc being
-  the one without. The editor's evidence therefore puts Misc and MiscRuntime
-  in one object, yet their `.data` keeps the game's split layout (Misc's
-  literals before the track-name text). That is the same literal emission
-  as `gMapCodeLetters` (`docs/matching/Misc-track-name-data/`): one compiler
-  behaviour, not yet reproduced from source, would explain both residuals.
+  spelling). LINK's zero padding after the Rich key depends only on the Rich
+  entries, so with the counts the key and the PE header offset follow.
+
+The historical link is byte-identical to retail (`config/retail/editor/link_diff.tsv`
+is banked at zero in every region).
 
 ## Open work
 
-- The initializer-literal emission point (EDITMGR's `gMapCodeLetters`, and
-  with it a one-object Misc giving retail's 65 C++ objects).
 - The editor's clean export.

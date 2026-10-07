@@ -302,34 +302,34 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00037b10	0xa8	func	?ReadPrefs@@YIXXZ	BASE/Misc	0x000becb0	masked game body (168 bytes, 27 fields masked) unique at a census start
 0x00037bc0	0x63	func	?WritePrefsToFile@@YIXXZ	BASE/Misc	0x000bed60	masked game body (99 bytes, 9 fields masked) unique at a census start
 0x00037c30	0x4cb	func	?WritePrefsToRegistry@@YIXXZ	BASE/Misc	0x000bedd0	masked game body (1227 bytes, 137 fields masked) unique at a census start
-0x00038100	0xf	func	?WritePrefs@@YIXXZ	BASE/Misc	0x000bf2a0	masked game body (15 bytes) at its unit's block offset, shared by 23 bodies (5 occurrence(s))
+0x00038100	0xf	func	?WritePrefs@@YIXXZ	BASE/Misc	0x000bf2a0	masked game body (15 bytes) at its unit's block offset, shared by 49 bodies (5 occurrence(s))
 0x00038110	0x3f	func	?IsCDDrive@@YIHH@Z	BASE/Misc	0x000bf2b0	masked game body (63 bytes, 7 fields masked) unique at a census start
-0x00038150	0x7b	func	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	BASE/MiscRuntime	0x000bf2f0	masked game body (123 bytes, 6 fields masked) unique at a census start
-0x000381d0	0x35f	func	?SetupCDDrive@@YIHXZ	BASE/MiscRuntime	0x000bf370	masked game body (863 bytes, 62 fields masked) unique at a census start
-0x00038530	0x2b	func	?BitmapToScreen@@YIXPAVbitmap@@@Z	BASE/MiscRuntime	0x000bf6d0	masked game body (43 bytes, 1 fields masked) unique at a census start
-0x00038560	0x5b	func	?SetPalette@@YIXPACH@Z	BASE/MiscRuntime	0x000bf700	masked game body (91 bytes, 6 fields masked) unique at a census start
-0x000385c0	0x36	func	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	BASE/MiscRuntime	0x000bf760	masked game body (54 bytes, 1 fields masked) unique at a census start
-0x00038600	0x1e4	func	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	BASE/MiscRuntime	0x000bf7a0	masked game body (484 bytes, 39 fields masked) unique at a census start
-0x000387f0	0x91	func	?LogTruncate@@YIXXZ	BASE/MiscRuntime	0x000bf990	masked game body (145 bytes, 10 fields masked) unique at a census start
-0x00038890	0x9a	func	?LogStr@@YIXPAD@Z	BASE/MiscRuntime	0x000bfa30	masked game body (154 bytes, 11 fields masked) unique at a census start
-0x00038930	0x1b6	func	?LogInt@@YIXPADHHHHHHH@Z	BASE/MiscRuntime	0x000bfad0	masked game body (438 bytes, 19 fields masked) unique at a census start
-0x00038af0	0x76	func	?AiPrint@@YIXPAD@Z	BASE/MiscRuntime	0x000bfc90	masked game body (118 bytes, 7 fields masked) unique at a census start
-0x00038b70	0x30	func	?AbsAiPrint@@YIXPAD@Z	BASE/MiscRuntime	0x000bfd10	masked game body (48 bytes, 4 fields masked) unique at a census start
-0x00038ba0	0x19c	func	?FadeTo@@YIXPAE0H@Z	BASE/MiscRuntime	0x000bfd40	masked game body (412 bytes, 12 fields masked) unique at a census start
-0x00038d40	0x163	func	?FadeToColorTable@@YIXPAEH@Z	BASE/MiscRuntime	0x000bfee0	masked game body (355 bytes, 9 fields masked) unique at a census start
-0x00038eb0	0x44	func	?IsCycleColor@@YIHH@Z	BASE/MiscRuntime	0x000c0050	masked game body (68 bytes, 0 fields masked) unique at a census start
-0x00038f00	0x2a9	func	?CreatePCXFile@@YIXPADPAEHH1@Z	BASE/MiscRuntime	0x000c00a0	masked game body (681 bytes, 16 fields masked) unique at a census start
-0x000391b0	0x73	func	?FileSize@@YIJPAD@Z	BASE/MiscRuntime	0x000c0350	masked game body (115 bytes, 7 fields masked) unique at a census start
-0x00039230	0x1e	func	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	BASE/MiscRuntime	0x000c03d0	masked game body (30 bytes, 0 fields masked) unique at a census start
-0x00039250	0x72	func	?SRandom@@YIHHH@Z	BASE/MiscRuntime	0x000c03f0	masked game body (114 bytes, 6 fields masked) unique at a census start
-0x000392d0	0x92	func	?SIncRandomize@@YIXHH@Z	BASE/MiscRuntime	0x000c0470	masked game body (146 bytes, 9 fields masked) unique at a census start
-0x00039370	0x1f	func	?SRand@@YIXH@Z	BASE/MiscRuntime	0x000c0510	masked game body (31 bytes, 2 fields masked) unique at a census start
-0x00039390	0x92	func	?SGenRand@@YIHXZ	BASE/MiscRuntime	0x000c0530	masked game body (146 bytes, 8 fields masked) unique at a census start
-0x00039430	0x10	func	?MemSize@@YIHH@Z	BASE/MiscRuntime	0x000c05d0	masked game body (16 bytes, 0 fields masked) unique at a census start
-0x00039440	0x464	func	?GetDataEntry@@YIXPAD0H0HH@Z	BASE/MiscRuntime	0x000c05e0	masked game body (1124 bytes, 65 fields masked) unique at a census start
-0x000398b0	0x1fa	func	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	BASE/MiscRuntime	0x000c0a50	masked game body (506 bytes, 36 fields masked) unique at a census start
-0x00039ab0	0x27	func	_$E19	BASE/MiscRuntime	0x000c0c50	masked game body (39 bytes) at its unit's block offset, shared by 26 bodies (65 occurrence(s))
-0x00039ae0	0x12	func	_$E18	BASE/MiscRuntime	0x000c0c80	masked game body (18 bytes) at its unit's block offset, shared by 26 bodies (68 occurrence(s))
+0x00038150	0x7b	func	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	BASE/Misc	0x000bf2f0	masked game body (123 bytes, 6 fields masked) unique at a census start
+0x000381d0	0x35f	func	?SetupCDDrive@@YIHXZ	BASE/Misc	0x000bf370	masked game body (863 bytes, 62 fields masked) unique at a census start
+0x00038530	0x2b	func	?BitmapToScreen@@YIXPAVbitmap@@@Z	BASE/Misc	0x000bf6d0	masked game body (43 bytes, 1 fields masked) unique at a census start
+0x00038560	0x5b	func	?SetPalette@@YIXPACH@Z	BASE/Misc	0x000bf700	masked game body (91 bytes, 6 fields masked) unique at a census start
+0x000385c0	0x36	func	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	BASE/Misc	0x000bf760	masked game body (54 bytes, 1 fields masked) unique at a census start
+0x00038600	0x1e4	func	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	BASE/Misc	0x000bf7a0	masked game body (484 bytes, 39 fields masked) unique at a census start
+0x000387f0	0x91	func	?LogTruncate@@YIXXZ	BASE/Misc	0x000bf990	masked game body (145 bytes, 10 fields masked) unique at a census start
+0x00038890	0x9a	func	?LogStr@@YIXPAD@Z	BASE/Misc	0x000bfa30	masked game body (154 bytes, 11 fields masked) unique at a census start
+0x00038930	0x1b6	func	?LogInt@@YIXPADHHHHHHH@Z	BASE/Misc	0x000bfad0	masked game body (438 bytes, 19 fields masked) unique at a census start
+0x00038af0	0x76	func	?AiPrint@@YIXPAD@Z	BASE/Misc	0x000bfc90	masked game body (118 bytes, 7 fields masked) unique at a census start
+0x00038b70	0x30	func	?AbsAiPrint@@YIXPAD@Z	BASE/Misc	0x000bfd10	masked game body (48 bytes, 4 fields masked) unique at a census start
+0x00038ba0	0x19c	func	?FadeTo@@YIXPAE0H@Z	BASE/Misc	0x000bfd40	masked game body (412 bytes, 12 fields masked) unique at a census start
+0x00038d40	0x163	func	?FadeToColorTable@@YIXPAEH@Z	BASE/Misc	0x000bfee0	masked game body (355 bytes, 9 fields masked) unique at a census start
+0x00038eb0	0x44	func	?IsCycleColor@@YIHH@Z	BASE/Misc	0x000c0050	masked game body (68 bytes, 0 fields masked) unique at a census start
+0x00038f00	0x2a9	func	?CreatePCXFile@@YIXPADPAEHH1@Z	BASE/Misc	0x000c00a0	masked game body (681 bytes, 16 fields masked) unique at a census start
+0x000391b0	0x73	func	?FileSize@@YIJPAD@Z	BASE/Misc	0x000c0350	masked game body (115 bytes, 7 fields masked) unique at a census start
+0x00039230	0x1e	func	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	BASE/Misc	0x000c03d0	masked game body (30 bytes, 0 fields masked) unique at a census start
+0x00039250	0x72	func	?SRandom@@YIHHH@Z	BASE/Misc	0x000c03f0	masked game body (114 bytes, 6 fields masked) unique at a census start
+0x000392d0	0x92	func	?SIncRandomize@@YIXHH@Z	BASE/Misc	0x000c0470	masked game body (146 bytes, 9 fields masked) unique at a census start
+0x00039370	0x1f	func	?SRand@@YIXH@Z	BASE/Misc	0x000c0510	masked game body (31 bytes, 2 fields masked) unique at a census start
+0x00039390	0x92	func	?SGenRand@@YIHXZ	BASE/Misc	0x000c0530	masked game body (146 bytes, 8 fields masked) unique at a census start
+0x00039430	0x10	func	?MemSize@@YIHH@Z	BASE/Misc	0x000c05d0	masked game body (16 bytes, 0 fields masked) unique at a census start
+0x00039440	0x464	func	?GetDataEntry@@YIXPAD0H0HH@Z	BASE/Misc	0x000c05e0	masked game body (1124 bytes, 65 fields masked) unique at a census start
+0x000398b0	0x1fa	func	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	BASE/Misc	0x000c0a50	masked game body (506 bytes, 36 fields masked) unique at a census start
+0x00039ab0	0x27	func	_$E19	BASE/Misc	0x000c0c50	masked game body (39 bytes) at its unit's block offset, shared by 49 bodies (65 occurrence(s))
+0x00039ae0	0x12	func	_$E18	BASE/Misc	0x000c0c80	masked game body (18 bytes) at its unit's block offset, shared by 49 bodies (68 occurrence(s))
 0x00039d50	0x209	func	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	BASE/icon2bs	0x000cc4e0	masked game body (521 bytes, 7 fields masked) unique at a census start
 0x00039f60	0x27	func	_$E19	BASE/icon2bs	0x000cc6f0	masked game body (39 bytes) at its unit's block offset, shared by 3 bodies (65 occurrence(s))
 0x00039f90	0x12	func	_$E18	BASE/icon2bs	0x000cc720	masked game body (18 bytes) at its unit's block offset, shared by 3 bodies (68 occurrence(s))
@@ -592,17 +592,17 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00049a60	0x6d	func	?AdjustMilesSampleVolumes@@YIXXZ	BASE/MilesSound	0x000cdfd0	masked game body (109 bytes, 7 fields masked) unique at a census start
 0x00049ad0	0x27	func	_$E21	BASE/MilesSound	0x000ce040	masked game body (39 bytes) at its unit's block offset, shared by 13 bodies (65 occurrence(s))
 0x00049b00	0x12	func	_$E20	BASE/MilesSound	0x000ce070	masked game body (18 bytes) at its unit's block offset, shared by 13 bodies (68 occurrence(s))
-0x00049b20	0xa	func	?GetMusicFlagA@@YIEXZ	BASE/Midi	0x000c5770	masked game body (10 bytes) at its unit's block offset, shared by 11 bodies (2 occurrence(s))
+0x00049b20	0xa	func	?GetMusicFlagA@@YIEXZ	BASE/Midi	0x000c5770	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
 0x00049b30	0x32	func	?MusicFlagsActive@@YIEXZ	BASE/Midi	0x000c5780	masked game body (50 bytes, 2 fields masked) unique at a census start
-0x00049b70	0xa	func	?GetMusicFlagB@@YIEXZ	BASE/Midi	0x000c57c0	masked game body (10 bytes) at its unit's block offset, shared by 11 bodies (2 occurrence(s))
+0x00049b70	0xa	func	?GetMusicFlagB@@YIEXZ	BASE/Midi	0x000c57c0	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
 0x00049b80	0x51	func	?MIDIStartup@@YI_NXZ	BASE/Midi	0x000c57d0	masked game body (81 bytes, 8 fields masked) unique at a census start
 0x00049be0	0xf0	func	?MIDIShutdown@@YIXXZ	BASE/Midi	0x000c5830	masked game body (240 bytes, 19 fields masked) unique at a census start
 0x00049cd0	0x17b	func	?MIDIPlay@@YIXAAH0H@Z	BASE/Midi	0x000c5920	masked game body (379 bytes, 37 fields masked) unique at a census start
 0x00049e50	0xe7	func	?MIDIStop@@YIXAAH@Z	BASE/Midi	0x000c5aa0	masked game body (231 bytes, 28 fields masked) unique at a census start
 0x00049f40	0x56	func	?MIDIIsPlaying@@YI_NXZ	BASE/Midi	0x000c5b90	masked game body (86 bytes, 8 fields masked) unique at a census start
 0x00049fa0	0x8f	func	?MIDISetVolume@@YIXAAH@Z	BASE/Midi	0x000c5bf0	masked game body (143 bytes, 5 fields masked) unique at a census start
-0x0004a030	0x27	func	_$E19	BASE/Midi	0x000c5c80	masked game body (39 bytes) at its unit's block offset, shared by 11 bodies (65 occurrence(s))
-0x0004a060	0x12	func	_$E18	BASE/Midi	0x000c5cb0	masked game body (18 bytes) at its unit's block offset, shared by 11 bodies (68 occurrence(s))
+0x0004a030	0x27	func	_$E19	BASE/Midi	0x000c5c80	masked game body (39 bytes) at its unit's block offset, shared by 8 bodies (65 occurrence(s))
+0x0004a060	0x12	func	_$E18	BASE/Midi	0x000c5cb0	masked game body (18 bytes) at its unit's block offset, shared by 8 bodies (68 occurrence(s))
 0x0004a072	0xb	func	??3@YAXPAX@Z	(libcmt)	0x000d68c2	masked game body (11 bytes) at its unit's block offset, shared by 3 bodies (3 occurrence(s))
 0x0004a080	0x7	func	_strcpy	(libcmt)	0x000d68d0	masked game body (7 bytes) at its unit's block offset, shared by 3 bodies (1 occurrence(s))
 0x0004a090	0xe0	func	_strcat	(libcmt)	0x000d68e0	masked game body (224 bytes, 0 fields masked) unique at a census start
@@ -755,7 +755,6 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0004f6f2	0x170	func	__openfile	(libcmt)	0x000dfb43	masked game body (368 bytes, 15 fields masked) unique at a census start
 0x0004f862	0xc8	func	__getstream	(libcmt)	0x000dfcb3	masked game body (200 bytes, 16 fields masked) unique at a census start
 0x0004f92a	0xdc	func	__filbuf	(libcmt)	0x000dfa67	masked game body (220 bytes, 7 fields masked) unique at a census start
-0x00050483	0x10	func	_putc	(libcmt)	0x000d979f	masked game body (16 bytes, 1 fields masked) unique at a census start
 0x000504c0	0xbd	func	__except_handler3	(libcmt)	0x000de0a4	masked game body (189 bytes, 5 fields masked) unique at a census start
 0x0005057d	0x1b	func	__seh_longjmp_unwind@4	(libcmt)	0x000de161	masked game body (27 bytes, 1 fields masked) unique at a census start
 0x000505a0	0x34	func	__allmul	(libcmt)	0x000de520	masked game body (52 bytes, 0 fields masked) unique at a census start
@@ -1195,6 +1194,8 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0007e728	0x100	data	?gColorTableYellow@@3PAEA	SOURCE/KB	0x000f8698	1 field(s) of placed bodies
 0x0007e828	0x100	data	?gColorTableScenWin@@3PAEA	SOURCE/KB	0x000f8798	1 field(s) of placed bodies
 0x0007e928	0x100	data	?gColorTableDarkGray@@3PAEA	SOURCE/KB	0x000f8898	1 field(s) of placed bodies
+0x0007ec28	0x4	data	?MAP_WIDTH@@3HA	SOURCE/KB	0x000f8b98	1 field(s) of this image's exact variant bodies
+0x0007ec2c	0x4	data	?MAP_HEIGHT@@3HA	SOURCE/KB	0x000f8b9c	1 field(s) of this image's exact variant bodies
 0x0007ec30	0x4	data	?giMainVideoModeColorDepth@@3HA	SOURCE/KB	0x000f8ba0	2 field(s) of placed bodies
 0x0007ec34	0x4	data	?giMainVideoModeWidth@@3HA	SOURCE/KB	0x000f8ba4	8 field(s) of placed bodies
 0x0007ec38	0x4	data	?giMainVideoModeHeight@@3HA	SOURCE/KB	0x000f8ba8	3 field(s) of placed bodies
@@ -1314,10 +1315,10 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009ac54	0x0	data	$anon_str_5d024c7fff14eaa0f7f59367729dc85a54e6fbfa666cf6619761ddd714003e86_2	_const	0x0011e170	1 field(s) of placed bodies
 0x0009ac88	0x0	data	$anon_str_5d024c7fff14eaa0f7f59367729dc85a54e6fbfa666cf6619761ddd714003e86_3	_const	0x0011e1a4	1 field(s) of placed bodies
 0x0009acbc	0x0	data	$anon_str_bdfc479eb7d41fa8aebb86d7a9b296df9be406b1079615622befa98115ecae3e_0	_const	0x0011e1d8	1 field(s) of placed bodies
-0x0009ad08	0x4	data	?gcCDTrackName@@3PADA	BASE/Misc	0x0011e5dc	2 field(s) of placed bodies
+0x0009ad08	0x4	data	_gcCDTrackName	BASE/Misc	0x0011e5dc	2 field(s) of placed bodies
 0x0009ad0c	0x10	data	?giChangeThreshold@@3PAEA	BASE/Misc	0x0011e5e0	1 field(s) of placed bodies
 0x0009ad1c	0x4	data	?iLastSeed@@3HA	BASE/Misc	0x0011e5f0	22 field(s) of placed bodies
-0x0009ad20	0x4	data	_gMemEntryTag	BASE/Misc	0x0011e5f4	1 field(s) of placed bodies
+0x0009ad20	0x0	data	$anon_str_d92c674fb5aafb307999ab284ef8a6466289b95153f80b5a5b4c86c4b1afc05f_0	_const	0x0011e5f4	1 field(s) of placed bodies
 0x0009ad24	0x0	data	$anon_str_b53e25ec63a964fa5605ecef33141af554a0d090c373dc8bb6434dd6ad9a97b7_0	_const	0x0011e5f8	1 field(s) of placed bodies
 0x0009ad2c	0x0	data	$anon_str_98b5f7627e9ffd770e4074371caa00cdfbd9a53aef47e7ad5563856c9bde36e3_0	_const	0x0011e600	1 field(s) of placed bodies
 0x0009ad3c	0x0	data	$anon_str_d944e3b25f6170d547c2448f695799d55ac5144e8caf230eada20d898fcd7345_0	_const	0x0011e610	1 field(s) of placed bodies
@@ -1436,7 +1437,6 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009b80c	0x0	data	$anon_str_3070684ac72eeb3ee69f32044ead415ea70ee19d6b243e7e892ab86750d11c14_1	_const	0x0011f0e0	1 field(s) of placed bodies
 0x0009b828	0x0	data	$anon_str_0ec502d020761a964d08653e1c75485bdf3b89a075cb958f10cd24d29fae751a_1	_const	0x0011f0fc	1 field(s) of placed bodies
 0x0009b848	0x0	data	$anon_str_b4e1599c8e1632283b34f6681aa9cd68c2118ddc27aa21a11849f96f548b8373_0	_const	0x0011f11c	1 field(s) of placed bodies
-0x0009b84c	0x1e	data	?gcCDTrackNameText@@3PADA	BASE/MiscRuntime	0x0011f120	1 pointer field(s) of placed data, bytes equal
 0x0009b86c	0x0	data	$anon_str_0db435234ea00c3bc420d8307424daebdcdc97761a1a950a4e87bdc86d72f400_0	_const	0x0011f140	1 field(s) of placed bodies
 0x0009b870	0x0	data	$anon_str_161c22534f7112823436a59e51a6a2216a9d3129dcbc7967b876888f40d8b962_23	_const	0x0011f144	1 field(s) of placed bodies
 0x0009b878	0x0	data	$anon_str_cb44bed5d667878987e9ad4fb4f9889485d1f137c9754318b8658e89ed4aa4b5_0	_const	0x0011f14c	1 field(s) of placed bodies
@@ -1590,7 +1590,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a5760	0x4	data	?iMaxListSize@@3HA	SOURCE/REQUEST	0x00133d80	9 field(s) of placed bodies
 0x000a5764	0x1	data	?emptyFileName@?1??InitializeFiles@fileRequester@@QAEHPAD0H@Z@4PADA	SOURCE/REQUEST	0x00133d84	1 field(s) of this image's exact variant bodies
 0x000a5768	0x1	data	?emptyExtension@?1??InitializeFiles@fileRequester@@QAEHPAD0H@Z@4PADA	SOURCE/REQUEST	0x00133d88	1 field(s) of this image's exact variant bodies
-0x000a576c	0x1	data	?emptyLastFilename@?1??Open@fileRequester@@UAEHH@Z@4PADA	SOURCE/REQUEST	0x00133d8c	between its unit's placed neighbours, bytes equal
+0x000a576c	0x1	data	?emptyLastFilename@?1??Open@fileRequester@@UAEHH@Z@4PADA	SOURCE/REQUEST	0x00133d8c	1 field(s) of this image's exact variant bodies
 0x000a5770	0x1	data	?emptyCycleName@?1??Main@fileRequester@@UAEHAAUtag_message@@@Z@4PADA	SOURCE/REQUEST	0x00133d90	1 field(s) of this image's exact variant bodies
 0x000a5774	0x1	data	?emptyFilteredName@?1??Main@fileRequester@@UAEHAAUtag_message@@@Z@4PADA	SOURCE/REQUEST	0x00133d94	1 field(s) of this image's exact variant bodies
 0x000a58b0	0x10	data	_gDDClientRect	SOURCE/wingraph	0x00133fb8	5 field(s) of placed bodies
@@ -1662,8 +1662,8 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a759c	0x4	data	?bDataEntryTime@@3HA	BASE/Misc	0x0013608c	8 field(s) of placed bodies
 0x000a75a0	0x4	data	?inBoxY@@3HA	BASE/Misc	0x00136090	2 field(s) of placed bodies
 0x000a75a4	0x4	data	?inBoxX@@3HA	BASE/Misc	0x00136094	2 field(s) of placed bodies
-0x000a75a8	0x4	data	?gBlitBottom@@3HA	BASE/Misc	0x00136098	3 field(s) of placed bodies
-0x000a75ac	0x4	data	?gBlitRight@@3HA	BASE/Misc	0x0013609c	3 field(s) of placed bodies
+0x000a75a8	0x4	data	_gBlitBottom	BASE/Misc	0x00136098	3 field(s) of placed bodies
+0x000a75ac	0x4	data	_gBlitRight	BASE/Misc	0x0013609c	3 field(s) of placed bodies
 0x000a75b0	0x4	data	?DataEntryWin@@3PAVheroWindow@@A	BASE/Misc	0x001360a0	17 field(s) of placed bodies
 0x000a75b4	0x4	data	?cDEDest@@3PADA	BASE/Misc	0x001360a4	5 field(s) of placed bodies
 0x000a75b8	0x4	data	?iDEMaxLen@@3HA	BASE/Misc	0x001360a8	3 field(s) of placed bodies

@@ -167,6 +167,11 @@ def load_symbols():
                 if name:
                     sym.setdefault(name, v)
                     dups.setdefault(name, set()).add(v)
+                    if name.startswith("$SG"):
+                        # $SG<n> is a per-object counter: the same spelling names
+                        # different cells in different units.
+                        owner = row.get("object", "")
+                        LOCAL_SG[(owner, name)] = v
     data = {}                                    # C++ DATA() lexical fallback; assembly DATA
     for f in [str(p.relative_to(REPO)) for p in claim_files()] + glob.glob("include/**/*.h", recursive=True):
         for ln in open(f, encoding="latin-1"):   # headers are scanned to diagnose stale violations
@@ -175,7 +180,18 @@ def load_symbols():
                 data[m.group(2)] = int(m.group(1), 16) - IMAGE_BASE
     return sym, data, dups
 
-def resolve(sym, data, typ, s, add):
+#: (manifest source path, `$SG<n>`) -> RVA: object-local string cells.
+LOCAL_SG = {}
+
+
+def _sg_owner(unit):
+    return unit.replace("/", "\\") + ".c"
+
+
+def resolve(sym, data, typ, s, add, unit=None):
+    if unit is not None and s.startswith("$SG") and (_sg_owner(unit), s) in LOCAL_SG:
+        b = LOCAL_SG[(_sg_owner(unit), s)]
+        return b if typ == 'REL32' else (b + add) & 0xffffffff
     mc = re.match(r'const_([0-9a-fA-F]+)$', s)  # delinker names unlabeled data addrs const_<RVA>
     if mc:
         b = int(mc.group(1), 16)
@@ -1137,7 +1153,7 @@ def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs, tgt_extra=Non
         tvas.update(tgt_extra)
     bvas, va_sym = Counter(), {}
     for r in base_relocs:
-        v = resolve(sym, data, *r)
+        v = resolve(sym, data, *r, unit=unit)
         if v is not None:
             bvas[v] += 1; va_sym.setdefault(v, r[1])
     for v, n in (bvas - tvas).items():            # (2) base references an addr retail never does (or fewer)
