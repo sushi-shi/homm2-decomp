@@ -1,15 +1,13 @@
 # homm2-decomp
 
-> **The game's decompilation is complete.** Every function and data byte of
-> `HMM2PL.exe` matches, and it rebuilds byte-identical to retail. The scenario
-> editor `EDT2PL.exe` is in progress.
+> **The decompilation is complete.** Every function and data byte of both
+> programs matches, and `HMM2PL.exe` and `EDT2PL.exe` rebuild byte-identical to
+> retail.
 
 C++ reconstruction of **Heroes of Might and Magic II Gold 2.1 — Buka 2003**
 (`HMM2PL.exe` and the scenario editor `EDT2PL.exe`), built with the original
 Visual C++ 6.0 SP5 toolchain under Wine. Text lives in a catalog (English and
-Russian). The retail images are stripped, so every symbol is a claim made by
-the source's own markers and every relocation site comes from a reviewed
-manifest. Retail bytes are authoritative. Supply your own executables and game
+Russian). Retail bytes are authoritative. Supply your own executables and game
 assets.
 
 <!-- match-score:start -->
@@ -66,7 +64,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 - [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0#branches) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
 - [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0#branches) — Clean source, PoL 2.0
 - [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0#branches) — Reading view, PoL 2.0
-- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka#branches) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka#branches) — Gold 2.1 (Buka) game and editor, byte-identical
 - [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka#branches) — Clean source, Gold 2.1 (ru/en)
 - [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka#branches) — Reading view, UTF-8 Russian
 - [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port#branches) — Native port: Linux, Windows, browser
@@ -75,9 +73,9 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 
 ## Quickstart
 
-With Nix flakes enabled, run from the repository root. `homm2 build` compiles,
-compares and links; `homm2 build verify` checks every gate, including the
-byte-for-byte comparison of the linked executable with retail:
+With Nix flakes enabled, run from the repository root. `homm2 build` compiles
+and links both programs; `homm2 build verify` checks every gate, including the
+byte-for-byte comparison of both linked executables with retail:
 
 ```sh
 nix develop .#build
@@ -96,30 +94,18 @@ inputs, the toolchain, Wine state and generated reports stay in ignored
 
 ## Versions
 
-The Price of Loyalty 2.0 reconstruction lives on `decomp-pol-2.0`; what Gold
-2.1 and Buka changed is in [PoL 2.0 → Gold 2.1 → Buka changes](docs/version-changes.md).
+The version lineage runs Price of Loyalty 2.0 (`decomp-pol-2.0`) → Gold 2.1 →
+Buka; what Gold 2.1 and Buka changed is in [PoL 2.0 → Buka changes](docs/version-changes.md).
 
 ## Documentation
 
 - [Matching tooling](docs/tooling.md), [command map](docs/tooling-map.md) and
   [repository workflow](docs/workflow.md)
-- [Other builds](docs/builds.md) (locale builds, link modes, the toolchain) and
-  [playing the build](docs/play.md)
+- [Other builds](docs/builds.md) and [playing the build](docs/play.md)
 - [Documentation index](docs/README.md); contributor rules and verification
   commands are in [AGENTS.md](AGENTS.md)
 
-## Trust and provenance
-
-Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An
-exact function is still independently checkable against retail bytes and ordered
-relocations, so accepting it does not require trusting the model's prose or
-intent. The cross-platform port is a semantic rewrite, not a byte-matching
-result, and therefore still requires ordinary code review and play-testing.
-
 ## License
 
-Project-authored reconstruction source and tooling are dedicated to the public
-domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
-Files carrying separate copyright or license notices retain those terms. No
-binary game assets are stored in this repository; retail inputs and build
-outputs incorporating them are not covered by this dedication.
+Project-authored source and tooling use [CC0 1.0](LICENSE). Dependencies retain
+their own terms; retail inputs, compiler binaries and game assets are excluded.

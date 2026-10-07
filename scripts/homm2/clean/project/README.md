@@ -1,9 +1,8 @@
 # Heroes of Might and Magic II — Gold 2.1 (Buka) source
 
 C++ source for the Buka release of Heroes of Might and Magic II Gold 2.1
-(`HMM2PL.exe`, Windows), generated from the byte-identical reconstruction with
-its matching machinery removed. It builds a 32-bit Windows program with Clang
-and MinGW. The text lives in a catalog: `locales/messages.def` (English) and
+(`HMM2PL.exe`, Windows), built as a 32-bit Windows program with Clang and
+MinGW. The text lives in a catalog: `locales/messages.def` (English) and
 `locales/ru.po` (the retail Russian). Building selects one of them.
 
 ## Branches
@@ -25,7 +24,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 - [`decomp-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-pol-2.0#branches) — Price of Loyalty 2.0 `HEROES2W.EXE` (1997), VC4.2
 - [`source-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/source-pol-2.0#branches) — Clean source, PoL 2.0
 - [`classic-pol-2.0`](https://github.com/sushi-shi/homm2-decomp/tree/classic-pol-2.0#branches) — Reading view, PoL 2.0
-- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka#branches) — Gold 2.1 (Buka) game, byte-identical; editor in progress
+- [`decomp-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/decomp-gold-2.1-buka#branches) — Gold 2.1 (Buka) game and editor, byte-identical
 - [`source-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/source-gold-2.1-buka#branches) — Clean source, Gold 2.1 (ru/en)
 - [`classic-gold-2.1-buka`](https://github.com/sushi-shi/homm2-decomp/tree/classic-gold-2.1-buka#branches) — Reading view, UTF-8 Russian
 - [`port`](https://github.com/sushi-shi/homm2-decomp/tree/port#branches) — Native port: Linux, Windows, browser
@@ -34,8 +33,9 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 
 ## Build and play
 
-On x86-64 Linux with Nix flakes enabled, from this directory, with your Buka
-installation (its original `DATA`, `MAPS`, music and video files):
+On x86-64 Linux with Nix flakes enabled, from this directory, with your copy of
+the Buka game (an installed game folder with its original `DATA`, `MAPS`, music
+and video files):
 
 ```sh
 nix build                  # Russian (default)
@@ -45,38 +45,33 @@ cd /path/to/buka-installation
 ./run-game.sh
 ```
 
-The runner uses Wine and creates `.wineprefix` beside the game. Set
-`HOMM2_WINEPREFIX` to choose another prefix. No retail assets are stored in
-this repository.
+`nix build` builds `result/HMM2PL.exe`; `run-game.sh` runs it under Wine with a
+prefix in `.wineprefix` beside the game (`HOMM2_WINEPREFIX` chooses another).
+No retail assets are stored in this repository.
 
 ## Build
 
-In the supplied development shell:
+On x86-64 Linux with Nix flakes enabled, from this directory:
 
 ```sh
-nix develop
-./build.py --ru             # Russian (default if omitted)
-./build.py --en             # English
+nix develop -c python3 build.py --ru   # Russian (default)
+nix develop -c python3 build.py --en   # English
 ```
 
-The executables are written to `build/ru/HMM2PL.exe` and
-`build/en/HMM2PL.exe`; each locale has its own objects and generated compiler
-inputs. `-j N` and `-v` select parallel jobs and verbose commands. Ninja directly
-also works: `ninja` builds Russian and `ninja -f build-en.ninja` builds English.
-A non-Nix environment needs Python 3, Ninja, Clang, LLD, LLVM dlltool and a
-32-bit MinGW toolchain.
+This writes `build/ru/HMM2PL.exe` or `build/en/HMM2PL.exe`, each locale with its
+own objects. The flake supplies Clang, LLD, LLVM's dlltool, Ninja and a 32-bit
+MinGW toolchain. `-j N` and `-v` select parallel jobs and verbose commands;
+Ninja directly also works (`ninja`, or `ninja -f build-en.ninja` for English).
+These builds do not include Windows resources or the retail icon.
 
-The source keeps every piece of game text as `localization::Tr("semantic.id")`,
-with the English registry in `locales/messages.def` and UTF-8 Russian in
-`locales/ru.po`. Building resolves the selected catalog into literal
-Windows-1251 bytes under `build/<locale>/localized/`, without changing the
-authored source or adding runtime lookups. Edit the IDs and catalogs, not the
-generated compiler files. English selects source text only: external game
-assets are not translated, and these builds do not include Windows resources or
-the retail icon.
+The source keeps every piece of game text as `localization::Tr("semantic.id")`.
+The build resolves each ID to the selected language as literal Windows-1251
+bytes in a copy of the sources under `build/<locale>/localized/`; nothing is
+looked up at run time. Edit the IDs and catalogs, not the copies. English
+selects source text only; the game's data files stay as installed.
 
-What Gold 2.1 and Buka changed from Price of Loyalty 2.0 is in the
-[version ledger](https://github.com/sushi-shi/homm2-decomp/blob/decomp-gold-2.1-buka/docs/version-changes.md).
+`nix build` and `run-game.sh` run the results with your game data; see
+[Build and play](#build-and-play).
 
 ## Regeneration
 
@@ -85,8 +80,7 @@ changes there and regenerate; do not edit this branch by hand.
 
 ## License
 
-Project-authored reconstruction source and tooling are dedicated to the public
-domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
-Files carrying separate copyright or license notices retain those terms. No
-binary game assets are stored in this repository; retail inputs and build
-outputs incorporating them are not covered by this dedication.
+Original project contributions are dedicated to the public domain under
+[CC0 1.0](LICENSE), to the extent of the contributors' rights. This does not
+grant rights to New World Computing's or Buka's game or to the Microsoft, RAD
+Game Tools or other third-party material it uses. Game assets are not included.

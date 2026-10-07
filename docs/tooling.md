@@ -146,7 +146,7 @@ Every entry point keeps `homm2.core.usage.logged` (`homm2 audit usage`).
   `DATA_COMPGEN(...)`, `VTBL(...)`, and `VTBL2(...)` annotations. Candidate COFF
   supplies the physical topology for compiler-generated objects. Generated manifests
   belong in `build/gen`; there is no hand-maintained private-data supplement.
-- `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
+- `config/match_baseline.tsv` ([score tracking](match-status.md)) retains each function's best observed fuzzy score for its
   current normalized source hash. A changed hash starts a new current-score epoch. It is
   queue evidence only: no build or command rejects a regression against an older maximum.
   A controlled run from `homm2.permute.tu_state_noise` may raise the unchanged function's maximum
@@ -191,6 +191,11 @@ See `docs/data-symbol-normalization.md`, `docs/reviewed-data-objdiff.md`, and
   scores, retained maxima, or a claim that a live residual is complete.
 - Objdiff fuzzy percentages guide the queue but are not proof. They can hide wrong
   stack displacements and relocation fields.
+- Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An
+  exact function is still independently checkable against retail bytes and ordered
+  relocations, so accepting it does not require trusting the model's prose or intent.
+  The cross-platform port is a semantic rewrite, not a byte-matching result, and still
+  requires ordinary code review and play-testing.
 
 ## Usage history
 

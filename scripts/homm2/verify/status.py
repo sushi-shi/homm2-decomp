@@ -452,102 +452,71 @@ def split_carve_outs(data):
 
 
 def readme_block(data, maxima, image_section=False):
-    """Render live and current-source-hash-best per-tier comparison metrics.
+    """The README score block: every score at MAX (the best observed for each
+    function's current effective-source hash), plus one CUR / MAX line.
 
     The game's block carries the markers and appends a section per other
-    image with a report (rendered by that image's own process)."""
-    target_units, carved_units = split_carve_outs(data)
+    image with a report (rendered by that image's own process). Data bytes
+    are checked by `homm2 build verify` and reported by `homm2 verify status`;
+    the README shows functions only."""
+    target_units, _carved_units = split_carve_outs(data)
     tiers = {}
+    cur_exact = 0
+    cur_weight = max_weight = 0.0
     for u in target_units:
-        tier = u.get("name", "?").split("/")[0]
-        m = u.get("measures", {}) or {}
         unit_name = u.get("name", "?")
-        t = tiers.setdefault(tier, {"units": 0, "fe": 0, "fem": 0, "ft": 0,
-                                    "fz": 0.0, "fzt": 0, "mx": 0.0,
-                                    "dm": 0, "dt": 0, "de": 0, "du": 0})
+        t = tiers.setdefault(unit_name.split("/")[0],
+                             {"units": 0, "exact": 0, "functions": 0, "size": 0, "weight": 0.0})
         t["units"] += 1
-        t["fe"] += _i(m.get("matched_functions")); t["ft"] += _i(m.get("total_functions"))
-        matched_data = _i(m.get("matched_data")); total_data = _i(m.get("total_data"))
-        t["dm"] += matched_data; t["dt"] += total_data
-        if total_data:
-            t["du"] += 1
-            t["de"] += matched_data == total_data
         for f in u.get("functions", []) or []:
-            sz = _i(f.get("size")); cur = f.get("fuzzy_match_percent") or 0.0
+            size = _i(f.get("size")); cur = f.get("fuzzy_match_percent") or 0.0
             maximum = max(cur, maxima.get((unit_name, f.get("name", "?")), (cur, None))[0])
-            t["fem"] += maximum >= EXACT_MATCH_PERCENT
-            t["fz"] += sz * cur / 100.0; t["fzt"] += sz
-            t["mx"] += sz * maximum / 100.0
+            t["functions"] += 1
+            t["exact"] += maximum >= EXACT_MATCH_PERCENT
+            t["size"] += size
+            t["weight"] += size * maximum
+            cur_exact += cur >= EXACT_MATCH_PERCENT
+            cur_weight += size * cur
+            max_weight += size * maximum
+    tiers = {name: t for name, t in tiers.items() if t["functions"]}
     rows = []
-    TE = TEM = TT = DM = DT = DE = DU = 0; FZ = MX = 0.0; FZT = 0
-    for tier in sorted(tiers, key=lambda k: -tiers[k]["ft"]):
-        d = tiers[tier]
-        if d["ft"] == 0:
-            continue
-        TE += d["fe"]; TEM += d["fem"]; TT += d["ft"]
-        DM += d["dm"]; DT += d["dt"]; DE += d["de"]; DU += d["du"]
-        FZ += d["fz"]; FZT += d["fzt"]; MX += d["mx"]
-        fp = 100 * d["fe"] / d["ft"]
-        fmp = 100 * d["fem"] / d["ft"]
-        zp = 100 * d["fz"] / d["fzt"] if d["fzt"] else 0
-        mp = 100 * d["mx"] / d["fzt"] if d["fzt"] else 0
-        dp = 100 * d["dm"] / d["dt"] if d["dt"] else 0
-        rows.append([f"`{tier}`", str(d["units"]),
-                     f"{d['fe']} / {d['ft']} ({fp:.1f}%)",
-                     f"{d['fem']} / {d['ft']} ({fmp:.1f}%)",
-                     f"{zp:.1f}%", f"{mp:.1f}%",
-                     f"{d['de']} / {d['du']}",
-                     f"{d['dm']:,} / {d['dt']:,} ({dp:.2f}%)"])
-    overall_f = 100 * TE / TT if TT else 0
-    overall_fm = 100 * TEM / TT if TT else 0
-    overall_z = 100 * FZ / FZT if FZT else 0
-    overall_m = 100 * MX / FZT if FZT else 0
-    overall_d = 100 * DM / DT if DT else 0
+    for tier in sorted(tiers, key=lambda k: -tiers[k]["functions"]):
+        t = tiers[tier]
+        rows.append([f"`{tier}`", f"{t['units']}",
+                     f"{t['exact']:,} / {t['functions']:,} "
+                     f"({_pct(t['exact'], t['functions']):.1f}%)",
+                     f"{t['weight'] / t['size'] if t['size'] else 0.0:.1f}%"])
+    functions = sum(t["functions"] for t in tiers.values())
+    exact = sum(t["exact"] for t in tiers.values())
+    size = sum(t["size"] for t in tiers.values())
+    fuzzy_cur = cur_weight / size if size else 0.0
+    fuzzy_max = max_weight / size if size else 0.0
+    headline = (f"**{exact:,} / {functions:,} functions exact "
+                f"({_pct(exact, functions):.2f}%) &middot; {fuzzy_max:.2f}% fuzzy.**")
+    table = _md_table(["Module", "Units", "Functions exact", "Fuzzy"], "lrrr", rows)
     exe = retail_exe().name
-    headline = (f"**Overall: {TE} / {TT} functions exact ({overall_f:.2f}%) &middot; "
-                f"{TEM} / {TT} functions exact-max ({overall_fm:.2f}%) &middot; "
-                f"{overall_z:.2f}% fuzzy &middot; {overall_m:.2f}% fuzzy-max &middot; "
-                f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
-                f"{DE} / {DU} data-bearing units exact.**")
-    table = _md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
-                       "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows)
     if image_section:
         return "\n".join([f"### {exe}", "", headline + " A separate image with its own "
-                          "delink, comparison and scores; shared units compile once per image.",
+                          "link graph and scores; shared units compile once per image.",
                           "", *table])
     label = f" ({exe})" if len(images()) > 1 else ""
     out = [RM_START, "## Match status", "",
-           "_Auto-generated by `homm2 verify readme` (refreshed by `homm2 build`); do not hand-edit._", "",
+           "_Auto-generated by `homm2 verify readme`; do not hand-edit. Scores are "
+           "MAX (the best of each function's current source)._", "",
            headline + label, "",
-           "_**Functions exact** = 100% in the current normalized object comparison, "
-           "not a raw linked-image equality claim. Unbuilt source edits are not measured. "
-           "**Functions exact-max** = observed at "
-           "100% at least once for the current effective-source hash, including audited exact "
-           "disposable TU-state probes. **Fuzzy** is the live size-weighted instruction match; "
-           "**fuzzy-max** retains each function's best observed score for its current "
-           "effective-source hash. "
-           "Maxima are historical navigation data, not correctness proof or enforcement. "
-           "`homm2 build` runs separate raw-object audit gates, and its `link-diff` step "
-           "compares the whole linked image with retail._", "",
-           *table]
-    if carved_units:
-        carved_rows = []
-        for unit in sorted(carved_units, key=lambda u: u.get("name", "")):
-            measures = unit.get("measures", {}) or {}
-            carved_rows.append([
-                f"`{unit.get('name')}`",
-                str(_i(measures.get("total_functions"))),
-                f"{_i(measures.get('total_code')):,}",
-                CARVE_OUTS[unit.get("name")],
-            ])
-        out += ["",
-                "_Excluded from the % above — identified generated/library "
-                "code, not independent reconstruction targets:_", "",
-                *_md_table(["Module", "Functions", "Code (B)", "Why excluded"],
-                           "lrrl", carved_rows)]
+           "_Comparison mode: strict relocations and data values._", "",
+           *table, "",
+           f"_CUR / MAX: {cur_exact:,} / {exact:,} exact &middot; "
+           f"{fuzzy_cur:.2f}% / {fuzzy_max:.2f}% fuzzy (defined in "
+           "[docs/match-status.md](docs/match-status.md)). Totals cover every in-`.text` "
+           "reconstruction target; generated and library code is excluded._"]
     out += image_sections()
-    out += ["", RM_END]
+    out += [RM_END]
     return "\n".join(out)
+
+
+def _pct(num, den):
+    return 100.0 * num / den if den else 0.0
 
 
 def image_sections() -> list[str]:
