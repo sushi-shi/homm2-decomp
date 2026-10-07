@@ -56,7 +56,6 @@ H2_ENUM_BEGIN(EditorStartupConstant)
     EDITOR_SLOW_FADE_STEPS      = 8,
     // The screen is cleared to this palette index while the map view opens.
     EDITOR_BACKGROUND_COLOR     = 0x24,
-    EDITOR_SCREEN_BYTES         = 640 * 480,
     // The CD set-up results SetupCDDrive reports.
     EDITOR_CD_NO_DRIVE          = 1,
     EDITOR_CD_NOT_FOUND         = 2,
@@ -68,7 +67,6 @@ H2_ENUM_BEGIN(EditorStartupConstant)
     EDITOR_MOUSE_UPDATE_INTERVAL = 13,
     EDITOR_COLOR_CYCLE_INTERVAL = 200,
     EDITOR_NON_PALETTED_CYCLE_DELAY = 300,
-    EDITOR_PALETTED_COLOR_DEPTH = 8,
     // ShutDown's message buffer and FileError's.
     EDITOR_SHUTDOWN_TEXT_SIZE   = 768,
     EDITOR_FILE_ERROR_TEXT_SIZE = 200
@@ -89,8 +87,6 @@ H2_ENUM_BEGIN(EditorNormalDialogConstant)
     EDITOR_DIALOG_ROW_OFFSET       = 12,
     EDITOR_DIALOG_WINDOW_WIDTH     = 0x11e,
     EDITOR_DIALOG_WINDOW_BASE      = 0x81,
-    EDITOR_DIALOG_SCREEN_MAX_X     = 0x27f,
-    EDITOR_DIALOG_SCREEN_MAX_Y     = 0x1df,
     EDITOR_DIALOG_DEFAULT_X        = 0x9f,
 H2_ENUM_END(EditorNormalDialogConstant)
 
@@ -3572,7 +3568,7 @@ extern "C" void PollSound(void) {
     if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + EDITOR_COLOR_CYCLE_INTERVAL;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
-            && giMainVideoModeColorDepth != EDITOR_PALETTED_COLOR_DEPTH)
+            && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += EDITOR_NON_PALETTED_CYCLE_DELAY;
         CycleColors(0);
     }
@@ -3647,8 +3643,12 @@ i32 oldmain(void) {
     }
     gpMouseManager->HideColorPointer();
     gpWindowManager->FadeScreen(FADE_OUT, EDITOR_SLOW_FADE_STEPS, gPalette);
-    memset(gpWindowManager->m_screen->m_pixels, EDITOR_BACKGROUND_COLOR, EDITOR_SCREEN_BYTES);
-    if (gpExec->AddManager(gEditManager, -1))
+    memset(
+        gpWindowManager->m_screen->m_pixels,
+        EDITOR_BACKGROUND_COLOR,
+        LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
+    );
+    if (gpExec->AddManager(gEditManager, BASE_MANAGER_PRIORITY_UNASSIGNED))
         ShutDown(localization::Tr("system.manager.add_failed"));
     if (result == EDITOR_SETUP_LOAD_MAP) {
         strcpy(gMapFileName, loadName);
@@ -3954,9 +3954,9 @@ void NormalDialog(
         windowRows = 1;
     windowWidth = EDITOR_DIALOG_WINDOW_WIDTH;
     windowHeight = windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + EDITOR_DIALOG_WINDOW_BASE;
-    if (windowX == -1 || windowWidth + windowX >= EDITOR_DIALOG_SCREEN_MAX_X)
+    if (windowX == -1 || windowWidth + windowX >= LOGICAL_SCREEN_MAX_X)
         windowX = EDITOR_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowHeight + windowY >= EDITOR_DIALOG_SCREEN_MAX_Y) {
+    if (windowY == -1 || windowHeight + windowY >= LOGICAL_SCREEN_MAX_Y) {
         windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / 2;
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;

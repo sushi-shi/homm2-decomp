@@ -385,10 +385,10 @@ void mouseManager::NewUpdate(i32 force) {
                 m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
             m_cursorBottom =
                 m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
-            if (m_cursorRight > LOGICAL_SCREEN_WIDTH - 1)
-                m_cursorRight = LOGICAL_SCREEN_WIDTH - 1;
-            if (m_cursorBottom > LOGICAL_SCREEN_HEIGHT - 1)
-                m_cursorBottom = LOGICAL_SCREEN_HEIGHT - 1;
+            if (m_cursorRight > LOGICAL_SCREEN_MAX_X)
+                m_cursorRight = LOGICAL_SCREEN_MAX_X;
+            if (m_cursorBottom > LOGICAL_SCREEN_MAX_Y)
+                m_cursorBottom = LOGICAL_SCREEN_MAX_Y;
             if (m_cursorLeft < 0)
                 m_savedLeft = 0;
             else
@@ -398,16 +398,16 @@ void mouseManager::NewUpdate(i32 force) {
             else
                 m_savedTop = m_cursorTop;
 
-            if (gOldMouseLeft > LOGICAL_SCREEN_WIDTH - 1 || gOldMouseTop > LOGICAL_SCREEN_HEIGHT - 1
+            if (gOldMouseLeft > LOGICAL_SCREEN_MAX_X || gOldMouseTop > LOGICAL_SCREEN_MAX_Y
                 || gOldMouseRight < 0 || gOldMouseBottom < 0)
                 goto resetBounds;
 
             if (m_savedLeft > gOldMouseRight || m_cursorRight < gOldMouseLeft
                 || m_savedTop > gOldMouseBottom || m_cursorBottom < gOldMouseTop) {
-                if (gOldMouseRight > LOGICAL_SCREEN_WIDTH - 1)
-                    gOldMouseRight = LOGICAL_SCREEN_WIDTH - 1;
-                if (gOldMouseBottom > LOGICAL_SCREEN_HEIGHT - 1)
-                    gOldMouseBottom = LOGICAL_SCREEN_HEIGHT - 1;
+                if (gOldMouseRight > LOGICAL_SCREEN_MAX_X)
+                    gOldMouseRight = LOGICAL_SCREEN_MAX_X;
+                if (gOldMouseBottom > LOGICAL_SCREEN_MAX_Y)
+                    gOldMouseBottom = LOGICAL_SCREEN_MAX_Y;
                 BlitBitmapToScreenNoMouseCheck(
                     gpWindowManager->m_screen,
                     gOldMouseLeft,
@@ -439,14 +439,14 @@ void mouseManager::NewUpdate(i32 force) {
                         m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
             }
 
-            if (gOldMouseLeft > LOGICAL_SCREEN_WIDTH - 1 || gOldMouseTop > LOGICAL_SCREEN_HEIGHT - 1
+            if (gOldMouseLeft > LOGICAL_SCREEN_MAX_X || gOldMouseTop > LOGICAL_SCREEN_MAX_Y
                 || gOldMouseRight < 0 || gOldMouseBottom < 0)
                 goto finishUpdate;
 
-            if (gOldMouseRight > LOGICAL_SCREEN_WIDTH - 1)
-                gOldMouseRight = LOGICAL_SCREEN_WIDTH - 1;
-            if (gOldMouseBottom > LOGICAL_SCREEN_HEIGHT - 1)
-                gOldMouseBottom = LOGICAL_SCREEN_HEIGHT - 1;
+            if (gOldMouseRight > LOGICAL_SCREEN_MAX_X)
+                gOldMouseRight = LOGICAL_SCREEN_MAX_X;
+            if (gOldMouseBottom > LOGICAL_SCREEN_MAX_Y)
+                gOldMouseBottom = LOGICAL_SCREEN_MAX_Y;
 
             if (m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
                 > LOGICAL_SCREEN_WIDTH)

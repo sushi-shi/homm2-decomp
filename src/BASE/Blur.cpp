@@ -70,9 +70,9 @@ void DoBlur(
         redTable[i] =
             static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT)]);
         greenTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + 1]);
+            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)]);
         blueTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + 2]);
+            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)]);
     }
 
     gpResourceManager->PointToFile(gpResourceManager->MakeId("RGBLOOKP.BIN", 1));
@@ -106,22 +106,22 @@ void DoBlur(
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
         newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] =
             oldPalette[i * IDX(PALETTE_CHANNEL_COUNT)] + redAdjust;
-        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] =
-            oldPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] + greenAdjust;
-        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] =
-            oldPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] + blueAdjust;
+        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] =
+            oldPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] + greenAdjust;
+        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] =
+            oldPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] + blueAdjust;
         if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] > PALETTE_CHANNEL_MAX)
             newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] = PALETTE_CHANNEL_MAX;
         if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] < 0)
             newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] = 0;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] > PALETTE_CHANNEL_MAX)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] = PALETTE_CHANNEL_MAX;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] < 0)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] = 0;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] > PALETTE_CHANNEL_MAX)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] = PALETTE_CHANNEL_MAX;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] < 0)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] = 0;
+        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] > PALETTE_CHANNEL_MAX)
+            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] = PALETTE_CHANNEL_MAX;
+        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] < 0)
+            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] = 0;
+        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] > PALETTE_CHANNEL_MAX)
+            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] = PALETTE_CHANNEL_MAX;
+        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] < 0)
+            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] = 0;
     }
 
     gpWindowManager

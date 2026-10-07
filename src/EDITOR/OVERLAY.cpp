@@ -266,7 +266,7 @@ void overlayManager::Close(void) {
     delete m_className;
     gEditManager->m_window->RemoveWidget(m_highlight);
     delete m_highlight;
-    gEditManager->m_window->DrawWindow(0);
+    gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     m_active = false;
@@ -285,7 +285,7 @@ void overlayManager::ShowClass(b32 update) {
     gEditManager->m_window->BroadcastMessage(message);
     m_highlight->m_x = gClassButtonPositions[gObjectClass].x - OVERLAY_HIGHLIGHT_INSET;
     m_highlight->m_y = gClassButtonPositions[gObjectClass].y - OVERLAY_HIGHLIGHT_INSET;
-    gEditManager->m_window->DrawWindow(0);
+    gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     if (update)
         gpWindowManager->UpdateScreenRegion(
             EDIT_TOOL_PANEL_X,
@@ -1392,7 +1392,7 @@ void overlayManager::DrawPicker(b32 update) {
                             + 19.0;
     else
         m_pickerKnob->m_y = OVERLAY_PICKER_KNOB_PARKED;
-    m_picker->DrawWindow(0);
+    m_picker->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     for (col = 0; col < OVERLAY_PICKER_COLUMNS; col++)
         for (row = 0; row < OVERLAY_PICKER_ROWS; row++)
             m_paletteIcon->DrawToBuffer(

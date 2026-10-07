@@ -139,8 +139,8 @@ MessageDispatchResult lineManager::Main(tag_message& message) {
                                         AddLineCell(x, y);
                                         gSelectionX = x;
                                         gSelectionY = y;
-                                        gSelectionWidth = 1;
-                                        gSelectionHeight = 1;
+                                        gSelectionWidth = EDIT_BRUSH_SINGLE_CELLS;
+                                        gSelectionHeight = EDIT_BRUSH_SINGLE_CELLS;
                                         gEditManager->DrawMap();
                                         gEditManager->UpdateMapView();
                                         gEditManager->DrawRadar(true);

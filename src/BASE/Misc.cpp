@@ -1881,7 +1881,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     paletteData = gpBufferPalette->m_data;
-    for (i = 0; i < IDX(PALETTE_DATA_SIZE) / IDX(PALETTE_CHANNEL_COUNT); ++i) {
+    for (i = 0; i < PALETTE_COLOR_COUNT; ++i) {
         tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)] =
             paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)];
         tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] =

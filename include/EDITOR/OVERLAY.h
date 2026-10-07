@@ -69,8 +69,8 @@ H2_ENUM_END(OverlayTypeFlag)
 
 // overlayType::frameNumbering: where FillInOverlayTiles starts numbering a
 // type's parts in its tileset. Any other value continues after the previous
-// type (the catalogue spells it 9999); a negative one keeps the catalogue's
-// frames.
+// type (the catalogue spells it OVERLAY_FRAMES_CONTINUE); a negative one keeps
+// the catalogue's frames.
 H2_ENUM_BEGIN(OverlayFrameNumbering)
     // From frame 0.
     OVERLAY_FRAMES_OWN      = 0,
