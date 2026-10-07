@@ -8,6 +8,7 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/OVERLAY.h>
+#include <EDITOR/EDITMGR.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/specedit.h>
 #include <BASE/Misc.h>
@@ -103,16 +104,6 @@ H2_ENUM_BEGIN(TreasureGuard)
     TREASURE_GUARD_SW  = 3,
     TREASURE_GUARD_NW  = 4
 H2_ENUM_END(TreasureGuard)
-
-// giGroundShape's plain ground and the decorated plain variants
-// ScatterDecorations may put an object on.
-H2_ENUM_BEGIN(RandomMapGroundShape)
-    GROUND_SHAPE_PLAIN           = 0,
-    GROUND_SHAPE_DECORATED_FIRST = 0x12,
-    GROUND_SHAPE_DECORATED_A     = 0x13,
-    GROUND_SHAPE_DECORATED_B     = 0x14,
-    GROUND_SHAPE_DECORATED_C     = 0x15
-H2_ENUM_END(RandomMapGroundShape)
 
 // The eight directions a mountain or tree chain runs (gChainSteps): steep
 // directions move two rows per column.
@@ -360,7 +351,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
         for (walkX = 0; walkX < MAP_WIDTH; walkX++)
             for (walkY = 0; walkY < MAP_HEIGHT; walkY++)
                 gMap.CellAt(walkX, walkY)->m_terrainImageIndex =
-                    ChooseGroundTile(terrain, GROUND_SHAPE_PLAIN, false, walkX, walkY, false, 1.0f);
+                    ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, false, walkX, walkY, false, 1.0f);
     } else {
         targetCells = MAP_WIDTH * MAP_HEIGHT * percent / RANDOM_MAP_FULL_PERCENT;
         patches = Random(0, percent + 51) / 30 + 1;
@@ -474,7 +465,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
                 if (CELL_TERRAIN(gMap.CellAt(walkX, walkY)) == baseTerrain)
                     gMap.CellAt(walkX, walkY)->m_terrainImageIndex = ChooseGroundTile(
                         terrain,
-                        GROUND_SHAPE_PLAIN,
+                        EDIT_SHAPE_PLAIN,
                         false,
                         walkX,
                         walkY,
@@ -607,7 +598,7 @@ void editManager::RemoveSmallRegions(void) {
                         MAP_GRID_CELL(done, x, y) = true;
                         gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
                             neighbourTerrain,
-                            GROUND_SHAPE_PLAIN,
+                            EDIT_SHAPE_PLAIN,
                             false,
                             y,
                             y,
@@ -1137,11 +1128,11 @@ void editManager::PlaceTowns(void) {
         if (top < 0)
             ShutDown(localization::Tr("editor.random.castles_failed"));
         terrain = CELL_TERRAIN(gMap.CellAt(tileX, tileY));
-        gEditManager->ClearArea(tileX - 4, tileY - 2, 5, 4, EDIT_CLEAR_ALL, 1, 0);
+        gEditManager->ClearArea(tileX - 4, tileY - 2, 5, 4, EDIT_CLEAR_ALL, true, false);
         for (nearX = tileX - 4; nearX <= tileX + 1; nearX++)
             for (nearY = tileY - 2; nearY <= tileY + 1; nearY++)
                 gMap.CellAt(nearX, nearY)->m_terrainImageIndex =
-                    ChooseGroundTile(terrain, GROUND_SHAPE_PLAIN, false, nearX, nearY, false, 1.0f);
+                    ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, false, nearX, nearY, false, 1.0f);
         castlePlaced = PlaceOverlayAt(castles[c], tileX, tileY);
         if (!castlePlaced)
             goto retry;
@@ -1168,7 +1159,7 @@ void editManager::PlaceTowns(void) {
                 else {
                     gMap.CellAt(nearX, nearY)->m_terrainImageIndex = ChooseGroundTile(
                         IDX(TERRAIN_WATER),
-                        GROUND_SHAPE_PLAIN,
+                        EDIT_SHAPE_PLAIN,
                         false,
                         nearX,
                         nearY,
@@ -1177,7 +1168,7 @@ void editManager::PlaceTowns(void) {
                     );
                     gMap.CellAt(nearX + 1, nearY)->m_terrainImageIndex = ChooseGroundTile(
                         IDX(TERRAIN_WATER),
-                        GROUND_SHAPE_PLAIN,
+                        EDIT_SHAPE_PLAIN,
                         false,
                         nearX + 1,
                         nearY,
@@ -1258,7 +1249,7 @@ void editManager::PlaceTowns(void) {
                     gClearTilesets[IDX(TILESET_MINIMON)] = 0;
                     gClearTilesets[IDX(TILESET_OBJNARTI)] = 0;
                     gClearTilesets[IDX(TILESET_MONS32)] = 0;
-                    gEditManager->ClearArea(nearX, nearY, 1, 1, 0, 0, 1);
+                    gEditManager->ClearArea(nearX, nearY, 1, 1, 0, false, true);
                 }
             }
         }
@@ -1358,7 +1349,7 @@ void editManager::PlaceTowns(void) {
                         }
                     }
                 }
-                gEditManager->ClearArea(tileX, tileY, 1, 1, EDIT_CLEAR_ALL, 1, 0);
+                gEditManager->ClearArea(tileX, tileY, 1, 1, EDIT_CLEAR_ALL, true, false);
                 PlaceOverlayAt(&gOverlayTypes[OVERLAY_STONE_LITHS], tileX, tileY);
             }
         }
@@ -1546,7 +1537,7 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
         }
         if (valid) {
             towns -= RANDOM_MAP_TRIES_PER_OBJECT;
-            gEditManager->ClearArea(x - 2, y - 2, 5, 4, EDIT_CLEAR_ALL, 1, 0);
+            gEditManager->ClearArea(x - 2, y - 2, 5, 4, EDIT_CLEAR_ALL, true, false);
             PlaceOverlayAt(randomTown, x - 2, y);
         }
     }
@@ -1611,8 +1602,8 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
                     }
                 }
                 if (Random(0, 40) < appeal) {
-                    gEditManager->ClearArea(x, y - 1, 2, 2, EDIT_CLEAR_ALL, 0, 0);
-                    gEditManager->ClearArea(x - 1, y + 1, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+                    gEditManager->ClearArea(x, y - 1, 2, 2, EDIT_CLEAR_ALL, false, false);
+                    gEditManager->ClearArea(x - 1, y + 1, 1, 1, EDIT_CLEAR_ALL, false, false);
                     placed = PlaceResourceSite(x, y, kind);
                     if (placed) {
                         sitesPlaced++;
@@ -1732,7 +1723,7 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
         y = Random(1, MAP_WIDTH - 2);
         if (CELL_TERRAIN(gMap.CellAt(x, y)) != TERRAIN_WATER
             && gMap.CellAt(x, y)->m_objectTileset == TILESET_NONE) {
-            gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+            gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, false, false);
             roll = Random(0, 100);
             northWest = southWest = northEast = southEast = north = south = east = west = false;
             if (y == 0 || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_WATER
@@ -1793,19 +1784,19 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
                     else
                         PlaceOverlayAt(majorArtifact, x, y);
                     if (layout == TREASURE_GUARD_NE) {
-                        gEditManager->ClearArea(x + 1, y - 1, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+                        gEditManager->ClearArea(x + 1, y - 1, 1, 1, EDIT_CLEAR_ALL, false, false);
                         PlaceOverlayAt(
                             Random(0, 100) < 50 ? strongMonster : veryStrongMonster, x + 1, y - 1);
                     } else if (layout == TREASURE_GUARD_SE) {
-                        gEditManager->ClearArea(x + 1, y + 1, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+                        gEditManager->ClearArea(x + 1, y + 1, 1, 1, EDIT_CLEAR_ALL, false, false);
                         PlaceOverlayAt(
                             Random(0, 100) < 50 ? strongMonster : veryStrongMonster, x + 1, y + 1);
                     } else if (layout == TREASURE_GUARD_SW) {
-                        gEditManager->ClearArea(x - 1, y + 1, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+                        gEditManager->ClearArea(x - 1, y + 1, 1, 1, EDIT_CLEAR_ALL, false, false);
                         PlaceOverlayAt(
                             Random(0, 100) < 50 ? strongMonster : veryStrongMonster, x - 1, y + 1);
                     } else {
-                        gEditManager->ClearArea(x - 1, y - 1, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+                        gEditManager->ClearArea(x - 1, y - 1, 1, 1, EDIT_CLEAR_ALL, false, false);
                         PlaceOverlayAt(
                             Random(0, 100) < 50 ? strongMonster : veryStrongMonster, x - 1, y - 1);
                     }
@@ -1835,7 +1826,7 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
         if (CELL_TERRAIN(gMap.CellAt(x, y)) != TERRAIN_WATER
             && gMap.CellAt(x, y)->m_objectTileset == TILESET_NONE) {
             guards -= RANDOM_MAP_TRIES_PER_OBJECT;
-            gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, 0, 0);
+            gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, false, false);
             kind = Random(0, 100);
             if (kind < 40)
                 PlaceOverlayAt(weakMonster, x, y);
@@ -1896,11 +1887,11 @@ void editManager::ScatterDecorations(void) {
             if (Random(1, 1000) <= chance[CELL_TERRAIN(cell)]
                 && cell->m_objectIndex == MAPCELL_SPRITE_NONE
                 && cell->m_overlayIndex == MAPCELL_SPRITE_NONE
-                && (giGroundShape[cell->m_terrainImageIndex] == GROUND_SHAPE_PLAIN
-                    || giGroundShape[cell->m_terrainImageIndex] == GROUND_SHAPE_DECORATED_A
-                    || giGroundShape[cell->m_terrainImageIndex] == GROUND_SHAPE_DECORATED_C
-                    || giGroundShape[cell->m_terrainImageIndex] == GROUND_SHAPE_DECORATED_FIRST
-                    || giGroundShape[cell->m_terrainImageIndex] == GROUND_SHAPE_DECORATED_B)) {
+                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_PLAIN
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_DECORATED_SECOND
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_DECORATED_FOURTH
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_DECORATED_FIRST
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_DECORATED_THIRD)) {
                 tries = RANDOM_MAP_TRIES_PER_OBJECT;
                 while (tries-- > 0) {
                     index = Random(0, OVERLAY_TYPE_COUNT - 1);

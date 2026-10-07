@@ -4,8 +4,8 @@
 
 #include <va.h>
 #include <EDITOR/OVERLAY.h>
+#include <EDITOR/EDITMGR.h>
 #include <EDITOR/EDITOR.h>
-#include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/heroedit.h>
@@ -50,8 +50,6 @@ H2_ENUM_BEGIN(OverlayPlacementConstant)
     OVERLAY_TOWN_GROUND_COLUMN = 2,
     // A random town's faction in its map record.
     OVERLAY_RANDOM_TOWN_FACTION = 6,
-    // giGroundShape: a plain tile that has variants.
-    GROUND_SHAPE_VARIANT_FLAG = 0x80,
     // An alchemist's lab may reach at most 3 rows above the map.
     OVERLAY_ALCHEMIST_LAB_TOP = -3,
     // The ultimate artifact stays this many cells inside the map.
@@ -820,15 +818,15 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                                 node->animatedObject = 0;
                         } else {
                             if (giGroundShape[dest->m_terrainImageIndex]
-                                & GROUND_SHAPE_VARIANT_FLAG)
+                                & GROUND_SHAPE_VARIED)
                                 dest->m_terrainImageIndex = ChooseGroundTile(
                                     CELL_TERRAIN(dest),
                                     giGroundShape[dest->m_terrainImageIndex]
-                                        - GROUND_SHAPE_VARIANT_FLAG,
+                                        - GROUND_SHAPE_VARIED,
+                                    false,
                                     0,
                                     0,
-                                    0,
-                                    0,
+                                    false,
                                     1.0f
                                 );
                             dest->m_objectLink = gNextObjectLink;
@@ -872,9 +870,11 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         memset(newTown, 0, sizeof(TownExtra));
                         dest->m_objectMetadata = gEditManager->m_extraCount;
                         gEditManager->m_extras[gEditManager->m_extraCount] = newTown;
-                        gEditMapHeader.townNameIndex = (gEditMapHeader.townNameIndex + 1) % EDITOR_TOWN_NAME_COUNT;
+                        gEditMapHeader.townNameIndex =
+                            (gEditMapHeader.townNameIndex + 1) % EDITOR_TOWN_NAME_COUNT;
                         strcpy(newTown->name, gTownNames[gEditMapHeader.townNameIndex]);
-                        newTown->owner = type->color == OVERLAY_NO_COLOR ? TOWN_OWNER_NONE : type->color;
+                        newTown->owner =
+                            type->color == OVERLAY_NO_COLOR ? TOWN_OWNER_NONE : type->color;
                         if (type->id >= OVERLAY_RANDOM_TOWN_FIRST
                             && type->id <= OVERLAY_RANDOM_TOWN_LAST) {
                             newTown->faction = OVERLAY_RANDOM_TOWN_FACTION;
@@ -1418,7 +1418,14 @@ void overlayManager::DrawPicker(b32 update) {
         col = idx % OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_BOX_WIDTH + OVERLAY_PICKER_OBJECT_INSET;
         row =
             idx / OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_BOX_HEIGHT + OVERLAY_PICKER_OBJECT_INSET;
-        DrawFootprint(col, row, OVERLAY_PICKER_VIEW_WIDTH, OVERLAY_PICKER_VIEW_HEIGHT, shown, false);
+        DrawFootprint(
+            col,
+            row,
+            OVERLAY_PICKER_VIEW_WIDTH,
+            OVERLAY_PICKER_VIEW_HEIGHT,
+            shown,
+            false
+        );
         DrawOverlay(
             shown,
             col,

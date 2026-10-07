@@ -10,6 +10,7 @@
 #include <BASE/message.h>
 #include <SOURCE/REQUEST.h>
 #include <EDITOR/mapcell.h>
+#include <EDITOR/OVERLAY.h>
 
 struct tag_message;
 
@@ -48,7 +49,7 @@ H2_ENUM_BEGIN(EditGroundShape)
     EDIT_SHAPE_DECORATED_THIRD    = 20,
     EDIT_SHAPE_DECORATED_FOURTH   = 21,
     EDIT_SHAPE_COUNT              = 22,
-    // The shape without the varied-tile bit (GROUND_SHAPE_FLIPPED).
+    // The shape without the varied-tile bit (GROUND_SHAPE_VARIED).
     EDIT_SHAPE_MASK               = 0x7f,
     // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
     // each per terrain and shape.
@@ -84,6 +85,11 @@ union EditCornerCounts {
     u32 any;
 };
 
+// The object catalogue (overlayType) and the object tool's classes: the
+// category each class lists and the terrains it lists them on.
+extern overlayType gOverlayTypes[OVERLAY_TYPE_COUNT];
+extern u8 gObjectClassCategories[OVERLAY_CLASS_COUNT];
+extern u32 gObjectClassTerrains[OVERLAY_CLASS_COUNT];
 // The header of the edited map (its name, size and players).
 extern SMapHeader gEditMapHeader;
 // The map text export's file (set while it runs).

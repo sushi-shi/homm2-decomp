@@ -336,12 +336,6 @@ b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, b32 requireMine);
 // The picker window's handler: the tool manager's PickerMain.
 MessageDispatchResult PickerHandler(struct tag_message& message);
 
-// The catalogue (EDITMGR's data) and its classes: the category each class
-// lists and the terrains it lists them on.
-extern overlayType gOverlayTypes[OVERLAY_TYPE_COUNT];
-extern u8 gObjectClassCategories[OVERLAY_CLASS_COUNT];
-extern u32 gObjectClassTerrains[OVERLAY_CLASS_COUNT];
-
 // The selected m_types entry (OVERLAY_NONE: none).
 extern i32 gSelectedOverlay;
 

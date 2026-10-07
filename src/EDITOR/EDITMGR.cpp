@@ -13180,7 +13180,7 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
                 for (variant = 0; variant < EDIT_GROUND_VARIANTS; variant++)
                     gGroundTileCounts[terrainIndex][shapeIndex][variant] = 0;
         for (tile = 0; tile < GROUND_TILE_IMAGE_COUNT; tile++) {
-            variant = (giGroundShape[tile] & GROUND_SHAPE_FLIPPED) != 0;
+            variant = (giGroundShape[tile] & GROUND_SHAPE_VARIED) != 0;
             gGroundTiles[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]
                         [gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK]
                                           [variant]]
@@ -13189,20 +13189,20 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
         }
     }
     if (vary) {
-        if (shape & GROUND_SHAPE_FLIPPED) {
+        if (shape & GROUND_SHAPE_VARIED) {
             variant = EDIT_GROUND_VARIED;
         } else if ((gGroundVariantChance[terrain] && force)
                    || (Random(0, 100) < gGroundVariantChance[terrain] * chance
                        && gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][EDIT_GROUND_VARIED]
                               > 0)) {
             if ((x <= 0
-                 || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                 || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (x >= MAP_WIDTH - 2
-                    || !(giGroundShape[gMap.CellAt(x + 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                    || !(giGroundShape[gMap.CellAt(x + 1, y)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (y <= 0
-                    || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                    || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (y >= MAP_HEIGHT - 2
-                    || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED)))
+                    || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_VARIED)))
                 variant = EDIT_GROUND_VARIED;
         }
         gGroundTileCount = gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][variant];
@@ -14782,7 +14782,7 @@ void editManager::ToggleGroundVariant(void) {
     y += m_viewY;
     ground = gMap.CellAt(x, y)->m_terrainImageIndex;
     terrain = giGroundToTerrain[ground];
-    if (giGroundShape[ground] & GROUND_SHAPE_FLIPPED)
+    if (giGroundShape[ground] & GROUND_SHAPE_VARIED)
         vary = false;
     else
         vary = true;

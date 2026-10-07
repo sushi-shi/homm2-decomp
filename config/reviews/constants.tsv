@@ -77,7 +77,6 @@ include/EDITOR/heroedit.h	pending
 include/EDITOR/line.h	pending	
 include/EDITOR/lineManager.h	pending	
 include/EDITOR/mapcell.h	pending	
-include/EDITOR/overlayType.h	pending	
 include/EDITOR/ridledit.h	pending	
 include/EDITOR/rumredit.h	pending	
 include/EDITOR/setup.h	pending	
