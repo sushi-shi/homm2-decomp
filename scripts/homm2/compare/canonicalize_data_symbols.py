@@ -1198,8 +1198,13 @@ def canonicalize_coff(payload: bytes,
                 if index not in anon_first_site or key < anon_first_site[index]:
                     anon_first_site[index] = key
         counters = {}
+        # A cell no code references (an empty literal a .data table points
+        # at) falls back to its address, not its symbol index: VC6 numbers
+        # its `$SG` cells in creation order, which is not their address order.
         for index in sorted(anon_stems, key=lambda i: (
-                anon_first_site.get(i, (0x7FFFFFFF, 0x7FFFFFFF)), i)):
+                anon_first_site.get(i, (0x7FFFFFFF, 0x7FFFFFFF)),
+                (coff.symbols[i].section, coff.symbols[i].value)
+                if coff.symbols[i].section > 0 else (0x7FFFFFFF, 0), i)):
             stem = anon_stems[index]
             occurrence = counters.get(stem, 0)
             counters[stem] = occurrence + 1
