@@ -1,23 +1,46 @@
 # Constants audit
 
-`homm2 audit enums --duplicates` groups evaluated enum members by value for reuse
-investigation. Use `--value 0x200` to inspect one value, `--json` to save the inventory
-under `build/`, or `--strict` to inspect the typed-enum view. Equal integers are
-candidates, not proof of a shared semantic domain; game enums and SDK diagnostics
-are reported separately.
+`homm2 verify enum-reuse` maps every evaluated value to every enum member,
+`#define` constant and `const` integer of both programs that has it, for
+reuse investigation ([enum-reuse.md](enum-reuse.md)). Equal integers are
+candidates, not proof of a shared semantic domain.
 
-`homm2 constants` inventories numeric constants throughout reconstructed game code. It writes
-the complete occurrence list to `build/constants/literals.tsv` and a semantic unexplained-literal
-list to `build/constants/magic-numbers.tsv`. `build/constants/null-zero.tsv` must remain empty.
-The generated `build/constants/README.md` summarizes contexts and orders the current review queue.
+`homm2 verify constants` inventories numeric constants throughout reconstructed game code. It writes
+the complete occurrence list to `build/constants/literals.tsv` and clang-tidy's
+`readability-magic-numbers` findings (0 and 1 ignored) to `build/constants/magic-numbers.tsv`.
+`build/constants/null-zero.tsv` must remain empty. One census covers both programs: editor-only
+units are read with the editor's defines, and a shared unit with `#ifdef HOMM2_EDITOR` code is read
+a second time as the editor (`build/clangd/editor-view/`). The generated
+`build/constants/README.md` summarizes contexts and orders the current review queue.
 
-The durable checklist is `config/reviews/constants.tsv`. Every reconstructed source and project
+A finding in `code`, a `local-table` or a `declaration` (see Classification) is **open** until it
+is spelled as a name (an enumerator, a named constant, `NULL`) or a row in
+`config/constants.tsv` keeps it numeric with a reason. `build/constants/open.tsv` lists the open
+findings (path, line, column, literal, category, owner, context). The committed `#floor` in
+`config/constants.tsv` is the open count and only goes down: `homm2 verify constants` (run by
+`homm2 build verify`) fails when the open count rises above it, when a kept row keeps nothing
+(stale) or is malformed, when a file checked off as `reviewed` still has open findings, or when a
+null pointer is spelled `0`.
+
+```sh
+homm2 verify constants                       # census and gate
+homm2 verify constants --list EVENTS.cpp     # open findings whose file or owner contains it
+homm2 verify constants --update-floor        # lower the floor after a batch
+```
+
+Kept rows are tab-separated fnmatch globs over file, owner (the enclosing
+function), spelling, group (the finding's category) and detail (its source
+line), then a reason; the first matching row wins, so put narrow rows before
+broad ones. Keep rows for quantities that have no name in the game (pixel
+geometry of a retail layout, icon frame numbers, random bounds, delays). A value
+that a domain names is not kept; name it.
+
+The per-file checklist is `config/reviews/constants.tsv`. Every reconstructed source and project
 header has exactly one row. A reconstructed file stays `pending` until every occurrence has been
-reviewed; the audit rejects a `reviewed` source file while it still has an unexplained code,
-declaration, or local-table literal. Imported implementations that are intentionally preserved
-with their original algorithm spelling use `third-party`; their findings remain in the inventory
-but do not enter the reconstruction cleanup queue. Each such row records its provenance and the
-reason the numeric spelling remains intact.
+reviewed; the gate rejects a `reviewed` file while it still has an open finding. Imported
+implementations that are intentionally preserved with their original algorithm spelling use
+`third-party`; their findings remain in the inventory but are not counted as open. Each such row
+records its provenance and the reason the numeric spelling remains intact.
 
 ## Classification
 

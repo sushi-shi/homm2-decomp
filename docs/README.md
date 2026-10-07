@@ -1,85 +1,35 @@
-# Documentation map
+# Project documentation
 
-The durable documentation is organized by purpose. Live queues, generated reports, and
-one-run progress summaries belong under `build/`, not here.
+- [Matching workflow](tooling.md), [build gates](build-asserts.md),
+  [the scenario editor image](editor.md),
+  [command map](tooling-map.md), [repository workflow](workflow.md),
+  [tooling convergence](tooling-convergence.md).
+- [Version changes](version-changes.md) (PoL 2.0 → Gold 2.1 → Buka),
+  [cross-version spellings](cross-version-spellings.md),
+  [base selection](base-selection-audit.md).
+- [Other builds](builds.md), [retail-exact linking](retail-exact-link.md),
+  [playing the build](play.md), [generated source branches](clean-source.md),
+  [localization](localization.md).
+- [Score tracking](match-status.md), [compiler patterns](patterns/),
+  [matching attempts](matching/), [jump tables](jump-tables.md),
+  [constants](constants-audit.md), [enum and constant reuse](enum-reuse.md), a
+  [negative experiment matrix](iconf2bc-experiment-matrix.md).
+- [Relocation manifest](reloc-manifest-sweep.md),
+  [class hierarchy](class-hierarchy.md), [vendor middleware](vendor-middleware.md),
+  [editor strings](strings-editor.md), [icon format](icon-format.md) and
+  [decoders](icon-decoders.md), [resource plan](resource-source-reconstruction-plan.md).
+- Data and linking: [candidate data topology](candidate-data-topology.md),
+  [reviewed data](reviewed-data-objdiff.md),
+  [strict allocations](strict-data-allocations.md),
+  [COFF data relocations](coff-data-relocations.md),
+  [data symbol normalization](data-symbol-normalization.md),
+  [relocation canonicalization](relocation-canonicalization.md),
+  [static storage](static-storage-link-audit.md),
+  [missing public data](missing-public-data-audit.md).
 
-This branch reconstructs Buka's stripped HMM2PL.exe (Gold 2.1 tree, VC6 SP5).
-The PoL 2.0 line's binary-evidence and method documents (CodeView mine, VC4.2
-toolchain contracts, the VC4.2 pattern catalog and matching matrices) were
-deliberately not carried over: measured evidence does not port across compilers.
-Their successors grow here from VC6-measured evidence.
-
-## Tooling and workflow
-
-- `tooling.md` is the matching pipeline: ground truth, toolchain, build, navigation,
-  package layout and repository model; `tooling-map.md` maps every command to its
-  implementation; `workflow.md` is the campaign policy and matching loop.
-- `builds.md` covers locale builds without retail inputs, the native link modes and
-  the toolchain; `play.md` the Wine play environment.
-- `build-asserts.md` explains every gate of `homm2 build verify`.
-- `editor.md` is the scenario editor image: keying, census, placements, objects,
-  compiler profile and open work.
-- `tooling-convergence.md` is the ledger of the tooling convergence with the HoMM1
-  reconstruction and its open items.
-
-## Binary and toolchain evidence
-
-- `config/retail/functions.csv` (with its header notes) is the candidate function
-  inventory. It is config-tracked because it is a reviewed input, not generated output.
-- `reloc-manifest-sweep.md` covers `config/retail/absolute_relocations.tsv`, the DIR32 site
-  manifest that stands in for the image's missing base-relocation directory. It is
-  config-tracked but regenerated (`homm2 audit reloc-sweep --write`), and its rules
-  are scored against PoL 2.0's surviving `.reloc`.
-- `class-hierarchy.md`, `vendor-middleware.md`, and `strings-editor.md` retain
-  reconstruction evidence that is expensive to rediscover.
-- `resource-source-reconstruction-plan.md` records the deferred editable-resource work.
-- `icon-format.md` and `icon-decoders.md` record the retail-verified icon (ICN) container,
-  frame table, and both run-length pixel dialects, plus the per-function catalog for the
-  `Icon*ToBitmap*` family. They also retain the confirmed retail clipping defect in the
-  flipped decoders, whose dead branch must not be "simplified" away.
-- `buka-annotation-worklist.tsv` maps the PoL-line reconstruction onto this image's
-  addresses as an annotation work list.
-
-## Data and final linking
-
-- `candidate-data-topology.md`, `reviewed-data-objdiff.md`, `strict-data-allocations.md`,
-  `coff-data-relocations.md`, and `data-symbol-normalization.md` define candidate/target
-  object reconstruction.
-- `relocation-canonicalization.md`, `static-storage-link-audit.md`,
-  and `missing-public-data-audit.md` define the final-link checks. Object order for the
-  link is the `config/units.toml` manifest order, audited against source anchors.
-
-## Matching and proof
-
-- `build-asserts.md` and `jump-tables.md` are reusable matching references.
-- `patterns/` and `matching/` start empty on this branch and are founded by the first
-  VC6-proven idioms and preserved structural attempts.
-- `config/match_baseline.tsv` is the observation-only score ledger. It preserves a
-  per-function maximum for the current normalized source hash, but has no ratchet or
-  acceptance role.
-- `homm2 audit historical-losses` compares every committed score-ledger epoch with the
-  current live objdiff report. Its TSV separates unchanged effective-source hashes,
-  body-to-dependency hash upgrades, changed hashes, and pre-hash evidence, and marks hash
-  transitions whose immediately preceding maximum was exact. Write campaign output to `/tmp`
-  rather than committing a queue snapshot.
-- `constants-audit.md` defines the whole-tree numeric-literal inventory and per-file review
-  contract.
-- `iconf2bc-experiment-matrix.md` retains negative experiment evidence (measured on the
-  PoL line's compiler; compiler-scoped).
-- `archive/` contains contracts for retired experiment tools; it is not active workflow guidance.
-
-## Cross-version and branch policy
-
-- `version-changes.md` is the functional 2.0 -> Gold 2.1 -> Buka ledger.
-- `cross-version-spellings.md` records matching-only donor decisions for PoL.
-- `base-selection-audit.md` records the provisional Buka-base decision,
-  defect gate, and the target `clean`/terminal-`classic`/`port` topology.
-
-## Retention rule
-
-Keep a document when it is a tool contract, reproducible retail/toolchain evidence, an active
-future plan, or negative experiment evidence that prevents repeated work. Remove it when it is
-only a completed campaign report, duplicates an authoritative document, describes a live
-queue/checkpoint as though it were permanent, or carries another compiler's measured evidence.
-Source comments, versioned config, and generated reports remain authoritative for current
-function and linker status.
+Retail facts live in `config/retail`, build contracts in `config`, generated
+state in `build`, and reusable compiler mechanisms in `docs/patterns`. The PoL
+2.0 line's VC4.2 evidence was not carried over: measured evidence does not port
+across compilers. Keep a document when it is a tool contract, reproducible
+retail or toolchain evidence, an active plan, or negative evidence that prevents
+repeated work; `archive/` holds contracts of retired tools.
