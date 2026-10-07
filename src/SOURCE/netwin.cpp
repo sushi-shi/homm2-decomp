@@ -47,18 +47,18 @@ DATA(0x00515c48) static H2_CONST char* gNbGroupName =
 DATA(0x00515c4c) static H2_CONST char* gNbListenName =
     "*";
 
-#define gNbFreeQueue gNbFreeQueueRuntime
-#define gNbSessLsn gNbSessionNumbersEntry
-#define gNbRcvData gNbReceiveDataLocal
-#define gNbNameBuf gNbNameBufferBacking
-#define gNbSessBuf gNbSessionBufferContext
-#define gNbSessNcb gNbSessionControlBlocksArena
-#define gNbCtlNcb gNbControlBlockArena
-#define gNbRcvQueue gNbReceiveQueueEntry
-#define gNbSndQueue gNbSendQueueHead
-#define gNbRcvLock gNbReceiveLockCriticalSection
-#define gNbEvents gNbThreadEventsContext
-#define gNbSndLock gNbSendLockBacking
+#define gNbFreeQueue gNbFreeQueueRuntime         // spelling fixes .bss order
+#define gNbSessLsn gNbSessionNumbersEntry        // spelling fixes .bss order
+#define gNbRcvData gNbReceiveDataLocal           // spelling fixes .bss order
+#define gNbNameBuf gNbNameBufferBacking          // spelling fixes .bss order
+#define gNbSessBuf gNbSessionBufferContext       // spelling fixes .bss order
+#define gNbSessNcb gNbSessionControlBlocksArena  // spelling fixes .bss order
+#define gNbCtlNcb gNbControlBlockArena           // spelling fixes .bss order
+#define gNbRcvQueue gNbReceiveQueueEntry         // spelling fixes .bss order
+#define gNbSndQueue gNbSendQueueHead             // spelling fixes .bss order
+#define gNbRcvLock gNbReceiveLockCriticalSection // spelling fixes .bss order
+#define gNbEvents gNbThreadEventsContext         // spelling fixes .bss order
+#define gNbSndLock gNbSendLockBacking            // spelling fixes .bss order
 
 #if H2_RETAIL_COMPILER
 #define controlBlock ncb
