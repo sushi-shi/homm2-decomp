@@ -490,6 +490,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_map_records_test tools/map_records_test.cpp src/SOURCE/MapRecords.cpp)
   target_include_directories(homm2_map_records_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME map_records COMMAND homm2_map_records_test)
+  add_executable(homm2_packed_records_test
+    tools/packed_records_test.cpp
+    src/EDITOR/mapcell.cpp
+    src/SOURCE/MapRecords.cpp)
+  target_include_directories(homm2_packed_records_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_options(homm2_packed_records_test PRIVATE -Wno-invalid-offsetof)
+  target_link_libraries(homm2_packed_records_test PRIVATE homm2_platform)
+  add_test(NAME packed_records COMMAND homm2_packed_records_test)
 
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE
