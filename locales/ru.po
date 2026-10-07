@@ -2091,6 +2091,10 @@ msgctxt "editor.text.import_failed"
 msgid "Import error!"
 msgstr "Ошибка импорта!"
 
+msgctxt "editor.text.imported"
+msgid "Text successfully imported from %s"
+msgstr "Текст успешно импортирован из %s"
+
 msgctxt "editor.title"
 msgid "Heroes II Editor"
 msgstr "Редактор Героев II"

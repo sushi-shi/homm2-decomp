@@ -292,7 +292,27 @@ H2_ENUM_BEGIN(EditTextExport)
     EDIT_TEXT_CLEAR_SIZE       = 500,
     EDIT_TEXT_LINE_SIZE        = 1000,
     EDIT_TEXT_FILE_NAME_SIZE   = 300,
-    EDIT_TEXT_EXTENSION_LENGTH = 4
+    EDIT_TEXT_EXTENSION_LENGTH = 4,
+    // The import: a line's longest read, the headings' tag lengths, and
+    // the three '*' around an object's kind.
+    EDIT_TEXT_READ_SIZE            = 0x300,
+    EDIT_TEXT_HEADER_MARKS         = 3,
+    EDIT_TEXT_FILE_TAG_LENGTH      = 16,
+    EDIT_TEXT_NAME_TAG_LENGTH      = 10,
+    EDIT_TEXT_DAY_TAG_LENGTH       = 4,
+    EDIT_TEXT_DAY_SEPARATOR_LENGTH = 2,
+    EDIT_TEXT_TOWN_TAG_LENGTH      = 8,
+    // The records the import rebuilds: the bytes kept before the new text
+    // (they include the old text's first byte) and where the text starts.
+    EDIT_RUMOUR_HEAD_SIZE      = 9,
+    EDIT_RUMOUR_TEXT_OFFSET    = 8,
+    EDIT_EVENT_HEAD_SIZE       = 0x32,
+    EDIT_EVENT_TEXT_OFFSET     = 0x31,
+    EDIT_SIGN_HEAD_SIZE        = 10,
+    EDIT_SIGN_TEXT_OFFSET      = 9,
+    EDIT_SPHINX_HEAD_SIZE      = 0x89,
+    EDIT_SPHINX_TEXT_OFFSET    = 0x88,
+    EDIT_SPHINX_ANSWER_LENGTH  = 12
 H2_ENUM_END(EditTextExport)
 
 H2_ENUM_BEGIN(EditTriggerType)
@@ -11893,6 +11913,288 @@ void editManager::ExportMapText(void) {
     sprintf(gText, "Text successfully saved to %s", textName);
     NormalDialog(gText, NORMAL_DIALOG_INFO);
     gTextFileName = NULL;
+}
+
+// The map text import (ImportMapText) reads the .TXT ExportMapText wrote:
+// ReadTextLine reads a line without its newline, FindTextHeader checks a
+// blank line and an object's heading at (x, y).
+VA(0x00406cb9, 0x39)
+void ReadTextLine(FILE* file, char* line) {
+    fgets(line, EDIT_TEXT_READ_SIZE, file);
+    line[strlen(line) - 1] = 0;
+}
+
+VA(0x00406cf2, 0xf0)
+bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind) {
+    char line[EDIT_TEXT_LINE_SIZE];
+    char* mark;
+    i32 fileX;
+    i32 fileY;
+
+    ReadTextLine(file, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(file, gText);
+    sscanf(gText, "(x:%d, y:%d)", &fileX, &fileY);
+    if (fileX != x || fileY != y)
+        return false;
+    mark = strchr(gText, '*');
+    mark += EDIT_TEXT_HEADER_MARKS;
+    mark[strlen(mark) - EDIT_TEXT_HEADER_MARKS] = 0;
+    if (strcmp(mark, kind))
+        return false;
+    return true;
+}
+
+// Reads the map's texts back from its .TXT: the map name, the rumours,
+// the timed events' days and messages, and the signs', bottles', map
+// events' and sphinxes' texts (each record is rebuilt to the new text's
+// length). Any line out of place stops the import.
+VA(0x00406de2, 0x13b2)
+bool editManager::ImportMapText(void) {
+    i32 x;
+    i32 i;
+    i32 y;
+    char textName[EDIT_TEXT_FILE_NAME_SIZE];
+    char* ext;
+    mapCell* cell;
+
+    gTextFileName = textName;
+    strcpy(textName, gMapFileName);
+    ext = textName + strlen(gMapFileName) - EDIT_TEXT_EXTENSION_LENGTH;
+    strcpy(ext, ".TXT");
+    textFile in;
+    in.m_file = fopen(textName, "rt");
+    if (!in)
+        return false;
+    gEditManager->m_mapChanged = true;
+    ReadTextLine(in, gText);
+    if (strcmp(" ========================================", gText))
+        return false;
+    ReadTextLine(in, gText);
+    if (strncmp(gText, "Text for file:  ", EDIT_TEXT_FILE_TAG_LENGTH))
+        return false;
+    if (strcmp(gText + EDIT_TEXT_FILE_TAG_LENGTH, gMapFileName))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strncmp("Map Name: ", gText, EDIT_TEXT_NAME_TAG_LENGTH))
+        return false;
+    strncpy(gEditMapHeader.name, gText + EDIT_TEXT_NAME_TAG_LENGTH, MAP_HEADER_NAME_SIZE);
+    gEditMapHeader.name[MAP_HEADER_NAME_SIZE - 1] = 0;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, "Map Description:"))
+        return false;
+    ReadTextLine(in, gText);
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, "Rumours:"))
+        return false;
+    for (i = 0; i < gEditMapHeader.rumourCount; i++) {
+        i32 size;
+        char head[EDIT_RUMOUR_HEAD_SIZE];
+        char* record;
+
+        ReadTextLine(in, gText);
+        memcpy(head, gEditManager->m_extras[gRumourExtras[i]], EDIT_RUMOUR_HEAD_SIZE);
+        size = strlen(gText) + EDIT_RUMOUR_HEAD_SIZE;
+        record = new char[size];
+        memcpy(record, head, EDIT_RUMOUR_HEAD_SIZE);
+        strcpy(record + EDIT_RUMOUR_TEXT_OFFSET, gText);
+        delete gEditManager->m_extras[gRumourExtras[i]];
+        gEditManager->m_extras[gRumourExtras[i]] = record;
+        gEditManager->m_extraSizes[gRumourExtras[i]] = size;
+        ReadTextLine(in, gText);
+        if (strcmp("", gText))
+            return false;
+    }
+    ReadTextLine(in, gText);
+    if (strcmp("", gText))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp("", gText))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, "Timed Events:"))
+        return false;
+    for (i = 0; i < gEditMapHeader.timeEventCount; i++) {
+        i32 size;
+        char* record;
+        i32 date;
+        char* text;
+        char prefix[EDIT_EVENT_HEAD_SIZE];
+
+        ReadTextLine(in, gText);
+        if (strncmp(gText, "Day ", EDIT_TEXT_DAY_TAG_LENGTH))
+            return false;
+        sscanf(gText + EDIT_TEXT_DAY_TAG_LENGTH, "%d", &date);
+        static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
+        text = strchr(gText + EDIT_TEXT_DAY_TAG_LENGTH, ':') + EDIT_TEXT_DAY_SEPARATOR_LENGTH;
+        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], EDIT_EVENT_HEAD_SIZE);
+        size = strlen(text) + EDIT_EVENT_HEAD_SIZE;
+        record = new char[size];
+        memcpy(record, prefix, EDIT_EVENT_HEAD_SIZE);
+        strcpy(record + EDIT_EVENT_TEXT_OFFSET, text);
+        delete gEditManager->m_extras[gTimeEventExtras[i]];
+        gEditManager->m_extras[gTimeEventExtras[i]] = record;
+        gEditManager->m_extraSizes[gTimeEventExtras[i]] = size;
+        ReadTextLine(in, gText);
+        if (strcmp("", gText))
+            return false;
+    }
+    ReadTextLine(in, gText);
+    if (strcmp("", gText))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp("", gText))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, "Map Stuff:"))
+        return false;
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            i32 unused2;
+            i32 unused;
+            char* newEvent;
+            i32 length;
+            char* riddleRecord;
+            char sphinxHead[EDIT_SPHINX_HEAD_SIZE];
+            char bottleHead[EDIT_SIGN_HEAD_SIZE];
+            char* signCopy;
+            char mapEventStart[EDIT_EVENT_HEAD_SIZE];
+
+            cell = gMap.CellAt(x, y);
+            switch (cell->m_triggerType) {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE):
+                    if (!FindTextHeader(in, x, y, "Bottle"))
+                        return false;
+                    goto message;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIGN):
+                    if (!FindTextHeader(in, x, y, "Sign"))
+                        return false;
+                message:
+                    ReadTextLine(in, gText);
+                    memcpy(bottleHead, gEditManager->m_extras[cell->m_objectMetadata],
+                           EDIT_SIGN_HEAD_SIZE);
+                    length = strlen(gText) + EDIT_SIGN_HEAD_SIZE;
+                    if (!bottleHead[0])
+                        strcpy(gText, "");
+                    signCopy = new char[length];
+                    memcpy(signCopy, bottleHead, EDIT_SIGN_HEAD_SIZE);
+                    strcpy(signCopy + EDIT_SIGN_TEXT_OFFSET, gText);
+                    delete gEditManager->m_extras[cell->m_objectMetadata];
+                    gEditManager->m_extras[cell->m_objectMetadata] = signCopy;
+                    gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
+                    break;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
+                    if (!FindTextHeader(in, x, y, "Place Event"))
+                        return false;
+                    ReadTextLine(in, gText);
+                    memcpy(mapEventStart, gEditManager->m_extras[cell->m_objectMetadata],
+                           EDIT_EVENT_HEAD_SIZE);
+                    length = strlen(gText) + EDIT_EVENT_HEAD_SIZE;
+                    newEvent = new char[length];
+                    memcpy(newEvent, mapEventStart, EDIT_EVENT_HEAD_SIZE);
+                    strcpy(newEvent + EDIT_EVENT_TEXT_OFFSET, gText);
+                    delete gEditManager->m_extras[cell->m_objectMetadata];
+                    gEditManager->m_extras[cell->m_objectMetadata] = newEvent;
+                    gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
+                    break;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
+                    if (!FindTextHeader(in, x, y, "Sphinx"))
+                        return false;
+                    ReadTextLine(in, gText);
+                    if (strcmp(gText, "Riddle:"))
+                        return false;
+                    ReadTextLine(in, gText);
+                    memcpy(sphinxHead, gEditManager->m_extras[cell->m_objectMetadata],
+                           EDIT_SPHINX_HEAD_SIZE);
+                    length = strlen(gText) + EDIT_SPHINX_HEAD_SIZE;
+                    riddleRecord = new char[length];
+                    memcpy(riddleRecord, sphinxHead, EDIT_SPHINX_HEAD_SIZE);
+                    strcpy(riddleRecord + EDIT_SPHINX_TEXT_OFFSET, gText);
+                    delete gEditManager->m_extras[cell->m_objectMetadata];
+                    gEditManager->m_extras[cell->m_objectMetadata] = riddleRecord;
+                    gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
+                    ReadTextLine(in, gText);
+                    if (strcmp(gText, "Answers:"))
+                        return false;
+                    for (i = 0;
+                         i < static_cast<mapEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata])
+                                 ->answerCount;
+                         i++) {
+                        ReadTextLine(in, gText);
+                        strncpy(static_cast<mapEventExtra*>(
+                                    gEditManager->m_extras[cell->m_objectMetadata])
+                                    ->answers[i],
+                                gText, EDIT_SPHINX_ANSWER_LENGTH);
+                    }
+                    break;
+            }
+        }
+    }
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, ""))
+        return false;
+    ReadTextLine(in, gText);
+    if (strcmp(gText, "Towns with captains:"))
+        return false;
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            TownExtra* town;
+            i32 fileX;
+            i32 fileY;
+
+            cell = gMap.CellAt(x, y);
+            switch (cell->m_triggerType) {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
+                    town = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
+                    if (!town->isCastle && town->hasCaptain) {
+                        ReadTextLine(in, gText);
+                        if (strncmp(gText, "Town at ", EDIT_TEXT_TOWN_TAG_LENGTH))
+                            return false;
+                        sscanf(gText + EDIT_TEXT_TOWN_TAG_LENGTH, "x:%d, y:%d", &fileX, &fileY);
+                        if (fileX != x || fileY != y)
+                            return false;
+                    }
+                    break;
+            }
+        }
+    }
+    sprintf(gText, localization::Tr("editor.text.imported"), textName);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
+    return true;
+}
+
+// The import's file: closed when the import returns.
+VA(0x00408194, 0x17)
+textFile::textFile(void) {
+    m_file = NULL;
+}
+
+VA(0x004081ab, 0x21)
+textFile::~textFile() {
+    if (m_file)
+        fclose(m_file);
+}
+
+VA(0x004081cc, 0x10)
+textFile::operator FILE*(void) {
+    return m_file;
 }
 
 // Before a save: compacts the map's extras, clears the coast triggers and

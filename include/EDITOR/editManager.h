@@ -7,6 +7,7 @@
 // prove the member offsets.
 
 #include <va.h>
+#include <stdio.h>
 #include <BASE/baseManager.h>
 #include <SOURCE/REQUEST.h>
 #include <EDITOR/mapcell.h>
@@ -53,6 +54,16 @@ H2_ENUM_BEGIN(EditManagerLayout)
     // The save checks keep at most this many messages.
     EDIT_MANAGER_ERROR_CAPACITY = 100
 H2_ENUM_END(EditManagerLayout)
+
+// The map text import's file: closed on every return.
+class textFile {
+public:
+    FILE* m_file;
+
+    textFile(void);
+    ~textFile();
+    operator FILE*(void);
+};
 
 #pragma pack(push, 1)
 // A town or capturable-site record of the map file.
@@ -225,6 +236,8 @@ extern char* gTextFileName;
 void ClearTextFile(void);
 void AppendTextLine(H2_CONST char* text);
 void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
+void ReadTextLine(FILE* file, char* line);
+bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
 // The save checks' messages (editManager::AddError).
 extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
 extern i32 gEditErrorCount;
