@@ -60,8 +60,16 @@ PROJECT_FILES = (
     ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
     ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
-# The classic reading view carries its own README instead of the source tree's.
+# The classic reading view carries its own README instead of the source tree's,
+# and none of its build files: it is for reading, not building.
 CLASSIC_README = "scripts/homm2/clean/project/classic/README.md"
+CLASSIC_BUILD_ONLY = frozenset((
+    ".gitignore",
+    "build.ninja",
+    "flake.lock",
+    "flake.nix",
+    "run-game.sh",
+))
 GENERATED_BRANCHES = frozenset((
     "source-pol-2.0",
     "classic-pol-2.0",
@@ -1619,6 +1627,8 @@ def generate_classic(
     transformed = 0
     materialized = 0
     for relative in tracked:
+        if relative.as_posix() in CLASSIC_BUILD_ONLY:
+            continue  # Classic is a terminal reading view, with no build.
         source = source_root / relative
         if not source.is_file():
             continue

@@ -144,10 +144,12 @@ which presents the enum type while retaining each audited field width.
 
 ## Classic view
 
-`--classic-from` keeps the supplied clean project and changes only its legacy
-type presentation. Domains reconstructed through `H2_ENUM_CLASS_*` become
-anonymous enums with integer typedefs, packed fields become their proven
-storage type, and strict-only index, storage, and operator helpers disappear.
+`--classic-from` keeps the supplied clean project's sources and changes only
+their legacy type presentation; it leaves out the build files (the flake, Ninja
+graph, the runner and `.gitignore`), since classic is for reading. Domains
+reconstructed through `H2_ENUM_CLASS_*` become anonymous enums with integer
+typedefs, packed fields become their proven storage type, and strict-only
+index, storage, and operator helpers disappear.
 
 The domain widths come from the matching tree, including split domains whose
 public type is `i32` but whose serialized fields are narrower. Remaining scoped
