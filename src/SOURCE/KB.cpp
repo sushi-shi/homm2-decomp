@@ -920,9 +920,9 @@ i32 oldmain(void) {
             if (giEndSequence != 1) {
                 gpWindowManager->m_updateFlags = 0;
                 if (xIsExpansionMap)
-                    PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
+                    PlaySmacker(EXPANSION_DEFEAT_VIDEO);
                 else
-                    PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
+                    PlaySmacker(DEFEAT_VIDEO);
                 gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",

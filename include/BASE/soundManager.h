@@ -32,6 +32,7 @@ H2_ENUM_BEGIN(MusicTrack)
     MUSIC_TRACK_WATER            = 16,
     MUSIC_TRACK_DIRT             = 17,
     MUSIC_TRACK_GRASS            = 18,
+    MUSIC_TRACK_LOST_GAME        = 19,
     MUSIC_TRACK_NEW_WEEK         = 20,
     MUSIC_TRACK_NEW_MONTH        = 21,
     MUSIC_TRACK_CAMPAIGN_EVIL    = 22,

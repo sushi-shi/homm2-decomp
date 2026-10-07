@@ -727,7 +727,7 @@ SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	7f30eec
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	cd1aaf115aac
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	0f33caf210b6
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	d200e840db7d
-SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	2f4401e087c9
+SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	55fbcc63e12b
 SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	100.0000	199621861327
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	e4048412434c
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	b7335fe4b4e3
@@ -1016,7 +1016,7 @@ SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	100.0000	657efd095d85
 SOURCE/KB	?WaitEndSample@@YIXPAPAVsample@@H@Z	100.0000	c526c35032e2
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	5410aed186c1
 SOURCE/KB	?WaitHandler@@YIHAAUtag_message@@@Z	100.0000	fddb8d63da9d
-SOURCE/KB	?oldmain@@YIHXZ	100.0000	1d36ff3aa947
+SOURCE/KB	?oldmain@@YIHXZ	100.0000	c701ce80dc86
 SOURCE/KB	?toupper@@YIDD@Z	100.0000	7ef88e561c06
 SOURCE/KB	@PollSound@0	100.0000	4efd4c90e9e9
 SOURCE/Modem	?Connect@@YIXXZ	100.0000	7e100589fadf
@@ -1228,7 +1228,7 @@ SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	100.0000	c0c5de3972de
 SOURCE/SMACKMGR	?PointInRect@@YICHHPAUtag_rect@@@Z	100.0000	f415a2ca88d8
 SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	903f1771632c
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	ad88574cbded
-SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	c3f884eaaa69
+SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	0d62ff4729a4
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	86e5ad93f276
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	100.0000	dc5309b6d940
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	bff21f860d44
@@ -1247,7 +1247,7 @@ SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	0d64d4615285
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	76ddc50b1b9a
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	100.0000	1b6529abcf7c
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	100.0000	a78b03a7892a
-SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	100.0000	f4bd5a129571
+SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	100.0000	48f040a60f2b
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	39c5df9891b9
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	100.0000	879c767ef9fe
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	100.0000	2cd0eb5a8de4
@@ -1438,7 +1438,7 @@ SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	100.0000	db9c2bacc975
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	100.0000	dec10c9993f2
 SOURCE/kbwin	_WinMain@16	100.0000	cbd64ec3a8b0
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	680670507bda
-SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	5f81d890e2fa
+SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	fa4836d24141
 SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	9a4490bad5e9
 SOURCE/netwin	?nb_arm_recv@@YIXH@Z	100.0000	1473dae99beb
 SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	4a76f9aa4566
@@ -1446,14 +1446,14 @@ SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	3a8f8489c14b
 SOURCE/netwin	?nb_close_session@@YIXH@Z	100.0000	ee26921cc43b
 SOURCE/netwin	?nb_format_name@@YIXPADPAE@Z	100.0000	b65429c45471
 SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	efcc4c0df150
-SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	7aae41686da9
+SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	890a009d0200
 SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	8433d7271db4
 SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	61354c20e32c
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	21050a8fb409
 SOURCE/netwin	@nb_term@0	100.0000	fc7d0c90ca2d
 SOURCE/netwin	_nb_init	100.0000	6c3fffbe0c9b
 SOURCE/netwin	_nb_rcv	100.0000	0f2a2ac100ff
-SOURCE/netwin	_nb_sess	100.0000	5b3cfbb67015
+SOURCE/netwin	_nb_sess	100.0000	197144a44cb5
 SOURCE/netwin	_nb_snd	100.0000	08bff6df3949
 SOURCE/netwin	_nb_stat	100.0000	f14c489a0f8b
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	100.0000	23380610346d

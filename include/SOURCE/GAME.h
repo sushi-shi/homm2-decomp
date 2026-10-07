@@ -173,6 +173,8 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_HELP_COMBAT             = 3,
     VIEW_SPELL_HELP_CLOSE              = 4,
     VIEW_SPELL_HELP_OTHER              = 5,
+    VIEW_SPELL_HELP_SELECT_SPELL       = 6,
+    VIEW_SPELL_HELP_COMBAT_DEFAULT     = 7,
     VIEW_SPELL_HELP_MANA               = 8
 H2_ENUM_END(GameViewSpellsConstant)
 

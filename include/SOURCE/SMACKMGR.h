@@ -13,8 +13,7 @@ H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
 H2_ENUM_BEGIN(SmackVideo)
     OLD_MAIN_INTRO_FALLBACK_VIDEO    = 1,
     CONGRATS                         = 2,
-    INTRO_MUSIC                      = 3,
-    OLD_MAIN_STANDARD_VICTORY_VIDEO  = INTRO_MUSIC,
+    DEFEAT_VIDEO                     = 3,
     CAMPAIGN_INTRO                   = 4,
     SMACKER_ROLAND_INTRO             = 5,
     SMACKER_ROLAND_1                 = 6,
@@ -76,7 +75,7 @@ H2_ENUM_BEGIN(SmackVideo)
     SMACKER_VOY_PIRATE_ISLES         = 0x3d,
     SMACKER_VOY_KING_AND_COUNTRY     = 0x3e,
     SMACKER_VOY_BLOOD_IS_THICKER     = 0x3f,
-    OLD_MAIN_EXPANSION_VICTORY_VIDEO = 64,
+    EXPANSION_DEFEAT_VIDEO           = 64,
     OLD_MAIN_INTRO_SECONDARY_VIDEO   = 65,
     OLD_MAIN_INTRO_PRIMARY_VIDEO     = 66,
     EXPANSION_CAMPAIGN               = 67,
