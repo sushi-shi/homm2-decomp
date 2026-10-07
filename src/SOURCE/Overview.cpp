@@ -1243,6 +1243,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 quickView = true;
+                // fall through
             case WIDGET_NOTIFY_SELECT:
                 if (HAS(
                         message.payload.widget.modifiers,

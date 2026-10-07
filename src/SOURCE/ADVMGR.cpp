@@ -9139,6 +9139,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
+                // fall through
 
             default:
                 break;

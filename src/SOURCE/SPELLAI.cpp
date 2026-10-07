@@ -1279,6 +1279,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_COLD_RING:
                 if (step == 0)
                     step++;
+                // fall through: the cold ring skips the centre hex
             case SPELL_FIREBALL:
             case SPELL_FIREBLAST:
             case SPELL_METEOR_SHOWER:

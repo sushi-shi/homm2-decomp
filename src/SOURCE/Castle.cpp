@@ -103,9 +103,9 @@ H2_ENUM_END(CastleConstant)
 
 namespace {
 
-    // The recruit slot is refused when the town already spent its hero this
-    // turn, the player cannot pay, the roster is full, or a hero is standing in
-    // the town.
+    // The recruit slot is refused once a hero has been recruited from this
+    // castle dialog, when the player cannot pay, when the roster is full, or
+    // when a hero is standing in the town.
     inline i32 CannotRecruitHero(void) {
         b32 cannot;
 

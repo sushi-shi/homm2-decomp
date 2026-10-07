@@ -74,9 +74,6 @@ H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 H2_ENUM_END(ExpansionCampaignSaveConstant)
 
-/* CP1251 (Russian) code points the Buka build folds when it derives a save-file
-   base name; the Latin fold is the same 0x20 distance in both alphabets. */
-
 namespace {
 
     // The localised build folds the leading letter of a creature name through

@@ -293,6 +293,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_PALETTECHANGED:
             if (messageParam == reinterpret_cast<u32>(window))
                 break;
+            // fall through
         case WM_QUERYNEWPALETTE:
             return QueryNewPalette();
         case WM_PAINT:
@@ -310,9 +311,11 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                     return 0;
                 }
             }
+            // fall through
         case WM_DESTROY:
             gbClosingApp = true;
             PostQuitMessage(0);
+            // fall through
         case WM_QUIT:
             ShutDown(NULL);
             break;

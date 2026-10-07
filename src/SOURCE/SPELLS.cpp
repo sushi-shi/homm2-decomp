@@ -271,6 +271,7 @@ i32 combatManager::ViewSpells(i32) {
                     NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
+                // fall through
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
@@ -392,6 +393,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
         case MESSAGE_KEY_DOWN:
             if (message.payload.keyboard.keyCode != INPUT_SCAN_ESCAPE)
                 break;
+            // fall through
 
         case MESSAGE_RIGHT_BUTTON_DOWN:
             gpCombatManager->m_selectedSpell = SPELL_NONE;

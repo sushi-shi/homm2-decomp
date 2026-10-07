@@ -6414,6 +6414,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WHIRLPOOL:
             DoWhirlpool(eventHero);
+            // fall through
         case MAP_OBJECT_STONE_LITHS:
             exitCount = 0;
             for (exitY = 0; exitY < MAP_HEIGHT; ++exitY) {
