@@ -36,8 +36,6 @@ H2_ENUM_BEGIN(CursorPrivateConstant)
     DIRECTION_HALF_COUNT     = IDX(MAP_DIRECTION_COUNT) / 2,
     TURN_FRAME_MULTIPLIER    = 2,
     MOVE_TILE_HALF_COUNT     = 2,
-    GROUP_ALLOC_LINE_OFFSET  = 7,
-    GROUP_FREE_LINE_OFFSET   = 25
 H2_ENUM_END(CursorPrivateConstant)
 
 #define SLOW_TURN_DELAY_SCALE 1.5
@@ -68,7 +66,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_cursorMapY += directionY;
     cellX = m_mapOriginX + m_cursorMapX;
     cellY = m_mapOriginY + m_cursorMapY;
-    m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+    m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
 }
 #if H2_RETAIL_COMPILER
 #undef directionX
@@ -88,7 +86,7 @@ void advManager::StopCursor(i32 stopSound) {
             m_mapOriginX + m_previousCursorMapX,
             m_mapOriginY + m_previousCursorMapY
         )
-            ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+            ->m_flags &= ~HERO_MAP_CELL_PRESENT;
         m_previousCursorMapY = -1;
         m_previousCursorMapX = -1;
     }
@@ -578,17 +576,17 @@ mapCell* advManager::MoveHero(
                 m_cursorActive = false;
                 fizzleSample = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
-                    CURSOR_FIZZLE_X,
-                    CURSOR_FIZZLE_Y,
-                    CURSOR_FIZZLE_WIDTH,
-                    CURSOR_FIZZLE_HEIGHT
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE
                 );
                 CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
                 gpWindowManager->FizzleForward(
-                    CURSOR_FIZZLE_X,
-                    CURSOR_FIZZLE_Y,
-                    CURSOR_FIZZLE_WIDTH,
-                    CURSOR_FIZZLE_HEIGHT,
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
                     gbThisNetHumanPlayer[giCurPlayer] ? CURSOR_INVALID_POSITION
                                                       : CURSOR_FIZZLE_COMPUTER_TYPE,
                     NULL,
@@ -1056,8 +1054,8 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         return 0;
     }
 
-    northDirection = (1 << IDX(direction)) & CURSOR_NORTH_DIRECTION_MASK;
-    southDirection = (1 << IDX(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
+    northDirection = (1 << IDX(direction)) & MAP_DIRECTIONS_NORTHWARD;
+    southDirection = (1 << IDX(direction)) & MAP_DIRECTIONS_SOUTHWARD;
     if (northDirection) {
         if (CELL_HAS_NON_SHADOW_OBJECT(currentCell)
             && currentCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
@@ -1110,21 +1108,21 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     directionY = oldOriginY - m_mapOriginY;
     if (directionX != 0 || directionY != 0) {
         m_mapData->GetCell(oldOriginX + m_cursorMapX, oldOriginY + m_cursorMapY)->m_flags
-            &= ~CURSOR_MAP_VISIBLE_FLAG;
+            &= ~HERO_MAP_CELL_PRESENT;
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
         cellX = m_mapOriginX + m_cursorMapX;
         cellY = m_mapOriginY + m_cursorMapY;
-        m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+        m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
             m_mapData
                 ->GetCell(oldOriginX + m_previousCursorMapX, oldOriginY + m_previousCursorMapY)
-                ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+                ->m_flags &= ~HERO_MAP_CELL_PRESENT;
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
             cellX = m_mapOriginX + m_previousCursorMapX;
             cellY = m_mapOriginY + m_previousCursorMapY;
-            m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+            m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
         }
     }
     m_forceCompleteDraw = true;
@@ -1477,7 +1475,7 @@ void SendMapChange(
         reinterpret_cast<char*>(sMapChangeLastFew),
         CURSOR_REMOTE_PLAYER_ALL,
         sizeof(sMapChangeLastFew),
-        CURSOR_REMOTE_PACKET_TYPE,
+        ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE,
         0
     );
 }
