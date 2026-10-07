@@ -12,20 +12,20 @@ callback order and raw compiler output. Before/after equivalence supplements the
 retail comparison; it does not establish original developer spelling or turn a
 pre-existing retail residual into an exact closure.
 
-The eight source dossiers retain complete tested alternatives and measured
-results. They are documentation, not game build input. Disposable matrix axes,
+The eight source dossiers (above, removed after `f0ae961d2`) held the complete
+tested alternatives and measured results. They were documentation, not game build input. Disposable matrix axes,
 manifests, results and objects stay under `build/readability/`.
 
 | Evidence | Scope |
 | --- | --- |
-| [Widget message](../matching/SetWidgetMessage/shared-macro.cpp) | Ordered header writes; the comma expression is retained, `do/while(0)` adds VC6 `/Od` instructions. |
-| [Accessors and byte rules](../matching/ReadabilityAccessors/reuse.cpp) | Existing accessors and CP1251 folds; staged-byte calendar/filename alternatives remain explicit. |
-| [Widgets and resources](../matching/ReadabilityWidgets/shared-operations.cpp) | Hit tests, geometry reads, allocation/copy, icon bounds and display/configuration operations. |
-| [Domain predicates](../matching/ReadabilityDomains/shared-operations.cpp) | Precise creature, map, building, spell and stack queries. |
-| [Ordered operations](../matching/ReadabilityOrdered/shared-operations.cpp) | Dialog, extent, deadline, creature-name and combat-state sequences. |
-| [Formulas](../matching/ReadabilityFormulas/shared-operations.cpp) | Combat-grid, distance, gate, scouting, building, calendar and packed-count expressions. |
-| [Protocols](../matching/ReadabilityProtocols/shared-operations.cpp) | UI/campaign/resource operations and measured rejected wrappers. |
-| [Storage](../matching/ReadabilityStorage/shared-operations.cpp) | Adventure drawing, exact-size file values and separate transport-storage primitives. |
+| Widget message (`docs/matching/SetWidgetMessage/shared-macro.cpp` at `f0ae961d2`) | Ordered header writes; the comma expression is retained, `do/while(0)` adds VC6 `/Od` instructions. |
+| Accessors and byte rules (`docs/matching/ReadabilityAccessors/reuse.cpp` at `f0ae961d2`) | Existing accessors and CP1251 folds; staged-byte calendar/filename alternatives remain explicit. |
+| Widgets and resources (`docs/matching/ReadabilityWidgets/shared-operations.cpp` at `f0ae961d2`) | Hit tests, geometry reads, allocation/copy, icon bounds and display/configuration operations. |
+| Domain predicates (`docs/matching/ReadabilityDomains/shared-operations.cpp` at `f0ae961d2`) | Precise creature, map, building, spell and stack queries. |
+| Ordered operations (`docs/matching/ReadabilityOrdered/shared-operations.cpp` at `f0ae961d2`) | Dialog, extent, deadline, creature-name and combat-state sequences. |
+| Formulas (`docs/matching/ReadabilityFormulas/shared-operations.cpp` at `f0ae961d2`) | Combat-grid, distance, gate, scouting, building, calendar and packed-count expressions. |
+| Protocols (`docs/matching/ReadabilityProtocols/shared-operations.cpp` at `f0ae961d2`) | UI/campaign/resource operations and measured rejected wrappers. |
+| Storage (`docs/matching/ReadabilityStorage/shared-operations.cpp` at `f0ae961d2`) | Adventure drawing, exact-size file values and separate transport-storage primitives. |
 
 ## Reproducible inputs and baseline prerequisites
 
@@ -77,12 +77,11 @@ The separate field audit scans 1,727 functions and 38,307 ordered sites with zer
 structural review items. Rounded report totals do not supersede the local retail
 residuals explicitly retained in the source dossiers.
 
-The applied snapshot passed 905 selftests with Universal Ctags 6.2.1 and no skips.
-The documentation/output-path cleanup passes 909 tests with no skips, including
-four new inventory-path/read-credit regressions. All four generated inventories
-are byte-identical to the former tracked products. The build, 98-object comparison
-and field-relocation review were rerun successfully; game source and the eight
-matching dossiers are unchanged by this cleanup.
+All four generated inventories are byte-identical to the former tracked
+products. The build, 98-object comparison and field-relocation review were
+rerun successfully. The tool test suite that also covered this work was later
+removed with its runner; `homm2 build verify` and its `homm2 verify behaviour`
+tests are the remaining checks.
 
 The real-header VC6 contract executable checks all 256 uppercase and lowercase
 CP1251 inputs, creature/widget/map predicates, signed formulas, exact-size scalar

@@ -19,7 +19,7 @@ ordinary VC6 executables under `build/ordinary/<locale>/`. They use raw objects,
 source-backed import definitions and one LINK pass: no retail executable,
 delinking, COFF transforms, matching report or MAX updates. English requires
 `--no-match`; it must never populate the Russian matching-object directory.
-The [decomp README](../README.md#build-without-matching) covers initial setup.
+The [decomp README](../README.md#quickstart) covers initial setup.
 
 The generated source branch retains the authored IDs, English registry and
 Russian PO. Its standalone `./build.py --ru` / `./build.py --en` selects separate
@@ -108,8 +108,8 @@ annotation checks still encounter the pre-existing VC6 STL errors documented in
 The object comparison covers 42,433 relocations. The separate field audit passes
 38,307 reviewed sites across 1,727 functions. The normal report remains at 100%
 for code, functions and data. All 1,491 retained scores are unchanged; 154 hashes
-were re-keyed only after the all-object proof. The tool suite runs 929 tests with
-six pre-existing skips, including 24 localization tests.
+were re-keyed only after the all-object proof. The localization text checks run in
+`homm2 verify behaviour`.
 
 Local evidence is under `build/localization-*.log` and
 `build/localization-object-equivalence.json`; reproduce with a separately compiled

@@ -89,4 +89,4 @@ the value passes through a function's parameter or return slot.
 PoL 2.0's `swapManager::Close` is byte-exact from `m_active = true;` under
 MSVC 4.2 (its retail bytes carry the *folded* store at the same site), so this
 is a real 2.0 -> 2.1 source edit, not a compiler difference. See
-`docs/version-changes.md`.
+`docs/versions/gold-2.1-buka.md`.

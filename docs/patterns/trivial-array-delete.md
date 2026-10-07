@@ -20,6 +20,6 @@ body, including the deletion temporary. The array form is retained.
 
 Full native and genuine-retail proof covers all952 function bytes and all46
 ordered targets, not only this excerpt. All95 native TU functions and every
-allocated section are identical. See [B44](../reconstruction/B44.md) for
+allocated section are identical. See B44 (`docs/reconstruction/B44.md` at `f0ae961d2`) for
 artifacts and reproduction. This does not generalize to nontrivial element
 destructors, class-specific allocators, or another compiler configuration.

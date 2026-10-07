@@ -26,5 +26,5 @@ The complete before/after census proves all98 TUs/1826 emitted functions and
 all allocated sections unchanged, including ordered relocation semantics.
 The scoped retail body's byte comparison establishes the excerpt above;
 its separate exception-reference limitation is explicit in
-[U08](../reconstruction/U08.md). Logs: `build/u08-hero-{base,target}.log`,
+U08 (`docs/reconstruction/U08.md` at `f0ae961d2`). Logs: `build/u08-hero-{base,target}.log`,
 `build/u08-whole-native.log`, `build/u08-retail.log`.

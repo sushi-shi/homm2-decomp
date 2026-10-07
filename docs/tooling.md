@@ -96,9 +96,10 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 
 ## Tooling layout
 
-`scripts/` holds `homm2/` (the CLI and its role packages), `toolchain/`
-(VC6 SP5 release builder, Wine game prefix and runner) and `archive/` (retired
-tooling). The packages mirror the command structure:
+`scripts/` holds `homm2/` (the CLI and its role packages) and `toolchain/`
+(VC6 SP5 release builder, Wine game prefix and runner). Retired one-shot
+scripts were removed after `f0ae961d2`; recover one with `git show`. The
+packages mirror the command structure:
 
 | Package | Role |
 | --- | --- |
@@ -178,10 +179,10 @@ See `docs/data-symbol-normalization.md`, `docs/reviewed-data-objdiff.md`, and
   field, or call target).
 - Every banked maximum keeps its evidence, not just its score: after banking runs,
   run `homm2 audit harvest-max` to append replay coordinates (seed,
-  trial, probe tag) to `docs/matching-matrices/max-observations.tsv` and preserve
-  the winning bytes as disassembly under `docs/matching-matrices/max-asm/`. That
-  disassembly is the structural reference for later source-shape recovery.
-  (The directory starts empty on this branch; only VC6-measured evidence goes in.)
+  trial, probe tag) to `build/matching-matrices/max-observations.tsv` and preserve
+  the winning bytes as disassembly under `build/matching-matrices/max-asm/`. That
+  disassembly is the structural reference for later source-shape recovery; it is
+  generated state, not documentation.
 
 ## Proof vocabulary
 

@@ -11,7 +11,7 @@
 > `RefPtr<AudioDevice>`. The pinned header and raw-image census identify the
 > `$E` pair as initialization of a template static data member, not a source
 > function-local accessor. See the corrected conclusions in §§9.3–10.3 and
-> [the measured header audit](matching/Audiere-helper-identities/ctype-static-owner-audit.cpp).
+> the measured header audit (`docs/matching/Audiere-helper-identities/ctype-static-owner-audit.cpp` at `f0ae961d2`).
 
 Reverse-engineering of the pinned VC6 SP5 C++ front end to explain the object
 topology residuals: deferred COMDAT emission order, and string-literal / data
@@ -343,7 +343,7 @@ literals), then `$SG269, $SG276` (the two function-body literals).
 The three-group description above applies to the measured literal/pointer
 forms; it was too broad about function-local statics. The later complete
 REQUEST matrix in
-[`local-initialized-storage.cpp`](matching/fileRequester-cFRDummy/local-initialized-storage.cpp)
+`docs/matching/fileRequester-cFRDummy/local-initialized-storage.cpp` (removed; see `f0ae961d2`)
 measured initialized block-scope `static char name[1] = ""` arrays. VC6 emits
 those five method-owned arrays before the global-initializer empty literal,
 while preserving every method body and the three preceding named BSS globals.
@@ -358,7 +358,7 @@ original private identifiers nor a universal allocation rule follow from it.
 
 ### 5.4 A correction to the recorded prior art
 
-`docs/matching/…` records this as *"global-initializer literal cells are
+A matching note (`docs/matching/`, at `f0ae961d2`) recorded this as *"global-initializer literal cells are
 batched/reserved BEFORE function-level literal cells"*, implying the global's
 cell is reserved first. **The numbering proves the opposite.** In `e2.cpp` the
 global is defined *last*:
@@ -671,7 +671,7 @@ _$E21 @0x850 , _$E20 @0x878 , ??1AudiereSampleNode @0x88c
 The earlier interpretation of this sequence was incorrect. The retail EH
 callers identify the first destructor as `RefPtr<OutputStream>`; they do not
 show a missing OutputStream destructor or an AudioDevice destructor at this
-address. See [the typed caller audit](matching/Audiere-helper-identities/typed-unwind-ownership.cpp).
+address. See the typed caller audit (`docs/matching/Audiere-helper-identities/typed-unwind-ownership.cpp` at `f0ae961d2`).
 
 The node destructor follows the initialization pair in the image, but that
 placement alone does not establish its first compiler requirement or prove
@@ -755,7 +755,7 @@ destructor after these existing helpers through ordinary source/build inputs.
 Inventing a facet accessor or static object to trigger emission would not be
 supported by this evidence. The minimal inputs, full 95-pair census, and exact
 ordered-relocation checks are preserved in
-[ctype-static-owner-audit.cpp](matching/Audiere-helper-identities/ctype-static-owner-audit.cpp).
+`docs/matching/Audiere-helper-identities/ctype-static-owner-audit.cpp` (removed; see `f0ae961d2`).
 
 ### 10.4 DIMMER — the recipe does NOT transfer; the pair stays eager
 

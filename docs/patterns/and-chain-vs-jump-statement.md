@@ -46,8 +46,8 @@ P01  if (a > 0 && b > 0) Sink(1);            P16  ... { if (i > 0 && i < b) brea
                                              AFTER:
 ```
 
-This is the discriminator already recorded in `docs/campaign-state.md` ("two
-jumps = `if (...) return;`"); the matrix just proves nothing else produces it, so
+This is the discriminator ("two jumps = `if (...) return;`"); the matrix
+proves nothing else produces it, so
 when you see it, stop looking for a lowering.
 
 ## The three sightings, resolved

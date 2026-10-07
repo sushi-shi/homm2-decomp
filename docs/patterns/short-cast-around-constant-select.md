@@ -76,4 +76,4 @@ Removing only the arithmetic bool cast instead adds `25 ff 00 00 00`
 spellings do not prove the original source token choice; the persistent
 fact is the observed narrowing before the wider store.
 
-See [the complete C37 products](../reconstruction/C34-C37-S39-B59.md).
+See the complete C37 products (`docs/reconstruction/C34-C37-S39-B59.md` at `f0ae961d2`).

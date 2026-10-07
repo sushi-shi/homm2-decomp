@@ -18,7 +18,8 @@ Type, size and source position do not matter. The prediction held for all 29
 Two further allocation facts close the layout:
 
 - A record (struct/class) of 8 bytes or more starts 8-byte aligned; this is the
-  hole before `searchNode` at retail `0x00533dcc`.
+  hole before `searchNode` at retail `0x00533dcc`
+  ([record-data-alignment-ignores-pack](record-data-alignment-ignores-pack.md)).
 - An unreferenced function-local static keeps its slot in the hash-ordered run
   but VC6 emits no symbol for it. The non-alignment hole at retail
   `0x00533db8`, between two 4-byte owners, is such an object.

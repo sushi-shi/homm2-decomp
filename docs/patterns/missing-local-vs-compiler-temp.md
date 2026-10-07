@@ -81,8 +81,7 @@ are dead storage; only their buckets differ, and only one of them is retail's.
 
 ## Consequence for the missing-declaration lever
 
-`docs/campaign-state.md` records that retail allocating storage we never declared
-is a live class (the ours-larger negative result does not cover it). That stands,
+Retail allocating storage we never declared is a live class (the ours-larger negative result does not cover it). That stands,
 but read the slot's position first: `dpProcessMessages` really was a missing
 declaration (`unusedDpWord[2]`, and that function has no register arguments so
 the divider question does not arise), while `dropListWidget::Draw` looked

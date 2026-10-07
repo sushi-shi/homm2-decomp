@@ -22,15 +22,15 @@ by construction, so whatever rate they show is the channel's noise floor:
               address arithmetic constantly, and jump tables inside .text decode as
               garbage instructions. Reported as context, never flagged on: a channel
               that fires on four of five known-identical functions would flood
-              docs/version-changes.md with nothing.
+              docs/versions/gold-2.1-buka.md with nothing.
 
 Two normalizations earn their keep. Decoration is stripped before comparing call
 names, because `@nb_stat@4` and `_nb_stat` are the same function under different
 calling conventions - a real finding, but a convention finding, reported as its own
 channel rather than as a phantom added/removed pair. And the build-level changes
-already recorded in docs/version-changes.md (the BaseAlloc/BaseFree allocator layer,
-LogStr, the /QIfdiv helpers, the assert path) are suppressed unless --include-known,
-so a sweep surfaces what is NOT yet written down.
+already recorded in docs/versions/gold-2.1-buka.md (the BaseAlloc/BaseFree
+allocator layer, LogStr, the /QIfdiv helpers, the assert path) are suppressed unless
+--include-known, so a sweep surfaces what is NOT yet written down.
 
 What this is NOT: a proof. A difference is a CANDIDATE; read both bodies before
 writing a row. Size delta is reported for context but never flags on its own - see
@@ -66,7 +66,7 @@ from homm2.audit.cross_version import (
 )
 from homm2.audit.reloc_donation import IMAGE_BASE, pe_sections, retail_cstring
 
-OUTPUT = Path("docs/version-delta-candidates.tsv")
+OUTPUT = Path("build/versions/version-delta-candidates.tsv")
 
 # "  401006: 89 4d f8   mov  dword ptr [ebp - 0x8], ecx"
 INSTRUCTION = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*(\S+)\s*(.*)$")
@@ -85,9 +85,9 @@ FASTCALL_C = re.compile(r"^@(.+)@\d+$")
 CDECL_C = re.compile(r"^_(.+)$")
 CONVENTION_MANGLED = re.compile(r"@@(Y|Q[A-Z]?)[A-Z]")
 
-# Build-level changes already recorded in docs/version-changes.md. Suppressed by
-# default so a sweep surfaces what is not yet written down; --include-known
-# restores them. Each entry is a callee whose presence or absence IS the known
+# Build-level changes already recorded in docs/versions/gold-2.1-buka.md.
+# Suppressed by default so a sweep surfaces what is not yet written down;
+# --include-known restores them. Each entry is a callee whose presence or absence IS the known
 # change, not evidence of a new one.
 KNOWN_SYSTEMATIC = {
     # "[Buka] Debug allocation layer abandoned" - BaseAlloc/BaseFree have zero
@@ -337,7 +337,7 @@ def main(argv=None) -> int:
                              "(parity-gap, both-exact, ...); default all paired")
     parser.add_argument("--include-known", action="store_true",
                         help="also report the build-level changes already recorded "
-                             "in docs/version-changes.md")
+                             "in docs/versions/gold-2.1-buka.md")
     parser.add_argument("--write", action="store_true", help=f"write {OUTPUT}")
     parser.add_argument("--output", type=Path, default=REPO / OUTPUT)
     args = parser.parse_args(argv)
@@ -380,7 +380,7 @@ def main(argv=None) -> int:
                 f"# {buka_image} vs {pol_image}\n"
                 "# CANDIDATES, not findings: VC 4.2 and VC6 disagree about inlining\n"
                 "# and constant chunking, so read both bodies before writing a row\n"
-                "# into docs/version-changes.md.\n"
+                "# into docs/versions/gold-2.1-buka.md.\n"
                 "# added/removed are from Buka's side: 'added' is in 2.1 only.\n")
             writer = csv.DictWriter(stream, fieldnames=FIELDS, delimiter="\t",
                                     lineterminator="\n", extrasaction="ignore")

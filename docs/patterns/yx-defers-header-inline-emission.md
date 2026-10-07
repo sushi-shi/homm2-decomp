@@ -1,7 +1,7 @@
 # Automatic precompiled headers move header-inline emission to the object tail
 
 Measured with the pinned VC6 SP5 compiler on BASE/DIMMER, BASE/AudiereEffects
-and reduced units (`docs/matching/emission-order/pch/`).
+and reduced units (`docs/matching/emission-order/pch/` at `f0ae961d2`).
 
 ## Signature
 
@@ -29,4 +29,7 @@ flag is byte-neutral for every other unit. Put the inline body in the header
 - AudiereEffects: in-class `~AudiereSampleNode() {}` with `SOURCE/KB.h`
   included first gives the node destructor after the ctype pair.
 
-An inline body defined in the `.cpp` is not deferred.
+An inline body defined in the `.cpp` is not deferred. Neither is an implicit
+(compiler-generated) destructor nor an in-class member of a class template:
+with and without `/YX` they emit at the same place, right after their first
+user.

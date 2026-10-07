@@ -66,7 +66,7 @@ the contribution. An out-of-line destructor moves later, but still precedes five
 retail-predecessor helpers and changes the previously exact
 `PlayAudiereSample` body from 0x39c to 0x385 bytes. The authentic implicit form is
 retained. The measured source-shape ledger is
-`docs/matching/AudiereSampleNode-destructor/ownership-forms.cpp`.
+`docs/matching/AudiereSampleNode-destructor/ownership-forms.cpp` at `f0ae961d2`.
 
 Three other Audiere template functions are selected from earlier identical
 COMDAT definitions: one `RefPtr<AudioDevice>` destructor attributed to
@@ -96,7 +96,8 @@ ordinary constructor-adjacent position.
 An unchanged-source census added 50 varied declaration-forest states under the
 real `/Gy` final-link topology. All 50 preserved the exact same early deleting-
 destructor order while keeping every DIMMER body and ordered-relocation fingerprint
-exact. The retained evidence is recorded in the DIMMER matching ledger.
+exact. The DIMMER matrices are under `docs/matching/dimmerWidget-destructor/` at
+`f0ae961d2`.
 
 No tested authentic source or compiler-state arm emits the complete retail order.
 The source therefore retains the semantically correct form; no `/ORDER` file,

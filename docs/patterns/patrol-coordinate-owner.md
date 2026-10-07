@@ -38,4 +38,4 @@ This is an evidence-backed field/layout recovery, not a source respelling
 to select a compiler state. All98 units/1826 emitted functions and allocated
 sections match before/after, and the four affected bodies have complete
 independent retail evidence including their private numeric constants.
-See [U10](../reconstruction/U10.md) for provenance and verification scope.
+See U10 (`docs/reconstruction/U10.md` at `f0ae961d2`) for provenance and verification scope.

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Harvest banked-MAX evidence into tracked artifacts.
+"""Harvest banked-MAX evidence out of the run directories.
 
 Walks build/tu-state-noise/*/manifest.json for runs whose --record-max updated
-config/match_baseline.tsv and preserves, under version control:
+config/match_baseline.tsv and preserves, under build/ (outside the run trees):
 
-  docs/matching-matrices/max-observations.tsv
+  build/matching-matrices/max-observations.tsv
       one row per observation: when, unit, symbol, source hash, score, seed,
       trial, family, insertion, probe tag, run directory. These are the exact
       coordinates `tu_state_noise --seed ... --only-trial ...` needs to replay
       the island that produced the banked maximum.
 
-  docs/matching-matrices/max-asm/<unit>__<symbol-hash>__<src-hash>.asm
+  build/matching-matrices/max-asm/<unit>__<symbol-hash>__<src-hash>.asm
       Intel-syntax disassembly of the winning candidate bytes (plus the raw
       hex and ordered relocation stream in the header) so the best-known
       codegen SHAPE stays diffable even after the build tree or TU state
@@ -29,8 +29,8 @@ from pathlib import Path
 from homm2.core.paths import REPO as ROOT
 
 NOISE = ROOT / "build" / "tu-state-noise"
-OUT_TSV = ROOT / "docs" / "matching-matrices" / "max-observations.tsv"
-OUT_ASM = ROOT / "docs" / "matching-matrices" / "max-asm"
+OUT_TSV = ROOT / "build" / "matching-matrices" / "max-observations.tsv"
+OUT_ASM = ROOT / "build" / "matching-matrices" / "max-asm"
 HEADER = ("recorded_utc\tunit\tsymbol\tsrc_hash\tscore\tseed\ttrial\tfamily\t"
           "insertion\ttag\trun_dir\n")
 

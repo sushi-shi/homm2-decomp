@@ -616,7 +616,7 @@ def run_census():
     return rows, inferred, callers, callees
 
 
-CARVING_OUTPUT = REPO / "docs/buka-new-tu-carving.tsv"
+CARVING_OUTPUT = REPO / "build/gen/buka-new-tu-carving.tsv"
 
 
 def write_carving(rows, callers):
@@ -838,7 +838,7 @@ def main(argv=None):
                         help="persist config/retail/functions_static_libs.csv and "
                              "config/retail/functions_imports.csv from this census")
     parser.add_argument("--write-carving", action="store_true",
-                        help="persist docs/buka-new-tu-carving.tsv cluster "
+                        help="write build/gen/buka-new-tu-carving.tsv cluster "
                              "proposals for the game-side residue")
     args = parser.parse_args(argv)
     rows, inferred, callers, _callees = run_census()

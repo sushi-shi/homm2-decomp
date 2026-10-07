@@ -51,7 +51,7 @@ needed the same on both `m_cursorMapX/Y = VIEW_CENTER_CELL` and
 
 **Corollary.** The reverse reading is just as usable: when retail *does* carry the
 reload-and-copy triple, the source really is the chained `a = b;` form — see the
-`CompleteDraw` all-black origin reset row in docs/cross-version-spellings.md, where
+`CompleteDraw` all-black origin reset row in docs/versions/cross-version-spellings.md, where
 PoL 2.0 spells the chain and Buka spells two literals.
 
 ## The genuine chained EXPRESSION `a = b = K` is the literal form, not the copy form

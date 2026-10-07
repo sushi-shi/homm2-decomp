@@ -9,7 +9,7 @@ has not. It cannot say why, and the two explanations want opposite work:
                              the slot model, and the control-flow detectors.
   the bodies differ          either this branch's copy drifted during the port (a
                              regression to revert) or 2.1 genuinely changed the
-                             function (a row for docs/version-changes.md).
+                             function (a row for docs/versions/gold-2.1-buka.md).
 
 Sorting the gap that way before touching anything is the cheapest triage available,
 because both trees hold the same reconstruction and the comparison is textual.
@@ -52,7 +52,7 @@ from homm2.audit.cross_version import (
     read_symbols,
 )
 
-OUTPUT = Path("docs/cross-version-bodies.tsv")
+OUTPUT = Path("build/versions/cross-version-bodies.tsv")
 IMAGE_BASE = 0x400000
 
 # The marker opening a claimed function span. Matching at line start keeps a VA(...)

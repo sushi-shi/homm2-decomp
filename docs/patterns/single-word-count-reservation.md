@@ -17,7 +17,7 @@ retail                                 scalar candidate
 
 Both complete raw312-byte functions and all14 ordered relocation operands
 match genuine retail; before/after all34 functions and all allocated sections
-in the TU agree. [S01](../reconstruction/S01.md) preserves the four-arm
+in the TU agree. S01 (`docs/reconstruction/S01.md` at `f0ae961d2`) preserves the four-arm
 matrix and reproduction commands. This proves scalar sufficiency, not the
 original spelling. Do not infer array extent from an aligned slot gap alone,
 and do not generalize this to wider reads or pointer escapes.
@@ -41,6 +41,6 @@ retail                                 scalar candidate
 ```
 
 The last wide load is masked to the scalar's16-bit domain. It does not prove
-that the source declared a second checksum. [S25](../reconstruction/S25.md)
+that the source declared a second checksum. S25 (`docs/reconstruction/S25.md` at `f0ae961d2`)
 records the complete4-arm matrix, all16 native functions/sections equal and
 independent retail bytes/sites/ordered-target proof for both changed functions.

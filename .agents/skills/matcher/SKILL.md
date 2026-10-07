@@ -118,11 +118,9 @@ seed: try evidence-based structural descendants and their bounded matrices befor
 discarding it. Score can fall when entering the compiler-state orbit that contains
 the exact solution. Prune for contradictory semantics or topology, not merely
 because the parent or its first state census is below the current MAX.
-Preserve every reviewed structural attempt in
-`docs/matching/<function-name>/<attempt-name>.cpp`. Include its source arms and comments
-identifying the matrix or retained artifact, measured outcome, and disposition. A
-permutation matrix is one attempt; its compiler-state trials are not separate source
-attempts.
+Structural attempts and their matrices are generated state under `build/`; do not
+commit attempt dossiers. When an attempt measures a reusable VC6 mechanism, record the
+mechanism in `docs/patterns/`.
 
 The emitted block partition is not a correctness invariant. MSVC TU/compiler state
 can split or merge basic blocks for unchanged source, changing block count,
@@ -212,7 +210,7 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 - **Version-delta ledger is part of the close.** If the function you match
   differs semantically from the PoL 2.0 body (logic, fields, signature,
   removed/added behavior), add or update its entry in
-  `docs/version-changes.md` in the same change. Classify [2.1] vs [Buka] by
+  `docs/versions/gold-2.1-buka.md` in the same change. Classify [2.1] vs [Buka] by
   diffing against the Gold 2.1 GOG binary where it matters; otherwise mark
   [unclassified].
 - Treat a proven sibling as a structural reference for its function family.
@@ -290,6 +288,6 @@ Never `git add`/commit.
 Matching Buka's bytes proves a spelling is *sufficient for 2.1*, never that
 it is what the devs wrote. If your close diverges from the PoL 2.0 spelling
 (expression shape, local names, guard-vs-wrap, operand order), add an OPEN
-row to docs/cross-version-spellings.md in the same change. Resolution
+row to docs/versions/cross-version-spellings.md in the same change. Resolution
 (invariant / mixed / dev-change) comes from compiling the candidate under
 MSVC 4.2 in the 2.0 tree and byte-comparing - not from this branch alone.

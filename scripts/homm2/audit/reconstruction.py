@@ -4,6 +4,9 @@ Run with Universal Ctags 6 on PATH:
   python3 -m homm2.audit.reconstruction --write
   python3 -m homm2.audit.reconstruction --check
 
+The inventory is written to build/reconstruction/. Optional manual verdicts are
+read from reviews.json and file-reviews.json in the same directory.
+
 Ctags indexes physical definitions, including header bodies and inactive branches.
 An independent preprocessor pass covers macros in branches the C++ parser skips.
 Project enum macros are expanded only for indexing; game files are never rewritten.
@@ -22,7 +25,7 @@ import re
 import subprocess
 
 REPO = Path(__file__).resolve().parents[3]
-REPORT = Path("docs/reconstruction")
+REPORT = Path("build/reconstruction")
 VA = re.compile(r"^\s*VA\(\s*(0x[0-9a-fA-F]+)\s*,[^\n]*\)\s*$", re.M)
 PROC = re.compile(r"^(\w+)\s+PROC\b", re.M | re.I)
 IGNORES = (

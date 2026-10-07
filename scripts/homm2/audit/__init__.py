@@ -30,8 +30,9 @@ when a residual will not explain itself, grouped by the question they answer:
               claimed allocation may be, which is the only channel that catches a
               trailing element the reconstruction invented.
   evidence    harvest_max_observations - copies banked-MAX replay coordinates and
-              winning disassembly out of build/ into tracked docs, so a maximum keeps
-              its evidence and not just its score.
+              winning disassembly out of the run directories into
+              build/matching-matrices, so a maximum keeps its evidence and not
+              just its score.
   oracle      od_oracle - ground truth for homm2.core.od_slots, read straight from the
               S_BPREL32 debug records our compiler emits under /Z7. Needs wine.
   tooling     usage - every entry point keeps homm2.core.usage.logged.
@@ -75,7 +76,7 @@ TOOLS = {
     "data-claims": ("data_claims",
                     "derive DATA() addresses for globals; `extents` audits lengths"),
     "harvest-max": ("harvest_max_observations",
-                    "bank MAX replay coordinates + asm into docs"),
+                    "keep MAX replay coordinates + asm under build/"),
     "od-oracle": ("od_oracle",
                   "compiler ground truth for the /Od slot model (needs wine)"),
     "unmatched-census": ("unmatched_census",

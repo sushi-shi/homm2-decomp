@@ -62,7 +62,7 @@ static inline bool MidiMusicPresent(void)    { return true; }
 ```
 
 (previously two `gpSoundManager->m_cdReady == 0` / `m_midiReady == 0` member reads that
-retail does not have at all — see docs/version-changes.md.)
+retail does not have at all — see docs/versions/gold-2.1-buka.md.)
 
 ## Companion: `!(A || B)` materialises one more bool temp than `!A && !B`
 
