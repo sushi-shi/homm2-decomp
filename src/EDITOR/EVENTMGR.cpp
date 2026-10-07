@@ -204,7 +204,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     sprintf(text, "%d", gEditCell->m_animatedOverlay);
     message.payload.widget.id = textBase + CELL_FIELD_ANIMATED_OVERLAY;
     gEditDialog->BroadcastMessage(message);
-    sprintf(text, "%d", gEditCell->m_objectLayerBit1);
+    sprintf(text, "%d", gEditCell->m_objectShadow);
     message.payload.widget.id = textBase + CELL_FIELD_OBJECT_LAYER;
     gEditDialog->BroadcastMessage(message);
     sprintf(text, "%d", gEditCell->m_isRoad);
@@ -538,11 +538,11 @@ void UpdateNewMapWindow(void) {
     message.payload.widget.data.value = WIDGET_FLAG_DRAW;
     message.payload.widget.id = NEW_MAP_SCATTER_TOWNS;
     message.payload.widget.command =
-        gScatterTowns ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+        gScatterTerrain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     gNewMapWindow->BroadcastMessage(message);
     message.payload.widget.id = NEW_MAP_CENTRE_TOWNS;
     message.payload.widget.command =
-        gScatterTowns ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
+        gScatterTerrain ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     gNewMapWindow->BroadcastMessage(message);
     message.payload.widget.id = NEW_MAP_GENERATE_UNSEEN;
     message.payload.widget.command =
@@ -672,7 +672,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 DragNewMapSlider(false, message.payload.widget.id - NEW_MAP_FIRST_DENSITY_KNOB);
             if (message.payload.widget.id >= NEW_MAP_SCATTER_TOWNS
                 && message.payload.widget.id <= NEW_MAP_CENTRE_TOWNS) {
-                gScatterTowns = message.payload.widget.id == NEW_MAP_SCATTER_TOWNS;
+                gScatterTerrain = message.payload.widget.id == NEW_MAP_SCATTER_TOWNS;
                 redraw = true;
             }
             if (message.payload.widget.id == NEW_MAP_GENERATE_UNSEEN) {

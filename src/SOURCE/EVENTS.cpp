@@ -3612,8 +3612,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         currentCell->m_objectIndex = extra->objectIndex;
         currentCell->m_objectTileset = extra->objectTileset;
         currentCell->m_animatedObject = extra->animatedObject;
-        currentCell->m_objectLayerBit0 = extra->objectLayerBit0;
-        currentCell->m_objectLayerBit1 = extra->objectLayerBit1;
+        currentCell->m_objectHighLayer = extra->objectHighLayer;
+        currentCell->m_objectShadow = extra->objectShadow;
         extra->objectIndex = 0;
         extra->objectTileset = TILESET_DUMMY;
         extra->animatedObject = 0;
@@ -3628,7 +3628,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             continue;
 
         if (currentCell->m_objectTileset != TILESET_DUMMY
-            && currentCell->m_objectIndex != EMPTY_INDEX && !currentCell->m_objectLayerBit1)
+            && currentCell->m_objectIndex != EMPTY_INDEX && !currentCell->m_objectShadow)
             goto cellDone;
 
         if (currentCell->m_extraIndex
@@ -3639,7 +3639,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
         while (extra) {
             if (extra->objectTileset != TILESET_DUMMY && extra->objectIndex != EMPTY_INDEX
-                && !extra->objectLayerBit1)
+                && !extra->objectShadow)
                 goto cellDone;
 
             if (extra->nextIndex

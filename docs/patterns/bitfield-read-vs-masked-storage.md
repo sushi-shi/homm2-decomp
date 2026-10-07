@@ -17,7 +17,7 @@ Measured on `advManager::VWCompleteDraw` (RVA 0xae4ee), VC6 SP5 `/Od /Ob1`.
 ## Bytes - the one-bit field at `mapCell+4` bit 0
 
 ```
-ours   cell0->m_objectData & 1              retail  cell0->m_objectLayerBit0
+ours   cell0->m_objectData & 1              retail  cell0->m_objectHighLayer
 --------------------------------------      --------------------------------------
 33 d2              xorl  %edx, %edx
 66 8b 51 04        movw  0x4(%ecx), %dx     66 8b 48 04        movw  0x4(%eax), %cx
@@ -44,7 +44,7 @@ member and not out of a hand-masked `u16`:
 Use the declared bitfield member, not a mask of the union's storage member:
 
 ```cpp
-if (cell->m_objectLayerBit0 && cell->m_objectIndex != WORLD_NO_SPRITE ...)
+if (cell->m_objectHighLayer && cell->m_objectIndex != WORLD_NO_SPRITE ...)
 ```
 
 `advManager::VWCompleteDraw` 90.12% -> EXACT (two sites; the same TU also has

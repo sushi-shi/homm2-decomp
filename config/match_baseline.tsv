@@ -444,8 +444,8 @@ BASE/soundmgr	?StopSample@soundManager@@QAEXPAVsample@@@Z	100.0000	ac6d9464b51d
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	2dbb27de9e21
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	f24847db220b
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	13926594114c
-EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	33eab9664005
-EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	ab28acab3f58
+EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	225dcad1c829
+EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	01930f3dd006
 EDITOR/mapcell	?Close@fullMap@@QAEXXZ	100.0000	44590acf6616
 EDITOR/mapcell	?GetNewCellExtraIndex@fullMap@@QAEHXZ	100.0000	38b033339fbb
 EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	100.0000	15dce8d87f9e
@@ -485,7 +485,7 @@ SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	100.0000	11fa5ebebb36
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	100.0000	621aa27eb5ec
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	3ba23b9302e1
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	0eb2708bd905
-SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	30be455f26fc
+SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	5a927b4aa511
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	100.0000	5476615f7f23
 SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	100.0000	6dd2baf471bd
 SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	831af262f4ae
@@ -508,7 +508,7 @@ SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	4f2192515cb7
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	9c5fa2b3c975
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	2700d374386a
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	100.0000	3fc957b31d82
-SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	a97acca07fd1
+SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	22f6021cefb5
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	100.0000	60e9091b8f30
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	100.0000	8bdcbfb573a4
 SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	100.0000	00341cceda59
@@ -746,7 +746,7 @@ SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	2cdec7e58758
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	26b71a4cee5c
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	affe91f1edc0
-SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	7ac9692fedf1
+SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	56baf407ab3c
 SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAPAVsample@@@Z	100.0000	8b6a8f939345
 SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	ce2356f8f54c
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	c5f5eb4a33d3
@@ -851,14 +851,14 @@ SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	100.0000	7aa5ceb9f4f5
 SOURCE/GAME	?NextPlayer@game@@QAEXXZ	100.0000	6e225786da9c
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	100.0000	9e7a5a75265b
 SOURCE/GAME	?PerDay@game@@QAEXXZ	100.0000	65db474f582e
-SOURCE/GAME	?PerMonth@game@@QAEXXZ	100.0000	6cd8c326e13c
+SOURCE/GAME	?PerMonth@game@@QAEXXZ	100.0000	179af7b52f7c
 SOURCE/GAME	?PerWeek@game@@QAEXXZ	100.0000	28a9fb741921
 SOURCE/GAME	?ProcessMapExtra@game@@QAEXXZ	100.0000	ff2db8bd48df
 SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	100.0000	dcfd260af187
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	100.0000	325766c0a23f
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	76b8b2809e89
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	d6220b4c13d1
-SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	100.0000	d4b422911b62
+SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	100.0000	e50deefc3eb6
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	100.0000	bb1b13e8edda
 SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	100.0000	7f4c2e1f5a61
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	cb28ef3f664c
@@ -1344,7 +1344,7 @@ SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	100.0000	c9f5fd6ce6c2
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	100.0000	892981a5f4f9
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	100.0000	97d1fb61c232
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	8f85a9beed9e
-SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	100.0000	adae073ef521
+SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	100.0000	248eb36fbf9f
 SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	cc41bbcbe807
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	100.0000	14f1cd918285
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	2ee7c463637e

@@ -853,7 +853,7 @@ DATA(0x00480010) i32 gSelectionX = EDIT_NO_CELL;
 DATA(0x00480014) i32 gRandomMapPlayers = 4;
 DATA(0x00480018) double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT] = {30.0, 30.0, 20.0, 0.0, 0.0, 0.0, 20.0, 0.0};
 DATA(0x00480058) double gDensityPercent[RANDOM_MAP_DENSITY_COUNT] = {50.0, 50.0, 50.0, 50.0, 50.0};
-DATA(0x00480080) b32 gScatterTowns = true;
+DATA(0x00480080) b32 gScatterTerrain = true;
 DATA(0x00480088) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {IDX(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
