@@ -193,7 +193,6 @@ H2_ENUM_END(PollSoundConstant)
 H2_ENUM_BEGIN(CongratsConstant)
     CONGRATS_TEXT_SIZE = 500,
     CONGRATS_RATING_LENGTH = 32,
-    CONGRATS_SMACKER = 2,
     CONGRATS_DIFFICULTY_SCALE = 100
 H2_ENUM_END(CongratsConstant)
 
@@ -216,7 +215,6 @@ H2_ENUM_BEGIN(InitMenuConstant)
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_MOVIE_SMACKER = 0x26,
     MENU_MAIN_MUSIC = 0x2a,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
@@ -3697,7 +3695,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         );
     }
 
-    PlaySmacker(CONGRATS_SMACKER);
+    PlaySmacker(CONGRATS);
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), palette);
     memcpy(gPalette->m_data, palette, PALETTE_DATA_SIZE);

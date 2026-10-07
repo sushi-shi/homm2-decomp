@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,13 +65,6 @@ namespace {
 
     H2_ENUM_BEGIN(CombatSpellUiConstant)
         CONTROL_CLOSE = DIALOG_BUTTON_0,
-        CONTROL_PREVIOUS_PAGE = 2,
-        CONTROL_NEXT_PAGE = 3,
-        CONTROL_FIRST_MANA = 6,
-        CONTROL_LAST_MANA = 9,
-        HELP_PREVIOUS_PAGE = 0,
-        HELP_NEXT_PAGE = 1,
-        HELP_CLOSE = 4,
         HELP_MANA = 6,
         HELP_DEFAULT = 7
     H2_ENUM_END(CombatSpellUiConstant)
@@ -305,19 +299,19 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
 
         switch (message.payload.hover.id) {
-            case CONTROL_PREVIOUS_PAGE:
-                gpCombatManager->CombatMessage(cSpellHelp[HELP_PREVIOUS_PAGE], 1, 0, 0);
+            case VIEW_SPELL_PREVIOUS_ID:
+                gpCombatManager->CombatMessage(cSpellHelp[VIEW_SPELL_HELP_PREVIOUS], 1, 0, 0);
                 break;
-            case CONTROL_NEXT_PAGE:
-                gpCombatManager->CombatMessage(cSpellHelp[HELP_NEXT_PAGE], 1, 0, 0);
+            case VIEW_SPELL_NEXT_ID:
+                gpCombatManager->CombatMessage(cSpellHelp[VIEW_SPELL_HELP_NEXT], 1, 0, 0);
                 break;
             case CONTROL_CLOSE:
-                gpCombatManager->CombatMessage(cSpellHelp[HELP_CLOSE], 1, 0, 0);
+                gpCombatManager->CombatMessage(cSpellHelp[VIEW_SPELL_HELP_CLOSE], 1, 0, 0);
                 break;
-            case CONTROL_FIRST_MANA:
-            case CONTROL_FIRST_MANA + 1:
-            case CONTROL_LAST_MANA - 1:
-            case CONTROL_LAST_MANA:
+            case VIEW_SPELL_MANA_LABEL_ID:
+            case VIEW_SPELL_MANA_HUNDREDS_ID:
+            case VIEW_SPELL_MANA_TENS_ID:
+            case VIEW_SPELL_MANA_ONES_ID:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_MANA], 1, 0, 0);
                 break;
             default:

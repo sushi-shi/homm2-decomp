@@ -527,49 +527,6 @@ H2_ENUM_BEGIN(GameOwnershipConstant)
     MINE_ALCHEMIST_FLAG_Y_OFFSET = 3
 H2_ENUM_END(GameOwnershipConstant)
 
-H2_ENUM_BEGIN(GameViewSpellsConstant)
-    VIEW_SPELLS_WINDOW_X               = 86,
-    VIEW_SPELLS_WINDOW_Y               = 87,
-    VIEW_SPELL_PREVIOUS_ID             = 2,
-    VIEW_SPELL_NEXT_ID                 = 3,
-    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
-    VIEW_SPELL_COMBAT_TAB_ID           = 5,
-    VIEW_SPELL_MANA_LABEL_ID           = 6,
-    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
-    VIEW_SPELL_MANA_TENS_ID            = 8,
-    VIEW_SPELL_MANA_ONES_ID            = 9,
-    VIEW_SPELL_CLOSE_ID                = 10,
-    VIEW_SPELL_PAGE_SIZE               = 12,
-    VIEW_SPELL_TEXT_ID_BASE            = 30,
-    VIEW_SPELL_ICON_ID_0               = 100,
-    VIEW_SPELL_ICON_ID_1               = 101,
-    VIEW_SPELL_ICON_ID_2               = 102,
-    VIEW_SPELL_ICON_ID_3               = 103,
-    VIEW_SPELL_ICON_ID_4               = 104,
-    VIEW_SPELL_ICON_ID_5               = 105,
-    VIEW_SPELL_ICON_ID_6               = 106,
-    VIEW_SPELL_ICON_ID_7               = 107,
-    VIEW_SPELL_ICON_ID_8               = 108,
-    VIEW_SPELL_ICON_ID_9               = 109,
-    VIEW_SPELL_ICON_ID_10              = 110,
-    VIEW_SPELL_ICON_ID_11              = 111,
-    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_NAME_WIDTH              = 78,
-    VIEW_SPELL_MANA_MAX                = 999,
-    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
-    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
-    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
-    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
-    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
-    VIEW_SPELL_HELP_PREVIOUS           = 0,
-    VIEW_SPELL_HELP_NEXT               = 1,
-    VIEW_SPELL_HELP_ADVENTURE          = 2,
-    VIEW_SPELL_HELP_COMBAT             = 3,
-    VIEW_SPELL_HELP_CLOSE              = 4,
-    VIEW_SPELL_HELP_OTHER              = 5,
-    VIEW_SPELL_HELP_MANA               = 8
-H2_ENUM_END(GameViewSpellsConstant)
-
 H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_UNUSED_BASE_X           = 86,
     VIEW_ARMY_UNUSED_QUICK_BASE_Y     = 164,
@@ -3483,7 +3440,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case DIALOG_BUTTON_0:
-                            message.payload.widget.id = VIEW_SPELL_CLOSE_ID;
+                            message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                             break;
                     }
                 }
@@ -3615,7 +3572,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                 break;
         }
 
-        if (message.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
+        if (message.payload.widget.id == IDX(WIDGET_COMMAND_DIALOG_SELECT)) {
             message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
             return MESSAGE_DISPATCH_FORWARD;
         }

@@ -19,6 +19,7 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SETUP.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
@@ -40,7 +41,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SETUP_BUFFER_SIZE                = 240,
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
-    GAME_REMOTE_CHAT                      = 0x0b,
     GAME_REMOTE_SETUP                     = 0x33,
     GAME_REMOTE_MAP_HEADER                = 0x34,
     GAME_REMOTE_START                     = 0x35,
@@ -113,8 +113,6 @@ H2_ENUM_END(NewGameStorageConstant)
 H2_ENUM_BEGIN(NewGameDialogConstant)
     MAP_REQUESTER_X           = 212,
     MAP_REQUESTER_Y           = 9,
-    MAP_CHOICE_WINDOW_X       = 405,
-    MAP_CHOICE_WINDOW_Y       = 8,
     NEW_GAME_WINDOW_X         = 190,
     NEW_GAME_NETWORK_WINDOW_Y = 4,
     NEW_GAME_SINGLE_WINDOW_Y  = 33,
@@ -125,9 +123,9 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
 H2_ENUM_END(NewGameDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
-    MAP_CHOICE_CANCEL    = DIALOG_BUTTON_1,
-    MAP_CHOICE_STANDARD  = 1,
-    MAP_CHOICE_EXPANSION = 2,
+    MAP_CHOICE_CANCEL    = DIALOG_CANCEL,
+    MAP_CHOICE_STANDARD  = CHOICE_ONE,
+    MAP_CHOICE_EXPANSION = CHOICE_TWO,
 H2_ENUM_CLASS_END(NewGameMapChoice)
 
 H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
@@ -402,7 +400,7 @@ i32 game::NewGame(void) {
     m_newGameWindow = NULL;
 
     if ((!gbRemoteOn || giThisNetPos == 0) && (!gbRemoteOn || !xNetHasOldPlayers)) {
-        choiceWindow = new heroWindow(MAP_CHOICE_WINDOW_X, MAP_CHOICE_WINDOW_Y, "x_mapmnu.bin");
+        choiceWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (choiceWindow == NULL)
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
@@ -1020,7 +1018,7 @@ VA(0x0047734a, 0xdd1)
                         gpGame->ProcessNewMap(&mapHeader);
                         break;
 
-                    case GAME_REMOTE_CHAT:
+                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
                         redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
@@ -1075,7 +1073,7 @@ VA(0x0047734a, 0xdd1)
                 cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1],
                 REMOTE_BROADCAST_PLAYER,
                 strlen(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1]) + 1,
-                GAME_REMOTE_CHAT,
+                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!sendResult)

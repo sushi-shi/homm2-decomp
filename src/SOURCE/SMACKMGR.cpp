@@ -27,17 +27,6 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     NORMAL_FADE                    = 0x80,
     SHORT_FADE                     = 8,
     FAST_FADE                      = 4,
-    CHOOSE_CAMPAIGN                = 35,
-    SMACK_CREDITS                  = 36,
-    SMACK_EARTH                    = 37,
-    FIRST_NETWORK                  = 39,
-    EXPANSION_CAMPAIGN             = 67,
-    EXPANSION_FIRST_MOVIE          = 68,
-    SPECIAL_MUSIC                  = 72,
-    BUKA_LOGO                      = 73,
-    BUKA_CREDITS                   = 74,
-    CONGRATS                       = 2,
-    INTRO_MUSIC                    = 3,
     LOW_MEMORY_MOVIE               = 30,
     BACKGROUND_COLOR               = 36,
     MAIN_MUSIC                     = 42,
@@ -67,7 +56,6 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     VIDEO_SPEED_TEST               = 3,
     VIDEO_OPEN_READ_SLOW_THRESHOLD = 2000,
     VIDEO_DECOMP_SLOW_THRESHOLD    = 1300,
-    SMACK_OPTION_COUNT             = 75
 H2_ENUM_END(SmackManagerConstant)
 
 DATA(0x00533e94) static i8 bExpansionSmackNum;

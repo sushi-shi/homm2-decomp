@@ -21,6 +21,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Overview.h>
+#include <SOURCE/fileRequester.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
@@ -116,16 +117,12 @@ H2_ENUM_BEGIN(OverviewScrollConstant)
     SCROLL_KNOB_STATIC_Y      = 169,
     SCROLL_MIN_Y              = 18,
     SCROLL_RANGE              = 304,
-    SCROLL_KNOB_OFFSET        = 9,
     SCROLL_LAST_PIXEL_ADJUST  = 1,
     SCROLL_SCALE              = 100,
     SCROLL_TRACK_PIXEL_COUNT  = 321,
     SCROLL_SCALED_TRACK_RANGE = SCROLL_TRACK_PIXEL_COUNT * SCROLL_SCALE,
     SCROLL_KNOB_X             = 629,
     SCROLL_KNOB_Y             = 18,
-    SCROLL_KNOB_WIDTH         = 8,
-    SCROLL_KNOB_HEIGHT        = 17,
-    SCROLL_KNOB_FRAME         = 4,
     SCROLL_UPDATE_X           = 627,
     SCROLL_UPDATE_Y           = 17,
     SCROLL_UPDATE_WIDTH       = 11,
@@ -1074,10 +1071,10 @@ void game::Overview(void) {
     OVScrollKnob = new iconWidget(
         SCROLL_KNOB_X,
         SCROLL_KNOB_Y,
-        SCROLL_KNOB_WIDTH,
-        SCROLL_KNOB_HEIGHT,
+        FILE_REQUESTER_SCROLL_KNOB_WIDTH,
+        FILE_REQUESTER_SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
-        SCROLL_KNOB_FRAME,
+        FILE_REQUESTER_SCROLL_KNOB_FRAME,
         ICON_DRAW_NORMAL,
         SCROLL_KNOB_WIDGET,
         WIDGET_KIND_ICON_DIRECT,
@@ -1174,7 +1171,7 @@ void game::DoKnob(void) {
                 }
                 gpMouseManager->Main(widgetMessage);
                 OVScrollKnob->m_y =
-                    widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                    widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                 topNow = ((OVScrollKnob->m_y - topValue) / itemPixels);
                 if (topNow != topBefore) {
                     if (topNow > giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
@@ -1185,7 +1182,7 @@ void game::DoKnob(void) {
                     }
                     giOverviewTop[IDX(giOverviewType)] = topNow;
                     OVScrollKnob->m_y =
-                        widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                        widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                     SetupDynamicStuff(1, 0, 0);
                     topBefore = topNow;
                 } else {
@@ -1268,7 +1265,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         scrollDivisor = SCROLL_SCALED_TRACK_RANGE / scrollSpan;
                         y = message.payload.mouse.screenY;
                         y -= SCROLL_MIN_Y;
-                        y -= SCROLL_KNOB_OFFSET;
+                        y -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                         topIndex = y * SCROLL_SCALE / scrollDivisor;
                         giOverviewTop[IDX(giOverviewType)] = topIndex;
                         if (giOverviewTop[IDX(giOverviewType)] + (OVERVIEW_VISIBLE_ROWS - 1)

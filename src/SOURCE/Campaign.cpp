@@ -33,38 +33,6 @@ H2_ENUM_BEGIN(CampaignScenarioArmyCount)
     NECROMANCER_VAMPIRE_COUNT  = 8
 H2_ENUM_END(CampaignScenarioArmyCount)
 
-H2_ENUM_BEGIN(CampaignSmacker)
-    SMACKER_ROLAND_INTRO    = 5,
-    SMACKER_ROLAND_1        = 6,
-    SMACKER_ROLAND_2        = 7,
-    SMACKER_ROLAND_3A       = 8,
-    SMACKER_ROLAND_3B       = 9,
-    SMACKER_ROLAND_4        = 10,
-    SMACKER_ROLAND_5A       = 11,
-    SMACKER_ROLAND_5B       = 12,
-    SMACKER_ROLAND_6        = 13,
-    SMACKER_ROLAND_7        = 14,
-    SMACKER_ROLAND_8        = 15,
-    SMACKER_ROLAND_9        = 16,
-    SMACKER_ROLAND_END      = 18,
-    SMACKER_ARCHIBALD_INTRO = 19,
-    SMACKER_ARCHIBALD_1     = 20,
-    SMACKER_ARCHIBALD_2     = 21,
-    SMACKER_ARCHIBALD_3     = 22,
-    SMACKER_ARCHIBALD_4A    = 23,
-    SMACKER_ARCHIBALD_4B    = 24,
-    SMACKER_ARCHIBALD_4_END = 25,
-    SMACKER_ARCHIBALD_5A    = 26,
-    SMACKER_ARCHIBALD_5B    = 27,
-    SMACKER_ARCHIBALD_6     = 28,
-    SMACKER_ARCHIBALD_7A    = 29,
-    SMACKER_ARCHIBALD_7B    = 30,
-    SMACKER_ARCHIBALD_8     = 31,
-    SMACKER_ARCHIBALD_9     = 32,
-    SMACKER_ARCHIBALD_10    = 33,
-    SMACKER_ARCHIBALD_END   = 34
-H2_ENUM_END(CampaignSmacker)
-
 H2_ENUM_BEGIN(CampaignMapIndex)
     MAP_ONE      = 0,
     MAP_TWO      = 1,
