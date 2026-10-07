@@ -675,6 +675,9 @@ extern u8* mapExtra;
 #define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
 extern tag_tilePoint normalDirTable[];
 extern u8 giSetupGameType;
+#ifdef HOMM2_EDITOR
+#define pNormalDialogWindow pNormalDialogWindowShared // spelling fixes .bss order
+#endif
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;

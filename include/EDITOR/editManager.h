@@ -232,8 +232,10 @@ public:
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
 
+#define gEditManager gpEditManager // spelling fixes .bss order
 extern editManager* gEditManager;
 // The map text export's file and its line writers.
+#define gTextFileName gTextFileNameBlockBuffer // spelling fixes .bss order
 extern char* gTextFileName;
 void ClearTextFile(void);
 void AppendTextLine(H2_CONST char* text);
@@ -241,10 +243,13 @@ void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
 void ReadTextLine(FILE* file, char* line);
 bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
 // Set while BlendTerrain may pick ground variants.
+#define gVaryTiles gVaryTilesBase // spelling fixes .bss order
 extern b32 gVaryTiles;
 // Set when ClearArea erased a road or stream part (to redraw the lines).
+#define gLinesRemoved gLinesRemovedLocal // spelling fixes .bss order
 extern b32 gLinesRemoved;
 // ClearArea's object filter: the tilesets whose objects it erases.
+#define gClearTilesets gClearTilesetsInstance // spelling fixes .bss order
 extern u8 gClearTilesets[TILESET_COUNT];
 
 H2_ENUM_BEGIN(EditClearMask)
@@ -304,8 +309,11 @@ i32 PickMap(i32 mode);
 void CalculatePlayerNumbers(void);
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 extern i32 gSelectionX;
+#define gSelectionY gSelectionYBlock // spelling fixes .bss order
 extern i32 gSelectionY;
+#define gSelectionWidth gSelectionWidthBufferShared // spelling fixes .bss order
 extern i32 gSelectionWidth;
+#define gSelectionHeight gSelectionHeightRuntimeTable // spelling fixes .bss order
 extern i32 gSelectionHeight;
 
 #endif

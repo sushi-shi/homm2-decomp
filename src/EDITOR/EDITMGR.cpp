@@ -9989,15 +9989,24 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
 
 // The drag selection's outline colour and the tick the view last animated.
 DATA(0x0049f5f0) i32 gSelectionColor;
+#define gLastAnimationTick gLastAnimationTickCore // spelling fixes .bss order
 DATA(0x0049f940) i32 gLastAnimationTick;
 // DrawCell's working state: the map cell, its view position, the ground
 // tile, the layer pass, the extra record and an animation's frame count.
+#define gDrawCell gDrawCellHolderArea // spelling fixes .bss order
 DATA(0x0049f7ac) mapCell* gDrawCell;
+#define gDrawX gDrawXGlobal // spelling fixes .bss order
 DATA(0x0049f5f4) i32 gDrawX;
 DATA(0x0049f79c) i32 gDrawY;
 DATA(0x0049f7a0) u32 gDrawTile;
+// Unread storage between gDrawTile and gLinesRemoved; its name is the
+// compiled spelling that keeps EDITMGR's .bss in its name-hash order.
+DATA(0x0049f7a4) i32 gUnusedData49f7a4Store;
+#define gDrawLayer gDrawLayerBlockRuntime // spelling fixes .bss order
 DATA(0x0049f5d8) i32 gDrawLayer;
+#define gDrawExtra gDrawExtraSlot // spelling fixes .bss order
 DATA(0x0049f5e8) mapCellExtra* gDrawExtra;
+#define gDrawFrames gDrawFramesContextRuntime // spelling fixes .bss order
 DATA(0x0049f944) i32 gDrawFrames;
 
 VA(0x00401a40, 0x139)
@@ -11719,7 +11728,9 @@ VTBL(editManager, 0x0045b368)
 
 // The save checks' messages: AddError keeps a copy of each, ShowErrors
 // shows them one by one and ClearErrors frees them.
+#define gEditErrors gEditErrorsObject // spelling fixes .bss order
 DATA(0x0049f7b0) char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
+#define gEditErrorCount gEditErrorCountDataShared // spelling fixes .bss order
 DATA(0x004a3a48) i32 gEditErrorCount;
 
 // Reports a travel gate kind with a single gate, a lone whirlpool and a
@@ -13199,9 +13210,12 @@ void ShowStatusWarning(char* text) {
 // the first call.
 DATA(0x0047d73c)
 i32 gGroundVariantChance[TERRAIN_COUNT] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
+#define gGroundTilesIndexed gGroundTilesIndexedStateField // spelling fixes .bss order
 DATA(0x004a3a54) b32 gGroundTilesIndexed;
+#define gGroundTiles gGroundTilesAreaHolder // spelling fixes .bss order
 DATA(0x0049f94c) u16 gGroundTiles[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
 DATA(0x004a372c) u16 gGroundTileCounts[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
+#define gGroundTileCount gGroundTileCountCopyInfo // spelling fixes .bss order
 DATA(0x0049f948) i32 gGroundTileCount;
 DATA(0x0049f5ec) i32 gGroundTileChoice;
 

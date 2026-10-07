@@ -3502,10 +3502,14 @@ DATA(0x004a4a48) b32 gbInMemError = false;
 
 // Uninitialized storage: VC6 orders it by name hash, not by definition.
 DATA(0x004a3ac8) i32 giDebugLevel;
+// KB's override driver names, kept by the editor's copy and never read.
+DATA(0x004a3acc) char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x004a3adc) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 DATA(0x004a3b18) u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 DATA(0x004a3b7c) class mouseManager* gpMouseManager;
 DATA(0x004a3b80) char gText[GLOBAL_TEXT_BUFFER_SIZE];
+// Unread storage; the name is the compiled spelling that keeps the name-hash order.
+DATA(0x004a3e80) i32 gUnusedData4a3e80Cache[3];
 DATA(0x004a3e8c) char* EXPANSION_AGGREGATE_NAME;
 DATA(0x004a3e90) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a3ff0) char* DEFAULT_AGGREGATE_NAME;
@@ -3526,6 +3530,8 @@ DATA(0x004a4190) i32 gSelectionHeight;
 DATA(0x004a4194) soundManager* gpSoundManager;
 DATA(0x004a4198) char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 DATA(0x004a42f8) i32 gStatusTextHoldTime;
+// Unread storage; the name is the compiled spelling that keeps the name-hash order.
+DATA(0x004a42fc) i32 gUnusedData4a42fcBlock[2];
 DATA(0x004a4304) mapCell* gEditCell;
 DATA(0x004a4308) class palette* gpBufferPalette;
 DATA(0x004a430c) palette* gPalette;
@@ -3533,11 +3539,16 @@ DATA(0x004a4310) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a4470) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a45d0) i32 giMaxExtentX;
 DATA(0x004a45d4) i32 giMaxExtentY;
+// Unread storage; the name is the compiled spelling that keeps the name-hash order.
+DATA(0x004a45d8) i32 gUnusedData4a45d8Instance[2];
 DATA(0x004a45e0) inputManager* gpInputManager;
+DATA(0x004a45e4) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 // The placement link the next placed object's parts share (mapCell).
 DATA(0x004a45f4) i32 gNextObjectLink;
 DATA(0x004a45f8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 DATA(0x004a4638) configStruct gConfig;
+// Unread storage; the name is the compiled spelling that keeps the name-hash order.
+DATA(0x004a47d8) i32 gUnusedData4a47d8StateBlock;
 DATA(0x004a47dc) i32 giMinExtentX;
 DATA(0x004a47e0) i32 giMinExtentY;
 DATA(0x004a47e4) executive* gpExec;
@@ -3545,6 +3556,8 @@ DATA(0x004a47e8) i32 gLandCellCount;
 DATA(0x004a47ec) i32 giCurWindowsStyleFlags;
 DATA(0x004a47f0) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x004a4950) i32 glTimers[GLOBAL_TIMER_COUNT];
+// Unread storage; the name is the compiled spelling that keeps the name-hash order.
+DATA(0x004a4978) i32 gUnusedData4a4978Runtime[5];
 
 VA(0x004101b6, 0x9b)
 extern "C" void PollSound(void) {

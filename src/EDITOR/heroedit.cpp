@@ -22,6 +22,8 @@
 // Zero-initialized: .bss in definition order.
 DATA(0x004a4c50) HeroExtra gHeroEdit = {0};
 DATA(0x004a4c9c) b32 gEditJailedHero = false;
+// Unread zero-initialized storage after gEditJailedHero.
+DATA(0x004a4ca0) i32 gUnusedData4a4ca0[2] = {0};
 
 VA(0x00413f50, 0x5c1)
 void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {

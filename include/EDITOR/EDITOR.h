@@ -83,8 +83,10 @@ extern b32 gScatterTowns;
 extern b32 gGenerateUnseen;
 extern b32 gGeneratingMap;
 extern i32 gObjectClass;
+#define gNextObjectLink gNextObjectLinkValue // spelling fixes .bss order
 extern i32 gNextObjectLink;
 // The map's land cells, as RemoveSmallRegions last counted them.
+#define gLandCellCount gLandCellCountInfoCore // spelling fixes .bss order
 extern i32 gLandCellCount;
 extern i32 gZoomScale[EDIT_ZOOM_COUNT];
 extern i32 gZoomCellSize[EDIT_ZOOM_COUNT];
@@ -116,22 +118,28 @@ extern H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 extern class heroWindow* gEditDialog;
 extern class mapCell* gEditCell;
 
+#define gMaps gMapsStorage // spelling fixes .bss order
 extern fullMap gMaps[EDIT_MAP_COPIES];
 #define gMap (gMaps[EDIT_MAP_CURRENT])
 #define gUndoMap (gMaps[EDIT_MAP_UNDO])
 
 // The map file being edited (an 8.3 name).
+#define gMapFileName gMapFileNameInfo // spelling fixes .bss order
 extern char gMapFileName[EDITOR_MAP_FILE_NAME_SIZE];
 extern char gShippedMaps[EDITOR_SHIPPED_MAP_COUNT][EDITOR_SHIPPED_MAP_NAMES]
                         [EDITOR_SHIPPED_MAP_NAME_SIZE];
 extern i32 gClearFlags;
+#define gStatusText gStatusTextStore // spelling fixes .bss order
 extern char gStatusText[EDITOR_STATUS_TEXT_SIZE];
 extern b32 gStatusTextShown;
+#define gStatusTextHoldTime gStatusTextHoldTimeFieldMemory // spelling fixes .bss order
 extern i32 gStatusTextHoldTime;
 extern i32 gStatusTextClearTime;
 // The map's time events and rumours: their map-extra record indices, in
 // list order (counted by gEditMapHeader's timeEventCount and rumourCount).
+#define gTimeEventExtras gTimeEventExtrasBacking // spelling fixes .bss order
 extern u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
+#define gRumourExtras gRumourExtrasSlotContent // spelling fixes .bss order
 extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 // The player colours' short names (the specification dialog's side lists).
 extern H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
