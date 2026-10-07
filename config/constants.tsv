@@ -9,3 +9,33 @@
 # owner is the enclosing function, group the finding's category (code,
 # local-table, declaration) and detail its source line.
 #floor	1959
+src/BASE/FONT.cpp	font::ExtractLine	2	code	*	the hyphenation offsets: the break scan starts two characters before the overflowing word's end, and the terminator follows the inserted hyphen (+ 1 is the hyphen)
+src/BASE/Ripple.cpp	DoRipple	*	local-table	*	the ripple profile's per-column row displacements (retail table)
+src/BASE/WINMGR.cpp	CycleColors	*	local-table	*	the world view's cycled palette entries (retail table)
+src/BASE/soundmgr.cpp	soundManager::Open	2[24]	code	bMusicIsLooping[[]2?] = 1;	a looping music track (22, 24) that no game code names
+src/EDITOR/*.cpp	*	*	code	case *FIRST* + *:	the n-th control of a widget-id run (FIRST + n) in a case label
+src/EDITOR/*.cpp	*	*	code	i32 H2_UNUSED(unused*)[[]*];	an unused local array kept for the retail stack frame
+src/EDITOR/*.cpp	*	*	declaration	DATA(*) i32 gUnusedData*	an unreferenced retail datum's initializer or element count (it keeps its retail .data place)
+src/EDITOR/EDITMGR.cpp	editManager::Main	*	code	amount = ?;	the digit key's ground-variety level (Ctrl+0..9 calls RandomizeGround with 0..9)
+src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);	the third and fourth rows of a small map's 4x4 radar dot
+src/EDITOR/EDITMGR.cpp	editManager::DoRadar	2	code	*gZoomViewCells[[]m_zoomLevel] / 2;	half the view: a radar click centres the view on its cell
+src/EDITOR/*.cpp	*Knob	0.5	code	* + 0.5;	rounds the knob's scaled position to the nearest cell or row
+src/EDITOR/EDITMGR.cpp	editManager::CheckObjects	2	code	*gates[[]2]*	the third travel-gate kind's count (gates holds EDIT_TRAVEL_GATE_KINDS counts)
+src/EDITOR/EDITMGR.cpp	*	2	code	*MAP_WIDTH - 2*	a map-edge margin of a neighbour test (the cell beside it stays off the last column)
+src/EDITOR/EDITMGR.cpp	*	2	code	*MAP_HEIGHT - 2*	a map-edge margin of a neighbour test (the cell below it stays off the last row)
+src/EDITOR/EDITMGR.cpp	MakeMapCode	[23]	code	code[[]?] = *	the map code's letter positions, filled last letter first
+src/EDITOR/*.cpp	*	100	code	*Random(0, 100)*	a percent roll's scale
+src/EDITOR/EDITMGR.cpp	editManager::RandomizeGround	*	code	chances[[]*] = *;	the ground-variety chance of each level (retail table; the levels are the digit keys')
+src/EDITOR/EDITOR.cpp	InterpretCommandLine	[23]	code	*	a command-line character offset past the '/' switch
+src/EDITOR/EDITOR.cpp	NormalDialog	2	code	*) / 2;	centres the dialog on the screen
+src/EDITOR/OVERLAY.cpp	PlaceOverlay	2	code	if (row < OVERLAY_GRID_HEIGHT - 2	the overlay grid's last two rows: a cell draws over the row below only when that row is not the bottom (anchor) row
+src/EDITOR/line.cpp	SetLineTile	2	code	*y >= 2	a road gate's map-edge margin (the town sits on the row above the road cell)
+src/EDITOR/setup.cpp	Setup*Handler	*	code	helpIndex = ?;	the right-clicked choice's row in its help table (gSetup*Help)
+src/EDITOR/specedit.cpp	FillVictoryConditionList	2	code	*playerCount - 2*	the defeat-side list's last index: one entry fewer than the other players (playerCount - 1 entries)
+src/EDITOR/townedit.cpp	eventsManager::FillInTownEdit	2	code	*2 * TOWN_EDIT_LABEL_STEP;	the second label row above a building control (TOWN_EDIT_LABEL_STEP each)
+src/EDITOR/RANDOM.cpp	editManager::PaintRandomTerrain	*	code	*	the terrain painter's retail tuning: its patch count, walk weights (rolled 3..7, drifting by -1..1 and tested against a 0..9 roll), averaging divisors and seed reserve factor
+src/EDITOR/RANDOM.cpp	editManager::PlaceObstacleChains	*	code	*	the chain layer's retail tuning: percent odds and thresholds, its quarter and three-quarter map-width bands, steep direction picks and two-column steps
+src/EDITOR/RANDOM.cpp	editManager::PlaceTowns	*	code	*	the castle placer's retail tuning: region share thresholds (percent), castle slot and region rank indices, rating weights and distance penalties, the castle footprint and road offsets, and the harbour walk's step limits and odds
+src/EDITOR/RANDOM.cpp	editManager::PlaceRandomObjects	*	code	*	the object placer's retail tuning: the monster density scale, map margins, the town footprint, resource-site quotas, appeal weights, distance thresholds and odds
+src/EDITOR/RANDOM.cpp	editManager::PlaceTreasures	*	code	*	the treasure placer's retail odds and thresholds (percent rolls), guard ratio and map margins
+src/EDITOR/RANDOM.cpp	editManager::ScatterDecorations	*	code	*	each terrain's decoration chance (retail values) and its roll
