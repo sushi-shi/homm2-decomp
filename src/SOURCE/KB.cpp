@@ -81,7 +81,6 @@ H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_TEXT_BUFFER_SIZE = 100,
     END_GAME_GOLD_SCALE = 1000,
     END_GAME_ULTIMATE_ARTIFACT = 0,
-    END_GAME_PLAYER_DIALOG_ICON = 9,
     END_GAME_REMOTE_DIALOG_TIME = 5000,
     END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20,
     END_GAME_SCENARIO_OFFSET = 1
@@ -185,13 +184,9 @@ H2_ENUM_BEGIN(NetBoxLocalConstant)
     BOX_KEY_BACKSPACE = 0x7f,
     BOX_KEY_F1 = 0x3b00,
     BOX_CURSOR_GLYPH = 0x1f,
-    BOX_PACKET_BUFFER_SIZE = 0x7f,
     BOX_FIRST_PRINTABLE = 0x20,
     BOX_LAST_PRINTABLE = 0x7f,
-    BOX_REMOTE_MAP_CHANGE = 0x29,
-    BOX_REMOTE_SETUP = 0x20,
-    BOX_REMOTE_SAVE = 1,
-    BOX_REMOTE_CHAT = 0xb
+    BOX_REMOTE_SETUP = 0x20
 H2_ENUM_END(NetBoxLocalConstant)
 
 H2_ENUM_BEGIN(PollSoundConstant)
@@ -1101,11 +1096,11 @@ i32 oldmain(void) {
 VA(0x00467c38, 0x70)
 char toupper(char character) {
     if (static_cast<u8>(character) >= 'a' && static_cast<u8>(character) <= 'z')
-        return character - ' ';
-    if (static_cast<u8>(character) >= 0xE0 && static_cast<u8>(character) <= 0xFF)
-        return character - ' ';
-    if (static_cast<u8>(character) == 0xB8)
-        return static_cast<char>(0xA8);
+        return character - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(character) >= CYRILLIC_SMALL_A && static_cast<u8>(character) <= CYRILLIC_SMALL_YA)
+        return character - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(character) == CYRILLIC_SMALL_YO)
+        return static_cast<char>(CYRILLIC_CAPITAL_YO);
     return character;
 }
 #if H2_RETAIL_COMPILER
@@ -2094,7 +2089,7 @@ void CheckEndGame(
                 if (player == giThisGamePos) {
                     showedDialog = true;
                     sprintf(gText, localization::Tr("player.eliminated"));
-                    NormalDialog(gText, 1);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                 } else {
                     sprintf(gText, localization::Tr("player.vanquished"), cPlayerNames[player]);
                     NormalDialog(
@@ -2102,7 +2097,7 @@ void CheckEndGame(
                         1,
                         -1,
                         -1,
-                        END_GAME_PLAYER_DIALOG_ICON,
+                        NORMAL_DIALOG_CREST,
                         gpGame->m_players[static_cast<i8>(player)].m_color,
                         -1,
                         -1,
@@ -2123,7 +2118,7 @@ void CheckEndGame(
                             1,
                             -1,
                             -1,
-                            END_GAME_PLAYER_DIALOG_ICON,
+                            NORMAL_DIALOG_CREST,
                             gpGame->m_players[static_cast<i8>(player)].m_color,
                             -1,
                             0,
@@ -2155,7 +2150,7 @@ void CheckEndGame(
                         1,
                         -1,
                         -1,
-                        END_GAME_PLAYER_DIALOG_ICON,
+                        NORMAL_DIALOG_CREST,
                         gpGame->m_players[static_cast<i8>(player)].m_color,
                         -1,
                         0,
@@ -2237,7 +2232,7 @@ void CheckEndGame(
             if (!showedDialog && winFlag) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2269,7 +2264,7 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2283,7 +2278,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("loss.town_fallen"), lossTown->m_name);
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2320,7 +2315,7 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                 }
             }
         }
@@ -2338,7 +2333,7 @@ void CheckEndGame(
                     localization::Tr("victory.hero_captured"),
                     winningHeroEntry->m_name
                 );
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2351,7 +2346,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("loss.hero"), lossHero->m_name);
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2362,7 +2357,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("loss.time_expired"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2424,7 +2419,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2446,7 +2441,7 @@ void CheckEndGame(
                     gText,
                     localization::Tr("campaign.loss.dwarf_towns")
                 );
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2458,7 +2453,7 @@ void CheckEndGame(
         if (!showedDialog) {
             showedDialog = true;
             sprintf(gText, localization::Tr("campaign.victory.dragon_city"));
-            NormalDialog(gText, 1);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
     }
 
@@ -2478,7 +2473,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("campaign.loss.roland_captured"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2499,7 +2494,7 @@ void CheckEndGame(
             if (!showedDialog && winFlag) {
                 showedDialog = true;
                 sprintf(gText, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -3112,7 +3107,7 @@ i32 WaitForOtherPlayer(void) {
                 );
                 giThisGamePos = NetPosToGamePos(giThisNetPos);
                 break;
-            case BOX_REMOTE_SAVE:
+            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
                 result = gpGame->ReceiveSaveGame(
                     data->payload.save.dataSize,
                     data->payload.save.crc,
@@ -3257,7 +3252,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             if (remoteData->type == REMOTE_MESSAGE_UNRELIABLE) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData->command) {
-                    case BOX_REMOTE_MAP_CHANGE:
+                    case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt;
@@ -3273,7 +3268,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData->command) {
-                    case BOX_REMOTE_CHAT:
+                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
                         remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         sprintf(
                             gText,
@@ -3349,9 +3344,9 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             AddNetBoxLine(inputText, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result = TransmitRemoteData(
                 inputText,
-                BOX_PACKET_BUFFER_SIZE,
+                REMOTE_BROADCAST_PLAYER,
                 strlen(inputText) + 1,
-                BOX_REMOTE_CHAT,
+                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!result)
@@ -5911,7 +5906,7 @@ VA(0x00470d22, 0x68)
 void UpdateNormalDialog(H2_CONST char* text) {
     i16 H2_UNUSED(show) = 1;
     tag_message message;
-    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message);
     pNormalDialogWindow
@@ -6707,7 +6702,7 @@ DATA(0x004f9fdc) i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
 DATA(0x004f9ffc) i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137};
 DATA(0x004fa01c) i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] =
-    {IDX(RES_WOOD), IDX(RES_ORE), -1, -1};
+    {IDX(RES_WOOD), IDX(RES_ORE), IDX(RES_NONE), IDX(RES_NONE)};
 DATA(0x004fa020) i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
 DATA(0x004fa028) i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 DATA(0x004fa02c) i16 gVesaMode[VESA_MODE_VALUE_COUNT] =

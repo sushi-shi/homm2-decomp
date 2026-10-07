@@ -646,7 +646,7 @@ mapCell* advManager::MoveHero(
 
     if (movingHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         town* occupiedTown = gpGame->GetTown(movingHero->m_occupiedTown);
-        occupiedTown->m_occupyingHeroId = -1;
+        occupiedTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
     if (m_visibilityMapValid) {
         *(m_visibilityMap + (movingHero->m_x + directionX)
@@ -819,7 +819,7 @@ adjacentDone:
                     if (gpGame->m_players[giCurPlayer].m_resources[step] < 0)
                         gpGame->m_players[giCurPlayer].m_resources[step] = 0;
                 }
-                if (mapEvent->artifact != -1
+                if (mapEvent->artifact != MAP_EVENT_REWARD_NONE
                     && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
                     GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
@@ -847,7 +847,7 @@ adjacentDone:
                     primaryAmount = eventAmount;
                 }
             }
-            if (mapEvent->artifact != -1
+            if (mapEvent->artifact != MAP_EVENT_REWARD_NONE
                 && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {

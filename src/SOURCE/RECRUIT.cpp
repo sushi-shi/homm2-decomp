@@ -48,7 +48,7 @@ H2_ENUM_BEGIN(RecruitControl)
     INCREASE_CONTROL       = 0x45,
     DECREASE_CONTROL       = 0x46,
     MAXIMUM_CONTROL        = 0x47,
-    GOLD_ICON_CONTROL      = 0x49,
+    GOLD_COST_CONTROL      = 0x49,
     RESOURCE_ICON_CONTROL  = 0x4a,
     RESOURCE_COST_CONTROL  = 0x4b,
     GOLD_TOTAL_CONTROL     = 0x4d,
@@ -82,7 +82,7 @@ void SetupRecruitWin(
     window->BroadcastMessage(message);
 
     sprintf(label, "%d", goldCost);
-    message.payload.widget.id = GOLD_ICON_CONTROL;
+    message.payload.widget.id = GOLD_COST_CONTROL;
     window->BroadcastMessage(message);
     if (resourceType != RES_NONE) {
         sprintf(label, "%d", resourceCost);
@@ -146,7 +146,7 @@ i32 recruitUnit::Open(i32 priority) {
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
 
-    goldMaximum = gpCurPlayer->m_resources[GOLD_RESOURCE] / m_goldCost;
+    goldMaximum = gpCurPlayer->m_resources[IDX(RES_GOLD)] / m_goldCost;
     if (m_resourceType != RES_NONE) {
         resourceMaximum = gpCurPlayer->m_resources[IDX(m_resourceType)] / m_resourceCost;
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
@@ -283,7 +283,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         break;
                 }
                 Update();
-                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 break;
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
@@ -295,7 +295,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_quantity = m_maximum;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case DECREASE_CONTROL:
                         if (quickView != 0)
@@ -305,7 +305,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_quantity = 0;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case MAXIMUM_CONTROL:
                         if (quickView != 0)
@@ -313,7 +313,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         m_quantity = m_maximum;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case CANCEL_CONTROL:
                         if (quickView != 0)
@@ -335,7 +335,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_noRoom = true;
                             goto checkClose;
                         }
-                        gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
+                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= m_quantity * m_goldCost;
                         if (m_resourceType != RES_NONE) {
                             gpCurPlayer->m_resources[IDX(m_resourceType)] -=
                                 m_quantity * m_resourceCost;
@@ -362,7 +362,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
 
 VA(0x0048cd07, 0xc4)
 recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[IDX(RES_COUNT)];
     i32 resourceIndex;
 
     m_sourceType = RECRUIT_SOURCE_EVENT;
@@ -371,7 +371,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     m_creatureType = creatureType;
     m_available = available;
     GetMonsterCost(m_creatureType, unitCosts);
-    m_goldCost = unitCosts[GOLD_RESOURCE];
+    m_goldCost = unitCosts[IDX(RES_GOLD)];
     for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
@@ -387,7 +387,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
 
 VA(0x0048cdcb, 0xdf)
 recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[IDX(RES_COUNT)];
     i32 resourceIndex;
 
     m_refreshTown = refreshTown;
@@ -396,7 +396,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
     m_available = &townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(m_creatureType, unitCosts);
-    m_goldCost = unitCosts[GOLD_RESOURCE];
+    m_goldCost = unitCosts[IDX(RES_GOLD)];
     for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
@@ -415,7 +415,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     CreatureType monsterType;
     ResourceType resourceType;
     heroWindow* recruitWindow;
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[IDX(RES_COUNT)];
     i32 resourceCost;
     i32 goldCost;
     i32 resourceIndex;
@@ -424,7 +424,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     monsterType = gDwellingType[IDX(townData->m_type)][dwelling];
     avail = townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(monsterType, unitCosts);
-    goldCost = unitCosts[GOLD_RESOURCE];
+    goldCost = unitCosts[IDX(RES_GOLD)];
     for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;

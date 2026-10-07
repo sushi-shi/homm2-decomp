@@ -380,7 +380,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
 ProcessAction:
     if (giNextAction == ACTION_NONE) {
-        if (m_playerId[IDX(m_currentSide)] == -1
+        if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
             || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || m_gridSelectionDisabled != 0) {
             CheckGetAIMove();
@@ -1402,7 +1402,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
             giNextActionGridIndex = m_selectedHex;
-            if (m_playerId[IDX(m_currentSide)] == -1
+            if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
                 || gbHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
                 || m_gridSelectionDisabled != 0) {
                 giNextAction = ACTION_MOVE;
@@ -1452,7 +1452,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 ,
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES)
                 giNextAction = ACTION_RETREAT;
             ResetMouse();
             break;
@@ -2233,12 +2233,12 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
             if (!(giCurPlayer == -1 || gbThisNetHumanPlayer[giCurPlayer] == 0
                   || m_playerId[IDX(winningSide)] != giCurPlayer)
                 || !(
-                    giCurPlayer == -1 || m_playerId[IDX(winningSide)] == -1
+                    giCurPlayer == -1 || m_playerId[IDX(winningSide)] == PLAYER_NONE
                     || gbThisNetHumanPlayer[giCurPlayer] != 0
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )
                 || !(
-                    m_playerId[IDX(winningSide)] == -1
+                    m_playerId[IDX(winningSide)] == PLAYER_NONE
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
@@ -2321,7 +2321,7 @@ void combatManager::DoLoseWindow(void) {
     } else if (giCurPlayer == m_playerId[IDX(COMBAT_DEFENDER_SIDE)]
                && gbThisNetHumanPlayer[m_playerId[IDX(COMBAT_DEFENDER_SIDE)]] != 0) {
         losingSide = COMBAT_RESULT_DEFENDER;
-    } else if (m_playerId[IDX(COMBAT_ATTACKER_SIDE)] != -1
+    } else if (m_playerId[IDX(COMBAT_ATTACKER_SIDE)] != PLAYER_NONE
                && gbThisNetHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0) {
         losingSide = COMBAT_RESULT_ATTACKER;
     } else {
@@ -2444,7 +2444,7 @@ i32 combatManager::DoSurrender(void) {
     if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.data.value =
-            m_playerId[IDX(OppositeCombatSide(m_currentSide))] == -1
+            m_playerId[IDX(OppositeCombatSide(m_currentSide))] == PLAYER_NONE
             ? COMBAT_NEUTRAL_HERO_COLOR
             : gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]].m_color;
         window->BroadcastMessage(message);
@@ -2502,7 +2502,7 @@ VA(0x004309fa, 0xb6)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
     if (m_heroCastSpell[IDX(m_currentSide)] == 0
-        && (m_playerId[IDX(m_currentSide)] == -1
+        && (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
             || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || gConfig.autoCombatUseSpells != 0)) {
         if (DoSpellAI(m_currentSide, retreat) != 0)
@@ -2533,7 +2533,7 @@ void combatManager::GetControl(void) {
         gbThisNetHasControl = true;
         goto setup_view;
     }
-    if (m_playerId[IDX(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0
+    if (m_playerId[IDX(m_currentSide)] != PLAYER_NONE && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0
         && gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0)
         gbThisNetHasControl = false;
     else
@@ -2867,7 +2867,7 @@ void combatManager::CycleCombatScreen(void) {
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
                    && m_heroLossReactionPlayed[index] == 0
                    && m_heroLossReactionPending[index] != 0) {
-            if (m_playerId[IDX(m_currentSide)] == -1
+            if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
                 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
                 m_heroOpponentLossReactionPending[index] = 0;
                 m_heroLossReactionPending[index] = 0;
@@ -2885,7 +2885,7 @@ void combatManager::CycleCombatScreen(void) {
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
                    && m_heroOpponentLossReactionPlayed[index] == 0
                    && m_heroOpponentLossReactionPending[index] != 0) {
-            if (m_playerId[IDX(m_currentSide)] == -1
+            if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
                 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
                 m_heroOpponentLossReactionPending[index] = 0;
                 m_heroLossReactionPending[index] = 0;

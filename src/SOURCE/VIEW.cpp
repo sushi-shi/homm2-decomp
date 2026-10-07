@@ -243,7 +243,7 @@ i32 combatManager::ViewGeneral(
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
             && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
         || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[1] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
+        || m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_ACTION_RETREAT;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);

@@ -4653,7 +4653,7 @@ void game::PerDay(void) {
         currentTown = GetTown(player);
         if (!HAS(currentTown->m_buildings, BIT(BUILDING_SLOT_MAGE_GUILD)))
             continue;
-        if (currentTown->m_occupyingHeroId != -1) {
+        if (currentTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             townHero = GetHero(currentTown->m_occupyingHeroId);
             maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*townHero);
             if (maxSpellPoints > townHero->m_spellPoints)
@@ -6819,7 +6819,7 @@ void game::CheckHeroConsistency(void) {
                         if (boardHro->m_locationType
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                             townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
-                            townOccupied->m_occupyingHeroId = -1;
+                            townOccupied->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
                         }
                         if (boardHro->m_x == mapX && boardHro->m_y == mapY) {
                             RestoreCell(
@@ -7421,7 +7421,7 @@ void game::DoNewTurn(void) {
             }
             gpSoundManager->PlayAmbientMusic(musicTrack);
             gpMouseManager->SetPointer(0);
-            NormalDialog(gText, 1);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
             );

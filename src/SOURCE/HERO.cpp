@@ -560,7 +560,7 @@ void hero::Deallocate(i32 updateMap) {
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         DebugCheck();
         curTown = &gpGame->m_castleRecs[m_occupiedTown];
-        curTown->m_occupyingHeroId = -1;
+        curTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
 
     if (giCurPlayer != m_owner || gpGame->m_players[IDX(m_owner)].m_currentHero != m_id

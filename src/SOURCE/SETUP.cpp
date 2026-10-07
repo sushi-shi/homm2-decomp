@@ -183,7 +183,7 @@ i32 game::SetupHotSeatGame(void) {
             ""
         );
 
-    if (giSetupGameType == 0) {
+    if (giSetupGameType == OLD_MAIN_SETUP_NEW) {
         sprintf(
             gText,
              localization::Tr("network.hotseat.enter_names_prompt")

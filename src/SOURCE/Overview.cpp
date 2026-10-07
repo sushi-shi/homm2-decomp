@@ -1091,7 +1091,7 @@ void game::Overview(void) {
     overWin->AddWidget(OVScrollKnob, -1);
 
     SetupResources();
-    memset(mineCounts, 0, IDX(RES_COUNT));
+    memset(mineCounts, 0, sizeof(mineCounts));
     lighthouseCount = 0;
     for (mine = 0; mine < GAME_MINE_COUNT; mine++) {
         if (m_mineOwners[mine] == giCurPlayer) {
@@ -1363,8 +1363,8 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
         }
     }
     if (done == 1) {
-        message.payload.widget.id = SCROLL_UP_WIDGET;
-        message.payload.widget.command = BaseWidgetCommand(SCROLL_UP_WIDGET);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = BaseWidgetCommand(IDX(WIDGET_COMMAND_DIALOG_SELECT));
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

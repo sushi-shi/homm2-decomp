@@ -323,7 +323,7 @@ void combatManager::SetupCombat(
 
     m_drawbridgeBackgroundVisible = false;
     if (defenderTown != NULL) {
-        if (defenderTown->m_occupyingHeroId != -1) {
+        if (defenderTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)] = &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army;
             CombineGroups(&defenderTown->m_army, &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army);
             m_visitingHeroPresent[IDX(COMBAT_DEFENDER_SIDE)] = true;
@@ -1100,7 +1100,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT)
+    if (HAS(activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT))
         H2_ENUM_CLEAR_FLAG(
             activeArmy->m_monster.attributes, MONSTER_FLAGS_TURN_SPENT
         );

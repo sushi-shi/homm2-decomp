@@ -565,7 +565,7 @@ void philAI::DoAllHeroInteractions(void) {
     i32 i;
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
         town* pTown = gpGame->GetTown(gpCurPlayer->m_townIds[i]);
-        if (pTown->m_occupyingHeroId != -1)
+        if (pTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             HeroInteractionAtTown(gpGame->GetHero(pTown->m_occupyingHeroId), pTown, 0, &iDummy);
     }
 }
@@ -594,7 +594,7 @@ void philAI::CheckForCreatureUpgrades(void) {
             if (armyNo == 0)
                 army = &townRef->m_army;
             else {
-                if (townRef->m_occupyingHeroId == -1)
+                if (townRef->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
                     continue;
                 army = &gpGame->GetHero(townRef->m_occupyingHeroId)->m_army;
             }
@@ -1928,7 +1928,7 @@ firstWeekDone:
 VA(0x00481580, 0x59f)
 void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
     float bhcValue = 1.0f;
-    float topVal = -99.0f;
+    float topVal = AI_PURCHASE_INITIAL_VALUE;
     i32 totalStrength = 0;
     i32 totalWeight = 0;
     BHC choice;
@@ -2867,8 +2867,8 @@ void philAI::GetBestBuilding(town* townPointer, BHC& purchase, float& benefitCos
     BuildingSlotType bestBuilding;
     float bestBenefitCost;
     i32 cost;
-    bestBenefitCost = -99.0f;
-    bestScore = -99.0f;
+    bestBenefitCost = AI_PURCHASE_INITIAL_VALUE;
+    bestScore = AI_PURCHASE_INITIAL_VALUE;
     bestBuilding = BUILDING_SLOT_NONE;
     for (currentBuilding = BUILDING_SLOT_MAGE_GUILD; currentBuilding < BUILDING_SLOT_COUNT; currentBuilding++) {
         if (!HAS(townPointer->m_buildings, (1 << IDX(currentBuilding)))
@@ -4908,7 +4908,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 doI
         if (!hasRoom)
             transferRating = 0;
         *value += transferRating;
-        if (townPointer->m_threat != 0 && townPointer->m_occupyingHeroId == -1)
+        if (townPointer->m_threat != 0 && townPointer->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
             *value += AI_UNGUARDED_TOWN_VALUE;
     } else {
         townPointer->GiveSpells(NULL);
@@ -5439,7 +5439,7 @@ i32 philAI::CanBuyBHC(BHC& purchase) {
             break;
         case PURCHASE_HERO:
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= gHeroGoldCost
-                && purchase.pTown->m_occupyingHeroId == -1
+                && purchase.pTown->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
                 && bHeroBuiltThisTurn == 0)
                 return 1;
             break;

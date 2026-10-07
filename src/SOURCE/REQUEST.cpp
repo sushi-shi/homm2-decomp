@@ -926,7 +926,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     iResult - giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-                if (gpWindowManager->m_dialogResult != DIALOG_BUTTON_5) {
+                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES) {
                     acceptStep = false;
                 }
             }

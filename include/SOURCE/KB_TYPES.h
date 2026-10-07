@@ -631,7 +631,7 @@ template <typename Storage>
 inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator|=(
     H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerActionFlag
 ) {
-    trigger = MapTriggerCode(static_cast<i32>(trigger) | 0x80);
+    trigger = MapTriggerCode(static_cast<i32>(trigger) | MAP_TRIGGER_ACTION_FLAG);
     return trigger;
 }
 

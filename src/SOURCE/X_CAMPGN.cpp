@@ -349,7 +349,7 @@ void ExpCampaign::InitMap(void) {
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
 
-    playerData* player = &gpGame->m_players[0];
+    playerData* player = &gpGame->m_players[EXPANSION_CAMPAIGN_MAIN_PLAYER];
     i32 heroSlot;
     hero* pHero;
     switch (bonus->type) {
@@ -576,7 +576,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitMap();
             PRESENT_RESTARTED_CAMPAIGN_MAP();
         }

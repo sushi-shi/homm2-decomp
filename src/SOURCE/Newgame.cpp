@@ -424,7 +424,7 @@ i32 game::NewGame(void) {
     }
 
     SetupNetPlayerNames();
-    glTimers[0] = 0;
+    glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = 0;
     for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
@@ -1049,7 +1049,7 @@ VA(0x0047734a, 0xdd1)
                         break;
                 }
             }
-            if (KBTickCount() > glTimers[0]) {
+            if (KBTickCount() > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, NGKPcursorIndex);
                 gpGame->DrawNGKPDisplayString(1);
             }
@@ -1584,9 +1584,9 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (KBTickCount() > glTimers[0]) {
+    if (KBTickCount() > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
-        glTimers[0] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
+        glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
     }
 
     if (cursor > 0)

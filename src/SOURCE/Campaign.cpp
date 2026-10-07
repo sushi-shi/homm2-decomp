@@ -477,7 +477,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             localization::Tr("campaign.confirm.restart_scenario"),
             CAMPAIGN_RESTART_CONFIRM
         );
-        if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitCampaignMap();
             PRESENT_RESTARTED_CAMPAIGN_MAP();
         }

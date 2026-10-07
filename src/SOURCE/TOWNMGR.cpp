@@ -1332,7 +1332,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
                                     if (m_selectedBuilding == BUILDING_SLOT_NEUTRAL_LAST
-                                        && m_town->m_occupyingHeroId == -1) {
+                                        && m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE) {
                                         if (m_heroStrip != NULL)
                                             delete m_heroStrip;
                                         m_heroStrip = NULL;
@@ -1368,7 +1368,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 goto showBuildingInformation;
                             }
                             {
-                                if (m_town->m_occupyingHeroId != -1
+                                if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE
                                     && !gpGame->GetHero(m_town->m_occupyingHeroId)
                                             ->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
@@ -1898,7 +1898,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             ResetStrips();
             break;
     }
-    m_lastHoverId = -1;
+    m_lastHoverId = TOWN_HOVER_NONE;
 }
 
 VA(0x004a8413, 0xa4)
@@ -1986,7 +1986,7 @@ void townManager::ResetStrips(void) {
     m_heroStrip->Draw();
     m_garrisonStrip->Draw();
     m_swapStrip = m_pendingStrip = NULL;
-    m_swapArmySlot = m_pendingArmySlot = -1;
+    m_swapArmySlot = m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
 }
 
 VA(0x004a88d6, 0x79)
@@ -2613,7 +2613,7 @@ void townManager::SetupMage(heroWindow* window) {
     i32 H2_UNUSED(unusedLocal);
 
     message.type = MESSAGE_WIDGET;
-    if (m_town->m_occupyingHeroId == -1) {
+    if (m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE) {
         strcpy(gText, localization::Tr("town.mage_guild.spells_available"));
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;

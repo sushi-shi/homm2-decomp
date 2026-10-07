@@ -2705,7 +2705,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                         gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 if (special) {
                     hero->ViewArtifact(ARTIFACT_SPHERE_NEGATION, false, -1);
                 } else {
@@ -10423,7 +10423,7 @@ creaturesFight:
     goto showVision;
 
 showVision:
-    NormalDialog(gText, 1);
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     return 1;
 }
 #if H2_RETAIL_COMPILER
