@@ -8,7 +8,7 @@
 #include <EDITOR/editManager.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
-#include <EDITOR/overlayType.h>
+#include <EDITOR/OVERLAY.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/icon.h>

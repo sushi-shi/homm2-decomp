@@ -33,9 +33,127 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <stdio.h>
 #include <string.h>
+
+H2_ENUM_BEGIN(OverlayPlacementConstant)
+    // A town's entrance and the grid offset its ground is read at; its
+    // flags go 3 and 1 cells left and a row up. A dragged town reads its
+    // ground two cells left of the pointer.
+    OVERLAY_TOWN_ENTRANCE_X   = 5,
+    OVERLAY_TOWN_ENTRANCE_Y   = 5,
+    OVERLAY_LEFT_FLAG_X       = -3,
+    OVERLAY_RIGHT_FLAG_X      = -1,
+    OVERLAY_FLAG_Y            = -1,
+    OVERLAY_TOWN_GROUND_COLUMN = 2,
+    // A random town's faction in its map record.
+    OVERLAY_RANDOM_TOWN_FACTION = 6,
+    // giGroundShape: a plain tile that has variants.
+    GROUND_SHAPE_VARIANT_FLAG = 0x80,
+    // An alchemist's lab may reach at most 3 rows above the map.
+    OVERLAY_ALCHEMIST_LAB_TOP = -3,
+    // The ultimate artifact stays this many cells inside the map.
+    OVERLAY_ULTIMATE_MARGIN   = 9,
+    // The map's limits on events (towns and mines take the game's).
+    OVERLAY_EVENT_LIMIT       = 50,
+    // CanPlaceOverlay's lists of the placement links an object would cover
+    // and keep.
+    OVERLAY_LINK_LIST_CAPACITY = 400
+H2_ENUM_END(OverlayPlacementConstant)
+
+H2_ENUM_BEGIN(OverlayManagerLayout)
+    // The map view: 448 pixels square at (16, 16).
+    EDIT_VIEW_ORIGIN              = 0x10,
+    EDIT_VIEW_SIZE                = 0x1c0,
+    EDIT_VIEW_END                 = EDIT_VIEW_ORIGIN + EDIT_VIEW_SIZE,
+    // gClearHelp's right-click help of the first class.
+    OVERLAY_CLASS_HELP_FIRST      = 5,
+    // The class buttons: transparent borders over the panel's swatches.
+    OVERLAY_CLASS_BUTTON_SIZE     = 0x1b,
+    OVERLAY_CLASS_BUTTON_ID_FIRST = 500,
+    // The class name under the buttons.
+    OVERLAY_CLASS_NAME_X          = 0x1ed,
+    OVERLAY_CLASS_NAME_Y          = 0x16f,
+    OVERLAY_CLASS_NAME_WIDTH      = 0x75,
+    OVERLAY_CLASS_NAME_HEIGHT     = 10,
+    OVERLAY_CLASS_NAME_ID         = 0x578,
+    OVERLAY_CLASS_NAME_TEXT_SIZE  = 2,
+    // The frame (terrains.icn) that outlines the selected class button.
+    OVERLAY_HIGHLIGHT_SIZE        = 0x1f,
+    OVERLAY_HIGHLIGHT_FRAME       = 9,
+    OVERLAY_HIGHLIGHT_ID          = 0x19,
+    OVERLAY_HIGHLIGHT_INSET       = 2,
+    // objpalet.icn's panel backdrop and its place.
+    OVERLAY_PANEL_X               = 0x1fd,
+    OVERLAY_PANEL_Y               = 0xe3,
+    OVERLAY_PANEL_FRAME           = 0,
+    // The tool panel's screen region.
+    OVERLAY_PANEL_REGION_X        = 0x1e0,
+    OVERLAY_PANEL_REGION_Y        = 0xe8,
+    OVERLAY_PANEL_REGION_WIDTH    = 0x90,
+    OVERLAY_PANEL_REGION_HEIGHT   = 0xa0,
+    // The region the selected object's preview is drawn in.
+    OVERLAY_PREVIEW_REGION_X      = 0x1fd,
+    OVERLAY_PREVIEW_REGION_Y      = 0xc2,
+    OVERLAY_PREVIEW_REGION_WIDTH  = 0x56,
+    OVERLAY_PREVIEW_REGION_HEIGHT = 0x46,
+    // A footprint cell's colour: an overlay part, a shadow, an entrance,
+    // any other part.
+    OVERLAY_COLOR_OVERLAY         = 0x65,
+    OVERLAY_COLOR_SHADOW          = 0x24,
+    OVERLAY_COLOR_ENTRANCE        = 0xcf,
+    OVERLAY_COLOR_OBJECT          = 0xc4,
+    // A town's flags on its grid cells (4, 4) and (6, 4); a hero's icon is
+    // drawn this many pixels up.
+    OVERLAY_TOWN_FLAG_COLUMN      = 4,
+    OVERLAY_TOWN_RIGHT_FLAG_COLUMN = 6,
+    OVERLAY_TOWN_FLAG_ROW         = 4,
+    OVERLAY_HERO_LIFT             = 0xe
+H2_ENUM_END(OverlayManagerLayout)
+
+H2_ENUM_BEGIN(OverlayPickerLayout)
+    // The picker (editpalt.bin): a 9 x 9 page of 69 x 53 boxes, an object
+    // drawn 2 pixels in, in a 4 x 3 cell view.
+    OVERLAY_PICKER_COLUMNS      = 9,
+    OVERLAY_PICKER_ROWS         = 9,
+    OVERLAY_PICKER_PAGE         = OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_ROWS,
+    OVERLAY_PICKER_BOX_WIDTH    = 0x45,
+    OVERLAY_PICKER_BOX_HEIGHT   = 0x35,
+    OVERLAY_PICKER_OBJECT_INSET = 2,
+    OVERLAY_PICKER_VIEW_WIDTH   = 4,
+    OVERLAY_PICKER_VIEW_HEIGHT  = 3,
+    // objpalet.icn's box frames: a plain box, then a colour's.
+    OVERLAY_PICKER_PLAIN_BOX    = 1,
+    OVERLAY_PICKER_COLOR_BOX    = 2,
+    // A random hero's portrait frames: seven per colour.
+    OVERLAY_HERO_FRAMES_PER_COLOR = 7,
+    // The scroll track and knob (escroll.icn).
+    OVERLAY_PICKER_TRACK_X      = 0x26e,
+    OVERLAY_PICKER_TRACK_Y      = 0x10,
+    OVERLAY_PICKER_TRACK_WIDTH  = 0x10,
+    OVERLAY_PICKER_TRACK_HEIGHT = 0x1a0,
+    OVERLAY_PICKER_TRACK_FRAME  = 1,
+    OVERLAY_PICKER_TRACK_ID     = 0xb,
+    OVERLAY_PICKER_KNOB_X       = 0x272,
+    OVERLAY_PICKER_KNOB_Y       = 0x13,
+    OVERLAY_PICKER_KNOB_WIDTH   = 8,
+    OVERLAY_PICKER_KNOB_HEIGHT  = 0x11,
+    OVERLAY_PICKER_KNOB_FRAME   = 3,
+    OVERLAY_PICKER_KNOB_ID      = 0xd,
+    // The knob's place without a scrollable page, and the track a knob
+    // drag measures from. The picker draws at the middle zoom.
+    OVERLAY_PICKER_KNOB_PARKED  = 0xd7,
+    OVERLAY_PICKER_ZOOM         = 1,
+    OVERLAY_PICKER_DRAG_ORIGIN  = 0x27,
+    // The picker's controls: the row arrows, the class arrows, the boxes.
+    OVERLAY_PICKER_ROW_UP       = 100,
+    OVERLAY_PICKER_ROW_DOWN     = 101,
+    OVERLAY_PICKER_CLASS_PREVIOUS = 102,
+    OVERLAY_PICKER_CLASS_NEXT   = 103,
+    OVERLAY_PICKER_BOXES        = 0x6e
+H2_ENUM_END(OverlayPickerLayout)
 
 // The class buttons on the tool panel, water to beach then the other
 // classes.
@@ -71,7 +189,7 @@ DATA(0x004a5744) static i32 gPickerFirst;
 DATA(0x004a5748) static i32 gPickedOverlay;
 
 VA(0x00418dc0, 0x67)
-i32 OverlayGridHas(u32* grid, i32 x, i32 y) {
+b32 OverlayGridHas(u32* grid, i32 x, i32 y) {
     i32 bit;
 
     bit = (OVERLAY_GRID_WIDTH - x - 1) + (OVERLAY_GRID_HEIGHT - y - 1) * OVERLAY_GRID_WIDTH;
@@ -88,7 +206,7 @@ i32 overlayManager::Open(i32 priority) {
     i32 i;
     char* name;
 
-    m_previewDrawn = 0;
+    m_previewDrawn = false;
     m_cellIcon = gpResourceManager->GetIcon("overlay.icn");
     m_paletteIcon = gpResourceManager->GetIcon("objpalet.icn");
     for (i = 0; i < OVERLAY_CLASS_COUNT; i++) {
@@ -135,14 +253,14 @@ i32 overlayManager::Open(i32 priority) {
     gEditManager->m_window->DrawWindow();
     m_paletteIcon
         ->DrawToBuffer(OVERLAY_PANEL_X, OVERLAY_PANEL_Y, OVERLAY_PANEL_FRAME, ICON_DRAW_NORMAL);
-    ShowClass(0);
+    ShowClass(false);
     gEditManager->m_placedY = EDIT_NO_CELL;
     gEditManager->m_placedX = EDIT_NO_CELL;
     LoadClass(gObjectClass);
     DrawSelectedOverlay();
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "overlayManager");
     return 0;
 }
@@ -164,11 +282,11 @@ void overlayManager::Close(void) {
     gEditManager->m_window->DrawWindow(0);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x004192a2, 0xcc)
-void overlayManager::ShowClass(i32 update) {
+void overlayManager::ShowClass(b32 update) {
     tag_message message;
     i32 i;
 
@@ -190,9 +308,10 @@ void overlayManager::ShowClass(i32 update) {
         );
 }
 
+#define placed result // frame-slot spelling
 VA(0x0041936e, 0x49a)
 MessageDispatchResult overlayManager::Main(tag_message& message) {
-    i32 result;
+    b32 placed;
     b32 finished;
     i32 helpItem;
     tag_message peek;
@@ -224,21 +343,21 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                                 break;
                             ClearStatusText();
                             gEditManager->SaveUndo();
-                            result = PlaceOverlay(
+                            placed = PlaceOverlay(
                                 &m_types[gSelectedOverlay],
                                 gEditManager->m_cursorX - OVERLAY_ANCHOR_X,
                                 gEditManager->m_cursorY - OVERLAY_ANCHOR_Y,
-                                1
+                                true
                             );
-                            if (result) {
+                            if (placed) {
                                 gEditManager->m_placedX = gEditManager->m_cursorX;
                                 gEditManager->m_placedY =
                                     gEditManager->m_cursorY + (OVERLAY_GRID_HEIGHT - m_height);
                                 gEditManager->m_placedState = 0;
                                 gEditManager->DrawMap();
                                 gEditManager->UpdateMapView();
-                                gEditManager->DrawRadar(1);
-                                gEditManager->m_mapChanged = 1;
+                                gEditManager->DrawRadar(true);
+                                gEditManager->m_mapChanged = true;
                             }
                             break;
                     }
@@ -255,7 +374,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                     pick:
                         gSelectedOverlay = PickOverlay(gObjectClass);
                         DrawSelectedOverlay();
-                        ShowClass(1);
+                        ShowClass(true);
                         gpInputManager->Flush();
                     }
                     break;
@@ -289,20 +408,20 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                                 OVERLAY_GRID_WIDTH,
                                 OVERLAY_GRID_HEIGHT,
                                 &m_types[gSelectedOverlay],
-                                1
+                                true
                             );
                             DrawOverlay(
                                 &m_types[gSelectedOverlay],
                                 mapX,
                                 mapY,
-                                1,
+                                true,
                                 OVERLAY_GRID_WIDTH,
                                 OVERLAY_GRID_HEIGHT,
-                                1,
+                                true,
                                 gEditManager->m_cursorX,
                                 gEditManager->m_cursorY
                             );
-                            m_previewDrawn = 1;
+                            m_previewDrawn = true;
                         }
                         gEditManager->UpdateMapView();
                         gEditManager->UpdateCursor();
@@ -310,7 +429,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                     gEditManager->UpdateCursor();
                 }
             } else if (m_previewDrawn) {
-                m_previewDrawn = 0;
+                m_previewDrawn = false;
                 gEditManager->DrawMap();
                 gEditManager->UpdateMapView();
                 gEditManager->UpdateCursor();
@@ -324,6 +443,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONTINUE;
 }
+#undef placed
 
 VA(0x00419808, 0x1dd)
 void overlayManager::DrawFootprint(
@@ -332,7 +452,7 @@ void overlayManager::DrawFootprint(
     i32 width,
     i32 height,
     overlayType* type,
-    i32 clip
+    b32 clip
 ) {
     i32 cellSize;
     u8 color;
@@ -384,7 +504,7 @@ void overlayManager::DrawFootprint(
 }
 
 VA(0x004199e5, 0x631)
-i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
+b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
     i32 covered;
     i32 kept;
     mapCellExtra* part;
@@ -403,14 +523,14 @@ i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
     covered = 0;
     kept = 0;
     if (type->trigger == IDX(MAP_OBJECT_ALCHEMIST_LAB) && top < OVERLAY_ALCHEMIST_LAB_TOP)
-        return 0;
+        return false;
     for (y = 0; y < OVERLAY_GRID_HEIGHT; y++)
         for (x = 0; x < OVERLAY_GRID_WIDTH; x++) {
             if (OverlayGridHas(shape->occupiedRows, x, y)
                 && !OverlayGridHas(shape->shadowRows, x, y)) {
                 if (left + x < 0 || left + x > MAP_WIDTH - 1 || top + y < 0
                     || top + y > MAP_HEIGHT - 1)
-                    return 0;
+                    return false;
                 cell = gMap.CellAt(left + x, top + y);
                 if (OverlayGridHas(shape->overlayRows, x, y)) {
                     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
@@ -429,12 +549,12 @@ i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
                     }
                 } else {
                     if (!(shape->groundMask & 1 << CELL_TERRAIN(gMap.CellAt(left + x, top + y))))
-                        return 0;
+                        return false;
                     if (OverlayGridHas(shape->entranceRows, x, y)) {
                         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
-                            blocked = 0;
+                            blocked = false;
                             if (!cell->m_objectLayerBit1)
-                                blocked = 1;
+                                blocked = true;
                             if (cell->m_extraIndex
                                 && gMap.extras[cell->m_extraIndex].objectIndex
                                        != MAPCELL_SPRITE_NONE)
@@ -443,7 +563,7 @@ i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
                                 part = NULL;
                             while (part) {
                                 if (!part->objectLayerBit1)
-                                    blocked = 1;
+                                    blocked = true;
                                 if (part->nextIndex
                                     && gMap.extras[part->nextIndex].objectIndex
                                            != MAPCELL_SPRITE_NONE)
@@ -452,17 +572,17 @@ i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
                                     part = NULL;
                             }
                             if (blocked && shape->trigger != IDX(MAP_OBJECT_MINE))
-                                return 0;
+                                return false;
                         }
                     } else if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                                && !OverlayGridHas(shape->shadowRows, x, y))
-                        return 0;
+                        return false;
                     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE
                         || (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !cell->m_objectLayerBit0
                             && shape->highLayer))
                         gKeptLinks[kept++] = cell->m_overlayLink;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !overObjects)
-                        return 0;
+                        return false;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE
                         && (!shape->highLayer || cell->m_objectLayerBit0))
                         gCoveredLinks[covered++] = cell->m_objectLink;
@@ -485,8 +605,8 @@ i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects) {
     for (i = 0; i < covered; i++)
         for (j = 0; j < kept; j++)
             if (gCoveredLinks[i] == gKeptLinks[j])
-                return 0;
-    return 1;
+                return false;
+    return true;
 }
 
 VA(0x0041a016, 0x256)
@@ -526,45 +646,57 @@ void RemoveReplacedObjects(overlayType* type, i32 left, i32 top) {
         }
 }
 
+#define placed done       // frame-slot spelling
+#define newTown newCastle // frame-slot spelling
+#define newSign bottle    // frame-slot spelling
+#define newEvent pEvent   // frame-slot spelling
+#define newSphinx sphinx  // frame-slot spelling
+#define newHero jail      // frame-slot spelling
+#define heroFaction kind  // frame-slot spelling
+#define anchor landing    // frame-slot spelling
+#define anchorX spotX     // frame-slot spelling
+#define anchorY spotY     // frame-slot spelling
+#define ground groundNum  // frame-slot spelling
+#define shadow shadowNum  // frame-slot spelling
 VA(0x0041a26c, 0x14d6)
-i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
+b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
     i32 idx;
     i32 col;
     mapCellExtra* node;
     i32 row;
     mapCell* dest;
-    i32 spotX;
-    mapCell* landing;
-    i32 groundNum;
-    i32 spotY;
-    i32 shadowNum;
-    i32 done;
-    TownExtra* newCastle;
-    signEventExtra* bottle;
-    EventExtra* pEvent;
-    HeroExtra* jail;
-    mapEventExtra* sphinx;
-    i32 extraIndex;
-    i32 kind;
+    i32 anchorX;
+    mapCell* anchor;
+    i32 ground;
+    i32 anchorY;
+    i32 shadow;
+    b32 placed;
+    TownExtra* newTown;
+    signEventExtra* newSign;
+    EventExtra* newEvent;
+    HeroExtra* newHero;
+    mapEventExtra* newSphinx;
+    i32 H2_UNUSED(extraIndex);
+    i32 heroFaction;
 
     if (newLink)
         gNextObjectLink++;
-    if (!CanPlaceOverlay(type, x, y, 1)) {
+    if (!CanPlaceOverlay(type, x, y, true)) {
         LogStr("Invalid Placement");
         ShowStatusWarning(localization::Tr("editor.overlay.invalid_placement"));
-        return 0;
+        return false;
     }
     RemoveReplacedObjects(type, x, y);
     if (type->category == OVERLAY_CATEGORY_TOWN && gEditManager->CountTowns() >= GAME_TOWN_COUNT) {
         sprintf(gText, localization::Tr("editor.overlay.limit.towns"), GAME_TOWN_COUNT);
         ShowStatusWarning(gText);
-        return 0;
+        return false;
     }
     if (type->trigger == IDX(MAP_OBJECT_MAP_EVENT)
         && gEditManager->CountEvents() >= OVERLAY_EVENT_LIMIT) {
         sprintf(gText, localization::Tr("editor.overlay.limit.events"), OVERLAY_EVENT_LIMIT);
         ShowStatusWarning(gText);
-        return 0;
+        return false;
     }
     if ((type->trigger & MAP_TRIGGER_TYPE_MASK) == IDX(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT)) {
         for (col = 0; col < MAP_WIDTH; col++)
@@ -573,22 +705,22 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                     == IDX(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT)) {
                     sprintf(gText, localization::Tr("editor.overlay.ultimate.placed"));
                     ShowStatusWarning(gText);
-                    return 0;
+                    return false;
                 }
-        spotX = x + OVERLAY_ANCHOR_X;
-        spotY = y + OVERLAY_ANCHOR_Y;
-        if (spotX < OVERLAY_ULTIMATE_MARGIN || spotX > MAP_WIDTH - OVERLAY_ULTIMATE_MARGIN - 1
-            || spotY < OVERLAY_ULTIMATE_MARGIN
-            || spotY > MAP_HEIGHT - OVERLAY_ULTIMATE_MARGIN - 1) {
+        anchorX = x + OVERLAY_ANCHOR_X;
+        anchorY = y + OVERLAY_ANCHOR_Y;
+        if (anchorX < OVERLAY_ULTIMATE_MARGIN || anchorX > MAP_WIDTH - OVERLAY_ULTIMATE_MARGIN - 1
+            || anchorY < OVERLAY_ULTIMATE_MARGIN
+            || anchorY > MAP_HEIGHT - OVERLAY_ULTIMATE_MARGIN - 1) {
             sprintf(gText, localization::Tr("editor.overlay.ultimate.edge"));
             ShowStatusWarning(gText);
-            return 0;
+            return false;
         }
-        landing = gMap.CellAt(x + OVERLAY_ANCHOR_X, y + OVERLAY_ANCHOR_Y);
-        if (CELL_TERRAIN(landing) == TERRAIN_WATER) {
+        anchor = gMap.CellAt(x + OVERLAY_ANCHOR_X, y + OVERLAY_ANCHOR_Y);
+        if (CELL_TERRAIN(anchor) == TERRAIN_WATER) {
             sprintf(gText, localization::Tr("editor.overlay.ultimate.land"));
             ShowStatusWarning(gText);
-            return 0;
+            return false;
         }
     }
     if ((type->trigger == IDX(MAP_OBJECT_ABANDONED_MINE) || type->trigger == IDX(MAP_OBJECT_MINE)
@@ -600,21 +732,21 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
         && gEditManager->CountMines() >= GAME_MINE_COUNT) {
         sprintf(gText, localization::Tr("editor.overlay.limit.mines"), GAME_MINE_COUNT);
         ShowStatusWarning(gText);
-        return 0;
+        return false;
     }
     if (type->category == OVERLAY_CATEGORY_TOWN) {
-        shadowNum = -1;
-        groundNum = -1;
+        shadow = -1;
+        ground = -1;
         if (type->id >= OVERLAY_TOWN_FIRST && type->id <= OVERLAY_TOWN_LAST)
-            shadowNum =
+            shadow =
                 (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS + OVERLAY_TOWN_SHADOWS;
         else
-            shadowNum = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
-        groundNum =
+            shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
+        ground =
             CELL_TERRAIN(gMap.CellAt(x + OVERLAY_TOWN_ENTRANCE_X, y + OVERLAY_TOWN_ENTRANCE_Y))
             + OVERLAY_TOWN_GROUNDS;
-        done = PlaceOverlay(&gOverlayTypes[shadowNum], x, y, 0);
-        done = PlaceOverlay(&gOverlayTypes[groundNum], x, y, 0);
+        placed = PlaceOverlay(&gOverlayTypes[shadow], x, y, false);
+        placed = PlaceOverlay(&gOverlayTypes[ground], x, y, false);
     }
     for (row = 0; row < OVERLAY_GRID_HEIGHT; row++)
         for (col = 0; col < OVERLAY_GRID_WIDTH; col++) {
@@ -736,21 +868,21 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                          || dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
                          || dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE))
                         && OverlayGridHas(type->entranceRows, col, row)) {
-                        newCastle = new TownExtra;
-                        memset(newCastle, 0, sizeof(TownExtra));
+                        newTown = new TownExtra;
+                        memset(newTown, 0, sizeof(TownExtra));
                         dest->m_objectMetadata = gEditManager->m_extraCount;
-                        gEditManager->m_extras[gEditManager->m_extraCount] = newCastle;
+                        gEditManager->m_extras[gEditManager->m_extraCount] = newTown;
                         gEditMapHeader.townNameIndex = (gEditMapHeader.townNameIndex + 1) % EDITOR_TOWN_NAME_COUNT;
-                        strcpy(newCastle->name, gTownNames[gEditMapHeader.townNameIndex]);
-                        newCastle->owner = type->color == OVERLAY_NO_COLOR ? -1 : type->color;
+                        strcpy(newTown->name, gTownNames[gEditMapHeader.townNameIndex]);
+                        newTown->owner = type->color == OVERLAY_NO_COLOR ? TOWN_OWNER_NONE : type->color;
                         if (type->id >= OVERLAY_RANDOM_TOWN_FIRST
                             && type->id <= OVERLAY_RANDOM_TOWN_LAST) {
-                            newCastle->faction = OVERLAY_RANDOM_TOWN_FACTION;
-                            newCastle->isCastle = 1 - (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2;
+                            newTown->faction = OVERLAY_RANDOM_TOWN_FACTION;
+                            newTown->isCastle = 1 - (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2;
                         } else {
-                            newCastle->faction =
+                            newTown->faction =
                                 (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS / 2;
-                            newCastle->isCastle = 1 - (type->id - OVERLAY_TOWN_FIRST) % 2;
+                            newTown->isCastle = 1 - (type->id - OVERLAY_TOWN_FIRST) % 2;
                         }
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(TownExtra);
                         gEditManager->m_extraCount++;
@@ -758,36 +890,36 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                     if ((dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SIGN)
                          || dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE))
                         && OverlayGridHas(type->entranceRows, col, row)) {
-                        bottle = new signEventExtra;
-                        memset(bottle, 0, sizeof(signEventExtra));
-                        bottle->pad[0] = MAP_EVENT_DATA_AVAILABLE;
+                        newSign = new signEventExtra;
+                        memset(newSign, 0, sizeof(signEventExtra));
+                        newSign->pad[0] = MAP_EVENT_DATA_AVAILABLE;
                         dest->m_objectMetadata = gEditManager->m_extraCount;
-                        gEditManager->m_extras[gEditManager->m_extraCount] = bottle;
+                        gEditManager->m_extras[gEditManager->m_extraCount] = newSign;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] =
                             sizeof(signEventExtra);
                         gEditManager->m_extraCount++;
                     }
                     if (dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT)
                         && OverlayGridHas(type->entranceRows, col, row)) {
-                        pEvent = new EventExtra;
-                        memset(pEvent, 0, sizeof(EventExtra));
-                        pEvent->isMapEvent = 1;
-                        pEvent->artifact = -1;
-                        pEvent->cancelAfterVisit = 1;
+                        newEvent = new EventExtra;
+                        memset(newEvent, 0, sizeof(EventExtra));
+                        newEvent->isMapEvent = true;
+                        newEvent->artifact = IDX(ARTIFACT_NONE);
+                        newEvent->cancelAfterVisit = true;
                         for (idx = 0; idx < GAME_PLAYER_COUNT; idx++)
-                            pEvent->players[idx] = 1;
+                            newEvent->players[idx] = true;
                         dest->m_objectMetadata = gEditManager->m_extraCount;
-                        gEditManager->m_extras[gEditManager->m_extraCount] = pEvent;
+                        gEditManager->m_extras[gEditManager->m_extraCount] = newEvent;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(EventExtra);
                         gEditManager->m_extraCount++;
                     }
                     if (dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX)
                         && OverlayGridHas(type->entranceRows, col, row)) {
-                        sphinx = new mapEventExtra;
-                        memset(sphinx, 0, sizeof(mapEventExtra));
-                        sphinx->artifact = -1;
+                        newSphinx = new mapEventExtra;
+                        memset(newSphinx, 0, sizeof(mapEventExtra));
+                        newSphinx->artifact = IDX(ARTIFACT_NONE);
                         dest->m_objectMetadata = gEditManager->m_extraCount;
-                        gEditManager->m_extras[gEditManager->m_extraCount] = sphinx;
+                        gEditManager->m_extras[gEditManager->m_extraCount] = newSphinx;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] =
                             sizeof(mapEventExtra);
                         gEditManager->m_extraCount++;
@@ -795,52 +927,52 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                     if ((dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_HERO)
                          || dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_JAIL))
                         && OverlayGridHas(type->entranceRows, col, row)) {
-                        jail = new HeroExtra;
-                        memset(jail, 0, sizeof(HeroExtra));
+                        newHero = new HeroExtra;
+                        memset(newHero, 0, sizeof(HeroExtra));
                         for (idx = 0; idx < ARMY_GROUP_SLOT_COUNT; idx++)
-                            jail->troopTypes[idx] = -1;
+                            newHero->troopTypes[idx] = CREATURE_NONE;
                         for (idx = 0; idx < EVENT_RECORD_HERO_ARTIFACT_COUNT; idx++)
-                            jail->artifacts[idx] = -1;
+                            newHero->artifacts[idx] = IDX(ARTIFACT_NONE);
                         for (idx = 0; idx < HERO_SECONDARY_SKILL_CAPACITY; idx++)
-                            jail->skillTypes[idx] = -1;
+                            newHero->skillTypes[idx] = IDX(HERO_SKILL_NONE);
                         if (dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_JAIL))
-                            kind = IDX(FACTION_KNIGHT);
+                            heroFaction = IDX(FACTION_KNIGHT);
                         else
-                            kind = dest->m_objectIndex % OVERLAY_HERO_FRAMES_PER_COLOR;
-                        if (kind == IDX(FACTION_KNIGHT)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_LEADERSHIP);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
-                            jail->skillTypes[1] = IDX(HERO_SKILL_BALLISTICS);
-                            jail->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                            heroFaction = dest->m_objectIndex % OVERLAY_HERO_FRAMES_PER_COLOR;
+                        if (heroFaction == IDX(FACTION_KNIGHT)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_LEADERSHIP);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillTypes[1] = IDX(HERO_SKILL_BALLISTICS);
+                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
                         }
-                        if (kind == IDX(FACTION_SORCERESS)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_NAVIGATION);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
-                            jail->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            jail->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                        if (heroFaction == IDX(FACTION_SORCERESS)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_NAVIGATION);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
+                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
                         }
-                        if (kind == IDX(FACTION_BARBARIAN)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_PATHFINDING);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                        if (heroFaction == IDX(FACTION_BARBARIAN)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_PATHFINDING);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
                         }
-                        if (kind == IDX(FACTION_WARLOCK)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_SCOUTING);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
-                            jail->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            jail->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                        if (heroFaction == IDX(FACTION_WARLOCK)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_SCOUTING);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
+                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
                         }
-                        if (kind == IDX(FACTION_WIZARD)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_WISDOM);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                        if (heroFaction == IDX(FACTION_WIZARD)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_WISDOM);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
                         }
-                        if (kind == IDX(FACTION_NECROMANCER)) {
-                            jail->skillTypes[0] = IDX(HERO_SKILL_NECROMANCY);
-                            jail->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
-                            jail->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            jail->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                        if (heroFaction == IDX(FACTION_NECROMANCER)) {
+                            newHero->skillTypes[0] = IDX(HERO_SKILL_NECROMANCY);
+                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
+                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
                         }
                         dest->m_objectMetadata = gEditManager->m_extraCount;
-                        gEditManager->m_extras[gEditManager->m_extraCount] = jail;
+                        gEditManager->m_extras[gEditManager->m_extraCount] = newHero;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(HeroExtra);
                         gEditManager->m_extraCount++;
                     }
@@ -904,7 +1036,7 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
                             &gOverlayTypes[OVERLAY_RESOURCE_MARKERS] + type->color,
                             x + col,
                             y + row,
-                            0
+                            false
                         );
                 }
             }
@@ -914,20 +1046,32 @@ i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink) {
             &gOverlayTypes[OVERLAY_TOWN_FLAGS + type->color * 2],
             x + OVERLAY_LEFT_FLAG_X,
             y + OVERLAY_FLAG_Y,
-            0
+            false
         );
         PlaceOverlay(
             &gOverlayTypes[OVERLAY_TOWN_FLAGS + 1 + type->color * 2],
             x + OVERLAY_RIGHT_FLAG_X,
             y + OVERLAY_FLAG_Y,
-            0
+            false
         );
     }
-    return 1;
+    return true;
 }
+#undef placed
+#undef newTown
+#undef newSign
+#undef newEvent
+#undef newSphinx
+#undef newHero
+#undef heroFaction
+#undef anchor
+#undef anchorX
+#undef anchorY
+#undef ground
+#undef shadow
 
 VA(0x0041b742, 0xf1)
-b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, i32 requireMine) {
+b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, b32 requireMine) {
     b32 valid;
     mapCell* dest;
 
@@ -953,15 +1097,17 @@ b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, i32 requireMine) {
     return true;
 }
 
+#define ground groundType // frame-slot spelling
+#define frameCount count  // frame-slot spelling
 VA(0x0041b833, 0x627)
 void overlayManager::DrawOverlay(
     overlayType* type,
     i32 x,
     i32 y,
-    i32 clip,
+    b32 clip,
     i32 width,
     i32 height,
-    i32 update,
+    b32 update,
     i32 cellX,
     i32 cellY
 ) {
@@ -971,20 +1117,20 @@ void overlayManager::DrawOverlay(
     i32 fromX;
     i32 fromY;
     i32 cellTerrain;
-    i32 count;
-    i32 groundType;
+    i32 frameCount;
+    i32 ground;
     i32 shadow;
 
     fromY = OVERLAY_GRID_HEIGHT - height;
     fromX = OVERLAY_GRID_WIDTH - width;
     if (type->category == OVERLAY_CATEGORY_TOWN) {
         shadow = -1;
-        groundType = -1;
+        ground = -1;
         if (type->id >= OVERLAY_TOWN_FIRST && type->id <= OVERLAY_TOWN_LAST)
             shadow = (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS + OVERLAY_TOWN_SHADOWS;
         else
             shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
-        groundType = OVERLAY_TOWN_GRASS_GROUND;
+        ground = OVERLAY_TOWN_GRASS_GROUND;
         if (cellX != EDIT_NO_CELL) {
             if (cellX < OVERLAY_TOWN_GROUND_COLUMN)
                 cellX = OVERLAY_TOWN_GROUND_COLUMN;
@@ -996,7 +1142,7 @@ void overlayManager::DrawOverlay(
                 cellY = MAP_HEIGHT - 1;
             cellTerrain = CELL_TERRAIN(gMap.CellAt(cellX - OVERLAY_TOWN_GROUND_COLUMN, cellY));
             if (cellTerrain != IDX(TERRAIN_WATER))
-                groundType = cellTerrain + OVERLAY_TOWN_GROUNDS;
+                ground = cellTerrain + OVERLAY_TOWN_GROUNDS;
         }
         DrawOverlay(
             &gOverlayTypes[shadow],
@@ -1005,18 +1151,18 @@ void overlayManager::DrawOverlay(
             clip,
             width,
             height,
-            0,
+            false,
             EDIT_NO_CELL,
             EDIT_NO_CELL
         );
         DrawOverlay(
-            &gOverlayTypes[groundType],
+            &gOverlayTypes[ground],
             x,
             y,
             clip,
             width,
             height,
-            0,
+            false,
             EDIT_NO_CELL,
             EDIT_NO_CELL
         );
@@ -1060,7 +1206,7 @@ void overlayManager::DrawOverlay(
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 if (OverlayGridHas(type->animatedRows, gridX, gridY)) {
-                    count = GetIconEntry(
+                    frameCount = GetIconEntry(
                                 gEditManager->m_objectIcons[type->tileset][0],
                                 type->frames[gridX + gridY * OVERLAY_GRID_WIDTH]
                     )
@@ -1071,7 +1217,7 @@ void overlayManager::DrawOverlay(
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH] + 1
-                            + gEditManager->m_animationCounter % count,
+                            + gEditManager->m_animationCounter % frameCount,
                         clip,
                         EDIT_VIEW_ORIGIN,
                         EDIT_VIEW_ORIGIN,
@@ -1134,14 +1280,16 @@ void overlayManager::DrawOverlay(
                     );
             }
 }
+#undef ground
+#undef frameCount
 
 VA(0x0041be5a, 0x24c)
-i32 overlayManager::LoadClass(i32 objectClass) {
+b32 overlayManager::LoadClass(i32 objectClass) {
     i32 unusedCount;
-    i32 changed;
-    i32 unusedFlag;
+    b32 changed;
+    i32 H2_UNUSED(unusedFlag);
     overlayType tmp;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
     i32 i;
     i32 j;
 
@@ -1152,20 +1300,20 @@ i32 overlayManager::LoadClass(i32 objectClass) {
             && gOverlayTypes[i].terrainMask & gObjectClassTerrains[objectClass])
             m_types[m_typeCount++] = gOverlayTypes[i];
     for (i = 0; i < m_typeCount; i++) {
-        changed = 0;
+        changed = false;
         for (j = m_typeCount - 1; j > 0; j--)
             if (m_types[j].ordinal < m_types[j - 1].ordinal) {
                 tmp = m_types[j];
                 m_types[j] = m_types[j - 1];
                 m_types[j - 1] = tmp;
-                changed = 1;
+                changed = true;
             }
         if (!changed)
             break;
     }
     if (m_typeCount)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x0041c0a6, 0xbe)
@@ -1189,16 +1337,17 @@ void overlayManager::MeasureOverlay(overlayType* type) {
 VA(0x0041c164, 0xb)
 void overlayManager::DrawSelectedOverlay(void) {}
 
+#define previousClass was // frame-slot spelling
 VA(0x0041c16f, 0x120)
-i32 overlayManager::SelectOverlay(i32 index) {
+b32 overlayManager::SelectOverlay(i32 index) {
     i32 objectClass;
     i32 slot;
-    i32 was;
+    i32 previousClass;
     i32 x;
     tag_message message;
     i32 y;
 
-    was = gObjectClass;
+    previousClass = gObjectClass;
     for (objectClass = OVERLAY_CLASS_COUNT - 1; objectClass >= 0; objectClass--) {
         gObjectClass = objectClass;
         LoadClass(gObjectClass);
@@ -1206,23 +1355,24 @@ i32 overlayManager::SelectOverlay(i32 index) {
             if (m_types[slot].id == gOverlayTypes[index].id) {
                 gSelectedOverlay = slot;
                 DrawSelectedOverlay();
-                ShowClass(1);
+                ShowClass(true);
                 gEditManager->m_cursorX = EDIT_NO_CELL;
                 message.type = MESSAGE_MOUSE_MOVE;
                 gpMouseManager->MouseCoords(x, y);
                 message.payload.mouse.screenX = message.payload.mouse.x = x;
                 message.payload.mouse.screenY = message.payload.mouse.y = y;
                 Main(message);
-                return 1;
+                return true;
             }
     }
     gSelectedOverlay = OVERLAY_NONE;
-    gObjectClass = was;
-    return 0;
+    gObjectClass = previousClass;
+    return false;
 }
+#undef previousClass
 
 VA(0x0041c28f, 0x2ba)
-void overlayManager::DrawPicker(i32 update) {
+void overlayManager::DrawPicker(b32 update) {
     i32 col;
     i32 idx;
     i32 row;
@@ -1268,15 +1418,15 @@ void overlayManager::DrawPicker(i32 update) {
         col = idx % OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_BOX_WIDTH + OVERLAY_PICKER_OBJECT_INSET;
         row =
             idx / OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_BOX_HEIGHT + OVERLAY_PICKER_OBJECT_INSET;
-        DrawFootprint(col, row, OVERLAY_PICKER_VIEW_WIDTH, OVERLAY_PICKER_VIEW_HEIGHT, shown, 0);
+        DrawFootprint(col, row, OVERLAY_PICKER_VIEW_WIDTH, OVERLAY_PICKER_VIEW_HEIGHT, shown, false);
         DrawOverlay(
             shown,
             col,
             row,
-            0,
+            false,
             OVERLAY_PICKER_VIEW_WIDTH,
             OVERLAY_PICKER_VIEW_HEIGHT,
-            0,
+            false,
             EDIT_NO_CELL,
             EDIT_NO_CELL
         );
@@ -1288,14 +1438,14 @@ void overlayManager::DrawPicker(i32 update) {
 
 VA(0x0041c549, 0x2d7)
 i32 overlayManager::PickOverlay(i32 objectClass) {
-    i32 needDraw;
-    i32 done;
+    b32 needDraw;
+    b32 done;
     tag_message message;
     i32 zoom;
 
     zoom = gEditManager->m_zoomLevel;
-    done = 0;
-    needDraw = 1;
+    done = false;
+    needDraw = true;
     m_picker = new heroWindow(0, 0, "editpalt.bin");
     m_pickerTrack = new iconWidget(
         OVERLAY_PICKER_TRACK_X,
@@ -1335,7 +1485,7 @@ i32 overlayManager::PickOverlay(i32 objectClass) {
     gPickerRows = (m_typeCount - 1) / OVERLAY_PICKER_COLUMNS + 1;
     gpInputManager->Flush();
     gpWindowManager->AddWindow(m_picker, -1, 0);
-    DrawPicker(1);
+    DrawPicker(true);
     gpWindowManager->DoDialog(m_picker, PickerHandler, 0);
     gpWindowManager->RemoveWindow(m_picker);
     delete m_picker;
@@ -1396,13 +1546,13 @@ MessageDispatchResult overlayManager::PickerMain(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case OVERLAY_PICKER_TRACK_ID:
                             DragPickerKnob(
-                                1,
+                                true,
                                 message.payload.widget.screenX,
                                 message.payload.widget.screenY
                             );
                             break;
                         case OVERLAY_PICKER_KNOB_ID:
-                            DragPickerKnob(0, EDIT_NO_CELL, EDIT_NO_CELL);
+                            DragPickerKnob(false, EDIT_NO_CELL, EDIT_NO_CELL);
                             break;
                         case OVERLAY_PICKER_BOXES:
                             x = message.payload.widget.screenX / OVERLAY_PICKER_BOX_WIDTH;
@@ -1421,13 +1571,13 @@ MessageDispatchResult overlayManager::PickerMain(tag_message& message) {
             break;
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
-                case OVERLAY_KEY_PAGE_UP:
+                case INPUT_SCAN_NUMPAD_9:
                     gPickerFirst -= OVERLAY_PICKER_PAGE;
                     if (gPickerFirst < 0)
                         gPickerFirst = 0;
                     needDraw = true;
                     break;
-                case OVERLAY_KEY_PAGE_DOWN:
+                case INPUT_SCAN_NUMPAD_3:
                     if (m_typeCount < OVERLAY_PICKER_PAGE)
                         break;
                     gPickerFirst += OVERLAY_PICKER_PAGE;
@@ -1438,7 +1588,7 @@ MessageDispatchResult overlayManager::PickerMain(tag_message& message) {
                                   % OVERLAY_PICKER_COLUMNS;
                     needDraw = true;
                     break;
-                case OVERLAY_KEY_ESCAPE:
+                case INPUT_SCAN_ESCAPE:
                     gPickedOverlay = OVERLAY_NONE;
                     done = true;
                     break;
@@ -1446,7 +1596,7 @@ MessageDispatchResult overlayManager::PickerMain(tag_message& message) {
             break;
     }
     if (needDraw)
-        DrawPicker(1);
+        DrawPicker(true);
     if (done) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         FINISH_EDIT_DIALOG(message);
@@ -1456,7 +1606,7 @@ MessageDispatchResult overlayManager::PickerMain(tag_message& message) {
 }
 
 VA(0x0041cb93, 0x197)
-void overlayManager::DragPickerKnob(i32 trackClick, i32 mouseX, i32 mouseY) {
+void overlayManager::DragPickerKnob(b32 trackClick, i32 mouseX, i32 mouseY) {
     double rowHeight;
     tag_message latest;
     tag_message message;
@@ -1490,7 +1640,7 @@ void overlayManager::DragPickerKnob(i32 trackClick, i32 mouseX, i32 mouseY) {
             top = top * OVERLAY_PICKER_COLUMNS;
             if (gPickerFirst != top) {
                 gPickerFirst = top;
-                DrawPicker(1);
+                DrawPicker(true);
             }
             if (trackClick)
                 return;

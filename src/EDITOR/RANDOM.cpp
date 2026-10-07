@@ -7,7 +7,7 @@
 #include <EDITOR/RANDOM.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>
-#include <EDITOR/overlayType.h>
+#include <EDITOR/OVERLAY.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/specedit.h>
 #include <BASE/Misc.h>
@@ -18,6 +18,148 @@
 #include <string.h>
 
 #define RANDOM_SOURCE_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Editor\\RANDOM.CPP"
+
+// A cell offset, kept as a plain (x, y) pair in the chain tables.
+H2_ENUM_BEGIN(MapStepAxis)
+    MAP_STEP_X    = 0,
+    MAP_STEP_Y    = 1,
+    MAP_STEP_AXES = 2
+H2_ENUM_END(MapStepAxis)
+typedef i32 MapStepPair[MAP_STEP_AXES];
+
+H2_ENUM_BEGIN(RandomMapConstant)
+    // GenerateRandomMap retries a map without enough castles this often.
+    RANDOM_MAP_ATTEMPTS          = 5,
+    // PaintRandomTerrain's percent that covers the whole map; densities and
+    // terrain shares are percents.
+    RANDOM_MAP_FULL_PERCENT      = 100,
+    // ScaleByDensity leaves a count unchanged at this density.
+    RANDOM_MAP_NEUTRAL_DENSITY   = 50,
+    // GenerateRandomMap's terrain index past the last terrain once the base
+    // terrain is painted.
+    RANDOM_MAP_END_TERRAIN_SCAN  = 99,
+    // PaintRandomTerrain drifts a seed every eighth step and its walk
+    // weights every 64th.
+    RANDOM_MAP_SEED_DRIFT_MASK   = 7,
+    RANDOM_MAP_WEIGHT_DRIFT_MASK = 0x3f,
+    // PaintRandomTerrain gives up a seed search after this many tries and a
+    // walk after this many steps (a step against the map's edge costs
+    // RANDOM_MAP_EDGE_STEP_COST more); it grows at most this many seeds.
+    RANDOM_MAP_SEED_TRIES        = 200,
+    RANDOM_MAP_WALK_LIMIT        = 250,
+    RANDOM_MAP_EDGE_STEP_COST    = 50,
+    RANDOM_MAP_ESCAPED_WALK      = 1000,
+    RANDOM_MAP_SEED_LIMIT        = 20,
+    // RemoveSmallRegions merges a region of at most this many cells, and
+    // scans neighbours against the largest map's last cell.
+    RANDOM_MAP_SMALL_REGION_SIZE = 15,
+    RANDOM_MAP_LARGEST_LAST_CELL = 71,
+    // PlaceObstacleChains: a chain per this many land cells (scaled by the
+    // density), each worth this many placements, a link costing this many;
+    // a root with mountains or trees within RANDOM_MAP_CHAIN_SPACING cells
+    // is rerolled up to this often.
+    RANDOM_MAP_LAND_PER_CHAIN    = 30,
+    RANDOM_MAP_CHAIN_BUDGET      = 13,
+    RANDOM_MAP_CHAIN_LINK_COST   = 12,
+    RANDOM_MAP_CHAIN_SPACING     = 5,
+    RANDOM_MAP_CROWDED_TRIES     = 10,
+    // CountNearbyObstacles' count for the map's corner.
+    RANDOM_MAP_CROWDED           = 100,
+    // gMineResources: the five mines' resources.
+    RANDOM_MAP_MINE_RESOURCE_COUNT = 5,
+    // PlaceTowns: a castle per player and the land regions it numbers; a
+    // scan ends by setting its counters past the map.
+    RANDOM_MAP_CASTLE_SLOTS      = 6,
+    RANDOM_MAP_REGION_LIMIT      = 255,
+    RANDOM_MAP_END_SCAN          = 999,
+    // PlaceTowns: a castle on another region than its peers digs its
+    // harbour without a step limit.
+    RANDOM_MAP_UNLIMITED_STEPS   = 999,
+    // PlaceRandomObjects: a town per this many land cells (at most this
+    // many), a resource site per this many and an obelisk per this many,
+    // each with this many placement tries.
+    RANDOM_MAP_LAND_PER_TOWN     = 640,
+    RANDOM_MAP_MAX_TOWNS         = 22,
+    RANDOM_MAP_TRIES_PER_OBJECT  = 100,
+    RANDOM_MAP_LAND_PER_SITE     = 140,
+    RANDOM_MAP_MIN_SITES         = 6,
+    RANDOM_MAP_MAX_SITES         = 34,
+    RANDOM_MAP_TRIES_PER_SITE    = 1000,
+    RANDOM_MAP_LAND_PER_OBELISK = 180,
+    RANDOM_MAP_MIN_OBELISKS     = 8,
+    RANDOM_MAP_MAX_OBELISKS     = 24,
+    // PlaceTreasures: a treasure per this many land cells and a roaming
+    // monster per this many, each scaled by its density.
+    RANDOM_MAP_LAND_PER_TREASURE = 40,
+    RANDOM_MAP_LAND_PER_MONSTER  = 130
+H2_ENUM_END(RandomMapConstant)
+
+// Where PlaceTreasures guards a treasure: the diagonal cell of a corner
+// whose two sides are blocked.
+H2_ENUM_BEGIN(TreasureGuard)
+    TREASURE_UNGUARDED = 0,
+    TREASURE_GUARD_NE  = 1,
+    TREASURE_GUARD_SE  = 2,
+    TREASURE_GUARD_SW  = 3,
+    TREASURE_GUARD_NW  = 4
+H2_ENUM_END(TreasureGuard)
+
+// giGroundShape's plain ground and the decorated plain variants
+// ScatterDecorations may put an object on.
+H2_ENUM_BEGIN(RandomMapGroundShape)
+    GROUND_SHAPE_PLAIN           = 0,
+    GROUND_SHAPE_DECORATED_FIRST = 0x12,
+    GROUND_SHAPE_DECORATED_A     = 0x13,
+    GROUND_SHAPE_DECORATED_B     = 0x14,
+    GROUND_SHAPE_DECORATED_C     = 0x15
+H2_ENUM_END(RandomMapGroundShape)
+
+// The eight directions a mountain or tree chain runs (gChainSteps): steep
+// directions move two rows per column.
+H2_ENUM_BEGIN(ChainDirection)
+    CHAIN_UP_RIGHT_STEEP   = 0,
+    CHAIN_UP_RIGHT         = 1,
+    CHAIN_DOWN_RIGHT       = 2,
+    CHAIN_DOWN_RIGHT_STEEP = 3,
+    CHAIN_DOWN_LEFT_STEEP  = 4,
+    CHAIN_DOWN_LEFT        = 5,
+    CHAIN_UP_LEFT          = 6,
+    CHAIN_UP_LEFT_STEEP    = 7,
+    // Directions below this one run rightwards.
+    CHAIN_RIGHTWARD_END    = CHAIN_DOWN_LEFT_STEEP,
+    CHAIN_DIRECTION_COUNT  = 8
+H2_ENUM_END(ChainDirection)
+
+// A chain's sideways shift when it turns (gChainTurns' second index), and
+// what the turn adds to the direction modulo CHAIN_DIRECTION_COUNT.
+H2_ENUM_BEGIN(ChainTurn)
+    CHAIN_TURN_CLOCKWISE        = 0,
+    CHAIN_TURN_COUNTERCLOCKWISE = 1,
+    CHAIN_TURN_COUNT            = 2,
+    CHAIN_CLOCKWISE_STEP        = 10,
+    CHAIN_COUNTERCLOCKWISE_STEP = 6
+H2_ENUM_END(ChainTurn)
+
+// The four objects of a mountain or tree chain, in catalogue order from the
+// one whose bottom rows have the chain link's shape.
+H2_ENUM_BEGIN(ChainPiece)
+    CHAIN_PIECE_STEEP_FALLING = 0,
+    CHAIN_PIECE_STEEP_RISING  = 1,
+    CHAIN_PIECE_FALLING       = 2,
+    CHAIN_PIECE_RISING        = 3,
+    // overlayType::occupiedRows[OVERLAY_GRID_BOTTOM] of a chain's first
+    // piece.
+    CHAIN_LINK_SHAPE          = 0xe0f07
+H2_ENUM_END(ChainPiece)
+
+// gDensityPercent's rows.
+H2_ENUM_BEGIN(RandomMapDensity)
+    RANDOM_MAP_DENSITY_MOUNTAINS = 0,
+    RANDOM_MAP_DENSITY_TREES     = 1,
+    RANDOM_MAP_DENSITY_OBJECTS   = 2,
+    RANDOM_MAP_DENSITY_TREASURE  = 3,
+    RANDOM_MAP_DENSITY_MONSTERS  = 4
+H2_ENUM_END(RandomMapDensity)
 
 // The generator's own data: the chain directions' steps and turns, then the
 // five mines' resources.
@@ -45,13 +187,13 @@ static i32 gMineResources[RANDOM_MAP_MINE_RESOURCE_COUNT] = {
 DATA(0x004a5750) b32 gGeneratingRandomMap;
 
 VA(0x0041cd70, 0x29)
-i32 PlaceOverlayAt(overlayType* type, i32 x, i32 y) {
+b32 PlaceOverlayAt(overlayType* type, i32 x, i32 y) {
     return PlaceOverlay(type, x - OVERLAY_ANCHOR_X, y - OVERLAY_ANCHOR_Y, 1);
 }
 
 VA(0x0041cd99, 0x2b)
-i32 CanPlaceOverlayAt(overlayType* type, i32 x, i32 y, i32 strict) {
-    return CanPlaceOverlay(type, x - OVERLAY_ANCHOR_X, y - OVERLAY_ANCHOR_Y, strict);
+b32 CanPlaceOverlayAt(overlayType* type, i32 x, i32 y, b32 overObjects) {
+    return CanPlaceOverlay(type, x - OVERLAY_ANCHOR_X, y - OVERLAY_ANCHOR_Y, overObjects);
 }
 
 #if H2_RETAIL_COMPILER
@@ -751,7 +893,7 @@ b32 editManager::PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, ch
     link = NULL;
     for (n = 0; n < OVERLAY_TYPE_COUNT; n++) {
         if (!link && gOverlayTypes[n].tileset == tileset
-            && gOverlayTypes[n].occupiedRows[OVERLAY_OCCUPIED_BOTTOM] == CHAIN_LINK_SHAPE)
+            && gOverlayTypes[n].occupiedRows[OVERLAY_GRID_BOTTOM] == CHAIN_LINK_SHAPE)
             link = &gOverlayTypes[n + piece];
     }
     if (CanPlaceOverlayAt(link, *x, *y, 1)) {
@@ -1363,7 +1505,7 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
     mediumMonster = &gOverlayTypes[OVERLAY_RANDOM_MONSTER_MEDIUM];
     strongMonster = &gOverlayTypes[OVERLAY_RANDOM_MONSTER_STRONG];
     veryStrongMonster = &gOverlayTypes[OVERLAY_RANDOM_MONSTER_VERY_STRONG];
-    randomTown = &gOverlayTypes[OVERLAY_RANDOM_TOWN];
+    randomTown = &gOverlayTypes[OVERLAY_RANDOM_NEUTRAL_TOWN];
     sitesPlaced = 0;
     ScatterDecorations();
     obelisks[IDX(TERRAIN_GRASS)] = &gOverlayTypes[OVERLAY_OBELISK_GRASS];

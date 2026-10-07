@@ -14143,14 +14143,6 @@ void editManager::CheckScreenScroll(void) {
     }
 }
 
-H2_ENUM_BEGIN(EditOverlayFrames)
-    // overlayType::reserved4e: a type that reuses the previous type's
-    // frames, and one that numbers its own from frame 0 (a negative value
-    // leaves the frames alone).
-    EDIT_OVERLAY_FRAMES_SHARED = 1111,
-    EDIT_OVERLAY_FRAMES_OWN    = 0
-H2_ENUM_END(EditOverlayFrames)
-
 // Numbers the parts of every catalogue entry: each occupied grid cell takes
 // the next frame of its tileset (an animated one its animation's frames as
 // well), and the entry's width is the widest occupied row.
@@ -14176,9 +14168,9 @@ void FillInOverlayTiles(void) {
         if (shape->tileset != curTileset)
             baseFrame = 0;
         curTileset = shape->tileset;
-        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_SHARED)
+        if (shape->frameNumbering == OVERLAY_FRAMES_SHARED)
             baseFrame = runFrame;
-        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_OWN)
+        if (shape->frameNumbering == OVERLAY_FRAMES_OWN)
             baseFrame = 0;
         nextFrame = baseFrame;
         runFrame = baseFrame;
@@ -14188,22 +14180,22 @@ void FillInOverlayTiles(void) {
                 if (OverlayGridHas(shape->occupiedRows, gx, gy)) {
                     if (OVERLAY_GRID_WIDTH - gx > width)
                         width = OVERLAY_GRID_WIDTH - gx;
-                    if (shape->reserved4e >= 0)
+                    if (shape->frameNumbering >= 0)
                         shape->frames[cellIndex] = nextFrame;
                     if (OverlayGridHas(shape->animatedRows, gx, gy)) {
-                        nextFrame += shape->reserved10 + 1;
-                        baseFrame += shape->reserved10 + 1;
+                        nextFrame += shape->animationFrames + 1;
+                        baseFrame += shape->animationFrames + 1;
                     } else {
                         nextFrame++;
                         baseFrame++;
                     }
-                } else if (shape->reserved4e >= 0) {
+                } else if (shape->frameNumbering >= 0) {
                     shape->frames[cellIndex] = OVERLAY_NO_FRAME;
                 }
                 cellIndex++;
             }
         }
-        shape->reserved4d = width;
+        shape->width = width;
     }
 }
 

@@ -40,10 +40,7 @@ H2_ENUM_BEGIN(OverlayGridConstant)
     // overlayType::frames: a cell without a part.
     OVERLAY_NO_FRAME        = 0xff,
     // The catalogue (gOverlayTypes).
-    OVERLAY_TYPE_COUNT      = 956,
-    // The older names of the grid's words.
-    OVERLAY_OCCUPIED_HALVES = OVERLAY_GRID_WORDS,
-    OVERLAY_OCCUPIED_BOTTOM = OVERLAY_GRID_BOTTOM
+    OVERLAY_TYPE_COUNT      = 956
 H2_ENUM_END(OverlayGridConstant)
 
 // One bit per grid cell (see OVERLAY_GRID_WORDS).
@@ -70,6 +67,18 @@ H2_ENUM_BEGIN(OverlayTypeFlag)
     OVERLAY_FLAG_SHOWS_RESOURCE = 2
 H2_ENUM_END(OverlayTypeFlag)
 
+// overlayType::frameNumbering: where FillInOverlayTiles starts numbering a
+// type's parts in its tileset. Any other value continues after the previous
+// type (the catalogue spells it 9999); a negative one keeps the catalogue's
+// frames.
+H2_ENUM_BEGIN(OverlayFrameNumbering)
+    // From frame 0.
+    OVERLAY_FRAMES_OWN      = 0,
+    // From the previous type's first frame: the two share their parts.
+    OVERLAY_FRAMES_SHARED   = 1111,
+    OVERLAY_FRAMES_CONTINUE = 9999
+H2_ENUM_END(OverlayFrameNumbering)
+
 #pragma pack(push, 1)
 // An entry of the editor's object catalogue: the tileset its parts come
 // from, its class, the masks of its grid cells and each cell's frame.
@@ -88,7 +97,8 @@ struct overlayType {
     i8 category;
     // How often ScatterDecorations picks it, in tenths of a percent.
     u16 frequency;
-    u8 reserved10;
+    // The frames an animated part runs through after its own.
+    u8 animationFrames;
     // The cells the object occupies.
     OverlayGrid occupiedRows;
     // The terrains (a TerrainType bit each) whose classes list it and on
@@ -104,8 +114,8 @@ struct overlayType {
     OverlayGrid animatedRows;
     // The cells a resource marker goes on (OVERLAY_FLAG_SHOWS_RESOURCE).
     OverlayGrid resourceRows;
-    // A town's or hero's player colour (6: none); a resource marker's
-    // resource.
+    // A town's or hero's player colour (OVERLAY_NO_COLOR: none); a resource
+    // marker's resource.
     u8 color;
     // OverlayTypeFlag.
     u8 flags;
@@ -115,8 +125,13 @@ struct overlayType {
     u8 highLayer;
     // The map object (MapObjectType) its cells take as their trigger.
     u8 trigger;
-    u8 reserved4d;
-    i32 reserved4e;
+    // The grid columns from its leftmost part to the anchor's, as
+    // FillInOverlayTiles measures them; the editor never reads it.
+    u8 width;
+    // OverlayFrameNumbering.
+    i32 frameNumbering;
+    // Each grid cell's part: a frame of the tileset (OVERLAY_NO_FRAME: none),
+    // numbered by FillInOverlayTiles.
     u8 frames[OVERLAY_GRID_CELLS];
 };
 #pragma pack(pop)
@@ -132,26 +147,48 @@ H2_ENUM_BEGIN(OverlayClassConstant)
 H2_ENUM_END(OverlayClassConstant)
 
 H2_ENUM_BEGIN(OverlayCatalogueEntry)
-    // The resource markers, one per resource from gOverlayTypes[128].
+    // Each ground's mines: a mine is the entry its resource (one of
+    // ore, sulfur, crystal, gems, gold) is past its ground's.
+    OVERLAY_MINES_WATER       = 4,
+    OVERLAY_MINES_WASTELAND   = 17,
+    OVERLAY_MINES_GRASS       = 28,
+    OVERLAY_MINES_SNOW        = 39,
+    OVERLAY_MINES_SWAMP       = 50,
+    OVERLAY_MINES_LAVA        = 61,
+    OVERLAY_MINES_DESERT      = 72,
+    OVERLAY_MINES_DIRT        = 85,
+    // The resource markers, one per resource.
     OVERLAY_RESOURCE_MARKERS  = 128,
     // A town flag's left and right part, two per player colour.
     OVERLAY_TOWN_FLAGS        = 134,
-    // The towns and castles (twelve per faction) and their shadows.
-    OVERLAY_TOWN_FIRST        = 835,
-    OVERLAY_TOWN_LAST         = 918,
-    OVERLAY_TOWN_SHADOWS      = 919,
-    OVERLAY_TOWN_VARIANTS     = 12,
-    // The ground under a town, one per terrain; grass when the terrain
-    // left of a dragged town's entrance is water.
-    OVERLAY_TOWN_GROUNDS      = 930,
-    OVERLAY_TOWN_GRASS_GROUND = 931,
-    // The random towns and castles (a town and a castle per colour) and
-    // their two shadows.
-    OVERLAY_RANDOM_TOWN_FIRST = 939,
-    OVERLAY_RANDOM_TOWN_LAST  = 954,
-    OVERLAY_RANDOM_TOWN_SHADOWS = 941,
-    // The outline DrawFootprint and CanPlaceOverlay take for every town.
-    OVERLAY_TOWN_OUTLINE      = 955,
+    // The random monsters: any, then by strength.
+    OVERLAY_RANDOM_MONSTER             = 214,
+    OVERLAY_RANDOM_MONSTER_WEAK        = 215,
+    OVERLAY_RANDOM_MONSTER_MEDIUM      = 216,
+    OVERLAY_RANDOM_MONSTER_STRONG      = 217,
+    OVERLAY_RANDOM_MONSTER_VERY_STRONG = 218,
+    // The random artifacts.
+    OVERLAY_RANDOM_TREASURE_ARTIFACT   = 337,
+    OVERLAY_RANDOM_MINOR_ARTIFACT      = 338,
+    OVERLAY_RANDOM_MAJOR_ARTIFACT      = 339,
+    // Each ground's obelisk, sawmill and alchemist's lab (one lab serves
+    // every ground but snow).
+    OVERLAY_OBELISK_GRASS       = 514,
+    OVERLAY_OBELISK_SNOW        = 550,
+    OVERLAY_ALCHEMIST_LAB_SNOW  = 552,
+    OVERLAY_SAWMILL_SNOW        = 556,
+    OVERLAY_OBELISK_SWAMP       = 598,
+    OVERLAY_OBELISK_LAVA        = 615,
+    OVERLAY_SAWMILL_LAVA        = 618,
+    OVERLAY_OBELISK_DESERT      = 655,
+    OVERLAY_SAWMILL_DESERT      = 661,
+    OVERLAY_OBELISK_DIRT        = 709,
+    OVERLAY_OBELISK_WASTELAND   = 742,
+    OVERLAY_SAWMILL_WASTELAND   = 743,
+    OVERLAY_ALCHEMIST_LAB       = 770,
+    OVERLAY_SAWMILL_DIRT        = 774,
+    OVERLAY_STONE_LITHS         = 777,
+    OVERLAY_SAWMILL_GRASS       = 789,
     // The Price of Loyalty sites whose cells keep their kind in the cell's
     // metadata: the generic sites (GenericSiteType order), the recruitment
     // sites (RecruitSiteType order), and the barriers and traveller tents,
@@ -169,132 +206,47 @@ H2_ENUM_BEGIN(OverlayCatalogueEntry)
     OVERLAY_TRAVELER_TENTS       = 807,
     OVERLAY_STABLES_SITE         = 815,
     OVERLAY_MERMAID_SITE         = 817,
-    OVERLAY_SIRENS_SITE          = 818
+    OVERLAY_SIRENS_SITE          = 818,
+    // The treasures.
+    OVERLAY_ANCIENT_LAMP         = 832,
+    OVERLAY_RANDOM_RESOURCE      = 833,
+    OVERLAY_TREASURE_CHEST       = 834,
+    // The towns and castles, twelve per player colour (a castle and a
+    // town of each faction, neutral last), and the shadow of each of the
+    // twelve.
+    OVERLAY_TOWN_FIRST        = 835,
+    OVERLAY_TOWN_LAST         = 918,
+    OVERLAY_TOWN_SHADOWS      = 919,
+    OVERLAY_TOWN_VARIANTS     = 12,
+    // The ground under a town, one per terrain; grass when the terrain
+    // left of a dragged town's entrance is water.
+    OVERLAY_TOWN_GROUNDS      = 930,
+    OVERLAY_TOWN_GRASS_GROUND = 931,
+    // The random castles and towns, a castle and a town per colour
+    // (neutral last), and their two shadows after the first pair.
+    OVERLAY_RANDOM_TOWN_FIRST   = 939,
+    OVERLAY_RANDOM_TOWN_SHADOWS = 941,
+    OVERLAY_RANDOM_TOWN_LAST    = 954,
+    OVERLAY_RANDOM_CASTLE_0     = OVERLAY_RANDOM_TOWN_FIRST,
+    OVERLAY_RANDOM_CASTLE_1     = 943,
+    OVERLAY_RANDOM_CASTLE_2     = 945,
+    OVERLAY_RANDOM_CASTLE_3     = 947,
+    OVERLAY_RANDOM_CASTLE_4     = 949,
+    OVERLAY_RANDOM_CASTLE_5     = 951,
+    OVERLAY_RANDOM_NEUTRAL_TOWN = OVERLAY_RANDOM_TOWN_LAST,
+    // The outline DrawFootprint and CanPlaceOverlay take for every town.
+    OVERLAY_TOWN_OUTLINE      = 955
 H2_ENUM_END(OverlayCatalogueEntry)
 
-H2_ENUM_BEGIN(OverlayPlacementConstant)
-    // A town's entrance and the grid offset its ground is read at; its
-    // flags go 3 and 1 cells left and a row up. A dragged town reads its
-    // ground two cells left of the pointer.
-    OVERLAY_TOWN_ENTRANCE_X   = 5,
-    OVERLAY_TOWN_ENTRANCE_Y   = 5,
-    OVERLAY_LEFT_FLAG_X       = -3,
-    OVERLAY_RIGHT_FLAG_X      = -1,
-    OVERLAY_FLAG_Y            = -1,
-    OVERLAY_TOWN_GROUND_COLUMN = 2,
-    // overlayType::color without a player, and a random town's faction in
-    // its map record.
-    OVERLAY_NO_COLOR          = 6,
-    OVERLAY_RANDOM_TOWN_FACTION = 6,
-    // giGroundShape: a plain tile that has variants.
-    GROUND_SHAPE_VARIANT_FLAG = 0x80,
-    // An alchemist's lab may reach at most 3 rows above the map.
-    OVERLAY_ALCHEMIST_LAB_TOP = -3,
-    // The ultimate artifact stays this many cells inside the map.
-    OVERLAY_ULTIMATE_MARGIN   = 9,
-    // The map's limits on events (towns and mines take the game's).
-    OVERLAY_EVENT_LIMIT       = 50,
-    // CanPlaceOverlay's lists of the placement links an object would cover
-    // and keep.
-    OVERLAY_LINK_LIST_CAPACITY = 400
-H2_ENUM_END(OverlayPlacementConstant)
+// overlayType::color of a town or hero without a player.
+H2_ENUM_BEGIN(OverlayColor)
+    OVERLAY_NO_COLOR = 6
+H2_ENUM_END(OverlayColor)
 
-H2_ENUM_BEGIN(OverlayManagerLayout)
-    // The map view: 448 pixels square at (16, 16).
-    EDIT_VIEW_ORIGIN              = 0x10,
-    EDIT_VIEW_SIZE                = 0x1c0,
-    EDIT_VIEW_END                 = EDIT_VIEW_ORIGIN + EDIT_VIEW_SIZE,
-    // gClearHelp's right-click help of the first class.
-    OVERLAY_CLASS_HELP_FIRST      = 5,
-    // The class buttons: transparent borders over the panel's swatches.
-    OVERLAY_CLASS_BUTTON_SIZE     = 0x1b,
-    OVERLAY_CLASS_BUTTON_ID_FIRST = 500,
-    // The class name under the buttons.
-    OVERLAY_CLASS_NAME_X          = 0x1ed,
-    OVERLAY_CLASS_NAME_Y          = 0x16f,
-    OVERLAY_CLASS_NAME_WIDTH      = 0x75,
-    OVERLAY_CLASS_NAME_HEIGHT     = 10,
-    OVERLAY_CLASS_NAME_ID         = 0x578,
-    OVERLAY_CLASS_NAME_TEXT_SIZE  = 2,
-    // The frame (terrains.icn) that outlines the selected class button.
-    OVERLAY_HIGHLIGHT_SIZE        = 0x1f,
-    OVERLAY_HIGHLIGHT_FRAME       = 9,
-    OVERLAY_HIGHLIGHT_ID          = 0x19,
-    OVERLAY_HIGHLIGHT_INSET       = 2,
-    // objpalet.icn's panel backdrop and its place.
-    OVERLAY_PANEL_X               = 0x1fd,
-    OVERLAY_PANEL_Y               = 0xe3,
-    OVERLAY_PANEL_FRAME           = 0,
-    // The tool panel's screen region.
-    OVERLAY_PANEL_REGION_X        = 0x1e0,
-    OVERLAY_PANEL_REGION_Y        = 0xe8,
-    OVERLAY_PANEL_REGION_WIDTH    = 0x90,
-    OVERLAY_PANEL_REGION_HEIGHT   = 0xa0,
-    // The region the selected object's preview is drawn in.
-    OVERLAY_PREVIEW_REGION_X      = 0x1fd,
-    OVERLAY_PREVIEW_REGION_Y      = 0xc2,
-    OVERLAY_PREVIEW_REGION_WIDTH  = 0x56,
-    OVERLAY_PREVIEW_REGION_HEIGHT = 0x46,
-    // A footprint cell's colour: an overlay part, a shadow, an entrance,
-    // any other part.
-    OVERLAY_COLOR_OVERLAY         = 0x65,
-    OVERLAY_COLOR_SHADOW          = 0x24,
-    OVERLAY_COLOR_ENTRANCE        = 0xcf,
-    OVERLAY_COLOR_OBJECT          = 0xc4,
-    // A town's flags on its grid cell (6, 4); a hero's lifts its icon.
-    OVERLAY_TOWN_FLAG_COLUMN      = 4,
-    OVERLAY_TOWN_RIGHT_FLAG_COLUMN = 6,
-    OVERLAY_TOWN_FLAG_ROW         = 4,
-    OVERLAY_HERO_LIFT             = 0xe
-H2_ENUM_END(OverlayManagerLayout)
-
-H2_ENUM_BEGIN(OverlayPickerLayout)
-    // The picker (editpalt.bin): a 9 x 9 page of 69 x 53 boxes, an object
-    // drawn 2 pixels in, in a 4 x 3 cell view.
-    OVERLAY_PICKER_COLUMNS      = 9,
-    OVERLAY_PICKER_ROWS         = 9,
-    OVERLAY_PICKER_PAGE         = OVERLAY_PICKER_COLUMNS * OVERLAY_PICKER_ROWS,
-    OVERLAY_PICKER_BOX_WIDTH    = 0x45,
-    OVERLAY_PICKER_BOX_HEIGHT   = 0x35,
-    OVERLAY_PICKER_OBJECT_INSET = 2,
-    OVERLAY_PICKER_VIEW_WIDTH   = 4,
-    OVERLAY_PICKER_VIEW_HEIGHT  = 3,
-    // objpalet.icn's box frames: a plain box, then a colour's.
-    OVERLAY_PICKER_PLAIN_BOX    = 1,
-    OVERLAY_PICKER_COLOR_BOX    = 2,
-    // A random hero's portrait frames: seven per colour.
-    OVERLAY_HERO_FRAMES_PER_COLOR = 7,
-    // The scroll track and knob (escroll.icn).
-    OVERLAY_PICKER_TRACK_X      = 0x26e,
-    OVERLAY_PICKER_TRACK_Y      = 0x10,
-    OVERLAY_PICKER_TRACK_WIDTH  = 0x10,
-    OVERLAY_PICKER_TRACK_HEIGHT = 0x1a0,
-    OVERLAY_PICKER_TRACK_FRAME  = 1,
-    OVERLAY_PICKER_TRACK_ID     = 0xb,
-    OVERLAY_PICKER_KNOB_X       = 0x272,
-    OVERLAY_PICKER_KNOB_Y       = 0x13,
-    OVERLAY_PICKER_KNOB_WIDTH   = 8,
-    OVERLAY_PICKER_KNOB_HEIGHT  = 0x11,
-    OVERLAY_PICKER_KNOB_FRAME   = 3,
-    OVERLAY_PICKER_KNOB_ID      = 0xd,
-    // The knob's place without a scrollable page, and the track a knob
-    // drag measures from. The picker draws at the middle zoom.
-    OVERLAY_PICKER_KNOB_PARKED  = 0xd7,
-    OVERLAY_PICKER_ZOOM         = 1,
-    OVERLAY_PICKER_DRAG_ORIGIN  = 0x27,
-    // The picker's controls: the row arrows, the class arrows, the boxes.
-    OVERLAY_PICKER_ROW_UP       = 100,
-    OVERLAY_PICKER_ROW_DOWN     = 101,
-    OVERLAY_PICKER_CLASS_PREVIOUS = 102,
-    OVERLAY_PICKER_CLASS_NEXT   = 103,
-    OVERLAY_PICKER_BOXES        = 0x6e,
-    // Scan codes: escape, page up, page down.
-    OVERLAY_KEY_ESCAPE          = 1,
-    OVERLAY_KEY_PAGE_UP         = 0x49,
-    OVERLAY_KEY_PAGE_DOWN       = 0x51,
-    // gPickedOverlay when the picker is cancelled.
-    OVERLAY_NONE                = -1
-H2_ENUM_END(OverlayPickerLayout)
+H2_ENUM_BEGIN(OverlaySelection)
+    // gSelectedOverlay, and PickOverlay's result, without an object.
+    OVERLAY_NONE = -1
+H2_ENUM_END(OverlaySelection)
 
 // A class button's place on the tool panel.
 struct ClassButtonPosition {
@@ -330,11 +282,11 @@ public:
     virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     // Names the selected class and outlines its button.
-    void ShowClass(i32 update);
+    void ShowClass(b32 update);
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     // Outlines the cells of type's grid from (8 - width, 6 - height) on at
     // screen (left, top), each in its part's colour.
-    void DrawFootprint(i32 left, i32 top, i32 width, i32 height, overlayType* type, i32 clip);
+    void DrawFootprint(i32 left, i32 top, i32 width, i32 height, overlayType* type, b32 clip);
     // Draws the parts of type's grid from (8 - width, 6 - height) on at
     // screen (x, y); a town also draws its shadow and the ground under the
     // map cell (cellX, cellY) when given.
@@ -342,45 +294,45 @@ public:
         overlayType* type,
         i32 x,
         i32 y,
-        i32 clip,
+        b32 clip,
         i32 width,
         i32 height,
-        i32 update,
+        b32 update,
         i32 cellX,
         i32 cellY
     );
     // Fills m_types with the class's entries, sorted; false when none.
-    i32 LoadClass(i32 objectClass);
+    b32 LoadClass(i32 objectClass);
     void MeasureOverlay(overlayType* type);
     void DrawSelectedOverlay(void);
     // Selects the catalogue entry's class and the entry; false when no
     // class lists it.
-    i32 SelectOverlay(i32 index);
-    void DrawPicker(i32 update);
+    b32 SelectOverlay(i32 index);
+    void DrawPicker(b32 update);
     // The picker; returns the chosen m_types index (OVERLAY_NONE: none).
     i32 PickOverlay(i32 objectClass);
     MessageDispatchResult PickerMain(struct tag_message& message);
     // Follows the pointer along the picker's track (until the button is
     // released, or one step for a track click).
-    void DragPickerKnob(i32 trackClick, i32 mouseX, i32 mouseY);
+    void DragPickerKnob(b32 trackClick, i32 mouseX, i32 mouseY);
 };
 #pragma pack(pop)
 SIZE(overlayManager, 0x1e616);
 
 // Whether cell (x, y) of an object's grid is set in grid.
-i32 OverlayGridHas(u32* grid, i32 x, i32 y);
+b32 OverlayGridHas(u32* grid, i32 x, i32 y);
 // Whether type fits with its grid's top-left on map cell (left, top); without
 // overObjects, no part may go on a cell that has an object.
-i32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, i32 overObjects);
+b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects);
 // Removes the objects whose parts type's parts would replace.
 void RemoveReplacedObjects(overlayType* type, i32 left, i32 top);
 // Places type with its grid's top-left on map cell (x, y), as a new
 // placement link when newLink is set; false (with a status warning) when it
 // does not fit or a map limit is reached.
-i32 PlaceOverlay(overlayType* type, i32 x, i32 y, i32 newLink);
+b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink);
 // Puts the resource marker type on map cell (x, y) (requireMine: only on a
 // mine's entrance).
-b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, i32 requireMine);
+b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, b32 requireMine);
 // The picker window's handler: the tool manager's PickerMain.
 MessageDispatchResult PickerHandler(struct tag_message& message);
 
