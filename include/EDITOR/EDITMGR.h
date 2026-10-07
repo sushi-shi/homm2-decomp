@@ -12,8 +12,6 @@
 #include <EDITOR/mapcell.h>
 #include <EDITOR/OVERLAY.h>
 
-struct tag_message;
-
 H2_ENUM_BEGIN(EditClearMask)
     // ClearArea's layer masks: everything, or what a road may cross.
     EDIT_CLEAR_ALL       = 0xffff,

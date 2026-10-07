@@ -40,8 +40,7 @@ H2_ENUM_BEGIN(WindowColorCyclePaletteOffset)
 H2_ENUM_END(WindowColorCyclePaletteOffset)
 
 H2_ENUM_BEGIN(WindowScreenConstant)
-    FRAMEBUFFER_DWORD_COUNT = 0x12c00,
-    FRAMEBUFFER_FILL_COLOR  = 0x24
+    FRAMEBUFFER_FILL_COLOR = 0x24
 H2_ENUM_END(WindowScreenConstant)
 
 H2_ENUM_BEGIN(WindowFizzleConstant)
@@ -503,10 +502,6 @@ i32 heroWindowManager::DoDialog(
         SetNoDialogMenus(true);
     return 0;
 }
-
-#undef MESSAGE_DISPATCH_CONTINUE
-#undef MESSAGE_DISPATCH_CONSUME
-#undef MESSAGE_DISPATCH_FORWARD
 
 VA(0x004b7690, 0x20)
 void heroWindowManager::UpdateScreen(void) {

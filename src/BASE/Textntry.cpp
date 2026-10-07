@@ -24,10 +24,6 @@ H2_ENUM_BEGIN(TextEntryKeyConstant)
     ASCII_KEY_MASK         = 0xff
 H2_ENUM_END(TextEntryKeyConstant)
 
-H2_ENUM_BEGIN(TextEntrySourceFileConstant)
-    ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-H2_ENUM_END(TextEntrySourceFileConstant)
-
 H2_ENUM_BEGIN(TextEntryConstant)
     RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,

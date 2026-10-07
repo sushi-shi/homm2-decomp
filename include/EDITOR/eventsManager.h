@@ -22,7 +22,6 @@ class icon;
 struct mapEventExtra;
 struct rumourEventExtra;
 struct signEventExtra;
-struct tag_message;
 
 H2_ENUM_BEGIN(EventsDialogButton)
     // The editor dialogs' closing buttons (heroWindowManager::m_dialogResult):

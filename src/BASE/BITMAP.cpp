@@ -178,18 +178,6 @@ void bitmap::CopyTo(
     PollSound();
 }
 
-static inline i16 H2_UNUSED(BitmapWidth)(bitmap* value) {
-    return value->m_width;
-}
-
-static inline u8* H2_UNUSED(BitmapPixels)(bitmap* value) {
-    return value->m_pixels;
-}
-
-static inline u8* H2_UNUSED(BitmapPixels)(bitmap* value, i32 offset) {
-    return value->m_pixels + offset;
-}
-
 VA(0x004c6380, 0x77)
 void bitmap::CopyToCareful(
     class bitmap* destination,

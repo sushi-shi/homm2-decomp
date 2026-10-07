@@ -12,7 +12,6 @@
 
 class heroWindow;
 class iconWidget;
-struct tag_message;
 
 H2_ENUM_BEGIN(EventsManagerLayout)
     // The cell and monster dialogs open at (16, 16).

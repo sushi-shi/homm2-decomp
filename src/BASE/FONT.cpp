@@ -435,9 +435,6 @@ void font::DrawBoundedString(
 #undef width
 #endif
 
-#undef CENTER_DIVISOR
-#undef WRAP_HEIGHT_LINE_COUNT
-
 #if H2_RETAIL_COMPILER
 #define length len
 #define lineWidth lw

@@ -40,7 +40,6 @@ public:
 
 protected:
     void DrawStringExecute(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
-    void PolishBoundedTextLayout(H2_CONST char*, char*, u32*, i32, i32*, char);
 
 public:
     void DrawString(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode);
