@@ -92,7 +92,9 @@ H2_ENUM_BEGIN(RandomMapConstant)
     // PlaceTreasures: a treasure per this many land cells and a roaming
     // monster per this many, each scaled by its density.
     RANDOM_MAP_LAND_PER_TREASURE = 40,
-    RANDOM_MAP_LAND_PER_MONSTER  = 130
+    RANDOM_MAP_LAND_PER_MONSTER  = 130,
+    // ScatterDecorations rolls each terrain's chance per mille.
+    RANDOM_MAP_DECORATION_ROLL   = 1000
 H2_ENUM_END(RandomMapConstant)
 
 // Where PlaceTreasures guards a treasure: the diagonal cell of a corner
@@ -1875,7 +1877,7 @@ void editManager::ScatterDecorations(void) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             cell = gMap.CellAt(x, y);
             terrain = IDX(CELL_TERRAIN(cell));
-            if (Random(1, 1000) <= chance[IDX(CELL_TERRAIN(cell))]
+            if (Random(1, RANDOM_MAP_DECORATION_ROLL) <= chance[IDX(CELL_TERRAIN(cell))]
                 && cell->m_objectIndex == MAPCELL_SPRITE_NONE
                 && cell->m_overlayIndex == MAPCELL_SPRITE_NONE
                 && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_PLAIN

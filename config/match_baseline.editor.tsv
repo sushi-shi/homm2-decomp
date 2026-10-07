@@ -520,7 +520,7 @@ EDITOR/RANDOM	?PlaceTowns@editManager@@QAEXXZ	100.0000	071b39e58ed1
 EDITOR/RANDOM	?PlaceTreasures@editManager@@QAEXHH@Z	100.0000	06a8da8744c7
 EDITOR/RANDOM	?RemoveSmallRegions@editManager@@QAEXXZ	100.0000	45b8802e6870
 EDITOR/RANDOM	?ScaleByDensity@@YIXPAHH@Z	100.0000	7486b14e3754
-EDITOR/RANDOM	?ScatterDecorations@editManager@@QAEXXZ	100.0000	81bbe47afc2c
+EDITOR/RANDOM	?ScatterDecorations@editManager@@QAEXXZ	100.0000	8860a4bb649a
 EDITOR/evntedit	?EditEvent@eventsManager@@QAEHH@Z	100.0000	38fa33f3f550
 EDITOR/evntedit	?EditEventHandler@@YIHAAUtag_message@@@Z	100.0000	bff63e5f89cb
 EDITOR/evntedit	?FillInEventEdit@eventsManager@@QAEXPAUEventExtra@@@Z	100.0000	afc89e671d35
