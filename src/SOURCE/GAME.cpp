@@ -6270,7 +6270,7 @@ void game::ProcessMapExtra(void) {
 #if H2_RETAIL_COMPILER
 #define attempts attempts17
 #define castle castle8
-#define combatSpells combatSpells27
+#define adventureSpells combatSpells27
 #define defaultDwellingRoll defaultDwellingRoll15
 #define dwellingCount dwellingCount1
 #define extra extra0
@@ -6295,7 +6295,7 @@ void game::SetupTowns(void) {
     i32 attempts;
     i8 usedSpells[IDX(SPELL_COUNT)];
     i32 owner;
-    i32 combatSpells;
+    i32 adventureSpells;
     i32 roll;
     SpellType spell;
     i32 spellLevel;
@@ -6451,7 +6451,7 @@ void game::SetupTowns(void) {
         spellsPerLevel[spellLevel]++;
 
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
-            combatSpells = 0;
+            adventureSpells = 0;
             for (spellIndex = 0; spellIndex < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellIndex++) {
                 if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex]
                     != SPELL_NONE) {
@@ -6485,7 +6485,7 @@ void game::SetupTowns(void) {
                         if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
                     } while (
-                        (combatSpells == 1
+                        (adventureSpells == 1
                          && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_ADVENTURE))
                         || Random(0, 10)
                                > gsSpellInfo[IDX(spell)].raceChance[IDX(castle->m_type)]
@@ -6493,7 +6493,7 @@ void game::SetupTowns(void) {
                         || Random(1, 1500) > spellValue
                     );
                     if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_ADVENTURE))
-                        combatSpells++;
+                        adventureSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex] =
                         spell;
@@ -6508,7 +6508,7 @@ void game::SetupTowns(void) {
 #if H2_RETAIL_COMPILER
 #undef attempts
 #undef castle
-#undef combatSpells
+#undef adventureSpells
 #undef defaultDwellingRoll
 #undef dwellingCount
 #undef extra

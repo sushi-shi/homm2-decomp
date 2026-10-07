@@ -77,7 +77,7 @@ H2_ENUM_END(ViewGeneralHoverHelp)
 
 #if H2_RETAIL_COMPILER
 #define captainWidgetId msgConst7
-#define closeWidgetId msgConst17
+#define castSpellWidgetId msgConst17
 #define colorWidgetId msgConst15
 #define cost cost2
 #define eighthControlWidgetId msgConst2
@@ -113,7 +113,7 @@ i32 combatManager::ViewGeneral(
     i16 H2_UNUSED(captainWidgetId);
     i16 H2_UNUSED(fourteenthControlWidgetId);
     i16 H2_UNUSED(nameWidgetId);
-    i16 H2_UNUSED(closeWidgetId);
+    i16 H2_UNUSED(castSpellWidgetId);
     i16 H2_UNUSED(noControlWidgetId);
     i16 H2_UNUSED(colorWidgetId);
     i32 H2_UNUSED(cost);
@@ -135,7 +135,7 @@ i32 combatManager::ViewGeneral(
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    castSpellWidgetId = GENERAL_ACTION_CAST_SPELL;
     retreatWidgetId = GENERAL_ACTION_RETREAT;
     surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
@@ -268,7 +268,7 @@ i32 combatManager::ViewGeneral(
 }
 #if H2_RETAIL_COMPILER
 #undef captainWidgetId
-#undef closeWidgetId
+#undef castSpellWidgetId
 #undef colorWidgetId
 #undef cost
 #undef eighthControlWidgetId
@@ -290,7 +290,7 @@ i32 combatManager::ViewGeneral(
 #endif
 
 #if H2_RETAIL_COMPILER
-#define closeWidgetId msgConst15
+#define castSpellWidgetId msgConst15
 #define colorWidgetId msgConst0
 #define eighthControlWidgetId msgConst7
 #define fourteenthControlWidgetId msgConst17
@@ -326,7 +326,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 H2_UNUSED(portraitWidgetId);
     i16 H2_UNUSED(noControlWidgetId);
     i16 H2_UNUSED(eighthControlWidgetId);
-    i16 H2_UNUSED(closeWidgetId);
+    i16 H2_UNUSED(castSpellWidgetId);
     nameWidgetIdCopy = GENERAL_NAME_WIDGET;
     portraitWidgetId = GENERAL_PORTRAIT_WIDGET;
     colorWidgetId = GENERAL_COLOR_WIDGET;
@@ -336,7 +336,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     seventhControlWidgetId = GENERAL_CONTROL_SEVEN;
     eighthControlWidgetId = GENERAL_CONTROL_EIGHT;
     ninthControlWidgetId = GENERAL_CONTROL_NINE;
-    closeWidgetId = GENERAL_ACTION_CAST_SPELL;
+    castSpellWidgetId = GENERAL_ACTION_CAST_SPELL;
     retreatWidgetId = GENERAL_ACTION_RETREAT;
     surrenderWidgetId = GENERAL_ACTION_SURRENDER;
     thirteenthControlWidgetId = GENERAL_CONTROL_THIRTEEN;
@@ -419,7 +419,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 #if H2_RETAIL_COMPILER
-#undef closeWidgetId
+#undef castSpellWidgetId
 #undef colorWidgetId
 #undef eighthControlWidgetId
 #undef fourteenthControlWidgetId

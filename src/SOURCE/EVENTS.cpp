@@ -5761,8 +5761,8 @@ void advManager::FizzleCenter(i32 fizzleType) {
 #if H2_RETAIL_COMPILER
 #define abandonedMineValue abandonedMineValue_f
 #define adjacentMonster adjacentMonster_j
-#define artifactGuardCount artifactGuardCount_b
-#define artifactGuardResult artifactGuardResult_e
+#define artifactGuardType artifactGuardCount_b
+#define artifactGuardCount artifactGuardResult_e
 #define artifactResource artifactResource_p
 #define attackerLoss attackerLoss_c
 #define battleResult battleResult_l
@@ -5822,7 +5822,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     boatRecord* boat;
     i32 exitCount;
     ResourceType eventResourceType;
-    i32 artifactGuardResult;
+    i32 artifactGuardCount;
     i32 exitY;
     i32 exitX;
     ArtifactType eventArtifact;
@@ -5830,7 +5830,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* otherHero;
     CombatResult heroCombatResult;
     i32 heroInteractionResult;
-    CreatureType artifactGuardCount;
+    CreatureType artifactGuardType;
     i32 survivingCount;
     mapEventExtra* eventExtra;
     MapObjectType eventType;
@@ -6459,7 +6459,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             artifactResource = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                  >> ARTIFACT_EVENT_RESOURCE_SHIFT;
             eventArtifact = static_cast<ArtifactType>(cell->m_objectIndex / 2);
-            artifactGuardCount = static_cast<CreatureType>(
+            artifactGuardType = static_cast<CreatureType>(
                 cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK
             );
             if (eventHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
@@ -6470,17 +6470,17 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 break;
             }
             if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
-                if (artifactGuardCount == CREATURE_ROGUE) {
-                    artifactGuardResult = EVENT_ROGUE_COUNT;
+                if (artifactGuardType == CREATURE_ROGUE) {
+                    artifactGuardCount = EVENT_ROGUE_COUNT;
                     goto artifactFight;
                 }
-                artifactGuardResult = 1;
-                if (gpPhilAI->ChooseToFightForArtifact(eventArtifact, artifactGuardCount, 1)) {
+                artifactGuardCount = 1;
+                if (gpPhilAI->ChooseToFightForArtifact(eventArtifact, artifactGuardType, 1)) {
                 artifactFight:
                     if (gpPhilAI->CombatMonsterEvent(
                             eventHero,
-                            artifactGuardCount,
-                            &artifactGuardResult,
+                            artifactGuardType,
+                            &artifactGuardCount,
                             cell
                         ))
                         goto artifactPickup;
@@ -6907,8 +6907,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 #if H2_RETAIL_COMPILER
 #undef abandonedMineValue
 #undef adjacentMonster
+#undef artifactGuardType
 #undef artifactGuardCount
-#undef artifactGuardResult
 #undef artifactResource
 #undef attackerLoss
 #undef battleResult
