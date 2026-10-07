@@ -8,6 +8,7 @@
 
 #include <va.h>
 #include <Ints.h>
+#include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 
 H2_ENUM_BEGIN(EditorStatusBar)
@@ -65,6 +66,8 @@ H2_ENUM_BEGIN(EditorTableCount)
     EDIT_SYSTEM_OPTIONS_HELP_COUNT = 5,
     SPEC_VICTORY_CONDITION_COUNT = 6,
     SPEC_LOSS_CONDITION_COUNT = 4,
+    // The eraser panel's help: its brushes, then the object classes it erases.
+    CLEAR_HELP_COUNT = 20,
     // The random map generator's terrain and density settings.
     RANDOM_MAP_TERRAIN_COUNT = 8,
     RANDOM_MAP_DENSITY_COUNT = 5,
@@ -76,10 +79,35 @@ H2_ENUM_BEGIN(EditorTableCount)
     EDITOR_PLAYER_COLOR_COUNT = 6
 H2_ENUM_END(EditorTableCount)
 
+H2_ENUM_BEGIN(RandomMapDensity)
+    // gDensityPercent's rows (RANDOM_MAP_DENSITY_COUNT).
+    RANDOM_MAP_DENSITY_MOUNTAINS = 0,
+    RANDOM_MAP_DENSITY_TREES     = 1,
+    RANDOM_MAP_DENSITY_OBJECTS   = 2,
+    RANDOM_MAP_DENSITY_TREASURE  = 3,
+    RANDOM_MAP_DENSITY_MONSTERS  = 4
+H2_ENUM_END(RandomMapDensity)
+
+H2_ENUM_BEGIN(EditorWinText)
+    // The dialogs whose texts SetWinText fills from gWinSetup.
+    EDITOR_WIN_TEXT_SYSTEM_OPTIONS    = 3,
+    EDITOR_WIN_TEXT_EVENT             = 4,
+    EDITOR_WIN_TEXT_HERO              = 5,
+    EDITOR_WIN_TEXT_MONSTER           = 8,
+    EDITOR_WIN_TEXT_SPHINX            = 10,
+    // The rumour dialog, which the sign editor reuses.
+    EDITOR_WIN_TEXT_RUMOUR            = 11,
+    EDITOR_WIN_TEXT_SPECIFICATIONS    = 13,
+    EDITOR_WIN_TEXT_TOWN              = 15,
+    EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT = 16
+H2_ENUM_END(EditorWinText)
+
 extern i32 gRandomMapPlayers;
 extern double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT];
 extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];
-extern b32 gScatterTowns;
+// The random map generator spreads each terrain's patches over the whole
+// map, or (unset) gathers them toward its centre.
+extern b32 gScatterTerrain;
 extern b32 gGenerateUnseen;
 extern b32 gGeneratingMap;
 extern i32 gObjectClass;
@@ -110,6 +138,21 @@ extern H2_CONST char* gFileMenuHelp[EDIT_FILE_MENU_HELP_COUNT];
 extern H2_CONST char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT];
 extern H2_CONST char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT];
 extern H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
+// The eraser panel's help: its brushes, then the object classes it erases.
+extern H2_CONST char* gClearHelp[CLEAR_HELP_COUNT];
+
+// The editor manager (InitMainClasses).
+class editManager;
+#define gEditManager gpEditManager // spelling fixes .bss order
+extern editManager* gEditManager;
+// The drag selection the map view outlines (EDIT_NO_CELL when there is none).
+extern i32 gSelectionX;
+#define gSelectionY gSelectionYBlock // spelling fixes .bss order
+extern i32 gSelectionY;
+#define gSelectionWidth gSelectionWidthBufferShared // spelling fixes .bss order
+extern i32 gSelectionWidth;
+#define gSelectionHeight gSelectionHeightRuntimeTable // spelling fixes .bss order
+extern i32 gSelectionHeight;
 
 // The object dialog the detail tool has open, and the map cell it edits.
 // The compiled spellings keep EDITOR's .bss in its name-hash order.
@@ -144,6 +187,37 @@ extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 // The player colours' short names (the specification dialog's side lists).
 extern H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
 
+class heroWindow;
+struct tag_message;
+
+// The game's KB.cpp functions the editor keeps its own copies of (the game
+// declares them in KBDeclarations.h and NOOPT.h).
+extern "C" void PollSound(void);
+i32 oldmain(void);
+void DelayTil(i32* endTime);
+void DelayMilli(i32l delay);
+void DelayTilMilli(i32l endTime);
+void FileError(H2_CONST char* filename);
+void ShutDown(H2_CONST char* message);
+i32 InterpretCommandLine(void);
+void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text);
+i32 EarlySetup(void);
+void MemError(void);
+void InitMainClasses(void);
+void DeleteMainClasses(void);
+MessageDispatchResult EventWindowHandler(struct tag_message& message);
+void QuickViewWait(void);
+void UpdateAppSpecificMenus(void* hMenu);
+void CleanUpMenus(void);
+void EarlyShutDownSystem(void);
+i32 GameUnsaved(void);
+i32 HandleAppSpecificMenuCommands(i32 command);
+void EarlyResizeWindow(i32 x, i32 y, i32 width, i32 height);
+void UpdateSystemOptionsMenu(void);
+void SetWinText(heroWindow* window, i32 id);
+
+// The editor's own: an edited copy of a shipped map gets a new name, the
+// status line's texts, and three hooks nothing calls.
 void ProtectShippedMap(void);
 void IncrementArgumentA(i32 value);
 void EditorIdleHook(void);

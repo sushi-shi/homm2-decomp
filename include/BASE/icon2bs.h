@@ -20,6 +20,4 @@ void IconToBitmapScale(
     i32 scale
 );
 
-#include <BASE/icon2bss.h>
-
 #endif

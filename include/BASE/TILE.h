@@ -14,6 +14,4 @@ H2_ENUM_END(TileFlag)
 
 extern "C" void __cdecl TileToBitmap(tileset* source, u32 flags, bitmap* destination, i32 x, i32 y);
 
-#include <BASE/tile2bs.h>
-
 #endif

@@ -943,3 +943,21 @@ Reference: `src/SOURCE/tradpost.cpp:101`. Original offer wording, with resource 
 | Original 2.0 | `"units"` |
 
 Reference: `src/SOURCE/tradpost.cpp:104`. Original 2.0 text, unchanged.
+
+## Editor catalog
+
+The 384 `editor.*` entries were checked against the English editors'
+string tables: Price of Loyalty `EDITOR2W.EXE` (May 1997) and the 2.0
+`EDITOR2W.EXE` (November 1996), matching whole NUL-terminated strings.
+377 occurred verbatim. One guess had an original and now uses it:
+
+| ID | Was | Original (PoL and 2.0) |
+|---|---|---|
+| `editor.requester.map.size_mismatch` | `"No maps exist at that size."` | `"No maps exist for that size."` |
+
+The remaining six have no English original and keep their translations of
+the Buka text: `editor.overlay.ultimate.land` (Buka's water check on the
+ultimate artifact), `editor.quick_view.rocks` (2.0 names only reefs),
+`editor.startup.cd_required` and `editor.startup.no_cd_drive` (the English
+editors have no CD check), and `editor.text.import_failed` and
+`editor.text.imported` (Buka's map-text import).

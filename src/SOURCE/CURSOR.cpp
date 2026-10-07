@@ -812,7 +812,7 @@ adjacentDone:
 
     if (mapEvent) {
         if (processEvent) {
-            if (mapEvent->applyToComputer) {
+            if (mapEvent->appliesToComputer) {
                 for (step = 0; step < IDX(RES_COUNT); ++step) {
                     gpGame->m_players[giCurPlayer].m_resources[step] +=
                         mapEvent->resources[step];

@@ -4,8 +4,8 @@
 // assertion names it; Open stores the class name "eventsManager".
 
 #include <va.h>
+#include <EDITOR/EVENTMGR.h>
 #include <EDITOR/eventsManager.h>
-#include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/mapcell.h>
@@ -44,7 +44,7 @@ i32 eventsManager::Open(i32 priority) {
     m_overlayIcon = gpResourceManager->GetIcon("overlay.icn");
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "eventsManager");
     return 0;
 }
@@ -55,9 +55,9 @@ void eventsManager::Close(void) {
     if (!gbClosingApp) {
         gEditManager->DrawMap();
         gEditManager->UpdateMapView();
-        gEditManager->DrawRadar(1);
+        gEditManager->DrawRadar(true);
     }
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x00411748, 0x491)
@@ -142,8 +142,8 @@ MessageDispatchResult eventsManager::Main(tag_message& message) {
                     cursorCell = gMap.GetCell(hoverX, hoverY);
                     hoverX -= gEditManager->m_viewX;
                     hoverY -= gEditManager->m_viewY;
-                    hoverX = hoverX * gZoomTileSize[gEditManager->m_zoomLevel] + EVENTS_VIEW_LEFT;
-                    hoverY = hoverY * gZoomTileSize[gEditManager->m_zoomLevel] + EVENTS_VIEW_TOP;
+                    hoverX = hoverX * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_LEFT;
+                    hoverY = hoverY * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_TOP;
                     gEditManager->DrawMap();
                     if (LocationHasSpecialDetails(cursorCell->m_triggerType))
                         m_overlayIcon->FillToBuffer(
@@ -167,7 +167,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     mapCell original;
     // Never read: a slot of the retail frame.
     i32 unusedCode;
-    char text[20];
+    char text[EVENTS_NUMBER_TEXT_SIZE];
     tag_message message;
 
     if (giDebugLevel < CELL_WINDOW_DEBUG_LEVEL) {
@@ -176,6 +176,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
         return;
     }
     const i16 textBase = CELL_WINDOW_FIRST_FIELD;
+    // Never read: a slot of the retail frame.
     const i16 toggleBase = CELL_WINDOW_FIRST_FLAG;
     gEditCell = gMap.GetCell(x, y);
     original = *gEditCell;
@@ -204,7 +205,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     sprintf(text, "%d", gEditCell->m_animatedOverlay);
     message.payload.widget.id = textBase + CELL_FIELD_ANIMATED_OVERLAY;
     gEditDialog->BroadcastMessage(message);
-    sprintf(text, "%d", gEditCell->m_objectLayerBit1);
+    sprintf(text, "%d", gEditCell->m_objectShadow);
     message.payload.widget.id = textBase + CELL_FIELD_OBJECT_LAYER;
     gEditDialog->BroadcastMessage(message);
     sprintf(text, "%d", gEditCell->m_isRoad);
@@ -230,13 +231,14 @@ void eventsManager::EditCell(i32 x, i32 y) {
     if (gpWindowManager->m_dialogResult == EVENTS_DIALOG_CANCEL)
         *gMap.GetCell(x, y) = original;
     else
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
 }
 
 VA(0x00412066, 0x386)
 MessageDispatchResult CellWindowHandler(tag_message& message) {
+    // Never read: a slot of the retail frame.
     const i16 firstTextId = CELL_WINDOW_FIRST_FIELD;
     const i16 firstToggleId = CELL_WINDOW_FIRST_FLAG;
     i32 value;
@@ -270,6 +272,9 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                             value = atoi(message.payload.widget.data.text);
                             if (value < 0)
                                 break;
+                            // Rows 6, 8 and 9 store the fields HoMM1's cell
+                            // editor kept there (flags, trigger type and
+                            // metadata), not the ones EditCell fills them from.
                             switch (message.payload.widget.id) {
                                 case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TERRAIN_IMAGE:
                                     gEditCell->m_terrainImageIndex = value & CELL_WINDOW_BYTE_MASK;
@@ -350,17 +355,17 @@ VA(0x004123ec, 0x215)
 void eventsManager::EditMonster(i32 x, i32 y, b32 ultimateArtifact) {
     // Never read: a slot of the retail frame.
     i32 unused;
-    char buffer[20];
+    char buffer[EVENTS_NUMBER_TEXT_SIZE];
     tag_message message;
 
     gEditUltimateArtifact = ultimateArtifact;
     gEditCell = gMap.GetCell(x, y);
     if (ultimateArtifact) {
         gEditDialog = new heroWindow(EVENTS_DIALOG_X, EVENTS_DIALOG_Y, "ultaedit.bin");
-        SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_ULTIMATE_ARTIFACT);
+        SetWinText(gEditDialog, EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT);
     } else {
         gEditDialog = new heroWindow(EVENTS_DIALOG_X, EVENTS_DIALOG_Y, "monedit.bin");
-        SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_MONSTER);
+        SetWinText(gEditDialog, EDITOR_WIN_TEXT_MONSTER);
     }
     gMonsterCountEdit = gEditCell->m_objectMetadata;
     sprintf(buffer, "%d", gEditCell->m_objectMetadata);
@@ -370,7 +375,7 @@ void eventsManager::EditMonster(i32 x, i32 y, b32 ultimateArtifact) {
     gpWindowManager->DoDialog(gEditDialog, MonsterWindowHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
         gEditCell->m_objectMetadata = gMonsterCountEdit;
     }
     gEditManager->DrawMap();
@@ -468,7 +473,7 @@ b32 NewMapDialog(void) {
             ICON_DRAW_NORMAL,
             i + NEW_MAP_FIRST_TERRAIN_TRACK,
             WIDGET_KIND_ICON_DIRECT,
-            1
+            NEW_MAP_SLIDER_FILL_COLOR
         );
         gNewMapWindow->AddWidget(gTerrainTracks[i], -1);
         gTerrainKnobs[i] = new iconWidget(
@@ -481,7 +486,7 @@ b32 NewMapDialog(void) {
             ICON_DRAW_NORMAL,
             i + NEW_MAP_FIRST_TERRAIN_KNOB,
             WIDGET_KIND_ICON_DIRECT,
-            1
+            NEW_MAP_SLIDER_FILL_COLOR
         );
         gNewMapWindow->AddWidget(gTerrainKnobs[i], -1);
     }
@@ -496,7 +501,7 @@ b32 NewMapDialog(void) {
             ICON_DRAW_NORMAL,
             i + NEW_MAP_FIRST_DENSITY_TRACK,
             WIDGET_KIND_ICON_DIRECT,
-            1
+            NEW_MAP_SLIDER_FILL_COLOR
         );
         gNewMapWindow->AddWidget(gDensityTracks[i], -1);
         gDensityKnobs[i] = new iconWidget(
@@ -509,7 +514,7 @@ b32 NewMapDialog(void) {
             ICON_DRAW_NORMAL,
             i + NEW_MAP_FIRST_DENSITY_KNOB,
             WIDGET_KIND_ICON_DIRECT,
-            1
+            NEW_MAP_SLIDER_FILL_COLOR
         );
         gNewMapWindow->AddWidget(gDensityKnobs[i], -1);
     }
@@ -530,19 +535,19 @@ void UpdateNewMapWindow(void) {
 
     for (i = 0; i < RANDOM_MAP_TERRAIN_COUNT; i++)
         gTerrainKnobs[i]->m_x =
-            NEW_MAP_KNOB_TRAVEL * gTerrainPercent[i] / 100.0 + NEW_MAP_KNOB_LEFT;
+            NEW_MAP_KNOB_TRAVEL * gTerrainPercent[i] / NEW_MAP_ALL_PERCENT + NEW_MAP_KNOB_LEFT;
     for (i = 0; i < RANDOM_MAP_DENSITY_COUNT; i++)
         gDensityKnobs[i]->m_x =
-            NEW_MAP_KNOB_TRAVEL * gDensityPercent[i] / 100.0 + NEW_MAP_KNOB_LEFT;
+            NEW_MAP_KNOB_TRAVEL * gDensityPercent[i] / NEW_MAP_ALL_PERCENT + NEW_MAP_KNOB_LEFT;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.data.value = WIDGET_FLAG_DRAW;
     message.payload.widget.id = NEW_MAP_SCATTER_TOWNS;
     message.payload.widget.command =
-        gScatterTowns ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+        gScatterTerrain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     gNewMapWindow->BroadcastMessage(message);
     message.payload.widget.id = NEW_MAP_CENTRE_TOWNS;
     message.payload.widget.command =
-        gScatterTowns ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
+        gScatterTerrain ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     gNewMapWindow->BroadcastMessage(message);
     message.payload.widget.id = NEW_MAP_GENERATE_UNSEEN;
     message.payload.widget.command =
@@ -556,10 +561,8 @@ void UpdateNewMapWindow(void) {
     }
 }
 
-#if H2_RETAIL_COMPILER
-#define othersTotal unfixedTotal
-#define landTotal total
-#endif
+#define othersTotal unfixedTotal // frame-slot spelling
+#define landTotal total          // frame-slot spelling
 VA(0x00412cca, 0x193)
 void BalanceTerrainPercents(i32 changedTerrain) {
     double landTotal;
@@ -568,7 +571,7 @@ void BalanceTerrainPercents(i32 changedTerrain) {
     double remaining;
     double othersTotal;
 
-    remaining = 100.0 - gTerrainPercent[changedTerrain];
+    remaining = NEW_MAP_ALL_PERCENT - gTerrainPercent[changedTerrain];
     othersTotal = 0.0;
     landTotal = 0.0;
     for (i = 0; i < RANDOM_MAP_TERRAIN_COUNT; i++)
@@ -580,27 +583,26 @@ void BalanceTerrainPercents(i32 changedTerrain) {
         if (landTotal < NEW_MAP_MINIMUM_LAND)
             gTerrainPercent[NEW_MAP_TERRAIN_GRASS] += NEW_MAP_MINIMUM_LAND - landTotal;
     } else {
-        if (othersTotal < 1.0) {
-            othersTotal = 1.0;
-            if (gTerrainPercent[NEW_MAP_TERRAIN_WATER] < 1.0)
-                gTerrainPercent[NEW_MAP_TERRAIN_WATER] = 1.0;
+        if (othersTotal < NEW_MAP_ONE_PERCENT) {
+            othersTotal = NEW_MAP_ONE_PERCENT;
+            if (gTerrainPercent[NEW_MAP_TERRAIN_WATER] < NEW_MAP_ONE_PERCENT)
+                gTerrainPercent[NEW_MAP_TERRAIN_WATER] = NEW_MAP_ONE_PERCENT;
             else
-                gTerrainPercent[NEW_MAP_TERRAIN_GRASS] = 1.0;
+                gTerrainPercent[NEW_MAP_TERRAIN_GRASS] = NEW_MAP_ONE_PERCENT;
         }
         ratio = remaining / othersTotal;
         for (i = 0; i < RANDOM_MAP_TERRAIN_COUNT; i++)
             if (i != changedTerrain)
                 gTerrainPercent[i] = ratio * gTerrainPercent[i];
-        if (gTerrainPercent[NEW_MAP_TERRAIN_WATER] > NEW_MAP_MAXIMUM_WATER + 0.5) {
+        if (gTerrainPercent[NEW_MAP_TERRAIN_WATER]
+            > NEW_MAP_MAXIMUM_WATER + NEW_MAP_PERCENT_ROUNDING) {
             gTerrainPercent[NEW_MAP_TERRAIN_WATER] = NEW_MAP_MAXIMUM_WATER;
             BalanceTerrainPercents(NEW_MAP_TERRAIN_WATER);
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef othersTotal
 #undef landTotal
-#endif
 
 VA(0x00412e5d, 0x3de)
 MessageDispatchResult NewMapWindowHandler(tag_message& message) {
@@ -616,7 +618,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 && message.payload.widget.id
                        < NEW_MAP_FIRST_TERRAIN_DECREASE + RANDOM_MAP_TERRAIN_COUNT) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_DECREASE;
-                gTerrainPercent[index] -= 1.0;
+                gTerrainPercent[index] -= NEW_MAP_ONE_PERCENT;
                 if (gTerrainPercent[index] < 0.0)
                     gTerrainPercent[index] = 0.0;
                 BalanceTerrainPercents(index);
@@ -624,24 +626,24 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                        && message.payload.widget.id
                               < NEW_MAP_FIRST_TERRAIN_INCREASE + RANDOM_MAP_TERRAIN_COUNT) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_INCREASE;
-                gTerrainPercent[index] += 1.0;
-                if (gTerrainPercent[index] > 100.0)
-                    gTerrainPercent[index] = 100.0;
+                gTerrainPercent[index] += NEW_MAP_ONE_PERCENT;
+                if (gTerrainPercent[index] > NEW_MAP_ALL_PERCENT)
+                    gTerrainPercent[index] = NEW_MAP_ALL_PERCENT;
                 BalanceTerrainPercents(index);
             } else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_DECREASE
                        && message.payload.widget.id
                               < NEW_MAP_FIRST_DENSITY_DECREASE + RANDOM_MAP_DENSITY_COUNT) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_DENSITY_DECREASE;
-                gDensityPercent[index] -= 1.0;
+                gDensityPercent[index] -= NEW_MAP_ONE_PERCENT;
                 if (gDensityPercent[index] < 0.0)
                     gDensityPercent[index] = 0.0;
             } else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_INCREASE
                        && message.payload.widget.id
                               < NEW_MAP_FIRST_DENSITY_INCREASE + RANDOM_MAP_DENSITY_COUNT) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_DENSITY_INCREASE;
-                gDensityPercent[index] += 1.0;
-                if (gDensityPercent[index] > 100.0)
-                    gDensityPercent[index] = 100.0;
+                gDensityPercent[index] += NEW_MAP_ONE_PERCENT;
+                if (gDensityPercent[index] > NEW_MAP_ALL_PERCENT)
+                    gDensityPercent[index] = NEW_MAP_ALL_PERCENT;
             } else {
                 redraw = false;
                 if (message.payload.widget.id == EVENTS_DIALOG_OK
@@ -672,7 +674,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 DragNewMapSlider(false, message.payload.widget.id - NEW_MAP_FIRST_DENSITY_KNOB);
             if (message.payload.widget.id >= NEW_MAP_SCATTER_TOWNS
                 && message.payload.widget.id <= NEW_MAP_CENTRE_TOWNS) {
-                gScatterTowns = message.payload.widget.id == NEW_MAP_SCATTER_TOWNS;
+                gScatterTerrain = message.payload.widget.id == NEW_MAP_SCATTER_TOWNS;
                 redraw = true;
             }
             if (message.payload.widget.id == NEW_MAP_GENERATE_UNSEEN) {

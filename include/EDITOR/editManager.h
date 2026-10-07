@@ -7,10 +7,9 @@
 // prove the member offsets.
 
 #include <va.h>
-#include <stdio.h>
 #include <BASE/baseManager.h>
-#include <SOURCE/REQUEST.h>
-#include <EDITOR/mapcell.h>
+#include <EDITOR/EDITMGR.h>
+#include <EDITOR/EDITOR.h>
 
 class heroWindow;
 class icon;
@@ -35,11 +34,101 @@ H2_ENUM_BEGIN(EditTool)
     EDIT_TOOL_ROAD          = 4,
     EDIT_TOOL_ERASE         = 5,
     EDIT_TOOL_COUNT         = 6,
-    EDIT_CONTROL_TOOL_FIRST = 0x65,
-    EDIT_CONTROL_TOOL_PANEL = 0x78,
     // A tool manager runs at the executive's default priority.
     EDIT_TOOL_PRIORITY      = -1
 H2_ENUM_END(EditTool)
+
+H2_ENUM_BEGIN(EditViewGeometry)
+    // The map view's 448x448 square at (16, 16).
+    EDIT_VIEW_LEFT   = 0x10,
+    EDIT_VIEW_TOP    = 0x10,
+    EDIT_VIEW_PIXELS = 0x1c0,
+    EDIT_VIEW_RIGHT  = EDIT_VIEW_LEFT + EDIT_VIEW_PIXELS,
+    EDIT_VIEW_BOTTOM = EDIT_VIEW_TOP + EDIT_VIEW_PIXELS,
+    // Monsters stand 5 pixels and heroes 14 above their cell (at the normal
+    // zoom).
+    EDIT_MONSTER_LIFT = 5,
+    EDIT_HERO_LIFT    = 0xe
+H2_ENUM_END(EditViewGeometry)
+
+H2_ENUM_BEGIN(EditControl)
+    // The editor window's widgets (editwind.bin) the managers answer: the
+    // map view, the scroll bars and arrows, the radar, the tool buttons
+    // (EDIT_CONTROL_TOOL_FIRST + EditTool) and the panel's buttons.
+    EDIT_CONTROL_MAP               = 9,
+    EDIT_CONTROL_HORIZONTAL_TRACK  = 0xa,
+    EDIT_CONTROL_VERTICAL_TRACK    = 0xb,
+    EDIT_CONTROL_HORIZONTAL_KNOB   = 0xc,
+    EDIT_CONTROL_VERTICAL_KNOB     = 0xd,
+    EDIT_CONTROL_SCROLL_UP         = 0xe,
+    EDIT_CONTROL_SCROLL_DOWN       = 0xf,
+    EDIT_CONTROL_SCROLL_RIGHT      = 0x10,
+    EDIT_CONTROL_SCROLL_LEFT       = 0x11,
+    EDIT_CONTROL_SCROLL_UP_LEFT    = 0x12,
+    EDIT_CONTROL_SCROLL_UP_RIGHT   = 0x13,
+    EDIT_CONTROL_SCROLL_DOWN_LEFT  = 0x14,
+    EDIT_CONTROL_SCROLL_DOWN_RIGHT = 0x15,
+    EDIT_CONTROL_RADAR             = 0x27,
+    EDIT_CONTROL_TOOL_FIRST        = 0x65,
+    EDIT_CONTROL_TERRAIN           = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_TERRAIN,
+    EDIT_CONTROL_OBJECT            = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_OBJECT,
+    EDIT_CONTROL_DETAIL            = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_DETAIL,
+    EDIT_CONTROL_STREAM            = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_STREAM,
+    EDIT_CONTROL_ROAD              = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_ROAD,
+    EDIT_CONTROL_ERASE             = EDIT_CONTROL_TOOL_FIRST + EDIT_TOOL_ERASE,
+    EDIT_CONTROL_ZOOM              = 0x6f,
+    EDIT_CONTROL_UNDO              = 0x70,
+    EDIT_CONTROL_NEW               = 0x71,
+    EDIT_CONTROL_SPECIFICATIONS    = 0x72,
+    EDIT_CONTROL_FILE              = 0x73,
+    EDIT_CONTROL_SYSTEM            = 0x74,
+    EDIT_CONTROL_LOAD              = 0x75,
+    EDIT_CONTROL_SAVE              = 0x76,
+    EDIT_CONTROL_QUIT              = 0x77,
+    EDIT_CONTROL_TOOL_PANEL        = 0x78
+H2_ENUM_END(EditControl)
+
+H2_ENUM_BEGIN(EditBrush)
+    // The terrain and eraser tools' brushes: a one-, two- or four-cell
+    // square, or a dragged rectangle. Keys 1-4 pick them.
+    EDIT_BRUSH_SINGLE    = 0,
+    EDIT_BRUSH_DOUBLE    = 1,
+    EDIT_BRUSH_QUADRUPLE = 2,
+    EDIT_BRUSH_AREA      = 3,
+    EDIT_BRUSH_COUNT     = 4,
+    // The square brushes' widths in cells.
+    EDIT_BRUSH_SINGLE_CELLS    = 1,
+    EDIT_BRUSH_DOUBLE_CELLS    = 2,
+    EDIT_BRUSH_QUADRUPLE_CELLS = 4
+H2_ENUM_END(EditBrush)
+
+H2_ENUM_BEGIN(EditToolPanel)
+    // The tool panel's screen region, which a tool redraws its buttons into.
+    EDIT_TOOL_PANEL_X      = 0x1e0,
+    EDIT_TOOL_PANEL_Y      = 0xe8,
+    EDIT_TOOL_PANEL_WIDTH  = 0x90,
+    EDIT_TOOL_PANEL_HEIGHT = 0xa0,
+    // The brush buttons along its bottom (editbtns.icn), left to right; each
+    // brush has a normal and a selected frame, as each tool button has.
+    EDIT_BUTTON_FRAMES         = 2,
+    EDIT_BRUSH_BUTTON_X        = 0x1ee,
+    EDIT_BRUSH_BUTTON_STEP     = 0x1e,
+    EDIT_BRUSH_BUTTON_Y        = 0x168,
+    EDIT_BRUSH_BUTTON_WIDTH    = 0x18,
+    EDIT_BRUSH_BUTTON_HEIGHT   = 0x12,
+    EDIT_BRUSH_FRAME_FIRST     = 0x18,
+    EDIT_BRUSH_BUTTON_ID_FIRST = 0x514,
+    EDIT_BRUSH_BUTTON_ID_LAST  = EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_COUNT - 1,
+    // The mouse-move repeats a tool's cursor redraw waits for.
+    EDIT_CURSOR_REDRAW_INTERVAL = 10
+H2_ENUM_END(EditToolPanel)
+
+H2_ENUM_BEGIN(EditManagerSetting)
+    // The editor manager's Main accepts these messages; its pointer is
+    // editor.mse frame 0.
+    EDIT_MANAGER_DISPATCH_MASK = 0x4000,
+    EDIT_POINTER_DEFAULT       = 0
+H2_ENUM_END(EditManagerSetting)
 
 H2_ENUM_BEGIN(EditManagerLayout)
     // m_objectIcons: two icons per adventure tileset slot (gTilesetFiles);
@@ -51,28 +140,10 @@ H2_ENUM_BEGIN(EditManagerLayout)
     // The map-extra records (towns, heroes, events, signs) cells name, as
     // the map file stores them; record 0 is never allocated.
     EDIT_MANAGER_EXTRA_CAPACITY = 512,
+    EDIT_MANAGER_FIRST_EXTRA    = 1,
     // The save checks keep at most this many messages.
     EDIT_MANAGER_ERROR_CAPACITY = 100
 H2_ENUM_END(EditManagerLayout)
-
-// The map text import's file: closed on every return.
-class textFile {
-public:
-    FILE* m_file;
-
-    textFile(void);
-    ~textFile();
-    operator FILE*(void);
-};
-
-#pragma pack(push, 1)
-// A town or capturable-site record of the map file.
-struct EditMapRecord {
-    u8 x;
-    u8 y;
-    u8 type;
-};
-#pragma pack(pop)
 
 #pragma pack(push, 1)
 class editManager : public baseManager {
@@ -148,7 +219,7 @@ public:
     void DoHorizontalKnob(void);
     void DoVerticalKnob(void);
     // Moves the scroll knobs to the view origin (and redraws them).
-    void UpdateKnobs(i32 update);
+    void UpdateKnobs(b32 updateScreen);
     // The save checks: CheckObjects reports objects that cannot work, the
     // Count helpers count map objects and the Write helpers write the map
     // file's tables (and report what does not fit).
@@ -181,9 +252,11 @@ public:
     void FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain);
     // Starts an empty (or random) map of the given size.
     void InitializeMap(b32 random, i32 width, i32 height);
-    // Fits the terrain's edge tiles to their neighbours over the whole map.
-    void BlendTerrain(i32 terrain, b32 unused, b32 fromUndo, b32 skipBorders, b32 skipFill);
-    void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, i32 allLayers, i32 filtered);
+    // Fits the terrain's edge tiles to their neighbours over the whole map
+    // (the terrain tool's terrain, the generator's flag and fromUndo go
+    // unread).
+    void BlendTerrain(i32 terrain, b32 generating, b32 fromUndo, b32 skipBorders, b32 skipFill);
+    void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, b32 allLayers, b32 filtered);
     i32 SaveMap(char* name);
     // Rerolls every plain ground tile to one of its variants, more often at
     // a higher variety (0-9).
@@ -197,7 +270,7 @@ public:
     void PlaceObstacleChains(i32 density, b32 mountains);
     b32 PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset);
     void PlaceTowns(void);
-    i32 PlaceResourceSite(i32 x, i32 y, i32 resource);
+    b32 PlaceResourceSite(i32 x, i32 y, i32 resource);
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
     void ScatterDecorations(void);
@@ -231,89 +304,5 @@ public:
 };
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
-
-#define gEditManager gpEditManager // spelling fixes .bss order
-extern editManager* gEditManager;
-// The map text export's file and its line writers.
-#define gTextFileName gTextFileNameBlockBuffer // spelling fixes .bss order
-extern char* gTextFileName;
-void ClearTextFile(void);
-void AppendTextLine(H2_CONST char* text);
-void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
-void ReadTextLine(FILE* file, char* line);
-bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
-// Set while BlendTerrain may pick ground variants.
-#define gVaryTiles gVaryTilesBase // spelling fixes .bss order
-extern b32 gVaryTiles;
-// Set when ClearArea erased a road or stream part (to redraw the lines).
-#define gLinesRemoved gLinesRemovedLocal // spelling fixes .bss order
-extern b32 gLinesRemoved;
-// ClearArea's object filter: the tilesets whose objects it erases.
-#define gClearTilesets gClearTilesetsInstance // spelling fixes .bss order
-extern u8 gClearTilesets[TILESET_COUNT];
-
-H2_ENUM_BEGIN(EditClearMask)
-    // ClearArea's layer masks: everything, or what a road may cross.
-    EDIT_CLEAR_ALL       = 0xffff,
-    EDIT_CLEAR_ROAD_MASK = 0xfc7f
-H2_ENUM_END(EditClearMask)
-
-// The ground tile of a terrain and shape: the plain or a varied tile (vary),
-// whose variant is rolled at (x, y) with the given chance.
-i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
-// The header of the edited map (its name, size and players).
-extern SMapHeader gEditMapHeader;
-
-void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape);
-
-// BlendShallowWater's count of a water cell's shaded neighbours by the coast
-// corner (a flip state, 0-3) they face; `any` tests all four at once.
-union EditCornerCounts {
-    u8 corner[4];
-    u32 any;
-};
-
-// A map code of the serial (a letter from 'V' and three base-26 letters).
-char* MakeMapCode(i32 serial);
-// Shows a warning on the status bar with a beep.
-void ShowStatusWarning(char* text);
-// Whether the map needs the expansion (an event, sphinx, castle, hero,
-// artifact or object only the expansion has): it then saves as .MX2.
-b8 UsesExpansionObjects(void);
-// Whether a cell's object (its trigger) keeps a map-extra record, and
-// freeing one record (the later ones and their users move down).
-b32 HasExtraObjectData(i32 triggerType);
-void DeleteExtraObjectData(u32 index);
-// The file menu (ecpanel.bin): the button chosen, or -1.
-i32 FileOptions(void);
-MessageDispatchResult FileOptionsHandler(struct tag_message& message);
-// The system options dialog's toggles and handler.
-void UpdateEditorSystemOptions(i32 initialDraw);
-MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message);
-
-// Rebuilds the overlay tiles of the whole map.
-void FillInOverlayTiles(void);
-
-// Whether a cell's object (its trigger type) has a detail editor: towns,
-// signs, events, sphinxes, monsters, the ultimate artifact, heroes, jails
-// and artifacts.
-b32 LocationHasSpecialDetails(i32 triggerType);
-
-// Marks the players whose towns or heroes the map holds
-// (gEditMapHeader.playerEnabled).
-void ResetPlayerAvailability(void);
-
-// The map file requester: loads or saves (`mode`) and stores the chosen
-// file name in gMapFileName.
-i32 PickMap(i32 mode);
-void CalculatePlayerNumbers(void);
-// The drag selection the map view outlines (EDIT_NO_CELL when there is none).
-extern i32 gSelectionX;
-#define gSelectionY gSelectionYBlock // spelling fixes .bss order
-extern i32 gSelectionY;
-#define gSelectionWidth gSelectionWidthBufferShared // spelling fixes .bss order
-extern i32 gSelectionWidth;
-#define gSelectionHeight gSelectionHeightRuntimeTable // spelling fixes .bss order
-extern i32 gSelectionHeight;
 
 #endif

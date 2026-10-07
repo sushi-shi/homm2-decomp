@@ -1,6 +1,6 @@
 #include <va.h>
-#include "EDITOR/fullMap.h"
-#include "EDITOR/mapcell.h"
+#include <EDITOR/mapcell.h>
+#include <EDITOR/fullMap.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <string.h>
@@ -62,11 +62,7 @@ void fullMap::Init(i32 mapWidth, i32 mapHeight) {
         extras[index].nextIndex = MAPCELL_EXTRA_FREE;
 }
 #else
-#if H2_RETAIL_COMPILER
-#define mapHeight h
-#define mapWidth w
-#define unused n
-#endif
+#define unused n // frame-slot spelling
 VA(0x004720f2, 0x4d)
 void fullMap::Init(i32 mapWidth, i32 mapHeight) {
     i32 H2_UNUSED(unused);
@@ -75,11 +71,7 @@ void fullMap::Init(i32 mapWidth, i32 mapHeight) {
     Close();
     cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
 }
-#if H2_RETAIL_COMPILER
-#undef mapHeight
-#undef mapWidth
 #undef unused
-#endif
 #endif
 
 VA(0x0047213f, 0x151)
@@ -88,8 +80,8 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = TILESET_NONE;
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
-    extras[index].objectLayerBit0 = 0;
-    extras[index].objectLayerBit1 = 0;
+    extras[index].objectHighLayer = 0;
+    extras[index].objectShadow = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = TILESET_NONE;
     extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
@@ -113,10 +105,8 @@ void fullMap::Copy(fullMap& source) {
 }
 #endif
 
-#if H2_RETAIL_COMPILER
-#define extraIndex n
-#define newExtras i
-#endif
+#define extraIndex n // frame-slot spelling
+#define newExtras i  // frame-slot spelling
 VA(0x00472290, 0x113)
 VA_AT(editor, 0x00417a3d, 0x113)
 i32 fullMap::GetNewCellExtraIndex(void) {
@@ -142,15 +132,11 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     ClearCellExtra(extraCount - EXTRA_ALLOCATION_STEP);
     return extraCount - EXTRA_ALLOCATION_STEP;
 }
-#if H2_RETAIL_COMPILER
 #undef extraIndex
 #undef newExtras
-#endif
 
-#if H2_RETAIL_COMPILER
-#define index ix
-#define newExtraIndex ni
-#endif
+#define index ix         // frame-slot spelling
+#define newExtraIndex ni // frame-slot spelling
 VA(0x004723a3, 0x165)
 VA_AT(editor, 0x00417b50, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
@@ -181,15 +167,11 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef index
 #undef newExtraIndex
-#endif
 
-#if H2_RETAIL_COMPILER
-#define index ix
-#define newExtraIndex ni
-#endif
+#define index ix         // frame-slot spelling
+#define newExtraIndex ni // frame-slot spelling
 VA(0x00472508, 0x165)
 VA_AT(editor, 0x00417cb5, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
@@ -220,35 +202,31 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef index
 #undef newExtraIndex
-#endif
 
 #ifdef HOMM2_EDITOR
-#if H2_RETAIL_COMPILER
-#define nextIndex_ ni
-#endif
 // Pulls the object part of the record after `index` up into it, recursively,
 // and frees a record left with neither part.
+#define nextExtraIndex ni // frame-slot spelling
 VA_AT(editor, 0x00417e1a, 0x1ab)
 void fullMap::RemoveExtraObject(i32 index) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCellExtra* next;
 
     extra = &extras[index];
-    nextIndex_ = extra->nextIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].objectIndex != MAPCELL_SPRITE_NONE) {
-        next = &extras[nextIndex_];
+    nextExtraIndex = extra->nextIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].objectIndex != MAPCELL_SPRITE_NONE) {
+        next = &extras[nextExtraIndex];
         extra->objectLink = next->objectLink;
         extra->objectTileset = next->objectTileset;
         extra->objectIndex = next->objectIndex;
         extra->animatedObject = next->animatedObject;
-        extra->objectLayerBit0 = next->objectLayerBit0;
-        extra->objectLayerBit1 = next->objectLayerBit1;
+        extra->objectHighLayer = next->objectHighLayer;
+        extra->objectShadow = next->objectShadow;
         extra->objectDrawnAsOverlay = next->objectDrawnAsOverlay;
-        RemoveExtraObject(nextIndex_);
+        RemoveExtraObject(nextExtraIndex);
         if (next->objectIndex == MAPCELL_SPRITE_NONE && next->overlayIndex == MAPCELL_SPRITE_NONE) {
             extra->nextIndex = 0;
             next->nextIndex = MAPCELL_EXTRA_FREE;
@@ -258,34 +236,36 @@ void fullMap::RemoveExtraObject(i32 index) {
         extra->objectTileset = TILESET_NONE;
         extra->objectIndex = MAPCELL_SPRITE_NONE;
         extra->animatedObject = 0;
-        extra->objectLayerBit0 = 0;
-        extra->objectLayerBit1 = 0;
+        extra->objectHighLayer = 0;
+        extra->objectShadow = 0;
         extra->objectDrawnAsOverlay = 0;
     }
 }
+#undef nextExtraIndex
 
 // Removes the cell's object part: the first extra record's object takes its
 // place, or the cell is left without one.
+#define nextExtraIndex ni // frame-slot spelling
 VA_AT(editor, 0x00417fc5, 0x227)
 void fullMap::RemoveCellObject(i32 x, i32 y) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCell* cell;
 
     cell = &Column(x)[y * width];
-    nextIndex_ = cell->m_extraIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].objectIndex != MAPCELL_SPRITE_NONE) {
-        extra = &extras[nextIndex_];
+    nextExtraIndex = cell->m_extraIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].objectIndex != MAPCELL_SPRITE_NONE) {
+        extra = &extras[nextExtraIndex];
         cell->m_objectLink = extra->objectLink;
         cell->m_objectTileset = extra->objectTileset;
         cell->m_objectIndex = extra->objectIndex;
         cell->m_animatedObject = extra->animatedObject;
-        cell->m_objectLayerBit0 = extra->objectLayerBit0;
-        cell->m_objectLayerBit1 = extra->objectLayerBit1;
+        cell->m_objectHighLayer = extra->objectHighLayer;
+        cell->m_objectShadow = extra->objectShadow;
         cell->m_objectDrawnAsOverlay = extra->objectDrawnAsOverlay;
         cell->m_triggerType = MAP_OBJECT_NONE;
         cell->m_objectMetadata = 0;
-        RemoveExtraObject(nextIndex_);
+        RemoveExtraObject(nextExtraIndex);
         if (extra->objectIndex == MAPCELL_SPRITE_NONE && extra->overlayIndex == MAPCELL_SPRITE_NONE) {
             cell->m_extraIndex = 0;
             extra->nextIndex = MAPCELL_EXTRA_FREE;
@@ -295,13 +275,14 @@ void fullMap::RemoveCellObject(i32 x, i32 y) {
         cell->m_objectTileset = TILESET_NONE;
         cell->m_objectIndex = MAPCELL_SPRITE_NONE;
         cell->m_animatedObject = 0;
-        cell->m_objectLayerBit0 = 0;
-        cell->m_objectLayerBit1 = 0;
+        cell->m_objectHighLayer = 0;
+        cell->m_objectShadow = 0;
         cell->m_objectDrawnAsOverlay = 0;
         cell->m_objectMetadata = 0;
         cell->m_triggerType = MAP_OBJECT_NONE;
     }
 }
+#undef nextExtraIndex
 
 // Moves the cell's object part into a new extra record of the edited map,
 // leaving the cell free for another object.
@@ -315,15 +296,15 @@ void fullMap::PushCellObject(i32 x, i32 y) {
     extra->animatedObject = cell->m_animatedObject;
     extra->objectTileset = cell->m_objectTileset;
     extra->objectIndex = cell->m_objectIndex;
-    extra->objectLayerBit0 = cell->m_objectLayerBit0;
-    extra->objectLayerBit1 = cell->m_objectLayerBit1;
+    extra->objectHighLayer = cell->m_objectHighLayer;
+    extra->objectShadow = cell->m_objectShadow;
     extra->objectDrawnAsOverlay = cell->m_objectDrawnAsOverlay;
     extra->objectLink = cell->m_objectLink;
     cell->m_animatedObject = 0;
     cell->m_objectTileset = TILESET_NONE;
     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
-    cell->m_objectLayerBit0 = 0;
-    cell->m_objectLayerBit1 = 0;
+    cell->m_objectHighLayer = 0;
+    cell->m_objectShadow = 0;
     cell->m_objectDrawnAsOverlay = 0;
     cell->m_objectLink = 0;
     cell->m_triggerType = MAP_OBJECT_NONE;
@@ -331,22 +312,23 @@ void fullMap::PushCellObject(i32 x, i32 y) {
 
 // The overlay counterpart of RemoveExtraObject. The retail check reads the
 // next record's overlay twice; its object part is never consulted.
+#define nextExtraIndex ni // frame-slot spelling
 VA_AT(editor, 0x00418356, 0x154)
 void fullMap::RemoveExtraOverlay(i32 index) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCellExtra* next;
 
     extra = &extras[index];
-    nextIndex_ = extra->nextIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].overlayIndex != MAPCELL_SPRITE_NONE) {
-        next = &extras[nextIndex_];
+    nextExtraIndex = extra->nextIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].overlayIndex != MAPCELL_SPRITE_NONE) {
+        next = &extras[nextExtraIndex];
         extra->overlayLink = next->overlayLink;
         extra->overlayTileset = next->overlayTileset;
         extra->overlayIndex = next->overlayIndex;
         extra->animatedOverlay = next->animatedOverlay;
         extra->drawOverlayOnTop = next->drawOverlayOnTop;
-        RemoveExtraOverlay(nextIndex_);
+        RemoveExtraOverlay(nextExtraIndex);
         if (next->overlayIndex == MAPCELL_SPRITE_NONE && next->overlayIndex == MAPCELL_SPRITE_NONE) {
             extra->nextIndex = 0;
             next->nextIndex = MAPCELL_EXTRA_FREE;
@@ -359,24 +341,26 @@ void fullMap::RemoveExtraOverlay(i32 index) {
         extra->drawOverlayOnTop = 0;
     }
 }
+#undef nextExtraIndex
 
 // The overlay counterpart of RemoveCellObject.
+#define nextExtraIndex ni // frame-slot spelling
 VA_AT(editor, 0x004184aa, 0x163)
 void fullMap::RemoveCellOverlay(i32 x, i32 y) {
     mapCellExtra* extra;
-    i32 nextIndex_;
+    i32 nextExtraIndex;
     mapCell* cell;
 
     cell = &Column(x)[y * width];
-    nextIndex_ = cell->m_extraIndex;
-    if (nextIndex_ != 0 && extras[nextIndex_].overlayIndex != MAPCELL_SPRITE_NONE) {
-        extra = &extras[nextIndex_];
+    nextExtraIndex = cell->m_extraIndex;
+    if (nextExtraIndex != 0 && extras[nextExtraIndex].overlayIndex != MAPCELL_SPRITE_NONE) {
+        extra = &extras[nextExtraIndex];
         cell->m_overlayLink = extra->overlayLink;
         cell->m_overlayTileset = extra->overlayTileset;
         cell->m_overlayIndex = extra->overlayIndex;
         cell->m_animatedOverlay = extra->animatedOverlay;
         cell->m_drawOverlayOnTop = extra->drawOverlayOnTop;
-        RemoveExtraOverlay(nextIndex_);
+        RemoveExtraOverlay(nextExtraIndex);
         if (extra->overlayIndex == MAPCELL_SPRITE_NONE && extra->overlayIndex == MAPCELL_SPRITE_NONE) {
             cell->m_extraIndex = 0;
             extra->nextIndex = MAPCELL_EXTRA_FREE;
@@ -389,9 +373,7 @@ void fullMap::RemoveCellOverlay(i32 x, i32 y) {
         cell->m_drawOverlayOnTop = 0;
     }
 }
-#if H2_RETAIL_COMPILER
-#undef nextIndex_
-#endif
+#undef nextExtraIndex
 
 // Closes the gaps in the extra-record pool: records move down, every cell
 // and chain index is remapped, and the pool keeps EXTRA_COMPACT_SLACK free
@@ -457,7 +439,7 @@ void fullMap::Write(i32 handle) {
 
 #ifdef HOMM2_EDITOR
 VA_AT(editor, 0x00418958, 0xd5)
-void fullMap::Read(i32 handle, i32) {
+void fullMap::Read(i32 handle, i32 H2_UNUSED(convert)) {
     i32 extraIndex;
 
     READ_FILE_VALUE(handle, width);
@@ -470,11 +452,9 @@ void fullMap::Read(i32 handle, i32) {
         extras[extraIndex].nextIndex = MAPCELL_EXTRA_FREE;
 }
 #else
-#if H2_RETAIL_COMPILER
-#define extraIndex nb
-#define oldCells tmp1
-#define oldExtras tmp2
-#endif
+#define extraIndex nb  // frame-slot spelling
+#define oldCells tmp1  // frame-slot spelling
+#define oldExtras tmp2 // frame-slot spelling
 VA(0x004726f9, 0x258)
 void fullMap::Read(i32 handle, i32 convert) {
     i32 extraIndex;
@@ -509,19 +489,15 @@ void fullMap::Read(i32 handle, i32 convert) {
         read(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
-#if H2_RETAIL_COMPILER
 #undef extraIndex
 #undef oldCells
 #undef oldExtras
 #endif
-#endif
 
-#if H2_RETAIL_COMPILER
-#define extra ptr
-#define extraIndex idx
-#define newTileset t
-#define unused a
-#endif
+#define extra ptr      // frame-slot spelling
+#define extraIndex idx // frame-slot spelling
+#define newTileset t   // frame-slot spelling
+#define unused a       // frame-slot spelling
 VA(0x00472951, 0x314)
 VA_AT(editor, 0x00418a2d, 0x356)
 void fullMap::ChangeTilesetIndex(
@@ -554,8 +530,8 @@ void fullMap::ChangeTilesetIndex(
                     extraIndex = extra->nextIndex;
                 } else {
                     extra->animatedObject = 0;
-                    extra->objectLayerBit0 = 0;
-                    extra->objectLayerBit1 = 0;
+                    extra->objectHighLayer = 0;
+                    extra->objectShadow = 0;
                     extra->objectDrawnAsOverlay = 0;
                     extra->objectTileset = newTileset;
                     extra->objectIndex = index;
@@ -575,8 +551,8 @@ void fullMap::ChangeTilesetIndex(
             }
         } else {
             cell->m_animatedObject = 0;
-            cell->m_objectLayerBit0 = 0;
-            cell->m_objectLayerBit1 = 0;
+            cell->m_objectHighLayer = 0;
+            cell->m_objectShadow = 0;
             cell->m_objectDrawnAsOverlay = 0;
             cell->m_objectTileset = newTileset;
             cell->m_objectIndex = index;
@@ -621,9 +597,7 @@ void fullMap::ChangeTilesetIndex(
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef extra
 #undef extraIndex
 #undef newTileset
 #undef unused
-#endif

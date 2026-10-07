@@ -79,8 +79,10 @@ struct mapCellExtra {
     u8 animatedObject : 1;
     H2_ENUM_BITFIELD(TilesetId, u8) objectTileset : 7;
     u8 objectIndex;
-    u8 objectLayerBit0 : 1;
-    u8 objectLayerBit1 : 1;
+    // The object part draws on the high layer (overlayType::highLayer), or
+    // is only a shadow.
+    u8 objectHighLayer : 1;
+    u8 objectShadow : 1;
     u8 objectDrawnAsOverlay : 1;
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
@@ -117,8 +119,9 @@ public:
     union {
         u16 m_objectData;
         struct {
-            u16 m_objectLayerBit0 : 1;
-            u16 m_objectLayerBit1 : 1;
+            // As mapCellExtra's: the high layer, and a shadow part.
+            u16 m_objectHighLayer : 1;
+            u16 m_objectShadow : 1;
             u16 m_objectDrawnAsOverlay : 1;
             u16 m_objectMetadata : 13;
         };
@@ -154,11 +157,24 @@ SIZE(mapCell, 12);
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \
      && ((cell)->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)) == 0)
 
+#ifndef HOMM2_EDITOR
+#pragma pack(push, 1)
+// A map cell and an extra record as the scenario editor keeps them: the
+// game's record and its placement links (see mapCellExtra). fullMap::Read
+// with `convert` drops the links.
 struct oldMapCell {
-    u8 raw[20];
+    mapCell cell;
+    i32 objectLink;
+    i32 overlayLink;
 };
 
 struct oldMapCellExtra {
-    u8 raw[15];
+    mapCellExtra extra;
+    i32 objectLink;
+    i32 overlayLink;
 };
+#pragma pack(pop)
+SIZE(oldMapCell, 20);
+SIZE(oldMapCellExtra, 15);
+#endif
 #endif
