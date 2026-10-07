@@ -38,7 +38,6 @@ typedef enum GameSerializationConstant {
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,
     GAME_BOAT_COUNT              = 48,
-    GAME_EVENT_RUNTIME_GAP_SIZE  = 4,
     GAME_EVENT_MESSAGE_HEAD_SIZE = 1
 } GameSerializationConstant;
 
@@ -52,17 +51,20 @@ typedef enum GameSetupSharedConstant {
 } GameSetupSharedConstant;
 
 #pragma pack(push, 1)
+
+
 struct EventExtra {
-    u8 unknown00;
+    u8 isMapEvent;
     i32 resources[H2EnumIndex(RES_COUNT)];
     i16 artifact;
-    u8 applyToComputer;
+    u8 appliesToComputer;
     u8 cancelAfterVisit;
-    char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
+    u16 firstDay;
+    u16 repeatInterval;
     b8 active;
     u16 x;
     u16 y;
-    u8 unknown2a;
+    u8 appliesToHuman;
     u8 players[GAME_PLAYER_COUNT];
     char message[GAME_EVENT_MESSAGE_HEAD_SIZE];
 };
@@ -113,7 +115,6 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_EXPERIENCE_BASE           = 40,
     RANDOM_HERO_SEED_MIN                  = 1,
     RANDOM_HERO_SEED_MAX                  = 255,
-    RANDOM_HERO_ENABLED                   = 1,
     RANDOM_HERO_STARTING_SPELL_KNOWN      = 1,
     RANDOM_HERO_FIRST_STACK_CHANCE        = 50,
     RANDOM_HERO_FIRST_STACK_BONUS_CHANCE  = 30,
@@ -134,7 +135,7 @@ typedef enum GameWaitConstant {
     WAIT_DIALOG_TYPE         = 9
 } GameWaitConstant;
 
-i32 GetNumObelisks(i32 color);
+i32 GetNumObelisks(i32 player);
 void ComputeUALoc(i32 playerIndex);
 void GenerateStandardFileName(char* source, char* destination);
 MessageDispatchResult ViewSpellsHandler(struct tag_message& message);

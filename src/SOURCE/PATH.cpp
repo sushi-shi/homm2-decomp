@@ -60,7 +60,7 @@ i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     if (!ValidHex(targetHex))
         return 0;
 
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING)))
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING))))
         return ValidFlight(targetHex, pathMode);
 
     pathResult = FindPath(m_hex, targetHex, m_monster.speed, 0, pathMode);
@@ -137,7 +137,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         frontValid = true;
     }
 
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         rearSquare = ARMY_HEX_INVALID;
         switch (m_facing) {
             case ARMY_FACING_LEFT:
@@ -188,7 +188,7 @@ i32 army::ValidAttack(
         return 0;
 
     adjacentSourceHex = sourceHex;
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,

@@ -2,12 +2,15 @@
 
 #include <Ints.h>
 #include <EDITOR/EDITOR.h>
+#include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
+#include <EDITOR/lineManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/NOOPT.h>
+#include <SOURCE/fileRequester.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/Misc.h>
@@ -24,6 +27,7 @@
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
+#include <BASE/widget.h>
 #include <windows.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -38,24 +42,16 @@ typedef enum EditorStartupConstant {
     EDITOR_SETUP_NEW_MAP        = 1,
     EDITOR_SETUP_LOAD_MAP       = 2,
     EDITOR_SETUP_QUIT           = 0x69,
-    EDITOR_SETUP_PICK_LOAD_MODE = 4,
     EDITOR_FADE_STEPS           = 6,
     EDITOR_SLOW_FADE_STEPS      = 8,
 
     EDITOR_BACKGROUND_COLOR     = 0x24,
-    EDITOR_SCREEN_BYTES         = 640 * 480,
-
-    EDITOR_CD_NO_DRIVE          = 1,
-    EDITOR_CD_NOT_FOUND         = 2,
-    EDITOR_CD_NO_APP_PATH       = 3,
-    EDITOR_CD_NO_DATA           = 4,
 
     EDITOR_DELAY_TICK_MILLISECONDS = 15,
     EDITOR_DELAY_TIMER_SLOT     = 1,
     EDITOR_MOUSE_UPDATE_INTERVAL = 13,
     EDITOR_COLOR_CYCLE_INTERVAL = 200,
     EDITOR_NON_PALETTED_CYCLE_DELAY = 300,
-    EDITOR_PALETTED_COLOR_DEPTH = 8,
 
     EDITOR_SHUTDOWN_TEXT_SIZE   = 768,
     EDITOR_FILE_ERROR_TEXT_SIZE = 200
@@ -76,8 +72,6 @@ typedef enum EditorNormalDialogConstant {
     EDITOR_DIALOG_ROW_OFFSET       = 12,
     EDITOR_DIALOG_WINDOW_WIDTH     = 0x11e,
     EDITOR_DIALOG_WINDOW_BASE      = 0x81,
-    EDITOR_DIALOG_SCREEN_MAX_X     = 0x27f,
-    EDITOR_DIALOG_SCREEN_MAX_Y     = 0x1df,
     EDITOR_DIALOG_DEFAULT_X        = 0x9f,
 } EditorNormalDialogConstant;
 
@@ -143,28 +137,28 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(21),
     GROUND_REPEAT_2(19),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_REPEAT_4(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED,
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_REPEAT_4(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED,
     GROUND_REPEAT_4(5),
     GROUND_REPEAT_4(6),
     GROUND_REPEAT_4(7),
     GROUND_REPEAT_4(8),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED
 };
 
 #undef GROUND_SHAPE_STANDARD_FRAME_SET
@@ -840,7 +834,7 @@ i32 gSelectionX = EDIT_NO_CELL;
 i32 gRandomMapPlayers = 4;
 double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT] = {30.0, 30.0, 20.0, 0.0, 0.0, 0.0, 20.0, 0.0};
 double gDensityPercent[RANDOM_MAP_DENSITY_COUNT] = {50.0, 50.0, 50.0, 50.0, 50.0};
-b32 gScatterTowns = true;
+b32 gScatterTerrain = true;
 struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {H2EnumIndex(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
@@ -1201,122 +1195,122 @@ const char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT] = {
 };
 
 SWinSetup gWinSetup[EDITOR_DIALOG_WIN_SETUP_COUNT] = {
-    {16, 500, localization::Tr("editor.table.gWinSetup.0")},
-    {3, 100, localization::Tr("editor.table.gWinSetup.1")},
-    {3, 101, localization::Tr("editor.table.gWinSetup.2")},
-    {3, 103, localization::Tr("editor.table.gWinSetup.3")},
-    {3, 105, localization::Tr("editor.table.gWinSetup.4")},
-    {4, 100, localization::Tr("editor.table.gWinSetup.5")},
-    {4, 101, localization::Tr("editor.table.gWinSetup.6")},
-    {4, 102, localization::Tr("editor.table.gWinSetup.7")},
-    {4, 103, localization::Tr("editor.table.gWinSetup.8")},
-    {4, 104, localization::Tr("editor.table.gWinSetup.9")},
-    {4, 105, localization::Tr("editor.table.gWinSetup.10")},
-    {4, 106, localization::Tr("editor.table.gWinSetup.11")},
-    {4, 107, localization::Tr("editor.table.gWinSetup.12")},
-    {4, 108, localization::Tr("editor.table.gWinSetup.13")},
-    {4, 109, localization::Tr("editor.table.gWinSetup.14")},
-    {4, 400, localization::Tr("editor.table.gWinSetup.15")},
-    {4, 420, localization::Tr("editor.table.gWinSetup.16")},
-    {4, 300, localization::Tr("editor.table.gWinSetup.17")},
-    {4, 305, localization::Tr("editor.table.gWinSetup.18")},
-    {4, 302, localization::Tr("editor.table.gWinSetup.19")},
-    {4, 600, localization::Tr("editor.table.gWinSetup.20")},
-    {5, 100, localization::Tr("editor.table.gWinSetup.21")},
-    {5, 200, localization::Tr("editor.table.gWinSetup.22")},
-    {5, 201, localization::Tr("editor.table.gWinSetup.23")},
-    {5, 202, localization::Tr("editor.table.gWinSetup.24")},
-    {5, 210, localization::Tr("editor.table.gWinSetup.25")},
-    {5, 211, localization::Tr("editor.table.gWinSetup.26")},
-    {5, 212, localization::Tr("editor.table.gWinSetup.27")},
-    {5, 213, localization::Tr("editor.table.gWinSetup.28")},
-    {5, 214, localization::Tr("editor.table.gWinSetup.29")},
-    {5, 215, localization::Tr("editor.table.gWinSetup.30")},
-    {5, 216, localization::Tr("editor.table.gWinSetup.31")},
-    {5, 300, localization::Tr("editor.table.gWinSetup.32")},
-    {5, 304, localization::Tr("editor.table.gWinSetup.33")},
-    {5, 305, localization::Tr("editor.table.gWinSetup.34")},
-    {5, 306, localization::Tr("editor.table.gWinSetup.35")},
-    {5, 800, localization::Tr("editor.table.gWinSetup.36")},
-    {5, 400, localization::Tr("editor.table.gWinSetup.37")},
-    {5, 500, localization::Tr("editor.table.gWinSetup.38")},
-    {5, 501, localization::Tr("editor.table.gWinSetup.39")},
-    {5, 502, localization::Tr("editor.table.gWinSetup.40")},
-    {5, 510, localization::Tr("editor.table.gWinSetup.41")},
-    {5, 511, localization::Tr("editor.table.gWinSetup.42")},
-    {5, 512, localization::Tr("editor.table.gWinSetup.43")},
-    {5, 513, localization::Tr("editor.table.gWinSetup.44")},
-    {5, 514, localization::Tr("editor.table.gWinSetup.45")},
-    {5, 515, localization::Tr("editor.table.gWinSetup.46")},
-    {5, 516, localization::Tr("editor.table.gWinSetup.47")},
-    {5, 517, localization::Tr("editor.table.gWinSetup.48")},
-    {5, 600, localization::Tr("editor.table.gWinSetup.49")},
-    {5, 601, localization::Tr("editor.table.gWinSetup.50")},
-    {5, 602, localization::Tr("editor.table.gWinSetup.51")},
-    {5, 700, localization::Tr("editor.table.gWinSetup.52")},
-    {8, 500, localization::Tr("editor.table.gWinSetup.53")},
-    {10, 100, localization::Tr("editor.table.gWinSetup.54")},
-    {10, 101, localization::Tr("editor.table.gWinSetup.55")},
-    {10, 102, localization::Tr("editor.table.gWinSetup.56")},
-    {10, 103, localization::Tr("editor.table.gWinSetup.57")},
-    {10, 104, localization::Tr("editor.table.gWinSetup.58")},
-    {10, 105, localization::Tr("editor.table.gWinSetup.59")},
-    {10, 106, localization::Tr("editor.table.gWinSetup.60")},
-    {10, 107, localization::Tr("editor.table.gWinSetup.61")},
-    {10, 108, localization::Tr("editor.table.gWinSetup.62")},
-    {10, 109, localization::Tr("editor.table.gWinSetup.63")},
-    {10, 300, localization::Tr("editor.table.gWinSetup.64")},
-    {10, 400, localization::Tr("editor.table.gWinSetup.65")},
-    {11, 100, localization::Tr("editor.table.gWinSetup.66")},
-    {13, 200, localization::Tr("editor.table.gWinSetup.67")},
-    {13, 220, localization::Tr("editor.table.gWinSetup.68")},
-    {13, 221, localization::Tr("editor.table.gWinSetup.69")},
-    {13, 250, localization::Tr("editor.table.gWinSetup.70")},
-    {13, 300, localization::Tr("editor.table.gWinSetup.71")},
-    {13, 320, localization::Tr("editor.table.gWinSetup.72")},
-    {13, 400, localization::Tr("editor.table.gWinSetup.73")},
-    {13, 401, localization::Tr("editor.table.gWinSetup.74")},
-    {13, 500, localization::Tr("editor.table.gWinSetup.75")},
-    {13, 600, localization::Tr("editor.table.gWinSetup.76")},
-    {13, 610, localization::Tr("editor.table.gWinSetup.77")},
-    {13, 611, localization::Tr("editor.table.gWinSetup.78")},
-    {13, 612, localization::Tr("editor.table.gWinSetup.79")},
-    {13, 613, localization::Tr("editor.table.gWinSetup.80")},
-    {13, 100, localization::Tr("editor.table.gWinSetup.81")},
-    {13, 700, localization::Tr("editor.table.gWinSetup.82")},
-    {13, 800, localization::Tr("editor.table.gWinSetup.83")},
-    {13, 900, localization::Tr("editor.table.gWinSetup.84")},
-    {15, 100, localization::Tr("editor.table.gWinSetup.85")},
-    {15, 200, localization::Tr("editor.table.gWinSetup.86")},
-    {15, 201, localization::Tr("editor.table.gWinSetup.87")},
-    {15, 202, localization::Tr("editor.table.gWinSetup.88")},
-    {15, 210, localization::Tr("editor.table.gWinSetup.89")},
-    {15, 211, localization::Tr("editor.table.gWinSetup.90")},
-    {15, 212, localization::Tr("editor.table.gWinSetup.91")},
-    {15, 213, localization::Tr("editor.table.gWinSetup.92")},
-    {15, 214, localization::Tr("editor.table.gWinSetup.93")},
-    {15, 215, localization::Tr("editor.table.gWinSetup.94")},
-    {15, 216, localization::Tr("editor.table.gWinSetup.95")},
-    {15, 600, localization::Tr("editor.table.gWinSetup.96")},
-    {15, 601, localization::Tr("editor.table.gWinSetup.97")},
-    {15, 602, localization::Tr("editor.table.gWinSetup.98")},
-    {15, 300, localization::Tr("editor.table.gWinSetup.99")},
-    {15, 310, localization::Tr("editor.table.gWinSetup.100")},
-    {15, 400, localization::Tr("editor.table.gWinSetup.101")},
-    {15, 401, localization::Tr("editor.table.gWinSetup.102")},
-    {15, 402, localization::Tr("editor.table.gWinSetup.103")},
-    {15, 470, localization::Tr("editor.table.gWinSetup.104")},
-    {15, 510, localization::Tr("editor.table.gWinSetup.105")},
-    {15, 512, localization::Tr("editor.table.gWinSetup.106")},
-    {15, 513, localization::Tr("editor.table.gWinSetup.107")},
-    {15, 514, localization::Tr("editor.table.gWinSetup.108")},
-    {15, 515, localization::Tr("editor.table.gWinSetup.109")},
-    {15, 516, localization::Tr("editor.table.gWinSetup.110")},
-    {15, 517, localization::Tr("editor.table.gWinSetup.111")},
-    {15, 518, localization::Tr("editor.table.gWinSetup.112")},
-    {15, 519, localization::Tr("editor.table.gWinSetup.113")},
-    {15, 520, localization::Tr("editor.table.gWinSetup.114")},
-    {15, 521, localization::Tr("editor.table.gWinSetup.115")}
+    {EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT, 500, localization::Tr("editor.table.gWinSetup.0")},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 100, localization::Tr("editor.table.gWinSetup.1")},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 101, localization::Tr("editor.table.gWinSetup.2")},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 103, localization::Tr("editor.table.gWinSetup.3")},
+    {EDITOR_WIN_TEXT_SYSTEM_OPTIONS, 105, localization::Tr("editor.table.gWinSetup.4")},
+    {EDITOR_WIN_TEXT_EVENT, 100, localization::Tr("editor.table.gWinSetup.5")},
+    {EDITOR_WIN_TEXT_EVENT, 101, localization::Tr("editor.table.gWinSetup.6")},
+    {EDITOR_WIN_TEXT_EVENT, 102, localization::Tr("editor.table.gWinSetup.7")},
+    {EDITOR_WIN_TEXT_EVENT, 103, localization::Tr("editor.table.gWinSetup.8")},
+    {EDITOR_WIN_TEXT_EVENT, 104, localization::Tr("editor.table.gWinSetup.9")},
+    {EDITOR_WIN_TEXT_EVENT, 105, localization::Tr("editor.table.gWinSetup.10")},
+    {EDITOR_WIN_TEXT_EVENT, 106, localization::Tr("editor.table.gWinSetup.11")},
+    {EDITOR_WIN_TEXT_EVENT, 107, localization::Tr("editor.table.gWinSetup.12")},
+    {EDITOR_WIN_TEXT_EVENT, 108, localization::Tr("editor.table.gWinSetup.13")},
+    {EDITOR_WIN_TEXT_EVENT, 109, localization::Tr("editor.table.gWinSetup.14")},
+    {EDITOR_WIN_TEXT_EVENT, 400, localization::Tr("editor.table.gWinSetup.15")},
+    {EDITOR_WIN_TEXT_EVENT, 420, localization::Tr("editor.table.gWinSetup.16")},
+    {EDITOR_WIN_TEXT_EVENT, 300, localization::Tr("editor.table.gWinSetup.17")},
+    {EDITOR_WIN_TEXT_EVENT, 305, localization::Tr("editor.table.gWinSetup.18")},
+    {EDITOR_WIN_TEXT_EVENT, 302, localization::Tr("editor.table.gWinSetup.19")},
+    {EDITOR_WIN_TEXT_EVENT, 600, localization::Tr("editor.table.gWinSetup.20")},
+    {EDITOR_WIN_TEXT_HERO, 100, localization::Tr("editor.table.gWinSetup.21")},
+    {EDITOR_WIN_TEXT_HERO, 200, localization::Tr("editor.table.gWinSetup.22")},
+    {EDITOR_WIN_TEXT_HERO, 201, localization::Tr("editor.table.gWinSetup.23")},
+    {EDITOR_WIN_TEXT_HERO, 202, localization::Tr("editor.table.gWinSetup.24")},
+    {EDITOR_WIN_TEXT_HERO, 210, localization::Tr("editor.table.gWinSetup.25")},
+    {EDITOR_WIN_TEXT_HERO, 211, localization::Tr("editor.table.gWinSetup.26")},
+    {EDITOR_WIN_TEXT_HERO, 212, localization::Tr("editor.table.gWinSetup.27")},
+    {EDITOR_WIN_TEXT_HERO, 213, localization::Tr("editor.table.gWinSetup.28")},
+    {EDITOR_WIN_TEXT_HERO, 214, localization::Tr("editor.table.gWinSetup.29")},
+    {EDITOR_WIN_TEXT_HERO, 215, localization::Tr("editor.table.gWinSetup.30")},
+    {EDITOR_WIN_TEXT_HERO, 216, localization::Tr("editor.table.gWinSetup.31")},
+    {EDITOR_WIN_TEXT_HERO, 300, localization::Tr("editor.table.gWinSetup.32")},
+    {EDITOR_WIN_TEXT_HERO, 304, localization::Tr("editor.table.gWinSetup.33")},
+    {EDITOR_WIN_TEXT_HERO, 305, localization::Tr("editor.table.gWinSetup.34")},
+    {EDITOR_WIN_TEXT_HERO, 306, localization::Tr("editor.table.gWinSetup.35")},
+    {EDITOR_WIN_TEXT_HERO, 800, localization::Tr("editor.table.gWinSetup.36")},
+    {EDITOR_WIN_TEXT_HERO, 400, localization::Tr("editor.table.gWinSetup.37")},
+    {EDITOR_WIN_TEXT_HERO, 500, localization::Tr("editor.table.gWinSetup.38")},
+    {EDITOR_WIN_TEXT_HERO, 501, localization::Tr("editor.table.gWinSetup.39")},
+    {EDITOR_WIN_TEXT_HERO, 502, localization::Tr("editor.table.gWinSetup.40")},
+    {EDITOR_WIN_TEXT_HERO, 510, localization::Tr("editor.table.gWinSetup.41")},
+    {EDITOR_WIN_TEXT_HERO, 511, localization::Tr("editor.table.gWinSetup.42")},
+    {EDITOR_WIN_TEXT_HERO, 512, localization::Tr("editor.table.gWinSetup.43")},
+    {EDITOR_WIN_TEXT_HERO, 513, localization::Tr("editor.table.gWinSetup.44")},
+    {EDITOR_WIN_TEXT_HERO, 514, localization::Tr("editor.table.gWinSetup.45")},
+    {EDITOR_WIN_TEXT_HERO, 515, localization::Tr("editor.table.gWinSetup.46")},
+    {EDITOR_WIN_TEXT_HERO, 516, localization::Tr("editor.table.gWinSetup.47")},
+    {EDITOR_WIN_TEXT_HERO, 517, localization::Tr("editor.table.gWinSetup.48")},
+    {EDITOR_WIN_TEXT_HERO, 600, localization::Tr("editor.table.gWinSetup.49")},
+    {EDITOR_WIN_TEXT_HERO, 601, localization::Tr("editor.table.gWinSetup.50")},
+    {EDITOR_WIN_TEXT_HERO, 602, localization::Tr("editor.table.gWinSetup.51")},
+    {EDITOR_WIN_TEXT_HERO, 700, localization::Tr("editor.table.gWinSetup.52")},
+    {EDITOR_WIN_TEXT_MONSTER, 500, localization::Tr("editor.table.gWinSetup.53")},
+    {EDITOR_WIN_TEXT_SPHINX, 100, localization::Tr("editor.table.gWinSetup.54")},
+    {EDITOR_WIN_TEXT_SPHINX, 101, localization::Tr("editor.table.gWinSetup.55")},
+    {EDITOR_WIN_TEXT_SPHINX, 102, localization::Tr("editor.table.gWinSetup.56")},
+    {EDITOR_WIN_TEXT_SPHINX, 103, localization::Tr("editor.table.gWinSetup.57")},
+    {EDITOR_WIN_TEXT_SPHINX, 104, localization::Tr("editor.table.gWinSetup.58")},
+    {EDITOR_WIN_TEXT_SPHINX, 105, localization::Tr("editor.table.gWinSetup.59")},
+    {EDITOR_WIN_TEXT_SPHINX, 106, localization::Tr("editor.table.gWinSetup.60")},
+    {EDITOR_WIN_TEXT_SPHINX, 107, localization::Tr("editor.table.gWinSetup.61")},
+    {EDITOR_WIN_TEXT_SPHINX, 108, localization::Tr("editor.table.gWinSetup.62")},
+    {EDITOR_WIN_TEXT_SPHINX, 109, localization::Tr("editor.table.gWinSetup.63")},
+    {EDITOR_WIN_TEXT_SPHINX, 300, localization::Tr("editor.table.gWinSetup.64")},
+    {EDITOR_WIN_TEXT_SPHINX, 400, localization::Tr("editor.table.gWinSetup.65")},
+    {EDITOR_WIN_TEXT_RUMOUR, 100, localization::Tr("editor.table.gWinSetup.66")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 200, localization::Tr("editor.table.gWinSetup.67")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 220, localization::Tr("editor.table.gWinSetup.68")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 221, localization::Tr("editor.table.gWinSetup.69")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 250, localization::Tr("editor.table.gWinSetup.70")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 300, localization::Tr("editor.table.gWinSetup.71")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 320, localization::Tr("editor.table.gWinSetup.72")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 400, localization::Tr("editor.table.gWinSetup.73")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 401, localization::Tr("editor.table.gWinSetup.74")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 500, localization::Tr("editor.table.gWinSetup.75")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 600, localization::Tr("editor.table.gWinSetup.76")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 610, localization::Tr("editor.table.gWinSetup.77")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 611, localization::Tr("editor.table.gWinSetup.78")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 612, localization::Tr("editor.table.gWinSetup.79")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 613, localization::Tr("editor.table.gWinSetup.80")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 100, localization::Tr("editor.table.gWinSetup.81")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 700, localization::Tr("editor.table.gWinSetup.82")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 800, localization::Tr("editor.table.gWinSetup.83")},
+    {EDITOR_WIN_TEXT_SPECIFICATIONS, 900, localization::Tr("editor.table.gWinSetup.84")},
+    {EDITOR_WIN_TEXT_TOWN, 100, localization::Tr("editor.table.gWinSetup.85")},
+    {EDITOR_WIN_TEXT_TOWN, 200, localization::Tr("editor.table.gWinSetup.86")},
+    {EDITOR_WIN_TEXT_TOWN, 201, localization::Tr("editor.table.gWinSetup.87")},
+    {EDITOR_WIN_TEXT_TOWN, 202, localization::Tr("editor.table.gWinSetup.88")},
+    {EDITOR_WIN_TEXT_TOWN, 210, localization::Tr("editor.table.gWinSetup.89")},
+    {EDITOR_WIN_TEXT_TOWN, 211, localization::Tr("editor.table.gWinSetup.90")},
+    {EDITOR_WIN_TEXT_TOWN, 212, localization::Tr("editor.table.gWinSetup.91")},
+    {EDITOR_WIN_TEXT_TOWN, 213, localization::Tr("editor.table.gWinSetup.92")},
+    {EDITOR_WIN_TEXT_TOWN, 214, localization::Tr("editor.table.gWinSetup.93")},
+    {EDITOR_WIN_TEXT_TOWN, 215, localization::Tr("editor.table.gWinSetup.94")},
+    {EDITOR_WIN_TEXT_TOWN, 216, localization::Tr("editor.table.gWinSetup.95")},
+    {EDITOR_WIN_TEXT_TOWN, 600, localization::Tr("editor.table.gWinSetup.96")},
+    {EDITOR_WIN_TEXT_TOWN, 601, localization::Tr("editor.table.gWinSetup.97")},
+    {EDITOR_WIN_TEXT_TOWN, 602, localization::Tr("editor.table.gWinSetup.98")},
+    {EDITOR_WIN_TEXT_TOWN, 300, localization::Tr("editor.table.gWinSetup.99")},
+    {EDITOR_WIN_TEXT_TOWN, 310, localization::Tr("editor.table.gWinSetup.100")},
+    {EDITOR_WIN_TEXT_TOWN, 400, localization::Tr("editor.table.gWinSetup.101")},
+    {EDITOR_WIN_TEXT_TOWN, 401, localization::Tr("editor.table.gWinSetup.102")},
+    {EDITOR_WIN_TEXT_TOWN, 402, localization::Tr("editor.table.gWinSetup.103")},
+    {EDITOR_WIN_TEXT_TOWN, 470, localization::Tr("editor.table.gWinSetup.104")},
+    {EDITOR_WIN_TEXT_TOWN, 510, localization::Tr("editor.table.gWinSetup.105")},
+    {EDITOR_WIN_TEXT_TOWN, 512, localization::Tr("editor.table.gWinSetup.106")},
+    {EDITOR_WIN_TEXT_TOWN, 513, localization::Tr("editor.table.gWinSetup.107")},
+    {EDITOR_WIN_TEXT_TOWN, 514, localization::Tr("editor.table.gWinSetup.108")},
+    {EDITOR_WIN_TEXT_TOWN, 515, localization::Tr("editor.table.gWinSetup.109")},
+    {EDITOR_WIN_TEXT_TOWN, 516, localization::Tr("editor.table.gWinSetup.110")},
+    {EDITOR_WIN_TEXT_TOWN, 517, localization::Tr("editor.table.gWinSetup.111")},
+    {EDITOR_WIN_TEXT_TOWN, 518, localization::Tr("editor.table.gWinSetup.112")},
+    {EDITOR_WIN_TEXT_TOWN, 519, localization::Tr("editor.table.gWinSetup.113")},
+    {EDITOR_WIN_TEXT_TOWN, 520, localization::Tr("editor.table.gWinSetup.114")},
+    {EDITOR_WIN_TEXT_TOWN, 521, localization::Tr("editor.table.gWinSetup.115")}
 };
 
 const char* gArtifactNames[H2EnumIndex(ARTIFACT_COUNT)] = {
@@ -2364,7 +2358,7 @@ const char* gColors[H2EnumIndex(FACTION_COUNT)] = {
     localization::Tr("table.gColors.4"),
     localization::Tr("table.gColors.5")
 };
-static const char* gColorAbbreviations [[maybe_unused]][H2EnumIndex(FACTION_COUNT)] = {
+const char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT] = {
     localization::Tr("color.abbreviated.blue"),
     localization::Tr("color.abbreviated.green"),
     localization::Tr("color.abbreviated.red"),
@@ -3481,9 +3475,14 @@ b32 gbInMemError = false;
 
 
 i32 giDebugLevel;
+
+char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
 u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 class mouseManager* gpMouseManager;
 char gText[GLOBAL_TEXT_BUFFER_SIZE];
+
+i32 gUnusedData4a3e80Cache[3];
 char* EXPANSION_AGGREGATE_NAME;
 char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 char* DEFAULT_AGGREGATE_NAME;
@@ -3496,27 +3495,42 @@ char gMapFileName[EDITOR_MAP_FILE_NAME_SIZE];
 char gStatusText[EDITOR_STATUS_TEXT_SIZE];
 i32 gSelectionY;
 resourceManager* gpResourceManager;
+u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 heroWindow* pNormalDialogWindow;
 u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+heroWindow* gEditDialog;
 i32 gSelectionHeight;
 soundManager* gpSoundManager;
 char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 i32 gStatusTextHoldTime;
+
+i32 gUnusedData4a42fcBlock[2];
+mapCell* gEditCell;
 class palette* gpBufferPalette;
 palette* gPalette;
 char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 i32 giMaxExtentX;
 i32 giMaxExtentY;
+
+i32 gUnusedData4a45d8Instance[2];
 inputManager* gpInputManager;
+char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
+
+i32 gNextObjectLink;
 char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 configStruct gConfig;
+
+i32 gUnusedData4a47d8StateBlock;
 i32 giMinExtentX;
 i32 giMinExtentY;
 executive* gpExec;
+i32 gLandCellCount;
 i32 giCurWindowsStyleFlags;
 char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 i32 glTimers[GLOBAL_TIMER_COUNT];
+
+i32 gUnusedData4a4978Runtime[5];
 
 extern "C" void PollSound(void) {
     if (gbInPollSound)
@@ -3529,7 +3543,7 @@ extern "C" void PollSound(void) {
     if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + EDITOR_COLOR_CYCLE_INTERVAL;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
-            && giMainVideoModeColorDepth != EDITOR_PALETTED_COLOR_DEPTH)
+            && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += EDITOR_NON_PALETTED_CYCLE_DELAY;
         CycleColors(0);
     }
@@ -3543,7 +3557,7 @@ void ProtectShippedMap(void) {
     if (gbShowAllMaps)
         return;
     for (i = 0; i < EDITOR_SHIPPED_MAP_COUNT; i++) {
-        if (!strcmpi(gMapFileName, gShippedMaps[i][0])) {
+        if (!stricmp(gMapFileName, gShippedMaps[i][0])) {
             strcpy(gMapFileName, gShippedMaps[i][1]);
             memmove(gEditMapHeader.name + 1, gEditMapHeader.name, sizeof(gEditMapHeader.name) - 1);
             gEditMapHeader.name[sizeof(gEditMapHeader.name) - 1] = 0;
@@ -3555,7 +3569,7 @@ void ProtectShippedMap(void) {
 i32 oldmain(void) {
     heroWindow* window;
     i32 result;
-    i32 keepRunning;
+    b32 keepRunning;
     char loadName[EDITOR_MAP_FILE_NAME_SIZE];
 
     if (gpExec->InitSystem())
@@ -3564,15 +3578,15 @@ i32 oldmain(void) {
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("BIGfont.fnt");
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, true);
     gpWindowManager->UpdateScreen();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_FADE_STEPS, gPalette);
-    gpMouseManager->SetPointer("editor.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("editor.mse", EDIT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor);
     gpMouseManager->ShowColorPointer();
     window = NULL;
     result = -1;
-    keepRunning = 1;
+    keepRunning = true;
     while (keepRunning) {
         gbInSetupDialog = true;
         window = new heroWindow(EDITOR_SETUP_WINDOW_X, EDITOR_SETUP_WINDOW_Y, "stpemain.bin");
@@ -3584,13 +3598,13 @@ i32 oldmain(void) {
         gbInSetupDialog = false;
         switch (result) {
             case EDITOR_SETUP_LOAD_MAP:
-                if (PickMap(EDITOR_SETUP_PICK_LOAD_MODE))
-                    keepRunning = 0;
+                if (PickMap(FILE_REQUESTER_MAP))
+                    keepRunning = false;
                 sprintf(loadName, gMapFileName);
                 break;
             case EDITOR_SETUP_NEW_MAP:
                 if (SetupNewMap())
-                    keepRunning = 0;
+                    keepRunning = false;
                 break;
             case EDITOR_SETUP_QUIT:
             case DIALOG_BUTTON_1:
@@ -3601,15 +3615,19 @@ i32 oldmain(void) {
     }
     gpMouseManager->HideColorPointer();
     gpWindowManager->FadeScreen(FADE_OUT, EDITOR_SLOW_FADE_STEPS, gPalette);
-    memset(gpWindowManager->m_screen->m_pixels, EDITOR_BACKGROUND_COLOR, EDITOR_SCREEN_BYTES);
-    if (gpExec->AddManager(gEditManager, -1))
+    memset(
+        gpWindowManager->m_screen->m_pixels,
+        EDITOR_BACKGROUND_COLOR,
+        LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
+    );
+    if (gpExec->AddManager(gEditManager, BASE_MANAGER_PRIORITY_UNASSIGNED))
         ShutDown(localization::Tr("system.manager.add_failed"));
     if (result == EDITOR_SETUP_LOAD_MAP) {
         strcpy(gMapFileName, loadName);
         gEditManager->LoadMap(gMapFileName);
         ProtectShippedMap();
     }
-    gEditManager->DrawRadar(1);
+    gEditManager->DrawRadar(true);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_SLOW_FADE_STEPS, gPalette);
@@ -3682,9 +3700,9 @@ void ShutDown(const char* message) {
         sprintf(buffer, localization::Tr("system.goodbye"));
     }
     gbClosingApp = true;
-    if (mapExtra)
-        delete mapExtra;
-    mapExtra = NULL;
+    if (gLineMap)
+        delete gLineMap;
+    gLineMap = NULL;
     if (bigFont) {
         gpResourceManager->Dispose(bigFont);
         bigFont = NULL;
@@ -3738,7 +3756,7 @@ void EarlyShutdown(const char* caption, const char* text) {
 }
 
 i32 EarlySetup(void) {
-    i32 result;
+    CDRomSetupResult result;
     i32 i;
 
     if (bEarlySetupDone)
@@ -3754,28 +3772,28 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     result = SetupCDDrive();
-    if (result == EDITOR_CD_NO_DRIVE) {
+    if (result == CD_ROM_DRIVE_UNAVAILABLE) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("editor.startup.no_cd_drive")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NOT_FOUND) {
+    if (result == CD_ROM_EXPANSION_DISC_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("editor.startup.cd_required")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_APP_PATH) {
+    if (result == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("system.startup_error.game_directory_missing")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_DATA) {
+    if (result == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("system.startup_error.data_files_missing")
@@ -3839,16 +3857,16 @@ void NormalDialog(
     i32 dialogType,
     i32 windowX,
     i32 windowY,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    i32 firstResourceType [[maybe_unused]],
+    i32 firstResourceValue [[maybe_unused]],
+    i32 secondResourceType [[maybe_unused]],
+    i32 secondResourceValue [[maybe_unused]],
+    i32 showOrText [[maybe_unused]],
+    i32 timeout [[maybe_unused]]
 ) {
     i32 resourceFrame [[maybe_unused]];
     i16 showMessage [[maybe_unused]];
-    i32 textWidgetId;
+    i32 textWidgetId [[maybe_unused]];
     i32 windowHeight;
     b32 showPrimaryBonus [[maybe_unused]];
     tag_message message;
@@ -3878,9 +3896,9 @@ void NormalDialog(
         windowRows = 1;
     windowWidth = EDITOR_DIALOG_WINDOW_WIDTH;
     windowHeight = windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + EDITOR_DIALOG_WINDOW_BASE;
-    if (windowX == -1 || windowWidth + windowX >= EDITOR_DIALOG_SCREEN_MAX_X)
+    if (windowX == -1 || windowWidth + windowX >= LOGICAL_SCREEN_MAX_X)
         windowX = EDITOR_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowHeight + windowY >= EDITOR_DIALOG_SCREEN_MAX_Y) {
+    if (windowY == -1 || windowHeight + windowY >= LOGICAL_SCREEN_MAX_Y) {
         windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / 2;
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
@@ -3892,7 +3910,7 @@ void NormalDialog(
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_CLEAR_FLAGS);
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED) | H2EnumIndex(WIDGET_FLAG_DRAW);
     message.payload.widget.id = DIALOG_BUTTON_7;
     pNormalDialogWindow->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_8;
@@ -3963,7 +3981,7 @@ void QuickViewWait(void) {
 }
 
 
-void ShowStatusText(char* text) {
+void ShowStatusText(const char* text) {
     if (gStatusTextShown && !text)
         text = gStatusText;
     else
@@ -3999,7 +4017,7 @@ void ClearStatusText(void) {
     gStatusTextClearTime = EDITOR_STATUS_TEXT_KEPT;
     if (gStatusTextShown) {
         gStatusTextShown = false;
-        gEditManager->m_window->DrawWindow(0);
+        gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             EDITOR_STATUS_BAR_X,
             EDITOR_STATUS_BAR_Y,
@@ -4009,7 +4027,7 @@ void ClearStatusText(void) {
     }
 }
 
-void UpdateAppSpecificMenus(void*) {}
+void UpdateAppSpecificMenus(void* hMenu [[maybe_unused]]) {}
 
 void CleanUpMenus(void) {
     if (hmnuApp) {
@@ -4022,7 +4040,7 @@ void CleanUpMenus(void) {
 
 void EarlyShutDownSystem(void) {
     if (gEditManager)
-        gEditManager->SelectTool(-1);
+        gEditManager->SelectTool(EDIT_TOOL_NONE);
 }
 
 i32 GameUnsaved(void) {
@@ -4053,7 +4071,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     return 0;
 }
 
-void EarlyResizeWindow(i32, i32, i32, i32) {}
+void EarlyResizeWindow(i32 x [[maybe_unused]], i32 y [[maybe_unused]], i32 width [[maybe_unused]],
+                       i32 height [[maybe_unused]]) {}
 
 void UpdateSystemOptionsMenu(void) {}
 

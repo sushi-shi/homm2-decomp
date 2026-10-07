@@ -9,7 +9,7 @@
 struct tag_message;
 
 typedef enum NewGameControlConstant {
-    NEW_GAME_DIFFICULTY_HELP_FIRST = 1,
+    NEW_GAME_DIFFICULTY_BUTTON_FIRST = 1,
     NEW_GAME_DIFFICULTY_FIRST      = 0x43,
     NEW_GAME_RACE_FIRST            = 6,
     NEW_GAME_COLOR_FIRST           = 0x0c,

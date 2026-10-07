@@ -36,7 +36,7 @@ typedef enum ViewWorldConstant {
     WORLD_WINDOW_Y             = 0x10,
     WORLD_ICON_WIDGET          = 3,
     WORLD_POINTER_FRAME        = 0,
-    WORLD_GROUND_SHAPE_MASK    = GROUND_SHAPE_FLIPPED - 1,
+    WORLD_GROUND_SHAPE_MASK    = GROUND_SHAPE_VARIED - 1,
     WORLD_TERRAIN_FRAME_STRIDE = 21,
     WORLD_DRAW_SIZE            = 0x1c0,
     WORLD_LEFT                 = 0x10,
@@ -351,7 +351,7 @@ void advManager::VWCompleteDraw(void) {
                     );
                 }
 
-                if (cell->m_objectLayerBit0 && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[H2EnumIndex(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
@@ -373,7 +373,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (extraCell->objectLayerBit0 && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[H2EnumIndex(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[H2EnumIndex(extraCell->objectTileset)],
@@ -397,7 +397,7 @@ void advManager::VWCompleteDraw(void) {
                         extraCell = NULL;
                 }
 
-                if (!cell->m_objectLayerBit0 && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (!cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[H2EnumIndex(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
@@ -419,7 +419,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (!extraCell->objectLayerBit0 && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (!extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[H2EnumIndex(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[H2EnumIndex(extraCell->objectTileset)],

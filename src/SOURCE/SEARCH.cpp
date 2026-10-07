@@ -71,7 +71,7 @@ void searchArray::SeedPosition(
     static i32 s_adjacentX;
     static searchNode s_currentNode;
     static i32 s_mapY;
-    static b32 s_directionBlocked;
+    static b32 s_directionOpen;
     static i32 s_neighborY;
     static mapCell* s_targetCell;
     static i8 s_directionCosts[H2EnumIndex(MAP_DIRECTION_COUNT)];
@@ -333,13 +333,13 @@ void searchArray::SeedPosition(
                                 {
                                     s_neighborCell =
                                         gpAdvManager->GetCell(s_adjacentX, s_candidateY);
-                                    s_directionBlocked = true;
+                                    s_directionOpen = true;
                                     if (((1 << H2EnumIndex(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && CELL_HAS_NON_SHADOW_OBJECT(s_neighborCell)) {
-                                        s_directionBlocked = false;
+                                        s_directionOpen = false;
                                     }
 
-                                    if (s_directionBlocked
+                                    if (s_directionOpen
                                         && GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
                                                .visited
                                         && !(s_neighborCell->m_triggerType

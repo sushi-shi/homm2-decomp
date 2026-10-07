@@ -1765,7 +1765,7 @@ i32 army::WalkTo(i32 destination) {
         if (moatFound) {
             canEnterMoat = false;
             if (moatIndex == ARMY_MOAT_GATE_INDEX
-                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
+                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_CLOSED) {
                 canEnterMoat = true;
             }
             if ((moatIndex > 0 && m_hex == moatCell[moatIndex - 1])
@@ -2737,7 +2737,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_SLOW:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
             m_monster.speed = static_cast<i8>((m_monster.speed + 1) / SLOW_SPEED_DIVISOR);
-            if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING))) {
+            if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING)))) {
                 ((m_monster.attributes) &= ~(MONSTER_FLAGS_FLYING));
             }
             m_frameInfo.walkDuration =

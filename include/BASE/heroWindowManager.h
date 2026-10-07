@@ -42,7 +42,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message& message) override;
     MessageDispatchResult ConvertToHover(struct tag_message& message);
     MessageDispatchResult BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value);
-    void AddWindow(class heroWindow* window, i32 zOrder, i32 openFlags);
+    void AddWindow(class heroWindow* window, i32 zOrder, i32 updateScreen);
     void RemoveWindow(class heroWindow* window);
     i32 DoDialog(class heroWindow* window, MessageDispatchHandler handler, i32 fade);
     void UpdateScreen(void);

@@ -6,8 +6,6 @@
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/combatTypes.h>
 
-struct tag_message;
-
 enum class BoltColorMode : i32 {
     BOLT_COLOR_RED_TABLE       = 257,
     BOLT_COLOR_RAINBOW_FORWARD = 300,

@@ -7,8 +7,6 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 
-class hero;
-
 typedef enum CombatRemoteTransferConstant {
     COMBAT_REMOTE_BUFFER_SIZE        = 0xFF,
     COMBAT_REMOTE_HEADER_SIZE        = 0x9b,
@@ -25,11 +23,12 @@ typedef enum EventRecordConstant {
     EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE = 1,
     EVENT_RECORD_SIGN_HEADER_SIZE        = 9,
     EVENT_RECORD_RUMOUR_HEADER_SIZE      = 8,
-    EVENT_RECORD_TIME_GAP_FIRST_SIZE     = 2,
-    EVENT_RECORD_TIME_GAP_SECOND_SIZE    = 5,
+
+
+    EVENT_RECORD_HERO_ARTIFACT_SLOTS     = 4,
     EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
     EVENT_RECORD_HERO_NAME_SIZE          = 13,
-    EVENT_RECORD_TOWN_NAME_SIZE          = 15
+    EVENT_RECORD_TOWN_NAME_SIZE          = 13
 } EventRecordConstant;
 
 typedef enum MapEventEncodingConstant {
@@ -80,25 +79,15 @@ struct mapEventExtra {
     char riddle[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct signEventExtra {
-    char pad[EVENT_RECORD_SIGN_HEADER_SIZE];
+
+
+    i8 active;
+    char reserved01[EVENT_RECORD_SIGN_HEADER_SIZE - 1];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct rumourEventExtra {
     char pad[EVENT_RECORD_RUMOUR_HEADER_SIZE];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
-};
-struct timeEventExtra {
-    char unknown00;
-    i32 resources[H2EnumIndex(RES_COUNT)];
-    char unknown1d[EVENT_RECORD_TIME_GAP_FIRST_SIZE];
-    u8 appliesToComputer;
-    char unknown20;
-    u16 firstDay;
-    u16 repeatInterval;
-    char unknown25[EVENT_RECORD_TIME_GAP_SECOND_SIZE];
-    u8 appliesToHuman;
-    u8 players[GAME_PLAYER_COUNT];
-    char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct mapHeroExtra {
     i8 owner;
@@ -107,8 +96,7 @@ struct mapHeroExtra {
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
-    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
-    char unknown16;
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_SLOTS];
     i32 experience;
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
@@ -131,10 +119,12 @@ struct mapTownExtra {
     i8 hasCustomArmy;
     H2EnumStorage<CreatureType, i8> troopTypes[ARMY_GROUP_SLOT_COUNT];
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
-    u8 hasShrine;
-    char unused18;
+    u8 hasCaptain;
+    u8 hasCustomName;
     char name[EVENT_RECORD_TOWN_NAME_SIZE];
-    i8 unknown28;
+    H2EnumStorage<FactionType, i8> faction;
+    i8 isCastle;
+    i8 disallowCastle;
 };
 #pragma pack(pop)
 

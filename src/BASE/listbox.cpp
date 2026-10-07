@@ -14,33 +14,9 @@
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 
-typedef enum ListBoxSourceFileConstant {
-    SOURCE_FILE_SLOT_SIZE = 0x2c
-} ListBoxSourceFileConstant;
-
 typedef enum ListBoxTiming {
     DOUBLE_CLICK_TICKS = 0x190
 } ListBoxTiming;
-
-typedef enum ListBoxDestructorSourceFileOffset {
-    DESTRUCTOR_ITEM_SOURCE_FILE_OFFSET = 0,
-    DESTRUCTOR_LIST_SOURCE_FILE_OFFSET = SOURCE_FILE_SLOT_SIZE
-} ListBoxDestructorSourceFileOffset;
-
-typedef enum ListBoxDeleteSourceFileOffset {
-    DELETE_ITEM_SOURCE_FILE_OFFSET       = 0,
-    DELETE_LIST_SOURCE_FILE_OFFSET       = SOURCE_FILE_SLOT_SIZE,
-    DELETE_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
-    DELETE_OLD_LIST_SOURCE_FILE_OFFSET   = 3 * SOURCE_FILE_SLOT_SIZE
-} ListBoxDeleteSourceFileOffset;
-
-typedef enum ListBoxMainSourceFileOffset {
-    REPLACE_ITEM_SOURCE_FILE_OFFSET           = 0,
-    REPLACE_ALLOCATION_SOURCE_FILE_OFFSET     = SOURCE_FILE_SLOT_SIZE,
-    APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
-    APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET = 3 * SOURCE_FILE_SLOT_SIZE,
-    APPEND_OLD_LIST_SOURCE_FILE_OFFSET        = 4 * SOURCE_FILE_SLOT_SIZE
-} ListBoxMainSourceFileOffset;
 
 typedef enum ListBoxFrame {
     FRAME_FIRST_ROW           = 0,
@@ -74,16 +50,12 @@ typedef enum ListBoxLayoutConstant {
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
 } ListBoxLayoutConstant;
 
-typedef enum ListBoxSelectionClickCount {
-    SELECTION_SINGLE_CLICK = 1,
-    SELECTION_DOUBLE_CLICK = 2
-} ListBoxSelectionClickCount;
 
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_itemCount = 0;
     m_items = NULL;
-    m_selectedIndex = -1;
-    m_lastSelectedIndex = -1;
+    m_selectedIndex = LIST_BOX_NO_SELECTION;
+    m_lastSelectedIndex = LIST_BOX_NO_SELECTION;
     m_scrollbar = NULL;
 }
 
@@ -170,7 +142,7 @@ void listBoxWidget::Read(void) {
 void listBoxWidget::DeleteItem(i32 index) {
     if (m_itemCount > index) {
         if (m_selectedIndex == index)
-            m_selectedIndex = -1;
+            m_selectedIndex = LIST_BOX_NO_SELECTION;
         if (m_topIndex == index && m_scrollRange <= m_topIndex)
             m_topIndex--;
         if (--m_scrollRange < 0)

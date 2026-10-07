@@ -552,13 +552,13 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
-        && (!(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CAPTAIN))))
+        && (!(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_STATUE))))
             || !(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION))))))
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
-        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CAPTAIN))))
+        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_STATUE))))
         && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION)))))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
@@ -1296,7 +1296,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
                                     if (m_selectedBuilding == BUILDING_SLOT_NEUTRAL_LAST
-                                        && m_town->m_occupyingHeroId == -1) {
+                                        && m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE) {
                                         if (m_heroStrip != NULL)
                                             delete m_heroStrip;
                                         m_heroStrip = NULL;
@@ -1332,7 +1332,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 goto showBuildingInformation;
                             }
                             {
-                                if (m_town->m_occupyingHeroId != -1
+                                if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE
                                     && !gpGame->GetHero(m_town->m_occupyingHeroId)
                                             ->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
@@ -1477,7 +1477,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 }
                                 if (BuyBuild(
                                         BUILDING_SLOT_CASTLE,
-                                        CanBuy(m_town, BUILDING_SLOT_CASTLE) == 0,
+                                        !CanBuy(m_town, BUILDING_SLOT_CASTLE),
                                         quickView
                                     ))
                                     BuildObj(BUILDING_SLOT_CASTLE);
@@ -1860,7 +1860,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             ResetStrips();
             break;
     }
-    m_lastHoverId = -1;
+    m_lastHoverId = TOWN_HOVER_NONE;
 }
 
 void townManager::RedrawTownScreen(void) {
@@ -1915,7 +1915,7 @@ void townManager::SplitArmy(void) {
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
             sameType = true;
-        if (sameType != 0) {
+        if (sameType) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] += m_splitAmount;
         } else {
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
@@ -1938,7 +1938,7 @@ void townManager::ResetStrips(void) {
     m_heroStrip->Draw();
     m_garrisonStrip->Draw();
     m_swapStrip = m_pendingStrip = NULL;
-    m_swapArmySlot = m_pendingArmySlot = -1;
+    m_swapArmySlot = m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
 }
 
 void townManager::Toggle(BuildingSlotType building) {
@@ -2438,11 +2438,11 @@ void townManager::SetupMage(heroWindow* window) {
     i32 slot;
     i32 spellState;
     i32 lineCount;
-    i32 unusedGuildFrame;
+    i32 guildFrame;
     i32 unusedLocal [[maybe_unused]];
 
     message.type = MESSAGE_WIDGET;
-    if (m_town->m_occupyingHeroId == -1) {
+    if (m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE) {
         strcpy(gText, localization::Tr("town.mage_guild.spells_available"));
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
@@ -2520,10 +2520,10 @@ void townManager::SetupMage(heroWindow* window) {
         }
     }
 
-    unusedGuildFrame = m_town->m_mageGuildLevel - 1;
+    guildFrame = m_town->m_mageGuildLevel - 1;
     message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
-    message.payload.widget.data.value = unusedGuildFrame;
+    message.payload.widget.data.value = guildFrame;
     window->BroadcastMessage(message);
     sprintf(gText, "magegld%c.icn", cHeroTypeInitial[H2EnumIndex(m_town->m_type)]);
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;

@@ -39,7 +39,7 @@ i16 wsnet_init(void) {
 
             localization::Tr("network.tcp.fullscreen_warning")
         );
-        NormalDialog(gText, 1);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;

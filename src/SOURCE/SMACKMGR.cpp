@@ -488,11 +488,13 @@ void SmackManagerMain(void) {
             case MESSAGE_KEY_DOWN:
                 if (message.payload.keyboard.keyCode == INPUT_SCAN_F4)
                     break;
+
             case MESSAGE_RIGHT_BUTTON_DOWN:
                 if (bSmackNum == CHOOSE_CAMPAIGN)
                     break;
                 if (bSmackNum == EXPANSION_CAMPAIGN)
                     break;
+
             case MESSAGE_LEFT_BUTTON_DOWN:
                 if (bSmackNum == SMACK_EARTH)
                     break;

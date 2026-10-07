@@ -83,7 +83,6 @@ typedef enum MouseManagerConstant {
     MOUSE_CURSOR_MASK_BITS_PER_BYTE    = 8,
     MOUSE_CURSOR_MASK_HIGH_BIT         = MOUSE_CURSOR_MASK_BITS_PER_BYTE - 1,
     MOUSE_SPELL_CURSOR_HOTSPOT         = 15,
-    MOUSE_MANAGER_MESSAGE_MASK         = 0x40,
     MOUSE_INVALID_CURSOR_FRAME         = -1,
     MOUSE_DEFAULT_HOTSPOT              = -1,
     MOUSE_RELOAD_CURSOR_FRAME          = -99,

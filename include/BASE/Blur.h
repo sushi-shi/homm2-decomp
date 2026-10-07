@@ -6,8 +6,8 @@
 class bitmap;
 
 void DoBlur(
-    class bitmap* destination,
-    class bitmap* source,
+    class bitmap* scratch,
+    class bitmap* screen,
     i32 height,
     i32 redAdjust,
     i32 greenAdjust,

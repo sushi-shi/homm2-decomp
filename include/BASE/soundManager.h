@@ -11,9 +11,7 @@ typedef enum MidiTrackConstant {
 } MidiTrackConstant;
 
 typedef enum SoundStorageConstant {
-    SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
-    DIGITAL_DRIVER_NAME_COUNT     = 14,
-    SOUND_CHANNEL_TYPE_COUNT      = 4
+    SOUND_CHANNEL_TYPE_COUNT = 4
 } SoundStorageConstant;
 
 enum class SoundVolumeConversionMode : i32 {
@@ -21,20 +19,6 @@ enum class SoundVolumeConversionMode : i32 {
     SOUND_VOLUME_MUSIC  = 101
 };
 using enum SoundVolumeConversionMode;
-
-enum class SoundSampleOperation : i16 {
-    SOUND_SAMPLE_OPERATION_VOLUME        = 1,
-    SOUND_SAMPLE_OPERATION_START         = 5,
-    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
-    SOUND_SAMPLE_OPERATION_MUSIC_VOLUME  = 101
-};
-using enum SoundSampleOperation;
-
-enum class SoundDigitalReportQuery : i16 {
-    SOUND_DIGITAL_REPORT_VOLUME  = 1,
-    SOUND_DIGITAL_REPORT_PLAYING = 4
-};
-using enum SoundDigitalReportQuery;
 
 class sample;
 struct _SAMPLE;

@@ -156,7 +156,7 @@ public:
     u32 m_treeKnowledgeVisits;
     u32 m_xanaduVisits;
     u8 m_randomSeed;
-    u8 m_enabled;
+    u8 m_lastWisdomOfferLevel;
     class armyGroup m_army;
     H2SteppedEnumStorage<HeroSkillLevel, i8> m_secondarySkills[H2EnumIndex(HERO_SKILL_COUNT)];
     u8 m_secondarySkillOrder[H2EnumIndex(HERO_SKILL_COUNT)];

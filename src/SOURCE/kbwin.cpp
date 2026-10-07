@@ -13,6 +13,9 @@
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
+#ifdef HOMM2_EDITOR
+#include <EDITOR/EDITOR.h>
+#endif
 
 typedef enum KbWinPrivateConstant {
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -28,14 +31,22 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
+#ifdef HOMM2_EDITOR
+        localization::Tr("editor.title")
+#else
         localization::Tr("system.title.short")
+#endif
     );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
             localization::Tr("system.single_instance"),
+#ifdef HOMM2_EDITOR
+            localization::Tr("editor.title")
+#else
             localization::Tr("system.title.full")
+#endif
         );
         MessageBoxA(
             NULL,
@@ -108,7 +119,11 @@ i32 AppInit(
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
+#ifdef HOMM2_EDITOR
+            localization::Tr("editor.title.short")
+#else
             localization::Tr("system.title.short")
+#endif
         );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
@@ -151,7 +166,11 @@ i32 AppInit(
             ICON_SMALL,
             reinterpret_cast<LPARAM>(LoadIconA(
                 instance,
+#ifdef HOMM2_EDITOR
+                "Editor"
+#else
                 "Heroes"
+#endif
             ))
         );
         ShowWindow(hwndApp, showCommand);
@@ -205,6 +224,11 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (lTemp > lLastGTimerTickCount + TIMER_UPDATE_MIN_INTERVAL) {
                 lLastGTimerTickCount = lTemp;
             }
+#ifdef HOMM2_EDITOR
+
+            if (gStatusTextClearTime != EDITOR_STATUS_TEXT_KEPT && lTemp > gStatusTextClearTime)
+                ClearStatusText();
+#endif
             return 0;
         case WM_ACTIVATEAPP:
             gbForegroundApp = messageParam;
@@ -258,6 +282,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_PALETTECHANGED:
             if (messageParam == reinterpret_cast<u32>(window))
                 break;
+
         case WM_QUERYNEWPALETTE:
             return QueryNewPalette();
         case WM_PAINT:
@@ -275,9 +300,11 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                     return 0;
                 }
             }
+
         case WM_DESTROY:
             gbClosingApp = true;
             PostQuitMessage(0);
+
         case WM_QUIT:
             ShutDown(NULL);
             break;
@@ -377,7 +404,11 @@ LRESULT AppCommand(
             lpfnDlgProc = reinterpret_cast<DLGPROC>(AppAbout);
             DialogBoxParamA(
                 hInstApp,
+#ifdef HOMM2_EDITOR
+                "EDITOR",
+#else
                 "HEROES",
+#endif
                 window,
                 lpfnDlgProc,
                 0
@@ -492,7 +523,7 @@ void SetMenus(HMENU menu, b32 enabled) {
     u32 id;
     i32 match;
     i32 position;
-    i32 disabled;
+    i32 updateItem;
     i32 index;
 
     count = GetMenuItemCount(menu);
@@ -500,11 +531,11 @@ void SetMenus(HMENU menu, b32 enabled) {
         id = GetMenuItemID(menu, index);
         if (id == static_cast<u32>(-1)) {
             SetMenus(GetSubMenu(menu, index), enabled);
-            disabled = 0;
+            updateItem = 0;
         } else {
-            disabled = 0;
+            updateItem = 0;
             if (enabled) {
-                disabled = 1;
+                updateItem = 1;
             } else {
                 match = 0;
                 for (position = 0; position < MENU_ENABLE_STATUS_COUNT; position++) {
@@ -513,12 +544,12 @@ void SetMenus(HMENU menu, b32 enabled) {
                     }
                 }
                 if (gbInSetupDialog)
-                    disabled = 1 - gsMenuEnableStatus[match].setupEnabled;
+                    updateItem = 1 - gsMenuEnableStatus[match].setupEnabled;
                 else
-                    disabled = 1 - gsMenuEnableStatus[match].normalEnabled;
+                    updateItem = 1 - gsMenuEnableStatus[match].normalEnabled;
             }
         }
-        if (disabled != 0) {
+        if (updateItem != 0) {
             EnableMenuItem(menu, id, enabled == 0 ? MF_GRAYED : MF_ENABLED);
         }
     }
@@ -533,9 +564,16 @@ void InitVideo(void) {
     return;
 }
 
-char szAppName[] = localization::Tr("system.title.short");
-char szTitle[] =
-    localization::Tr("system.title.full");
+
+#ifdef HOMM2_EDITOR
+#define KBWIN_APP_NAME localization::Tr("editor.title")
+#define KBWIN_TITLE localization::Tr("editor.title")
+#else
+#define KBWIN_APP_NAME localization::Tr("system.title.short")
+#define KBWIN_TITLE localization::Tr("system.title.full")
+#endif
+char szAppName[] = KBWIN_APP_NAME;
+char szTitle[] = KBWIN_TITLE;
 HWND hwndApp = NULL;
 HMENU hmnuApp = NULL;
 HANDLE gEventHandle = NULL;

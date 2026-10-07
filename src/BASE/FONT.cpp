@@ -54,10 +54,10 @@ void font::DrawStringExecute(
     i32 x,
     i32 y,
     FontDrawMode mode,
-    i32 clipL,
-    i32 clipT,
-    i32 clipR,
-    i32 clipB
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
 ) {
     i32 character = 0;
     i32 position = x;
@@ -93,10 +93,10 @@ void font::DrawStringExecute(
                     y,
                     character,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0
                 );
             else if (mode == FONT_DRAW_YELLOW
@@ -108,10 +108,10 @@ void font::DrawStringExecute(
                     y,
                     character,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableYellow,
                     1
@@ -124,10 +124,10 @@ void font::DrawStringExecute(
                     y,
                     character,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableScenWin,
                     0
@@ -140,10 +140,10 @@ void font::DrawStringExecute(
                     y,
                     character,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableDarkGray,
                     1
@@ -365,9 +365,6 @@ void font::DrawBoundedString(
     }
     H2_FREE(line);
 }
-
-#undef CENTER_DIVISOR
-#undef WRAP_HEIGHT_LINE_COUNT
 
 i32 font::LineLength(const char* text, i32 maxW) {
 

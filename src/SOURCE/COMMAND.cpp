@@ -384,7 +384,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
 ProcessAction:
     if (giNextAction == ACTION_NONE) {
-        if (m_playerId[H2EnumIndex(m_currentSide)] == -1
+        if (m_playerId[H2EnumIndex(m_currentSide)] == PLAYER_NONE
             || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0
             || m_gridSelectionDisabled != 0) {
             CheckGetAIMove();
@@ -1071,10 +1071,10 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
         combatEnded = true;
         m_combatResult = CombatResultForSide(OppositeCombatSide(m_currentSide));
-    } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
+    } else if (m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != 0 || m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != 0) {
         combatEnded = true;
         gbRetreatWin = true;
-        m_combatResult = m_sideRetreated[0] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
+        m_combatResult = m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
     }
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
@@ -1118,7 +1118,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     }
     switch (hexIndex) {
         case COMBAT_GRID_RIGHT_HERO_HEX:
-            if (m_heroes[1] != NULL) {
+            if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != NULL) {
                 if (m_currentSide == COMBAT_DEFENDER_SIDE)
                     command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                 else
@@ -1127,8 +1127,8 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
             }
             break;
-        case COMBAT_GRID_LEFT_SPECIAL_HEX:
-            if (m_heroes[0] != NULL) {
+        case COMBAT_GRID_LEFT_HERO_HEX:
+            if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != NULL) {
                 if (m_currentSide == COMBAT_ATTACKER_SIDE)
                     command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                 else
@@ -1236,13 +1236,13 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 ViewBallista(1);
             return 0;
         case COMBAT_GRID_RIGHT_HERO_HEX:
-            if (m_heroes[1] != NULL) {
+            if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != NULL) {
                 ViewGeneral(COMBAT_DEFENDER_SIDE, 0, 1);
                 ResetMouse();
             }
             return 0;
-        case COMBAT_GRID_LEFT_SPECIAL_HEX:
-            if (m_heroes[0] != NULL) {
+        case COMBAT_GRID_LEFT_HERO_HEX:
+            if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != NULL) {
                 ViewGeneral(COMBAT_ATTACKER_SIDE, 0, 1);
                 ResetMouse();
             }
@@ -1293,7 +1293,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
             giNextActionGridIndex = m_selectedHex;
-            if (m_playerId[H2EnumIndex(m_currentSide)] == -1
+            if (m_playerId[H2EnumIndex(m_currentSide)] == PLAYER_NONE
                 || gbHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0
                 || m_gridSelectionDisabled != 0) {
                 giNextAction = ACTION_MOVE;
@@ -1343,7 +1343,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 ,
                 NORMAL_DIALOG_CONFIRM
             );
-            if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES)
                 giNextAction = ACTION_RETREAT;
             ResetMouse();
             break;
@@ -2063,12 +2063,12 @@ void combatManager::DoVictory(CombatResult winningSide) {
             if (!(giCurPlayer == -1 || gbThisNetHumanPlayer[giCurPlayer] == 0
                   || m_playerId[H2EnumIndex(winningSide)] != giCurPlayer)
                 || !(
-                    giCurPlayer == -1 || m_playerId[H2EnumIndex(winningSide)] == -1
+                    giCurPlayer == -1 || m_playerId[H2EnumIndex(winningSide)] == PLAYER_NONE
                     || gbThisNetHumanPlayer[giCurPlayer] != 0
                     || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(winningSide)]] == 0
                 )
                 || !(
-                    m_playerId[H2EnumIndex(winningSide)] == -1
+                    m_playerId[H2EnumIndex(winningSide)] == PLAYER_NONE
                     || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
@@ -2150,7 +2150,7 @@ void combatManager::DoLoseWindow(void) {
     } else if (giCurPlayer == m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)]
                && gbThisNetHumanPlayer[m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)]] != 0) {
         losingSide = COMBAT_RESULT_DEFENDER;
-    } else if (m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != -1
+    } else if (m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != PLAYER_NONE
                && gbThisNetHumanPlayer[m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)]] != 0) {
         losingSide = COMBAT_RESULT_ATTACKER;
     } else {
@@ -2272,7 +2272,7 @@ i32 combatManager::DoSurrender(void) {
     if (m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.data.value =
-            m_playerId[H2EnumIndex(OppositeCombatSide(m_currentSide))] == -1
+            m_playerId[H2EnumIndex(OppositeCombatSide(m_currentSide))] == PLAYER_NONE
             ? COMBAT_NEUTRAL_HERO_COLOR
             : gpGame->m_players[m_playerId[H2EnumIndex(OppositeCombatSide(m_currentSide))]].m_color;
         window->BroadcastMessage(message);
@@ -2327,7 +2327,7 @@ void combatManager::CheckCastleAttack(void) {
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
     if (m_heroCastSpell[H2EnumIndex(m_currentSide)] == 0
-        && (m_playerId[H2EnumIndex(m_currentSide)] == -1
+        && (m_playerId[H2EnumIndex(m_currentSide)] == PLAYER_NONE
             || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0
             || gConfig.autoCombatUseSpells != 0)) {
         if (DoSpellAI(m_currentSide, retreat) != 0)
@@ -2357,7 +2357,7 @@ void combatManager::GetControl(void) {
         gbThisNetHasControl = true;
         goto setup_view;
     }
-    if (m_playerId[H2EnumIndex(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] != 0
+    if (m_playerId[H2EnumIndex(m_currentSide)] != PLAYER_NONE && gbHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] != 0
         && gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0)
         gbThisNetHasControl = false;
     else
@@ -2660,7 +2660,7 @@ void combatManager::CycleCombatScreen(void) {
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
                    && m_heroLossReactionPlayed[index] == 0
                    && m_heroLossReactionPending[index] != 0) {
-            if (m_playerId[H2EnumIndex(m_currentSide)] == -1
+            if (m_playerId[H2EnumIndex(m_currentSide)] == PLAYER_NONE
                 || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0) {
                 m_heroOpponentLossReactionPending[index] = 0;
                 m_heroLossReactionPending[index] = 0;
@@ -2678,7 +2678,7 @@ void combatManager::CycleCombatScreen(void) {
         } else if (m_heroAnimationState[index] == HERO_ANIMATION_STAND
                    && m_heroOpponentLossReactionPlayed[index] == 0
                    && m_heroOpponentLossReactionPending[index] != 0) {
-            if (m_playerId[H2EnumIndex(m_currentSide)] == -1
+            if (m_playerId[H2EnumIndex(m_currentSide)] == PLAYER_NONE
                 || gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0) {
                 m_heroOpponentLossReactionPending[index] = 0;
                 m_heroLossReactionPending[index] = 0;

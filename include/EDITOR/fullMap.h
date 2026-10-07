@@ -61,6 +61,10 @@ public:
     mapCell* GetCell(i32 x, i32 y) {
         return &Column(x)[y * width];
     }
+
+    mapCell* CellAt(i32 x, i32 y) {
+        return cells + x + y * width;
+    }
     mapCellExtra* Extra(i32 i) {
         return &extras[i];
     }

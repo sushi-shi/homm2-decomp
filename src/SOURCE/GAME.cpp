@@ -74,7 +74,6 @@ typedef enum ExpansionCampaignSaveConstant {
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 } ExpansionCampaignSaveConstant;
 
-
 namespace {
 
 
@@ -544,8 +543,8 @@ typedef enum GameViewSpellsConstant {
     VIEW_SPELLS_WINDOW_Y               = 87,
     VIEW_SPELL_PREVIOUS_ID             = 2,
     VIEW_SPELL_NEXT_ID                 = 3,
-    VIEW_SPELL_COMBAT_TAB_ID           = 4,
-    VIEW_SPELL_ADVENTURE_TAB_ID        = 5,
+    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
+    VIEW_SPELL_COMBAT_TAB_ID           = 5,
     VIEW_SPELL_MANA_LABEL_ID           = 6,
     VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
     VIEW_SPELL_MANA_TENS_ID            = 8,
@@ -575,8 +574,8 @@ typedef enum GameViewSpellsConstant {
     VIEW_SPELL_MANA_DIGIT_BASE         = 10,
     VIEW_SPELL_HELP_PREVIOUS           = 0,
     VIEW_SPELL_HELP_NEXT               = 1,
-    VIEW_SPELL_HELP_COMBAT             = 2,
-    VIEW_SPELL_HELP_ADVENTURE          = 3,
+    VIEW_SPELL_HELP_ADVENTURE          = 2,
+    VIEW_SPELL_HELP_COMBAT             = 3,
     VIEW_SPELL_HELP_CLOSE              = 4,
     VIEW_SPELL_HELP_OTHER              = 5,
     VIEW_SPELL_HELP_MANA               = 8
@@ -753,11 +752,11 @@ i32 playerData::HasMobileHero(void) {
     return 0;
 }
 
-i32 GetNumObelisks(i32 color) {
+i32 GetNumObelisks(i32 player) {
     i32 count = 0;
     i32 index;
     for (index = 0; index < GAME_OBELISK_VISITOR_COUNT; index++) {
-        if (gpGame->m_obeliskVisitors[index] & (1 << color))
+        if (gpGame->m_obeliskVisitors[index] & (1 << player))
             count++;
     }
     return count;
@@ -957,10 +956,10 @@ fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
-i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
+i32 game::CreateBoat(i32 x, i32 y, i32 skipNotify) {
     i32 boatIndex = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIndex != -1) {
-        if (notify == 0)
+        if (skipNotify == 0)
             SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
         m_boatSlots[boatIndex] = boatIndex;
         boatRecord* boat = &m_boats[boatIndex];
@@ -1085,7 +1084,7 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, extension);
 }
 
-i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
+i32 game::SaveGame(const char* filename, i32 generateName, i8 baseFormat) {
     i32 nHuman;
     i32 saveFlag [[maybe_unused]];
     char workBuffer[SAVE_LEGACY_SCRATCH_SIZE];
@@ -1104,7 +1103,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
-        expansionFormat = 1;
+        baseFormat = 1;
     gpAdvManager->DemobilizeCurrHero();
 
     if (generateName) {
@@ -1128,7 +1127,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
                 if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
                     nHuman++;
             }
-            if (xIsExpansionMap && !expansionFormat)
+            if (xIsExpansionMap && !baseFormat)
                 sprintf(genName, "%s.GX%d", filename, nHuman);
             else
                 sprintf(genName, "%s.GM%d", filename, nHuman);
@@ -1161,7 +1160,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
         FileError(savePath);
 
     oldTag = -1;
-    if (!expansionFormat)
+    if (!baseFormat)
         WRITE_FILE_VALUE(outFile, oldTag);
     WRITE_FILE_VALUE(outFile, m_worldMap.width);
     WRITE_FILE_VALUE(outFile, m_worldMap.height);
@@ -1186,7 +1185,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
         if (gbInCampaign)
             write(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
-    if (!expansionFormat)
+    if (!baseFormat)
         WRITE_FILE_VALUE(outFile, xIsExpansionMap);
 
     gpAdvManager->PurgeMapChangeQueue();
@@ -1213,14 +1212,14 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
 
     WRITE_FILE_VALUE(outFile, m_obeliskCount);
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
-        m_heroRecs[iFile].Write(outFile, !expansionFormat);
+        m_heroRecs[iFile].Write(outFile, !baseFormat);
     write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
     write(outFile, m_castleRecs, sizeof(m_castleRecs));
     write(outFile, m_townOwners, sizeof(m_townOwners));
     write(outFile, m_townBuiltToday, sizeof(m_townBuiltToday));
     write(outFile, m_mines, sizeof(m_mines));
     write(outFile, m_mineOwners, sizeof(m_mineOwners));
-    if (!expansionFormat)
+    if (!baseFormat)
         write(outFile, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
         write(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
@@ -1406,7 +1405,7 @@ void game::SetupOrigData(void) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
+void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
     i32 oldFlag [[maybe_unused]];
     char isHuman[GAME_PLAYER_COUNT];
@@ -1423,7 +1422,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (loadFromFile) {
+    if (originalDataOnly) {
         SetupOrigData();
         return;
     }
@@ -1432,7 +1431,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (originalDataOnly || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(pathBuffer, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(pathBuffer, "%s%s", gcGamePath, filename);
@@ -1841,7 +1840,7 @@ void game::NewMap(char* filename) {
         m_players[player].m_ultimateArtifactHintY = -1;
         heroIndex = 0;
         selectedTown = -1;
-        if (m_mapHeader.unknown25 == 0 && m_players[player].m_townCount > 0) {
+        if (m_mapHeader.noStartingHero == 0 && m_players[player].m_townCount > 0) {
             for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
                 for (nTown = 0; nTown < m_players[player].m_townCount; nTown++) {
                     if (selectedTown == -1
@@ -2111,9 +2110,9 @@ void game::NewMap(char* filename) {
                    < FACTION_COUNT) {
             sideClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
         } else {
-            if (!!m_players[player].m_townCount) {
+            if (m_players[player].m_townCount) {
                 sideClass = gpGame->m_castleRecs[m_players[player].m_townIds[0]].m_type;
-            } else if (!!m_players[player].m_heroCount) {
+            } else if (m_players[player].m_heroCount) {
                 sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_cursorType;
             }
         }
@@ -2149,14 +2148,14 @@ void game::RandomizeEvents(void) {
     i32 row;
     i32 xPosition;
     ArtifactType value;
-    i32 shrineId = 1;
-    i32 bottleId = 1;
-    i32 jailId = 1;
-    i32 sphinxId = 1;
-    i32 tentId = 1;
-    i32 hutId = 1;
-    i32 eyeId = 1;
-    i32 signId = 1;
+    i32 obeliskId = 1;
+    i32 gazeboId = 1;
+    i32 fortId = 1;
+    i32 witchDoctorId = 1;
+    i32 mercenaryCampId = 1;
+    i32 standingStonesId = 1;
+    i32 treeOfKnowledgeId = 1;
+    i32 xanaduId = 1;
     i32 lowerTileIndex;
     mapCell* cell;
     i32 yPosition;
@@ -2195,7 +2194,7 @@ void game::RandomizeEvents(void) {
                     cell->m_objectTileset = TILESET_NONE;
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     CreateBoat(xPosition, yPosition, 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
@@ -2213,23 +2212,23 @@ void game::RandomizeEvents(void) {
                     mapEvent->y = yPosition;
                     mapEvent->active = true;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectTileset = TILESET_NONE;
                     m_mapEvents.count++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_GAZEBO):
-                    cell->m_objectMetadata = bottleId++;
+                    cell->m_objectMetadata = gazeboId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FORT):
-                    cell->m_objectMetadata = jailId++;
+                    cell->m_objectMetadata = fortId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_WITCH_DOCTOR_HUT):
-                    cell->m_objectMetadata = sphinxId;
-                    sphinxId++;
+                    cell->m_objectMetadata = witchDoctorId;
+                    witchDoctorId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MERCENARY_CAMP):
-                    cell->m_objectMetadata = tentId++;
+                    cell->m_objectMetadata = mercenaryCampId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_STANDING_STONES):
                     if (xPosition > 0
@@ -2238,16 +2237,16 @@ void game::RandomizeEvents(void) {
                         cell->m_objectMetadata =
                             m_worldMap.GetCell(xPosition - 1, yPosition)->m_objectMetadata;
                     else
-                        cell->m_objectMetadata = hutId++;
+                        cell->m_objectMetadata = standingStonesId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_XANADU):
-                    cell->m_objectMetadata = signId++;
+                    cell->m_objectMetadata = xanaduId++;
                     break;
                 case MAP_PASSIVE_TRIGGER(MAP_OBJECT_WHIRLPOOL):
                     cell->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_OBELISK):
-                    cell->m_objectMetadata = shrineId++;
+                    cell->m_objectMetadata = obeliskId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FLOTSAM):
                     cell->m_objectMetadata =
@@ -2416,7 +2415,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_OF_KNOWLEDGE):
                     cell->m_objectMetadata =
-                        eyeId++
+                        treeOfKnowledgeId++
                         | (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
                            << TREE_KNOWLEDGE_MODE_SHIFT);
                     break;
@@ -2678,13 +2677,13 @@ void game::RandomizeEvents(void) {
     for (yPosition = 0; yPosition < MAP_HEIGHT; yPosition++) {
         for (xPosition = 0; xPosition < MAP_WIDTH; xPosition++) {
             cell = m_worldMap.GetCell(xPosition, yPosition);
-            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectLayerBit1) {
+            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectShadow) {
                 valid = true;
                 extraIndex = cell->m_extraIndex;
                 while (extraIndex != 0) {
                     extra = m_worldMap.Extra(extraIndex);
                     if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                        && !extra->objectLayerBit1)
+                        && !extra->objectShadow)
                         valid = false;
                     extraIndex = extra->nextIndex;
                 }
@@ -2721,7 +2720,7 @@ void game::RandomizeEvents(void) {
                         m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
                         & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
-                    if (!cell->m_objectLayerBit1) {
+                    if (!cell->m_objectShadow) {
                         upperTilesets[upperCount] = cell->m_objectTileset;
                         upperIndexes[upperCount] = cell->m_objectIndex;
                         upperCount++;
@@ -2732,7 +2731,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (upperCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             upperTilesets[upperCount] = extra->objectTileset;
                             upperIndexes[upperCount] = extra->objectIndex;
                             upperCount++;
@@ -2743,7 +2742,7 @@ void game::RandomizeEvents(void) {
                             extra = NULL;
                     }
                     below = m_worldMap.GetCell(xPosition, yPosition + 1);
-                    if (!below->m_objectLayerBit1) {
+                    if (!below->m_objectShadow) {
                         lowerTilesets[lowerCount] = below->m_objectTileset;
                         lowerIndexes[lowerCount] = below->m_objectIndex;
                         lowerCount++;
@@ -2754,7 +2753,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (lowerCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             lowerTilesets[lowerCount] = extra->objectTileset;
                             lowerIndexes[lowerCount] = extra->objectIndex;
                             lowerCount++;
@@ -2801,7 +2800,7 @@ void game::InitializePasswords(void) {
     i32 j;
     for (i = 0; i < X_GLOBAL_PASSWORD_STRING_INDEX_COUNT; i++) {
         flag = false;
-        while (flag == 0) {
+        while (!flag) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = true;
             for (j = 0; j < i; j++) {
@@ -3091,7 +3090,7 @@ game::ViewSpells(
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = static_cast<i16>(
                 spellType == SPELL_TYPE_COMBAT
-                ? VIEW_SPELL_COMBAT_TAB_ID : VIEW_SPELL_ADVENTURE_TAB_ID
+                ? VIEW_SPELL_ADVENTURE_TAB_ID : VIEW_SPELL_COMBAT_TAB_ID
             );
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
@@ -3270,12 +3269,12 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
+                        case VIEW_SPELL_ADVENTURE_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_ADVENTURE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_ADVENTURE_TAB_ID:
+                        case VIEW_SPELL_COMBAT_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_COMBAT;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
@@ -3333,15 +3332,15 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
-                                NORMAL_DIALOG_QUICK_VIEW
-                            );
-                            break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
+                                NORMAL_DIALOG_QUICK_VIEW
+                            );
+                            break;
+                        case VIEW_SPELL_COMBAT_TAB_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
@@ -3433,11 +3432,11 @@ MessageDispatchResult ViewSpecialHandler(tag_message& message) {
             case VIEW_SPELL_NEXT_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_NEXT]);
                 break;
-            case VIEW_SPELL_COMBAT_TAB_ID:
-                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
-                break;
             case VIEW_SPELL_ADVENTURE_TAB_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_ADVENTURE]);
+                break;
+            case VIEW_SPELL_COMBAT_TAB_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
                 break;
             case DIALOG_BUTTON_0:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_CLOSE]);
@@ -4365,7 +4364,7 @@ void game::PerDay(void) {
         currentTown = GetTown(player);
         if (!(H2EnumIndex((currentTown->m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_MAGE_GUILD))))))
             continue;
-        if (currentTown->m_occupyingHeroId != -1) {
+        if (currentTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             townHero = GetHero(currentTown->m_occupyingHeroId);
             maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*townHero);
             if (maxSpellPoints > townHero->m_spellPoints)
@@ -4706,8 +4705,8 @@ void game::PerMonth(void) {
         for (x = 0; x < MAP_WIDTH; x++) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 spot = gpAdvManager->GetCell(x, y);
-                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
-                    && !spot->m_objectLayerBit0 && CELL_TERRAIN(spot) != TERRAIN_WATER) {
+                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectShadow
+                    && !spot->m_objectHighLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
@@ -5051,8 +5050,8 @@ i32 game::GetRandomArtifactId(
 
         if (!(H2EnumIndex((gArtifactLevel[H2EnumIndex(artifact)]) & (levelMask))))
             continue;
-        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
-            || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
+        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_83
+            || artifact == ARTIFACT_EDITOR_UNUSED_84 || artifact == ARTIFACT_EDITOR_UNUSED_85
             || artifact == ARTIFACT_SPELL_SCROLL)
             continue;
         if (xIsPlayingExpansionCampaign) {
@@ -5098,7 +5097,7 @@ void game::RandomizeHeroPool(void) {
         m_heroRecs[heroId].m_mobility = m_heroRecs[heroId].m_remainingMobility;
         m_heroRecs[heroId].m_randomSeed =
             Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX);
-        m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
+        m_heroRecs[heroId].m_lastWisdomOfferLevel = HERO_INITIAL_LEVEL;
 
         if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[H2EnumIndex(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
@@ -5824,7 +5823,7 @@ void game::SetupTowns(void) {
     i32 attempts;
     i8 usedSpells[H2EnumIndex(SPELL_COUNT)];
     i32 owner;
-    i32 combatSpells;
+    i32 adventureSpells;
     i32 roll;
     SpellType spell;
     i32 spellLevel;
@@ -5925,9 +5924,9 @@ void game::SetupTowns(void) {
                     castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
-        if (extra->hasShrine)
+        if (extra->hasCaptain)
             castle->m_buildings |= H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS);
-        castle->m_mayNotUpgradeToCastle = extra->unknown28;
+        castle->m_mayNotUpgradeToCastle = extra->disallowCastle;
         strcpy(castle->m_name, extra->name);
 
         memset(usedSpells, 0, H2EnumIndex(SPELL_COUNT));
@@ -5978,7 +5977,7 @@ void game::SetupTowns(void) {
         spellsPerLevel[spellLevel]++;
 
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
-            combatSpells = 0;
+            adventureSpells = 0;
             for (spellIndex = 0; spellIndex < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellIndex++) {
                 if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex]
                     != SPELL_NONE) {
@@ -6007,7 +6006,7 @@ void game::SetupTowns(void) {
                         if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
                     } while (
-                        (combatSpells == 1
+                        (adventureSpells == 1
                          && (H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_ADVENTURE))))
                         || Random(0, 10)
                                > gsSpellInfo[H2EnumIndex(spell)].raceChance[H2EnumIndex(castle->m_type)]
@@ -6015,7 +6014,7 @@ void game::SetupTowns(void) {
                         || Random(1, 1500) > spellValue
                     );
                     if ((H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_ADVENTURE))))
-                        combatSpells++;
+                        adventureSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex] =
                         spell;
@@ -6189,7 +6188,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell->m_objectTileset = TILESET_NONE;
                             cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell->m_objectMetadata = 0;
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                         }
 
                         if (extra->hasCustomSkills) {
@@ -6279,14 +6278,14 @@ void game::CheckHeroConsistency(void) {
                 if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != mapX || boardHro->m_y != mapY) {
-                        cell->m_triggerType = 0;
+                        cell->m_triggerType = MAP_OBJECT_NONE;
                         cell->m_objectMetadata = 0;
                     }
                     if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
                         if (boardHro->m_locationType
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                             townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
-                            townOccupied->m_occupyingHeroId = -1;
+                            townOccupied->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
                         }
                         if (boardHro->m_x == mapX && boardHro->m_y == mapY) {
                             RestoreCell(
@@ -6298,12 +6297,12 @@ void game::CheckHeroConsistency(void) {
                                 1
                             );
                         } else {
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                             cell->m_objectMetadata = 0;
                         }
                     }
                 } else {
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                 }
             }
         }
@@ -6791,7 +6790,7 @@ void game::DoNewTurn(void) {
             }
             gpSoundManager->PlayAmbientMusic(musicTrack);
             gpMouseManager->SetPointer(0);
-            NormalDialog(gText, 1);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
             );
@@ -6817,11 +6816,11 @@ i32 game::GetBoatsBuilt(void) {
     return count;
 }
 
-i32 game::GetNumThievesGuilds(i32 color) {
+i32 game::GetNumThievesGuilds(i32 player) {
     i32 count = 0;
     i32 i;
-    for (i = 0; i < m_players[color].m_townCount; i++) {
-        if ((H2EnumIndex((gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings) & (H2EnumIndex(TOWN_BUILDING_THIEVES_GUILD)))))
+    for (i = 0; i < m_players[player].m_townCount; i++) {
+        if ((H2EnumIndex((gpGame->m_castleRecs[m_players[player].m_townIds[i]].m_buildings) & (H2EnumIndex(TOWN_BUILDING_THIEVES_GUILD)))))
             count++;
     }
     return count;
@@ -6896,7 +6895,7 @@ void game::RestoreCell(
     i32 x,
     i32 y,
     MapTriggerCode objectType,
-    i32 barrier,
+    i32 objectMetadata,
     mapCell* passedCell,
     i32 unused [[maybe_unused]]
 ) {
@@ -6907,12 +6906,12 @@ void game::RestoreCell(
         cell = gpAdvManager->GetCell(x, y);
     if (y > 0 && objectType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
-        cell->m_triggerType = 0;
+        cell->m_triggerType = MAP_OBJECT_NONE;
         cell->m_objectMetadata = 0;
         return;
     }
     cell->m_triggerType = objectType;
-    cell->m_objectMetadata = barrier;
+    cell->m_objectMetadata = objectMetadata;
 }
 
 void game::SetMapSize(i32 width, i32 height) {
@@ -7349,7 +7348,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
 }
 
 void game::CheckForTimeEvent(void) {
-    timeEventExtra* event;
+    EventExtra* event;
     i32 dayNumber;
     i32 eventIndex;
     i32 resourceIndex;
@@ -7361,7 +7360,7 @@ void game::CheckForTimeEvent(void) {
 
     dayNumber = GAME_DAY_NUMBER(*this);
     for (eventIndex = 0; eventIndex < m_timeEvents.count; eventIndex++) {
-        event = static_cast<timeEventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
+        event = static_cast<EventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
         if (((gbHumanPlayer[giCurPlayer] && event->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event->appliesToComputer))
             && event->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]

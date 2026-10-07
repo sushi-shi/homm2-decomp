@@ -24,10 +24,6 @@ typedef enum TextEntryKeyConstant {
     ASCII_KEY_MASK         = 0xff
 } TextEntryKeyConstant;
 
-typedef enum TextEntrySourceFileConstant {
-    ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-} TextEntrySourceFileConstant;
-
 typedef enum TextEntryConstant {
     RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,

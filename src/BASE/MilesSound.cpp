@@ -15,8 +15,7 @@ typedef enum MilesSampleConstant {
     MILES_SAMPLE_STOP_WAIT_COUNT      = 10,
     MILES_STOP_ALL_WAIT_COUNT         = 5,
     MILES_SAMPLE_STATUS_DONE          = 2,
-    MILES_SAMPLE_STATUS_PLAYING       = 4,
-    MILES_VOLUME_CONVERSION_MODE      = 100
+    MILES_SAMPLE_STATUS_PLAYING       = 4
 } MilesSampleConstant;
 
 SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {

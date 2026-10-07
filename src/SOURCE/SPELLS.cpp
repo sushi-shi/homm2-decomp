@@ -13,6 +13,7 @@
 #include <BASE/Blur.h>
 #include <BASE/Ripple.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
@@ -63,7 +64,6 @@ namespace {
 
     typedef enum CombatSpellUiConstant {
         CONTROL_CLOSE = DIALOG_BUTTON_0,
-        COMMAND_CANCEL = 1,
         CONTROL_PREVIOUS_PAGE = 2,
         CONTROL_NEXT_PAGE = 3,
         CONTROL_FIRST_MANA = 6,
@@ -74,7 +74,6 @@ namespace {
         HELP_MANA = 6,
         HELP_DEFAULT = 7,
         NO_SELECTION = -1,
-        HEX_RIGHT_BORDER = 12,
         ELEMENTAL_ARMY_LIMIT = 20
     } CombatSpellUiConstant;
 
@@ -165,7 +164,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
-        if (hex % COMBAT_GRID_ROW_LENGTH == 0 || hex % COMBAT_GRID_ROW_LENGTH == HEX_RIGHT_BORDER)
+        if (hex % COMBAT_GRID_ROW_LENGTH == 0 || hex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_COLUMN_END)
             continue;
         if (ValidSpellTarget(spell, hex))
             return 1;
@@ -270,6 +269,7 @@ i32 combatManager::ViewSpells(i32) {
                     NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
+
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
@@ -387,8 +387,9 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
             break;
 
         case MESSAGE_KEY_DOWN:
-            if (message.payload.keyboard.keyCode != COMMAND_CANCEL)
+            if (message.payload.keyboard.keyCode != INPUT_SCAN_ESCAPE)
                 break;
+
 
         case MESSAGE_RIGHT_BUTTON_DOWN:
             gpCombatManager->m_selectedSpell = SPELL_NONE;
@@ -538,7 +539,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
             if (hex == COMBAT_HEX_EMPTY || hex % COMBAT_GRID_ROW_LENGTH == 0
-                || hex % COMBAT_GRID_ROW_LENGTH == HEX_RIGHT_BORDER)
+                || hex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_COLUMN_END)
                 return 0;
             break;
         default:
@@ -1458,7 +1459,7 @@ void combatManager::ElementalStorm(void) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[whichSide] && m_heroes[whichSide]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
-                    damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                    damage = static_cast<i32l>(damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
                 }
                 stack->Damage(damage, SPELL_ELEMENTAL_STORM);
                 hit = true;
@@ -1501,7 +1502,7 @@ void combatManager::Armageddon(void) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side] && m_heroes[side]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
-                    damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                    damage = static_cast<i32l>(damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
                 }
                 target->Damage(damage, SPELL_ARMAGEDDON);
                 anyAffected = true;
@@ -3573,9 +3574,9 @@ void combatManager::Earthquake(void) {
     }
 
     newKeepState = m_drawbridgeState;
-    if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN
+    if (m_drawbridgeState != COMBAT_CASTLE_GATE_DESTROYED
         && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
-        newKeepState = COMBAT_CASTLE_GATE_HIDDEN;
+        newKeepState = COMBAT_CASTLE_GATE_DESTROYED;
         impactPositions[impactCount][H2EnumIndex(COORDINATE_AXIS_X)] = towerPos[0][H2EnumIndex(COORDINATE_AXIS_X)];
         impactPositions[impactCount][H2EnumIndex(COORDINATE_AXIS_Y)] =
             towerPos[0][H2EnumIndex(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;

@@ -10,28 +10,15 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-u8 gMusicFeatureEnabled = 1;
-
-u8 GetMusicFlagA(void) {
-    return gMusicFlagA;
-}
-
-u8 MusicFlagsActive(void) {
-    b32 active;
-    if (gMusicFeatureEnabled && gMusicFlagB)
-        active = true;
-    else
-        active = false;
-    return active;
-}
-
-u8 GetMusicFlagB(void) {
-    return gMusicFlagB;
-}
-
 typedef enum MidiSequenceStatus {
     SEQUENCE_PLAYING = 4
 } MidiSequenceStatus;
+
+#ifdef HOMM2_EDITOR
+
+
+#include "MusicFlags.cpp"
+#endif
 
 typedef enum MidiVolumeConstant {
     VOLUME_HIGH_RANGE = 6,

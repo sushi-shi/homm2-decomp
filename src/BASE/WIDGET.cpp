@@ -29,7 +29,7 @@ widget::widget(
     m_height = height;
     m_id = id;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_kind = kind;
 }
 
@@ -39,7 +39,7 @@ widget::widget(void) {
     m_prev = NULL;
     m_id = 0;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_kind = WIDGET_KIND_DEFAULT;
     m_y = 0;
     m_x = 0;

@@ -1195,6 +1195,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_COLD_RING:
                 if (step == 0)
                     step++;
+
             case SPELL_FIREBALL:
             case SPELL_FIREBLAST:
             case SPELL_METEOR_SHOWER:

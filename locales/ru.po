@@ -567,6 +567,310 @@ msgctxt "common.treasure"
 msgid "Treasure"
 msgstr "Сокровище"
 
+msgctxt "editor.check.barrier.no_tent"
+msgid "There is a %s barrier on the map, but no matching %s tent.  A tent is needed because that is where the password is given to remove a barrier."
+msgstr "На карте есть %s барьер, %s шатер не установлен на карте. Необходимо установить такой шатер, потому что только там можно получить пароль для барьера."
+
+msgctxt "editor.check.log"
+msgid "MAP ERROR : %s"
+msgstr "ОШИБКА КАРТЫ: %s"
+
+msgctxt "editor.check.next"
+msgid "%s\n\nShow next error?"
+msgstr "%s\n\nПоказать следующую ошибку?"
+
+msgctxt "editor.check.obelisks.many"
+msgid "%d obelisks on map.  There should be no more than 48 obelisks."
+msgstr "%d обелисков на карте.  Максимально допустимое количество обелисков 48."
+
+msgctxt "editor.check.travel_gate.single"
+msgid "You have at least one travel gate on the map without a partner.  Each of the 3 different travel gates only goes to others of the same type and needs at least one other to work properly."
+msgstr "У вас на карте как минимум один телепорт без пары. Все 3 типа телепортов соединяются только с телепортами того же типа и нужен как минимум один такой для нормального функционирования."
+
+msgctxt "editor.check.whirlpool.single"
+msgid "Only 1 whirlpool on map.  Another whirlpool is needed so there is someplace to travel to."
+msgstr "На карте только 1 водоворот. Необходим второй водоворот, чтобы можно было куда-либо путешествовать."
+
+msgctxt "editor.events.cell.details_unavailable"
+msgid "Details are available only for cells containing a monster, hero, or the front door to a town or castle."
+msgstr "Дополнительная информация доступна только в клетках, содержащих монстров, героев, врата городов или замков, а также сфинксов, бутылки с посланиями и указатели."
+
+msgctxt "editor.events.empty_entry"
+msgid "-empty-"
+msgstr "-пусто-"
+
+msgctxt "editor.events.event.no_artifact"
+msgid "-none-"
+msgstr "-нет-"
+
+msgctxt "editor.events.hero.class_label"
+msgid "Type"
+msgstr "Тип"
+
+msgctxt "editor.events.hero.patrol_radius"
+msgid "Radius %d squares"
+msgstr "Радиус %d клеток"
+
+msgctxt "editor.events.hero.patrol_radius_one"
+msgid "Radius %d square"
+msgstr "Радиус %d клеток"
+
+msgctxt "editor.events.hero.stand_still"
+msgid "Stand still"
+msgstr "Стоять на месте"
+
+msgctxt "editor.events.monster.count_range"
+msgid "Must be between 0 and 4000.  (0 lets the computer determine the number randomly.)"
+msgstr "Значение должно быть от 0 до 4000. (0 позволяет компьютеру определять количество случайным образом.)"
+
+msgctxt "editor.events.town.mage_guild.level_1"
+msgid "Level 1"
+msgstr "1 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_2"
+msgid "Level 2"
+msgstr "2 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_3"
+msgid "Level 3"
+msgstr "3 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_4"
+msgid "Level 4"
+msgstr "4 этаж"
+
+msgctxt "editor.events.town.mage_guild.level_5"
+msgid "Level 5"
+msgstr "5 этаж"
+
+msgctxt "editor.events.town.mage_guild.none"
+msgid "-None-"
+msgstr "-Нет-"
+
+msgctxt "editor.events.town.old_editor"
+msgid "Unable to edit town - created under old editor"
+msgstr "Нельзя редактировать город. Объект создан старым редактором."
+
+msgctxt "editor.events.ultimate_artifact.radius_range"
+msgid "Must be between 0 and 127."
+msgstr "Значение должно быть от 0 до 127. "
+
+msgctxt "editor.file.confirm_load"
+msgid "Are you sure you want to load a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите загрузить новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
+msgctxt "editor.file.confirm_new"
+msgid "Are you sure you want to create a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите создать новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
+msgctxt "editor.file.confirm_quit"
+msgid "Are you sure you want to quit?"
+msgstr "Вы действительно хотите выйти?"
+
+msgctxt "editor.grab.failed"
+msgid "Couldn't grab object!"
+msgstr "Нельзя схватить объект!"
+
+msgctxt "editor.grab.nothing"
+msgid "Nothing to grab!"
+msgstr "Нечего подбирать!"
+
+msgctxt "editor.map.load.confirm"
+msgid "Are you sure you want to load a new map?  (Any unsaved changes to the current map will be lost.)"
+msgstr "Вы действительно хотите загрузить новую карту? (Любые несохраненные изменения данной карты будут потеряны)."
+
+msgctxt "editor.map.no_description"
+msgid "No Description"
+msgstr "Нет описания"
+
+msgctxt "editor.map.no_name"
+msgid "No Name"
+msgstr "Нет имени"
+
+msgctxt "editor.map.random.name"
+msgid "Random Map %d"
+msgstr "Случ. карта %d"
+
+msgctxt "editor.map.saved"
+msgid "'%s' saved successfully"
+msgstr "Карта '%s' успешно сохранена."
+
+msgctxt "editor.map.saved.expansion"
+msgid "\n\nThe map was saved as an expansion-set map.  It is not compatible with the original Heroes of Might and Magic 2."
+msgstr "\n\nКарта была сохранена в формате Цены Верности. Этот формат карт не совместим с оригинальным форматом карт Героев Меча и Магии 2."
+
+msgctxt "editor.map.saved.original"
+msgid "\n\nThe map was saved as an original Heroes 2 map.  It is compatible with both the original and expansion games."
+msgstr "\n\nКарта была сохранена в оригинальном формате. Эта карта совместима с оригинальной игрой и Ценой Верности."
+
+msgctxt "editor.map.unnamed"
+msgid "No Name %d"
+msgstr "Нет имени %d"
+
+msgctxt "editor.overlay.invalid_placement"
+msgid "Invalid Placement"
+msgstr "Неподходящее место"
+
+msgctxt "editor.overlay.limit.events"
+msgid "Max map events (%d) has been reached."
+msgstr "Лимит событий (%d) достигнут."
+
+msgctxt "editor.overlay.limit.mines"
+msgid "Max mines, sawmills and alchemists on map (%d) has been reached."
+msgstr "Лимит шахт, мельниц и алхимических лабораторий (%d) достигнут."
+
+msgctxt "editor.overlay.limit.towns"
+msgid "Max towns on map (%d) has been reached."
+msgstr "Лимит городов (%d) достигнут."
+
+msgctxt "editor.overlay.ultimate.edge"
+msgid "The ultimate artifact must be placed at least 9 squares in from map edge."
+msgstr "Могущественный артефакт следует размещать как минимум в 9 клетках от краев карты."
+
+msgctxt "editor.overlay.ultimate.land"
+msgid "The ultimate artifact must be placed on land."
+msgstr "Могущественный артефакт должен быть размещен на суше."
+
+msgctxt "editor.overlay.ultimate.placed"
+msgid "The ultimate artifact has already been placed."
+msgstr "Могущественный артефакт уже помещен на карту."
+
+msgctxt "editor.quick_view.reefs"
+msgid "Reefs"
+msgstr "Рифы"
+
+msgctxt "editor.quick_view.rocks"
+msgid "Rocks"
+msgstr "Скалы"
+
+msgctxt "editor.quick_view.unknown"
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgctxt "editor.quit.confirm"
+msgid "Are you sure you want to quit?\n"
+msgstr "Вы действительно хотите выйти?\n"
+
+msgctxt "editor.random.castles_failed"
+msgid "Unable to place castles"
+msgstr "Невозможно установить замки"
+
+msgctxt "editor.random.saved"
+msgid "'%s' saved successfully"
+msgstr "Карта '%s' успешно сохранена."
+
+msgctxt "editor.random.status.castles"
+msgid "Generating map - Placing Castles..."
+msgstr "Генерация карты - размещаю замки..."
+
+msgctxt "editor.random.status.land"
+msgid "Generating map - Analyzing Land Mass..."
+msgstr "Генерация карты - анализирую земной массив..."
+
+msgctxt "editor.random.status.mountains"
+msgid "Generating map - Placing mountains..."
+msgstr "Генерация карты - размещаю горы..."
+
+msgctxt "editor.random.status.objects"
+msgid "Generating map - Placing objects..."
+msgstr "Генерация карты - размещаю объекты..."
+
+msgctxt "editor.random.status.roads"
+msgid "Generating map - Connecting Castles..."
+msgstr "Генерация карты - соединяю замки..."
+
+msgctxt "editor.random.status.smoothing"
+msgid "Generating map - Cleaning up ground..."
+msgstr "Генерация карты - шлифую рельеф..."
+
+msgctxt "editor.random.status.terrain"
+msgid "Generating map - Drawing ground type - %s"
+msgstr "Генерация карты - рисую землю, тип - %s"
+
+msgctxt "editor.random.status.treasure"
+msgid "Generating map - Placing treasures..."
+msgstr "Генерация карты - размещаю сокровища..."
+
+msgctxt "editor.random.status.trees"
+msgid "Generating map - Placing trees..."
+msgstr "Генерация карты - размещаю деревья..."
+
+msgctxt "editor.requester.map.size_mismatch"
+msgid "No maps exist for that size."
+msgstr "Нет карт такого размера."
+
+msgctxt "editor.sign.bottle_title"
+msgid "Bottle Detail"
+msgstr "Содержание бутылки"
+
+msgctxt "editor.sign.old_editor"
+msgid "Unable to edit sign - created under old editor"
+msgstr "Нельзя редактировать указатель. Объект создан старым редактором."
+
+msgctxt "editor.sign.sign_title"
+msgid "Sign Detail"
+msgstr "Информация указателя"
+
+msgctxt "editor.spec.days"
+msgid "%d days"
+msgstr "%d дней"
+
+msgctxt "editor.spec.event_entry"
+msgid "Day %d - %s"
+msgstr "День %d - %s"
+
+msgctxt "editor.spec.events_full"
+msgid "No more events can be added unless some are deleted."
+msgstr "нельзя добавить новые события, если только удалить старые."
+
+msgctxt "editor.spec.gold"
+msgid "%d Gold"
+msgstr "%d золота"
+
+msgctxt "editor.spec.months"
+msgid "%d months"
+msgstr "%d месяцев"
+
+msgctxt "editor.spec.no_heroes"
+msgid "No heroes on map"
+msgstr "На карте нет героев"
+
+msgctxt "editor.spec.no_towns"
+msgid "No towns on map"
+msgstr "На карте нет городов"
+
+msgctxt "editor.spec.rumours_full"
+msgid "No more rumors can be added unless some are deleted."
+msgstr "Нельзя добавить новые слухи, если только не удалить старые."
+
+msgctxt "editor.spec.versus_others"
+msgid " vs. other(s)"
+msgstr " против других"
+
+msgctxt "editor.spec.weeks"
+msgid "%d weeks"
+msgstr "%d недель"
+
+msgctxt "editor.spell_scroll.prompt"
+msgid "Select Spell"
+msgstr "Выбрать заклинание"
+
+msgctxt "editor.spell_scroll.title"
+msgid "Spell Scroll"
+msgstr "Свиток заклинаний"
+
+msgctxt "editor.sphinx.answers_full"
+msgid "Sorry, you have already entered the maximum number of answers."
+msgstr "Извините, вы уже ввели максимальное число возможных ответов."
+
+msgctxt "editor.sphinx.enter_answer"
+msgid "Please enter the answer.\n\n\nNotes:\n1) Only the first 4 characters are used in checking the answer.\n\n2) Any combination of letters, numbers, and punctuations is ok.\n\n3) The answer comparison is not case sensitive.\n\n4) A user entry matching any answer on the list is ok."
+msgstr "Пожалуйста, введите ответы.\n\n1) Учитываются только первые 4 символа.\n\n2) Допускается любая комбинация слов, букв, цифр и знаков препинания.\n\n3) Система проверки не различает регистры букв.\n\n4) Достаточно совпадения с любым вариантом."
+
+msgctxt "editor.sphinx.no_artifact"
+msgid "-none-"
+msgstr "-нет-"
+
 msgctxt "editor.startup.cd_required"
 msgid "You must have the Heroes II CD in your CD-ROM drive to run the Heroes II \nMap Editor.  Please insert the CD and try again."
 msgstr "Вы должны иметь диск с Героями II в вашем CD-ROM, чтобы запустить Редактор \nкарт Героев II. Пожалуйста, вставьте диск и попробуйте еще раз."
@@ -1782,6 +2086,22 @@ msgstr "Выбрать"
 msgctxt "editor.table.gWinSetup.99"
 msgid "Captain"
 msgstr "Капитан"
+
+msgctxt "editor.text.import_failed"
+msgid "Import error!"
+msgstr "Ошибка импорта!"
+
+msgctxt "editor.text.imported"
+msgid "Text successfully imported from %s"
+msgstr "Текст успешно импортирован из %s"
+
+msgctxt "editor.title"
+msgid "Heroes II Editor"
+msgstr "Редактор Героев II"
+
+msgctxt "editor.title.short"
+msgid "Editor"
+msgstr "Редактор"
 
 msgctxt "event.inline.021d355fcf4f31af"
 msgid "{Flotsam}\n\nYou search through the flotsam, and find some wood."

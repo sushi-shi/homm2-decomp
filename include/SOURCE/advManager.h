@@ -101,10 +101,10 @@ public:
     i32 m_hoverCellY;
     i32 m_commandTargetX;
     i32 m_commandTargetY;
-    i32 m_updateMinX;
-    i32 m_updateMinY;
-    i32 m_updateMaxX;
-    i32 m_updateMaxY;
+    i32 m_scrollOffsetX;
+    i32 m_scrollOffsetY;
+    i32 m_animationTick;
+    i32 m_animationFrame;
     i32 m_updatePending;
     i32 m_animationPhases[ADVMGR_ANIMATION_PHASE_COUNT];
     class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
@@ -307,7 +307,7 @@ public:
         i32* removeMonsterObject,
         i32 x,
         i32 y,
-        i32 unused,
+        i32 defender,
         i32 combatX,
         i32 combatY
     );
