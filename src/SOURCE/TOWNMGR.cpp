@@ -1940,6 +1940,9 @@ void townManager::SplitArmy(void) {
     message.payload.widget.id = 1;
     message.payload.widget.data.text = gText;
     m_childWindow->BroadcastMessage(message);
+    // Retail bug: splitwin.bin has no widget 4. Its amount field is 68
+    // (TOWN_SPLIT_AMOUNT_CONTROL), so this text is lost and the field shows
+    // its resource default "0", which happens to equal m_splitAmount.
     sprintf(gText, "%d", m_splitAmount);
     message.payload.widget.id = SPLIT_SETUP_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
