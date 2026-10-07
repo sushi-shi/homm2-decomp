@@ -2,7 +2,7 @@
 #define HOMM2_EDITOR_RIDLEDIT_H
 
 // The sphinx editor (src/EDITOR/ridledit.cpp, ridledit.bin):
-// eventsManager::EditSphinx, its dialog update and its handler.
+// eventsManager::EditSphinx, its fill-in and its dialog handler.
 
 #include <va.h>
 #include <Ints.h>

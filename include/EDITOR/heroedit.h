@@ -16,7 +16,7 @@
 H2_ENUM_BEGIN(HeroEditConstant)
     // The map file's hero record and its unused tail.
     HERO_EDIT_RECORD_SIZE      = 0x4c,
-    HERO_EDIT_RESERVED_SIZE    = 15,
+    HERO_EDIT_RESERVED_SIZE    = 14,
     // heroedit.bin's controls.
     HERO_EDIT_STANDARD_ARMY    = 203,
     HERO_EDIT_STANDARD_ARMY_TOGGLE = 204,
@@ -51,20 +51,14 @@ H2_ENUM_BEGIN(HeroEditConstant)
     // The text fields' limits.
     HERO_EDIT_MAX_TROOP_COUNT  = 9999,
     HERO_EDIT_MAX_EXPERIENCE   = 999999,
-    // The last portrait the arrows step to.
+    // The last portrait the arrows step to, and the portrait of a record
+    // without a custom one.
     HERO_EDIT_LAST_PORTRAIT    = 70,
+    HERO_EDIT_NO_PORTRAIT      = -1,
     // A free hero patrols up to this many cells.
     HERO_EDIT_MAX_PATROL_RADIUS = 10,
     // The skill list: an entry per level and skill after "-empty-".
-    HERO_EDIT_SKILL_LEVELS     = 3,
-    // The heroes' classes a jailed hero can take.
-    HERO_EDIT_CLASS_COUNT      = 6,
-    HERO_EDIT_TEXT_SIZE        = 50,
-    // The artifact lists leave out the editor-only artifacts from
-    // ARTIFACT_EDITOR_ANY_ULTIMATE to ARTIFACT_SPELL_SCROLL.
-    HERO_EDIT_HIDDEN_ARTIFACTS = 5,
-    // SetWinText's row of the dialog.
-    HERO_EDIT_TEXT_ROW         = 5
+    HERO_EDIT_SKILL_LEVELS     = IDX(HERO_SKILL_LEVEL_COUNT) - IDX(HERO_SKILL_LEVEL_BASIC)
 H2_ENUM_END(HeroEditConstant)
 
 #pragma pack(push, 1)
@@ -76,8 +70,7 @@ struct HeroExtra {
     i16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomPortrait;
     i8 portrait;
-    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
-    char unknown16;
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_SLOTS];
     i32 experience;
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
@@ -88,7 +81,10 @@ struct HeroExtra {
     u8 hasPatrol;
     // A free hero's patrol radius, or a jailed hero's class.
     i8 patrolRadius;
-    char reserved3d[HERO_EDIT_RESERVED_SIZE];
+    // Set by the game while loading when the record's chosen hero is still
+    // free (mapHeroExtra); the editor saves it clear.
+    b8 hasAssignedHero;
+    char reserved3e[HERO_EDIT_RESERVED_SIZE];
 };
 #pragma pack(pop)
 SIZE(HeroExtra, HERO_EDIT_RECORD_SIZE);
@@ -97,6 +93,6 @@ SIZE(HeroExtra, HERO_EDIT_RECORD_SIZE);
 extern HeroExtra gHeroEdit;
 extern b32 gEditJailedHero;
 
-MessageDispatchResult HeroEditHandler(struct tag_message& message);
+MessageDispatchResult EditHeroHandler(struct tag_message& message);
 
 #endif

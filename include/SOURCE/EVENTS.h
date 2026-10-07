@@ -25,10 +25,12 @@ H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE = 1,
     EVENT_RECORD_SIGN_HEADER_SIZE        = 9,
     EVENT_RECORD_RUMOUR_HEADER_SIZE      = 8,
-    EVENT_RECORD_TIME_GAP_SECOND_SIZE    = 5,
+    // A hero record keeps the four artifact slots of HoMM1's record; the
+    // game and the editor fill and read the first three.
+    EVENT_RECORD_HERO_ARTIFACT_SLOTS     = 4,
     EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
     EVENT_RECORD_HERO_NAME_SIZE          = 13,
-    EVENT_RECORD_TOWN_NAME_SIZE          = 15
+    EVENT_RECORD_TOWN_NAME_SIZE          = 13
 H2_ENUM_END(EventRecordConstant)
 
 H2_ENUM_BEGIN(MapEventEncodingConstant)
@@ -77,25 +79,15 @@ struct mapEventExtra {
     char riddle[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct signEventExtra {
-    char pad[EVENT_RECORD_SIGN_HEADER_SIZE];
+    // Set as the editor places the sign; a sign saved without it keeps no
+    // text.
+    i8 active;
+    char reserved01[EVENT_RECORD_SIGN_HEADER_SIZE - 1];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct rumourEventExtra {
     char pad[EVENT_RECORD_RUMOUR_HEADER_SIZE];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
-};
-struct timeEventExtra {
-    char unknown00;
-    i32 resources[IDX(RES_COUNT)];
-    u16 unknown1d;
-    u8 appliesToComputer;
-    char unknown20;
-    u16 firstDay;
-    u16 repeatInterval;
-    char unknown25[EVENT_RECORD_TIME_GAP_SECOND_SIZE];
-    u8 appliesToHuman;
-    u8 players[GAME_PLAYER_COUNT];
-    char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct mapHeroExtra {
     i8 owner;
@@ -104,8 +96,7 @@ struct mapHeroExtra {
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
-    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
-    char unknown16;
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_SLOTS];
     i32 experience;
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
@@ -128,10 +119,12 @@ struct mapTownExtra {
     i8 hasCustomArmy;
     H2_ENUM_STORAGE(CreatureType, i8) troopTypes[ARMY_GROUP_SLOT_COUNT];
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
-    u8 hasShrine;
+    u8 hasCaptain;
     u8 hasCustomName;
     char name[EVENT_RECORD_TOWN_NAME_SIZE];
-    i8 unknown28;
+    H2_ENUM_STORAGE(FactionType, i8) faction;
+    i8 isCastle;
+    i8 disallowCastle;
 };
 #pragma pack(pop)
 

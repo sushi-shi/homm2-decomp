@@ -18,7 +18,7 @@ extern i32 gLandPercent;
 
 // Edits gEditMapHeader; cancelling restores it. The editor passes whether
 // the map came from the random map generator. Returns false when cancelled.
-b32 EditMapSpecifications(i32 randomMap);
+b32 EditMapSpecifications(b32 randomMap);
 void FillVictoryConditionList(void);
 void SetVictoryConditionChoice(i32 choice);
 void FillLossConditionList(void);

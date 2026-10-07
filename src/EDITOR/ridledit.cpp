@@ -1,7 +1,8 @@
 // The sphinx editor: the event tool opens it for a sphinx and edits its
 // riddle, the accepted answers and the reward. The unit name comes from
 // its dialog resource (ridledit.bin); descriptive names: EditSphinx,
-// UpdateSphinx, gSphinx, gSphinxText.
+// gSphinx, gSphinxText. FillInSphinxEdit takes the name of the Price of
+// Loyalty editor's FillInEventEdit family.
 
 #include <va.h>
 #include <EDITOR/ridledit.h>
@@ -12,6 +13,7 @@
 #include <BASE/dialog.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/listBoxWidget.h>
 #include <BASE/inputManager.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
@@ -23,7 +25,6 @@
 #include <string.h>
 
 H2_ENUM_BEGIN(SphinxDialog)
-    SPHINX_WINDOW_TEXT_ID = 10,
     // The reward resources' fields, one per resource.
     SPHINX_RESOURCE_FIRST = 200,
     SPHINX_RESOURCE_LAST  = SPHINX_RESOURCE_FIRST + IDX(RES_COUNT) - 1,
@@ -31,8 +32,6 @@ H2_ENUM_BEGIN(SphinxDialog)
     SPHINX_ANSWER_LIST    = 0x19a,
     SPHINX_ADD_ANSWER     = 0x1a4,
     SPHINX_DELETE_ANSWER  = 0x1ae,
-    // The artifact list skips the editor-only artifacts and the spell scroll.
-    SPHINX_SKIPPED_ARTIFACTS = IDX(ARTIFACT_SPELL_SCROLL) - IDX(ARTIFACT_EDITOR_ANY_ULTIMATE) + 1,
     SPHINX_ANSWER_LENGTH  = 11,
     SPHINX_ANSWER_BUFFER  = 100,
     SPHINX_RESOURCE_TEXT_SIZE = 52,
@@ -54,7 +53,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
     gSphinxText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gSphinxText, static_cast<mapEventExtra*>(gEditManager->m_extras[extra])->riddle);
     gEditDialog = new heroWindow(0, 0, "ridledit.bin");
-    SetWinText(gEditDialog, SPHINX_WINDOW_TEXT_ID);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_SPHINX);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     sprintf(gText, localization::Tr("editor.sphinx.no_artifact"));
@@ -75,7 +74,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
         message.payload.widget.data.text = gSphinx.answers[i];
         gEditDialog->BroadcastMessage(message);
     }
-    UpdateSphinx(&gSphinx);
+    FillInSphinxEdit(&gSphinx);
     gpWindowManager->DoDialog(gEditDialog, EditSphinxHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
@@ -88,14 +87,14 @@ i32 eventsManager::EditSphinx(i32 extra) {
         gEditManager->m_extraSizes[extra] = len;
         delete[] gSphinxText;
         gSphinxText = NULL;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->UpdateMapView();
     return gpWindowManager->m_dialogResult;
 }
 
 VA(0x004251f8, 0x170)
-void eventsManager::UpdateSphinx(mapEventExtra* sphinx) {
+void eventsManager::FillInSphinxEdit(mapEventExtra* sphinx) {
     char text[SPHINX_RESOURCE_TEXT_SIZE];
     b32 dimmed;
     tag_message message;
@@ -116,21 +115,21 @@ void eventsManager::UpdateSphinx(mapEventExtra* sphinx) {
     message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
     message.payload.widget.data.value = gSphinx.artifact + 1;
     if (gSphinx.artifact >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-        message.payload.widget.data.value -= SPHINX_SKIPPED_ARTIFACTS;
+        message.payload.widget.data.value -= EVENTS_HIDDEN_ARTIFACT_COUNT;
     message.payload.widget.id = SPHINX_ARTIFACT_LIST;
     gEditDialog->BroadcastMessage(message);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
     message.payload.widget.id = SPHINX_ANSWER_LIST;
     gEditDialog->BroadcastMessage(message);
-    if (message.payload.widget.data.value == -1 && gSphinx.answerCount > 0) {
+    if (message.payload.widget.data.value == LIST_BOX_NO_SELECTION && gSphinx.answerCount > 0) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
         message.payload.widget.id = SPHINX_ANSWER_LIST;
         message.payload.widget.data.value = 0;
         gEditDialog->BroadcastMessage(message);
     }
-    dimmed = message.payload.widget.data.value == -1;
+    dimmed = message.payload.widget.data.value == LIST_BOX_NO_SELECTION;
     message.payload.widget.command = dimmed ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = WIDGET_FLAGS_ARGUMENT_DIMMED;
     message.payload.widget.id = SPHINX_DELETE_ANSWER;
@@ -182,7 +181,7 @@ MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
                             request.payload.widget.id = SPHINX_ANSWER_LIST;
                             gEditDialog->BroadcastMessage(request);
                             answerIndex = request.payload.widget.data.value;
-                            if (answerIndex != -1) {
+                            if (answerIndex != LIST_BOX_NO_SELECTION) {
                                 request.payload.widget.command = WIDGET_COMMAND_DELETE_ITEM;
                                 request.payload.widget.data.value = answerIndex;
                                 gEditDialog->BroadcastMessage(request);
@@ -202,7 +201,7 @@ MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
                             message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
                             gEditDialog->BroadcastMessage(message);
                             if (message.payload.widget.data.value - 1 >= IDX(ARTIFACT_EDITOR_ANY_ULTIMATE))
-                                message.payload.widget.data.value += SPHINX_SKIPPED_ARTIFACTS;
+                                message.payload.widget.data.value += EVENTS_HIDDEN_ARTIFACT_COUNT;
                             gSphinx.artifact = message.payload.widget.data.value - 1;
                             modified = true;
                             break;
@@ -233,7 +232,7 @@ MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
             break;
     }
     if (modified) {
-        static_cast<eventsManager*>(gEditManager->m_toolManager)->UpdateSphinx(&gSphinx);
+        static_cast<eventsManager*>(gEditManager->m_toolManager)->FillInSphinxEdit(&gSphinx);
         gEditDialog->DrawWindow();
     }
     return MESSAGE_DISPATCH_CONSUME;

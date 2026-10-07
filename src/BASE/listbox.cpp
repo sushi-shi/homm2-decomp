@@ -74,17 +74,13 @@ H2_ENUM_BEGIN(ListBoxLayoutConstant)
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
 H2_ENUM_END(ListBoxLayoutConstant)
 
-H2_ENUM_BEGIN(ListBoxSelectionClickCount)
-    SELECTION_SINGLE_CLICK = 1,
-    SELECTION_DOUBLE_CLICK = 2
-H2_ENUM_END(ListBoxSelectionClickCount)
 
 VA(0x004ce6a0, 0x5d)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_itemCount = 0;
     m_items = NULL;
-    m_selectedIndex = -1;
-    m_lastSelectedIndex = -1;
+    m_selectedIndex = LIST_BOX_NO_SELECTION;
+    m_lastSelectedIndex = LIST_BOX_NO_SELECTION;
     m_scrollbar = NULL;
 }
 
@@ -176,7 +172,7 @@ VA(0x004cec60, 0x1f1)
 void listBoxWidget::DeleteItem(i32 index) {
     if (m_itemCount > index) {
         if (m_selectedIndex == index)
-            m_selectedIndex = -1;
+            m_selectedIndex = LIST_BOX_NO_SELECTION;
         if (m_topIndex == index && m_scrollRange <= m_topIndex)
             m_topIndex--;
         if (--m_scrollRange < 0)

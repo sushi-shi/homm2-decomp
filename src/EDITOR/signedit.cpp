@@ -1,6 +1,7 @@
 // The sign and bottle editor: the event tool opens it for a sign or a
 // bottle and edits its message in the rumour dialog. Descriptive names:
-// UpdateSign, EditSignHandler, gSign, gSignText.
+// EditSignHandler, gSign, gSignText; FillInSignEdit takes the name of the
+// Price of Loyalty editor's FillInEventEdit family.
 
 #include <va.h>
 #include <EDITOR/signedit.h>
@@ -15,11 +16,11 @@
 #include <BASE/inputManager.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
 H2_ENUM_BEGIN(SignDialog)
-    SIGN_WINDOW_TEXT_ID = 11,
     SIGN_TITLE          = 0x64,
 H2_ENUM_END(SignDialog)
 
@@ -44,7 +45,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     gSignText = new char[EVENT_TEXT_CAPACITY];
     strcpy(gSignText, static_cast<signEventExtra*>(gEditManager->m_extras[gEditCell->m_objectMetadata])->text);
     gEditDialog = new heroWindow(0, 0, "rumredit.bin");
-    SetWinText(gEditDialog, SIGN_WINDOW_TEXT_ID);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_RUMOUR);
     if (gEditCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)))
         sprintf(gText, localization::Tr("editor.sign.bottle_title"));
     else
@@ -54,29 +55,29 @@ void eventsManager::EditSign(i32 x, i32 y) {
     message.payload.widget.data.text = gText;
     message.payload.widget.id = SIGN_TITLE;
     gEditDialog->BroadcastMessage(message);
-    UpdateSign(&gSign);
+    FillInSignEdit(&gSign);
     gpWindowManager->DoDialog(gEditDialog, EditSignHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         len = strlen(gSignText) + sizeof(gSign);
-        if (!gSign.pad[0])
+        if (!gSign.active)
             strcpy(gSignText, "");
         newRecord = new char[len];
         memcpy(newRecord, &gSign, sizeof(gSign));
-        strcpy(newRecord + EVENT_RECORD_SIGN_HEADER_SIZE, gSignText);
+        strcpy(newRecord + offsetof(signEventExtra, text), gSignText);
         delete[] static_cast<char*>(gEditManager->m_extras[gEditCell->m_objectMetadata]);
         gEditManager->m_extras[gEditCell->m_objectMetadata] = newRecord;
         gEditManager->m_extraSizes[gEditCell->m_objectMetadata] = len;
         delete[] gSignText;
         gSignText = NULL;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
 }
 
 VA(0x0042647e, 0x3b)
-void eventsManager::UpdateSign(signEventExtra* sign) {
+void eventsManager::FillInSignEdit(signEventExtra* sign) {
     i32 unused;
     tag_message message;
 
@@ -126,7 +127,7 @@ MessageDispatchResult EditSignHandler(struct tag_message& message) {
             break;
     }
     if (modified) {
-        static_cast<eventsManager*>(gEditManager->m_toolManager)->UpdateSign(&gSign);
+        static_cast<eventsManager*>(gEditManager->m_toolManager)->FillInSignEdit(&gSign);
         gEditDialog->DrawWindow();
     }
     return MESSAGE_DISPATCH_CONSUME;

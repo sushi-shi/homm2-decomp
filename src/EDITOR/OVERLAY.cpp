@@ -881,7 +881,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         && OverlayGridHas(type->entranceRows, col, row)) {
                         newSign = new signEventExtra;
                         memset(newSign, 0, sizeof(signEventExtra));
-                        newSign->pad[0] = MAP_EVENT_DATA_AVAILABLE;
+                        newSign->active = MAP_EVENT_DATA_AVAILABLE;
                         dest->m_objectMetadata = gEditManager->m_extraCount;
                         gEditManager->m_extras[gEditManager->m_extraCount] = newSign;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] =

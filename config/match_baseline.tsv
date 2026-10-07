@@ -410,9 +410,9 @@ BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	2f1
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	a5fd52c40400
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	100.0000	1a5f535828f9
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	d46d700c890a
-BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	6e108658333c
+BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	93077aa381cc
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	044aca525aac
-BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	e5aad5bf2f33
+BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	85baeb5193ca
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	f04ab5d35611
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	4d48e5d8e842
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	100.0000	f746e447a2f0
@@ -701,7 +701,7 @@ SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	11a094a80b00
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	f9aab6633027
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	4ce608d23410
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	37a8324d9dba
-SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	6fb90bd16f82
+SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	4ec70cd41fb3
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	100.0000	ac67c5c52d99
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	9817f3742cf0
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	07a79ac95434
@@ -799,7 +799,7 @@ SOURCE/GAME	?CalcBaseScore@@YIHH@Z	100.0000	da2116387965
 SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	f0d314495a23
 SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	100.0000	3d53810001f9
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	fc1f93167fad
-SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	100.0000	884205f1d750
+SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	100.0000	6eac0fd269e6
 SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	100.0000	87ad802af864
 SOURCE/GAME	?CheckValidAvailableHeroes@@YIXXZ	100.0000	f4e9a2102d42
 SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	100.0000	ff94cb2d0d76
@@ -875,7 +875,7 @@ SOURCE/GAME	?SetupAdjacentMons@game@@QAEXXZ	100.0000	e492fbd4fb7f
 SOURCE/GAME	?SetupNewRumour@game@@QAEXXZ	100.0000	ce78273bf5f5
 SOURCE/GAME	?SetupOrigData@game@@QAEXXZ	100.0000	7f13cbdd6b6f
 SOURCE/GAME	?SetupPuzzlePieces@game@@QAEHHH@Z	100.0000	0ea8cde86e93
-SOURCE/GAME	?SetupTowns@game@@QAEXXZ	100.0000	326edafb44c5
+SOURCE/GAME	?SetupTowns@game@@QAEXXZ	100.0000	3532c0b95d4c
 SOURCE/GAME	?ShowComputerScreen@game@@QAEXXZ	100.0000	2af979ca13d5
 SOURCE/GAME	?ShowHeroesLogo@game@@QAEXXZ	100.0000	491fe842e0e4
 SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	100.0000	d93a7721cd58

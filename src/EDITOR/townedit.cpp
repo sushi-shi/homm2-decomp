@@ -54,7 +54,7 @@ void eventsManager::EditTown(i32 x, i32 y) {
     original = *gEditCell;
     memcpy(&gTownEdit, gEditManager->m_extras[gEditCell->m_objectMetadata], sizeof(TownExtra));
     gEditDialog = new heroWindow(0, 0, "townedit.bin");
-    SetWinText(gEditDialog, TOWN_EDIT_TEXT_ROW);
+    SetWinText(gEditDialog, EVENTS_WINDOW_TEXT_TOWN);
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
@@ -97,10 +97,10 @@ void eventsManager::EditTown(i32 x, i32 y) {
         gEditDialog->BroadcastMessage(msg);
     }
     FillInTownEdit(&gTownEdit);
-    gpWindowManager->DoDialog(gEditDialog, TownEditHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditTownHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
         memcpy(gEditManager->m_extras[gEditCell->m_objectMetadata], &gTownEdit, sizeof(TownExtra));
     }
     gEditManager->DrawMap();
@@ -109,7 +109,7 @@ void eventsManager::EditTown(i32 x, i32 y) {
 
 VA(0x0042a34c, 0x5e4)
 void eventsManager::FillInTownEdit(TownExtra* town) {
-    char text[TOWN_EDIT_TEXT_SIZE];
+    char text[EVENTS_FIELD_TEXT_SIZE];
     i32 i;
     i32 index;
     tag_message msg;
@@ -201,14 +201,14 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     gEditDialog->BroadcastMessage(msg);
     msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
     for (i = 0; i < TOWN_EDIT_DWELLING_COUNT; i++) {
-        msg.payload.widget.id = i * 2 + TOWN_EDIT_FIRST_DWELLING;
+        msg.payload.widget.id = i * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING;
         msg.payload.widget.command =
             town->hasCustomBuildings
                     && town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_FIRST)))
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
-        msg.payload.widget.id = i * 2 + TOWN_EDIT_FIRST_DWELLING + 1;
+        msg.payload.widget.id = i * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING + 1;
         msg.payload.widget.command =
             town->hasCustomBuildings
                     && town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_SIXTH)))
@@ -230,13 +230,14 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
                 msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                 index = i - IDX(BUILDING_SLOT_DWELLING_SIXTH);
                 msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
-                msg.payload.widget.id = index * 2 + TOWN_EDIT_FIRST_DWELLING + 1;
-                gEditDialog->BroadcastMessage(msg);
                 msg.payload.widget.id =
-                    index * 2 + TOWN_EDIT_FIRST_DWELLING + 1 - TOWN_EDIT_DWELLING_LABEL_STEP;
+                    index * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING + 1;
                 gEditDialog->BroadcastMessage(msg);
-                msg.payload.widget.id =
-                    index * 2 + TOWN_EDIT_FIRST_DWELLING + 1 - 2 * TOWN_EDIT_DWELLING_LABEL_STEP;
+                msg.payload.widget.id = index * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING
+                                        + 1 - TOWN_EDIT_LABEL_STEP;
+                gEditDialog->BroadcastMessage(msg);
+                msg.payload.widget.id = index * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING
+                                        + 1 - 2 * TOWN_EDIT_LABEL_STEP;
                 gEditDialog->BroadcastMessage(msg);
             }
         }
@@ -244,23 +245,24 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
         if (gTownEdit.faction == FACTION_NECROMANCER) {
             msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
-            msg.payload.widget.id = TOWN_EDIT_FIRST_BUILDING + 1;
+            msg.payload.widget.id = TOWN_EDIT_TAVERN;
             gEditDialog->BroadcastMessage(msg);
-            msg.payload.widget.id = TOWN_EDIT_FIRST_BUILDING + 1 - TOWN_EDIT_DWELLING_LABEL_STEP;
+            msg.payload.widget.id = TOWN_EDIT_TAVERN - TOWN_EDIT_LABEL_STEP;
             gEditDialog->BroadcastMessage(msg);
-            msg.payload.widget.id =
-                TOWN_EDIT_FIRST_BUILDING + 1 - 2 * TOWN_EDIT_DWELLING_LABEL_STEP;
+            msg.payload.widget.id = TOWN_EDIT_TAVERN - 2 * TOWN_EDIT_LABEL_STEP;
             gEditDialog->BroadcastMessage(msg);
         }
     }
 }
 
 VA(0x0042a930, 0x5c3)
-MessageDispatchResult TownEditHandler(tag_message& message) {
+MessageDispatchResult EditTownHandler(tag_message& message) {
     i32 building;
     i32 present;
     b32 update;
     i32 number;
+    // Never read: slots of the retail frame, the cell editor's handler
+    // constants.
     const i16 firstTextId = 1;
     const i16 toggleBase = CELL_WINDOW_FIRST_FLAG;
 
