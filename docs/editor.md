@@ -216,25 +216,16 @@ its link-diff stamp are the editor's default build target.
   KB's `cOverrideMIDIDriver`/`cOverrideDigitalDriver` (exact size and hash
   window) and `gUnusedData...` storage.
 
-`.text` layout, `.rdata` (imports, IAT, debug directory), `.rsrc`, the
-overlay and the file size are byte-identical. The residual (2,465 bytes,
-`config/retail/editor/link_diff.tsv`):
+- The editor's own sources (the EDITOR tier) compile with `/Ob2`
+  ([pattern](patterns/ob2-places-initializer-literals-lexically.md)): code
+  is unchanged at `/Od`, and EDITMGR's `gMapCodeLetters` text takes its
+  lexical place among the function literals, as in retail.
 
-| Region | Bytes | Cause |
-| --- | ---: | --- |
-| `.data` | 2,068 | EDITMGR's literal for `gMapCodeLetters` (`"ABC...Z"`): retail emits it among the function literals at `MakeMapCode`'s place (0x47e018), VC6 SP5 with the object's static data, right after its globals; the 28-byte cell shifts EDITMGR's string block |
-| `.text` | 115 | the same shift: operands that address EDITMGR's strings |
-| headers | 282 | the Rich header: 66 SP5 C++ objects where retail counts 65, so the key and the PE header offset differ |
+`.text`, `.rdata`, `.data`, `.rsrc`, the overlay and the file size are
+byte-identical. The residual (282 bytes, `config/retail/editor/link_diff.tsv`)
+is the Rich header: 66 SP5 C++ objects where retail counts 65, so its key and
+the PE header offset differ.
 
-Measured on the two (`build/exp/lit*`, `build/exp/rich*`):
-
-- VC6 emits every global initializer's literal with the object's static
-  data, after all globals and before every function literal, whatever the
-  definition position, linkage, cv-qualification, aggregate, cast,
-  `selectany`, preceding initializer size (64 B to 128 KB), `/Gf`, `/Gy`,
-  `/YX`, `/Zi`, `/Z7` or `/O1`. A function-local static pointer puts its
-  literal in function order, but the pointer object moves next to it,
-  whereas retail keeps the pointer at 0x47d738 among the globals.
 - Retail's alias count (12 OLDNAMES objects) is reached by EDITOR's
   shipped-map test calling `stricmp`, besides the `strcmpi` REQUEST and RESMGR
   call: its alias member pulls `__stricmp`, already pulled by `strcmpi`, so
@@ -245,15 +236,13 @@ Measured on the two (`build/exp/lit*`, `build/exp/rich*`):
   from the counts.
 - Every retail editor C++ object registers `std::ctype<wchar_t>::id`
   (65 sites, 65 objects), while Misc, which has no registration, is a
-  separate 66th object here. The game has 95 sites for 96 objects, Misc being
-  the one without. The editor's evidence therefore puts Misc and MiscRuntime
-  in one object, yet their `.data` keeps the game's split layout (Misc's
-  literals before the track-name text). That is the same literal emission
-  as `gMapCodeLetters` (`docs/matching/Misc-track-name-data/`): one compiler
-  behaviour, not yet reproduced from source, would explain both residuals.
+  separate 66th object here; the game has 95 sites for 96 objects, Misc
+  being the one without. The editor's evidence puts Misc and MiscRuntime in
+  one object; the track-name text's lexical placement is the `/Ob2`
+  behaviour above.
 
 ## Open work
 
-- The initializer-literal emission point (EDITMGR's `gMapCodeLetters`, and
-  with it a one-object Misc giving retail's 65 C++ objects).
+- A one-object Misc in the editor's BASE library, giving retail's 65 C++
+  objects and so its Rich header.
 - The editor's clean export.

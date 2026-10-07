@@ -4,8 +4,8 @@
 region	bytes
 size	0
 headers	282
-.text	115
+.text	0
 .rdata	0
-.data	2068
+.data	0
 .rsrc	0
 overlay	0
