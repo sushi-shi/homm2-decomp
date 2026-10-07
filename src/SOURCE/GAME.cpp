@@ -2874,7 +2874,8 @@ void game::RandomizeEvents(void) {
                 && !(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
                 && (yPosition == MAP_HEIGHT - 1
-                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags & 4)))
+                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
+                        & IDX(MAP_CELL_SHORE))))
                 cell->m_flags |= IDX(MAP_CELL_OCCUPIED);
         }
     }

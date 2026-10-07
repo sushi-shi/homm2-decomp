@@ -587,7 +587,7 @@ void hero::Deallocate(i32 updateMap) {
             gpAdvManager->m_cursorActive = false;
             map = &gpGame->m_worldMap;
             DebugCheck();
-            map->GetCell(m_x, m_y)->m_flags &= ~HERO_MAP_CELL_PRESENT;
+            map->GetCell(m_x, m_y)->m_flags &= ~IDX(MAP_CELL_HERO);
         }
         if (oldOwner == giCurPlayer)
             gpAdvManager->m_heroContextLocked = false;

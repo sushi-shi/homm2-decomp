@@ -66,7 +66,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_cursorMapY += directionY;
     cellX = m_mapOriginX + m_cursorMapX;
     cellY = m_mapOriginY + m_cursorMapY;
-    m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
+    m_mapData->GetCell(cellX, cellY)->m_flags |= IDX(MAP_CELL_HERO);
 }
 #if H2_RETAIL_COMPILER
 #undef directionX
@@ -86,7 +86,7 @@ void advManager::StopCursor(i32 stopSound) {
             m_mapOriginX + m_previousCursorMapX,
             m_mapOriginY + m_previousCursorMapY
         )
-            ->m_flags &= ~HERO_MAP_CELL_PRESENT;
+            ->m_flags &= ~IDX(MAP_CELL_HERO);
         m_previousCursorMapY = -1;
         m_previousCursorMapX = -1;
     }
@@ -123,7 +123,7 @@ void advManager::DrawCursor(void) {
                     m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
                 )
                     ->m_flags
-                & CURSOR_CELL_UNCOVERED_FLAG
+                & IDX(MAP_CELL_SHORE)
             )) {
             DRAW_FLIPPED_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
@@ -180,7 +180,7 @@ void advManager::DrawCursor(void) {
                     m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
                 )
                     ->m_flags
-                & CURSOR_CELL_UNCOVERED_FLAG
+                & IDX(MAP_CELL_SHORE)
             )) {
             DRAW_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
@@ -1108,21 +1108,21 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     directionY = oldOriginY - m_mapOriginY;
     if (directionX != 0 || directionY != 0) {
         m_mapData->GetCell(oldOriginX + m_cursorMapX, oldOriginY + m_cursorMapY)->m_flags
-            &= ~HERO_MAP_CELL_PRESENT;
+            &= ~IDX(MAP_CELL_HERO);
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
         cellX = m_mapOriginX + m_cursorMapX;
         cellY = m_mapOriginY + m_cursorMapY;
-        m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
+        m_mapData->GetCell(cellX, cellY)->m_flags |= IDX(MAP_CELL_HERO);
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
             m_mapData
                 ->GetCell(oldOriginX + m_previousCursorMapX, oldOriginY + m_previousCursorMapY)
-                ->m_flags &= ~HERO_MAP_CELL_PRESENT;
+                ->m_flags &= ~IDX(MAP_CELL_HERO);
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
             cellX = m_mapOriginX + m_previousCursorMapX;
             cellY = m_mapOriginY + m_previousCursorMapY;
-            m_mapData->GetCell(cellX, cellY)->m_flags |= HERO_MAP_CELL_PRESENT;
+            m_mapData->GetCell(cellX, cellY)->m_flags |= IDX(MAP_CELL_HERO);
         }
     }
     m_forceCompleteDraw = true;

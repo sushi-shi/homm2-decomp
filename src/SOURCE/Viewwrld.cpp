@@ -46,8 +46,6 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_SCALE_CONTROL        = 2,
     INITIAL_CENTER_OFFSET      = 7,
 
-    GROUND_HORIZONTAL_FLIP     = 2,
-    GROUND_ALTERNATE_SET       = 1,
     GROUND_ALTERNATE_OFFSET    = 9,
     GROUND_RANDOM_X_MULTIPLIER = 2,
     GROUND_RANDOM_FRAME_MASK   = 3,
@@ -340,9 +338,11 @@ void advManager::VWCompleteDraw(void) {
                     default:
                         break;
                 }
-                if (cell->m_flags & GROUND_HORIZONTAL_FLIP)
+                if (cell->m_flags & IDX(MAP_CELL_FLIP_HORIZONTAL))
                     orientation = ICON_DRAW_FLIPPED;
-                if (cell->m_flags & GROUND_ALTERNATE_SET)
+                // A vertically flipped cell draws its shape's frame
+                // GROUND_ALTERNATE_OFFSET further on.
+                if (cell->m_flags & IDX(MAP_CELL_FLIP_VERTICAL))
                     frame += GROUND_ALTERNATE_OFFSET;
                 if (frame == 0)
                     frame +=

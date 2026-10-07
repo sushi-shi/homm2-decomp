@@ -54,7 +54,6 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_PATROL_NONE                          = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
-    HERO_MAP_CELL_PRESENT                     = 0x40,
     HERO_NAME_SIZE                            = 13,
     HERO_PRIMARY_STAT_COUNT                   = 4,
     HERO_ARTIFACT_SLOT_COUNT                  = 14,

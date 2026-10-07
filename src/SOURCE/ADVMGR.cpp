@@ -3752,7 +3752,7 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
+                                && (s_drawCell->m_flags & IDX(MAP_CELL_SHORE)) == 0) {
                                 DRAW_FLIPPED_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
                                     s_drawPixelX + CELL_PIXELS,
@@ -3813,7 +3813,7 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
+                                && (s_drawCell->m_flags & IDX(MAP_CELL_SHORE)) == 0) {
                                 DRAW_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
                                     s_drawPixelX,
@@ -3854,7 +3854,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (m_cursorActive != 0 && (s_drawCell->m_flags & HERO_MAP_CELL_PRESENT) != 0
+                if (m_cursorActive != 0 && (s_drawCell->m_flags & IDX(MAP_CELL_HERO)) != 0
                     && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
@@ -4166,7 +4166,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
                 cell = m_mapData->GetCell(i, j);
-                if ((cell->m_flags & HERO_MAP_CELL_PRESENT) != 0
+                if ((cell->m_flags & IDX(MAP_CELL_HERO)) != 0
                     && i == m_mapOriginX + VIEW_CENTER_CELL
                     && j == m_mapOriginY + VIEW_CENTER_CELL) {
                     color = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
@@ -6798,7 +6798,7 @@ void advManager::DemobilizeCurrHero(void) {
     }
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroPointer->m_id;
-    cell->m_flags &= ~HERO_MAP_CELL_PRESENT;
+    cell->m_flags &= ~IDX(MAP_CELL_HERO);
     m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -6878,7 +6878,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
     mapCell* currentCell = GetCell(contextHero->m_x, contextHero->m_y);
-    currentCell->m_flags |= HERO_MAP_CELL_PRESENT;
+    currentCell->m_flags |= IDX(MAP_CELL_HERO);
     gpGame->RestoreCell(
         contextHero->m_x,
         contextHero->m_y,
@@ -8017,8 +8017,8 @@ void advManager::TeleportTo(
     }
 
     oldCellFlag = false;
-    if (cellOld->m_flags & HERO_MAP_CELL_PRESENT) {
-        cellOld->m_flags -= HERO_MAP_CELL_PRESENT;
+    if (cellOld->m_flags & IDX(MAP_CELL_HERO)) {
+        cellOld->m_flags -= IDX(MAP_CELL_HERO);
         oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
@@ -8062,7 +8062,7 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
+        destinationCell->m_flags |= IDX(MAP_CELL_HERO);
         gpWindowManager->SaveFizzleSource(
             ADVENTURE_VIEW_BORDER,
             ADVENTURE_VIEW_BORDER,
@@ -8089,7 +8089,7 @@ void advManager::TeleportTo(
         mapHero->m_locationType = destinationCell->m_triggerType;
         mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
         if (oldCellFlag != 0) {
-            destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
+            destinationCell->m_flags |= IDX(MAP_CELL_HERO);
         } else {
             destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
@@ -9268,7 +9268,8 @@ i32 advManager::FindAdjacentMonster(
                     if (s_adjacentMonsterY < originY) {
                         if ((GetCell(originX, originY)->m_objectIndex == MAPCELL_SPRITE_NONE
                              || GetCell(originX, originY)->m_objectTileset == TILESET_DUMMY
-                             || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
+                             || (GetCell(originX, originY)->m_flags
+                                 & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)))
                             && (s_adjacentMonsterX != excludedX
                                 || s_adjacentMonsterY != excludedY)) {
                             goto foundAdjacentMonster;
@@ -9307,7 +9308,8 @@ i32 advManager::FindAdjacentMonster(
                     if (s_adjacentMonsterY < originY) {
                         if ((GetCell(originX, originY)->m_objectIndex == MAPCELL_SPRITE_NONE
                              || GetCell(originX, originY)->m_objectTileset == TILESET_DUMMY
-                             || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
+                             || (GetCell(originX, originY)->m_flags
+                                 & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)))
                             && (s_adjacentMonsterX != excludedX
                                 || s_adjacentMonsterY != excludedY)) {
                             goto foundAdjacentMonster;
