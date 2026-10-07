@@ -32,6 +32,7 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/Castle.h>
 #include <SOURCE/EVENTS.h>
 #include <EDITOR/mapcell.h>
 #include <EDITOR/fullMap.h>
@@ -58,6 +59,7 @@
 #define GAME_SCORE_MEDIUM_DAY_SCALE 1.0
 #define GAME_SCORE_SMALL_DAY_SCALE 1.4
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
+#define GAME_ULTIMATE_ARTIFACT_ONE_THIRD 0.33
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
     0.66
 
@@ -69,10 +71,6 @@ H2_ENUM_END(ViewArmyControlId)
 H2_ENUM_BEGIN(MapTilesetConstant)
     WAGON_CAMP_ACTIVE_FRAME = 129
 H2_ENUM_END(MapTilesetConstant)
-
-H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
-    CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
-H2_ENUM_END(ExpansionCampaignSaveConstant)
 
 namespace {
 
@@ -135,9 +133,7 @@ H2_ENUM_END(GameHeroSelectionConstant)
 H2_ENUM_BEGIN(GameInitialStateConstant)
     INITIAL_DIFFICULTY_RATING   = 1,
     INITIAL_PLAYER_COUNT        = 4,
-    INITIAL_CALENDAR_VALUE      = 1,
     INITIAL_MAP_CHANGE_SEQUENCE = 1,
-    INITIAL_RECORD_TYPE_STRIDE  = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
     BOAT_HERO_NONE              = -1,
     BOAT_SLOT_EMPTY             = -1
 H2_ENUM_END(GameInitialStateConstant)
@@ -199,7 +195,6 @@ H2_ENUM_BEGIN(GameDailyEconomyConstant)
     DAILY_CAMPAIGN_WOOD_BONUS       = 2,
     DAILY_RESOURCE_BONUS_FIRST_DAY  = 1,
     DAILY_RESOURCE_BONUS_LAST_DAY   = IDX(RES_GOLD),
-    GAME_WEEKS_PER_MONTH            = 4,
     POWER_RING_DAILY_MANA_BONUS     = 2
 H2_ENUM_END(GameDailyEconomyConstant)
 
@@ -223,27 +218,20 @@ H2_ENUM_END(RandomMapConstant)
 H2_ENUM_BEGIN(GameMapSetupConstant)
     COMPUTER_SCREEN_WIDGET_FIRST          = 1,
     COMPUTER_SCREEN_WIDGET_LAST           = 6,
-    HEROES_LOGO_X                         = 480,
-    HEROES_LOGO_Y                         = 16,
-    HEROES_LOGO_WIDTH                     = 144,
-    HEROES_LOGO_HEIGHT                    = 144,
     ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
     DEFAULT_DWELLING_ROLL_CAPACITY        = 10,
     DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
-    TOWN_UPGRADE_TO_DWELLING_OFFSET       = 5,
     MAP_HERO_PROCESS_PASS_COUNT           = 3,
     MAP_HERO_ASSIGNMENT_PASS              = 0,
     MAP_HERO_CLASS_PASS                   = 1,
     MAP_HERO_PLACEMENT_PASS               = 2,
     MAP_HERO_FRAME_STRIDE                 = IDX(FACTION_NEUTRAL) + 1,
     MAP_HERO_RANDOM_FACTION_FRAME         = IDX(FACTION_NEUTRAL),
-    MAP_HEROES_PER_FACTION                = GAME_HERO_COUNT / IDX(FACTION_COUNT),
     MAP_HERO_CLASS_SCAN_RETRY_LIMIT       = 1000,
     HERO_CONSISTENCY_POOL_THRESHOLD       = 40
 H2_ENUM_END(GameMapSetupConstant)
 
 H2_ENUM_BEGIN(GamePlayerTurnConstant)
-    GAME_AI_MUSIC_TRACK            = 28,
     ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
 H2_ENUM_END(GamePlayerTurnConstant)
 
@@ -276,9 +264,7 @@ H2_ENUM_BEGIN(RemoteSaveConstant)
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
     REMOTE_RECEIVE_TIMEOUT           = 90000,
-    REMOTE_RECEIVE_DIALOG_BUTTONS    = 2,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
-    REMOTE_SAVE_INIT_COMMAND         = 1,
     REMOTE_SAVE_INIT_RESPONSE        = 2,
     REMOTE_SAVE_DATA_COMMAND         = 3,
     REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
@@ -290,9 +276,6 @@ H2_ENUM_BEGIN(NewTurnConstant)
     NEW_TURN_MUSIC_FILENAME_CAPACITY = 16,
     NEW_TURN_LOWER_NAME_CAPACITY     = 52,
     NEW_TURN_BOTTOM_VIEW_DURATION    = 3000,
-    NEW_TURN_DIALOG_TYPE             = 9,
-    NEW_MONTH_MUSIC_TRACK            = 21,
-    NEW_WEEK_MUSIC_TRACK             = 20,
     NEW_MONTH_NORMAL_TEXT            = 2,
     NEW_MONTH_CREATURE_TEXT          = 3,
     NEW_MONTH_PLAGUE_TEXT            = 4,
@@ -306,8 +289,7 @@ H2_ENUM_BEGIN(DiffRuntimeConstant)
     DIFF_BYTE_SHIFT       = 8,
     DIFF_BYTE_HEADER_SIZE = 2,
     DIFF_BUFFER_EXTRA     = 5000,
-    DIFF_MAX_SHORT_MATCH  = 3,
-    DIFF_COPY_FLAG_SHIFT  = 7
+    DIFF_MAX_SHORT_MATCH  = 3
 H2_ENUM_END(DiffRuntimeConstant)
 
 #define SCORE_SECOND_TIER_FACTOR 0.5
@@ -343,9 +325,6 @@ H2_ENUM_BEGIN(GameMonthlyConstant)
     NORMAL_NAME_MAX               = 9,
     CREATURE_LIST_MIN             = 0,
     CREATURE_LIST_MAX             = 11,
-    WELL_BUILDING                 = 0x10,
-    FIRST_DWELLING_BONUS_BUILDING = 0x800,
-    MONSTER_TRIGGER               = 0x98,
     MONSTER_SPAWN_MIN             = 0,
     MONSTER_SPAWN_MAX             = 360,
     MONSTER_SPAWN_ROLL            = 10
@@ -485,10 +464,6 @@ H2_ENUM_BEGIN(GameLuckConstant)
     RAINBOW_BONUS = 2
 H2_ENUM_END(GameLuckConstant)
 
-H2_ENUM_BEGIN(GameTimeEventConstant)
-    EVENT_RESOURCE_PENALTY = 100000
-H2_ENUM_END(GameTimeEventConstant)
-
 H2_ENUM_BEGIN(GameCompressionTestConstant)
     TEST_RANDOM_SIZE_MIN     = 20000,
     TEST_RANDOM_SIZE_MAX     = 100000,
@@ -501,7 +476,13 @@ H2_ENUM_END(GameCompressionTestConstant)
 
 H2_ENUM_BEGIN(GameRumourConstant)
     RUMOUR_SCRATCH_CAPACITY        = 100,
-    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT
+    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT,
+    RUMOUR_PICK_ATTEMPTS           = 200,
+    RUMOUR_EVENT_SHORT_TEXT_LENGTH = 2,
+    RUMOUR_TAVERN_TEXT_CHANCE      = 30,
+    RUMOUR_LEADER_CHANCE           = 80,
+    RUMOUR_ULTIMATE_REGION_CHANCE  = 33,
+    RUMOUR_ULTIMATE_TERRAIN_CHANCE = 66
 H2_ENUM_END(GameRumourConstant)
 
 DATA(0x0052499c) b32 gbGameOver = false;
@@ -539,49 +520,6 @@ H2_ENUM_BEGIN(GameOwnershipConstant)
     MINE_ALCHEMIST_FLAG_Y_OFFSET = 3
 H2_ENUM_END(GameOwnershipConstant)
 
-H2_ENUM_BEGIN(GameViewSpellsConstant)
-    VIEW_SPELLS_WINDOW_X               = 86,
-    VIEW_SPELLS_WINDOW_Y               = 87,
-    VIEW_SPELL_PREVIOUS_ID             = 2,
-    VIEW_SPELL_NEXT_ID                 = 3,
-    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
-    VIEW_SPELL_COMBAT_TAB_ID           = 5,
-    VIEW_SPELL_MANA_LABEL_ID           = 6,
-    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
-    VIEW_SPELL_MANA_TENS_ID            = 8,
-    VIEW_SPELL_MANA_ONES_ID            = 9,
-    VIEW_SPELL_CLOSE_ID                = 10,
-    VIEW_SPELL_PAGE_SIZE               = 12,
-    VIEW_SPELL_TEXT_ID_BASE            = 30,
-    VIEW_SPELL_ICON_ID_0               = 100,
-    VIEW_SPELL_ICON_ID_1               = 101,
-    VIEW_SPELL_ICON_ID_2               = 102,
-    VIEW_SPELL_ICON_ID_3               = 103,
-    VIEW_SPELL_ICON_ID_4               = 104,
-    VIEW_SPELL_ICON_ID_5               = 105,
-    VIEW_SPELL_ICON_ID_6               = 106,
-    VIEW_SPELL_ICON_ID_7               = 107,
-    VIEW_SPELL_ICON_ID_8               = 108,
-    VIEW_SPELL_ICON_ID_9               = 109,
-    VIEW_SPELL_ICON_ID_10              = 110,
-    VIEW_SPELL_ICON_ID_11              = 111,
-    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_NAME_WIDTH              = 78,
-    VIEW_SPELL_MANA_MAX                = 999,
-    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
-    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
-    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
-    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
-    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
-    VIEW_SPELL_HELP_PREVIOUS           = 0,
-    VIEW_SPELL_HELP_NEXT               = 1,
-    VIEW_SPELL_HELP_ADVENTURE          = 2,
-    VIEW_SPELL_HELP_COMBAT             = 3,
-    VIEW_SPELL_HELP_CLOSE              = 4,
-    VIEW_SPELL_HELP_OTHER              = 5,
-    VIEW_SPELL_HELP_MANA               = 8
-H2_ENUM_END(GameViewSpellsConstant)
-
 H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_UNUSED_BASE_X           = 86,
     VIEW_ARMY_UNUSED_QUICK_BASE_Y     = 164,
@@ -591,7 +529,6 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_DETAIL_WIDGET_ID        = 4,
     VIEW_ARMY_MONSTER_WIDGET_ID       = 5,
     VIEW_ARMY_UPGRADE_ACTION_ID       = 500,
-    VIEW_ARMY_FINISH_COMMAND          = IDX(WIDGET_COMMAND_DIALOG_SELECT),
     VIEW_ARMY_WINDOW_X                = 19,
     VIEW_ARMY_WINDOW_Y                = 75,
     VIEW_ARMY_MONSTER_BASE_X          = 167,
@@ -600,7 +537,6 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_LOW_MEMORY_MONSTER_Y    = 93,
     VIEW_ARMY_MONSTER_WIDGET_WIDTH    = 86,
     VIEW_ARMY_MONSTER_WIDGET_HEIGHT   = 149,
-    VIEW_ARMY_MONSTER_WIDGET_Z_ORDER  = 5,
     VIEW_ARMY_ICON_CENTER_DIVISOR     = 2,
     VIEW_ARMY_FILENAME_SIZE           = 16,
     VIEW_ARMY_NAME_SIZE               = 32,
@@ -618,9 +554,7 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_SPELL_WIDGET_ID_BASE    = 200,
     VIEW_ARMY_ANIMATION_INITIAL_DELAY = 90,
     VIEW_ARMY_HANDLER_FRAME_DELAY     = 5,
-    VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2,
-    VIEW_ARMY_DWELLING_UPGRADE_OFFSET =
-        IDX(BUILDING_SLOT_UPGRADE_FIRST) - IDX(BUILDING_SLOT_DWELLING_SECOND)
+    VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2
 H2_ENUM_END(GameViewArmyConstant)
 
 H2_ENUM_BEGIN(GameArmyDetailText)
@@ -1264,7 +1198,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 baseFormat) {
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
         WRITE_FILE_VALUE(outFile, campaignTypeInfo);
-        write(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        write(outFile, &xCampaign, sizeof(xCampaign));
     } else {
         WRITE_FILE_VALUE(outFile, gbInCampaign);
         if (gbInCampaign)
@@ -1370,10 +1304,10 @@ void game::SetupOrigData(void) {
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
-    m_month = INITIAL_CALENDAR_VALUE;
-    m_week = INITIAL_CALENDAR_VALUE;
-    m_day = INITIAL_CALENDAR_VALUE;
-    giCurTurn = INITIAL_CALENDAR_VALUE;
+    m_month = CALENDAR_FIRST;
+    m_week = CALENDAR_FIRST;
+    m_day = CALENDAR_FIRST;
+    giCurTurn = CALENDAR_FIRST;
 
     i32 i;
     i32 j;
@@ -1417,7 +1351,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
         m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
-        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / GAME_HEROES_PER_FACTION);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[IDX(m_heroRecs[i].m_cursorType)][j];
@@ -1465,7 +1399,7 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = i;
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
-        m_castleRecs[i].m_type = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_castleRecs[i].m_type = static_cast<FactionType>(i / GAME_HEROES_PER_FACTION);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_castleRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
@@ -1564,7 +1498,7 @@ void game::LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32) {
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        read(fileDescriptor, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        read(fileDescriptor, &xCampaign, sizeof(xCampaign));
     }
     if (expTag)
         READ_FILE_VALUE(fileDescriptor, xIsExpansionMap);
@@ -2189,12 +2123,12 @@ void game::NewMap(char* filename) {
         yPosition = m_mapHeader.lossTownY;
         m_mapHeader.lossConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
-            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
             m_mapHeader.lossConditionValue =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPosition, yPosition - 1)->m_triggerType
-                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
                 m_mapHeader.lossConditionValue =
                     m_worldMap.GetCell(xPosition, yPosition - 1)->m_objectMetadata;
             else
@@ -2206,12 +2140,12 @@ void game::NewMap(char* filename) {
         yPosition = m_mapHeader.victoryTownY;
         m_mapHeader.victoryConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
-            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
             m_mapHeader.victoryConditionValue =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPosition, yPosition - 1)->m_triggerType
-                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
                 m_mapHeader.victoryConditionValue =
                     m_worldMap.GetCell(xPosition, yPosition - 1)->m_objectMetadata;
             else
@@ -2586,7 +2520,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE):
-                    cell->m_objectMetadata = cell->m_objectIndex / 2;
+                    cell->m_objectMetadata = cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT;
                     switch (cell->m_objectMetadata) {
                         case IDX(RES_WOOD):
                         case IDX(RES_ORE):
@@ -2685,7 +2619,9 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT):
                     randomValue = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+                    value = static_cast<ArtifactType>(
+                        cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT
+                    );
                     if (value == ARTIFACT_SPELL_SCROLL)
                         break;
                     if (randomValue < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
@@ -3497,7 +3433,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case DIALOG_BUTTON_0:
-                            message.payload.widget.id = VIEW_SPELL_CLOSE_ID;
+                            message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                             break;
                     }
                 }
@@ -3629,7 +3565,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                 break;
         }
 
-        if (message.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
+        if (message.payload.widget.id == IDX(WIDGET_COMMAND_DIALOG_SELECT)) {
             message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
             return MESSAGE_DISPATCH_FORWARD;
         }
@@ -3759,7 +3695,7 @@ void game::ViewArmy(
                     == monsterType
                 && HAS(
                     castle->m_buildings,
-                    (1 << (loopIndex + VIEW_ARMY_DWELLING_UPGRADE_OFFSET))
+                    (1 << (loopIndex + CASTLE_UPGRADE_OFFSET))
                 )) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = NextCreatureType(monsterType);
@@ -3818,7 +3754,7 @@ void game::ViewArmy(
         filename,
         sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
         facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
-        VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
+        VIEW_ARMY_MONSTER_WIDGET_ID,
         WIDGET_KIND_ICON_DIRECT,
         1
     );
@@ -4077,8 +4013,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                     case VIEW_ARMY_CLOSE_BUTTON:
                     case DIALOG_BUTTON_1:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
-                        message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
                     case VIEW_ARMY_DISMISS_ID:
                         NormalDialog(
@@ -4089,8 +4025,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                         );
                         if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             gbDismissArmy = true;
-                            message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
-                            message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                            message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+                            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
@@ -4132,9 +4068,9 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                                 if (resourceType != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType)] -= resourceCost;
                                 gbUpgradeArmy = true;
-                                message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                                message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                                 message.payload.widget.command =
-                                    BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                                    WIDGET_COMMAND_DIALOG_SELECT;
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
@@ -4330,7 +4266,7 @@ i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
 VA(0x00456bf4, 0x2c)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
-    gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
+    gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_AI_TURN);
     gSoundBackendsReady = 0;
 }
 
@@ -4419,7 +4355,7 @@ void game::NextPlayer(void) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         giForceSwitchMusic = KBTickCount();
         gSoundBackendsReady = 0;
     }
@@ -4608,7 +4544,7 @@ void game::PerDay(void) {
             m_day = 1;
             PerWeek();
         }
-        if (m_week > GAME_WEEKS_PER_MONTH) {
+        if (m_week > CALENDAR_WEEKS_PER_MONTH) {
             m_week = 1;
             PerMonth();
         }
@@ -4699,7 +4635,7 @@ void game::PerWeek(void) {
 
     giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = Random(0, WEEK_NAME_LAST);
-    if (m_week != GAME_WEEKS_PER_MONTH) {
+    if (m_week != CALENDAR_WEEKS_PER_MONTH) {
         outerIndex = Random(1, SPECIAL_WEEK_ROLL_MAX);
         if (outerIndex == 1) {
             giWeekType = CALENDAR_PERIOD_CREATURE;
@@ -5004,10 +4940,10 @@ void game::PerMonth(void) {
                 growth = gMonsterDatabase[IDX(gDwellingType[IDX(townPointer->m_type)]
                                                            [j - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
                               .growth;
-                if (HAS(townPointer->m_buildings, WELL_BUILDING))
+                if (HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_WELL)))
                     growth += TOWN_WELL_BASE_GROWTH_BONUS;
                 if (j == IDX(BUILDING_SLOT_DWELLING_FIRST)
-                    && HAS(townPointer->m_buildings, FIRST_DWELLING_BONUS_BUILDING))
+                    && HAS(townPointer->m_buildings, IDX(TOWN_BUILDING_WELL_EXTRA)))
                     growth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
@@ -5034,7 +4970,7 @@ void game::PerMonth(void) {
                     && !spot->m_objectHighLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
-                        spot->m_triggerType = MONSTER_TRIGGER;
+                        spot->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
                         spot->m_objectTileset = TILESET_MONS32;
                         spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
@@ -5379,7 +5315,7 @@ void game::InitRandomArtifacts(void) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->GetCell(x, y);
             if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)))
-                m_randomArtifacts[cell->m_objectIndex / 2] = 1;
+                m_randomArtifacts[cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT] = 1;
         }
     }
 }
@@ -5622,14 +5558,14 @@ void game::ProcessRandomObjects(void) {
                     }
                 monsterBoundsReady:
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
-                    cell->m_objectIndex = Random(0, 65);
+                    cell->m_objectIndex = Random(0, IDX(CREATURE_COUNT) - 1);
                     while (gMonsterDatabase[cell->m_objectIndex].fightValue <= minValue
                            || gMonsterDatabase[cell->m_objectIndex].fightValue >= maxValue)
-                        cell->m_objectIndex = Random(0, 65);
+                        cell->m_objectIndex = Random(0, IDX(CREATURE_COUNT) - 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE);
-                    randomType = Random(0, 6);
+                    randomType = Random(IDX(RES_WOOD), IDX(RES_GOLD));
                     ConvertObject(
                         x - 1,
                         y,
@@ -5639,7 +5575,7 @@ void game::ProcessRandomObjects(void) {
                         16,
                         16,
                         TILESET_OBJNRSRC,
-                        randomType * 2,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5652,16 +5588,16 @@ void game::ProcessRandomObjects(void) {
                         17,
                         17,
                         TILESET_OBJNRSRC,
-                        randomType * 2 + 1,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     switch (randomType) {
-                        case 0:
-                        case 2:
+                        case IDX(RES_WOOD):
+                        case IDX(RES_ORE):
                             cell->m_objectMetadata = Random(8, 16);
                             break;
-                        case 6:
+                        case IDX(RES_GOLD):
                             cell->m_objectMetadata = Random(5, 10);
                             break;
                         default:
@@ -5681,7 +5617,7 @@ void game::ProcessRandomObjects(void) {
                         162,
                         162,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5694,7 +5630,7 @@ void game::ProcessRandomObjects(void) {
                         163,
                         163,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5711,7 +5647,7 @@ void game::ProcessRandomObjects(void) {
                         166,
                         166,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5724,7 +5660,7 @@ void game::ProcessRandomObjects(void) {
                         167,
                         167,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5741,7 +5677,7 @@ void game::ProcessRandomObjects(void) {
                         168,
                         168,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5754,7 +5690,7 @@ void game::ProcessRandomObjects(void) {
                         169,
                         169,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5771,7 +5707,7 @@ void game::ProcessRandomObjects(void) {
                         170,
                         170,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5784,7 +5720,7 @@ void game::ProcessRandomObjects(void) {
                         171,
                         171,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -6040,8 +5976,8 @@ void game::ShowHeroesLogo(void) {
         IconToBitmap(
             theIcon,
             gpWindowManager->m_screen,
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
             0,
             ICON_DRAW_NO_CLIP,
             0,
@@ -6051,10 +5987,10 @@ void game::ShowHeroesLogo(void) {
             0
         );
         gpWindowManager->UpdateScreenRegion(
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
-            HEROES_LOGO_WIDTH,
-            HEROES_LOGO_HEIGHT
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
+            ADVENTURE_RADAR_SIZE,
+            ADVENTURE_RADAR_SIZE
         );
         gpResourceManager->Dispose(theIcon);
     }
@@ -6071,7 +6007,7 @@ void game::WaitForPlayer(char* text, i32 player) {
         else
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         gSoundBackendsReady = 1;
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
         gpAdvManager->UpdateTownLocators(1, 1);
@@ -6083,7 +6019,7 @@ void game::WaitForPlayer(char* text, i32 player) {
             1,
             -1,
             -1,
-            WAIT_DIALOG_TYPE,
+            NORMAL_DIALOG_CREST,
             gpGame->m_players[player].m_color,
             -1,
             0,
@@ -6375,7 +6311,7 @@ void game::SetupTowns(void) {
                           | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
                 else
                     castle->m_buildings &=
-                        -1 - (1 << (slot - TOWN_UPGRADE_TO_DWELLING_OFFSET));
+                        -1 - (1 << (slot - CASTLE_UPGRADE_OFFSET));
             }
         }
         for (slot = IDX(BUILDING_SLOT_DWELLING_FIRST);
@@ -6610,8 +6546,8 @@ void game::ProcessOnMapHeroes(void) {
                         } else {
                             heroId = RandomScan(
                                 usedHeroes,
-                                IDX(heroFaction) * MAP_HEROES_PER_FACTION,
-                                MAP_HEROES_PER_FACTION,
+                                IDX(heroFaction) * GAME_HEROES_PER_FACTION,
+                                GAME_HEROES_PER_FACTION,
                                 MAP_HERO_CLASS_SCAN_RETRY_LIMIT,
                                 0
                             );
@@ -6624,7 +6560,7 @@ void game::ProcessOnMapHeroes(void) {
                                     0
                                 );
                                 heroFaction =
-                                    static_cast<FactionType>(heroId / MAP_HEROES_PER_FACTION);
+                                    static_cast<FactionType>(heroId / GAME_HEROES_PER_FACTION);
                             }
                             usedHeroes[heroId] = 1;
                             mapHero = GetHero(heroId);
@@ -6811,7 +6747,7 @@ void game::CheckHeroConsistency(void) {
     for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
         for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
             cell = gpAdvManager->GetCell(mapX, mapY);
-            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID))) {
+            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
                 if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != mapX || boardHro->m_y != mapY) {
@@ -6996,7 +6932,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
             header->bytes,
             remotePlayer,
             REMOTE_SAVE_HEADER_SIZE,
-            REMOTE_SAVE_INIT_COMMAND,
+            ADVMGR_REMOTE_COMMAND_SAVE_GAME,
             REMOTE_SAVE_INIT_RESPONSE,
             &reply
         );
@@ -7212,7 +7148,7 @@ i32 game::ReceiveSaveGame(
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 localization::Tr("network.receive.retry"),
-                REMOTE_RECEIVE_DIALOG_BUTTONS
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 lastPacketTime = KBTickCount();
@@ -7358,7 +7294,7 @@ void game::DoNewTurn(void) {
             1,
             -1,
             -1,
-            NEW_TURN_DIALOG_TYPE,
+            NORMAL_DIALOG_CREST,
             gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)),
             -1,
             0,
@@ -7380,7 +7316,7 @@ void game::DoNewTurn(void) {
         if (giWeekType != CALENDAR_PERIOD_NONE) {
             musicTrack = -1;
             if (m_week == 1) {
-                musicTrack = NEW_MONTH_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_MONTH;
                 strcpy(musicFile, "newmonth.82m");
                 if (giMonthType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(
@@ -7404,7 +7340,7 @@ void game::DoNewTurn(void) {
                     sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
                 }
             } else {
-                musicTrack = NEW_WEEK_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_WEEK;
                 strcpy(musicFile, "newweek.82m");
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
@@ -7859,7 +7795,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
         position = JOIN_HEADER_SIZE;
         while (position < diffLength) {
-            copyFlag = diffData[position] >> DIFF_COPY_FLAG_SHIFT;
+            copyFlag = diffData[position] >> COMMAND_SHIFT;
             copyLength = GetSkipCopyLen(diffData, &position);
             if (copyFlag) {
                 memcpy(outData + outSize, diffData + position, copyLength);
@@ -7946,14 +7882,14 @@ void game::SetupNewRumour(void) {
     i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
     if (m_rumourEvents.count != 0 && Random(0, 9) < m_rumourEvents.count) {
         attempts = 0;
-        while (attempts++ < 200) {
+        while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
             if (m_rumourEvents.count > 1)
                 eventIndex = Random(0, m_rumourEvents.count - 1);
             else
                 eventIndex = 0;
             event =
                 reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEvents.indices[eventIndex]]);
-            if (strlen(event->text) > 2 && event->text[0] != '@') {
+            if (strlen(event->text) > RUMOUR_EVENT_SHORT_TEXT_LENGTH && event->text[0] != '@') {
                 strcpy(m_rumour, event->text);
                 event->text[0] = '@';
                 return;
@@ -7961,13 +7897,16 @@ void game::SetupNewRumour(void) {
         }
     }
 
-    if (Random(0, 100) < 30) {
-        strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+    if (Random(0, 100) < RUMOUR_TAVERN_TEXT_CHANCE) {
+        strcpy(
+            m_rumour,
+            cRandomTavernText[(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]
+        );
     } else {
         roll = Random(0, 100);
-        if (roll < 80 && giCurTurn > 1) {
+        if (roll < RUMOUR_LEADER_CHANCE && giCurTurn > 1) {
             attempts = 0;
-            while (attempts++ < 200) {
+            while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
                 selectionRoll = Random(
                     IDX(THIEVES_CATEGORY_OBELISKS), IDX(THIEVES_CATEGORY_INCOME)
                 );
@@ -8009,42 +7948,48 @@ void game::SetupNewRumour(void) {
         } else {
         ultimateRumour:
             selectionRoll = Random(0, 100);
-            if (selectionRoll < 33) {
-                if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
-                      || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 7;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
+            if (selectionRoll < RUMOUR_ULTIMATE_REGION_CHANCE) {
+                if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                          * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
+                      || m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                             * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH_WEST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                     * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 5;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33)) {
-                    direction = 6;
+                    direction = IDX(MAP_DIRECTION_SOUTH_WEST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_WEST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
-                             || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 1;
+                             || m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                                    * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH_EAST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                     * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 3;
+                    direction = IDX(MAP_DIRECTION_SOUTH_EAST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 2;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 0;
+                    direction = IDX(MAP_DIRECTION_EAST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 4;
+                    direction = IDX(MAP_DIRECTION_SOUTH);
                 } else {
-                    direction = 8;
+                    direction = KB_DIRECTION_TEXT_CENTRAL;
                 }
                 sprintf(
                     m_rumour,
                     localization::Tr("rumor.ultimate_artifact.region"),
                     cDirections[direction]
                 );
-            } else if (selectionRoll < 66) {
+            } else if (selectionRoll < RUMOUR_ULTIMATE_TERRAIN_CHANCE) {
                 sprintf(
                     m_rumour,
                     localization::Tr("rumor.ultimate_artifact.terrain"),
@@ -8059,7 +8004,11 @@ void game::SetupNewRumour(void) {
                     gArtifactNames[IDX(m_ultimateArtifactId)]
                 );
             } else {
-                strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+                strcpy(
+                    m_rumour,
+                    cRandomTavernText
+                        [(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]
+                );
             }
         }
     }
@@ -8144,11 +8093,11 @@ void game::CheckForTimeEvent(void) {
             }
             if (primaryType >= 0 && primaryType <= IDX(RES_COUNT) - 1
                 && primaryAmount < 0) {
-                primaryAmount -= EVENT_RESOURCE_PENALTY;
+                primaryAmount -= NORMAL_DIALOG_DAILY_RESOURCE_OFFSET;
             }
             if (secondaryType >= 0 && secondaryType <= IDX(RES_COUNT) - 1
                 && secondaryAmount < 0) {
-                secondaryAmount -= EVENT_RESOURCE_PENALTY;
+                secondaryAmount -= NORMAL_DIALOG_DAILY_RESOURCE_OFFSET;
             }
             if (gbThisNetHumanPlayer[giCurPlayer]) {
                 NormalDialog(

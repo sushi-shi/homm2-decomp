@@ -13,7 +13,8 @@ H2_ENUM_END(MidiTrackConstant)
 // The music track numbers (CD audio tracks, MIDI and OGG files) the game plays
 // through PlayAmbientMusic/SwitchAmbientMusic: the battle themes, the town
 // themes in townTheme (KB.cpp, by faction), the terrain themes in
-// giTerrainToMusicTrack, the AI turn and the main menu and high score themes.
+// giTerrainToMusicTrack, the new week and month, the two campaigns, the AI turn,
+// the battle results and the main menu and high score themes.
 H2_ENUM_BEGIN(MusicTrack)
     MUSIC_TRACK_BATTLE_FIRST     = 2,
     MUSIC_TRACK_BATTLE_LAST      = 4,
@@ -31,7 +32,13 @@ H2_ENUM_BEGIN(MusicTrack)
     MUSIC_TRACK_WATER            = 16,
     MUSIC_TRACK_DIRT             = 17,
     MUSIC_TRACK_GRASS            = 18,
+    MUSIC_TRACK_NEW_WEEK         = 20,
+    MUSIC_TRACK_NEW_MONTH        = 21,
+    MUSIC_TRACK_CAMPAIGN_EVIL    = 22,
+    MUSIC_TRACK_CAMPAIGN_GOOD    = 24,
     MUSIC_TRACK_AI_TURN          = 28,
+    MUSIC_TRACK_BATTLE_VICTORY   = 29,
+    MUSIC_TRACK_BATTLE_LOSS      = 30,
     MUSIC_TRACK_MAIN_MENU        = 42,
     MUSIC_TRACK_HIGH_SCORE       = 43
 H2_ENUM_END(MusicTrack)

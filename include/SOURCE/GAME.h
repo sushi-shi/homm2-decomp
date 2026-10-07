@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <BASE/message.h>
+#include <BASE/soundManager.h>
 #include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
@@ -34,6 +35,7 @@ H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_UNUSED_FILE_MARKER      = 9999,
     GAME_PLAYER_COUNT            = PLAYER_COLOR_COUNT,
     GAME_HERO_COUNT              = 54,
+    GAME_HEROES_PER_FACTION      = GAME_HERO_COUNT / IDX(FACTION_COUNT),
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,
     GAME_BOAT_COUNT              = 48,
@@ -41,8 +43,10 @@ H2_ENUM_BEGIN(GameSerializationConstant)
 H2_ENUM_END(GameSerializationConstant)
 
 H2_ENUM_BEGIN(GameCalendarConstant)
-    CALENDAR_DAYS_PER_WEEK  = 7,
-    CALENDAR_DAYS_PER_MONTH = 28
+    CALENDAR_FIRST           = 1,
+    CALENDAR_DAYS_PER_WEEK   = 7,
+    CALENDAR_WEEKS_PER_MONTH = 4,
+    CALENDAR_DAYS_PER_MONTH  = 28
 H2_ENUM_END(GameCalendarConstant)
 
 H2_ENUM_BEGIN(GameSetupSharedConstant)
@@ -129,10 +133,52 @@ H2_ENUM_BEGIN(GameRandomHeroConstant)
     RANDOM_HERO_EMPTY_COUNT               = -1
 H2_ENUM_END(GameRandomHeroConstant)
 
+// spellwin.bin: game::ViewSpells' control ids and cSpellHelp rows (also CombatSpecialHandler's).
+H2_ENUM_BEGIN(GameViewSpellsConstant)
+    VIEW_SPELLS_WINDOW_X               = 86,
+    VIEW_SPELLS_WINDOW_Y               = 87,
+    VIEW_SPELL_PREVIOUS_ID             = 2,
+    VIEW_SPELL_NEXT_ID                 = 3,
+    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
+    VIEW_SPELL_COMBAT_TAB_ID           = 5,
+    VIEW_SPELL_MANA_LABEL_ID           = 6,
+    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
+    VIEW_SPELL_MANA_TENS_ID            = 8,
+    VIEW_SPELL_MANA_ONES_ID            = 9,
+    VIEW_SPELL_PAGE_SIZE               = 12,
+    VIEW_SPELL_TEXT_ID_BASE            = 30,
+    VIEW_SPELL_ICON_ID_0               = 100,
+    VIEW_SPELL_ICON_ID_1               = 101,
+    VIEW_SPELL_ICON_ID_2               = 102,
+    VIEW_SPELL_ICON_ID_3               = 103,
+    VIEW_SPELL_ICON_ID_4               = 104,
+    VIEW_SPELL_ICON_ID_5               = 105,
+    VIEW_SPELL_ICON_ID_6               = 106,
+    VIEW_SPELL_ICON_ID_7               = 107,
+    VIEW_SPELL_ICON_ID_8               = 108,
+    VIEW_SPELL_ICON_ID_9               = 109,
+    VIEW_SPELL_ICON_ID_10              = 110,
+    VIEW_SPELL_ICON_ID_11              = 111,
+    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
+    VIEW_SPELL_NAME_WIDTH              = 78,
+    VIEW_SPELL_MANA_MAX                = 999,
+    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
+    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
+    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
+    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
+    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
+    VIEW_SPELL_HELP_PREVIOUS           = 0,
+    VIEW_SPELL_HELP_NEXT               = 1,
+    VIEW_SPELL_HELP_ADVENTURE          = 2,
+    VIEW_SPELL_HELP_COMBAT             = 3,
+    VIEW_SPELL_HELP_CLOSE              = 4,
+    VIEW_SPELL_HELP_OTHER              = 5,
+    VIEW_SPELL_HELP_MANA               = 8
+H2_ENUM_END(GameViewSpellsConstant)
+
 H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
-    WAIT_AMBIENT_MUSIC       = 21,
-    WAIT_DIALOG_TYPE         = 9
+    WAIT_AMBIENT_MUSIC       = MUSIC_TRACK_NEW_MONTH
 H2_ENUM_END(GameWaitConstant)
 
 i32 GetNumObelisks(i32 player);

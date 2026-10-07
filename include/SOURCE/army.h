@@ -25,6 +25,10 @@ H2_ENUM_BEGIN(ArmyHexConstant)
     ARMY_HEX_INVALID      = -1
 H2_ENUM_END(ArmyHexConstant)
 
+H2_ENUM_BEGIN(ArmyDisplayConstant)
+    ARMY_QUANTITY_OVERRIDE_NONE = -1
+H2_ENUM_END(ArmyDisplayConstant)
+
 #pragma pack(push, 1)
 class army {
 public:

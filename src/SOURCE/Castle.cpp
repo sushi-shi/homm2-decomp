@@ -421,7 +421,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 );
                 if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
                 ++backFrame;
             }
         }
@@ -445,7 +445,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 );
                 if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
                 ++backFrame;
             }
         }
@@ -464,7 +464,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             );
             if (backgroundWidget == NULL)
                 MemError();
-            casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+            casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
         }
     }
 }
@@ -797,7 +797,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
                                     gpWindowManager
-                                        ->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+                                        ->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                                 } else {
                                     result = gpTownManager->RecruitHero(
                                         heroChoiceIndex,

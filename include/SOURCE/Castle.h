@@ -10,7 +10,7 @@ struct tag_message;
 
 H2_ENUM_BEGIN(CastleBuildingConstant)
     CASTLE_SLOT_COUNT     = 18,
-    CASTLE_UPGRADE_OFFSET = 5
+    CASTLE_UPGRADE_OFFSET = IDX(BUILDING_SLOT_UPGRADE_FIRST) - IDX(BUILDING_SLOT_DWELLING_SECOND)
 H2_ENUM_END(CastleBuildingConstant)
 
 MessageDispatchResult CastleHandler(struct tag_message& message);

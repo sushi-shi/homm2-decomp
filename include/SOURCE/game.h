@@ -72,9 +72,14 @@ H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_TIME_EVENT_CAPACITY             = 50,
     GAME_MAP_EVENT_CAPACITY              = 50,
     GAME_CURRENT_MAP_NAME_SIZE           = 16,
-    GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
 H2_ENUM_END(GameStateStorageConstant)
+
+// game::ViewArmy's standard dialog position (towns, the hero swap and the overview).
+H2_ENUM_BEGIN(GameViewArmyPosition)
+    VIEW_ARMY_STANDARD_X = 119,
+    VIEW_ARMY_STANDARD_Y = 20
+H2_ENUM_END(GameViewArmyPosition)
 
 #pragma pack(push, 1)
 template <i32 Capacity>
@@ -294,6 +299,7 @@ public:
         H2_OPEN_CODE_PARAM(MapTriggerCode, i32) objectType,
         i32 objectMetadata,
         class mapCell* passedCell,
+        // Unread: retail call sites pass their own tags here.
         i32 unused
     );
     void SetMapSize(i32 width, i32 height);
@@ -335,7 +341,7 @@ extern OverviewType giOverviewType;
 extern i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
 extern i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
-                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
+                  [IDX(COORDINATE_AXIS_COUNT)];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;

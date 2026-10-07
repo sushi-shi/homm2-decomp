@@ -25,8 +25,10 @@ H2_ENUM_CLASS_END(WindowFadeMode)
 // the usual fade, and the finer one the editor fades its start-up and
 // quitting screens with.
 H2_ENUM_BEGIN(WindowFadeSpeed)
+    FADE_SPEED_INSTANT  = 0x80,
     FADE_SPEED_STANDARD = 8,
-    FADE_SPEED_FINE     = 6
+    FADE_SPEED_FINE     = 6,
+    FADE_SPEED_FAST     = 4
 H2_ENUM_END(WindowFadeSpeed)
 
 // FizzleForward's palette blend time when its caller passes -1.

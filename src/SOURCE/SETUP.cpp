@@ -20,11 +20,6 @@
 #include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(SetupConstant)
-    DIALOG_YES                   = DIALOG_BUTTON_5,
-    DIALOG_CANCEL                = DIALOG_BUTTON_1,
-    WINDOW_X                     = 405,
-    WINDOW_Y                     = 8,
-    PLAYER_COUNT                 = IDX(GAME_PLAYER_COUNT),
     PLAYER_NAME_LENGTH           = GLOBAL_PLAYER_NAME_SIZE - 1,
     DEFAULT_PLAYER_NAME_CAPACITY = 24,
     MODEM_INIT_ENTRY_LENGTH      = 40,
@@ -33,24 +28,8 @@ H2_ENUM_BEGIN(SetupConstant)
     FILE_REQUESTER_X             = 200,
     FILE_REQUESTER_Y             = 58,
     DISABLED_WIDGET_ID           = 1,
-    CAMPAIGN_INTRO               = 4,
-    CAMPAIGN_SELECTION           = 35,
-    HELP_DIALOG                  = NORMAL_DIALOG_QUICK_VIEW,
     DIALOG_RESULT_MAX            = 1000,
 H2_ENUM_END(SetupConstant)
-
-H2_ENUM_BEGIN(SetupDialogChoice)
-    CHOICE_ONE = 1,
-    CHOICE_TWO = 2,
-    CHOICE_THREE = 3,
-    CHOICE_FOUR = 4,
-    CHOICE_FIVE = 5
-H2_ENUM_END(SetupDialogChoice)
-
-H2_ENUM_BEGIN(SetupHelpIndex)
-    NO_HELP = -1,
-    FIRST_HELP = 0
-H2_ENUM_END(SetupHelpIndex)
 
 H2_ENUM_BEGIN(HotSeatPlayerCount)
     TWO_PLAYERS = 2,
@@ -63,13 +42,13 @@ H2_ENUM_END(HotSeatPlayerCount)
 VA(0x004924e0, 0x24)
 i32 game::SetupCampaignGame(void) {
     PlaySmacker(CAMPAIGN_INTRO);
-    PlaySmacker(CAMPAIGN_SELECTION);
+    PlaySmacker(CHOOSE_CAMPAIGN);
     return 1;
 }
 
 VA(0x00492504, 0x137)
 i32 game::SetupBaud(void) {
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpbaud.bin");
+    heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpbaud.bin");
     if (window == NULL)
         MemError();
     gpWindowManager->DoDialog(window, SetupBaudHandler, 0);
@@ -99,7 +78,7 @@ i32 game::SetupComPort(void) {
     char initString[MODEM_INIT_ENTRY_LENGTH];
 
     LogStr("SCP 1");
-    heroWindow* setupWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpcom.bin");
+    heroWindow* setupWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpcom.bin");
     if (setupWindow == NULL)
         MemError();
     LogStr("SCP 2");
@@ -151,7 +130,7 @@ i32 game::SetupHotSeatGame(void) {
     i32 i;
     char name[DEFAULT_PLAYER_NAME_CAPACITY];
 
-    heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stphotst.bin");
+    heroWindow* dialogWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stphotst.bin");
     if (dialogWindow == NULL)
         MemError();
     gpWindowManager->DoDialog(dialogWindow, SetupHotSeatGameHandler, 0);
@@ -177,7 +156,7 @@ i32 game::SetupHotSeatGame(void) {
             return 0;
     }
 
-    for (i = 0; i < PLAYER_COUNT; i++)
+    for (i = 0; i < IDX(GAME_PLAYER_COUNT); i++)
         strcpy(
             cPlayerNames[i],
             ""
@@ -189,7 +168,7 @@ i32 game::SetupHotSeatGame(void) {
              localization::Tr("network.hotseat.enter_names_prompt")
         );
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
-        if (gpWindowManager->m_dialogResult == DIALOG_YES) {
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
                 strcpy(
                     name,
@@ -210,7 +189,7 @@ i32 game::SetupHotSeatGame(void) {
 VA(0x00492a44, 0x120)
 i32 game::SetupNetworkGame(void) {
     tag_message message;
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet.bin");
+    heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpnet.bin");
     if (window == NULL)
         MemError();
 
@@ -247,7 +226,7 @@ i32 game::SetupNetworkGame2(void) {
     i32 gotVersion;
     tag_message message;
 
-    heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
+    heroWindow* dialogWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpnet2.bin");
     if (dialogWindow == NULL)
         MemError();
 
@@ -312,14 +291,14 @@ i32 game::SetupModemGame(void) {
     LogStr("SMC 1");
     if (gbDirectConnect != 0) {
         if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED)
-            window = new heroWindow(WINDOW_X, WINDOW_Y, "stpdc.bin");
+            window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpdc.bin");
         else
-            window = new heroWindow(WINDOW_X, WINDOW_Y, "stpdccfg.bin");
+            window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpdccfg.bin");
     } else {
         if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED)
-            window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmodem.bin");
+            window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmodem.bin");
         else
-            window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmcfg.bin");
+            window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmcfg.bin");
     }
     if (window == NULL)
         MemError();
@@ -379,7 +358,7 @@ i32 game::SetupMultiPlayerGame(void) {
     tag_message message;
     b32 continueFlag;
 
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmp.bin");
+    heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmp.bin");
     if (window == NULL)
         MemError();
 
@@ -523,7 +502,7 @@ i32 game::SetupGame(void) {
         goto done;
     }
 
-    window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnewgm.bin");
+    window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpnewgm.bin");
     if (window == NULL)
         MemError();
 
@@ -547,7 +526,7 @@ i32 game::SetupGame(void) {
 
         case CHOICE_TWO:
             if (giSetupGameType == OLD_MAIN_SETUP_LOAD) {
-                window = new heroWindow(WINDOW_X, WINDOW_Y, "x_loadcm.bin");
+                window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_loadcm.bin");
                 if (window == NULL)
                     MemError();
                 gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
@@ -566,7 +545,7 @@ i32 game::SetupGame(void) {
                         goto done;
                 }
             } else {
-                window = new heroWindow(WINDOW_X, WINDOW_Y, "x_loadcm.bin");
+                window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_loadcm.bin");
                 if (window == NULL)
                     MemError();
                 gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
@@ -641,7 +620,7 @@ i32 game::PickLoadGame(void) {
         );
         sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     } else {
-        heroWin = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
+        heroWin = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (heroWin == NULL)
             MemError();
         gpWindowManager->DoDialog(heroWin, ExpStdGameHandler, 0);
@@ -716,9 +695,9 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(gSetupDCComPortHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupDCComPortHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
             else
-                NormalDialog(gSetupComPortHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupComPortHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
         }
     }
     return BaseSetupHandler(message);
@@ -750,9 +729,9 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(gSetupDCBaudHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupDCBaudHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
             else
-                NormalDialog(gSetupBaudHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupBaudHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
         }
     }
     return BaseSetupHandler(message);
@@ -786,7 +765,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(gSetupHotSeatGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(gSetupHotSeatGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -814,9 +793,9 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(gSetupDCGameHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupDCGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
             else
-                NormalDialog(gSetupModemGameHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupModemGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
         }
     }
     return BaseSetupHandler(message);
@@ -847,7 +826,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(gSetupMultiPlayerGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(gSetupMultiPlayerGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -871,7 +850,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(gSetupNetworkGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(gSetupNetworkGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -898,7 +877,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(gSetupNetworkGame2Help[helpIndex], HELP_DIALOG);
+            NormalDialog(gSetupNetworkGame2Help[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -925,7 +904,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
                     break;
             }
             if (helpIndex >= FIRST_HELP)
-                NormalDialog(gSetupGameHelp[helpIndex], HELP_DIALOG);
+                NormalDialog(gSetupGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
         }
     } else if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -960,7 +939,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(xSetupCampaignGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(xSetupCampaignGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -984,7 +963,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(xSetupCampaignGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(xSetupCampaignGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }
@@ -1008,7 +987,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(xSetupStandardGameHelp[helpIndex], HELP_DIALOG);
+            NormalDialog(xSetupStandardGameHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
     }
     return BaseSetupHandler(message);
 }

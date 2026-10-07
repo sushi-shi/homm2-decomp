@@ -3487,7 +3487,7 @@ DATA(0x004a4a48) b32 gbInMemError = false;
 DATA(0x004a3ac8) i32 giDebugLevel;
 // KB's override driver names, kept by the editor's copy and never read.
 DATA(0x004a3acc) char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
-DATA(0x004a3adc) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+DATA(0x004a3adc) u8 bSaveMusicPosition[MIDI_TRACK_COUNT];
 DATA(0x004a3b18) u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 DATA(0x004a3b7c) class mouseManager* gpMouseManager;
 DATA(0x004a3b80) char gText[GLOBAL_TEXT_BUFFER_SIZE];
@@ -3507,7 +3507,7 @@ DATA(0x004a4108) i32 gSelectionY;
 DATA(0x004a410c) resourceManager* gpResourceManager;
 DATA(0x004a4110) u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 DATA(0x004a414c) heroWindow* pNormalDialogWindow;
-DATA(0x004a4150) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+DATA(0x004a4150) u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 DATA(0x004a418c) heroWindow* gEditDialog;
 DATA(0x004a4190) i32 gSelectionHeight;
 DATA(0x004a4194) soundManager* gpSoundManager;

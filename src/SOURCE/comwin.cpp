@@ -28,11 +28,6 @@ H2_ENUM_BEGIN(ComErrorText)
     ERROR_TEXT_LOWER_BAUD_RATE = 5
 H2_ENUM_END(ComErrorText)
 
-H2_ENUM_BEGIN(ComSerialConstant)
-    BAUD_VALUE_4800        = 4800,
-
-H2_ENUM_END(ComSerialConstant)
-
 
 DATA(0x00524160) static ComPortState s_comPorts[PORT_COUNT];
 
@@ -183,7 +178,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
             state.BaudRate = IDX(CONFIG_BAUD_2400);
             break;
         case COM_BAUD_4800:
-            state.BaudRate = BAUD_VALUE_4800;
+            state.BaudRate = IDX(CONFIG_BAUD_4800);
             break;
         case COM_BAUD_9600:
             state.BaudRate = IDX(CONFIG_BAUD_9600);

@@ -20,17 +20,15 @@
 #include <SOURCE/townManager.h>
 #include <BASE/dialog.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/ADVMGR.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
-    RESOURCE_COUNT              = 6,
-    GOLD_RESOURCE               = 6,
     WINDOW_X                    = 0x8f,
     WINDOW_Y                    = 0x10,
     QUICK_WINDOW_X              = 0xa0,
     QUICK_WINDOW_Y              = 0x10,
     NAME_SIZE                   = 40,
     LABEL_SIZE                  = 40,
-    RECRUIT_DRAW_LAST_WIDGET_ID = 0x7fff,
     VIEW_ARMY_X                 = 0x77,
     VIEW_ARMY_Y                 = 0x20,
     NO_ROOM_DIALOG_X            = 177,
@@ -136,7 +134,7 @@ i32 recruitUnit::Open(i32 priority) {
         m_resourceCost,
         *m_available
     );
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     Update();
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
@@ -372,11 +370,11 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     m_available = available;
     GetMonsterCost(m_creatureType, unitCosts);
     m_goldCost = unitCosts[IDX(RES_GOLD)];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    for (resourceIndex = 0; resourceIndex < IDX(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < IDX(RES_GOLD)) {
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
@@ -397,11 +395,11 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_available = &townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(m_creatureType, unitCosts);
     m_goldCost = unitCosts[IDX(RES_GOLD)];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    for (resourceIndex = 0; resourceIndex < IDX(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < IDX(RES_GOLD)) {
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
@@ -425,11 +423,11 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     avail = townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(monsterType, unitCosts);
     goldCost = unitCosts[IDX(RES_GOLD)];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    for (resourceIndex = 0; resourceIndex < IDX(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < IDX(RES_GOLD)) {
         resourceType = ResourceType(resourceIndex);
         resourceCost = unitCosts[IDX(resourceType)];
     } else {

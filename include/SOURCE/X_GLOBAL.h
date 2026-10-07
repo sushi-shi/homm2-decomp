@@ -13,6 +13,7 @@
 #include <EDITOR/mapcell.h>
 #include <SOURCE/GAME.h>
 #include <BASE/display.h>
+#include <BASE/soundManager.h>
 
 class ExpCampaign;
 H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
@@ -70,17 +71,12 @@ SIZE(SCmbtObstacle, 0xe);
 SIZE(SElevationOverlay, 0x11);
 
 H2_ENUM_BEGIN(GlobalConstant)
-    EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT     = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT            = 5,
     X_GLOBAL_RECRUIT_BUY_COUNT              = 5,
     X_GLOBAL_PASSWORD_STRING_COUNT          = 211,
     X_GLOBAL_STABLE_TEXT_COUNT              = 4,
     X_GLOBAL_SETUP_HELP_COUNT               = 3,
-    X_GLOBAL_EXPANSION_CAMPAIGN_COUNT       = 4,
-    X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT   = 8,
-    X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT = 11,
     X_GLOBAL_EXPANSION_HERO_NAME_COUNT      = 6,
-    X_GLOBAL_SHORT_SKILL_LEVEL_COUNT        = 3,
     X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT       = 12,
     X_GLOBAL_PASSWORD_STRING_INDEX_COUNT    = 8,
     GLOBAL_MAP_NAME_SIZE                    = 0x14,
@@ -123,20 +119,13 @@ extern u8 xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
 extern H2_CONST char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT];
 extern H2_CONST char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT];
-extern H2_CONST char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT];
-extern H2_CONST char* xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT]
-                          [X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT];
-extern H2_CONST char* xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT]
-                                 [X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT];
-extern H2_CONST char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT];
-extern H2_CONST char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
 extern i32 xTheSpell;
 extern H2_CONST char* xNecromancerShrine;
 extern H2_CONST char* xNecromancerShrineDesc;
 extern H2_CONST char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT];
 extern H2_CONST char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
 extern H2_CONST char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
-extern H2_CONST char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
+extern H2_CONST char* xShortSSLevelNames[SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern H2_CONST char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
 extern i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
@@ -177,7 +166,6 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_COMBAT_SPEED_COUNT               = 3,
     KB_TOWN_COMMAND_COUNT               = 28,
     KB_ARMY_EFFECT_COUNT                = 20,
-    KB_MUSIC_TRACK_COUNT                = 0x3c,
     KB_ARTIFACT_LEVEL_COUNT             = IDX(ARTIFACT_COUNT) + 1,
     KB_STAT_POWER_COUNT                 = 41,
     BATTLE_STAT_TABLE_MAX_INDEX         = KB_STAT_POWER_COUNT - 1,
@@ -191,14 +179,14 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_COMBAT_OBSTACLE_COUNT            = 32,
     KB_TERRAIN_TYPE_COUNT               = IDX(TERRAIN_COUNT) + 1,
     KB_TERRAIN_STEP_TYPE_COUNT          = 2,
-    KB_TRIGGER_TYPE_COUNT               = 124,
+    KB_TRIGGER_TYPE_COUNT               = IDX(MAP_OBJECT_COUNT),
     KB_CASTLE_WALL_SEGMENT_COUNT        = 4,
     KB_CASTLE_TOWER_COUNT               = 4,
     KB_CASTLE_DOOR_POSITION_COUNT       = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT    = 11,
     KB_MOAT_CELL_COUNT                  = 9,
     KB_ALIGNMENT_NAME_COUNT             = IDX(FACTION_COUNT) + 2,
-    KB_QUICK_VIEW_TEXT_COUNT            = 124,
+    KB_QUICK_VIEW_TEXT_COUNT            = IDX(MAP_OBJECT_COUNT),
     KB_EVENT_TEXT_TABLE_COUNT           = 95,
     KB_CONTROL_PANEL_HELP_COUNT         = 5,
     KB_COMBAT_SPELL_PANEL_HELP_COUNT    = 7,
@@ -278,6 +266,11 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_INIT_MENU_HOTSPOT_COUNT          = 5
 H2_ENUM_END(KbGameTableConstant)
 
+// cDirections: the eight compass texts in MapDirection order, then the centre.
+H2_ENUM_BEGIN(KbDirectionText)
+    KB_DIRECTION_TEXT_CENTRAL = IDX(MAP_DIRECTION_COUNT)
+H2_ENUM_END(KbDirectionText)
+
 H2_ENUM_CLASS_BEGIN(InitMenuHotSpotField)
     INIT_MENU_HOTSPOT_X           = 0,
     INIT_MENU_HOTSPOT_Y           = 1,
@@ -345,12 +338,6 @@ extern i8 gbArrow[IDX(MAP_DIRECTION_COUNT)][IDX(MAP_DIRECTION_COUNT)];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
 H2_ENUM_CLASS_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE        = 0,
-    TOWN_MUSIC_WARLOCK     = 5,
-    TOWN_MUSIC_WIZARD      = 6,
-    TOWN_MUSIC_NECROMANCER = 7,
-    TOWN_MUSIC_KNIGHT      = 8,
-    TOWN_MUSIC_BARBARIAN   = 9,
-    TOWN_MUSIC_SORCERESS   = 10,
     TOWN_MUSIC_TABLE_SIZE  = 8
 H2_ENUM_CLASS_END(TownMusicTrack)
 
@@ -577,7 +564,7 @@ extern b8 xNetHasOldPlayers;
 extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 extern char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 extern class icon* gCurLoadedSpellIcon;
-extern u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+extern u8 bSaveMusicPosition[MIDI_TRACK_COUNT];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 extern b32 giFullySeeded;
@@ -608,6 +595,6 @@ extern i32 giCurWatchPlayer;
 extern char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 extern i32 giMapChangeCtr;
 extern b32 gbWaitForRemoteReceive;
-extern u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+extern u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 
 #endif
