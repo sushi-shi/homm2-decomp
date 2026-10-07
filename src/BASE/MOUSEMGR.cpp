@@ -27,8 +27,7 @@
 #define MOUSE_MANAGER_COMBAT_BITMAP "CMSEBW%02d.BMP"
 
 H2_ENUM_BEGIN(MouseManagerLocalConstant)
-    HOTSPOT_CENTER_DIVISOR = 2,
-    RESOURCE_NAME_CAPACITY = 16
+    HOTSPOT_CENTER_DIVISOR = 2
 H2_ENUM_END(MouseManagerLocalConstant)
 
 DATA(0x005349c8) static i32 gOldMouseLeft = 0;
@@ -186,7 +185,7 @@ void mouseManager::SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cu
             m_cursorReady = false;
             if (m_cursorIcon != NULL)
                 gpResourceManager->Dispose(m_cursorIcon);
-            char cursorResourceName[RESOURCE_NAME_CAPACITY];
+            char cursorResourceName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(
                     cursorResourceName,
@@ -258,7 +257,7 @@ void mouseManager::SetPointer(i32 frame) {
         cColorBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES));
         cAndBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_AND_BYTES));
 
-        char filename[RESOURCE_NAME_CAPACITY];
+        char filename[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
         if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
             sprintf(
                 filename,

@@ -83,6 +83,8 @@ H2_ENUM_BEGIN(EditRulerGeometry)
     EDIT_RULER_SLOTS            = 0x1c,
     EDIT_RULER_SLOT_PIXELS      = 0x10,
     EDIT_RULER_CELL_TEXT_OFFSET = 8,
+    // A normal-zoom cell spans two slots; a far-zoom slot spans two cells.
+    EDIT_RULER_ZOOM_STEP        = 2,
     // A ruler number's text ("{%02d}" when not the pointer's cell).
     EDIT_RULER_TEXT_SIZE        = 8,
     // The farthest zoom marks the pointer's even cell.
@@ -128,6 +130,7 @@ H2_ENUM_BEGIN(EditRadarGeometry)
     EDIT_RADAR_SMALL_DOT  = 4,
     EDIT_RADAR_MEDIUM_DOT = 2,
     EDIT_RADAR_PHASES = 3,
+    EDIT_RADAR_LARGE_WIDE_DOT = 2,
     // The obstacle, town and unseen colours, and the view outline's.
     EDIT_RADAR_OBSTACLE_SHADE = 3,
     EDIT_RADAR_TOWN_COLOR     = 0x11,
@@ -238,13 +241,10 @@ H2_ENUM_BEGIN(EditPanelHelp)
 H2_ENUM_END(EditPanelHelp)
 
 H2_ENUM_BEGIN(EditMainSetting)
-    // The map animates every 200 ms; the file screens fade in 8 steps and
-    // quitting in 6. A new map clears the 640x480 screen to colour 0x24.
-    EDIT_ANIMATION_TICKS      = 200,
-    EDIT_NEW_MAP_FADE_STEPS   = 8,
-    EDIT_QUIT_FADE_STEPS      = 6,
-    EDIT_SCREEN_CLEAR_COLOR   = 0x24,
-    EDIT_SCREEN_BYTES         = LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
+    // The map animates every 200 ms (the file screens fade at
+    // FADE_SPEED_STANDARD, quitting at FADE_SPEED_FINE; a new map clears the
+    // screen to SCREEN_FILL_COLOR).
+    EDIT_ANIMATION_TICKS      = 200
 H2_ENUM_END(EditMainSetting)
 
 H2_ENUM_BEGIN(EditSiteFrames)
@@ -5539,7 +5539,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                         confirmQuit:
                             if (Confirm(localization::Tr("editor.quit.confirm")) == true) {
                             quit:
-                                gpWindowManager->FadeScreen(FADE_OUT, EDIT_QUIT_FADE_STEPS, gPalette);
+                                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_FINE, gPalette);
                                 ShutDown(NULL);
                             } else {
                                 return MESSAGE_DISPATCH_CONSUME;
@@ -5558,15 +5558,15 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                             break;
                         case EDIT_CONTROL_NEW:
                         startNewMap:
-                            gpWindowManager->FadeScreen(FADE_OUT, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                             gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen,
                                                            true);
                             gpWindowManager->UpdateScreen();
-                            gpWindowManager->FadeScreen(FADE_IN, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                             newMap = SetupNewMap();
-                            gpWindowManager->FadeScreen(FADE_OUT, EDIT_NEW_MAP_FADE_STEPS, gPalette);
-                            memset(gpWindowManager->m_screen->m_pixels, EDIT_SCREEN_CLEAR_COLOR,
-                                   EDIT_SCREEN_BYTES);
+                            gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
+                            memset(gpWindowManager->m_screen->m_pixels, SCREEN_FILL_COLOR,
+                                   LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT);
                             if (newMap) {
                                 gEditManager->InitializeMap(false, gNewMapSize, gNewMapSize);
                                 ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -5577,7 +5577,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                             DrawMap();
                             DrawRadar(true);
                             gpWindowManager->UpdateScreen();
-                            gpWindowManager->FadeScreen(FADE_IN, EDIT_NEW_MAP_FADE_STEPS, gPalette);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                             break;
                         case EDIT_CONTROL_SYSTEM:
                             SystemOptions();
@@ -5953,11 +5953,11 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
                 ICON_DRAW_NORMAL
             );
         if (m_zoomLevel == EDIT_ZOOM_NORMAL)
-            cell = i / 2;
+            cell = i / EDIT_RULER_ZOOM_STEP;
         else if (m_zoomLevel == EDIT_ZOOM_HALF)
             cell = i;
         else
-            cell = i * 2;
+            cell = i * EDIT_RULER_ZOOM_STEP;
         sprintf(text, "%02d", viewX + cell);
         if (cell == cursorX)
             sprintf(text, "%02d", viewX + cell);
@@ -6147,7 +6147,7 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                 if (rowPhase)
                     line += EDIT_SCREEN_PITCH;
                 else
-                    line += 2 * EDIT_SCREEN_PITCH;
+                    line += EDIT_RADAR_LARGE_WIDE_DOT * EDIT_SCREEN_PITCH;
                 break;
             case MAP_DIMENSION_XLARGE:
                 line += EDIT_SCREEN_PITCH;
@@ -6226,13 +6226,13 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                     } else if (rowPhase) {
                         dst[0] = color;
                         dst[1] = color;
-                        dst += 2;
+                        dst += EDIT_RADAR_LARGE_WIDE_DOT;
                     } else {
                         dst[0] = color;
                         dst[1] = color;
                         dst[EDIT_SCREEN_PITCH] = color;
                         dst[EDIT_SCREEN_PITCH + 1] = color;
-                        dst += 2;
+                        dst += EDIT_RADAR_LARGE_WIDE_DOT;
                     }
                     xPhase++;
                     if (xPhase > EDIT_RADAR_PHASES - 1)

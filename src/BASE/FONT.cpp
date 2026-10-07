@@ -45,19 +45,20 @@ font::~font() {
 }
 
 // Maps a CP1251 byte onto the font's glyph range. Retail compares the
-// zero-extended byte, so the codes stay numeric: a signed char literal
-// (a signed CP1251 'Ё' byte == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
+// zero-extended byte against the unsigned Cp1251Code values: a signed char
+// literal (a signed CP1251 'Ё' byte == -88) would lower as cmp 0xffffffa8,
+// not retail's cmp 0xa8.
 VA(0x004c37a0, 0x52)
 i32 RemapCyrillicCharacter(i32 character) {
-    if (character == 0xa8)              // 'Ё'
-        return 0xa0;
-    if (character == 0xb8)              // 'ё'
-        return 0xc1;
-    if (character < 0xc0)               // below 'А': not a Cyrillic letter
-        return 0xa1;
-    if (character < 0xe0)               // 'А'..'Я'
-        return character - 0x40;
-    return character - 0x3f;            // 'а'..'я'
+    if (character == CP1251_CAPITAL_IO)
+        return FONT_CODE_CAPITAL_IO;
+    if (character == CP1251_SMALL_IO)
+        return FONT_CODE_SMALL_IO;
+    if (character < CP1251_CAPITAL_A)   // not a Cyrillic letter: the 'а' glyph
+        return FONT_CODE_SMALL_A;
+    if (character < CP1251_SMALL_A)     // 'А'..'Я'
+        return character - FONT_CODE_CAPITAL_SHIFT;
+    return character - FONT_CODE_SMALL_SHIFT; // 'а'..'я'
 }
 
 #if H2_RETAIL_COMPILER
@@ -93,12 +94,13 @@ void font::DrawStringExecute(
             m_suppressDraw = false;
             goto next;
         }
-        // The same glyph remap GetCharacterWidth performs, open-coded: the
-        // codes stay numeric so the byte compares zero-extend (see
-        // RemapCyrillicCharacter).
-        if (character < ' ' || (character > 0x7f && character < 0xc0 && character != 0xb8 && character != 0xa8)) {
-            character = 0x7f;
-        } else if (character > 0x7f) {
+        // The same glyph remap GetCharacterWidth performs, open-coded; the
+        // byte compares zero-extend (see RemapCyrillicCharacter).
+        if (character < ' '
+            || (character > CP1251_ASCII_LAST && character < CP1251_CAPITAL_A
+                && character != CP1251_SMALL_IO && character != CP1251_CAPITAL_IO)) {
+            character = FONT_CODE_UNPRINTABLE;
+        } else if (character > CP1251_ASCII_LAST) {
             character = RemapCyrillicCharacter(character);
         }
         character -= ' ';
@@ -204,9 +206,10 @@ i32 font::GetCharacterWidth(u8 character) {
     if (code == '.')  // the width path measures '.' as the underscore glyph
         code = '_';
     if (code < ' '
-        || (code > 0x7f && code < 0xc0 && code != 0xb8 && code != 0xa8)) {
-        code = 0x7f;
-    } else if (code > 0x7f) {
+        || (code > CP1251_ASCII_LAST && code < CP1251_CAPITAL_A
+            && code != CP1251_SMALL_IO && code != CP1251_CAPITAL_IO)) {
+        code = FONT_CODE_UNPRINTABLE;
+    } else if (code > CP1251_ASCII_LAST) {
         code = RemapCyrillicCharacter(code);
     }
     code -= ' ';
@@ -217,19 +220,19 @@ i32 font::GetCharacterWidth(u8 character) {
 #endif
 
 // Buka's Cyrillic line breaker. Retail compares the zero-extended byte, so
-// like RemapCyrillicCharacter the CP1251 codes stay numeric: through a plain
-// char a signed CP1251 'а' byte would compare -32 against 224 and never match.
+// like RemapCyrillicCharacter the tests read a u8: through a plain char a
+// signed CP1251 'а' byte would compare -32 against 224 and never match.
 static inline bool IsVowel(u8 c) {
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y'
-        || c == 0xe0 /* а */ || c == 0xe5 /* е */ || c == 0xb8 /* ё */
-        || c == 0xe8 /* и */ || c == 0xee /* о */ || c == 0xf3 /* у */
-        || c == 0xfb /* ы */ || c == 0xfd /* э */ || c == 0xfe /* ю */
-        || c == 0xff /* я */
+        || c == CP1251_SMALL_A || c == CP1251_SMALL_IE || c == CP1251_SMALL_IO
+        || c == CP1251_SMALL_I || c == CP1251_SMALL_O || c == CP1251_SMALL_U
+        || c == CP1251_SMALL_YERU || c == CP1251_SMALL_E || c == CP1251_SMALL_YU
+        || c == CP1251_SMALL_YA
         || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y'
-        || c == 0xc0 /* А */ || c == 0xc5 /* Е */ || c == 0xa8 /* Ё */
-        || c == 0xc8 /* И */ || c == 0xce /* О */ || c == 0xd3 /* У */
-        || c == 0xdb /* Ы */ || c == 0xdd /* Э */ || c == 0xde /* Ю */
-        || c == 0xdf /* Я */;
+        || c == CP1251_CAPITAL_A || c == CP1251_CAPITAL_IE || c == CP1251_CAPITAL_IO
+        || c == CP1251_CAPITAL_I || c == CP1251_CAPITAL_O || c == CP1251_CAPITAL_U
+        || c == CP1251_CAPITAL_YERU || c == CP1251_CAPITAL_E || c == CP1251_CAPITAL_YU
+        || c == CP1251_CAPITAL_YA;
 }
 
 static inline bool IsHyphen(u8 c) {

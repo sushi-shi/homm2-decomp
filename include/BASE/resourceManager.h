@@ -25,6 +25,9 @@ struct aggEntry {
 H2_ENUM_BEGIN(ResourceManagerLayoutConstant)
     RESOURCE_MANAGER_AGGREGATE_LIMIT   = 2,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
+    // The name buffer a widget's Read or the mouse manager reads a resource
+    // file name into (Read13's thirteen bytes, rounded up).
+    RESOURCE_MANAGER_NAME_BUFFER_SIZE  = 16,
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 H2_ENUM_END(ResourceManagerLayoutConstant)
 

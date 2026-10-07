@@ -17,7 +17,6 @@ H2_ENUM_BEGIN(ButtonHotkeyConstant)
 H2_ENUM_END(ButtonHotkeyConstant)
 
 H2_ENUM_BEGIN(ButtonConstant)
-    RESOURCE_NAME_CAPACITY = 16,
     REPEAT_DELAY_TICKS     = 60
 H2_ENUM_END(ButtonConstant)
 
@@ -79,7 +78,7 @@ button::button(
 
 VA(0x004d3710, 0x115)
 void button::Read(void) {
-    char iconName[RESOURCE_NAME_CAPACITY];
+    char iconName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();

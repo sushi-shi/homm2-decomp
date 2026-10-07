@@ -33,18 +33,16 @@ DATA(0x00539720) static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT] = H2_
 
 namespace {
 
-    // The Miles DIG_F_* sample format code: bit 0 selects 16-bit samples and
-    // bit 1 selects stereo.
     inline i32 MilesSampleFormat(SamplePlaybackData* sampleData) {
         if (sampleData->sampleFormat != FORMAT_8_BIT) {
             if (sampleData->stereo != 0)
-                return 3;
+                return MILES_DIG_F_STEREO_16;
             else
-                return 1;
+                return MILES_DIG_F_MONO_16;
         } else if (sampleData->stereo != 0) {
-            return 2;
+            return MILES_DIG_F_STEREO_8;
         } else {
-            return 0;
+            return MILES_DIG_F_MONO_8;
         }
     }
 

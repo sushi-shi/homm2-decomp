@@ -553,7 +553,7 @@ void UpdateNewMapWindow(void) {
     message.payload.widget.command =
         gGenerateUnseen ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     gNewMapWindow->BroadcastMessage(message);
-    for (i = NEW_MAP_MIN_PLAYERS; i <= NEW_MAP_MAX_PLAYERS; i++) {
+    for (i = NEW_MAP_MIN_PLAYERS; i <= GAME_PLAYER_COUNT; i++) {
         message.payload.widget.id = i + NEW_MAP_PLAYERS_BASE;
         message.payload.widget.command =
             gRandomMapPlayers == i ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -682,7 +682,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 redraw = true;
             }
             if (message.payload.widget.id >= NEW_MAP_PLAYERS_BASE + NEW_MAP_MIN_PLAYERS
-                && message.payload.widget.id <= NEW_MAP_PLAYERS_BASE + NEW_MAP_MAX_PLAYERS) {
+                && message.payload.widget.id <= NEW_MAP_PLAYERS_BASE + IDX(GAME_PLAYER_COUNT)) {
                 gRandomMapPlayers = message.payload.widget.id - NEW_MAP_PLAYERS_BASE;
                 redraw = true;
             }
