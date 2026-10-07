@@ -796,7 +796,7 @@ msgid "Generating map - Placing trees..."
 msgstr "Генерация карты - размещаю деревья..."
 
 msgctxt "editor.requester.map.size_mismatch"
-msgid "No maps exist at that size."
+msgid "No maps exist for that size."
 msgstr "Нет карт такого размера."
 
 msgctxt "editor.sign.bottle_title"
