@@ -67,8 +67,18 @@ PROJECT_FILES = (
     ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
     ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
-# The classic reading view carries its own README instead of the source tree's.
+# The classic reading view carries its own README instead of the source tree's,
+# and none of its build files: it is for reading, not building.
 CLASSIC_README = "scripts/homm2/clean/project/classic/README.md"
+CLASSIC_BUILD_ONLY = frozenset((
+    ".gitignore",
+    "build.ninja",
+    "build-en.ninja",
+    "build.py",
+    "flake.lock",
+    "flake.nix",
+    "run-game.sh",
+))
 GENERATED_BRANCHES = frozenset((
     "source-pol-2.0",
     "classic-pol-2.0",
@@ -1484,9 +1494,10 @@ def validate_out_root(requested: Path) -> Path:
 # The programs the generated tree builds: the game, and the scenario editor
 # with every unit it links compiled again under its image defines (shared
 # units select their editor variants with `#ifdef HOMM2_EDITOR`) and its
-# resources. Each is a Ninja target of its own; `all` builds both.
+# resources. Each is a Ninja target of its own with its resource script;
+# `all` builds both.
 PROGRAMS = (
-    ("game", "HMM2PL.exe", None),
+    ("game", "HMM2PL.exe", "src/SOURCE/HMM2PL.rc"),
     ("editor", "EDT2PL.exe", "src/EDITOR/EDT2PL.rc"),
 )
 
@@ -1642,8 +1653,10 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
             + ' | build.py tools/catalog.py locales/messages.def locales/ru.po',
         ]
     objects: dict[str, list[str]] = {}
-    for image, _executable, _resources in PROGRAMS:
+    for image, _executable, resources in PROGRAMS:
         directory = "$builddir/obj" if image == "game" else f"$builddir/{image}/obj"
+        resource_object = f"{directory}/{Path(resources).stem}.res.o"
+        lines.append(f"build {resource_object}: rc {resources} || {directory}")
         defines = " ".join(program_defines(image))
         objects[image] = []
         for relative in sources[image]:
@@ -1654,6 +1667,7 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
             if defines:
                 lines.append(f"  defines = {defines}")
             objects[image].append(obj)
+        objects[image].append(resource_object)
     import_libraries = []
     for dll, dlltool_flags in (
         ("AUDIERE", ""),
@@ -1677,15 +1691,10 @@ def write_ninja(out_root: Path, locale: str = 'ru') -> None:
         f"build {mss_aliases}: cxx imports/MSS32_aliases.S || $builddir/imports"
     )
     lines.append("")
-    for image, executable, resources in PROGRAMS:
-        inputs = list(objects[image])
-        if resources:
-            resource_object = f"$builddir/{image}/{Path(resources).stem}.res.o"
-            lines.append(f"build {resource_object}: rc {resources} || $builddir/{image}/obj")
-            inputs.append(resource_object)
+    for image, executable, _resources in PROGRAMS:
         lines += [
             f"build $builddir/{executable}: link "
-            + " ".join(inputs + [audiere_aliases, mss_aliases] + import_libraries),
+            + " ".join(objects[image] + [audiere_aliases, mss_aliases] + import_libraries),
             f"build {image}: phony $builddir/{executable}",
         ]
     lines += [
@@ -1878,11 +1887,10 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
         (out_root / 'build.py').chmod(0o755)
 
     for _image, _executable, resources in PROGRAMS:
-        if resources:
-            target = out_root / resources
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(clean_resource((REPO / resources).read_text(), resources),
-                              encoding="utf-8")
+        target = out_root / resources
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(clean_resource((REPO / resources).read_text(), resources),
+                          encoding="utf-8")
 
     write_import_defs(out_root)
     write_ninja(out_root)
@@ -1953,9 +1961,9 @@ def generate_classic(
                if readable_russian and (source_root / 'locales/messages.def').is_file()
                else None)
     for relative in tracked:
-        if catalog and (relative.parts[0] in ('locales', 'tools') or
-                        relative.as_posix() in ('build.py', 'build-en.ninja', 'build.ninja')):
-            continue  # Classic is a terminal reading view, with no locale build.
+        if relative.as_posix() in CLASSIC_BUILD_ONLY or (
+                catalog and relative.parts[0] in ('locales', 'tools')):
+            continue  # Classic is a terminal reading view, with no build.
         source = source_root / relative
         if not source.is_file():
             continue

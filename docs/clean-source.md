@@ -127,7 +127,8 @@ Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
 the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
-The branch carries `include/`, `src/` (with the editor's `src/EDITOR/EDT2PL.rc`), vendor SDK headers,
+The branch carries `include/`, `src/` (with the game's `src/SOURCE/HMM2PL.rc`
+and the editor's `src/EDITOR/EDT2PL.rc`), vendor SDK headers,
 import definitions, `build.ninja`, and a standalone Nix flake. The Ninja graph
 builds `build/<locale>/HMM2PL.exe` and, as its `editor` target,
 `build/<locale>/EDT2PL.exe` for 32-bit Windows with Clang at `-O0`, x87
@@ -136,9 +137,10 @@ compiles every unit `config/units.toml` links into it (`images` naming
 `editor`): its own `src/EDITOR/` units, the editor-only `BASE/icon2bsd` and
 `BASE/tile2bs`, and the shared units again with `HOMM2_EDITOR` defined, which
 also compiles the music flags inside `BASE/Midi` as the editor's BASE library
-did. Its resources compile with `llvm-windres`. The matching build's per-unit
-VC6 profiles, including the editor's `/Ob2` rule (`homm2.manifest.unit_flags`),
-do not apply: every generated unit compiles with the same Clang flags.
+did. Each program's resources compile with `llvm-windres` and link into it.
+The matching build's per-unit VC6 profiles, including the editor's `/Ob2` rule
+(`homm2.manifest.unit_flags`), do not apply: every generated unit compiles
+with the same Clang flags.
 
 The matching toolchain, delinker, objdiff plumbing, and MSVC are absent. A direct
 Ninja build requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW
@@ -197,10 +199,12 @@ which presents the enum type while retaining each audited field width.
 
 ## Classic view
 
-`--classic-from` keeps the supplied clean project and changes only its legacy
-type presentation. Domains reconstructed through `H2_ENUM_CLASS_*` become
-anonymous enums with integer typedefs, packed fields become their proven
-storage type, and strict-only index, storage, and operator helpers disappear.
+`--classic-from` keeps the supplied clean project's sources and changes only
+their legacy type presentation; it leaves out the build files (the flake, Ninja
+graphs, `build.py`, the runner and `.gitignore`), since classic is for
+reading. Domains reconstructed through `H2_ENUM_CLASS_*` become anonymous enums
+with integer typedefs, packed fields become their proven storage type, and
+strict-only index, storage, and operator helpers disappear.
 
 The domain widths come from the matching tree, including split domains whose
 public type is `i32` but whose serialized fields are narrower. Remaining scoped
