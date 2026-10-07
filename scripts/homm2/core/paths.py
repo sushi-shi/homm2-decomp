@@ -139,6 +139,13 @@ def ninja_args(image: str | None = None) -> list[str]:
     return graph + ninja_jobs()
 
 
+def job_cap(jobs: int) -> int:
+    """`jobs` workers, at most $HOMM2_JOBS of them when it is set (the cap a
+    shared machine puts on ninja applies to the tools' own worker pools)."""
+    cap = os.environ.get("HOMM2_JOBS", "").strip()
+    return max(1, min(jobs, int(cap)) if cap.isdigit() and int(cap) > 0 else jobs)
+
+
 def ninja_jobs() -> list[str]:
     """`-j N` from $HOMM2_JOBS (ninja's own default when unset), so a shared
     machine can cap every ninja the tooling starts."""

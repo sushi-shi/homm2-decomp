@@ -54,7 +54,8 @@ def configure_libclang() -> None:
             pass
 
 
-def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> list[str]:
+def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru',
+                image: str | None = None) -> list[str]:
     from homm2.graph.localization import clang_args as localization_args
     database_path = repo / "build/clangd/compile_commands.json"
     database = json.loads(database_path.read_text()) if database_path.is_file() else []
@@ -100,10 +101,10 @@ def _clang_args(repo: Path, source: Path, *, mode: ClangMode, locale='ru') -> li
         elif value.startswith(("--target=", "-fms", "-fdelayed")):
             args.append(value)
         index += 1
-    # The selected image's view of a shared unit (HOMM2_EDITOR); compdb
-    # entries already carry an editor-only unit's defines.
+    # The selected image's view of a shared unit (HOMM2_EDITOR), or the one
+    # `image` names; compdb entries already carry an editor-only unit's defines.
     from homm2.manifest import clang_image_defines
-    for define in clang_image_defines(source):
+    for define in clang_image_defines(source, image):
         if "-D" + define[2:] not in args:
             args.append("-D" + define[2:])
     return args + localization_args(repo, source, locale=locale)

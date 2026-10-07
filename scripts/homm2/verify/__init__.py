@@ -71,6 +71,9 @@ GATES = {
                       "every .text byte is claimed, padding or reviewed"),
     "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4"],
                   "numeric-literal inventory; no 0 spelled for a null pointer"),
+    "enum-reuse": ([PY, "-m", "homm2.verify.enum_reuse"],
+                   "enum, #define and const values of both images vs the reuse "
+                   "review ledger (pending rows)"),
     "relocs": ([PY, "-m", "homm2.verify.assert_relocs"],
                "focused relocation review (`relocs 0x<rva>`)"),
     "od-frames": ([PY, "-m", "homm2.verify.od_frames"],
