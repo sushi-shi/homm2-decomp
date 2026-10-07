@@ -106,8 +106,8 @@ BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	8f35036235f9
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	0ab6f4fa2618
 BASE/INPUTMGR	?TranslateInputCharacterCp1251@@YIXAAUtag_message@@@Z	100.0000	d212a0b28183
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	0c93a708b0f4
-BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	3013bc75ddb7
-BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	b560733e96d2
+BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	5ddc88d3ea75
+BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	24caa09aec0a
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	dea05991be73
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	e1a28f8ea1ad
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	523ff85572eb
@@ -258,9 +258,9 @@ BASE/WIDGET	?Close@widget@@QAEXXZ	100.0000	f728306d5a57
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	68df938d8f57
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	100.0000	6bd2ece82a02
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	13cb729f54d5
-BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	ff46ca944e9e
-BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	48b2a3ce3310
-BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	e663ad70ec88
+BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	101631717695
+BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	a878449985ac
+BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	894cd884933b
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	7dcf6b437c5d
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	3ddeb9f0d8ce
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	e5aafc82e4f1
@@ -294,10 +294,10 @@ BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	100.0000	630fba4075d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	7887492cb289
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	ae006dfb5dcf
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	3c41f0892372
-BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	8c7648fd1fd1
+BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	1af9f1480049
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	f425140d2afd
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	4a0d48d9eae1
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	100.0000	48a6d50ff5a7
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	100.0000	0b45f78a9c0e
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	ec81f37b9821
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	307e1c222795
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	b4810860dba4
@@ -474,10 +474,10 @@ EDITOR/EDITOR	?oldmain@@YIHXZ	100.0000	dc045c0a91c1
 EDITOR/EDITOR	@PollSound@0	100.0000	7560904aa040
 EDITOR/EVENTMGR	??0eventsManager@@QAE@XZ	100.0000	6ff021ecc6c1
 EDITOR/EVENTMGR	?BalanceTerrainPercents@@YIXH@Z	100.0000	a08d62e890e4
-EDITOR/EVENTMGR	?CellWindowHandler@@YIHAAUtag_message@@@Z	100.0000	c76228deed50
+EDITOR/EVENTMGR	?CellWindowHandler@@YIHAAUtag_message@@@Z	100.0000	639455154aa9
 EDITOR/EVENTMGR	?Close@eventsManager@@UAEXXZ	100.0000	2cc562e42391
 EDITOR/EVENTMGR	?DragNewMapSlider@@YIXHH@Z	100.0000	78a794c9a345
-EDITOR/EVENTMGR	?EditCell@eventsManager@@QAEXHH@Z	100.0000	41bb72df6160
+EDITOR/EVENTMGR	?EditCell@eventsManager@@QAEXHH@Z	100.0000	193fde31fca3
 EDITOR/EVENTMGR	?EditMonster@eventsManager@@QAEXHHH@Z	100.0000	290378d041fd
 EDITOR/EVENTMGR	?Main@eventsManager@@UAEHAAUtag_message@@@Z	100.0000	af115e6cbc5c
 EDITOR/EVENTMGR	?MonsterWindowHandler@@YIHAAUtag_message@@@Z	100.0000	3e6edd4d9319
@@ -526,7 +526,7 @@ EDITOR/evntedit	?EditEventHandler@@YIHAAUtag_message@@@Z	100.0000	bff63e5f89cb
 EDITOR/evntedit	?FillInEventEdit@eventsManager@@QAEXPAUEventExtra@@@Z	100.0000	afc89e671d35
 EDITOR/heroedit	?EditHero@eventsManager@@QAEXHHH@Z	100.0000	d6160a7da665
 EDITOR/heroedit	?EditHeroHandler@@YIHAAUtag_message@@@Z	100.0000	8bfddeaf73ae
-EDITOR/heroedit	?FillInHeroEdit@eventsManager@@QAEXPAUHeroExtra@@@Z	100.0000	32550438b59b
+EDITOR/heroedit	?FillInHeroEdit@eventsManager@@QAEXPAUHeroExtra@@@Z	100.0000	c4222768bc65
 EDITOR/line	??0lineManager@@QAE@XZ	100.0000	9e770d828983
 EDITOR/line	?AddLineCell@@YIXHH@Z	100.0000	f23cdefb47b4
 EDITOR/line	?BuildLineMap@@YIXHHHHH@Z	100.0000	87832fac4df7
@@ -538,7 +538,7 @@ EDITOR/line	?IsLineTile@@YIHHHH@Z	100.0000	502ef4446d46
 EDITOR/line	?Main@lineManager@@UAEHAAUtag_message@@@Z	100.0000	0d20cb0ea100
 EDITOR/line	?Open@lineManager@@UAEHH@Z	100.0000	5cb6a69c2c03
 EDITOR/line	?RedrawLines@@YIXHHHH@Z	100.0000	d74eb9a335f5
-EDITOR/line	?SetLineTile@@YIXHHHHH@Z	100.0000	b43e14754253
+EDITOR/line	?SetLineTile@@YIXHHHHH@Z	100.0000	f9f2ca69e34f
 EDITOR/line	?SetLineType@@YIXH@Z	100.0000	8b897660941a
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	f24847db220b
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	13926594114c
@@ -570,7 +570,7 @@ EDITOR/setup	?SetupMapSize@@YIHXZ	100.0000	1cc015fdd1e5
 EDITOR/setup	?SetupMapSizeHandler@@YIHAAUtag_message@@@Z	100.0000	1e564286185b
 EDITOR/setup	?SetupNewMap@@YIHXZ	100.0000	9aeecac85dcd
 EDITOR/setup	?SetupNewMapHandler@@YIHAAUtag_message@@@Z	100.0000	93390e2f9b03
-EDITOR/signedit	?EditSign@eventsManager@@QAEXHH@Z	100.0000	5d046fdf92cd
+EDITOR/signedit	?EditSign@eventsManager@@QAEXHH@Z	100.0000	c8953f3c7210
 EDITOR/signedit	?EditSignHandler@@YIHAAUtag_message@@@Z	100.0000	285e76f324ef
 EDITOR/signedit	?FillInSignEdit@eventsManager@@QAEXPAUsignEventExtra@@@Z	100.0000	74d55d88ab42
 EDITOR/specedit	?AddMapEvent@@YIXXZ	100.0000	79ee5f9e554b
@@ -598,7 +598,7 @@ EDITOR/terrain	?TrackCursor@terrainManager@@QAEXXZ	100.0000	b41cd403a842
 EDITOR/terrain	?UpdateButtons@terrainManager@@QAEXXZ	100.0000	666b186e4627
 EDITOR/townedit	?EditTown@eventsManager@@QAEXHH@Z	100.0000	413acdcd259c
 EDITOR/townedit	?EditTownHandler@@YIHAAUtag_message@@@Z	100.0000	b94c52ce205e
-EDITOR/townedit	?FillInTownEdit@eventsManager@@QAEXPAUTownExtra@@@Z	100.0000	ffa4f1ed18d1
+EDITOR/townedit	?FillInTownEdit@eventsManager@@QAEXPAUTownExtra@@@Z	100.0000	f37f3e5d06a9
 EDITOR/x_spedit	?EditSpellScroll@eventsManager@@QAEXPAH@Z	100.0000	eaf8d77d4035
 EDITOR/x_spedit	?EditSpellScrollHandler@@YIHAAUtag_message@@@Z	100.0000	4b16d3d27958
 SOURCE/REQUEST	??0fileRequester@@QAE@HHHPAD00@Z	100.0000	62323aa3f692

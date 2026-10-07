@@ -53,7 +53,7 @@ BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	766eff6d15ab
 BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	100.0000	4f84db0c3ddc
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	217c34fe8825
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	100.0000	384aff9f4553
-BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	100.0000	893e4a6a136d
+BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	100.0000	908c81967944
 BASE/Bzip	?DecodeData@@YIJPAD0K@Z	100.0000	346770b6ebaf
 BASE/Bzip	?EncodeData@@YIJPAD0K@Z	100.0000	078f7a2e6556
 BASE/Bzip	?FreeCompressStructures@@YIXXZ	100.0000	b9555f418c05
@@ -198,8 +198,8 @@ BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	8f35036235f9
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	0ab6f4fa2618
 BASE/INPUTMGR	?TranslateInputCharacterCp1251@@YIXAAUtag_message@@@Z	100.0000	d212a0b28183
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	0c93a708b0f4
-BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	3013bc75ddb7
-BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	b560733e96d2
+BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	5ddc88d3ea75
+BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	24caa09aec0a
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	dea05991be73
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	e1a28f8ea1ad
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	523ff85572eb
@@ -355,9 +355,9 @@ BASE/WIDGET	?Close@widget@@QAEXXZ	100.0000	f728306d5a57
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	68df938d8f57
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	100.0000	6bd2ece82a02
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	13cb729f54d5
-BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	ff46ca944e9e
-BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	48b2a3ce3310
-BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	e663ad70ec88
+BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	101631717695
+BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	a878449985ac
+BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	894cd884933b
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	7dcf6b437c5d
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	3ddeb9f0d8ce
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	e5aafc82e4f1
@@ -391,10 +391,10 @@ BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	100.0000	630fba4075d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	7887492cb289
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	ae006dfb5dcf
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	3c41f0892372
-BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	8c7648fd1fd1
+BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	1af9f1480049
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	f425140d2afd
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	4a0d48d9eae1
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	100.0000	48a6d50ff5a7
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	100.0000	0b45f78a9c0e
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	ec81f37b9821
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	307e1c222795
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	b4810860dba4
