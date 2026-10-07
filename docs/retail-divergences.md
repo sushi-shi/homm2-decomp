@@ -83,6 +83,13 @@ message/payload representations are copied into live objects instead of accessed
 through struct overlays. This models ownership; it does not establish that
 every malformed network command is safe or make portable multiplayer supported.
 
+Runtime manager, widget, resource, audio playback and combat objects also use
+natural alignment. Their pointers, messages and numeric members are passed by
+reference in portable C++; retaining byte packing made input initialization and
+music playback undefined. Packed map cells, resource headers and configuration
+records retain their file layouts. The `runtime_alignment` check rejects
+misaligned manager messages, music state and resource pointers at compile time.
+
 ## Corrected defects
 
 | Area | Retail behavior | `port` behavior |

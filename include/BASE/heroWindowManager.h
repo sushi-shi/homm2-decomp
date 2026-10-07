@@ -22,7 +22,6 @@ enum class WindowFadeMode : i32 {
 };
 using enum WindowFadeMode;
 
-#pragma pack(push, 1)
 class heroWindowManager : public baseManager {
 public:
     heroWindow* m_windowListHead;
@@ -54,8 +53,6 @@ public:
     void FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 delay, i8* startPalette, i8* endPalette);
     void ReleaseFizzleSource(void);
 };
-#pragma pack(pop)
-
 #define FINISH_DIALOG_MESSAGE(message)                                                             \
     (gpWindowManager->m_dialogResult = (message).payload.widget.id,                                \
      (message).payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT),                              \
