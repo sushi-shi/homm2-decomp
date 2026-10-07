@@ -8,8 +8,14 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       mingw = pkgs.pkgsCross.mingw32;
-      gameFor = locale: mingw.clangStdenv.mkDerivation {
-        pname = "homm2-gold-buka";
+      # The Ninja targets: the game, the scenario editor, or both.
+      programs = {
+        game = [ "HMM2PL.exe" ];
+        editor = [ "EDT2PL.exe" ];
+        all = [ "HMM2PL.exe" "EDT2PL.exe" ];
+      };
+      programFor = target: locale: mingw.clangStdenv.mkDerivation {
+        pname = "homm2-gold-buka-${target}";
         version = "2.1";
         src = ./.;
         nativeBuildInputs = [
@@ -35,20 +41,22 @@
             sed -i "s|--target=i686-w64-windows-gnu ||g" "$graph"
           done
           if test -f build.py; then
-            python3 build.py --${locale}
+            python3 build.py --${locale} --target ${target}
           else
-            ninja -k 0
+            ninja -k 0 ${target}
           fi
           runHook postBuild
         '';
         installPhase = ''
           runHook preInstall
           mkdir -p "$out"
-          if test -f build.py; then
-            cp build/${locale}/HMM2PL.exe "$out/"
-          else
-            cp build/HMM2PL.exe "$out/"
-          fi
+          for program in ${pkgs.lib.concatStringsSep " " programs.${target}}; do
+            if test -f build.py; then
+              cp "build/${locale}/$program" "$out/"
+            else
+              cp "build/$program" "$out/"
+            fi
+          done
           cp run-game.sh "$out/"
           chmod +x "$out/run-game.sh"
           runHook postInstall
@@ -56,10 +64,14 @@
       };
     in {
       packages.${system} = {
-        game = gameFor "ru";
-        game-en = gameFor "en";
-        default = gameFor "ru";
+        game = programFor "game" "ru";
+        game-en = programFor "game" "en";
+        editor = programFor "editor" "ru";
+        editor-en = programFor "editor" "en";
+        all = programFor "all" "ru";
+        all-en = programFor "all" "en";
+        default = programFor "game" "ru";
       };
-      devShells.${system}.default = gameFor "ru";
+      devShells.${system}.default = programFor "all" "ru";
     };
 }

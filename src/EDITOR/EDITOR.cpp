@@ -13,6 +13,7 @@
 
 #include <va.h>
 #include <EDITOR/EDITOR.h>
+#include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/lineManager.h>
@@ -57,11 +58,6 @@ H2_ENUM_BEGIN(EditorStartupConstant)
     // The screen is cleared to this palette index while the map view opens.
     EDITOR_BACKGROUND_COLOR     = 0x24,
     EDITOR_SCREEN_BYTES         = 640 * 480,
-    // The CD set-up results SetupCDDrive reports.
-    EDITOR_CD_NO_DRIVE          = 1,
-    EDITOR_CD_NOT_FOUND         = 2,
-    EDITOR_CD_NO_APP_PATH       = 3,
-    EDITOR_CD_NO_DATA           = 4,
     // DelayTicks counts in 15-millisecond ticks.
     EDITOR_DELAY_TICK_MILLISECONDS = 15,
     EDITOR_DELAY_TIMER_SLOT     = 1,
@@ -3796,7 +3792,7 @@ void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text) {
 
 VA(0x004109d9, 0x149)
 i32 EarlySetup(void) {
-    i32 result;
+    CDRomSetupResult result;
     i32 i;
 
     if (bEarlySetupDone)
@@ -3812,28 +3808,28 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     result = SetupCDDrive();
-    if (result == EDITOR_CD_NO_DRIVE) {
+    if (result == CD_ROM_DRIVE_UNAVAILABLE) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("editor.startup.no_cd_drive")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NOT_FOUND) {
+    if (result == CD_ROM_EXPANSION_DISC_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("editor.startup.cd_required")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_APP_PATH) {
+    if (result == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("system.startup_error.game_directory_missing")
         );
         exit(0);
     }
-    if (result == EDITOR_CD_NO_DATA) {
+    if (result == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
             localization::Tr("system.startup_error.title"),
             localization::Tr("system.startup_error.data_files_missing")
@@ -3924,7 +3920,7 @@ void NormalDialog(
 ) {
     i32 H2_UNUSED(resourceFrame);
     i16 H2_UNUSED(showMessage);
-    i32 textWidgetId;
+    i32 H2_UNUSED(textWidgetId);
     i32 windowHeight;
     b32 H2_UNUSED(showPrimaryBonus);
     tag_message message;
@@ -4055,7 +4051,7 @@ void QuickViewWait(void) {
 // Shows `text` (or, while a text is shown, the current one) in the status
 // line under the map view.
 VA(0x0041132e, 0xa5)
-void ShowStatusText(char* text) {
+void ShowStatusText(H2_CONST char* text) {
     if (gStatusTextShown && !text)
         text = gStatusText;
     else

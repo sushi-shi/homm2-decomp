@@ -8,6 +8,8 @@
 #include <va.h>
 #include <Ints.h>
 
+H2_ENUM_CLASS_FORWARD_SPLIT(TilesetId, u8);
+
 H2_ENUM_BEGIN(LineType)
     LINE_ROAD   = 0,
     LINE_STREAM = 1
@@ -25,7 +27,7 @@ H2_ENUM_END(LineConstant)
 
 // The line the tool draws (LineType), its tileset and its first overlay type.
 extern i32 gLineType;
-extern i32 gLineTileset;
+extern TilesetId gLineTileset;
 extern i32 gLineOverlayFirst;
 // The cells of the drawn line, a counter per map cell (MAP_WIDTH * MAP_HEIGHT).
 extern u8* gLineMap;
@@ -38,14 +40,14 @@ void AddLineCell(i32 x, i32 y);
 // Whether an object of the tileset is a tile of the current line; a road's
 // tiles count only when they join (gRoadTileJoins, or gRoadTileJoinsAlt for
 // the alternate set).
-b32 IsLineTile(i32 tileset, i32 index, b32 alternate);
+b32 IsLineTile(TilesetId tileset, i32 index, b32 alternate);
 void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate);
 void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY);
 // Gives the cell the line tile `index` (LINE_NO_TILE removes it); half the
 // time a cell takes `variant` instead when there is one.
-void SetLineTile(i32 x, i32 y, i32 tileset, i32 index, i32 variant);
+void SetLineTile(i32 x, i32 y, TilesetId tileset, i32 index, i32 variant);
 // Rebuilds the roads and then the streams around an edited area.
 void RedrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY);
 

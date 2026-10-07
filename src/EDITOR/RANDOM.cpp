@@ -92,7 +92,9 @@ H2_ENUM_BEGIN(RandomMapConstant)
     // PlaceTreasures: a treasure per this many land cells and a roaming
     // monster per this many, each scaled by its density.
     RANDOM_MAP_LAND_PER_TREASURE = 40,
-    RANDOM_MAP_LAND_PER_MONSTER  = 130
+    RANDOM_MAP_LAND_PER_MONSTER  = 130,
+    // ScatterDecorations rolls each terrain's chance per mille.
+    RANDOM_MAP_DECORATION_ROLL   = 1000
 H2_ENUM_END(RandomMapConstant)
 
 // Where PlaceTreasures guards a treasure: the diagonal cell of a corner
@@ -167,7 +169,7 @@ static MapStepPair gChainTurns[CHAIN_DIRECTION_COUNT][CHAIN_TURN_COUNT] = {
 };
 
 DATA(0x00498f8c)
-static i32 gMineResources[RANDOM_MAP_MINE_RESOURCE_COUNT] = {
+static i32 H2_UNUSED(gMineResources)[RANDOM_MAP_MINE_RESOURCE_COUNT] = {
     IDX(RES_ORE), IDX(RES_SULFUR), IDX(RES_CRYSTAL), IDX(RES_GEMS), IDX(RES_GOLD)
 };
 
@@ -192,7 +194,7 @@ void editManager::GenerateRandomMap(void) {
     i32 paintFrom;
     b32 done;
     i32 H2_UNUSED(unusedTries);
-    double unusedPercent;
+    double H2_UNUSED(unusedPercent);
     double H2_UNUSED(unusedRatio);
 
     gGeneratingRandomMap = true;
@@ -328,7 +330,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
     i32 maxWeight;
     i32 upWeight;
     i32 balance;
-    i32 escapes;
+    i32 H2_UNUSED(escapes);
     i32 patches;
     i32 minWeight;
     i32 seedX;
@@ -375,7 +377,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
                              + Random(0, MAP_HEIGHT - 1) + Random(0, MAP_HEIGHT - 1))
                             / 4;
                 }
-                if (CELL_TERRAIN(gMap.CellAt(seedX, seedY)) == baseTerrain)
+                if (IDX(CELL_TERRAIN(gMap.CellAt(seedX, seedY))) == baseTerrain)
                     looking = false;
             }
             horizontalWeight = Random(3, 7);
@@ -417,7 +419,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
                 walkX = seedX;
                 walkY = seedY;
                 guard = 0;
-                while (CELL_TERRAIN(gMap.CellAt(walkX, walkY)) == terrain
+                while (IDX(CELL_TERRAIN(gMap.CellAt(walkX, walkY))) == terrain
                        && guard++ < RANDOM_MAP_WALK_LIMIT) {
                     if (Random(0, 9) < horizontalWeight) {
                         if (walkX == 0) {
@@ -453,7 +455,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
                 }
                 if (guard >= RANDOM_MAP_ESCAPED_WALK)
                     escapes++;
-                if (CELL_TERRAIN(gMap.CellAt(walkX, walkY)) == baseTerrain)
+                if (IDX(CELL_TERRAIN(gMap.CellAt(walkX, walkY))) == baseTerrain)
                     gMap.CellAt(walkX, walkY)->m_terrainImageIndex = ChooseGroundTile(
                         terrain,
                         EDIT_SHAPE_PLAIN,
@@ -521,7 +523,7 @@ void editManager::RemoveSmallRegions(void) {
                 continue;
             memset(inRegion, 0, MAP_WIDTH * MAP_HEIGHT);
             MAP_GRID_CELL(inRegion, startX, startY)++;
-            ground = CELL_TERRAIN(gMap.CellAt(startX, startY));
+            ground = IDX(CELL_TERRAIN(gMap.CellAt(startX, startY)));
             spread = true;
             extent = 1;
             minX = startX - 1;
@@ -541,9 +543,9 @@ void editManager::RemoveSmallRegions(void) {
                     maxY = MAP_HEIGHT - 1;
                 for (y = minY; y <= maxY; y++) {
                     for (x = minX; x <= maxX; x++) {
-                        if (CELL_TERRAIN(gMap.CellAt(x, y)) != ground) {
+                        if (IDX(CELL_TERRAIN(gMap.CellAt(x, y))) != ground) {
                             if (neighbourTerrain == IDX(TERRAIN_INVALID))
-                                neighbourTerrain = CELL_TERRAIN(gMap.CellAt(x, y));
+                                neighbourTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
                             continue;
                         }
                         if (MAP_GRID_CELL(inRegion, x, y))
@@ -619,7 +621,7 @@ void editManager::RemoveSmallRegions(void) {
 
 VA(0x0041dede, 0x51)
 void ScaleByDensity(i32* count, i32 density) {
-    i32 base;
+    i32 H2_UNUSED(base);
 
     base = *count;
     if (density < RANDOM_MAP_NEUTRAL_DENSITY)
@@ -704,7 +706,7 @@ void editManager::PlaceObstacleChains(i32 density, b32 mountains) {
                 crowdedTries++;
                 hunting = true;
             }
-            ground = CELL_TERRAIN(gMap.CellAt(x, y));
+            ground = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
             if (ground == IDX(TERRAIN_WATER))
                 hunting = true;
             if (!mountains && (ground == IDX(TERRAIN_LAVA) || ground == IDX(TERRAIN_WASTELAND))
@@ -841,17 +843,17 @@ void editManager::PlaceObstacleChains(i32 density, b32 mountains) {
 #define piece piece_p         // frame-slot spelling
 #define unusedBit unusedBit_o // frame-slot spelling
 VA(0x0041e542, 0x1c7)
-b32 editManager::PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset) {
+b32 editManager::PlaceChainLink(i32* x, i32* y, i32 direction, b32 H2_UNUSED(mountains), char tileset) {
     i32 piece;
     overlayType* link;
     i32 H2_UNUSED(unusedBit);
-    i32 ground;
+    i32 H2_UNUSED(ground);
     i32 n;
 
     if (*x < 0 || *x > MAP_WIDTH - 1 || *y < 0 || *y > MAP_HEIGHT - 1)
         return false;
     piece = 0;
-    ground = CELL_TERRAIN(gMap.CellAt(*x, *y));
+    ground = IDX(CELL_TERRAIN(gMap.CellAt(*x, *y)));
     H2_ASSERT(tileset != IDX(TILESET_NONE), RETAIL_FILE, 750);
     if (direction == CHAIN_UP_RIGHT_STEEP)
         piece = CHAIN_PIECE_STEEP_RISING;
@@ -913,7 +915,7 @@ void editManager::PlaceTowns(void) {
     mapStep keeps[RANDOM_MAP_CASTLE_SLOTS];
     b32 tracing;
     i32 fromX;
-    i32 roadMask;
+    i32 H2_UNUSED(roadMask);
     i32 regionsUsed;
     i32 c;
     i32 round;
@@ -1118,7 +1120,7 @@ void editManager::PlaceTowns(void) {
         tileY = keeps[c].y + 1;
         if (top < 0)
             ShutDown(localization::Tr("editor.random.castles_failed"));
-        terrain = CELL_TERRAIN(gMap.CellAt(tileX, tileY));
+        terrain = IDX(CELL_TERRAIN(gMap.CellAt(tileX, tileY)));
         gEditManager->ClearArea(tileX - 4, tileY - 2, 5, 4, EDIT_CLEAR_ALL, true, false);
         for (nearX = tileX - 4; nearX <= tileX + 1; nearX++)
             for (nearY = tileY - 2; nearY <= tileY + 1; nearY++)
@@ -1369,7 +1371,7 @@ b32 editManager::PlaceResourceSite(i32 x, i32 y, i32 resource) {
     i32 ground;
 
     site = NULL;
-    ground = CELL_TERRAIN(gMap.CellAt(x, y));
+    ground = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
     if (resource == IDX(RES_WOOD)) {
         switch (ground) {
             case IDX(TERRAIN_SNOW):
@@ -1459,11 +1461,11 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
     b32 valid;
     i32 kind;
     i32 towns;
-    overlayType* weakMonster;
+    overlayType* H2_UNUSED(weakMonster);
     i32 decorations;
     i32 x;
     i32 appeal;
-    overlayType* veryStrongMonster;
+    overlayType* H2_UNUSED(veryStrongMonster);
     overlayType* obelisks[IDX(TERRAIN_COUNT)];
     i32 tries;
     overlayType* strongMonster;
@@ -1477,8 +1479,8 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
     i32 dist;
     i32 ground;
     i32 quota[IDX(RES_COUNT)];
-    i32 sitesPlaced;
-    overlayType* anyMonster;
+    i32 H2_UNUSED(sitesPlaced);
+    overlayType* H2_UNUSED(anyMonster);
 
     monsterDensity = monsterDensity * 1.2;
     anyMonster = &gOverlayTypes[OVERLAY_RANDOM_MONSTER];
@@ -1581,12 +1583,12 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
                             dist = MANHATTAN_LENGTH(i - x, j - y);
                             if (dist < 10)
                                 appeal -= 10 - dist;
-                            if ((kind == IDX(RES_WOOD)
-                                 && gMap.CellAt(i, j)->m_triggerType
-                                        == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
-                                 || kind == IDX(RES_MERCURY)
-                                        && gMap.CellAt(i, j)->m_triggerType
-                                               == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB))
+                            if (((kind == IDX(RES_WOOD)
+                                  && gMap.CellAt(i, j)->m_triggerType
+                                         == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL))
+                                 || (kind == IDX(RES_MERCURY)
+                                     && gMap.CellAt(i, j)->m_triggerType
+                                            == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)))
                                 && dist < 15)
                                 appeal -= (15 - dist) * 2;
                         }
@@ -1621,7 +1623,7 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
         x = Random(0, MAP_WIDTH - 1);
         y = Random(0, MAP_WIDTH - 1);
         if (CELL_TERRAIN(gMap.CellAt(x, y)) != TERRAIN_WATER) {
-            ground = CELL_TERRAIN(gMap.CellAt(x, y));
+            ground = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
             if (CanPlaceOverlayAt(obelisks[ground], x, y, false)) {
                 decorations -= RANDOM_MAP_TRIES_PER_OBJECT;
                 PlaceOverlayAt(obelisks[ground], x, y);
@@ -1670,7 +1672,7 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
     b32 southEast;
     overlayType* chest;
     b32 east;
-    overlayType* anyMonster;
+    overlayType* H2_UNUSED(anyMonster);
     overlayType* mediumMonster;
     i32 x;
     overlayType* weakMonster;
@@ -1718,24 +1720,24 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
             roll = Random(0, 100);
             northWest = southWest = northEast = southEast = north = south = east = west = false;
             if (y == 0 || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_WATER
-                || gMap.CellAt(x, y - 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x, y - 1)->m_objectHighLayer
-                       && !gMap.CellAt(x, y - 1)->m_objectShadow)
+                || (gMap.CellAt(x, y - 1)->m_objectIndex != MAPCELL_SPRITE_NONE
+                    && !gMap.CellAt(x, y - 1)->m_objectHighLayer
+                    && !gMap.CellAt(x, y - 1)->m_objectShadow))
                 north = true;
             if (y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == TERRAIN_WATER
-                || gMap.CellAt(x, y + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x, y + 1)->m_objectHighLayer
-                       && !gMap.CellAt(x, y + 1)->m_objectShadow)
+                || (gMap.CellAt(x, y + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
+                    && !gMap.CellAt(x, y + 1)->m_objectHighLayer
+                    && !gMap.CellAt(x, y + 1)->m_objectShadow))
                 south = true;
             if (x == 0 || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == TERRAIN_WATER
-                || gMap.CellAt(x - 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x - 1, y)->m_objectHighLayer
-                       && !gMap.CellAt(x - 1, y)->m_objectShadow)
+                || (gMap.CellAt(x - 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
+                    && !gMap.CellAt(x - 1, y)->m_objectHighLayer
+                    && !gMap.CellAt(x - 1, y)->m_objectShadow))
                 west = true;
             if (x == MAP_WIDTH - 1 || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == TERRAIN_WATER
-                || gMap.CellAt(x + 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x + 1, y)->m_objectHighLayer
-                       && !gMap.CellAt(x + 1, y)->m_objectShadow)
+                || (gMap.CellAt(x + 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
+                    && !gMap.CellAt(x + 1, y)->m_objectHighLayer
+                    && !gMap.CellAt(x + 1, y)->m_objectShadow))
                 east = true;
             if (x < MAP_WIDTH + 1 && y > 0
                 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != TERRAIN_WATER
@@ -1874,8 +1876,8 @@ void editManager::ScatterDecorations(void) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             cell = gMap.CellAt(x, y);
-            terrain = CELL_TERRAIN(cell);
-            if (Random(1, 1000) <= chance[CELL_TERRAIN(cell)]
+            terrain = IDX(CELL_TERRAIN(cell));
+            if (Random(1, RANDOM_MAP_DECORATION_ROLL) <= chance[IDX(CELL_TERRAIN(cell))]
                 && cell->m_objectIndex == MAPCELL_SPRITE_NONE
                 && cell->m_overlayIndex == MAPCELL_SPRITE_NONE
                 && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_PLAIN

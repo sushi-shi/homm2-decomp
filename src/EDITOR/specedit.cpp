@@ -104,7 +104,7 @@ DATA(0x004a583c) i32 gLandPercent;
 DATA(0x004a5840) heroWindow* gSpecWindow;
 
 VA(0x00426640, 0x528)
-b32 EditMapSpecifications(b32 randomMap) {
+b32 EditMapSpecifications(b32 H2_UNUSED(randomMap)) {
     char buffer[SPEC_EXCERPT_SIZE];
     tag_message message;
     i32 y;
@@ -173,11 +173,11 @@ b32 EditMapSpecifications(b32 randomMap) {
     }
     message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
     message.payload.widget.id = SPEC_VICTORY_LIST;
-    message.payload.widget.data.value = gEditMapHeader.victoryCondition;
+    message.payload.widget.data.value = IDX(gEditMapHeader.victoryCondition);
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
     message.payload.widget.id = SPEC_LOSS_LIST;
-    message.payload.widget.data.value = gEditMapHeader.lossCondition;
+    message.payload.widget.data.value = IDX(gEditMapHeader.lossCondition);
     gSpecWindow->BroadcastMessage(message);
     UpdateSpecificationsWindow();
     gpWindowManager->DoDialog(gSpecWindow, SpecificationsHandler, 0);
@@ -525,25 +525,29 @@ void UpdateSpecificationsWindow(void) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SPEC_NORMAL_VICTORY_BOX;
     gSpecWindow->BroadcastMessage(message);
-    message.payload.widget.command
-        = gEditMapHeader.victoryCondition ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.command = gEditMapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
+        ? WIDGET_COMMAND_SET_FLAGS
+        : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SPEC_VICTORY_VALUE_LABEL;
     gSpecWindow->BroadcastMessage(message);
-    message.payload.widget.command
-        = gEditMapHeader.victoryCondition ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.command = gEditMapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
+        ? WIDGET_COMMAND_SET_FLAGS
+        : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SPEC_VICTORY_VALUE_LIST;
     gSpecWindow->BroadcastMessage(message);
-    message.payload.widget.command
-        = gEditMapHeader.lossCondition ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.command = gEditMapHeader.lossCondition != MAP_LOSS_STANDARD
+        ? WIDGET_COMMAND_SET_FLAGS
+        : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SPEC_LOSS_VALUE_LABEL;
     gSpecWindow->BroadcastMessage(message);
-    message.payload.widget.command
-        = gEditMapHeader.lossCondition ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.command = gEditMapHeader.lossCondition != MAP_LOSS_STANDARD
+        ? WIDGET_COMMAND_SET_FLAGS
+        : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = SPEC_LOSS_VALUE_LIST;
     gSpecWindow->BroadcastMessage(message);
     for (i = 0; i < IDX(DIFFICULTY_COUNT) - 1; i++) {
         message.payload.widget.command
-            = i == gEditMapHeader.difficulty ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+            = i == IDX(gEditMapHeader.difficulty) ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = SPEC_DIFFICULTY_FIRST + i;
         gSpecWindow->BroadcastMessage(message);
     }
@@ -556,7 +560,7 @@ void UpdateSpecificationsWindow(void) {
     gSpecWindow->BroadcastMessage(message);
     dimmed = message.payload.widget.data.value == LIST_BOX_NO_SELECTION;
     message.payload.widget.command = dimmed ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = WIDGET_FLAGS_ARGUMENT_DIMMED;
+    message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
     message.payload.widget.id = SPEC_EVENT_EDIT;
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.id = SPEC_EVENT_DELETE;
@@ -566,7 +570,7 @@ void UpdateSpecificationsWindow(void) {
     gSpecWindow->BroadcastMessage(message);
     dimmed = message.payload.widget.data.value == LIST_BOX_NO_SELECTION;
     message.payload.widget.command = dimmed ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = WIDGET_FLAGS_ARGUMENT_DIMMED;
+    message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
     message.payload.widget.id = SPEC_RUMOUR_EDIT;
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.id = SPEC_RUMOUR_DELETE;
@@ -785,8 +789,8 @@ void DeleteMapRumour(void) {
 
 VA(0x004283d7, 0x70e)
 MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
-    char spareText[SPEC_EXCERPT_LENGTH];
-    i32 unusedValues[2];
+    char H2_UNUSED(spareText)[SPEC_EXCERPT_LENGTH];
+    i32 H2_UNUSED(unusedValues)[2];
     i32 state;
     i32 color;
     b32 update;
@@ -879,8 +883,8 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                 case SPEC_VICTORY_LIST:
                     message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
                     gSpecWindow->BroadcastMessage(message);
-                    if (gEditMapHeader.victoryCondition != message.payload.widget.data.value) {
-                        gEditMapHeader.victoryCondition = message.payload.widget.data.value;
+                    if (IDX(gEditMapHeader.victoryCondition) != message.payload.widget.data.value) {
+                        gEditMapHeader.victoryCondition = static_cast<MapVictoryCondition>(message.payload.widget.data.value);
                         gEditMapHeader.victoryConditionValue = gEditMapHeader.victoryTownY = 0;
                         FillVictoryConditionList();
                         update = true;
@@ -900,8 +904,8 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                 case SPEC_LOSS_LIST:
                     message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
                     gSpecWindow->BroadcastMessage(message);
-                    if (gEditMapHeader.lossCondition != message.payload.widget.data.value) {
-                        gEditMapHeader.lossCondition = message.payload.widget.data.value;
+                    if (IDX(gEditMapHeader.lossCondition) != message.payload.widget.data.value) {
+                        gEditMapHeader.lossCondition = static_cast<MapLossCondition>(message.payload.widget.data.value);
                         gEditMapHeader.lossConditionValue = gEditMapHeader.lossTownY = 0;
                         FillLossConditionList();
                         update = true;

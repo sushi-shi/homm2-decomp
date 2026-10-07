@@ -275,7 +275,7 @@ void overlayManager::Close(void) {
 VA(0x004192a2, 0xcc)
 void overlayManager::ShowClass(b32 update) {
     tag_message message;
-    i32 i;
+    i32 H2_UNUSED(i);
 
     sprintf(gText, gObjectClassNames[gObjectClass]);
     message.type = MESSAGE_WIDGET;
@@ -300,7 +300,7 @@ VA(0x0041936e, 0x49a)
 MessageDispatchResult overlayManager::Main(tag_message& message) {
     b32 placed;
     b32 finished;
-    i32 helpItem;
+    i32 H2_UNUSED(helpItem);
     tag_message peek;
     i32 mapX;
     i32 mapY;
@@ -315,7 +315,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                         if (message.payload.widget.id >= OVERLAY_CLASS_BUTTON_ID_FIRST
                             && message.payload.widget.id
-                                   < OVERLAY_CLASS_BUTTON_ID_FIRST + OVERLAY_CLASS_COUNT)
+                                   < OVERLAY_CLASS_BUTTON_ID_FIRST + IDX(OVERLAY_CLASS_COUNT))
                             NormalDialog(
                                 gClearHelp
                                     [OVERLAY_CLASS_HELP_FIRST + message.payload.widget.id
@@ -356,7 +356,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                         goto pick;
                     if (message.payload.widget.id >= OVERLAY_CLASS_BUTTON_ID_FIRST
                         && message.payload.widget.id
-                               < OVERLAY_CLASS_BUTTON_ID_FIRST + OVERLAY_CLASS_COUNT) {
+                               < OVERLAY_CLASS_BUTTON_ID_FIRST + IDX(OVERLAY_CLASS_COUNT)) {
                         gObjectClass = message.payload.widget.id - OVERLAY_CLASS_BUTTON_ID_FIRST;
                     pick:
                         gSelectedOverlay = PickOverlay(gObjectClass);
@@ -481,7 +481,7 @@ void overlayManager::DrawFootprint(
                         top + (y - startY) * cellSize,
                         gEditManager->m_zoomLevel,
                         color,
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -535,7 +535,7 @@ b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
                         }
                     }
                 } else {
-                    if (!(shape->groundMask & 1 << CELL_TERRAIN(gMap.CellAt(left + x, top + y))))
+                    if (!(shape->groundMask & BIT(CELL_TERRAIN(gMap.CellAt(left + x, top + y)))))
                         return false;
                     if (OverlayGridHas(shape->entranceRows, x, y)) {
                         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
@@ -612,19 +612,19 @@ void RemoveReplacedObjects(overlayType* type, i32 left, i32 top) {
             if (OverlayGridHas(type->occupiedRows, x, y)) {
                 cell = gMap.CellAt(left + x, top + y);
                 if (cell->m_overlayIndex == type->frames[i]
-                    && cell->m_overlayTileset == type->tileset)
+                    && IDX(cell->m_overlayTileset) == type->tileset)
                     gEditManager->RemoveLinkedObject(cell->m_overlayLink);
                 if (cell->m_objectIndex == type->frames[i]
-                    && cell->m_objectTileset == type->tileset)
+                    && IDX(cell->m_objectTileset) == type->tileset)
                     gEditManager->RemoveLinkedObject(cell->m_objectLink);
                 if (cell->m_extraIndex) {
                     extra = &gMap.extras[cell->m_extraIndex];
                     while (extra) {
                         if (extra->overlayIndex == type->frames[i]
-                            && extra->overlayTileset == type->tileset)
+                            && IDX(extra->overlayTileset) == type->tileset)
                             gEditManager->RemoveLinkedObject(extra->overlayLink);
                         if (extra->objectIndex == type->frames[i]
-                            && extra->objectTileset == type->tileset)
+                            && IDX(extra->objectTileset) == type->tileset)
                             gEditManager->RemoveLinkedObject(extra->objectLink);
                         extra = extra->nextIndex ? &gMap.extras[extra->nextIndex] : NULL;
                     }
@@ -657,7 +657,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
     i32 ground;
     i32 anchorY;
     i32 shadow;
-    b32 placed;
+    b32 H2_UNUSED(placed);
     TownExtra* newTown;
     signEventExtra* newSign;
     EventExtra* newEvent;
@@ -689,7 +689,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
         for (col = 0; col < MAP_WIDTH; col++)
             for (row = 0; row < MAP_WIDTH; row++)
                 if ((gMap.CellAt(col, row)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
-                    == IDX(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT)) {
+                    == MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT) {
                     sprintf(gText, localization::Tr("editor.overlay.ultimate.placed"));
                     ShowStatusWarning(gText);
                     return false;
@@ -730,7 +730,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
         else
             shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
         ground =
-            CELL_TERRAIN(gMap.CellAt(x + OVERLAY_TOWN_ENTRANCE_X, y + OVERLAY_TOWN_ENTRANCE_Y))
+            IDX(CELL_TERRAIN(gMap.CellAt(x + OVERLAY_TOWN_ENTRANCE_X, y + OVERLAY_TOWN_ENTRANCE_Y)))
             + OVERLAY_TOWN_GROUNDS;
         placed = PlaceOverlay(&gOverlayTypes[shadow], x, y, false);
         placed = PlaceOverlay(&gOverlayTypes[ground], x, y, false);
@@ -746,7 +746,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             node = gMap.GetNewCellExtraOverlay(x + col, y + row);
                             node->overlayLink = gNextObjectLink;
                             node->overlayIndex = type->frames[idx];
-                            node->overlayTileset = type->tileset;
+                            node->overlayTileset = static_cast<TilesetId>(type->tileset);
                             if (row < OVERLAY_GRID_HEIGHT - 2
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
                                 && (type->trigger != IDX(MAP_OBJECT_ALCHEMIST_TOWER)
@@ -762,7 +762,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         } else {
                             dest->m_overlayLink = gNextObjectLink;
                             dest->m_overlayIndex = type->frames[idx];
-                            dest->m_overlayTileset = type->tileset;
+                            dest->m_overlayTileset = static_cast<TilesetId>(type->tileset);
                             if (row < OVERLAY_GRID_HEIGHT - 2
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
                                 && (type->trigger != IDX(MAP_OBJECT_ALCHEMIST_TOWER)
@@ -785,7 +785,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             node = gMap.GetNewCellExtraObject(x + col, y + row);
                             node->objectLink = gNextObjectLink;
                             node->objectIndex = type->frames[idx];
-                            node->objectTileset = type->tileset;
+                            node->objectTileset = static_cast<TilesetId>(type->tileset);
                             if (OverlayGridHas(type->shadowRows, col, row))
                                 node->objectShadow = 1;
                             else
@@ -809,7 +809,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             if (giGroundShape[dest->m_terrainImageIndex]
                                 & GROUND_SHAPE_VARIED)
                                 dest->m_terrainImageIndex = ChooseGroundTile(
-                                    CELL_TERRAIN(dest),
+                                    IDX(CELL_TERRAIN(dest)),
                                     giGroundShape[dest->m_terrainImageIndex]
                                         - GROUND_SHAPE_VARIED,
                                     false,
@@ -820,7 +820,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                                 );
                             dest->m_objectLink = gNextObjectLink;
                             dest->m_objectIndex = type->frames[idx];
-                            dest->m_objectTileset = type->tileset;
+                            dest->m_objectTileset = static_cast<TilesetId>(type->tileset);
                             if (OverlayGridHas(type->shadowRows, col, row))
                                 dest->m_triggerType = MAP_OBJECT_NONE;
                             else
@@ -930,35 +930,35 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             heroFaction = dest->m_objectIndex % OVERLAY_HERO_FRAMES_PER_COLOR;
                         if (heroFaction == IDX(FACTION_KNIGHT)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_LEADERSHIP);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_BASIC);
                             newHero->skillTypes[1] = IDX(HERO_SKILL_BALLISTICS);
-                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[1] = IDX(HERO_SKILL_LEVEL_BASIC);
                         }
                         if (heroFaction == IDX(FACTION_SORCERESS)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_NAVIGATION);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_ADVANCED);
                             newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[1] = IDX(HERO_SKILL_LEVEL_BASIC);
                         }
                         if (heroFaction == IDX(FACTION_BARBARIAN)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_PATHFINDING);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_ADVANCED);
                         }
                         if (heroFaction == IDX(FACTION_WARLOCK)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_SCOUTING);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_ADVANCED);
                             newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[1] = IDX(HERO_SKILL_LEVEL_BASIC);
                         }
                         if (heroFaction == IDX(FACTION_WIZARD)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_WISDOM);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_ADVANCED;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_ADVANCED);
                         }
                         if (heroFaction == IDX(FACTION_NECROMANCER)) {
                             newHero->skillTypes[0] = IDX(HERO_SKILL_NECROMANCY);
-                            newHero->skillLevels[0] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[0] = IDX(HERO_SKILL_LEVEL_BASIC);
                             newHero->skillTypes[1] = IDX(HERO_SKILL_WISDOM);
-                            newHero->skillLevels[1] = HERO_SKILL_LEVEL_BASIC;
+                            newHero->skillLevels[1] = IDX(HERO_SKILL_LEVEL_BASIC);
                         }
                         dest->m_objectMetadata = gEditManager->m_extraCount;
                         gEditManager->m_extras[gEditManager->m_extraCount] = newHero;
@@ -1129,7 +1129,7 @@ void overlayManager::DrawOverlay(
                 cellX = MAP_WIDTH - 1;
             if (cellY > MAP_HEIGHT - 1)
                 cellY = MAP_HEIGHT - 1;
-            cellTerrain = CELL_TERRAIN(gMap.CellAt(cellX - OVERLAY_TOWN_GROUND_COLUMN, cellY));
+            cellTerrain = IDX(CELL_TERRAIN(gMap.CellAt(cellX - OVERLAY_TOWN_GROUND_COLUMN, cellY)));
             if (cellTerrain != IDX(TERRAIN_WATER))
                 ground = cellTerrain + OVERLAY_TOWN_GROUNDS;
         }
@@ -1165,7 +1165,7 @@ void overlayManager::DrawOverlay(
                         && x + (gridX - fromX + 1) * tileSize <= EDIT_VIEW_RIGHT
                         && y + (gridY - fromY) * tileSize >= EDIT_VIEW_TOP
                         && y + (gridY - fromY + 1) * tileSize <= EDIT_VIEW_BOTTOM))) {
-                if (type->tileset == TILESET_MINIHERO)
+                if (type->tileset == IDX(TILESET_MINIHERO))
                     IconToBitmapScaleDouble(
                         gEditManager->m_objectIcons[type->tileset][0],
                         gpWindowManager->m_screen,
@@ -1173,7 +1173,7 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize
                             - EDIT_HERO_LIFT / gZoomScale[gEditManager->m_zoomLevel],
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH],
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1187,7 +1187,7 @@ void overlayManager::DrawOverlay(
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH],
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1207,7 +1207,7 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize,
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH] + 1
                             + gEditManager->m_animationCounter % frameCount,
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1218,12 +1218,12 @@ void overlayManager::DrawOverlay(
                 if (type->flags & OVERLAY_FLAG_SHOWS_RESOURCE
                     && OverlayGridHas(type->resourceRows, gridX, gridY))
                     IconToBitmapScale(
-                        gEditManager->m_objectIcons[TILESET_EXTRAOVR][0],
+                        gEditManager->m_objectIcons[IDX(TILESET_EXTRAOVR)][0],
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
                         type->color,
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1233,12 +1233,12 @@ void overlayManager::DrawOverlay(
                 if (type->category == OVERLAY_CATEGORY_TOWN && gridX == OVERLAY_TOWN_FLAG_COLUMN
                     && gridY == OVERLAY_TOWN_FLAG_ROW)
                     IconToBitmapScale(
-                        gEditManager->m_objectIcons[TILESET_FLAG32][0],
+                        gEditManager->m_objectIcons[IDX(TILESET_FLAG32)][0],
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
                         type->color * 2,
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1248,12 +1248,12 @@ void overlayManager::DrawOverlay(
                 if (type->category == OVERLAY_CATEGORY_TOWN
                     && gridX == OVERLAY_TOWN_RIGHT_FLAG_COLUMN && gridY == OVERLAY_TOWN_FLAG_ROW)
                     IconToBitmapScale(
-                        gEditManager->m_objectIcons[TILESET_FLAG32][0],
+                        gEditManager->m_objectIcons[IDX(TILESET_FLAG32)][0],
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
                         type->color * 2 + 1,
-                        clip,
+                        static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
                         EDIT_VIEW_PIXELS,
@@ -1274,7 +1274,7 @@ void overlayManager::DrawOverlay(
 
 VA(0x0041be5a, 0x24c)
 b32 overlayManager::LoadClass(i32 objectClass) {
-    i32 unusedCount;
+    i32 H2_UNUSED(unusedCount);
     b32 changed;
     i32 H2_UNUSED(unusedFlag);
     overlayType tmp;
@@ -1434,9 +1434,9 @@ void overlayManager::DrawPicker(b32 update) {
 
 VA(0x0041c549, 0x2d7)
 i32 overlayManager::PickOverlay(i32 objectClass) {
-    b32 needDraw;
-    b32 done;
-    tag_message message;
+    b32 H2_UNUSED(needDraw);
+    b32 H2_UNUSED(done);
+    tag_message H2_UNUSED(message);
     i32 zoom;
 
     zoom = gEditManager->m_zoomLevel;

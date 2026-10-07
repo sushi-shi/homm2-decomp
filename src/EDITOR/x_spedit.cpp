@@ -64,7 +64,7 @@ void eventsManager::EditSpellScroll(i32* spell) {
 
 VA(0x0042d1e0, 0x118)
 MessageDispatchResult EditSpellScrollHandler(struct tag_message& message) {
-    b32 handled = false;
+    b32 H2_UNUSED(handled) = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:

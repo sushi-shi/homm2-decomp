@@ -1,10 +1,11 @@
 # Heroes of Might and Magic II — Gold 2.1 (Buka) source, reading view
 
 The generated C++ source of the Buka release of Heroes of Might and Magic II
-Gold 2.1 (`HMM2PL.exe`) with its text written out in Russian. Every text
-reference of the source tree is replaced by the Russian string the retail
-program shows, as readable UTF-8. Code is that of `source-gold-2.1-buka`, with
-the original integer-enum and name-mangling model.
+Gold 2.1 (`HMM2PL.exe`) and its scenario editor (`EDT2PL.exe`, `src/EDITOR/`)
+with their text written out in Russian. Every text reference of the source
+tree is replaced by the Russian string the retail program shows, as readable
+UTF-8. Code is that of `source-gold-2.1-buka`, with the original integer-enum
+and name-mangling model.
 
 ## Branches
 

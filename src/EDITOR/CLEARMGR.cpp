@@ -95,7 +95,7 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
     i32 help;
     i32 x;
     i32 y;
-    i32 unusedMask;
+    i32 H2_UNUSED(unusedMask);
     tag_message event;
     i32 anchorX;
 
@@ -110,10 +110,10 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                             case EDIT_BRUSH_BUTTON_ID_FIRST:
                                 help = EDIT_BRUSH_SINGLE;
                                 break;
-                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_DOUBLE):
                                 help = EDIT_BRUSH_DOUBLE;
                                 break;
-                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_QUADRUPLE):
                                 help = EDIT_BRUSH_QUADRUPLE;
                                 break;
                             case EDIT_BRUSH_BUTTON_ID_LAST:
@@ -191,8 +191,8 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                 case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case EDIT_BRUSH_BUTTON_ID_FIRST:
-                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
-                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_DOUBLE):
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_QUADRUPLE):
                         case EDIT_BRUSH_BUTTON_ID_LAST:
                             gClearBrush = message.payload.widget.id - EDIT_BRUSH_BUTTON_ID_FIRST;
                             UpdateBrushButtons();

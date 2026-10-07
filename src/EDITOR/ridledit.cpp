@@ -42,7 +42,7 @@ DATA(0x004a580c) char* gSphinxText;
 
 VA(0x00424ef0, 0x308)
 i32 eventsManager::EditSphinx(i32 extra) {
-    i32 unused[2];
+    i32 H2_UNUSED(unused)[2];
     tag_message message;
     i32 i;
     i32 len;
@@ -94,7 +94,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
 }
 
 VA(0x004251f8, 0x170)
-void eventsManager::FillInSphinxEdit(mapEventExtra* sphinx) {
+void eventsManager::FillInSphinxEdit(mapEventExtra* H2_UNUSED(sphinx)) {
     char text[SPHINX_RESOURCE_TEXT_SIZE];
     b32 dimmed;
     tag_message message;
@@ -131,17 +131,17 @@ void eventsManager::FillInSphinxEdit(mapEventExtra* sphinx) {
     }
     dimmed = message.payload.widget.data.value == LIST_BOX_NO_SELECTION;
     message.payload.widget.command = dimmed ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = WIDGET_FLAGS_ARGUMENT_DIMMED;
+    message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
     message.payload.widget.id = SPHINX_DELETE_ANSWER;
     gEditDialog->BroadcastMessage(message);
 }
 
 VA(0x00425368, 0x475)
 MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
-    i32 unused[2];
+    i32 H2_UNUSED(unused)[2];
     tag_message request;
     b32 modified;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
     char newAnswer[SPHINX_ANSWER_BUFFER];
     i32 answerIndex;
 

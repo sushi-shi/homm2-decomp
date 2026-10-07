@@ -166,7 +166,7 @@ VA(0x00411bd9, 0x48d)
 void eventsManager::EditCell(i32 x, i32 y) {
     mapCell original;
     // Never read: a slot of the retail frame.
-    i32 unusedCode;
+    i32 H2_UNUSED(unusedCode);
     char text[EVENTS_NUMBER_TEXT_SIZE];
     tag_message message;
 
@@ -177,7 +177,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     }
     const i16 textBase = CELL_WINDOW_FIRST_FIELD;
     // Never read: a slot of the retail frame.
-    const i16 toggleBase = CELL_WINDOW_FIRST_FLAG;
+    const i16 H2_UNUSED(toggleBase) = CELL_WINDOW_FIRST_FLAG;
     gEditCell = gMap.GetCell(x, y);
     original = *gEditCell;
     gEditDialog = new heroWindow(EVENTS_DIALOG_X, EVENTS_DIALOG_Y, "cellwin.bin");
@@ -239,7 +239,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
 VA(0x00412066, 0x386)
 MessageDispatchResult CellWindowHandler(tag_message& message) {
     // Never read: a slot of the retail frame.
-    const i16 firstTextId = CELL_WINDOW_FIRST_FIELD;
+    const i16 H2_UNUSED(firstTextId) = CELL_WINDOW_FIRST_FIELD;
     const i16 firstToggleId = CELL_WINDOW_FIRST_FLAG;
     i32 value;
 
@@ -257,16 +257,16 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                     break;
                 case WIDGET_NOTIFY_SELECT:
                     switch (message.payload.widget.id) {
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TERRAIN_IMAGE:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OBJECT_TILESET:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OBJECT_INDEX:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OVERLAY_TILESET:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OVERLAY_INDEX:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_ANIMATED_OBJECT:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_ANIMATED_OVERLAY:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OBJECT_LAYER:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_ROAD:
-                        case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TRIGGER_TYPE:
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_TERRAIN_IMAGE):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_TILESET):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_INDEX):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OVERLAY_TILESET):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OVERLAY_INDEX):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ANIMATED_OBJECT):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ANIMATED_OVERLAY):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_LAYER):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ROAD):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_TRIGGER_TYPE):
                             message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
                             gEditDialog->BroadcastMessage(message);
                             value = atoi(message.payload.widget.data.text);
@@ -276,32 +276,32 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                             // editor kept there (flags, trigger type and
                             // metadata), not the ones EditCell fills them from.
                             switch (message.payload.widget.id) {
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TERRAIN_IMAGE:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_TERRAIN_IMAGE):
                                     gEditCell->m_terrainImageIndex = value & CELL_WINDOW_BYTE_MASK;
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OBJECT_TILESET:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_TILESET):
                                     if (value > CELL_WINDOW_MAX_TILESET)
                                         value = CELL_WINDOW_MAX_TILESET;
-                                    gEditCell->m_objectTileset = value;
+                                    gEditCell->m_objectTileset = static_cast<TilesetId>(value);
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OBJECT_INDEX:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_INDEX):
                                     gEditCell->m_objectIndex = value & CELL_WINDOW_BYTE_MASK;
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OVERLAY_TILESET:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OVERLAY_TILESET):
                                     if (value > CELL_WINDOW_MAX_TILESET)
                                         value = CELL_WINDOW_MAX_TILESET;
-                                    gEditCell->m_overlayTileset = value;
+                                    gEditCell->m_overlayTileset = static_cast<TilesetId>(value);
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_OVERLAY_INDEX:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OVERLAY_INDEX):
                                     gEditCell->m_overlayIndex = value & CELL_WINDOW_BYTE_MASK;
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_ANIMATED_OVERLAY:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ANIMATED_OVERLAY):
                                     gEditCell->m_flags = value;
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_ROAD:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ROAD):
                                     gEditCell->m_triggerType = value;
                                     break;
-                                case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TRIGGER_TYPE:
+                                case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_TRIGGER_TYPE):
                                     gEditCell->m_objectMetadata = value;
                                     break;
                             }
@@ -321,7 +321,7 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                                 gEditCell->m_flags & (1 << (message.payload.widget.id - firstToggleId))
                                     ? WIDGET_COMMAND_SET_FLAGS
                                     : WIDGET_COMMAND_CLEAR_FLAGS;
-                            message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+                            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                             gEditDialog->BroadcastMessage(message);
                             gEditDialog->DrawWindow();
                             break;
@@ -332,7 +332,7 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                                 gEditCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG
                                     ? WIDGET_COMMAND_SET_FLAGS
                                     : WIDGET_COMMAND_CLEAR_FLAGS;
-                            message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+                            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                             gEditDialog->BroadcastMessage(message);
                             gEditDialog->DrawWindow();
                             break;
@@ -354,7 +354,7 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
 VA(0x004123ec, 0x215)
 void eventsManager::EditMonster(i32 x, i32 y, b32 ultimateArtifact) {
     // Never read: a slot of the retail frame.
-    i32 unused;
+    i32 H2_UNUSED(unused);
     char buffer[EVENTS_NUMBER_TEXT_SIZE];
     tag_message message;
 
@@ -535,12 +535,12 @@ void UpdateNewMapWindow(void) {
 
     for (i = 0; i < RANDOM_MAP_TERRAIN_COUNT; i++)
         gTerrainKnobs[i]->m_x =
-            NEW_MAP_KNOB_TRAVEL * gTerrainPercent[i] / NEW_MAP_ALL_PERCENT + NEW_MAP_KNOB_LEFT;
+            IDX(NEW_MAP_KNOB_TRAVEL) * gTerrainPercent[i] / NEW_MAP_ALL_PERCENT + IDX(NEW_MAP_KNOB_LEFT);
     for (i = 0; i < RANDOM_MAP_DENSITY_COUNT; i++)
         gDensityKnobs[i]->m_x =
-            NEW_MAP_KNOB_TRAVEL * gDensityPercent[i] / NEW_MAP_ALL_PERCENT + NEW_MAP_KNOB_LEFT;
+            IDX(NEW_MAP_KNOB_TRAVEL) * gDensityPercent[i] / NEW_MAP_ALL_PERCENT + IDX(NEW_MAP_KNOB_LEFT);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.id = NEW_MAP_SCATTER_TOWNS;
     message.payload.widget.command =
         gScatterTerrain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -580,8 +580,8 @@ void BalanceTerrainPercents(i32 changedTerrain) {
     for (i = NEW_MAP_TERRAIN_GRASS; i < RANDOM_MAP_TERRAIN_COUNT; i++)
         landTotal += gTerrainPercent[i];
     if (changedTerrain != NEW_MAP_NO_TERRAIN) {
-        if (landTotal < NEW_MAP_MINIMUM_LAND)
-            gTerrainPercent[NEW_MAP_TERRAIN_GRASS] += NEW_MAP_MINIMUM_LAND - landTotal;
+        if (landTotal < IDX(NEW_MAP_MINIMUM_LAND))
+            gTerrainPercent[NEW_MAP_TERRAIN_GRASS] += IDX(NEW_MAP_MINIMUM_LAND) - landTotal;
     } else {
         if (othersTotal < NEW_MAP_ONE_PERCENT) {
             othersTotal = NEW_MAP_ONE_PERCENT;
@@ -595,7 +595,7 @@ void BalanceTerrainPercents(i32 changedTerrain) {
             if (i != changedTerrain)
                 gTerrainPercent[i] = ratio * gTerrainPercent[i];
         if (gTerrainPercent[NEW_MAP_TERRAIN_WATER]
-            > NEW_MAP_MAXIMUM_WATER + NEW_MAP_PERCENT_ROUNDING) {
+            > IDX(NEW_MAP_MAXIMUM_WATER) + NEW_MAP_PERCENT_ROUNDING) {
             gTerrainPercent[NEW_MAP_TERRAIN_WATER] = NEW_MAP_MAXIMUM_WATER;
             BalanceTerrainPercents(NEW_MAP_TERRAIN_WATER);
         }
@@ -616,7 +616,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
             redraw = true;
             if (message.payload.widget.id >= NEW_MAP_FIRST_TERRAIN_DECREASE
                 && message.payload.widget.id
-                       < NEW_MAP_FIRST_TERRAIN_DECREASE + RANDOM_MAP_TERRAIN_COUNT) {
+                       < NEW_MAP_FIRST_TERRAIN_DECREASE + IDX(RANDOM_MAP_TERRAIN_COUNT)) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_DECREASE;
                 gTerrainPercent[index] -= NEW_MAP_ONE_PERCENT;
                 if (gTerrainPercent[index] < 0.0)
@@ -624,7 +624,7 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 BalanceTerrainPercents(index);
             } else if (message.payload.widget.id >= NEW_MAP_FIRST_TERRAIN_INCREASE
                        && message.payload.widget.id
-                              < NEW_MAP_FIRST_TERRAIN_INCREASE + RANDOM_MAP_TERRAIN_COUNT) {
+                              < NEW_MAP_FIRST_TERRAIN_INCREASE + IDX(RANDOM_MAP_TERRAIN_COUNT)) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_INCREASE;
                 gTerrainPercent[index] += NEW_MAP_ONE_PERCENT;
                 if (gTerrainPercent[index] > NEW_MAP_ALL_PERCENT)
@@ -632,14 +632,14 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
                 BalanceTerrainPercents(index);
             } else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_DECREASE
                        && message.payload.widget.id
-                              < NEW_MAP_FIRST_DENSITY_DECREASE + RANDOM_MAP_DENSITY_COUNT) {
+                              < NEW_MAP_FIRST_DENSITY_DECREASE + IDX(RANDOM_MAP_DENSITY_COUNT)) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_DENSITY_DECREASE;
                 gDensityPercent[index] -= NEW_MAP_ONE_PERCENT;
                 if (gDensityPercent[index] < 0.0)
                     gDensityPercent[index] = 0.0;
             } else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_INCREASE
                        && message.payload.widget.id
-                              < NEW_MAP_FIRST_DENSITY_INCREASE + RANDOM_MAP_DENSITY_COUNT) {
+                              < NEW_MAP_FIRST_DENSITY_INCREASE + IDX(RANDOM_MAP_DENSITY_COUNT)) {
                 index = message.payload.widget.id - NEW_MAP_FIRST_DENSITY_INCREASE;
                 gDensityPercent[index] += NEW_MAP_ONE_PERCENT;
                 if (gDensityPercent[index] > NEW_MAP_ALL_PERCENT)
@@ -658,19 +658,19 @@ MessageDispatchResult NewMapWindowHandler(tag_message& message) {
             // The density rows' ranges span RANDOM_MAP_TERRAIN_COUNT ids too.
             if (message.payload.widget.id >= NEW_MAP_FIRST_TERRAIN_TRACK
                 && message.payload.widget.id
-                       < NEW_MAP_FIRST_TERRAIN_TRACK + RANDOM_MAP_TERRAIN_COUNT)
+                       < NEW_MAP_FIRST_TERRAIN_TRACK + IDX(RANDOM_MAP_TERRAIN_COUNT))
                 DragNewMapSlider(true, message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_TRACK);
             else if (message.payload.widget.id >= NEW_MAP_FIRST_TERRAIN_KNOB
                      && message.payload.widget.id
-                            < NEW_MAP_FIRST_TERRAIN_KNOB + RANDOM_MAP_TERRAIN_COUNT)
+                            < NEW_MAP_FIRST_TERRAIN_KNOB + IDX(RANDOM_MAP_TERRAIN_COUNT))
                 DragNewMapSlider(true, message.payload.widget.id - NEW_MAP_FIRST_TERRAIN_KNOB);
             else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_TRACK
                      && message.payload.widget.id
-                            < NEW_MAP_FIRST_DENSITY_TRACK + RANDOM_MAP_TERRAIN_COUNT)
+                            < NEW_MAP_FIRST_DENSITY_TRACK + IDX(RANDOM_MAP_TERRAIN_COUNT))
                 DragNewMapSlider(false, message.payload.widget.id - NEW_MAP_FIRST_DENSITY_TRACK);
             else if (message.payload.widget.id >= NEW_MAP_FIRST_DENSITY_KNOB
                      && message.payload.widget.id
-                            < NEW_MAP_FIRST_DENSITY_KNOB + RANDOM_MAP_TERRAIN_COUNT)
+                            < NEW_MAP_FIRST_DENSITY_KNOB + IDX(RANDOM_MAP_TERRAIN_COUNT))
                 DragNewMapSlider(false, message.payload.widget.id - NEW_MAP_FIRST_DENSITY_KNOB);
             if (message.payload.widget.id >= NEW_MAP_SCATTER_TOWNS
                 && message.payload.widget.id <= NEW_MAP_CENTRE_TOWNS) {
