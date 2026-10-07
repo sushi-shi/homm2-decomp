@@ -7,8 +7,6 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 
-class hero;
-
 H2_ENUM_BEGIN(CombatRemoteTransferConstant)
     COMBAT_REMOTE_BUFFER_SIZE        = 0xFF,
     COMBAT_REMOTE_HEADER_SIZE        = 0x9b,

@@ -334,7 +334,6 @@ extern OverviewType iLastDynamicType;
 extern OverviewType giOverviewType;
 extern i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
-extern b32 gbDoModemConfig;
 extern i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
 extern class heroWindow* campWin;

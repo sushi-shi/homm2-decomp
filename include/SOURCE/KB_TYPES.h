@@ -800,7 +800,6 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
 H2_ENUM_CLASS_END(MonsterFlags)
 H2_ENUM_FLAGS(MonsterFlags)
 
-typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE;
 

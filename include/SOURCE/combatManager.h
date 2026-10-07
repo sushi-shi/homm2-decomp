@@ -800,7 +800,6 @@ public:
 SIZE(combatManager, 0xf877);
 extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
-extern H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
 extern b32 bInTeleportGetDest;

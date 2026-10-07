@@ -462,7 +462,7 @@ SOURCE/ADVMGR	?CheckCastSpell@advManager@@QAEXXZ	100.0000	138d9e5ac398
 SOURCE/ADVMGR	?CheckDimHero@advManager@@QAEXXZ	100.0000	cd2ed662e712
 SOURCE/ADVMGR	?CheckDimNextHeroBut@advManager@@QAEXXZ	100.0000	5da76fe48a8d
 SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	100.0000	40332195eddf
-SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	755512798c65
+SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	60d4ca652080
 SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	6f2c97552f2a
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	2a5512d5b559
 SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	100.0000	a76af3640920
@@ -714,7 +714,7 @@ SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fc816f682610
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	b89545092a82
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	52e1969b956a
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	bad9f6fef5fd
-SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	18372203cdbc
+SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	b6886836653d
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	100.0000	c846079c1975
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	149a66b508c1
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	100.0000	b0f77740a4f5
@@ -741,7 +741,7 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	f
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	950ce7d9827f
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	100.0000	2dca6283b6ad
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	100.0000	a7f1f7a035aa
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	26dce9c88253
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	f69406043e1d
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	62a61b15dd18
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	b65bb0664db4
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	26b71a4cee5c
@@ -1060,7 +1060,7 @@ SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	7b737005a35e
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	d97170e2ed6c
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	c3a39d353079
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	a1f2bb1f6694
-SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	62539570cc76
+SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	646c95397b86
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	100.0000	ef7eaa5278e1
 SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	100.0000	caee92eb3bd4
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	5eeeee2a494c
@@ -1228,13 +1228,13 @@ SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	100.0000	c0c5de3972de
 SOURCE/SMACKMGR	?PointInRect@@YICHHPAUtag_rect@@@Z	100.0000	f415a2ca88d8
 SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	903f1771632c
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	ad88574cbded
-SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	85c6a0f38f1a
+SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	38d04204f2d0
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	86e5ad93f276
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	100.0000	dc5309b6d940
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	bff21f860d44
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	e1d7ab05afcf
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	100.0000	eb5a195620ac
-SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	100.0000	c65c6d534164
+SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	100.0000	e1c1572e7c2c
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	100.0000	e171d4330861
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	e590a6be71b6
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	9032589270f0
@@ -1258,7 +1258,7 @@ SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	b16dcd592ea2
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	100.0000	cb6424e45b0c
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	fd646e5612df
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	31b2bfc7d092
-SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	1a51eec2a92c
+SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	8458653993e6
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	693394cfdc99
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	4b86e5c73ea9
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	100.0000	b958ef6a03c1
@@ -1276,7 +1276,7 @@ SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	f9bc97decc87
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	864d0fd73fa9
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	100.0000	3d6e37b8699f
 SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	100.0000	7c1029fe6976
-SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	bbbfd9b84c6e
+SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	03fb8359e8b0
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	d881ce4a6dc5
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	3cfc80e96251
 SOURCE/STRIP	??1bankBox@@QAE@XZ	100.0000	8217bdb1ca26
@@ -1380,7 +1380,7 @@ SOURCE/X_CAMPGN	?IsSpecialUA@ExpCampaign@@QAECXZ	100.0000	5d6328a0b8ea
 SOURCE/X_CAMPGN	?IsThisMapCompleted@ExpCampaign@@QAECXZ	100.0000	05685ac84e31
 SOURCE/X_CAMPGN	?IvanName@ExpCampaign@@QAEPADXZ	100.0000	1806586ffa78
 SOURCE/X_CAMPGN	?JosephName@ExpCampaign@@QAEPADXZ	100.0000	518e53b30d86
-SOURCE/X_CAMPGN	?MessageHandler@ExpCampaign@@CIHAAUtag_message@@@Z	100.0000	2179097260af
+SOURCE/X_CAMPGN	?MessageHandler@ExpCampaign@@CIHAAUtag_message@@@Z	100.0000	ec783dc2b76f
 SOURCE/X_CAMPGN	?RemoveAward@ExpCampaign@@QAEXH@Z	100.0000	b4d24f34c45b
 SOURCE/X_CAMPGN	?ReplaySmacker1@ExpCampaign@@QAEXXZ	100.0000	443f69450077
 SOURCE/X_CAMPGN	?ReplaySmacker2@ExpCampaign@@QAEXXZ	100.0000	8cebddf04116
@@ -1426,7 +1426,7 @@ SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	100.0000	c2e327024b46
 SOURCE/kbwin	?AppExit@@YIXXZ	100.0000	5d5226685dd1
 SOURCE/kbwin	?AppIdle@@YIHXZ	100.0000	3f553df292bd
 SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	100.0000	17eef9abcb0b
-SOURCE/kbwin	?AppWndProc@@YGJPAXIIJ@Z	100.0000	a47b1128b970
+SOURCE/kbwin	?AppWndProc@@YGJPAXIIJ@Z	100.0000	3bf7621e913c
 SOURCE/kbwin	?InitVideo@@YIXXZ	100.0000	8a6cdef92d87
 SOURCE/kbwin	?KBChangeMenu@@YIXPAX@Z	100.0000	36466bd379d2
 SOURCE/kbwin	?KBTickCount@@YIJXZ	100.0000	6af258c026c4
