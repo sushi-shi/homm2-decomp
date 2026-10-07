@@ -103,7 +103,6 @@ namespace {
         EVENT_MINE_SPELL_COUNT_SCALE = 5,
         EVENT_TELEPORT_STONE_DISTANCE = 1,
         EVENT_TELEPORT_WHIRLPOOL_DISTANCE = 3,
-        EVENT_ABANDONED_MINE_ARMY_DIVISOR = 5,
         EVENT_OBSERVATION_RADIUS = 20,
         EVENT_RANDOM_EVENT_SUCCESS = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
@@ -245,8 +244,6 @@ namespace {
     H2_ENUM_END(FlotsamConstant)
 
     H2_ENUM_BEGIN(DoEventConstant)
-        ARTESIAN_SPRING_MANA_MULTIPLIER = 2,
-        XANADU_DIPLOMACY_MULTIPLIER = 2,
         SIGN_MINIMUM_TEXT_LENGTH = 1,
         SIGN_RANDOM_TEXT_COUNT = 4,
         CHEST_EXPERIENCE_LEVEL_OFFSET = 1,
@@ -6699,7 +6696,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 gpMonGroup->m_creatureTypes[index] =
                     gpGame->m_mines[cell->m_objectMetadata].guardianType;
                 gpMonGroup->m_creatureCounts[index] = gpGame->m_mines[cell->m_objectMetadata].guardianCount
-                    / EVENT_ABANDONED_MINE_ARMY_DIVISOR;
+                    / ARMY_GROUP_SLOT_COUNT;
             }
             abandonedMineValue = static_cast<i32>(
                 gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]

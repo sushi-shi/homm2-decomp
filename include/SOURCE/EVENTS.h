@@ -196,6 +196,8 @@ H2_ENUM_BEGIN(MapEventRewardConstant)
     MAGELLAN_MAP_COST                   = 1000,
     WATERING_HOLE_MOBILITY_BONUS        = 400,
     XANADU_ADMISSION_LEVEL              = 10,
+    XANADU_DIPLOMACY_MULTIPLIER         = 2,
+    ARTESIAN_SPRING_MANA_MULTIPLIER     = 2,
     TREE_KNOWLEDGE_GOLD_COST            = 2000,
     TREE_KNOWLEDGE_GEM_COST             = 10,
     PYRAMID_GUARD_COUNT                 = 50,
