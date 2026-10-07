@@ -1651,9 +1651,12 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         const std::string decodedRumour = localization::DecodeExternalText(field);
         utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
     }
-        for (index = 0; index < GAME_PLAYER_COUNT; ++index) {
-            provenanceFields[index + 2] = localization::TextField(cPlayerNames[index]);
-            RequireGameText(provenanceFields[index + 2], "player name");
+    ReadGameData(fileDescriptor, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    for (index = 0; index < GAME_PLAYER_COUNT; ++index) {
+        RequireGameText({m_defaultPlayerNames + index * GAME_DEFAULT_PLAYER_NAME_SIZE,
+                        GAME_DEFAULT_PLAYER_NAME_SIZE}, "default player name");
+    }
+    ReadEventHeader(fileDescriptor, m_rumourEventCount, m_rumourEventIndices[0]);
     RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
     ReadGameData(
         fileDescriptor,
