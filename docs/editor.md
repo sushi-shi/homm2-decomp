@@ -180,18 +180,54 @@ editor's. The editor's gates:
 Every census function has a source owner, so the editor links without
 `/FORCE` or retail stand-ins; see [Link](#link).
 
+## Link
+
+`homm2 --image editor link [--rsrc|--historical]` links `EDT2PL.exe` with the
+game's native-link driver (`homm2.graph.link`, the editor's `LinkProfile`);
+the graph is `link_graph.emit_image_link_graph`, and the historical link and
+its link-diff stamp are the editor's default build target.
+
+- Inputs: the editor's own objects explicitly, in the retail order of their
+  first functions; `OLDNAMES.LIB` searched first (its members' empty,
+  16-byte-aligned `.text` is the fill before the first import thunk);
+  `WINMM`, `KERNEL32`, `USER32`, `GDI32`, WinG, `ADVAPI32`, Miles and
+  Audiere import libraries (WINMM leads, as in the game: nothing references
+  it before BASE, so its descriptor still follows the first scan's DLLs
+  while its thunks open the second block); the BASE library as two archives
+  in retail member order, `MiscRuntime` opening the second; then `MSVCPRT`
+  and `LIBCMT`; and `res/EDT2PL.rc`. LINK pulls library members in
+  first-reference order
+  ([pattern](patterns/library-pull-order-is-reference-fifo.md)), so source
+  definition order and old-name spellings decide the BASE and CRT order.
+- Resources: `res/EDT2PL.rc` holds the five payloads (the `EDITOR` icon and
+  About dialog, `MNUDFLT`, `VERSIONINFO`), gated byte-exact by `graph/rc.py`
+  with the retail-extracted icon (`--icon editor.ico`).
+- Headers: LINK's defaults for stack and heap; `/DEBUG` with
+  `e:\Users\igorl\VSS\HMM\HMM2\temp\release\editor\EDT2PL.pdb`, created
+  fresh (age 1) by one link at the image stamp 2003-04-04 08:21:00 under
+  the frozen clock. Wine's builtin `msvcrt` reproduces the IAT slot order
+  (the VC6 runtime's `qsort`, measured with a native `MSVCRT.DLL`, does not).
+- The editor's own objects compile without `/Gf`
+  ([pattern](patterns/gf-literal-comdats-reverse-within-function.md)).
+- `.bss`: editor-only names compile under `// spelling fixes .bss order`
+  aliases where the readable name would break the name-hash order
+  (EDITOR, EDITMGR, rumredit, OVERLAY and tile2bs; `gEditManager` compiles
+  as `gpEditManager`). Retail holes are unread objects at their places:
+  KB's `cOverrideMIDIDriver`/`cOverrideDigitalDriver` (exact size and hash
+  window) and `gUnusedData...` storage.
+
+`.text` layout, `.rdata` (imports, IAT, debug directory), `.rsrc`, the
+overlay and the file size are byte-identical. The residual (2,466 bytes,
+`config/retail/editor/link_diff.tsv`):
+
+| Region | Bytes | Cause |
+| --- | ---: | --- |
+| `.data` | 2,068 | EDITMGR's literal for `gMapCodeLetters` (`"ABC...Z"`): retail emits it among the function literals at `MakeMapCode`'s place (0x47e018), VC6 SP5 after the object's globals; the 28-byte cell shifts EDITMGR's string block. No initializer, linkage, cast, const, aggregate, `/Gf`, `/Gy`, `/YX` or TU-size variant moved it (probes, `build/exp/lit`) |
+| `.text` | 115 | the same shift: operands that address EDITMGR's strings |
+| headers | 283 | the Rich header: retail counts 65 C++ (SP5) objects and 12 OLDNAMES alias objects where the link has 66 and 11, and LINK reserves one more Rich slot (PE header at 0x100, not 0xf8), shifting the PE header |
+
 ## Open work
 
-- Reconstruct the editor-only units in link order, starting from EDITMGR,
-  whose identities (`gEditManager`, the selection rectangle, the edit
-  manager's methods) the CLEARMGR seed waits for; `include/EDITOR/editManager.h`
-  declares them provisionally.
-- The shared units are exact in the editor: BASE (with the two library
-  objects only the editor links, `icon2bss` and `tile2bs`, the zoomed map
-  view's scale-downs) and the editor variants of kbwin (window names, the
-  status-bar timer), wingraph (its own `Source\Editor\wingraph.cpp` copy,
-  the palette refresh without a combat screen) and REQUEST (a map-only
-  requester).
-- Data: the editor's data bytes (31%) wait for its own units' `DATA` claims.
-- The editor's link graph and `link_diff.tsv` (when it can link), and its
-  clean export.
+- The two residuals above: the initializer literal's emission point in
+  EDITMGR, and which object composition gives retail's Rich counts.
+- The editor's clean export.

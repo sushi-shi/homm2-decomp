@@ -140,3 +140,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [od-slot-scope-groups](od-slot-scope-groups.md) | required slot order is not bucket-monotone → reconstruct lexical scope groups instead of renaming locals |
 | [two-dimensional-array-owner](two-dimensional-array-owner.md) | replace first-row pointer flattening with the real side/slot owner; complete five-site VC6 byte/relocation proof |
 | [typed-byte-enum-table](typed-byte-enum-table.md) | recover a lookup's enum domain while preserving one-byte storage and removing the compensating consumer cast; all-consumer/native/retail proof |
+| [library-pull-order-is-reference-fifo](library-pull-order-is-reference-fifo.md) | library members link out of retail order → LINK pulls them FIFO from the undefined-external list (first use order), whatever the archive order; fix the referencing source or the library cut |
+| [gf-literal-comdats-reverse-within-function](gf-literal-comdats-reverse-within-function.md) | one function's literals swapped in `.data` → `/Gf` emits them in reverse; retail's forward order means no `/Gf` |
