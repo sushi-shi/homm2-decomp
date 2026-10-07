@@ -20,6 +20,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/NOOPT.h>
+#include <SOURCE/fileRequester.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/Misc.h>
@@ -36,6 +37,7 @@
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
+#include <BASE/widget.h>
 #include <windows.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -50,7 +52,6 @@ H2_ENUM_BEGIN(EditorStartupConstant)
     EDITOR_SETUP_NEW_MAP        = 1,
     EDITOR_SETUP_LOAD_MAP       = 2,
     EDITOR_SETUP_QUIT           = 0x69,
-    EDITOR_SETUP_PICK_LOAD_MODE = 4,
     EDITOR_FADE_STEPS           = 6,
     EDITOR_SLOW_FADE_STEPS      = 8,
     // The screen is cleared to this palette index while the map view opens.
@@ -3600,7 +3601,7 @@ VA(0x004102d8, 0x368)
 i32 oldmain(void) {
     heroWindow* window;
     i32 result;
-    i32 keepRunning;
+    b32 keepRunning;
     char loadName[EDITOR_MAP_FILE_NAME_SIZE];
 
     if (gpExec->InitSystem())
@@ -3609,15 +3610,15 @@ i32 oldmain(void) {
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("BIGfont.fnt");
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, true);
     gpWindowManager->UpdateScreen();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_FADE_STEPS, gPalette);
-    gpMouseManager->SetPointer("editor.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("editor.mse", EDIT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[IDX(giCurExe)].colorMouseCursor);
     gpMouseManager->ShowColorPointer();
     window = NULL;
     result = -1;
-    keepRunning = 1;
+    keepRunning = true;
     while (keepRunning) {
         gbInSetupDialog = true;
         window = new heroWindow(EDITOR_SETUP_WINDOW_X, EDITOR_SETUP_WINDOW_Y, "stpemain.bin");
@@ -3629,13 +3630,13 @@ i32 oldmain(void) {
         gbInSetupDialog = false;
         switch (result) {
             case EDITOR_SETUP_LOAD_MAP:
-                if (PickMap(EDITOR_SETUP_PICK_LOAD_MODE))
-                    keepRunning = 0;
+                if (PickMap(FILE_REQUESTER_MAP))
+                    keepRunning = false;
                 sprintf(loadName, gMapFileName);
                 break;
             case EDITOR_SETUP_NEW_MAP:
                 if (SetupNewMap())
-                    keepRunning = 0;
+                    keepRunning = false;
                 break;
             case EDITOR_SETUP_QUIT:
             case DIALOG_BUTTON_1:
@@ -3654,7 +3655,7 @@ i32 oldmain(void) {
         gEditManager->LoadMap(gMapFileName);
         ProtectShippedMap();
     }
-    gEditManager->DrawRadar(1);
+    gEditManager->DrawRadar(true);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     gpWindowManager->FadeScreen(FADE_IN, EDITOR_SLOW_FADE_STEPS, gPalette);
@@ -3896,32 +3897,30 @@ void DeleteMainClasses(void) {
 // The editor's message boxes carry text only and are narrower than the
 // game's. The game's dialog locals the editor dropped the code for keep their
 // frame slots.
-#if H2_RETAIL_COMPILER
-#define iconFile iconFile_a
-#define iconHeight iconHeight_h
-#define message message_b
-#define panelHeight panelHeight_d
-#define resourceFrame resourceFrame_n
-#define resourceY resourceY_f
-#define savedFirstResourceType savedFirstResourceType_k
-#define savedSecondResourceType savedSecondResourceType_m
-#define showMessage showMessage_d
-#define windowHeight windowHeight_h
-#define windowRows windowRows_b
-#define windowWidth windowWidth_f
-#endif
+#define iconFile iconFile_a                               // frame-slot spelling
+#define iconHeight iconHeight_h                           // frame-slot spelling
+#define message message_b                                 // frame-slot spelling
+#define panelHeight panelHeight_d                         // frame-slot spelling
+#define resourceFrame resourceFrame_n                     // frame-slot spelling
+#define resourceY resourceY_f                             // frame-slot spelling
+#define savedFirstResourceType savedFirstResourceType_k   // frame-slot spelling
+#define savedSecondResourceType savedSecondResourceType_m // frame-slot spelling
+#define showMessage showMessage_d                         // frame-slot spelling
+#define windowHeight windowHeight_h                       // frame-slot spelling
+#define windowRows windowRows_b                           // frame-slot spelling
+#define windowWidth windowWidth_f                         // frame-slot spelling
 VA(0x00410f26, 0x2f4)
 void NormalDialog(
     H2_CONST char* text,
     i32 dialogType,
     i32 windowX,
     i32 windowY,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    i32 H2_UNUSED(firstResourceType),
+    i32 H2_UNUSED(firstResourceValue),
+    i32 H2_UNUSED(secondResourceType),
+    i32 H2_UNUSED(secondResourceValue),
+    i32 H2_UNUSED(showOrText),
+    i32 H2_UNUSED(timeout)
 ) {
     i32 H2_UNUSED(resourceFrame);
     i16 H2_UNUSED(showMessage);
@@ -3969,7 +3968,7 @@ void NormalDialog(
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = IDX(WIDGET_COMMAND_CLEAR_FLAGS);
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED) | IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.id = DIALOG_BUTTON_7;
     pNormalDialogWindow->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_8;
@@ -4002,7 +4001,6 @@ void NormalDialog(
     }
     delete pNormalDialogWindow;
 }
-#if H2_RETAIL_COMPILER
 #undef iconFile
 #undef iconHeight
 #undef message
@@ -4015,7 +4013,6 @@ void NormalDialog(
 #undef windowHeight
 #undef windowRows
 #undef windowWidth
-#endif
 
 VA(0x0041121a, 0x94)
 MessageDispatchResult EventWindowHandler(struct tag_message& message) {
@@ -4095,7 +4092,7 @@ void ClearStatusText(void) {
     gStatusTextClearTime = EDITOR_STATUS_TEXT_KEPT;
     if (gStatusTextShown) {
         gStatusTextShown = false;
-        gEditManager->m_window->DrawWindow(0);
+        gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             EDITOR_STATUS_BAR_X,
             EDITOR_STATUS_BAR_Y,
@@ -4106,7 +4103,7 @@ void ClearStatusText(void) {
 }
 
 VA(0x00411420, 0xb)
-void UpdateAppSpecificMenus(void*) {}
+void UpdateAppSpecificMenus(void* H2_UNUSED(hMenu)) {}
 
 VA(0x0041142b, 0x3c)
 void CleanUpMenus(void) {
@@ -4121,7 +4118,7 @@ void CleanUpMenus(void) {
 VA(0x00411467, 0x1b)
 void EarlyShutDownSystem(void) {
     if (gEditManager)
-        gEditManager->SelectTool(-1);
+        gEditManager->SelectTool(EDIT_TOOL_NONE);
 }
 
 VA(0x00411482, 0xa)
@@ -4155,16 +4152,14 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
 }
 
 VA(0x0041154e, 0x12)
-void EarlyResizeWindow(i32, i32, i32, i32) {}
+void EarlyResizeWindow(i32 H2_UNUSED(x), i32 H2_UNUSED(y), i32 H2_UNUSED(width),
+                       i32 H2_UNUSED(height)) {}
 
 VA(0x00411560, 0x5)
 void UpdateSystemOptionsMenu(void) {}
 
-#if H2_RETAIL_COMPILER
-#define matchedWidgets a
-#define message msg
-#define window j
-#endif
+#define matchedWidgets a // frame-slot spelling
+#define message msg      // frame-slot spelling
 VA(0x00411565, 0x88)
 void SetWinText(heroWindow* window, i32 id) {
     i32 H2_UNUSED(matchedWidgets) = 0;
@@ -4180,8 +4175,5 @@ void SetWinText(heroWindow* window, i32 id) {
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef matchedWidgets
 #undef message
-#undef window
-#endif

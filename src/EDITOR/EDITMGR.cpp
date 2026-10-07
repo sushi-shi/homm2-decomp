@@ -1,9 +1,14 @@
 // The scenario editor's main manager (EDITMGR, PoL editor editmgr.cpp): the
 // map view and its rulers, the radar and scroll knobs, the tool panel, the
 // map file and the edits the tool managers ask for.
-// Descriptive names: DrawRulers, DrawView, InitializeMap, FillInOverlayTiles.
+// Descriptive names (no retail string or assertion names them): DrawRulers,
+// DrawView, InitializeMap, FillInOverlayTiles, OverlayTypeAt, GrabObject,
+// CheckObjects, UpdateTriggers, the Count and Write helpers, the map text
+// export and import and their line helpers and textFile, RemoveLinkedObject,
+// and the x_loc frame ranges.
 
 #include <va.h>
+#include <EDITOR/EDITMGR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
@@ -44,14 +49,11 @@
 #include <fcntl.h>
 #include <io.h>
 #include <sys/stat.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(EditViewGeometry)
-    // The map view's 448x448 square at (16, 16).
-    EDIT_VIEW_LEFT   = 0x10,
-    EDIT_VIEW_TOP    = 0x10,
-    EDIT_VIEW_PIXELS = 0x1c0,
+H2_ENUM_BEGIN(EditScrollGeometry)
     // The scroll tracks and knobs (escroll.icn frames 0..3).
     EDIT_TRACK_LONG   = 0x1a0,
     EDIT_TRACK_SHORT  = 0x10,
@@ -65,20 +67,13 @@ H2_ENUM_BEGIN(EditViewGeometry)
     EDIT_SCROLL_VERTICAL_TRACK   = 1,
     EDIT_SCROLL_HORIZONTAL_KNOB  = 2,
     EDIT_SCROLL_VERTICAL_KNOB    = 3,
-    EDIT_CONTROL_HORIZONTAL_TRACK = 0xa,
-    EDIT_CONTROL_VERTICAL_TRACK   = 0xb,
-    EDIT_CONTROL_HORIZONTAL_KNOB  = 0xc,
-    EDIT_CONTROL_VERTICAL_KNOB    = 0xd,
-    // The view's scroll arrows (PickMap disables the up and down ones).
-    EDIT_CONTROL_SCROLL_UP        = 0xe,
-    EDIT_CONTROL_SCROLL_DOWN      = 0xf,
     // The map file requester: its position and its pattern buffers.
     EDIT_FILE_REQUESTER_X         = 0x83,
     EDIT_FILE_REQUESTER_Y         = 9,
     EDIT_FILE_PATTERN_SIZE        = 8,
     // A map the editor closes to (72x72, a medium map).
-    EDIT_DEFAULT_MAP_SIZE = 0x48
-H2_ENUM_END(EditViewGeometry)
+    EDIT_DEFAULT_MAP_SIZE = MAP_DIMENSION_MEDIUM
+H2_ENUM_END(EditScrollGeometry)
 
 H2_ENUM_BEGIN(EditRulerGeometry)
     // A ruler numbers every view cell, every second 16-pixel slot at the
@@ -86,6 +81,10 @@ H2_ENUM_BEGIN(EditRulerGeometry)
     EDIT_RULER_SLOTS            = 0x1c,
     EDIT_RULER_SLOT_PIXELS      = 0x10,
     EDIT_RULER_CELL_TEXT_OFFSET = 8,
+    // A ruler number's text ("{%02d}" when not the pointer's cell).
+    EDIT_RULER_TEXT_SIZE        = 8,
+    // The farthest zoom marks the pointer's even cell.
+    EDIT_RULER_EVEN_CELL_MASK   = 0xfffe,
     EDIT_TOP_RULER_TEXT_X       = 0x13,
     EDIT_TOP_RULER_TEXT_Y       = 5,
     EDIT_LEFT_RULER_TEXT_X      = 3,
@@ -108,30 +107,42 @@ H2_ENUM_BEGIN(EditCellLayer)
     EDIT_DRAW_OVERHANGING = 4,
     // The animation frame wraps here.
     EDIT_ANIMATION_FRAMES = 6,
-    // The drag selection's outline colour.
-    EDIT_SELECTION_COLOR  = 0xb5
+    // The drag selection's outline colour, and its width at the normal zoom
+    // and when zoomed out.
+    EDIT_SELECTION_COLOR  = 0xb5,
+    EDIT_SELECTION_LINE_NORMAL = 2,
+    EDIT_SELECTION_LINE_ZOOMED = 1
 H2_ENUM_END(EditCellLayer)
 
 H2_ENUM_BEGIN(EditRadarGeometry)
     // The radar at (480, 16) of the 640-pixel screen: a 144-pixel square a
     // small map fills with 4x4 dots, a medium one with 2x2, a large one with
-    // a 2-1-1 pattern of rows and columns, an extra large one with 1x1.
+    // a 2-1-1 pattern of rows and columns (EDIT_RADAR_LARGE_SCALE), an extra
+    // large one with 1x1.
     EDIT_RADAR_LEFT   = 0x1e0,
     EDIT_RADAR_TOP    = 0x10,
-    EDIT_RADAR_OFFSET = 0x29e0,
-    EDIT_SCREEN_PITCH = 0x280,
-    EDIT_MAP_SMALL    = 0x24,
-    EDIT_MAP_MEDIUM   = 0x48,
-    EDIT_MAP_LARGE    = 0x6c,
-    EDIT_MAP_XLARGE   = 0x90,
+    EDIT_SCREEN_PITCH = LOGICAL_SCREEN_WIDTH,
+    EDIT_RADAR_OFFSET = EDIT_RADAR_TOP * EDIT_SCREEN_PITCH + EDIT_RADAR_LEFT,
+    EDIT_RADAR_SMALL_DOT  = 4,
+    EDIT_RADAR_MEDIUM_DOT = 2,
     EDIT_RADAR_PHASES = 3,
-    // radar.icn: the view outline per zoom level and map size; the
-    // obstacle, town and unseen colours.
+    // The obstacle, town and unseen colours, and the view outline's.
     EDIT_RADAR_OBSTACLE_SHADE = 3,
     EDIT_RADAR_TOWN_COLOR     = 0x11,
     EDIT_RADAR_UNSEEN_COLOR   = 0,
-    EDIT_RADAR_VIEW_COLOR     = 0xb5
+    EDIT_RADAR_VIEW_COLOR     = 0xb5,
+    // radar.icn: the view outline, by its size in radar pixels.
+    EDIT_RADAR_OUTLINE_14  = 1,
+    EDIT_RADAR_OUTLINE_19  = 2,
+    EDIT_RADAR_OUTLINE_28  = 3,
+    EDIT_RADAR_OUTLINE_37  = 4,
+    EDIT_RADAR_OUTLINE_56  = 5,
+    EDIT_RADAR_OUTLINE_75  = 6,
+    EDIT_RADAR_OUTLINE_112 = 7
 H2_ENUM_END(EditRadarGeometry)
+
+// A large map's radar cells per map cell (three dots to two cells).
+#define EDIT_RADAR_LARGE_SCALE 1.3333
 
 H2_ENUM_BEGIN(EditCellDrawing)
     // Monsters stand 5 pixels and heroes 14 above their cell (at the normal
@@ -140,11 +151,8 @@ H2_ENUM_BEGIN(EditCellDrawing)
     EDIT_MONSTER_LIFT   = 5,
     EDIT_HERO_LIFT      = 0xe,
     EDIT_CLIP_VIEW      = 0x1e0,
-    EDIT_CLIP_SCREEN_W  = 0x280,
-    EDIT_CLIP_SCREEN_H  = 0x1e0,
-    // An animated part's frame count is its icon entry's flags; the trigger
-    // 0xdf draws one frame fewer.
-    EDIT_TRIGGER_ONE_FRAME_LESS = 0xdf,
+    EDIT_CLIP_SCREEN_W  = LOGICAL_SCREEN_WIDTH,
+    EDIT_CLIP_SCREEN_H  = LOGICAL_SCREEN_HEIGHT,
     // The layer passes: the high layer, the middle one, the ground layer.
     EDIT_LAYER_HIGH  = 2,
     EDIT_LAYER_MID   = 1,
@@ -161,13 +169,11 @@ H2_ENUM_BEGIN(EditKnobGeometry)
     EDIT_KNOB_FIRST       = 35,
     EDIT_KNOB_PARKED      = 231,
     EDIT_KNOB_SCALE_SPAN  = 402,
-    EDIT_CONTROL_SCROLL_LAST = 0x15,
+    EDIT_CONTROL_SCROLL_LAST = EDIT_CONTROL_SCROLL_DOWN_RIGHT,
     // ToggleZoom's view shifts keep the view centred.
     EDIT_ZOOM_SHIFT_SMALL = 7,
     EDIT_ZOOM_SHIFT_LARGE = 21,
-    EDIT_ZOOM_SHIFT_BACK  = 14,
-    // A ground cell's overlay-extra and hero-cursor flags.
-    EDIT_CELL_GROUND_KEEP = 0x9f
+    EDIT_ZOOM_SHIFT_BACK  = 14
 H2_ENUM_END(EditKnobGeometry)
 
 H2_ENUM_BEGIN(EditRadarDrag)
@@ -175,12 +181,6 @@ H2_ENUM_BEGIN(EditRadarDrag)
     EDIT_RADAR_SIZE      = 0x90,
     EDIT_KNOB_DRAG_ORIGIN = 0x27
 H2_ENUM_END(EditRadarDrag)
-
-H2_ENUM_BEGIN(EditManagerSetting)
-    // Every editor manager's Main accepts these messages.
-    EDIT_MANAGER_DISPATCH_MASK = 0x4000,
-    EDIT_POINTER_DEFAULT = 0
-H2_ENUM_END(EditManagerSetting)
 
 H2_ENUM_BEGIN(EditMapCheck)
     // The three kinds of travel gate (stone liths) take three frames each.
@@ -207,35 +207,14 @@ H2_ENUM_BEGIN(EditFileMenu)
     EDIT_FILE_MENU_CLOSE  = DIALOG_BUTTON_0,
     EDIT_FILE_MENU_NONE   = -1,
     EDIT_MENU_HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
+    EDIT_FILE_MENU_HELP_NONE  = -1,
+    EDIT_FILE_MENU_HELP_NEW   = 0,
+    EDIT_FILE_MENU_HELP_LOAD  = 1,
+    EDIT_FILE_MENU_HELP_SAVE  = 2,
+    EDIT_FILE_MENU_HELP_QUIT  = 3,
+    EDIT_FILE_MENU_HELP_CLOSE = 4,
     EDIT_MENU_QUESTION_SIZE = 200
 H2_ENUM_END(EditFileMenu)
-
-H2_ENUM_BEGIN(EditPanelControl)
-    // The panel's widgets Main answers, besides the scroll bars and arrows
-    // and the tool buttons (EDIT_CONTROL_TOOL_FIRST + EditTool).
-    EDIT_CONTROL_SCROLL_RIGHT      = 0x10,
-    EDIT_CONTROL_SCROLL_LEFT       = 0x11,
-    EDIT_CONTROL_SCROLL_UP_LEFT    = 0x12,
-    EDIT_CONTROL_SCROLL_UP_RIGHT   = 0x13,
-    EDIT_CONTROL_SCROLL_DOWN_LEFT  = 0x14,
-    EDIT_CONTROL_SCROLL_DOWN_RIGHT = 0x15,
-    EDIT_CONTROL_RADAR             = 0x27,
-    EDIT_CONTROL_TERRAIN           = 0x65,
-    EDIT_CONTROL_OBJECT            = 0x66,
-    EDIT_CONTROL_DETAIL            = 0x67,
-    EDIT_CONTROL_STREAM            = 0x68,
-    EDIT_CONTROL_ROAD              = 0x69,
-    EDIT_CONTROL_ERASE             = 0x6a,
-    EDIT_CONTROL_ZOOM              = 0x6f,
-    EDIT_CONTROL_UNDO              = 0x70,
-    EDIT_CONTROL_NEW               = 0x71,
-    EDIT_CONTROL_SPECIFICATIONS    = 0x72,
-    EDIT_CONTROL_FILE              = 0x73,
-    EDIT_CONTROL_SYSTEM            = 0x74,
-    EDIT_CONTROL_LOAD              = 0x75,
-    EDIT_CONTROL_SAVE              = 0x76,
-    EDIT_CONTROL_QUIT              = 0x77
-H2_ENUM_END(EditPanelControl)
 
 H2_ENUM_BEGIN(EditPanelHelp)
     // gEditPanelHelp's rows for the right-clicked widget.
@@ -264,7 +243,7 @@ H2_ENUM_BEGIN(EditMainSetting)
     EDIT_NEW_MAP_FADE_STEPS   = 8,
     EDIT_QUIT_FADE_STEPS      = 6,
     EDIT_SCREEN_CLEAR_COLOR   = 0x24,
-    EDIT_SCREEN_BYTES         = 640 * 480
+    EDIT_SCREEN_BYTES         = LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
 H2_ENUM_END(EditMainSetting)
 
 H2_ENUM_BEGIN(EditSiteFrames)
@@ -302,17 +281,8 @@ H2_ENUM_BEGIN(EditTextExport)
     EDIT_TEXT_DAY_TAG_LENGTH       = 4,
     EDIT_TEXT_DAY_SEPARATOR_LENGTH = 2,
     EDIT_TEXT_TOWN_TAG_LENGTH      = 8,
-    // The records the import rebuilds: the bytes kept before the new text
-    // (they include the old text's first byte) and where the text starts.
-    EDIT_RUMOUR_HEAD_SIZE      = 9,
-    EDIT_RUMOUR_TEXT_OFFSET    = 8,
-    EDIT_EVENT_HEAD_SIZE       = 0x32,
-    EDIT_EVENT_TEXT_OFFSET     = 0x31,
-    EDIT_SIGN_HEAD_SIZE        = 10,
-    EDIT_SIGN_TEXT_OFFSET      = 9,
-    EDIT_SPHINX_HEAD_SIZE      = 0x89,
-    EDIT_SPHINX_TEXT_OFFSET    = 0x88,
-    EDIT_SPHINX_ANSWER_LENGTH  = 12
+    // A sphinx answer the import reads (its record keeps a terminator).
+    EDIT_SPHINX_ANSWER_LENGTH  = EVENT_RECORD_MAP_ANSWER_SIZE - 1
 H2_ENUM_END(EditTextExport)
 
 H2_ENUM_BEGIN(EditTriggerType)
@@ -321,18 +291,21 @@ H2_ENUM_BEGIN(EditTriggerType)
     // monster).
     EDIT_TYPE_RANDOM_MONSTER   = 214,
     EDIT_TYPE_ABANDONED_MINE_A = 462,
-    EDIT_TYPE_ABANDONED_MINE_B = 662,
-    // The water ground shapes along a shore (giGroundShape), and the cell
-    // flags UpdateTriggers sets on them: any shore, and a straight shore.
-    EDIT_SHORE_SHAPE_A        = 1,
-    EDIT_SHORE_SHAPE_STRAIGHT = 2,
-    EDIT_SHORE_SHAPE_D        = 3,
-    EDIT_SHORE_SHAPE_E        = 4,
-    EDIT_SHORE_SHAPE_B        = 0x10,
-    EDIT_SHORE_SHAPE_C        = 0x11,
-    EDIT_CELL_SHORE           = 4,
-    EDIT_CELL_STRAIGHT_SHORE  = 0x10
+    EDIT_TYPE_ABANDONED_MINE_B = 662
 H2_ENUM_END(EditTriggerType)
+
+H2_ENUM_BEGIN(EditCellFlag)
+    // A cell's ground flags (mapCell::m_flags): the tile's flips, the water
+    // cells along a shore (an edge or corner shape) and those at a shore's
+    // outer corner.
+    EDIT_CELL_FLIP_VERTICAL   = 0x01,
+    EDIT_CELL_FLIP_HORIZONTAL = 0x02,
+    EDIT_CELL_SHORE           = 0x04,
+    EDIT_CELL_SHORE_CORNER    = 0x10,
+    // What a repainted cell keeps: everything but the overlay-extra and
+    // hero-cursor flags.
+    EDIT_CELL_GROUND_KEEP     = 0x9f
+H2_ENUM_END(EditCellFlag)
 
 H2_ENUM_BEGIN(EditMapFileName)
     // SaveMap and LoadMap: a path under .\maps, and a new map's file name
@@ -10024,11 +9997,11 @@ editManager::editManager(void) {
     SaveUndo();
     m_animationFrame = 0;
     m_animationCounter = 0;
-    m_tool = -1;
+    m_tool = EDIT_TOOL_NONE;
     m_toolManager = NULL;
-    m_mapChanged = 0;
+    m_mapChanged = false;
     m_placedX = m_placedY = EDIT_NO_CELL;
-    m_extraCount = 1;
+    m_extraCount = EDIT_MANAGER_FIRST_EXTRA;
     m_placedState = -1;
 }
 
@@ -10038,7 +10011,7 @@ i32 editManager::Open(i32 priority) {
 
     FillInOverlayTiles();
     InitializeMap(false, gNewMapSize, gNewMapSize);
-    gpResourceManager->GetBackdrop("bordedit.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop("bordedit.icn", gpWindowManager->m_screen, true);
     m_window = new heroWindow(0, 0, "editwind.bin");
     m_horizontalTrack = new iconWidget(
         EDIT_TRACK_START,
@@ -10103,7 +10076,7 @@ i32 editManager::Open(i32 priority) {
     }
     m_buttons = gpResourceManager->GetIcon("editbtns.icn");
     m_radarIcons = gpResourceManager->GetIcon("radar.icn");
-    m_window->DrawWindow(0);
+    m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     DrawRadar(true);
     DrawView(m_viewX, m_viewY);
     UpdateMapView();
@@ -10111,9 +10084,9 @@ i32 editManager::Open(i32 priority) {
     gpMouseManager->ShowColorPointer();
     m_messageMask = EDIT_MANAGER_DISPATCH_MASK;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "editManager");
-    SelectTool(0);
+    SelectTool(EDIT_TOOL_TERRAIN);
     return 0;
 }
 
@@ -10123,7 +10096,7 @@ void editManager::Close(void) {
 
     InitializeMap(false, EDIT_DEFAULT_MAP_SIZE, EDIT_DEFAULT_MAP_SIZE);
     ClearErrors();
-    SelectTool(-1);
+    SelectTool(EDIT_TOOL_NONE);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     m_window = NULL;
@@ -10134,7 +10107,7 @@ void editManager::Close(void) {
     gpResourceManager->Dispose(m_radarIcons);
     gpResourceManager->Dispose(m_buttons);
     gpMouseManager->SetPointer(-1);
-    m_active = 0;
+    m_active = false;
 }
 
 // The catalogue type of the object on map cell (x, y), from its topmost
@@ -10332,7 +10305,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                 m_placedX = m_placedY = EDIT_NO_CELL;
                             }
                             m_viewX = m_viewY = 0;
-                            m_window->DrawWindow(false);
+                            m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                             DrawRadar(true);
                             DrawMap();
                             UpdateMapView();
@@ -10374,7 +10347,8 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                         case EDIT_CONTROL_NEW:
                         startNewMap:
                             gpWindowManager->FadeScreen(FADE_OUT, EDIT_NEW_MAP_FADE_STEPS, gPalette);
-                            gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, 1);
+                            gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen,
+                                                           true);
                             gpWindowManager->UpdateScreen();
                             gpWindowManager->FadeScreen(FADE_IN, EDIT_NEW_MAP_FADE_STEPS, gPalette);
                             newMap = SetupNewMap();
@@ -10385,8 +10359,9 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                 gEditManager->InitializeMap(false, gNewMapSize, gNewMapSize);
                                 ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
                             }
-                            gpResourceManager->GetBackdrop("bordedit.icn", gpWindowManager->m_screen, 1);
-                            m_window->DrawWindow(false);
+                            gpResourceManager->GetBackdrop("bordedit.icn", gpWindowManager->m_screen,
+                                                           true);
+                            m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                             DrawMap();
                             DrawRadar(true);
                             gpWindowManager->UpdateScreen();
@@ -10736,7 +10711,7 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
     i32 mouseX;
     i32 mouseY;
     u8 color;
-    char text[8];
+    char text[EDIT_RULER_TEXT_SIZE];
     i32 i;
     i32 cell;
 
@@ -10744,8 +10719,8 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
     cursorX -= m_viewX;
     cursorY -= m_viewY;
     if (m_zoomLevel == EDIT_ZOOM_FAR) {
-        cursorX &= 0xfffe;
-        cursorY &= 0xfffe;
+        cursorX &= EDIT_RULER_EVEN_CELL_MASK;
+        cursorY &= EDIT_RULER_EVEN_CELL_MASK;
     }
     if (mouseX < EDIT_VIEW_LEFT || mouseX >= EDIT_VIEW_LEFT + EDIT_VIEW_PIXELS
         || mouseY < EDIT_VIEW_TOP || mouseY > EDIT_VIEW_TOP + EDIT_VIEW_PIXELS) {
@@ -10757,11 +10732,13 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
             continue;
         if (m_zoomLevel == EDIT_ZOOM_NORMAL)
             m_buttons->DrawToBuffer(
-                i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_LEFT, 0, EDIT_FRAME_TOP_RULER_CELL, 0
+                i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_LEFT, 0, EDIT_FRAME_TOP_RULER_CELL,
+                ICON_DRAW_NORMAL
             );
         else
             m_buttons->DrawToBuffer(
-                i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_LEFT, 0, EDIT_FRAME_ZOOMED_RULER_CELL, 0
+                i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_LEFT, 0, EDIT_FRAME_ZOOMED_RULER_CELL,
+                ICON_DRAW_NORMAL
             );
         if (m_zoomLevel == EDIT_ZOOM_NORMAL)
             cell = i / 2;
@@ -10774,7 +10751,7 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
             sprintf(text, "%02d", viewX + cell);
         else
             sprintf(text, "{%02d}", viewX + cell);
-        color = 1;
+        color = IDX(FONT_DRAW_DEFAULT);
         smallFont->DrawString(
             text,
             i * EDIT_RULER_SLOT_PIXELS + (m_zoomLevel ? 0 : EDIT_RULER_CELL_TEXT_OFFSET)
@@ -10784,17 +10761,19 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
         );
         if (m_zoomLevel == EDIT_ZOOM_NORMAL)
             m_buttons->DrawToBuffer(
-                0, i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_TOP, EDIT_FRAME_LEFT_RULER_CELL, 0
+                0, i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_TOP, EDIT_FRAME_LEFT_RULER_CELL,
+                ICON_DRAW_NORMAL
             );
         else
             m_buttons->DrawToBuffer(
-                0, i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_TOP, EDIT_FRAME_ZOOMED_RULER_CELL, 0
+                0, i * EDIT_RULER_SLOT_PIXELS + EDIT_VIEW_TOP, EDIT_FRAME_ZOOMED_RULER_CELL,
+                ICON_DRAW_NORMAL
             );
         if (cell == cursorY)
             sprintf(text, "%02d", viewY + cell);
         else
             sprintf(text, "{%02d}", viewY + cell);
-        color = 1;
+        color = IDX(FONT_DRAW_DEFAULT);
         smallFont->DrawString(
             text,
             EDIT_LEFT_RULER_TEXT_X,
@@ -10861,7 +10840,7 @@ void editManager::DrawView(i32 viewX, i32 viewY) {
         m_animationFrame %= EDIT_ANIMATION_FRAMES;
     }
     tileSize = gZoomTileSize[m_zoomLevel];
-    outline = m_zoomLevel ? 1 : 2;
+    outline = m_zoomLevel ? EDIT_SELECTION_LINE_ZOOMED : EDIT_SELECTION_LINE_NORMAL;
     if (gSelectionX >= 0) {
         gSelectionColor = EDIT_SELECTION_COLOR;
         FillBitmapAreaClip(
@@ -10916,20 +10895,19 @@ void editManager::DrawView(i32 viewX, i32 viewY) {
     m_zoomLevel = oldZoom;
 }
 
-#if H2_RETAIL_COMPILER
-#define radarLeft viewX4
-#define unusedA spare3
-#define unusedB tmp2
-#endif
+#define radarX viewX4  // frame-slot spelling
+#define radarY viewY   // frame-slot spelling
+#define unusedA spare3 // frame-slot spelling
+#define unusedB tmp2   // frame-slot spelling
 VA(0x00403def, 0x79b)
-void editManager::DrawRadar(b32) {
+void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
     u8* line;
     i32 rowPhase;
     u8 color;
     i32 xPhase;
-    i32 radarLeft;
+    i32 radarX;
     i32 x;
-    i32 viewY;
+    i32 radarY;
     u8* dst;
     i32 frame;
     i32 H2_UNUSED(unusedA);
@@ -10944,13 +10922,13 @@ void editManager::DrawRadar(b32) {
     for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
         dst = line;
         switch (MAP_HEIGHT) {
-            case EDIT_MAP_SMALL:
-                line += 4 * EDIT_SCREEN_PITCH;
+            case MAP_DIMENSION_SMALL:
+                line += EDIT_RADAR_SMALL_DOT * EDIT_SCREEN_PITCH;
                 break;
-            case EDIT_MAP_MEDIUM:
-                line += 2 * EDIT_SCREEN_PITCH;
+            case MAP_DIMENSION_MEDIUM:
+                line += EDIT_RADAR_MEDIUM_DOT * EDIT_SCREEN_PITCH;
                 break;
-            case EDIT_MAP_LARGE:
+            case MAP_DIMENSION_LARGE:
                 rowPhase++;
                 if (rowPhase > EDIT_RADAR_PHASES - 1)
                     rowPhase = 0;
@@ -10959,7 +10937,7 @@ void editManager::DrawRadar(b32) {
                 else
                     line += 2 * EDIT_SCREEN_PITCH;
                 break;
-            case EDIT_MAP_XLARGE:
+            case MAP_DIMENSION_XLARGE:
                 line += EDIT_SCREEN_PITCH;
                 break;
         }
@@ -11011,19 +10989,19 @@ void editManager::DrawRadar(b32) {
             if (gGeneratingMap)
                 color = EDIT_RADAR_UNSEEN_COLOR;
             switch (MAP_HEIGHT) {
-                case EDIT_MAP_SMALL:
-                    memset(dst, color, 4);
-                    memset(dst + EDIT_SCREEN_PITCH, color, 4);
-                    memset(dst + 2 * EDIT_SCREEN_PITCH, color, 4);
-                    memset(dst + 3 * EDIT_SCREEN_PITCH, color, 4);
-                    dst += 4;
+                case MAP_DIMENSION_SMALL:
+                    memset(dst, color, EDIT_RADAR_SMALL_DOT);
+                    memset(dst + EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
+                    memset(dst + 2 * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
+                    memset(dst + 3 * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
+                    dst += EDIT_RADAR_SMALL_DOT;
                     break;
-                case EDIT_MAP_MEDIUM:
-                    memset(dst, color, 2);
-                    memset(dst + EDIT_SCREEN_PITCH, color, 2);
-                    dst += 2;
+                case MAP_DIMENSION_MEDIUM:
+                    memset(dst, color, EDIT_RADAR_MEDIUM_DOT);
+                    memset(dst + EDIT_SCREEN_PITCH, color, EDIT_RADAR_MEDIUM_DOT);
+                    dst += EDIT_RADAR_MEDIUM_DOT;
                     break;
-                case EDIT_MAP_LARGE:
+                case MAP_DIMENSION_LARGE:
                     if (xPhase) {
                         if (rowPhase) {
                             *dst = color;
@@ -11048,7 +11026,7 @@ void editManager::DrawRadar(b32) {
                     if (xPhase > EDIT_RADAR_PHASES - 1)
                         xPhase = 0;
                     break;
-                case EDIT_MAP_XLARGE:
+                case MAP_DIMENSION_XLARGE:
                     *dst = color;
                     dst++;
                     break;
@@ -11057,75 +11035,75 @@ void editManager::DrawRadar(b32) {
     }
     frame = -1;
     switch (MAP_HEIGHT) {
-        case EDIT_MAP_SMALL:
+        case MAP_DIMENSION_SMALL:
             switch (m_zoomLevel) {
-                case 1:
-                    frame = 7;
+                case EDIT_ZOOM_HALF:
+                    frame = EDIT_RADAR_OUTLINE_112;
                     break;
-                case 0:
-                    frame = 5;
+                case EDIT_ZOOM_NORMAL:
+                    frame = EDIT_RADAR_OUTLINE_56;
                     break;
             }
-            radarLeft = m_viewX * 4;
-            viewY = m_viewY * 4;
+            radarX = m_viewX * EDIT_RADAR_SMALL_DOT;
+            radarY = m_viewY * EDIT_RADAR_SMALL_DOT;
             break;
-        case EDIT_MAP_MEDIUM:
+        case MAP_DIMENSION_MEDIUM:
             switch (m_zoomLevel) {
-                case 2:
-                    frame = 7;
+                case EDIT_ZOOM_FAR:
+                    frame = EDIT_RADAR_OUTLINE_112;
                     break;
-                case 1:
-                    frame = 5;
+                case EDIT_ZOOM_HALF:
+                    frame = EDIT_RADAR_OUTLINE_56;
                     break;
-                case 0:
-                    frame = 3;
+                case EDIT_ZOOM_NORMAL:
+                    frame = EDIT_RADAR_OUTLINE_28;
                     break;
             }
-            radarLeft = m_viewX * 2;
-            viewY = m_viewY * 2;
+            radarX = m_viewX * EDIT_RADAR_MEDIUM_DOT;
+            radarY = m_viewY * EDIT_RADAR_MEDIUM_DOT;
             break;
-        case EDIT_MAP_LARGE:
+        case MAP_DIMENSION_LARGE:
             switch (m_zoomLevel) {
-                case 2:
-                    frame = 6;
+                case EDIT_ZOOM_FAR:
+                    frame = EDIT_RADAR_OUTLINE_75;
                     break;
-                case 1:
-                    frame = 4;
+                case EDIT_ZOOM_HALF:
+                    frame = EDIT_RADAR_OUTLINE_37;
                     break;
-                case 0:
-                    frame = 2;
+                case EDIT_ZOOM_NORMAL:
+                    frame = EDIT_RADAR_OUTLINE_19;
                     break;
             }
-            radarLeft = m_viewX * 1.3333;
-            viewY = m_viewY * 1.3333;
+            radarX = m_viewX * EDIT_RADAR_LARGE_SCALE;
+            radarY = m_viewY * EDIT_RADAR_LARGE_SCALE;
             break;
         default:
             switch (m_zoomLevel) {
-                case 2:
-                    frame = 5;
+                case EDIT_ZOOM_FAR:
+                    frame = EDIT_RADAR_OUTLINE_56;
                     break;
-                case 1:
-                    frame = 3;
+                case EDIT_ZOOM_HALF:
+                    frame = EDIT_RADAR_OUTLINE_28;
                     break;
-                case 0:
-                    frame = 1;
+                case EDIT_ZOOM_NORMAL:
+                    frame = EDIT_RADAR_OUTLINE_14;
                     break;
             }
-            radarLeft = m_viewX;
-            viewY = m_viewY;
+            radarX = m_viewX;
+            radarY = m_viewY;
             break;
     }
     m_radarIcons->FillToBuffer(
-        radarLeft + EDIT_RADAR_LEFT, viewY + EDIT_RADAR_TOP, frame, EDIT_RADAR_VIEW_COLOR, 0, NULL
+        radarX + EDIT_RADAR_LEFT, radarY + EDIT_RADAR_TOP, frame, EDIT_RADAR_VIEW_COLOR,
+        ICON_DRAW_NORMAL, NULL
     );
-    UpdateKnobs(1);
+    UpdateKnobs(true);
     UpdateCursor();
 }
-#if H2_RETAIL_COMPILER
-#undef radarLeft
+#undef radarX
+#undef radarY
 #undef unusedA
 #undef unusedB
-#endif
 
 VA(0x0040458a, 0xb70)
 void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
@@ -11167,7 +11145,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gDrawX,
                         gDrawY - EDIT_MONSTER_LIFT / gZoomScale[m_zoomLevel],
                         gDrawCell->m_objectIndex,
-                        1,
+                        ICON_DRAW_CLIP,
                         0,
                         0,
                         EDIT_CLIP_VIEW,
@@ -11181,7 +11159,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gDrawX,
                         gDrawY - EDIT_HERO_LIFT / gZoomScale[m_zoomLevel],
                         gDrawCell->m_objectIndex,
-                        1,
+                        ICON_DRAW_CLIP,
                         0,
                         0,
                         EDIT_CLIP_VIEW,
@@ -11195,7 +11173,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gDrawX,
                         gDrawY,
                         gDrawCell->m_objectIndex,
-                        0,
+                        ICON_DRAW_NO_CLIP,
                         0,
                         0,
                         EDIT_CLIP_SCREEN_W,
@@ -11207,7 +11185,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                                       m_objectIcons[gDrawCell->m_objectTileset][0],
                                       gDrawCell->m_objectIndex
                                   )->flags;
-                    if (gDrawCell->m_triggerType == EDIT_TRIGGER_ONE_FRAME_LESS)
+                    if (gDrawCell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN))
                         gDrawFrames--;
                     IconToBitmapScale(
                         m_objectIcons[gDrawCell->m_objectTileset][0],
@@ -11215,7 +11193,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gDrawX,
                         gDrawY,
                         gDrawCell->m_objectIndex + 1 + m_animationCounter % gDrawFrames,
-                        0,
+                        ICON_DRAW_NO_CLIP,
                         0,
                         0,
                         EDIT_CLIP_SCREEN_W,
@@ -11241,7 +11219,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gDrawX,
                             gDrawY - EDIT_MONSTER_LIFT / gZoomScale[m_zoomLevel],
                             gDrawExtra->objectIndex,
-                            1,
+                            ICON_DRAW_CLIP,
                             0,
                             0,
                             EDIT_CLIP_VIEW,
@@ -11255,7 +11233,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gDrawX,
                             gDrawY - EDIT_HERO_LIFT / gZoomScale[m_zoomLevel],
                             gDrawExtra->objectIndex,
-                            1,
+                            ICON_DRAW_CLIP,
                             0,
                             0,
                             EDIT_CLIP_VIEW,
@@ -11269,7 +11247,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gDrawX,
                             gDrawY,
                             gDrawExtra->objectIndex,
-                            0,
+                            ICON_DRAW_NO_CLIP,
                             0,
                             0,
                             EDIT_CLIP_SCREEN_W,
@@ -11287,7 +11265,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gDrawX,
                             gDrawY,
                             gDrawExtra->objectIndex + 1 + m_animationCounter % gDrawFrames,
-                            0,
+                            ICON_DRAW_NO_CLIP,
                             0,
                             0,
                             EDIT_CLIP_SCREEN_W,
@@ -11312,7 +11290,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                 gDrawX,
                 gDrawY,
                 gDrawCell->m_overlayIndex,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 EDIT_CLIP_SCREEN_W,
@@ -11330,7 +11308,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                     gDrawX,
                     gDrawY,
                     gDrawCell->m_overlayIndex + 1 + m_animationCounter % gDrawFrames,
-                    0,
+                    ICON_DRAW_NO_CLIP,
                     0,
                     0,
                     EDIT_CLIP_SCREEN_W,
@@ -11351,7 +11329,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                 gDrawX,
                 gDrawY,
                 gDrawExtra->overlayIndex,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 EDIT_CLIP_SCREEN_W,
@@ -11369,7 +11347,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                     gDrawX,
                     gDrawY,
                     gDrawExtra->overlayIndex + 1 + m_animationCounter % gDrawFrames,
-                    0,
+                    ICON_DRAW_NO_CLIP,
                     0,
                     0,
                     EDIT_CLIP_SCREEN_W,
@@ -11389,7 +11367,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
 VA(0x004050fa, 0xc4)
 void editManager::ToggleZoom(void) {
     if (m_zoomLevel == EDIT_ZOOM_NORMAL) {
-        if (MAP_HEIGHT == EDIT_MAP_SMALL) {
+        if (MAP_HEIGHT == MAP_DIMENSION_SMALL) {
             m_zoomLevel = EDIT_ZOOM_HALF;
             Scroll(-EDIT_ZOOM_SHIFT_SMALL, -EDIT_ZOOM_SHIFT_SMALL);
         } else {
@@ -11426,7 +11404,7 @@ void editManager::SelectTool(i32 tool) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = i + EDIT_CONTROL_TOOL_FIRST;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        msg.payload.widget.data.value = (i == tool) + i * 2;
+        msg.payload.widget.data.value = (i == tool) + i * EDIT_BUTTON_FRAMES;
         m_window->BroadcastMessage(msg);
     }
     if (tool != EDIT_TOOL_NONE) {
@@ -11489,27 +11467,33 @@ void editManager::Scroll(i32 dx, i32 dy) {
 }
 
 VA(0x00405656, 0x189)
-void editManager::UpdateKnobs(i32 update) {
+void editManager::UpdateKnobs(b32 updateScreen) {
     double scaleX;
     double scaleY;
     i32 H2_UNUSED(xPos);
     i32 H2_UNUSED(yPos);
 
-    scaleX = 402.0 / (MAP_WIDTH - gZoomViewCells[m_zoomLevel] + 1);
-    scaleY = 402.0 / (MAP_HEIGHT - gZoomViewCells[m_zoomLevel] + 1);
+    scaleX = static_cast<double>(EDIT_KNOB_SCALE_SPAN)
+             / (MAP_WIDTH - gZoomViewCells[m_zoomLevel] + 1);
+    scaleY = static_cast<double>(EDIT_KNOB_SCALE_SPAN)
+             / (MAP_HEIGHT - gZoomViewCells[m_zoomLevel] + 1);
     xPos = m_viewX * scaleX;
     yPos = m_viewY * scaleY;
     if (MAP_WIDTH > gZoomViewCells[m_zoomLevel])
         m_horizontalKnob->m_x
-            = m_viewX * (393.0 / ((MAP_WIDTH + 1 - gZoomViewCells[m_zoomLevel]) - 1.0)) + 35.0;
+            = m_viewX * (static_cast<double>(EDIT_KNOB_TRAVEL)
+                         / ((MAP_WIDTH + 1 - gZoomViewCells[m_zoomLevel]) - 1.0))
+            + static_cast<double>(EDIT_KNOB_FIRST);
     else
         m_horizontalKnob->m_x = EDIT_KNOB_PARKED;
     if (MAP_HEIGHT > gZoomViewCells[m_zoomLevel])
         m_verticalKnob->m_y
-            = m_viewY * (393.0 / ((MAP_HEIGHT + 1 - gZoomViewCells[m_zoomLevel]) - 1.0)) + 35.0;
+            = m_viewY * (static_cast<double>(EDIT_KNOB_TRAVEL)
+                         / ((MAP_HEIGHT + 1 - gZoomViewCells[m_zoomLevel]) - 1.0))
+            + static_cast<double>(EDIT_KNOB_FIRST);
     else
         m_verticalKnob->m_y = EDIT_KNOB_PARKED;
-    m_window->DrawWindow(update, EDIT_CONTROL_HORIZONTAL_TRACK, EDIT_CONTROL_SCROLL_LAST);
+    m_window->DrawWindow(updateScreen, EDIT_CONTROL_HORIZONTAL_TRACK, EDIT_CONTROL_SCROLL_LAST);
 }
 
 VA(0x004057df, 0xd6)
@@ -11525,11 +11509,12 @@ void editManager::PaintGround(i32 column, i32 row, i32 width, i32 height, i32 te
 
     startX = m_viewX + column;
     startY = m_viewY + row;
-    gEditManager->ClearArea(startX, startY, width, height, EDIT_CLEAR_ALL, 0, 0);
+    gEditManager->ClearArea(startX, startY, width, height, EDIT_CLEAR_ALL, false, false);
     for (i = 0; i < width; i++)
         for (j = 0; j < height; j++)
             gMap.CellAt(startX + i, startY + j)->m_terrainImageIndex
-                = ChooseGroundTile(terrain, 0, 1, startX + i, startY + j, 0, 1.0f);
+                = ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, true, startX + i, startY + j, false,
+                                   1.0f);
 }
 
 VA(0x004058b5, 0xe9)
@@ -11537,11 +11522,11 @@ void editManager::FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain) {
     i32 i;
     i32 j;
 
-    gEditManager->ClearArea(x, y, width, height, EDIT_CLEAR_ALL, 0, 0);
+    gEditManager->ClearArea(x, y, width, height, EDIT_CLEAR_ALL, false, false);
     for (i = x; i < x + width; i++) {
         for (j = y; j < y + height; j++) {
             gMap.CellAt(i, j)->m_terrainImageIndex
-                = ChooseGroundTile(terrain, 0, 1, i, j, 0, 1.0f);
+                = ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
             gMap.Column(i)[j * gMap.width].m_flags &= EDIT_CELL_GROUND_KEEP;
         }
     }
@@ -11554,9 +11539,10 @@ void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape) {
 
     cell = &gMap.Column(x)[y * gMap.width];
     if (giGroundToTerrain[cell->m_terrainImageIndex] == terrain
-        && (giGroundShape[cell->m_terrainImageIndex] & 0x7f) == (shape & 0x7f))
+        && (giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK)
+               == (shape & EDIT_SHAPE_MASK))
         return;
-    cell->m_terrainImageIndex = ChooseGroundTile(terrain, shape, 1, x, y, 0, 1.0f);
+    cell->m_terrainImageIndex = ChooseGroundTile(terrain, shape, true, x, y, false, 1.0f);
 }
 
 // Centres the view on the radar cell under the pointer while the button is
@@ -11574,14 +11560,14 @@ void editManager::DoRadar(void) {
         || y > EDIT_RADAR_TOP + EDIT_RADAR_SIZE)
         return;
     switch (MAP_HEIGHT) {
-        case EDIT_MAP_SMALL:
-            scale = 4.0f;
+        case MAP_DIMENSION_SMALL:
+            scale = EDIT_RADAR_SMALL_DOT;
             break;
-        case EDIT_MAP_MEDIUM:
-            scale = 2.0f;
+        case MAP_DIMENSION_MEDIUM:
+            scale = EDIT_RADAR_MEDIUM_DOT;
             break;
-        case EDIT_MAP_LARGE:
-            scale = 1.3333f;
+        case MAP_DIMENSION_LARGE:
+            scale = static_cast<float>(EDIT_RADAR_LARGE_SCALE);
             break;
         default:
             scale = 1.0f;
@@ -11641,7 +11627,8 @@ void editManager::DoHorizontalKnob(void) {
     i32 y;
     i32 newX;
 
-    scale = 402.0 / (MAP_WIDTH - gZoomViewCells[m_zoomLevel] + 1);
+    scale = static_cast<double>(EDIT_KNOB_SCALE_SPAN)
+            / (MAP_WIDTH - gZoomViewCells[m_zoomLevel] + 1);
     gpMouseManager->MouseCoords(x, y);
     gpInputManager->Flush();
     message.type = MESSAGE_MOUSE_MOVE;
@@ -11687,7 +11674,8 @@ void editManager::DoVerticalKnob(void) {
     i32 y;
     i32 newY;
 
-    scale = 402.0 / (MAP_HEIGHT - gZoomViewCells[m_zoomLevel] + 1);
+    scale = static_cast<double>(EDIT_KNOB_SCALE_SPAN)
+            / (MAP_HEIGHT - gZoomViewCells[m_zoomLevel] + 1);
     gpMouseManager->MouseCoords(x, y);
     gpInputManager->Flush();
     message.type = MESSAGE_MOUSE_MOVE;
@@ -12014,15 +12002,15 @@ bool editManager::ImportMapText(void) {
         return false;
     for (i = 0; i < gEditMapHeader.rumourCount; i++) {
         i32 size;
-        char head[EDIT_RUMOUR_HEAD_SIZE];
+        char head[sizeof(rumourEventExtra)];
         char* record;
 
         ReadTextLine(in, gText);
-        memcpy(head, gEditManager->m_extras[gRumourExtras[i]], EDIT_RUMOUR_HEAD_SIZE);
-        size = strlen(gText) + EDIT_RUMOUR_HEAD_SIZE;
+        memcpy(head, gEditManager->m_extras[gRumourExtras[i]], sizeof(rumourEventExtra));
+        size = strlen(gText) + sizeof(rumourEventExtra);
         record = new char[size];
-        memcpy(record, head, EDIT_RUMOUR_HEAD_SIZE);
-        strcpy(record + EDIT_RUMOUR_TEXT_OFFSET, gText);
+        memcpy(record, head, sizeof(rumourEventExtra));
+        strcpy(record + offsetof(rumourEventExtra, text), gText);
         delete gEditManager->m_extras[gRumourExtras[i]];
         gEditManager->m_extras[gRumourExtras[i]] = record;
         gEditManager->m_extraSizes[gRumourExtras[i]] = size;
@@ -12044,7 +12032,7 @@ bool editManager::ImportMapText(void) {
         char* record;
         i32 date;
         char* text;
-        char prefix[EDIT_EVENT_HEAD_SIZE];
+        char prefix[sizeof(timeEventExtra)];
 
         ReadTextLine(in, gText);
         if (strncmp(gText, "Day ", EDIT_TEXT_DAY_TAG_LENGTH))
@@ -12052,11 +12040,11 @@ bool editManager::ImportMapText(void) {
         sscanf(gText + EDIT_TEXT_DAY_TAG_LENGTH, "%d", &date);
         static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
         text = strchr(gText + EDIT_TEXT_DAY_TAG_LENGTH, ':') + EDIT_TEXT_DAY_SEPARATOR_LENGTH;
-        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], EDIT_EVENT_HEAD_SIZE);
-        size = strlen(text) + EDIT_EVENT_HEAD_SIZE;
+        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], sizeof(timeEventExtra));
+        size = strlen(text) + sizeof(timeEventExtra);
         record = new char[size];
-        memcpy(record, prefix, EDIT_EVENT_HEAD_SIZE);
-        strcpy(record + EDIT_EVENT_TEXT_OFFSET, text);
+        memcpy(record, prefix, sizeof(timeEventExtra));
+        strcpy(record + offsetof(timeEventExtra, message), text);
         delete gEditManager->m_extras[gTimeEventExtras[i]];
         gEditManager->m_extras[gTimeEventExtras[i]] = record;
         gEditManager->m_extraSizes[gTimeEventExtras[i]] = size;
@@ -12080,10 +12068,10 @@ bool editManager::ImportMapText(void) {
             char* newEvent;
             i32 length;
             char* riddleRecord;
-            char sphinxHead[EDIT_SPHINX_HEAD_SIZE];
-            char bottleHead[EDIT_SIGN_HEAD_SIZE];
+            char sphinxHead[sizeof(mapEventExtra)];
+            char bottleHead[sizeof(signEventExtra)];
             char* signCopy;
-            char mapEventStart[EDIT_EVENT_HEAD_SIZE];
+            char mapEventStart[sizeof(EventExtra)];
 
             cell = gMap.CellAt(x, y);
             switch (cell->m_triggerType) {
@@ -12097,13 +12085,13 @@ bool editManager::ImportMapText(void) {
                 message:
                     ReadTextLine(in, gText);
                     memcpy(bottleHead, gEditManager->m_extras[cell->m_objectMetadata],
-                           EDIT_SIGN_HEAD_SIZE);
-                    length = strlen(gText) + EDIT_SIGN_HEAD_SIZE;
+                           sizeof(signEventExtra));
+                    length = strlen(gText) + sizeof(signEventExtra);
                     if (!bottleHead[0])
                         strcpy(gText, "");
                     signCopy = new char[length];
-                    memcpy(signCopy, bottleHead, EDIT_SIGN_HEAD_SIZE);
-                    strcpy(signCopy + EDIT_SIGN_TEXT_OFFSET, gText);
+                    memcpy(signCopy, bottleHead, sizeof(signEventExtra));
+                    strcpy(signCopy + offsetof(signEventExtra, text), gText);
                     delete gEditManager->m_extras[cell->m_objectMetadata];
                     gEditManager->m_extras[cell->m_objectMetadata] = signCopy;
                     gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
@@ -12113,11 +12101,11 @@ bool editManager::ImportMapText(void) {
                         return false;
                     ReadTextLine(in, gText);
                     memcpy(mapEventStart, gEditManager->m_extras[cell->m_objectMetadata],
-                           EDIT_EVENT_HEAD_SIZE);
-                    length = strlen(gText) + EDIT_EVENT_HEAD_SIZE;
+                           sizeof(EventExtra));
+                    length = strlen(gText) + sizeof(EventExtra);
                     newEvent = new char[length];
-                    memcpy(newEvent, mapEventStart, EDIT_EVENT_HEAD_SIZE);
-                    strcpy(newEvent + EDIT_EVENT_TEXT_OFFSET, gText);
+                    memcpy(newEvent, mapEventStart, sizeof(EventExtra));
+                    strcpy(newEvent + offsetof(EventExtra, message), gText);
                     delete gEditManager->m_extras[cell->m_objectMetadata];
                     gEditManager->m_extras[cell->m_objectMetadata] = newEvent;
                     gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
@@ -12130,11 +12118,11 @@ bool editManager::ImportMapText(void) {
                         return false;
                     ReadTextLine(in, gText);
                     memcpy(sphinxHead, gEditManager->m_extras[cell->m_objectMetadata],
-                           EDIT_SPHINX_HEAD_SIZE);
-                    length = strlen(gText) + EDIT_SPHINX_HEAD_SIZE;
+                           sizeof(mapEventExtra));
+                    length = strlen(gText) + sizeof(mapEventExtra);
                     riddleRecord = new char[length];
-                    memcpy(riddleRecord, sphinxHead, EDIT_SPHINX_HEAD_SIZE);
-                    strcpy(riddleRecord + EDIT_SPHINX_TEXT_OFFSET, gText);
+                    memcpy(riddleRecord, sphinxHead, sizeof(mapEventExtra));
+                    strcpy(riddleRecord + offsetof(mapEventExtra, riddle), gText);
                     delete gEditManager->m_extras[cell->m_objectMetadata];
                     gEditManager->m_extras[cell->m_objectMetadata] = riddleRecord;
                     gEditManager->m_extraSizes[cell->m_objectMetadata] = length;
@@ -12261,20 +12249,20 @@ void editManager::UpdateTriggers(void) {
                 SetCoast(x, y);
             }
             if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
-                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_A
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_B
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_C
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_D
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_E))
+                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EDGE
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EDGE_ALT
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_CORNER
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE_ALT
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_INNER))
                 cell->m_flags |= EDIT_CELL_SHORE;
             else
                 cell->m_flags &= ~EDIT_CELL_SHORE;
             if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
-                && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT)
-                cell->m_flags |= EDIT_CELL_STRAIGHT_SHORE;
+                && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_CORNER)
+                cell->m_flags |= EDIT_CELL_SHORE_CORNER;
             else
-                cell->m_flags &= ~EDIT_CELL_STRAIGHT_SHORE;
+                cell->m_flags &= ~EDIT_CELL_SHORE_CORNER;
         }
     }
     lineType = gLineType;
@@ -12447,8 +12435,6 @@ void editManager::WriteTowns(i32 file) {
 #define lighthouseCount beaconCount // frame-slot spelling
 #define cityCount numCities         // frame-slot spelling
 #define markerCell neighbour        // frame-slot spelling
-#define mineSlot mineNumber         // frame-slot spelling
-#define link extraIndex             // frame-slot spelling
 VA(0x00408bb5, 0x313)
 void editManager::WriteMines(i32 file) {
     u8 type;
@@ -12460,11 +12446,11 @@ void editManager::WriteMines(i32 file) {
     u8 y;
     EditMapRecord empty;
     u8 lighthouseX;
-    i32 mineSlot;
+    i32 mineNumber;
     u8 lighthouseY;
     i32 cityCount;
     mapCell* markerCell;
-    i32 link;
+    i32 extraIndex;
 
     cityX = EDIT_MAP_NO_RECORD;
     cityY = EDIT_MAP_NO_RECORD;
@@ -12476,7 +12462,7 @@ void editManager::WriteMines(i32 file) {
     empty.x = EDIT_MAP_NO_RECORD;
     empty.y = EDIT_MAP_NO_RECORD;
     empty.type = EDIT_MAP_NO_RECORD;
-    mineSlot = 0;
+    mineNumber = 0;
     for (y = 0; y < MAP_HEIGHT; y++) {
         for (x = 0; x < MAP_WIDTH; x++) {
             cell = gMap.CellAt(x, y);
@@ -12498,14 +12484,14 @@ void editManager::WriteMines(i32 file) {
                     type = EDIT_MINE_TYPE_EYE_OF_MAGI;
                 } else {
                     markerCell = gMap.CellAt(x, y);
-                    link = markerCell->m_extraIndex;
-                    while (link) {
-                        if (gMap.Extra(link)->objectIndex != MAPCELL_SPRITE_NONE
-                            && gMap.Extra(link)->objectTileset == TILESET_EXTRAOVR) {
-                            type = gMap.Extra(link)->objectIndex + EDIT_MINE_TYPE_FIRST_ORE;
+                    extraIndex = markerCell->m_extraIndex;
+                    while (extraIndex) {
+                        if (gMap.Extra(extraIndex)->objectIndex != MAPCELL_SPRITE_NONE
+                            && gMap.Extra(extraIndex)->objectTileset == TILESET_EXTRAOVR) {
+                            type = gMap.Extra(extraIndex)->objectIndex + EDIT_MINE_TYPE_FIRST_ORE;
                             goto write;
                         }
-                        link = gMap.Extra(link)->nextIndex;
+                        extraIndex = gMap.Extra(extraIndex)->nextIndex;
                     }
                     if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL))
                         type = EDIT_MINE_TYPE_WOOD;
@@ -12516,13 +12502,13 @@ void editManager::WriteMines(i32 file) {
                 WRITE_FILE_VALUE(file, x);
                 WRITE_FILE_VALUE(file, y);
                 WRITE_FILE_VALUE(file, type);
-                sprintf(gText, "Mine %02d: (%02d,%02d) type: %02d\n", mineSlot, x, y, type);
+                sprintf(gText, "Mine %02d: (%02d,%02d) type: %02d\n", mineNumber, x, y, type);
                 LogStr(gText);
-                mineSlot++;
+                mineNumber++;
             }
         }
     }
-    for (x = 0; x < EDIT_MAP_MINE_RECORDS - mineSlot; x++)
+    for (x = 0; x < EDIT_MAP_MINE_RECORDS - mineNumber; x++)
         WRITE_FILE_VALUE(file, empty);
 }
 #undef cell
@@ -12531,8 +12517,6 @@ void editManager::WriteMines(i32 file) {
 #undef lighthouseCount
 #undef cityCount
 #undef markerCell
-#undef mineSlot
-#undef link
 
 // The map file keeps no artifact table.
 VA(0x00408ec8, 0xd)
@@ -12661,7 +12645,7 @@ named:
     write(file, gRumourExtras, gEditMapHeader.rumourCount * sizeof(gRumourExtras[0]));
     write(file, gTimeEventExtras, gEditMapHeader.timeEventCount * sizeof(gTimeEventExtras[0]));
     WRITE_FILE_VALUE(file, m_extraCount);
-    for (n = 1; n < m_extraCount; n++) {
+    for (n = EDIT_MANAGER_FIRST_EXTRA; n < m_extraCount; n++) {
         WRITE_FILE_VALUE(file, m_extraSizes[n]);
         write(file, m_extras[n], m_extraSizes[n]);
     }
@@ -12708,7 +12692,7 @@ i32 editManager::LoadMap(char* name) {
     read(handle, gRumourExtras, gEditMapHeader.rumourCount * sizeof(gRumourExtras[0]));
     read(handle, gTimeEventExtras, gEditMapHeader.timeEventCount * sizeof(gTimeEventExtras[0]));
     READ_FILE_VALUE(handle, m_extraCount);
-    for (i = 1; i < m_extraCount; i++) {
+    for (i = EDIT_MANAGER_FIRST_EXTRA; i < m_extraCount; i++) {
         READ_FILE_VALUE(handle, m_extraSizes[i]);
         m_extras[i] = new char[m_extraSizes[i]];
         read(handle, m_extras[i], m_extraSizes[i]);
@@ -12723,10 +12707,10 @@ i32 editManager::LoadMap(char* name) {
 // name in gMapFileName. The view's up and down scroll arrows are disabled
 // while it is open.
 VA(0x00409740, 0x1cc)
-i32 PickMap(i32 mode) {
+b32 PickMap(i32 mode) {
     fileRequester* requester;
     char pattern[EDIT_FILE_PATTERN_SIZE];
-    i32 picked;
+    b32 picked;
     tag_message msg;
     i32 button;
     char ext[EDIT_FILE_PATTERN_SIZE];
@@ -12812,7 +12796,7 @@ void editManager::AddError(char* text) {
 // redrawn.
 VA(0x00409aa8, 0x29f)
 void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(mask),
-                            i32 allLayers, i32 filtered) {
+                            b32 allLayers, b32 filtered) {
     mapCellExtra* part;
     u16 nextIndex;
     i32 i;
@@ -12930,46 +12914,6 @@ H2_ENUM_BEGIN(EditNewMap)
     EDIT_STATUS_WARNING_MILLISECONDS = 1500
 H2_ENUM_END(EditNewMap)
 
-H2_ENUM_BEGIN(EditGroundShape)
-    // giGroundShape: a terrain's plain tile, its border runs against water
-    // (the edges and corners take the cell's flip flags), the second edge
-    // runs and the decorated plain tiles.
-    EDIT_SHAPE_PLAIN              = 0,
-    EDIT_SHAPE_NORTH_EDGE         = 1,
-    EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
-    EDIT_SHAPE_EAST_EDGE          = 3,
-    EDIT_SHAPE_NORTH_EAST_INNER   = 4,
-    // The coast borders (water or beach on that side), the borders where a
-    // coast and another terrain meet, and an edge or corner with the coast
-    // beyond its corner.
-    EDIT_SHAPE_SHORE_NORTH_EDGE   = 5,
-    EDIT_SHAPE_SHORE_CORNER       = 6,
-    EDIT_SHAPE_SHORE_EAST_EDGE    = 7,
-    EDIT_SHAPE_SHORE_INNER        = 8,
-    EDIT_SHAPE_CORNER_SHORE_FAR   = 10,
-    EDIT_SHAPE_CORNER_SHORE_NEAR  = 11,
-    EDIT_SHAPE_NORTH_EDGE_SHORE   = 12,
-    EDIT_SHAPE_EAST_EDGE_SHORE    = 13,
-    EDIT_SHAPE_SHORE_EDGE_BORDER  = 14,
-    EDIT_SHAPE_SHORE_SIDE_BORDER  = 15,
-    EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
-    EDIT_SHAPE_EAST_EDGE_ALT      = 17,
-    EDIT_SHAPE_DECORATED_FIRST    = 18,
-    EDIT_SHAPE_DECORATED_SECOND   = 19,
-    EDIT_SHAPE_DECORATED_THIRD    = 20,
-    EDIT_SHAPE_DECORATED_FOURTH   = 21,
-    EDIT_SHAPE_COUNT              = 22,
-    EDIT_SHAPE_MASK               = 0x7f,
-    // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
-    // each per terrain and shape.
-    EDIT_GROUND_VARIANTS          = 2,
-    EDIT_GROUND_TILES_PER_SHAPE   = 20,
-    // A cell's ground flip flags (mapCell::m_flags).
-    EDIT_CELL_FLIP_VERTICAL       = 0x01,
-    EDIT_CELL_FLIP_HORIZONTAL     = 0x02,
-    EDIT_CELL_FLIP_CLEAR          = 0xfc
-H2_ENUM_END(EditGroundShape)
-
 VA(0x00409f0d, 0x258)
 void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
     i32 i;
@@ -12982,7 +12926,7 @@ void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
             gMap.CellAt(i, j)->m_overlayLink = 0;
             gMap.CellAt(i, j)->m_extraIndex = 0;
             gMap.CellAt(i, j)->m_terrainImageIndex
-                = ChooseGroundTile(TERRAIN_WATER, EDIT_SHAPE_PLAIN, 1, i, j, 0, 1.0f);
+                = ChooseGroundTile(TERRAIN_WATER, EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
             gMap.CellAt(i, j)->m_objectTileset = TILESET_NONE;
             gMap.CellAt(i, j)->m_objectIndex = MAPCELL_SPRITE_NONE;
             gMap.CellAt(i, j)->m_overlayTileset = TILESET_NONE;
@@ -13024,9 +12968,9 @@ VA(0x0040a24a, 0x58)
 void editManager::FreeMapExtras(void) {
     i32 i;
 
-    for (i = 1; i < m_extraCount; i++)
+    for (i = EDIT_MANAGER_FIRST_EXTRA; i < m_extraCount; i++)
         delete m_extras[i];
-    m_extraCount = 1;
+    m_extraCount = EDIT_MANAGER_FIRST_EXTRA;
 }
 
 // A new map: normal difficulty, no rumours or events, named after the next
@@ -13078,7 +13022,7 @@ void editManager::InitializeMap(b32 random, i32 width, i32 height) {
 // and no object but shadows.
 VA(0x0040a44d, 0x147)
 b32 editManager::CanBeCoast(i32 x, i32 y) {
-    i32 shadowsOnly;
+    b32 shadowsOnly;
     mapCellExtra* extra;
     mapCell* cell;
     i32 extraIndex;
@@ -13226,7 +13170,7 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
     i32 terrainIndex;
     i32 tile;
 
-    variant = 0;
+    variant = EDIT_GROUND_PLAIN;
     if (!gGroundTilesIndexed) {
         gGroundTilesIndexed = true;
         for (terrainIndex = 0; terrainIndex < TERRAIN_COUNT; terrainIndex++)
@@ -13244,10 +13188,11 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
     }
     if (vary) {
         if (shape & GROUND_SHAPE_FLIPPED) {
-            variant = 1;
+            variant = EDIT_GROUND_VARIED;
         } else if ((gGroundVariantChance[terrain] && force)
                    || (Random(0, 100) < gGroundVariantChance[terrain] * chance
-                       && gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][1] > 0)) {
+                       && gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][EDIT_GROUND_VARIED]
+                              > 0)) {
             if ((x <= 0
                  || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
                 && (x >= MAP_WIDTH - 2
@@ -13256,7 +13201,7 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
                     || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
                 && (y >= MAP_HEIGHT - 2
                     || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED)))
-                variant = 1;
+                variant = EDIT_GROUND_VARIED;
         }
         gGroundTileCount = gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][variant];
         if (gGroundTileCount) {
@@ -13266,12 +13211,19 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
                 gGroundTileChoice = 0;
         } else {
             gGroundTileChoice = 0;
-            variant = 0;
+            variant = EDIT_GROUND_PLAIN;
         }
         return gGroundTiles[terrain][shape][variant][gGroundTileChoice];
     }
-    return gGroundTiles[terrain][shape][0][0];
+    return gGroundTiles[terrain][shape][EDIT_GROUND_PLAIN][0];
 }
+
+H2_ENUM_BEGIN(EditBlendTerrain)
+    // BlendTerrain's fill passes stop after eight; a land cell with water on
+    // three sides becomes water.
+    EDIT_BLEND_MAX_PASSES  = 8,
+    EDIT_BLEND_WATER_SIDES = 3
+H2_ENUM_END(EditBlendTerrain)
 
 H2_ENUM_BEGIN(EditMapArea)
     // The map view's screen square.
@@ -13313,7 +13265,8 @@ i32 InMapArea(i32 x, i32 y) {
 #define otherUpRight otherUpRight6      // frame-slot spelling
 #define otherUp otherUp7                // frame-slot spelling
 VA(0x0040b0fe, 0x23af)
-void editManager::BlendTerrain(i32 H2_UNUSED(brushTerrain), b32 H2_UNUSED(ignored), b32 fromUndo, b32 skipBorders, b32 skipFill) {
+void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating), b32 fromUndo,
+                               b32 skipBorders, b32 skipFill) {
     b32 otherUp;
     b32 otherUpRight;
     mapCell* cell;
@@ -13357,12 +13310,13 @@ void editManager::BlendTerrain(i32 H2_UNUSED(brushTerrain), b32 H2_UNUSED(ignore
         goto borders;
     LogStr("PB 1");
     repeat = true;
-    while (repeat && passes < 8) {
+    while (repeat && passes < EDIT_BLEND_MAX_PASSES) {
         repeat = false;
         passes++;
         for (y = 0; y < MAP_HEIGHT; y++) {
             for (x = 0; x < MAP_WIDTH; x++) {
                 thisTerrain = CELL_TERRAIN(gMap.CellAt(x, y));
+                // A constant condition: retail keeps its compiled test.
                 if (1) {
                     waterUp = waterDown = waterRight = waterLeft = sameUp = sameDown = sameRight = sameLeft
                         = sameUpLeft = sameUpRight = sameDownLeft = sameDownRight = 0;
@@ -13413,7 +13367,8 @@ void editManager::BlendTerrain(i32 H2_UNUSED(brushTerrain), b32 H2_UNUSED(ignore
                     if ((!sameUp || !sameLeft) && (!sameUp || !sameRight) && (!sameDown || !sameLeft)
                         && (!sameDown || !sameRight)) {
                         if (thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1) {
-                            if (waterUp + waterDown + waterRight + waterLeft >= 3) {
+                            if (waterUp + waterDown + waterRight + waterLeft
+                                >= EDIT_BLEND_WATER_SIDES) {
                                 SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_PLAIN);
                             } else if (waterUp && waterRight) {
                                 newTerrain = CELL_TERRAIN(gMap.CellAt(x - 1, y + 1));
@@ -13575,7 +13530,7 @@ borders:
                         || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == TERRAIN_BEACH))
                     waterUpRight = true;
             }
-            cell->m_flags &= EDIT_CELL_FLIP_CLEAR;
+            cell->m_flags &= ~(EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL);
             if ((otherUpRight || otherUpLeft || otherDownRight || otherDownLeft || otherUp || otherDown || otherRight
                  || otherLeft)
                 && (waterUpRight || waterUpLeft || waterDownRight || waterDownLeft || waterUp || waterDown
@@ -14301,12 +14256,18 @@ void editManager::CoalesceObjectData(void) {
                 usedExtras[cell->m_objectMetadata] = true;
         }
     }
-    for (index = m_extraCount - 1; index >= 1; index--) {
+    for (index = m_extraCount - 1; index >= EDIT_MANAGER_FIRST_EXTRA; index--) {
         if (!usedExtras[index])
             DeleteExtraObjectData(index);
     }
     SaveUndo();
 }
+
+H2_ENUM_BEGIN(EditTownNames)
+    // RandomizeTownNames renames the towns whose names start like these
+    // (Dusk..., Necr...).
+    EDIT_TOWN_NAME_PREFIX_LENGTH = 4
+H2_ENUM_END(EditTownNames)
 
 H2_ENUM_BEGIN(EditPlayerFactions)
     // A hero's sprite is its player's colour times seven plus its faction;
@@ -14461,9 +14422,11 @@ void editManager::RandomizeTownNames(void) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)) {
                 townExtra = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
                 for (choice = 0; choice < EDITOR_TOWN_NAME_COUNT; choice++) {
-                    if (!strcmp(townExtra->name, gTownNames[choice]) || !strnicmp(townExtra->name, "dusk", 4)
-                        || !strnicmp(townExtra->name, "necr", 4)) {
-                        if (!strnicmp(townExtra->name, "dusk", 4) || !strnicmp(townExtra->name, "necr", 4))
+                    if (!strcmp(townExtra->name, gTownNames[choice])
+                        || !strnicmp(townExtra->name, "dusk", EDIT_TOWN_NAME_PREFIX_LENGTH)
+                        || !strnicmp(townExtra->name, "necr", EDIT_TOWN_NAME_PREFIX_LENGTH)) {
+                        if (!strnicmp(townExtra->name, "dusk", EDIT_TOWN_NAME_PREFIX_LENGTH)
+                            || !strnicmp(townExtra->name, "necr", EDIT_TOWN_NAME_PREFIX_LENGTH))
                             namesTaken[choice] = true;
                         if (namesTaken[choice]) {
                             while (namesTaken[choice])
@@ -14585,31 +14548,31 @@ i32 FileOptions(void) {
 // New map, load and quit ask first; save and close close the menu at once.
 VA(0x0040f412, 0x270)
 MessageDispatchResult FileOptionsHandler(struct tag_message& message) {
-    b32 bDone;
+    b32 done;
     char text[EDIT_MENU_QUESTION_SIZE];
 
-    bDone = false;
+    done = false;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
             if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                 i32 helpIndex;
 
-                helpIndex = -1;
+                helpIndex = EDIT_FILE_MENU_HELP_NONE;
                 switch (message.payload.widget.id) {
                     case EDIT_FILE_MENU_NEW:
-                        helpIndex = 0;
+                        helpIndex = EDIT_FILE_MENU_HELP_NEW;
                         break;
                     case EDIT_FILE_MENU_LOAD:
-                        helpIndex = 1;
+                        helpIndex = EDIT_FILE_MENU_HELP_LOAD;
                         break;
                     case EDIT_FILE_MENU_SAVE:
-                        helpIndex = 2;
+                        helpIndex = EDIT_FILE_MENU_HELP_SAVE;
                         break;
                     case EDIT_FILE_MENU_QUIT:
-                        helpIndex = 3;
+                        helpIndex = EDIT_FILE_MENU_HELP_QUIT;
                         break;
                     case EDIT_FILE_MENU_CLOSE:
-                        helpIndex = 4;
+                        helpIndex = EDIT_FILE_MENU_HELP_CLOSE;
                         break;
                 }
                 if (helpIndex >= 0)
@@ -14628,21 +14591,21 @@ MessageDispatchResult FileOptionsHandler(struct tag_message& message) {
                         case EDIT_FILE_MENU_QUIT:
                             strcpy(text, localization::Tr("editor.file.confirm_quit"));
                         confirm:
-                            bDone = true;
+                            done = true;
                             NormalDialog(text, NORMAL_DIALOG_CONFIRM);
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_NO)
-                                bDone = false;
+                                done = false;
                             break;
                         case EDIT_FILE_MENU_SAVE:
                         case EDIT_FILE_MENU_CLOSE:
-                            bDone = true;
+                            done = true;
                             break;
                     }
                     break;
             }
         }
     }
-    if (bDone) {
+    if (done) {
         FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -14668,7 +14631,13 @@ H2_ENUM_BEGIN(EditSystemOptions)
     EDIT_OPTIONS_CYCLING_FRAMES       = 2,
     EDIT_OPTIONS_OBJECT_BOXES_FRAMES  = 4,
     EDIT_OPTIONS_COLOR_MICE_FRAMES    = 6,
-    EDIT_OPTIONS_CLOSE                = DIALOG_BUTTON_0
+    EDIT_OPTIONS_CLOSE                = DIALOG_BUTTON_0,
+    EDIT_OPTIONS_HELP_NONE            = -1,
+    EDIT_OPTIONS_HELP_CLOSE           = 0,
+    EDIT_OPTIONS_HELP_ANIMATION       = 1,
+    EDIT_OPTIONS_HELP_CYCLING         = 2,
+    EDIT_OPTIONS_HELP_OBJECT_BOXES    = 3,
+    EDIT_OPTIONS_HELP_COLOR_MICE      = 4
 H2_ENUM_END(EditSystemOptions)
 
 // The system options window, and whether a toggle changed the preferences.
@@ -14684,7 +14653,7 @@ void editManager::SystemOptions(void) {
     if (!ESPanel)
         MemError();
     SetWinText(ESPanel, EDIT_OPTIONS_TITLE);
-    UpdateEditorSystemOptions(1);
+    UpdateEditorSystemOptions(true);
     gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
     delete ESPanel;
     if (bEPrefsChanged)
@@ -14692,7 +14661,7 @@ void editManager::SystemOptions(void) {
 }
 
 VA(0x0040f76b, 0x165)
-void UpdateEditorSystemOptions(i32 initialDraw) {
+void UpdateEditorSystemOptions(b32 initialDraw) {
     tag_message message;
 
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, EDIT_OPTIONS_ANIMATION_BUTTON);
@@ -14727,28 +14696,28 @@ void UpdateEditorSystemOptions(i32 initialDraw) {
 
 VA(0x0040f8d0, 0x269)
 MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
-    b32 bRedraw = false;
-    b32 bDone = false;
+    b32 redraw = false;
+    b32 done = false;
 
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
             if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
-                i32 helpIndex = -1;
+                i32 helpIndex = EDIT_OPTIONS_HELP_NONE;
                 switch (message.payload.widget.id) {
                     case EDIT_OPTIONS_CLOSE:
-                        helpIndex = 0;
+                        helpIndex = EDIT_OPTIONS_HELP_CLOSE;
                         break;
                     case EDIT_OPTIONS_ANIMATION_BUTTON:
-                        helpIndex = 1;
+                        helpIndex = EDIT_OPTIONS_HELP_ANIMATION;
                         break;
                     case EDIT_OPTIONS_CYCLING_BUTTON:
-                        helpIndex = 2;
+                        helpIndex = EDIT_OPTIONS_HELP_CYCLING;
                         break;
                     case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
-                        helpIndex = 3;
+                        helpIndex = EDIT_OPTIONS_HELP_OBJECT_BOXES;
                         break;
                     case EDIT_OPTIONS_COLOR_MICE_BUTTON:
-                        helpIndex = 4;
+                        helpIndex = EDIT_OPTIONS_HELP_COLOR_MICE;
                         break;
                 }
                 if (helpIndex >= 0)
@@ -14759,7 +14728,7 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                 case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
                         case EDIT_OPTIONS_CLOSE:
-                            bDone = true;
+                            done = true;
                             break;
                     }
                     break;
@@ -14767,24 +14736,24 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                     switch (message.payload.widget.id) {
                         case EDIT_OPTIONS_ANIMATION_BUTTON:
                             gConfig.editorScreenAnimation = 1 - gConfig.editorScreenAnimation;
-                            bRedraw = true;
+                            redraw = true;
                             bEPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_CYCLING_BUTTON:
                             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
                             gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
-                            bRedraw = true;
+                            redraw = true;
                             bEPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
                             gConfig.showObjectBoxes = 1 - gConfig.showObjectBoxes;
-                            bRedraw = true;
+                            redraw = true;
                             bEPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_COLOR_MICE_BUTTON:
                             CURRENT_GRAPHICS_CONFIG.colorMouseCursor
                                 = 1 - CURRENT_GRAPHICS_CONFIG.colorMouseCursor;
-                            bRedraw = true;
+                            redraw = true;
                             bEPrefsChanged = true;
                             gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
                             break;
@@ -14793,9 +14762,9 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
             }
         }
     }
-    if (bRedraw)
-        UpdateEditorSystemOptions(0);
-    if (bDone) {
+    if (redraw)
+        UpdateEditorSystemOptions(false);
+    if (done) {
         FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -14809,7 +14778,7 @@ void editManager::ToggleGroundVariant(void) {
     i32 terrain;
     i32 x;
     i32 y;
-    i32 vary;
+    b32 vary;
     i32 ground;
 
     SaveUndo();
@@ -14824,7 +14793,8 @@ void editManager::ToggleGroundVariant(void) {
     else
         vary = true;
     gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
-        terrain, giGroundShape[ground] & EDIT_SHAPE_MASK, 1, x, y, vary, static_cast<float>(vary != false)
+        terrain, giGroundShape[ground] & EDIT_SHAPE_MASK, true, x, y, vary,
+        static_cast<float>(vary != false)
     );
     DrawMap();
     UpdateMapView();
@@ -14867,7 +14837,7 @@ void editManager::RandomizeGround(i32 variety) {
             if (!variety)
                 isEmpty = false;
             gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
-                terrain, giGroundShape[groundTile] & EDIT_SHAPE_MASK, 1, x, y, 0,
+                terrain, giGroundShape[groundTile] & EDIT_SHAPE_MASK, true, x, y, false,
                 isEmpty ? chances[variety] : 0.0f
             );
         }
