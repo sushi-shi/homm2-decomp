@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SMACKMGR.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -477,7 +478,7 @@ void ExpCampaign::InitMap(void) {
 VA(0x004b3aba, 0x34b)
 void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     b32 savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = true;
@@ -531,7 +532,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
-    gpSoundManager->SwitchAmbientMusic(EXPANSION_CAMPAIGN_MUSIC);
+    gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_CAMPAIGN_GOOD);
     UpdateInfo(0);
     gpWindowManager->DoDialog(m_window, MessageHandler, 0);
     delete m_window;

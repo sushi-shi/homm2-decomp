@@ -12,6 +12,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SMACKMGR.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
@@ -359,7 +360,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     tag_message message;
     i32 trackMapIndex;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
     gbUseEvilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
@@ -427,7 +428,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
-        m_campaignType == CAMPAIGN_ROLAND ? CAMPAIGN_GOOD_MUSIC : CAMPAIGN_EVIL_MUSIC
+        m_campaignType == CAMPAIGN_ROLAND ? MUSIC_TRACK_CAMPAIGN_GOOD : MUSIC_TRACK_CAMPAIGN_EVIL
     );
     CampaignInfoUpdate(0);
     gpWindowManager->DoDialog(campWin, CampaignHandler, 0);

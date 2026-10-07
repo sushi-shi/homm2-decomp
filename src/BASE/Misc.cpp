@@ -47,10 +47,6 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
 H2_ENUM_END(DataEntryWidgetId)
 
 H2_ENUM_BEGIN(MiscLogPrivateConstant)
-    MEMORY_LEAK_DEBUG_LEVEL   = 1,
-    FILE_DEBUG_LEVEL          = 2,
-    DEBUGGER_OUTPUT_LEVEL     = 4,
-    FORCED_DEBUG_LEVEL        = 9,
     FORMAT_BUFFER_SIZE        = 200,
     TEXT_BUFFER_SIZE          = 500,
     MEMORY_ENTRY_CAPACITY     = 2000,
@@ -145,6 +141,7 @@ H2_ENUM_END(FileIdHashConstant)
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
@@ -1647,10 +1644,10 @@ void BlitBitmapToScreen(
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        sourceX = giScrollX + WINGRAPH_SCROLL_MARGIN;
-        width = WINGRAPH_SCROLL_SIZE;
-        sourceY = giScrollY + WINGRAPH_SCROLL_MARGIN;
-        height = WINGRAPH_SCROLL_SIZE;
+        sourceX = giScrollX + ADVENTURE_VIEW_BORDER;
+        width = ADVENTURE_VIEW_SIZE;
+        sourceY = giScrollY + ADVENTURE_VIEW_BORDER;
+        height = ADVENTURE_VIEW_SIZE;
     }
     gBlitRight = destinationX + width - 1;
     gBlitBottom = destinationY + height - 1;
@@ -2110,7 +2107,7 @@ void GetDataEntry(
     nFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;

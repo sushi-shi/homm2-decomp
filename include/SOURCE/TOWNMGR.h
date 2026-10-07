@@ -66,7 +66,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_CREST_FRAME_WITH_HERO               = 1,
     TOWN_CREST_FRAME_WITHOUT_HERO            = 4,
     TOWN_EMPTY_HERO_PORTRAIT_OFFSET          = 0x10,
-    TOWN_FADE_STEPS                          = 8,
     TOWN_GARRISON_SLOT_FIRST                 = 0x75,
     TOWN_GARRISON_SLOT_LAST                  = 0x79,
     TOWN_HERO_SLOT_FIRST                     = 0x7b,

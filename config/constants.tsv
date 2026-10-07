@@ -32,7 +32,6 @@ src/SOURCE/KB.cpp	RecruitHeroHandler	*	code	*H2_UNUSED(*) = *	an unused local's 
 src/SOURCE/KB.cpp	InitVars	[23]	code	*cNetBox*[[]*[]]*	the third and fourth of the net box's four scrolling lines (retail unrolls BOX_LINE_COUNT)
 src/SOURCE/KB.cpp	PopNetBox	[23]	code	*	the third and fourth of the net box's four scrolling lines and their colour widgets (retail unrolls BOX_LINE_COUNT)
 src/SOURCE/KB.cpp	AddNetBoxLine	[23]	code	*cNetBox*[[]*[]]*	the third and fourth of the net box's four scrolling lines (retail unrolls BOX_LINE_COUNT)
-src/SOURCE/KB.cpp	PopNetBox	0xff	code	*keyCode & 0xff*	the keyboard key code's low byte, the typed character
 src/SOURCE/SPELLS.cpp	combatManager::CastSpell	*	code	missileAngles[[]*[]] = *;	the bolt missile's nine sprite angles in degrees, filled element by element as retail does
 src/SOURCE/SPELLS.cpp	combatManager::Armageddon	*	local-table	{*, *},	the screen-shake offsets of each frame, a retail local table of pixels
 src/SOURCE/SPELLS.cpp	combatManager::Earthquake	*	local-table	{*, *},	the screen-shake offsets of each frame, a retail local table of pixels

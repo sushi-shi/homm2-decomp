@@ -68,17 +68,14 @@ H2_ENUM_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_TRACK_FRAME_COMPLETE  = 11,
     CAMPAIGN_TRACK_FRAME_AVAILABLE = 10,
     CAMPAIGN_TRACK_FRAME_LOCKED    = 12,
-    CAMPAIGN_DIALOG_FADE_STEPS     = 8,
-    CAMPAIGN_GOOD_MUSIC            = 24,
-    CAMPAIGN_EVIL_MUSIC            = 22
 H2_ENUM_END(CampaignDisplayConstant)
 
 // Called after the caller's map initialization, with live receivers across callbacks.
 #define PRESENT_RESTARTED_CAMPAIGN_MAP() \
     (gpAdvManager->m_visibilityMapValid = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
-     gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette), \
+     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette), \
      gpAdvManager->SetInitialMapOrigin(), gpAdvManager->RedrawAdvScreen(1, 0), \
-     gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette))
+     gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette))
 
 MessageDispatchResult CampaignHandler(struct tag_message& message);
 

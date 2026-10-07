@@ -45,7 +45,6 @@ H2_ENUM_END(OverviewStorageConstant)
 
 H2_ENUM_BEGIN(OverviewPresentationConstant)
     OVERVIEW_ICON_FILL_COLOR          = 1,
-    OVERVIEW_FADE_STEPS               = 8,
     OVERVIEW_WINDOW_TEXT_ID           = 9,
     OVERVIEW_POINTER_FRAME            = 0
 H2_ENUM_END(OverviewPresentationConstant)
@@ -1039,7 +1038,7 @@ void game::Overview(void) {
     giOverviewReturnActionExtra = OVERVIEW_RETURN_ID_NONE;
     message.type = MESSAGE_WIDGET;
     gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     for (mine = 0; mine < OVERVIEW_TITLE_COUNT; mine++) {
         textWidgetTitle[mine] = NULL;
     }
@@ -1121,7 +1120,7 @@ void game::Overview(void) {
     overWin->BroadcastMessage(message);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     delete overWin;
     overWin = NULL;
     H2_FREE(textWidgetDynamic);

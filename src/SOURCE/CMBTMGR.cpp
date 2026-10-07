@@ -92,12 +92,6 @@ H2_ENUM_BEGIN(CombatSetupConstant)
     DEFENDER_HERO_OVERLAY_INITIAL_FRAME = 3
 H2_ENUM_END(CombatSetupConstant)
 
-H2_ENUM_BEGIN(CombatPresentationConstant)
-    FADE_STEPS          = 8,
-    AMBIENT_MUSIC_FIRST = 2,
-    AMBIENT_MUSIC_LAST  = 4
-H2_ENUM_END(CombatPresentationConstant)
-
 H2_ENUM_BEGIN(CombatMapConstant)
     MAP_RANDOM_OFFSET_MINIMUM = 8,
     MAP_RANDOM_OFFSET_MAXIMUM = 15
@@ -479,7 +473,7 @@ i32 combatManager::Open(i32 openFlags) {
     m_backgroundDrawn = false;
 
     SAMPLE2 preBattleSample = LoadPlaySample("PREBATTL.82M");
-    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
     CycleColors(1);
@@ -502,11 +496,11 @@ i32 combatManager::Open(i32 openFlags) {
     gConfig.showCombatMouseHex = savedMouseHex;
     if (gpBufferPalette->m_data != m_combatPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(&preBattleSample);
 
-    gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
+    gpSoundManager->SwitchAmbientMusic(SRandom(MUSIC_TRACK_BATTLE_FIRST, MUSIC_TRACK_BATTLE_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
     ResetCycleTimers();
     gpInputManager->Flush();
@@ -526,7 +520,7 @@ void combatManager::Close(void) {
         memcpy(gPalette->m_data, m_savedPalette, PALETTE_DATA_SIZE);
         memcpy(gpBufferPalette->m_data, m_savedPalette, PALETTE_DATA_SIZE);
     }
-    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     CycleColors(0);
     delete m_combatBuffer;

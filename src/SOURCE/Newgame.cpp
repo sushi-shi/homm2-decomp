@@ -98,12 +98,6 @@ H2_ENUM_BEGIN(NewGamePlayerSetupType)
     GAME_PLAYER_FLEXIBLE = 1
 H2_ENUM_END(NewGamePlayerSetupType)
 
-H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
-    GAME_KEY_ENTER          = 10,
-    GAME_KEY_BACKSPACE      = 0x7f,
-    GAME_KEY_FIRST_EXTENDED = 0x100,
-H2_ENUM_CLASS_END(NewGameKeyCode)
-
 H2_ENUM_BEGIN(NewGameStorageConstant)
     FILE_MASK_CAPACITY      = 16,
     SAVED_MAP_NAME_CAPACITY = 16,
@@ -203,12 +197,6 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
     SCENARIO_PLAYER_RACE_NAME_Y       = PLAYER_RACE_NAME_Y - SCENARIO_PLAYER_Y_OFFSET,
     SCENARIO_PLAYER_RACE_CYCLE_Y      = PLAYER_RACE_CYCLE_Y - SCENARIO_PLAYER_Y_OFFSET
 H2_ENUM_END(NewGamePlayerLayout)
-
-H2_ENUM_BEGIN(NewGameKeyEncoding)
-    KEY_SCAN_CODE_SHIFT = 8,
-    KEY_SCAN_CODE_MASK  = 0xff00,
-    KEY_ASCII_MASK      = 0xff
-H2_ENUM_END(NewGameKeyEncoding)
 
 
 VA(0x004754b0, 0x1d2)
@@ -1489,10 +1477,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_ENTER))
+            if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_ENTER)
                 return 1;
 
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_BACKSPACE)) {
+            if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_DELETE) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1505,9 +1493,9 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 && message.payload.keyboard.keyCode != 0) {
                 strcpy(buffer, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
-                    scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
-                        >> KEY_SCAN_CODE_SHIFT;
+                if (message.payload.keyboard.keyCode >= INPUT_KEY_CODE_FIRST_SCAN) {
+                    scanCode = (message.payload.keyboard.keyCode & INPUT_KEY_CODE_SCAN_MASK)
+                        >> INPUT_KEY_CODE_SCAN_SHIFT;
                     switch (static_cast<InputManagerScanCode>(scanCode)) {
                         case IDX(INPUT_SCAN_NUMPAD_0):
                             keyChar = '0';
@@ -1542,7 +1530,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     }
                 } else {
                     keyChar =
-                        message.payload.keyboard.keyCode & KEY_ASCII_MASK;
+                        message.payload.keyboard.keyCode & INPUT_KEY_CODE_CHARACTER_MASK;
 
                     if (keyChar == '{' || keyChar == '}')
                         keyChar = 0;
@@ -1650,7 +1638,7 @@ void game::ShowScenInfo(void) {
     widget* iconControl;
     heroWindow* window;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     window = new heroWindow(SCENARIO_WINDOW_X, SCENARIO_WINDOW_Y, "sceninfo.bin");
     if (window == NULL)
         MemError();

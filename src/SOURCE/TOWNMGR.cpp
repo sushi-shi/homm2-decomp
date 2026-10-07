@@ -683,12 +683,12 @@ i32 townManager::Open(i32 id) {
     SetupExtraStuff();
     SetupTown();
     KBChangeMenu(hmnuTown);
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     m_messageMask = BASE_MANAGER_ACCEPT_TOWN_EVENT;
     m_priority = id;
     m_active = true;
     strcpy(m_name, "townManager");
-    gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
     return 0;
 }
 
@@ -927,7 +927,7 @@ void townManager::Close(void) {
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(MIDI_NO_TRACK);
-    gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpMouseManager->SetPointer(MOUSE_INVALID_CURSOR_FRAME);
     m_active = false;
     m_town->m_buildings &= IDX(TOWN_CLOSE_DYNAMIC_CLEAR_MASK);
@@ -1883,7 +1883,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
         case ARMY_COMMAND_VIEW_HERO:
             HeroView(m_town->m_occupyingHeroId, true, false);
             RedrawTownScreen();
-            gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
             break;
 
         case ARMY_COMMAND_SPLIT:
@@ -2923,7 +2923,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            AI_HERO_AVAILABLE_FLAG;
+            HERO_AVAILABILITY_FOR_HIRE;
     } else {
         if (m_castleDialogActive != 0)
             SetupCastle(m_heroWindow0, 0);

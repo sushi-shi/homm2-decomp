@@ -55,7 +55,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     MONO_ICON_DEFAULT         = -1,
     SLOT_NONE                 = -1,
     ARTIFACT_COLUMN_COUNT     = 7,
-    FADE_STEPS                = 8,
     VIEW_FULL                 = 0,
     VIEW_QUICK                = 1,
     CLOSE_REQUESTED           = 1,
@@ -405,7 +404,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_RIGHT_HERO:
@@ -416,7 +415,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:

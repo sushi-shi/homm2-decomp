@@ -249,8 +249,6 @@ namespace {
         VICTORY_FADE_STEPS = 8,
         VICTORY_WASTELAND_FADE_STEPS = 5,
         VICTORY_FADE_DELAY = 60,
-        VICTORY_MUSIC = 29,
-        LOSS_MUSIC = 30,
         VICTORY_EXPERIENCE_TEXT_SIZE = 152,
         WIN_LOSE_WINDOW_X = 143,
         WIN_LOSE_WINDOW_Y = 10,
@@ -2158,7 +2156,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 
     switch (winningSide) {
         case COMBAT_RESULT_DRAW:
-            gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
+            gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_BATTLE_LOSS);
             DoLoseWindow();
             break;
         case COMBAT_RESULT_ATTACKER:
@@ -2227,7 +2225,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     m_playerId[IDX(winningSide)] == PLAYER_NONE
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
-                gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
+                gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_BATTLE_VICTORY);
                 m_winLoseWindow =
                     new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
                 if (m_winLoseWindow == NULL)
@@ -2285,7 +2283,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     m_heroes[IDX(winningSide)]->ApplyBattleWinTemps();
                 if (m_heroes[IDX(OppositeCombatResult(winningSide))] != NULL)
                     m_heroes[IDX(OppositeCombatResult(winningSide))]->ApplyBattleLossTemps();
-                gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
+                gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_BATTLE_LOSS);
                 DoLoseWindow();
             }
             break;

@@ -293,10 +293,6 @@ H2_ENUM_CLASS_END(DialogWaitType)
 H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
-    OLD_MAIN_MAIN_MUSIC                       = 42,
-    OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
-    OLD_MAIN_FADE_SPEED                       = 8,
-    OLD_MAIN_LONG_FADE_SPEED                  = 0x80,
     OLD_MAIN_NEW_GAME                         = 0x65,
     OLD_MAIN_LOAD_GAME                        = 0x66,
     OLD_MAIN_HIGH_SCORES                      = 0x67,
@@ -563,8 +559,18 @@ extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
 // giDebugLevel thresholds: each role is enabled from its level up.
 H2_ENUM_BEGIN(DebugLevel)
+    MEMORY_LEAK_DEBUG_LEVEL                    = 1,
+    CELL_WINDOW_DEBUG_LEVEL                    = 1,
+    FILE_DEBUG_LEVEL                           = 2,
     FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
-    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9
+    AI_PURCHASE_DEBUG_LEVEL                    = 3,
+    DEBUGGER_OUTPUT_LEVEL                      = 4,
+    COMBAT_AUTO_RESOLVE_DEBUG_LEVEL            = 4,
+    AI_PURCHASE_VALUE_DEBUG_LEVEL              = 5,
+    POSITION_DEBUG_LEVEL                       = 5,
+    FORCED_DEBUG_LEVEL                         = 9,
+    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9,
+    AI_BATTLE_DEBUG_LEVEL                      = 9
 H2_ENUM_END(DebugLevel)
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;

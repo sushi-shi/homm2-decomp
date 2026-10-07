@@ -20,6 +20,7 @@
 #include <SOURCE/townManager.h>
 #include <BASE/dialog.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/ADVMGR.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
     WINDOW_X                    = 0x8f,
@@ -133,7 +134,7 @@ i32 recruitUnit::Open(i32 priority) {
         m_resourceCost,
         *m_available
     );
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     Update();
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,

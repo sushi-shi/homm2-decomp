@@ -172,9 +172,6 @@ H2_ENUM_BEGIN(NetBoxLocalConstant)
     BOX_FIRST_COLOR_ID = 0x14,
     BOX_INPUT_ID = 5,
     BOX_THIS_PLAYER_COLOR_ID = 0x18,
-    BOX_KEY_ESCAPE = 0x1b,
-    BOX_KEY_ENTER = 10,
-    BOX_KEY_BACKSPACE = 0x7f,
     BOX_KEY_F1 = 0x3b00,
     BOX_CURSOR_GLYPH = 0x1f,
     BOX_FIRST_PRINTABLE = 0x20,
@@ -215,7 +212,6 @@ H2_ENUM_BEGIN(InitMenuConstant)
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_MAIN_MUSIC = 0x2a,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
     MENU_IDLE_FRAME = 1,
@@ -233,7 +229,6 @@ H2_ENUM_END(InitMenuConstant)
 
 H2_ENUM_BEGIN(RecruitHeroConstant)
     RECRUIT_HERO_VIEW_BUTTON = 2,
-    RECRUIT_HERO_FADE_STEPS = 8
 H2_ENUM_END(RecruitHeroConstant)
 
 H2_ENUM_BEGIN(BuildingRuleConstant)
@@ -488,7 +483,7 @@ i32 oldmain(void) {
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
     gpMouseManager->SetPointer(
         "advmice.mse",
-        0,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
@@ -544,7 +539,7 @@ i32 oldmain(void) {
                 "shnganim.icn"
             );
         if (gGameCommand != OLD_MAIN_EXIT)
-            gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+            gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_MAIN_MENU);
 
         if (!mainScreenLoaded) {
             if (gGameCommand != OLD_MAIN_EXIT) {
@@ -558,12 +553,12 @@ i32 oldmain(void) {
                 if (firstMainScreen)
                     SetPalette(gPalette->m_data, 1);
                 else
-                    gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 firstMainScreen = false;
             }
             gpMouseManager->SetPointer(
                 "advmice.mse",
-                0,
+                ADVENTURE_POINTER_DEFAULT,
                 MOUSE_AUTO_CURSOR_TYPE
             );
         }
@@ -685,7 +680,7 @@ i32 oldmain(void) {
                                 goto initialize_game;
                             } else {
                                 gpWindowManager
-                                    ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                    ->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                                 mainScreenLoaded = false;
                                 goto main_menu;
                             }
@@ -696,7 +691,7 @@ i32 oldmain(void) {
                                     goto initialize_game;
                                 } else {
                                     gpWindowManager
-                                        ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                        ->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                                     mainScreenLoaded = false;
                                     goto main_menu;
                                 }
@@ -724,12 +719,12 @@ i32 oldmain(void) {
                 mainScreenLoaded = false;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_THIRD_VIDEO);
                 mainScreenLoaded = false;
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
                 quit = true;
@@ -875,7 +870,7 @@ i32 oldmain(void) {
             gbGameInitialized = true;
             mainScreenLoaded = false;
             gpSoundManager->StopAllSamples(1);
-            gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
+            gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
             gMapX = 0;
             gMapY = 0;
             giCurWatchPlayer = giCurPlayer;
@@ -903,7 +898,7 @@ i32 oldmain(void) {
                 gMapX = gpAdvManager->m_mapOriginX;
                 gMapY = gpAdvManager->m_mapOriginY;
                 gpExec->RemoveManager(gpAdvManager);
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
             }
         }
 
@@ -913,7 +908,7 @@ i32 oldmain(void) {
             bShowIt = true;
             gpMouseManager->SetPointer(
                 "advmice.mse",
-                0,
+                ADVENTURE_POINTER_DEFAULT,
                 MOUSE_AUTO_CURSOR_TYPE
             );
             sprintf(
@@ -928,7 +923,7 @@ i32 oldmain(void) {
                     PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
                 else
                     PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
                     gpWindowManager->m_screen,
@@ -936,10 +931,10 @@ i32 oldmain(void) {
                 );
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 gpWindowManager->m_updateFlags = 1;
                 mainScreenLoaded = true;
-                gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
             } else {
                 i32 campaignResult = 0;
                 if (gbInCampaign) {
@@ -1002,7 +997,7 @@ i32 oldmain(void) {
                 } else {
                     ShowCongrats(HIGH_SCORE_STANDARD);
                     if (!gbShowHighScore) {
-                        gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
                             gpWindowManager->m_screen,
@@ -1014,12 +1009,12 @@ i32 oldmain(void) {
                             LOGICAL_SCREEN_WIDTH,
                             LOGICAL_SCREEN_HEIGHT
                         );
-                        gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                         gpWindowManager->m_updateFlags = 1;
                         mainScreenLoaded = true;
-                        gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                     } else {
-                        gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_HIGH_SCORE);
                     }
                 }
             }
@@ -1032,7 +1027,7 @@ i32 oldmain(void) {
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 giHighScoreRank = -1;
-                gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
                     gpWindowManager->m_screen,
@@ -1040,7 +1035,7 @@ i32 oldmain(void) {
                 );
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 mainScreenLoaded = true;
             }
         }
@@ -1352,7 +1347,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                         gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                         gpWindowManager
                             ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                        gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                         break;
                     } else {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1470,7 +1465,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
-                        gpWindowManager->FadeScreen(FADE_IN, RECRUIT_HERO_FADE_STEPS, NULL);
+                        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                         break;
                     default:
                         break;
@@ -3281,17 +3276,17 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             case MESSAGE_KEY_DOWN:
                 messageTime = 0;
                 switch (event.payload.keyboard.keyCode) {
-                    case BOX_KEY_ESCAPE:
+                    case INPUT_KEY_CODE_ESCAPE:
                     case BOX_KEY_F1:
                         done = true;
                         break;
-                    case BOX_KEY_BACKSPACE:
+                    case INPUT_KEY_CODE_DELETE:
                         if (inputLength > 0)
                             inputLength--;
                         updateInput = true;
                         cursorState = 1;
                         break;
-                    case BOX_KEY_ENTER:
+                    case INPUT_KEY_CODE_ENTER:
                         sendText = true;
                         break;
                     default:
@@ -3304,7 +3299,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                             textWidth = smallFont->LineWidth(inputText);
                             if (textWidth + BOX_CURSOR_WIDTH_PADDING < BOX_CURSOR_WIDTH_LIMIT) {
                                 inputText[inputLength] =
-                                    static_cast<char>(event.payload.keyboard.keyCode & 0xff);
+                                    static_cast<char>(event.payload.keyboard.keyCode & INPUT_KEY_CODE_CHARACTER_MASK);
                                 inputLength++;
                                 updateInput = true;
                                 cursorState = 0;
@@ -3614,7 +3609,7 @@ void SmackFade(u8* source, u8* destination) {
         );
         colorMap[sourceColor] = bestColor;
     }
-    FadeTo(source, transitionPalette, HIGH_SCORE_FADE_STEPS);
+    FadeTo(source, transitionPalette, FADE_SPEED_STANDARD);
     pixel = gpWindowManager->m_screen->m_pixels;
     for (column = 0; column < LOGICAL_SCREEN_WIDTH; column++) {
         for (row = 0; row < LOGICAL_SCREEN_HEIGHT; row++) {
@@ -4262,14 +4257,10 @@ void EarlyResizeWindow(
 #undef width
 #endif
 
-H2_ENUM_BEGIN(MapAreaConstant)
-    MAP_AREA_ORIGIN = 16,
-    MAP_AREA_LIMIT = 448
-H2_ENUM_END(MapAreaConstant)
-
 VA(0x0046e31d, 0x41)
 i32 InMapArea(i32 x, i32 y) {
-    return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN && y < MAP_AREA_LIMIT;
+    return x >= ADVENTURE_VIEW_BORDER && x < ADVENTURE_VIEW_SIZE && y >= ADVENTURE_VIEW_BORDER
+           && y < ADVENTURE_VIEW_SIZE;
 }
 
 H2_ENUM_BEGIN(DynamicWindowConstant)
@@ -5825,7 +5816,7 @@ void NormalDialog(
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer(
         "advmice.mse",
-        0,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
 
@@ -7168,12 +7159,12 @@ DATA(0x004faf78) i16 giScoreCampaignMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_F
     {320, 46},  {300, 37}
 };
 DATA(0x004fb080) i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
-    IDX(TOWN_MUSIC_KNIGHT),
-    IDX(TOWN_MUSIC_BARBARIAN),
-    IDX(TOWN_MUSIC_WARLOCK),
-    IDX(TOWN_MUSIC_WIZARD),
-    IDX(TOWN_MUSIC_SORCERESS),
-    IDX(TOWN_MUSIC_NECROMANCER),
+    MUSIC_TRACK_KNIGHT_TOWN,
+    MUSIC_TRACK_BARBARIAN_TOWN,
+    MUSIC_TRACK_SORCERESS_TOWN,
+    MUSIC_TRACK_WARLOCK_TOWN,
+    MUSIC_TRACK_WIZARD_TOWN,
+    MUSIC_TRACK_NECROMANCER_TOWN,
     IDX(TOWN_MUSIC_NONE),
     IDX(TOWN_MUSIC_NONE)
 };
@@ -9119,7 +9110,7 @@ DATA(0x004fdffc) H2_CONST char* gResourceNames[IDX(RES_COUNT)] = {
 };
 // The localised build names the mine, not the resource it yields, in the
 // adventure-map quick info; the English 2.1 tree has no such table and reads
-// gResourceNames there. See docs/version-changes.md.
+// gResourceNames there. See docs/versions/gold-2.1-buka.md.
 DATA(0x004fe018) H2_CONST char* gMineNames[IDX(RES_COUNT)] = {
     localization::Tr("table.gMineNames.0"),
     localization::Tr("table.gMineNames.1"),
@@ -10839,7 +10830,7 @@ DATA(0x00526124) game* gpGame;
 DATA(0x00525bc3) b8 gbRetreatWin;
 DATA(0x005260fc) DialogWaitType giWaitType;
 DATA(0x005258a4) class icon* gCurLoadedSpellIcon;
-DATA(0x005249f4) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+DATA(0x005249f4) u8 bSaveMusicPosition[MIDI_TRACK_COUNT];
 DATA(0x00525a10) H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 DATA(0x00524f74) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x005249dc) u8 giSetupGameType;
@@ -10892,7 +10883,7 @@ DATA(0x0052588c) b32 gbThisNetGotAdventureControl;
 DATA(0x00526414) i32 giMapChangeCtr;
 DATA(0x00525018) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 DATA(0x005258c0) b32 gbWaitForRemoteReceive;
-DATA(0x00525a14) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+DATA(0x00525a14) u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 DATA(0x00526168) townManager* gpTownManager;
 DATA(0x00524df8) advManager* gpAdvManager;
 DATA(0x00526144) i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

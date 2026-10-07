@@ -36,9 +36,7 @@ H2_ENUM_BEGIN(CellWindowConstant)
     CELL_WINDOW_ACTION_TOGGLE   = 0x48,
     CELL_WINDOW_BYTE_MASK       = 0xff,
     // The largest tileset a tileset field accepts.
-    CELL_WINDOW_MAX_TILESET     = 15,
-    // The debug level the raw cell editor needs.
-    CELL_WINDOW_DEBUG_LEVEL     = 1
+    CELL_WINDOW_MAX_TILESET     = 15
 H2_ENUM_END(CellWindowConstant)
 
 H2_ENUM_BEGIN(CellWindowField)

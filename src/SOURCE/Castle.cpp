@@ -797,7 +797,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
                                     gpWindowManager
-                                        ->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+                                        ->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                                 } else {
                                     result = gpTownManager->RecruitHero(
                                         heroChoiceIndex,

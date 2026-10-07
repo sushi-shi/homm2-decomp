@@ -32,7 +32,7 @@ i32 highScoreManager::Open(i32 id) {
     m_showCampaignScores = giHighScoreType == HIGH_SCORE_CAMPAIGN
                            || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN;
 
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     sprintf(gText, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
     m_window = new heroWindow(0, 0, "hiscore.bin");
@@ -45,14 +45,14 @@ i32 highScoreManager::Open(i32 id) {
     m_active = true;
     strcpy(m_name, "highScoreManager");
     KBChangeMenu(hmnuDflt);
-    gpWindowManager->FadeScreen(FADE_IN, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
     glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
 VA(0x004652d6, 0x4f)
 void highScoreManager::Close(void) {
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     m_active = false;

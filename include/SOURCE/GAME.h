@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <BASE/message.h>
+#include <BASE/soundManager.h>
 #include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
@@ -177,7 +178,7 @@ H2_ENUM_END(GameViewSpellsConstant)
 
 H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
-    WAIT_AMBIENT_MUSIC       = 21
+    WAIT_AMBIENT_MUSIC       = MUSIC_TRACK_NEW_MONTH
 H2_ENUM_END(GameWaitConstant)
 
 i32 GetNumObelisks(i32 player);

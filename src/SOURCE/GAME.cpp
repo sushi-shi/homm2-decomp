@@ -218,10 +218,6 @@ H2_ENUM_END(RandomMapConstant)
 H2_ENUM_BEGIN(GameMapSetupConstant)
     COMPUTER_SCREEN_WIDGET_FIRST          = 1,
     COMPUTER_SCREEN_WIDGET_LAST           = 6,
-    HEROES_LOGO_X                         = 480,
-    HEROES_LOGO_Y                         = 16,
-    HEROES_LOGO_WIDTH                     = 144,
-    HEROES_LOGO_HEIGHT                    = 144,
     ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
     DEFAULT_DWELLING_ROLL_CAPACITY        = 10,
     DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
@@ -236,7 +232,6 @@ H2_ENUM_BEGIN(GameMapSetupConstant)
 H2_ENUM_END(GameMapSetupConstant)
 
 H2_ENUM_BEGIN(GamePlayerTurnConstant)
-    GAME_AI_MUSIC_TRACK            = 28,
     ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
 H2_ENUM_END(GamePlayerTurnConstant)
 
@@ -281,8 +276,6 @@ H2_ENUM_BEGIN(NewTurnConstant)
     NEW_TURN_MUSIC_FILENAME_CAPACITY = 16,
     NEW_TURN_LOWER_NAME_CAPACITY     = 52,
     NEW_TURN_BOTTOM_VIEW_DURATION    = 3000,
-    NEW_MONTH_MUSIC_TRACK            = 21,
-    NEW_WEEK_MUSIC_TRACK             = 20,
     NEW_MONTH_NORMAL_TEXT            = 2,
     NEW_MONTH_CREATURE_TEXT          = 3,
     NEW_MONTH_PLAGUE_TEXT            = 4,
@@ -4273,7 +4266,7 @@ i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
 VA(0x00456bf4, 0x2c)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
-    gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
+    gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_AI_TURN);
     gSoundBackendsReady = 0;
 }
 
@@ -4362,7 +4355,7 @@ void game::NextPlayer(void) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         giForceSwitchMusic = KBTickCount();
         gSoundBackendsReady = 0;
     }
@@ -5983,8 +5976,8 @@ void game::ShowHeroesLogo(void) {
         IconToBitmap(
             theIcon,
             gpWindowManager->m_screen,
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
             0,
             ICON_DRAW_NO_CLIP,
             0,
@@ -5994,10 +5987,10 @@ void game::ShowHeroesLogo(void) {
             0
         );
         gpWindowManager->UpdateScreenRegion(
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
-            HEROES_LOGO_WIDTH,
-            HEROES_LOGO_HEIGHT
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
+            ADVENTURE_RADAR_SIZE,
+            ADVENTURE_RADAR_SIZE
         );
         gpResourceManager->Dispose(theIcon);
     }
@@ -6014,7 +6007,7 @@ void game::WaitForPlayer(char* text, i32 player) {
         else
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         gSoundBackendsReady = 1;
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
         gpAdvManager->UpdateTownLocators(1, 1);
@@ -7323,7 +7316,7 @@ void game::DoNewTurn(void) {
         if (giWeekType != CALENDAR_PERIOD_NONE) {
             musicTrack = -1;
             if (m_week == 1) {
-                musicTrack = NEW_MONTH_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_MONTH;
                 strcpy(musicFile, "newmonth.82m");
                 if (giMonthType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(
@@ -7347,7 +7340,7 @@ void game::DoNewTurn(void) {
                     sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
                 }
             } else {
-                musicTrack = NEW_WEEK_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_WEEK;
                 strcpy(musicFile, "newweek.82m");
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);

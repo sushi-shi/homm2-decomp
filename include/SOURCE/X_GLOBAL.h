@@ -166,7 +166,6 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_COMBAT_SPEED_COUNT               = 3,
     KB_TOWN_COMMAND_COUNT               = 28,
     KB_ARMY_EFFECT_COUNT                = 20,
-    KB_MUSIC_TRACK_COUNT                = MIDI_TRACK_COUNT,
     KB_ARTIFACT_LEVEL_COUNT             = IDX(ARTIFACT_COUNT) + 1,
     KB_STAT_POWER_COUNT                 = 41,
     BATTLE_STAT_TABLE_MAX_INDEX         = KB_STAT_POWER_COUNT - 1,
@@ -339,12 +338,6 @@ extern i8 gbArrow[IDX(MAP_DIRECTION_COUNT)][IDX(MAP_DIRECTION_COUNT)];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
 H2_ENUM_CLASS_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE        = 0,
-    TOWN_MUSIC_WARLOCK     = 5,
-    TOWN_MUSIC_WIZARD      = 6,
-    TOWN_MUSIC_NECROMANCER = 7,
-    TOWN_MUSIC_KNIGHT      = 8,
-    TOWN_MUSIC_BARBARIAN   = 9,
-    TOWN_MUSIC_SORCERESS   = 10,
     TOWN_MUSIC_TABLE_SIZE  = 8
 H2_ENUM_CLASS_END(TownMusicTrack)
 
@@ -571,7 +564,7 @@ extern b8 xNetHasOldPlayers;
 extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 extern char cPlayerNames[GAME_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 extern class icon* gCurLoadedSpellIcon;
-extern u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+extern u8 bSaveMusicPosition[MIDI_TRACK_COUNT];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 extern b32 giFullySeeded;
@@ -602,6 +595,6 @@ extern i32 giCurWatchPlayer;
 extern char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 extern i32 giMapChangeCtr;
 extern b32 gbWaitForRemoteReceive;
-extern u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+extern u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 
 #endif

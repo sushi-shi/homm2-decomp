@@ -299,6 +299,7 @@ public:
         H2_OPEN_CODE_PARAM(MapTriggerCode, i32) objectType,
         i32 objectMetadata,
         class mapCell* passedCell,
+        // Unread: retail call sites pass their own tags here.
         i32 unused
     );
     void SetMapSize(i32 width, i32 height);

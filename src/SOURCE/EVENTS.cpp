@@ -112,7 +112,6 @@ namespace {
     H2_ENUM_END(MonsterCombatValueIndex)
 
     H2_ENUM_BEGIN(CombatFlowConstant)
-        COMBAT_AUTO_RESOLVE_DEBUG_LEVEL = 4,
         COMBAT_RANDOM_SEED_MAX = 1000,
         COMBAT_NETWORK_POLL_X = 30,
         COMBAT_NETWORK_POLL_Y = 30,
