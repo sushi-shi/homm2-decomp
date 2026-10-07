@@ -20,7 +20,7 @@ i32 combatManager::Open(i32) { return 0; }
 void combatManager::Close() {}
 MessageDispatchResult combatManager::Main(tag_message&) { return MessageDispatchResult(0); }
 i32 hero::HasArtifact(ArtifactType) { return 0; }
-u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {};
+H2EnumStorage<SpellType, u8> giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {};
 tag_monsterInfo gMonsterDatabase[KB_CREATURE_TABLE_CAPACITY] = {};
 b8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT] = {};
 SSpellInfo gsSpellInfo[KB_SPELL_TABLE_CAPACITY] = {};
@@ -100,7 +100,7 @@ int main() {
     check(raw(friendly, ARMY_SPELL_INFLUENCE_DRAGON_SLAYER) == 280,
           "adjacent dragons give full Dragon Slayer value");
     adjacentDragon = false;
-    enemy.m_monster.flags.all = MONSTER_FLAGS_SHOOTER;
+    enemy.m_monster.attributes = MONSTER_FLAGS_SHOOTER;
     const int shield = raw(friendly, ARMY_SPELL_INFLUENCE_SHIELD);
     check(shield >= 224 && shield <= 225,
           "Shield counts opposing shooters and scales by stack worth");
