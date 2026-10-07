@@ -286,8 +286,8 @@ flags = "base"
 # holds one body and the std::ctype<wchar_t>::id registration, between Misc
 # and EXEC in EDT2PL.exe's BASE run.
 [[unit]]
-unit = "BASE/icon2bss"
-source = "src/BASE/icon2bss.cpp"
+unit = "BASE/icon2bsd"
+source = "src/BASE/icon2bsd.cpp"
 images = ["editor"]
 flags = "base"
 

@@ -150,7 +150,9 @@ H2_ENUM_END(RadarColorTableCount)
 
 H2_ENUM_BEGIN(GroundTableConstant)
     GROUND_TILE_IMAGE_COUNT = 432,
-    GROUND_SHAPE_FLIPPED    = 0x80
+    // giGroundShape: a varied tile (a plain tile's variant), whose shape is
+    // the bits below it.
+    GROUND_SHAPE_VARIED     = 0x80
 H2_ENUM_END(GroundTableConstant)
 
 H2_ENUM_BEGIN(KbControlTableConstant)

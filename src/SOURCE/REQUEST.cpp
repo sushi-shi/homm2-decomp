@@ -405,10 +405,7 @@ i32 fileRequester::Open(i32 id) {
     // frame keeps the game's selection locals.
     enabled = 1;
     message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-    sprintf(
-        gText,
-         localization::Tr("requester.file_to_load")
-    );
+    sprintf(gText, localization::Tr("requester.file_to_load"));
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 #else

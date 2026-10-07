@@ -31,9 +31,11 @@
 #include <BASE/font.h>
 #include <BASE/bmap2.h>
 #include <BASE/icon2bs.h>
+#include <BASE/icon2bsd.h>
 #include <BASE/IconEntry.h>
 #include <BASE/Misc.h>
 #include <BASE/TILE.h>
+#include <BASE/tile2bs.h>
 #include <BASE/icon.h>
 #include <BASE/tileset.h>
 #include <BASE/heroWindow.h>
@@ -11153,7 +11155,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gZoomCellSize[m_zoomLevel]
                     );
                 else if (gDrawCell->m_objectTileset == TILESET_MINIHERO)
-                    IconToBitmapScaleShadow(
+                    IconToBitmapScaleDouble(
                         m_objectIcons[gDrawCell->m_objectTileset][0],
                         gpWindowManager->m_screen,
                         gDrawX,
@@ -11227,7 +11229,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gZoomCellSize[m_zoomLevel]
                         );
                     else if (gDrawExtra->objectTileset == TILESET_MINIHERO)
-                        IconToBitmapScaleShadow(
+                        IconToBitmapScaleDouble(
                             m_objectIcons[gDrawExtra->objectTileset][0],
                             gpWindowManager->m_screen,
                             gDrawX,
@@ -13178,7 +13180,7 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
                 for (variant = 0; variant < EDIT_GROUND_VARIANTS; variant++)
                     gGroundTileCounts[terrainIndex][shapeIndex][variant] = 0;
         for (tile = 0; tile < GROUND_TILE_IMAGE_COUNT; tile++) {
-            variant = (giGroundShape[tile] & GROUND_SHAPE_FLIPPED) != 0;
+            variant = (giGroundShape[tile] & GROUND_SHAPE_VARIED) != 0;
             gGroundTiles[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]
                         [gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK]
                                           [variant]]
@@ -13187,20 +13189,20 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
         }
     }
     if (vary) {
-        if (shape & GROUND_SHAPE_FLIPPED) {
+        if (shape & GROUND_SHAPE_VARIED) {
             variant = EDIT_GROUND_VARIED;
         } else if ((gGroundVariantChance[terrain] && force)
                    || (Random(0, 100) < gGroundVariantChance[terrain] * chance
                        && gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][EDIT_GROUND_VARIED]
                               > 0)) {
             if ((x <= 0
-                 || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                 || !(giGroundShape[gMap.CellAt(x - 1, y)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (x >= MAP_WIDTH - 2
-                    || !(giGroundShape[gMap.CellAt(x + 1, y)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                    || !(giGroundShape[gMap.CellAt(x + 1, y)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (y <= 0
-                    || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED))
+                    || !(giGroundShape[gMap.CellAt(x, y - 1)->m_terrainImageIndex] & GROUND_SHAPE_VARIED))
                 && (y >= MAP_HEIGHT - 2
-                    || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_FLIPPED)))
+                    || !(giGroundShape[gMap.CellAt(x, y + 1)->m_terrainImageIndex] & GROUND_SHAPE_VARIED)))
                 variant = EDIT_GROUND_VARIED;
         }
         gGroundTileCount = gGroundTileCounts[terrain][shape & EDIT_SHAPE_MASK][variant];
@@ -14096,14 +14098,6 @@ void editManager::CheckScreenScroll(void) {
     }
 }
 
-H2_ENUM_BEGIN(EditOverlayFrames)
-    // overlayType::reserved4e: a type that reuses the previous type's
-    // frames, and one that numbers its own from frame 0 (a negative value
-    // leaves the frames alone).
-    EDIT_OVERLAY_FRAMES_SHARED = 1111,
-    EDIT_OVERLAY_FRAMES_OWN    = 0
-H2_ENUM_END(EditOverlayFrames)
-
 // Numbers the parts of every catalogue entry: each occupied grid cell takes
 // the next frame of its tileset (an animated one its animation's frames as
 // well), and the entry's width is the widest occupied row.
@@ -14129,9 +14123,9 @@ void FillInOverlayTiles(void) {
         if (shape->tileset != curTileset)
             baseFrame = 0;
         curTileset = shape->tileset;
-        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_SHARED)
+        if (shape->frameNumbering == OVERLAY_FRAMES_SHARED)
             baseFrame = runFrame;
-        if (shape->reserved4e == EDIT_OVERLAY_FRAMES_OWN)
+        if (shape->frameNumbering == OVERLAY_FRAMES_OWN)
             baseFrame = 0;
         nextFrame = baseFrame;
         runFrame = baseFrame;
@@ -14141,22 +14135,22 @@ void FillInOverlayTiles(void) {
                 if (OverlayGridHas(shape->occupiedRows, gx, gy)) {
                     if (OVERLAY_GRID_WIDTH - gx > width)
                         width = OVERLAY_GRID_WIDTH - gx;
-                    if (shape->reserved4e >= 0)
+                    if (shape->frameNumbering >= 0)
                         shape->frames[cellIndex] = nextFrame;
                     if (OverlayGridHas(shape->animatedRows, gx, gy)) {
-                        nextFrame += shape->reserved10 + 1;
-                        baseFrame += shape->reserved10 + 1;
+                        nextFrame += shape->animationFrames + 1;
+                        baseFrame += shape->animationFrames + 1;
                     } else {
                         nextFrame++;
                         baseFrame++;
                     }
-                } else if (shape->reserved4e >= 0) {
+                } else if (shape->frameNumbering >= 0) {
                     shape->frames[cellIndex] = OVERLAY_NO_FRAME;
                 }
                 cellIndex++;
             }
         }
-        shape->reserved4d = width;
+        shape->width = width;
     }
 }
 
@@ -14788,7 +14782,7 @@ void editManager::ToggleGroundVariant(void) {
     y += m_viewY;
     ground = gMap.CellAt(x, y)->m_terrainImageIndex;
     terrain = giGroundToTerrain[ground];
-    if (giGroundShape[ground] & GROUND_SHAPE_FLIPPED)
+    if (giGroundShape[ground] & GROUND_SHAPE_VARIED)
         vary = false;
     else
         vary = true;

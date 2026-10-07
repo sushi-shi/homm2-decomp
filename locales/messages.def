@@ -197,7 +197,7 @@ HOMM2_MESSAGE("editor.random.status.smoothing", "Generating map - Cleaning up gr
 HOMM2_MESSAGE("editor.random.status.terrain", "Generating map - Drawing ground type - %s")
 HOMM2_MESSAGE("editor.random.status.treasure", "Generating map - Placing treasures...")
 HOMM2_MESSAGE("editor.random.status.trees", "Generating map - Placing trees...")
-HOMM2_MESSAGE("editor.requester.map.size_mismatch", "No maps exist at that size.")
+HOMM2_MESSAGE("editor.requester.map.size_mismatch", "No maps exist for that size.")
 HOMM2_MESSAGE("editor.sign.bottle_title", "Bottle Detail")
 HOMM2_MESSAGE("editor.sign.old_editor", "Unable to edit sign - created under old editor")
 HOMM2_MESSAGE("editor.sign.sign_title", "Sign Detail")

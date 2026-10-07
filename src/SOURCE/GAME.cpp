@@ -1957,7 +1957,7 @@ void game::NewMap(char* filename) {
         m_players[player].m_ultimateArtifactHintY = -1;
         heroIndex = 0;
         selectedTown = -1;
-        if (m_mapHeader.unknown25 == 0 && m_players[player].m_townCount > 0) {
+        if (m_mapHeader.noStartingHero == 0 && m_players[player].m_townCount > 0) {
             for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
                 for (nTown = 0; nTown < m_players[player].m_townCount; nTown++) {
                     if (selectedTown == -1

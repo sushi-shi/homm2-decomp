@@ -51,7 +51,7 @@ H2_ENUM_BEGIN(SpecDialogWidget)
     SPEC_DIFFICULTY_FIRST      = 0x26c,
     SPEC_DIFFICULTY_LAST       = SPEC_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 2,
     // "Start with hero in each player's main castle": checked while the
-    // header's flag at +0x25 is clear.
+    // header's noStartingHero is clear.
     SPEC_STARTING_HERO_BOX     = 0x2bd,
     SPEC_RUMOUR_LIST           = 0x321,
     SPEC_RUMOUR_ADD            = 0x322,
@@ -548,7 +548,7 @@ void UpdateSpecificationsWindow(void) {
         gSpecWindow->BroadcastMessage(message);
     }
     message.payload.widget.command
-        = gEditMapHeader.unknown25 ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
+        = gEditMapHeader.noStartingHero ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.id = SPEC_STARTING_HERO_BOX;
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
@@ -848,7 +848,7 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gEditMapHeader.difficulty = message.payload.widget.id - SPEC_DIFFICULTY_FIRST;
                     break;
                 case SPEC_STARTING_HERO_BOX:
-                    gEditMapHeader.unknown25 = 1 - gEditMapHeader.unknown25;
+                    gEditMapHeader.noStartingHero = 1 - gEditMapHeader.noStartingHero;
                     break;
                 case SPEC_DESCRIPTION:
                     gSpecWindow->BroadcastMessage(request);

@@ -36,7 +36,7 @@ start	end	unit	functions	evidence
 0x357c0	0x35fb0	BASE/ICON	10	placed game unit
 0x35fb0	0x36310	BASE/bmap2	6	placed game unit
 0x36310	0x39b00	BASE/Misc	49	placed game unit
-0x39b00	0x39d50	BASE/icon2bss	3	BASE-library object the game does not link: a 64-pixel icon scale-down (IconToBitmap callee, DrawCell caller)
+0x39b00	0x39d50	BASE/icon2bsd	3	BASE-library object the game does not link: a double-size icon scale-down (IconToBitmap callee, DrawCell caller)
 0x39d50	0x39fb0	BASE/icon2bs	3	placed game unit
 0x39fb0	0x3a530	BASE/tile2bs	3	BASE-library object the game does not link: a tile scale-down (TileToBitmap callee, DrawCell caller)
 0x3a530	0x3ad80	BASE/EXEC	12	placed game unit
