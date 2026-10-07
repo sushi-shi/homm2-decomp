@@ -542,7 +542,7 @@ void UpdateSpecificationsWindow(void) {
         gSpecWindow->BroadcastMessage(message);
     }
     message.payload.widget.command
-        = gEditMapHeader.unknown25 ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
+        = gEditMapHeader.noStartingHero ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.id = SPEC_UNKNOWN25_BOX;
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_GET_SELECTION;
@@ -840,7 +840,7 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gEditMapHeader.difficulty = message.payload.widget.id - SPEC_DIFFICULTY_FIRST;
                     break;
                 case SPEC_UNKNOWN25_BOX:
-                    gEditMapHeader.unknown25 = 1 - gEditMapHeader.unknown25;
+                    gEditMapHeader.noStartingHero = 1 - gEditMapHeader.noStartingHero;
                     break;
                 case SPEC_DESCRIPTION:
                     gSpecWindow->BroadcastMessage(request);

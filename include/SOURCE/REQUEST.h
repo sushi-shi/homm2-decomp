@@ -45,7 +45,8 @@ H2_ENUM_CLASS_END_T(MapLossCondition, u8)
 struct SMapHeader {
     u32 magic;
     H2_ENUM_STORAGE(GameDifficulty, u8) difficulty;
-    u8 unknown5;
+    // Zero in every shipped map; neither the game nor the editor reads it.
+    u8 reserved5;
     u8 width;
     u8 height;
     u8 playerEnabled[GAME_PLAYER_COUNT];
@@ -60,11 +61,14 @@ struct SMapHeader {
     u16 victoryConditionValue;
     MapLossCondition lossCondition;
     u16 lossConditionValue;
-    u8 unknown25;
+    // Set: players do not start with a hero in their main castle (the
+    // editor's "Start with hero in each player's main castle", cleared).
+    u8 noStartingHero;
     H2_ENUM_STORAGE(FactionType, i8) playerRace[GAME_PLAYER_COUNT];
     u16 victoryTownY;
     u16 lossTownY;
     u16 victorySideThreshold;
+    // Zero in every shipped map; neither the game nor the editor reads it.
     u8 reserved32[MAP_HEADER_RESERVED_SIZE];
     // The scenario editor's own bytes: the gTownNames entry its next town
     // is named after, and whether the next save names the file after the

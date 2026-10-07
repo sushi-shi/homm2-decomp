@@ -587,8 +587,8 @@ EDITOR/specedit	?FillLossConditionList@@YIXXZ	100.0000	9c89d88eb38b
 EDITOR/specedit	?FillVictoryConditionList@@YIXXZ	100.0000	7e3fa4d41f94
 EDITOR/specedit	?SetLossConditionChoice@@YIXH@Z	100.0000	721838bbbacb
 EDITOR/specedit	?SetVictoryConditionChoice@@YIXH@Z	100.0000	964ff788b314
-EDITOR/specedit	?SpecificationsHandler@@YIHAAUtag_message@@@Z	100.0000	2854268696e4
-EDITOR/specedit	?UpdateSpecificationsWindow@@YIXXZ	100.0000	aad41a2e8f78
+EDITOR/specedit	?SpecificationsHandler@@YIHAAUtag_message@@@Z	100.0000	8f4cbb33ad8c
+EDITOR/specedit	?UpdateSpecificationsWindow@@YIXXZ	100.0000	ef3a376b2553
 EDITOR/terrain	??0terrainManager@@QAE@XZ	100.0000	a6f3293dd972
 EDITOR/terrain	?Close@terrainManager@@UAEXXZ	100.0000	c3a8d117ed18
 EDITOR/terrain	?GetBrushSize@terrainManager@@QAEHXZ	100.0000	b8f6676a64d2
@@ -614,7 +614,7 @@ SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	100.0000	af29e7cf50de
 SOURCE/REQUEST	?InitializeFiles@fileRequester@@QAEHPAD0H@Z	100.0000	70b1b65ca5ac
 SOURCE/REQUEST	?Main@fileRequester@@UAEHAAUtag_message@@@Z	100.0000	d0807e5e3202
 SOURCE/REQUEST	?MapExistsForFilter@fileRequester@@QAEHH@Z	100.0000	17edf3633bb6
-SOURCE/REQUEST	?Open@fileRequester@@UAEHH@Z	100.0000	466d41b887eb
+SOURCE/REQUEST	?Open@fileRequester@@UAEHH@Z	100.0000	84d0a767ac87
 SOURCE/REQUEST	?SetOK@fileRequester@@QAEXH@Z	100.0000	191053882db8
 SOURCE/REQUEST	?SetupFiles@fileRequester@@QAEXXZ	100.0000	969dc97eda09
 SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	f8e954565b91
