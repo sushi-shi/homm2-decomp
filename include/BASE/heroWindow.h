@@ -39,6 +39,12 @@ H2_ENUM_BEGIN(HeroWindowConstant)
     HERO_WINDOW_NAME_CAPACITY = 0x14
 H2_ENUM_END(HeroWindowConstant)
 
+H2_ENUM_BEGIN(HeroWindowZOrder)
+    // AddWindow/AddWidget: one above the current top (0 in an empty list);
+    // also the z-order of a window or widget not yet placed.
+    WINDOW_Z_ORDER_TOP = -1
+H2_ENUM_END(HeroWindowZOrder)
+
 #pragma pack(push, 1)
 class heroWindow {
 public:

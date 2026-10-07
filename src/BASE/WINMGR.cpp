@@ -377,7 +377,7 @@ void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 upda
     heroWindow* currentWindow = m_windowListTail;
     if (HAS(window->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
         zOrder = 0;
-    if (zOrder == -1) {
+    if (zOrder == WINDOW_Z_ORDER_TOP) {
         if (currentWindow == NULL)
             zOrder = 0;
         else
@@ -467,7 +467,7 @@ i32 heroWindowManager::DoDialog(
     iDialogNestCount++;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
-        AddWindow(window, -1, 1);
+        AddWindow(window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
     if (fade != 0)
         gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
     gpInputManager->Flush();

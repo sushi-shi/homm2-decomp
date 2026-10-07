@@ -43,7 +43,7 @@ VA(0x004ba5c0, 0x99)
 heroWindow::heroWindow(void) {
     strcpy(m_name, "Default Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = m_posY = 0;
     m_winWidth = LOGICAL_SCREEN_WIDTH;
     m_winHeight = LOGICAL_SCREEN_HEIGHT;
@@ -63,7 +63,7 @@ heroWindow::heroWindow(
 ) {
     strcpy(m_name, "Dynamic Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = width;
@@ -102,7 +102,7 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
     m_savedBackground = NULL;
     m_nextWindow = m_prevWindow = NULL;
     m_winState = WINDOW_STATE_CLOSED;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
@@ -181,7 +181,7 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
                 break;
         }
         if (finishedReading == 0 && pWidget != NULL)
-            AddWidget(pWidget, -1);
+            AddWidget(pWidget, WINDOW_Z_ORDER_TOP);
     }
 }
 #if H2_RETAIL_COMPILER
@@ -252,7 +252,7 @@ void heroWindow::Close(void) {
 VA(0x004bafc0, 0x109)
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* currentWidget = m_widgetListHead;
-    if (zOrder == -1) {
+    if (zOrder == WINDOW_Z_ORDER_TOP) {
         if (currentWidget == NULL)
             zOrder = 0;
         else
