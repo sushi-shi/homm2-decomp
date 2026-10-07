@@ -1975,7 +1975,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     }
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
-    write(fileDescriptor, &bMark, 1);
+    WRITE_FILE_VALUE(fileDescriptor, bMark);
     palOut = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     for (x = 0; x < PALETTE_DATA_SIZE; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;

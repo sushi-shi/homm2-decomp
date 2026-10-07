@@ -6179,9 +6179,9 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                         case IDX(MAP_OBJECT_ALCHEMIST_LAB):
                         case IDX(MAP_OBJECT_MINE):
                         case IDX(MAP_OBJECT_SAWMILL):
-                        case MAP_TRIGGER_ACTION_FLAG | IDX(MAP_OBJECT_ALCHEMIST_LAB):
-                        case MAP_TRIGGER_ACTION_FLAG | IDX(MAP_OBJECT_MINE):
-                        case MAP_TRIGGER_ACTION_FLAG | IDX(MAP_OBJECT_SAWMILL):
+                        case MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB):
+                        case MAP_ACTION_TRIGGER(MAP_OBJECT_MINE):
+                        case MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL):
                             color = EDIT_RADAR_TOWN_COLOR;
                             break;
                         default:
@@ -9414,12 +9414,12 @@ void DeleteExtraObjectData(u32 index) {
         memmove(
             &gEditManager->m_extras[index],
             &gEditManager->m_extras[index + 1],
-            (gEditManager->m_extraCount - (index + 1)) * sizeof(void*)
+            (gEditManager->m_extraCount - (index + 1)) * sizeof(gEditManager->m_extras[0])
         );
         memmove(
             &gEditManager->m_extraSizes[index],
             &gEditManager->m_extraSizes[index + 1],
-            (gEditManager->m_extraCount - (index + 1)) * sizeof(i16)
+            (gEditManager->m_extraCount - (index + 1)) * sizeof(gEditManager->m_extraSizes[0])
         );
     }
     gEditManager->m_extraCount--;
