@@ -369,7 +369,7 @@ void advManager::VWCompleteDraw(void) {
                     );
                 }
 
-                if (cell->m_objectLayerBit0 && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[IDX(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[IDX(cell->m_objectTileset)],
@@ -391,7 +391,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (extraCell->objectLayerBit0 && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[IDX(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[IDX(extraCell->objectTileset)],
@@ -415,7 +415,7 @@ void advManager::VWCompleteDraw(void) {
                         extraCell = NULL;
                 }
 
-                if (!cell->m_objectLayerBit0 && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (!cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[IDX(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[IDX(cell->m_objectTileset)],
@@ -437,7 +437,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (!extraCell->objectLayerBit0 && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (!extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[IDX(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[IDX(extraCell->objectTileset)],

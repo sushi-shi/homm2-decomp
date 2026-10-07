@@ -66,6 +66,7 @@ include/BASE/widget.h	pending
 include/BASE/widgetKind.h	pending	
 include/EDITOR/EDITMGR.h	pending	
 include/EDITOR/EDITOR.h	pending	
+include/EDITOR/EVENTMGR.h	pending	
 include/EDITOR/OVERLAY.h	pending	
 include/EDITOR/RANDOM.h	pending	
 include/EDITOR/clearManager.h	pending	

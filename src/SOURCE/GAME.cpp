@@ -2828,13 +2828,13 @@ void game::RandomizeEvents(void) {
     for (yPosition = 0; yPosition < MAP_HEIGHT; yPosition++) {
         for (xPosition = 0; xPosition < MAP_WIDTH; xPosition++) {
             cell = m_worldMap.GetCell(xPosition, yPosition);
-            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectLayerBit1) {
+            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectShadow) {
                 valid = true;
                 extraIndex = cell->m_extraIndex;
                 while (extraIndex != 0) {
                     extra = m_worldMap.Extra(extraIndex);
                     if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                        && !extra->objectLayerBit1)
+                        && !extra->objectShadow)
                         valid = false;
                     extraIndex = extra->nextIndex;
                 }
@@ -2871,7 +2871,7 @@ void game::RandomizeEvents(void) {
                         m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
                         & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
-                    if (!cell->m_objectLayerBit1) {
+                    if (!cell->m_objectShadow) {
                         upperTilesets[upperCount] = cell->m_objectTileset;
                         upperIndexes[upperCount] = cell->m_objectIndex;
                         upperCount++;
@@ -2882,7 +2882,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (upperCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             upperTilesets[upperCount] = extra->objectTileset;
                             upperIndexes[upperCount] = extra->objectIndex;
                             upperCount++;
@@ -2893,7 +2893,7 @@ void game::RandomizeEvents(void) {
                             extra = NULL;
                     }
                     below = m_worldMap.GetCell(xPosition, yPosition + 1);
-                    if (!below->m_objectLayerBit1) {
+                    if (!below->m_objectShadow) {
                         lowerTilesets[lowerCount] = below->m_objectTileset;
                         lowerIndexes[lowerCount] = below->m_objectIndex;
                         lowerCount++;
@@ -2904,7 +2904,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (lowerCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             lowerTilesets[lowerCount] = extra->objectTileset;
                             lowerIndexes[lowerCount] = extra->objectIndex;
                             lowerCount++;
@@ -5027,8 +5027,8 @@ void game::PerMonth(void) {
         for (x = 0; x < MAP_WIDTH; x++) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 spot = gpAdvManager->GetCell(x, y);
-                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
-                    && !spot->m_objectLayerBit0 && CELL_TERRAIN(spot) != TERRAIN_WATER) {
+                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectShadow
+                    && !spot->m_objectHighLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
@@ -6395,9 +6395,9 @@ void game::SetupTowns(void) {
                     castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
-        if (extra->hasShrine)
+        if (extra->hasCaptain)
             castle->m_buildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
-        castle->m_mayNotUpgradeToCastle = extra->unknown28;
+        castle->m_mayNotUpgradeToCastle = extra->disallowCastle;
         strcpy(castle->m_name, extra->name);
 
         memset(usedSpells, 0, IDX(SPELL_COUNT));
@@ -8096,7 +8096,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
 #endif
 VA(0x004604d2, 0x318)
 void game::CheckForTimeEvent(void) {
-    timeEventExtra* event;
+    EventExtra* event;
     i32 dayNumber;
     i32 eventIndex;
     i32 resourceIndex;
@@ -8108,7 +8108,7 @@ void game::CheckForTimeEvent(void) {
 
     dayNumber = GAME_DAY_NUMBER(*this);
     for (eventIndex = 0; eventIndex < m_timeEvents.count; eventIndex++) {
-        event = static_cast<timeEventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
+        event = static_cast<EventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
         if (((gbHumanPlayer[giCurPlayer] && event->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event->appliesToComputer))
             && event->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]

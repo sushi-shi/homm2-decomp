@@ -79,10 +79,35 @@ H2_ENUM_BEGIN(EditorTableCount)
     EDITOR_PLAYER_COLOR_COUNT = 6
 H2_ENUM_END(EditorTableCount)
 
+H2_ENUM_BEGIN(RandomMapDensity)
+    // gDensityPercent's rows (RANDOM_MAP_DENSITY_COUNT).
+    RANDOM_MAP_DENSITY_MOUNTAINS = 0,
+    RANDOM_MAP_DENSITY_TREES     = 1,
+    RANDOM_MAP_DENSITY_OBJECTS   = 2,
+    RANDOM_MAP_DENSITY_TREASURE  = 3,
+    RANDOM_MAP_DENSITY_MONSTERS  = 4
+H2_ENUM_END(RandomMapDensity)
+
+H2_ENUM_BEGIN(EditorWinText)
+    // The dialogs whose texts SetWinText fills from gWinSetup.
+    EDITOR_WIN_TEXT_SYSTEM_OPTIONS    = 3,
+    EDITOR_WIN_TEXT_EVENT             = 4,
+    EDITOR_WIN_TEXT_HERO              = 5,
+    EDITOR_WIN_TEXT_MONSTER           = 8,
+    EDITOR_WIN_TEXT_SPHINX            = 10,
+    // The rumour dialog, which the sign editor reuses.
+    EDITOR_WIN_TEXT_RUMOUR            = 11,
+    EDITOR_WIN_TEXT_SPECIFICATIONS    = 13,
+    EDITOR_WIN_TEXT_TOWN              = 15,
+    EDITOR_WIN_TEXT_ULTIMATE_ARTIFACT = 16
+H2_ENUM_END(EditorWinText)
+
 extern i32 gRandomMapPlayers;
 extern double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT];
 extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];
-extern b32 gScatterTowns;
+// The random map generator spreads each terrain's patches over the whole
+// map, or (unset) gathers them toward its centre.
+extern b32 gScatterTerrain;
 extern b32 gGenerateUnseen;
 extern b32 gGeneratingMap;
 extern i32 gObjectClass;

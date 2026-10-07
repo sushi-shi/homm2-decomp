@@ -143,15 +143,6 @@ H2_ENUM_BEGIN(ChainPiece)
     CHAIN_LINK_SHAPE          = 0xe0f07
 H2_ENUM_END(ChainPiece)
 
-// gDensityPercent's rows.
-H2_ENUM_BEGIN(RandomMapDensity)
-    RANDOM_MAP_DENSITY_MOUNTAINS = 0,
-    RANDOM_MAP_DENSITY_TREES     = 1,
-    RANDOM_MAP_DENSITY_OBJECTS   = 2,
-    RANDOM_MAP_DENSITY_TREASURE  = 3,
-    RANDOM_MAP_DENSITY_MONSTERS  = 4
-H2_ENUM_END(RandomMapDensity)
-
 // A cell of a new'ed MAP_WIDTH x MAP_HEIGHT byte grid: RemoveSmallRegions'
 // visited and region marks, PlaceTowns' region numbers and each castle's
 // reach.
@@ -357,21 +348,21 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
         patches = Random(0, percent + 51) / 30 + 1;
         balance = targetCells;
         escapes = 0;
-        minWeight = gScatterTowns ? 2 : 3;
-        maxWeight = (gScatterTowns != 0) + 6;
+        minWeight = gScatterTerrain ? 2 : 3;
+        maxWeight = (gScatterTerrain != 0) + 6;
         for (cluster = 0; cluster < patches; cluster++) {
             perSeed = balance / (patches - cluster);
             looking = true;
             guard = 0;
             while (guard < RANDOM_MAP_SEED_TRIES && looking) {
                 guard++;
-                if (gScatterTowns)
+                if (gScatterTerrain)
                     seedX = Random(0, MAP_WIDTH - 1);
                 else
                     seedX = (Random(0, MAP_WIDTH - 1) + Random(0, MAP_WIDTH - 1)
                              + Random(0, MAP_WIDTH - 1) + Random(0, MAP_WIDTH - 1))
                             / 4;
-                if (gScatterTowns) {
+                if (gScatterTerrain) {
                     if (terrain == IDX(TERRAIN_DESERT) || terrain == IDX(TERRAIN_WASTELAND)
                         || terrain == IDX(TERRAIN_LAVA))
                         seedY = (Random(0, MAP_HEIGHT - 1) + Random(0, MAP_HEIGHT - 1)
@@ -1371,7 +1362,7 @@ void editManager::PlaceTowns(void) {
 #define unusedIndex unusedIndex_l   // frame-slot spelling
 #define unusedMarker unusedMarker_g // frame-slot spelling
 VA(0x004208ca, 0x217)
-i32 editManager::PlaceResourceSite(i32 x, i32 y, i32 resource) {
+b32 editManager::PlaceResourceSite(i32 x, i32 y, i32 resource) {
     overlayType* site;
     overlayType* H2_UNUSED(unusedMarker);
     i32 H2_UNUSED(unusedIndex);
@@ -1464,7 +1455,7 @@ i32 editManager::PlaceResourceSite(i32 x, i32 y, i32 resource) {
 #define randomTown randomTown_c               // frame-slot spelling
 VA(0x00420ae1, 0xac8)
 void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
-    i32 placed;
+    b32 placed;
     b32 valid;
     i32 kind;
     i32 towns;
@@ -1728,23 +1719,23 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
             northWest = southWest = northEast = southEast = north = south = east = west = false;
             if (y == 0 || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_WATER
                 || gMap.CellAt(x, y - 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x, y - 1)->m_objectLayerBit0
-                       && !gMap.CellAt(x, y - 1)->m_objectLayerBit1)
+                       && !gMap.CellAt(x, y - 1)->m_objectHighLayer
+                       && !gMap.CellAt(x, y - 1)->m_objectShadow)
                 north = true;
             if (y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == TERRAIN_WATER
                 || gMap.CellAt(x, y + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x, y + 1)->m_objectLayerBit0
-                       && !gMap.CellAt(x, y + 1)->m_objectLayerBit1)
+                       && !gMap.CellAt(x, y + 1)->m_objectHighLayer
+                       && !gMap.CellAt(x, y + 1)->m_objectShadow)
                 south = true;
             if (x == 0 || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == TERRAIN_WATER
                 || gMap.CellAt(x - 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x - 1, y)->m_objectLayerBit0
-                       && !gMap.CellAt(x - 1, y)->m_objectLayerBit1)
+                       && !gMap.CellAt(x - 1, y)->m_objectHighLayer
+                       && !gMap.CellAt(x - 1, y)->m_objectShadow)
                 west = true;
             if (x == MAP_WIDTH - 1 || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == TERRAIN_WATER
                 || gMap.CellAt(x + 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                       && !gMap.CellAt(x + 1, y)->m_objectLayerBit0
-                       && !gMap.CellAt(x + 1, y)->m_objectLayerBit1)
+                       && !gMap.CellAt(x + 1, y)->m_objectHighLayer
+                       && !gMap.CellAt(x + 1, y)->m_objectShadow)
                 east = true;
             if (x < MAP_WIDTH + 1 && y > 0
                 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != TERRAIN_WATER

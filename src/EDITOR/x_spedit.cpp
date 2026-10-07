@@ -56,7 +56,7 @@ void eventsManager::EditSpellScroll(i32* spell) {
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         *spell = gSpellScrollChoice;
-        gEditManager->m_mapChanged = 1;
+        gEditManager->m_mapChanged = true;
     }
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();

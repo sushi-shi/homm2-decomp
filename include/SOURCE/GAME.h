@@ -57,7 +57,7 @@ struct EventExtra {
     u8 isMapEvent;
     i32 resources[IDX(RES_COUNT)];
     i16 artifact;
-    u8 applyToComputer;
+    u8 appliesToComputer;
     u8 cancelAfterVisit;
     u16 firstDay;
     u16 repeatInterval;

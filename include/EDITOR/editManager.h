@@ -42,7 +42,13 @@ H2_ENUM_BEGIN(EditViewGeometry)
     // The map view's 448x448 square at (16, 16).
     EDIT_VIEW_LEFT   = 0x10,
     EDIT_VIEW_TOP    = 0x10,
-    EDIT_VIEW_PIXELS = 0x1c0
+    EDIT_VIEW_PIXELS = 0x1c0,
+    EDIT_VIEW_RIGHT  = EDIT_VIEW_LEFT + EDIT_VIEW_PIXELS,
+    EDIT_VIEW_BOTTOM = EDIT_VIEW_TOP + EDIT_VIEW_PIXELS,
+    // Monsters stand 5 pixels and heroes 14 above their cell (at the normal
+    // zoom).
+    EDIT_MONSTER_LIFT = 5,
+    EDIT_HERO_LIFT    = 0xe
 H2_ENUM_END(EditViewGeometry)
 
 H2_ENUM_BEGIN(EditControl)
@@ -264,7 +270,7 @@ public:
     void PlaceObstacleChains(i32 density, b32 mountains);
     b32 PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset);
     void PlaceTowns(void);
-    i32 PlaceResourceSite(i32 x, i32 y, i32 resource);
+    b32 PlaceResourceSite(i32 x, i32 y, i32 resource);
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
     void ScatterDecorations(void);

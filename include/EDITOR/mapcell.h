@@ -79,8 +79,10 @@ struct mapCellExtra {
     u8 animatedObject : 1;
     H2_ENUM_BITFIELD(TilesetId, u8) objectTileset : 7;
     u8 objectIndex;
-    u8 objectLayerBit0 : 1;
-    u8 objectLayerBit1 : 1;
+    // The object part draws on the high layer (overlayType::highLayer), or
+    // is only a shadow.
+    u8 objectHighLayer : 1;
+    u8 objectShadow : 1;
     u8 objectDrawnAsOverlay : 1;
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
@@ -117,8 +119,9 @@ public:
     union {
         u16 m_objectData;
         struct {
-            u16 m_objectLayerBit0 : 1;
-            u16 m_objectLayerBit1 : 1;
+            // As mapCellExtra's: the high layer, and a shadow part.
+            u16 m_objectHighLayer : 1;
+            u16 m_objectShadow : 1;
             u16 m_objectDrawnAsOverlay : 1;
             u16 m_objectMetadata : 13;
         };

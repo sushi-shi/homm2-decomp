@@ -12,10 +12,11 @@
 // The side of the square map a new map starts with.
 extern i32 gNewMapSize;
 // Set when the new map is to come from the random-map generator.
-extern b32 gbNewRandomMap;
+extern b32 gNewRandomMap;
 
-i32 SetupNewMap(void);
-i32 SetupMapSize(void);
+// The new-map choice and its size; false when cancelled.
+b32 SetupNewMap(void);
+b32 SetupMapSize(void);
 MessageDispatchResult SetupNewMapHandler(struct tag_message& message);
 MessageDispatchResult SetupMapSizeHandler(struct tag_message& message);
 MessageDispatchResult BaseSetupHandler(struct tag_message& message);

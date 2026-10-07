@@ -62,10 +62,6 @@ H2_ENUM_BEGIN(OverlayPlacementConstant)
 H2_ENUM_END(OverlayPlacementConstant)
 
 H2_ENUM_BEGIN(OverlayManagerLayout)
-    // The map view: 448 pixels square at (16, 16).
-    EDIT_VIEW_ORIGIN              = 0x10,
-    EDIT_VIEW_SIZE                = 0x1c0,
-    EDIT_VIEW_END                 = EDIT_VIEW_ORIGIN + EDIT_VIEW_SIZE,
     // gClearHelp's right-click help of the first class.
     OVERLAY_CLASS_HELP_FIRST      = 5,
     // The class buttons: transparent borders over the panel's swatches.
@@ -87,11 +83,6 @@ H2_ENUM_BEGIN(OverlayManagerLayout)
     OVERLAY_PANEL_X               = 0x1fd,
     OVERLAY_PANEL_Y               = 0xe3,
     OVERLAY_PANEL_FRAME           = 0,
-    // The tool panel's screen region.
-    OVERLAY_PANEL_REGION_X        = 0x1e0,
-    OVERLAY_PANEL_REGION_Y        = 0xe8,
-    OVERLAY_PANEL_REGION_WIDTH    = 0x90,
-    OVERLAY_PANEL_REGION_HEIGHT   = 0xa0,
     // The region the selected object's preview is drawn in.
     OVERLAY_PREVIEW_REGION_X      = 0x1fd,
     OVERLAY_PREVIEW_REGION_Y      = 0xc2,
@@ -103,12 +94,10 @@ H2_ENUM_BEGIN(OverlayManagerLayout)
     OVERLAY_COLOR_SHADOW          = 0x24,
     OVERLAY_COLOR_ENTRANCE        = 0xcf,
     OVERLAY_COLOR_OBJECT          = 0xc4,
-    // A town's flags on its grid cells (4, 4) and (6, 4); a hero's icon is
-    // drawn this many pixels up.
+    // A town's flags on its grid cells (4, 4) and (6, 4).
     OVERLAY_TOWN_FLAG_COLUMN      = 4,
     OVERLAY_TOWN_RIGHT_FLAG_COLUMN = 6,
-    OVERLAY_TOWN_FLAG_ROW         = 4,
-    OVERLAY_HERO_LIFT             = 0xe
+    OVERLAY_TOWN_FLAG_ROW         = 4
 H2_ENUM_END(OverlayManagerLayout)
 
 H2_ENUM_BEGIN(OverlayPickerLayout)
@@ -299,10 +288,10 @@ void overlayManager::ShowClass(b32 update) {
     gEditManager->m_window->DrawWindow(0);
     if (update)
         gpWindowManager->UpdateScreenRegion(
-            OVERLAY_PANEL_REGION_X,
-            OVERLAY_PANEL_REGION_Y,
-            OVERLAY_PANEL_REGION_WIDTH,
-            OVERLAY_PANEL_REGION_HEIGHT
+            EDIT_TOOL_PANEL_X,
+            EDIT_TOOL_PANEL_Y,
+            EDIT_TOOL_PANEL_WIDTH,
+            EDIT_TOOL_PANEL_HEIGHT
         );
 }
 
@@ -397,8 +386,8 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                         gEditManager->DrawMap();
                         mapX -= OVERLAY_ANCHOR_X;
                         mapY -= OVERLAY_ANCHOR_Y;
-                        mapX = mapX * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_ORIGIN;
-                        mapY = mapY * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_ORIGIN;
+                        mapX = mapX * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_LEFT;
+                        mapY = mapY * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_TOP;
                         if (gSelectedOverlay != OVERLAY_NONE) {
                             DrawFootprint(
                                 mapX,
@@ -481,10 +470,10 @@ void overlayManager::DrawFootprint(
                 else
                     color = OVERLAY_COLOR_OBJECT;
                 if (!clip
-                    || (left + (x - startX) * cellSize >= EDIT_VIEW_ORIGIN
-                        && left + (x - startX + 1) * cellSize <= EDIT_VIEW_END
-                        && top + (y - startY) * cellSize >= EDIT_VIEW_ORIGIN
-                        && top + (y - startY + 1) * cellSize <= EDIT_VIEW_END))
+                    || (left + (x - startX) * cellSize >= EDIT_VIEW_LEFT
+                        && left + (x - startX + 1) * cellSize <= EDIT_VIEW_RIGHT
+                        && top + (y - startY) * cellSize >= EDIT_VIEW_TOP
+                        && top + (y - startY + 1) * cellSize <= EDIT_VIEW_BOTTOM))
                     MonoIconToBitmap(
                         m_cellIcon,
                         gpWindowManager->m_screen,
@@ -493,10 +482,10 @@ void overlayManager::DrawFootprint(
                         gEditManager->m_zoomLevel,
                         color,
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS
                     );
             }
 }
@@ -551,7 +540,7 @@ b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
                     if (OverlayGridHas(shape->entranceRows, x, y)) {
                         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                             blocked = false;
-                            if (!cell->m_objectLayerBit1)
+                            if (!cell->m_objectShadow)
                                 blocked = true;
                             if (cell->m_extraIndex
                                 && gMap.extras[cell->m_extraIndex].objectIndex
@@ -560,7 +549,7 @@ b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
                             else
                                 part = NULL;
                             while (part) {
-                                if (!part->objectLayerBit1)
+                                if (!part->objectShadow)
                                     blocked = true;
                                 if (part->nextIndex
                                     && gMap.extras[part->nextIndex].objectIndex
@@ -576,23 +565,23 @@ b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
                                && !OverlayGridHas(shape->shadowRows, x, y))
                         return false;
                     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE
-                        || (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !cell->m_objectLayerBit0
+                        || (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !cell->m_objectHighLayer
                             && shape->highLayer))
                         gKeptLinks[kept++] = cell->m_overlayLink;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !overObjects)
                         return false;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE
-                        && (!shape->highLayer || cell->m_objectLayerBit0))
+                        && (!shape->highLayer || cell->m_objectHighLayer))
                         gCoveredLinks[covered++] = cell->m_objectLink;
                     if (cell->m_extraIndex) {
                         part = &gMap.extras[cell->m_extraIndex];
                         while (part) {
                             if (part->overlayIndex != MAPCELL_SPRITE_NONE
                                 || (part->objectIndex != MAPCELL_SPRITE_NONE
-                                    && !part->objectLayerBit0 && shape->highLayer))
+                                    && !part->objectHighLayer && shape->highLayer))
                                 gKeptLinks[kept++] = part->overlayLink;
                             if (part->objectIndex != MAPCELL_SPRITE_NONE
-                                && (!shape->highLayer || part->objectLayerBit0))
+                                && (!shape->highLayer || part->objectHighLayer))
                                 gCoveredLinks[covered++] = part->objectLink;
                             part = part->nextIndex ? &gMap.extras[part->nextIndex] : NULL;
                         }
@@ -798,9 +787,9 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             node->objectIndex = type->frames[idx];
                             node->objectTileset = type->tileset;
                             if (OverlayGridHas(type->shadowRows, col, row))
-                                node->objectLayerBit1 = 1;
+                                node->objectShadow = 1;
                             else
-                                node->objectLayerBit1 = 0;
+                                node->objectShadow = 0;
                             if (row < OVERLAY_GRID_HEIGHT - 1 && !type->highLayer
                                 && !OverlayGridHas(type->shadowRows, col, row)
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
@@ -809,9 +798,9 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             else
                                 node->objectDrawnAsOverlay = 0;
                             if (type->highLayer)
-                                node->objectLayerBit0 = 1;
+                                node->objectHighLayer = 1;
                             else
-                                node->objectLayerBit0 = 0;
+                                node->objectHighLayer = 0;
                             if (OverlayGridHas(type->animatedRows, col, row))
                                 node->animatedObject = 1;
                             else
@@ -837,9 +826,9 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             else
                                 dest->m_triggerType = type->trigger;
                             if (OverlayGridHas(type->shadowRows, col, row))
-                                dest->m_objectLayerBit1 = 1;
+                                dest->m_objectShadow = 1;
                             else
-                                dest->m_objectLayerBit1 = 0;
+                                dest->m_objectShadow = 0;
                             if (row < OVERLAY_GRID_HEIGHT - 1 && !type->highLayer
                                 && !OverlayGridHas(type->shadowRows, col, row)
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
@@ -848,9 +837,9 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             else
                                 dest->m_objectDrawnAsOverlay = 0;
                             if (type->highLayer)
-                                dest->m_objectLayerBit0 = 1;
+                                dest->m_objectHighLayer = 1;
                             else
-                                dest->m_objectLayerBit0 = 0;
+                                dest->m_objectHighLayer = 0;
                             if (OverlayGridHas(type->animatedRows, col, row))
                                 dest->m_animatedObject = 1;
                             else
@@ -892,7 +881,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         && OverlayGridHas(type->entranceRows, col, row)) {
                         newSign = new signEventExtra;
                         memset(newSign, 0, sizeof(signEventExtra));
-                        newSign->pad[0] = MAP_EVENT_DATA_AVAILABLE;
+                        newSign->active = MAP_EVENT_DATA_AVAILABLE;
                         dest->m_objectMetadata = gEditManager->m_extraCount;
                         gEditManager->m_extras[gEditManager->m_extraCount] = newSign;
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] =
@@ -1172,23 +1161,23 @@ void overlayManager::DrawOverlay(
         for (gridX = fromX; gridX < OVERLAY_GRID_WIDTH; gridX++)
             if (type->frames[gridX + gridY * OVERLAY_GRID_WIDTH] != OVERLAY_NO_FRAME
                 && (!clip
-                    || (x + (gridX - fromX) * tileSize >= EDIT_VIEW_ORIGIN
-                        && x + (gridX - fromX + 1) * tileSize <= EDIT_VIEW_END
-                        && y + (gridY - fromY) * tileSize >= EDIT_VIEW_ORIGIN
-                        && y + (gridY - fromY + 1) * tileSize <= EDIT_VIEW_END))) {
+                    || (x + (gridX - fromX) * tileSize >= EDIT_VIEW_LEFT
+                        && x + (gridX - fromX + 1) * tileSize <= EDIT_VIEW_RIGHT
+                        && y + (gridY - fromY) * tileSize >= EDIT_VIEW_TOP
+                        && y + (gridY - fromY + 1) * tileSize <= EDIT_VIEW_BOTTOM))) {
                 if (type->tileset == TILESET_MINIHERO)
                     IconToBitmapScaleDouble(
                         gEditManager->m_objectIcons[type->tileset][0],
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize
-                            - OVERLAY_HERO_LIFT / gZoomScale[gEditManager->m_zoomLevel],
+                            - EDIT_HERO_LIFT / gZoomScale[gEditManager->m_zoomLevel],
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH],
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 else
@@ -1199,10 +1188,10 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize,
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH],
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 if (OverlayGridHas(type->animatedRows, gridX, gridY)) {
@@ -1219,10 +1208,10 @@ void overlayManager::DrawOverlay(
                         type->frames[gridX + gridY * OVERLAY_GRID_WIDTH] + 1
                             + gEditManager->m_animationCounter % frameCount,
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 }
@@ -1235,10 +1224,10 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize,
                         type->color,
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 if (type->category == OVERLAY_CATEGORY_TOWN && gridX == OVERLAY_TOWN_FLAG_COLUMN
@@ -1250,10 +1239,10 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize,
                         type->color * 2,
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 if (type->category == OVERLAY_CATEGORY_TOWN
@@ -1265,10 +1254,10 @@ void overlayManager::DrawOverlay(
                         y + (gridY - fromY) * tileSize,
                         type->color * 2 + 1,
                         clip,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_ORIGIN,
-                        EDIT_VIEW_SIZE,
-                        EDIT_VIEW_SIZE,
+                        EDIT_VIEW_LEFT,
+                        EDIT_VIEW_TOP,
+                        EDIT_VIEW_PIXELS,
+                        EDIT_VIEW_PIXELS,
                         gZoomCellSize[gEditManager->m_zoomLevel]
                     );
                 if (update)

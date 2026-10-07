@@ -11,8 +11,7 @@
 #include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(EventEditConstant)
-    // evntedit.bin's controls.
-    EVENT_EDIT_MESSAGE           = 120,
+    // evntedit.bin's controls; the message is EVENT_TEXT_FIELD.
     EVENT_EDIT_FIRST_RESOURCE    = 200,
     EVENT_EDIT_LAST_RESOURCE     = 206,
     EVENT_EDIT_ARTIFACT          = 301,
@@ -31,14 +30,6 @@ H2_ENUM_BEGIN(EventEditConstant)
     EVENT_EDIT_MAP_ROW_END       = 304,
     EVENT_EDIT_FIRST_TIME_ROW    = 400,
     EVENT_EDIT_TIME_ROW_END      = 479,
-    // The message buffer the dialog edits.
-    EVENT_EDIT_MESSAGE_SIZE      = 2000,
-    EVENT_EDIT_TEXT_SIZE         = 50,
-    // SetWinText's row of the dialog.
-    EVENT_EDIT_TEXT_ROW          = 4,
-    // The artifact list leaves out the editor-only artifacts from
-    // ARTIFACT_EDITOR_ANY_ULTIMATE to ARTIFACT_SPELL_SCROLL.
-    EVENT_EDIT_HIDDEN_ARTIFACTS    = 5,
     // The frequency list: "never" and every 1..7 days, then every 14, 21
     // and 28 (a week count + EVENT_EDIT_WEEKLY_BASE).
     EVENT_EDIT_DAILY_LAST        = 7,
@@ -49,6 +40,6 @@ H2_ENUM_END(EventEditConstant)
 extern EventExtra gEventEdit;
 extern char* gEventMessage;
 
-MessageDispatchResult EventEditHandler(struct tag_message& message);
+MessageDispatchResult EditEventHandler(struct tag_message& message);
 
 #endif

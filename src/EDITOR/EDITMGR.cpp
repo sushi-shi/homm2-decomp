@@ -147,11 +147,9 @@ H2_ENUM_END(EditRadarGeometry)
 #define EDIT_RADAR_LARGE_SCALE 1.3333
 
 H2_ENUM_BEGIN(EditCellDrawing)
-    // Monsters stand 5 pixels and heroes 14 above their cell (at the normal
-    // zoom); both draw clipped to the 480-pixel view square, everything else
-    // to the screen.
-    EDIT_MONSTER_LIFT   = 5,
-    EDIT_HERO_LIFT      = 0xe,
+    // Monsters and heroes (lifted above their cell) draw clipped to the
+    // 480-pixel square of the view and its frame, everything else to the
+    // screen.
     EDIT_CLIP_VIEW      = 0x1e0,
     EDIT_CLIP_SCREEN_W  = LOGICAL_SCREEN_WIDTH,
     EDIT_CLIP_SCREEN_H  = LOGICAL_SCREEN_HEIGHT,
@@ -10151,11 +10149,11 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
                 part = NULL;
         }
     } else if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
-        if (!cell->m_objectLayerBit1 && cell->m_objectTileset != TILESET_FLAG32
+        if (!cell->m_objectShadow && cell->m_objectTileset != TILESET_FLAG32
             && cell->m_objectTileset != TILESET_EXTRAOVR) {
             set = cell->m_objectTileset;
             sprite = cell->m_objectIndex;
-            isLow = cell->m_objectLayerBit0;
+            isLow = cell->m_objectHighLayer;
         }
         if (cell->m_extraIndex
             && gMap.Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
@@ -10163,11 +10161,11 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
         else
             part = NULL;
         while (part) {
-            if ((!part->objectLayerBit0 || isLow) && !part->objectLayerBit1
+            if ((!part->objectHighLayer || isLow) && !part->objectShadow
                 && part->objectTileset != TILESET_FLAG32 && part->objectTileset != TILESET_EXTRAOVR) {
                 set = part->objectTileset;
                 sprite = part->objectIndex;
-                isLow = part->objectLayerBit0;
+                isLow = part->objectHighLayer;
             }
             if (part->nextIndex && gMap.Extra(part->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
                 part = gMap.Extra(part->nextIndex);
@@ -10259,9 +10257,9 @@ MessageDispatchResult editManager::Main(tag_message& message) {
     }
     switch (message.type) {
         case MESSAGE_NONE:
-            if (gbNewRandomMap) {
+            if (gNewRandomMap) {
                 GenerateRandomMap();
-                gbNewRandomMap = false;
+                gNewRandomMap = false;
             }
             break;
         case MESSAGE_WIDGET:
@@ -10724,8 +10722,8 @@ void editManager::DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY) {
         cursorX &= EDIT_RULER_EVEN_CELL_MASK;
         cursorY &= EDIT_RULER_EVEN_CELL_MASK;
     }
-    if (mouseX < EDIT_VIEW_LEFT || mouseX >= EDIT_VIEW_LEFT + EDIT_VIEW_PIXELS
-        || mouseY < EDIT_VIEW_TOP || mouseY > EDIT_VIEW_TOP + EDIT_VIEW_PIXELS) {
+    if (mouseX < EDIT_VIEW_LEFT || mouseX >= EDIT_VIEW_RIGHT
+        || mouseY < EDIT_VIEW_TOP || mouseY > EDIT_VIEW_BOTTOM) {
         cursorX = EDIT_NO_CELL;
         cursorY = EDIT_NO_CELL;
     }
@@ -11136,10 +11134,10 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
     if (layers & EDIT_DRAW_OBJECTS) {
         for (gDrawLayer = EDIT_LAYER_HIGH; gDrawLayer >= EDIT_LAYER_LOW; gDrawLayer--) {
             if (gDrawCell->m_objectIndex != MAPCELL_SPRITE_NONE
-                && ((gDrawLayer == EDIT_LAYER_HIGH && gDrawCell->m_objectLayerBit0)
-                    || (gDrawLayer == EDIT_LAYER_MID && gDrawCell->m_objectLayerBit1)
-                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawCell->m_objectLayerBit0
-                        && !gDrawCell->m_objectLayerBit1))) {
+                && ((gDrawLayer == EDIT_LAYER_HIGH && gDrawCell->m_objectHighLayer)
+                    || (gDrawLayer == EDIT_LAYER_MID && gDrawCell->m_objectShadow)
+                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawCell->m_objectHighLayer
+                        && !gDrawCell->m_objectShadow))) {
                 if (gDrawCell->m_objectTileset == TILESET_MONS32)
                     IconToBitmapScale(
                         m_objectIcons[gDrawCell->m_objectTileset][0],
@@ -11210,10 +11208,10 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
             else
                 gDrawExtra = NULL;
             while (gDrawExtra) {
-                if ((gDrawLayer == EDIT_LAYER_HIGH && gDrawExtra->objectLayerBit0)
-                    || (gDrawLayer == EDIT_LAYER_MID && gDrawExtra->objectLayerBit1)
-                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawExtra->objectLayerBit0
-                        && !gDrawExtra->objectLayerBit1)) {
+                if ((gDrawLayer == EDIT_LAYER_HIGH && gDrawExtra->objectHighLayer)
+                    || (gDrawLayer == EDIT_LAYER_MID && gDrawExtra->objectShadow)
+                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawExtra->objectHighLayer
+                        && !gDrawExtra->objectShadow)) {
                     if (gDrawExtra->objectTileset == TILESET_MONS32)
                         IconToBitmapScale(
                             m_objectIcons[gDrawExtra->objectTileset][0],
@@ -11851,8 +11849,8 @@ void editManager::ExportMapText(void) {
     AppendTextLine("Timed Events:");
     for (i = 0; i < gEditMapHeader.timeEventCount; i++) {
         sprintf(gText, "Day %d: %s",
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message);
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message);
         AppendTextLine(gText);
         AppendTextLine("");
     }
@@ -12034,19 +12032,19 @@ bool editManager::ImportMapText(void) {
         char* record;
         i32 date;
         char* text;
-        char prefix[sizeof(timeEventExtra)];
+        char prefix[sizeof(EventExtra)];
 
         ReadTextLine(in, gText);
         if (strncmp(gText, "Day ", EDIT_TEXT_DAY_TAG_LENGTH))
             return false;
         sscanf(gText + EDIT_TEXT_DAY_TAG_LENGTH, "%d", &date);
-        static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
+        static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
         text = strchr(gText + EDIT_TEXT_DAY_TAG_LENGTH, ':') + EDIT_TEXT_DAY_SEPARATOR_LENGTH;
-        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], sizeof(timeEventExtra));
-        size = strlen(text) + sizeof(timeEventExtra);
+        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], sizeof(EventExtra));
+        size = strlen(text) + sizeof(EventExtra);
         record = new char[size];
-        memcpy(record, prefix, sizeof(timeEventExtra));
-        strcpy(record + offsetof(timeEventExtra, message), text);
+        memcpy(record, prefix, sizeof(EventExtra));
+        strcpy(record + offsetof(EventExtra, message), text);
         delete gEditManager->m_extras[gTimeEventExtras[i]];
         gEditManager->m_extras[gTimeEventExtras[i]] = record;
         gEditManager->m_extraSizes[gTimeEventExtras[i]] = size;
@@ -12820,7 +12818,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
         for (j = y; j < y + height; j++) {
             cell = gMap.CellAt(i, j);
             while (cell->m_objectIndex != MAPCELL_SPRITE_NONE
-                   && (!cell->m_objectLayerBit1 || cell->m_objectLayerBit0 || allLayers)
+                   && (!cell->m_objectShadow || cell->m_objectHighLayer || allLayers)
                    && (!filtered || gClearTilesets[cell->m_objectTileset]))
                 RemoveLinkedObject(cell->m_objectLink);
             if (cell->m_extraIndex
@@ -12830,7 +12828,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
                 part = NULL;
             while (part) {
                 nextIndex = part->nextIndex;
-                if ((!part->objectLayerBit1 || part->objectLayerBit0 || allLayers)
+                if ((!part->objectShadow || part->objectHighLayer || allLayers)
                     && (!filtered || gClearTilesets[part->objectTileset]))
                     RemoveLinkedObject(part->objectLink);
                 if (nextIndex && gMap.Extra(nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
@@ -13036,12 +13034,12 @@ b32 editManager::CanBeCoast(i32 x, i32 y) {
         && cell->m_triggerType != MAP_OBJECT_RANDOM_TOWN && cell->m_triggerType != MAP_OBJECT_RANDOM_CASTLE) {
         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
             shadowsOnly = false;
-            if (cell->m_objectLayerBit1) {
+            if (cell->m_objectShadow) {
                 shadowsOnly = true;
                 extraIndex = cell->m_extraIndex;
                 while (extraIndex) {
                     extra = gMap.Extra(extraIndex);
-                    if (extra->objectIndex != MAPCELL_SPRITE_NONE && !extra->objectLayerBit1)
+                    if (extra->objectIndex != MAPCELL_SPRITE_NONE && !extra->objectShadow)
                         shadowsOnly = false;
                     extraIndex = extra->nextIndex;
                 }
@@ -13227,16 +13225,12 @@ H2_ENUM_BEGIN(EditBlendTerrain)
     EDIT_BLEND_WATER_SIDES = 3
 H2_ENUM_END(EditBlendTerrain)
 
-H2_ENUM_BEGIN(EditMapArea)
-    // The map view's screen square.
-    EDIT_MAP_AREA_ORIGIN = 16,
-    EDIT_MAP_AREA_LIMIT  = 448
-H2_ENUM_END(EditMapArea)
-
+// The test stops at the view's width from the screen's edge, 16 pixels short
+// of the view's right and bottom edges.
 VA(0x0040b0bd, 0x41)
 i32 InMapArea(i32 x, i32 y) {
-    return x >= EDIT_MAP_AREA_ORIGIN && x < EDIT_MAP_AREA_LIMIT && y >= EDIT_MAP_AREA_ORIGIN
-        && y < EDIT_MAP_AREA_LIMIT;
+    return x >= EDIT_VIEW_LEFT && x < EDIT_VIEW_PIXELS && y >= EDIT_VIEW_TOP
+        && y < EDIT_VIEW_PIXELS;
 }
 
 // Fits every cell's ground to its neighbours: first (unless skipFill) cells
@@ -14100,12 +14094,15 @@ void editManager::CheckScreenScroll(void) {
 
 // Numbers the parts of every catalogue entry: each occupied grid cell takes
 // the next frame of its tileset (an animated one its animation's frames as
-// well), and the entry's width is the widest occupied row.
+// well), from where the entry's frameNumbering says (a shared entry starts
+// at the previous entry's first frame), and the entry's width is the widest
+// occupied row.
+#define typeFirstFrame runFrame // frame-slot spelling
 VA(0x0040e3a2, 0x1a8)
 void FillInOverlayTiles(void) {
     i32 nextFrame;
     i32 width;
-    i32 runFrame;
+    i32 typeFirstFrame;
     i32 curTileset;
     i32 i;
     i32 gx;
@@ -14116,7 +14113,7 @@ void FillInOverlayTiles(void) {
 
     curTileset = -1;
     baseFrame = 0;
-    runFrame = 0;
+    typeFirstFrame = 0;
     for (i = 0; i < OVERLAY_TYPE_COUNT; i++) {
         width = 0;
         shape = &gOverlayTypes[i];
@@ -14124,11 +14121,11 @@ void FillInOverlayTiles(void) {
             baseFrame = 0;
         curTileset = shape->tileset;
         if (shape->frameNumbering == OVERLAY_FRAMES_SHARED)
-            baseFrame = runFrame;
+            baseFrame = typeFirstFrame;
         if (shape->frameNumbering == OVERLAY_FRAMES_OWN)
             baseFrame = 0;
         nextFrame = baseFrame;
-        runFrame = baseFrame;
+        typeFirstFrame = baseFrame;
         cellIndex = 0;
         for (gy = 0; gy < OVERLAY_GRID_HEIGHT; gy++) {
             for (gx = 0; gx < OVERLAY_GRID_WIDTH; gx++) {
@@ -14153,6 +14150,7 @@ void FillInOverlayTiles(void) {
         shape->width = width;
     }
 }
+#undef typeFirstFrame
 
 // Whether a cell's object (its trigger) keeps a map-extra record: towns,
 // castles, signs, sphinxes, bottles, events, heroes and jails.
@@ -14612,7 +14610,6 @@ H2_ENUM_BEGIN(EditSystemOptions)
     // help rows (gSystemOptionsHelp).
     EDIT_OPTIONS_X                    = 160,
     EDIT_OPTIONS_Y                    = 33,
-    EDIT_OPTIONS_TITLE                = 3,
     EDIT_OPTIONS_ANIMATION_BUTTON     = 10,
     EDIT_OPTIONS_CYCLING_BUTTON       = 11,
     EDIT_OPTIONS_OBJECT_BOXES_BUTTON  = 13,
@@ -14646,7 +14643,7 @@ void editManager::SystemOptions(void) {
     ESPanel = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
     if (!ESPanel)
         MemError();
-    SetWinText(ESPanel, EDIT_OPTIONS_TITLE);
+    SetWinText(ESPanel, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
     UpdateEditorSystemOptions(true);
     gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
     delete ESPanel;
