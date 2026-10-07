@@ -195,11 +195,11 @@ guides are skills under `.agents/skills/` (`.claude/skills` links there);
 Every `homm2 build` runs `annotated-sources` before configuring and, after
 Ninja, the build gates in `homm2.verify.BUILD_GATES`: `annotated-functions`,
 `decls`, `no-fake-labels`, `globals-data`, `globals-defined`, `vtables`,
-`assert-relocs` (ordered resolved sites) and `fixed-width-ints`, with
-`model-drift` as a warning. The staged gates `defs-declared` (74 free
-functions without an owner-header declaration) and `reloc-identities` (the
-unordered identity audit's `$SG` reports) run and report without failing until
-their findings are resolved (`docs/match-provenance-audit.md`).
+`assert-relocs` (ordered resolved sites), `reloc-identities` (the unordered
+identity audit) and `fixed-width-ints`, with `model-drift` as a warning. The
+staged gate `defs-declared` (74 free functions without an owner-header
+declaration) runs and reports without failing until its findings are resolved
+(`docs/match-provenance-audit.md`).
 
 `homm2 build verify` adds the tier in `homm2.verify.TIER`: `check` (every
 function and data byte exact), `link-diff`, `behaviour`, `localization`,
