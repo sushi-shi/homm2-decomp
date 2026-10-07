@@ -9,6 +9,7 @@ class icon;
 enum class ExpansionCampaignId : i32;
 
 typedef enum SmackManagerStorageConstant {
+    SMACK_OPTION_COUNT        = 75,
     SMACK_OPTION_FILENAME_SIZE = 9,
     SMACK_MILES_RESERVED_SIZE  = 0x4c
 } SmackManagerStorageConstant;
@@ -48,7 +49,7 @@ extern b32 bSmackSound;
 extern class icon* brotherIcon;
 extern class icon* cmpnNoCD;
 extern class icon* backImage;
-extern struct SSmackOptions SmackOptions[];
+extern struct SSmackOptions SmackOptions[SMACK_OPTION_COUNT];
 extern platform::MovieId smk1;
 extern platform::MovieId smk2;
 extern i8 bSmackNum;

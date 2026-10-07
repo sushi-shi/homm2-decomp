@@ -30,8 +30,17 @@ void PushBinding(lua_State* state, Binding<town*> value) {
     PushObject(state, value.Get(), "town_mt");
 }
 
-void PushBinding(lua_State* state, Binding<SCampaignChoice*> value) {
-    PushObject(state, value.Get(), "campaignChoice_mt");
+void PushBinding(lua_State* state, Binding<SCampaignChoice> value) {
+    // A choice is an authored value. Scripts receive a snapshot, never a
+    // mutable pointer into a catalog that can be replaced by loading a file.
+    const auto choice = value.Get();
+    lua_newtable(state);
+    lua_pushinteger(state, H2EnumIndex(choice.type));
+    lua_setfield(state, -2, "type");
+    lua_pushinteger(state, choice.value);
+    lua_setfield(state, -2, "field");
+    lua_pushinteger(state, choice.amount);
+    lua_setfield(state, -2, "amount");
 }
 
 void* PointerFromLuaClassTable(lua_State* state, i32 stackIndex) {

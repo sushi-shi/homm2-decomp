@@ -16,6 +16,55 @@
 
 using namespace ironfist;
 
+static void CheckCampaignCatalog() {
+    InitializeCampaigns();
+    assert(Campaigns().At(EXPANSION_CAMPAIGN_DESCENDANTS).scenarios.size() == 8);
+    tinyxml2::XMLDocument document;
+    document.Parse(R"(<campaignMetadata>
+      <name>Detached campaign</name><shortName>DET</shortName>
+      <scenarioName index="0" value="First"/><scenarioName index="1" value="Second"/>
+      <mapToComplete index="0" value="0"/><mapToComplete index="1" value="1"/>
+      <saveHero scenarioID="0" playerID="0" ownedHeroID="0"/>
+      <numMaps>2</numMaps><id>4</id>
+    </campaignMetadata>)");
+    CampaignDefinition parsed;
+    std::string error;
+    assert(ParseCampaignDefinition(document.RootElement(), parsed, error));
+    const auto id = ExpansionCampaignIdFromCode(4);
+    assert(!Campaigns().Find(id));
+    Campaigns().Replace(parsed);
+    assert(CampaignChoice(id, 1, 0)->type == CAMPAIGN_CHOICE_NONE);
+    assert(Campaigns().At(id).Scenario(0).victory.unlocks.count(1));
+
+    // Replacing a definition removes rules that disappeared from the source.
+    parsed.scenarios[0].victory.unlocks.clear();
+    parsed.scenarios[0].heroesToSave.clear();
+    Campaigns().Replace(parsed);
+    assert(Campaigns().At(id).Scenario(0).victory.unlocks.empty());
+    assert(Campaigns().At(id).Scenario(0).heroesToSave.empty());
+    document.RootElement()->FirstChildElement("scenarioName")->SetAttribute("index", 9);
+    assert(!ParseCampaignDefinition(document.RootElement(), parsed, error));
+    assert(parsed.scenarios.size() == 2 && parsed.name == "Detached campaign");
+
+    save::XmlFile saved;
+    auto data = runtime::CaptureSession();
+    data.campaignType = save::CAMPAIGN_EXPANSION;
+    data.campaignDefinition = parsed;
+    data.expansion.m_campaignId = id;
+    data.expansion.m_mapCount = 2;
+    data.scriptSource = "campaignLoaded = true";
+    assert(saved.Save("GAMES/campaign.GIC", data) == tinyxml2::XML_SUCCESS);
+    SessionData decoded;
+    saved.ReadRoot(saved.tempDoc->RootElement(), decoded);
+    assert(decoded.campaignDefinition && decoded.campaignDefinition->scenarios.size() == 2);
+    assert(decoded.campaignDefinition->Scenario(0).heroesToSave.empty());
+    runtime::RestoreSession(decoded);
+    assert(luaL_dostring(script::MapState(),
+        "local c = GetCampaignChoice(); assert(c.type == 7 and c.ptr == nil); "
+        "c.type = 0; assert(GetCampaignChoiceType() == 7)") == LUA_OK);
+    xIsPlayingExpansionCampaign = false;
+}
+
 static void ReadState(save::XmlFile& saved, bool scriptFirst) {
     save::XmlFile loaded;
     auto* root = loaded.tempDoc->NewElement("ironfist_save");
@@ -45,6 +94,7 @@ static void ReadState(save::XmlFile& saved, bool scriptFirst) {
 
 int main() {
     gpGame = new game{};
+    CheckCampaignCatalog();
     gpGame->m_heroRecs[3].m_id = 3;
     gpGame->m_heroRecs[4].m_id = 4;
     gpGame->m_castleRecs[1].m_id = 1;
