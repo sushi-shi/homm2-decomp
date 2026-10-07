@@ -176,8 +176,8 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     } else {
         msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         msg.payload.widget.id = TOWN_EDIT_ALLOW_CASTLE;
-        msg.payload.widget.command = 1 - town->disallowCastle ? WIDGET_COMMAND_SET_FLAGS
-                                                              : WIDGET_COMMAND_CLEAR_FLAGS;
+        msg.payload.widget.command = (1 - town->disallowCastle) ? WIDGET_COMMAND_SET_FLAGS
+                                                                : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
     }
     msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
@@ -204,14 +204,14 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
         msg.payload.widget.id = i * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING;
         msg.payload.widget.command =
             town->hasCustomBuildings
-                    && town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_FIRST)))
+                    && (town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_FIRST))))
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
         msg.payload.widget.id = i * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING + 1;
         msg.payload.widget.command =
             town->hasCustomBuildings
-                    && town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_SIXTH)))
+                    && (town->buildings & (1 << (i + IDX(BUILDING_SLOT_DWELLING_SIXTH))))
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
@@ -219,7 +219,7 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     for (i = 0; i < TOWN_EDIT_BUILDING_COUNT; i++) {
         msg.payload.widget.id = i + TOWN_EDIT_FIRST_BUILDING;
         msg.payload.widget.command =
-            town->hasCustomBuildings && town->buildings & BIT(gTownEditBuildings[i])
+            town->hasCustomBuildings && (town->buildings & BIT(gTownEditBuildings[i]))
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);

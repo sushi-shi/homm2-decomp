@@ -423,9 +423,9 @@ void SetLineTile(i32 x, i32 y, TilesetId tileset, i32 index, i32 variant) {
     if (tileset == TILESET_ROAD) {
         variant = LINE_NO_VARIANT;
         if (index == ROAD_TILE_PLAIN && y >= 2
-            && (gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
-                || gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN))
-                || gMap.GetCell(x, y - 1)->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE))))
+            && (gMap.GetCell(x, y - 1)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)
+                || gMap.GetCell(x, y - 1)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN)
+                || gMap.GetCell(x, y - 1)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)))
             index = ROAD_TILE_GATE;
         if (index == ROAD_TILE_PLAIN)
             variant = ROAD_TILE_PLAIN_ALT;

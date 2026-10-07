@@ -32,7 +32,8 @@ extern i32 gLineOverlayFirst;
 // The cells of the drawn line, a counter per map cell (MAP_WIDTH * MAP_HEIGHT).
 extern u8* gLineMap;
 
-// The line map's counter of map cell (x, y).
+// The line map's counter of map cell (x, y). x stays unparenthesized:
+// retail adds an x - 1 or x + 1 neighbour's offsets to the pointer in turn.
 #define LINE_MAP_AT(x, y) ((gLineMap + x)[(y) * MAP_WIDTH])
 
 void SetLineType(i32 type);

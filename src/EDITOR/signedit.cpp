@@ -46,7 +46,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     strcpy(gSignText, static_cast<signEventExtra*>(gEditManager->m_extras[gEditCell->m_objectMetadata])->text);
     gEditDialog = new heroWindow(0, 0, "rumredit.bin");
     SetWinText(gEditDialog, EDITOR_WIN_TEXT_RUMOUR);
-    if (gEditCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE)))
+    if (gEditCell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BOTTLE))
         sprintf(gText, localization::Tr("editor.sign.bottle_title"));
     else
         sprintf(gText, localization::Tr("editor.sign.sign_title"));
