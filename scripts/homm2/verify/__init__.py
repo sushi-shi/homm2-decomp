@@ -100,13 +100,11 @@ TIER = ("check", "link-diff", "behaviour", "localization", "strict-allocations",
 #: the game; its build gates check the image's own inventory and objects; its
 #: tier holds it to its banked maxima (`check`) and, once it links, its
 #: link-diff ceiling.
-IMAGE_BUILD_GATES = ("vtables",)
-#: Staged for another image while its units are reconstructed: a shared
-#: unit's body the image compiles differently (an editor variant not yet
-#: reconstructed) has no identity yet, and a header extern whose owner unit
-#: is not yet written (an editor unit, or the game's KB data the editor's own
-#: objects define) has no DATA claim or definition.
-IMAGE_STAGED = ("no-fake-labels", "globals-data", "globals-defined")
+IMAGE_BUILD_GATES = ("vtables", "no-fake-labels", "globals-data", "globals-defined")
+#: Staged for another image while its units are reconstructed (none now: the
+#: editor's objects name only reviewed functions, and every header extern its
+#: own sources define carries its DATA claim and definition).
+IMAGE_STAGED: tuple[str, ...] = ()
 IMAGE_TIER = ("check", "image-link-diff", "strict-allocations", "reloc-fields")
 
 

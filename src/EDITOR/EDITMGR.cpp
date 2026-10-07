@@ -13198,16 +13198,11 @@ void ShowStatusWarning(char* text) {
 // the first call.
 DATA(0x0047d73c)
 i32 gGroundVariantChance[TERRAIN_COUNT] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
-DATA(0x004a3a54)
-b32 gGroundTilesIndexed;
-DATA(0x0049f94c)
-u16 gGroundTiles[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
-DATA(0x004a372c)
-u16 gGroundTileCounts[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
-DATA(0x0049f948)
-i32 gGroundTileCount;
-DATA(0x0049f5ec)
-i32 gGroundTileChoice;
+DATA(0x004a3a54) b32 gGroundTilesIndexed;
+DATA(0x0049f94c) u16 gGroundTiles[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
+DATA(0x004a372c) u16 gGroundTileCounts[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
+DATA(0x0049f948) i32 gGroundTileCount;
+DATA(0x0049f5ec) i32 gGroundTileChoice;
 
 VA(0x0040acef, 0x3ce)
 i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance) {
@@ -14021,8 +14016,7 @@ H2_ENUM_BEGIN(EditScreenScroll)
 H2_ENUM_END(EditScreenScroll)
 
 // The tick the view last scrolled.
-DATA(0x004a3a58)
-i32 iLastScrollTime;
+DATA(0x004a3a58) i32 iLastScrollTime;
 
 // Scrolls the view one cell in the direction (a MapDirection).
 VA(0x0040e053, 0x1c9)
@@ -14663,10 +14657,8 @@ H2_ENUM_BEGIN(EditSystemOptions)
 H2_ENUM_END(EditSystemOptions)
 
 // The system options window, and whether a toggle changed the preferences.
-DATA(0x004a3a44)
-heroWindow* ESPanel;
-DATA(0x0049f5dc)
-b32 bEPrefsChanged;
+DATA(0x004a3a44) heroWindow* ESPanel;
+DATA(0x0049f5dc) b32 bEPrefsChanged;
 
 VA(0x0040f682, 0xe9)
 void editManager::SystemOptions(void) {

@@ -240,9 +240,6 @@ void AppendTextLine(H2_CONST char* text);
 void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
 void ReadTextLine(FILE* file, char* line);
 bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
-// The save checks' messages (editManager::AddError).
-extern char* gEditErrors[EDIT_MANAGER_ERROR_CAPACITY];
-extern i32 gEditErrorCount;
 // Set while BlendTerrain may pick ground variants.
 extern b32 gVaryTiles;
 // Set when ClearArea erased a road or stream part (to redraw the lines).

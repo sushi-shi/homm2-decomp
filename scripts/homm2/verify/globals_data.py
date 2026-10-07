@@ -7,7 +7,7 @@ the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces
   * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
 from homm2.manifest import claim_files, image_lines
-from homm2.core.paths import REPO
+from homm2.core.paths import REPO, gen_dir, image_key
 import csv, re, sys, glob
 
 from homm2.core.usage import logged
@@ -22,7 +22,7 @@ def main(argv=None) -> int:
     # part of the key, and a .cpp definition is matched against its own unit first.
     rva_of = {}
     static_rva_of = {}
-    for r in csv.DictReader(open("build/gen/symbol_names.csv")):
+    for r in csv.DictReader(open(gen_dir() / "symbol_names.csv")):
         if r["kind"] != "data":
             continue
         m = re.match(r'\?([A-Za-z_]\w*)@@', r["name"]) or re.match(r'[_@]?([A-Za-z_]\w*)', r["name"])
@@ -52,6 +52,11 @@ def main(argv=None) -> int:
         return m.group(1) if m else None
 
     bad = []; dup = []; seen = {}
+    defined = set()                                     # globals this image's sources define
+    # A `.bss` spelling alias (`#define gEditDialog gEditDlg // spelling fixes
+    # .bss order`) declares the readable name; the inventory has the spelling.
+    alias_re = re.compile(r'^\s*#\s*define\s+([A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*//\s*spelling fixes \.bss order')
+    spelling = {}
     def note(va, loc):
         va = va.lower()
         if va in seen:
@@ -70,6 +75,7 @@ def main(argv=None) -> int:
             name = def_name(rest.split('//')[0])
             if not name:
                 continue
+            defined.add(name)
             claimed = want_rva(unit, name)
             if claimed is None:                           # unclaimed file-scope def (helper/static)
                 if dm:
@@ -91,6 +97,9 @@ def main(argv=None) -> int:
     reachable, pending = set(), [p for p in claim_files()]
     while pending:
         for line in image_lines(pending.pop()):
+            am = alias_re.match(line)
+            if am:
+                spelling[am.group(1)] = am.group(2)
             m = include_re.match(line)
             header = REPO / "include" / m.group(1) if m else None
             if header is not None and header.is_file() and header not in reachable:
@@ -109,6 +118,11 @@ def main(argv=None) -> int:
             name = nm.group(1) if nm else None
             if not name:
                 continue                                  # `extern "C" T f(...);` — a function
+            name = spelling.get(name, name)
+            if image_key() != "game" and name not in defined:
+                # Another image's header reaches the game's globals; only the
+                # storage this image defines must carry its inventory symbol.
+                continue
             if dm:
                 bad.append((loc, name, "DATA() on header extern — move it to the .cpp definition", "—"))
             elif name not in rva_of:

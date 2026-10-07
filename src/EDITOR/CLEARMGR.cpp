@@ -18,6 +18,8 @@
 #include <string.h>
 
 DATA(0x0045f150) i32 gClearBrush = CLEAR_BRUSH_DOUBLE;
+// Pointer moves since the brush outline was last redrawn.
+DATA(0x0049f590) i32 gClearCursorMoves;
 
 VA(0x00401000, 0x33)
 clearManager::clearManager(void) {
