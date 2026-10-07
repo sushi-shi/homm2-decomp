@@ -1,7 +1,7 @@
 // The editor's start-up dialogs: the main set-up screen, the new-map choice
 // (blank or random) and the new map's size. The handlers began as copies of
 // the game's SETUP.cpp handlers. Descriptive names: SetupMapSize, the three
-// handlers but BaseSetupHandler, gNewMapSize, gbNewRandomMap.
+// handlers but BaseSetupHandler, gNewMapSize, gNewRandomMap.
 
 #include <va.h>
 #include <EDITOR/setup.h>
@@ -37,7 +37,7 @@ H2_ENUM_BEGIN(SetupHelpIndex)
 H2_ENUM_END(SetupHelpIndex)
 
 DATA(0x00499460) i32 gNewMapSize = MAP_DIMENSION_MEDIUM;
-DATA(0x004a5820) b32 gbNewRandomMap;
+DATA(0x004a5820) b32 gNewRandomMap;
 
 VA(0x00425bf0, 0xfa)
 b32 SetupNewMap(void) {
@@ -49,10 +49,10 @@ b32 SetupNewMap(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
-            gbNewRandomMap = false;
+            gNewRandomMap = false;
             break;
         case CHOICE_TWO:
-            gbNewRandomMap = true;
+            gNewRandomMap = true;
             break;
         case DIALOG_CANCEL:
             return false;

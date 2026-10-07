@@ -89,22 +89,6 @@ struct rumourEventExtra {
     char pad[EVENT_RECORD_RUMOUR_HEADER_SIZE];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
-// The map event record EventExtra (GAME.h) under a second name.
-struct timeEventExtra {
-    u8 isMapEvent;
-    i32 resources[IDX(RES_COUNT)];
-    i16 artifact;
-    u8 appliesToComputer;
-    u8 cancelAfterVisit;
-    u16 firstDay;
-    u16 repeatInterval;
-    b8 active;
-    u16 x;
-    u16 y;
-    u8 appliesToHuman;
-    u8 players[GAME_PLAYER_COUNT];
-    char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
-};
 struct mapHeroExtra {
     i8 owner;
     u8 hasCustomArmy;

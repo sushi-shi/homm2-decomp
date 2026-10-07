@@ -10259,9 +10259,9 @@ MessageDispatchResult editManager::Main(tag_message& message) {
     }
     switch (message.type) {
         case MESSAGE_NONE:
-            if (gbNewRandomMap) {
+            if (gNewRandomMap) {
                 GenerateRandomMap();
-                gbNewRandomMap = false;
+                gNewRandomMap = false;
             }
             break;
         case MESSAGE_WIDGET:
@@ -11851,8 +11851,8 @@ void editManager::ExportMapText(void) {
     AppendTextLine("Timed Events:");
     for (i = 0; i < gEditMapHeader.timeEventCount; i++) {
         sprintf(gText, "Day %d: %s",
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message);
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message);
         AppendTextLine(gText);
         AppendTextLine("");
     }
@@ -12034,19 +12034,19 @@ bool editManager::ImportMapText(void) {
         char* record;
         i32 date;
         char* text;
-        char prefix[sizeof(timeEventExtra)];
+        char prefix[sizeof(EventExtra)];
 
         ReadTextLine(in, gText);
         if (strncmp(gText, "Day ", EDIT_TEXT_DAY_TAG_LENGTH))
             return false;
         sscanf(gText + EDIT_TEXT_DAY_TAG_LENGTH, "%d", &date);
-        static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
+        static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay = date;
         text = strchr(gText + EDIT_TEXT_DAY_TAG_LENGTH, ':') + EDIT_TEXT_DAY_SEPARATOR_LENGTH;
-        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], sizeof(timeEventExtra));
-        size = strlen(text) + sizeof(timeEventExtra);
+        memcpy(prefix, gEditManager->m_extras[gTimeEventExtras[i]], sizeof(EventExtra));
+        size = strlen(text) + sizeof(EventExtra);
         record = new char[size];
-        memcpy(record, prefix, sizeof(timeEventExtra));
-        strcpy(record + offsetof(timeEventExtra, message), text);
+        memcpy(record, prefix, sizeof(EventExtra));
+        strcpy(record + offsetof(EventExtra, message), text);
         delete gEditManager->m_extras[gTimeEventExtras[i]];
         gEditManager->m_extras[gTimeEventExtras[i]] = record;
         gEditManager->m_extraSizes[gTimeEventExtras[i]] = size;
