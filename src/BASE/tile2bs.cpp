@@ -14,14 +14,20 @@ H2_ENUM_BEGIN(TileScaleConstant)
 H2_ENUM_END(TileScaleConstant)
 
 DATA(0x004a75e4) static u8* s_dest;
+#define s_nextSourceRow s_nextSourceRowContents // spelling fixes .bss order
 DATA(0x004a75e8) static char* s_nextSourceRow;
+#define s_tileWidth s_tileWidthStore // spelling fixes .bss order
 DATA(0x004a75ec) static i32 s_tileWidth;
 DATA(0x004a75f0) static i32 s_y;
+#define s_x s_xTable // spelling fixes .bss order
 DATA(0x004a75f4) static i32 s_x;
+#define s_tileHeight s_tileHeightContents // spelling fixes .bss order
 DATA(0x004a75f8) static i32 s_tileHeight;
 DATA(0x004a75fc) static i32 s_sourceRowStep;
+#define s_destRow s_destRowBlockBase // spelling fixes .bss order
 DATA(0x004a7600) static u8* s_destRow;
 DATA(0x004a7604) static char* s_source;
+#define s_destPitch s_destPitchHolder // spelling fixes .bss order
 DATA(0x004a7608) static i32 s_destPitch;
 
 VA(0x00439fb0, 0x524)

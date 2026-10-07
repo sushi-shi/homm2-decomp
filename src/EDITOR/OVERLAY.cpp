@@ -62,8 +62,11 @@ DATA(0x00498cdc) i32 gSelectedOverlay = OVERLAY_NONE;
 DATA(0x004a5420) static u16 gCoveredLinks[OVERLAY_LINK_LIST_CAPACITY];
 DATA(0x004a5100) static u16 gKeptLinks[OVERLAY_LINK_LIST_CAPACITY];
 // The picker's rows, its first shown entry and the entry it picked.
+#define gPickerRows gPickerRowsRecord // spelling fixes .bss order
 DATA(0x004a5740) static i32 gPickerRows;
+#define gPickerFirst gPickerFirstValue // spelling fixes .bss order
 DATA(0x004a5744) static i32 gPickerFirst;
+#define gPickedOverlay gPickedOverlayCopy // spelling fixes .bss order
 DATA(0x004a5748) static i32 gPickedOverlay;
 
 VA(0x00418dc0, 0x67)
