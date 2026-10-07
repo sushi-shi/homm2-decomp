@@ -8,12 +8,12 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/EVENTS.h>
 #include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(TownEditConstant)
     // The map file's town record and its unused tail.
     TOWN_EDIT_RECORD_SIZE         = 0x46,
-    TOWN_EDIT_NAME_SIZE           = 13,
     TOWN_EDIT_RESERVED_SIZE       = 29,
     // townedit.bin's controls.
     TOWN_EDIT_STANDARD_ARMY       = 203,
@@ -71,7 +71,7 @@ struct TownExtra {
     i16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCaptain;
     u8 hasCustomName;
-    char name[TOWN_EDIT_NAME_SIZE];
+    char name[EVENT_RECORD_TOWN_NAME_SIZE];
     H2_ENUM_STORAGE(FactionType, i8) faction;
     i8 isCastle;
     i8 disallowCastle;

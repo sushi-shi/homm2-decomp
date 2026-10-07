@@ -6395,9 +6395,9 @@ void game::SetupTowns(void) {
                     castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
-        if (extra->hasShrine)
+        if (extra->hasCaptain)
             castle->m_buildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
-        castle->m_mayNotUpgradeToCastle = extra->unknown28;
+        castle->m_mayNotUpgradeToCastle = extra->disallowCastle;
         strcpy(castle->m_name, extra->name);
 
         memset(usedSpells, 0, IDX(SPELL_COUNT));
@@ -8096,7 +8096,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
 #endif
 VA(0x004604d2, 0x318)
 void game::CheckForTimeEvent(void) {
-    timeEventExtra* event;
+    EventExtra* event;
     i32 dayNumber;
     i32 eventIndex;
     i32 resourceIndex;
@@ -8108,7 +8108,7 @@ void game::CheckForTimeEvent(void) {
 
     dayNumber = GAME_DAY_NUMBER(*this);
     for (eventIndex = 0; eventIndex < m_timeEvents.count; eventIndex++) {
-        event = static_cast<timeEventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
+        event = static_cast<EventExtra*>(ppMapExtra[m_timeEvents.indices[eventIndex]]);
         if (((gbHumanPlayer[giCurPlayer] && event->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event->appliesToComputer))
             && event->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]

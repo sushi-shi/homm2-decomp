@@ -10,7 +10,9 @@
 #include <EDITOR/editManager.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/fullMap.h>
+#include <EDITOR/heroedit.h>
 #include <EDITOR/mapcell.h>
+#include <EDITOR/townedit.h>
 #include <BASE/dialog.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -145,11 +147,11 @@ b32 EditMapSpecifications(i32 randomMap) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
         strncpy(buffer,
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message,
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->message,
                 SPEC_EXCERPT_LENGTH);
         buffer[SPEC_EXCERPT_LENGTH] = '\0';
         sprintf(gText, localization::Tr("editor.spec.event_entry"),
-                static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
+                static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[i]])->firstDay,
                 buffer);
         message.payload.widget.data.text = gText;
         message.payload.widget.id = SPEC_EVENT_LIST;
@@ -193,12 +195,12 @@ void FillVictoryConditionList(void) {
     char itemText[SPEC_LIST_TEXT_SIZE];
     i32 listSelection;
     i32 nextColor;
-    mapTownExtra* townExtra;
+    TownExtra* townExtra;
     i32 j;
     i32 i;
     i32 y;
     i32 x;
-    mapHeroExtra* heroExtra;
+    HeroExtra* heroExtra;
 
     listSelection = 0;
     listMessage.type = MESSAGE_WIDGET;
@@ -218,7 +220,7 @@ void FillVictoryConditionList(void) {
                 for (i = 0; i < SPEC_MAX_TOWNS; i++) {
                     if (!gEditManager->FindTown(i, &x, &y))
                         break;
-                    townExtra = static_cast<mapTownExtra*>(
+                    townExtra = static_cast<TownExtra*>(
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, townExtra->hasCustomName ? townExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
@@ -235,7 +237,7 @@ void FillVictoryConditionList(void) {
                 for (i = 0; i < SPEC_MAX_HEROES; i++) {
                     if (!gEditManager->FindHero(i, &x, &y))
                         break;
-                    heroExtra = static_cast<mapHeroExtra*>(
+                    heroExtra = static_cast<HeroExtra*>(
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, heroExtra->hasCustomName ? heroExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
@@ -355,11 +357,11 @@ void FillLossConditionList(void) {
     tag_message listMessage;
     char itemText[SPEC_LIST_TEXT_SIZE];
     i32 listSelection;
-    mapTownExtra* townExtra;
+    TownExtra* townExtra;
     i32 i;
     i32 y;
     i32 x;
-    mapHeroExtra* heroExtra;
+    HeroExtra* heroExtra;
 
     listSelection = 0;
     listMessage.type = MESSAGE_WIDGET;
@@ -379,7 +381,7 @@ void FillLossConditionList(void) {
                 for (i = 0; i < SPEC_MAX_TOWNS; i++) {
                     if (!gEditManager->FindTown(i, &x, &y))
                         break;
-                    townExtra = static_cast<mapTownExtra*>(
+                    townExtra = static_cast<TownExtra*>(
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, townExtra->hasCustomName ? townExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
@@ -396,7 +398,7 @@ void FillLossConditionList(void) {
                 for (i = 0; i < SPEC_MAX_HEROES; i++) {
                     if (!gEditManager->FindHero(i, &x, &y))
                         break;
-                    heroExtra = static_cast<mapHeroExtra*>(
+                    heroExtra = static_cast<HeroExtra*>(
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, heroExtra->hasCustomName ? heroExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
@@ -578,7 +580,7 @@ void UpdateSpecificationsWindow(void) {
 VA(0x00427c48, 0x256)
 void AddMapEvent(void) {
     char itemText[SPEC_EXCERPT_SIZE];
-    timeEventExtra* event;
+    EventExtra* event;
     i32 choice;
     tag_message message;
 
@@ -587,15 +589,15 @@ void AddMapEvent(void) {
         sprintf(gText, localization::Tr("editor.spec.events_full"));
         NormalDialog(gText, NORMAL_DIALOG_INFO);
     } else {
-        event = new timeEventExtra;
-        memset(event, 0, sizeof(timeEventExtra));
-        event->unknown00 = 0;
-        event->unknown1d = 0xffff;
+        event = new EventExtra;
+        memset(event, 0, sizeof(EventExtra));
+        event->isMapEvent = false;
+        event->artifact = IDX(ARTIFACT_NONE);
         event->firstDay = 1;
         event->appliesToHuman = 1;
         memset(event->players, 1, sizeof(event->players));
         gEditManager->m_extras[gEditManager->m_extraCount] = event;
-        gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(timeEventExtra);
+        gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(EventExtra);
         choice = static_cast<eventsManager*>(gEditManager->m_toolManager)
                      ->EditEvent(gEditManager->m_extraCount);
         if (choice != EVENTS_DIALOG_CANCEL) {
@@ -603,13 +605,13 @@ void AddMapEvent(void) {
             message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
             message.payload.widget.id = SPEC_EVENT_LIST;
             strncpy(itemText,
-                    static_cast<timeEventExtra*>(
+                    static_cast<EventExtra*>(
                         gEditManager->m_extras[gTimeEventExtras[gEditMapHeader.timeEventCount]])
                         ->message,
                     SPEC_EXCERPT_LENGTH);
             itemText[SPEC_EXCERPT_LENGTH] = '\0';
             sprintf(gText, localization::Tr("editor.spec.event_entry"),
-                    static_cast<timeEventExtra*>(
+                    static_cast<EventExtra*>(
                         gEditManager->m_extras[gTimeEventExtras[gEditMapHeader.timeEventCount]])
                         ->firstDay,
                     itemText);
@@ -644,12 +646,12 @@ void EditMapEvent(void) {
             message.payload.widget.command = WIDGET_COMMAND_REPLACE_ITEM;
             message.payload.widget.id = SPEC_EVENT_LIST;
             strncpy(itemText,
-                    static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[index]])
+                    static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[index]])
                         ->message,
                     SPEC_EXCERPT_LENGTH);
             itemText[SPEC_EXCERPT_LENGTH] = '\0';
             sprintf(gText, localization::Tr("editor.spec.event_entry"),
-                    static_cast<timeEventExtra*>(gEditManager->m_extras[gTimeEventExtras[index]])
+                    static_cast<EventExtra*>(gEditManager->m_extras[gTimeEventExtras[index]])
                         ->firstDay,
                     itemText);
             message.payload.widget.parameter = index;

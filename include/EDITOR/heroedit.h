@@ -16,7 +16,7 @@
 H2_ENUM_BEGIN(HeroEditConstant)
     // The map file's hero record and its unused tail.
     HERO_EDIT_RECORD_SIZE      = 0x4c,
-    HERO_EDIT_RESERVED_SIZE    = 15,
+    HERO_EDIT_RESERVED_SIZE    = 14,
     // heroedit.bin's controls.
     HERO_EDIT_STANDARD_ARMY    = 203,
     HERO_EDIT_STANDARD_ARMY_TOGGLE = 204,
@@ -76,8 +76,7 @@ struct HeroExtra {
     i16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomPortrait;
     i8 portrait;
-    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
-    char unknown16;
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_SLOTS];
     i32 experience;
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
@@ -88,7 +87,10 @@ struct HeroExtra {
     u8 hasPatrol;
     // A free hero's patrol radius, or a jailed hero's class.
     i8 patrolRadius;
-    char reserved3d[HERO_EDIT_RESERVED_SIZE];
+    // Set by the game while loading when the record's chosen hero is still
+    // free (mapHeroExtra); the editor saves it clear.
+    b8 hasAssignedHero;
+    char reserved3e[HERO_EDIT_RESERVED_SIZE];
 };
 #pragma pack(pop)
 SIZE(HeroExtra, HERO_EDIT_RECORD_SIZE);

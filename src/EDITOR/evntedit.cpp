@@ -118,7 +118,7 @@ void eventsManager::FillInEventEdit(EventExtra* event) {
     gEditDialog->BroadcastMessage(message);
     message.payload.widget.id = EVENT_EDIT_APPLY_TO_COMPUTER;
     message.payload.widget.command =
-        event->applyToComputer ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+        event->appliesToComputer ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     gEditDialog->BroadcastMessage(message);
     message.payload.widget.id = EVENT_EDIT_APPLY_TO_HUMAN;
     message.payload.widget.command =
@@ -188,7 +188,7 @@ MessageDispatchResult EventEditHandler(tag_message& message) {
                             gEventEdit.cancelAfterVisit = 1 - gEventEdit.cancelAfterVisit;
                             break;
                         case EVENT_EDIT_APPLY_TO_COMPUTER:
-                            gEventEdit.applyToComputer = 1 - gEventEdit.applyToComputer;
+                            gEventEdit.appliesToComputer = 1 - gEventEdit.appliesToComputer;
                             break;
                         case EVENT_EDIT_APPLY_TO_HUMAN:
                             gEventEdit.appliesToHuman = 1 - gEventEdit.appliesToHuman;
