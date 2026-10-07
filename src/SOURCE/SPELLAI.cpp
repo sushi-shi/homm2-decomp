@@ -11,7 +11,7 @@
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
 // The disabling spells score positive here, unlike PoL 2.0 where the same five
-// cells hold the negated value; see docs/version-changes.md.
+// cells hold the negated value; see docs/versions/gold-2.1-buka.md.
 DATA(0x004ea80c) static const float COMBAT_SPELL_AI_BLIND_MODIFIER = 0.4f;
 DATA(0x004ea810) static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = 0.55f;
 DATA(0x004ea814) static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = 0.5f;
