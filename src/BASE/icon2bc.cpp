@@ -117,7 +117,7 @@ void IconToBitmapColorTable(
                 }
                 if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {
                     s_dimPal = reinterpret_cast<u8*>(uDimPal)
-                               + (static_cast<u32>(s_run & ICON_RLE_DIM_LEVEL_MASK) >> 2)
+                               + (static_cast<u32>(s_run & ICON_RLE_DIM_LEVEL_MASK) >> ICON_RLE_DIM_LEVEL_SHIFT)
                                      * PALETTE_COLOR_COUNT;
                     if (clip == ICON_DRAW_NO_CLIP) {
                         s_dst = s_row + s_x;

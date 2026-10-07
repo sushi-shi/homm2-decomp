@@ -86,7 +86,7 @@ H2_ENUM_BEGIN(NewMapWindowConstant)
     // The player count radio buttons: NEW_MAP_PLAYERS_BASE + players.
     NEW_MAP_PLAYERS_BASE           = 1498,
     NEW_MAP_MIN_PLAYERS            = 2,
-    NEW_MAP_MAX_PLAYERS            = 6,
+    NEW_MAP_DEFAULT_PLAYERS        = 4,
     NEW_MAP_TRACK_X                = 154,
     NEW_MAP_TRACK_WIDTH            = 250,
     NEW_MAP_TRACK_HEIGHT           = 16,
@@ -107,6 +107,8 @@ H2_ENUM_BEGIN(NewMapWindowConstant)
     NEW_MAP_KNOB_RIGHT             = 383,
     NEW_MAP_KNOB_TRAVEL            = 227,
     NEW_MAP_KNOB_GRAB              = 8,
+    // The settings' percent scale (gTerrainPercent, gDensityPercent): the
+    // generator paints a terrain at NEW_MAP_PERCENT over the whole map.
     NEW_MAP_PERCENT                = 100,
     // The land terrains keep at least 20 percent; water is capped at 75.
     NEW_MAP_MINIMUM_LAND           = 20,

@@ -10,7 +10,6 @@
 #include <SOURCE/KB.h>
 
 H2_ENUM_BEGIN(IconWidgetConstant)
-    RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff,
     ORIENTATION_MASK       = 0xff,
     FRAME_INDEX_MASK       = 0xffff,
@@ -73,7 +72,7 @@ iconWidget::iconWidget(
 
 VA(0x004bb890, 0x113)
 void iconWidget::Read(void) {
-    char iconName[RESOURCE_NAME_CAPACITY];
+    char iconName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();

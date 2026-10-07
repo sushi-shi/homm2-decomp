@@ -11,6 +11,21 @@ H2_ENUM_BEGIN(MilesSampleStorageConstant)
     MILES_SAMPLE_HANDLE_STORAGE_COUNT = 16
 H2_ENUM_END(MilesSampleStorageConstant)
 
+// The Miles DIG_F_* sample format codes AIL_set_sample_type takes: bit 0
+// selects 16-bit samples and bit 1 selects stereo.
+H2_ENUM_BEGIN(MilesDigitalFormat)
+    MILES_DIG_F_MONO_8    = 0,
+    MILES_DIG_F_MONO_16   = 1,
+    MILES_DIG_F_STEREO_8  = 2,
+    MILES_DIG_F_STEREO_16 = 3
+H2_ENUM_END(MilesDigitalFormat)
+
+// The interleaved channel count of an Audiere sample buffer.
+H2_ENUM_BEGIN(AudiereChannelCount)
+    AUDIERE_CHANNELS_MONO   = 1,
+    AUDIERE_CHANNELS_STEREO = 2
+H2_ENUM_END(AudiereChannelCount)
+
 // Startup clears this complete owner before allocating the handle prefix.
 struct MilesSampleState {
     i32 ready;

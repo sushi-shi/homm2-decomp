@@ -25,8 +25,7 @@ H2_ENUM_END(MidiSequenceStatus)
 H2_ENUM_BEGIN(MidiVolumeConstant)
     VOLUME_HIGH_RANGE = 6,
     VOLUME_FADE_SPLIT = 10,
-    VOLUME_LOW_RANGE  = 11,
-    MAX_VOLUME        = 127
+    VOLUME_LOW_RANGE  = 11
 H2_ENUM_END(MidiVolumeConstant)
 
 H2_ENUM_BEGIN(MidiConstant)
@@ -147,7 +146,7 @@ VA(0x004c5bf0, 0x8f)
 void MIDISetVolume(i32& fadeSteps) {
     if (!GetMusicFlagA())
         return;
-    i32 volume = MAX_VOLUME;
+    i32 volume = SOUND_VOLUME_FULL;
     if (fadeSteps > 0) {
         if (fadeSteps <= VOLUME_FADE_SPLIT)
             volume = (volume * (VOLUME_LOW_RANGE - fadeSteps)) / VOLUME_LOW_RANGE;

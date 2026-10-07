@@ -29,7 +29,7 @@
 H2_ENUM_BEGIN(SpecDialogWidget)
     // A colour's player button: its frame shows who may play it.
     SPEC_PLAYER_FIRST          = 0x6e,
-    SPEC_PLAYER_LAST           = SPEC_PLAYER_FIRST + EDITOR_PLAYER_COLOR_COUNT - 1,
+    SPEC_PLAYER_LAST           = SPEC_PLAYER_FIRST + PLAYER_COLOR_COUNT - 1,
     SPEC_VICTORY_LIST          = 0xd2,
     // The victory options: computer also wins and the normal victory, each
     // with two labels and a check box.
@@ -71,9 +71,6 @@ H2_ENUM_BEGIN(SpecDialogConstant)
     SPEC_PLAYER_HUMAN          = 1,
     SPEC_PLAYER_COMPUTER       = 2,
     SPEC_PLAYER_STATES         = 4,
-    // The towns and heroes a map holds at most.
-    SPEC_MAX_TOWNS             = 72,
-    SPEC_MAX_HEROES            = 54,
     // Accumulate gold: twenty choices in steps of 50,000; the header keeps
     // thousands.
     SPEC_GOLD_CHOICES          = 20,
@@ -86,8 +83,6 @@ H2_ENUM_BEGIN(SpecDialogConstant)
     SPEC_WEEKS_LAST            = 8,
     SPEC_MONTHS_FIRST          = 3,
     SPEC_MONTHS_LAST           = 12,
-    SPEC_DAYS_PER_WEEK         = 7,
-    SPEC_DAYS_PER_MONTH        = 28,
     // The time list's choices: days, then weeks, then months. Choosing
     // reads one week past the list and maps the first month a choice late.
     SPEC_LAST_DAYS_CHOICE      = SPEC_DAYS_LAST - SPEC_DAYS_FIRST,
@@ -219,7 +214,7 @@ void FillVictoryConditionList(void) {
                 sprintf(itemText, localization::Tr("editor.spec.no_towns"));
                 gSpecWindow->BroadcastMessage(listMessage);
             } else {
-                for (i = 0; i < SPEC_MAX_TOWNS; i++) {
+                for (i = 0; i < GAME_TOWN_COUNT; i++) {
                     if (!gEditManager->FindTown(i, &x, &y))
                         break;
                     townExtra = static_cast<TownExtra*>(
@@ -236,7 +231,7 @@ void FillVictoryConditionList(void) {
                 sprintf(itemText, localization::Tr("editor.spec.no_heroes"));
                 gSpecWindow->BroadcastMessage(listMessage);
             } else {
-                for (i = 0; i < SPEC_MAX_HEROES; i++) {
+                for (i = 0; i < GAME_HERO_COUNT; i++) {
                     if (!gEditManager->FindHero(i, &x, &y))
                         break;
                     heroExtra = static_cast<HeroExtra*>(
@@ -380,7 +375,7 @@ void FillLossConditionList(void) {
                 sprintf(itemText, localization::Tr("editor.spec.no_towns"));
                 gSpecWindow->BroadcastMessage(listMessage);
             } else {
-                for (i = 0; i < SPEC_MAX_TOWNS; i++) {
+                for (i = 0; i < GAME_TOWN_COUNT; i++) {
                     if (!gEditManager->FindTown(i, &x, &y))
                         break;
                     townExtra = static_cast<TownExtra*>(
@@ -397,7 +392,7 @@ void FillLossConditionList(void) {
                 sprintf(itemText, localization::Tr("editor.spec.no_heroes"));
                 gSpecWindow->BroadcastMessage(listMessage);
             } else {
-                for (i = 0; i < SPEC_MAX_HEROES; i++) {
+                for (i = 0; i < GAME_HERO_COUNT; i++) {
                     if (!gEditManager->FindHero(i, &x, &y))
                         break;
                     heroExtra = static_cast<HeroExtra*>(
@@ -426,11 +421,11 @@ void FillLossConditionList(void) {
                 listSelection = 0;
             else if (gEditMapHeader.lossConditionValue <= SPEC_DAYS_LAST)
                 listSelection = gEditMapHeader.lossConditionValue - SPEC_DAYS_FIRST;
-            else if (gEditMapHeader.lossConditionValue <= SPEC_WEEKS_LAST * SPEC_DAYS_PER_WEEK)
-                listSelection = gEditMapHeader.lossConditionValue / SPEC_DAYS_PER_WEEK
+            else if (gEditMapHeader.lossConditionValue <= SPEC_WEEKS_LAST * IDX(CALENDAR_DAYS_PER_WEEK))
+                listSelection = gEditMapHeader.lossConditionValue / CALENDAR_DAYS_PER_WEEK
                             + SPEC_FIRST_WEEKS_CHOICE - SPEC_WEEKS_FIRST;
             else
-                listSelection = gEditMapHeader.lossConditionValue / SPEC_DAYS_PER_MONTH
+                listSelection = gEditMapHeader.lossConditionValue / CALENDAR_DAYS_PER_MONTH
                             + SPEC_FIRST_MONTHS_CHOICE - SPEC_MONTHS_FIRST;
             break;
     }
@@ -467,12 +462,12 @@ void SetLossConditionChoice(i32 choice) {
                 gEditMapHeader.lossConditionValue = choice + SPEC_DAYS_FIRST;
             else if (choice <= SPEC_LAST_WEEKS_CHOICE)
                 gEditMapHeader.lossConditionValue
-                    = (choice - SPEC_FIRST_WEEKS_CHOICE) * SPEC_DAYS_PER_WEEK
-                      + SPEC_WEEKS_FIRST * SPEC_DAYS_PER_WEEK;
+                    = (choice - SPEC_FIRST_WEEKS_CHOICE) * CALENDAR_DAYS_PER_WEEK
+                      + SPEC_WEEKS_FIRST * IDX(CALENDAR_DAYS_PER_WEEK);
             else
                 gEditMapHeader.lossConditionValue
-                    = (choice - SPEC_FIRST_MONTHS_CHOICE) * SPEC_DAYS_PER_MONTH
-                      + SPEC_MONTHS_FIRST * SPEC_DAYS_PER_MONTH;
+                    = (choice - SPEC_FIRST_MONTHS_CHOICE) * CALENDAR_DAYS_PER_MONTH
+                      + SPEC_MONTHS_FIRST * IDX(CALENDAR_DAYS_PER_MONTH);
             break;
     }
 }
@@ -576,7 +571,7 @@ void UpdateSpecificationsWindow(void) {
     message.payload.widget.id = SPEC_RUMOUR_DELETE;
     gSpecWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    for (i = 0; i < EDITOR_PLAYER_COLOR_COUNT; i++) {
+    for (i = 0; i < PLAYER_COLOR_COUNT; i++) {
         message.payload.widget.id = SPEC_PLAYER_FIRST + i;
         message.payload.widget.data.value = gEditMapHeader.playerCanHuman[i]
                                             + SPEC_PLAYER_FRAME_FIRST + i * SPEC_PLAYER_FRAMES
