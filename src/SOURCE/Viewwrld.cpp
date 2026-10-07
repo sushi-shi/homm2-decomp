@@ -35,7 +35,6 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_WINDOW_X             = ADVENTURE_RADAR_LEFT,
     WORLD_WINDOW_Y             = ADVENTURE_RADAR_TOP,
     WORLD_ICON_WIDGET          = 3,
-    WORLD_POINTER_FRAME        = 0,
     WORLD_GROUND_SHAPE_MASK    = GROUND_SHAPE_VARIED - 1,
     WORLD_TERRAIN_FRAME_STRIDE = 21,
     WORLD_BACKGROUND_COLOR     = 0x24,
@@ -201,7 +200,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     iVWYPixelOffset = iVWXPixelOffset;
     gpMouseManager->SetPointer(
         "advmice.mse",
-        WORLD_POINTER_FRAME,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     sprintf(

@@ -26,10 +26,31 @@ H2_ENUM_BEGIN(AdventureViewportConstant)
     ADVENTURE_RADAR_BOTTOM            = ADVENTURE_RADAR_TOP + ADVENTURE_RADAR_SIZE,
     ADVENTURE_RADAR_SMALL_CELL_PIXELS  = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_SMALL,
     ADVENTURE_RADAR_MEDIUM_CELL_PIXELS = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_MEDIUM,
+    // A large map draws four radar pixels per three cells: one wide cell of
+    // each three, so positions scale by 1 + 1/3, rounded up.
+    ADVENTURE_RADAR_LARGE_SCALE_DIVISOR  = 3,
+    ADVENTURE_RADAR_LARGE_SCALE_ROUNDING = ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1,
     ADVENTURE_HERO_FIZZLE_LEFT        = 192,
     ADVENTURE_HERO_FIZZLE_TOP         = 192,
     ADVENTURE_HERO_FIZZLE_SIZE        = 96
 H2_ENUM_END(AdventureViewportConstant)
+
+// advmice.mse pointer frames of the adventure screen; frames from SCROLL_FIRST
+// up to SCROLL_END are the eight edge-scroll arrows.
+H2_ENUM_BEGIN(AdventurePointerFrame)
+    ADVENTURE_POINTER_DEFAULT      = 0,
+    ADVENTURE_POINTER_HERO         = 2,
+    ADVENTURE_POINTER_TOWN         = 3,
+    ADVENTURE_POINTER_MOVE         = 4,
+    ADVENTURE_POINTER_ATTACK       = 5,
+    ADVENTURE_POINTER_SAIL         = 6,
+    ADVENTURE_POINTER_DISEMBARK    = 7,
+    ADVENTURE_POINTER_SELECT_HERO  = 8,
+    ADVENTURE_POINTER_ACTION       = 9,
+    ADVENTURE_POINTER_WATER_ACTION = 28,
+    ADVENTURE_POINTER_SCROLL_FIRST = 32,
+    ADVENTURE_POINTER_SCROLL_END   = 40
+H2_ENUM_END(AdventurePointerFrame)
 
 // Current screen and fixed adventure viewport; clipping policy remains explicit.
 #define DRAW_ADVENTURE_ICON(pic, x, y, frame, clip)                                                \

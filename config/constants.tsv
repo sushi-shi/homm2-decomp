@@ -76,7 +76,7 @@ src/EDITOR/*.cpp	*	*	code	case *FIRST* + *:	the n-th control of a widget-id run 
 src/EDITOR/*.cpp	*	*	code	i32 H2_UNUSED(unused*)[[]*];	an unused local array kept for the retail stack frame
 src/EDITOR/*.cpp	*	*	declaration	DATA(*) i32 gUnusedData*	an unreferenced retail datum's initializer or element count (it keeps its retail .data place)
 src/EDITOR/EDITMGR.cpp	editManager::Main	*	code	amount = ?;	the digit key's ground-variety level (Ctrl+0..9 calls RandomizeGround with 0..9)
-src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);	the third and fourth rows of a small map's 4x4 radar dot
+src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);	the third and fourth rows of a small map's 4x4 radar dot
 src/EDITOR/EDITMGR.cpp	editManager::DoRadar	2	code	*gZoomViewCells[[]m_zoomLevel] / 2;	half the view: a radar click centres the view on its cell
 src/EDITOR/*.cpp	*Knob	0.5	code	* + 0.5;	rounds the knob's scaled position to the nearest cell or row
 src/EDITOR/EDITMGR.cpp	editManager::CheckObjects	2	code	*gates[[]2]*	the third travel-gate kind's count (gates holds EDIT_TRAVEL_GATE_KINDS counts)

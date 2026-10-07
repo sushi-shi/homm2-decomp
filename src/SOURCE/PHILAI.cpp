@@ -337,12 +337,7 @@ H2_ENUM_END(AIArtifactEventConstant)
 
 H2_ENUM_BEGIN(AIFightEventConstant)
     FIGHT_EVENT_EMPTY             = 1,
-    FIGHT_EVENT_LEVEL_1           = 2,
-    FIGHT_EVENT_LEVEL_2           = 3,
-    FIGHT_EVENT_LEVEL_3           = 4,
-    FIGHT_EVENT_LEVEL_4           = 5,
     FIGHT_EVENT_STACKS            = 5,
-    FIGHT_EVENT_LEVEL_OFFSET      = 2,
     FIGHT_EVENT_LEVEL_COUNT       = 4,
     FIGHT_EVENT_GRAVEYARD_COUNT_1 = 2,
     FIGHT_EVENT_GRAVEYARD_COUNT_2 = 3,
@@ -5581,16 +5576,16 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
         case MAP_OBJECT_SHIPWRECK:
             monsterType = CREATURE_GHOST;
             monsterCount =
-                shipwreckCounts[cell->m_objectMetadata - FIGHT_EVENT_LEVEL_OFFSET];
+                shipwreckCounts[cell->m_objectMetadata - IDX(EVENT_LEVEL_SMALL)];
             break;
         case MAP_OBJECT_GRAVEYARD:
             monsterType = CREATURE_ZOMBIE;
             monsterCount =
-                graveyardCounts[cell->m_objectMetadata - FIGHT_EVENT_LEVEL_OFFSET];
+                graveyardCounts[cell->m_objectMetadata - IDX(EVENT_LEVEL_SMALL)];
             break;
         default:
             monsterType = CREATURE_SKELETON;
-            monsterCount = derelictCounts[cell->m_objectMetadata - FIGHT_EVENT_LEVEL_OFFSET];
+            monsterCount = derelictCounts[cell->m_objectMetadata - IDX(EVENT_LEVEL_SMALL)];
             break;
     }
 
@@ -5602,26 +5597,26 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
     rewardValue = 0;
     switch (eventType) {
         case MAP_OBJECT_GRAVEYARD:
-            switch (cell->m_objectMetadata) {
-                case FIGHT_EVENT_LEVEL_1:
+            switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                case EVENT_LEVEL_SMALL:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_500_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_2:
+                case EVENT_LEVEL_MEDIUM:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_1000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_3:
+                case EVENT_LEVEL_LARGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_3000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_4:
+                case EVENT_LEVEL_HUGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_1000_VALUE
                             * gafAITurnCostResource[IDX(RES_GOLD)]
@@ -5631,26 +5626,26 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
             }
             break;
         case MAP_OBJECT_SHIPWRECK:
-            switch (cell->m_objectMetadata) {
-                case FIGHT_EVENT_LEVEL_1:
+            switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                case EVENT_LEVEL_SMALL:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_1000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_2:
+                case EVENT_LEVEL_MEDIUM:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_2000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_3:
+                case EVENT_LEVEL_LARGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_5000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_4:
+                case EVENT_LEVEL_HUGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_2000_VALUE
                             * gafAITurnCostResource[IDX(RES_GOLD)]
@@ -5660,26 +5655,26 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
             }
             break;
         case MAP_OBJECT_DERELICT_SHIP:
-            switch (cell->m_objectMetadata) {
-                case FIGHT_EVENT_LEVEL_1:
+            switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                case EVENT_LEVEL_SMALL:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_500_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_2:
+                case EVENT_LEVEL_MEDIUM:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_1000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_3:
+                case EVENT_LEVEL_LARGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_2000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
-                case FIGHT_EVENT_LEVEL_4:
+                case EVENT_LEVEL_HUGE:
                     rewardValue = static_cast<i32>(
                         AI_FIGHT_EVENT_REWARD_5000_VALUE
                         * gafAITurnCostResource[IDX(RES_GOLD)]
@@ -5708,51 +5703,51 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
                != 0) {
         switch (eventType) {
             case MAP_OBJECT_SHIPWRECK:
-                switch (cell->m_objectMetadata) {
-                    case FIGHT_EVENT_LEVEL_1:
+                switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                    case EVENT_LEVEL_SMALL:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_1000);
                         break;
-                    case FIGHT_EVENT_LEVEL_2:
+                    case EVENT_LEVEL_MEDIUM:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_2000);
                         break;
-                    case FIGHT_EVENT_LEVEL_3:
+                    case EVENT_LEVEL_LARGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_5000);
                         break;
-                    case FIGHT_EVENT_LEVEL_4:
+                    case EVENT_LEVEL_HUGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_2000);
                         gpAdvManager->GiveRandomArtifact(heroPointer);
                         break;
                 }
                 break;
             case MAP_OBJECT_GRAVEYARD:
-                switch (cell->m_objectMetadata) {
-                    case FIGHT_EVENT_LEVEL_1:
+                switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                    case EVENT_LEVEL_SMALL:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_500);
                         break;
-                    case FIGHT_EVENT_LEVEL_2:
+                    case EVENT_LEVEL_MEDIUM:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_1000);
                         break;
-                    case FIGHT_EVENT_LEVEL_3:
+                    case EVENT_LEVEL_LARGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_3000);
                         break;
-                    case FIGHT_EVENT_LEVEL_4:
+                    case EVENT_LEVEL_HUGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_1000);
                         gpAdvManager->GiveRandomArtifact(heroPointer);
                         break;
                 }
                 break;
             case MAP_OBJECT_DERELICT_SHIP:
-                switch (cell->m_objectMetadata) {
-                    case FIGHT_EVENT_LEVEL_1:
+                switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+                    case EVENT_LEVEL_SMALL:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_500);
                         break;
-                    case FIGHT_EVENT_LEVEL_2:
+                    case EVENT_LEVEL_MEDIUM:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_1000);
                         break;
-                    case FIGHT_EVENT_LEVEL_3:
+                    case EVENT_LEVEL_LARGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_2000);
                         break;
-                    case FIGHT_EVENT_LEVEL_4:
+                    case EVENT_LEVEL_HUGE:
                         gpAdvManager->GiveResource(heroPointer, RES_GOLD, FIGHT_EVENT_REWARD_5000);
                         break;
                 }

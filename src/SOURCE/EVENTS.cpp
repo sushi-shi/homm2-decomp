@@ -7871,7 +7871,7 @@ CombatResult advManager::DoCombat(
     gpExec->CallManager(gpCombatManager);
     gpMouseManager->SetPointer(
         "advmice.mse",
-        0,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
