@@ -4,8 +4,8 @@
 // assertion names it; Open stores the class name "eventsManager".
 
 #include <va.h>
+#include <EDITOR/EVENTMGR.h>
 #include <EDITOR/eventsManager.h>
-#include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/mapcell.h>
@@ -142,8 +142,8 @@ MessageDispatchResult eventsManager::Main(tag_message& message) {
                     cursorCell = gMap.GetCell(hoverX, hoverY);
                     hoverX -= gEditManager->m_viewX;
                     hoverY -= gEditManager->m_viewY;
-                    hoverX = hoverX * gZoomTileSize[gEditManager->m_zoomLevel] + EVENTS_VIEW_LEFT;
-                    hoverY = hoverY * gZoomTileSize[gEditManager->m_zoomLevel] + EVENTS_VIEW_TOP;
+                    hoverX = hoverX * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_LEFT;
+                    hoverY = hoverY * gZoomTileSize[gEditManager->m_zoomLevel] + EDIT_VIEW_TOP;
                     gEditManager->DrawMap();
                     if (LocationHasSpecialDetails(cursorCell->m_triggerType))
                         m_overlayIcon->FillToBuffer(
@@ -558,10 +558,8 @@ void UpdateNewMapWindow(void) {
     }
 }
 
-#if H2_RETAIL_COMPILER
-#define othersTotal unfixedTotal
-#define landTotal total
-#endif
+#define othersTotal unfixedTotal // frame-slot spelling
+#define landTotal total          // frame-slot spelling
 VA(0x00412cca, 0x193)
 void BalanceTerrainPercents(i32 changedTerrain) {
     double landTotal;
@@ -600,10 +598,8 @@ void BalanceTerrainPercents(i32 changedTerrain) {
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef othersTotal
 #undef landTotal
-#endif
 
 VA(0x00412e5d, 0x3de)
 MessageDispatchResult NewMapWindowHandler(tag_message& message) {
