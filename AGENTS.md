@@ -44,8 +44,8 @@ byte-identical to retail.
 
 | Path | Contents |
 | --- | --- |
-| `src/{BASE,SOURCE,EDITOR}`, `include/` | reconstructed source and owner headers |
-| `res/`, `imports/`, `locales/` | resources, reviewed import ABI, text catalogs |
+| `src/{BASE,SOURCE,EDITOR}`, `include/` | reconstructed source, resource scripts and owner headers |
+| `imports/`, `locales/` | reviewed import ABI, text catalogs |
 | `vendor/` | third-party SDK headers (Audiere, Miles, Smacker, WinG) |
 | `config/`, `config/retail/`, `config/reviews/` | build contracts; retail facts; review ledgers |
 | `scripts/homm2/` | tooling; keep `homm2.core.usage.logged` on entry points (`homm2 audit usage`) |

@@ -2,7 +2,7 @@
 """clangd.py - generate a clangd compilation database for the HoMM2 tree.
 
 Invoke via `homm2 clangd`. ADDITIVE editor tooling (go-to-def / completion /
-hover / diagnostics in nvim) that runs ALONGSIDE the real matching build; it does
+hover / diagnostics in an editor) that runs ALONGSIDE the real matching build; it does
 not touch it. The matching build compiles with the pinned VC6 CL.EXE under wine
 (scripts/homm2/graph/cc.py), which clangd cannot invoke. So we emit our OWN
 compilation database, in clang-cl form, that points clang at the toolchain's MSVC

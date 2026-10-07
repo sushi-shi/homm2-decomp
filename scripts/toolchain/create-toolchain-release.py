@@ -85,7 +85,7 @@ MASM_DISK_MD5 = "bb1f36e70d67720fa63356010b07c992"
 BACK_END_ALIAS = "msvcep.dll"
 
 # These install from COMMON\MSDEV98\BIN rather than VC98\BIN.  RC.EXE and
-# RCDLL.DLL are also independently gated by rc_res.py against byte-exact
+# RCDLL.DLL are also independently gated by homm2.graph.rc against byte-exact
 # resource output from the supported Buka retail image.
 SHARED_BIN = ("MSPDB60.DLL", "MSOBJ10.DLL", "RC.EXE", "RCDLL.DLL")
 

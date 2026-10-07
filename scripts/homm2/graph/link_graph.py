@@ -26,6 +26,7 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
                     base_symbol_sidecars: list[str],
                     first_function_rva: dict[str, int],
                     first_compgen_rva: dict[str, int]) -> None:
+    from homm2.graph.link import PROFILES
     generic_import_outputs = []
     for name in ("audiere", "mss32"):
         output = f"build/link/generic-imports/{name}.lib"
@@ -50,7 +51,7 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     generic_import_outputs.append(output)
     resource_output = "build/link/HMM2PL.res"
     w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
-            inputs=["res/HMM2PL.rc", "build/orig/HMM2PL.exe"],
+            inputs=[PROFILES["game"].resources, "build/orig/HMM2PL.exe"],
             implicit=["scripts/homm2/graph/rc.py",
                       "scripts/homm2/graph/extract_resources.py",
                       "build/toolchain/msvc/bin/RC.EXE"])
@@ -216,7 +217,7 @@ def emit_image_link_graph(w, image, units: list[dict], objs: list[str]) -> str:
         import_outputs.append(output)
     resource_output = f"{link_root}/{stem}.res"
     w.build([resource_output, f"{link_root}/{stem}.resources.json"], "image_link_resources",
-            inputs=[f"res/{stem}.rc", image.exe],
+            inputs=[profile.resources, image.exe],
             implicit=["scripts/homm2/graph/rc.py",
                       "scripts/homm2/graph/extract_resources.py",
                       "build/toolchain/msvc/bin/RC.EXE"])

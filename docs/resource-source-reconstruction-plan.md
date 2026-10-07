@@ -8,7 +8,7 @@ of the gate comparison.
 
 ## Delivered state
 
-- `res/HMM2PL.rc` — all ten retail resources as reviewed rc grammar: the six
+- `src/SOURCE/HMM2PL.rc` — all ten retail resources as reviewed rc grammar: the six
   menus (`MNUADV`, `MNUADVD`, `MNUDFLT`, `MNUCMBT`, `MNUTOWN`, `MNUTOWND`),
   the `HEROES` About dialog, the `HEROES` icon statement, and the
   `1 VERSIONINFO` block. Statement order is retail payload order. All
@@ -18,7 +18,7 @@ of the gate comparison.
   are invented (the retail image names none).
 - `heroes.ico` — the one retail binary: the 32x32 16-color program icon,
   rebuilt as an ordinary `.ico` container from the retail `RT_ICON` payload
-  and `RT_GROUP_ICON` directory. It is retail artwork, so `rc_res.py` stages it
+  and `RT_GROUP_ICON` directory. It is retail artwork, so `homm2.graph.rc` stages it
   beside a temporary copy of `HMM2PL.rc` only while `rc.exe` runs; the staging
   directory is then removed. `rc.exe` splits it back into exactly those two
   records.
@@ -53,6 +53,6 @@ copies under different names), and one `RT_VERSION`.
 
 `scripts/toolchain/create-toolchain-release.py` packages the era RC pair from
 `COMMON/MSDEV98/BIN` on the pinned VS6 Enterprise base disc. The release
-builder and `rc_res.py` both verify their SHA-256s; the latter additionally
+builder and `homm2.graph.rc` both verify their SHA-256s; the latter additionally
 proves their ten compiled payloads byte-exact against retail on every resource
 build.

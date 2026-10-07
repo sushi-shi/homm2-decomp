@@ -87,7 +87,7 @@ commands; Ninja directly also works (`ninja game`, `ninja editor` or
 `ninja all`, with `-f build-en.ninja` for English). The editor reuses the
 game's `BASE` sources and its `kbwin`, `REQUEST` and `wingraph` sources,
 compiled a second time with `HOMM2_EDITOR` defined; `src/EDITOR/` holds the
-editor's own units and `res/EDT2PL.rc` its menu, About box and version
+editor's own units and `src/EDITOR/EDT2PL.rc` its menu, About box and version
 resources (in Russian, as retail, for both languages). Neither program
 includes the retail icon, and the game has no Windows resources.
 

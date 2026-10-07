@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Compile an image's .rc with the era resource compiler and gate it byte-exactly.
 
-The retail resources live as SOURCE: `res/HMM2PL.rc` (the game) carries the six
-menus, the About dialog, and the VERSIONINFO as reviewed rc grammar, and
-`res/EDT2PL.rc` (the scenario editor) its menu, About dialog and VERSIONINFO.
+The retail resources live as SOURCE: `src/SOURCE/HMM2PL.rc` (the game) carries
+the six menus, the About dialog, and the VERSIONINFO as reviewed rc grammar,
+and `src/EDITOR/EDT2PL.rc` (the scenario editor) its menu, About dialog and
+VERSIONINFO.
 The one binary payload, the 32x32 16-color program icon, is extracted into a
 temporary build directory beside a staged copy of that RC file (`--icon` names
 the file the RC statement reads).  It never becomes a repository
@@ -49,7 +50,7 @@ def check_rc_binaries() -> None:
             raise RuntimeError(
                 f"{path} is missing: the era resource compiler (RC.EXE 5.00 + "
                 "RCDLL.DLL from the VS6 Enterprise base disc) is not "
-                "provisioned. See rc_res.py for "
+                "provisioned. See RC_PINS in homm2.graph.rc for "
                 "the pinned SHA-256 provenance record."
             )
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -112,7 +113,7 @@ from homm2.core.usage import logged
 @logged
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rc", type=Path, default=ROOT / "res/HMM2PL.rc")
+    parser.add_argument("--rc", type=Path, default=ROOT / "src/SOURCE/HMM2PL.rc")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--verify-exe", type=Path, default=ROOT / "build/orig/HMM2PL.exe")
     parser.add_argument("--report", type=Path)
