@@ -32,7 +32,7 @@ GATES = {
     "link-diff": (["ninja", "link-diff"],
                   "historical link byte-identical within config/link_diff.tsv"),
     "image-link-diff": ([PY, "-m", "homm2.verify.link_diff"],
-                        "another image's link within its ceiling (pending until it links)"),
+                        "another image's link byte-identical within its ceiling"),
     "localization": ([PY, "-m", "homm2.graph.localization"],
                      "every used text ID resolves in the catalog"),
     "strict-allocations": ([PY, "-m", "homm2.verify.strict_allocations"],

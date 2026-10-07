@@ -158,8 +158,11 @@ from `audit/reloc_donation`, which no longer defines it.
 
 ## Documentation and repository shape
 
-Done: `AGENTS.md` has the contract shape and keeps this repository's evidence,
-source, data and git rules; `CLAUDE.md` links to it. The project guide became
+Done: `AGENTS.md`, the README (with its generated status block) and the
+documentation index have HoMM1's shape and wording; `CLAUDE.md` links to
+`AGENTS.md`. This repository's evidence, full source, data and git rules are in
+`docs/workflow.md`, the score definitions and carve-outs in
+`docs/match-status.md`. The project guide became
 `docs/tooling.md`, the campaign and matching loop `docs/workflow.md`, the
 command map `docs/tooling-map.md`, and the README's build and play prose
 `docs/builds.md` and `docs/play.md`. The matcher, orchestrator and permute
