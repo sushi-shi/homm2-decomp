@@ -5356,11 +5356,11 @@ void NormalDialog(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED) | IDX(WIDGET_FLAG_DRAW);
-    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
+    if (dialogType != NORMAL_DIALOG_SHOW_BUTTONS_7_8 && dialogType != NORMAL_DIALOG_SHOW_BUTTON_7) {
         message.payload.widget.id = DIALOG_BUTTON_7;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
+    if (dialogType != NORMAL_DIALOG_SHOW_BUTTONS_7_8) {
         message.payload.widget.id = DIALOG_BUTTON_8;
         pNormalDialogWindow->BroadcastMessage(message);
     }
@@ -8450,16 +8450,16 @@ DATA(0x004fcdf8) struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
       {-1, -1, -1, -1, -1, -1, -1, -1, -1}}}
 };
 DATA(0x004fd404) H2_ENUM_STORAGE(CombatCastleHex, u8) iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {
-    COMBAT_CASTLE_HEX_TOP_TOWER,
-    COMBAT_CASTLE_HEX_SECOND_TOWER,
-    COMBAT_CASTLE_HEX_THIRD_TOWER,
-    COMBAT_CASTLE_HEX_BOTTOM_TOWER
-};
-DATA(0x004fd408) H2_ENUM_STORAGE(CombatCastleHex, u8) iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
     COMBAT_CASTLE_HEX_TOP_WALL,
     COMBAT_CASTLE_HEX_SECOND_WALL,
     COMBAT_CASTLE_HEX_THIRD_WALL,
     COMBAT_CASTLE_HEX_BOTTOM_WALL
+};
+DATA(0x004fd408) H2_ENUM_STORAGE(CombatCastleHex, u8) iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
+    COMBAT_CASTLE_HEX_TOP_TOWER,
+    COMBAT_CASTLE_HEX_SECOND_TOWER,
+    COMBAT_CASTLE_HEX_THIRD_TOWER,
+    COMBAT_CASTLE_HEX_BOTTOM_TOWER
 };
 DATA(0x004fd40c) u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
     {{468, 58}, {421, 128}, {417, 291}, {498, 402}};

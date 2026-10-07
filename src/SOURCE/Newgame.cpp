@@ -1090,9 +1090,9 @@ VA(0x0047734a, 0xdd1)
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
-                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
+                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_BUTTON_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_COUNT) - 1)
+                                <= NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
                             && message.payload.widget.id
                                    <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
@@ -1184,13 +1184,13 @@ VA(0x0047734a, 0xdd1)
 
                     case WIDGET_NOTIFY_SELECT:
                         switch (message.payload.widget.id) {
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
                                 currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_BUTTON_FIRST;
                                 goto setDifficulty;
 
                             case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):

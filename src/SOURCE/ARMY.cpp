@@ -1861,7 +1861,7 @@ i32 army::WalkTo(i32 destination) {
         if (moatFound) {
             canEnterMoat = false;
             if (moatIndex == ARMY_MOAT_GATE_INDEX
-                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
+                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_CLOSED) {
                 canEnterMoat = true;
             }
             if ((moatIndex > 0 && m_hex == moatCell[moatIndex - 1])

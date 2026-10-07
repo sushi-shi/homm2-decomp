@@ -569,13 +569,13 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
-        && (!HAS(gpTownManager->m_town->m_buildings, IDX(TOWN_BUILDING_CAPTAIN))
+        && (!HAS(gpTownManager->m_town->m_buildings, IDX(TOWN_BUILDING_STATUE))
             || !HAS(gpTownManager->m_town->m_buildings, IDX(RENDER_SORCERESS_LEFT_OPTION))))
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
-        && HAS(gpTownManager->m_town->m_buildings, IDX(TOWN_BUILDING_CAPTAIN))
+        && HAS(gpTownManager->m_town->m_buildings, IDX(TOWN_BUILDING_STATUE))
         && HAS(gpTownManager->m_town->m_buildings, IDX(RENDER_SORCERESS_LEFT_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
@@ -2586,7 +2586,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 #define unusedFirstDescription unusedFirstDescription_h
 #define unusedFirstIcon unusedFirstIcon_c
 #define unusedFirstSpell unusedFirstSpell_c
-#define unusedGuildFrame unusedGuildFrame_g
+#define guildFrame unusedGuildFrame_g
 #define unusedGuildIcon unusedGuildIcon_i
 #define unusedIconState unusedIconState_m
 #define unusedInvalid unusedInvalid_d
@@ -2609,7 +2609,7 @@ void townManager::SetupMage(heroWindow* window) {
     i32 slot;
     i32 spellState;
     i32 lineCount;
-    i32 unusedGuildFrame;
+    i32 guildFrame;
     i32 H2_UNUSED(unusedLocal);
 
     message.type = MESSAGE_WIDGET;
@@ -2691,10 +2691,10 @@ void townManager::SetupMage(heroWindow* window) {
         }
     }
 
-    unusedGuildFrame = m_town->m_mageGuildLevel - 1;
+    guildFrame = m_town->m_mageGuildLevel - 1;
     message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
-    message.payload.widget.data.value = unusedGuildFrame;
+    message.payload.widget.data.value = guildFrame;
     window->BroadcastMessage(message);
     sprintf(gText, "magegld%c.icn", cHeroTypeInitial[IDX(m_town->m_type)]);
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
@@ -2713,7 +2713,7 @@ void townManager::SetupMage(heroWindow* window) {
 #undef unusedFirstDescription
 #undef unusedFirstIcon
 #undef unusedFirstSpell
-#undef unusedGuildFrame
+#undef guildFrame
 #undef unusedGuildIcon
 #undef unusedIconState
 #undef unusedInvalid

@@ -184,7 +184,7 @@ public:
     i32 SetupPuzzlePieces(i32 player, i32 justCount);
     i32 IsMobile(i32 heroId);
     class fullMap* GetWorldMapData(void);
-    i32 CreateBoat(i32 x, i32 y, i32 notify);
+    i32 CreateBoat(i32 x, i32 y, i32 skipNotify);
     i32 Scan(i8* array, i32 start, i32 length);
     i32 RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
@@ -205,9 +205,9 @@ public:
         return m_players[player].m_color;
     }
     i32 GetMineId(i32 column, i32 row);
-    i32 SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat);
+    i32 SaveGame(H2_CONST char* filename, i32 generateName, i8 baseFormat);
     void SetupOrigData(void);
-    void LoadGame(H2_CONST char* filename, i32 loadFromFile, i32);
+    void LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32);
     void GiveTroopsToNeutralTown(i32 townId);
     void GiveTroopsToNeutralTowns(void);
     void NewMap(char* filename);
@@ -226,7 +226,7 @@ public:
         H2_ENUM_PARAM(CreatureType, i32) monsterType,
         i32 numTroops,
         class town* castle,
-        i32 disableUpgrade,
+        i32 disableDismiss,
         H2_ENUM_PARAM(ArmyFacing, i32) facing,
         i32 quickView,
         class hero* theHero,
@@ -282,17 +282,17 @@ public:
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
     void CheckHeroConsistency(void);
-    i32 TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave);
+    i32 TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave);
     i32 ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc, i32 remotePlayer);
     void DoNewTurn(void);
     i32 GetBoatsBuilt(void);
-    i32 GetNumThievesGuilds(i32 color);
+    i32 GetNumThievesGuilds(i32 player);
     i32 CalcDifficultyRating(void);
     void RestoreCell(
         i32 x,
         i32 y,
         H2_OPEN_CODE_PARAM(MapTriggerCode, i32) objectType,
-        i32 barrier,
+        i32 objectMetadata,
         class mapCell* passedCell,
         i32 unused
     );

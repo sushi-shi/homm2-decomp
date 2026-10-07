@@ -125,7 +125,7 @@ SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENTS_SIZE);
 i32 is_netbios_avail(void);
 extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions);
 extern "C" void __fastcall nb_term(void);
-extern "C" u16 __cdecl nb_rcv(i16 session, void* buffer);
+extern "C" u16 __cdecl nb_rcv(i16 maxLength, void* buffer);
 extern "C" u16 __cdecl nb_snd(i16 session, i16 length, void* data);
 extern "C" u16 __cdecl nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...);
 extern "C" char __cdecl nb_stat(i16 session);

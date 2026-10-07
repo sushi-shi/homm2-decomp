@@ -59,7 +59,7 @@ i32 searchArray::BuildPath(
 #define s_targetHasRoad s_targetWater_6
 #define s_currentHasRoad s_currentWater
 #define s_mapY s_mapY_9
-#define s_directionBlocked s_directionBlocked_i
+#define s_directionOpen s_directionBlocked_i
 #define s_neighborY sg_neighborY
 #define s_targetCell s1_targetCell
 #define s_directionCosts s2_directionCosts
@@ -105,7 +105,7 @@ void searchArray::SeedPosition(
     DATA(0x00533dc8) static i32 s_adjacentX;
     DATA(0x00533dd0) static searchNode s_currentNode;
     DATA(0x00533ddc) static i32 s_mapY;
-    DATA(0x00533de0) static b32 s_directionBlocked;
+    DATA(0x00533de0) static b32 s_directionOpen;
     DATA(0x00533de4) static i32 s_neighborY;
     DATA(0x00533de8) static mapCell* s_targetCell;
     DATA(0x00533dec) static i8 s_directionCosts[IDX(MAP_DIRECTION_COUNT)];
@@ -367,13 +367,13 @@ void searchArray::SeedPosition(
                                 {
                                     s_neighborCell =
                                         gpAdvManager->GetCell(s_adjacentX, s_candidateY);
-                                    s_directionBlocked = true;
+                                    s_directionOpen = true;
                                     if (((1 << IDX(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && CELL_HAS_NON_SHADOW_OBJECT(s_neighborCell)) {
-                                        s_directionBlocked = false;
+                                        s_directionOpen = false;
                                     }
 
-                                    if (s_directionBlocked
+                                    if (s_directionOpen
                                         && GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
                                                .visited
                                         && !(s_neighborCell->m_triggerType
@@ -425,7 +425,7 @@ void searchArray::SeedPosition(
 #undef s_targetHasRoad
 #undef s_currentHasRoad
 #undef s_mapY
-#undef s_directionBlocked
+#undef s_directionOpen
 #undef s_neighborY
 #undef s_targetCell
 #undef s_directionCosts

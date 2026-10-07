@@ -4075,9 +4075,9 @@ void combatManager::Earthquake(void) {
     }
 
     newKeepState = m_drawbridgeState;
-    if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN
+    if (m_drawbridgeState != COMBAT_CASTLE_GATE_DESTROYED
         && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
-        newKeepState = COMBAT_CASTLE_GATE_HIDDEN;
+        newKeepState = COMBAT_CASTLE_GATE_DESTROYED;
         impactPositions[impactCount][IDX(COORDINATE_AXIS_X)] = towerPos[0][IDX(COORDINATE_AXIS_X)];
         impactPositions[impactCount][IDX(COORDINATE_AXIS_Y)] =
             towerPos[0][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;

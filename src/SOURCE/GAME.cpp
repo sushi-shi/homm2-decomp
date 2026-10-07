@@ -547,8 +547,8 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELLS_WINDOW_Y               = 87,
     VIEW_SPELL_PREVIOUS_ID             = 2,
     VIEW_SPELL_NEXT_ID                 = 3,
-    VIEW_SPELL_COMBAT_TAB_ID           = 4,
-    VIEW_SPELL_ADVENTURE_TAB_ID        = 5,
+    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
+    VIEW_SPELL_COMBAT_TAB_ID           = 5,
     VIEW_SPELL_MANA_LABEL_ID           = 6,
     VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
     VIEW_SPELL_MANA_TENS_ID            = 8,
@@ -578,8 +578,8 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_MANA_DIGIT_BASE         = 10,
     VIEW_SPELL_HELP_PREVIOUS           = 0,
     VIEW_SPELL_HELP_NEXT               = 1,
-    VIEW_SPELL_HELP_COMBAT             = 2,
-    VIEW_SPELL_HELP_ADVENTURE          = 3,
+    VIEW_SPELL_HELP_ADVENTURE          = 2,
+    VIEW_SPELL_HELP_COMBAT             = 3,
     VIEW_SPELL_HELP_CLOSE              = 4,
     VIEW_SPELL_HELP_OTHER              = 5,
     VIEW_SPELL_HELP_MANA               = 8
@@ -764,11 +764,11 @@ i32 playerData::HasMobileHero(void) {
 #define index idx
 #endif
 VA(0x0044c5a6, 0x5a)
-i32 GetNumObelisks(i32 color) {
+i32 GetNumObelisks(i32 player) {
     i32 count = 0;
     i32 index;
     for (index = 0; index < GAME_OBELISK_VISITOR_COUNT; index++) {
-        if (gpGame->m_obeliskVisitors[index] & (1 << color))
+        if (gpGame->m_obeliskVisitors[index] & (1 << player))
             count++;
     }
     return count;
@@ -996,10 +996,10 @@ fullMap* game::GetWorldMapData(void) {
 #define boatIndex boatIdx
 #endif
 VA(0x0044cde3, 0x119)
-i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
+i32 game::CreateBoat(i32 x, i32 y, i32 skipNotify) {
     i32 boatIndex = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIndex != -1) {
-        if (notify == 0)
+        if (skipNotify == 0)
             SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
         m_boatSlots[boatIndex] = boatIndex;
         boatRecord* boat = &m_boats[boatIndex];
@@ -1172,7 +1172,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 #define workBuffer workBuf
 #endif
 VA(0x0044d3ae, 0xb5a)
-i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat) {
+i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 baseFormat) {
     i32 nHuman;
     i32 H2_UNUSED(saveFlag);
     char workBuffer[SAVE_LEGACY_SCRATCH_SIZE];
@@ -1191,7 +1191,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
-        expansionFormat = 1;
+        baseFormat = 1;
     gpAdvManager->DemobilizeCurrHero();
 
     if (generateName) {
@@ -1215,7 +1215,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
                 if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
                     nHuman++;
             }
-            if (xIsExpansionMap && !expansionFormat)
+            if (xIsExpansionMap && !baseFormat)
                 sprintf(genName, "%s.GX%d", filename, nHuman);
             else
                 sprintf(genName, "%s.GM%d", filename, nHuman);
@@ -1248,7 +1248,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
         FileError(savePath);
 
     oldTag = -1;
-    if (!expansionFormat)
+    if (!baseFormat)
         WRITE_FILE_VALUE(outFile, oldTag);
     WRITE_FILE_VALUE(outFile, m_worldMap.width);
     WRITE_FILE_VALUE(outFile, m_worldMap.height);
@@ -1273,7 +1273,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
         if (gbInCampaign)
             write(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
-    if (!expansionFormat)
+    if (!baseFormat)
         WRITE_FILE_VALUE(outFile, xIsExpansionMap);
 
     gpAdvManager->PurgeMapChangeQueue();
@@ -1300,14 +1300,14 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
 
     WRITE_FILE_VALUE(outFile, m_obeliskCount);
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
-        m_heroRecs[iFile].Write(outFile, !expansionFormat);
+        m_heroRecs[iFile].Write(outFile, !baseFormat);
     write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
     write(outFile, m_castleRecs, sizeof(m_castleRecs));
     write(outFile, m_townOwners, sizeof(m_townOwners));
     write(outFile, m_townBuiltToday, sizeof(m_townBuiltToday));
     write(outFile, m_mines, sizeof(m_mines));
     write(outFile, m_mineOwners, sizeof(m_mineOwners));
-    if (!expansionFormat)
+    if (!baseFormat)
         write(outFile, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
         write(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
@@ -1506,7 +1506,7 @@ void game::SetupOrigData(void) {
 #define playerBuffer plBuf
 #endif
 VA(0x0044e8d9, 0xa79)
-void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
+void game::LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
     i32 H2_UNUSED(oldFlag);
     char isHuman[GAME_PLAYER_COUNT];
@@ -1523,7 +1523,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (loadFromFile) {
+    if (originalDataOnly) {
         SetupOrigData();
         return;
     }
@@ -1532,7 +1532,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (originalDataOnly || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(pathBuffer, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(pathBuffer, "%s%s", gcGamePath, filename);
@@ -2274,21 +2274,24 @@ inline town* GetCastleSlot(game* instance, i32 index) {
 #define eventData eventData4
 #define extra extra9
 #define extraIndex extraIndex27
-#define eyeId eyeId13
-#define hutId hutId27
-#define jailId jailId8
+#define fortId jailId8
+#define gazeboId bottleId
 #define lowerIndexes lowerIndexes28
 #define lowerTileIndex j4
 #define lowerTilesets lowerTilesets5
 #define mapEvent mapEvent0
+#define mercenaryCampId tentId0
 #define mineId mineId6
+#define obeliskId shrineId8
 #define randomValue randomValue5
-#define shrineId shrineId8
-#define tentId tentId0
+#define standingStonesId hutId27
 #define townEntrance townEntrance2
+#define treeOfKnowledgeId eyeId13
 #define upperCount upperCount5
 #define upperIndexes upperIndexes8
 #define upperTilesets upperTilesets0
+#define witchDoctorId sphinxId
+#define xanaduId signId
 #define xPosition xPos
 #define yPosition yPos
 #endif
@@ -2299,14 +2302,14 @@ void game::RandomizeEvents(void) {
     i32 row;
     i32 xPosition;
     ArtifactType value;
-    i32 shrineId = 1;
-    i32 bottleId = 1;
-    i32 jailId = 1;
-    i32 sphinxId = 1;
-    i32 tentId = 1;
-    i32 hutId = 1;
-    i32 eyeId = 1;
-    i32 signId = 1;
+    i32 obeliskId = 1;
+    i32 gazeboId = 1;
+    i32 fortId = 1;
+    i32 witchDoctorId = 1;
+    i32 mercenaryCampId = 1;
+    i32 standingStonesId = 1;
+    i32 treeOfKnowledgeId = 1;
+    i32 xanaduId = 1;
     i32 lowerTileIndex;
     mapCell* cell;
     i32 yPosition;
@@ -2369,17 +2372,17 @@ void game::RandomizeEvents(void) {
                     m_mapEvents.count++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_GAZEBO):
-                    cell->m_objectMetadata = bottleId++;
+                    cell->m_objectMetadata = gazeboId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FORT):
-                    cell->m_objectMetadata = jailId++;
+                    cell->m_objectMetadata = fortId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_WITCH_DOCTOR_HUT):
-                    cell->m_objectMetadata = sphinxId;
-                    sphinxId++;
+                    cell->m_objectMetadata = witchDoctorId;
+                    witchDoctorId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MERCENARY_CAMP):
-                    cell->m_objectMetadata = tentId++;
+                    cell->m_objectMetadata = mercenaryCampId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_STANDING_STONES):
                     if (xPosition > 0
@@ -2388,16 +2391,16 @@ void game::RandomizeEvents(void) {
                         cell->m_objectMetadata =
                             m_worldMap.GetCell(xPosition - 1, yPosition)->m_objectMetadata;
                     else
-                        cell->m_objectMetadata = hutId++;
+                        cell->m_objectMetadata = standingStonesId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_XANADU):
-                    cell->m_objectMetadata = signId++;
+                    cell->m_objectMetadata = xanaduId++;
                     break;
                 case MAP_PASSIVE_TRIGGER(MAP_OBJECT_WHIRLPOOL):
                     cell->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_OBELISK):
-                    cell->m_objectMetadata = shrineId++;
+                    cell->m_objectMetadata = obeliskId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FLOTSAM):
                     cell->m_objectMetadata =
@@ -2566,7 +2569,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_OF_KNOWLEDGE):
                     cell->m_objectMetadata =
-                        eyeId++
+                        treeOfKnowledgeId++
                         | (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
                            << TREE_KNOWLEDGE_MODE_SHIFT);
                     break;
@@ -2952,21 +2955,24 @@ void game::RandomizeEvents(void) {
 #undef eventData
 #undef extra
 #undef extraIndex
-#undef eyeId
-#undef hutId
-#undef jailId
+#undef fortId
+#undef gazeboId
 #undef lowerIndexes
 #undef lowerTileIndex
 #undef lowerTilesets
 #undef mapEvent
+#undef mercenaryCampId
 #undef mineId
+#undef obeliskId
 #undef randomValue
-#undef shrineId
-#undef tentId
+#undef standingStonesId
 #undef townEntrance
+#undef treeOfKnowledgeId
 #undef upperCount
 #undef upperIndexes
 #undef upperTilesets
+#undef witchDoctorId
+#undef xanaduId
 #undef xPosition
 #undef yPosition
 #endif
@@ -3294,7 +3300,7 @@ game::ViewSpells(
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = static_cast<i16>(
                 spellType == SPELL_TYPE_COMBAT
-                ? VIEW_SPELL_COMBAT_TAB_ID : VIEW_SPELL_ADVENTURE_TAB_ID
+                ? VIEW_SPELL_ADVENTURE_TAB_ID : VIEW_SPELL_COMBAT_TAB_ID
             );
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
@@ -3483,12 +3489,12 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
+                        case VIEW_SPELL_ADVENTURE_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_ADVENTURE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_ADVENTURE_TAB_ID:
+                        case VIEW_SPELL_COMBAT_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_COMBAT;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
@@ -3546,15 +3552,15 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
-                                NORMAL_DIALOG_QUICK_VIEW
-                            );
-                            break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
+                                NORMAL_DIALOG_QUICK_VIEW
+                            );
+                            break;
+                        case VIEW_SPELL_COMBAT_TAB_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
@@ -3647,11 +3653,11 @@ MessageDispatchResult ViewSpecialHandler(tag_message& message) {
             case VIEW_SPELL_NEXT_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_NEXT]);
                 break;
-            case VIEW_SPELL_COMBAT_TAB_ID:
-                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
-                break;
             case VIEW_SPELL_ADVENTURE_TAB_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_ADVENTURE]);
+                break;
+            case VIEW_SPELL_COMBAT_TAB_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
                 break;
             case DIALOG_BUTTON_0:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_CLOSE]);
@@ -5400,8 +5406,8 @@ i32 game::GetRandomArtifactId(
 
         if (!HAS(gArtifactLevel[IDX(artifact)], levelMask))
             continue;
-        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
-            || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
+        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_83
+            || artifact == ARTIFACT_EDITOR_UNUSED_84 || artifact == ARTIFACT_EDITOR_UNUSED_85
             || artifact == ARTIFACT_SPELL_SCROLL)
             continue;
         if (xIsPlayingExpansionCampaign) {
@@ -5449,7 +5455,7 @@ void game::RandomizeHeroPool(void) {
         m_heroRecs[heroId].m_mobility = m_heroRecs[heroId].m_remainingMobility;
         m_heroRecs[heroId].m_randomSeed =
             Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX);
-        m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
+        m_heroRecs[heroId].m_lastWisdomOfferLevel = HERO_INITIAL_LEVEL;
 
         if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[IDX(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
@@ -7457,11 +7463,11 @@ i32 game::GetBoatsBuilt(void) {
 #define count num
 #endif
 VA(0x0045ee47, 0x7f)
-i32 game::GetNumThievesGuilds(i32 color) {
+i32 game::GetNumThievesGuilds(i32 player) {
     i32 count = 0;
     i32 i;
-    for (i = 0; i < m_players[color].m_townCount; i++) {
-        if (HAS(gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings,
+    for (i = 0; i < m_players[player].m_townCount; i++) {
+        if (HAS(gpGame->m_castleRecs[m_players[player].m_townIds[i]].m_buildings,
                 IDX(TOWN_BUILDING_THIEVES_GUILD)))
             count++;
     }
@@ -7546,7 +7552,7 @@ void game::RestoreCell(
     i32 x,
     i32 y,
     H2_OPEN_CODE_PARAM(MapTriggerCode, i32) objectType,
-    i32 barrier,
+    i32 objectMetadata,
     mapCell* passedCell,
     i32 H2_UNUSED(unused)
 ) {
@@ -7562,7 +7568,7 @@ void game::RestoreCell(
         return;
     }
     cell->m_triggerType = objectType;
-    cell->m_objectMetadata = barrier;
+    cell->m_objectMetadata = objectMetadata;
 }
 #if H2_RETAIL_COMPILER
 #undef unused

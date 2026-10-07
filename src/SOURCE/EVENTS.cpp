@@ -7219,7 +7219,7 @@ void advManager::PlayerMonsterInteract(
     i32* removeMonsterObject,
     i32 x,
     i32 y,
-    i32 unused,
+    i32 defender,
     i32 combatX,
     i32 combatY
 ) {
@@ -7232,7 +7232,7 @@ void advManager::PlayerMonsterInteract(
     char monsterText[MONSTER_OFFER_BUFFER_SIZE];
     i32 numJoining;
 
-    unused = 0;
+    defender = 0;
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
@@ -7449,7 +7449,7 @@ fightMonsters:
         combatCell,
         x,
         y,
-        unused,
+        defender,
         combatX,
         combatY,
         CREATURE_NONE,

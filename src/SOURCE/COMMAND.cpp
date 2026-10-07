@@ -1215,7 +1215,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
             }
             break;
-        case COMBAT_GRID_LEFT_SPECIAL_HEX:
+        case COMBAT_GRID_LEFT_HERO_HEX:
             if (m_heroes[0] != NULL) {
                 if (m_currentSide == COMBAT_ATTACKER_SIDE)
                     command = COMBAT_MESSAGE_COMMAND_OPTIONS;
@@ -1341,7 +1341,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 ResetMouse();
             }
             return 0;
-        case COMBAT_GRID_LEFT_SPECIAL_HEX:
+        case COMBAT_GRID_LEFT_HERO_HEX:
             if (m_heroes[0] != NULL) {
                 ViewGeneral(COMBAT_ATTACKER_SIDE, 0, 1);
                 ResetMouse();

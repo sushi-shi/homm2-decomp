@@ -474,7 +474,7 @@ DATA(0x00530c10) searchArray SVSearchArray;
 #define index idx
 #endif
 VA(0x0047e1ef, 0x187)
-void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
+void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
     i32 index;
     i32 node;
 
@@ -482,7 +482,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
         return;
     for (node = 0; node < MAP_WIDTH; node++) {
         for (index = 0; index < MAP_HEIGHT; index++) {
-            if (resetAll != 0) {
+            if (nearbyOnly != 0) {
                 if (MANHATTAN_LENGTH(x - node, y - index) < NEARBY_RADIUS)
                     *(gaiHeroStrategicRVOfPos + node + index * MAP_WIDTH) = IDX(RV_UNSET);
             } else {
@@ -493,7 +493,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     }
     *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) = IDX(RV_UNSET);
     for (node = 0; node < GAME_HERO_COUNT; node++) {
-        if (resetAll == 0
+        if (nearbyOnly == 0
             || MANHATTAN_LENGTH(x - gpGame->m_heroRecs[node].m_x, y - gpGame->m_heroRecs[node].m_x)
                    < NEARBY_RADIUS)
             gaiHeroLiveChance[node] = IDX(RV_UNSET);

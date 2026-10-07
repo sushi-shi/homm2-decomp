@@ -115,7 +115,6 @@ H2_ENUM_BEGIN(GameRandomHeroConstant)
     RANDOM_HERO_EXPERIENCE_BASE           = 40,
     RANDOM_HERO_SEED_MIN                  = 1,
     RANDOM_HERO_SEED_MAX                  = 255,
-    RANDOM_HERO_ENABLED                   = 1,
     RANDOM_HERO_STARTING_SPELL_KNOWN      = 1,
     RANDOM_HERO_FIRST_STACK_CHANCE        = 50,
     RANDOM_HERO_FIRST_STACK_BONUS_CHANCE  = 30,
@@ -136,7 +135,7 @@ H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_DIALOG_TYPE         = 9
 H2_ENUM_END(GameWaitConstant)
 
-i32 GetNumObelisks(i32 color);
+i32 GetNumObelisks(i32 player);
 void ComputeUALoc(i32 playerIndex);
 void GenerateStandardFileName(char* source, char* destination);
 MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
