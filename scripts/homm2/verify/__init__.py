@@ -60,12 +60,12 @@ GATES = {
                             "source VA spans and private identities in the objects"),
     "annotated-sources": ([PY, "-m", "homm2.retail_labels.annotated_functions", "--check"],
                           "source VA spans and private identities"),
-    # Staged: they run in every build and report, but carry findings that
-    # predate their enforcement (docs/match-provenance-audit.md).
-    "defs-declared": ([PY, "-m", "homm2.verify.defs_declared"],
-                      "every free function is declared in its owner header"),
     "reloc-identities": ([PY, "-m", "homm2.verify.assert_relocs"],
                          "unordered relocation identities of near-exact functions"),
+    # Staged: it runs in every build and reports, but carries findings that
+    # predate its enforcement (docs/match-provenance-audit.md).
+    "defs-declared": ([PY, "-m", "homm2.verify.defs_declared"],
+                      "every free function is declared in its owner header"),
     # Outside the build and the tier: known findings or reports.
     "text-coverage": ([PY, "-m", "homm2.verify.text_coverage"],
                       "every .text byte is claimed, padding or reviewed"),
@@ -87,10 +87,11 @@ GATES = {
 #: runs before configuring). A score is not evidence that declarations, data
 #: owners or relocations are sound.
 BUILD_GATES = ("annotated-functions", "decls", "no-fake-labels", "globals-data",
-               "globals-defined", "vtables", "assert-relocs", "fixed-width-ints")
+               "globals-defined", "vtables", "assert-relocs", "reloc-identities",
+               "fixed-width-ints")
 #: Run by every build; a failure is reported, not fatal, until its recorded
 #: findings are resolved.
-STAGED = ("defs-declared", "reloc-identities")
+STAGED = ("defs-declared",)
 #: Added by `homm2 build verify`, in run order.
 TIER = ("check", "link-diff", "behaviour", "localization", "strict-allocations",
         "reloc-fields", "text-coverage", "constants", "usage")

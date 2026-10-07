@@ -10,31 +10,17 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-DATA(0x0051f550) u8 gMusicFeatureEnabled = 1;
-
-VA(0x004c5770, 0xa)
-u8 GetMusicFlagA(void) {
-    return gMusicFlagA;
-}
-
-VA(0x004c5780, 0x32)
-u8 MusicFlagsActive(void) {
-    b32 active;
-    if (gMusicFeatureEnabled && gMusicFlagB)
-        active = true;
-    else
-        active = false;
-    return active;
-}
-
-VA(0x004c57c0, 0xa)
-u8 GetMusicFlagB(void) {
-    return gMusicFlagB;
-}
-
 H2_ENUM_BEGIN(MidiSequenceStatus)
     SEQUENCE_PLAYING = 4
 H2_ENUM_END(MidiSequenceStatus)
+
+#ifdef HOMM2_EDITOR
+// The editor's BASE library compiled the music flags as Midi's prefix; the
+// game's links them as their own object (docs/editor.md, Link). Included
+// after Midi's first declaration so /YX does not take them into the
+// automatic precompiled header, whose bodies VC6 emits at the object's end.
+#include "MusicFlags.cpp"
+#endif
 
 H2_ENUM_BEGIN(MidiVolumeConstant)
     VOLUME_HIGH_RANGE = 6,

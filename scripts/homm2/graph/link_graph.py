@@ -83,18 +83,6 @@ def emit_link_graph(w, units: list[dict], objs: list[str],
     # Every archive member is an untouched compiler or assembler output.
     midi_index = base_objects.index("build/objdiff/base/BASE/Midi.obj")
     prefix_libraries = [("build/link/BASE-prefix.lib", base_objects[:midi_index])]
-    if any(obj in base_objects for obj in (
-            "build/objdiff/base/BASE/Misc.obj", "build/objdiff/base/BASE/MiscRuntime.obj")):
-        misc_index = base_objects.index("build/objdiff/base/BASE/Misc.obj")
-        misc_runtime_index = base_objects.index("build/objdiff/base/BASE/MiscRuntime.obj")
-        if misc_runtime_index != misc_index + 1 or misc_runtime_index >= midi_index:
-            raise ValueError("Misc and MiscRuntime must be adjacent before Midi")
-        prefix_libraries = [
-            ("build/link/BASE-prefix.lib", base_objects[:misc_index]),
-            ("build/link/Misc.lib", base_objects[misc_index:misc_index + 1]),
-            ("build/link/MiscRuntime.lib", base_objects[misc_runtime_index:misc_runtime_index + 1]),
-            ("build/link/BASE-middle.lib", base_objects[misc_runtime_index + 1:midi_index]),
-        ]
     base_libraries = []
     for library, members in (
             *prefix_libraries,
@@ -180,11 +168,9 @@ IMAGE_LINK_LIBRARIES = {
 #: archive. LINK resolves one library at a time, pulling members in the order
 #: of the undefined-symbol list (first reference, appended as members are
 #: pulled), so a member's archive decides whether an earlier-referenced member
-#: of a later archive can precede it. In the editor MiscRuntime, though first
-#: referenced (GetIconEntry) before any Misc symbol, links after Misc: as in
-#: the game's archives, it opens the archive after Misc's.
-IMAGE_ARCHIVE_CUTS = {
-    "editor": ("BASE/MiscRuntime",),
+#: of a later archive can precede it. The editor's BASE library is one archive.
+IMAGE_ARCHIVE_CUTS: dict[str, tuple[str, ...]] = {
+    "editor": (),
 }
 
 

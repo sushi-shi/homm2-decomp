@@ -21,7 +21,6 @@ include/BASE/Midi.h	pending
 include/BASE/Misc.h	pending	
 include/BASE/MiscEnums.h	pending	
 include/BASE/MiscGraphicsConstants.h	pending	
-include/BASE/MiscState.h	pending	
 include/BASE/MusicFlags.h	pending	
 include/BASE/Ripple.h	pending	
 include/BASE/TILE.h	pending	
@@ -179,7 +178,7 @@ src/BASE/MOUSEMGR.cpp	pending
 src/BASE/Midi.cpp	pending	
 src/BASE/MilesSound.cpp	pending	
 src/BASE/Misc.cpp	pending	
-src/BASE/MiscRuntime.cpp	pending	
+src/BASE/MusicFlags.cpp	pending	
 src/BASE/PALETTE.cpp	pending	
 src/BASE/RESMGR.cpp	pending	
 src/BASE/RESOURCE.cpp	pending	

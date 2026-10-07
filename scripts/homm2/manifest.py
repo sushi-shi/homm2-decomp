@@ -122,8 +122,15 @@ def unit_flags(unit: dict, manifest: dict | None = None,
     library also used VC6's automatic precompiled headers (/YX): header-inline
     functions and a header class's deleting destructor are then emitted at the
     end of the object, which is the retail DIMMER and AudiereEffects order.
-    /YX is byte-neutral for every other unit (measured on all C++ units). That
-    tier rule lives here and nowhere else.
+    /YX is byte-neutral for every other unit (measured on all C++ units).
+
+    The scenario editor's own sources (the EDITOR tier, compiled for the
+    editor) used /Ob2. At /Od it changes no code in any unit; it moves the
+    string literal of a file-scope initializer from ahead of every function
+    literal to its lexical place among them, while the initialized object
+    stays among the globals - retail EDITMGR's gMapCodeLetters text sits at
+    MakeMapCode's place (docs/patterns/ob2-places-initializer-literals-lexically.md).
+    These tier rules live here and nowhere else.
     """
     manifest = manifest if manifest is not None else load()
     profiles = flag_profiles(manifest)
@@ -132,6 +139,8 @@ def unit_flags(unit: dict, manifest: dict | None = None,
     flags = list(profiles[profile])
     if unit["unit"].startswith("BASE/"):
         flags.extend(("/Gy", "/YX"))
+    if key == "editor" and unit["unit"].startswith("EDITOR/"):
+        flags = ["/Ob2" if flag == "/Ob1" else flag for flag in flags]
     return flags + image_defines(key, manifest)
 
 

@@ -1,6 +1,7 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <BASE/dialog.h>
+#include <BASE/display.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -11,7 +12,6 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
-#include <BASE/MiscState.h>
 
 #define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
 #include <BASE/MiscEnums.h>
@@ -150,7 +150,7 @@ H2_ENUM_END(FileIdHashConstant)
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
-#include <SOURCE/KBDeclarations.h>
+#include <SOURCE/KB.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
@@ -164,26 +164,21 @@ H2_ENUM_END(FileIdHashConstant)
 #include <string.h>
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/MiscGraphicsConstants.h>
 
 DATA(0x00536088) static i32 giFindMid = 0;
 DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime =
     ENTRY_PHASE_IMMEDIATE;
 DATA(0x00536090) i32 inBoxY = 0;
 DATA(0x00536094) i32 inBoxX = 0;
-DATA(0x00536098) i32 gBlitBottom = 0;
-DATA(0x0053609c) i32 gBlitRight = 0;
+DATA(0x00536098) static i32 gBlitBottom = 0;
+DATA(0x0053609c) static i32 gBlitRight = 0;
 DATA(0x005360a0) class heroWindow* DataEntryWin = NULL;
 DATA(0x005360a4) char* cDEDest = NULL;
 DATA(0x005360a8) i32 iDEMaxLen = 0;
 DATA(0x005360ac) i32 iMemEntries = 0;
 DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
 DATA(0x005360b4) i32 giTotalMemAllocated = 0;
-DATA(0x0051e5dc) H2_CONST char* gcCDTrackName = gcCDTrackNameText;
-DATA(0x0051e5e0) u8
-    giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
-        {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
-DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 H2_ENUM_BEGIN(StatusBarLayout)
     STATUS_BAR_Y       = 460,
@@ -194,7 +189,7 @@ H2_ENUM_END(StatusBarLayout)
 
 VA(0x004bd4b0, 0x75)
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries);
+    LogInt("IME", iMemEntries);
     gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
     for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
@@ -1476,3 +1471,810 @@ i32 IsCDDrive(i32 driveIndex) {
     gText[0] += driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
+
+// The CD audio track path, the music state and the random seed are defined
+// here, after the memory, preference and CD-drive helpers: with /Ob2 the
+// track path's text is emitted at this place among the function literals.
+DATA(0x0051e5dc) static H2_CONST char* gcCDTrackName = "\\Tracks2\\02-AudioTrack 02.ogg";
+DATA(0x0051e5e0) u8
+    giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
+        {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
+DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
+
+VA(0x004bf2f0, 0x7b)
+bool DriveSupportsFreeSpaceQuery(char driveLetter) {
+    UINT oldMode;
+    char szPath[CD_DRIVE_QUERY_PATH_SIZE];
+    ULARGE_INTEGER availToCaller;
+    ULARGE_INTEGER total;
+    ULARGE_INTEGER freeBytes;
+
+    wsprintfA(szPath, "%c:", driveLetter);
+    oldMode = SetErrorMode(SEM_FAILCRITICALERRORS);
+    if (GetDiskFreeSpaceExA(szPath, &availToCaller, &total, &freeBytes) != 0) {
+        SetErrorMode(oldMode);
+        return true;
+    } else {
+        SetErrorMode(oldMode);
+        return false;
+    }
+}
+
+#if H2_RETAIL_COMPILER
+#define count num
+#endif
+VA(0x004bf370, 0x35f)
+H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
+    u32l H2_UNUSED(dwErr);
+    u32l drives;
+    i32 i;
+    i32 handle;
+    i32 j;
+    i32 cdrom[CD_DRIVE_SLOT_COUNT];
+    char buffer[CD_READ_BUFFER_SIZE];
+    i32 status;
+    i32 count;
+    HKEY hKey;
+    char szKey[CD_PATH_BUFFER_SIZE];
+
+    sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
+    handle = open(gText, _O_BINARY);
+    if (handle == -1) {
+        if (_chdir(gcRegAppPath) == -1)
+            return CD_ROM_GAME_DIRECTORY_MISSING;
+        handle = open(gText, _O_BINARY);
+        if (handle == -1)
+            return CD_ROM_DATA_FILES_MISSING;
+    }
+    close(handle);
+
+    drives = GetLogicalDrives();
+    memset(cdrom, 0, CD_DRIVE_SLOT_COUNT);
+    for (i = CD_FIRST_DRIVE_INDEX, j = 0; i < CD_DRIVE_SLOT_COUNT; ++i) {
+        if (drives & (1 << i)) {
+            if (IsCDDrive(i)) {
+                cdrom[j] = i;
+                ++j;
+            }
+        }
+    }
+    count = j;
+
+    if (strlen(gcRegCDRomPath) > 0 && gcRegCDRomPath[0] >= 'A' && gcRegCDRomPath[0] <= 'Z'
+        && DriveSupportsFreeSpaceQuery(gcRegCDRomPath[0])) {
+        sprintf(gText, "%s%s", gcRegCDRomPath, gcCDTrackName);
+        handle = open(gText, _O_BINARY);
+        if (handle != -1) {
+            close(handle);
+            return CD_ROM_READY;
+        }
+    }
+    if (count <= 0)
+        return CD_ROM_DRIVE_UNAVAILABLE;
+
+    for (i = 0; i < CD_RETRY_LIMIT; ++i) {
+        for (j = 0; j < count; ++j) {
+            if (DriveSupportsFreeSpaceQuery(cdrom[j] + 'A')) {
+                sprintf(gText, "%c:%s", cdrom[j] + 'A', gcCDTrackName);
+                handle = open(gText, _O_BINARY);
+                if (handle == -1)
+                    continue;
+                status = _lseek(handle, 0, SEEK_END);
+                if (status != -1) {
+                    status = _lseek(handle, -CD_PROBE_TRAILER_SIZE, SEEK_CUR);
+                    if (status != -1)
+                        status = read(handle, buffer, CD_PROBE_TRAILER_SIZE);
+                }
+                close(handle);
+                if (status != -1) {
+                    sprintf(gcRegCDRomPath, "%c:", cdrom[j] + 'A');
+                    strcpy(szKey, MISC_REGISTRY_KEY);
+                    hKey = NULL;
+                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_WRITE, &hKey) == 0) {
+                        RegSetValueExA(
+                            hKey,
+                            "HMM2POL CDDrive",
+                            0,
+                            REG_SZ,
+                            reinterpret_cast<u8*>(gcRegCDRomPath),
+                            strlen(gcRegCDRomPath) + 1
+                        );
+                        RegCloseKey(hKey);
+                    }
+                    return CD_ROM_READY;
+                }
+            }
+        }
+        Sleep(CD_RETRY_DELAY_MILLISECONDS);
+    }
+    return CD_ROM_EXPANSION_DISC_MISSING;
+}
+#if H2_RETAIL_COMPILER
+#undef count
+#endif
+
+#if H2_RETAIL_COMPILER
+#define image bmp
+#endif
+VA(0x004bf6d0, 0x2b)
+void BitmapToScreen(class bitmap* image) {
+    BlitBitmapToScreen(image, 0, 0, image->m_width, image->m_height, 0, 0);
+}
+#if H2_RETAIL_COMPILER
+#undef image
+#endif
+
+VA(0x004bf700, 0x5b)
+void SetPalette(i8* paletteData, i32 updateDisplay) {
+    memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
+    memcpy(
+        gCyclePal,
+        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * IDX(PALETTE_CHANNEL_COUNT),
+        sizeof(gCyclePal)
+    );
+    if (updateDisplay != 0)
+        UpdatePalette(gpBufferPalette->m_data);
+}
+
+#if H2_RETAIL_COMPILER
+#define image bmp
+#endif
+VA(0x004bf760, 0x36)
+void BlitBitmapToScreenNoMouseCheck(
+    class bitmap* image,
+    i32 sourceX,
+    i32 sourceY,
+    i32 width,
+    i32 height,
+    i32 destinationX,
+    i32 destinationY
+) {
+    BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
+}
+#if H2_RETAIL_COMPILER
+#undef image
+#endif
+
+#if H2_RETAIL_COMPILER
+#define image bmp
+#endif
+VA(0x004bf7a0, 0x1e4)
+void BlitBitmapToScreen(
+    class bitmap* image,
+    i32 sourceX,
+    i32 sourceY,
+    i32 width,
+    i32 height,
+    i32 destinationX,
+    i32 destinationY
+) {
+    if (gbColorMice == 0) {
+        BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
+        return;
+    }
+    if (giScrollX != 0 || giScrollY != 0) {
+        sourceX = giScrollX + BLIT_SCROLL_OFFSET;
+        width = BLIT_SCROLL_EXTENT;
+        sourceY = giScrollY + BLIT_SCROLL_OFFSET;
+        height = BLIT_SCROLL_EXTENT;
+    }
+    gBlitRight = destinationX + width - 1;
+    gBlitBottom = destinationY + height - 1;
+    if (gpMouseManager->IsVis() == 0 || gBlitRight < gpMouseManager->m_savedLeft
+        || destinationX > gpMouseManager->m_cursorRight
+        || gBlitBottom < gpMouseManager->m_savedTop
+        || destinationY > gpMouseManager->m_cursorBottom) {
+        BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
+    } else {
+        gpMouseManager->SaveAndDraw();
+        BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
+        if (gBlitRight < gpMouseManager->m_cursorRight
+            || destinationX > gpMouseManager->m_savedLeft
+            || gBlitBottom < gpMouseManager->m_cursorBottom
+            || destinationY > gpMouseManager->m_savedTop) {
+            BlitBitmapToScreenVesa(
+                image,
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop,
+                gpMouseManager->m_cursorRight - gpMouseManager->m_savedLeft + 1,
+                gpMouseManager->m_cursorBottom - gpMouseManager->m_savedTop + 1,
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop
+            );
+        }
+        gpMouseManager->RestoreUnderlying();
+    }
+}
+#if H2_RETAIL_COMPILER
+#undef image
+#endif
+VA(0x004bf990, 0x91)
+void LogTruncate(void) {
+    char logText[TEXT_BUFFER_SIZE];
+    i32 fileHandle;
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+    fileHandle = open("KB.LOG", _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
+    if (fileHandle == -1)
+        return;
+    strcpy(logText, "===========New Log==========");
+    strcat(logText, "\n");
+    write(fileHandle, logText, strlen(logText));
+    close(fileHandle);
+}
+
+
+VA(0x004bfa30, 0x9a)
+void LogStr(H2_CONST char* text) {
+    char logText[TEXT_BUFFER_SIZE];
+    FILE* out;
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+    out = fopen("KB.LOG", "at+");
+    if (out == NULL)
+        return;
+    strcpy(logText, text);
+    strcat(logText, "\n");
+    fputs(logText, out);
+    fclose(out);
+    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
+        OutputDebugStringA(logText);
+}
+
+VA(0x004bfad0, 0x1b6)
+void LogInt(
+    H2_CONST char* label,
+    i32 value1,
+    i32 value2,
+    i32 value3,
+    i32 value4,
+    i32 value5,
+    i32 value6,
+    i32 value7
+) {
+    char text[FORMAT_BUFFER_SIZE];
+    if (value7 != LOG_UNUSED_VALUE)
+        sprintf(
+            text,
+            "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d",
+            label,
+            value1,
+            value2,
+            value3,
+            value4,
+            value5,
+            value6,
+            value7
+        );
+    else if (value6 != LOG_UNUSED_VALUE)
+        sprintf(
+            text,
+            "%s : % 8d % 8d % 8d % 8d % 8d % 8d",
+            label,
+            value1,
+            value2,
+            value3,
+            value4,
+            value5,
+            value6
+        );
+    else if (value5 != LOG_UNUSED_VALUE)
+        sprintf(
+            text,
+            "%s : % 8d % 8d % 8d % 8d % 8d",
+            label,
+            value1,
+            value2,
+            value3,
+            value4,
+            value5
+        );
+    else if (value4 != LOG_UNUSED_VALUE)
+        sprintf(text, "%s : % 8d % 8d % 8d % 8d", label, value1, value2, value3, value4);
+    else if (value3 != LOG_UNUSED_VALUE)
+        sprintf(text, "%s : % 8d % 8d % 8d", label, value1, value2, value3);
+    else if (value2 != LOG_UNUSED_VALUE)
+        sprintf(text, "%s : % 8d % 8d", label, value1, value2);
+    else
+        sprintf(text, "%s : % 8d", label, value1);
+    LogStr(text);
+}
+
+VA(0x004bfc90, 0x76)
+void AiPrint(H2_CONST char* text) {
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+
+    FillBitmapArea(
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, LOGICAL_SCREEN_WIDTH, STATUS_BAR_HEIGHT, 0
+    );
+    smallFont->DrawBoundedString(
+        text,
+        0,
+        STATUS_TEXT_Y,
+        LOGICAL_SCREEN_WIDTH,
+        STATUS_TEXT_HEIGHT,
+        FONT_DRAW_DEFAULT,
+        FONT_ALIGN_LEFT
+    );
+    BlitBitmapToScreen(
+        gpWindowManager->m_screen,
+        0,
+        STATUS_BAR_Y,
+        LOGICAL_SCREEN_WIDTH,
+        STATUS_BAR_HEIGHT,
+        0,
+        STATUS_BAR_Y
+    );
+}
+
+VA(0x004bfd10, 0x30)
+void AbsAiPrint(H2_CONST char* text) {
+    i32 saved = giDebugLevel;
+    giDebugLevel = FORCED_DEBUG_LEVEL;
+    AiPrint(text);
+    giDebugLevel = saved;
+}
+
+#if H2_RETAIL_COMPILER
+#define destinationPalette to
+#define index idx
+#endif
+VA(0x004bfd40, 0x19c)
+void FadeTo(u8* source, u8* destination, i32 increment) {
+    u8 temp[PALETTE_DATA_SIZE];
+    u8 *current, *destinationPalette;
+    i32 index, change, diff, move, H2_UNUSED(delay), iLevel, nextTime, k;
+
+    delay = FADE_TO_FRAME_DELAY;
+    memcpy(temp, source, PALETTE_DATA_SIZE);
+    increment >>= FADE_TO_INCREMENT_SHIFT;
+    if (increment < 1) {
+        increment = 1;
+        delay *= WINDOWED_FADE_INCREMENT_SCALE;
+    }
+    for (iLevel = FADE_TO_START_LEVEL; iLevel < PALETTE_LEVEL_COUNT; iLevel += increment) {
+        nextTime = KBTickCount() + FADE_TO_FRAME_DELAY;
+        PollSound();
+        index = PALETTE_LEVEL_COUNT - iLevel - increment;
+        if (index < 0)
+            index = 0;
+        change = giChangeThreshold[index];
+        current = temp;
+        destinationPalette = destination;
+        for (k = 0; k < PALETTE_DATA_SIZE; ++k) {
+            diff = *destinationPalette - *current;
+            if (abs(diff) > change) {
+                move = abs(diff) - change;
+                if (diff > 0)
+                    *current = *current + move;
+                else
+                    *current = *current - move;
+            }
+            ++current;
+            ++destinationPalette;
+        }
+        UpdatePalette(reinterpret_cast<i8*>(temp));
+        DelayTil(&nextTime);
+    }
+    UpdatePalette(reinterpret_cast<i8*>(destination));
+}
+#if H2_RETAIL_COMPILER
+#undef destinationPalette
+#undef index
+#endif
+
+#if H2_RETAIL_COMPILER
+#define currentColorTable p
+#define paletteData pal
+#endif
+VA(0x004bfee0, 0x163)
+void FadeToColorTable(u8* colorTable, i32 increment) {
+    u8* currentColorTable;
+    i32 x;
+    i32 i;
+    i32 y;
+    u8 tempPal[PALETTE_DATA_SIZE];
+    i8* paletteData;
+    i32 savedFlags;
+
+    savedFlags = gpWindowManager->m_updateFlags;
+    gpWindowManager->m_updateFlags = 0;
+    paletteData = gpBufferPalette->m_data;
+    for (i = 0; i < IDX(PALETTE_DATA_SIZE) / IDX(PALETTE_CHANNEL_COUNT); ++i) {
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_GREEN)];
+        tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)] =
+            paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)];
+    }
+    FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
+    currentColorTable = gpWindowManager->m_screen->m_pixels;
+    for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
+            *currentColorTable = colorTable[*currentColorTable];
+            ++currentColorTable;
+        }
+    }
+    gpWindowManager->UpdateScreen();
+    UpdatePalette(paletteData);
+    gpWindowManager->m_updateFlags = savedFlags;
+}
+#if H2_RETAIL_COMPILER
+#undef currentColorTable
+#undef paletteData
+#endif
+
+VA(0x004c0050, 0x44)
+i32 IsCycleColor(i32 color) {
+    return (color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
+        || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
+}
+
+#if H2_RETAIL_COMPILER
+#define encodedLength iLen
+#define endPosition endPos
+#define fileDescriptor fd
+#define rowPointer rowPtr
+#endif
+VA(0x004c00a0, 0x2a9)
+void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
+    i32 fileDescriptor;
+    i32 encodedLength;
+    u8 bMark;
+    u8 color;
+    i32 sourceIndex;
+    i32 x;
+    i32 y;
+    i32 endPosition;
+    u8* rowPointer;
+    u8* encodedRow;
+    PCXHeader pcxHdr;
+    u8* palOut;
+    i32 runLength;
+
+    memset(&pcxHdr, 0, sizeof(pcxHdr));
+    pcxHdr.manufacturer = MANUFACTURER_ZSOFT;
+    pcxHdr.version = VERSION_3_0;
+    pcxHdr.encoding = ENCODING_RLE;
+    pcxHdr.bitsPerPixel = BITS_PER_PIXEL;
+    pcxHdr.xMax = static_cast<u16>(width - 1);
+    pcxHdr.yMax = static_cast<u16>(height - 1);
+    pcxHdr.planes = PLANE_COUNT;
+    pcxHdr.bytesPerLine = static_cast<u16>(width);
+    pcxHdr.paletteType = PALETTE_TYPE_COLOR;
+    fileDescriptor = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (fileDescriptor == -1)
+        return;
+    WRITE_FILE_VALUE(fileDescriptor, pcxHdr);
+    encodedRow = static_cast<u8*>(H2_ALLOC(width * 2));
+    for (y = 0; y < height; ++y) {
+        sourceIndex = 0;
+        rowPointer = pixels + y * width;
+        encodedLength = 0;
+        while (sourceIndex < width) {
+            color = *(rowPointer + sourceIndex);
+            endPosition = sourceIndex;
+            while (endPosition < width && *(rowPointer + endPosition) == color
+                   && endPosition - sourceIndex + 1 < RLE_RUN_LIMIT)
+                ++endPosition;
+            runLength = endPosition - sourceIndex;
+            if (runLength > 1 || (color & RLE_RUN_MARKER) == RLE_RUN_MARKER) {
+                *(encodedRow + encodedLength) = static_cast<u8>(runLength | RLE_RUN_MARKER);
+                *(encodedRow + encodedLength + 1) = color;
+                encodedLength += 2;
+                sourceIndex += runLength;
+            } else {
+                *(encodedRow + encodedLength) = color;
+                encodedLength += 1;
+                sourceIndex += 1;
+            }
+        }
+        write(fileDescriptor, encodedRow, encodedLength);
+    }
+    H2_FREE(encodedRow);
+    bMark = VGA_PALETTE_MARKER;
+    write(fileDescriptor, &bMark, 1);
+    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    for (x = 0; x < PALETTE_DATA_SIZE; ++x)
+        *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
+    write(fileDescriptor, palOut, PALETTE_DATA_SIZE);
+    H2_FREE(palOut);
+    close(fileDescriptor);
+}
+#if H2_RETAIL_COMPILER
+#undef encodedLength
+#undef endPosition
+#undef fileDescriptor
+#undef rowPointer
+#endif
+
+#if H2_RETAIL_COMPILER
+#define file f
+#define length lLen
+#endif
+VA(0x004c0350, 0x73)
+i32l FileSize(char* filename) {
+    FILE* file;
+    i32l length;
+
+    file = fopen(filename, "r+b");
+    if (file == NULL) {
+        if (file == NULL)
+            FileError(filename);
+    }
+    fseek(file, 0, SEEK_END);
+    length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    fclose(file);
+    return length;
+}
+#if H2_RETAIL_COMPILER
+#undef file
+#undef length
+#endif
+
+#if H2_RETAIL_COMPILER
+#define iconPointer iconPtr
+#endif
+VA(0x004c03d0, 0x1e)
+struct IconEntry* GetIconEntry(class icon* iconPointer, i32 index) {
+    return reinterpret_cast<struct IconEntry*>(index * sizeof(IconEntry) + iconPointer->m_data);
+}
+#if H2_RETAIL_COMPILER
+#undef iconPointer
+#endif
+VA(0x004c03f0, 0x72)
+i32 SRandom(i32 low, i32 high) {
+    if (high == low) {
+        return high;
+    }
+    if (high < low) {
+        return low;
+    }
+    SIncRandomize(low, high);
+    i32 result = SGenRand();
+    iLastSeed += low;
+    iLastSeed += high * RANDOM_HIGH_MIX_MULTIPLIER;
+    return result % (high - low + 1) + low;
+}
+
+VA(0x004c0470, 0x92)
+void SIncRandomize(i32 x, i32 y) {
+    x *= RANDOM_TERM_MULTIPLIER;
+    y *= RANDOM_TERM_MULTIPLIER;
+    x &= RANDOM_TERM_MASK;
+    y &= RANDOM_TERM_MASK;
+    iLastSeed += y << RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += x * RANDOM_LOW_TERM_MULTIPLIER;
+    iLastSeed += y;
+    i32 feedback = iLastSeed & RANDOM_FEEDBACK_MASK;
+    iLastSeed += feedback << RANDOM_FEEDBACK_SHIFT;
+}
+
+VA(0x004c0510, 0x1f)
+void SRand(i32 seed) {
+    iLastSeed = seed;
+    srand(seed);
+}
+
+#if H2_RETAIL_COMPILER
+#define result ret
+#endif
+VA(0x004c0530, 0x92)
+i32 SGenRand(void) {
+    i32 bitMask;
+    i32 result = 0;
+    iLastSeed &= RANDOM_SEED_MASK;
+    iLastSeed *= RANDOM_MIX_MULTIPLIER;
+    iLastSeed += (iLastSeed & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
+    for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
+        bitMask = 1 << i;
+        if (iLastSeed & bitMask) {
+            result |= 1 << i;
+        }
+    }
+    return result;
+}
+#if H2_RETAIL_COMPILER
+#undef result
+#endif
+
+VA(0x004c05d0, 0x10)
+i32 MemSize(i32) {
+    return REPORTED_MEMORY_KILOBYTES;
+}
+#if H2_RETAIL_COMPILER
+#define message msg
+#define textBuffer cBuf
+#define widgetId wId
+#endif
+VA(0x004c05e0, 0x464)
+void GetDataEntry(
+    H2_CONST char* prompt,
+    char* destination,
+    i32 maximumLength,
+    H2_CONST char* initialText,
+    i32 showCancel,
+    i32 useImmediateHandler
+) {
+    MouseCursorType savedCursorType;
+    i16 H2_UNUSED(widgetId);
+    i32 nRows;
+    char windowName[WINDOW_NAME_CAPACITY];
+    i32 entryY;
+    i32 nHeight;
+    i32 textLines;
+    char textBuffer[TEXT_BUFFER_CAPACITY];
+    textEntryWidget* pText;
+    tag_message message;
+    i32 nFrame;
+
+    widgetId = ENTRY_TEXT_WIDGET;
+    savedCursorType = gpMouseManager->m_cursorType;
+    nFrame = gpMouseManager->m_cursorFrame;
+    while (gpMouseManager->m_hideCount != 0)
+        gpMouseManager->ShowColorPointer();
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+
+    cDEDest = destination;
+    iDEMaxLen = maximumLength;
+    strcpy(
+        cDEDest,
+        ""
+    );
+
+    textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
+    nHeight = textLines * PROMPT_LINE_HEIGHT;
+    if (showCancel != 0)
+        nHeight += CANCEL_PROMPT_HEIGHT;
+    nHeight += ROW_TOP_MARGIN;
+    nRows = (nHeight - ROW_ROUNDING_BIAS) / ROW_HEIGHT;
+    if (nRows > MAX_ROW_COUNT)
+        nRows = MAX_ROW_COUNT;
+    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
+
+    sprintf(windowName, "evntwin%d.bin", nRows);
+    DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
+    if (DataEntryWin == NULL)
+        MemError();
+
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_PROMPT_WIDGET);
+    message.payload.widget.data.text = prompt;
+    DataEntryWin->BroadcastMessage(message);
+
+    if (initialText != NULL)
+        strcpy(textBuffer, initialText);
+    else
+        strcpy(
+            textBuffer,
+            ""
+        );
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
+    message.payload.widget.data.text = textBuffer;
+    DataEntryWin->BroadcastMessage(message);
+    strcpy(destination, textBuffer);
+
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    message.payload.widget.id = DIALOG_BUTTON_1;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_7;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_8;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_5;
+    DataEntryWin->BroadcastMessage(message);
+    message.payload.widget.id = DIALOG_BUTTON_6;
+    DataEntryWin->BroadcastMessage(message);
+    if (showCancel == 0) {
+        message.payload.widget.id = ENTRY_CANCEL_BUTTON;
+        DataEntryWin->BroadcastMessage(message);
+    }
+
+    pText = new textEntryWidget(
+        TEXT_FIELD_X,
+        static_cast<i16>(entryY),
+        TEXT_FIELD_WIDTH,
+        TEXT_FIELD_HEIGHT,
+        static_cast<i16>(maximumLength),
+        destination,
+        "bigfont.fnt",
+        FONT_DRAW_DARK_GRAY,
+        "buybuild.icn",
+        TEXT_FIELD_ICON_FRAME,
+        ENTRY_TEXT_WIDGET,
+        WIDGET_KIND_NONE,
+        TEXT_ENTRY_LAYOUT_INSET,
+        TEXT_FIELD_HORIZONTAL_INSET,
+        TEXT_FIELD_VERTICAL_INSET
+    );
+    if (pText == NULL)
+        MemError();
+    inBoxX = INPUT_BOX_X;
+    inBoxY = entryY + INPUT_BOX_Y_OFFSET;
+    DataEntryWin->AddWidget(pText, WIDGET_Z_ORDER);
+
+    if (useImmediateHandler != 0) {
+        bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
+        gbAllowTextEntryEscape = false;
+    } else
+        bDataEntryTime = ENTRY_PHASE_READY;
+    gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
+    delete DataEntryWin;
+    gpMouseManager->SetPointer(
+        "",
+        nFrame,
+        savedCursorType
+    );
+    gbAllowTextEntryEscape = true;
+}
+#if H2_RETAIL_COMPILER
+#undef message
+#undef textBuffer
+#undef widgetId
+#endif
+
+#if H2_RETAIL_COMPILER
+#define widgetId wId
+#endif
+VA(0x004c0a50, 0x1fa)
+MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
+    i16 H2_UNUSED(widgetId);
+
+    widgetId = ENTRY_TEXT_WIDGET;
+    if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
+        ++bDataEntryTime;
+        message.type = MESSAGE_LEFT_BUTTON_DOWN;
+        message.payload.mouse.x = inBoxX;
+        message.payload.mouse.y = inBoxY;
+        DataEntryWin->BroadcastMessage(message);
+        return MESSAGE_DISPATCH_CONSUME;
+    }
+
+    if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT) {
+        ++bDataEntryTime;
+        goto gotText;
+    }
+    if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
+            case WIDGET_NOTIFY_DESELECT:
+                switch (message.payload.widget.id) {
+                    case ENTRY_CANCEL_BUTTON:
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        return MESSAGE_DISPATCH_FORWARD;
+                }
+                break;
+            case WIDGET_NOTIFY_SELECT:
+                switch (message.payload.widget.id) {
+                    case ENTRY_TEXT_WIDGET:
+                    gotText:
+                        message.type = MESSAGE_WIDGET;
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
+                        DataEntryWin->BroadcastMessage(message);
+                        if (strlen(message.payload.widget.data.text) == 0)
+                            break;
+                        memset(cDEDest, 0, iDEMaxLen);
+                        strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
+                        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_TEXT_WIDGET);
+                        message.payload.widget.data.text = cDEDest;
+                        DataEntryWin->BroadcastMessage(message);
+                        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
+                        if (gbTextEntryEscaped != 0)
+                            break;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        return MESSAGE_DISPATCH_FORWARD;
+                }
+        }
+    }
+    return EventWindowHandler(message);
+}
+#if H2_RETAIL_COMPILER
+#undef widgetId
+#endif

@@ -63,9 +63,8 @@ runs with `TZ=UTC0` (`homm2.tool.wine`).
 ## Source and build evidence
 
 `native_link.py` and the Ninja link graph consume raw `build/objdiff/base`
-objects. Comparison-normalized objects never enter the link. The six project
-archives (`BASE-prefix.lib`, `Misc.lib`, `MiscRuntime.lib`, `BASE-middle.lib`,
-`Midi.lib`, `BASE-suffix.lib`) contain untouched
+objects. Comparison-normalized objects never enter the link. The three project
+archives (`BASE-prefix.lib`, `Midi.lib`, `BASE-suffix.lib`) contain untouched
 compiler/assembler outputs, in the reconstructed native archive order.
 
 The response scans SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock
