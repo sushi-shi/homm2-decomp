@@ -700,7 +700,7 @@ void AddMapRumour(void) {
         gEditManager->m_extras[gEditManager->m_extraCount] = newRumour;
         gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(rumourEventExtra);
         choice = static_cast<eventsManager*>(gEditManager->m_toolManager)
-                     ->EditRumor(gEditManager->m_extraCount);
+                     ->EditRumour(gEditManager->m_extraCount);
         if (choice != EVENTS_DIALOG_CANCEL) {
             gRumourExtras[gEditMapHeader.rumourCount] = gEditManager->m_extraCount;
             message.payload.widget.command = WIDGET_COMMAND_APPEND_ITEM;
@@ -738,7 +738,7 @@ void EditMapRumour(void) {
     index = message.payload.widget.data.value;
     if (index != -1) {
         dialogResult = static_cast<eventsManager*>(gEditManager->m_toolManager)
-                     ->EditRumor(gRumourExtras[index]);
+                     ->EditRumour(gRumourExtras[index]);
         if (dialogResult != EVENTS_DIALOG_CANCEL) {
             message.payload.widget.command = WIDGET_COMMAND_REPLACE_ITEM;
             message.payload.widget.id = SPEC_RUMOUR_LIST;

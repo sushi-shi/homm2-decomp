@@ -84,6 +84,6 @@ SIZE(TownExtra, TOWN_EDIT_RECORD_SIZE);
 extern TownExtra gTownEdit;
 extern H2_ENUM_STORAGE(BuildingSlotType, i32) gTownEditBuildings[TOWN_EDIT_BUILDING_COUNT];
 
-MessageDispatchResult TownEditHandler(struct tag_message& message);
+MessageDispatchResult EditTownHandler(struct tag_message& message);
 
 #endif

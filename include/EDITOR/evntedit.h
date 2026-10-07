@@ -49,6 +49,6 @@ H2_ENUM_END(EventEditConstant)
 extern EventExtra gEventEdit;
 extern char* gEventMessage;
 
-MessageDispatchResult EventEditHandler(struct tag_message& message);
+MessageDispatchResult EditEventHandler(struct tag_message& message);
 
 #endif

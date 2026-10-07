@@ -1,7 +1,8 @@
 // The sphinx editor: the event tool opens it for a sphinx and edits its
 // riddle, the accepted answers and the reward. The unit name comes from
 // its dialog resource (ridledit.bin); descriptive names: EditSphinx,
-// UpdateSphinx, gSphinx, gSphinxText.
+// gSphinx, gSphinxText. FillInSphinxEdit takes the name of the Price of
+// Loyalty editor's FillInEventEdit family.
 
 #include <va.h>
 #include <EDITOR/ridledit.h>
@@ -75,7 +76,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
         message.payload.widget.data.text = gSphinx.answers[i];
         gEditDialog->BroadcastMessage(message);
     }
-    UpdateSphinx(&gSphinx);
+    FillInSphinxEdit(&gSphinx);
     gpWindowManager->DoDialog(gEditDialog, EditSphinxHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
@@ -95,7 +96,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
 }
 
 VA(0x004251f8, 0x170)
-void eventsManager::UpdateSphinx(mapEventExtra* sphinx) {
+void eventsManager::FillInSphinxEdit(mapEventExtra* sphinx) {
     char text[SPHINX_RESOURCE_TEXT_SIZE];
     b32 dimmed;
     tag_message message;
@@ -233,7 +234,7 @@ MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
             break;
     }
     if (modified) {
-        static_cast<eventsManager*>(gEditManager->m_toolManager)->UpdateSphinx(&gSphinx);
+        static_cast<eventsManager*>(gEditManager->m_toolManager)->FillInSphinxEdit(&gSphinx);
         gEditDialog->DrawWindow();
     }
     return MESSAGE_DISPATCH_CONSUME;

@@ -117,7 +117,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
         }
     }
     FillInHeroEdit(&gHeroEdit);
-    gpWindowManager->DoDialog(gEditDialog, HeroEditHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditHeroHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         gEditManager->m_mapChanged = 1;
@@ -247,7 +247,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
 }
 
 VA(0x004149d3, 0x6ba)
-MessageDispatchResult HeroEditHandler(tag_message& message) {
+MessageDispatchResult EditHeroHandler(tag_message& message) {
     i32 number;
     b32 update;
 

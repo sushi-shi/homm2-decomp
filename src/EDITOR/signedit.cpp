@@ -1,6 +1,7 @@
 // The sign and bottle editor: the event tool opens it for a sign or a
 // bottle and edits its message in the rumour dialog. Descriptive names:
-// UpdateSign, EditSignHandler, gSign, gSignText.
+// EditSignHandler, gSign, gSignText; FillInSignEdit takes the name of the
+// Price of Loyalty editor's FillInEventEdit family.
 
 #include <va.h>
 #include <EDITOR/signedit.h>
@@ -54,7 +55,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     message.payload.widget.data.text = gText;
     message.payload.widget.id = SIGN_TITLE;
     gEditDialog->BroadcastMessage(message);
-    UpdateSign(&gSign);
+    FillInSignEdit(&gSign);
     gpWindowManager->DoDialog(gEditDialog, EditSignHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
@@ -76,7 +77,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
 }
 
 VA(0x0042647e, 0x3b)
-void eventsManager::UpdateSign(signEventExtra* sign) {
+void eventsManager::FillInSignEdit(signEventExtra* sign) {
     i32 unused;
     tag_message message;
 
@@ -126,7 +127,7 @@ MessageDispatchResult EditSignHandler(struct tag_message& message) {
             break;
     }
     if (modified) {
-        static_cast<eventsManager*>(gEditManager->m_toolManager)->UpdateSign(&gSign);
+        static_cast<eventsManager*>(gEditManager->m_toolManager)->FillInSignEdit(&gSign);
         gEditDialog->DrawWindow();
     }
     return MESSAGE_DISPATCH_CONSUME;

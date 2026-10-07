@@ -99,6 +99,6 @@ SIZE(HeroExtra, HERO_EDIT_RECORD_SIZE);
 extern HeroExtra gHeroEdit;
 extern b32 gEditJailedHero;
 
-MessageDispatchResult HeroEditHandler(struct tag_message& message);
+MessageDispatchResult EditHeroHandler(struct tag_message& message);
 
 #endif

@@ -73,7 +73,7 @@ i32 eventsManager::EditEvent(i32 extra) {
         gEditDialog->BroadcastMessage(message);
     }
     FillInEventEdit(&gEventEdit);
-    gpWindowManager->DoDialog(gEditDialog, EventEditHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditEventHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         byteCount = strlen(gEventMessage) + sizeof(EventExtra);
@@ -152,7 +152,7 @@ void eventsManager::FillInEventEdit(EventExtra* event) {
 }
 
 VA(0x00413aca, 0x447)
-MessageDispatchResult EventEditHandler(tag_message& message) {
+MessageDispatchResult EditEventHandler(tag_message& message) {
     tag_message query;
     // Never read: slots of the retail frame.
     i32 unused;

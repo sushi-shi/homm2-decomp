@@ -97,7 +97,7 @@ void eventsManager::EditTown(i32 x, i32 y) {
         gEditDialog->BroadcastMessage(msg);
     }
     FillInTownEdit(&gTownEdit);
-    gpWindowManager->DoDialog(gEditDialog, TownEditHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditTownHandler, 0);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         gEditManager->m_mapChanged = 1;
@@ -256,7 +256,7 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
 }
 
 VA(0x0042a930, 0x5c3)
-MessageDispatchResult TownEditHandler(tag_message& message) {
+MessageDispatchResult EditTownHandler(tag_message& message) {
     i32 building;
     i32 present;
     b32 update;

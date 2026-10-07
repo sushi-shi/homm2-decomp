@@ -183,13 +183,13 @@ public:
     void FillInTownEdit(struct TownExtra* town);
     // ridledit: the sphinx's riddle, answers and reward.
     i32 EditSphinx(i32 extra);
-    void UpdateSphinx(mapEventExtra* sphinx);
+    void FillInSphinxEdit(mapEventExtra* sphinx);
     // rumredit: one of the map's rumours.
-    i32 EditRumor(i32 extra);
-    void UpdateRumor(rumourEventExtra* rumor);
+    i32 EditRumour(i32 extra);
+    void FillInRumourEdit(rumourEventExtra* rumour);
     // signedit: a sign's or a bottle's message.
     void EditSign(i32 x, i32 y);
-    void UpdateSign(signEventExtra* sign);
+    void FillInSignEdit(signEventExtra* sign);
     // x_spedit: a spell scroll's spell.
     void EditSpellScroll(i32* spell);
 };

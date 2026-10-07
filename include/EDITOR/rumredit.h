@@ -2,7 +2,7 @@
 #define HOMM2_EDITOR_RUMREDIT_H
 
 // The rumour editor (src/EDITOR/rumredit.cpp, rumredit.bin):
-// eventsManager::EditRumor, its text update and its dialog handler.
+// eventsManager::EditRumour, its fill-in and its dialog handler.
 
 #include <va.h>
 #include <Ints.h>
@@ -10,10 +10,10 @@
 #include <SOURCE/EVENTS.h>
 
 // The record header and the text the open rumour dialog edits.
-extern rumourEventExtra gRumor;
-#define gRumorText gRumorTextCache // spelling fixes .bss order
-extern char* gRumorText;
+extern rumourEventExtra gRumour;
+#define gRumourText gRumorTextCache // spelling fixes .bss order
+extern char* gRumourText;
 
-MessageDispatchResult EditRumorHandler(struct tag_message& message);
+MessageDispatchResult EditRumourHandler(struct tag_message& message);
 
 #endif
