@@ -142,28 +142,6 @@ H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
     ANIMATION_PHASE_COLUMN_3_INITIAL = 13
 H2_ENUM_END(AdventureAnimationPhaseIndex)
 
-H2_ENUM_BEGIN(AdventureSourceLineConstant)
-    CLOSE_BORDER_FREE_LINE_BASE = 0x0124,
-    BORDER_INITIAL_FREE_LINE_OFFSET = 22,
-    BORDER_SECONDARY_FREE_LINE_OFFSET = 9,
-    BORDER_ALLOC_LINE_OFFSET = 4,
-    NEW_TURN_LINE_BASE = 0x11d0,
-    RESOURCE_VIEW_LINE_BASE = 0x122f,
-    KINGDOM_VIEW_LINE_BASE = 0x1296,
-    BOTTOM_HERO_LINE_BASE = 0x12e3,
-    BOTTOM_HERO_ALLOC_LINE_OFFSET = 0x44,
-    QUICK_VIEW_LINE_BASE = 0x1376,
-    QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET = 0x9b,
-    QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET = 0xe3,
-    QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x10e,
-    TOWN_VIEW_LINE_BASE = 0x14e2,
-    TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET = 0x83,
-    TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET = 0xd6,
-    TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x108,
-    REDRAW_BORDER_FREE_LINE_BASE = 0x1628,
-    SAVE_BORDER_ALLOC_LINE_BASE = 0x2025
-H2_ENUM_END(AdventureSourceLineConstant)
-
 H2_ENUM_BEGIN(AdventureBorderConstant)
     BORDER_BUFFER_SIZE = 0x7400,
     BORDER_EDGE_SIZE = 16,
@@ -178,14 +156,6 @@ H2_ENUM_BEGIN(AdventureScrollConstant)
 H2_ENUM_END(AdventureScrollConstant)
 
 H2_ENUM_BEGIN(AdventureButtonConstant)
-    BUTTON_FIRST         = 1,
-    BUTTON_LAST          = 6,
-    BUTTON_SLOT_1        = 1,
-    BUTTON_SLOT_2        = 2,
-    BUTTON_SLOT_3        = 3,
-    BUTTON_SLOT_4        = 4,
-    BUTTON_SLOT_5        = 5,
-    BUTTON_SLOT_6        = 6,
     BUTTON_BROADCAST_ARG = 1,
 H2_ENUM_END(AdventureButtonConstant)
 
@@ -255,13 +225,8 @@ H2_ENUM_BEGIN(AdventureStateConstant)
     UNUSED_OBJECT_ICON_2 = 38
 H2_ENUM_END(AdventureStateConstant)
 
-H2_ENUM_BEGIN(AdventureMainConstant)
-    ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
-H2_ENUM_END(AdventureMainConstant)
-
 H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_ORIGIN_NONE = -1,
-    ENVIRONMENT_SOUND_LOG_UNUSED = -999,
     ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
     ENVIRONMENT_SOUND_MAX_DISTANCE = 5,
     ENVIRONMENT_VOLUME_COUNT = 8,
@@ -272,8 +237,6 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
 H2_ENUM_END(AdventureEnvironmentSoundConstant)
 
 H2_ENUM_BEGIN(AdventureTeleportConstant)
-    TELEPORT_MAP_CHANGE_VALUE = -999,
-    TELEPORT_CELL_OBJECT_FLAG = 0x40,
     TELEPORT_RESTORE_MODE = 99,
     TELEPORT_DELAY = 90,
     TELEPORT_FIZZLE_TIME = 128,
@@ -334,7 +297,6 @@ H2_ENUM_BEGIN(AdventureSystemOptionConstant)
 H2_ENUM_END(AdventureSystemOptionConstant)
 
 H2_ENUM_BEGIN(AdventureSummonBoatConstant)
-    SUMMON_OCCUPIED_FLAG = 0x80,
     SUMMON_MIN_DISTANCE = 2,
     SUMMON_RESTORE_MODE = 5,
     SUMMON_FIZZLE_X_OFFSET = 48,
@@ -396,8 +358,6 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
-    RADAR_ROW_GROUPS = 5,
-    RADAR_GROUP_BYTES = 128,
     RADAR_UNSEEN_COLOR = 0x24,
     RADAR_VIEWPORT_COLOR = 181,
     RADAR_NEUTRAL_OWNER = GAME_PLAYER_COUNT,
@@ -595,10 +555,7 @@ H2_ENUM_END(AdventureQuickViewPlacementConstant)
 
 H2_ENUM_BEGIN(AdventureSpellConstant)
     TRAVEL_SPELL_MOBILITY_COST = 225,
-    MINE_GUARDIAN_MAX_POWER = 51,
     MINE_GUARDIANS_PER_POWER = 4,
-    MINE_GUARDIAN_VALUE_COUNT = 2,
-    MINE_GUARDIAN_TYPE_INDEX = 0
 H2_ENUM_END(AdventureSpellConstant)
 
 H2_ENUM_BEGIN(AdventureSaveConstant)
@@ -636,8 +593,6 @@ H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
     NEW_TURN_WEEK_TEXT_HEIGHT = 12,
     NEW_TURN_DAY_TEXT_HEIGHT = 25,
     NEW_TURN_FIRST_DAY = 1,
-    NEW_TURN_WEEK_ALLOC_LINE_OFFSET = 0x29,
-    NEW_TURN_DAY_ALLOC_LINE_OFFSET = 0x43
 H2_ENUM_END(AdventureNewTurnViewConstant)
 
 H2_ENUM_BEGIN(AdventureResourceViewConstant)
@@ -655,8 +610,6 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
     RESOURCE_VIEW_COUNT_Y = 453,
     RESOURCE_VIEW_COUNT_WIDTH = 80,
     RESOURCE_VIEW_COUNT_HEIGHT = 12,
-    RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET = 0x26,
-    RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x50
 H2_ENUM_END(AdventureResourceViewConstant)
 
 H2_ENUM_BEGIN(AdventureKingdomViewConstant)
@@ -680,7 +633,6 @@ H2_ENUM_BEGIN(AdventureKingdomViewConstant)
     KINGDOM_VIEW_GOLD_TEXT_X = 123,
     KINGDOM_VIEW_CASTLE_TEXT_X = 27,
     KINGDOM_VIEW_VILLAGE_TEXT_X = 80,
-    KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x32
 H2_ENUM_END(AdventureKingdomViewConstant)
 
 H2_ENUM_BEGIN(AdventureVisionsConstant)
@@ -736,7 +688,6 @@ H2_ENUM_END(AdventureCloudNeighbor)
 
 H2_ENUM_BEGIN(AdventureQuickInfoObject)
     OBELISK_INDEX_BASE             = 1,
-    RESOURCE_FRAME_PAIR_MASK       = ~1,
     CRYSTAL_BALL_RADIUS            = 8,
     ROUTE_BEYOND_MOBILITY_FLAG     = 0x100,
     HERO_FRAME_MIRROR_FLAG         = 0x80,
@@ -3917,7 +3868,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
+                if (m_cursorActive != 0 && (s_drawCell->m_flags & HERO_MAP_CELL_PRESENT) != 0
                     && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
@@ -4225,7 +4176,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
                 cell = m_mapData->GetCell(i, j);
-                if ((cell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
+                if ((cell->m_flags & HERO_MAP_CELL_PRESENT) != 0
                     && i == m_mapOriginX + VIEW_CENTER_CELL
                     && j == m_mapOriginY + VIEW_CENTER_CELL) {
                     color = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
@@ -6857,7 +6808,7 @@ void advManager::DemobilizeCurrHero(void) {
     }
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroPointer->m_id;
-    cell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+    cell->m_flags &= ~HERO_MAP_CELL_PRESENT;
     m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -6937,7 +6888,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
     mapCell* currentCell = GetCell(contextHero->m_x, contextHero->m_y);
-    currentCell->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+    currentCell->m_flags |= HERO_MAP_CELL_PRESENT;
     gpGame->RestoreCell(
         contextHero->m_x,
         contextHero->m_y,
@@ -8062,7 +8013,7 @@ void advManager::TeleportTo(
             mapHero->m_id,
             static_cast<u8>(destinationX),
             static_cast<u8>(destinationY),
-            TELEPORT_MAP_CHANGE_VALUE,
+            MAP_CHANGE_CURRENT_PLAYER,
             0,
             0
         );
@@ -8076,8 +8027,8 @@ void advManager::TeleportTo(
     }
 
     oldCellFlag = false;
-    if (cellOld->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
-        cellOld->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
+    if (cellOld->m_flags & HERO_MAP_CELL_PRESENT) {
+        cellOld->m_flags -= HERO_MAP_CELL_PRESENT;
         oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
@@ -8121,7 +8072,7 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
         gpWindowManager->SaveFizzleSource(
             ADVENTURE_VIEW_BORDER,
             ADVENTURE_VIEW_BORDER,
@@ -8148,7 +8099,7 @@ void advManager::TeleportTo(
         mapHero->m_locationType = destinationCell->m_triggerType;
         mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
         if (oldCellFlag != 0) {
-            destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+            destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
         } else {
             destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
@@ -8413,7 +8364,7 @@ void advManager::SummonBoat(void) {
         for (slotIndex = 0; slotIndex < GAME_BOAT_COUNT; ++slotIndex) {
             if (gpGame->m_boatSlots[slotIndex] != -1
                 && gpGame->m_boats[slotIndex].heroId
-                       == (heroSlot | SUMMON_OCCUPIED_FLAG)) {
+                       == (heroSlot | BOAT_OCCUPIED_FLAG)) {
                 foundBoat = true;
                 break;
             }
@@ -8422,7 +8373,7 @@ void advManager::SummonBoat(void) {
         if (!foundBoat) {
             for (slotIndex = 0; slotIndex < GAME_BOAT_COUNT; ++slotIndex) {
                 if (gpGame->m_boatSlots[slotIndex] != -1
-                    && (gpGame->m_boats[slotIndex].heroId & SUMMON_OCCUPIED_FLAG)
+                    && (gpGame->m_boats[slotIndex].heroId & BOAT_OCCUPIED_FLAG)
                     && gpGame->m_boats[slotIndex].owner == giCurPlayer
                     && MANHATTAN_LENGTH(
                            gpGame->m_boats[slotIndex].x - summonHero->m_x,

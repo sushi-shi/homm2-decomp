@@ -19,11 +19,8 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_DIAGONAL_COST_MASK         = 1,
     SEARCH_CELL_UNREACHABLE           = 0x08,
     SEARCH_MAP_BLOCKED                = 0x80,
-    SEARCH_CELL_BLOCKED               = 0x80,
     SEARCH_INVALID_COORDINATE         = -1,
-    SEARCH_NO_OBJECT                  = 0xFF,
-    SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
-    SEARCH_DIRECTION_OBJECT_MASK      = 0x38
+    SEARCH_NO_OBJECT                  = 0xFF
 H2_ENUM_END(SearchConstant)
 
 #pragma pack(push, 1)

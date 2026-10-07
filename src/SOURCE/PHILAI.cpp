@@ -154,7 +154,6 @@
 #define AI_BUILDING_LEFT_TURRET_MASK 0x00000100
 #define AI_BUILDING_RIGHT_TURRET_MASK 0x00000200
 #define AI_MAGIC_BOOK_COST 500
-#define AI_MANA_PER_KNOWLEDGE 10
 #define AI_EARLY_TOWN_SHARE_TURN 7
 #define AI_SECOND_WEEK_END_TURN 14
 #define AI_THIRD_WEEK_END_TURN 21
@@ -429,7 +428,6 @@ H2_ENUM_BEGIN(AIPositionValueConstant)
     POSITION_FAILED_VALUE         = -100,
     POSITION_EMBARKED_BOAT_BONUS  = 40,
     POSITION_DEBUG_LEVEL          = 5,
-    POSITION_DEBUG_UNUSED         = -999,
     POSITION_OBJECT_NAME_COUNT    = 119,
     POSITION_DEBUG_TEXT_CAPACITY  = 100,
     POSITION_STRATEGIC_MULTIPLIER = 2
@@ -5350,7 +5348,7 @@ void philAI::BuildHero(town* townPointer, i32 availableHeroIndex) {
     gpCurPlayer->m_availableHeroIds[availableHeroIndex] =
         static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, FACTION_ANY, 1));
     gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[availableHeroIndex]] =
-        AI_HERO_AVAILABLE_FLAG;
+        HERO_AVAILABILITY_FOR_HIRE;
     bHeroBuiltThisTurn = true;
     HeroInteractionAtTown(newHero, townPointer, 0, &iDummy);
     ShowStatus();

@@ -271,7 +271,7 @@ void searchArray::TestPossibleDirections(
             goto storeDirection;
         }
 
-        if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
+        if (((1U << gSearchDirection) & MAP_DIRECTIONS_NORTHWARD) != 0) {
             if (CELL_HAS_NON_SHADOW_OBJECT(gSearchCurrentCell)) {
                 gSearchTerrain = TERRAIN_INVALID;
                 goto storeDirection;
@@ -284,7 +284,7 @@ void searchArray::TestPossibleDirections(
                     goto storeDirection;
                 }
             }
-        } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
+        } else if (((1U << gSearchDirection) & MAP_DIRECTIONS_SOUTHWARD) != 0) {
             if (CELL_HAS_NON_SHADOW_OBJECT(gSearchNextCell)) {
                 if (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                     gSearchTriggerType = gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;

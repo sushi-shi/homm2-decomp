@@ -40,6 +40,7 @@ H2_ENUM_END(MapEventEncodingConstant)
 
 H2_ENUM_BEGIN(MapEventGameplayConstant)
     PYRAMID_GUARD_STACK_QUANTITY = 10,
+    MINE_GUARDIAN_MAX_POWER      = 51,
 H2_ENUM_END(MapEventGameplayConstant)
 
 H2_ENUM_CLASS_BEGIN(GenericSiteType)
@@ -195,6 +196,8 @@ H2_ENUM_BEGIN(MapEventRewardConstant)
     SEA_CHEST_ARTIFACT_GOLD             = 1000,
     MAGELLAN_MAP_COST                   = 1000,
     WATERING_HOLE_MOBILITY_BONUS        = 400,
+    STABLES_MOBILITY_BONUS              = 400,
+    ALCHEMIST_CURSE_REMOVAL_COST        = 750,
     XANADU_ADMISSION_LEVEL              = 10,
     XANADU_DIPLOMACY_MULTIPLIER         = 2,
     ARTESIAN_SPRING_MANA_MULTIPLIER     = 2,
@@ -267,10 +270,6 @@ H2_ENUM_BEGIN(MapEventDisplayConstant)
     MINE_RESOURCE_ICON_OFFSET = 59,
     BOAT_RESTORE_MODE         = 2,
     ORACLE_WINDOW_TEXT_ID     = 14,
-    COAST_FIZZLE_X            = 192,
-    COAST_FIZZLE_Y            = 192,
-    COAST_FIZZLE_WIDTH        = 96,
-    COAST_FIZZLE_HEIGHT       = 96,
 H2_ENUM_END(MapEventDisplayConstant)
 
 H2_ENUM_CLASS_BEGIN(UndeadEventLevel)

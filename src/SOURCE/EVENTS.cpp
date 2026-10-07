@@ -96,21 +96,13 @@ namespace {
 
     H2_ENUM_BEGIN(AIEventConstant)
         EVENT_NO_OWNER = -1,
-        EVENT_ROGUE_COUNT = 50,
         EVENT_GUARD_COUNT_MAX = 255,
         EVENT_MINE_SPELL_LOOP_END = 999,
-        EVENT_MINE_SPELL_POWER_MAX = 51,
         EVENT_MINE_SPELL_COUNT_SCALE = 5,
-        EVENT_TELEPORT_STONE_DISTANCE = 1,
-        EVENT_TELEPORT_WHIRLPOOL_DISTANCE = 3,
-        EVENT_OBSERVATION_RADIUS = 20,
         EVENT_RANDOM_EVENT_SUCCESS = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
         EVENT_BOAT_RESTORE_MODE = 3,
-        EVENT_CURSED_ARTIFACT_COST = 750,
-        EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD = 1500,
         EVENT_SIRENS_MIN_ARMY_QUANTITY = 1,
-        EVENT_CREATURE_UPGRADE_MOBILITY = 400,
     H2_ENUM_END(AIEventConstant)
 
     H2_ENUM_BEGIN(MonsterCombatValueIndex)
@@ -141,10 +133,8 @@ namespace {
     H2_ENUM_END(BarrierEventConstant)
 
     H2_ENUM_BEGIN(GenericSiteConstant)
-        SITE_ALCHEMIST_COST = 750,
         SITE_VISIBILITY_RADIUS = 10,
         SITE_HUT_COLOR = 3,
-        SITE_STABLE_MOBILITY = 400,
         SITE_STABLE_REWARD_VALUE = 8,
         SITE_MERMAID_WINDOW_ICON = 10,
         SITE_STRING_LIMIT = 10
@@ -218,7 +208,6 @@ namespace {
         ERASE_COORDINATE_COUNT = 2,
         NO_FRAME = -1,
         EMPTY_INDEX = 0xFF,
-        MAP_CHANGE_VALUE = -999,
         ENVIRONMENT_BORDER = 7
     H2_ENUM_END(EraseObjectConstant)
 
@@ -966,17 +955,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 m_cursorActive = true;
                 playedSample = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
-                    COAST_FIZZLE_X,
-                    COAST_FIZZLE_Y,
-                    COAST_FIZZLE_WIDTH,
-                    COAST_FIZZLE_HEIGHT
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE
                 );
                 CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
                 gpWindowManager->FizzleForward(
-                    COAST_FIZZLE_X,
-                    COAST_FIZZLE_Y,
-                    COAST_FIZZLE_WIDTH,
-                    COAST_FIZZLE_HEIGHT,
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
                     -1,
                     NULL,
                     NULL
@@ -3652,7 +3641,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         changed = 0;
     }
 
-    SendMapChange(MAP_CHANGE_ERASE_OBJECT, 0, x, y, MAP_CHANGE_VALUE, 0, 0);
+    SendMapChange(MAP_CHANGE_ERASE_OBJECT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
     SetEnvironmentOrigin(m_mapOriginX + ENVIRONMENT_BORDER, m_mapOriginY + ENVIRONMENT_BORDER, 1);
     gpGame->SetupAdjacentMons();
 }
@@ -3836,7 +3825,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 }
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
-                    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
+                    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= ALCHEMIST_CURSE_REMOVAL_COST) {
                         for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++) {
                             if (IsCursedItem(eventHero->m_artifacts[index])) {
                                 GiveTakeArtifactStat(
@@ -3845,7 +3834,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                                 eventHero->m_artifacts[index] = ARTIFACT_NONE;
                             }
                         }
-                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SITE_ALCHEMIST_COST;
+                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= ALCHEMIST_CURSE_REMOVAL_COST;
                     } else {
                         NormalDialog(
                             localization::Tr("event.inline.35891c3b946b11c8"),
@@ -3981,8 +3970,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             stableResult = STABLE_VISIT_NONE;
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_STABLES) == 0) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_STABLES;
-                eventHero->m_mobility += SITE_STABLE_MOBILITY;
-                eventHero->m_remainingMobility += SITE_STABLE_MOBILITY;
+                eventHero->m_mobility += STABLES_MOBILITY_BONUS;
+                eventHero->m_remainingMobility += STABLES_MOBILITY_BONUS;
                 stableResult |= STABLE_VISIT_MOBILITY;
             }
             if (eventHero->CreatureTypeCount(CREATURE_CAVALRY)) {
@@ -5924,8 +5913,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         gpGame->m_mines[cell->m_objectMetadata].guardianType =
                             static_cast<CreatureType>(index + 1);
                         spellPower = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
-                        if (spellPower > EVENT_MINE_SPELL_POWER_MAX)
-                            spellPower = EVENT_MINE_SPELL_POWER_MAX;
+                        if (spellPower > MINE_GUARDIAN_MAX_POWER)
+                            spellPower = MINE_GUARDIAN_MAX_POWER;
                         gpGame->m_mines[cell->m_objectMetadata].guardianCount =
                             spellPower * EVENT_MINE_SPELL_COUNT_SCALE;
                         index = EVENT_MINE_SPELL_LOOP_END;
@@ -6422,8 +6411,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                == cell->m_objectIndex
                         && MANHATTAN_LENGTH(exitX - x, exitY - y)
                                > (eventType == MAP_OBJECT_STONE_LITHS
-                                      ? EVENT_TELEPORT_STONE_DISTANCE
-                                      : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
+                                      ? STONE_LITHS_MIN_DISTANCE
+                                      : WHIRLPOOL_MIN_DISTANCE)) {
                         ++exitCount;
                     }
                 }
@@ -6439,8 +6428,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                    == cell->m_objectIndex
                             && MANHATTAN_LENGTH(exitX - x, exitY - y)
                                    > (eventType == MAP_OBJECT_STONE_LITHS
-                                          ? EVENT_TELEPORT_STONE_DISTANCE
-                                          : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
+                                          ? STONE_LITHS_MIN_DISTANCE
+                                          : WHIRLPOOL_MIN_DISTANCE)
                             && --exitCount <= 0) {
                             goto teleportDestination;
                         }
@@ -6468,7 +6457,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
                 if (artifactGuardType == CREATURE_ROGUE) {
-                    artifactGuardCount = EVENT_ROGUE_COUNT;
+                    artifactGuardCount = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
                     goto artifactFight;
                 }
                 artifactGuardCount = 1;
@@ -6804,7 +6793,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_OBSERVATION_TOWER:
-            gpGame->SetVisibility(x, y, giCurPlayer, EVENT_OBSERVATION_RADIUS);
+            gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
             break;
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
@@ -7011,13 +7000,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             if (cursedArtifactCount != 0
                 && gpCurPlayer->m_resources[IDX(RES_GOLD)]
-                       >= EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
+                       >= AI_GENERIC_SITE_GOLD_THRESHOLD) {
                 for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT;
                      artifactIndex++) {
                     if (IsCursedItem(eventHero->m_artifacts[artifactIndex]))
                         eventHero->m_artifacts[artifactIndex] = ARTIFACT_NONE;
                 }
-                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
+                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= ALCHEMIST_CURSE_REMOVAL_COST;
             }
             break;
         case GENERIC_SITE_ARENA:
@@ -7075,8 +7064,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_STABLES:
             if (!(eventHero->m_eventFlags & HERO_EVENT_STABLES)) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_STABLES;
-                eventHero->m_mobility += EVENT_CREATURE_UPGRADE_MOBILITY;
-                eventHero->m_remainingMobility += EVENT_CREATURE_UPGRADE_MOBILITY;
+                eventHero->m_mobility += STABLES_MOBILITY_BONUS;
+                eventHero->m_remainingMobility += STABLES_MOBILITY_BONUS;
             }
             if (eventHero->CreatureTypeCount(CREATURE_CAVALRY))
                 eventHero->UpgradeCreatures(CREATURE_CAVALRY, CREATURE_CHAMPION);

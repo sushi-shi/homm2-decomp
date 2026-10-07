@@ -12,7 +12,8 @@ class mapCell;
 struct tag_message;
 
 // Adventure screen geometry: the 480-pixel map frame, the 448-pixel map view
-// inside its 16-pixel border, and the radar square to the right of the frame.
+// inside its 16-pixel border, the radar square to the right of the frame, and
+// the square around the hero that embarking and disembarking fizzle.
 H2_ENUM_BEGIN(AdventureViewportConstant)
     ADVENTURE_VIEWPORT_EXTENT         = 480,
     ADVENTURE_VIEW_BORDER             = 16,
@@ -24,7 +25,10 @@ H2_ENUM_BEGIN(AdventureViewportConstant)
     ADVENTURE_RADAR_RIGHT             = ADVENTURE_RADAR_LEFT + ADVENTURE_RADAR_SIZE,
     ADVENTURE_RADAR_BOTTOM            = ADVENTURE_RADAR_TOP + ADVENTURE_RADAR_SIZE,
     ADVENTURE_RADAR_SMALL_CELL_PIXELS  = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_SMALL,
-    ADVENTURE_RADAR_MEDIUM_CELL_PIXELS = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_MEDIUM
+    ADVENTURE_RADAR_MEDIUM_CELL_PIXELS = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_MEDIUM,
+    ADVENTURE_HERO_FIZZLE_LEFT        = 192,
+    ADVENTURE_HERO_FIZZLE_TOP         = 192,
+    ADVENTURE_HERO_FIZZLE_SIZE        = 96
 H2_ENUM_END(AdventureViewportConstant)
 
 // Current screen and fixed adventure viewport; clipping policy remains explicit.
