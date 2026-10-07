@@ -952,7 +952,7 @@ advManager::advManager(void) {
 VA(0x004012f2, 0x955)
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
-    m_openState = false;
+    m_heroesLogoShown = false;
     bShowIt = false;
     m_adventureBorder = NULL;
 
@@ -3695,7 +3695,7 @@ void advManager::DrawCell(
                         s_drawHeroType =
                             s_drawHero->IsEmbarked()
                                 ? HERO_TYPE_BOAT
-                                : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
+                                : static_cast<HeroCursorType>(s_drawHero->m_faction);
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
                         if (s_drawHero->IsEmbarked()) {
@@ -4098,7 +4098,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         return;
     }
 
-    gpAdvManager->m_openState = false;
+    gpAdvManager->m_heroesLogoShown = false;
     xrem = ymod = 0;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
@@ -6873,7 +6873,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
     m_cursorType = contextHero->IsEmbarked()
                        ? HERO_TYPE_BOAT
-                       : static_cast<HeroCursorType>(contextHero->m_cursorType);
+                       : static_cast<HeroCursorType>(contextHero->m_faction);
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 

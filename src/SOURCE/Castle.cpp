@@ -666,7 +666,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     [IDX(gpGame
                                              ->m_heroRecs[gpCurPlayer
                                                               ->AvailableHeroId(heroChoiceIndex)]
-                                             .m_cursorType)]
+                                             .m_faction)]
                             );
                         }
                         break;
@@ -682,8 +682,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, CONTROL_STATUS_TEXT);
         message.payload.widget.data.text = gText;
-        gpTownManager->m_heroWindow0->BroadcastMessage(message);
-        gpTownManager->m_heroWindow0
+        gpTownManager->m_buildingWindow->BroadcastMessage(message);
+        gpTownManager->m_buildingWindow
             ->DrawWindow(WINDOW_DRAW_BUFFER_ONLY, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
         gpWindowManager
             ->UpdateScreenRegion(INTERFACE_X, INTERFACE_Y, INTERFACE_WIDTH, INTERFACE_HEIGHT);
@@ -712,8 +712,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
-                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                        gpTownManager->m_heroWindow0->DrawWindow();
+                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, 1);
+                        gpTownManager->m_buildingWindow->DrawWindow();
                         break;
 
                     case CONTROL_CAPTAIN_FORMATION_GROUPED:
@@ -727,8 +727,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
-                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                        gpTownManager->m_heroWindow0->DrawWindow();
+                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, 1);
+                        gpTownManager->m_buildingWindow->DrawWindow();
                         break;
 
                     case IDX(TOWN_OBJECT_MAGE_GUILD):

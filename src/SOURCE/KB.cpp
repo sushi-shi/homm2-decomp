@@ -1463,8 +1463,8 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
-                        gpTownManager->m_heroWindow0->DrawWindow();
-                        gpTownManager->m_heroWindow1->DrawWindow();
+                        gpTownManager->m_buildingWindow->DrawWindow();
+                        gpTownManager->m_childWindow->DrawWindow();
                         gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                         break;
                     default:

@@ -57,8 +57,11 @@ public:
     u32l m_buildableBuildings;
     b32 m_castleDialogActive;
     H2_ENUM_STORAGE(BuildingSlotType, i32) m_selectedBuilding;
-    heroWindow* m_heroWindow0;
-    heroWindow* m_heroWindow1;
+    // The building dialog over the town screen (castle, mage guild, well,
+    // thieves' guild, shipyard, tavern), and the split-army or recruit-hero
+    // window opened over the town screen or that dialog.
+    heroWindow* m_buildingWindow;
+    heroWindow* m_childWindow;
     i32 m_splitAmount;
     i32 m_splitMaximum;
     i32 m_recruitState;

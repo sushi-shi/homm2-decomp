@@ -969,9 +969,9 @@ void swapManager::SplitMons(void) {
     dlgState = 0;
     textControl = SPLIT_TEXT_CONTROL;
 
-    gpTownManager->m_heroWindow1 =
+    gpTownManager->m_childWindow =
         new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == NULL)
+    if (gpTownManager->m_childWindow == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = selectedArmy->m_creatureCounts[m_selectedSlot];
@@ -994,13 +994,13 @@ void swapManager::SplitMons(void) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = SPLIT_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpTownManager->m_childWindow->BroadcastMessage(message);
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
-    delete gpTownManager->m_heroWindow1;
+    gpTownManager->m_childWindow->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
         if (targetTroops->m_creatureTypes[m_targetSlot]

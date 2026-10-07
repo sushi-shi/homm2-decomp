@@ -135,7 +135,8 @@ public:
     class sample* m_loopingSamples[IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
     class sample* m_cursorSamples[ADVMGR_CURSOR_SAMPLE_COUNT];
     b32 m_identifyHeroActive;
-    b32 m_openState;
+    // The heroes logo covers the radar; UpdateRadar clears it.
+    b32 m_heroesLogoShown;
     advManager(void);
     virtual i32 Open(i32 id) OVERRIDE;
     virtual void Close(void) OVERRIDE;

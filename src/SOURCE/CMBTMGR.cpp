@@ -317,7 +317,7 @@ void combatManager::SetupCombat(
                     captainStats[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                 [index];
             m_captain.m_spellPoints = HERO_NORMAL_SPELL_POINTS(m_captain);
-            m_captain.m_cursorType = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type;
+            m_captain.m_faction = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type;
             m_captain.m_portrait = static_cast<HeroPortrait>(
                 static_cast<i32>(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
@@ -844,14 +844,14 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroes[index]) {
             if (m_heroes[index]->m_isCaptain) {
-                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_faction)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] =
-                    IDX(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
+                    IDX(m_heroes[index]->m_faction) + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
-                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_faction)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
-                m_heroSpriteIndex[index] = IDX(m_heroes[index]->m_cursorType);
+                m_heroSpriteIndex[index] = IDX(m_heroes[index]->m_faction);
             }
         }
 

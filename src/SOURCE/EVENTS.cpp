@@ -949,7 +949,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = m_cursorDirection;
-                m_cursorType = eventHero->m_cursorType;
+                m_cursorType = eventHero->m_faction;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = true;
                 playedSample = LoadPlaySample("killfade.82m");
@@ -5855,7 +5855,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = m_cursorDirection;
-                m_cursorType = eventHero->m_cursorType;
+                m_cursorType = eventHero->m_faction;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = true;
                 CheckAdjacentMon(&adjacentMonster);
@@ -7011,7 +7011,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_ARENA:
             if (!(eventHero->m_eventFlags & HERO_EVENT_ARENA)) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
-                switch (eventHero->m_cursorType) {
+                switch (eventHero->m_faction) {
                     case FACTION_SORCERESS:
                     case FACTION_WARLOCK:
                     case FACTION_WIZARD:
