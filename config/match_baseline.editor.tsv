@@ -629,7 +629,7 @@ SOURCE/kbwin	?KBTickCount@@YIJXZ	100.0000	6af258c026c4
 SOURCE/kbwin	?Process1WindowsMessage@@YIXXZ	100.0000	cbc38c95dcfe
 SOURCE/kbwin	?ResizeWindow@@YIXHHHH@Z	100.0000	def71e909d52
 SOURCE/kbwin	?SetMenuStatus@@YIXH@Z	100.0000	c5d1599224de
-SOURCE/kbwin	?SetMenus@@YIXPAXH@Z	100.0000	7d0b2cac2b25
+SOURCE/kbwin	?SetMenus@@YIXPAXH@Z	100.0000	5d2bca460943
 SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	100.0000	db9c2bacc975
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	100.0000	dec10c9993f2
 SOURCE/kbwin	_WinMain@16	100.0000	cbd64ec3a8b0

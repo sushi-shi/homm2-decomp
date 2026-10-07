@@ -65,7 +65,7 @@ DATA(0x005167d0) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 VA(0x0048d050, 0x15c)
 void RemoteCleanup(void) {
     LogStr("RC1");
-    if (gbRemoteOn == 0)
+    if (!gbRemoteOn)
         return;
     LogStr("RC2");
     if (gbInRemoteMain != 0)
@@ -619,7 +619,7 @@ void PollRemote(void) {
     SPlayerExit guestExit;
     u8 cmdByte;
 
-    if (gbRemoteOn == 0)
+    if (!gbRemoteOn)
         return;
     if (gbInRemoteCleanup != 0)
         return;

@@ -1357,7 +1357,7 @@ void philAI::DoAI(i32 player) {
         );
 
         while (!heroDone && gpCurAIHero->m_remainingMobility >= AI_MINIMUM_SITE_MOBILITY) {
-            if (!(gbGameOver == 0)) {
+            if (gbGameOver != 0) {
                 goto aiCleanup;
             } else {
                 if (gpCurAIHero->m_remainingMobility == gpCurAIHero->m_mobility
@@ -1452,7 +1452,7 @@ void philAI::DoAI(i32 player) {
                         stopAfterStep = true;
                         while (pathIndex >= 0 && steps < stepLimit) {
                             stopAfterStep =
-                                (steps + 1 == stepLimit || pathIndex == 0) ? 1 : 0;
+                                steps + 1 == stepLimit || pathIndex == 0;
                             if (pathIndex > 0) {
                                 moveFlagA = 0;
                                 moveFlagB = 0;
@@ -5092,7 +5092,7 @@ void philAI::RedistributeTroops(
 
 VA(0x00487a58, 0x23)
 i32 philAI::ChooseGoldOrExperience(i32, i32) {
-    return gpCurPlayer->m_resources[IDX(RES_GOLD)] > 4000 ? 1 : 0;
+    return gpCurPlayer->m_resources[IDX(RES_GOLD)] > 4000;
 }
 
 #if H2_RETAIL_COMPILER

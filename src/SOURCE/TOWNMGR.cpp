@@ -1513,7 +1513,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 }
                                 if (BuyBuild(
                                         BUILDING_SLOT_CASTLE,
-                                        CanBuy(m_town, BUILDING_SLOT_CASTLE) == 0,
+                                        !CanBuy(m_town, BUILDING_SLOT_CASTLE),
                                         quickView
                                     ))
                                     BuildObj(BUILDING_SLOT_CASTLE);
@@ -1958,7 +1958,7 @@ void townManager::SplitArmy(void) {
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
             sameType = true;
-        if (sameType != 0) {
+        if (sameType) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] += m_splitAmount;
         } else {
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =

@@ -2137,7 +2137,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             localPlayer = i;
     }
 
-    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer ? 1 : 0;
+    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer;
 
     sideCount = lastPlayer - firstPlayer + 1;
     otherPlayerCount = sideCount - (onSide != 0);

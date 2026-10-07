@@ -1887,7 +1887,7 @@ void combatManager::ResetHitByCreature(void) {
 
 VA(0x0042a182, 0x2c)
 i32 ValidHex(i32 hex) {
-    return hex >= 0 && hex < COMBAT_HEX_COUNT ? 1 : 0;
+    return hex >= 0 && hex < COMBAT_HEX_COUNT;
 }
 
 VA(0x0042a1ae, 0xb)

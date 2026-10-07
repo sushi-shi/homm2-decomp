@@ -2225,9 +2225,9 @@ void game::NewMap(char* filename) {
                    < FACTION_COUNT) {
             sideClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
         } else {
-            if (!!m_players[player].m_townCount) {
+            if (m_players[player].m_townCount) {
                 sideClass = gpGame->m_castleRecs[m_players[player].m_townIds[0]].m_type;
-            } else if (!!m_players[player].m_heroCount) {
+            } else if (m_players[player].m_heroCount) {
                 sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_cursorType;
             }
         }
@@ -2981,7 +2981,7 @@ void game::InitializePasswords(void) {
     i32 j;
     for (i = 0; i < X_GLOBAL_PASSWORD_STRING_INDEX_COUNT; i++) {
         flag = false;
-        while (flag == 0) {
+        while (!flag) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = true;
             for (j = 0; j < i; j++) {
