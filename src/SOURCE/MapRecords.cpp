@@ -30,7 +30,7 @@ T Copy(Record bytes) {
 
 template<class T>
 bool ArmyValid(const T& record) {
-    for (std::size_t i = 0; i < EVENT_RECORD_ARMY_SLOT_COUNT; ++i) {
+    for (std::size_t i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         const i32 creature = H2EnumIndex(record.troopTypes[i]);
         if (record.troopCounts[i] > 0 && record.troopCounts[i] <= 32767
             && (creature < 0 || creature >= H2EnumIndex(CREATURE_COUNT)))
@@ -55,7 +55,7 @@ const char* HeroError(Record bytes, bool jail) {
             return "invalid hero artifact index";
     }
     if (hero.hasCustomSkills) {
-        for (std::size_t i = 0; i < EVENT_RECORD_SKILL_CAPACITY; ++i) {
+        for (std::size_t i = 0; i < HERO_SECONDARY_SKILL_CAPACITY; ++i) {
             if (hero.skillTypes[i] == -1) continue;
             if (hero.skillTypes[i] < 0 || hero.skillTypes[i] >= H2EnumIndex(HERO_SKILL_COUNT)
                 || hero.skillLevels[i] < H2EnumIndex(HERO_SKILL_LEVEL_BASIC)

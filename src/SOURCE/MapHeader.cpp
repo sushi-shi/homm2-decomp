@@ -17,13 +17,13 @@ const char* MapHeaderError(const SMapHeader& header) {
         return "invalid map dimensions";
     if (header.difficulty.value() >= H2EnumIndex(DIFFICULTY_COUNT))
         return "invalid map difficulty";
-    if (header.playerCount == 0 || header.playerCount > MAP_HEADER_PLAYER_COUNT
+    if (header.playerCount == 0 || header.playerCount > GAME_PLAYER_COUNT
         || header.minHumanPlayers > header.maxHumanPlayers
         || header.maxHumanPlayers > header.playerCount)
         return "invalid player counts";
 
     unsigned enabled = 0;
-    for (unsigned player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
+    for (unsigned player = 0; player < GAME_PLAYER_COUNT; ++player) {
         if (header.playerEnabled[player] > 1 || header.playerCanHuman[player] > 1
             || header.playerCanComputer[player] > 1)
             return "invalid player flags";
