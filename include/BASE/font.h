@@ -39,7 +39,7 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode, i32 clipL, i32 clipT, i32 clipR, i32 clipB);
+    void DrawStringExecute(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode, i32 clipX, i32 clipY, i32 clipW, i32 clipH);
 
 public:
     void DrawString(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode);

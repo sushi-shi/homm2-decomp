@@ -47,25 +47,25 @@ void FillBitmapAreaClip(
     i32 width,
     i32 height,
     i32 color,
-    i32 clipx,
-    i32 clipy,
-    i32 clipw,
-    i32 cliph
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
 ) {
-    if (x >= clipx + clipw - 1 || x + width - 1 <= clipx || y >= clipy + cliph - 1
-        || y + height - 1 <= clipy)
+    if (x >= clipX + clipW - 1 || x + width - 1 <= clipX || y >= clipY + clipH - 1
+        || y + height - 1 <= clipY)
         return;
-    if (x + width - 1 >= clipx + clipw - 1)
-        width = clipx + clipw - x;
-    if (x < clipx) {
-        width = width - (clipx - x);
-        x = clipx;
+    if (x + width - 1 >= clipX + clipW - 1)
+        width = clipX + clipW - x;
+    if (x < clipX) {
+        width = width - (clipX - x);
+        x = clipX;
     }
-    if (y + height - 1 >= clipy + cliph - 1)
-        height = clipy + cliph - y;
-    if (y < clipy) {
-        height = height - (clipy - y);
-        y = clipy;
+    if (y + height - 1 >= clipY + clipH - 1)
+        height = clipY + clipH - y;
+    if (y < clipY) {
+        height = height - (clipY - y);
+        y = clipY;
     }
     FillBitmapArea(image, x, y, width, height, color);
 }
@@ -89,11 +89,11 @@ void BlitBitmap(
     i32 width,
     i32 height,
     class bitmap* destination,
-    i32 dx,
-    i32 dy
+    i32 destinationX,
+    i32 destinationY
 ) {
     gBlitSrc = source->m_pixels + sourceX + sourceY * source->m_width;
-    gBlitDst = destination->m_pixels + dx + dy * destination->m_width;
+    gBlitDst = destination->m_pixels + destinationX + destinationY * destination->m_width;
     for (gBlitRow = 0; gBlitRow < height; gBlitRow++) {
         memcpy(gBlitDst, gBlitSrc, width);
         gBlitSrc += source->m_width;

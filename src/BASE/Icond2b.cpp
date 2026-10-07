@@ -34,7 +34,7 @@ void DimIconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 color,
+    i32 dimLevel,
     H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
@@ -71,7 +71,7 @@ void DimIconToBitmap(
             if (clip == ICON_DRAW_NO_CLIP) {
                 s_dst = s_row + s_x;
                 for (s_loopCount = 0; s_loopCount < s_run; s_loopCount++) {
-                    *s_dst = uDimPal[0][color][*s_dst];
+                    *s_dst = uDimPal[0][dimLevel][*s_dst];
                     s_dst++;
                 }
             } else if (s_y >= clipY && s_y <= s_clipB && s_x + s_run > clipX && s_x <= s_clipR) {
@@ -89,7 +89,7 @@ void DimIconToBitmap(
                     s_dst = s_row + clipX;
                 }
                 for (s_loopCount = 0; s_loopCount < s_spanCount; s_loopCount++) {
-                    *s_dst = uDimPal[0][color][*s_dst];
+                    *s_dst = uDimPal[0][dimLevel][*s_dst];
                     s_dst++;
                 }
             }

@@ -45,7 +45,7 @@ H2_ENUM_BEGIN(HeroEditConstant)
     HERO_EDIT_PREVIOUS_PORTRAIT = 703,
     HERO_EDIT_NEXT_PORTRAIT    = 704,
     HERO_EDIT_TYPE_LABEL       = 800,
-    HERO_EDIT_CLASS_LABEL      = 801,
+    HERO_EDIT_PATROL_LABEL     = 801,
     HERO_EDIT_PATROL           = 802,
     HERO_EDIT_PATROL_RADIUS    = 803,
     // The text fields' limits.

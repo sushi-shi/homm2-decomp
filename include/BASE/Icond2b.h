@@ -12,7 +12,7 @@ void DimIconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 color,
+    i32 dimLevel,
     H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,

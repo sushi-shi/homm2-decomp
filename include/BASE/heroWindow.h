@@ -45,7 +45,7 @@ public:
     i32 m_zOrder;
     heroWindow* m_nextWindow;
     heroWindow* m_prevWindow;
-    char name[HERO_WINDOW_NAME_CAPACITY];
+    char m_name[HERO_WINDOW_NAME_CAPACITY];
     WindowFlag m_winFlags;
     WindowState m_winState;
     i32 m_posX;
@@ -58,7 +58,7 @@ public:
     heroWindow(void);
     heroWindow(i32 x, i32 y, i32 width, i32 height, H2_ENUM_PARAM(WindowFlag, i32) flags);
     heroWindow(i32 x, i32 y, H2_CONST char* resourceName);
-    i32 Open(i32 x, i32 flags);
+    i32 Open(i32 zOrder, i32 updateScreen);
     void RemoveAndDeleteWidget(i32 id);
     void Close(void);
     void AddWidget(class widget* newWidget, i32 zOrder);

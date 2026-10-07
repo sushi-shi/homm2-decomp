@@ -39,8 +39,8 @@ H2_ENUM_END(BlurConstant)
 #endif
 VA(0x004cba60, 0xa22)
 void DoBlur(
-    bitmap* destination,
-    bitmap* source,
+    bitmap* scratch,
+    bitmap* screen,
     i32 height,
     i32 redAdjust,
     i32 greenAdjust,
@@ -63,7 +63,7 @@ void DoBlur(
     gpWindowManager->SaveFizzleSource(0, 0, LOGICAL_SCREEN_WIDTH, height);
 
     savedBitmap = new bitmap(BITMAP_TYPE_NONE, LOGICAL_SCREEN_WIDTH, static_cast<i16>(height));
-    memcpy(savedBitmap->m_pixels, source->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(savedBitmap->m_pixels, screen->m_pixels, height * LOGICAL_SCREEN_WIDTH);
 
     lookupTable = static_cast<u8*>(H2_ALLOC(LOOKUP_BYTE_COUNT));
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
@@ -77,15 +77,15 @@ void DoBlur(
 
     gpResourceManager->PointToFile(gpResourceManager->MakeId("RGBLOOKP.BIN", 1));
     gpResourceManager->ReadBlock(lookupTable, LOOKUP_BYTE_COUNT);
-    memcpy(destination->m_pixels, source->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(scratch->m_pixels, screen->m_pixels, height * LOGICAL_SCREEN_WIDTH);
     PollSound();
 
     for (y = BORDER_RADIUS; y < height - BORDER_RADIUS; y++) {
         if ((y & SOUND_POLL_MASK) == SOUND_POLL_MASK)
             PollSound();
 
-        u8* input   = destination->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
-        u8* outputPixel = source->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
+        u8* input = scratch->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
+        u8* outputPixel = screen->m_pixels + y * LOGICAL_SCREEN_WIDTH + BORDER_RADIUS;
 
         for (x = BORDER_RADIUS; x < IDX(LOGICAL_SCREEN_WIDTH) - BORDER_RADIUS; x++) {
             blendIndex = BLUR_TAP_SUM(redTable, input) >> COMPONENT_SHIFT << RED_INDEX_SHIFT;
@@ -100,7 +100,7 @@ void DoBlur(
 
     PollSound();
     oldPalette = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
-    newPalette  = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
+    newPalette = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     memcpy(oldPalette, gPalette->m_data, PALETTE_DATA_SIZE);
 
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
@@ -128,7 +128,7 @@ void DoBlur(
         ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, oldPalette, newPalette);
     DelayMilli(static_cast<i32l>(350.0f * gfCombatSpeedMod[gConfig.combatSpeed]));
     gpWindowManager->SaveFizzleSource(0, 0, LOGICAL_SCREEN_WIDTH, height);
-    memcpy(source->m_pixels, savedBitmap->m_pixels, height * LOGICAL_SCREEN_WIDTH);
+    memcpy(screen->m_pixels, savedBitmap->m_pixels, height * LOGICAL_SCREEN_WIDTH);
     gpWindowManager
         ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
     H2_FREE(lookupTable);

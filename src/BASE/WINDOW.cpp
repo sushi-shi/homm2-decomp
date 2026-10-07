@@ -41,7 +41,7 @@ H2_ENUM_END(WindowConstant)
 
 VA(0x004ba5c0, 0x99)
 heroWindow::heroWindow(void) {
-    strcpy(name, "Default Construct");
+    strcpy(m_name, "Default Construct");
     m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
     m_posX = m_posY = 0;
@@ -61,7 +61,7 @@ VA(0x004ba660, 0x96)
 heroWindow::heroWindow(
     i32 x, i32 y, i32 width, i32 height, H2_ENUM_PARAM(WindowFlag, i32) flags
 ) {
-    strcpy(name, "Dynamic Construct");
+    strcpy(m_name, "Dynamic Construct");
     m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
     m_posX = x;
@@ -96,7 +96,7 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
     listBoxWidget* pListBox;
     i32 finishedReading;
     u32l resourceId;
-    strcpy(name, resourceName);
+    strcpy(m_name, resourceName);
     resourceId = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(resourceId);
     m_savedBackground = NULL;
@@ -190,13 +190,13 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
 #endif
 
 VA(0x004bae20, 0x66)
-i32 heroWindow::Open(i32 x, i32 flags) {
+i32 heroWindow::Open(i32 zOrder, i32 updateScreen) {
     if (HAS(m_winState, WINDOW_STATE_OPEN) != 0)
         return OPEN_FAILURE;
     if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0 && SaveBackground() != 0)
         return OPEN_FAILURE;
-    m_zOrder = x;
-    DrawWindow(flags);
+    m_zOrder = zOrder;
+    DrawWindow(updateScreen);
     m_winState |= WINDOW_STATE_OPEN;
     return 0;
 }

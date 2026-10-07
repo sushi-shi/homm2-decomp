@@ -206,7 +206,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     message.payload.widget.id = textBase + CELL_FIELD_ANIMATED_OVERLAY;
     gEditDialog->BroadcastMessage(message);
     sprintf(text, "%d", gEditCell->m_objectShadow);
-    message.payload.widget.id = textBase + CELL_FIELD_OBJECT_LAYER;
+    message.payload.widget.id = textBase + CELL_FIELD_OBJECT_SHADOW;
     gEditDialog->BroadcastMessage(message);
     sprintf(text, "%d", gEditCell->m_isRoad);
     message.payload.widget.id = textBase + CELL_FIELD_ROAD;
@@ -264,7 +264,7 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                         case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OVERLAY_INDEX):
                         case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ANIMATED_OBJECT):
                         case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ANIMATED_OVERLAY):
-                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_LAYER):
+                        case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_OBJECT_SHADOW):
                         case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_ROAD):
                         case CELL_WINDOW_FIRST_FIELD + IDX(CELL_FIELD_TRIGGER_TYPE):
                             message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;

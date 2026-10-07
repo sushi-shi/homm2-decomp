@@ -373,7 +373,7 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command,
 #define window w
 #endif
 VA(0x004b72b0, 0x142)
-void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 openFlags) {
+void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 updateScreen) {
     heroWindow* currentWindow = m_windowListTail;
     if (HAS(window->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
         zOrder = 0;
@@ -385,7 +385,7 @@ void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 open
     }
     if (zOrder != 0 && m_windowListHead == NULL)
         return;
-    if (window->Open(zOrder, openFlags) != 0)
+    if (window->Open(zOrder, updateScreen) != 0)
         return;
     while (currentWindow != NULL && currentWindow->m_zOrder > zOrder)
         currentWindow = currentWindow->m_prevWindow;

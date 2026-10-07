@@ -163,7 +163,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = HERO_EDIT_PATROL;
         gEditDialog->BroadcastMessage(message);
-        message.payload.widget.id = HERO_EDIT_CLASS_LABEL;
+        message.payload.widget.id = HERO_EDIT_PATROL_LABEL;
         gEditDialog->BroadcastMessage(message);
     } else {
         message.payload.widget.id = HERO_EDIT_PATROL;
