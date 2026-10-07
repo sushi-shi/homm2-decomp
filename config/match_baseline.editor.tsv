@@ -379,7 +379,7 @@ EDITOR/EDITMGR	?CountMines@editManager@@QAEHXZ	100.0000	aeecebc36723
 EDITOR/EDITMGR	?CountTowns@editManager@@QAEHXZ	100.0000	cce90fb4203e
 EDITOR/EDITMGR	?DeleteExtraObjectData@@YIXI@Z	100.0000	57c51793a5e4
 EDITOR/EDITMGR	?DoHorizontalKnob@editManager@@QAEXXZ	100.0000	e9c6ae6bfb41
-EDITOR/EDITMGR	?DoRadar@editManager@@QAEXXZ	100.0000	0c2ba55b7621
+EDITOR/EDITMGR	?DoRadar@editManager@@QAEXXZ	100.0000	731a1cfa770b
 EDITOR/EDITMGR	?DoVerticalKnob@editManager@@QAEXXZ	100.0000	d3230d6e32c9
 EDITOR/EDITMGR	?DrawCell@editManager@@QAEXHHHHH@Z	100.0000	c2fd6445593e
 EDITOR/EDITMGR	?DrawMap@editManager@@QAEXXZ	100.0000	9f349b2bd6af
@@ -470,7 +470,7 @@ EDITOR/EDITOR	?ShowStatusText@@YIXPAD@Z	100.0000	9d6e0b2dd078
 EDITOR/EDITOR	?ShutDown@@YIXPAD@Z	100.0000	78e07e534fbc
 EDITOR/EDITOR	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	8c83b56c629c
 EDITOR/EDITOR	?UpdateSystemOptionsMenu@@YIXXZ	100.0000	d472f8440de0
-EDITOR/EDITOR	?oldmain@@YIHXZ	100.0000	3d92db5b548a
+EDITOR/EDITOR	?oldmain@@YIHXZ	100.0000	63758c0748a3
 EDITOR/EDITOR	@PollSound@0	100.0000	7560904aa040
 EDITOR/EVENTMGR	??0eventsManager@@QAE@XZ	100.0000	6ff021ecc6c1
 EDITOR/EVENTMGR	?BalanceTerrainPercents@@YIXH@Z	100.0000	a08d62e890e4
@@ -565,11 +565,11 @@ EDITOR/rumredit	?EditRumour@eventsManager@@QAEHH@Z	100.0000	5a72dc5ea325
 EDITOR/rumredit	?EditRumourHandler@@YIHAAUtag_message@@@Z	100.0000	3d3cb6d4f5db
 EDITOR/rumredit	?FillInRumourEdit@eventsManager@@QAEXPAUrumourEventExtra@@@Z	100.0000	daecce4c547b
 EDITOR/setup	?BaseSetupHandler@@YIHAAUtag_message@@@Z	100.0000	56071b33e195
-EDITOR/setup	?SetupMainHandler@@YIHAAUtag_message@@@Z	100.0000	c5287969dc53
-EDITOR/setup	?SetupMapSize@@YIHXZ	100.0000	4a1495b775b6
-EDITOR/setup	?SetupMapSizeHandler@@YIHAAUtag_message@@@Z	100.0000	cc6630c24afc
-EDITOR/setup	?SetupNewMap@@YIHXZ	100.0000	ab57d0841632
-EDITOR/setup	?SetupNewMapHandler@@YIHAAUtag_message@@@Z	100.0000	107a7c184cf8
+EDITOR/setup	?SetupMainHandler@@YIHAAUtag_message@@@Z	100.0000	948ad281be2b
+EDITOR/setup	?SetupMapSize@@YIHXZ	100.0000	da89ee8b520a
+EDITOR/setup	?SetupMapSizeHandler@@YIHAAUtag_message@@@Z	100.0000	1e564286185b
+EDITOR/setup	?SetupNewMap@@YIHXZ	100.0000	0f492d1b30d7
+EDITOR/setup	?SetupNewMapHandler@@YIHAAUtag_message@@@Z	100.0000	93390e2f9b03
 EDITOR/signedit	?EditSign@eventsManager@@QAEXHH@Z	100.0000	c8953f3c7210
 EDITOR/signedit	?EditSignHandler@@YIHAAUtag_message@@@Z	100.0000	285e76f324ef
 EDITOR/signedit	?FillInSignEdit@eventsManager@@QAEXPAUsignEventExtra@@@Z	100.0000	74d55d88ab42

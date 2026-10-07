@@ -177,8 +177,7 @@ H2_ENUM_BEGIN(EditKnobGeometry)
 H2_ENUM_END(EditKnobGeometry)
 
 H2_ENUM_BEGIN(EditRadarDrag)
-    // The radar's 144-pixel square; a knob's drag measures from its centre.
-    EDIT_RADAR_SIZE      = 0x90,
+    // A knob's drag measures from its centre.
     EDIT_KNOB_DRAG_ORIGIN = 0x27
 H2_ENUM_END(EditRadarDrag)
 
@@ -6751,8 +6750,8 @@ void editManager::DoRadar(void) {
     float scale;
 
     gpMouseManager->MouseCoords(x, y);
-    if (x < ADVENTURE_RADAR_LEFT || x > ADVENTURE_RADAR_LEFT + IDX(EDIT_RADAR_SIZE)
-        || y < ADVENTURE_RADAR_TOP || y > ADVENTURE_RADAR_TOP + IDX(EDIT_RADAR_SIZE))
+    if (x < ADVENTURE_RADAR_LEFT || x > ADVENTURE_RADAR_RIGHT
+        || y < ADVENTURE_RADAR_TOP || y > ADVENTURE_RADAR_BOTTOM)
         return;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
