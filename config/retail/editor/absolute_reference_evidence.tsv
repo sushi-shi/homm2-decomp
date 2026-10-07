@@ -14421,6 +14421,7 @@ site_rva	target_rva	channel	instruction_rva	evidence
 0x826b4	0x9860c	object-data		DIR32 of object:EDITOR/EDITOR .data contribution 0x7e1c8+0x1a72e
 0x826b8	0x9861c	object-data		DIR32 of object:EDITOR/EDITOR .data contribution 0x7e1c8+0x1a72e
 0x826bc	0x98628	object-data		DIR32 of object:EDITOR/EDITOR .data contribution 0x7e1c8+0x1a72e
+0x991e8	0xa5778	object-data		DIR32 of object:SOURCE/REQUEST .data contribution 0x991e4+0x11d
 0x9ad08	0x9b84c	object-data		DIR32 of object:BASE/Misc .data contribution 0x9ad08+0x1c
 0x9be18	0x4a8a8	library-data		DIR32 of libcmt.lib:..\build\intel\mt_obj\fpinit.obj .data contribution 0x9be10+0x14
 0x9be1c	0x4a8bf	library-data		DIR32 of libcmt.lib:..\build\intel\mt_obj\fpinit.obj .data contribution 0x9be10+0x14
@@ -14429,6 +14430,7 @@ site_rva	target_rva	channel	instruction_rva	evidence
 0x9bfa8	0x53191	data		data word names census start 0x53191
 0x9bfb4	0x4d504	data		data word names census start 0x4d504
 0x9c188	0x5b6c0	data-pointer		target begins a string
+0x9c190	0x4e045	data		data word names census start 0x4e045
 0x9c194	0x5b6b4	data-pointer		neighbouring pointer word
 0x9c198	0x9c078	data-pointer		neighbouring pointer word
 0x9c1a0	0x5b6a8	data-pointer		neighbouring pointer word

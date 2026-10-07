@@ -663,6 +663,11 @@ def collect_image(image: str, repo: Path) -> list[SourceSymbol]:
     # The image's own definitions win over a game body or datum placed there
     # (the editor's copies of KB.cpp's functions and globals).
     claimed = {row.rva for row in rows}
+    # So do its reviewed compiler-generated bodies: the folded std::ctype id
+    # destructor every object's registration names belongs to the first
+    # object, not to the game unit whose copy the placement matched.
+    claimed |= {row.rva for row in reviewed_claims(repo, image)
+                if row.provenance == "reviewed-compgen"}
     rows.extend(row for row in placement_claims(image) if row.rva not in claimed)
     # The scanners below read the selected image's claim space (its own units).
     for vtable in source_vtables(source_root, repo):

@@ -14423,6 +14423,7 @@ site_rva	kind
 0x826b4	dir32
 0x826b8	dir32
 0x826bc	dir32
+0x991e8	dir32
 0x9ad08	dir32
 0x9be18	dir32
 0x9be1c	dir32
@@ -14431,6 +14432,7 @@ site_rva	kind
 0x9bfa8	dir32
 0x9bfb4	dir32
 0x9c188	dir32
+0x9c190	dir32
 0x9c194	dir32
 0x9c198	dir32
 0x9c1a0	dir32

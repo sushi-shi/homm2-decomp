@@ -308,6 +308,7 @@ class Census:
         # byte-identical members (memcpy/memmove, the lock wrappers) collide
         self.lib_candidates: dict[int, set[tuple[str, str, str]]] = defaultdict(set)
         self.lib_data_code: list[tuple[int, int]] = []
+        pending = []
         self.library_data_ranges: list[tuple[int, int]] = []
         for library in ("libcmt.lib", "oldnames.lib"):
             path = find_ci(msvc_dir() / "lib", library)
@@ -318,8 +319,21 @@ class Census:
                     coff = CoffObject(payload)
                 except Exception:
                     continue
+                # Where this member's previous code section was placed: a
+                # body too short to search for (fpinit's one-byte `ret`
+                # _fpclear) is admitted only directly after it.
+                follow = None
                 for section in coff.sections:
                     if section.raw_size < 8:
+                        if follow is not None and section.raw_size \
+                                and section.characteristics & MEM_EXECUTE \
+                                and not any(r.section == section.index
+                                            for r in coff.relocations):
+                            body = coff.section_bytes(section)
+                            if self.text[follow:follow + len(body)] == body:
+                                pending.append((follow, len(body), coff, section, body, [],
+                                                f"{library}:{member}"))
+                                follow += len(body)
                         continue
                     if not section.characteristics & MEM_EXECUTE:
                         if section.raw_offset and section.characteristics & 0x40 \
@@ -345,8 +359,18 @@ class Census:
                     if not hits or len(hits) > (4 if len(body) >= 32 else 1):
                         continue
                     for hit in hits:
-                        self._library_hit(coff, section, body, relocs, hit,
-                                          f"{library}:{member}")
+                        pending.append((hit, len(body), coff, section, body, relocs,
+                                        f"{library}:{member}"))
+                    follow = hits[0] + len(body) if len(hits) == 1 else None
+        # A short member body found inside a longer body of another member
+        # (iswctype's `push; push; call; pop; pop; ret` inside input.obj's
+        # _un_inc) is that body's tail, not a function of its own.
+        spans = sorted({(hit, hit + size) for hit, size, *_rest in pending})
+        for hit, size, coff, section, body, relocs, name in pending:
+            if any(lo <= hit and hit + size <= hi and (lo, hi) != (hit, hit + size)
+                   for lo, hi in spans):
+                continue
+            self._library_hit(coff, section, body, relocs, hit, name)
         # The candidate objects' own initialized data: a uniquely placed,
         # byte-identical section fixes its pointer fields the same way.
         from homm2.core.paths import IMAGE_BUILD
@@ -382,7 +406,8 @@ class Census:
             if value < len(body):
                 self.lib_starts[lo + value] = name
         for sym in coff.symbols.values():
-            if sym.section == section.index and sym.storage_class == 2 \
+            if sym.section == section.index and (sym.storage_class == 2
+                                                 or (compiled and sym.typ == 0x20)) \
                     and sym.value < len(body) and name.startswith("libcmt"):
                 self.lib_names.setdefault(lo + sym.value, sym.name)
                 library, member = name.split(":", 1)
@@ -951,7 +976,22 @@ def write_identifications(census: Census, out: Path, sizes: dict[int, int]) -> N
         lines.append(f"0x{rva:x},{sizes[rva]},{symbol},{member.rsplit(chr(92), 1)[-1]},"
                      f"{library},census masked-bytes contribution 0x{lo:x}+0x{hi - lo:x},"
                      f"{alternates}")
-    (out / "functions_static_libs.csv").write_text("\n".join(lines) + "\n")
+    # Reviewed rows survive regeneration: a disambiguated byte-identical
+    # member (unlink.obj's _remove, not rmdir.obj's _rmdir) or a member the
+    # byte search cannot place (a forwarding stub whose body is one call).
+    path = out / "functions_static_libs.csv"
+    reviewed = {}
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            fields = line.split(",", 6)
+            if line.startswith("0x") and len(fields) == 7 and (
+                    fields[5].startswith("reviewed") or fields[6].startswith("disambiguated")):
+                reviewed[int(fields[0], 16)] = line
+    rows = {int(line.split(",", 1)[0], 16): line for line in lines if line.startswith("0x")}
+    rows.update(reviewed)
+    lines = [line for line in lines if not line.startswith("0x")] + [
+        rows[rva] for rva in sorted(rows)]
+    path.write_text("\n".join(lines) + "\n")
     coff = _import_coff_names(t["dll"] for t in census.thunks)
     lines = [
         "# Import thunks (jmp [IAT]) resolved through the retail import directory",

@@ -15,6 +15,7 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
+#include <EDITOR/lineManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -3722,9 +3723,9 @@ void ShutDown(H2_CONST char* message) {
         sprintf(buffer, localization::Tr("system.goodbye"));
     }
     gbClosingApp = true;
-    if (mapExtra)
-        delete mapExtra;
-    mapExtra = NULL;
+    if (gLineMap)
+        delete gLineMap;
+    gLineMap = NULL;
     if (bigFont) {
         gpResourceManager->Dispose(bigFont);
         bigFont = NULL;

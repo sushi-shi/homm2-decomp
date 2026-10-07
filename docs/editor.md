@@ -70,6 +70,13 @@ dispatch and index tables, unreached bodies at a `/Od` frame prologue or a
 with their relocations masked. Run on the game as a control it recovers 2,455
 of the 2,474 inventory starts and 30,504 of the 30,675 reviewed DIR32 sites.
 EH registration stubs are not functions (as in the game's inventory).
+A LIBCMT body found entirely inside a longer member's body is that body's
+tail, not a function (iswctype's six instructions end input.obj's
+`_un_inc`); a body under eight bytes is placed only straight after its own
+member's previous section (fpinit's one-byte `_fpclear`). Compiled static
+functions are named too (input.obj's `_hextodec`, frame.obj's
+`ExFilterRethrow`). Reviewed rows of functions_static_libs.csv (evidence
+`reviewed...` or alternates `disambiguated...`) survive regeneration.
 Data words it would admit as pointers but that are ordinary payload (packed
 `gOverlayTypes` fields whose dwords happen to name image addresses) are
 reviewed out in `config/retail/editor/reloc_exclusions.tsv`.
@@ -81,12 +88,12 @@ that module.
 
 | Editor census | Count |
 | --- | ---: |
-| Function starts | 2,208 |
-| Functions | 1,259 |
+| Function starts | 2,197 |
+| Functions | 1,248 |
 | EH funclets | 197 |
 | Import thunks | 200 |
 | Alignment fill | 552 |
-| Absolute fields | 14,676 |
+| Absolute fields | 14,678 |
 
 ## Placements
 
