@@ -94,29 +94,6 @@
         unset _homm2_root
       '';
 
-      # nvim shim: auto-load editor/nvim (:Homm2) without touching the user's config.
-      nvimShimHook = ''
-        if command -v nvim >/dev/null 2>&1 && [ -d "$HOMM2_DIR/editor/nvim" ]; then
-          if [ -z "''${HOMM2_NVIM_REAL:-}" ] || [ ! -x "$HOMM2_NVIM_REAL" ]; then
-            export HOMM2_NVIM_REAL="$(command -v nvim)"
-          fi
-          export HOMM2_NVIM_RTP="$HOMM2_DIR/editor/nvim"
-          _homm2_nvim_bin="$HOMM2_DIR/build/nvim-shim"
-          if mkdir -p "$_homm2_nvim_bin" \
-              && printf '%s\n' '#!/bin/sh' \
-                "exec \"\$HOMM2_NVIM_REAL\" --cmd 'lua vim.opt.runtimepath:prepend(vim.env.HOMM2_NVIM_RTP)' \"\$@\"" \
-                > "$_homm2_nvim_bin/nvim" \
-              && chmod +x "$_homm2_nvim_bin/nvim"; then
-            export PATH="$_homm2_nvim_bin:$PATH"
-            export HOMM2_NVIM_WRAPPED="$HOMM2_DIR"
-            echo "[homm2] nvim       : WRAPPED -> auto-loads editor/nvim (:Homm2)." >&2
-          else
-            echo "[homm2] nvim       : wrapper setup failed" >&2
-          fi
-          unset _homm2_nvim_bin
-        fi
-      '';
-
       # objdiff shim: open this checkout's generated project unless the caller
       # explicitly selects another project directory.
       objdiffShimHook = ''
@@ -239,7 +216,6 @@
             echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
             echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC6 SP5 + wine)" >&2
-            ${nvimShimHook}
             ${objdiffShimHook}
           '';
         };
@@ -282,7 +258,6 @@
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/sema/ghidra/...)" >&2
-            ${nvimShimHook}
             ${objdiffShimHook}
           '';
         };
