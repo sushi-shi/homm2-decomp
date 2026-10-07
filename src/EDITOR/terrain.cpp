@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-DATA(0x004996ac) i32 gTerrainBrush = TERRAIN_BRUSH_DOUBLE;
+DATA(0x004996ac) i32 gTerrainBrush = EDIT_BRUSH_DOUBLE;
 DATA(0x004996b0) TerrainButtonPosition gTerrainButtonPositions[IDX(TERRAIN_COUNT)] = {
     {0x1fe, 0xf3},
     {0x21b, 0xf3},
@@ -48,16 +48,16 @@ i32 terrainManager::Open(i32 priority) {
     i32 i;
     char* name;
 
-    for (i = 0; i < TERRAIN_BRUSH_COUNT; i++) {
+    for (i = 0; i < EDIT_BRUSH_COUNT; i++) {
         m_brushButtons[i] = new iconWidget(
-            TERRAIN_BRUSH_BUTTON_X + i * TERRAIN_BRUSH_BUTTON_STEP,
-            TERRAIN_BRUSH_BUTTON_Y,
-            TERRAIN_BRUSH_BUTTON_WIDTH,
-            TERRAIN_BRUSH_BUTTON_HEIGHT,
+            EDIT_BRUSH_BUTTON_X + i * EDIT_BRUSH_BUTTON_STEP,
+            EDIT_BRUSH_BUTTON_Y,
+            EDIT_BRUSH_BUTTON_WIDTH,
+            EDIT_BRUSH_BUTTON_HEIGHT,
             "editbtns.icn",
-            TERRAIN_BRUSH_FRAME_FIRST + i * 2 + (i == gTerrainBrush),
+            EDIT_BRUSH_FRAME_FIRST + i * EDIT_BUTTON_FRAMES + (i == gTerrainBrush),
             ICON_DRAW_NORMAL,
-            TERRAIN_BRUSH_BUTTON_ID_FIRST + i,
+            EDIT_BRUSH_BUTTON_ID_FIRST + i,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -108,7 +108,7 @@ i32 terrainManager::Open(i32 priority) {
     gEditManager->m_placedX = EDIT_NO_CELL;
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "terrainManager");
     SelectTerrain(gTerrainChoice);
     return 0;
@@ -118,7 +118,7 @@ VA(0x00428e9e, 0x1ac)
 void terrainManager::Close(void) {
     i32 i;
 
-    for (i = 0; i < TERRAIN_BRUSH_COUNT; i++) {
+    for (i = 0; i < EDIT_BRUSH_COUNT; i++) {
         gEditManager->m_window->RemoveWidget(m_brushButtons[i]);
         delete m_brushButtons[i];
     }
@@ -135,7 +135,7 @@ void terrainManager::Close(void) {
         gEditManager->DrawMap();
     }
     gEditManager->m_window->DrawWindow();
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x0042904a, 0xeb)
@@ -143,12 +143,12 @@ void terrainManager::UpdateButtons(void) {
     tag_message message;
     i32 i;
 
-    for (i = 0; i < TERRAIN_BRUSH_COUNT; i++) {
+    for (i = 0; i < EDIT_BRUSH_COUNT; i++) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        message.payload.widget.id = TERRAIN_BRUSH_BUTTON_ID_FIRST + i;
+        message.payload.widget.id = EDIT_BRUSH_BUTTON_ID_FIRST + i;
         message.payload.widget.data.value
-            = TERRAIN_BRUSH_FRAME_FIRST + i * 2 + (i == gTerrainBrush);
+            = EDIT_BRUSH_FRAME_FIRST + i * EDIT_BUTTON_FRAMES + (i == gTerrainBrush);
         gEditManager->m_window->BroadcastMessage(message);
     }
     sprintf(gText, gTerrainNames[m_terrain]);
@@ -157,19 +157,19 @@ void terrainManager::UpdateButtons(void) {
     message.payload.widget.id = TERRAIN_NAME_ID;
     message.payload.widget.data.text = gText;
     gEditManager->m_window->BroadcastMessage(message);
-    gEditManager->m_window->DrawWindow(0);
+    gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     gpWindowManager->UpdateScreenRegion(
-        TERRAIN_PANEL_REGION_X, TERRAIN_PANEL_REGION_Y,
-        TERRAIN_PANEL_REGION_WIDTH, TERRAIN_PANEL_REGION_HEIGHT);
+        EDIT_TOOL_PANEL_X, EDIT_TOOL_PANEL_Y,
+        EDIT_TOOL_PANEL_WIDTH, EDIT_TOOL_PANEL_HEIGHT);
 }
 
 VA(0x00429135, 0x3d)
 i32 terrainManager::GetBrushSize(void) {
-    if (gTerrainBrush == TERRAIN_BRUSH_QUADRUPLE)
+    if (gTerrainBrush == EDIT_BRUSH_QUADRUPLE)
         return TERRAIN_BRUSH_SIZE_QUADRUPLE;
-    else if (gTerrainBrush == TERRAIN_BRUSH_DOUBLE)
+    else if (gTerrainBrush == EDIT_BRUSH_DOUBLE)
         return TERRAIN_BRUSH_SIZE_DOUBLE;
-    else if (gTerrainBrush == TERRAIN_BRUSH_SINGLE)
+    else if (gTerrainBrush == EDIT_BRUSH_SINGLE)
         return TERRAIN_BRUSH_SIZE_SINGLE;
     else
         return TERRAIN_BRUSH_SIZE_AREA;
@@ -180,18 +180,18 @@ void terrainManager::SelectBrush(i32 size, i32 x, i32 y) {
     if (size == TERRAIN_BRUSH_SIZE_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 1;
-        gSelectionHeight = 1;
+        gSelectionWidth = EDIT_BRUSH_SINGLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_SINGLE_CELLS;
     } else if (size == TERRAIN_BRUSH_SIZE_DOUBLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 2;
-        gSelectionHeight = 2;
+        gSelectionWidth = EDIT_BRUSH_DOUBLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_DOUBLE_CELLS;
     } else if (size == TERRAIN_BRUSH_SIZE_QUADRUPLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 4;
-        gSelectionHeight = 4;
+        gSelectionWidth = EDIT_BRUSH_QUADRUPLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_QUADRUPLE_CELLS;
     } else {
         gSelectionX = gSelectionY = EDIT_NO_CELL;
     }
@@ -213,7 +213,7 @@ void terrainManager::TrackCursor(void) {
         nextEvent = gpInputManager->PeekEvent();
         if (nextEvent.type == MESSAGE_MOUSE_MOVE) {
             gTerrainCursorMoves++;
-            if (gTerrainCursorMoves < TERRAIN_CURSOR_REDRAW_INTERVAL)
+            if (gTerrainCursorMoves < EDIT_CURSOR_REDRAW_INTERVAL)
                 return;
         }
         gTerrainCursorMoves = 0;
@@ -228,14 +228,12 @@ void terrainManager::TrackCursor(void) {
     }
 }
 
-#if H2_RETAIL_COMPILER
-#define help help_b
-#define peek peek_p
-#define first first_m
-#define width width_o
-#define height height_j
-#define oldSize oldSize_b
-#endif
+#define help help_b       // frame-slot spelling
+#define peek peek_p       // frame-slot spelling
+#define first first_m     // frame-slot spelling
+#define width width_o     // frame-slot spelling
+#define height height_j   // frame-slot spelling
+#define oldSize oldSize_b // frame-slot spelling
 VA(0x00429398, 0xa3e)
 MessageDispatchResult terrainManager::Main(tag_message& message) {
     tag_message peek;
@@ -258,12 +256,12 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
                         break;
                     switch (message.payload.widget.id) {
-                        case TERRAIN_BRUSH_BUTTON_ID_FIRST:
-                        case TERRAIN_BRUSH_BUTTON_ID_FIRST + 1:
-                        case TERRAIN_BRUSH_BUTTON_ID_FIRST + 2:
-                        case TERRAIN_BRUSH_BUTTON_ID_LAST:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                        case EDIT_BRUSH_BUTTON_ID_LAST:
                             gTerrainBrush
-                                = message.payload.widget.id - TERRAIN_BRUSH_BUTTON_ID_FIRST;
+                                = message.payload.widget.id - EDIT_BRUSH_BUTTON_ID_FIRST;
                             gEditManager->m_brushSize = GetBrushSize();
                             UpdateButtons();
                             break;
@@ -301,17 +299,17 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                             case TERRAIN_BUTTON_ID_FIRST + IDX(TERRAIN_BEACH):
                                 help = TERRAIN_HELP_FIRST_TERRAIN + IDX(TERRAIN_BEACH);
                                 break;
-                            case TERRAIN_BRUSH_BUTTON_ID_FIRST:
-                                help = TERRAIN_HELP_FIRST_BRUSH + TERRAIN_BRUSH_SINGLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST:
+                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_SINGLE;
                                 break;
-                            case TERRAIN_BRUSH_BUTTON_ID_FIRST + 1:
-                                help = TERRAIN_HELP_FIRST_BRUSH + TERRAIN_BRUSH_DOUBLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
+                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_DOUBLE;
                                 break;
-                            case TERRAIN_BRUSH_BUTTON_ID_FIRST + 2:
-                                help = TERRAIN_HELP_FIRST_BRUSH + TERRAIN_BRUSH_QUADRUPLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_QUADRUPLE;
                                 break;
-                            case TERRAIN_BRUSH_BUTTON_ID_LAST:
-                                help = TERRAIN_HELP_FIRST_BRUSH + TERRAIN_BRUSH_AREA;
+                            case EDIT_BRUSH_BUTTON_ID_LAST:
+                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_AREA;
                                 break;
                         }
                         if (help >= 0)
@@ -359,7 +357,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                 anchorX += gEditManager->m_viewX;
                                 anchorY += gEditManager->m_viewY;
                                 gEditManager->SaveUndo();
-                                first = 1;
+                                first = true;
                                 gTerrainCursorMoves = 0;
                                 event = gpInputManager->GetEvent();
                                 while (event.type != MESSAGE_LEFT_BUTTON_UP
@@ -367,7 +365,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                     Process1WindowsMessage();
                                     gpMouseManager->Main(event);
                                     if (event.type == MESSAGE_MOUSE_MOVE || first) {
-                                        first = 0;
+                                        first = false;
                                         if (event.type == MESSAGE_MOUSE_MOVE) {
                                             x = event.payload.mouse.screenX;
                                             y = event.payload.mouse.screenY;
@@ -387,12 +385,13 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
-                                                        1, 1, ground);
+                                                        EDIT_BRUSH_SINGLE_CELLS, EDIT_BRUSH_SINGLE_CELLS,
+                                                        ground);
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_DOUBLE:
                                                     SelectBrush(gEditManager->m_brushSize, x, y);
-                                                    width = x < MAP_WIDTH - 1 ? 2 : 1;
-                                                    height = y < MAP_HEIGHT - 1 ? 2 : 1;
+                                                    width = x < MAP_WIDTH - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
+                                                    height = y < MAP_HEIGHT - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
@@ -400,9 +399,12 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_QUADRUPLE:
                                                     SelectBrush(gEditManager->m_brushSize, x, y);
-                                                    width = x < MAP_WIDTH - 3 ? 4 : MAP_WIDTH - x;
-                                                    height
-                                                        = y < MAP_HEIGHT - 3 ? 4 : MAP_HEIGHT - y;
+                                                    width = x < MAP_WIDTH - (EDIT_BRUSH_QUADRUPLE_CELLS - 1)
+                                                                ? EDIT_BRUSH_QUADRUPLE_CELLS
+                                                                : MAP_WIDTH - x;
+                                                    height = y < MAP_HEIGHT - (EDIT_BRUSH_QUADRUPLE_CELLS - 1)
+                                                                 ? EDIT_BRUSH_QUADRUPLE_CELLS
+                                                                 : MAP_HEIGHT - y;
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
@@ -441,13 +443,13 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                         gSelectionX, gSelectionY,
                                         gSelectionWidth, gSelectionHeight, ground);
                                 gSelectionX = gSelectionY = EDIT_NO_CELL;
-                                gEditManager->BlendTerrain(m_terrain, 0, 1, 0, 0);
+                                gEditManager->BlendTerrain(m_terrain, false, true, false, false);
                                 gEditManager->DrawMap();
                                 gEditManager->UpdateMapView();
-                                gEditManager->DrawRadar(1);
+                                gEditManager->DrawRadar(true);
                                 m_lastY = EDIT_NO_CELL;
                                 m_lastX = EDIT_NO_CELL;
-                                gEditManager->m_mapChanged = 1;
+                                gEditManager->m_mapChanged = true;
                                 break;
                         }
                     }
@@ -465,13 +467,13 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
             }
             return MESSAGE_DISPATCH_CONSUME;
         case MESSAGE_KEY_DOWN:
-            if ((message.payload.keyboard.keyCode == TERRAIN_BRUSH_KEY_FIRST
-                 || message.payload.keyboard.keyCode == TERRAIN_BRUSH_KEY_FIRST + 1
-                 || message.payload.keyboard.keyCode == TERRAIN_BRUSH_KEY_FIRST + 2
-                 || message.payload.keyboard.keyCode == TERRAIN_BRUSH_KEY_LAST)
+            if ((message.payload.keyboard.keyCode == INPUT_SCAN_1
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_2
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_3
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_4)
                 && !HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                 oldSize = gEditManager->m_brushSize;
-                gTerrainBrush = message.payload.keyboard.keyCode - TERRAIN_BRUSH_KEY_FIRST;
+                gTerrainBrush = message.payload.keyboard.keyCode - INPUT_SCAN_1;
                 gEditManager->m_brushSize = GetBrushSize();
                 if (oldSize != gEditManager->m_brushSize)
                     TrackCursor();
@@ -482,14 +484,12 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONTINUE;
 }
-#if H2_RETAIL_COMPILER
 #undef help
 #undef peek
 #undef first
 #undef width
 #undef height
 #undef oldSize
-#endif
 
 // Nothing calls it.
 VA(0x00429dd6, 0xb)

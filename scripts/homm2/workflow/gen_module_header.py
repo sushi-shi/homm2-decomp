@@ -8,6 +8,8 @@ Prints the decls to stdout (review) — does not overwrite an existing header un
 import sys, re, os
 
 VA_RE = re.compile(r'^VA\(0x[0-9a-fA-F]+,')
+# A second image's address of the same definition (`VA_AT(editor, ...)`).
+VA_AT_RE = re.compile(r'^VA_AT\(')
 HEAD_RE = re.compile(r'\)(\s*const)?$')          # a function head ends with ')' or ') const'
 
 def free_decls(path):
@@ -16,7 +18,10 @@ def free_decls(path):
     for i in range(len(lines) - 1):
         if not VA_RE.match(lines[i]):
             continue
-        line = lines[i + 1]
+        j = i + 1
+        while j < len(lines) - 1 and VA_AT_RE.match(lines[j]):
+            j += 1
+        line = lines[j]
         if '(' not in line:
             continue
         brace = line.find('{')
