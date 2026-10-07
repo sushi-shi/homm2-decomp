@@ -63,3 +63,18 @@ statement here, so both casts are needed.
 
 The mirrored form — an `i8` cast — emits `movsbl %al, %ecx` instead, so the register
 half named in the `movsx` tells you the width directly.
+
+## Without an addend
+
+The tell does not need a sum. `townManager::SetupMage` stores a bare
+relational through the same 16-bit path at function+0x120:
+
+```
+0f 9d c0     setge al
+0f bf c8     movsx ecx, ax        <<< retail and the cast arm
+89 4d e4     mov [ebp-0x1c], ecx
+```
+
+Removing the `i16` cast stores `89 45 e4` directly: three bytes shorter and
+no longer exact (889 against 886 bytes). The bytes require a 16-bit
+intermediate; they do not say which source construct produced it.

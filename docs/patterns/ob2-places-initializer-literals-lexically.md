@@ -57,7 +57,7 @@ per-function literal sections into the main `.data`).
   (their first users follow), so the pointer and the tables lead Misc's
   `.data` while the track text sits between the two halves' literals, in
   both programs. This replaces the earlier two-unit split
-  (`docs/matching/Misc-track-name-data/owner-split.cpp`): the editor's Rich
+  (`docs/matching/Misc-track-name-data/owner-split.cpp` at `f0ae961d2`): the editor's Rich
   header counts one C++ object per `ctype` registration (65 and 65), which
   the split could not meet, and both linked images are byte-identical with
   the one-object Misc.

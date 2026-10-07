@@ -89,7 +89,7 @@ you opt into with reason.
   hash) and keep the cleanest spelling that preserves the win, or record the
   island that certifies the clean body.
 - **Cross-version rule**: any winning spelling that diverges from the PoL 2.0
-  spelling adds an OPEN row to `docs/cross-version-spellings.md` in the same
+  spelling adds an OPEN row to `docs/versions/cross-version-spellings.md` in the same
   change. (Verification against 2.0 is deferred until 2.1 is complete.)
 
 ## Known VC6 /Od levers to seed axes from (measured this campaign)

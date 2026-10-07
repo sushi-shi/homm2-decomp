@@ -38,5 +38,5 @@ change the shared bchar alias or substitute VC6 bool.
 
 Evidence: `build/c56-pow-batch/results.json` (256/256, restored, no truncation),
 `army-owner-all-native.log`, `army-pow-owner-final-retail.log`, and the
-[army review](../reconstruction/C55-C56-B73.md). The old-owner failed arms remain
+army review (`docs/reconstruction/C55-C56-B73.md` at `f0ae961d2`). The old-owner failed arms remain
 diagnostic history; they do not contradict the new structural parent.

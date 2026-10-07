@@ -38,6 +38,9 @@ for `EDT2PL.exe`). Addresses are image RVAs.
   `data_initialized_storage.tsv`: reviewed initialized storage for the strict
   allocation audit.
 - `link_order_crt.txt`: the reviewed LIBCMT member order of the retail link.
+- `versions/buka-va-queue.tsv`: PoL 2.0 → Buka address claims harvested from
+  the earlier attempt; `homm2.audit.cross_version` reads them to cross-check its
+  pairing ([version lineage](../docs/versions/README.md)).
 
 ## Reviews (`reviews/`)
 

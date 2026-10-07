@@ -34,6 +34,6 @@ retail address / bytes                 candidate function offset / bytes
 Separate complete two-arm matrices produce identical 51/193-byte targets
 and 4/12 blocks. Both final objects pass full native whole-section comparison;
 both functions pass scoped genuine-retail bytes, DIR32 sites and ordered
-target checks. See [serial-scalar evidence](../reconstruction/serial-scalars.md).
+target checks. See serial-scalar evidence (`docs/reconstruction/serial-scalars.md` at `f0ae961d2`).
 These are sufficient reconstructions, not claims about the lost original
 variable names or declarations.

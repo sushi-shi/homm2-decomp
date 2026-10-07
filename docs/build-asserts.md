@@ -52,8 +52,8 @@ functions follow the separate source-private `VA` inventory described above.
 
 Rationale for def-not-extern: the VA describes *storage*, which the definition owns; a caller that
 `#include`s the header sees the plain `extern` and never a duplicated address. The completed
-migration emitted `DATA(VA) T g;`; its generator is archived as
-`scripts/archive/gen_global_defs.py`. Anonymous or synthetic storage without a retained public
+migration emitted `DATA(VA) T g;`; its retired generator is
+`scripts/archive/gen_global_defs.py` at `f0ae961d2`. Anonymous or synthetic storage without a retained public
 symbol is a `DATA(VA) static T g;` definition in the sole owning module. A real cross-TU external
 necessarily has a retained public symbol and uses its owner header; def-less synthetic externs are
 rejected.

@@ -25,9 +25,10 @@ ID-to-readable-UTF-8 integration remains separate work.
   `a813e8254`; expanded compiler text for all 96 game source files is unchanged.
 - `homm2 build` passes. All 98 objects still pass the migration baseline comparison
   (42,433 ordered relocations); the field audit reports 38,307 sites and no items.
-- All 28 localization tests pass; the full suite runs 933 tests with six existing
-  skips. Tests cover original wording, Buka argument composition and English-only
-  edits preserving the Russian compiler view.
+- The localization text tests in `homm2 verify behaviour`
+  (`scripts/homm2/verify/behaviour/test_localization_text.py`) cover the original
+  English wording, complete sentences built from fragments, branch-specific map
+  messages and the absence of text outside the catalog.
 
 ## Russian / corrected English / original 2.0
 

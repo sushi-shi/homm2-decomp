@@ -9,7 +9,7 @@ source changes. Anchors are function/member names because line numbers move.
 
 The PoL retail image used here is
 `/tmp/homm2-rename-ai-decomp-pol/build/orig/HEROES2W.EXE`.
-Run `python3 scripts/archive/codeview_symbols.py <image>` to reproduce its
+The retired `scripts/archive/codeview_symbols.py <image>` (at `f0ae961d2`) reproduces its
 public symbol inventory. Its NB09 symbol subsections contain 3,541 `S_PUB32`
 records, zero `S_BPREL32` stack-local/argument records, zero `S_REGISTER`
 records, and no `sstTypes` subsection. This establishes public name provenance;

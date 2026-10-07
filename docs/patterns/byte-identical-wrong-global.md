@@ -72,3 +72,16 @@ offset (`parse_obj(..., with_sites=True)` on both sides) and read the site the
 audit names: the retail symbol at that site is the operand the source must load
 there. Reach for the source operand order and the assignment/test split before
 anything else — the bytes cannot tell you, and the fuzzy score never will.
+
+## A third shape: the owner moves into the addend
+
+`owner[i - K]` over adjacent globals folds `-K * sizeof(element)` into the
+DIR32 addend, which may be negative. The linked displacement is then the same
+as indexing the preceding global at `[i]`, and only the symbol/addend pair
+says which array the code indexes. `JosephName` and `IvanName` (40 bytes each,
+`8b 04 95` at +0x1d, DIR32 at +0x20) index four map slots that belong to
+`xJosephName` (6 entries at 0x0051b7d0) and `xUncleIvanName` (6 at
+0x0051b7e8) with `map - 4`. Writing them against `xStableText` (4 entries at
+0x0051b7c0) at `+0` and `+24` links to the same 0x0051b7c0 / 0x0051b7d8 but
+reads out of that object's bounds; the correct owners carry addend
+`0xfffffff0` (-16). Only the ordered relocation check distinguishes them.

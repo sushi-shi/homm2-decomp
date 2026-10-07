@@ -59,5 +59,5 @@ necessarily wrote an explicit cast. The arithmetic form's direct cast
 deletion still adds the six-byte AND in this parent.
 
 The complete cross-products and native/retail evidence are recorded in
-[C34/C37/S39/B59](../reconstruction/C34-C37-S39-B59.md), with exact source
-axes under `docs/matching/game-spell-widgets/`.
+C34/C37/S39/B59 (`docs/reconstruction/C34-C37-S39-B59.md` at `f0ae961d2`), with exact source
+axes under `docs/matching/game-spell-widgets/` at the same commit.

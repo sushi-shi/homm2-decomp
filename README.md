@@ -87,8 +87,9 @@ inputs, the toolchain, Wine state and generated reports stay in ignored
 
 ## Versions
 
-The version lineage runs Price of Loyalty 2.0 (`decomp-pol-2.0`) → Gold 2.1 →
-Buka; what Gold 2.1 and Buka changed is in [PoL 2.0 → Buka changes](docs/version-changes.md).
+The [version lineage](docs/versions/README.md) runs Price of Loyalty 2.0
+(`decomp-pol-2.0`) → Gold 2.1 → Buka; what Gold 2.1 and Buka changed is in
+[PoL 2.0 → Buka changes](docs/versions/gold-2.1-buka.md).
 
 ## Documentation
 

@@ -29,7 +29,7 @@ Identical on MSVC 4.2, so this is not a version difference.
 
 ## This retires the "`this`-slot counter" rule
 
-`docs/campaign-state.md` claimed: *"retail spilling `this` at `[ebp-N]` means retail
+An earlier campaign note claimed: *"retail spilling `this` at `[ebp-N]` means retail
 has exactly `N/4 - 1` named locals"*. That is only true for a function that inlines
 nothing and materialises no temporaries. Any function calling an inlined accessor
 that has locals of its own breaks it, and the game's headers are full of such

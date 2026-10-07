@@ -145,7 +145,7 @@ declarations differ.
 Renaming a local until the buckets line up reproduces retail's bytes, but many
 different names share a bucket, so the match is SUFFICIENT and never UNIQUE. Such a
 rename is an unresolved claim about what the developers wrote, not a recovery of it,
-and belongs in `docs/cross-version-spellings.md` as an OPEN row - not in the source
+and belongs in `docs/versions/cross-version-spellings.md` as an OPEN row - not in the source
 as a settled fact.
 
 Levers that carry no naming claim, and are therefore preferable:
@@ -178,7 +178,7 @@ way, no identifier touched.
 So the preference order for a displacement-only residual is: scope move first,
 then a same-bucket declaration swap, then a missing declaration, and a rename only
 when none of those can express the required order - and then as an OPEN row in
-`docs/cross-version-spellings.md`, never as a settled fact.
+`docs/versions/cross-version-spellings.md`, never as a settled fact.
 
 ## How far the block explanation actually reaches (measured)
 

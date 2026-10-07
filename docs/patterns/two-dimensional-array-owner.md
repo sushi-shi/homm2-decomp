@@ -31,7 +31,7 @@ Fireball and MeteorShower independently confirm both read and write forms
 with4-arm products each. Five accesses are recovered overall, without a
 global layout change. Complete SPELLS/SPELLAI native objects retain all54
 emitted functions and allocated sections. Detailed matrices and private
-numeric-operand proof: [O05/C58/S56](../reconstruction/O05-C58-S56-B75.md).
+numeric-operand proof: O05/C58/S56 (`docs/reconstruction/O05-C58-S56-B75.md` at `f0ae961d2`).
 
 This establishes a sufficient clean spelling, not the original source text.
 It does not justify flattening arbitrary neighboring scalar objects or
@@ -77,4 +77,4 @@ The adjacent-cell marker read/write retain the same row stride and stack
 base. `check-ai-evidence.py` checks all three sequences against raw COFF and
 retail bytes; complete native verification covers all98 objects,1826 emitted
 function instances and allocated sections. Valid side0..1 and index0..19
-remain caller/occupancy contracts. See [C65/A02/S59](../reconstruction/C65-A02-S59-B80.md).
+remain caller/occupancy contracts. See C65/A02/S59 (`docs/reconstruction/C65-A02-S59-B80.md` at `f0ae961d2`).

@@ -51,7 +51,7 @@ buf[0] = ch;
 **Where to look for it.** Every `sprintf`/`strcpy` of a `gResourceNames[]` /
 `GetMonsterPluralName()` value that is then interpolated mid-sentence. The PoL
 2.0 body has `name[0] += ' '` there; Buka replaced it. Classify as **[Buka]** in
-`docs/version-changes.md`.
+`docs/versions/gold-2.1-buka.md`.
 
 **Closes.** `advManager::DoEvent`: three sites (`MAP_OBJECT_CAMPFIRE`,
 `ARTIFACT_EVENT_MODE_RESOURCE_3`, `ARTIFACT_EVENT_MODE_RESOURCE_5`), ~120

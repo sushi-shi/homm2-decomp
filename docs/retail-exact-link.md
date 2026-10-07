@@ -115,8 +115,8 @@ results are not proof that the current source/build reproduces retail.
 The removed implementation includes BSS/CRT/Misc/COMDAT adapters, synthetic
 COMMON-order objects, post-link import/text/PE normalizers, their orchestration,
 the legacy import-library patchers, and the production transform path. Shared
-read-only import ABI identities remain available to comparison audits. Matching
-dossiers retain the measured
-experiments as historical evidence. Conclusions about untested source ownership
+read-only import ABI identities remain available to comparison audits. The
+matching dossiers that held the measured experiments were removed after
+`f0ae961d2`. Conclusions about untested source ownership
 must remain open; a failed matrix does not prove all native explanations
 impossible.

@@ -101,11 +101,9 @@ details are in [tooling.md](tooling.md).
    change can expose a different compiler-state orbit. Never invent a source change merely to
    perturb the compiler. Generated source is never retained; best compiled clue artifacts may
    remain under `build/`, and a higher sub-100 observation may advance hash-scoped MAX.
-   Preserve each reviewed source-shape experiment under
-   `docs/matching/<function-name>/<attempt-name>.cpp`, with the attempted code, the generated
-   matrix/artifact path, and comments recording the result and disposition. One file may describe
-   all arms of a single permutation matrix; TU-state probes do not need separate source files
-   because they leave the effective function source unchanged.
+   Source-shape experiments and their matrices stay under `build/`; when one measures a reusable
+   compiler mechanism, record the mechanism in `docs/patterns/`, not the
+   attempt history.
 11. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
@@ -190,10 +188,9 @@ details are in [tooling.md](tooling.md).
   become source. Use `--record-max` only for an audited exact closure; never edit
   generated MAX/status configuration by hand.
 - Read matrix results from `results.json`/`results.csv`, not terminal snippets alone.
-  Preserve each source matrix under `docs/matching/<function>/<attempt>.cpp` with code,
-  artifact paths, completeness, topology, relocation result, and disposition. Mark
-  planned ideas explicitly `UNTRIED`; do not mix them with measured rejections.
-  (The directory starts empty on this branch; only VC6-measured attempts go in.)
+  Matrices and their artifacts are generated state under `build/`; do not commit
+  campaign logs or attempt dossiers. A measured, reusable VC6 mechanism goes to
+  `docs/patterns/`.
 - Before a focused commit run `homm2 build`, `homm2 verify relocs 0x<RVA>`,
   the appropriate disassembly/block diff, and `git diff --check`. Inspect
   `git status --short`, stage only the declared source/header/docs plus intentional

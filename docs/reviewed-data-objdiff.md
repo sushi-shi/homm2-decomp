@@ -115,7 +115,7 @@ masks relocations (see `docs/patterns/byte-identical-wrong-global.md`):
   (twice), closed by the `VTBL()` channel above.
 - 6 rows: `gArmyNames` where retail reads `gArmyNamesPlural` (and one the other
   way) across TOWNMGR, GAME and SWAPMGR — a Buka localisation change, see
-  `docs/version-changes.md`.
+  `docs/versions/gold-2.1-buka.md`.
 - 1 row: `CheckChangeCursor` read `gbColorMice` and `bLastOnscreenMouseColor`
   in the wrong order and used the compound `if ((a = b) != 0)` where retail
   splits the latch from its test.
@@ -159,10 +159,11 @@ reads the retail image, every compiled object and every file-scope `VarDecl` in
 `src/`, applies exactly the rules listed here, writes `build/gen/data_claims.json`
 and `build/gen/data_claims_rejected.json`, and with `--write` inserts the accepted
 markers. Proposals already claimed by a marker are dropped before selection, so a
-run after a landed tranche derives only what is new. `homm2 selftest audit` covers
-the pure rules: the majority rule, the payload verdicts, the per-symbol vote
-transposition, every rejection reason in `select_claims`, marker insertion, the PE
-reader's loader-zero tail, and the extent classifier.
+run after a landed tranche derives only what is new. The unit tests that covered
+its pure rules (the majority rule, payload verdicts, vote transposition, rejection
+reasons, marker insertion, the PE loader-zero tail and the extent classifier) were
+removed with the `homm2 selftest` runner; the accepted markers are checked by
+`homm2 build verify`.
 
 One caution about proving a tranche codegen-neutral from `report.json`: a
 function row carries `fuzzy_match_percent`, `size` and `address` at its own top
@@ -234,7 +235,7 @@ exactly to `crc32Table` at 0x51f5a4, and `include/BASE/MIDI_TYPES.h` is gone.
   `.rdata` floats left the list because no use site negates, so the stored sign
   is the fact and the definitions are now positive and claimed at
   0x4ea80c..0x4ea81c. `szAppName`/`szTitle` left it because they are Russian in
-  retail (see `docs/version-changes.md`), and with the translation restored both
+  retail (see `docs/versions/gold-2.1-buka.md`), and with the translation restored both
   payloads match byte for byte. `gMineCharacteristics`, `gMapColors`,
   `cCombatBkgNames` and `xRecruitmentSiteNames` were length faults rather than
   content ones: their leading cells always matched and only a trailing invented

@@ -13,7 +13,7 @@ checkout's ledger and reports. This joins the two.
 
 The join key is (unit, mangled symbol): both trees reconstruct the same source, so
 the mangled name is stable across them even where the retail address is not.
-`docs/buka-va-queue.tsv` carries the address mapping (`pol_va`) and is used only to
+`config/retail/versions/buka-va-queue.tsv` carries the address mapping (`pol_va`) and is used only to
 cross-check the pairing, never to make it.
 
 What the 2.0 evidence is worth depends on the flag change, so every paired row
@@ -33,7 +33,7 @@ matched in both images - is measured each run to calibrate the envelope. Only ro
 outside that envelope are flagged as body-change candidates.
 
     homm2 audit cross-version                       # summary
-    homm2 audit cross-version --write               # + docs/cross-version-parity.tsv
+    homm2 audit cross-version --write               # + build/versions/cross-version-parity.tsv
     homm2 audit cross-version --reference ../homm2-decomp
 """
 from __future__ import annotations
@@ -51,8 +51,8 @@ from homm2.core.paths import REPO
 
 REFERENCE_BRANCH = "decomp-pol-2.0"
 REFERENCE_ENV = "HOMM2_POL_DIR"
-OUTPUT = Path("docs/cross-version-parity.tsv")
-VA_QUEUE = Path("docs/buka-va-queue.tsv")
+OUTPUT = Path("build/versions/cross-version-parity.tsv")
+VA_QUEUE = Path("config/retail/versions/buka-va-queue.tsv")
 
 REPORT = Path("build/objdiff/report.json")
 LEDGER = Path("config/match_baseline.tsv")

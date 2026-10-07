@@ -38,7 +38,7 @@ declaration did not perturb dependent code/data/relocations.
 This recovers a credible domain, not the unknowable original declaration.
 Review every consumer and representation boundary before applying it to
 another table. Evidence and the separate four-cast product are in
-[C60/C61](../reconstruction/C60-C61-S57-B77.md) and the fixed operand checker.
+C60/C61 (`docs/reconstruction/C60-C61-S57-B77.md` at `f0ae961d2`) and the fixed operand checker.
 
 ## Castle hexes: second measured owner
 
@@ -78,4 +78,4 @@ the enum's wall/tower names are not grounds for swapping the table contents.
 Every consumer in CatAttack, ShotIsThroughWall and Earthquake was read.
 All98 native objects and1826 emitted function instances, allocated sections
 and ordered relocation identities are unchanged. See
-[C62/C63](../reconstruction/C62-C63-S58-B78.md) for scope and residuals.
+C62/C63 (`docs/reconstruction/C62-C63-S58-B78.md` at `f0ae961d2`) for scope and residuals.

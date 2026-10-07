@@ -14,8 +14,7 @@ Example::
         --min-depth 2 --max-depth 3 --limit 512 \
         -o /tmp/icon2bs-combined.json --run
 
-The historical ``permute_ast.py`` command is retained under ``scripts/archive`` only to
-reproduce old audit-ledger commands. New searches should use this frontend.
+This frontend replaces the retired ``permute_ast.py`` command.
 """
 
 from homm2.permute.generate_ast_variants import main as generate_main

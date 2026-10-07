@@ -1876,7 +1876,7 @@ DATA(0x00481364) H2_CONST char* gResourceNames[IDX(RES_COUNT)] = {
 };
 // The localised build names the mine, not the resource it yields, in the
 // adventure-map quick info; the English 2.1 tree has no such table and reads
-// gResourceNames there. See docs/version-changes.md.
+// gResourceNames there. See docs/versions/gold-2.1-buka.md.
 DATA(0x00481380) H2_CONST char* gMineNames[IDX(RES_COUNT)] = {
     localization::Tr("table.gMineNames.0"),
     localization::Tr("table.gMineNames.1"),

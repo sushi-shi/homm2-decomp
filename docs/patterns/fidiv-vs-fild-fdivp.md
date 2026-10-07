@@ -84,7 +84,7 @@ carries the cast does not matter, only the type of the division.
 `fild; fild; fdivrp`, but the 2.0 reconstruction reaches them from
 `(float)a / (float)b` under MSVC 4.2, which does not perform the `fidiv` fold at
 all. The spelling divergence is therefore a compiler-version artifact rather
-than a source difference, and stays OPEN in `docs/cross-version-spellings.md`
+than a source difference, and stays OPEN in `docs/versions/cross-version-spellings.md`
 until the 2.0 tree re-tests the `double` spelling.
 
 ## Third confirmation, and the sharper statement of the rule (SOURCE/GAME)
