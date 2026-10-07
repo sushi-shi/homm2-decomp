@@ -154,11 +154,24 @@ SIZE(mapCell, 12);
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->m_objectTileset != TILESET_DUMMY      \
      && ((cell)->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)) == 0)
 
+#ifndef HOMM2_EDITOR
+#pragma pack(push, 1)
+// A map cell and an extra record as the scenario editor keeps them: the
+// game's record and its placement links (see mapCellExtra). fullMap::Read
+// with `convert` drops the links.
 struct oldMapCell {
-    u8 raw[20];
+    mapCell cell;
+    i32 objectLink;
+    i32 overlayLink;
 };
 
 struct oldMapCellExtra {
-    u8 raw[15];
+    mapCellExtra extra;
+    i32 objectLink;
+    i32 overlayLink;
 };
+#pragma pack(pop)
+SIZE(oldMapCell, 20);
+SIZE(oldMapCellExtra, 15);
+#endif
 #endif

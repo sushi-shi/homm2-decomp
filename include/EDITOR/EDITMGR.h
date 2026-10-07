@@ -19,6 +19,45 @@ H2_ENUM_BEGIN(EditClearMask)
     EDIT_CLEAR_ROAD_MASK = 0xfc7f
 H2_ENUM_END(EditClearMask)
 
+H2_ENUM_BEGIN(EditGroundShape)
+    // giGroundShape: a terrain's plain tile, its border runs against water
+    // (the edges and corners take the cell's flip flags), the second edge
+    // runs and the decorated plain tiles.
+    EDIT_SHAPE_PLAIN              = 0,
+    EDIT_SHAPE_NORTH_EDGE         = 1,
+    EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
+    EDIT_SHAPE_EAST_EDGE          = 3,
+    EDIT_SHAPE_NORTH_EAST_INNER   = 4,
+    // The coast borders (water or beach on that side), the borders where a
+    // coast and another terrain meet, and an edge or corner with the coast
+    // beyond its corner.
+    EDIT_SHAPE_SHORE_NORTH_EDGE   = 5,
+    EDIT_SHAPE_SHORE_CORNER       = 6,
+    EDIT_SHAPE_SHORE_EAST_EDGE    = 7,
+    EDIT_SHAPE_SHORE_INNER        = 8,
+    EDIT_SHAPE_CORNER_SHORE_FAR   = 10,
+    EDIT_SHAPE_CORNER_SHORE_NEAR  = 11,
+    EDIT_SHAPE_NORTH_EDGE_SHORE   = 12,
+    EDIT_SHAPE_EAST_EDGE_SHORE    = 13,
+    EDIT_SHAPE_SHORE_EDGE_BORDER  = 14,
+    EDIT_SHAPE_SHORE_SIDE_BORDER  = 15,
+    EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
+    EDIT_SHAPE_EAST_EDGE_ALT      = 17,
+    EDIT_SHAPE_DECORATED_FIRST    = 18,
+    EDIT_SHAPE_DECORATED_SECOND   = 19,
+    EDIT_SHAPE_DECORATED_THIRD    = 20,
+    EDIT_SHAPE_DECORATED_FOURTH   = 21,
+    EDIT_SHAPE_COUNT              = 22,
+    // The shape without the varied-tile bit (GROUND_SHAPE_FLIPPED).
+    EDIT_SHAPE_MASK               = 0x7f,
+    // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
+    // each per terrain and shape.
+    EDIT_GROUND_PLAIN             = 0,
+    EDIT_GROUND_VARIED            = 1,
+    EDIT_GROUND_VARIANTS          = 2,
+    EDIT_GROUND_TILES_PER_SHAPE   = 20
+H2_ENUM_END(EditGroundShape)
+
 #pragma pack(push, 1)
 // A town or capturable-site record of the map file.
 struct EditMapRecord {
@@ -75,7 +114,7 @@ void ReadTextLine(FILE* file, char* line);
 bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
 // The map file requester: loads or saves (`mode`, a FileRequesterMode) and
 // stores the chosen file name in gMapFileName.
-i32 PickMap(i32 mode);
+b32 PickMap(i32 mode);
 // A map code of the serial (a letter from 'V' and three base-26 letters).
 char* MakeMapCode(i32 serial);
 // Shows a warning on the status bar with a beep.

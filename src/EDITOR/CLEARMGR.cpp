@@ -37,7 +37,7 @@ i32 clearManager::Open(i32 priority) {
             EDIT_BRUSH_BUTTON_WIDTH,
             EDIT_BRUSH_BUTTON_HEIGHT,
             "editbtns.icn",
-            EDIT_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush),
+            EDIT_BRUSH_FRAME_FIRST + brush * EDIT_BUTTON_FRAMES + (brush == gClearBrush),
             ICON_DRAW_NORMAL,
             EDIT_BRUSH_BUTTON_ID_FIRST + brush,
             WIDGET_KIND_ICON_DIRECT,
@@ -79,7 +79,7 @@ void clearManager::UpdateBrushButtons(void) {
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id = EDIT_BRUSH_BUTTON_ID_FIRST + brush;
         msg.payload.widget.data.value
-            = EDIT_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush);
+            = EDIT_BRUSH_FRAME_FIRST + brush * EDIT_BUTTON_FRAMES + (brush == gClearBrush);
         gEditManager->m_window->BroadcastMessage(msg);
     }
     gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
@@ -148,6 +148,8 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                         m_lastX = x;
                                         m_lastY = y;
                                         if (gClearBrush <= EDIT_BRUSH_QUADRUPLE) {
+                                            // The brush index plus one: the
+                                            // quadruple brush erases 3x3 cells.
                                             gEditManager->ClearArea(
                                                 x, y, gClearBrush + 1, gClearBrush + 1,
                                                 0, false, false);
@@ -261,18 +263,18 @@ void clearManager::SelectBrush(i32 brush, i32 x, i32 y) {
     if (brush == EDIT_BRUSH_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 1;
-        gSelectionHeight = 1;
+        gSelectionWidth = EDIT_BRUSH_SINGLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_SINGLE_CELLS;
     } else if (brush == EDIT_BRUSH_DOUBLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 2;
-        gSelectionHeight = 2;
+        gSelectionWidth = EDIT_BRUSH_DOUBLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_DOUBLE_CELLS;
     } else if (brush == EDIT_BRUSH_QUADRUPLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 4;
-        gSelectionHeight = 4;
+        gSelectionWidth = EDIT_BRUSH_QUADRUPLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_QUADRUPLE_CELLS;
     } else {
         gSelectionX = gSelectionY = EDIT_NO_CELL;
     }

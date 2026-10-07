@@ -55,7 +55,7 @@ i32 terrainManager::Open(i32 priority) {
             EDIT_BRUSH_BUTTON_WIDTH,
             EDIT_BRUSH_BUTTON_HEIGHT,
             "editbtns.icn",
-            EDIT_BRUSH_FRAME_FIRST + i * 2 + (i == gTerrainBrush),
+            EDIT_BRUSH_FRAME_FIRST + i * EDIT_BUTTON_FRAMES + (i == gTerrainBrush),
             ICON_DRAW_NORMAL,
             EDIT_BRUSH_BUTTON_ID_FIRST + i,
             WIDGET_KIND_ICON_DIRECT,
@@ -148,7 +148,7 @@ void terrainManager::UpdateButtons(void) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = EDIT_BRUSH_BUTTON_ID_FIRST + i;
         message.payload.widget.data.value
-            = EDIT_BRUSH_FRAME_FIRST + i * 2 + (i == gTerrainBrush);
+            = EDIT_BRUSH_FRAME_FIRST + i * EDIT_BUTTON_FRAMES + (i == gTerrainBrush);
         gEditManager->m_window->BroadcastMessage(message);
     }
     sprintf(gText, gTerrainNames[m_terrain]);
@@ -180,18 +180,18 @@ void terrainManager::SelectBrush(i32 size, i32 x, i32 y) {
     if (size == TERRAIN_BRUSH_SIZE_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 1;
-        gSelectionHeight = 1;
+        gSelectionWidth = EDIT_BRUSH_SINGLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_SINGLE_CELLS;
     } else if (size == TERRAIN_BRUSH_SIZE_DOUBLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 2;
-        gSelectionHeight = 2;
+        gSelectionWidth = EDIT_BRUSH_DOUBLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_DOUBLE_CELLS;
     } else if (size == TERRAIN_BRUSH_SIZE_QUADRUPLE) {
         gSelectionX = x;
         gSelectionY = y;
-        gSelectionWidth = 4;
-        gSelectionHeight = 4;
+        gSelectionWidth = EDIT_BRUSH_QUADRUPLE_CELLS;
+        gSelectionHeight = EDIT_BRUSH_QUADRUPLE_CELLS;
     } else {
         gSelectionX = gSelectionY = EDIT_NO_CELL;
     }
@@ -385,12 +385,13 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
-                                                        1, 1, ground);
+                                                        EDIT_BRUSH_SINGLE_CELLS, EDIT_BRUSH_SINGLE_CELLS,
+                                                        ground);
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_DOUBLE:
                                                     SelectBrush(gEditManager->m_brushSize, x, y);
-                                                    width = x < MAP_WIDTH - 1 ? 2 : 1;
-                                                    height = y < MAP_HEIGHT - 1 ? 2 : 1;
+                                                    width = x < MAP_WIDTH - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
+                                                    height = y < MAP_HEIGHT - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
@@ -398,9 +399,12 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_QUADRUPLE:
                                                     SelectBrush(gEditManager->m_brushSize, x, y);
-                                                    width = x < MAP_WIDTH - 3 ? 4 : MAP_WIDTH - x;
-                                                    height
-                                                        = y < MAP_HEIGHT - 3 ? 4 : MAP_HEIGHT - y;
+                                                    width = x < MAP_WIDTH - (EDIT_BRUSH_QUADRUPLE_CELLS - 1)
+                                                                ? EDIT_BRUSH_QUADRUPLE_CELLS
+                                                                : MAP_WIDTH - x;
+                                                    height = y < MAP_HEIGHT - (EDIT_BRUSH_QUADRUPLE_CELLS - 1)
+                                                                 ? EDIT_BRUSH_QUADRUPLE_CELLS
+                                                                 : MAP_HEIGHT - y;
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,

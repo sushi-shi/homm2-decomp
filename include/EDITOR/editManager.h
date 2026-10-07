@@ -89,7 +89,11 @@ H2_ENUM_BEGIN(EditBrush)
     EDIT_BRUSH_DOUBLE    = 1,
     EDIT_BRUSH_QUADRUPLE = 2,
     EDIT_BRUSH_AREA      = 3,
-    EDIT_BRUSH_COUNT     = 4
+    EDIT_BRUSH_COUNT     = 4,
+    // The square brushes' widths in cells.
+    EDIT_BRUSH_SINGLE_CELLS    = 1,
+    EDIT_BRUSH_DOUBLE_CELLS    = 2,
+    EDIT_BRUSH_QUADRUPLE_CELLS = 4
 H2_ENUM_END(EditBrush)
 
 H2_ENUM_BEGIN(EditToolPanel)
@@ -99,7 +103,8 @@ H2_ENUM_BEGIN(EditToolPanel)
     EDIT_TOOL_PANEL_WIDTH  = 0x90,
     EDIT_TOOL_PANEL_HEIGHT = 0xa0,
     // The brush buttons along its bottom (editbtns.icn), left to right; each
-    // brush has a normal and a selected frame.
+    // brush has a normal and a selected frame, as each tool button has.
+    EDIT_BUTTON_FRAMES         = 2,
     EDIT_BRUSH_BUTTON_X        = 0x1ee,
     EDIT_BRUSH_BUTTON_STEP     = 0x1e,
     EDIT_BRUSH_BUTTON_Y        = 0x168,
@@ -112,6 +117,13 @@ H2_ENUM_BEGIN(EditToolPanel)
     EDIT_CURSOR_REDRAW_INTERVAL = 10
 H2_ENUM_END(EditToolPanel)
 
+H2_ENUM_BEGIN(EditManagerSetting)
+    // The editor manager's Main accepts these messages; its pointer is
+    // editor.mse frame 0.
+    EDIT_MANAGER_DISPATCH_MASK = 0x4000,
+    EDIT_POINTER_DEFAULT       = 0
+H2_ENUM_END(EditManagerSetting)
+
 H2_ENUM_BEGIN(EditManagerLayout)
     // m_objectIcons: two icons per adventure tileset slot (gTilesetFiles);
     // Open loads the first and clears both.
@@ -122,6 +134,7 @@ H2_ENUM_BEGIN(EditManagerLayout)
     // The map-extra records (towns, heroes, events, signs) cells name, as
     // the map file stores them; record 0 is never allocated.
     EDIT_MANAGER_EXTRA_CAPACITY = 512,
+    EDIT_MANAGER_FIRST_EXTRA    = 1,
     // The save checks keep at most this many messages.
     EDIT_MANAGER_ERROR_CAPACITY = 100
 H2_ENUM_END(EditManagerLayout)
@@ -233,8 +246,10 @@ public:
     void FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain);
     // Starts an empty (or random) map of the given size.
     void InitializeMap(b32 random, i32 width, i32 height);
-    // Fits the terrain's edge tiles to their neighbours over the whole map.
-    void BlendTerrain(i32 terrain, b32 unused, b32 fromUndo, b32 skipBorders, b32 skipFill);
+    // Fits the terrain's edge tiles to their neighbours over the whole map
+    // (the terrain tool's terrain, the generator's flag and fromUndo go
+    // unread).
+    void BlendTerrain(i32 terrain, b32 generating, b32 fromUndo, b32 skipBorders, b32 skipFill);
     void ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask, b32 allLayers, b32 filtered);
     i32 SaveMap(char* name);
     // Rerolls every plain ground tile to one of its variants, more often at
