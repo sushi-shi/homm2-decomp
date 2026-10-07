@@ -65,6 +65,7 @@ include/BASE/tile2bs.h	pending
 include/BASE/tileset.h	pending	
 include/BASE/widget.h	pending	
 include/BASE/widgetKind.h	pending	
+include/EDITOR/EDITMGR.h	pending	
 include/EDITOR/EDITOR.h	pending	
 include/EDITOR/OVERLAY.h	pending	
 include/EDITOR/RANDOM.h	pending	
@@ -74,6 +75,7 @@ include/EDITOR/eventsManager.h	pending
 include/EDITOR/evntedit.h	pending	
 include/EDITOR/fullMap.h	pending	
 include/EDITOR/heroedit.h	pending	
+include/EDITOR/line.h	pending	
 include/EDITOR/lineManager.h	pending	
 include/EDITOR/mapcell.h	pending	
 include/EDITOR/overlayType.h	pending	

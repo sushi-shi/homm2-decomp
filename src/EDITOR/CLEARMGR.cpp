@@ -17,8 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-DATA(0x0045f150) i32 gClearBrush = CLEAR_BRUSH_DOUBLE;
-// Pointer moves since the brush outline was last redrawn.
+DATA(0x0045f150) i32 gClearBrush = EDIT_BRUSH_DOUBLE;
 DATA(0x0049f590) i32 gClearCursorMoves;
 
 VA(0x00401000, 0x33)
@@ -31,16 +30,16 @@ VA(0x00401033, 0x138)
 i32 clearManager::Open(i32 priority) {
     i32 brush;
 
-    for (brush = 0; brush < CLEAR_BRUSH_COUNT; brush++) {
+    for (brush = 0; brush < EDIT_BRUSH_COUNT; brush++) {
         m_brushButtons[brush] = new iconWidget(
-            CLEAR_BRUSH_BUTTON_X + brush * CLEAR_BRUSH_BUTTON_STEP,
-            CLEAR_BRUSH_BUTTON_Y,
-            CLEAR_BRUSH_BUTTON_WIDTH,
-            CLEAR_BRUSH_BUTTON_HEIGHT,
+            EDIT_BRUSH_BUTTON_X + brush * EDIT_BRUSH_BUTTON_STEP,
+            EDIT_BRUSH_BUTTON_Y,
+            EDIT_BRUSH_BUTTON_WIDTH,
+            EDIT_BRUSH_BUTTON_HEIGHT,
             "editbtns.icn",
-            CLEAR_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush),
+            EDIT_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush),
             ICON_DRAW_NORMAL,
-            CLEAR_BRUSH_BUTTON_ID_FIRST + brush,
+            EDIT_BRUSH_BUTTON_ID_FIRST + brush,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -49,7 +48,7 @@ i32 clearManager::Open(i32 priority) {
     gEditManager->m_window->DrawWindow();
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "clearManager");
     return 0;
 }
@@ -58,7 +57,7 @@ VA(0x0040116b, 0xb8)
 void clearManager::Close(void) {
     i32 brush;
 
-    for (brush = 0; brush < CLEAR_BRUSH_COUNT; brush++) {
+    for (brush = 0; brush < EDIT_BRUSH_COUNT; brush++) {
         gEditManager->m_window->RemoveWidget(m_brushButtons[brush]);
         delete m_brushButtons[brush];
     }
@@ -67,7 +66,7 @@ void clearManager::Close(void) {
         gEditManager->DrawMap();
     }
     gEditManager->m_window->DrawWindow();
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x00401223, 0xa0)
@@ -75,18 +74,18 @@ void clearManager::UpdateBrushButtons(void) {
     tag_message msg;
     i32 brush;
 
-    for (brush = 0; brush < CLEAR_BRUSH_COUNT; brush++) {
+    for (brush = 0; brush < EDIT_BRUSH_COUNT; brush++) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        msg.payload.widget.id = CLEAR_BRUSH_BUTTON_ID_FIRST + brush;
+        msg.payload.widget.id = EDIT_BRUSH_BUTTON_ID_FIRST + brush;
         msg.payload.widget.data.value
-            = CLEAR_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush);
+            = EDIT_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush);
         gEditManager->m_window->BroadcastMessage(msg);
     }
-    gEditManager->m_window->DrawWindow(0);
+    gEditManager->m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
     gpWindowManager->UpdateScreenRegion(
-        CLEAR_PANEL_REGION_X, CLEAR_PANEL_REGION_Y,
-        CLEAR_PANEL_REGION_WIDTH, CLEAR_PANEL_REGION_HEIGHT);
+        EDIT_TOOL_PANEL_X, EDIT_TOOL_PANEL_Y,
+        EDIT_TOOL_PANEL_WIDTH, EDIT_TOOL_PANEL_HEIGHT);
 }
 
 #define help helpIdx // frame-slot spelling
@@ -106,19 +105,19 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                 case WIDGET_NOTIFY_SELECT:
                 case WIDGET_NOTIFY_RIGHT_CLICK:
                     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                        help = -1;
+                        help = CLEAR_HELP_NONE;
                         switch (message.payload.widget.id) {
-                            case CLEAR_BRUSH_BUTTON_ID_FIRST:
-                                help = CLEAR_BRUSH_SINGLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST:
+                                help = EDIT_BRUSH_SINGLE;
                                 break;
-                            case CLEAR_BRUSH_BUTTON_ID_FIRST + 1:
-                                help = CLEAR_BRUSH_DOUBLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
+                                help = EDIT_BRUSH_DOUBLE;
                                 break;
-                            case CLEAR_BRUSH_BUTTON_ID_FIRST + 2:
-                                help = CLEAR_BRUSH_QUADRUPLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                                help = EDIT_BRUSH_QUADRUPLE;
                                 break;
-                            case CLEAR_BRUSH_BUTTON_ID_FIRST + 3:
-                                help = CLEAR_BRUSH_AREA;
+                            case EDIT_BRUSH_BUTTON_ID_LAST:
+                                help = EDIT_BRUSH_AREA;
                                 break;
                         }
                         if (help >= 0)
@@ -148,14 +147,14 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                     if (x != m_lastX || y != m_lastY) {
                                         m_lastX = x;
                                         m_lastY = y;
-                                        if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE) {
+                                        if (gClearBrush <= EDIT_BRUSH_QUADRUPLE) {
                                             gEditManager->ClearArea(
                                                 x, y, gClearBrush + 1, gClearBrush + 1,
-                                                0, 0, 0);
+                                                0, false, false);
                                             SelectBrush(gClearBrush, x, y);
                                             gEditManager->DrawMap();
                                             gEditManager->UpdateMapView();
-                                            gEditManager->DrawRadar(1);
+                                            gEditManager->DrawRadar(true);
                                         } else {
                                             gSelectionX = x < anchorX ? x : anchorX;
                                             gSelectionY = y < anchorY ? y : anchorY;
@@ -163,37 +162,37 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                             gSelectionHeight = abs(y - anchorY) + 1;
                                             gEditManager->DrawMap();
                                             gEditManager->UpdateMapView();
-                                            gEditManager->DrawRadar(1);
+                                            gEditManager->DrawRadar(true);
                                         }
                                     }
                                 }
                                 event = gpInputManager->GetEvent();
                             }
-                            if (gClearBrush <= CLEAR_BRUSH_QUADRUPLE)
+                            if (gClearBrush <= EDIT_BRUSH_QUADRUPLE)
                                 gEditManager->ClearArea(
                                     anchorX, anchorY, gClearBrush + 1, gClearBrush + 1,
-                                    0, 0, 0);
+                                    0, false, false);
                             else
                                 gEditManager->ClearArea(
                                     gSelectionX, gSelectionY,
-                                    gSelectionWidth, gSelectionHeight, 0, 0, 0);
+                                    gSelectionWidth, gSelectionHeight, 0, false, false);
                             gSelectionX = gSelectionY = EDIT_NO_CELL;
                             gEditManager->DrawMap();
                             gEditManager->UpdateMapView();
-                            gEditManager->DrawRadar(1);
+                            gEditManager->DrawRadar(true);
                             m_lastY = EDIT_NO_CELL;
                             m_lastX = EDIT_NO_CELL;
-                            gEditManager->m_mapChanged = 1;
+                            gEditManager->m_mapChanged = true;
                             break;
                     }
                     break;
                 case WIDGET_NOTIFY_DESELECT:
                     switch (message.payload.widget.id) {
-                        case CLEAR_BRUSH_BUTTON_ID_FIRST:
-                        case CLEAR_BRUSH_BUTTON_ID_FIRST + 1:
-                        case CLEAR_BRUSH_BUTTON_ID_FIRST + 2:
-                        case CLEAR_BRUSH_BUTTON_ID_FIRST + 3:
-                            gClearBrush = message.payload.widget.id - CLEAR_BRUSH_BUTTON_ID_FIRST;
+                        case EDIT_BRUSH_BUTTON_ID_FIRST:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                        case EDIT_BRUSH_BUTTON_ID_LAST:
+                            gClearBrush = message.payload.widget.id - EDIT_BRUSH_BUTTON_ID_FIRST;
                             UpdateBrushButtons();
                             break;
                     }
@@ -210,12 +209,12 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
             }
             return MESSAGE_DISPATCH_CONSUME;
         case MESSAGE_KEY_DOWN:
-            if ((message.payload.keyboard.keyCode == CLEAR_BRUSH_KEY_FIRST
-                 || message.payload.keyboard.keyCode == CLEAR_BRUSH_KEY_FIRST + 1
-                 || message.payload.keyboard.keyCode == CLEAR_BRUSH_KEY_FIRST + 2
-                 || message.payload.keyboard.keyCode == CLEAR_BRUSH_KEY_LAST)
+            if ((message.payload.keyboard.keyCode == INPUT_SCAN_1
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_2
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_3
+                 || message.payload.keyboard.keyCode == INPUT_SCAN_4)
                 && !HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
-                gClearBrush = message.payload.keyboard.keyCode - CLEAR_BRUSH_KEY_FIRST;
+                gClearBrush = message.payload.keyboard.keyCode - INPUT_SCAN_1;
                 TrackCursor();
                 UpdateBrushButtons();
                 return MESSAGE_DISPATCH_CONSUME;
@@ -242,7 +241,7 @@ void clearManager::TrackCursor(void) {
         pending = gpInputManager->PeekEvent();
         if (pending.type == MESSAGE_MOUSE_MOVE) {
             gClearCursorMoves++;
-            if (gClearCursorMoves < CLEAR_CURSOR_REDRAW_INTERVAL)
+            if (gClearCursorMoves < EDIT_CURSOR_REDRAW_INTERVAL)
                 return;
         }
         gClearCursorMoves = 0;
@@ -259,17 +258,17 @@ void clearManager::TrackCursor(void) {
 
 VA(0x0040194a, 0xa9)
 void clearManager::SelectBrush(i32 brush, i32 x, i32 y) {
-    if (brush == CLEAR_BRUSH_SINGLE) {
+    if (brush == EDIT_BRUSH_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;
         gSelectionWidth = 1;
         gSelectionHeight = 1;
-    } else if (brush == CLEAR_BRUSH_DOUBLE) {
+    } else if (brush == EDIT_BRUSH_DOUBLE) {
         gSelectionX = x;
         gSelectionY = y;
         gSelectionWidth = 2;
         gSelectionHeight = 2;
-    } else if (brush == CLEAR_BRUSH_QUADRUPLE) {
+    } else if (brush == EDIT_BRUSH_QUADRUPLE) {
         gSelectionX = x;
         gSelectionY = y;
         gSelectionWidth = 4;

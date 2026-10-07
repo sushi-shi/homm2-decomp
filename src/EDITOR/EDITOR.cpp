@@ -3896,32 +3896,30 @@ void DeleteMainClasses(void) {
 // The editor's message boxes carry text only and are narrower than the
 // game's. The game's dialog locals the editor dropped the code for keep their
 // frame slots.
-#if H2_RETAIL_COMPILER
-#define iconFile iconFile_a
-#define iconHeight iconHeight_h
-#define message message_b
-#define panelHeight panelHeight_d
-#define resourceFrame resourceFrame_n
-#define resourceY resourceY_f
-#define savedFirstResourceType savedFirstResourceType_k
-#define savedSecondResourceType savedSecondResourceType_m
-#define showMessage showMessage_d
-#define windowHeight windowHeight_h
-#define windowRows windowRows_b
-#define windowWidth windowWidth_f
-#endif
+#define iconFile iconFile_a                               // frame-slot spelling
+#define iconHeight iconHeight_h                           // frame-slot spelling
+#define message message_b                                 // frame-slot spelling
+#define panelHeight panelHeight_d                         // frame-slot spelling
+#define resourceFrame resourceFrame_n                     // frame-slot spelling
+#define resourceY resourceY_f                             // frame-slot spelling
+#define savedFirstResourceType savedFirstResourceType_k   // frame-slot spelling
+#define savedSecondResourceType savedSecondResourceType_m // frame-slot spelling
+#define showMessage showMessage_d                         // frame-slot spelling
+#define windowHeight windowHeight_h                       // frame-slot spelling
+#define windowRows windowRows_b                           // frame-slot spelling
+#define windowWidth windowWidth_f                         // frame-slot spelling
 VA(0x00410f26, 0x2f4)
 void NormalDialog(
     H2_CONST char* text,
     i32 dialogType,
     i32 windowX,
     i32 windowY,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32,
-    i32
+    i32 H2_UNUSED(firstResourceType),
+    i32 H2_UNUSED(firstResourceValue),
+    i32 H2_UNUSED(secondResourceType),
+    i32 H2_UNUSED(secondResourceValue),
+    i32 H2_UNUSED(showOrText),
+    i32 H2_UNUSED(timeout)
 ) {
     i32 H2_UNUSED(resourceFrame);
     i16 H2_UNUSED(showMessage);
@@ -4002,7 +4000,6 @@ void NormalDialog(
     }
     delete pNormalDialogWindow;
 }
-#if H2_RETAIL_COMPILER
 #undef iconFile
 #undef iconHeight
 #undef message
@@ -4015,7 +4012,6 @@ void NormalDialog(
 #undef windowHeight
 #undef windowRows
 #undef windowWidth
-#endif
 
 VA(0x0041121a, 0x94)
 MessageDispatchResult EventWindowHandler(struct tag_message& message) {
@@ -4106,7 +4102,7 @@ void ClearStatusText(void) {
 }
 
 VA(0x00411420, 0xb)
-void UpdateAppSpecificMenus(void*) {}
+void UpdateAppSpecificMenus(void* H2_UNUSED(hMenu)) {}
 
 VA(0x0041142b, 0x3c)
 void CleanUpMenus(void) {
@@ -4155,16 +4151,13 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
 }
 
 VA(0x0041154e, 0x12)
-void EarlyResizeWindow(i32, i32, i32, i32) {}
+void EarlyResizeWindow(i32 H2_UNUSED(x), i32 H2_UNUSED(y), i32 H2_UNUSED(width), i32 H2_UNUSED(height)) {}
 
 VA(0x00411560, 0x5)
 void UpdateSystemOptionsMenu(void) {}
 
-#if H2_RETAIL_COMPILER
-#define matchedWidgets a
-#define message msg
-#define window j
-#endif
+#define matchedWidgets a // frame-slot spelling
+#define message msg      // frame-slot spelling
 VA(0x00411565, 0x88)
 void SetWinText(heroWindow* window, i32 id) {
     i32 H2_UNUSED(matchedWidgets) = 0;
@@ -4180,8 +4173,5 @@ void SetWinText(heroWindow* window, i32 id) {
         }
     }
 }
-#if H2_RETAIL_COMPILER
 #undef matchedWidgets
 #undef message
-#undef window
-#endif

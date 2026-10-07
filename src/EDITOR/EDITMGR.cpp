@@ -4,6 +4,7 @@
 // Descriptive names: DrawRulers, DrawView, InitializeMap, FillInOverlayTiles.
 
 #include <va.h>
+#include <EDITOR/EDITMGR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
@@ -47,11 +48,7 @@
 #include <stdio.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(EditViewGeometry)
-    // The map view's 448x448 square at (16, 16).
-    EDIT_VIEW_LEFT   = 0x10,
-    EDIT_VIEW_TOP    = 0x10,
-    EDIT_VIEW_PIXELS = 0x1c0,
+H2_ENUM_BEGIN(EditScrollGeometry)
     // The scroll tracks and knobs (escroll.icn frames 0..3).
     EDIT_TRACK_LONG   = 0x1a0,
     EDIT_TRACK_SHORT  = 0x10,
@@ -65,20 +62,13 @@ H2_ENUM_BEGIN(EditViewGeometry)
     EDIT_SCROLL_VERTICAL_TRACK   = 1,
     EDIT_SCROLL_HORIZONTAL_KNOB  = 2,
     EDIT_SCROLL_VERTICAL_KNOB    = 3,
-    EDIT_CONTROL_HORIZONTAL_TRACK = 0xa,
-    EDIT_CONTROL_VERTICAL_TRACK   = 0xb,
-    EDIT_CONTROL_HORIZONTAL_KNOB  = 0xc,
-    EDIT_CONTROL_VERTICAL_KNOB    = 0xd,
-    // The view's scroll arrows (PickMap disables the up and down ones).
-    EDIT_CONTROL_SCROLL_UP        = 0xe,
-    EDIT_CONTROL_SCROLL_DOWN      = 0xf,
     // The map file requester: its position and its pattern buffers.
     EDIT_FILE_REQUESTER_X         = 0x83,
     EDIT_FILE_REQUESTER_Y         = 9,
     EDIT_FILE_PATTERN_SIZE        = 8,
     // A map the editor closes to (72x72, a medium map).
     EDIT_DEFAULT_MAP_SIZE = 0x48
-H2_ENUM_END(EditViewGeometry)
+H2_ENUM_END(EditScrollGeometry)
 
 H2_ENUM_BEGIN(EditRulerGeometry)
     // A ruler numbers every view cell, every second 16-pixel slot at the
@@ -142,9 +132,6 @@ H2_ENUM_BEGIN(EditCellDrawing)
     EDIT_CLIP_VIEW      = 0x1e0,
     EDIT_CLIP_SCREEN_W  = 0x280,
     EDIT_CLIP_SCREEN_H  = 0x1e0,
-    // An animated part's frame count is its icon entry's flags; the trigger
-    // 0xdf draws one frame fewer.
-    EDIT_TRIGGER_ONE_FRAME_LESS = 0xdf,
     // The layer passes: the high layer, the middle one, the ground layer.
     EDIT_LAYER_HIGH  = 2,
     EDIT_LAYER_MID   = 1,
@@ -161,13 +148,11 @@ H2_ENUM_BEGIN(EditKnobGeometry)
     EDIT_KNOB_FIRST       = 35,
     EDIT_KNOB_PARKED      = 231,
     EDIT_KNOB_SCALE_SPAN  = 402,
-    EDIT_CONTROL_SCROLL_LAST = 0x15,
+    EDIT_CONTROL_SCROLL_LAST = EDIT_CONTROL_SCROLL_DOWN_RIGHT,
     // ToggleZoom's view shifts keep the view centred.
     EDIT_ZOOM_SHIFT_SMALL = 7,
     EDIT_ZOOM_SHIFT_LARGE = 21,
-    EDIT_ZOOM_SHIFT_BACK  = 14,
-    // A ground cell's overlay-extra and hero-cursor flags.
-    EDIT_CELL_GROUND_KEEP = 0x9f
+    EDIT_ZOOM_SHIFT_BACK  = 14
 H2_ENUM_END(EditKnobGeometry)
 
 H2_ENUM_BEGIN(EditRadarDrag)
@@ -209,33 +194,6 @@ H2_ENUM_BEGIN(EditFileMenu)
     EDIT_MENU_HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
     EDIT_MENU_QUESTION_SIZE = 200
 H2_ENUM_END(EditFileMenu)
-
-H2_ENUM_BEGIN(EditPanelControl)
-    // The panel's widgets Main answers, besides the scroll bars and arrows
-    // and the tool buttons (EDIT_CONTROL_TOOL_FIRST + EditTool).
-    EDIT_CONTROL_SCROLL_RIGHT      = 0x10,
-    EDIT_CONTROL_SCROLL_LEFT       = 0x11,
-    EDIT_CONTROL_SCROLL_UP_LEFT    = 0x12,
-    EDIT_CONTROL_SCROLL_UP_RIGHT   = 0x13,
-    EDIT_CONTROL_SCROLL_DOWN_LEFT  = 0x14,
-    EDIT_CONTROL_SCROLL_DOWN_RIGHT = 0x15,
-    EDIT_CONTROL_RADAR             = 0x27,
-    EDIT_CONTROL_TERRAIN           = 0x65,
-    EDIT_CONTROL_OBJECT            = 0x66,
-    EDIT_CONTROL_DETAIL            = 0x67,
-    EDIT_CONTROL_STREAM            = 0x68,
-    EDIT_CONTROL_ROAD              = 0x69,
-    EDIT_CONTROL_ERASE             = 0x6a,
-    EDIT_CONTROL_ZOOM              = 0x6f,
-    EDIT_CONTROL_UNDO              = 0x70,
-    EDIT_CONTROL_NEW               = 0x71,
-    EDIT_CONTROL_SPECIFICATIONS    = 0x72,
-    EDIT_CONTROL_FILE              = 0x73,
-    EDIT_CONTROL_SYSTEM            = 0x74,
-    EDIT_CONTROL_LOAD              = 0x75,
-    EDIT_CONTROL_SAVE              = 0x76,
-    EDIT_CONTROL_QUIT              = 0x77
-H2_ENUM_END(EditPanelControl)
 
 H2_ENUM_BEGIN(EditPanelHelp)
     // gEditPanelHelp's rows for the right-clicked widget.
@@ -321,18 +279,58 @@ H2_ENUM_BEGIN(EditTriggerType)
     // monster).
     EDIT_TYPE_RANDOM_MONSTER   = 214,
     EDIT_TYPE_ABANDONED_MINE_A = 462,
-    EDIT_TYPE_ABANDONED_MINE_B = 662,
-    // The water ground shapes along a shore (giGroundShape), and the cell
-    // flags UpdateTriggers sets on them: any shore, and a straight shore.
-    EDIT_SHORE_SHAPE_A        = 1,
-    EDIT_SHORE_SHAPE_STRAIGHT = 2,
-    EDIT_SHORE_SHAPE_D        = 3,
-    EDIT_SHORE_SHAPE_E        = 4,
-    EDIT_SHORE_SHAPE_B        = 0x10,
-    EDIT_SHORE_SHAPE_C        = 0x11,
-    EDIT_CELL_SHORE           = 4,
-    EDIT_CELL_STRAIGHT_SHORE  = 0x10
+    EDIT_TYPE_ABANDONED_MINE_B = 662
 H2_ENUM_END(EditTriggerType)
+
+H2_ENUM_BEGIN(EditCellFlag)
+    // A cell's ground flags (mapCell::m_flags): the tile's flips, the water
+    // cells along a shore (an edge or corner shape) and those at a shore's
+    // outer corner.
+    EDIT_CELL_FLIP_VERTICAL   = 0x01,
+    EDIT_CELL_FLIP_HORIZONTAL = 0x02,
+    EDIT_CELL_SHORE           = 0x04,
+    EDIT_CELL_SHORE_CORNER    = 0x10,
+    // What a repainted cell keeps: everything but the overlay-extra and
+    // hero-cursor flags.
+    EDIT_CELL_GROUND_KEEP     = 0x9f
+H2_ENUM_END(EditCellFlag)
+
+H2_ENUM_BEGIN(EditGroundShape)
+    // giGroundShape: a terrain's plain tile, its border runs against water
+    // (the edges and corners take the cell's flip flags), the second edge
+    // runs and the decorated plain tiles.
+    EDIT_SHAPE_PLAIN              = 0,
+    EDIT_SHAPE_NORTH_EDGE         = 1,
+    EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
+    EDIT_SHAPE_EAST_EDGE          = 3,
+    EDIT_SHAPE_NORTH_EAST_INNER   = 4,
+    // The coast borders (water or beach on that side), the borders where a
+    // coast and another terrain meet, and an edge or corner with the coast
+    // beyond its corner.
+    EDIT_SHAPE_SHORE_NORTH_EDGE   = 5,
+    EDIT_SHAPE_SHORE_CORNER       = 6,
+    EDIT_SHAPE_SHORE_EAST_EDGE    = 7,
+    EDIT_SHAPE_SHORE_INNER        = 8,
+    EDIT_SHAPE_CORNER_SHORE_FAR   = 10,
+    EDIT_SHAPE_CORNER_SHORE_NEAR  = 11,
+    EDIT_SHAPE_NORTH_EDGE_SHORE   = 12,
+    EDIT_SHAPE_EAST_EDGE_SHORE    = 13,
+    EDIT_SHAPE_SHORE_EDGE_BORDER  = 14,
+    EDIT_SHAPE_SHORE_SIDE_BORDER  = 15,
+    EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
+    EDIT_SHAPE_EAST_EDGE_ALT      = 17,
+    EDIT_SHAPE_DECORATED_FIRST    = 18,
+    EDIT_SHAPE_DECORATED_SECOND   = 19,
+    EDIT_SHAPE_DECORATED_THIRD    = 20,
+    EDIT_SHAPE_DECORATED_FOURTH   = 21,
+    EDIT_SHAPE_COUNT              = 22,
+    // The shape without the varied-tile bit (GROUND_SHAPE_FLIPPED).
+    EDIT_SHAPE_MASK               = 0x7f,
+    // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
+    // each per terrain and shape.
+    EDIT_GROUND_VARIANTS          = 2,
+    EDIT_GROUND_TILES_PER_SHAPE   = 20
+H2_ENUM_END(EditGroundShape)
 
 H2_ENUM_BEGIN(EditMapFileName)
     // SaveMap and LoadMap: a path under .\maps, and a new map's file name
@@ -11207,7 +11205,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                                       m_objectIcons[gDrawCell->m_objectTileset][0],
                                       gDrawCell->m_objectIndex
                                   )->flags;
-                    if (gDrawCell->m_triggerType == EDIT_TRIGGER_ONE_FRAME_LESS)
+                    if (gDrawCell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN))
                         gDrawFrames--;
                     IconToBitmapScale(
                         m_objectIcons[gDrawCell->m_objectTileset][0],
@@ -11489,7 +11487,7 @@ void editManager::Scroll(i32 dx, i32 dy) {
 }
 
 VA(0x00405656, 0x189)
-void editManager::UpdateKnobs(i32 update) {
+void editManager::UpdateKnobs(b32 updateScreen) {
     double scaleX;
     double scaleY;
     i32 H2_UNUSED(xPos);
@@ -11509,7 +11507,7 @@ void editManager::UpdateKnobs(i32 update) {
             = m_viewY * (393.0 / ((MAP_HEIGHT + 1 - gZoomViewCells[m_zoomLevel]) - 1.0)) + 35.0;
     else
         m_verticalKnob->m_y = EDIT_KNOB_PARKED;
-    m_window->DrawWindow(update, EDIT_CONTROL_HORIZONTAL_TRACK, EDIT_CONTROL_SCROLL_LAST);
+    m_window->DrawWindow(updateScreen, EDIT_CONTROL_HORIZONTAL_TRACK, EDIT_CONTROL_SCROLL_LAST);
 }
 
 VA(0x004057df, 0xd6)
@@ -12261,20 +12259,20 @@ void editManager::UpdateTriggers(void) {
                 SetCoast(x, y);
             }
             if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
-                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_A
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_B
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_C
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_D
-                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_E))
+                && (giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EDGE
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EDGE_ALT
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_CORNER
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE_ALT
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE
+                    || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_INNER))
                 cell->m_flags |= EDIT_CELL_SHORE;
             else
                 cell->m_flags &= ~EDIT_CELL_SHORE;
             if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
-                && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHORE_SHAPE_STRAIGHT)
-                cell->m_flags |= EDIT_CELL_STRAIGHT_SHORE;
+                && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_CORNER)
+                cell->m_flags |= EDIT_CELL_SHORE_CORNER;
             else
-                cell->m_flags &= ~EDIT_CELL_STRAIGHT_SHORE;
+                cell->m_flags &= ~EDIT_CELL_SHORE_CORNER;
         }
     }
     lineType = gLineType;
@@ -12812,7 +12810,7 @@ void editManager::AddError(char* text) {
 // redrawn.
 VA(0x00409aa8, 0x29f)
 void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(mask),
-                            i32 allLayers, i32 filtered) {
+                            b32 allLayers, b32 filtered) {
     mapCellExtra* part;
     u16 nextIndex;
     i32 i;
@@ -12929,46 +12927,6 @@ H2_ENUM_BEGIN(EditNewMap)
     // A warning stays on the status bar for one and a half seconds.
     EDIT_STATUS_WARNING_MILLISECONDS = 1500
 H2_ENUM_END(EditNewMap)
-
-H2_ENUM_BEGIN(EditGroundShape)
-    // giGroundShape: a terrain's plain tile, its border runs against water
-    // (the edges and corners take the cell's flip flags), the second edge
-    // runs and the decorated plain tiles.
-    EDIT_SHAPE_PLAIN              = 0,
-    EDIT_SHAPE_NORTH_EDGE         = 1,
-    EDIT_SHAPE_NORTH_EAST_CORNER  = 2,
-    EDIT_SHAPE_EAST_EDGE          = 3,
-    EDIT_SHAPE_NORTH_EAST_INNER   = 4,
-    // The coast borders (water or beach on that side), the borders where a
-    // coast and another terrain meet, and an edge or corner with the coast
-    // beyond its corner.
-    EDIT_SHAPE_SHORE_NORTH_EDGE   = 5,
-    EDIT_SHAPE_SHORE_CORNER       = 6,
-    EDIT_SHAPE_SHORE_EAST_EDGE    = 7,
-    EDIT_SHAPE_SHORE_INNER        = 8,
-    EDIT_SHAPE_CORNER_SHORE_FAR   = 10,
-    EDIT_SHAPE_CORNER_SHORE_NEAR  = 11,
-    EDIT_SHAPE_NORTH_EDGE_SHORE   = 12,
-    EDIT_SHAPE_EAST_EDGE_SHORE    = 13,
-    EDIT_SHAPE_SHORE_EDGE_BORDER  = 14,
-    EDIT_SHAPE_SHORE_SIDE_BORDER  = 15,
-    EDIT_SHAPE_NORTH_EDGE_ALT     = 16,
-    EDIT_SHAPE_EAST_EDGE_ALT      = 17,
-    EDIT_SHAPE_DECORATED_FIRST    = 18,
-    EDIT_SHAPE_DECORATED_SECOND   = 19,
-    EDIT_SHAPE_DECORATED_THIRD    = 20,
-    EDIT_SHAPE_DECORATED_FOURTH   = 21,
-    EDIT_SHAPE_COUNT              = 22,
-    EDIT_SHAPE_MASK               = 0x7f,
-    // ChooseGroundTile's tile lists: plain and varied tiles, at most 20 of
-    // each per terrain and shape.
-    EDIT_GROUND_VARIANTS          = 2,
-    EDIT_GROUND_TILES_PER_SHAPE   = 20,
-    // A cell's ground flip flags (mapCell::m_flags).
-    EDIT_CELL_FLIP_VERTICAL       = 0x01,
-    EDIT_CELL_FLIP_HORIZONTAL     = 0x02,
-    EDIT_CELL_FLIP_CLEAR          = 0xfc
-H2_ENUM_END(EditGroundShape)
 
 VA(0x00409f0d, 0x258)
 void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
@@ -13575,7 +13533,7 @@ borders:
                         || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == TERRAIN_BEACH))
                     waterUpRight = true;
             }
-            cell->m_flags &= EDIT_CELL_FLIP_CLEAR;
+            cell->m_flags &= ~(EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL);
             if ((otherUpRight || otherUpLeft || otherDownRight || otherDownLeft || otherUp || otherDown || otherRight
                  || otherLeft)
                 && (waterUpRight || waterUpLeft || waterDownRight || waterDownLeft || waterUp || waterDown
