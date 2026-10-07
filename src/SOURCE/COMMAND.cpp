@@ -1148,10 +1148,10 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
         combatEnded = true;
         m_combatResult = CombatResultForSide(OppositeCombatSide(m_currentSide));
-    } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
+    } else if (m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0 || m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] != 0) {
         combatEnded = true;
         gbRetreatWin = true;
-        m_combatResult = m_sideRetreated[0] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
+        m_combatResult = m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
     }
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
@@ -1206,7 +1206,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     }
     switch (hexIndex) {
         case COMBAT_GRID_RIGHT_HERO_HEX:
-            if (m_heroes[1] != NULL) {
+            if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
                 if (m_currentSide == COMBAT_DEFENDER_SIDE)
                     command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                 else
@@ -1216,7 +1216,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
             }
             break;
         case COMBAT_GRID_LEFT_HERO_HEX:
-            if (m_heroes[0] != NULL) {
+            if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL) {
                 if (m_currentSide == COMBAT_ATTACKER_SIDE)
                     command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                 else
@@ -1336,13 +1336,13 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 ViewBallista(1);
             return 0;
         case COMBAT_GRID_RIGHT_HERO_HEX:
-            if (m_heroes[1] != NULL) {
+            if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
                 ViewGeneral(COMBAT_DEFENDER_SIDE, 0, 1);
                 ResetMouse();
             }
             return 0;
         case COMBAT_GRID_LEFT_HERO_HEX:
-            if (m_heroes[0] != NULL) {
+            if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL) {
                 ViewGeneral(COMBAT_ATTACKER_SIDE, 0, 1);
                 ResetMouse();
             }

@@ -2345,7 +2345,7 @@ void game::RandomizeEvents(void) {
                     cell->m_objectTileset = TILESET_NONE;
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     CreateBoat(xPosition, yPosition, 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
@@ -2363,7 +2363,7 @@ void game::RandomizeEvents(void) {
                     mapEvent->y = yPosition;
                     mapEvent->active = true;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectTileset = TILESET_NONE;
                     m_mapEvents.count++;
@@ -6702,7 +6702,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell->m_objectTileset = TILESET_NONE;
                             cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell->m_objectMetadata = 0;
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                         }
 
                         if (extra->hasCustomSkills) {
@@ -6815,7 +6815,7 @@ void game::CheckHeroConsistency(void) {
                 if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != mapX || boardHro->m_y != mapY) {
-                        cell->m_triggerType = 0;
+                        cell->m_triggerType = MAP_OBJECT_NONE;
                         cell->m_objectMetadata = 0;
                     }
                     if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
@@ -6834,12 +6834,12 @@ void game::CheckHeroConsistency(void) {
                                 1
                             );
                         } else {
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                             cell->m_objectMetadata = 0;
                         }
                     }
                 } else {
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                 }
             }
         }
@@ -7560,7 +7560,7 @@ void game::RestoreCell(
         cell = gpAdvManager->GetCell(x, y);
     if (y > 0 && objectType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
-        cell->m_triggerType = 0;
+        cell->m_triggerType = MAP_OBJECT_NONE;
         cell->m_objectMetadata = 0;
         return;
     }

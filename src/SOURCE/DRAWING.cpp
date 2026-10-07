@@ -1050,18 +1050,18 @@ void combatManager::DrawFrame(
     }
 
     for (row = DRAW_FIRST_LAYER; row < DRAW_LAYER_COUNT; row++) {
-        if (row == DRAW_RIGHT_HERO_LAYER && m_heroes[1] != NULL) {
+        if (row == DRAW_RIGHT_HERO_LAYER && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
-                ((m_heroes[1]->m_isCaptain ? -1 : 0)
+                ((m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
                     + COMBAT_HERO_RIGHT_X,
-                ((m_heroes[1]->m_isCaptain ? -1 : 0)
+                ((m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
                     + COMBAT_HERO_RIGHT_Y,
                 sCmbtHero[m_heroSpriteIndex[IDX(COMBAT_DEFENDER_SIDE)]]
                     .animationFrames[m_heroAnimationState[IDX(COMBAT_DEFENDER_SIDE)]]
                                     [m_heroAnimationFrame[IDX(COMBAT_DEFENDER_SIDE)]],
-                &m_heroLimits[1],
+                &m_heroLimits[IDX(COMBAT_DEFENDER_SIDE)],
                 ICON_DRAW_FLIPPED
             );
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
@@ -1073,14 +1073,14 @@ void combatManager::DrawFrame(
             );
         }
 
-        if (row == DRAW_LEFT_HERO_LAYER && m_heroes[0] != NULL) {
+        if (row == DRAW_LEFT_HERO_LAYER && m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL) {
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
                 sCmbtHero[m_heroSpriteIndex[IDX(COMBAT_ATTACKER_SIDE)]]
                     .animationFrames[m_heroAnimationState[IDX(COMBAT_ATTACKER_SIDE)]]
                                     [m_heroAnimationFrame[IDX(COMBAT_ATTACKER_SIDE)]],
-                &m_heroLimits[0],
+                &m_heroLimits[IDX(COMBAT_ATTACKER_SIDE)],
                 ICON_DRAW_NORMAL
             );
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(

@@ -1543,7 +1543,7 @@ void combatManager::ElementalStorm(void) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[whichSide] && m_heroes[whichSide]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
-                    damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                    damage = static_cast<i32l>(damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
                 }
                 stack->Damage(damage, SPELL_ELEMENTAL_STORM);
                 hit = true;
@@ -1618,7 +1618,7 @@ void combatManager::Armageddon(void) {
                     damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side] && m_heroes[side]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
-                    damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                    damage = static_cast<i32l>(damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
                 }
                 target->Damage(damage, SPELL_ARMAGEDDON);
                 anyAffected = true;
