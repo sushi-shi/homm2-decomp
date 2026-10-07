@@ -1,0 +1,11 @@
+# Highest differing byte count per region of the historical native link
+# against retail. Written by `python3 -m homm2.verify.link_diff --update`;
+# lower it when the residual shrinks, never raise it to admit a regression.
+region	bytes
+size	0
+headers	283
+.text	12542
+.rdata	0
+.data	2203
+.rsrc	0
+overlay	0

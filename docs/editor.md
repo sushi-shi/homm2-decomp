@@ -174,11 +174,11 @@ editor's. The editor's gates:
 | `vtables` | build gate: every vtable the editor's inventory names has a source marker (own or placed) |
 | `no-fake-labels`, `globals-data`, `globals-defined` | build gates: the editor's objects name only reviewed functions; every header extern the editor's own sources define carries its DATA claim (read from the editor's inventory, `.bss` spelling aliases resolved) and a definition. Game globals the shared headers declare but the editor never defines are not the editor's |
 | `check` | tier: no function below the maximum banked in `config/match_baseline.editor.tsv` |
-| `image-link-diff` | tier: pending until the editor links; the first `--update` banks `config/retail/editor/link_diff.tsv` and the gate holds it from then on |
+| `image-link-diff` | tier (and the editor's default build target): the historical link within `config/retail/editor/link_diff.tsv`; `HOMM2_IMAGE=editor python3 -m homm2.verify.link_diff --update` banks a lower count |
 | `strict-allocations`, `reloc-fields` | tier |
 
-The editor's link graph waits for a link that can resolve: every census
-function needs a source owner first (no `/FORCE`, no retail stand-ins).
+Every census function has a source owner, so the editor links without
+`/FORCE` or retail stand-ins; see [Link](#link).
 
 ## Open work
 
